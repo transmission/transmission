@@ -46,7 +46,7 @@ public:
      * @param when the current time in sec, such as from tr_time()
      * @param seconds how many seconds to count back through.
      */
-    constexpr SizeType count(time_t now, unsigned int age_sec) const
+    [[nodiscard]] constexpr SizeType count(time_t now, unsigned int age_sec) const
     {
         auto sum = SizeType{};
         time_t const oldest = now - age_sec;

@@ -80,7 +80,7 @@ size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error) cons
 #ifdef WITH_UTP
     if (is_utp())
     {
-        auto [data, datalen] = buf.pullup();
+        auto const [data, datalen] = buf.pullup();
 
         errno = 0;
         auto const n_written = utp_write(handle.utp, data, std::min(datalen, max));

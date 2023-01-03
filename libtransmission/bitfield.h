@@ -73,7 +73,7 @@ public:
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
-    [[nodiscard]] bool test(size_t bit) const
+    [[nodiscard]] TR_CONSTEXPR20 bool test(size_t bit) const
     {
         return hasAll() || (!hasNone() && testFlag(bit));
     }

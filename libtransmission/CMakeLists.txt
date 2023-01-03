@@ -207,18 +207,6 @@ tr_allow_compile_if(
         file-posix.cc
         subprocess-posix.cc)
 
-foreach(UT
-        ${EVENT2_UPSTREAM_TARGET}
-        ${NATPMP_UPSTREAM_TARGET}
-        ${MINIUPNPC_UPSTREAM_TARGET}
-        ${DHT_UPSTREAM_TARGET}
-        ${DEFLATE_UPSTREAM_TARGET}
-        ${UTP_UPSTREAM_TARGET}
-        ${PSL_UPSTREAM_TARGET}
-        ${B64_UPSTREAM_TARGET})
-    add_dependencies(${TR_NAME} ${UT})
-endforeach()
-
 target_compile_definitions(${TR_NAME}
     PRIVATE
         __TRANSMISSION__
@@ -231,10 +219,7 @@ target_compile_definitions(${TR_NAME}
         $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}> # API version macro was only added in 1.7
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
-        $<$<BOOL:${ICONV_FOUND}>:HAVE_ICONV>
-        $<$<BOOL:${ICONV_SECOND_ARGUMENT_IS_CONST}>:ICONV_SECOND_ARGUMENT_IS_CONST>
-        ${NATPMP_DEFINITIONS}
-        ${MINIUPNPC_DEFINITIONS}
+        $<$<BOOL:${Iconv_FOUND}>:HAVE_ICONV>
     PUBLIC
         $<$<NOT:$<BOOL:${ENABLE_NLS}>>:DISABLE_GETTEXT>)
 
@@ -274,52 +259,38 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
 
 target_include_directories(${TR_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}
     INTERFACE
-        ${CMAKE_BINARY_DIR})
-
-target_include_directories(${TR_NAME} SYSTEM
-    PRIVATE
-        ${WIDE_INTEGER_INCLUDE_DIRS}
-        ${UTFCPP_INCLUDE_DIRS}
-        ${DEFLATE_INCLUDE_DIRS}
-        ${FAST_FLOAT_INCLUDE_DIRS}
-        ${CRYPTO_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS}
-        ${PSL_INCLUDE_DIRS}
-        ${NATPMP_INCLUDE_DIRS}
-        ${MINIUPNPC_INCLUDE_DIRS}
-        ${DHT_INCLUDE_DIRS}
-        ${UTP_INCLUDE_DIRS}
-        ${B64_INCLUDE_DIRS}
-        $<$<BOOL:${ICONV_FOUND}>:${ICONV_INCLUDE_DIRS}>
-    PUBLIC
-        ${EVENT2_INCLUDE_DIRS}
-        ${LIBFMT_INCLUDE_DIRS})
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CMAKE_CURRENT_BINARY_DIR}/..)
 
 target_link_libraries(${TR_NAME}
     PRIVATE
-        ${CMAKE_THREAD_LIBS_INIT}
-        ${DEFLATE_LIBRARIES}
-        ${CRYPTO_LIBRARIES}
-        ${CURL_LIBRARIES}
-        ${EVENT2_LIBRARIES}
-        ${PSL_LIBRARIES}
-        ${NATPMP_LIBRARIES}
-        ${MINIUPNPC_LIBRARIES}
-        ${DHT_LIBRARIES}
-        ${UTP_LIBRARIES}
-        ${B64_LIBRARIES}
+        Threads::Threads
+        deflate::deflate
+        transmission::crypto_impl
+        CURL::libcurl
+        FastFloat::fast_float
+        psl::psl
+        natpmp::natpmp
+        miniupnpc::libminiupnpc
+        dht::dht
+        libutp::libutp
+        libb64::libb64
         ${LIBINTL_LIBRARY}
         ${LIBM_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
         jsonsl
+        utf8::cpp
         wildmat
-        $<$<BOOL:${ICONV_FOUND}>:${ICONV_LIBRARIES}>
+        WideInteger::WideInteger
+        $<$<BOOL:${ICONV_FOUND}>:Iconv::Iconv>
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
-        "$<$<BOOL:${APPLE}>:-framework Foundation>")
+        "$<$<BOOL:${APPLE}>:-framework Foundation>"
+    PUBLIC
+        fmt::fmt-header-only
+        libevent::event)
 
 if(INSTALL_LIB)
     install(

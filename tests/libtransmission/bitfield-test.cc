@@ -8,9 +8,9 @@
 #include <limits>
 #include <vector>
 
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "bitfield.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/bitfield.h>
 
 #include "gtest/gtest.h"
 

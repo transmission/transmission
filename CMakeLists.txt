@@ -193,10 +193,6 @@ endif()
 set(CMAKE_FOLDER "third-party")
 
 find_package(Fmt)
-add_definitions(
-    -DFMT_HEADER_ONLY
-    -DFMT_EXCEPTIONS=0)
-
 find_package(WideInteger)
 find_package(FastFloat)
 find_package(UtfCpp)
@@ -204,15 +200,16 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
-if(TARGET CURL::libcurl)
-    set(CURL_LIBRARIES CURL::libcurl)
-    set(CURL_INCLUDE_DIRS)
+if(NOT TARGET CURL::libcurl)
+    add_library(CURL::libcurl INTERFACE IMPORTED)
+    target_link_libraries(CURL::libcurl INTERFACE ${CURL_LIBRARIES})
+    target_include_directories(CURL::libcurl INTERFACE ${CURL_INCLUDE_DIRS})
 endif()
 
 if(NOT WIN32)
-    find_package(ICONV)
+    find_package(Iconv)
 else()
-    set(ICONV_FOUND OFF)
+    set(Iconv_FOUND OFF)
 endif()
 
 set(CRYPTO_PKG "")
@@ -259,6 +256,7 @@ if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "mbedtls")
         set(CRYPTO_LIBRARIES ${MBEDTLS_LIBRARIES})
     endif()
 endif()
+
 # We should have found the library by now
 if(CRYPTO_PKG STREQUAL "")
     if(WITH_CRYPTO STREQUAL "AUTO")
@@ -266,6 +264,16 @@ if(CRYPTO_PKG STREQUAL "")
     else()
         message(FATAL_ERROR "Requested crypto library '${WITH_CRYPTO}' is not supported.")
     endif()
+else()
+    add_library(transmission::crypto_impl INTERFACE IMPORTED)
+
+    target_include_directories(transmission::crypto_impl
+        INTERFACE
+            ${CRYPTO_INCLUDE_DIRS})
+
+    target_link_libraries(transmission::crypto_impl
+        INTERFACE
+            ${CRYPTO_LIBRARIES})
 endif()
 
 if(ENABLE_GTK)
@@ -304,6 +312,26 @@ if(ENABLE_GTK)
     endif()
 else()
     set(WITH_APPINDICATOR OFF)
+endif()
+
+if(GTK_FOUND)
+    add_library(transmission::gtk_impl INTERFACE IMPORTED)
+
+    target_compile_options(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_CFLAGS_OTHER})
+
+    target_include_directories(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_INCLUDE_DIRS})
+
+    target_link_directories(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_LIBRARY_DIRS})
+
+    target_link_libraries(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_LIBRARIES})
 endif()
 
 if(ENABLE_QT)
@@ -388,6 +416,14 @@ if(ENABLE_QT)
     tr_fixup_auto_option(ENABLE_QT QT_FOUND QT_IS_REQUIRED)
 endif()
 
+if(QT_FOUND)
+    add_library(transmission::qt_impl INTERFACE IMPORTED)
+
+    target_link_libraries(transmission::qt_impl
+        INTERFACE
+            ${QT_TARGETS})
+endif()
+
 if(ENABLE_MAC)
     tr_get_required_flag(ENABLE_MAC MAC_IS_REQUIRED)
 
@@ -405,12 +441,14 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-tr_add_external_auto_library(DEFLATE libdeflate deflate)
+tr_add_external_auto_library(DEFLATE libdeflate deflate
+    TARGET deflate::deflate)
 if(NOT USE_SYSTEM_DEFLATE)
     set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
 endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
+    TARGET libevent::event
     CMAKE_ARGS
         -DEVENT__DISABLE_OPENSSL:BOOL=ON
         -DEVENT__DISABLE_BENCHMARK:BOOL=ON
@@ -419,49 +457,51 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
-tr_add_external_auto_library(NATPMP libnatpmp natpmp)
+tr_add_external_auto_library(NATPMP libnatpmp natpmp
+    TARGET natpmp::natpmp)
 if(NOT USE_SYSTEM_NATPMP)
-    set(NATPMP_DEFINITIONS NATPMP_STATICLIB)
+    target_compile_definitions(natpmp::natpmp
+        INTERFACE
+            NATPMP_STATICLIB)
 endif()
 
 tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+    TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
         -DUPNPC_BUILD_TESTS=OFF)
-set(MINIUPNPC_DEFINITIONS SYSTEM_MINIUPNP)
 if(NOT USE_SYSTEM_MINIUPNPC)
-    list(APPEND MINIUPNPC_DEFINITIONS MINIUPNP_STATICLIB)
+    target_compile_definitions(miniupnpc::libminiupnpc
+        INTERFACE
+            MINIUPNP_STATICLIB)
+
     set(MINIUPNPC_VERSION 1.9)
     set(MINIUPNPC_API_VERSION 12)
 endif()
 
+target_compile_definitions(miniupnpc::libminiupnpc
+    INTERFACE
+        SYSTEM_MINIUPNP
+        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
+
 add_subdirectory(third-party/jsonsl)
 add_subdirectory(third-party/wildmat)
 
-tr_add_external_auto_library(DHT dht dht)
+tr_add_external_auto_library(DHT dht dht
+    TARGET dht::dht)
 
-tr_add_external_auto_library(PSL libpsl psl)
+tr_add_external_auto_library(PSL libpsl psl
+    TARGET psl::psl)
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp
+        TARGET libutp::libutp
         CMAKE_ARGS -DLIBUTP_BUILD_PROGRAMS=OFF)
-
-    if(UTP_UPSTREAM_TARGET)
-        # Use C++ linker for anything that depends on static libutp
-        # TODO: switch to imported targets for all the dependencies
-        add_library(UTP::UTP STATIC IMPORTED)
-        set_property(
-            TARGET UTP::UTP
-            PROPERTY IMPORTED_LOCATION "${UTP_LIBRARIES}")
-        set_property(
-            TARGET UTP::UTP
-            PROPERTY IMPORTED_LINK_INTERFACE_LANGUAGES "CXX")
-        set(UTP_LIBRARIES UTP::UTP)
-    endif()
 endif()
 
-tr_add_external_auto_library(B64 libb64 b64)
+tr_add_external_auto_library(B64 libb64 b64
+    TARGET libb64::libb64)
 
 if(WITH_INOTIFY)
     tr_get_required_flag(WITH_INOTIFY INOTIFY_IS_REQUIRED)

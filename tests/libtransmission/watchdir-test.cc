@@ -10,13 +10,13 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "file.h"
-#include "net.h"
-#include "watchdir.h"
-#include "watchdir-base.h"
-#include "timer-ev.h"
+#include <libtransmission/file.h>
+#include <libtransmission/net.h>
+#include <libtransmission/watchdir.h>
+#include <libtransmission/watchdir-base.h>
+#include <libtransmission/timer-ev.h>
 
 #include "test-fixtures.h"
 

@@ -8,10 +8,10 @@
 
 #include "gtest/gtest.h"
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "magnet-metainfo.h"
-#include "crypto-utils.h" // tr_rand_buffer()
+#include <libtransmission/magnet-metainfo.h>
+#include <libtransmission/crypto-utils.h> // tr_rand_buffer()
 
 using namespace std::literals;
 

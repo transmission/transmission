@@ -144,7 +144,7 @@ struct tau_scrape_request
         }
     }
 
-    [[nodiscard]] auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
         return created_at_ + TR_SCRAPE_TIMEOUT_SEC.count();
     }
@@ -230,8 +230,8 @@ struct tau_announce_request
             response.leechers = buf.toUint32();
             response.seeders = buf.toUint32();
 
-            auto const contiguous = std::vector<std::byte>{ std::begin(buf), std::end(buf) };
-            response.pex = tr_pex::from_compact_ipv4(std::data(contiguous), std::size(contiguous), nullptr, 0);
+            auto const [bytes, n_bytes] = buf.pullup();
+            response.pex = tr_pex::from_compact_ipv4(bytes, n_bytes, nullptr, 0);
             requestFinished();
         }
         else
@@ -241,7 +241,7 @@ struct tau_announce_request
         }
     }
 
-    [[nodiscard]] auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
         return created_at_ + TR_ANNOUNCE_TIMEOUT_SEC.count();
     }
@@ -383,8 +383,8 @@ struct tau_tracker
             buf.addUint32(TAU_ACTION_CONNECT);
             buf.addUint32(this->connection_transaction_id);
 
-            auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
-            this->sendto(std::data(contiguous), std::size(contiguous));
+            auto const [bytes, n_bytes] = buf.pullup();
+            this->sendto(bytes, n_bytes);
         }
 
         if (timeout_reqs)
@@ -544,8 +544,8 @@ private:
         buf.addUint64(this->connection_id);
         buf.add(payload, payload_len);
 
-        auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
-        this->sendto(std::data(contiguous), std::size(contiguous));
+        auto const [bytes, n_bytes] = buf.pullup();
+        this->sendto(bytes, n_bytes);
     }
 
 public:
