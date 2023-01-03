@@ -282,6 +282,7 @@
 		BE1183780CE161390002D0F3 /* libminiupnp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE1183480CE160960002D0F3 /* libminiupnp.a */; };
 		BE75C38A0C72A1ED00DBEFE0 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BE75C3490C729E9500DBEFE0 /* libevent.a */; };
 		BE7AA337F6752914B0C416B0 /* utils-ev.h in Headers */ = {isa = PBXBuildFile; fileRef = BE7AA337F6752914B0C416B1 /* utils-ev.h */; };
+		BE7AA337F6752914B0C416B2 /* utils-ev.cc in Sources */ = {isa = PBXBuildFile; fileRef = BE7AA337F6752914B0C416B3 /* utils-ev.cc */; };
 		BEFC1C050C07753500B0BB3C /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
 		BEFC1C1A0C07756200B0BB3C /* daemon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C0E0C07756200B0BB3C /* daemon.cc */; };
 		BEFC1D050C07825A00B0BB3C /* remote.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1C140C07756200B0BB3C /* remote.cc */; };
@@ -1080,6 +1081,7 @@
 		BE1183680CE160D50002D0F3 /* miniupnpc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = miniupnpc.c; sourceTree = "<group>"; };
 		BE75C3490C729E9500DBEFE0 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE7AA337F6752914B0C416B1 /* utils-ev.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "utils-ev.h"; sourceTree = "<group>"; };
+		BE7AA337F6752914B0C416B3 /* utils-ev.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "utils-ev.cc"; sourceTree = "<group>"; };
 		BEFC1C000C07750000B0BB3C /* transmission-daemon */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-daemon"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BEFC1C0E0C07756200B0BB3C /* daemon.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = daemon.cc; sourceTree = "<group>"; };
 		BEFC1C140C07756200B0BB3C /* remote.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = remote.cc; sourceTree = "<group>"; };
@@ -1784,6 +1786,7 @@
 				A24621360C769CF400088E81 /* session-thread.cc */,
 				A24621350C769CF400088E81 /* session-thread.h */,
 				BE7AA337F6752914B0C416B1 /* utils-ev.h */,
+				BE7AA337F6752914B0C416B3 /* utils-ev.cc */,
 				BEFC1DF40C07861A00B0BB3C /* port-forwarding-upnp.cc */,
 				BEFC1DF30C07861A00B0BB3C /* port-forwarding-upnp.h */,
 				BEFC1DF20C07861A00B0BB3C /* utils.cc */,
@@ -3023,6 +3026,7 @@
 				D9057D68C13B75636539B680 /* variant-converters.cc in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.cc in Sources */,
 				2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */,
+				BE7AA337F6752914B0C416B2 /* utils-ev.cc in Sources */,
 				A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */,
 				BEFC1E360C07861A00B0BB3C /* port-forwarding.cc in Sources */,
 				BEFC1E3C0C07861A00B0BB3C /* platform.cc in Sources */,
