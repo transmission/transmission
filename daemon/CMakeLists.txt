@@ -26,21 +26,15 @@ tr_target_compile_definitions_for_functions(${TR_NAME}-daemon
         daemon
         syslog)
 
-target_include_directories(${TR_NAME}-daemon
-    PRIVATE
-        ${CMAKE_SOURCE_DIR})
-
 target_include_directories(${TR_NAME}-daemon SYSTEM
     PRIVATE
-        ${LIBFMT_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS}
-        ${EVENT2_INCLUDE_DIRS}
         $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_INCLUDE_DIRS}>)
 
 target_link_libraries(${TR_NAME}-daemon
     PRIVATE
         ${TR_NAME}
-        ${EVENT2_LIBRARIES}
+        libevent::event
+        fmt::fmt-header-only
         $<$<BOOL:${WITH_SYSTEMD}>:${SYSTEMD_LIBRARIES}>)
 
 tr_win32_app_info(${TR_NAME}-daemon

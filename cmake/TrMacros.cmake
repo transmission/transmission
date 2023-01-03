@@ -129,6 +129,8 @@ function(tr_process_list_conditions VAR_PREFIX)
 endfunction()
 
 macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
+    cmake_parse_arguments(_TAEAL_ARG "" "TARGET" "CMAKE_ARGS" ${ARGN})
+
     if(USE_SYSTEM_${ID})
         tr_get_required_flag(USE_SYSTEM_${ID} SYSTEM_${ID}_IS_REQUIRED)
         find_package(${ID} ${${ID}_MINIMUM} ${SYSTEM_${ID}_IS_REQUIRED})
@@ -161,7 +163,6 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         ExternalProject_Add(
             ${${ID}_UPSTREAM_TARGET}
             URL "${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}"
-            ${ARGN}
             PREFIX "${${ID}_PREFIX}"
             CMAKE_ARGS
                 -Wno-dev # We don't want to be warned over unused variables
@@ -175,9 +176,29 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
                 "-DCMAKE_INSTALL_LIBDIR:STRING=lib"
                 ${${ID}_EXT_PROJ_CMAKE_ARGS}
+                ${_TAEAL_ARG_CMAKE_ARGS}
             BUILD_BYPRODUCTS "${${ID}_LIBRARY}")
 
         set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "third-party")
+
+        # Imported target (below) requires include directories to be present at configuration time
+        file(MAKE_DIRECTORY ${${ID}_INCLUDE_DIRS})
+    endif()
+
+    if(_TAEAL_ARG_TARGET)
+        add_library(${_TAEAL_ARG_TARGET} INTERFACE IMPORTED)
+
+        target_include_directories(${_TAEAL_ARG_TARGET}
+            INTERFACE
+                ${${ID}_INCLUDE_DIRS})
+
+        target_link_libraries(${_TAEAL_ARG_TARGET}
+            INTERFACE
+                ${${ID}_LIBRARIES})
+
+        if(${ID}_UPSTREAM_TARGET)
+            add_dependencies(${_TAEAL_ARG_TARGET} ${${ID}_UPSTREAM_TARGET})
+        endif()
     endif()
 endmacro()
 

@@ -43,7 +43,7 @@ struct tr_error;
 
 /* #define DISABLE_GETTEXT */
 #ifndef DISABLE_GETTEXT
-#if defined(_WIN32) || defined(TR_LIGHTWEIGHT)
+#if defined(_WIN32)
 #define DISABLE_GETTEXT
 #endif
 #endif

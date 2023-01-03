@@ -144,7 +144,7 @@ struct tau_scrape_request
         }
     }
 
-    [[nodiscard]] auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
         return created_at_ + TR_SCRAPE_TIMEOUT_SEC.count();
     }
@@ -241,7 +241,7 @@ struct tau_announce_request
         }
     }
 
-    [[nodiscard]] auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
         return created_at_ + TR_ANNOUNCE_TIMEOUT_SEC.count();
     }

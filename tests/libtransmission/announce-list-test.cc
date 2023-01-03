@@ -9,13 +9,13 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "announce-list.h"
-#include "error.h"
-#include "torrent-metainfo.h"
-#include "tr-strbuf.h"
-#include "variant.h"
+#include <libtransmission/announce-list.h>
+#include <libtransmission/error.h>
+#include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/variant.h>
 
 #include "test-fixtures.h"
 

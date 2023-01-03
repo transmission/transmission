@@ -20,12 +20,12 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h" // tr_rand_int()
-#include "platform.h"
-#include "tr-strbuf.h"
-#include "utils.h"
+#include <libtransmission/crypto-utils.h> // tr_rand_int()
+#include <libtransmission/platform.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 

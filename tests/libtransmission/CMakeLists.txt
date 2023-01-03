@@ -63,27 +63,17 @@ target_compile_definitions(libtransmission-test
         -DLIBTRANSMISSION_TEST_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
         __TRANSMISSION__)
 
-target_include_directories(libtransmission-test
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/libtransmission
-        ${CMAKE_BINARY_DIR}/libtransmission)
-
-target_include_directories(libtransmission-test SYSTEM
-    PRIVATE
-        ${LIBFMT_INCLUDE_DIRS}
-        ${WIDE_INTEGER_INCLUDE_DIRS}
-        ${B64_INCLUDE_DIRS}
-        ${CURL_INCLUDE_DIRS}
-        ${DHT_INCLUDE_DIRS}
-        ${EVENT2_INCLUDE_DIRS})
-
 target_compile_options(libtransmission-test
     PRIVATE $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>>:-Wno-sign-compare>) # patches welcomed
 
 target_link_libraries(libtransmission-test
     PRIVATE
         ${TR_NAME}
-        gtestall)
+        gtestall
+        dht::dht
+        fmt::fmt-header-only
+        libevent::event
+        WideInteger::WideInteger)
 
 add_test(
     NAME libtransmission-test

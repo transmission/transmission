@@ -5,13 +5,13 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "benc.h"
-#include "crypto-utils.h" // tr_rand_buffer(), tr_rand_int()
-#include "error.h"
-#include "variant-common.h"
-#include "variant.h"
+#include <libtransmission/benc.h>
+#include <libtransmission/crypto-utils.h> // tr_rand_buffer(), tr_rand_int()
+#include <libtransmission/error.h>
+#include <libtransmission/variant-common.h>
+#include <libtransmission/variant.h>
 
 #include <algorithm>
 #include <array>
