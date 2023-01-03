@@ -193,13 +193,9 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
 tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
 {
     TR_ASSERT(addr.is_valid());
+    TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP())
-    {
-        return {};
-    }
-
-    if (!addr.is_valid_for_peers(port))
+    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !addr.is_valid_for_peers(port))
     {
         return {};
     }
