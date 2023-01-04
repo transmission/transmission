@@ -144,8 +144,6 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 
 static tr_socket_t createSocket(int domain, int type)
 {
-    TR_ASSERT(session != nullptr);
-
     auto const sockfd = socket(domain, type, 0);
     if (sockfd == TR_BAD_SOCKET)
     {
