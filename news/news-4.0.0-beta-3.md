@@ -50,7 +50,7 @@
 
 ### transmission-show
 
-* FIxed `4.0.0-beta.2` regression that caused `transmission-show --scrape` to not exit cleanly. ([#4447](https://github.com/transmission/transmission/pull/4447))
+* Fixed `4.0.0-beta.2` regression that caused `transmission-show --scrape` to not exit cleanly. ([#4447](https://github.com/transmission/transmission/pull/4447))
 
 ### Everything Else
 
