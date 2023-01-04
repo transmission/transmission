@@ -1456,6 +1456,16 @@ void tr_torrentStartNow(tr_torrent* tor)
     }
 }
 
+void tr_torrentStartMagent(tr_torrent* tor)
+{
+    if (tr_isTorrent(tor))
+    {
+        tor->magnetStartAfterVerify = true;
+        tor->startAfterVerify = true;
+        torrentStart(tor, {});
+    }
+}
+
 static void onVerifyDoneThreadFunc(tr_torrent* const tor)
 {
     TR_ASSERT(tor->session->amInSessionThread());

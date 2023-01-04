@@ -304,9 +304,9 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
         tor->incompleteMetadata = nullptr;
         tor->isStopping = true;
         tor->magnetVerify = true;
-        if (!tor->session->shouldPauseAddedTorrents() && tor->startAfterVerify)
+        if (tor->session->shouldPauseAddedTorrents() && !tor->magnetStartAfterVerify)
         {
-            tor->startAfterVerify = true;
+            tor->startAfterVerify = false;
         }
         tor->markEdited();
     }
