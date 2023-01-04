@@ -9,7 +9,7 @@
 * Fixed out-of-order teardown bug that could cause a crash on shutdown. ([#4331](https://github.com/transmission/transmission/pull/4331), [#4348](https://github.com/transmission/transmission/pull/4348), [#4451](https://github.com/transmission/transmission/pull/4451))
 * Fixed `4.0.0-beta.1` bug that broke detection of a peer's UDP port in a peer handshake. ([#4334](https://github.com/transmission/transmission/pull/4334))
 * Fixed `4.0.0-beta.2` regression that broke port forwarding in some settings. ([#4343](https://github.com/transmission/transmission/pull/4343))
-* FIxed `4.0.0-beta.2` bitfield crash. ([#4346](https://github.com/transmission/transmission/pull/4346))
+* Fixed `4.0.0-beta.2` bitfield crash. ([#4346](https://github.com/transmission/transmission/pull/4346))
 * Fixed `4.0.0-beta.1` pattern matching in whitelist and host_whitelist. ([#4353](https://github.com/transmission/transmission/pull/4353))
 * Fixed `4.0.0-beta.2` crash when pausing a torrent. ([#4358](https://github.com/transmission/transmission/pull/4358))
 * Fixed `4.0.0-beta.2` IPv6 μTP socket binding regression. ([#4469](https://github.com/transmission/transmission/pull/4469))
