@@ -172,7 +172,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
     }
 
-    if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    if (!tr_net_hasIPv6(udp_port_))
+    {
+        // no IPv6; do nothing
+    }
+    else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         auto optval = int{ 1 };
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
@@ -235,9 +239,10 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     {
         errno = EAFNOSUPPORT;
     }
-    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock == TR_BAD_SOCKET)
+    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock != TR_BAD_SOCKET)
     {
-        errno = EBADF;
+        // don't warn on bad sockets; the system may not support IPv6
+        return;
     }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
     {
