@@ -36,7 +36,7 @@
 
 ### Qt Client
 
-* Fixed progress bars positioning in Qt client on Mac. ([#4489](https://github.com/transmission/transmission/pull/4489))
+* Fixed progress bars positioning on Mac. ([#4489](https://github.com/transmission/transmission/pull/4489))
 * Added Qt dependencies for Windows build instructions and minor fixes. ([#4363](https://github.com/transmission/transmission/pull/4363))
 * Updated Qt CMakeLists.txt to include support for building svg. ([#4437](https://github.com/transmission/transmission/pull/4437))
 
@@ -57,7 +57,7 @@
 
 ### Everything Else
 
-* Added windows build manual. ([#4291](https://github.com/transmission/transmission/pull/4291))
+* Added Windows build manual. ([#4291](https://github.com/transmission/transmission/pull/4291))
 * Removed Visual C++ redistributable libraries installation from the MSI package. ([#4339](https://github.com/transmission/transmission/pull/4339))
 * Removed obsolete 'lightweight' build option. ([#4509](https://github.com/transmission/transmission/pull/4509))
 
@@ -107,5 +107,5 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 * [@LaserEyess](https://github.com/LaserEyess):
   * Code review for [#4291](https://github.com/transmission/transmission/pull/4291)
 * [@Petrprogs (Peter)](https://github.com/Petrprogs):
-  * Added windows build manual. ([#4291](https://github.com/transmission/transmission/pull/4291))
+  * Added Windows build manual. ([#4291](https://github.com/transmission/transmission/pull/4291))
 
