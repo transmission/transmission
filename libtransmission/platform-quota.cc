@@ -474,7 +474,7 @@ tr_device_info tr_device_info_create(std::string_view path)
     out.path = path;
 #ifndef _WIN32
     out.device = getblkdev(out.path);
-    auto const* const fstype = getfstype(out.path.c_str());
+    auto const* const fstype = getfstype(out.path);
     out.fstype = fstype != nullptr ? fstype : "";
 #endif
     return out;
