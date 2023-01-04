@@ -496,25 +496,6 @@ public:
         return settings_.peer_limit_per_torrent;
     }
 
-    [[nodiscard]] constexpr bool incPeerCount() noexcept
-    {
-        if (this->peer_count_ >= this->peerLimit())
-        {
-            return false;
-        }
-
-        ++this->peer_count_;
-        return true;
-    }
-
-    constexpr void decPeerCount() noexcept
-    {
-        if (this->peer_count_ > 0)
-        {
-            --this->peer_count_;
-        }
-    }
-
     // bandwidth
 
     [[nodiscard]] tr_bandwidth& getBandwidthGroup(std::string_view name);
@@ -1058,8 +1039,6 @@ private:
     // e.g. if the public device is a router that chose to use a different
     // port than the one requested by Transmission.
     tr_port advertised_peer_port_;
-
-    uint16_t peer_count_ = 0;
 
     bool is_closing_ = false;
 

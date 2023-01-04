@@ -331,7 +331,7 @@ tr_session::BoundSocket::~BoundSocket()
 
     if (socket_ != TR_BAD_SOCKET)
     {
-        tr_netCloseSocket(socket_);
+        tr_net_close_socket(socket_);
         socket_ = TR_BAD_SOCKET;
     }
 }
