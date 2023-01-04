@@ -1174,7 +1174,7 @@
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Ustaw p_ołożenie…</translation>
+        <translation>Ustaw p&amp;ołożenie…</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1247,7 +1247,7 @@
         <location line="+733"/>
         <location line="+9"/>
         <source>Limited at %1</source>
-        <translation>Ograniczenie na %1</translation>
+        <translation>Ograniczenie do %1</translation>
     </message>
     <message>
         <location line="-687"/>

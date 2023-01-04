@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Omer I.S. <omeritzicschwartz@gmail.com>, 2022
+# עומר א״ש <omeritzicschwartz@gmail.com>, 2022
 # Avi Markovitz <avi.markovitz@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2022
@@ -2649,10 +2649,6 @@ msgstr[3] "ימים"
 
 #~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
 #~ msgstr "לא ניתן לאגד שקע IPv6 מחדש {address}: {error} ({error_code})"
-
-#~ msgctxt "Logging level"
-#~ msgid "Trace"
-#~ msgstr "מעקב קריאות"
 
 #~ msgid "Update Blocklist"
 #~ msgstr "עדכון רשימת חסימה"

@@ -2543,9 +2543,5 @@ msgstr[1] "egun"
 #~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
 #~ msgstr "Ezin izan da IPv6 socket-a {address} lotu: {error} ({error_code})"
 
-#~ msgctxt "Logging level"
-#~ msgid "Trace"
-#~ msgstr "Arrastoa"
-
 #~ msgid "Update Blocklist"
 #~ msgstr "Eguneratu blokeo-zerrenda"

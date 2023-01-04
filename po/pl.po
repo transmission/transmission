@@ -1566,7 +1566,7 @@ msgstr "_O programie"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr "_Porządkowanie torrentów"
+msgstr "_Sortowanie torrentów według"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -2670,10 +2670,6 @@ msgstr[3] "dni"
 
 #~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
 #~ msgstr "Nie można ponownie dowiązać gniazda IPv6 {address}: {error} ({error_code})"
-
-#~ msgctxt "Logging level"
-#~ msgid "Trace"
-#~ msgstr "Śledzenie"
 
 #~ msgid "Update Blocklist"
 #~ msgstr "Aktualizacja listy blokowania"

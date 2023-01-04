@@ -2527,9 +2527,5 @@ msgstr[0] "天"
 #~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
 #~ msgstr "无法重新绑定 IPv6 socket {address}：{error}（{error_code}）"
 
-#~ msgctxt "Logging level"
-#~ msgid "Trace"
-#~ msgstr "跟踪"
-
 #~ msgid "Update Blocklist"
 #~ msgstr "更新屏蔽列表"

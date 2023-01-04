@@ -5,8 +5,8 @@
 #
 # Translators:
 # MMP 0 <mmmmpp0@yahoo.co.jp>, 2022
-# maboroshin, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# maboroshin, 2022
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-04 21:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: maboroshin, 2022\n"
 "Language-Team: Japanese (https://www.transifex.com/transmissionbt/teams/33778/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -101,7 +101,7 @@ msgstr "Transmissionを {content_type} ハンドラーとして登録できま�
 
 #: ../gtk/Application.cc:550
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "終了シグナルを取得し、きれいなシャットダウンを試します。うまくいかなければ再度お試しください。"
 
 #: ../gtk/Application.cc:777
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -485,12 +485,12 @@ msgstr[0] "プロパティ― - {torrent_count:L} トレント"
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
+msgstr[0] "{count:L} 個のトレントを削除しますか？"
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
+msgstr[0] "これら{count:L}個のトレントのダウンロード済みファイルを削除します？"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -710,31 +710,31 @@ msgstr "時間"
 #: ../gtk/MessageLogWindow.cc:483
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "重大"
 
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "エラー"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "情報"
 
 #: ../gtk/MessageLogWindow.cc:487
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "デバッグ"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "以下用のプロキシを作成できません「{bus}」: {error} ({error_code})"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -774,15 +774,15 @@ msgstr "開く(_O)"
 
 #: ../gtk/OptionsDialog.cc:385
 msgid "Show options dialog"
-msgstr ""
+msgstr "オプションダイアログを表示"
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
-msgstr ""
+msgstr "ファイルを選択"
 
 #: ../gtk/PathButton.cc:202
 msgid "(None)"
-msgstr ""
+msgstr "(なし)"
 
 #: ../gtk/PrefsDialog.cc:306
 msgid "Allow encryption"
@@ -873,7 +873,7 @@ msgstr "デスクトップの休止状態を許可中"
 
 #: ../gtk/Session.cc:1216
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "タグ保留中のRPCリクエストが見つかりません"
 
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"
@@ -1115,11 +1115,11 @@ msgstr "トレントを開けません"
 
 #: ../gtk/Utils.cc:429
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "以下をゴミ箱へ移動できません「{path}」: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:537
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "開けません「{url}」"
 
 #: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:198 ../libtransmission/announcer.cc:232
 msgid "Unsupported URL: '{url}'"
@@ -1161,7 +1161,7 @@ msgstr "[トレントファイルか URL]"
 
 #: ../gtk/main.cc:107
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "「{program} --help」の実行で、コマンドラインのオプションの完全な一覧を表示します。\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1874,11 +1874,11 @@ msgstr "全体での最大ピア数(_O):"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1437 ../gtk/ui/gtk4/PrefsDialog.ui:994
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "ピア通信用の µTP を使用(_TP)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1441 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP はネットワークの混雑を緩和するツールです。"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1009
 msgid "Use PE_X to find more peers"
@@ -2101,7 +2101,7 @@ msgstr "この行を解析できません: 「{line}」"
 
 #: ../libtransmission/blocklist.cc:384
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "古いブロックリストのファイル形式を新しいものへ書き換え中"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:75 ../libtransmission/crypto-utils-mbedtls.cc:43 ../libtransmission/crypto-utils-openssl.cc:58 ../libtransmission/crypto-utils-wolfssl.cc:46
 msgid "{crypto_library} error: {error} ({error_code})"
@@ -2320,7 +2320,7 @@ msgstr "トレントファイルを移行「{old_path}」から「{path}」へ"
 
 #: ../libtransmission/torrent.cc:124
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "「{path}」からのメタ情報が使用できません。 「{magnet}」用のものです: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:432
 msgid "Seed ratio reached; pausing torrent"
@@ -2360,7 +2360,7 @@ msgstr "移動できません。「{old_path}」から「{path}」へ: {error} (
 
 #: ../libtransmission/tr-dht.cc:528
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "解析負荷「{filename}」の{line}行"
 
 #: ../libtransmission/tr-lpd.cc:259
 msgid "Couldn't initialize LPD: {error} ({error_code})"
@@ -2446,12 +2446,12 @@ msgstr "注: 無効な証明書では、多くのほかのエラーのように�
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
+msgstr[0] "{file_count:L} ファイル, {total_size}\n"
 
 #: ../utils/create.cc:232
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
+msgstr[0] "{piece_count:L} ピース, 各{piece_size}\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"

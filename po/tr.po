@@ -261,7 +261,7 @@ msgstr[1] "{file_count:L} dosyada {total_size}"
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] "({piece_size} boyutlu {piece_count} BitTorrent parçası)"
-msgstr[1] "({piece_size} boyutlu {piece_count} BitTorrrent parçası)"
+msgstr[1] "({piece_size} boyutlu {piece_count} BitTorrent parçası)"
 
 #: ../gtk/DetailsDialog.cc:933
 msgid "{current_size} ({percent_done}%)"
@@ -402,7 +402,7 @@ msgstr "Web Gönderimleri"
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 msgstr[0] "{time_span_ago} {markup_begin}{peer_count} eşin{markup_end} listesi alındı"
-msgstr[1] "{time_span_ago} {markup_begin}{peer_count} eşin{markup_end} listesini alındı"
+msgstr[1] "{time_span_ago} {markup_begin}{peer_count} eşin{markup_end} listesi alındı"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1835
@@ -2535,10 +2535,6 @@ msgstr[1] "gün"
 
 #~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
 #~ msgstr "{address} IPv6 yuvası yeniden sarılamadı: {error} ({error_code})"
-
-#~ msgctxt "Logging level"
-#~ msgid "Trace"
-#~ msgstr "İz"
 
 #~ msgid "Update Blocklist"
 #~ msgstr "Engel Listesini Güncelle"

@@ -2664,9 +2664,5 @@ msgstr[2] "días"
 #~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
 #~ msgstr "No se pudo reasociar «socket» IPv6  {address}: {error} ({error_code}) "
 
-#~ msgctxt "Logging level"
-#~ msgid "Trace"
-#~ msgstr "Traza"
-
 #~ msgid "Update Blocklist"
 #~ msgstr "Actualizar lista de bloqueo"

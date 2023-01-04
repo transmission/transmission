@@ -396,8 +396,8 @@ msgstr "Webbdistributioner"
 #: ../gtk/DetailsDialog.cc:1823
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] "Fick en lista över {markup_begin}{peer_count} jämlike{markup_end} för {time_span_ago}"
-msgstr[1] "Fick en lista över {markup_begin}{peer_count} jämlikar{markup_end} för {time_span_ago}"
+msgstr[0] "Mottog en lista med {markup_begin}{peer_count} jämlike{markup_end} för {time_span_ago}"
+msgstr[1] "Mottog en lista med {markup_begin}{peer_count} jämlikar{markup_end} för {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1835
@@ -1492,7 +1492,7 @@ msgstr "Skickat:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:116 ../gtk/ui/gtk3/StatsDialog.ui:117 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:69 ../gtk/ui/gtk4/StatsDialog.ui:54 ../gtk/ui/gtk4/StatsDialog.ui:172
 msgid "Downloaded:"
-msgstr "Hämtat:"
+msgstr "Mottagit:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:128 ../gtk/ui/gtk4/DetailsDialog.ui:79
 msgid "State:"
@@ -2530,10 +2530,6 @@ msgstr[1] "dagar"
 
 #~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
 #~ msgstr "Det gick inte att binda om IPv6-socketen {address}: {error} ({error_code})"
-
-#~ msgctxt "Logging level"
-#~ msgid "Trace"
-#~ msgstr "Spåra"
 
 #~ msgid "Update Blocklist"
 #~ msgstr "Uppdatera blocklista"

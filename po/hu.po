@@ -6,11 +6,11 @@
 # Translators:
 # gyeben <gyonkibendeguz@gmail.com>, 2017
 # Kristóf Korcsog <kristofkorcsog@gmail.com>, 2020
-# Balázs Meskó <meskobalazs@mailbox.org>, 2022
 # c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2022
 # Béla Bajza, 2022
-# Anon, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Balázs Meskó <meskobalazs@mailbox.org>, 2022
+# Anon, 2022
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-04 21:55+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Anon, 2022\n"
 "Language-Team: Hungarian (https://www.transifex.com/transmissionbt/teams/33778/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -105,7 +105,7 @@ msgstr "Nem sikerült a Transmission regisztrációja {content_type} tartalomtí
 
 #: ../gtk/Application.cc:550
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Befejezési szignál érkezett: %d; kísérlet a tiszta leállítására. Ha elakad, próbálja újra."
 
 #: ../gtk/Application.cc:777
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -528,14 +528,14 @@ msgstr[1] "Tulajdonságok - {torrent_count:L} torrent"
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Eltávolítja a torrentet?"
+msgstr[1] "Eltávolít {count:L} torrentet?"
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Törli a torrent letöltött fájljait?"
+msgstr[1] "Törli {count:L} torrent letöltött fájljait?"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -784,7 +784,7 @@ msgstr "Hibakeresés"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Nem sikerült a proxy létrehozása a következőhöz: '{bus}': {error} ({error_code})"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -924,7 +924,7 @@ msgstr "Számítógép hibernálásának engedélyezése"
 
 #: ../gtk/Session.cc:1216
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Nem található függőben lévő RPC kérés a {tag} címkéhez"
 
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"
@@ -1188,11 +1188,11 @@ msgstr "Nem sikerült megnyitni a torrentet"
 
 #: ../gtk/Utils.cc:429
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Nem sikerült '{old_path}' áthelyezése a kukába: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:537
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "'{url}' url nem nyitható meg"
 
 #: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:198 ../libtransmission/announcer.cc:232
 msgid "Unsupported URL: '{url}'"
@@ -1234,7 +1234,7 @@ msgstr "[torrent fájlok vagy webcímek]"
 
 #: ../gtk/main.cc:107
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "A parancssori kapcsolók teljes listájáért futtassa a '%s --help' parancsot.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -2390,7 +2390,7 @@ msgstr[1] "{count} torrent betöltve"
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] "A mágneslink metainformációi nem dolgozhatók fel: „{error}”. {piece_count} szelet újbóli letöltése."
-msgstr[1] "A magnet link meta információi nem dolgozhatók fel: \"{error}\". {piece_count} szelet újbóli letöltése"
+msgstr[1] "A magnet link meta információi nem dolgozhatók fel: '{error}'. {piece_count} szelet újbóli letöltése"
 
 #: ../libtransmission/torrent-metainfo.cc:678
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
@@ -2438,7 +2438,7 @@ msgstr "'{old_path}' áthelyezése nem sikerült ide: '{path}': {error} ({error_
 
 #: ../libtransmission/tr-dht.cc:528
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Nem sikerült '{filename}' sorának feldolgozása. Sor: '{line}'"
 
 #: ../libtransmission/tr-lpd.cc:259
 msgid "Couldn't initialize LPD: {error} ({error_code})"
@@ -2524,14 +2524,14 @@ msgstr "NB: az érvénytelen tanúsítványok (más hibákhoz hasonlóan) 'Nem s
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} fájl, {total_size}\n"
+msgstr[1] "{file_count:L} fájl, {total_size}\n"
 
 #: ../utils/create.cc:232
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} darab, {piece_size}-os szelet\n"
+msgstr[1] "{piece_count:L} darab, {piece_size}-os szelet\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2565,10 +2565,6 @@ msgstr[1] "nap"
 
 #~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
 #~ msgstr "Nem sikerült a {address} IPv6-foglalat újbóli lefoglalása: {error} ({error_code})"
-
-#~ msgctxt "Logging level"
-#~ msgid "Trace"
-#~ msgstr "Nyomkövetés"
 
 #~ msgid "Update Blocklist"
 #~ msgstr "Tiltólista frissítése"
