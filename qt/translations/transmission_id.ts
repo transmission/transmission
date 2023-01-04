@@ -1665,7 +1665,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         <translation>&amp;Pada hari:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+388"/>
+        <location filename="../PrefsDialog.cc" line="+382"/>
         <source>Every Day</source>
         <translation>Setiap Hari</translation>
     </message>
@@ -2399,7 +2399,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+173"/>
+        <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Transfer termagnetisasi - mengambil metadata (%1%)</translation>
