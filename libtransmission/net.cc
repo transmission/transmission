@@ -142,7 +142,7 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 #endif
 }
 
-static tr_socket_t createSocket(tr_session* session, int domain, int type)
+static tr_socket_t createSocket(int domain, int type)
 {
     TR_ASSERT(session != nullptr);
 
@@ -201,7 +201,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     }
 
     static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(session, Domains[addr.type], SOCK_STREAM);
+    auto const s = createSocket(Domains[addr.type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
