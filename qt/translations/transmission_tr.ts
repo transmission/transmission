@@ -1665,7 +1665,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>&amp;Şu günler:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+388"/>
+        <location filename="../PrefsDialog.cc" line="+382"/>
         <source>Every Day</source>
         <translation>Her Gün</translation>
     </message>
@@ -2399,7 +2399,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+173"/>
+        <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Mıknatıslı aktarım - üst veri alınıyor (%%1)</translation>

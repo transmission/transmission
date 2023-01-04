@@ -1691,7 +1691,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>W&#xa0;d&amp;niach:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+388"/>
+        <location filename="../PrefsDialog.cc" line="+382"/>
         <source>Every Day</source>
         <translation>Codziennie</translation>
     </message>
@@ -2439,7 +2439,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+173"/>
+        <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Przesyłanie magnet — pobieranie metadanych (%1%)</translation>

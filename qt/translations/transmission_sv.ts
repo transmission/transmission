@@ -1678,7 +1678,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>&amp;På dagar:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+388"/>
+        <location filename="../PrefsDialog.cc" line="+382"/>
         <source>Every Day</source>
         <translation>Varje dag</translation>
     </message>
@@ -2419,7 +2419,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+173"/>
+        <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Magnetöverföring - hämtar metadata (%1%)</translation>
