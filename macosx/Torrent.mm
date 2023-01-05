@@ -276,11 +276,11 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     [self startTransferIgnoringQueue:NO];
 }
 
-- (void)startMagentTransferAfterMetaDownload
+- (void)startMagnetTransferAfterMetaDownload
 {
     if ([self alertForRemainingDiskSpace])
     {
-        tr_torrentStartMagent(self.fHandle);
+        tr_torrentStartMagnet(self.fHandle);
         [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
