@@ -42,15 +42,17 @@
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())
 #define logtrace(interned, msg) tr_logAddTrace(msg, (interned).sv())
 
+namespace
+{
 using namespace std::literals;
 
 // size defined by bep15
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
-static constexpr auto TauConnectionTtlSecs = time_t{ 45 };
+constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
-static auto tau_transaction_new()
+auto tau_transaction_new()
 {
     return tr_rand_obj<tau_transaction_t>();
 }
@@ -64,9 +66,7 @@ enum tau_action_t
     TAU_ACTION_ERROR = 3
 };
 
-/****
-*****  SCRAPE
-****/
+/// SCRAPE
 
 struct tau_scrape_request
 {
@@ -162,9 +162,7 @@ private:
     tr_scrape_response_func on_response_;
 };
 
-/****
-*****  ANNOUNCE
-****/
+/// ANNOUNCE
 
 struct tau_announce_request
 {
@@ -287,9 +285,7 @@ private:
     tr_announce_response_func on_response_;
 };
 
-/****
-*****  TRACKER
-****/
+/// TRACKER
 
 struct tau_tracker
 {
@@ -573,9 +569,7 @@ private:
     static inline constexpr auto ConnectionRequestTtl = int{ 30 };
 };
 
-/****
-*****  SESSION
-****/
+/// SESSION
 
 class tr_announcer_udp_impl final : public tr_announcer_udp
 {
@@ -750,6 +744,8 @@ private:
 
     Mediator& mediator_;
 };
+
+} // namespace
 
 std::unique_ptr<tr_announcer_udp> tr_announcer_udp::create(Mediator& mediator)
 {

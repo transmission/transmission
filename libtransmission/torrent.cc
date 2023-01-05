@@ -401,10 +401,95 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
         difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idle_minutes * 60U;
 }
 
-static void torrentCallScript(tr_torrent const* tor, std::string const& script);
-
-static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
+namespace
 {
+namespace script_helpers
+{
+[[nodiscard]] std::string buildLabelsString(tr_torrent const* tor)
+{
+    auto buf = std::stringstream{};
+
+    for (auto it = std::begin(tor->labels), end = std::end(tor->labels); it != end;)
+    {
+        buf << tr_quark_get_string_view(*it);
+
+        if (++it != end)
+        {
+            buf << ',';
+        }
+    }
+
+    return buf.str();
+}
+
+[[nodiscard]] std::string buildTrackersString(tr_torrent const* tor)
+{
+    auto buf = std::stringstream{};
+
+    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
+    {
+        buf << tr_torrentTracker(tor, i).host;
+
+        if (++i < n)
+        {
+            buf << ',';
+        }
+    }
+
+    return buf.str();
+}
+
+void torrentCallScript(tr_torrent const* tor, std::string const& script)
+{
+    if (std::empty(script))
+    {
+        return;
+    }
+
+    auto torrent_dir = tr_pathbuf{ tor->currentDir() };
+    tr_sys_path_native_separators(std::data(torrent_dir));
+
+    auto const cmd = std::array<char const*, 2>{ script.c_str(), nullptr };
+
+    auto const id_str = std::to_string(tr_torrentId(tor));
+    auto const labels_str = buildLabelsString(tor);
+    auto const trackers_str = buildTrackersString(tor);
+    auto const bytes_downloaded_str = std::to_string(tor->downloadedCur + tor->downloadedPrev);
+
+    auto const env = std::map<std::string_view, std::string_view>{
+        { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
+        { "TR_TIME_LOCALTIME"sv, fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time())) },
+        { "TR_TORRENT_BYTES_DOWNLOADED"sv, bytes_downloaded_str },
+        { "TR_TORRENT_DIR"sv, torrent_dir.c_str() },
+        { "TR_TORRENT_HASH"sv, tor->infoHashString() },
+        { "TR_TORRENT_ID"sv, id_str },
+        { "TR_TORRENT_LABELS"sv, labels_str },
+        { "TR_TORRENT_NAME"sv, tr_torrentName(tor) },
+        { "TR_TORRENT_TRACKERS"sv, trackers_str },
+    };
+
+    tr_logAddInfoTor(tor, fmt::format(_("Calling script '{path}'"), fmt::arg("path", script)));
+
+    tr_error* error = nullptr;
+
+    if (!tr_spawn_async(std::data(cmd), env, TR_IF_WIN32("\\", "/"), &error))
+    {
+        tr_logAddWarnTor(
+            tor,
+            fmt::format(
+                _("Couldn't call script '{path}': {error} ({error_code})"),
+                fmt::arg("path", script),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+        tr_error_free(error);
+    }
+}
+} // namespace script_helpers
+
+void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
+{
+    using namespace script_helpers;
+
     auto const* session = tor->session;
 
     if (tr_sessionIsScriptEnabled(session, type))
@@ -413,9 +498,9 @@ static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
     }
 }
 
-/***
-****
-***/
+} // namespace
+
+///
 
 void tr_torrentCheckSeedLimit(tr_torrent* tor)
 {
@@ -1568,7 +1653,11 @@ void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func
 ***  Completeness
 **/
 
-static char const* getCompletionString(int type)
+namespace
+{
+namespace completeness_helpers
+{
+[[nodiscard]] constexpr char const* get_completion_string(int type)
 {
     switch (type)
     {
@@ -1587,89 +1676,13 @@ static char const* getCompletionString(int type)
         return "Incomplete";
     }
 }
-
-static std::string buildLabelsString(tr_torrent const* tor)
-{
-    auto buf = std::stringstream{};
-
-    for (auto it = std::begin(tor->labels), end = std::end(tor->labels); it != end;)
-    {
-        buf << tr_quark_get_string_view(*it);
-
-        if (++it != end)
-        {
-            buf << ',';
-        }
-    }
-
-    return buf.str();
-}
-
-static std::string buildTrackersString(tr_torrent const* tor)
-{
-    auto buf = std::stringstream{};
-
-    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
-    {
-        buf << tr_torrentTracker(tor, i).host;
-
-        if (++i < n)
-        {
-            buf << ',';
-        }
-    }
-
-    return buf.str();
-}
-
-static void torrentCallScript(tr_torrent const* tor, std::string const& script)
-{
-    if (std::empty(script))
-    {
-        return;
-    }
-
-    auto torrent_dir = tr_pathbuf{ tor->currentDir() };
-    tr_sys_path_native_separators(std::data(torrent_dir));
-
-    auto const cmd = std::array<char const*, 2>{ script.c_str(), nullptr };
-
-    auto const id_str = std::to_string(tr_torrentId(tor));
-    auto const labels_str = buildLabelsString(tor);
-    auto const trackers_str = buildTrackersString(tor);
-    auto const bytes_downloaded_str = std::to_string(tor->downloadedCur + tor->downloadedPrev);
-
-    auto const env = std::map<std::string_view, std::string_view>{
-        { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
-        { "TR_TIME_LOCALTIME"sv, fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time())) },
-        { "TR_TORRENT_BYTES_DOWNLOADED"sv, bytes_downloaded_str },
-        { "TR_TORRENT_DIR"sv, torrent_dir.c_str() },
-        { "TR_TORRENT_HASH"sv, tor->infoHashString() },
-        { "TR_TORRENT_ID"sv, id_str },
-        { "TR_TORRENT_LABELS"sv, labels_str },
-        { "TR_TORRENT_NAME"sv, tr_torrentName(tor) },
-        { "TR_TORRENT_TRACKERS"sv, trackers_str },
-    };
-
-    tr_logAddInfoTor(tor, fmt::format(_("Calling script '{path}'"), fmt::arg("path", script)));
-
-    tr_error* error = nullptr;
-
-    if (!tr_spawn_async(std::data(cmd), env, TR_IF_WIN32("\\", "/"), &error))
-    {
-        tr_logAddWarnTor(
-            tor,
-            fmt::format(
-                _("Couldn't call script '{path}': {error} ({error_code})"),
-                fmt::arg("path", script),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-        tr_error_free(error);
-    }
-}
+} // namespace completeness_helpers
+} // namespace
 
 void tr_torrent::recheckCompleteness()
 {
+    using namespace completeness_helpers;
+
     auto const lock = unique_lock();
 
     needs_completeness_check_ = false;
@@ -1688,8 +1701,8 @@ void tr_torrent::recheckCompleteness()
                 this,
                 fmt::format(
                     "State changed from {} to {}",
-                    getCompletionString(this->completeness),
-                    getCompletionString(completeness)));
+                    get_completion_string(this->completeness),
+                    get_completion_string(completeness)));
         }
 
         this->completeness = new_completeness;
@@ -2395,19 +2408,19 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
     }
 }
 
-/***
-****
-****  RENAME
-****
-***/
+/// RENAME
 
-static bool renameArgsAreValid(std::string_view oldpath, std::string_view newname)
+namespace
+{
+namespace rename_helpers
+{
+bool renameArgsAreValid(std::string_view oldpath, std::string_view newname)
 {
     return !std::empty(oldpath) && !std::empty(newname) && newname != "."sv && newname != ".."sv &&
         !tr_strvContains(newname, TR_PATH_DELIMITER);
 }
 
-static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
+auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
 {
     auto indices = std::vector<tr_file_index_t>{};
     auto const oldpath_as_dir = tr_pathbuf{ oldpath, '/' };
@@ -2425,7 +2438,7 @@ static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldp
     return indices;
 }
 
-static int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
+int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
 {
     int err = 0;
 
@@ -2468,11 +2481,7 @@ static int renamePath(tr_torrent const* tor, std::string_view oldpath, std::stri
     return err;
 }
 
-static void renameTorrentFileString(
-    tr_torrent* tor,
-    std::string_view oldpath,
-    std::string_view newname,
-    tr_file_index_t file_index)
+void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::string_view newname, tr_file_index_t file_index)
 {
     auto name = std::string{};
     auto const subpath = std::string_view{ tor->fileSubpath(file_index) };
@@ -2514,7 +2523,7 @@ static void renameTorrentFileString(
     }
 }
 
-static void torrentRenamePath(
+void torrentRenamePath(
     tr_torrent* const tor,
     std::string oldpath, // NOLINT performance-unnecessary-value-param
     std::string newname, // NOLINT performance-unnecessary-value-param
@@ -2522,10 +2531,6 @@ static void torrentRenamePath(
     void* const callback_user_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    /***
-    ****
-    ***/
 
     int error = 0;
 
@@ -2560,9 +2565,7 @@ static void torrentRenamePath(
         }
     }
 
-    /***
-    ****
-    ***/
+    ///
 
     tor->markChanged();
 
@@ -2573,12 +2576,17 @@ static void torrentRenamePath(
     }
 }
 
+} // namespace rename_helpers
+} // namespace
+
 void tr_torrent::renamePath(
     std::string_view oldpath,
     std::string_view newname,
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
+    using namespace rename_helpers;
+
     this->session->runInSessionThread(
         torrentRenamePath,
         this,
@@ -2600,6 +2608,8 @@ void tr_torrentRenamePath(
 
     tor->renamePath(oldpath, newname, callback, callback_user_data);
 }
+
+///
 
 void tr_torrentSetFilePriorities(
     tr_torrent* tor,
