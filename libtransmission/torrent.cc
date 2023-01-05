@@ -2395,19 +2395,19 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
     }
 }
 
-/***
-****
-****  RENAME
-****
-***/
+/// RENAME
 
-static bool renameArgsAreValid(std::string_view oldpath, std::string_view newname)
+namespace
+{
+namespace rename_helpers
+{
+bool renameArgsAreValid(std::string_view oldpath, std::string_view newname)
 {
     return !std::empty(oldpath) && !std::empty(newname) && newname != "."sv && newname != ".."sv &&
         !tr_strvContains(newname, TR_PATH_DELIMITER);
 }
 
-static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
+auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
 {
     auto indices = std::vector<tr_file_index_t>{};
     auto const oldpath_as_dir = tr_pathbuf{ oldpath, '/' };
@@ -2425,7 +2425,7 @@ static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldp
     return indices;
 }
 
-static int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
+int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
 {
     int err = 0;
 
@@ -2468,7 +2468,7 @@ static int renamePath(tr_torrent const* tor, std::string_view oldpath, std::stri
     return err;
 }
 
-static void renameTorrentFileString(
+void renameTorrentFileString(
     tr_torrent* tor,
     std::string_view oldpath,
     std::string_view newname,
@@ -2514,7 +2514,7 @@ static void renameTorrentFileString(
     }
 }
 
-static void torrentRenamePath(
+void torrentRenamePath(
     tr_torrent* const tor,
     std::string oldpath, // NOLINT performance-unnecessary-value-param
     std::string newname, // NOLINT performance-unnecessary-value-param
@@ -2522,10 +2522,6 @@ static void torrentRenamePath(
     void* const callback_user_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    /***
-    ****
-    ***/
 
     int error = 0;
 
@@ -2560,9 +2556,7 @@ static void torrentRenamePath(
         }
     }
 
-    /***
-    ****
-    ***/
+    ///
 
     tor->markChanged();
 
@@ -2573,12 +2567,17 @@ static void torrentRenamePath(
     }
 }
 
+} // namespace rename_helpers
+} // namespace
+
 void tr_torrent::renamePath(
     std::string_view oldpath,
     std::string_view newname,
     tr_torrent_rename_done_func callback,
     void* callback_user_data)
 {
+    using namespace rename_helpers;
+
     this->session->runInSessionThread(
         torrentRenamePath,
         this,
@@ -2600,6 +2599,8 @@ void tr_torrentRenamePath(
 
     tor->renamePath(oldpath, newname, callback, callback_user_data);
 }
+
+///
 
 void tr_torrentSetFilePriorities(
     tr_torrent* tor,
