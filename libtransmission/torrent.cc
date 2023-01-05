@@ -2468,11 +2468,7 @@ int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view
     return err;
 }
 
-void renameTorrentFileString(
-    tr_torrent* tor,
-    std::string_view oldpath,
-    std::string_view newname,
-    tr_file_index_t file_index)
+void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::string_view newname, tr_file_index_t file_index)
 {
     auto name = std::string{};
     auto const subpath = std::string_view{ tor->fileSubpath(file_index) };
