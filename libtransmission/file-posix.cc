@@ -97,7 +97,9 @@
 
 using namespace std::literals;
 
-static void set_system_error(tr_error** error, int code)
+namespace
+{
+void set_system_error(tr_error** error, int code)
 {
     if (error == nullptr)
     {
@@ -107,7 +109,7 @@ static void set_system_error(tr_error** error, int code)
     tr_error_set(error, code, tr_strerror(code));
 }
 
-static void set_system_error_if_file_found(tr_error** error, int code)
+void set_system_error_if_file_found(tr_error** error, int code)
 {
     if (code != ENOENT)
     {
@@ -115,7 +117,7 @@ static void set_system_error_if_file_found(tr_error** error, int code)
     }
 }
 
-static void set_file_for_single_pass(tr_sys_file_t handle)
+void set_file_for_single_pass(tr_sys_file_t handle)
 {
     /* Set hints about the lookahead buffer and caching. It's okay
        for these to fail silently, so don't let them affect errno */
@@ -142,6 +144,7 @@ static void set_file_for_single_pass(tr_sys_file_t handle)
 
     errno = err;
 }
+} // namespace
 
 bool tr_sys_path_exists(char const* path, tr_error** error)
 {

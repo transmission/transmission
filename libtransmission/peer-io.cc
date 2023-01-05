@@ -91,6 +91,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     bool is_seed,
     bool utp)
 {
+    TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
@@ -166,7 +167,7 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
 void tr_peerIo::close()
 {
-    socket_.close(session_);
+    socket_.close();
     event_write_.reset();
     event_read_.reset();
 }
@@ -188,6 +189,11 @@ bool tr_peerIo::reconnect()
     event_disable(EV_READ | EV_WRITE);
 
     close();
+
+    if (tr_peer_socket::limit_reached(session_))
+    {
+        return false;
+    }
 
     auto const [addr, port] = socket_address();
     socket_ = tr_netOpenPeerSocket(session_, addr, port, is_seed());

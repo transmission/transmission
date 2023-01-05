@@ -382,7 +382,7 @@
     <message>
         <location line="+26"/>
         <source>Downloaded:</source>
-        <translation>Hämtat:</translation>
+        <translation>Mottagit:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -1678,7 +1678,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>&amp;På dagar:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+388"/>
+        <location filename="../PrefsDialog.cc" line="+382"/>
         <source>Every Day</source>
         <translation>Varje dag</translation>
     </message>
@@ -2330,7 +2330,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="-82"/>
         <location line="+96"/>
         <source>Downloaded:</source>
-        <translation>Hämtat:</translation>
+        <translation>Mottagit:</translation>
     </message>
     <message>
         <location line="-82"/>
@@ -2419,7 +2419,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+173"/>
+        <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Magnetöverföring - hämtar metadata (%1%)</translation>
@@ -2540,8 +2540,8 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>Fick en lista på%1 %Ln jämlike%2 för %3 sedan</numerusform>
-            <numerusform>Fick en lista på%1 %Ln jämlikar%2 för %3 sedan</numerusform>
+            <numerusform>Mottog en lista med%1 %Ln jämlike%2 för %3 sedan</numerusform>
+            <numerusform>Mottog en lista med%1 %Ln jämlikar%2 för %3 sedan</numerusform>
         </translation>
     </message>
     <message>

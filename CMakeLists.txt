@@ -80,7 +80,7 @@ set(TR_NAME ${PROJECT_NAME})
 set(TR_VERSION_MAJOR "4")
 set(TR_VERSION_MINOR "0")
 set(TR_VERSION_PATCH "0")
-set(TR_VERSION_BETA_NUMBER "2") # empty string for not beta
+set(TR_VERSION_BETA_NUMBER "3") # empty string for not beta
 set(TR_VERSION_DEV TRUE)
 
 # derived from above: release type
@@ -696,7 +696,7 @@ endif()
 
 if(RUN_CLANG_TIDY)
     message(STATUS "Looking for clang-tidy")
-    find_program(CLANG_TIDY clang-tidy-15 clang-tidy)
+    find_program(CLANG_TIDY clang-tidy)
     if(CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
         message(STATUS "Looking for clang-tidy - not found")
     else()

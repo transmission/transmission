@@ -159,7 +159,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
-            tr_netCloseSocket(sock);
+            tr_net_close_socket(sock);
         }
         else
         {
@@ -193,7 +193,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
-            tr_netCloseSocket(sock);
+            tr_net_close_socket(sock);
         }
         else
         {
@@ -220,7 +220,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
     if (udp6_socket_ != TR_BAD_SOCKET)
     {
-        tr_netCloseSocket(udp6_socket_);
+        tr_net_close_socket(udp6_socket_);
         udp6_socket_ = TR_BAD_SOCKET;
     }
 
@@ -228,7 +228,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
     if (udp4_socket_ != TR_BAD_SOCKET)
     {
-        tr_netCloseSocket(udp4_socket_);
+        tr_net_close_socket(udp4_socket_);
         udp4_socket_ = TR_BAD_SOCKET;
     }
 }
@@ -239,7 +239,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     {
         errno = EAFNOSUPPORT;
     }
-    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock != TR_BAD_SOCKET)
+    else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock == TR_BAD_SOCKET)
     {
         // don't warn on bad sockets; the system may not support IPv6
         return;
