@@ -138,11 +138,11 @@ auto constexpr PrefetchMax = size_t{ 18 };
 // meet our bandwidth goals for the next N seconds
 auto constexpr RequestBufSecs = int{ 10 };
 
-///
+// ---
 
 auto constexpr MaxPexPeerCount = size_t{ 50 };
 
-///
+// ---
 
 enum class AwaitingBt
 {
@@ -159,7 +159,7 @@ enum class EncryptionPreference
     No
 };
 
-///
+// ---
 
 struct peer_request
 {
@@ -179,7 +179,7 @@ peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
     return peer_request{ loc.piece, loc.piece_offset, tor->blockSize(block) };
 }
 
-///
+// ---
 
 /* this is raw, unchanged data from the peer regarding
  * the current message that it's sending us. */
@@ -804,7 +804,7 @@ void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
 }
 
-/// INTEREST
+// --- INTEREST
 
 void sendInterest(tr_peerMsgsImpl* msgs, bool b)
 {
@@ -846,7 +846,7 @@ void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
     msgs->peer_requested_.clear();
 }
 
-///
+// ---
 
 void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
@@ -1856,7 +1856,7 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     return ret;
 }
 
-///
+// ---
 
 void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 {

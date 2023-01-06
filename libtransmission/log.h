@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-///
+// ---
 
 enum tr_log_level
 {
@@ -42,7 +42,7 @@ enum tr_log_level
 
 std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key);
 
-///
+// ---
 
 struct tr_log_message
 {
@@ -65,7 +65,7 @@ struct tr_log_message
     struct tr_log_message* next;
 };
 
-////
+// ---
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 
@@ -77,7 +77,7 @@ void tr_logSetQueueEnabled(bool is_enabled);
 
 void tr_logFreeQueue(tr_log_message* freeme);
 
-////
+// ---
 
 void tr_logSetLevel(tr_log_level);
 
@@ -85,7 +85,7 @@ void tr_logSetLevel(tr_log_level);
 
 [[nodiscard]] bool tr_logLevelIsActive(tr_log_level level);
 
-////
+// ---
 
 void tr_logAddMessage(
     char const* source_file,
@@ -110,6 +110,6 @@ void tr_logAddMessage(
 #define tr_logAddDebug(...) tr_logAddLevel(TR_LOG_DEBUG, __VA_ARGS__)
 #define tr_logAddTrace(...) tr_logAddLevel(TR_LOG_TRACE, __VA_ARGS__)
 
-////
+// ---
 
 char* tr_logGetTimeStr(char* buf, size_t buflen);

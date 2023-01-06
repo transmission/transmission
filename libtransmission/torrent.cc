@@ -500,7 +500,7 @@ void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 
 } // namespace
 
-///
+// ---
 
 void tr_torrentCheckSeedLimit(tr_torrent* tor)
 {
@@ -2024,7 +2024,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
     return bytes_left;
 }
 
-///
+// ---
 
 static void setLocationInSessionThread(
     tr_torrent* tor,
@@ -2114,7 +2114,7 @@ void tr_torrentSetLocation(
     tor->setLocation(location, move_from_old_path, setme_progress, setme_state);
 }
 
-///
+// ---
 
 std::string_view tr_torrent::primaryMimeType() const
 {
@@ -2408,7 +2408,7 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
     }
 }
 
-/// RENAME
+// --- RENAME
 
 namespace
 {
@@ -2609,7 +2609,7 @@ void tr_torrentRenamePath(
     tor->renamePath(oldpath, newname, callback, callback_user_data);
 }
 
-///
+// ---
 
 void tr_torrentSetFilePriorities(
     tr_torrent* tor,

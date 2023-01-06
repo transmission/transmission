@@ -140,7 +140,7 @@ tr_peerIo::~tr_peerIo()
     close();
 }
 
-///
+// ---
 
 void tr_peerIo::set_socket(tr_peer_socket socket_in)
 {
@@ -211,7 +211,7 @@ bool tr_peerIo::reconnect()
     return true;
 }
 
-///
+// ---
 
 // Helps us to ignore errors that say "try again later"
 // since that's what peer-io does by default anyway.
@@ -220,7 +220,7 @@ bool tr_peerIo::reconnect()
     return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
 }
 
-///
+// ---
 
 void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 {
@@ -314,7 +314,7 @@ void tr_peerIo::event_write_cb([[maybe_unused]] evutil_socket_t fd, short /*even
     io->try_write(SIZE_MAX);
 }
 
-///
+// ---
 
 void tr_peerIo::can_read_wrapper()
 {
@@ -439,7 +439,7 @@ void tr_peerIo::event_read_cb([[maybe_unused]] evutil_socket_t fd, short /*event
     io->try_read(n_left);
 }
 
-///
+// ---
 
 void tr_peerIo::event_enable(short event)
 {
@@ -547,7 +547,7 @@ size_t tr_peerIo::flush_outgoing_protocol_msgs()
     return flush(TR_UP, byte_count);
 }
 
-///
+// ---
 
 static size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
 {
@@ -594,7 +594,7 @@ void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_dat
     outbuf_info_.emplace_back(n_bytes, is_piece_data);
 }
 
-///
+// ---
 
 void tr_peerIo::read_bytes(void* bytes, size_t byte_count)
 {
@@ -634,7 +634,7 @@ void tr_peerIo::read_buffer_drain(size_t byte_count)
     }
 }
 
-/// UTP
+// --- UTP
 
 #ifdef WITH_UTP
 

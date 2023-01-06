@@ -34,7 +34,7 @@ namespace
 {
 constexpr int MaxRememberedPeers = 200;
 
-///
+// ---
 
 void savePeers(tr_variant* dict, tr_torrent const* tor)
 {
@@ -82,7 +82,7 @@ auto loadPeers(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+// ---
 
 void saveLabels(tr_variant* dict, tr_torrent const* tor)
 {
@@ -118,7 +118,7 @@ auto loadLabels(tr_variant* dict, tr_torrent* tor)
     return tr_resume::Labels;
 }
 
-///
+// ---
 
 void saveGroup(tr_variant* dict, tr_torrent const* tor)
 {
@@ -136,7 +136,7 @@ auto loadGroup(tr_variant* dict, tr_torrent* tor)
     return tr_resume::fields_t{};
 }
 
-///
+// ---
 
 void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
@@ -193,7 +193,7 @@ auto loadDND(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+// ---
 
 void saveFilePriorities(tr_variant* dict, tr_torrent const* tor)
 {
@@ -229,7 +229,7 @@ auto loadFilePriorities(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+// ---
 
 void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direction dir)
 {
@@ -344,7 +344,7 @@ auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+// ---
 
 void saveName(tr_variant* dict, tr_torrent const* tor)
 {
@@ -373,7 +373,7 @@ auto loadName(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+// ---
 
 void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 {
@@ -410,7 +410,7 @@ auto loadFilenames(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+// ---
 
 void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
 {
@@ -619,7 +619,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
     return tr_resume::fields_t{};
 }
 
-///
+// ---
 
 auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did_migrate_filename)
 {

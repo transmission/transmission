@@ -107,7 +107,7 @@ tr_tracker_view tr_announcerTracker(tr_torrent const* torrent, size_t nth);
 
 size_t tr_announcerTrackerCount(tr_torrent const* tor);
 
-/// ANNOUNCE
+// --- ANNOUNCE
 
 enum tr_announce_event
 {
@@ -126,7 +126,7 @@ struct tr_announce_response;
 struct tr_scrape_request;
 struct tr_scrape_response;
 
-/// UDP ANNOUNCER
+// --- UDP ANNOUNCER
 
 using tr_scrape_response_func = std::function<void(tr_scrape_response const&)>;
 using tr_announce_response_func = std::function<void(tr_announce_response const&)>;

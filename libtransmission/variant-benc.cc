@@ -28,7 +28,7 @@ using namespace std::literals;
 
 auto constexpr MaxBencStrLength = size_t{ 128 * 1024 * 1024 }; // arbitrary
 
-///
+// ---
 
 namespace transmission::benc::impl
 {
@@ -123,7 +123,7 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
 } // namespace transmission::benc::impl
 
-///
+// ---
 
 namespace
 {
@@ -271,7 +271,7 @@ bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc,
     return transmission::benc::parse(benc, stack, handler, setme_end, error) && std::empty(stack);
 }
 
-///
+// ---
 
 namespace
 {

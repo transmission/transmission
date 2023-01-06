@@ -184,7 +184,7 @@ tr_peer_id_t tr_peerIdInit()
     return peer_id;
 }
 
-///
+// ---
 
 std::vector<tr_torrent_id_t> tr_session::DhtMediator::torrentsAllowingDHT() const
 {
@@ -221,7 +221,7 @@ void tr_session::DhtMediator::addPex(tr_sha1_digest_t const& info_hash, tr_pex c
     }
 }
 
-///
+// ---
 
 bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_address address, tr_port port)
 {
@@ -2071,7 +2071,7 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
     return max - active_count;
 }
 
-///
+// ---
 
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
 {
@@ -2085,7 +2085,7 @@ void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noe
     openFiles().closeFile(tor->id(), file_num);
 }
 
-///
+// ---
 
 void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data)
 {

@@ -502,7 +502,7 @@ std::optional<tr_address> tr_globalIPv6()
     return cache_val;
 }
 
-///
+// ---
 
 namespace is_valid_for_peers_helpers
 {
@@ -553,7 +553,7 @@ bool tr_address::is_valid_for_peers(tr_port port) const noexcept
         !is_martian_addr(*this);
 }
 
-/// tr_port
+// --- tr_port
 
 std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compact) noexcept
 {
@@ -567,7 +567,7 @@ std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compa
     return std::make_pair(tr_port::fromNetwork(nport), compact);
 }
 
-/// tr_address
+// --- tr_address
 
 std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 {

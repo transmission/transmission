@@ -111,7 +111,7 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** error)
 
 } // unnamed namespace
 
-///
+// ---
 
 std::optional<tr_sys_file_t> tr_open_files::get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable)
 {
