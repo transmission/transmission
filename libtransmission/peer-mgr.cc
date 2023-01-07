@@ -64,8 +64,6 @@ static auto constexpr CancelHistorySec = int{ 60 };
 ***
 **/
 
-static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr);
-
 class HandshakeMediator final : public tr_handshake::Mediator
 {
 private:
@@ -118,11 +116,7 @@ public:
         }
     }
 
-    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const override
-    {
-        auto const* const tor = session_.torrents().get(tor_id);
-        return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
-    }
+    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const override;
 
     [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
     {
@@ -482,14 +476,28 @@ public:
         pool_is_all_seeds_.reset();
     }
 
-    [[nodiscard]] peer_atom* get_existing_atom(tr_address const& addr)
+    [[nodiscard]] peer_atom* get_existing_atom(tr_address const& addr) noexcept
     {
-        auto const test = [&addr](auto const& atom)
-        {
-            return atom.addr == addr;
-        };
-        auto const it = std::find_if(std::begin(pool), std::end(pool), test);
-        return it != std::end(pool) ? &*it : nullptr;
+        auto const iter = std::find_if(
+            std::begin(pool),
+            std::end(pool),
+            [&addr](auto const& atom) { return atom.addr == addr; });
+        return iter != std::end(pool) ? &*iter : nullptr;
+    }
+
+    [[nodiscard]] peer_atom const* get_existing_atom(tr_address const& addr) const noexcept
+    {
+        auto const iter = std::find_if(
+            std::begin(pool),
+            std::end(pool),
+            [&addr](auto const& atom) { return atom.addr == addr; });
+        return iter != std::end(pool) ? &*iter : nullptr;
+    }
+
+    [[nodiscard]] bool peer_is_a_seed(tr_address const& addr) const noexcept
+    {
+        auto const* const atom = get_existing_atom(addr);
+        return atom != nullptr && atom->isSeed();
     }
 
     peer_atom* ensure_atom_exists(tr_address const& addr, tr_port const port, uint8_t const flags, uint8_t const from)
@@ -706,16 +714,6 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 /***
 ****
 ***/
-
-static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
-{
-    if (auto const* atom = tor->swarm->get_existing_atom(addr); atom != nullptr)
-    {
-        return atom->isSeed();
-    }
-
-    return false;
-}
 
 void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr)
 {
@@ -1299,7 +1297,7 @@ struct CompareAtomsByUsefulness
         return false;
     }
 
-    if (peerIsInUse(tor->swarm, &atom))
+    if (tor->swarm->peer_is_in_use(atom))
     {
         return true;
     }
@@ -2466,7 +2464,7 @@ namespace
     }
 
     // not if we've already got a connection to them...
-    if (tor->swarm->peer_is_in_use(&atom))
+    if (tor->swarm->peer_is_in_use(atom))
     {
         return false;
     }
@@ -2708,4 +2706,12 @@ void tr_peerMgr::makeNewPeerConnections(size_t max)
     {
         initiateConnection(this, candidate.tor->swarm, *candidate.atom);
     }
+}
+
+// ---
+
+bool HandshakeMediator::is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const
+{
+    auto const* const tor = session_.torrents().get(tor_id);
+    return tor != nullptr && tor->swarm != nullptr && tor->swarm->peer_is_a_seed(addr);
 }
