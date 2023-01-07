@@ -343,6 +343,8 @@ public:
         TR_ASSERT(std::empty(peers));
     }
 
+    [[nodiscard]] bool peer_is_in_use(peer_atom const& atom) const;
+
     void cancelOldRequests()
     {
         auto const now = tr_time();
@@ -673,12 +675,6 @@ tr_peer::~tr_peer()
 /**
 ***
 **/
-
-static TR_CONSTEXPR20 bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
-{
-    return atom->is_connected || swarm->outgoing_handshakes.count(atom->addr) != 0U ||
-        swarm->manager->incoming_handshakes.count(atom->addr) != 0U;
-}
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
@@ -2443,6 +2439,12 @@ void tr_peerMgr::bandwidthPulse()
 ****
 ***/
 
+bool tr_swarm::peer_is_in_use(peer_atom const& atom) const
+{
+    return atom.is_connected || outgoing_handshakes.count(atom.addr) != 0U ||
+        manager->incoming_handshakes.count(atom.addr) != 0U;
+}
+
 namespace connect_helpers
 {
 namespace
@@ -2464,7 +2466,7 @@ namespace
     }
 
     // not if we've already got a connection to them...
-    if (peerIsInUse(tor->swarm, &atom))
+    if (tor->swarm->peer_is_in_use(&atom))
     {
         return false;
     }
