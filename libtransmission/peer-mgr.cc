@@ -467,6 +467,16 @@ public:
         pool_is_all_seeds_.reset();
     }
 
+    [[nodiscard]] peer_atom* get_existing_atom(tr_address const& addr)
+    {
+        auto const test = [&addr](auto const& atom)
+        {
+            return atom.addr == addr;
+        };
+        auto const it = std::find_if(std::begin(pool), std::end(pool), test);
+        return it != std::end(pool) ? &*it : nullptr;
+    }
+
     Handshakes outgoing_handshakes;
 
     uint16_t interested_count = 0;
@@ -559,6 +569,12 @@ struct tr_peerMgr
     void refillUpkeep() const;
     void makeNewPeerConnections(size_t max);
 
+    [[nodiscard]] tr_swarm* get_existing_swarm(tr_sha1_digest_t const& hash) const
+    {
+        auto* const tor = session->torrents().get(hash);
+        return tor == nullptr ? nullptr : tor->swarm;
+    }
+
     tr_session* const session;
     Handshakes incoming_handshakes;
 
@@ -623,24 +639,6 @@ tr_peer::~tr_peer()
 ***
 **/
 
-static tr_swarm* getExistingSwarm(tr_peerMgr* manager, tr_sha1_digest_t const& hash)
-{
-    auto* const tor = manager->session->torrents().get(hash);
-
-    return tor == nullptr ? nullptr : tor->swarm;
-}
-
-static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address const& addr)
-{
-    auto* swarm = const_cast<tr_swarm*>(cswarm);
-    auto const test = [&addr](auto const& atom)
-    {
-        return atom.addr == addr;
-    };
-    auto const it = std::find_if(std::begin(swarm->pool), std::end(swarm->pool), test);
-    return it != std::end(swarm->pool) ? &*it : nullptr;
-}
-
 static bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
 {
     return atom->is_connected || swarm->outgoing_handshakes.count(atom->addr) != 0U ||
@@ -701,7 +699,7 @@ static void atomSetSeed(tr_swarm* swarm, peer_atom& atom)
 
 static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
 {
-    if (auto const* atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
+    if (auto const* atom = tor->swarm->get_existing_atom(addr); atom != nullptr)
     {
         return atom->isSeed();
     }
@@ -711,7 +709,7 @@ static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
 
 void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr)
 {
-    if (auto* const atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
+    if (auto* const atom = tor->swarm->get_existing_atom(addr); atom != nullptr)
     {
         atom->flags |= ADDED_F_UTP_FLAGS;
     }
@@ -719,7 +717,7 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr)
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed)
 {
-    if (auto* const atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
+    if (auto* const atom = tor->swarm->get_existing_atom(addr); atom != nullptr)
     {
         atom->utp_failed = failed;
     }
@@ -1046,7 +1044,7 @@ static struct peer_atom* ensureAtomExists(
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(from < TR_PEER_FROM__MAX);
 
-    struct peer_atom* a = getExistingAtom(s, addr);
+    struct peer_atom* a = s->get_existing_atom(addr);
 
     if (a == nullptr)
     {
@@ -1097,7 +1095,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
     bool const ok = result.is_connected;
     bool success = false;
 
-    tr_swarm* const s = getExistingSwarm(manager, result.io->torrent_hash());
+    auto* const s = manager->get_existing_swarm(result.io->torrent_hash());
 
     auto const [addr, port] = result.io->socket_address();
 
@@ -1116,7 +1114,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
     {
         if (s != nullptr)
         {
-            struct peer_atom* atom = getExistingAtom(s, addr);
+            struct peer_atom* atom = s->get_existing_atom(addr);
 
             if (atom != nullptr)
             {

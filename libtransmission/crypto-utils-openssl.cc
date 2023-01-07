@@ -27,11 +27,9 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-/***
-****
-***/
-
-static void log_openssl_error(char const* file, int line)
+namespace
+{
+void log_openssl_error(char const* file, int line)
 {
     unsigned long const error_code = ERR_get_error();
 
@@ -64,7 +62,7 @@ static void log_openssl_error(char const* file, int line)
 
 #define log_error() log_openssl_error(__FILE__, __LINE__)
 
-static bool check_openssl_result(int result, int expected_result, bool expected_equal, char const* file, int line)
+bool check_openssl_result(int result, int expected_result, bool expected_equal, char const* file, int line)
 {
     bool const ret = (result == expected_result) == expected_equal;
 
@@ -77,13 +75,8 @@ static bool check_openssl_result(int result, int expected_result, bool expected_
 }
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
-#define check_result_neq(result, x_result) check_openssl_result((result), (x_result), false, __FILE__, __LINE__)
 
-/***
-****
-***/
-
-namespace
+namespace sha_helpers
 {
 
 class ShaHelper
@@ -196,55 +189,26 @@ private:
     ShaHelper helper_{ EVP_sha256 };
 };
 
+} // namespace sha_helpers
 } // namespace
+
+// --- sha
 
 std::unique_ptr<tr_sha1> tr_sha1::create()
 {
+    using namespace sha_helpers;
+
     return std::make_unique<Sha1Impl>();
 }
 
 std::unique_ptr<tr_sha256> tr_sha256::create()
 {
+    using namespace sha_helpers;
+
     return std::make_unique<Sha256Impl>();
 }
 
-/***
-****
-***/
-
-#if OPENSSL_VERSION_NUMBER < 0x0090802fL
-
-static EVP_CIPHER_CTX* openssl_evp_cipher_context_new()
-{
-    auto* const handle = new EVP_CIPHER_CTX{};
-
-    if (handle != nullptr)
-    {
-        EVP_CIPHER_CTX_init(handle);
-    }
-
-    return handle;
-}
-
-static void openssl_evp_cipher_context_free(EVP_CIPHER_CTX* handle)
-{
-    if (handle == nullptr)
-    {
-        return;
-    }
-
-    EVP_CIPHER_CTX_cleanup(handle);
-    delete handle;
-}
-
-#define EVP_CIPHER_CTX_new() openssl_evp_cipher_context_new()
-#define EVP_CIPHER_CTX_free(x) openssl_evp_cipher_context_free((x))
-
-#endif
-
-/***
-****
-***/
+// --- x509
 
 tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle)
 {
@@ -288,9 +252,7 @@ void tr_x509_cert_free(tr_x509_cert_t handle)
     X509_free(static_cast<X509*>(handle));
 }
 
-/***
-****
-***/
+// --- rand
 
 bool tr_rand_buffer_crypto(void* buffer, size_t length)
 {
