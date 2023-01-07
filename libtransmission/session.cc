@@ -1238,9 +1238,7 @@ uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
     return session->peerLimitPerTorrent();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetPaused(tr_session* session, bool is_paused)
 {
@@ -1263,18 +1261,12 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
     session->settings_.should_delete_source_torrents = delete_source;
 }
 
-/***
-****
-***/
-
-static tr_kilobytes_per_second_t tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
-{
-    return session != nullptr ? session->top_bandwidth_.getRawSpeedBytesPerSecond(0, dir) : 0;
-}
+// ---
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
+    auto const bps = session != nullptr ? session->top_bandwidth_.getRawSpeedBytesPerSecond(0, dir) : 0;
+    return tr_toSpeedKBps(bps);
 }
 
 void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
