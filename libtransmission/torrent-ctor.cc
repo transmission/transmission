@@ -62,9 +62,7 @@ struct tr_ctor
     }
 };
 
-/***
-****
-***/
+// ---
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error)
 {
@@ -128,9 +126,7 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_erro
     return tr_saveFile(filename, ctor->contents, error);
 }
 
-/***
-****
-***/
+// ---
 
 void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
 {
@@ -169,9 +165,7 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
     tor->initFilesWanted(std::data(ctor->wanted), std::size(ctor->wanted), true);
 }
 
-/***
-****
-***/
+// ---
 
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool delete_source)
 {
@@ -194,9 +188,7 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
     return true;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool paused)
 {
@@ -308,21 +300,16 @@ tr_session* tr_ctorGetSession(tr_ctor const* ctor)
     return const_cast<tr_session*>(ctor->session);
 }
 
-/***
-****
-***/
-
-static bool isPriority(int i)
-{
-    return i == TR_PRI_LOW || i == TR_PRI_NORMAL || i == TR_PRI_HIGH;
-}
+// ---
 
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
 {
-    if (isPriority(priority))
+    if (priority != TR_PRI_LOW && priority != TR_PRI_NORMAL && priority != TR_PRI_HIGH)
     {
-        ctor->priority = priority;
+        return;
     }
+
+    ctor->priority = priority;
 }
 
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
@@ -330,9 +317,7 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
     return ctor->priority;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels)
 {
@@ -344,9 +329,7 @@ tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor)
     return ctor->labels;
 }
 
-/***
-****
-***/
+// ---
 
 tr_ctor* tr_ctorNew(tr_session const* session)
 {
