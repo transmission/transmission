@@ -639,7 +639,7 @@ tr_peer::~tr_peer()
 ***
 **/
 
-static bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
+static TR_CONSTEXPR20 bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
 {
     return atom->is_connected || swarm->outgoing_handshakes.count(atom->addr) != 0U ||
         swarm->manager->incoming_handshakes.count(atom->addr) != 0U;
@@ -1061,7 +1061,11 @@ static struct peer_atom* ensureAtomExists(
     return a;
 }
 
-static void createBitTorrentPeer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, struct peer_atom* atom, tr_quark client)
+namespace
+{
+namespace handshake_helpers
+{
+void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, struct peer_atom* atom, tr_quark client)
 {
     TR_ASSERT(atom != nullptr);
     TR_ASSERT(tr_isTorrent(tor));
@@ -1088,7 +1092,7 @@ static void createBitTorrentPeer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io,
 }
 
 /* FIXME: this is kind of a mess. */
-static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& result)
+[[nodiscard]] bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& result)
 {
     TR_ASSERT(result.io != nullptr);
 
@@ -1177,7 +1181,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
             }
 
             result.io->set_bandwidth(&s->tor->bandwidth_);
-            createBitTorrentPeer(s->tor, result.io, atom, client);
+            create_bit_torrent_peer(s->tor, result.io, atom, client);
 
             success = true;
         }
@@ -1185,9 +1189,13 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
 
     return success;
 }
+} // namespace handshake_helpers
+} // namespace
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
 {
+    using namespace handshake_helpers;
+
     TR_ASSERT(manager->session != nullptr);
     auto const lock = manager->unique_lock();
 
@@ -2713,7 +2721,9 @@ struct peer_candidate
 
 void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
 {
-    time_t const now = tr_time();
+    using namespace handshake_helpers;
+
+    auto const now = tr_time();
     bool utp = mgr->session->allowsUTP() && !atom.utp_failed;
 
     if (atom.fromFirst == TR_PEER_FROM_PEX)
