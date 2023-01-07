@@ -64,8 +64,6 @@
 
 using namespace std::literals;
 
-static auto constexpr SaveIntervalSecs = 360s;
-
 namespace
 {
 namespace bandwidth_group_helpers
@@ -144,6 +142,19 @@ int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 }
 
 } // namespace bandwidth_group_helpers
+
+void update_bandwidth(tr_session* session, tr_direction dir)
+{
+    if (auto const limit_bytes_per_second = session->activeSpeedLimitBps(dir); limit_bytes_per_second)
+    {
+        session->top_bandwidth_.setLimited(dir, *limit_bytes_per_second > 0U);
+        session->top_bandwidth_.setDesiredSpeedBytesPerSecond(dir, *limit_bytes_per_second);
+    }
+    else
+    {
+        session->top_bandwidth_.setLimited(dir, false);
+    }
+}
 } // namespace
 
 tr_port tr_session::randomPort() const
@@ -438,9 +449,27 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
     return {};
 }
 
-/***
-****
-***/
+// ---
+
+namespace
+{
+namespace settings_helpers
+{
+
+void get_settings_filename(tr_pathbuf& setme, char const* config_dir, char const* appname)
+{
+    if (!tr_str_is_empty(config_dir))
+    {
+        setme.assign(std::string_view{ config_dir }, "/settings.json"sv);
+        return;
+    }
+
+    auto const default_config_dir = tr_getDefaultConfigDir(appname);
+    setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
+}
+
+} // namespace settings_helpers
+} // namespace
 
 void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
 {
@@ -459,20 +488,10 @@ void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictiona
     tr_variantDictAddInt(setme_dictionary, TR_KEY_message_level, tr_logGetLevel());
 }
 
-static void getSettingsFilename(tr_pathbuf& setme, char const* config_dir, char const* appname)
-{
-    if (!tr_str_is_empty(config_dir))
-    {
-        setme.assign(std::string_view{ config_dir }, "/settings.json"sv);
-        return;
-    }
-
-    auto const default_config_dir = tr_getDefaultConfigDir(appname);
-    setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
-}
-
 bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* app_name)
 {
+    using namespace settings_helpers;
+
     TR_ASSERT(tr_variantIsDict(dict));
 
     /* initializing the defaults: caller may have passed in some app-level defaults.
@@ -486,7 +505,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     /* file settings override the defaults */
     auto success = bool{};
     auto filename = tr_pathbuf{};
-    getSettingsFilename(filename, config_dir, app_name);
+    get_settings_filename(filename, config_dir, app_name);
     if (!tr_sys_path_exists(filename))
     {
         success = true;
@@ -546,9 +565,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     bandwidthGroupWrite(session, config_dir);
 }
 
-/***
-****
-***/
+// ---
 
 struct tr_session::init_data
 {
@@ -647,8 +664,6 @@ void tr_session::initImpl(init_data& data)
     tr_variantClear(&settings);
     data.done_cv.notify_one();
 }
-
-static void updateBandwidth(tr_session* session, tr_direction dir);
 
 void tr_session::setSettings(tr_variant* settings_dict, bool force)
 {
@@ -779,8 +794,8 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 
     // We need to update bandwidth if speed settings changed.
     // It's a harmless call, so just call it instead of checking for settings changes
-    updateBandwidth(this, TR_UP);
-    updateBandwidth(this, TR_DOWN);
+    update_bandwidth(this, TR_UP);
+    update_bandwidth(this, TR_DOWN);
 }
 
 void tr_sessionSet(tr_session* session, tr_variant* settings)
@@ -1018,19 +1033,6 @@ std::optional<tr_bytes_per_second_t> tr_session::activeSpeedLimitBps(tr_directio
     return {};
 }
 
-static void updateBandwidth(tr_session* session, tr_direction dir)
-{
-    if (auto const limit_bytes_per_second = session->activeSpeedLimitBps(dir); limit_bytes_per_second)
-    {
-        session->top_bandwidth_.setLimited(dir, *limit_bytes_per_second > 0U);
-        session->top_bandwidth_.setDesiredSpeedBytesPerSecond(dir, *limit_bytes_per_second);
-    }
-    else
-    {
-        session->top_bandwidth_.setLimited(dir, false);
-    }
-}
-
 time_t tr_session::AltSpeedMediator::time()
 {
     return tr_time();
@@ -1040,8 +1042,8 @@ void tr_session::AltSpeedMediator::isActiveChanged(bool is_active, tr_session_al
 {
     auto const in_session_thread = [session = &session_, is_active, reason]()
     {
-        updateBandwidth(session, TR_UP);
-        updateBandwidth(session, TR_DOWN);
+        update_bandwidth(session, TR_UP);
+        update_bandwidth(session, TR_DOWN);
 
         if (session->alt_speed_active_changed_func_ != nullptr)
         {
@@ -1074,7 +1076,7 @@ void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilo
         session->settings_.speed_limit_up = limit;
     }
 
-    updateBandwidth(session, dir);
+    update_bandwidth(session, dir);
 }
 
 tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
@@ -1099,7 +1101,7 @@ void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
         session->settings_.speed_limit_up_enabled = limited;
     }
 
-    updateBandwidth(session, dir);
+    update_bandwidth(session, dir);
 }
 
 bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
@@ -1120,7 +1122,7 @@ void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kiloby
     TR_ASSERT(tr_isDirection(dir));
 
     session->alt_speeds_.setLimitKBps(dir, limit);
-    updateBandwidth(session, dir);
+    update_bandwidth(session, dir);
 }
 
 tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
@@ -1238,9 +1240,7 @@ uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const* session)
     return session->peerLimitPerTorrent();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetPaused(tr_session* session, bool is_paused)
 {
@@ -1263,18 +1263,12 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
     session->settings_.should_delete_source_torrents = delete_source;
 }
 
-/***
-****
-***/
-
-static tr_kilobytes_per_second_t tr_sessionGetRawSpeed_Bps(tr_session const* session, tr_direction dir)
-{
-    return session != nullptr ? session->top_bandwidth_.getRawSpeedBytesPerSecond(0, dir) : 0;
-}
+// ---
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
+    auto const bps = session != nullptr ? session->top_bandwidth_.getRawSpeedBytesPerSecond(0, dir) : 0;
+    return tr_toSpeedKBps(bps);
 }
 
 void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
@@ -1370,7 +1364,11 @@ void tr_sessionClose(tr_session* session, size_t timeout_secs)
     delete session;
 }
 
-static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
+namespace
+{
+namespace load_torrents_helpers
+{
+void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
 {
     auto const& dirname = session->torrentDir();
     auto const info = tr_sys_path_get_info(dirname);
@@ -1414,13 +1412,17 @@ static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise
 
     loaded_promise->set_value(n_torrents);
 }
+} // namespace load_torrents_helpers
+} // namespace
 
 size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor)
 {
+    using namespace load_torrents_helpers;
+
     auto loaded_promise = std::promise<size_t>{};
     auto loaded_future = loaded_promise.get_future();
 
-    session->runInSessionThread(sessionLoadTorrents, session, ctor, &loaded_promise);
+    session->runInSessionThread(session_load_torrents, session, ctor, &loaded_promise);
     loaded_future.wait();
     auto const n_torrents = loaded_future.get();
 
@@ -2129,6 +2131,7 @@ void tr_sessionClearStats(tr_session* session)
 
 namespace
 {
+auto constexpr SaveIntervalSecs = 360s;
 
 auto makeResumeDir(std::string_view config_dir)
 {
