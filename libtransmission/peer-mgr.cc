@@ -1998,18 +1998,6 @@ void rechokeDownloads(tr_swarm* s)
 ***
 **/
 
-[[nodiscard]] static inline bool isBandwidthMaxedOut(tr_bandwidth const& b, uint64_t const now_msec, tr_direction dir)
-{
-    if (!b.isLimited(dir))
-    {
-        return false;
-    }
-
-    auto const got = b.getPieceSpeedBytesPerSecond(now_msec, dir);
-    auto const want = b.getDesiredSpeedBytesPerSecond(dir);
-    return got >= want;
-}
-
 namespace rechoke_uploads_helpers
 {
 namespace
@@ -2096,7 +2084,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     choked.reserve(peer_count);
     auto const* const session = s->manager->session;
     bool const choke_all = !s->tor->clientCanUpload();
-    bool const is_maxed_out = isBandwidthMaxedOut(s->tor->bandwidth_, now, TR_UP);
+    bool const is_maxed_out = s->tor->bandwidth_.is_maxed_out(TR_UP, now);
 
     /* an optimistic unchoke peer's "optimistic"
      * state lasts for N calls to rechokeUploads(). */
@@ -2688,7 +2676,7 @@ struct peer_candidate
         }
 
         /* if we've already got enough speed in this torrent... */
-        if (seeding && isBandwidthMaxedOut(tor->bandwidth_, now_msec, TR_UP))
+        if (seeding && tor->bandwidth_.is_maxed_out(TR_UP, now_msec))
         {
             continue;
         }
