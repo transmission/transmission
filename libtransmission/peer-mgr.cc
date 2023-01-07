@@ -869,61 +869,6 @@ void tr_peerMgr::refillUpkeep() const
     }
 }
 
-static void peerSuggestedPiece(
-    tr_swarm const* /*s*/,
-    tr_peer const* /*peer*/,
-    tr_piece_index_t /*pieceIndex*/,
-    bool /*isFastAllowed*/)
-{
-#if 0
-
-    TR_ASSERT(t != nullptr);
-    TR_ASSERT(peer != nullptr);
-    TR_ASSERT(peer->msgs != nullptr);
-
-    /* is this a valid piece? */
-    if (pieceIndex >= t->tor->pieceCount())
-    {
-        return;
-    }
-
-    /* don't ask for it if we've already got it */
-    if (t->tor->hasPiece(pieceIndex))
-    {
-        return;
-    }
-
-    /* don't ask for it if they don't have it */
-    if (!peer->have.readBit(pieceIndex))
-    {
-        return;
-    }
-
-    /* don't ask for it if we're choked and it's not fast */
-    if (!isFastAllowed && peer->clientIsChoked)
-    {
-        return;
-    }
-
-    /* request the blocks that we don't have in this piece */
-    {
-        tr_torrent const* tor = t->tor;
-        auto const [begin, end] = tor->blockSpanForPiece(pieceIndex);
-
-        for (tr_block_index_t b = begin; b < end; ++b)
-        {
-            if (tor->hasBlock(b))
-            {
-                uint32_t const offset = getBlockOffsetInPiece(tor, b);
-                uint32_t const length = tor->blockSize(b);
-                tr_peerMsgsAddRequest(peer->msgs, pieceIndex, offset, length);
-                incrementPieceRequests(t, pieceIndex);
-            }
-        }
-    }
-#endif
-}
-
 void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 {
     bool piece_came_from_peers = false;
@@ -1018,11 +963,8 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs
         break;
 
     case tr_peer_event::Type::ClientGotSuggest:
-        peerSuggestedPiece(s, peer, event.pieceIndex, false);
-        break;
-
     case tr_peer_event::Type::ClientGotAllowedFast:
-        peerSuggestedPiece(s, peer, event.pieceIndex, true);
+        // not currently supported
         break;
 
     case tr_peer_event::Type::ClientGotBlock:
