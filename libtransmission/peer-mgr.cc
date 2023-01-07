@@ -60,9 +60,7 @@ static auto constexpr MyflagUnreachable = int{ 2 };
 
 static auto constexpr CancelHistorySec = int{ 60 };
 
-/**
-***
-**/
+// ---
 
 class HandshakeMediator final : public tr_handshake::Mediator
 {
@@ -782,9 +780,7 @@ tr_peer::~tr_peer()
     }
 }
 
-/**
-***
-**/
+// ---
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
@@ -796,9 +792,7 @@ void tr_peerMgrFree(tr_peerMgr* manager)
     delete manager;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 {
@@ -813,9 +807,7 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
     }
 }
 
-/***
-****
-***/
+// ---
 
 void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr)
 {
@@ -1224,9 +1216,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
     return pex;
 }
 
-/**
-***
-**/
+// ---
 
 void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index)
 {
@@ -1921,9 +1911,7 @@ void rechokeDownloads(tr_swarm* s)
 
 } // namespace rechoke_downloads_helpers
 
-/**
-***
-**/
+// ---
 
 namespace rechoke_uploads_helpers
 {
@@ -2429,11 +2417,7 @@ void tr_peerMgr::bandwidthPulse()
     reconnectPulse();
 }
 
-/***
-****
-****
-****
-***/
+// ---
 
 bool tr_swarm::peer_is_in_use(peer_atom const& atom) const
 {
