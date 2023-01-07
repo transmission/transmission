@@ -490,6 +490,28 @@ public:
         return it != std::end(pool) ? &*it : nullptr;
     }
 
+    peer_atom* ensure_atom_exists(tr_address const& addr, tr_port const port, uint8_t const flags, uint8_t const from)
+    {
+        TR_ASSERT(addr.is_valid());
+        TR_ASSERT(from < TR_PEER_FROM__MAX);
+
+        peer_atom* atom = get_existing_atom(addr);
+
+        if (atom == nullptr)
+        {
+            atom = &pool.emplace_back(addr, port, flags, from);
+        }
+        else
+        {
+            atom->fromBest = std::min(atom->fromBest, from);
+            atom->flags |= flags;
+        }
+
+        markAllSeedsFlagDirty();
+
+        return atom;
+    }
+
     void mark_atom_as_seed(peer_atom& atom)
     {
         tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", atom.display_name()));
@@ -1033,33 +1055,6 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs
     }
 }
 
-static struct peer_atom* ensureAtomExists(
-    tr_swarm* s,
-    tr_address const& addr,
-    tr_port const port,
-    uint8_t const flags,
-    uint8_t const from)
-{
-    TR_ASSERT(addr.is_valid());
-    TR_ASSERT(from < TR_PEER_FROM__MAX);
-
-    struct peer_atom* a = s->get_existing_atom(addr);
-
-    if (a == nullptr)
-    {
-        a = &s->pool.emplace_back(addr, port, flags, from);
-    }
-    else
-    {
-        a->fromBest = std::min(a->fromBest, from);
-        a->flags |= flags;
-    }
-
-    s->markAllSeedsFlagDirty();
-
-    return a;
-}
-
 namespace
 {
 namespace handshake_helpers
@@ -1138,7 +1133,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
     }
     else /* looking good */
     {
-        struct peer_atom* atom = ensureAtomExists(s, addr, port, 0, TR_PEER_FROM_INCOMING);
+        struct peer_atom* atom = s->ensure_atom_exists(addr, port, 0, TR_PEER_FROM_INCOMING);
 
         atom->time = tr_time();
         atom->piece_data_time = 0;
@@ -1246,7 +1241,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
         if (tr_isPex(pex) && /* safeguard against corrupt data */
             !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers())
         {
-            ensureAtomExists(s, pex->addr, pex->port, pex->flags, from);
+            s->ensure_atom_exists(pex->addr, pex->port, pex->flags, from);
             ++n_used;
         }
     }
