@@ -73,10 +73,12 @@ void tr_utpClose(tr_session* /*session*/)
 
 #else
 
+namespace
+{
 /* Greg says 50ms works for them. */
-static auto constexpr UtpInterval = 50ms;
+auto constexpr UtpInterval = 50ms;
 
-static void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
+void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 {
     auto from_storage = sockaddr_storage{};
     auto* const from = (struct sockaddr*)&from_storage;
@@ -102,7 +104,7 @@ static void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
     }
 }
 
-static void utp_send_to(
+void utp_send_to(
     tr_session const* const ss,
     uint8_t const* const buf,
     size_t const buflen,
@@ -112,7 +114,7 @@ static void utp_send_to(
     ss->udp_core_->sendto(buf, buflen, to, tolen);
 }
 
-static uint64 utp_callback(utp_callback_arguments* args)
+uint64 utp_callback(utp_callback_arguments* args)
 {
     auto* const session = static_cast<tr_session*>(utp_context_get_userdata(args->context));
 
@@ -139,7 +141,7 @@ static uint64 utp_callback(utp_callback_arguments* args)
     return 0;
 }
 
-static void reset_timer(tr_session* session)
+void reset_timer(tr_session* session)
 {
     auto interval = std::chrono::milliseconds{};
     auto const random_percent = tr_rand_int(1000U) / 1000.0;
@@ -167,7 +169,7 @@ static void reset_timer(tr_session* session)
     session->utp_timer->startSingleShot(interval);
 }
 
-static void timer_callback(void* vsession)
+void timer_callback(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -177,6 +179,7 @@ static void timer_callback(void* vsession)
     utp_check_timeouts(session->utp_context);
     reset_timer(session);
 }
+} // namespace
 
 void tr_utpInit(tr_session* session)
 {
