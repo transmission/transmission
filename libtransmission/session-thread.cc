@@ -274,8 +274,8 @@ private:
         }
     }
 
-    libtransmission::evhelpers::evbase_unique_ptr const evbase_{ makeEventBase() };
-    libtransmission::evhelpers::event_unique_ptr const work_queue_event_{
+    libtransmission::evhelpers::evbase_unique_ptr evbase_{ makeEventBase() };
+    libtransmission::evhelpers::event_unique_ptr work_queue_event_{
         event_new(evbase_.get(), -1, 0, onWorkAvailableStatic, this)
     };
 

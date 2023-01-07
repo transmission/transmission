@@ -41,7 +41,7 @@ void on_idle(tr_webseed* w);
 class tr_webseed_task
 {
 private:
-    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
+    libtransmission::evhelpers::evbuffer_unique_ptr content_{ evbuffer_new() };
 
 public:
     tr_webseed_task(tr_torrent* tor, tr_webseed* webseed_in, tr_block_span_t blocks_in)
@@ -53,16 +53,16 @@ public:
     {
     }
 
-    tr_webseed* const webseed;
+    tr_webseed* webseed;
 
     [[nodiscard]] auto* content() const
     {
         return content_.get();
     }
 
-    tr_session* const session;
-    tr_block_span_t const blocks;
-    uint64_t const end_byte;
+    tr_session* session;
+    tr_block_span_t blocks;
+    uint64_t end_byte;
 
     // the current position in the task; i.e., the next block to save
     tr_block_info::Location loc;
@@ -308,10 +308,10 @@ public:
         }
     }
 
-    tr_torrent_id_t const torrent_id;
-    std::string const base_url;
-    tr_peer_callback const callback;
-    void* const callback_data;
+    tr_torrent_id_t torrent_id;
+    std::string base_url;
+    tr_peer_callback callback;
+    void* callback_data;
 
     ConnectionLimiter connection_limiter;
     std::set<tr_webseed_task*> tasks;
@@ -319,7 +319,7 @@ public:
 private:
     static auto constexpr IdleTimerInterval = 2s;
 
-    std::unique_ptr<libtransmission::Timer> const idle_timer_;
+    std::unique_ptr<libtransmission::Timer> idle_timer_;
 
     tr_bitfield have_;
 
@@ -333,7 +333,7 @@ private:
 struct write_block_data
 {
 private:
-    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
+    libtransmission::evhelpers::evbuffer_unique_ptr content_{ evbuffer_new() };
 
 public:
     write_block_data(
@@ -362,11 +362,11 @@ public:
     }
 
 private:
-    tr_session* const session_;
-    tr_torrent_id_t const tor_id_;
-    tr_block_index_t const block_;
+    tr_session* session_;
+    tr_torrent_id_t tor_id_;
+    tr_block_index_t block_;
     std::unique_ptr<std::vector<uint8_t>> data_;
-    tr_webseed* const webseed_;
+    tr_webseed* webseed_;
 };
 
 void useFetchedBlocks(tr_webseed_task* task)

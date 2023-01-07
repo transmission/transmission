@@ -270,7 +270,7 @@ struct peer_atom
         return std::nullopt;
     }
 
-    tr_address const addr;
+    tr_address addr;
 
     tr_port port = {};
 
@@ -282,7 +282,7 @@ struct peer_atom
     time_t lastConnectionAttemptAt = {};
     time_t lastConnectionAt = {};
 
-    uint8_t const fromFirst; /* where the peer was first found */
+    uint8_t fromFirst; /* where the peer was first found */
     uint8_t fromBest; /* the "best" value of where the peer has been found */
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
@@ -640,9 +640,9 @@ public:
 
     bool is_running = false;
 
-    tr_peerMgr* const manager;
+    tr_peerMgr* manager;
 
-    tr_torrent* const tor;
+    tr_torrent* tor;
 
     std::vector<std::unique_ptr<tr_peer>> webseeds;
     std::vector<tr_peerMsgs*> peers;
@@ -727,7 +727,7 @@ struct tr_peerMgr
         return tor == nullptr ? nullptr : tor->swarm;
     }
 
-    tr_session* const session;
+    tr_session* session;
     Handshakes incoming_handshakes;
 
     HandshakeMediator handshake_mediator_;
@@ -739,9 +739,9 @@ private:
         rechoke_timer_->setInterval(RechokePeriod);
     }
 
-    std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
-    std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
-    std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
+    std::unique_ptr<libtransmission::Timer> bandwidth_timer_;
+    std::unique_ptr<libtransmission::Timer> rechoke_timer_;
+    std::unique_ptr<libtransmission::Timer> refill_upkeep_timer_;
 
     static auto constexpr BandwidthPeriod = 500ms;
     static auto constexpr RechokePeriod = 10s;
@@ -915,9 +915,9 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         }
 
     private:
-        tr_torrent const* const torrent_;
-        tr_swarm const* const swarm_;
-        tr_peer const* const peer_;
+        tr_torrent const* torrent_;
+        tr_swarm const* swarm_;
+        tr_peer const* peer_;
     };
 
     torrent->swarm->updateEndgame();

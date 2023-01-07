@@ -374,9 +374,9 @@ public:
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
     static auto constexpr MaxRedirects = long{ 10 };
 
-    bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
-    bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
-    bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
+    bool curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
+    bool curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
+    bool curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
 
     Mediator& mediator;
 
@@ -473,7 +473,7 @@ public:
     }
 #endif
 
-    void initEasy(Task& task)
+    void initEasy(Task& task) const
     {
         TR_ASSERT(std::this_thread::get_id() == curl_thread->get_id());
         auto* const e = task.easy();
@@ -710,7 +710,7 @@ public:
         }
     }
 
-    curl_helpers::shared_unique_ptr const curlsh_{ curl_share_init() };
+    curl_helpers::shared_unique_ptr curlsh_{ curl_share_init() };
 
     std::map<std::string /*host*/, std::stack<curl_helpers::easy_unique_ptr>, std::less<>> easy_pool_;
 
@@ -719,12 +719,12 @@ public:
     std::list<Task> queued_tasks_;
     std::list<Task> running_tasks_;
 
-    CURLSH* shared()
+    [[nodiscard]] CURLSH* shared() const
     {
         return curlsh_.get();
     }
 
-    void shareEverything()
+    void shareEverything() const
     {
         // Tell curl to share whatever it can.
         // https://curl.se/libcurl/c/CURLSHOPT_SHARE.html

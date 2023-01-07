@@ -226,7 +226,7 @@ public:
         }
     }
 
-    tr_session* const session;
+    tr_session* session;
 
 private:
     void flushCloseMessages()
@@ -245,7 +245,7 @@ private:
 
     std::map<tr_interned_string, tr_scrape_info> scrape_info_;
 
-    std::unique_ptr<libtransmission::Timer> const upkeep_timer_;
+    std::unique_ptr<libtransmission::Timer> upkeep_timer_;
 
     std::set<tr_announce_request, StopsCompare> stops_;
 
@@ -305,10 +305,10 @@ struct tr_tracker
         }
     }
 
-    tr_interned_string const host;
-    tr_interned_string const announce_url;
-    std::string_view const sitename;
-    tr_scrape_info* const scrape_info;
+    tr_interned_string host;
+    tr_interned_string announce_url;
+    std::string_view sitename;
+    tr_scrape_info* scrape_info;
 
     std::string tracker_id;
 
@@ -319,7 +319,7 @@ struct tr_tracker
 
     int consecutive_failures = 0;
 
-    tr_tracker_id_t const id;
+    tr_tracker_id_t id;
 };
 
 // format: `${host}:${port}`
@@ -480,7 +480,7 @@ struct tr_tier
 
     std::optional<size_t> current_tracker_index_;
 
-    tr_torrent* const tor;
+    tr_torrent* tor;
 
     time_t scrapeAt = 0;
     time_t lastScrapeStartTime = 0;
@@ -491,7 +491,7 @@ struct tr_tier
     time_t lastAnnounceStartTime = 0;
     time_t lastAnnounceTime = 0;
 
-    int const id = next_key++;
+    int id = next_key++;
 
     int announce_event_priority = 0;
 

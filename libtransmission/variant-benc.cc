@@ -131,8 +131,8 @@ namespace parse_helpers
 {
 struct MyHandler : public transmission::benc::Handler
 {
-    tr_variant* const top_;
-    int const parse_opts_;
+    tr_variant* top_;
+    int parse_opts_;
     std::deque<tr_variant*> stack_;
     std::optional<tr_quark> key_;
 

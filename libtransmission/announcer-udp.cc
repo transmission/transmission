@@ -152,12 +152,12 @@ struct tau_scrape_request
     std::vector<std::byte> payload;
 
     time_t sent_at = 0;
-    tau_transaction_t const transaction_id = tau_transaction_new();
+    tau_transaction_t transaction_id = tau_transaction_new();
 
     tr_scrape_response response = {};
 
 private:
-    time_t const created_at_ = tr_time();
+    time_t created_at_ = tr_time();
 
     tr_scrape_response_func on_response_;
 };
@@ -257,7 +257,7 @@ struct tau_announce_request
     std::vector<std::byte> payload;
 
     time_t sent_at = 0;
-    tau_transaction_t const transaction_id = tau_transaction_new();
+    tau_transaction_t transaction_id = tau_transaction_new();
 
     tr_announce_response response = {};
 
@@ -280,7 +280,7 @@ private:
         }
     }
 
-    time_t const created_at_ = tr_time();
+    time_t created_at_ = tr_time();
 
     tr_announce_response_func on_response_;
 };
@@ -545,9 +545,9 @@ private:
     }
 
 public:
-    tr_interned_string const key;
-    tr_interned_string const host;
-    tr_port const port;
+    tr_interned_string key;
+    tr_interned_string host;
+    tr_port port;
 
     time_t connecting_at = 0;
     time_t connection_expiration_time = 0;

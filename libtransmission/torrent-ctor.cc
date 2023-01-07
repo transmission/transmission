@@ -34,7 +34,7 @@ struct optional_args
  * @ingroup tr_ctor */
 struct tr_ctor
 {
-    tr_session const* const session;
+    tr_session const* session;
     std::optional<bool> delete_source;
 
     tr_torrent_metainfo metainfo = {};

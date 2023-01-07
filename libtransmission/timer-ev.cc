@@ -153,8 +153,8 @@ private:
     bool is_running_ = false;
     std::function<void()> callback_;
 
-    struct event_base* const base_;
-    evhelpers::event_unique_ptr const evtimer_{ event_new(base_, -1, events(is_repeating_), &EvTimer::onTimer, this) };
+    struct event_base* base_;
+    evhelpers::event_unique_ptr evtimer_{ event_new(base_, -1, events(is_repeating_), &EvTimer::onTimer, this) };
 };
 
 std::unique_ptr<Timer> EvTimerMaker::create()

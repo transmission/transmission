@@ -343,7 +343,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
         tr_announce_response& response_;
-        std::string_view const log_name_;
+        std::string_view log_name_;
         std::optional<size_t> row_;
         tr_pex pex_ = {};
 
@@ -588,7 +588,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
         tr_scrape_response& response_;
-        std::string_view const log_name_;
+        std::string_view log_name_;
         std::optional<size_t> row_;
 
         explicit ScrapeHandler(tr_scrape_response& response, std::string_view const log_name)

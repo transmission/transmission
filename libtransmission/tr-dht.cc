@@ -572,15 +572,15 @@ private:
 
     ///
 
-    tr_port const peer_port_;
-    tr_socket_t const udp4_socket_;
-    tr_socket_t const udp6_socket_;
+    tr_port peer_port_;
+    tr_socket_t udp4_socket_;
+    tr_socket_t udp6_socket_;
 
     Mediator& mediator_;
-    std::string const state_filename_;
-    std::unique_ptr<libtransmission::Timer> const announce_timer_;
-    std::unique_ptr<libtransmission::Timer> const bootstrap_timer_;
-    std::unique_ptr<libtransmission::Timer> const periodic_timer_;
+    std::string state_filename_;
+    std::unique_ptr<libtransmission::Timer> announce_timer_;
+    std::unique_ptr<libtransmission::Timer> bootstrap_timer_;
+    std::unique_ptr<libtransmission::Timer> periodic_timer_;
 
     Id id_ = {};
 
