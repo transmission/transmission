@@ -569,6 +569,12 @@ struct tr_peerMgr
     void refillUpkeep() const;
     void makeNewPeerConnections(size_t max);
 
+    [[nodiscard]] tr_swarm* get_existing_swarm(tr_sha1_digest_t const& hash) const
+    {
+        auto* const tor = session->torrents().get(hash);
+        return tor == nullptr ? nullptr : tor->swarm;
+    }
+
     tr_session* const session;
     Handshakes incoming_handshakes;
 
@@ -632,13 +638,6 @@ tr_peer::~tr_peer()
 /**
 ***
 **/
-
-static tr_swarm* getExistingSwarm(tr_peerMgr* manager, tr_sha1_digest_t const& hash)
-{
-    auto* const tor = manager->session->torrents().get(hash);
-
-    return tor == nullptr ? nullptr : tor->swarm;
-}
 
 static bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
 {
@@ -1096,7 +1095,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
     bool const ok = result.is_connected;
     bool success = false;
 
-    tr_swarm* const s = getExistingSwarm(manager, result.io->torrent_hash());
+    auto* const s = manager->get_existing_swarm(result.io->torrent_hash());
 
     auto const [addr, port] = result.io->socket_address();
 
