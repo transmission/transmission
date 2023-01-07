@@ -490,6 +490,13 @@ public:
         return it != std::end(pool) ? &*it : nullptr;
     }
 
+    void mark_atom_as_seed(peer_atom& atom)
+    {
+        tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", atom.display_name()));
+        atom.flags |= ADDED_F_SEED_FLAG;
+        markAllSeedsFlagDirty();
+    }
+
     Handshakes outgoing_handshakes;
 
     uint16_t interested_count = 0;
@@ -688,13 +695,6 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 /***
 ****
 ***/
-
-static void atomSetSeed(tr_swarm* swarm, peer_atom& atom)
-{
-    tr_logAddTraceSwarm(swarm, fmt::format("marking peer {} as a seed", atom.display_name()));
-    atom.flags |= ADDED_F_SEED_FLAG;
-    swarm->markAllSeedsFlagDirty();
-}
 
 static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
 {
@@ -1229,7 +1229,7 @@ void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
 
     for (auto& atom : swarm->pool)
     {
-        atomSetSeed(swarm, atom);
+        swarm->mark_atom_as_seed(atom);
     }
 
     swarm->markAllSeedsFlagDirty();
@@ -1496,23 +1496,25 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
 
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
 {
+    auto* const swarm = tor->swarm;
+
     /* the webseed list may have changed... */
-    tor->swarm->rebuildWebseeds();
+    swarm->rebuildWebseeds();
 
     /* some peer_msgs' progress fields may not be accurate if we
        didn't have the metadata before now... so refresh them all... */
-    for (auto* peer : tor->swarm->peers)
+    for (auto* peer : swarm->peers)
     {
         peer->onTorrentGotMetainfo();
 
         if (peer->isSeed())
         {
-            atomSetSeed(tor->swarm, *peer->atom);
+            swarm->mark_atom_as_seed(*peer->atom);
         }
     }
 
     /* update the bittorrent peers' willingness... */
-    for (auto* peer : tor->swarm->peers)
+    for (auto* peer : swarm->peers)
     {
         peer->update_active(TR_UP);
         peer->update_active(TR_DOWN);
