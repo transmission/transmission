@@ -67,13 +67,11 @@
 #include "utils.h"
 #include "platform-quota.h"
 
-/***
-****
-***/
-
+namespace
+{
 #ifndef _WIN32
 
-static char const* getdev(std::string_view path)
+[[nodiscard]] char const* getdev(std::string_view path)
 {
 #ifdef HAVE_GETMNTENT
 
@@ -141,7 +139,7 @@ static char const* getdev(std::string_view path)
 #endif
 }
 
-static char const* getfstype(std::string_view device)
+[[nodiscard]] char const* getfstype(std::string_view device)
 {
 #ifdef HAVE_GETMNTENT
 
@@ -209,7 +207,7 @@ static char const* getfstype(std::string_view device)
 #endif
 }
 
-static std::string getblkdev(std::string_view path)
+std::string getblkdev(std::string_view path)
 {
     for (;;)
     {
@@ -235,7 +233,7 @@ extern "C"
 #include <quota.h>
 }
 
-struct tr_disk_space getquota(char const* device)
+[[nodiscard]] tr_disk_space getquota(char const* device)
 {
     struct quotahandle* qh;
     struct quotakey qk;
@@ -285,7 +283,7 @@ struct tr_disk_space getquota(char const* device)
 
 #else
 
-static struct tr_disk_space getquota(char const* device)
+[[nodiscard]] tr_disk_space getquota(char const* device)
 {
 #if defined(__DragonFly__)
     struct ufs_dqblk dq = {};
@@ -371,7 +369,7 @@ static struct tr_disk_space getquota(char const* device)
 
 #ifdef HAVE_XQM
 
-static struct tr_disk_space getxfsquota(char const* device)
+[[nodiscard]] tr_disk_space getxfsquota(char const* device)
 {
     struct tr_disk_space disk_space = { -1, -1 };
     struct fs_disk_quota dq;
@@ -410,7 +408,7 @@ static struct tr_disk_space getxfsquota(char const* device)
 
 #endif /* _WIN32 */
 
-static tr_disk_space getQuotaSpace([[maybe_unused]] tr_device_info const& info)
+[[nodiscard]] tr_disk_space getQuotaSpace([[maybe_unused]] tr_device_info const& info)
 {
     struct tr_disk_space ret = { -1, -1 };
 
@@ -432,7 +430,7 @@ static tr_disk_space getQuotaSpace([[maybe_unused]] tr_device_info const& info)
     return ret;
 }
 
-static struct tr_disk_space getDiskSpace(char const* path)
+[[nodiscard]] tr_disk_space getDiskSpace(char const* path)
 {
 #ifdef _WIN32
 
@@ -467,6 +465,8 @@ static struct tr_disk_space getDiskSpace(char const* path)
 
 #endif
 }
+
+} // namespace
 
 tr_device_info tr_device_info_create(std::string_view path)
 {
