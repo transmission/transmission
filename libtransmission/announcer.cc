@@ -56,9 +56,7 @@ static auto constexpr MaxScrapesPerUpkeep = int{ 20 };
 /* how many infohashes to remove when we get a scrape-too-long error */
 static auto constexpr TrMultiscrapeStep = int{ 5 };
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -109,9 +107,7 @@ struct StopsCompare
 
 } // namespace
 
-/***
-****
-***/
+// ---
 
 struct tr_scrape_info
 {
@@ -271,9 +267,7 @@ std::unique_ptr<tr_announcer> tr_announcer::create(
     return std::make_unique<tr_announcer_impl>(session, announcer_udp, n_pending_stops);
 }
 
-/***
-****
-***/
+// ---
 
 /* a row in tr_tier's list of trackers */
 struct tr_tracker
@@ -342,9 +336,7 @@ tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed)
     return tr_interned_string{ sv };
 }
 
-/***
-****
-***/
+// ---
 
 /** @brief A group of trackers in a single tier, as per the multitracker spec */
 struct tr_tier
@@ -552,9 +544,7 @@ private:
     static inline int next_key = 0;
 };
 
-/***
-****
-***/
+// ---
 
 /**
  * @brief Opaque, per-torrent data structure for tracker announce information
@@ -669,11 +659,13 @@ static tr_tier* getTier(tr_announcer_impl* announcer, tr_sha1_digest_t const& in
     return tor->torrent_announcer->getTier(tier_id);
 }
 
-/***
-****  PUBLISH
-***/
+// --- PUBLISH
 
-static void publishMessage(tr_tier* tier, std::string_view msg, tr_tracker_event::Type type)
+namespace
+{
+namespace publish_helpers
+{
+void publishMessage(tr_tier* tier, std::string_view msg, tr_tracker_event::Type type)
 {
     if (tier != nullptr && tier->tor != nullptr && tier->tor->torrent_announcer != nullptr &&
         tier->tor->torrent_announcer->callback != nullptr)
@@ -692,22 +684,22 @@ static void publishMessage(tr_tier* tier, std::string_view msg, tr_tracker_event
     }
 }
 
-static void publishErrorClear(tr_tier* tier)
+void publishErrorClear(tr_tier* tier)
 {
     publishMessage(tier, ""sv, tr_tracker_event::Type::ErrorClear);
 }
 
-static void publishWarning(tr_tier* tier, std::string_view msg)
+void publishWarning(tr_tier* tier, std::string_view msg)
 {
     publishMessage(tier, msg, tr_tracker_event::Type::Warning);
 }
 
-static void publishError(tr_tier* tier, std::string_view msg)
+void publishError(tr_tier* tier, std::string_view msg)
 {
     publishMessage(tier, msg, tr_tracker_event::Type::Error);
 }
 
-static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
+void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
 {
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
@@ -721,7 +713,7 @@ static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
     }
 }
 
-static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pex> const& pex)
+void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pex> const& pex)
 {
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
@@ -741,10 +733,10 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vecto
         (*tier->tor->torrent_announcer->callback)(tier->tor, &e, nullptr);
     }
 }
+} // namespace publish_helpers
+} // namespace
 
-/***
-****
-***/
+// ---
 
 tr_torrent_announcer* tr_announcer_impl::addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data)
 {
@@ -756,9 +748,7 @@ tr_torrent_announcer* tr_announcer_impl::addTorrent(tr_torrent* tor, tr_tracker_
     return ta;
 }
 
-/***
-****
-***/
+// ---
 
 bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
 {
@@ -904,9 +894,7 @@ void tr_announcerChangeMyPort(tr_torrent* tor)
     torrentAddAnnounce(tor, TR_ANNOUNCE_EVENT_STARTED, tr_time());
 }
 
-/***
-****
-***/
+// ---
 
 void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes)
 {
@@ -919,9 +907,7 @@ void tr_announcerAddBytes(tr_torrent* tor, int type, uint32_t n_bytes)
     }
 }
 
-/***
-****
-***/
+// ---
 
 [[nodiscard]] static tr_announce_request create_announce_request(
     tr_announcer_impl const* const announcer,
@@ -1022,6 +1008,8 @@ void tr_announcer_impl::onAnnounceDone(
     bool is_running_on_success,
     tr_announce_response const& response)
 {
+    using namespace publish_helpers;
+
     auto* const tier = getTier(this, response.info_hash, tier_id);
     if (tier == nullptr)
     {
@@ -1234,11 +1222,7 @@ static void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
         });
 }
 
-/***
-****
-****  SCRAPE
-****
-***/
+// --- SCRAPE
 
 static bool multiscrape_too_big(std::string_view errmsg)
 {
@@ -1322,6 +1306,8 @@ static void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response
 
 void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
 {
+    using namespace publish_helpers;
+
     auto const now = tr_time();
 
     for (int i = 0; i < response.row_count; ++i)
@@ -1588,9 +1574,7 @@ void tr_announcer_impl::upkeep()
     announcer_udp_.upkeep();
 }
 
-/***
-****
-***/
+// ---
 
 static tr_tracker_view trackerView(tr_torrent const& tor, size_t tier_index, tr_tier const& tier, tr_tracker const& tracker)
 {
@@ -1719,9 +1703,7 @@ tr_tracker_view tr_announcerTracker(tr_torrent const* tor, size_t nth)
     return {};
 }
 
-/***
-****
-***/
+// ---
 
 // called after the torrent's announceList was rebuilt --
 // so announcer needs to update the tr_tier / tr_trackers to match

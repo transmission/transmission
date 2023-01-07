@@ -111,7 +111,7 @@ bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 }
 #endif
 
-///
+// ---
 
 void send_simple_response(struct evhttp_request* req, int code, char const* text)
 {
@@ -130,7 +130,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
     evbuffer_free(body);
 }
 
-///
+// ---
 
 [[nodiscard]] constexpr char const* mimetype_guess(std::string_view path)
 {
@@ -820,7 +820,7 @@ void tr_rpc_server::setWhitelist(std::string_view whitelist)
     this->whitelist_ = parseWhitelist(whitelist);
 }
 
-/// PASSWORD
+// --- PASSWORD
 
 void tr_rpc_server::setUsername(std::string_view username)
 {
@@ -858,7 +858,7 @@ void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept
     }
 }
 
-/// LIFECYCLE
+// --- LIFECYCLE
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }

@@ -32,7 +32,7 @@
 
 using namespace std::literals;
 
-///
+// ---
 
 namespace
 {
@@ -141,7 +141,7 @@ auto makeEventBase()
 
 } // namespace
 
-///
+// ---
 
 void tr_session_thread::tr_evthread_init()
 {

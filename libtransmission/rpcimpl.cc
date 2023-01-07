@@ -57,7 +57,7 @@ enum class TrFormat
     Table
 };
 
-///
+// ---
 
 /* For functions that can't be immediately executed, like torrentAdd,
  * this is the callback data used to pass a response to the caller
@@ -83,7 +83,7 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
     delete data;
 }
 
-///
+// ---
 
 auto getTorrents(tr_session* session, tr_variant* args)
 {
@@ -298,7 +298,7 @@ char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_variant* 
     return nullptr;
 }
 
-///
+// ---
 
 void addLabels(tr_torrent const* tor, tr_variant* list)
 {
@@ -960,7 +960,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
     return errmsg;
 }
 
-///
+// ---
 
 [[nodiscard]] std::pair<std::vector<tr_quark>, char const* /*errmsg*/> makeLabels(tr_variant* list)
 {
@@ -1327,7 +1327,7 @@ char const* torrentSetLocation(
     return nullptr;
 }
 
-///
+// ---
 
 void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char const* newname, int error, void* user_data)
 {
@@ -1366,7 +1366,7 @@ char const* torrentRenamePath(
     return errmsg;
 }
 
-///
+// ---
 
 void onPortTested(tr_web::FetchResponse const& web_response)
 {
@@ -1398,7 +1398,7 @@ char const* portTest(tr_session* session, tr_variant* /*args_in*/, tr_variant* /
     return nullptr;
 }
 
-///
+// ---
 
 void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 {
@@ -1482,7 +1482,7 @@ char const* blocklistUpdate(
     return nullptr;
 }
 
-///
+// ---
 
 void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
 {
@@ -1708,7 +1708,7 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
     return nullptr;
 }
 
-///
+// ---
 
 char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* /*idle_data*/)
 {
@@ -1788,7 +1788,7 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
     return nullptr;
 }
 
-///
+// ---
 
 char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
 {
@@ -2403,7 +2403,7 @@ char const* freeSpace(tr_session* /*session*/, tr_variant* args_in, tr_variant* 
     return err;
 }
 
-///
+// ---
 
 char const* sessionClose(
     tr_session* session,
@@ -2415,7 +2415,7 @@ char const* sessionClose(
     return nullptr;
 }
 
-///
+// ---
 
 using handler = char const* (*)(tr_session*, tr_variant*, tr_variant*, struct tr_rpc_idle_data*);
 

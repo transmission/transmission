@@ -39,7 +39,7 @@ constexpr bool tr_variantIsContainer(tr_variant const* v)
     return tr_variantIsList(v) || tr_variantIsDict(v);
 }
 
-///
+// ---
 
 auto constexpr StringInit = tr_variant_string{
     TR_STRING_TYPE_QUARK,
@@ -114,7 +114,7 @@ void tr_variant_string_set_string(struct tr_variant_string* str, std::string_vie
     }
 }
 
-///
+// ---
 
 constexpr char const* getStr(tr_variant const* v)
 {
@@ -407,7 +407,7 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, std::byte const
     return tr_variantGetRaw(child, setme_raw, setme_len);
 }
 
-///
+// ---
 
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len)
 {
@@ -635,7 +635,7 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
     return removed;
 }
 
-/// BENC WALKING
+// --- BENC WALKING
 
 class WalkNode
 {
@@ -864,7 +864,7 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walk_f
     }
 }
 
-///
+// ---
 
 namespace
 {
@@ -908,7 +908,7 @@ void tr_variantClear(tr_variant* v)
     *v = {};
 }
 
-///
+// ---
 
 bool tr_variantDictChild(tr_variant* dict, size_t pos, tr_quark* key, tr_variant** setme_value)
 {
@@ -1069,7 +1069,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
     }
 }
 
-///
+// ---
 
 std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
 {
@@ -1107,7 +1107,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view f
     return error_code;
 }
 
-///
+// ---
 
 bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char const** setme_end, tr_error** error)
 {

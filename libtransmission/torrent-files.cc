@@ -108,7 +108,7 @@ bool isJunkFile(std::string_view filename)
 
 } // unnamed namespace
 
-///
+// ---
 
 std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     tr_file_index_t file_index,
@@ -151,7 +151,7 @@ bool tr_torrent_files::hasAnyLocalData(std::string_view const* search_paths, siz
     return false;
 }
 
-///
+// ---
 
 bool tr_torrent_files::move(
     std::string_view old_parent_in,
@@ -233,7 +233,7 @@ bool tr_torrent_files::move(
     return !err;
 }
 
-///
+// ---
 
 /**
  * This convoluted code does something (seemingly) simple:

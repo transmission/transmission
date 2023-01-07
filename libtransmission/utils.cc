@@ -1029,7 +1029,7 @@ void tr_net_init()
 #endif
 }
 
-/// mime-type
+// --- mime-type
 
 std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 {
@@ -1055,7 +1055,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     return Fallback;
 }
 
-/// parseNum()
+// --- parseNum()
 
 #if defined(__GNUC__) && !__has_include(<charconv>)
 

@@ -326,7 +326,7 @@ void tr_net_close_socket(tr_socket_t fd);
 
 bool tr_net_hasIPv6(tr_port);
 
-/// TOS / DSCP
+// --- TOS / DSCP
 
 /**
  * A toString() / from_string() convenience wrapper around the TOS int value
