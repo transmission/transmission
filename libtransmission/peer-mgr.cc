@@ -306,8 +306,6 @@ using Handshakes = std::map<tr_address, tr_handshake>;
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
 
-static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const& /*e*/, void* /*vs*/);
-
 /** @brief Opaque, per-torrent data structure for peer connection information */
 class tr_swarm
 {
@@ -454,7 +452,7 @@ public:
         webseeds.reserve(n);
         for (size_t i = 0; i < n; ++i)
         {
-            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), peerCallbackFunc, this));
+            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), &tr_swarm::peerCallbackFunc, this));
         }
         webseeds.shrink_to_fit();
 
@@ -527,6 +525,110 @@ public:
         tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", atom.display_name()));
         atom.flags |= ADDED_F_SEED_FLAG;
         markAllSeedsFlagDirty();
+    }
+
+    static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs)
+    {
+        TR_ASSERT(peer != nullptr);
+        auto* s = static_cast<tr_swarm*>(vs);
+        auto const lock = s->unique_lock();
+
+        switch (event.type)
+        {
+        case tr_peer_event::Type::ClientSentPieceData:
+            {
+                auto const now = tr_time();
+                auto* const tor = s->tor;
+
+                tor->uploadedCur += event.length;
+                tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
+                tor->setDateActive(now);
+                tor->setDirty();
+                tor->session->addUploaded(event.length);
+
+                if (peer->atom != nullptr)
+                {
+                    peer->atom->piece_data_time = now;
+                }
+
+                break;
+            }
+
+        case tr_peer_event::Type::ClientGotPieceData:
+            {
+                auto const now = tr_time();
+                auto* const tor = s->tor;
+
+                tor->downloadedCur += event.length;
+                tor->setDateActive(now);
+                tor->setDirty();
+                tor->session->addDownloaded(event.length);
+
+                if (peer->atom != nullptr)
+                {
+                    peer->atom->piece_data_time = now;
+                }
+
+                break;
+            }
+
+        case tr_peer_event::Type::ClientGotHave:
+        case tr_peer_event::Type::ClientGotHaveAll:
+        case tr_peer_event::Type::ClientGotHaveNone:
+        case tr_peer_event::Type::ClientGotBitfield:
+            /* TODO: if we don't need these, should these events be removed? */
+            /* noop */
+            break;
+
+        case tr_peer_event::Type::ClientGotRej:
+            s->active_requests.remove(s->tor->pieceLoc(event.pieceIndex, event.offset).block, peer);
+            break;
+
+        case tr_peer_event::Type::ClientGotChoke:
+            s->active_requests.remove(peer);
+            break;
+
+        case tr_peer_event::Type::ClientGotPort:
+            if (peer->atom != nullptr)
+            {
+                peer->atom->port = event.port;
+            }
+
+            break;
+
+        case tr_peer_event::Type::ClientGotSuggest:
+        case tr_peer_event::Type::ClientGotAllowedFast:
+            // not currently supported
+            break;
+
+        case tr_peer_event::Type::ClientGotBlock:
+            {
+                auto* const tor = s->tor;
+                auto const loc = tor->pieceLoc(event.pieceIndex, event.offset);
+                s->cancelAllRequestsForBlock(loc.block, peer);
+                peer->blocks_sent_to_client.add(tr_time(), 1);
+                tr_torrentGotBlock(tor, loc.block);
+                break;
+            }
+
+        case tr_peer_event::Type::Error:
+            if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
+            {
+                /* some protocol error from the peer */
+                peer->do_purge = true;
+                tr_logAddDebugSwarm(
+                    s,
+                    fmt::format(
+                        "setting {} do_purge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
+                        peer->display_name()));
+            }
+            else
+            {
+                tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(event.err)));
+            }
+
+            break;
+        }
     }
 
     Handshakes outgoing_handshakes;
@@ -880,110 +982,6 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
     tor->set_needs_completeness_check();
 }
 
-static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs)
-{
-    TR_ASSERT(peer != nullptr);
-    auto* s = static_cast<tr_swarm*>(vs);
-    auto const lock = s->unique_lock();
-
-    switch (event.type)
-    {
-    case tr_peer_event::Type::ClientSentPieceData:
-        {
-            auto const now = tr_time();
-            auto* const tor = s->tor;
-
-            tor->uploadedCur += event.length;
-            tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
-            tor->setDateActive(now);
-            tor->setDirty();
-            tor->session->addUploaded(event.length);
-
-            if (peer->atom != nullptr)
-            {
-                peer->atom->piece_data_time = now;
-            }
-
-            break;
-        }
-
-    case tr_peer_event::Type::ClientGotPieceData:
-        {
-            auto const now = tr_time();
-            auto* const tor = s->tor;
-
-            tor->downloadedCur += event.length;
-            tor->setDateActive(now);
-            tor->setDirty();
-            tor->session->addDownloaded(event.length);
-
-            if (peer->atom != nullptr)
-            {
-                peer->atom->piece_data_time = now;
-            }
-
-            break;
-        }
-
-    case tr_peer_event::Type::ClientGotHave:
-    case tr_peer_event::Type::ClientGotHaveAll:
-    case tr_peer_event::Type::ClientGotHaveNone:
-    case tr_peer_event::Type::ClientGotBitfield:
-        /* TODO: if we don't need these, should these events be removed? */
-        /* noop */
-        break;
-
-    case tr_peer_event::Type::ClientGotRej:
-        s->active_requests.remove(s->tor->pieceLoc(event.pieceIndex, event.offset).block, peer);
-        break;
-
-    case tr_peer_event::Type::ClientGotChoke:
-        s->active_requests.remove(peer);
-        break;
-
-    case tr_peer_event::Type::ClientGotPort:
-        if (peer->atom != nullptr)
-        {
-            peer->atom->port = event.port;
-        }
-
-        break;
-
-    case tr_peer_event::Type::ClientGotSuggest:
-    case tr_peer_event::Type::ClientGotAllowedFast:
-        // not currently supported
-        break;
-
-    case tr_peer_event::Type::ClientGotBlock:
-        {
-            auto* const tor = s->tor;
-            auto const loc = tor->pieceLoc(event.pieceIndex, event.offset);
-            s->cancelAllRequestsForBlock(loc.block, peer);
-            peer->blocks_sent_to_client.add(tr_time(), 1);
-            tr_torrentGotBlock(tor, loc.block);
-            break;
-        }
-
-    case tr_peer_event::Type::Error:
-        if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
-        {
-            /* some protocol error from the peer */
-            peer->do_purge = true;
-            tr_logAddDebugSwarm(
-                s,
-                fmt::format(
-                    "setting {} do_purge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
-                    peer->display_name()));
-        }
-        else
-        {
-            tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(event.err)));
-        }
-
-        break;
-    }
-}
-
 namespace
 {
 namespace handshake_helpers
@@ -996,7 +994,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
     tr_swarm* swarm = tor->swarm;
 
-    auto* peer = tr_peerMsgsNew(tor, atom, std::move(io), peerCallbackFunc, swarm);
+    auto* peer = tr_peerMsgsNew(tor, atom, std::move(io), &tr_swarm::peerCallbackFunc, swarm);
     peer->client = client;
     atom->is_connected = true;
 
