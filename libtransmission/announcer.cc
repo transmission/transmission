@@ -1209,7 +1209,7 @@ namespace
 {
 namespace on_scrape_done_helpers
 {
-[[nodiscard]] constexpr bool multiscrape_too_big(std::string_view errmsg)
+[[nodiscard]] TR_CONSTEXPR20 bool multiscrape_too_big(std::string_view errmsg)
 {
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
