@@ -318,11 +318,29 @@ static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const& /*e*/, void
 class tr_swarm
 {
 public:
+    [[nodiscard]] auto unique_lock() const
+    {
+        return tor->unique_lock();
+    }
+
     tr_swarm(tr_peerMgr* manager_in, tr_torrent* tor_in) noexcept
         : manager{ manager_in }
         , tor{ tor_in }
     {
         rebuildWebseeds();
+    }
+
+    tr_swarm(tr_swarm&&) = delete;
+    tr_swarm(tr_swarm const&) = delete;
+    tr_swarm& operator=(tr_swarm&&) = delete;
+    tr_swarm& operator=(tr_swarm const&) = delete;
+
+    ~tr_swarm()
+    {
+        auto const lock = unique_lock();
+        TR_ASSERT(!is_running);
+        TR_ASSERT(std::empty(outgoing_handshakes));
+        TR_ASSERT(std::empty(peers));
     }
 
     void cancelOldRequests()
@@ -343,11 +361,6 @@ public:
         {
             maybeSendCancelRequest(peer, block, no_notify);
         }
-    }
-
-    [[nodiscard]] auto unique_lock() const
-    {
-        return tor->unique_lock();
     }
 
     [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
@@ -643,20 +656,6 @@ static TR_CONSTEXPR20 bool peerIsInUse(tr_swarm const* swarm, struct peer_atom c
 {
     return atom->is_connected || swarm->outgoing_handshakes.count(atom->addr) != 0U ||
         swarm->manager->incoming_handshakes.count(atom->addr) != 0U;
-}
-
-static void swarmFree(tr_swarm* s)
-{
-    TR_ASSERT(s != nullptr);
-    auto const lock = s->unique_lock();
-
-    TR_ASSERT(!s->is_running);
-    TR_ASSERT(std::empty(s->outgoing_handshakes));
-    TR_ASSERT(s->peerCount() == 0);
-
-    s->stats = {};
-
-    delete s;
 }
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
@@ -1491,7 +1490,8 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
     auto const lock = tor->unique_lock();
 
     tor->swarm->stop();
-    swarmFree(tor->swarm);
+    delete tor->swarm;
+    tor->swarm = nullptr;
 }
 
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
