@@ -649,13 +649,6 @@ private:
 *** tr_peer virtual functions
 **/
 
-tr_bytes_per_second_t tr_peerGetPieceSpeedBytesPerSecond(tr_peer const* peer, uint64_t now, tr_direction direction)
-{
-    tr_bytes_per_second_t bytes_per_second = 0;
-    peer->isTransferringPieces(now, direction, &bytes_per_second);
-    return bytes_per_second;
-}
-
 tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     : session{ tor->session }
     , swarm{ tor->swarm }
@@ -1587,8 +1580,8 @@ namespace peer_stat_helpers
     stats.progress = peer->percentDone();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
-    stats.rateToPeer_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeedBytesPerSecond(peer, now_msec, TR_CLIENT_TO_PEER));
-    stats.rateToClient_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeedBytesPerSecond(peer, now_msec, TR_PEER_TO_CLIENT));
+    stats.rateToPeer_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_CLIENT_TO_PEER));
+    stats.rateToClient_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_PEER_TO_CLIENT));
     stats.peerIsChoked = peer->is_peer_choked();
     stats.peerIsInterested = peer->is_peer_interested();
     stats.clientIsChoked = peer->is_client_choked();
@@ -1995,19 +1988,19 @@ struct ChokeData
 {
     if (tor->isDone())
     {
-        return tr_peerGetPieceSpeedBytesPerSecond(peer, now, TR_CLIENT_TO_PEER);
+        return peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
     }
 
     /* downloading a private torrent... take upload speed into account
      * because there may only be a small window of opportunity to share */
     if (tor->isPrivate())
     {
-        return tr_peerGetPieceSpeedBytesPerSecond(peer, now, TR_PEER_TO_CLIENT) +
-            tr_peerGetPieceSpeedBytesPerSecond(peer, now, TR_CLIENT_TO_PEER);
+        return peer->get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT) +
+            peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
     }
 
     /* downloading a public torrent */
-    return tr_peerGetPieceSpeedBytesPerSecond(peer, now, TR_PEER_TO_CLIENT);
+    return peer->get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
 }
 
 // an optimistically unchoked peer is immune from rechoking
