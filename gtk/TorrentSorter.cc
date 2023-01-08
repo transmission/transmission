@@ -1,10 +1,11 @@
-// This file Copyright © 2022 Mnemosyne LLC.
+// This file Copyright © 2022-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include "TorrentSorter.h"
 
+#include "SorterBase.hh"
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
@@ -185,6 +186,11 @@ int compare_by_state(Torrent const& lhs, Torrent const& rhs)
 
 } // namespace
 
+TorrentSorter::TorrentSorter()
+    : Glib::ObjectBase(typeid(TorrentSorter))
+{
+}
+
 void TorrentSorter::set_mode(std::string_view mode)
 {
     static auto const compare_funcs = std::map<std::string_view, CompareFunc>({
@@ -253,49 +259,8 @@ void TorrentSorter::update(Torrent::ChangeFlags changes)
     }
 }
 
-#if !GTKMM_CHECK_VERSION(4, 0, 0)
-
-sigc::signal<void()>& TorrentSorter::signal_changed()
-{
-    return signal_changed_;
-}
-
-#endif
-
 Glib::RefPtr<TorrentSorter> TorrentSorter::create()
 {
     // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new TorrentSorter());
-}
-
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-
-Gtk::Ordering TorrentSorter::compare_vfunc(gpointer lhs, gpointer rhs)
-{
-    auto const* const lhs_torrent = dynamic_cast<Torrent const*>(Glib::wrap_auto(static_cast<GObject*>(lhs)));
-    g_return_val_if_fail(lhs_torrent != nullptr, Gtk::Ordering::SMALLER);
-
-    auto const* const rhs_torrent = dynamic_cast<Torrent const*>(Glib::wrap_auto(static_cast<GObject*>(rhs)));
-    g_return_val_if_fail(rhs_torrent != nullptr, Gtk::Ordering::LARGER);
-
-    return Gtk::Ordering{ compare(*lhs_torrent, *rhs_torrent) };
-}
-
-Gtk::Sorter::Order TorrentSorter::get_order_vfunc()
-{
-    return Gtk::Sorter::Order::PARTIAL;
-}
-
-#else
-
-void TorrentSorter::changed(Change /*change*/)
-{
-    signal_changed_.emit();
-}
-
-#endif
-
-TorrentSorter::TorrentSorter()
-    : Glib::ObjectBase(typeid(TorrentSorter))
-{
 }

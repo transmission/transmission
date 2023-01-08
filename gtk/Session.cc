@@ -9,6 +9,7 @@
 #include "Notify.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
+#include "SortListModel.hh"
 #include "Torrent.h"
 #include "TorrentSorter.h"
 #include "Utils.h"
@@ -83,8 +84,6 @@ TrVariantPtr create_variant(tr_variant& other)
 
 class Session::Impl
 {
-    using SortModel = IF_GTKMM4(Gtk::SortListModel, Gtk::TreeModelSort);
-
 public:
     Impl(Session& core, tr_session* session);
     ~Impl();
@@ -94,7 +93,7 @@ public:
     tr_session* close();
 
     Glib::RefPtr<Gio::ListStore<Torrent>> get_raw_model() const;
-    Glib::RefPtr<SortModel> get_model();
+    Glib::RefPtr<SortListModel<Torrent>> get_model();
     tr_session* get_session() const;
 
     std::pair<Glib::RefPtr<Torrent>, guint> find_torrent_by_id(tr_torrent_id_t torrent_id) const;
@@ -207,7 +206,7 @@ private:
     guint inhibit_cookie_ = 0;
     gint busy_count_ = 0;
     Glib::RefPtr<Gio::ListStore<Torrent>> raw_model_;
-    Glib::RefPtr<SortModel> sorted_model_;
+    Glib::RefPtr<SortListModel<Torrent>> sorted_model_;
     Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
 };
@@ -237,7 +236,7 @@ Glib::RefPtr<Session::Model> Session::get_sorted_model() const
     return impl_->get_model();
 }
 
-Glib::RefPtr<Session::Impl::SortModel> Session::Impl::get_model()
+Glib::RefPtr<SortListModel<Torrent>> Session::Impl::get_model()
 {
     return sorted_model_;
 }
@@ -537,20 +536,7 @@ Session::Impl::Impl(Session& core, tr_session* session)
 {
     raw_model_ = Gio::ListStore<Torrent>::create();
     signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_.get(), &TorrentSorter::update)));
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    sorted_model_ = Gtk::SortListModel::create(raw_model_, sorter_);
-#else
-    static auto const& self_col = Torrent::get_columns().self;
-
-    auto const sort_func = [this](SortModel::const_iterator const& lhs, SortModel::const_iterator const& rhs)
-    {
-        return sorter_->compare(*lhs->get_value(self_col), *rhs->get_value(self_col));
-    };
-
-    sorted_model_ = Gtk::TreeModelSort::create(ListModelAdapter::create<Torrent>(raw_model_));
-    sorted_model_->set_default_sort_func(sort_func);
-    sorter_->signal_changed().connect([this, sort_func]() { sorted_model_->set_default_sort_func(sort_func); });
-#endif
+    sorted_model_ = SortListModel<Torrent>::create(gtr_ptr_static_cast<Gio::ListModel>(raw_model_), sorter_);
 
     /* init from prefs & listen to pref changes */
     on_pref_changed(TR_KEY_sort_mode);
