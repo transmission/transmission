@@ -31,7 +31,7 @@ SortListModel<ItemT>::SortListModel(Glib::RefPtr<Gtk::TreeModel> const& model, G
 {
     static auto const& self_col = ItemT::get_columns().self;
 
-    auto const sort_func = [this, sorter](const_iterator const& lhs, const_iterator const& rhs)
+    auto const sort_func = [sorter](const_iterator const& lhs, const_iterator const& rhs)
     {
         auto const* const lhs_self = lhs->get_value(self_col);
         auto const* const rhs_self = rhs->get_value(self_col);
