@@ -220,7 +220,6 @@ target_compile_definitions(${TR_NAME}
         $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}> # API version macro was only added in 1.7
         $<$<BOOL:${USE_SYSTEM_B64}>:USE_SYSTEM_B64>
         $<$<BOOL:${HAVE_SO_REUSEPORT}>:HAVE_SO_REUSEPORT=1>
-        $<$<BOOL:${Iconv_FOUND}>:HAVE_ICONV>
     PUBLIC
         $<$<NOT:$<BOOL:${ENABLE_NLS}>>:DISABLE_GETTEXT>)
 
@@ -285,7 +284,6 @@ target_link_libraries(${TR_NAME}
         utf8::cpp
         wildmat
         WideInteger::WideInteger
-        $<$<BOOL:${ICONV_FOUND}>:Iconv::Iconv>
         $<$<BOOL:${WIN32}>:crypt32>
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
