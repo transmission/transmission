@@ -93,7 +93,7 @@ jobs:
           ./code_style.sh
           set +e
           git diff --exit-code > style.diff
-          echo "::set-output name=differs::$?"
+          echo "differs=$?" >> $GITHUB_OUTPUT
           cat style.diff
           set -e
       - name: Upload Diffs
