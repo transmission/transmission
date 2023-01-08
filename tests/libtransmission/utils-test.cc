@@ -126,7 +126,7 @@ TEST_F(UtilsTest, strvReplaceInvalid)
     // this version is not utf-8 (but cp866)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
     out = tr_strv_replace_invalid(in, '?');
-    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
+    EXPECT_EQ(17U, std::size(out));
     EXPECT_EQ(out, tr_strv_replace_invalid(out));
 
     // same string, but utf-8 clean
@@ -147,7 +147,7 @@ TEST_F(UtilsTest, strvReplaceInvalid)
     in = "\xF4\x33\x81\x82"sv;
     out = tr_strv_replace_invalid(in, '?');
     EXPECT_NE(nullptr, out.data());
-    EXPECT_TRUE(out.size() == 4 || out.size() == 7);
+    EXPECT_EQ(4U, std::size(out));
     EXPECT_EQ(out, tr_strv_replace_invalid(out));
 }
 
