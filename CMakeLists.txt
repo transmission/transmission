@@ -206,12 +206,6 @@ if(NOT TARGET CURL::libcurl)
     target_include_directories(CURL::libcurl INTERFACE ${CURL_INCLUDE_DIRS})
 endif()
 
-if(NOT WIN32)
-    find_package(Iconv)
-else()
-    set(Iconv_FOUND OFF)
-endif()
-
 set(CRYPTO_PKG "")
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "ccrypto")
     tr_get_required_flag(WITH_CRYPTO CCRYPTO_IS_REQUIRED)

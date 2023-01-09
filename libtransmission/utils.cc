@@ -19,7 +19,6 @@
 #include <set>
 #include <string>
 #include <string_view>
-#include <tuple>
 #include <vector>
 
 #ifdef _WIN32
@@ -31,10 +30,6 @@
 
 #ifndef _WIN32
 #include <sys/stat.h> // mode_t
-#endif
-
-#ifdef HAVE_ICONV
-#include <iconv.h>
 #endif
 
 #define UTF_CPP_CPLUSPLUS 201703L
@@ -303,104 +298,11 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 ****
 ***/
 
-namespace
-{
-namespace tr_strvUtf8Clean_impl
-{
-
-template<std::size_t N, typename F>
-struct ArgTypeImpl;
-
-template<std::size_t N, typename R, typename... ArgTs>
-struct ArgTypeImpl<N, R (*)(ArgTs...)> : std::tuple_element<1, std::tuple<ArgTs...>>
-{
-};
-
-template<std::size_t N, typename F>
-using ArgType = typename ArgTypeImpl<N, F>::type;
-
-bool validateUtf8(std::string_view sv, char const** good_end)
-{
-    auto const* begin = std::data(sv);
-    auto const* const end = begin + std::size(sv);
-    auto const* walk = begin;
-    auto all_good = false;
-
-    try
-    {
-        while (walk < end)
-        {
-            utf8::next(walk, end);
-        }
-
-        all_good = true;
-    }
-    catch (utf8::exception const&)
-    {
-        all_good = false;
-    }
-
-    if (good_end != nullptr)
-    {
-        *good_end = walk;
-    }
-
-    return all_good;
-}
-
-std::string strip_non_utf8(std::string_view sv)
+std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
     auto out = std::string{};
-    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), '?');
+    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
-}
-
-std::string to_utf8(std::string_view sv)
-{
-#ifdef HAVE_ICONV
-    size_t const buflen = std::size(sv) * 4 + 10;
-    auto buf = std::vector<char>{};
-    buf.resize(buflen);
-
-    auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
-    for (auto const* test_encoding : Encodings)
-    {
-        iconv_t cd = iconv_open("UTF-8", test_encoding);
-        if (cd == (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
-        {
-            continue;
-        }
-
-        auto const* inbuf = std::data(sv);
-        size_t inbytesleft = std::size(sv);
-        char* out = std::data(buf);
-        size_t outbytesleft = std::size(buf);
-        auto const rv = iconv(cd, const_cast<ArgType<1, decltype(&iconv)>>(&inbuf), &inbytesleft, &out, &outbytesleft);
-        iconv_close(cd);
-        if (rv != size_t(-1))
-        {
-            return std::string{ std::data(buf), buflen - outbytesleft };
-        }
-    }
-
-#endif
-
-    return strip_non_utf8(sv);
-}
-
-} // namespace tr_strvUtf8Clean_impl
-} // namespace
-
-std::string tr_strvUtf8Clean(std::string_view cleanme)
-{
-    using namespace tr_strvUtf8Clean_impl;
-
-    if (validateUtf8(cleanme, nullptr))
-    {
-        return std::string{ cleanme };
-    }
-
-    return to_utf8(cleanme);
 }
 
 #ifdef _WIN32
