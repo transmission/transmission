@@ -19,15 +19,16 @@
 #include "tr-utp.h"
 #include "utils.h"
 
+namespace
+{
 /* Since we use a single UDP socket in order to implement multiple
    µTP sockets, try to set up huge buffers. */
-
-static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
-static auto constexpr SendBufferSize = 1 * 1024 * 1024;
-static auto constexpr SmallBufferSize = 32 * 1024;
-
-static void set_socket_buffers(tr_socket_t fd, bool large)
+void set_socket_buffers(tr_socket_t fd, bool large)
 {
+    static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
+    static auto constexpr SendBufferSize = 1 * 1024 * 1024;
+    static auto constexpr SmallBufferSize = 32 * 1024;
+
     int rbuf = 0;
     int sbuf = 0;
     socklen_t rbuf_len = sizeof(rbuf);
@@ -83,7 +84,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     }
 }
 
-static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
+void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
 {
     TR_ASSERT(vsession != nullptr);
     TR_ASSERT(type == EV_READ);
@@ -130,6 +131,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         }
     }
 }
+} // namespace
 
 // BEP-32 explains why we need to bind to one IPv6 address
 
@@ -159,7 +161,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
-            tr_netCloseSocket(sock);
+            tr_net_close_socket(sock);
         }
         else
         {
@@ -172,7 +174,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
     }
 
-    if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    if (!tr_net_hasIPv6(udp_port_))
+    {
+        // no IPv6; do nothing
+    }
+    else if (auto sock = socket(PF_INET6, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         auto optval = int{ 1 };
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
@@ -189,7 +195,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
-            tr_netCloseSocket(sock);
+            tr_net_close_socket(sock);
         }
         else
         {
@@ -216,7 +222,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
     if (udp6_socket_ != TR_BAD_SOCKET)
     {
-        tr_netCloseSocket(udp6_socket_);
+        tr_net_close_socket(udp6_socket_);
         udp6_socket_ = TR_BAD_SOCKET;
     }
 
@@ -224,7 +230,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
     if (udp4_socket_ != TR_BAD_SOCKET)
     {
-        tr_netCloseSocket(udp4_socket_);
+        tr_net_close_socket(udp4_socket_);
         udp4_socket_ = TR_BAD_SOCKET;
     }
 }
@@ -237,7 +243,8 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     }
     else if (auto const sock = to->sa_family == AF_INET ? udp4_socket_ : udp6_socket_; sock == TR_BAD_SOCKET)
     {
-        errno = EBADF;
+        // don't warn on bad sockets; the system may not support IPv6
+        return;
     }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
     {

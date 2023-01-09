@@ -1678,7 +1678,7 @@ For å legge til en primær URL, legg den til etter en tom linje.</translation>
         <translation>&amp;På disse dagene:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+388"/>
+        <location filename="../PrefsDialog.cc" line="+382"/>
         <source>Every Day</source>
         <translation>Hver dag</translation>
     </message>
@@ -2419,7 +2419,7 @@ For å legge til en primær URL, legg den til etter en tom linje.</translation>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+173"/>
+        <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Magnetisert overføring - mottar metadata (%1%)</translation>

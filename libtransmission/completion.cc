@@ -121,7 +121,7 @@ std::vector<uint8_t> tr_completion::createPieceBitfield() const
     return pieces.raw();
 }
 
-/// mutators
+// --- mutators
 
 void tr_completion::addBlock(tr_block_index_t block)
 {

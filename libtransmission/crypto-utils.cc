@@ -29,7 +29,7 @@ extern "C"
 
 using namespace std::literals;
 
-///
+// ---
 
 namespace
 {
