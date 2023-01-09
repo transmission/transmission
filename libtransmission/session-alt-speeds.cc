@@ -51,7 +51,7 @@ void tr_session_alt_speeds::defaultSettings(tr_variant* tgt)
 #undef V
 }
 
-/// minutes
+// --- minutes
 
 void tr_session_alt_speeds::updateMinutes()
 {

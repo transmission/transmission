@@ -9,7 +9,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint32_t
 
-///
+// ---
 
 #ifdef _MSVC_LANG
 #define TR_CPLUSPLUS _MSVC_LANG
@@ -28,11 +28,7 @@
 // Can't implement right now because __cplusplus version for C++23 is currently TBD
 #define TR_CONSTEXPR23
 
-///
-
-/***
-****
-***/
+// ---
 
 #ifndef __has_builtin
 #define __has_builtin(x) 0

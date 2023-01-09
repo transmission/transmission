@@ -18,10 +18,6 @@
 #include "tr-assert.h"
 #include "utils.h" // tr_time_msec()
 
-/***
-****
-***/
-
 tr_bytes_per_second_t tr_bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
@@ -77,20 +73,20 @@ void tr_bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl*
     r->cache_time_ = 0;
 }
 
-/***
-****
-***/
+// ---
 
 tr_bandwidth::tr_bandwidth(tr_bandwidth* parent)
 {
     this->setParent(parent);
 }
 
-/***
-****
-***/
+// ---
 
-static void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me) noexcept
+namespace
+{
+namespace deparent_helpers
+{
+void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me) noexcept
 {
     // the list isn't sorted -- so instead of erase()ing `it`,
     // do the cheaper option of overwriting it with the final item
@@ -100,9 +96,13 @@ static void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me)
         v.resize(v.size() - 1);
     }
 }
+} // namespace deparent_helpers
+} // namespace
 
 void tr_bandwidth::deparent() noexcept
 {
+    using namespace deparent_helpers;
+
     if (parent_ == nullptr)
     {
         return;
@@ -131,9 +131,7 @@ void tr_bandwidth::setParent(tr_bandwidth* new_parent)
     }
 }
 
-/***
-****
-***/
+// ---
 
 void tr_bandwidth::allocateBandwidth(
     tr_priority_t parent_priority,
@@ -259,9 +257,7 @@ void tr_bandwidth::allocate(unsigned int period_msec)
     }
 }
 
-/***
-****
-***/
+// ---
 
 size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) const
 {
@@ -347,9 +343,7 @@ void tr_bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, 
     }
 }
 
-/***
-****
-***/
+// ---
 
 tr_bandwidth_limits tr_bandwidth::getLimits() const
 {

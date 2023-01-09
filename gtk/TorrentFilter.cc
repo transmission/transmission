@@ -1,13 +1,19 @@
-// This file Copyright © 2022 Mnemosyne LLC.
+// This file Copyright © 2022-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include "TorrentFilter.h"
 
+#include "FilterBase.hh"
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+
+TorrentFilter::TorrentFilter()
+    : Glib::ObjectBase(typeid(TorrentFilter))
+{
+}
 
 void TorrentFilter::set_activity(Activity type)
 {
@@ -108,6 +114,11 @@ bool TorrentFilter::match(Torrent const& torrent) const
     return match_activity(torrent) && match_tracker(torrent) && match_text(torrent);
 }
 
+bool TorrentFilter::matches_all() const
+{
+    return activity_type_ == Activity::ALL && tracker_type_ == Tracker::ALL && text_.empty();
+}
+
 void TorrentFilter::update(Torrent::ChangeFlags changes)
 {
     using Flag = Torrent::ChangeFlag;
@@ -145,15 +156,6 @@ void TorrentFilter::update(Torrent::ChangeFlags changes)
         changed(Change::DIFFERENT);
     }
 }
-
-#if !GTKMM_CHECK_VERSION(4, 0, 0)
-
-sigc::signal<void()>& TorrentFilter::signal_changed()
-{
-    return signal_changed_;
-}
-
-#endif
 
 Glib::RefPtr<TorrentFilter> TorrentFilter::create()
 {
@@ -245,33 +247,4 @@ bool TorrentFilter::match_text(Torrent const& torrent, Glib::ustring const& text
     }
 
     return ret;
-}
-
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-
-bool TorrentFilter::match_vfunc(Glib::RefPtr<Glib::ObjectBase> const& item)
-{
-    auto const torrent = gtr_ptr_dynamic_cast<Torrent>(item);
-    g_return_val_if_fail(torrent != nullptr, false);
-
-    return match(*torrent);
-}
-
-TorrentFilter::Match TorrentFilter::get_strictness_vfunc()
-{
-    return activity_type_ == Activity::ALL && tracker_type_ == Tracker::ALL && text_.empty() ? Match::ALL : Match::SOME;
-}
-
-#else
-
-void TorrentFilter::changed(Change /*change*/)
-{
-    signal_changed_.emit();
-}
-
-#endif
-
-TorrentFilter::TorrentFilter()
-    : Glib::ObjectBase(typeid(TorrentFilter))
-{
 }

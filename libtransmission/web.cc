@@ -228,8 +228,10 @@ public:
         Task(tr_web::Impl& impl_in, tr_web::FetchOptions&& options_in)
             : impl{ impl_in }
             , options{ std::move(options_in) }
-            , easy_{ impl.get_easy(tr_urlParse(options.url)->host) }
         {
+            auto const parsed = tr_urlParse(options.url);
+            easy_ = parsed ? impl.get_easy(parsed->host) : nullptr;
+
             response.user_data = options.done_func_user_data;
         }
 
@@ -365,7 +367,7 @@ public:
 
         tr_web::FetchOptions options;
 
-        CURL* const easy_;
+        CURL* easy_;
     };
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
