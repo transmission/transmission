@@ -59,7 +59,7 @@ struct tr_tracker_event
     int seeders;
 };
 
-using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);
+using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event);
 
 class tr_announcer
 {
@@ -70,7 +70,7 @@ public:
         std::atomic<size_t>& n_pending_stops);
     virtual ~tr_announcer() = default;
 
-    virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data) = 0;
+    virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback) = 0;
     virtual void startTorrent(tr_torrent* tor) = 0;
     virtual void stopTorrent(tr_torrent* tor) = 0;
     virtual void resetTorrent(tr_torrent* tor) = 0;
