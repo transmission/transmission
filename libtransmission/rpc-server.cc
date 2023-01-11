@@ -113,7 +113,7 @@ bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 
 // ---
 
-void send_simple_response(struct evhttp_request* req, int code, char const* text)
+void send_simple_response(struct evhttp_request* req, int code, char const* text = nullptr)
 {
     char const* code_text = tr_webGetResponseStr(code);
     struct evbuffer* body = evbuffer_new();
@@ -208,7 +208,7 @@ void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::st
     if (req->type != EVHTTP_REQ_GET)
     {
         evhttp_add_header(req->output_headers, "Allow", "GET");
-        send_simple_response(req, 405, nullptr);
+        send_simple_response(req, HTTP_BADMETHOD);
         return;
     }
 
@@ -268,7 +268,7 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
 
         if (tr_strvContains(subpath, ".."sv))
         {
-            send_simple_response(req, HTTP_NOTFOUND, "<p>Tsk, tsk.</p>");
+            send_simple_response(req, HTTP_NOTFOUND);
         }
         else
         {
@@ -322,7 +322,7 @@ void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
         return;
     }
 
-    send_simple_response(req, 405, nullptr);
+    send_simple_response(req, HTTP_BADMETHOD);
 }
 
 bool isAddressAllowed(tr_rpc_server const* server, char const* address)
@@ -419,6 +419,9 @@ bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
 
 void handle_request(struct evhttp_request* req, void* arg)
 {
+    auto constexpr HttpErrorUnauthorized = 401;
+    auto constexpr HttpErrorForbidden = 403;
+
     auto* server = static_cast<tr_rpc_server*>(arg);
 
     if (req != nullptr && req->evcon != nullptr)
@@ -427,19 +430,13 @@ void handle_request(struct evhttp_request* req, void* arg)
 
         if (server->isAntiBruteForceEnabled() && server->login_attempts_ >= server->anti_brute_force_limit_)
         {
-            send_simple_response(req, 403, "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
+            send_simple_response(req, HttpErrorForbidden);
             return;
         }
 
         if (!isAddressAllowed(server, req->remote_host))
         {
-            send_simple_response(
-                req,
-                403,
-                "<p>Unauthorized IP Address.</p>"
-                "<p>Either disable the IP address whitelist or add your address to it.</p>"
-                "<p>If you're editing settings.json, see the 'rpc-whitelist' and 'rpc-whitelist-enabled' entries.</p>"
-                "<p>If you're still using ACLs, use a whitelist instead. See the transmission-daemon manpage for details.</p>");
+            send_simple_response(req, HttpErrorForbidden);
             return;
         }
 
@@ -454,7 +451,7 @@ void handle_request(struct evhttp_request* req, void* arg)
             }
 
             evhttp_add_header(req->output_headers, "Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-            send_simple_response(req, 200, "");
+            send_simple_response(req, HTTP_OK);
             return;
         }
 
@@ -466,10 +463,7 @@ void handle_request(struct evhttp_request* req, void* arg)
                 ++server->login_attempts_;
             }
 
-            auto const unauthuser = fmt::format(
-                FMT_STRING("<p>Unauthorized User. {:d} unsuccessful login attempts.</p>"),
-                server->login_attempts_);
-            send_simple_response(req, 401, unauthuser.c_str());
+            send_simple_response(req, HttpErrorUnauthorized);
             return;
         }
 

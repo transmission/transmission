@@ -1025,7 +1025,7 @@ bool isNewTorrentASeed(tr_torrent* tor)
     return tor->ensurePieceIsChecked(0);
 }
 
-void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* /*user_data*/)
+void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event)
 {
     switch (event->type)
     {
@@ -1212,7 +1212,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         }
     }
 
-    tor->torrent_announcer = session->announcer_->addTorrent(tor, onTrackerResponse, nullptr);
+    tor->torrent_announcer = session->announcer_->addTorrent(tor, onTrackerResponse);
 
     if (is_new_torrent)
     {
@@ -1522,6 +1522,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     using namespace stat_helpers;
 
     TR_ASSERT(tr_isTorrent(tor));
+    auto const lock = tor->unique_lock();
 
     auto const now = tr_time_msec();
     auto const now_sec = tr_time();
