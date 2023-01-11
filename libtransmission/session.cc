@@ -609,13 +609,13 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 void tr_session::onNowTimer()
 {
     TR_ASSERT(now_timer_);
+    auto const now = std::chrono::system_clock::now();
 
     // tr_session upkeep tasks to perform once per second
-    tr_timeUpdate(time(nullptr));
+    tr_timeUpdate(std::chrono::system_clock::to_time_t(now));
     alt_speeds_.checkScheduler();
 
     // set the timer to kick again right after (10ms after) the next second
-    auto const now = std::chrono::system_clock::now();
     auto const target_time = std::chrono::time_point_cast<std::chrono::seconds>(now) + 1s + 10ms;
     auto target_interval = target_time - now;
     if (target_interval < 100ms)
