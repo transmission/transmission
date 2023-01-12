@@ -237,22 +237,6 @@ uint64_t tr_time_msec()
     return std::chrono::system_clock::now().time_since_epoch() / 1ms;
 }
 
-void tr_wait_msec(long int delay_milliseconds)
-{
-#ifdef _WIN32
-
-    Sleep((DWORD)delay_milliseconds);
-
-#else
-
-    struct timespec ts = {};
-    ts.tv_sec = delay_milliseconds / 1000;
-    ts.tv_nsec = (delay_milliseconds % 1000) * 1000000;
-    nanosleep(&ts, nullptr);
-
-#endif
-}
-
 /***
 ****
 ***/
