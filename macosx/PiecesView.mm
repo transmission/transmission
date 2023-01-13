@@ -39,6 +39,15 @@ enum
 
 @implementation PiecesView
 
+- (instancetype)initWithCoder:(NSCoder*)coder
+{
+    if ((self = [super initWithCoder:coder]))
+    {
+        _fPieces = std::vector<int8_t>{};
+    }
+    return self;
+}
+
 - (void)drawRect:(NSRect)dirtyRect
 {
     [[NSColor.controlTextColor colorWithAlphaComponent:0.2] setFill];
