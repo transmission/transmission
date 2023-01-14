@@ -3,9 +3,9 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 
 #import "PiecesView.h"
 #import "Torrent.h"
