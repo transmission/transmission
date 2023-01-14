@@ -337,28 +337,6 @@ static void removeKeRangerRansomware()
 
     ExpandedPathToIconTransformer* iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
     [NSValueTransformer setValueTransformer:iconTransformer forName:@"ExpandedPathToIconTransformer"];
-
-    //cover our asses
-    if ([NSUserDefaults.standardUserDefaults boolForKey:@"WarningLegal"])
-    {
-        NSAlert* alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle:NSLocalizedString(@"I Accept", "Legal alert -> button")];
-        [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Legal alert -> button")];
-        alert.messageText = NSLocalizedString(@"Welcome to Transmission", "Legal alert -> title");
-        alert.informativeText = NSLocalizedString(
-            @"Transmission is a file-sharing program."
-             " When you run a torrent, its data will be made available to others by means of upload."
-             " You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.",
-            "Legal alert -> message");
-        alert.alertStyle = NSAlertStyleInformational;
-
-        if ([alert runModal] == NSAlertSecondButtonReturn)
-        {
-            exit(0);
-        }
-
-        [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningLegal"];
-    }
 }
 
 void onStartQueue(tr_session* /*session*/, tr_torrent* tor, void* vself)
@@ -873,6 +851,28 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
 {
+    //cover our asses
+    if ([NSUserDefaults.standardUserDefaults boolForKey:@"WarningLegal"])
+    {
+        NSAlert* alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle:NSLocalizedString(@"I Accept", "Legal alert -> button")];
+        [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Legal alert -> button")];
+        alert.messageText = NSLocalizedString(@"Welcome to Transmission", "Legal alert -> title");
+        alert.informativeText = NSLocalizedString(
+            @"Transmission is a file-sharing program."
+             " When you run a torrent, its data will be made available to others by means of upload."
+             " You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.",
+            "Legal alert -> message");
+        alert.alertStyle = NSAlertStyleInformational;
+
+        if ([alert runModal] == NSAlertSecondButtonReturn)
+        {
+            exit(0);
+        }
+
+        [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningLegal"];
+    }
+
     NSApp.servicesProvider = self;
 
     self.fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
