@@ -26,7 +26,7 @@ using PieceInfo = union
 };
 
 auto* const DoneColor = NSColor.systemBlueColor;
-auto* const FlashColor = NSColor.systemOrangeColor;
+auto* const BlinkColor = NSColor.systemOrangeColor;
 auto* const HighColor = NSColor.systemGreenColor; // high availability
 
 [[nodiscard]] NSColor* backgroundColor()
@@ -34,7 +34,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
     return NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
 }
 
-[[nodiscard]] NSColor* availabilityColor(int8_t old_val, int8_t new_val, bool first)
+[[nodiscard]] NSColor* availabilityColor(int8_t old_val, int8_t new_val, bool no_blink)
 {
     constexpr auto kHighPeers = int8_t{ 10 };
 
@@ -51,28 +51,26 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
         return val >= kHighPeers;
     };
 
-    if (auto const is_done = test_done(new_val); is_done)
+    if (test_done(new_val))
     {
-        auto const was_done = test_done(old_val);
-        return !first && !was_done ? FlashColor : DoneColor;
+        return no_blink || test_done(old_val) ? DoneColor : BlinkColor;
     }
 
-    if (auto const is_none = test_none(new_val); is_none)
+    if (test_none(new_val))
     {
-        auto const was_none = test_none(old_val);
-        return !first && !was_none ? FlashColor : backgroundColor();
+        return no_blink || test_none(old_val) ? backgroundColor() : BlinkColor;
     }
-    else if (auto const is_high = test_high(new_val); is_high)
+
+    if (test_high(new_val))
     {
-        auto const was_high = test_high(old_val);
-        return !first && !was_high ? FlashColor : HighColor;
+        return no_blink || test_high(old_val) ? HighColor : BlinkColor;
     }
 
     auto percent = static_cast<CGFloat>(new_val) / kHighPeers;
     return [backgroundColor() blendedColorWithFraction:percent ofColor:HighColor];
 }
 
-[[nodiscard]] NSColor* completenessColor(float old_val, float new_val, bool first)
+[[nodiscard]] NSColor* completenessColor(float old_val, float new_val, bool no_blink)
 {
     constexpr auto test_done = [](auto val)
     {
@@ -83,20 +81,17 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
         return val <= 0.0F;
     };
 
-    if (auto const is_done = test_done(new_val); is_done)
+    if (test_done(new_val))
     {
-        auto const was_done = test_done(old_val);
-        return !first && !was_done ? FlashColor : DoneColor;
+        return no_blink || test_done(old_val) ? DoneColor : BlinkColor;
     }
 
-    if (auto const is_none = test_none(new_val); is_none)
+    if (test_none(new_val))
     {
-        auto const was_none = test_none(old_val);
-        return !first && !was_none ? FlashColor : backgroundColor();
+        return no_blink || test_none(old_val) ? backgroundColor() : BlinkColor;
     }
 
-    auto percent = new_val;
-    return [backgroundColor() blendedColorWithFraction:percent ofColor:DoneColor];
+    return [backgroundColor() blendedColorWithFraction:new_val ofColor:DoneColor];
 }
 
 } // namespace
@@ -165,7 +160,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
     auto const old_info = fPieceInfo;
     auto const first = fFirst;
 
-    // get the data that we're going to render
+    // get the info that we're going to render
     auto info = PieceInfo{};
     auto const show_availability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
     if (show_availability)
@@ -177,7 +172,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
         [self.torrent getAmountFinished:std::data(info.complete) size:n_cells];
     }
 
-    // get the render info for each cell
+    // get the bounds and color for each cell
     auto cell_colors = std::array<NSColor*, kMaxCells>{};
     auto cell_rects = std::array<NSRect, kMaxCells>{};
     for (NSInteger index = 0; index < n_cells; ++index)
@@ -194,7 +189,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
                                                  completenessColor(old_info.complete[index], info.complete[index], first);
     }
 
-    // render it
+    // draw it
     if (n_cells > 0)
     {
         self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
