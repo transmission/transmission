@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <optional>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -20,25 +19,96 @@ constexpr auto kMaxCells = kMaxAcross * kMaxAcross;
 
 constexpr auto kBetweenPadding = CGFloat{ 1.0 };
 
-constexpr auto kHighPeers = int8_t{ 10 };
-
-enum class PieceMode
+using PieceInfo = union
 {
-    None,
-    Some,
-    HighPeers,
-    Finished,
-    Flashing
+    std::array<int8_t, kMaxCells> available;
+    std::array<float, kMaxCells> complete;
 };
+
+auto* const DoneColor = NSColor.systemBlueColor;
+auto* const FlashColor = NSColor.systemOrangeColor;
+auto* const HighColor = NSColor.systemGreenColor; // high availability
+
+[[nodiscard]] NSColor* backgroundColor()
+{
+    return NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
+}
+
+[[nodiscard]] NSColor* availabilityColor(int8_t old_val, int8_t new_val, bool first)
+{
+    constexpr auto kHighPeers = int8_t{ 10 };
+
+    constexpr auto test_done = [](auto val)
+    {
+        return val == -1;
+    };
+    constexpr auto test_none = [](auto val)
+    {
+        return val == 0;
+    };
+    constexpr auto test_high = [](auto val)
+    {
+        return val >= kHighPeers;
+    };
+
+    if (auto const is_done = test_done(new_val); is_done)
+    {
+        auto const was_done = test_done(old_val);
+        return !first && !was_done ? FlashColor : DoneColor;
+    }
+
+    if (auto const is_none = test_none(new_val); is_none)
+    {
+        auto const was_none = test_none(old_val);
+        return !first && !was_none ? FlashColor : backgroundColor();
+    }
+    else if (auto const is_high = test_high(new_val); is_high)
+    {
+        auto const was_high = test_high(old_val);
+        return !first && !was_high ? FlashColor : HighColor;
+    }
+
+    auto percent = static_cast<CGFloat>(new_val) / kHighPeers;
+    return [backgroundColor() blendedColorWithFraction:percent ofColor:HighColor];
+}
+
+[[nodiscard]] NSColor* completenessColor(float old_val, float new_val, bool first)
+{
+    constexpr auto test_done = [](auto val)
+    {
+        return val >= 1.0F;
+    };
+    constexpr auto test_none = [](auto val)
+    {
+        return val <= 0.0F;
+    };
+
+    if (auto const is_done = test_done(new_val); is_done)
+    {
+        auto const was_done = test_done(old_val);
+        return !first && !was_done ? FlashColor : DoneColor;
+    }
+
+    if (auto const is_none = test_none(new_val); is_none)
+    {
+        auto const was_none = test_none(old_val);
+        return !first && !was_none ? FlashColor : backgroundColor();
+    }
+
+    auto percent = new_val;
+    return [backgroundColor() blendedColorWithFraction:percent ofColor:DoneColor];
+}
+
 } // namespace
 
 @interface PiecesView ()
-
-@property(nonatomic) std::optional<NSInteger> fNumPieces;
-
 @end
 
 @implementation PiecesView
+{
+    PieceInfo fPieceInfo;
+    bool fFirst;
+}
 
 - (void)drawRect:(NSRect)dirtyRect
 {
@@ -67,7 +137,6 @@ enum class PieceMode
     [self clearView];
 
     _torrent = (torrent && !torrent.magnet) ? torrent : nil;
-    _fNumPieces.reset();
     self.image = [[NSImage alloc] initWithSize:self.bounds.size];
 
     [self setNeedsDisplay];
@@ -75,7 +144,8 @@ enum class PieceMode
 
 - (void)clearView
 {
-    self.fNumPieces.reset();
+    fFirst = true;
+    fPieceInfo = {};
 }
 
 - (void)updateView
@@ -85,103 +155,58 @@ enum class PieceMode
         return;
     }
 
-    auto const n_pieces = std::min(_torrent.pieceCount, kMaxCells);
+    auto const n_cells = std::min(_torrent.pieceCount, kMaxCells);
     auto const full_width = self.bounds.size.width;
-    auto const across = static_cast<NSInteger>(ceil(sqrt(n_pieces)));
+    auto const across = static_cast<NSInteger>(ceil(sqrt(n_cells)));
     auto const cell_width = static_cast<NSInteger>((full_width - (across + 1) * kBetweenPadding) / across);
     auto const extra_border = static_cast<NSInteger>((full_width - ((cell_width + kBetweenPadding) * across + kBetweenPadding)) / 2);
 
-    // determine if first time
-    auto const first = !_fNumPieces.has_value();
-    _fNumPieces = n_pieces;
+    // get the previous state
+    auto const old_info = fPieceInfo;
+    auto const first = fFirst;
 
     // get the data that we're going to render
-    auto pieces = std::array<int8_t, kMaxCells>{};
-    auto pieces_percent = std::array<float, kMaxCells>{};
+    auto info = PieceInfo{};
     auto const show_availability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
     if (show_availability)
     {
-        [self.torrent getAvailability:std::data(pieces) size:n_pieces];
+        [self.torrent getAvailability:std::data(info.available) size:n_cells];
     }
     else
     {
-        [self.torrent getAmountFinished:std::data(pieces_percent) size:n_pieces];
+        [self.torrent getAmountFinished:std::data(info.complete) size:n_cells];
     }
 
-    // get the rect, color info for each cell
-    auto fill_colors = std::array<NSColor*, kMaxCells>{};
-    auto fill_rects = std::array<NSRect, kMaxCells>{};
-    auto piece_modes = std::array<PieceMode, kMaxCells>{};
-    auto* const default_color = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
-    auto used_count = NSInteger{};
-    for (NSInteger index = 0; index < n_pieces; ++index)
+    // get the render info for each cell
+    auto cell_colors = std::array<NSColor*, kMaxCells>{};
+    auto cell_rects = std::array<NSRect, kMaxCells>{};
+    for (NSInteger index = 0; index < n_cells; ++index)
     {
-        NSColor* pieceColor = nil;
+        auto const row = index / across;
+        auto const col = index % across;
 
-        if (show_availability ? pieces[index] == -1 : pieces_percent[index] == 1.0)
-        {
-            if (first || piece_modes[index] != PieceMode::Finished)
-            {
-                if (!first && piece_modes[index] != PieceMode::Flashing)
-                {
-                    pieceColor = NSColor.systemOrangeColor;
-                    piece_modes[index] = PieceMode::Flashing;
-                }
-                else
-                {
-                    pieceColor = NSColor.systemBlueColor;
-                    piece_modes[index] = PieceMode::Finished;
-                }
-            }
-        }
-        else if (show_availability ? pieces[index] == 0 : pieces_percent[index] == 0.0)
-        {
-            if (first || piece_modes[index] != PieceMode::None)
-            {
-                pieceColor = default_color;
-                piece_modes[index] = PieceMode::None;
-            }
-        }
-        else if (show_availability && pieces[index] >= kHighPeers)
-        {
-            if (first || piece_modes[index] != PieceMode::HighPeers)
-            {
-                pieceColor = NSColor.systemGreenColor;
-                piece_modes[index] = PieceMode::HighPeers;
-            }
-        }
-        else
-        {
-            //always redraw "mixed"
-            CGFloat percent = show_availability ? (CGFloat)pieces[index] / kHighPeers : pieces_percent[index];
-            NSColor* fullColor = show_availability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
-            pieceColor = [default_color blendedColorWithFraction:percent ofColor:fullColor];
-            piece_modes[index] = PieceMode::Some;
-        }
-
-        if (pieceColor)
-        {
-            auto const row = index / across;
-            auto const col = index % across;
-            fill_rects[used_count] = NSMakeRect(
-                col * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
-                full_width - (row + 1) * (cell_width + kBetweenPadding) - extra_border,
-                cell_width,
-                cell_width);
-            fill_colors[used_count] = pieceColor;
-
-            ++used_count;
-        }
+        cell_rects[index] = NSMakeRect(
+            col * (cell_width + kBetweenPadding) + kBetweenPadding + extra_border,
+            full_width - (row + 1) * (cell_width + kBetweenPadding) - extra_border,
+            cell_width,
+            cell_width);
+        cell_colors[index] = show_availability ? availabilityColor(old_info.available[index], info.available[index], first) :
+                                                 completenessColor(old_info.complete[index], info.complete[index], first);
     }
 
-    if (used_count > 0)
+    // render it
+    if (n_cells > 0)
     {
         self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
-            NSRectFillListWithColors(std::data(fill_rects), std::data(fill_colors), used_count);
+            NSRectFillListWithColors(std::data(cell_rects), std::data(cell_colors), n_cells);
             return YES;
         }];
         [self setNeedsDisplay];
     }
+
+    // save the current state so we can compare it later
+    fPieceInfo = info;
+    fFirst = false;
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent*)event
