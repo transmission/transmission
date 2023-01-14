@@ -28,11 +28,11 @@ else()
     if(STATUS AND NOT STATUS EQUAL 0)
         file(READ ${reference_file} CONTENTS)
         message("EXPECTED CONTENTS (${reference_file}):")
-        message(${CONTENTS})
+        message("===\n${CONTENTS}\n===\n")
 
         file(READ ${output_file} CONTENTS)
         message("RECEIVED CONTENTS (${output_file}):")
-        message(${CONTENTS})
+        message("===\n${CONTENTS}\n===\n")
 
         find_program(DIFF_EXEC diff)
         if(DIFF_EXEC)
