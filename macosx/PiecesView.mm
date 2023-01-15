@@ -158,7 +158,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
 
     // get the previous state
     auto const old_info = fPieceInfo;
-    auto const first = fRenderedHashString == nil || fRenderedHashString != self.torrent.hashString;
+    auto const first = fRenderedHashString != self.torrent.hashString;
 
     // get the info that we're going to render
     auto info = PieceInfo{};
