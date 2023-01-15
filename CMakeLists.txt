@@ -435,7 +435,12 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-tr_add_external_auto_library(DEFLATE libdeflate deflatestatic
+if(WIN32 AND NOT MINGW)
+    set(DEFLATE_LIB_NAME deflatestatic)
+else()
+    set(DEFLATE_LIB_NAME deflate)
+endif()
+tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
     TARGET deflate::deflate
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
