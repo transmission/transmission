@@ -622,7 +622,7 @@ struct tr_torrent_announcer
 
     std::vector<tr_tier> tiers;
 
-    tr_tracker_callback callback = nullptr;
+    tr_tracker_callback callback;
 
 private:
     [[nodiscard]] static tr_announce_list getAnnounceList(tr_torrent const* tor)
@@ -660,7 +660,7 @@ void publishMessage(tr_tier* tier, std::string_view msg, tr_tracker_event::Type 
             event.announce_url = current_tracker->announce_url;
         }
 
-        (*ta->callback)(tier->tor, &event);
+        ta->callback(*tier->tor, &event);
     }
 }
 
@@ -689,7 +689,7 @@ void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
         e.leechers = leechers;
         tr_logAddDebugTier(tier, fmt::format("peer counts: {} seeders, {} leechers.", seeders, leechers));
 
-        (*tier->tor->torrent_announcer->callback)(tier->tor, &e);
+        tier->tor->torrent_announcer->callback(*tier->tor, &e);
     }
 }
 
@@ -710,7 +710,7 @@ void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pe
                 leechers,
                 std::size(pex)));
 
-        (*tier->tor->torrent_announcer->callback)(tier->tor, &e);
+        tier->tor->torrent_announcer->callback(*tier->tor, &e);
     }
 }
 } // namespace publish_helpers

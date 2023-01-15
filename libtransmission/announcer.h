@@ -59,7 +59,7 @@ struct tr_tracker_event
     int seeders;
 };
 
-using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event);
+using tr_tracker_callback = std::function<void(tr_torrent&, tr_tracker_event const*)>;
 
 class tr_announcer
 {
