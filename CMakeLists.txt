@@ -31,7 +31,7 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
-set(DEFLATE_MINIMUM 1.10)
+set(DEFLATE_MINIMUM 1.17)
 set(EVENT2_MINIMUM 2.1.0)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
@@ -435,8 +435,16 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-tr_add_external_auto_library(DEFLATE libdeflate deflate
-    TARGET deflate::deflate)
+if(WIN32 AND NOT MINGW)
+    set(DEFLATE_LIB_NAME deflatestatic)
+else()
+    set(DEFLATE_LIB_NAME deflate)
+endif()
+tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
+    TARGET deflate::deflate
+    CMAKE_ARGS
+        -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
+        -DLIBDEFLATE_BUILD_GZIP=OFF)
 if(NOT USE_SYSTEM_DEFLATE)
     set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
 endif()
