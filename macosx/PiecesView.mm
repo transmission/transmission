@@ -102,7 +102,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
 @implementation PiecesView
 {
     PieceInfo fPieceInfo;
-    bool fFirst;
+    NSString* fRenderedHashString;
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -139,7 +139,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
 
 - (void)clearView
 {
-    fFirst = true;
+    fRenderedHashString = nil;
     fPieceInfo = {};
 }
 
@@ -158,7 +158,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
 
     // get the previous state
     auto const old_info = fPieceInfo;
-    auto const first = fFirst;
+    auto const first = fRenderedHashString == nil || fRenderedHashString != self.torrent.hashString;
 
     // get the info that we're going to render
     auto info = PieceInfo{};
@@ -201,7 +201,7 @@ auto* const HighColor = NSColor.systemGreenColor; // high availability
 
     // save the current state so we can compare it later
     fPieceInfo = info;
-    fFirst = false;
+    fRenderedHashString = self.torrent.hashString;
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent*)event
