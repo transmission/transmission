@@ -15,7 +15,9 @@
 #include "tr-macros.h"
 #include "utils.h"
 
-static char* tr_strvDup(std::string_view in)
+namespace
+{
+[[nodiscard]] char* tr_strvdup(std::string_view in)
 {
     auto const n = std::size(in);
     auto* const ret = new char[n + 1];
@@ -23,6 +25,7 @@ static char* tr_strvDup(std::string_view in)
     ret[n] = '\0';
     return ret;
 }
+} // namespace
 
 void tr_error_free(tr_error* error)
 {
@@ -43,7 +46,7 @@ void tr_error_set(tr_error** error, int code, std::string_view message)
     }
 
     TR_ASSERT(*error == nullptr);
-    *error = new tr_error{ code, tr_strvDup(message) };
+    *error = new tr_error{ code, tr_strvdup(message) };
 }
 
 void tr_error_propagate(tr_error** new_error, tr_error** old_error)
@@ -86,7 +89,7 @@ void tr_error_prefix(tr_error** error, char const* prefix)
     }
 
     auto* err = *error;
-    auto* const new_message = tr_strvDup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
+    auto* const new_message = tr_strvdup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
     delete[] err->message;
     err->message = new_message;
 }

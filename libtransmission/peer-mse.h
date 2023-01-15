@@ -75,7 +75,7 @@ private:
     key_bigend_t secret_ = {};
 };
 
-/// arc4 encryption for both incoming and outgoing stream
+// --- arc4 encryption for both incoming and outgoing stream
 class Filter
 {
 public:

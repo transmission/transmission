@@ -148,7 +148,7 @@ struct tr_announce_response
     std::optional<tr_address> external_ip;
 };
 
-/// SCRAPE
+// --- SCRAPE
 
 /* pick a number small enough for common tracker software:
  *  - ocelot has no upper bound

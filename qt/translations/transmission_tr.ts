@@ -222,7 +222,7 @@
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform>dakika</numerusform>
+            <numerusform> dakika</numerusform>
         </translation>
     </message>
     <message>
@@ -1337,7 +1337,7 @@
         <location line="-505"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
-            <numerusform>%Ln torrentden %L1 tanesi gösteriliyor</numerusform>
+            <numerusform>%Ln torrentin %L1 tanesi gösteriliyor</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1665,7 +1665,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>&amp;Şu günler:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+388"/>
+        <location filename="../PrefsDialog.cc" line="+382"/>
         <source>Every Day</source>
         <translation>Her Gün</translation>
     </message>
@@ -1765,7 +1765,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform>dakika</numerusform>
+            <numerusform> dakika</numerusform>
         </translation>
     </message>
     <message>
@@ -1830,7 +1830,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location filename="../PrefsDialog.cc" line="+168"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
-            <numerusform>&lt;i&gt;Karaliste %Ln kurallar içeriyor&lt;i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Engel listesi %Ln kural içeriyor&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -2214,7 +2214,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot;, &quot;%2&quot; olarak yeniden adlandırılamadı: %3.&lt;b&gt;&lt;p&gt;&lt;p&gt;Lütfen hataları düzeltip yeniden deneyin.&lt;p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot;, &quot;%2&quot; olarak yeniden adlandırılamadı: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Lütfen hataları düzeltip yeniden deneyin.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+528"/>
@@ -2334,7 +2334,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location filename="../StatsDialog.cc" line="+63"/>
         <source>Started %Ln time(s)</source>
         <translation>
-            <numerusform>%Ln defa başladı</numerusform>
+            <numerusform>%Ln kez başladı</numerusform>
         </translation>
     </message>
 </context>
@@ -2399,7 +2399,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+173"/>
+        <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Mıknatıslı aktarım - üst veri alınıyor (%%1)</translation>
@@ -2475,7 +2475,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>%Ln eşinden üstveri indiriliyor (%1% tamamlandı)</numerusform>
+            <numerusform>%Ln eşten üst veri indiriliyor (%%1 tamamlandı)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2483,7 +2483,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>%Ln bağlı eşten %1 tanesinden indiriliyor</numerusform>
+            <numerusform>%Ln bağlı eşin %1 tanesinden indiriliyor</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2491,7 +2491,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;, notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform>ve %Ln web beslemeleri</numerusform>
+            <numerusform> + %Ln web beslemesi</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2514,7 +2514,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>%1 %Ln eşitlerinin bir listesi var %2 %3 önce</numerusform>
+            <numerusform>%3 önce%1 %Ln eşin%2 listesi alındı</numerusform>
         </translation>
     </message>
     <message>
@@ -2527,7 +2527,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>%1&quot;%2&quot;%3 %4 önce hata alındı</translation>
+        <translation>%4 önce %1&quot;%2&quot;%3 hatası alındı</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2556,7 +2556,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform> İzleyicide %1 %Ln gönderici vardı %2</numerusform>
+            <numerusform>İzleyicide%1 %Ln besleyici%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2564,7 +2564,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform>ve %1 %Ln alıcılar %2 %3 önce</numerusform>
+            <numerusform> ve%1 %Ln alıcı%2 vardı, %3 önce</numerusform>
         </translation>
     </message>
     <message>
@@ -2577,7 +2577,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="-24"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>%1&quot;%2&quot;%3 %4 önce scrape hatası oluştu</translation>
+        <translation>%4 önce %1&quot;%2&quot;%3 scrape hatası alındı</translation>
     </message>
     <message>
         <location line="-17"/>

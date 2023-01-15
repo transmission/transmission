@@ -18,6 +18,10 @@ target_sources(${TR_NAME}-gtk
         FileList.h
         FilterBar.cc
         FilterBar.h
+        FilterBase.h
+        FilterBase.hh
+        FilterListModel.h
+        FilterListModel.hh
         Flags.h
         FreeSpaceLabel.cc
         FreeSpaceLabel.h
@@ -48,6 +52,10 @@ target_sources(${TR_NAME}-gtk
         RelocateDialog.h
         Session.cc
         Session.h
+        SorterBase.h
+        SorterBase.hh
+        SortListModel.h
+        SortListModel.hh
         StatsDialog.cc
         StatsDialog.h
         SystemTrayIcon.cc

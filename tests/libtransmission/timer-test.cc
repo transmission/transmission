@@ -198,9 +198,9 @@ TEST_F(TimerTest, restartWithDifferentInterval)
         expectInterval(interval, AsMSec(end_time - begin_time));
     };
 
-    test(100ms);
     test(200ms);
-    test(100ms);
+    test(400ms);
+    test(200ms);
 }
 
 TEST_F(TimerTest, restartWithSameInterval)
@@ -259,7 +259,7 @@ TEST_F(TimerTest, repeatingThenSingleShot)
     // now restart it as a single shot
     auto const baseline = n_calls;
     begin_time = currentTime();
-    static auto constexpr SingleShotInterval = 80ms;
+    static auto constexpr SingleShotInterval = 200ms;
     timer->startSingleShot(SingleShotInterval);
     EXPECT_EQ(SingleShotInterval, timer->interval());
     EXPECT_FALSE(timer->isRepeating());
