@@ -14,6 +14,7 @@
 void SessionDialog::accept()
 {
     prefs_.set(Prefs::SESSION_IS_REMOTE, ui_.remoteSessionRadio->isChecked());
+    prefs_.set(Prefs::SESSION_REMOTE_HTTPS, ui_.httpsCheck->isChecked());
     prefs_.set(Prefs::SESSION_REMOTE_HOST, ui_.hostEdit->text());
     prefs_.set(Prefs::SESSION_REMOTE_PORT, ui_.portSpin->value());
     prefs_.set(Prefs::SESSION_REMOTE_AUTH, ui_.authCheck->isChecked());
@@ -55,6 +56,9 @@ SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent)
 
     ui_.remoteSessionRadio->setChecked(prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
     connect(ui_.remoteSessionRadio, &QAbstractButton::toggled, this, &SessionDialog::resensitize);
+
+    ui_.httpsCheck->setChecked(prefs.get<bool>(Prefs::SESSION_REMOTE_HTTPS));
+    remote_widgets_ << ui_.httpsCheck;
 
     ui_.hostEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_HOST));
     remote_widgets_ << ui_.hostLabel << ui_.hostEdit;
