@@ -330,7 +330,14 @@ void Session::start()
     if (prefs_.get<bool>(Prefs::SESSION_IS_REMOTE))
     {
         QUrl url;
-        url.setScheme(QStringLiteral("http"));
+        if (prefs_.get<bool>(Prefs::SESSION_REMOTE_HTTPS))
+        {
+            url.setScheme(QStringLiteral("https"));
+        }
+        else
+        {
+            url.setScheme(QStringLiteral("http"));
+        }
         url.setHost(prefs_.get<QString>(Prefs::SESSION_REMOTE_HOST));
         url.setPort(prefs_.get<int>(Prefs::SESSION_REMOTE_PORT));
         url.setPath(QStringLiteral("/transmission/rpc"));
