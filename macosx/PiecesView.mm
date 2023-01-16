@@ -10,7 +10,7 @@
 #import "Torrent.h"
 #import "InfoWindowController.h"
 #import "NSApplicationAdditions.h"
-    
+
 static NSInteger const kMaxAcross = 18;
 static NSInteger const kMaxCells = kMaxAcross * kMaxAcross;
 
@@ -22,9 +22,10 @@ static NSColor* const DoneColor = NSColor.systemBlueColor;
 static NSColor* const BlinkColor = NSColor.systemOrangeColor;
 static NSColor* const HighColor = NSColor.systemGreenColor; // high availability
 
-typedef struct PieceInfo {
-    int8_t available[ kMaxCells ];
-    float complete[ kMaxCells ];
+typedef struct PieceInfo
+{
+    int8_t available[kMaxCells];
+    float complete[kMaxCells];
 } PieceInfo;
 
 @interface PiecesView ()
@@ -81,7 +82,7 @@ typedef struct PieceInfo {
     return val >= kHighPeers;
 }
 
-- (NSColor*)availabilityColor:(int8_t)oldVal newVal:(int8_t)newVal  noBlink:(bool)noBlink
+- (NSColor*)availabilityColor:(int8_t)oldVal newVal:(int8_t)newVal noBlink:(bool)noBlink
 {
     if ([self availabilityDone:newVal])
     {
@@ -182,17 +183,15 @@ typedef struct PieceInfo {
         NSInteger const row = index / across;
         NSInteger const col = index % across;
 
-        cellBounds[index] = [NSValue
-            valueWithRect:NSMakeRect(
-                              col * (cellWidth + kBetweenPadding) + kBetweenPadding + extraBorder,
-                              fullWidth - (row + 1) * (cellWidth + kBetweenPadding) - extraBorder,
-                              cellWidth,
-                              cellWidth)];
+        cellBounds[index] = [NSValue valueWithRect:NSMakeRect(
+                                                       col * (cellWidth + kBetweenPadding) + kBetweenPadding + extraBorder,
+                                                       fullWidth - (row + 1) * (cellWidth + kBetweenPadding) - extraBorder,
+                                                       cellWidth,
+                                                       cellWidth)];
 
-        cellColors[index] = showAvailability
-            ? [self availabilityColor:oldInfo.available[index] newVal:info.available[index] noBlink:first]
-            : [self completenessColor:oldInfo.complete[index] newVal:info.complete[index] noBlink:first];
-
+        cellColors[index] = showAvailability ?
+            [self availabilityColor:oldInfo.available[index] newVal:info.available[index] noBlink:first] :
+            [self completenessColor:oldInfo.complete[index] newVal:info.complete[index] noBlink:first];
     }
 
     // draw it
