@@ -40,61 +40,61 @@ typedef struct PieceInfo
     return NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
 }
 
-- (BOOL)completenessDone:(float)val
+- (BOOL)isCompletenessDone:(float)val
 {
     return val >= 1.0F;
 }
 
-- (BOOL)completenessNone:(float)val
+- (BOOL)isCompletenessNone:(float)val
 {
     return val <= 0.0F;
 }
 
 - (NSColor*)completenessColor:(float)oldVal newVal:(float)newVal noBlink:(BOOL)noBlink
 {
-    if ([self completenessDone:newVal])
+    if ([self isCompletenessDone:newVal])
     {
-        return noBlink || [self completenessDone:oldVal] ? DoneColor : BlinkColor;
+        return noBlink || [self isCompletenessDone:oldVal] ? DoneColor : BlinkColor;
     }
 
-    if ([self completenessNone:newVal])
+    if ([self isCompletenessNone:newVal])
     {
-        return noBlink || [self completenessNone:oldVal] ? [self backgroundColor] : BlinkColor;
+        return noBlink || [self isCompletenessNone:oldVal] ? [self backgroundColor] : BlinkColor;
     }
 
     return [[self backgroundColor] blendedColorWithFraction:newVal ofColor:DoneColor];
 }
 
-- (BOOL)availabilityDone:(uint8_t)val
+- (BOOL)isAvailabilityDone:(uint8_t)val
 {
     return val == (uint8_t)-1;
 }
 
-- (BOOL)availabilityNone:(uint8_t)val
+- (BOOL)isAvailabilityNone:(uint8_t)val
 {
     return val == 0;
 }
 
-- (BOOL)availabilityHigh:(uint8_t)val
+- (BOOL)isAvailabilityHigh:(uint8_t)val
 {
     return val >= kHighPeers;
 }
 
 - (NSColor*)availabilityColor:(int8_t)oldVal newVal:(int8_t)newVal noBlink:(bool)noBlink
 {
-    if ([self availabilityDone:newVal])
+    if ([self isAvailabilityDone:newVal])
     {
-        return noBlink || [self availabilityDone:oldVal] ? DoneColor : BlinkColor;
+        return noBlink || [self isAvailabilityDone:oldVal] ? DoneColor : BlinkColor;
     }
 
-    if ([self availabilityNone:newVal])
+    if ([self isAvailabilityNone:newVal])
     {
-        return noBlink || [self availabilityNone:oldVal] ? [self backgroundColor] : BlinkColor;
+        return noBlink || [self isAvailabilityNone:oldVal] ? [self backgroundColor] : BlinkColor;
     }
 
-    if ([self availabilityHigh:newVal])
+    if ([self isAvailabilityHigh:newVal])
     {
-        return noBlink || [self availabilityHigh:oldVal] ? HighColor : BlinkColor;
+        return noBlink || [self isAvailabilityHigh:oldVal] ? HighColor : BlinkColor;
     }
 
     CGFloat percent = CGFloat(newVal) / kHighPeers;
