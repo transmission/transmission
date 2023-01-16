@@ -1275,13 +1275,7 @@ void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const&
     if (multiscrape_max != n)
     {
         // don't log the full URL, since that might have a personal announce id
-        // (note: we know 'parsed' will be successful since this url has a scrape_info)
-        if (auto const parsed = tr_urlParse(url); parsed)
-        {
-            tr_logAddDebug(
-                fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n),
-                fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed->scheme, parsed->host, parsed->port));
-        }
+        tr_logAddDebug(fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n), tr_urlTrackerLogName(url));
 
         multiscrape_max = n;
     }
