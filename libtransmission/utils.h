@@ -7,12 +7,14 @@
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
 #include <ctime> // time_t
 #include <optional>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <type_traits>
 #include <vector>
 
@@ -85,8 +87,12 @@ constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, 
 /** @brief return the current date in milliseconds */
 [[nodiscard]] uint64_t tr_time_msec();
 
-/** @brief sleep the specified number of milliseconds */
-void tr_wait_msec(long int delay_milliseconds);
+/** @brief sleep for the specified duration */
+template<class rep, class period>
+void tr_wait(std::chrono::duration<rep, period> const& delay)
+{
+    std::this_thread::sleep_for(delay);
+}
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
@@ -204,7 +210,7 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
 
 [[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
 
-[[nodiscard]] std::string tr_strvUtf8Clean(std::string_view cleanme);
+[[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 
 /**
  * @brief copies `src` into `buf`.

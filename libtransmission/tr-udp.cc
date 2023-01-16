@@ -19,15 +19,16 @@
 #include "tr-utp.h"
 #include "utils.h"
 
+namespace
+{
 /* Since we use a single UDP socket in order to implement multiple
    µTP sockets, try to set up huge buffers. */
-
-static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
-static auto constexpr SendBufferSize = 1 * 1024 * 1024;
-static auto constexpr SmallBufferSize = 32 * 1024;
-
-static void set_socket_buffers(tr_socket_t fd, bool large)
+void set_socket_buffers(tr_socket_t fd, bool large)
 {
+    static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
+    static auto constexpr SendBufferSize = 1 * 1024 * 1024;
+    static auto constexpr SmallBufferSize = 32 * 1024;
+
     int rbuf = 0;
     int sbuf = 0;
     socklen_t rbuf_len = sizeof(rbuf);
@@ -83,7 +84,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     }
 }
 
-static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
+void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
 {
     TR_ASSERT(vsession != nullptr);
     TR_ASSERT(type == EV_READ);
@@ -130,6 +131,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         }
     }
 }
+} // namespace
 
 // BEP-32 explains why we need to bind to one IPv6 address
 

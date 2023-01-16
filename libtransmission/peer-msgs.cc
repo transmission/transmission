@@ -48,12 +48,10 @@
 
 using namespace std::literals;
 
-/**
-***
-**/
+namespace
+{
 
 // these values are hardcoded by various BEPs as noted
-
 namespace BtPeerMsgs
 {
 
@@ -118,34 +116,33 @@ auto constexpr Reject = int{ 2 };
 
 } // namespace MetadataMsgType
 
-static auto constexpr MinChokePeriodSec = int{ 10 };
+auto constexpr MinChokePeriodSec = int{ 10 };
 
 // idle seconds before we send a keepalive
-static auto constexpr KeepaliveIntervalSecs = int{ 100 };
+auto constexpr KeepaliveIntervalSecs = int{ 100 };
 
-static auto constexpr MetadataReqQ = int{ 64 };
+auto constexpr MetadataReqQ = int{ 64 };
 
-static auto constexpr ReqQ = int{ 512 };
+auto constexpr ReqQ = int{ 512 };
 
 // used in lowering the outMessages queue period
-static auto constexpr ImmediatePriorityIntervalSecs = int{ 0 };
-static auto constexpr HighPriorityIntervalSecs = int{ 2 };
-static auto constexpr LowPriorityIntervalSecs = int{ 10 };
+auto constexpr ImmediatePriorityIntervalSecs = int{ 0 };
+auto constexpr HighPriorityIntervalSecs = int{ 2 };
+auto constexpr LowPriorityIntervalSecs = int{ 10 };
 
 // how many blocks to keep prefetched per peer
-static auto constexpr PrefetchMax = size_t{ 18 };
+auto constexpr PrefetchMax = size_t{ 18 };
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to
 // meet our bandwidth goals for the next N seconds
-static auto constexpr RequestBufSecs = int{ 10 };
+auto constexpr RequestBufSecs = int{ 10 };
 
-namespace
-{
+// ---
 
 auto constexpr MaxPexPeerCount = size_t{ 50 };
 
-} // unnamed namespace
+// ---
 
 enum class AwaitingBt
 {
@@ -162,9 +159,7 @@ enum class EncryptionPreference
     No
 };
 
-/**
-***
-**/
+// ---
 
 struct peer_request
 {
@@ -178,15 +173,13 @@ struct peer_request
     }
 };
 
-static peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
+peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
 {
     auto const loc = tor->blockLoc(block);
     return peer_request{ loc.piece, loc.piece_offset, tor->blockSize(block) };
 }
 
-/**
-***
-**/
+// ---
 
 /* this is raw, unchanged data from the peer regarding
  * the current message that it's sending us. */
@@ -200,19 +193,19 @@ struct tr_incoming
 
 class tr_peerMsgsImpl;
 // TODO: make these to be member functions
-static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
-static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
-static void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs);
-static void gotError(tr_peerIo* io, tr_error const& err, void* vmsgs);
-static void peerPulse(void* vmsgs);
-static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
-static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
-static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index);
-static void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port);
-static void sendInterest(tr_peerMsgsImpl* msgs, bool b);
-static void sendLtepHandshake(tr_peerMsgsImpl* msgs);
-static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
-static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
+ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece);
+void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs);
+void didWrite(tr_peerIo* io, size_t bytes_written, bool was_piece_data, void* vmsgs);
+void gotError(tr_peerIo* io, tr_error const& err, void* vmsgs);
+void peerPulse(void* vmsgs);
+void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
+void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
+void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index);
+void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port);
+void sendInterest(tr_peerMsgsImpl* msgs, bool b);
+void sendLtepHandshake(tr_peerMsgsImpl* msgs);
+void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
+void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 
 #define myLogMacro(msgs, level, text) \
     do \
@@ -230,12 +223,6 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 
 #define logdbg(msgs, text) myLogMacro(msgs, TR_LOG_DEBUG, text)
 #define logtrace(msgs, text) myLogMacro(msgs, TR_LOG_TRACE, text)
-
-tr_peerMsgs::~tr_peerMsgs()
-{
-    [[maybe_unused]] auto const n_prev = n_peers_--;
-    TR_ASSERT(n_prev > 0U);
-}
 
 /**
  * Low-level communication state information about a connected peer.
@@ -562,7 +549,7 @@ private:
         // Get the rate limit we should use.
         // TODO: this needs to consider all the other peers as well...
         uint64_t const now = tr_time_msec();
-        auto rate_bytes_per_second = tr_peerGetPieceSpeedBytesPerSecond(this, now, TR_PEER_TO_CLIENT);
+        auto rate_bytes_per_second = get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
         if (torrent->usesSpeedLimit(TR_PEER_TO_CLIENT))
         {
             rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speedLimitBps(TR_PEER_TO_CLIENT));
@@ -719,21 +706,11 @@ private:
     static auto constexpr SendPexInterval = 90s;
 };
 
-tr_peerMsgs* tr_peerMsgsNew(
-    tr_torrent* torrent,
-    peer_atom* atom,
-    std::shared_ptr<tr_peerIo> io,
-    tr_peer_callback callback,
-    void* callback_data)
-{
-    return new tr_peerMsgsImpl(torrent, atom, std::move(io), callback, callback_data);
-}
-
 /**
 ***
 **/
 
-static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const* req)
+void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
     TR_ASSERT(msgs->io->supports_fext());
 
@@ -749,7 +726,7 @@ static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const*
     msgs->dbgOutMessageLen();
 }
 
-static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
+void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
 {
     auto& out = msgs->outMessages;
 
@@ -764,7 +741,7 @@ static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
 }
 
-static void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port)
+void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port)
 {
     auto& out = msgs->outMessages;
 
@@ -774,7 +751,7 @@ static void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port)
     out.addPort(port);
 }
 
-static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
+void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
 {
     auto& out = msgs->outMessages;
 
@@ -787,7 +764,7 @@ static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
     msgs->pokeBatchPeriod(LowPriorityIntervalSecs);
 }
 
-static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
+void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
 {
     auto& out = msgs->outMessages;
 
@@ -799,7 +776,7 @@ static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
 }
 
-static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
+void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
 {
     TR_ASSERT(msgs->io->supports_fext());
 
@@ -813,7 +790,7 @@ static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
 }
 
-static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
+void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
 {
     TR_ASSERT(msgs->io->supports_fext());
 
@@ -827,11 +804,9 @@ static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
 }
 
-/**
-***  INTEREST
-**/
+// --- INTEREST
 
-static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
+void sendInterest(tr_peerMsgsImpl* msgs, bool b)
 {
     TR_ASSERT(msgs != nullptr);
 
@@ -845,7 +820,7 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
     msgs->dbgOutMessageLen();
 }
 
-static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* setme)
+bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* setme)
 {
     if (std::empty(msgs->peerAskedForMetadata))
     {
@@ -858,7 +833,7 @@ static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* setme)
     return true;
 }
 
-static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
+void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
     if (auto const must_send_rej = msgs->io->supports_fext(); must_send_rej)
     {
@@ -871,11 +846,9 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
     msgs->peer_requested_.clear();
 }
 
-/**
-***
-**/
+// ---
 
-static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
+void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
     auto& out = msgs->outMessages;
     static tr_quark version_quark = 0;
@@ -998,7 +971,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantClear(&val);
 }
 
-static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len)
+void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len)
 {
     msgs->peerSentLtepHandshake = true;
 
@@ -1104,7 +1077,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len)
     tr_variantClear(&val);
 }
 
-static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
+void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
 {
     int64_t msg_type = -1;
     int64_t piece = -1;
@@ -1173,7 +1146,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
     }
 }
 
-static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
+void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
 {
     auto* const tor = msgs->torrent;
     if (!tor->allowsPex())
@@ -1223,7 +1196,7 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen)
     }
 }
 
-static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen)
+void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen)
 {
     TR_ASSERT(msglen > 0);
 
@@ -1261,7 +1234,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen)
     }
 }
 
-static ReadState readBtLength(tr_peerMsgsImpl* msgs, size_t inlen)
+ReadState readBtLength(tr_peerMsgsImpl* msgs, size_t inlen)
 {
     auto len = uint32_t{};
     if (inlen < sizeof(len))
@@ -1283,9 +1256,9 @@ static ReadState readBtLength(tr_peerMsgsImpl* msgs, size_t inlen)
     return READ_NOW;
 }
 
-static ReadState readBtMessage(tr_peerMsgsImpl* /*msgs*/, size_t /*inlen*/);
+ReadState readBtMessage(tr_peerMsgsImpl* /*msgs*/, size_t /*inlen*/);
 
-static ReadState readBtId(tr_peerMsgsImpl* msgs, size_t inlen)
+ReadState readBtId(tr_peerMsgsImpl* msgs, size_t inlen)
 {
     if (inlen < sizeof(uint8_t))
     {
@@ -1314,7 +1287,7 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, size_t inlen)
     return readBtMessage(msgs, inlen - 1);
 }
 
-static void prefetchPieces(tr_peerMsgsImpl* msgs)
+void prefetchPieces(tr_peerMsgsImpl* msgs)
 {
     if (!msgs->session->allowsPrefetch())
     {
@@ -1333,7 +1306,7 @@ static void prefetchPieces(tr_peerMsgsImpl* msgs)
     }
 }
 
-[[nodiscard]] static bool canAddRequestFromPeer(tr_peerMsgsImpl const* const msgs, struct peer_request const& req)
+[[nodiscard]] bool canAddRequestFromPeer(tr_peerMsgsImpl const* const msgs, struct peer_request const& req)
 {
     if (msgs->peer_is_choked_)
     {
@@ -1362,7 +1335,7 @@ static void prefetchPieces(tr_peerMsgsImpl* msgs)
     return true;
 }
 
-static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
+void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
     if (canAddRequestFromPeer(msgs, *req))
     {
@@ -1375,7 +1348,7 @@ static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* re
     }
 }
 
-static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint32_t len)
+bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint32_t len)
 {
     switch (id)
     {
@@ -1426,9 +1399,9 @@ static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint3
     }
 }
 
-static int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>>& block_data, tr_block_index_t block);
+int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>>& block_data, tr_block_index_t block);
 
-static ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_bytes_read)
+ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_bytes_read)
 {
     TR_ASSERT(msgs->io->read_buffer_size() >= inlen);
 
@@ -1508,7 +1481,7 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_
     return clientGotBlock(msgs, block_buf, block) != 0 ? READ_ERR : READ_NOW;
 }
 
-static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
+ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
 {
     uint8_t const id = msgs->incoming.id;
 #ifdef TR_ENABLE_ASSERTS
@@ -1773,10 +1746,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, size_t inlen)
 }
 
 /* returns 0 on success, or an errno on failure */
-static int clientGotBlock(
-    tr_peerMsgsImpl* msgs,
-    std::unique_ptr<std::vector<uint8_t>>& block_data,
-    tr_block_index_t const block)
+int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>>& block_data, tr_block_index_t const block)
 {
     TR_ASSERT(msgs != nullptr);
 
@@ -1827,7 +1797,7 @@ static int clientGotBlock(
     return 0;
 }
 
-static void didWrite(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs)
+void didWrite(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_data, void* vmsgs)
 {
     auto* const msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
@@ -1839,7 +1809,7 @@ static void didWrite(tr_peerIo* /*io*/, size_t bytes_written, bool was_piece_dat
     peerPulse(msgs);
 }
 
-static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
+ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
     size_t const inlen = io->read_buffer_size();
@@ -1886,16 +1856,14 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     return ret;
 }
 
-/**
-***
-**/
+// ---
 
-static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
+void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 {
     msgs->desired_request_count = msgs->canRequest().max_blocks;
 }
 
-static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
+void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
 {
     if (!msgs->peerSupportsMetadataXfer)
     {
@@ -1928,7 +1896,7 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
     }
 }
 
-static void updateBlockRequests(tr_peerMsgsImpl* msgs)
+void updateBlockRequests(tr_peerMsgsImpl* msgs)
 {
     auto* const tor = msgs->torrent;
 
@@ -1958,7 +1926,7 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
     }
 }
 
-static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
+size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 {
     size_t bytes_written = 0;
     struct peer_request req;
@@ -2132,7 +2100,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     return bytes_written;
 }
 
-static void peerPulse(void* vmsgs)
+void peerPulse(void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
     time_t const now = tr_time();
@@ -2150,12 +2118,12 @@ static void peerPulse(void* vmsgs)
     }
 }
 
-static void gotError(tr_peerIo* /*io*/, tr_error const& /*error*/, void* vmsgs)
+void gotError(tr_peerIo* /*io*/, tr_error const& /*error*/, void* vmsgs)
 {
     static_cast<tr_peerMsgsImpl*>(vmsgs)->publish(tr_peer_event::GotError(ENOTCONN));
 }
 
-static void sendBitfield(tr_peerMsgsImpl* msgs)
+void sendBitfield(tr_peerMsgsImpl* msgs)
 {
     TR_ASSERT(msgs->torrent->hasMetainfo());
 
@@ -2169,7 +2137,7 @@ static void sendBitfield(tr_peerMsgsImpl* msgs)
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
 }
 
-static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
+void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 {
     bool const fext = msgs->io->supports_fext();
 
@@ -2327,4 +2295,22 @@ void tr_peerMsgsImpl::sendPex()
     this->dbgOutMessageLen();
 
     tr_variantClear(&val);
+}
+
+} // namespace
+
+tr_peerMsgs::~tr_peerMsgs()
+{
+    [[maybe_unused]] auto const n_prev = n_peers_--;
+    TR_ASSERT(n_prev > 0U);
+}
+
+tr_peerMsgs* tr_peerMsgsNew(
+    tr_torrent* torrent,
+    peer_atom* atom,
+    std::shared_ptr<tr_peerIo> io,
+    tr_peer_callback callback,
+    void* callback_data)
+{
+    return new tr_peerMsgsImpl(torrent, atom, std::move(io), callback, callback_data);
 }

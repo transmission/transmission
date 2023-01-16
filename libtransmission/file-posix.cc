@@ -1097,9 +1097,10 @@ std::string tr_sys_dir_get_current(tr_error** error)
     }
 }
 
+namespace
+{
 #ifndef HAVE_MKDIRP
-
-static bool tr_mkdirp_(std::string_view path, int permissions, tr_error** error)
+[[nodiscard]] bool tr_mkdirp_(std::string_view path, int permissions, tr_error** error)
 {
     auto walk = path.find_first_not_of('/'); // walk past the root
     auto subpath = tr_pathbuf{};
@@ -1128,8 +1129,8 @@ static bool tr_mkdirp_(std::string_view path, int permissions, tr_error** error)
 
     return true;
 }
-
 #endif
+} // namespace
 
 bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
 {

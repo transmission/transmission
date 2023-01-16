@@ -66,7 +66,7 @@ enum tau_action_t
     TAU_ACTION_ERROR = 3
 };
 
-/// SCRAPE
+// --- SCRAPE
 
 struct tau_scrape_request
 {
@@ -162,7 +162,7 @@ private:
     tr_scrape_response_func on_response_;
 };
 
-/// ANNOUNCE
+// --- ANNOUNCE
 
 struct tau_announce_request
 {
@@ -285,7 +285,7 @@ private:
     tr_announce_response_func on_response_;
 };
 
-/// TRACKER
+// --- TRACKER
 
 struct tau_tracker
 {
@@ -569,7 +569,7 @@ private:
     static inline constexpr auto ConnectionRequestTtl = int{ 30 };
 };
 
-/// SESSION
+// --- SESSION
 
 class tr_announcer_udp_impl final : public tr_announcer_udp
 {

@@ -43,6 +43,33 @@
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
 
+namespace
+{
+// Helps us to ignore errors that say "try again later"
+// since that's what peer-io does by default anyway.
+[[nodiscard]] auto constexpr canRetryFromError(int error_code) noexcept
+{
+    return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
+}
+
+size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
+{
+    // this is all kind of arbitrary, but what seems to work well is
+    // being large enough to hold the next 20 seconds' worth of input,
+    // or a few blocks, whichever is bigger. OK to tweak this as needed.
+    static auto constexpr PeriodSecs = 15U;
+
+    // the 3 is an arbitrary number of blocks;
+    // the .5 is to leave room for protocol messages
+    static auto constexpr Floor = static_cast<size_t>(tr_block_info::BlockSize * 3.5);
+
+    auto const current_speed_bytes_per_second = io->get_piece_speed_bytes_per_second(now, TR_UP);
+    return std::max(Floor, current_speed_bytes_per_second * PeriodSecs);
+}
+} // namespace
+
+// ---
+
 tr_peerIo::tr_peerIo(
     tr_session* session,
     tr_sha1_digest_t const* info_hash,
@@ -140,7 +167,7 @@ tr_peerIo::~tr_peerIo()
     close();
 }
 
-///
+// ---
 
 void tr_peerIo::set_socket(tr_peer_socket socket_in)
 {
@@ -211,16 +238,7 @@ bool tr_peerIo::reconnect()
     return true;
 }
 
-///
-
-// Helps us to ignore errors that say "try again later"
-// since that's what peer-io does by default anyway.
-[[nodiscard]] static auto constexpr canRetryFromError(int error_code) noexcept
-{
-    return error_code == 0 || error_code == EAGAIN || error_code == EINTR || error_code == EINPROGRESS;
-}
-
-///
+// ---
 
 void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
 {
@@ -314,7 +332,7 @@ void tr_peerIo::event_write_cb([[maybe_unused]] evutil_socket_t fd, short /*even
     io->try_write(SIZE_MAX);
 }
 
-///
+// ---
 
 void tr_peerIo::can_read_wrapper()
 {
@@ -439,7 +457,7 @@ void tr_peerIo::event_read_cb([[maybe_unused]] evutil_socket_t fd, short /*event
     io->try_read(n_left);
 }
 
-///
+// ---
 
 void tr_peerIo::event_enable(short event)
 {
@@ -547,22 +565,7 @@ size_t tr_peerIo::flush_outgoing_protocol_msgs()
     return flush(TR_UP, byte_count);
 }
 
-///
-
-static size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
-{
-    // this is all kind of arbitrary, but what seems to work well is
-    // being large enough to hold the next 20 seconds' worth of input,
-    // or a few blocks, whichever is bigger. OK to tweak this as needed.
-    static auto constexpr PeriodSecs = 15U;
-
-    // the 3 is an arbitrary number of blocks;
-    // the .5 is to leave room for protocol messages
-    static auto constexpr Floor = static_cast<size_t>(tr_block_info::BlockSize * 3.5);
-
-    auto const current_speed_bytes_per_second = io->get_piece_speed_bytes_per_second(now, TR_UP);
-    return std::max(Floor, current_speed_bytes_per_second * PeriodSecs);
-}
+// ---
 
 size_t tr_peerIo::get_write_buffer_space(uint64_t now) const noexcept
 {
@@ -594,7 +597,7 @@ void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_dat
     outbuf_info_.emplace_back(n_bytes, is_piece_data);
 }
 
-///
+// ---
 
 void tr_peerIo::read_bytes(void* bytes, size_t byte_count)
 {
@@ -634,7 +637,7 @@ void tr_peerIo::read_buffer_drain(size_t byte_count)
     }
 }
 
-/// UTP
+// --- UTP
 
 #ifdef WITH_UTP
 

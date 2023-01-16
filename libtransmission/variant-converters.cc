@@ -34,7 +34,7 @@ void VariantConverter::save<bool>(tr_variant* tgt, bool const& val)
     tr_variantInitBool(tgt, val);
 }
 
-///
+// ---
 
 template<>
 std::optional<double> VariantConverter::load<double>(tr_variant* src)
@@ -53,7 +53,7 @@ void VariantConverter::save<double>(tr_variant* tgt, double const& val)
     tr_variantInitReal(tgt, val);
 }
 
-///
+// ---
 
 namespace EncryptionHelpers
 {
@@ -104,7 +104,7 @@ void VariantConverter::save<tr_encryption_mode>(tr_variant* tgt, tr_encryption_m
     tr_variantInitInt(tgt, val);
 }
 
-///
+// ---
 
 namespace LogLevelHelpers
 {
@@ -159,7 +159,7 @@ void VariantConverter::save<tr_log_level>(tr_variant* tgt, tr_log_level const& v
     tr_variantInitInt(tgt, val);
 }
 
-///
+// ---
 
 template<>
 std::optional<tr_mode_t> VariantConverter::load<tr_mode_t>(tr_variant* src)
@@ -186,7 +186,7 @@ void VariantConverter::save<tr_mode_t>(tr_variant* tgt, tr_mode_t const& val)
     tr_variantInitStr(tgt, fmt::format("{:#03o}", val));
 }
 
-///
+// ---
 
 template<>
 std::optional<tr_port> VariantConverter::load<tr_port>(tr_variant* src)
@@ -205,7 +205,7 @@ void VariantConverter::save<tr_port>(tr_variant* tgt, tr_port const& val)
     tr_variantInitInt(tgt, val.host());
 }
 
-///
+// ---
 
 namespace PreallocationModeHelpers
 {
@@ -258,7 +258,7 @@ void VariantConverter::save<tr_preallocation_mode>(tr_variant* tgt, tr_prealloca
     tr_variantInitInt(tgt, val);
 }
 
-///
+// ---
 
 template<>
 std::optional<size_t> VariantConverter::load<size_t>(tr_variant* src)
@@ -277,7 +277,7 @@ void VariantConverter::save<size_t>(tr_variant* tgt, size_t const& val)
     tr_variantInitInt(tgt, val);
 }
 
-///
+// ---
 
 template<>
 std::optional<std::string> VariantConverter::load<std::string>(tr_variant* src)
@@ -296,7 +296,7 @@ void VariantConverter::save<std::string>(tr_variant* tgt, std::string const& val
     tr_variantInitStr(tgt, val);
 }
 
-///
+// ---
 
 template<>
 std::optional<tr_tos_t> VariantConverter::load<tr_tos_t>(tr_variant* src)
