@@ -1782,7 +1782,7 @@ void tr_torrentStartNow(tr_torrent* tor)
     }
 }
 
-void tr_torrentStartMagent(tr_torrent* tor)
+void tr_torrentStartMagnet(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))
     {
