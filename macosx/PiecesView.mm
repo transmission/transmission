@@ -2,8 +2,6 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <vector>
-
 #include <libtransmission/transmission.h>
 
 #import "PiecesView.h"
@@ -127,16 +125,10 @@ typedef struct PieceInfo
 
 - (void)setTorrent:(Torrent*)torrent
 {
-    [self clearView];
-
     _torrent = (torrent && !torrent.magnet) ? torrent : nil;
-    if (_torrent)
-    {
-    }
+    self.image = [[NSImage alloc] initWithSize:self.bounds.size];
 
-    NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
-    self.image = back;
-
+    [self clearView];
     [self setNeedsDisplay];
 }
 
@@ -153,19 +145,14 @@ typedef struct PieceInfo
         return;
     }
 
-    NSInteger const numCells = MIN(_torrent.pieceCount, kMaxCells);
-    NSInteger const across = (NSInteger)ceil(sqrt(numCells));
-    CGFloat const fullWidth = self.bounds.size.width;
-    NSInteger const cellWidth = (NSInteger)((fullWidth - (across + 1) * kBetweenPadding) / across);
-    NSInteger const extraBorder = (NSInteger)((fullWidth - ((cellWidth + kBetweenPadding) * across + kBetweenPadding)) / 2);
-
     // get the previous state
     PieceInfo const oldInfo = fPieceInfo;
-    BOOL const first = fRenderedHashString != self.torrent.hashString;
+    BOOL const first = ![self.torrent.hashString isEqualToString:fRenderedHashString];
 
     // get the current state
     PieceInfo info;
     BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
+    NSInteger const numCells = MIN(_torrent.pieceCount, kMaxCells);
     if (showAvailability)
     {
         [self.torrent getAvailability:info.available size:numCells];
@@ -175,7 +162,11 @@ typedef struct PieceInfo
         [self.torrent getAmountFinished:info.complete size:numCells];
     }
 
-    // get the bounds and color info for each cell
+    // compute bounds and color of each cell
+    NSInteger const across = (NSInteger)ceil(sqrt(numCells));
+    CGFloat const fullWidth = self.bounds.size.width;
+    NSInteger const cellWidth = (NSInteger)((fullWidth - (across + 1) * kBetweenPadding) / across);
+    NSInteger const extraBorder = (NSInteger)((fullWidth - ((cellWidth + kBetweenPadding) * across + kBetweenPadding)) / 2);
     NSMutableArray<NSValue*>* cellBounds = [NSMutableArray arrayWithCapacity:numCells];
     NSMutableArray<NSColor*>* cellColors = [NSMutableArray arrayWithCapacity:numCells];
     for (NSInteger index = 0; index < numCells; index++)
@@ -194,7 +185,7 @@ typedef struct PieceInfo
             [self completenessColor:oldInfo.complete[index] newVal:info.complete[index] noBlink:first];
     }
 
-    // draw it
+    // build an image with the cells
     if (numCells > 0)
     {
         self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
