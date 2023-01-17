@@ -1184,12 +1184,12 @@ $video-image: '../img/film.svg';
 
   > * {
     appearance: none;
+    background-color: var(--color-border-selected);
     background-position: center;
     background-repeat: no-repeat;
     background-size: $halfsize, $size;
     border: 1px solid var(--color-border);
     height: $size;
-    background-color: var(--color-border-selected);
     margin: 0;
     padding: 0;
     width: $size;
