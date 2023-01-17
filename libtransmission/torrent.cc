@@ -2213,7 +2213,10 @@ void tr_torrent::onTrackerResponse(tr_tracker_event const* event)
         break;
 
     case tr_tracker_event::Type::Warning:
-        tr_logAddWarnTor(this, fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", event->text)));
+        tr_logAddWarnTor(
+            this,
+            fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", event->text))
+                .append(fmt::format(" ({})", tr_urlTrackerLogName(event->announce_url))));
         error = TR_STAT_TRACKER_WARNING;
         error_announce_url = event->announce_url;
         error_string = event->text;
