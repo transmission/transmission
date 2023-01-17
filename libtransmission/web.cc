@@ -228,8 +228,10 @@ public:
         Task(tr_web::Impl& impl_in, tr_web::FetchOptions&& options_in)
             : impl{ impl_in }
             , options{ std::move(options_in) }
-            , easy_{ impl.get_easy(tr_urlParse(options.url)->host) }
         {
+            auto const parsed = tr_urlParse(options.url);
+            easy_ = parsed ? impl.get_easy(parsed->host) : nullptr;
+
             response.user_data = options.done_func_user_data;
         }
 
@@ -245,7 +247,7 @@ public:
             easy_dispose(easy_);
         }
 
-        [[nodiscard]] auto* easy() const
+        [[nodiscard]] constexpr auto* easy() const
         {
             return easy_;
         }
@@ -255,42 +257,42 @@ public:
             return options.buffer != nullptr ? options.buffer : privbuf.get();
         }
 
-        [[nodiscard]] auto const& speedLimitTag() const
+        [[nodiscard]] constexpr auto const& speedLimitTag() const
         {
             return options.speed_limit_tag;
         }
 
-        [[nodiscard]] auto const& url() const
+        [[nodiscard]] constexpr auto const& url() const
         {
             return options.url;
         }
 
-        [[nodiscard]] auto const& range() const
+        [[nodiscard]] constexpr auto const& range() const
         {
             return options.range;
         }
 
-        [[nodiscard]] auto const& cookies() const
+        [[nodiscard]] constexpr auto const& cookies() const
         {
             return options.cookies;
         }
 
-        [[nodiscard]] auto const& sndbuf() const
+        [[nodiscard]] constexpr auto const& sndbuf() const
         {
             return options.sndbuf;
         }
 
-        [[nodiscard]] auto const& rcvbuf() const
+        [[nodiscard]] constexpr auto const& rcvbuf() const
         {
             return options.rcvbuf;
         }
 
-        [[nodiscard]] auto const& timeoutSecs() const
+        [[nodiscard]] constexpr auto const& timeoutSecs() const
         {
             return options.timeout_secs;
         }
 
-        [[nodiscard]] auto ipProtocol() const
+        [[nodiscard]] constexpr auto ipProtocol() const
         {
             switch (options.ip_proto)
             {
@@ -365,7 +367,7 @@ public:
 
         tr_web::FetchOptions options;
 
-        CURL* const easy_;
+        CURL* easy_;
     };
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
@@ -428,6 +430,31 @@ public:
         size_t const bytes_used = size * nmemb;
         auto* task = static_cast<Task*>(vtask);
         TR_ASSERT(std::this_thread::get_id() == task->impl.curl_thread->get_id());
+
+        if (auto const range = task->range(); range)
+        {
+            // https://curl.se/libcurl/c/CURLINFO_RESPONSE_CODE.html
+            // "The stored value will be zero if no server response code has been received"
+            static auto constexpr NoResponseCode = 0L;
+            static auto constexpr PartialContentResponseCode = 206L;
+
+            // Test for webservers that don't support partial-content, see GH #4595
+            auto code = long{};
+            (void)curl_easy_getinfo(task->easy(), CURLINFO_RESPONSE_CODE, &code);
+            if (code != NoResponseCode && code != PartialContentResponseCode)
+            {
+                tr_logAddWarn(fmt::format(
+                    _("Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"),
+                    fmt::arg("url", task->url()),
+                    fmt::arg("expected_code", PartialContentResponseCode),
+                    fmt::arg("actual_code", code)));
+
+                // Tell curl to error out. Returning anything that's not
+                // `bytes_used` signals an error and causes the transfer
+                // to be aborted w/CURLE_WRITE_ERROR.
+                return bytes_used + 1;
+            }
+        }
 
         if (auto const& tag = task->speedLimitTag(); tag)
         {
@@ -528,7 +555,7 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_URL, task.url().c_str());
         (void)curl_easy_setopt(e, CURLOPT_VERBOSE, curl_verbose ? 1L : 0L);
         (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, &task);
-        (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
+        (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, &tr_web::Impl::onDataReceived);
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
 
         if (auto const addrstr = task.publicAddress(); addrstr)
@@ -669,7 +696,7 @@ public:
                 ++repeats;
                 if (repeats > 1U)
                 {
-                    tr_wait_msec(100);
+                    tr_wait(100ms);
                 }
             }
             else

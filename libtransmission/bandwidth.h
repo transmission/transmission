@@ -168,6 +168,18 @@ public:
         return did_change;
     }
 
+    [[nodiscard]] bool is_maxed_out(tr_direction dir, uint64_t now_msec) const noexcept
+    {
+        if (!isLimited(dir))
+        {
+            return false;
+        }
+
+        auto const got = getPieceSpeedBytesPerSecond(now_msec, dir);
+        auto const want = getDesiredSpeedBytesPerSecond(dir);
+        return got >= want;
+    }
+
     /**
      * @brief Get the desired speed for the bandwidth subtree.
      * @see tr_bandwidth::setDesiredSpeed

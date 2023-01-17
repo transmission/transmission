@@ -11,12 +11,12 @@
 
 #include <event2/buffer.h>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "cache.h" // tr_cacheWriteBlock()
-#include "file.h" // tr_sys_path_*()
-#include "tr-strbuf.h"
-#include "variant.h"
+#include <libtransmission/cache.h> // tr_cacheWriteBlock()
+#include <libtransmission/file.h> // tr_sys_path_*()
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/variant.h>
 
 #include "test-fixtures.h"
 

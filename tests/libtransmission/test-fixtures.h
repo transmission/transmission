@@ -18,14 +18,14 @@
 
 #include <event2/event.h>
 
-#include "crypto-utils.h" // tr_base64_decode()
-#include "error.h"
-#include "file.h" // tr_sys_file_*()
-#include "platform.h" // TR_PATH_DELIMITER
-#include "quark.h"
-#include "torrent.h"
-#include "utils.h"
-#include "variant.h"
+#include <libtransmission/crypto-utils.h> // tr_base64_decode()
+#include <libtransmission/error.h>
+#include <libtransmission/file.h> // tr_sys_file_*()
+#include <libtransmission/platform.h> // TR_PATH_DELIMITER
+#include <libtransmission/quark.h>
+#include <libtransmission/torrent.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
 
@@ -89,7 +89,7 @@ inline bool waitFor(std::function<bool()> const& test, std::chrono::milliseconds
             return false;
         }
 
-        tr_wait_msec(10);
+        tr_wait(10ms);
     }
 }
 

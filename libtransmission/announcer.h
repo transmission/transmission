@@ -59,7 +59,7 @@ struct tr_tracker_event
     int seeders;
 };
 
-using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event, void* client_data);
+using tr_tracker_callback = std::function<void(tr_torrent&, tr_tracker_event const*)>;
 
 class tr_announcer
 {
@@ -70,7 +70,7 @@ public:
         std::atomic<size_t>& n_pending_stops);
     virtual ~tr_announcer() = default;
 
-    virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback, void* callback_data) = 0;
+    virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback) = 0;
     virtual void startTorrent(tr_torrent* tor) = 0;
     virtual void stopTorrent(tr_torrent* tor) = 0;
     virtual void resetTorrent(tr_torrent* tor) = 0;
@@ -107,7 +107,7 @@ tr_tracker_view tr_announcerTracker(tr_torrent const* torrent, size_t nth);
 
 size_t tr_announcerTrackerCount(tr_torrent const* tor);
 
-/// ANNOUNCE
+// --- ANNOUNCE
 
 enum tr_announce_event
 {
@@ -126,7 +126,7 @@ struct tr_announce_response;
 struct tr_scrape_request;
 struct tr_scrape_response;
 
-/// UDP ANNOUNCER
+// --- UDP ANNOUNCER
 
 using tr_scrape_response_func = std::function<void(tr_scrape_response const&)>;
 using tr_announce_response_func = std::function<void(tr_announce_response const&)>;

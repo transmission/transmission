@@ -41,9 +41,9 @@
 #undef TR_ENCRYPTION_H
 #undef TR_CRYPTO_UTILS_H
 
-#include "crypto-utils.h"
-#include "crypto-utils.cc"
-#include "crypto-utils-openssl.cc"
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/crypto-utils.cc>
+#include <libtransmission/crypto-utils-openssl.cc>
 
 #undef tr_base64_decode
 #undef tr_base64_decode_impl

@@ -7,8 +7,9 @@
 
 #include <array>
 #include <cstddef> // size_t
+#include <cstdint> // uint32_t
 
-///
+// ---
 
 #ifdef _MSVC_LANG
 #define TR_CPLUSPLUS _MSVC_LANG
@@ -27,11 +28,7 @@
 // Can't implement right now because __cplusplus version for C++23 is currently TBD
 #define TR_CONSTEXPR23
 
-///
-
-/***
-****
-***/
+// ---
 
 #ifndef __has_builtin
 #define __has_builtin(x) 0
@@ -87,6 +84,20 @@
 
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__
+
+// https://www.bittorrent.org/beps/bep_0007.html
+// "The client SHOULD include a key parameter in its announces. The key
+// should remain the same for a particular infohash during a torrent
+// session. Together with the peer_id this allows trackers to uniquely
+// identify clients for the purpose of statistics-keeping when they
+// announce from multiple IP.
+// The key should be generated so it has at least 32bits worth of entropy."
+//
+// https://www.bittorrent.org/beps/bep_0015.html
+// "Clients that resolve hostnames to v4 and v6 and then announce to both
+// should use the same [32-bit integer] key for both so that trackers that
+// care about accurate statistics-keeping can match the two announces."
+using tr_announce_key_t = uint32_t;
 
 // https://www.bittorrent.org/beps/bep_0003.html
 // A string of length 20 which this downloader uses as its id. Each

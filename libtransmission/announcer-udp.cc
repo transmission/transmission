@@ -5,6 +5,7 @@
 
 #include <algorithm> // for std::find_if()
 #include <cerrno> // for errno, EAFNOSUPPORT
+#include <climits> // for CHAR_BIT
 #include <cstring> // for memset()
 #include <ctime>
 #include <future>
@@ -41,15 +42,17 @@
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())
 #define logtrace(interned, msg) tr_logAddTrace(msg, (interned).sv())
 
+namespace
+{
 using namespace std::literals;
 
 // size defined by bep15
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
-static constexpr auto TauConnectionTtlSecs = time_t{ 45 };
+constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
-static auto tau_transaction_new()
+auto tau_transaction_new()
 {
     return tr_rand_obj<tau_transaction_t>();
 }
@@ -63,9 +66,7 @@ enum tau_action_t
     TAU_ACTION_ERROR = 3
 };
 
-/****
-*****  SCRAPE
-****/
+// --- SCRAPE
 
 struct tau_scrape_request
 {
@@ -143,7 +144,7 @@ struct tau_scrape_request
         }
     }
 
-    [[nodiscard]] auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
         return created_at_ + TR_SCRAPE_TIMEOUT_SEC.count();
     }
@@ -161,15 +162,16 @@ private:
     tr_scrape_response_func on_response_;
 };
 
-/****
-*****  ANNOUNCE
-****/
+// --- ANNOUNCE
 
 struct tau_announce_request
 {
     tau_announce_request(uint32_t announce_ip, tr_announce_request const& in, tr_announce_response_func on_response)
         : on_response_{ std::move(on_response) }
     {
+        // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
+        static_assert(sizeof(tr_announce_request::key) * CHAR_BIT == 32);
+
         response.seeders = -1;
         response.leechers = -1;
         response.downloads = -1;
@@ -226,8 +228,8 @@ struct tau_announce_request
             response.leechers = buf.toUint32();
             response.seeders = buf.toUint32();
 
-            auto const contiguous = std::vector<std::byte>{ std::begin(buf), std::end(buf) };
-            response.pex = tr_pex::from_compact_ipv4(std::data(contiguous), std::size(contiguous), nullptr, 0);
+            auto const [bytes, n_bytes] = buf.pullup();
+            response.pex = tr_pex::from_compact_ipv4(bytes, n_bytes, nullptr, 0);
             requestFinished();
         }
         else
@@ -237,7 +239,7 @@ struct tau_announce_request
         }
     }
 
-    [[nodiscard]] auto expiresAt() const noexcept
+    [[nodiscard]] constexpr auto expiresAt() const noexcept
     {
         return created_at_ + TR_ANNOUNCE_TIMEOUT_SEC.count();
     }
@@ -283,9 +285,7 @@ private:
     tr_announce_response_func on_response_;
 };
 
-/****
-*****  TRACKER
-****/
+// --- TRACKER
 
 struct tau_tracker
 {
@@ -379,8 +379,8 @@ struct tau_tracker
             buf.addUint32(TAU_ACTION_CONNECT);
             buf.addUint32(this->connection_transaction_id);
 
-            auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
-            this->sendto(std::data(contiguous), std::size(contiguous));
+            auto const [bytes, n_bytes] = buf.pullup();
+            this->sendto(bytes, n_bytes);
         }
 
         if (timeout_reqs)
@@ -540,8 +540,8 @@ private:
         buf.addUint64(this->connection_id);
         buf.add(payload, payload_len);
 
-        auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
-        this->sendto(std::data(contiguous), std::size(contiguous));
+        auto const [bytes, n_bytes] = buf.pullup();
+        this->sendto(bytes, n_bytes);
     }
 
 public:
@@ -569,9 +569,7 @@ private:
     static inline constexpr auto ConnectionRequestTtl = int{ 30 };
 };
 
-/****
-*****  SESSION
-****/
+// --- SESSION
 
 class tr_announcer_udp_impl final : public tr_announcer_udp
 {
@@ -746,6 +744,8 @@ private:
 
     Mediator& mediator_;
 };
+
+} // namespace
 
 std::unique_ptr<tr_announcer_udp> tr_announcer_udp::create(Mediator& mediator)
 {

@@ -55,7 +55,7 @@ public:
 
 auto log_state = tr_log_state{};
 
-///
+// ---
 
 tr_sys_file_t tr_logGetFile()
 {
@@ -295,7 +295,7 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     errno = err;
 }
 
-///
+// ---
 
 namespace
 {

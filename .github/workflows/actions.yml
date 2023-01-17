@@ -93,7 +93,7 @@ jobs:
           ./code_style.sh
           set +e
           git diff --exit-code > style.diff
-          echo "::set-output name=differs::$?"
+          echo "differs=$?" >> $GITHUB_OUTPUT
           cat style.diff
           set -e
       - name: Upload Diffs
@@ -389,6 +389,7 @@ jobs:
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
       - name: Package
+        if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
         run: |
           Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
           cmake --build obj --config RelWithDebInfo --target pack-msi

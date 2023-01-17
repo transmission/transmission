@@ -1,186 +1,176 @@
-project(trmac)
-
 if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS MACOS_SUPPORT_MINIMUM)
     message(FATAL_ERROR "Targeting macOS versions before ${MACOS_SUPPORT_MINIMUM} is not supported for the macOS project, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR})
+set(MAC_BUNDLE_NAME Transmission)
 
 add_compile_options(
     -fcxx-modules
     -fmodules
-    -fobjc-arc)
+    -fobjc-arc
+    # #warnings are good practice in development
+    "-Wno-#warnings"
+    # GNU extensions are good practice in Objective-C
+    -Wno-gnu)
 
 find_program(ACTOOL_EXECUTABLE actool REQUIRED)
 find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
-find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
 
-macro(tr_wrap_xib IFILE OFILE)
-    get_filename_component(twx_nib_dir "${OFILE}" DIRECTORY)
-    add_custom_command(
-        OUTPUT ${OFILE}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${twx_nib_dir}
-        COMMAND ${IBTOOL_EXECUTABLE} --compile ${OFILE} ${IFILE}
-        DEPENDS ${IFILE}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-        VERBATIM
-    )
-    source_group("Generated Files" FILES ${OFILE})
-endmacro()
+add_subdirectory(QuickLookPlugin)
+add_subdirectory(VDKQueue)
 
-set(${PROJECT_NAME}_SOURCES
-    AboutWindowController.mm
-    AddMagnetWindowController.mm
-    AddWindowController.mm
-    BadgeView.mm
-    Badger.mm
-    BlocklistDownloader.mm
-    BlocklistDownloaderViewController.mm
-    BlocklistScheduler.mm
-    BonjourController.mm
-    ButtonToolbarItem.mm
-    ColorTextField.mm
-    Controller.mm
-    CreatorWindowController.mm
-    DragOverlayView.mm
-    DragOverlayWindow.mm
-    ExpandedPathToIconTransformer.mm
-    ExpandedPathToPathTransformer.mm
-    FileListNode.mm
-    FileNameCell.mm
-    FileOutlineController.mm
-    FileOutlineView.mm
-    FilePriorityCell.mm
-    FileRenameSheetController.mm
-    FilterBarController.mm
-    FilterBarView.mm
-    FilterButton.mm
-    GlobalOptionsPopoverViewController.mm
-    GroupPopUpButtonCell.mm
-    GroupTextCell.mm
-    GroupToolbarItem.mm
-    GroupsController.mm
-    GroupsPrefsController.mm
-    InfoActivityViewController.mm
-    InfoFileViewController.mm
-    InfoGeneralViewController.mm
-    InfoOptionsViewController.mm
-    InfoPeersViewController.mm
-    InfoTextField.mm
-    InfoTrackersViewController.mm
-    InfoWindowController.mm
-    main.mm
-    MessageWindowController.mm
-    NSApplicationAdditions.mm
-    NSDataAdditions.mm
-    NSImageAdditions.mm
-    NSKeyedUnarchiverAdditions.mm
-    NSMutableArrayAdditions.mm
-    NSStringAdditions.mm
-    PeerProgressIndicatorCell.mm
-    PeerTableView.mm
-    PiecesView.mm
-    PortChecker.mm
-    PredicateEditorRowTemplateAny.mm
-    PrefsController.mm
-    PrefsWindow.mm
-    PriorityPopUpButtonCell.mm
-    ProgressGradients.mm
-    ShareToolbarItem.mm
-    ShareTorrentFileHelper.mm
-    SparkleProxy.mm
-    StatsWindowController.mm
-    StatusBarController.mm
-    StatusBarView.mm
-    Toolbar.mm
-    Torrent.mm
-    TorrentCell.mm
-    TorrentGroup.mm
-    TorrentTableView.mm
-    TrackerCell.mm
-    TrackerNode.mm
-    TrackerTableView.mm
-    URLSheetWindowController.mm
-    WebSeedTableView.mm
-)
+add_executable(${TR_NAME}-mac MACOSX_BUNDLE)
 
-set(${PROJECT_NAME}_HEADERS
-    AboutWindowController.h
-    AddMagnetWindowController.h
-    AddWindowController.h
-    BadgeView.h
-    Badger.h
-    BlocklistDownloader.h
-    BlocklistDownloaderViewController.h
-    BlocklistScheduler.h
-    BonjourController.h
-    ButtonToolbarItem.h
-    CocoaCompatibility.h
-    ColorTextField.h
-    Controller.h
-    CreatorWindowController.h
-    DragOverlayView.h
-    DragOverlayWindow.h
-    ExpandedPathToIconTransformer.h
-    ExpandedPathToPathTransformer.h
-    FileListNode.h
-    FileNameCell.h
-    FileOutlineController.h
-    FileOutlineView.h
-    FilePriorityCell.h
-    FileRenameSheetController.h
-    FilterBarController.h
-    FilterBarView.h
-    FilterButton.h
-    GlobalOptionsPopoverViewController.h
-    GroupPopUpButtonCell.h
-    GroupTextCell.h
-    GroupToolbarItem.h
-    GroupsController.h
-    GroupsPrefsController.h
-    InfoActivityViewController.h
-    InfoFileViewController.h
-    InfoGeneralViewController.h
-    InfoOptionsViewController.h
-    InfoPeersViewController.h
-    InfoTextField.h
-    InfoTrackersViewController.h
-    InfoViewController.h
-    InfoWindowController.h
-    MessageWindowController.h
-    NSApplicationAdditions.h
-    NSDataAdditions.h
-    NSImageAdditions.h
-    NSKeyedUnarchiverAdditions.h
-    NSMutableArrayAdditions.h
-    NSStringAdditions.h
-    PeerProgressIndicatorCell.h
-    PeerTableView.h
-    PiecesView.h
-    PortChecker.h
-    PredicateEditorRowTemplateAny.h
-    PrefsController.h
-    PrefsWindow.h
-    PriorityPopUpButtonCell.h
-    ProgressGradients.h
-    ShareToolbarItem.h
-    ShareTorrentFileHelper.h
-    StatsWindowController.h
-    StatusBarController.h
-    StatusBarView.h
-    Toolbar.h
-    Torrent.h
-    TorrentCell.h
-    TorrentGroup.h
-    TorrentTableView.h
-    TrackerCell.h
-    TrackerNode.h
-    TrackerTableView.h
-    URLSheetWindowController.h
-    WebSeedTableView.h
-)
+target_sources(${TR_NAME}-mac
+    PRIVATE
+        AboutWindowController.h
+        AboutWindowController.mm
+        AddMagnetWindowController.h
+        AddMagnetWindowController.mm
+        AddWindowController.h
+        AddWindowController.mm
+        Badger.h
+        Badger.mm
+        BadgeView.h
+        BadgeView.mm
+        BlocklistDownloader.h
+        BlocklistDownloader.mm
+        BlocklistDownloaderViewController.h
+        BlocklistDownloaderViewController.mm
+        BlocklistScheduler.h
+        BlocklistScheduler.mm
+        BonjourController.h
+        BonjourController.mm
+        ButtonToolbarItem.h
+        ButtonToolbarItem.mm
+        CocoaCompatibility.h
+        ColorTextField.h
+        ColorTextField.mm
+        Controller.h
+        Controller.mm
+        CreatorWindowController.h
+        CreatorWindowController.mm
+        DragOverlayView.h
+        DragOverlayView.mm
+        DragOverlayWindow.h
+        DragOverlayWindow.mm
+        ExpandedPathToIconTransformer.h
+        ExpandedPathToIconTransformer.mm
+        ExpandedPathToPathTransformer.h
+        ExpandedPathToPathTransformer.mm
+        FileListNode.h
+        FileListNode.mm
+        FileNameCell.h
+        FileNameCell.mm
+        FileOutlineController.h
+        FileOutlineController.mm
+        FileOutlineView.h
+        FileOutlineView.mm
+        FilePriorityCell.h
+        FilePriorityCell.mm
+        FileRenameSheetController.h
+        FileRenameSheetController.mm
+        FilterBarController.h
+        FilterBarController.mm
+        FilterBarView.h
+        FilterBarView.mm
+        FilterButton.h
+        FilterButton.mm
+        GlobalOptionsPopoverViewController.h
+        GlobalOptionsPopoverViewController.mm
+        GroupPopUpButtonCell.h
+        GroupPopUpButtonCell.mm
+        GroupsController.h
+        GroupsController.mm
+        GroupsPrefsController.h
+        GroupsPrefsController.mm
+        GroupTextCell.h
+        GroupTextCell.mm
+        GroupToolbarItem.h
+        GroupToolbarItem.mm
+        InfoActivityViewController.h
+        InfoActivityViewController.mm
+        InfoFileViewController.h
+        InfoFileViewController.mm
+        InfoGeneralViewController.h
+        InfoGeneralViewController.mm
+        InfoOptionsViewController.h
+        InfoOptionsViewController.mm
+        InfoPeersViewController.h
+        InfoPeersViewController.mm
+        InfoTextField.h
+        InfoTextField.mm
+        InfoTrackersViewController.h
+        InfoTrackersViewController.mm
+        InfoViewController.h
+        InfoWindowController.h
+        InfoWindowController.mm
+        main.mm
+        MessageWindowController.h
+        MessageWindowController.mm
+        NSApplicationAdditions.h
+        NSApplicationAdditions.mm
+        NSDataAdditions.h
+        NSDataAdditions.mm
+        NSImageAdditions.h
+        NSImageAdditions.mm
+        NSKeyedUnarchiverAdditions.h
+        NSKeyedUnarchiverAdditions.mm
+        NSMutableArrayAdditions.h
+        NSMutableArrayAdditions.mm
+        NSStringAdditions.h
+        NSStringAdditions.mm
+        PeerProgressIndicatorCell.h
+        PeerProgressIndicatorCell.mm
+        PeerTableView.h
+        PeerTableView.mm
+        PiecesView.h
+        PiecesView.mm
+        PortChecker.h
+        PortChecker.mm
+        PredicateEditorRowTemplateAny.h
+        PredicateEditorRowTemplateAny.mm
+        PrefsController.h
+        PrefsController.mm
+        PrefsWindow.h
+        PrefsWindow.mm
+        PriorityPopUpButtonCell.h
+        PriorityPopUpButtonCell.mm
+        ProgressGradients.h
+        ProgressGradients.mm
+        ShareToolbarItem.h
+        ShareToolbarItem.mm
+        ShareTorrentFileHelper.h
+        ShareTorrentFileHelper.mm
+        SparkleProxy.mm
+        StatsWindowController.h
+        StatsWindowController.mm
+        StatusBarController.h
+        StatusBarController.mm
+        StatusBarView.h
+        StatusBarView.mm
+        Toolbar.h
+        Toolbar.mm
+        Torrent.h
+        Torrent.mm
+        TorrentCell.h
+        TorrentCell.mm
+        TorrentGroup.h
+        TorrentGroup.mm
+        TorrentTableView.h
+        TorrentTableView.mm
+        TrackerCell.h
+        TrackerCell.mm
+        TrackerNode.h
+        TrackerNode.mm
+        TrackerTableView.h
+        TrackerTableView.mm
+        URLSheetWindowController.h
+        URLSheetWindowController.mm
+        WebSeedTableView.h
+        WebSeedTableView.mm)
 
-set(${PROJECT_NAME}_XIB_FILES
+set(XIB_FILES
     AboutWindow.xib
     BlocklistStatusWindow.xib
     FileRenameSheetController.xib
@@ -192,24 +182,23 @@ set(${PROJECT_NAME}_XIB_FILES
     MessageWindow.xib
     StatsWindow.xib
     StatusBar.xib
-    URLSheetWindow.xib
-)
-source_group(Resources FILES ${${PROJECT_NAME}_XIB_FILES})
+    URLSheetWindow.xib)
 
-set(${PROJECT_NAME}_RESOURCES
+set(RESOURCES
     Defaults.plist
     Credits.rtf
     sparkle_dsa_pub.pem
     ../COPYING
-    Images/TransmissionDocument.icns
-)
-source_group(Resources FILES ${${PROJECT_NAME}_RESOURCES})
+    Images/TransmissionDocument.icns)
+source_group(Resources
+    FILES ${RESOURCES})
 
-set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
-    MACOSX_PACKAGE_LOCATION Resources
-)
+set_source_files_properties(
+    ${RESOURCES}
+    PROPERTIES
+        MACOSX_PACKAGE_LOCATION Resources)
 
-set(${PROJECT_NAME}_IMAGESETS
+set(IMAGESETS
     ActionHover
     Bandwidth
     CleanupTemplate
@@ -267,8 +256,7 @@ set(${PROJECT_NAME}_IMAGESETS
     UpArrowTemplate
     UploadBadge
     YingYangGroupTemplate
-    YingYangTemplate
-)
+    YingYangTemplate)
 
 set(APPICON_NAME AppIcon)
 
@@ -279,7 +267,7 @@ set(IMAGE_ASSETS
     ${IMAGE_ASSETS_DIR}/Contents.json
     ${APPICONSET_DIR}/Contents.json)
 
-foreach(IMG IN LISTS ${PROJECT_NAME}_IMAGESETS)
+foreach(IMG IN LISTS IMAGESETS)
     set(IMG_DIR "${IMAGE_ASSETS_DIR}/${IMG}.imageset")
     list(APPEND IMAGE_ASSETS
         ${IMG_DIR}/${IMG}.png
@@ -301,7 +289,8 @@ add_custom_command(
     OUTPUT
         ${COMPILED_IMAGE_ASSETS}
         ${APPICON_NAME}.Info.plist
-    COMMAND ${ACTOOL_EXECUTABLE}
+    COMMAND
+        ${ACTOOL_EXECUTABLE}
         --compile "${CMAKE_CURRENT_BINARY_DIR}"
         --platform macosx
         --minimum-deployment-target ${CMAKE_OSX_DEPLOYMENT_TARGET}
@@ -309,16 +298,21 @@ add_custom_command(
         --output-partial-info-plist "${CMAKE_CURRENT_BINARY_DIR}/${APPICON_NAME}.Info.plist"
         ${IMAGE_ASSETS_DIR}
     DEPENDS ${IMAGE_ASSETS}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-source_group("Generated Files" FILES ${COMPILED_IMAGE_ASSETS} ${APPICON_NAME}.Info.plist)
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+source_group("Generated Files"
+    FILES
+        ${COMPILED_IMAGE_ASSETS}
+        ${APPICON_NAME}.Info.plist)
 
-list(APPEND ${PROJECT_NAME}_RESOURCES ${COMPILED_IMAGE_ASSETS})
+list(APPEND RESOURCES
+    ${COMPILED_IMAGE_ASSETS})
 
-set_source_files_properties(${COMPILED_IMAGE_ASSETS} PROPERTIES
-    MACOSX_PACKAGE_LOCATION Resources)
+set_source_files_properties(
+    ${COMPILED_IMAGE_ASSETS}
+    PROPERTIES
+        MACOSX_PACKAGE_LOCATION Resources)
 
-set(${PROJECT_NAME}_LINGUAS
+set(LINGUAS
     da
     de
     en
@@ -328,16 +322,15 @@ set(${PROJECT_NAME}_LINGUAS
     nl
     pt_PT
     ru
-    tr
-)
+    tr)
 
 if(ENABLE_NLS)
-    set(${PROJECT_NAME}_ENABLED_LINGUAS ${${PROJECT_NAME}_LINGUAS})
+    set(ENABLED_LINGUAS ${LINGUAS})
 else()
-    set(${PROJECT_NAME}_ENABLED_LINGUAS en)
+    set(ENABLED_LINGUAS en)
 endif()
 
-set(${PROJECT_NAME}_LANG_XIB_FILES
+set(BASE_XIB_FILES
     AddMagnetWindow.xib
     AddWindow.xib
     Creator.xib
@@ -347,137 +340,95 @@ set(${PROJECT_NAME}_LANG_XIB_FILES
     InfoGeneralView.xib
     InfoOptionsView.xib
     MainMenu.xib
-    PrefsWindow.xib
-)
+    PrefsWindow.xib)
+list(TRANSFORM BASE_XIB_FILES
+    PREPEND Base.lproj/)
 
-set(${PROJECT_NAME}_LANG_STRINGS_FILES
+set(LANG_STRINGS_FILES
     InfoPlist.strings
-    Localizable.strings
-)
+    Localizable.strings)
 
-set(${PROJECT_NAME}_NIB_FILES)
-foreach(F ${${PROJECT_NAME}_XIB_FILES})
-    get_filename_component(F_BASE "${F}" NAME_WE)
-    set(F_NIB "${PROJECT_BINARY_DIR}/${F_BASE}.nib")
-    tr_wrap_xib("${F}" "${F_NIB}")
-    list(APPEND ${PROJECT_NAME}_NIB_FILES "${F_NIB}")
-endforeach()
-
-set_source_files_properties(${${PROJECT_NAME}_NIB_FILES} PROPERTIES
-    MACOSX_PACKAGE_LOCATION Resources)
-
-set(${PROJECT_NAME}_BASE_XIB_FILES)
-set(${PROJECT_NAME}_BASE_NIB_FILES)
-foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
-    set(F_XIB "Base.lproj/${F}")
-    get_filename_component(F_BASE "${F}" NAME_WE)
-    set(F_NIB "${PROJECT_BINARY_DIR}/Base.lproj/${F_BASE}.nib")
-    tr_wrap_xib("${F_XIB}" "${F_NIB}")
-    list(APPEND ${PROJECT_NAME}_BASE_XIB_FILES "${F_XIB}")
-    list(APPEND ${PROJECT_NAME}_BASE_NIB_FILES "${F_NIB}")
-    source_group(Resources/Base.lproj FILES ${F_XIB})
-endforeach()
-
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
+foreach(LANG ${ENABLED_LINGUAS})
+    set(${LANG}_STRINGS_FILES)
     if(NOT LANG STREQUAL "en")
-        foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
+        foreach(F ${BASE_XIB_FILES})
             get_filename_component(F_BASE "${F}" NAME_WE)
-            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F_BASE}.strings)
+            list(APPEND ${LANG}_STRINGS_FILES ${LANG}.lproj/${F_BASE}.strings)
         endforeach()
     endif()
-    foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
-        list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+    foreach(F ${LANG_STRINGS_FILES})
+        list(APPEND ${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
     endforeach()
-    source_group(Resources/${LANG}.lproj FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+    source_group(Resources/${LANG}.lproj
+        FILES ${${LANG}_STRINGS_FILES})
 endforeach()
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}/libtransmission
-    ${CMAKE_BINARY_DIR}/libtransmission
-    ${PROJECT_SOURCE_DIR}/VDKQueue
-)
-
-add_compile_options(
-    # #warnings are good practice in development
-    "-Wno-#warnings"
-    # GNU extensions are good practice in Objective-C
-    -Wno-gnu
-)
-
-add_library(vdkqueue STATIC
-    VDKQueue/VDKQueue.mm
-    VDKQueue/VDKQueue.h
-)
-
-set_property(TARGET vdkqueue PROPERTY FOLDER "third-party")
-
-set(BASE_NIB_FILES_RESOURCES_DIR Resources)
-if(NOT CMAKE_GENERATOR STREQUAL Xcode)
-    string(APPEND BASE_NIB_FILES_RESOURCES_DIR /Base.lproj)
-endif()
-set_source_files_properties(${${PROJECT_NAME}_BASE_NIB_FILES} PROPERTIES
-    MACOSX_PACKAGE_LOCATION ${BASE_NIB_FILES_RESOURCES_DIR})
-
-foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
-    list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+foreach(LANG ${ENABLED_LINGUAS})
+    list(APPEND RESOURCES ${${LANG}_STRINGS_FILES})
     set(STRINGS_FILES_RESOURCES_DIR Resources)
     if(NOT CMAKE_GENERATOR STREQUAL Xcode)
         string(APPEND STRINGS_FILES_RESOURCES_DIR /${LANG}.lproj)
     endif()
-    set_source_files_properties(${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
-        MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
+    set_source_files_properties(
+        ${${LANG}_STRINGS_FILES}
+        PROPERTIES
+            MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
 endforeach()
 
-add_executable(${TR_NAME}-mac MACOSX_BUNDLE
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_XIB_FILES}
-    ${${PROJECT_NAME}_NIB_FILES}
-    ${${PROJECT_NAME}_BASE_XIB_FILES}
-    ${${PROJECT_NAME}_BASE_NIB_FILES}
-    ${${PROJECT_NAME}_RESOURCES}
-)
+target_sources(${TR_NAME}-mac
+    PRIVATE
+        ${RESOURCES})
 
-find_library(SPARKLE_FRAMEWORK Sparkle PATHS ${PROJECT_SOURCE_DIR} NO_DEFAULT_PATHS)
+tr_target_xib_files(${TR_NAME}-mac
+    ${XIB_FILES}
+    ${BASE_XIB_FILES})
+
+find_library(SPARKLE_FRAMEWORK Sparkle
+    PATHS ${CMAKE_CURRENT_SOURCE_DIR}
+    NO_DEFAULT_PATHS)
 
 target_link_libraries(${TR_NAME}-mac
-    ${TR_NAME}
-    vdkqueue
-    ${SPARKLE_FRAMEWORK}
-    "-framework AppKit"
-    "-framework Carbon"
-    "-framework Foundation"
-    "-framework IOKit"
-    "-framework Quartz"
-    "-framework Security"
-    "-weak_framework UserNotifications"
-)
+    PRIVATE
+        ${TR_NAME}
+        fmt::fmt-header-only
+        vdkqueue
+        ${SPARKLE_FRAMEWORK}
+        "-framework AppKit"
+        "-framework Carbon"
+        "-framework Foundation"
+        "-framework IOKit"
+        "-framework Quartz"
+        "-framework Security"
+        "-weak_framework UserNotifications")
 
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)
-    add_custom_command(TARGET ${TR_NAME}-mac POST_BUILD
+    add_custom_command(
+        TARGET ${TR_NAME}-mac
+        POST_BUILD
         COMMAND ${CODESIGN_EXECUTABLE} -s - $<TARGET_BUNDLE_DIR:${TR_NAME}-mac>)
 endif()
 
-set(MAC_BUNDLE_NAME Transmission)
+set_target_properties(
+    ${TR_NAME}-mac
+    PROPERTIES
+        OUTPUT_NAME ${MAC_BUNDLE_NAME}
+        MACOSX_BUNDLE_GUI_IDENTIFIER "org.m0k.transmission"
+        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
+        INSTALL_RPATH "@executable_path;@executable_path/../Frameworks")
 
-set_target_properties(${TR_NAME}-mac PROPERTIES
-    OUTPUT_NAME ${MAC_BUNDLE_NAME}
-    MACOSX_BUNDLE_GUI_IDENTIFIER "org.m0k.transmission"
-    MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/Info.plist.in
-    INSTALL_RPATH "@executable_path;@executable_path/../Frameworks"
-)
+install(
+    TARGETS ${TR_NAME}-mac
+    DESTINATION Applications)
 
-add_subdirectory(QuickLookPlugin)
-
-install(TARGETS ${TR_NAME}-mac DESTINATION Applications)
-
-install(DIRECTORY TransmissionHelp DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
+install(
+    DIRECTORY TransmissionHelp
+    DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 
-install(CODE "
-    list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
+install(CODE
+    "list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
     include(TrMacros)
     include(GetPrerequisites)
-    tr_fixup_bundle_item(\"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/Applications/${MAC_BUNDLE_NAME}.app\" \"Contents/MacOS/${MAC_BUNDLE_NAME}\" \"${PROJECT_SOURCE_DIR}\")
-")
+    tr_fixup_bundle_item(
+        \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/Applications/${MAC_BUNDLE_NAME}.app\"
+        \"Contents/MacOS/${MAC_BUNDLE_NAME}\" \"${CMAKE_CURRENT_SOURCE_DIR}\")")

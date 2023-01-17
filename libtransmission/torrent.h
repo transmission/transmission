@@ -24,6 +24,7 @@
 #include "bitfield.h"
 #include "block-info.h"
 #include "completion.h"
+#include "crypto-utils.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
 #include "log.h"
@@ -121,9 +122,19 @@ public:
 
     /// SPEED LIMIT
 
+    [[nodiscard]] constexpr auto& bandwidth() noexcept
+    {
+        return bandwidth_;
+    }
+
+    [[nodiscard]] constexpr auto const& bandwidth() const noexcept
+    {
+        return bandwidth_;
+    }
+
     constexpr void setSpeedLimitBps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
     {
-        if (bandwidth_.setDesiredSpeedBytesPerSecond(dir, bytes_per_second))
+        if (bandwidth().setDesiredSpeedBytesPerSecond(dir, bytes_per_second))
         {
             setDirty();
         }
@@ -131,7 +142,7 @@ public:
 
     constexpr void useSpeedLimit(tr_direction dir, bool do_use)
     {
-        if (bandwidth_.setLimited(dir, do_use))
+        if (bandwidth().setLimited(dir, do_use))
         {
             setDirty();
         }
@@ -139,35 +150,17 @@ public:
 
     [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const
     {
-        return bandwidth_.getDesiredSpeedBytesPerSecond(dir);
+        return bandwidth().getDesiredSpeedBytesPerSecond(dir);
     }
 
     [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
     {
-        return bandwidth_.areParentLimitsHonored(TR_UP);
+        return bandwidth().areParentLimitsHonored(TR_UP);
     }
 
     [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
     {
-        return bandwidth_.isLimited(dir);
-    }
-
-    [[nodiscard]] constexpr auto isPieceTransferAllowed(tr_direction direction) const noexcept
-    {
-        if (usesSpeedLimit(direction) && speedLimitBps(direction) <= 0)
-        {
-            return false;
-        }
-
-        if (usesSessionLimits())
-        {
-            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return bandwidth().isLimited(dir);
     }
 
     /// BLOCK INFO
@@ -250,7 +243,7 @@ public:
         return completion.hasPiece(piece);
     }
 
-    [[nodiscard]] auto hasBlock(tr_block_index_t block) const
+    [[nodiscard]] TR_CONSTEXPR20 auto hasBlock(tr_block_index_t block) const
     {
         return completion.hasBlock(block);
     }
@@ -331,7 +324,7 @@ public:
         return files_wanted_.pieceWanted(piece);
     }
 
-    [[nodiscard]] bool fileIsWanted(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 bool fileIsWanted(tr_file_index_t file) const
     {
         return files_wanted_.fileWanted(file);
     }
@@ -439,6 +432,8 @@ public:
 
     bool setTrackerList(std::string_view text);
 
+    void onTrackerResponse(tr_tracker_event const* event);
+
     /// METAINFO - WEBSEEDS
 
     [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
@@ -535,7 +530,7 @@ public:
 
     /// METAINFO - PIECE CHECKSUMS
 
-    [[nodiscard]] bool isPieceChecked(tr_piece_index_t piece) const
+    [[nodiscard]] TR_CONSTEXPR20 bool isPieceChecked(tr_piece_index_t piece) const
     {
         return checked_pieces_.test(piece);
     }
@@ -573,12 +568,12 @@ public:
         return this->isPublic() && this->session->allowsLPD();
     }
 
-    [[nodiscard]] bool clientCanDownload() const
+    [[nodiscard]] constexpr bool clientCanDownload() const
     {
         return this->isPieceTransferAllowed(TR_PEER_TO_CLIENT);
     }
 
-    [[nodiscard]] bool clientCanUpload() const
+    [[nodiscard]] constexpr bool clientCanUpload() const
     {
         return this->isPieceTransferAllowed(TR_CLIENT_TO_PEER);
     }
@@ -690,7 +685,7 @@ public:
 
     [[nodiscard]] constexpr auto getPriority() const noexcept
     {
-        return bandwidth_.getPriority();
+        return bandwidth().getPriority();
     }
 
     [[nodiscard]] constexpr auto const& bandwidthGroup() const noexcept
@@ -786,6 +781,11 @@ public:
         {
             tr_torrentStop(this);
         }
+    }
+
+    [[nodiscard]] constexpr auto announce_key() const noexcept
+    {
+        return announce_key_;
     }
 
     tr_torrent_metainfo metainfo_;
@@ -905,6 +905,24 @@ public:
     bool magnetVerify = false;
 
 private:
+    [[nodiscard]] constexpr bool isPieceTransferAllowed(tr_direction direction) const noexcept
+    {
+        if (usesSpeedLimit(direction) && speedLimitBps(direction) <= 0)
+        {
+            return false;
+        }
+
+        if (usesSessionLimits())
+        {
+            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
     {
         auto const lock = unique_lock();
@@ -920,7 +938,11 @@ private:
     }
 
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
+
     float verify_progress_ = -1;
+
+    tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
+
     tr_interned_string bandwidth_group_;
 
     bool needs_completeness_check_ = true;

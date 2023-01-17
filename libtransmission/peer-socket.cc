@@ -26,6 +26,7 @@ tr_peer_socket::tr_peer_socket(tr_session const* session, tr_address const& addr
 {
     TR_ASSERT(sock != TR_BAD_SOCKET);
 
+    ++n_open_sockets_;
     session->setSocketTOS(sock, address_.type);
 
     if (auto const& algo = session->peerCongestionAlgorithm(); !std::empty(algo))
@@ -42,20 +43,24 @@ tr_peer_socket::tr_peer_socket(tr_address const& address, tr_port port, struct U
     , type_{ Type::UTP }
 {
     TR_ASSERT(sock != nullptr);
+
+    ++n_open_sockets_;
     handle.utp = sock;
 
     tr_logAddTraceIo(this, fmt::format("socket (µTP) is {}", fmt::ptr(handle.utp)));
 }
 
-void tr_peer_socket::close(tr_session* session)
+void tr_peer_socket::close()
 {
     if (is_tcp() && (handle.tcp != TR_BAD_SOCKET))
     {
-        tr_netClose(session, handle.tcp);
+        --n_open_sockets_;
+        tr_net_close_socket(handle.tcp);
     }
 #ifdef WITH_UTP
     else if (is_utp())
     {
+        --n_open_sockets_;
         utp_set_userdata(handle.utp, nullptr);
         utp_close(handle.utp);
     }
@@ -80,7 +85,7 @@ size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error) cons
 #ifdef WITH_UTP
     if (is_utp())
     {
-        auto [data, datalen] = buf.pullup();
+        auto const [data, datalen] = buf.pullup();
 
         errno = 0;
         auto const n_written = utp_write(handle.utp, data, std::min(datalen, max));
@@ -125,4 +130,9 @@ size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error) const
 #endif
 
     return {};
+}
+
+bool tr_peer_socket::limit_reached(tr_session* const session) noexcept
+{
+    return n_open_sockets_.load() >= session->peerLimit();
 }

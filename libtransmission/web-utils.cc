@@ -28,9 +28,7 @@
 
 using namespace std::literals;
 
-/***
-****
-***/
+// ---
 
 bool tr_addressIsIP(char const* address)
 {
@@ -172,7 +170,7 @@ char const* tr_webGetResponseStr(long code)
     }
 }
 
-//// URLs
+// --- URLs
 
 namespace
 {
@@ -373,6 +371,17 @@ bool tr_urlIsValid(std::string_view url)
     auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
     auto const parsed = tr_urlParse(url);
     return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
+}
+
+std::string tr_urlTrackerLogName(std::string_view url)
+{
+    if (auto const parsed = tr_urlParse(url); parsed)
+    {
+        return fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed->scheme, parsed->host, parsed->port);
+    }
+
+    // we have an invalid URL, we log the full string
+    return std::string{ url };
 }
 
 tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()

@@ -35,7 +35,6 @@
 
 namespace
 {
-
 enum class UpnpState
 {
     Idle,
@@ -45,29 +44,6 @@ enum class UpnpState
     WillMap, // next action is UPNP_AddPortMapping()
     WillUnmap // next action is UPNP_DeletePortMapping()
 };
-
-constexpr auto portFwdState(UpnpState upnp_state, bool is_mapped)
-{
-    switch (upnp_state)
-    {
-    case UpnpState::WillDiscover:
-    case UpnpState::Discovering:
-        return TR_PORT_UNMAPPED;
-
-    case UpnpState::WillMap:
-        return TR_PORT_MAPPING;
-
-    case UpnpState::WillUnmap:
-        return TR_PORT_UNMAPPING;
-
-    case UpnpState::Idle:
-        return is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
-
-    default: // UpnpState::FAILED:
-        return TR_PORT_ERROR;
-    }
-}
-
 } // namespace
 
 struct tr_upnp
@@ -102,25 +78,31 @@ struct tr_upnp
     std::optional<std::future<UPNPDev*>> discover_future;
 };
 
-/**
-***
-**/
-
-tr_upnp* tr_upnpInit()
+namespace
 {
-    return new tr_upnp();
+constexpr auto port_fwd_state(UpnpState upnp_state, bool is_mapped)
+{
+    switch (upnp_state)
+    {
+    case UpnpState::WillDiscover:
+    case UpnpState::Discovering:
+        return TR_PORT_UNMAPPED;
+
+    case UpnpState::WillMap:
+        return TR_PORT_MAPPING;
+
+    case UpnpState::WillUnmap:
+        return TR_PORT_UNMAPPING;
+
+    case UpnpState::Idle:
+        return is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
+
+    default: // UpnpState::FAILED:
+        return TR_PORT_ERROR;
+    }
 }
 
-void tr_upnpClose(tr_upnp* handle)
-{
-    delete handle;
-}
-
-/**
-***  Wrappers for miniupnpc functions
-**/
-
-static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
+[[nodiscard]] UPNPDev* upnp_discover(int msec, char const* bindaddr)
 {
     UPNPDev* ret = nullptr;
     auto have_err = bool{};
@@ -148,7 +130,7 @@ static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
     return ret;
 }
 
-static int tr_upnpGetSpecificPortMappingEntry(tr_upnp const* handle, char const* proto)
+[[nodiscard]] int get_specific_port_mapping_entry(tr_upnp const* handle, char const* proto)
 {
     auto int_client = std::array<char, 16>{};
     auto int_port = std::array<char, 16>{};
@@ -191,7 +173,7 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp const* handle, char const*
     return err;
 }
 
-static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_port port, char const* desc)
+[[nodiscard]] int upnp_add_port_mapping(tr_upnp const* handle, char const* proto, tr_port port, char const* desc)
 {
     int const old_errno = errno;
     errno = 0;
@@ -230,16 +212,12 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
     return err;
 }
 
-static void tr_upnpDeletePortMapping(tr_upnp const* handle, char const* proto, tr_port port)
+void tr_upnpDeletePortMapping(tr_upnp const* handle, char const* proto, tr_port port)
 {
     auto const port_str = fmt::format(FMT_STRING("{:d}"), port.host());
 
     UPNP_DeletePortMapping(handle->urls.controlURL, handle->data.first.servicetype, port_str.c_str(), proto, nullptr);
 }
-
-/**
-***
-**/
 
 enum
 {
@@ -249,18 +227,31 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-static auto* discoverThreadfunc(std::string bindaddr) // NOLINT performance-unnecessary-value-param
+auto* discover_thread_func(std::string bindaddr) // NOLINT performance-unnecessary-value-param
 {
     // If multicastif is not NULL, it will be used instead of the default
     // multicast interface for sending SSDP discover packets.
     char const* multicastif = std::empty(bindaddr) ? nullptr : bindaddr.c_str();
-    return tr_upnpDiscover(2000, multicastif);
+    return upnp_discover(2000, multicastif);
 }
 
 template<typename T>
-static bool isFutureReady(std::future<T> const& future)
+bool is_future_ready(std::future<T> const& future)
 {
     return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+}
+} // namespace
+
+// ---
+
+tr_upnp* tr_upnpInit()
+{
+    return new tr_upnp();
+}
+
+void tr_upnpClose(tr_upnp* handle)
+{
+    delete handle;
 }
 
 tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_enabled, bool do_port_check, std::string bindaddr)
@@ -269,7 +260,7 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
     {
         TR_ASSERT(!handle->discover_future);
 
-        auto task = std::packaged_task<UPNPDev*(std::string)>{ discoverThreadfunc };
+        auto task = std::packaged_task<UPNPDev*(std::string)>{ discover_thread_func };
         handle->discover_future = task.get_future();
         handle->state = UpnpState::Discovering;
 
@@ -277,7 +268,7 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
     }
 
     if (is_enabled && handle->state == UpnpState::Discovering && handle->discover_future &&
-        isFutureReady(*handle->discover_future))
+        is_future_ready(*handle->discover_future))
     {
         auto* const devlist = handle->discover_future->get();
         handle->discover_future.reset();
@@ -309,8 +300,8 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
     }
 
     if (is_enabled && handle->isMapped && do_port_check &&
-        ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
-         (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
+        ((get_specific_port_mapping_entry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
+         (get_specific_port_mapping_entry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
     {
         tr_logAddInfo(fmt::format(_("Port {port} is not forwarded"), fmt::arg("port", handle->port.host())));
         handle->isMapped = false;
@@ -347,8 +338,8 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         else
         {
             auto const desc = fmt::format(FMT_STRING("Transmission at {:d}"), port.host());
-            int const err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc.c_str());
-            int const err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc.c_str());
+            int const err_tcp = upnp_add_port_mapping(handle, "TCP", port, desc.c_str());
+            int const err_udp = upnp_add_port_mapping(handle, "UDP", port, desc.c_str());
 
             handle->isMapped = err_tcp == 0 || err_udp == 0;
         }
@@ -374,5 +365,5 @@ tr_port_forwarding_state tr_upnpPulse(tr_upnp* handle, tr_port port, bool is_ena
         }
     }
 
-    return portFwdState(handle->state, handle->isMapped);
+    return port_fwd_state(handle->state, handle->isMapped);
 }

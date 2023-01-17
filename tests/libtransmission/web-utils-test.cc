@@ -11,11 +11,11 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h"
-#include "platform.h"
-#include "web-utils.h"
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/platform.h>
+#include <libtransmission/web-utils.h>
 
 #include "test-fixtures.h"
 

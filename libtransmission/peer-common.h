@@ -211,6 +211,13 @@ public:
     // requests that have been made but haven't been fulfilled yet
     [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
 
+    [[nodiscard]] tr_bytes_per_second_t get_piece_speed_bytes_per_second(uint64_t now, tr_direction direction) const
+    {
+        auto bytes_per_second = tr_bytes_per_second_t{};
+        isTransferringPieces(now, direction, &bytes_per_second);
+        return bytes_per_second;
+    }
+
     virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
     struct RequestLimit
