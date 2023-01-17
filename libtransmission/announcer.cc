@@ -856,8 +856,10 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
 {
     using namespace announce_helpers;
 
-    /* increment the error count */
     auto* current_tracker = tier->currentTracker();
+    std::string announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) : "nullptr";
+
+    /* increment the error count */
     if (current_tracker != nullptr)
     {
         ++current_tracker->consecutive_failures;
@@ -871,12 +873,14 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
 
     if (isUnregistered(err))
     {
-        tr_logAddErrorTier(tier, fmt::format(_("Announce error: {error}"), fmt::arg("error", err)));
+        tr_logAddErrorTier(
+            tier,
+            fmt::format(_("Announce error: {error}"), fmt::arg("error", err)).append(fmt::format(" ({})", announce_url)));
     }
     else
     {
         /* schedule a reannounce */
-        int const interval = current_tracker->getRetryInterval();
+        auto const interval = current_tracker->getRetryInterval();
         tr_logAddWarnTier(
             tier,
             fmt::format(
@@ -885,7 +889,8 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
                     "Announce error: {error} (Retrying in {count} seconds)",
                     interval),
                 fmt::arg("error", err),
-                fmt::arg("count", interval)));
+                fmt::arg("count", interval))
+                .append(fmt::format(" ({})", announce_url)));
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
@@ -1275,13 +1280,7 @@ void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const&
     if (multiscrape_max != n)
     {
         // don't log the full URL, since that might have a personal announce id
-        // (note: we know 'parsed' will be successful since this url has a scrape_info)
-        if (auto const parsed = tr_urlParse(url); parsed)
-        {
-            tr_logAddDebug(
-                fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n),
-                fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed->scheme, parsed->host, parsed->port));
-        }
+        tr_logAddDebug(fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n), tr_urlTrackerLogName(url));
 
         multiscrape_max = n;
     }
