@@ -150,17 +150,11 @@ typedef struct PieceInfo
     BOOL const first = ![self.torrent.hashString isEqualToString:fRenderedHashString];
 
     // get the current state
-    PieceInfo info;
     BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
     NSInteger const numCells = MIN(_torrent.pieceCount, kMaxCells);
-    if (showAvailability)
-    {
-        [self.torrent getAvailability:info.available size:numCells];
-    }
-    else
-    {
-        [self.torrent getAmountFinished:info.complete size:numCells];
-    }
+    PieceInfo info;
+    [self.torrent getAvailability:info.available size:numCells];
+    [self.torrent getAmountFinished:info.complete size:numCells];
 
     // compute bounds and color of each cell
     NSInteger const across = (NSInteger)ceil(sqrt(numCells));
