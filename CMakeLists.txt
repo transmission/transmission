@@ -31,7 +31,7 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
-set(DEFLATE_MINIMUM 1.17)
+set(DEFLATE_MINIMUM 1.10)
 set(EVENT2_MINIMUM 2.1.0)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
@@ -445,9 +445,6 @@ tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
-if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
-endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
     TARGET libevent::event
