@@ -506,7 +506,7 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_SHARE, shared());
         (void)curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, DnsCacheTimeoutSecs);
         (void)curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
-        (void)curl_easy_setopt(e, CURLOPT_ENCODING, "");
+        (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "");
         (void)curl_easy_setopt(e, CURLOPT_FOLLOWLOCATION, 1L);
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, -1L);
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
@@ -576,7 +576,8 @@ public:
         if (auto const& range = task.range(); range)
         {
             /* don't bother asking the server to compress webseed fragments */
-            (void)curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
+            (void)curl_easy_setopt(e, CURLOPT_ACCEPT_ENCODING, "identity");
+            (void)curl_easy_setopt(e, CURLOPT_HTTP_CONTENT_DECODING, 0L);
             (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
         }
     }
