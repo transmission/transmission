@@ -381,7 +381,7 @@ std::string tr_urlTrackerLogName(std::string_view url)
     }
 
     // we have an invalid URL, we log the full string
-    return std::string(url);
+    return std::string{ url };
 }
 
 tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()
