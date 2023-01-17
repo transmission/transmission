@@ -1184,12 +1184,12 @@ $video-image: '../img/film.svg';
 
   > * {
     appearance: none;
-    background-color: var(--color-bg-primary);
     background-position: center;
     background-repeat: no-repeat;
     background-size: $halfsize, $size;
     border: 1px solid var(--color-border);
     height: $size;
+    background-color: var(--color-border-selected);
     margin: 0;
     padding: 0;
     width: $size;
@@ -1209,9 +1209,9 @@ $video-image: '../img/film.svg';
     border-left-width: 0;
   }
 
-  //if input is not checked, change background color
-  > *:not(:checked) {
-    background-color: var(--color-border-selected);
+  //if input is checked then change the background color
+  > .checked {
+    background-color: var(--color-bg-hover);
   }
 }
 

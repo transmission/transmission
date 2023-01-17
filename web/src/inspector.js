@@ -825,11 +825,11 @@ export class Inspector extends EventTarget {
     const { indices, priority } = event_;
 
     let command = null;
-    switch (priority) {
-      case -1:
+    switch (priority.toString()) {
+      case '-1':
         command = 'priority-low';
         break;
-      case 1:
+      case '1':
         command = 'priority-high';
         break;
       default:
