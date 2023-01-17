@@ -445,9 +445,6 @@ tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
     CMAKE_ARGS
         -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
         -DLIBDEFLATE_BUILD_GZIP=OFF)
-if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
-endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
     TARGET libevent::event
