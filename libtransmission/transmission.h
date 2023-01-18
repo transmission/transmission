@@ -60,6 +60,16 @@ using tr_priority_t = int8_t;
 
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
 
+enum tr_verify_added_mode
+{
+    // See discussion @ https://github.com/transmission/transmission/pull/2626
+    // Let newly-added torrents skip upfront verify do it on-demand later.
+    TR_VERIFY_ADDED_FAST = 0,
+
+    // Force torrents to be fully verified as they are added.
+    TR_VERIFY_ADDED_FULL = 1
+};
+
 enum tr_preallocation_mode
 {
     TR_PREALLOCATE_NONE = 0,
