@@ -709,7 +709,7 @@ public:
 
     [[nodiscard]] constexpr auto shouldFullyVerifyAddedTorrents() const noexcept
     {
-        return settings_.verify_added_mode == TR_VERIFY_ADDED_FULL;
+        return settings_.torrent_added_verify_mode == TR_VERIFY_ADDED_FULL;
     }
 
     [[nodiscard]] constexpr auto shouldDeleteSource() const noexcept

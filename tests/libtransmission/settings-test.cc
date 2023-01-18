@@ -409,11 +409,11 @@ TEST_F(SettingsTest, canSaveTos)
 
 TEST_F(SettingsTest, canLoadVerify)
 {
-    static auto constexpr Key = TR_KEY_verify_added_torrents;
+    static auto constexpr Key = TR_KEY_torrent_added_verify_mode;
     static auto constexpr ChangedValue = TR_VERIFY_ADDED_FULL;
 
     auto settings = std::make_unique<tr_session_settings>();
-    auto const default_value = settings->verify_added_mode;
+    auto const default_value = settings->torrent_added_verify_mode;
     ASSERT_NE(ChangedValue, default_value);
 
     auto dict = tr_variant{};
@@ -421,27 +421,27 @@ TEST_F(SettingsTest, canLoadVerify)
     tr_variantDictAddStrView(&dict, Key, "full");
     settings->load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(ChangedValue, settings->verify_added_mode);
+    EXPECT_EQ(ChangedValue, settings->torrent_added_verify_mode);
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&dict, 1);
     tr_variantDictAddInt(&dict, Key, ChangedValue);
     settings->load(&dict);
     tr_variantClear(&dict);
-    EXPECT_EQ(ChangedValue, settings->verify_added_mode);
+    EXPECT_EQ(ChangedValue, settings->torrent_added_verify_mode);
 }
 
 TEST_F(SettingsTest, canSaveVerify)
 {
-    static auto constexpr Key = TR_KEY_verify_added_torrents;
+    static auto constexpr Key = TR_KEY_torrent_added_verify_mode;
     static auto constexpr ChangedValue = TR_VERIFY_ADDED_FULL;
 
     auto settings = tr_session_settings{};
-    ASSERT_NE(ChangedValue, settings.verify_added_mode);
+    ASSERT_NE(ChangedValue, settings.torrent_added_verify_mode);
 
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 100);
-    settings.verify_added_mode = ChangedValue;
+    settings.torrent_added_verify_mode = ChangedValue;
     settings.save(&dict);
     auto val = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
