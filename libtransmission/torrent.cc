@@ -1188,7 +1188,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             opts.has_local_data = has_local_data;
             torrentStart(tor, opts);
         }
-        else if (isNewTorrentASeed(tor))
+        else if (!session->shouldFullyVerifyAddedTorrents() && isNewTorrentASeed(tor))
         {
             tor->completion.setHasAll();
             tor->doneDate = tor->addedDate;
