@@ -1,5 +1,5 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -7,6 +7,7 @@
 #include <array>
 #include <cmath> // sqrt()
 #include <cstdlib> // setenv(), unsetenv()
+#include <cstring>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -19,16 +20,15 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h" // tr_rand_int_weak()
-#include "platform.h"
-#include "tr-strbuf.h"
-#include "utils.h"
+#include <libtransmission/crypto-utils.h> // tr_rand_int()
+#include <libtransmission/platform.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 
-using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;
 using namespace std::literals;
 
@@ -113,67 +113,54 @@ TEST_F(UtilsTest, trStrvStrip)
     EXPECT_EQ("test"sv, tr_strvStrip("test"sv));
 }
 
-TEST_F(UtilsTest, trStrvDup)
-{
-    auto constexpr Key = "this is a test"sv;
-    char* str = tr_strvDup(Key);
-    EXPECT_NE(nullptr, str);
-    EXPECT_EQ(Key, str);
-    tr_free(str);
-}
-
-TEST_F(UtilsTest, trStrvPath)
-{
-    EXPECT_EQ("foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("foo", "bar"));
-    EXPECT_EQ(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("", "foo", "bar"));
-
-    EXPECT_EQ("", tr_strvPath(""sv));
-    EXPECT_EQ("foo"sv, tr_strvPath("foo"sv));
-    EXPECT_EQ(
-        "foo" TR_PATH_DELIMITER_STR "bar" TR_PATH_DELIMITER_STR "baz" TR_PATH_DELIMITER_STR "mum"sv,
-        tr_strvPath("foo"sv, "bar", std::string{ "baz" }, "mum"sv));
-}
-
-TEST_F(UtilsTest, trStrvUtf8Clean)
+TEST_F(UtilsTest, strvReplaceInvalid)
 {
     auto in = "hello world"sv;
-    auto out = std::string{};
-    tr_strvUtf8Clean(in, out);
+    auto out = tr_strv_replace_invalid(in);
     EXPECT_EQ(in, out);
 
     in = "hello world"sv;
-    tr_strvUtf8Clean(in.substr(0, 5), out);
+    out = tr_strv_replace_invalid(in.substr(0, 5));
     EXPECT_EQ("hello"sv, out);
 
     // this version is not utf-8 (but cp866)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
-    tr_strvUtf8Clean(in, out);
-    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
-    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    out = tr_strv_replace_invalid(in, '?');
+    EXPECT_EQ(17U, std::size(out));
+    EXPECT_EQ(out, tr_strv_replace_invalid(out));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом"sv;
-    tr_strvUtf8Clean(in, out);
-    EXPECT_NE(nullptr, out.data());
-    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    out = tr_strv_replace_invalid(in);
+    EXPECT_NE(0U, std::size(out));
+    EXPECT_EQ(out, tr_strv_replace_invalid(out));
     EXPECT_EQ(in, out);
 
     // https://trac.transmissionbt.com/ticket/6064
-    // TODO(anyone): It seems like that bug was not fixed so much as we just
-    // let strlen() solve the problem for us; however, it's probably better
-    // to wait until https://github.com/transmission/transmission/issues/612
-    // is resolved before revisiting this.
+    // This was a fuzzer-generated string that crashed Transmission.
+    // Even invalid strings shouldn't cause a crash.
     in = "\xF4\x00\x81\x82"sv;
-    tr_strvUtf8Clean(in, out);
-    EXPECT_NE(nullptr, out.data());
-    EXPECT_TRUE(out.size() == 1 || out.size() == 2);
-    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    out = tr_strv_replace_invalid(in);
+    EXPECT_NE(0U, std::size(out));
+    EXPECT_EQ(out, tr_strv_replace_invalid(out));
 
     in = "\xF4\x33\x81\x82"sv;
-    tr_strvUtf8Clean(in, out);
+    out = tr_strv_replace_invalid(in, '?');
     EXPECT_NE(nullptr, out.data());
-    EXPECT_TRUE(out.size() == 4 || out.size() == 7);
-    EXPECT_TRUE(tr_utf8_validate(out, nullptr));
+    EXPECT_EQ(4U, std::size(out));
+    EXPECT_EQ(out, tr_strv_replace_invalid(out));
+}
+
+TEST_F(UtilsTest, strvReplaceInvalidFuzz)
+{
+    auto buf = std::vector<char>{};
+    for (size_t i = 0; i < 1000; ++i)
+    {
+        buf.resize(tr_rand_int(4096U));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+        auto const out = tr_strv_replace_invalid({ std::data(buf), std::size(buf) });
+        EXPECT_EQ(out, tr_strv_replace_invalid(out));
+    }
 }
 
 TEST_F(UtilsTest, trParseNumberRange)
@@ -216,36 +203,6 @@ TEST_F(UtilsTest, trStrlower)
     EXPECT_EQ("hello"sv, tr_strlower("hello"sv));
 }
 
-TEST_F(UtilsTest, array)
-{
-    auto array = std::array<size_t, 10>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    auto n = array.size();
-
-    tr_removeElementFromArray(array.data(), 5U, sizeof(size_t), n);
-    --n;
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        EXPECT_EQ(array[i], i < 5 ? i : i + 1);
-    }
-
-    tr_removeElementFromArray(array.data(), 0U, sizeof(size_t), n);
-    --n;
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        EXPECT_EQ(array[i], i < 4 ? i + 1 : i + 2);
-    }
-
-    tr_removeElementFromArray(array.data(), n - 1, sizeof(size_t), n);
-    --n;
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        EXPECT_EQ(array[i], i < 4 ? i + 1 : i + 2);
-    }
-}
-
 TEST_F(UtilsTest, truncd)
 {
     EXPECT_EQ("100.00%"sv, fmt::format("{:.2f}%", 99.999));
@@ -271,7 +228,7 @@ TEST_F(UtilsTest, trStrlcpy)
     char const initial_char = '1';
     std::array<char, 100> destination = { initial_char };
 
-    std::vector<std::string> tests{
+    std::vector<std::string> const tests{
         "a",
         "",
         "12345678901234567890",
@@ -327,27 +284,22 @@ TEST_F(UtilsTest, env)
 
     EXPECT_FALSE(tr_env_key_exists(test_key));
     EXPECT_EQ(123, tr_env_get_int(test_key, 123));
-    EXPECT_EQ(nullptr, tr_env_get_string(test_key, nullptr));
-    auto s = makeString(tr_env_get_string(test_key, "a"));
-    EXPECT_EQ("a", s);
+    EXPECT_EQ(""sv, tr_env_get_string(test_key));
+    EXPECT_EQ("a"sv, tr_env_get_string(test_key, "a"sv));
 
     setenv(test_key, "", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
     EXPECT_EQ(456, tr_env_get_int(test_key, 456));
-    s = makeString(tr_env_get_string(test_key, nullptr));
-    EXPECT_EQ("", s);
-    s = makeString(tr_env_get_string(test_key, "b"));
-    EXPECT_EQ("", s);
+    EXPECT_EQ("", tr_env_get_string(test_key, ""));
+    EXPECT_EQ("", tr_env_get_string(test_key, "b"));
 
     setenv(test_key, "135", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
     EXPECT_EQ(135, tr_env_get_int(test_key, 789));
-    s = makeString(tr_env_get_string(test_key, nullptr));
-    EXPECT_EQ("135", s);
-    s = makeString(tr_env_get_string(test_key, "c"));
-    EXPECT_EQ("135", s);
+    EXPECT_EQ("135", tr_env_get_string(test_key, ""));
+    EXPECT_EQ("135", tr_env_get_string(test_key, "c"));
 }
 
 TEST_F(UtilsTest, mimeTypes)

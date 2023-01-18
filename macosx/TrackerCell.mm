@@ -10,15 +10,15 @@
 #import "TrackerCell.h"
 #import "TrackerNode.h"
 
-#define PADDING_HORIZONTAL 3.0
-#define PADDING_STATUS_HORIZONTAL 3.0
-#define ICON_SIZE 16.0
-#define PADDING_BETWEEN_ICON_AND_NAME 4.0
-#define PADDING_ABOVE_ICON 1.0
-#define PADDING_ABOVE_NAME 1.0
-#define PADDING_BETWEEN_LINES 1.0
-#define PADDING_BETWEEN_LINES_ON_SAME_LINE 4.0
-#define COUNT_WIDTH 60.0
+static CGFloat const kPaddingHorizontal = 3.0;
+static CGFloat const kPaddingStatusHorizontal = 3.0;
+static CGFloat const kIconSize = 16.0;
+static CGFloat const kPaddingBetweenIconAndName = 4.0;
+static CGFloat const kPaddingAboveIcon = 1.0;
+static CGFloat const kPaddingAboveName = 1.0;
+static CGFloat const kPaddingBetweenLines = 1.0;
+static CGFloat const kPaddingBetweenLinesOnSameLine = 4.0;
+static CGFloat const kCountWidth = 60.0;
 
 @interface TrackerCell ()
 
@@ -26,20 +26,6 @@
 @property(nonatomic, readonly) NSAttributedString* attributedName;
 @property(nonatomic, readonly) NSMutableDictionary* fNameAttributes;
 @property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
-
-- (void)loadTrackerIcon:(NSString*)baseAddress;
-
-- (NSRect)imageRectForBounds:(NSRect)bounds;
-- (NSRect)rectForNameWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
-- (NSRect)rectForCountWithString:(NSAttributedString*)string withAboveRect:(NSRect)aboveRect inBounds:(NSRect)bounds;
-- (NSRect)rectForCountLabelWithString:(NSAttributedString*)string withRightRect:(NSRect)rightRect inBounds:(NSRect)bounds;
-- (NSRect)rectForStatusWithString:(NSAttributedString*)string
-                    withAboveRect:(NSRect)aboveRect
-                    withRightRect:(NSRect)rightRect
-                         inBounds:(NSRect)bounds;
-
-- (NSAttributedString*)attributedStatusWithString:(NSString*)statusString;
-- (NSAttributedString*)attributedCount:(NSInteger)count;
 
 @end
 
@@ -66,7 +52,7 @@ NSMutableSet* fTrackerIconLoading;
             initWithObjectsAndKeys:[NSFont messageFontOfSize:12.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
 
         _fStatusAttributes = [[NSMutableDictionary alloc]
-            initWithObjectsAndKeys:[NSFont messageFontOfSize:9.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
+            initWithObjectsAndKeys:[NSFont messageFontOfSize:9.5], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
     }
     return self;
 }
@@ -223,9 +209,15 @@ NSMutableSet* fTrackerIconLoading;
 
     NSURLSessionDataTask* task = [NSURLSession.sharedSession
         dataTaskWithRequest:request completionHandler:^(NSData* iconData, NSURLResponse* response, NSError* error) {
+            if (error)
+            {
+                NSLog(@"Unable to get tracker icon: task failed (%@)", error.localizedDescription);
+                return;
+            }
             BOOL ok = ((NSHTTPURLResponse*)response).statusCode == 200 ? YES : NO;
             if (!ok)
             {
+                NSLog(@"Unable to get tracker icon: status code not OK (%ld)", (long)((NSHTTPURLResponse*)response).statusCode);
                 return;
             }
 
@@ -250,17 +242,17 @@ NSMutableSet* fTrackerIconLoading;
 
 - (NSRect)imageRectForBounds:(NSRect)bounds
 {
-    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONTAL, NSMinY(bounds) + PADDING_ABOVE_ICON, ICON_SIZE, ICON_SIZE);
+    return NSMakeRect(NSMinX(bounds) + kPaddingHorizontal, NSMinY(bounds) + kPaddingAboveIcon, kIconSize, kIconSize);
 }
 
 - (NSRect)rectForNameWithString:(NSAttributedString*)string inBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + ICON_SIZE + PADDING_BETWEEN_ICON_AND_NAME;
-    result.origin.y = NSMinY(bounds) + PADDING_ABOVE_NAME;
+    result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kIconSize + kPaddingBetweenIconAndName;
+    result.origin.y = NSMinY(bounds) + kPaddingAboveName;
 
     result.size.height = [string size].height;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal;
 
     return result;
 }
@@ -268,9 +260,9 @@ NSMutableSet* fTrackerIconLoading;
 - (NSRect)rectForCountWithString:(NSAttributedString*)string withAboveRect:(NSRect)aboveRect inBounds:(NSRect)bounds
 {
     return NSMakeRect(
-        NSMaxX(bounds) - PADDING_HORIZONTAL - COUNT_WIDTH,
-        NSMaxY(aboveRect) + PADDING_BETWEEN_LINES,
-        COUNT_WIDTH,
+        NSMaxX(bounds) - kPaddingHorizontal - kCountWidth,
+        NSMaxY(aboveRect) + kPaddingBetweenLines,
+        kCountWidth,
         [string size].height);
 }
 
@@ -289,11 +281,11 @@ NSMutableSet* fTrackerIconLoading;
                          inBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_STATUS_HORIZONTAL;
-    result.origin.y = NSMaxY(aboveRect) + PADDING_BETWEEN_LINES;
+    result.origin.x = NSMinX(bounds) + kPaddingStatusHorizontal;
+    result.origin.y = NSMaxY(aboveRect) + kPaddingBetweenLines;
 
     result.size.height = [string size].height;
-    result.size.width = NSMinX(rightRect) - PADDING_BETWEEN_LINES_ON_SAME_LINE - NSMinX(result);
+    result.size.width = NSMinX(rightRect) - kPaddingBetweenLinesOnSameLine - NSMinX(result);
 
     return result;
 }
@@ -311,7 +303,8 @@ NSMutableSet* fTrackerIconLoading;
 
 - (NSAttributedString*)attributedCount:(NSInteger)count
 {
-    NSString* countString = count != -1 ? [NSString stringWithFormat:@"%ld", count] : NSLocalizedString(@"N/A", "tracker peer stat");
+    NSString* countString = count != -1 ? [NSString localizedStringWithFormat:@"%ld", count] :
+                                          NSLocalizedString(@"N/A", "tracker peer stat");
     return [[NSAttributedString alloc] initWithString:countString attributes:self.fStatusAttributes];
 }
 

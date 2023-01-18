@@ -58,10 +58,11 @@ typedef void (^CompletionBlock)(BOOL);
                 modalForWindow:(NSWindow*)window
              completionHandler:(void (^)(BOOL))completionHandler
 {
+    // we capture renamer strongly to avoid it being deallocated before completionHandler
+    __block FileRenameSheetController* strongRenamer = renamer;
     [window beginSheet:renamer.window completionHandler:^(NSModalResponse returnCode) {
         completionHandler(returnCode == NSModalResponseOK);
-
-        [renamer.window orderOut:self];
+        strongRenamer = nil;
     }];
 }
 

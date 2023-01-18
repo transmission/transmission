@@ -1,53 +1,38 @@
 
-/* Class = "NSWindow"; title = "Torrent Maker"; ObjectID = "5"; */
+/* Class = "NSWindow"; title = "Torrent Creator"; ObjectID = "5"; */
 "5.title" = "Torrent Maker";
 
-/* Class = "NSTextFieldCell"; title = "Bestandsnaam"; ObjectID = "68"; */
-"68.title" = "Bestandsnaam";
-
-/* Class = "NSTextFieldCell"; title = "status info"; ObjectID = "69"; */
-"69.title" = "status info";
-
-/* Class = "NSTextFieldCell"; title = "Opmerking:"; ObjectID = "70"; */
+/* Class = "NSTextFieldCell"; title = "Comment:"; ObjectID = "70"; */
 "70.title" = "Opmerking:";
 
 /* Class = "NSTextFieldCell"; title = "Trackers:"; ObjectID = "71"; */
 "71.title" = "Trackers:";
 
-/* Class = "NSButtonCell"; title = "Wijzig..."; ObjectID = "73"; */
+/* Class = "NSButtonCell"; title = "Change…"; ObjectID = "73"; */
 "73.title" = "Wijzig...";
 
-/* Class = "NSTextFieldCell"; title = "Torrent:"; ObjectID = "74"; */
+/* Class = "NSTextFieldCell"; title = "Torrent File:"; ObjectID = "74"; */
 "74.title" = "Torrent:";
 
-/* Class = "NSTextFieldCell"; title = "Bestand\nBestand"; ObjectID = "75"; */
-"75.title" = "Bestand\nBestand";
-
-/* Class = "NSButtonCell"; title = "Privaat"; ObjectID = "77"; */
+/* Class = "NSButtonCell"; title = "Private"; ObjectID = "77"; */
 "77.title" = "Privaat";
 
-/* Class = "NSButtonCell"; title = "Maak aan"; ObjectID = "78"; */
+/* Class = "NSButtonCell"; title = "Create"; ObjectID = "78"; */
 "78.title" = "Maak aan";
 
-/* Class = "NSButtonCell"; title = "Annuleer"; ObjectID = "79"; */
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "79"; */
 "79.title" = "Annuleer";
 
-/* Class = "NSTextFieldCell"; title = "fragment info"; ObjectID = "80"; */
-"80.title" = "fragment info";
-
-/* Class = "NSButtonCell"; title = "Open na maken"; ObjectID = "81"; */
+/* Class = "NSButtonCell"; title = "Open when created"; ObjectID = "81"; */
 "81.title" = "Open na maken";
 
-/* Class = "NSButtonCell"; title = "Annuleer"; ObjectID = "82"; */
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "82"; */
 "82.title" = "Annuleer";
 
-/* Class = "NSTextFieldCell"; title = "Maken van torrent bestand..."; ObjectID = "83"; */
+/* Class = "NSTextFieldCell"; title = "Creating torrent file…"; ObjectID = "83"; */
 "83.title" = "Maken van torrent bestand...";
 
-/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "97"; */
-"97.title" = "Text Cell";
-
-/* Class = "NSTextFieldCell"; title = "Trackers worden elk in hun eigen tier geplaatst."; ObjectID = "108"; */
+/* Class = "NSTextFieldCell"; title = "Each tracker will be placed into its own tier"; ObjectID = "108"; */
 "108.title" = "Trackers worden elk in hun eigen tier geplaatst.";
 
 /* Class = "NSTextFieldCell"; title = "Source:"; ObjectID = "f1g-Kk-weU"; */

@@ -11,7 +11,7 @@
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 
-#define ROW_SMALL_HEIGHT 18.0
+static CGFloat const kRowSmallHeight = 18.0;
 
 typedef NS_ENUM(unsigned int, fileCheckMenuTag) { //
     FILE_CHECK_TAG,
@@ -32,12 +32,6 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
 @property(nonatomic, readonly) NSMenu* menu;
 
-- (NSUInteger)findFileNode:(FileListNode*)node
-                    inList:(NSArray<FileListNode*>*)list
-                 atIndexes:(NSIndexSet*)range
-             currentParent:(FileListNode*)currentParent
-               finalParent:(FileListNode**)parent;
-
 @end
 
 @implementation FileOutlineController
@@ -45,9 +39,6 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 - (void)awakeFromNib
 {
     self.fFileList = [[NSMutableArray alloc] init];
-
-    self.fOutline.doubleAction = @selector(revealFile:);
-    self.fOutline.target = self;
 
     //set table header tool tips
     [self.fOutline tableColumnWithIdentifier:@"Check"].headerToolTip = NSLocalizedString(@"Download", "file table -> header tool tip");
@@ -67,7 +58,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 {
     _torrent = torrent;
 
-    [self.fFileList setArray:_torrent.fileList];
+    [self.fFileList setArray:torrent.fileList ?: @[]];
 
     self.filterText = nil;
 
@@ -103,7 +94,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         __block BOOL filter = NO;
         if (components)
         {
-            [components enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* obj, NSUInteger idx, BOOL* stop) {
+            [components enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* obj, NSUInteger /*idx*/, BOOL* stop) {
                 if ([item.name rangeOfString:obj options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
                 {
                     filter = YES;
@@ -352,7 +343,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 {
     if (((FileListNode*)item).isFolder)
     {
-        return ROW_SMALL_HEIGHT;
+        return kRowSmallHeight;
     }
     else
     {
@@ -609,7 +600,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
 - (NSMenu*)menu
 {
-    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"File Outline Menu"];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@""];
 
     //check and uncheck
     NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check Selected", "File Outline -> Menu")
@@ -637,7 +628,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
     //priority
     item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Priority", "File Outline -> Menu") action:NULL keyEquivalent:@""];
-    NSMenu* priorityMenu = [[NSMenu alloc] initWithTitle:@"File Priority Menu"];
+    NSMenu* priorityMenu = [[NSMenu alloc] initWithTitle:@""];
     item.submenu = priorityMenu;
     [menu addItem:item];
 
@@ -694,35 +685,45 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 {
     NSAssert(!node.isFolder, @"Looking up folder node!");
 
+    __block FileListNode* retNode;
     __block NSUInteger retIndex = NSNotFound;
 
-    [list enumerateObjectsAtIndexes:indexes options:NSEnumerationConcurrent
-                         usingBlock:^(FileListNode* checkNode, NSUInteger index, BOOL* stop) {
-                             if ([checkNode.indexes containsIndex:node.indexes.firstIndex])
-                             {
-                                 if (!checkNode.isFolder)
+    using FindFileNode = void (^)(FileListNode*, NSArray<FileListNode*>*, NSIndexSet*, FileListNode*);
+    __weak __block FindFileNode weakFindFileNode;
+    FindFileNode findFileNode;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshadow"
+    weakFindFileNode = findFileNode = ^(FileListNode* node, NSArray<FileListNode*>* list, NSIndexSet* indexes, FileListNode* currentParent) {
+#pragma clang diagnostic pop
+        [list enumerateObjectsAtIndexes:indexes options:NSEnumerationConcurrent
+                             usingBlock:^(FileListNode* checkNode, NSUInteger index, BOOL* stop) {
+                                 if ([checkNode.indexes containsIndex:node.indexes.firstIndex])
                                  {
-                                     NSAssert2([checkNode isEqualTo:node], @"Expected file nodes to be equal: %@ %@", checkNode, node);
-
-                                     *parent = currentParent;
-                                     retIndex = index;
+                                     if (!checkNode.isFolder)
+                                     {
+                                         NSAssert([checkNode isEqualTo:node], @"Expected file nodes to be equal: %@ %@", checkNode, node);
+                                         retNode = currentParent;
+                                         retIndex = index;
+                                     }
+                                     else
+                                     {
+                                         weakFindFileNode(
+                                             node,
+                                             checkNode.children,
+                                             [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, checkNode.children.count)],
+                                             checkNode);
+                                         NSAssert(retIndex != NSNotFound, @"We didn't find an expected file node.");
+                                     }
+                                     *stop = YES;
                                  }
-                                 else
-                                 {
-                                     NSUInteger const subIndex = [self
-                                          findFileNode:node
-                                                inList:checkNode.children
-                                             atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, checkNode.children.count)]
-                                         currentParent:checkNode
-                                           finalParent:parent];
-                                     NSAssert(subIndex != NSNotFound, @"We didn't find an expected file node.");
-                                     retIndex = subIndex;
-                                 }
+                             }];
+    };
+    findFileNode(node, list, indexes, currentParent);
 
-                                 *stop = YES;
-                             }
-                         }];
-
+    if (retNode)
+    {
+        *parent = retNode;
+    }
     return retIndex;
 }
 

@@ -1,5 +1,5 @@
 // This file Copyright 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -10,8 +10,9 @@
 #endif
 
 #include <array>
-#include <cstdint>
-#include <ctime> // time_t
+#include <cstddef> // for size_t
+#include <cstdint> // for uint32_t
+#include <ctime> // for time_t
 
 /**
  * A short-term memory object that remembers how many times something
@@ -28,7 +29,7 @@ public:
      * @param when the current time in sec, such as from tr_time()
      * @param n how many items to add to the history's counter
      */
-    void add(time_t now, SizeType n)
+    constexpr void add(time_t now, SizeType n)
     {
         if (timestamps_[newest_] != now)
         {
@@ -45,7 +46,7 @@ public:
      * @param when the current time in sec, such as from tr_time()
      * @param seconds how many seconds to count back through.
      */
-    SizeType count(time_t now, unsigned int age_sec) const
+    [[nodiscard]] constexpr SizeType count(time_t now, unsigned int age_sec) const
     {
         auto sum = SizeType{};
         time_t const oldest = now - age_sec;

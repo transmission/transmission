@@ -1,90 +1,90 @@
 
-/* Class = "NSTextFieldCell"; title = "Скачано:"; ObjectID = "30"; */
+/* Class = "NSTextFieldCell"; title = "Downloaded:"; ObjectID = "30"; */
 "30.title" = "Скачано:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "31"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "31"; */
 "31.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Роздано:"; ObjectID = "32"; */
+/* Class = "NSTextFieldCell"; title = "Uploaded:"; ObjectID = "32"; */
 "32.title" = "Роздано:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "33"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "33"; */
 "33.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Рейтинг:"; ObjectID = "34"; */
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "34"; */
 "34.title" = "Рейтинг:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "35"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "35"; */
 "35.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Доступно:"; ObjectID = "36"; */
+/* Class = "NSTextFieldCell"; title = "Have:"; ObjectID = "36"; */
 "36.title" = "Доступно:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "37"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "37"; */
 "37.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Состояние:"; ObjectID = "38"; */
+/* Class = "NSTextFieldCell"; title = "State:"; ObjectID = "38"; */
 "38.title" = "Состояние:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "39"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "39"; */
 "39.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Ошибки:"; ObjectID = "41"; */
+/* Class = "NSTextFieldCell"; title = "Error:"; ObjectID = "41"; */
 "41.title" = "Ошибки:";
 
-/* Class = "NSTextFieldCell"; title = "Даты"; ObjectID = "42"; */
+/* Class = "NSTextFieldCell"; title = "Dates"; ObjectID = "42"; */
 "42.title" = "Даты";
 
-/* Class = "NSTextFieldCell"; title = "Добавлено:"; ObjectID = "43"; */
+/* Class = "NSTextFieldCell"; title = "Added:"; ObjectID = "43"; */
 "43.title" = "Добавлено:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "44"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "44"; */
 "44.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Завершено:"; ObjectID = "46"; */
+/* Class = "NSTextFieldCell"; title = "Completed:"; ObjectID = "46"; */
 "46.title" = "Завершено:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "47"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "47"; */
 "47.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Раздача"; ObjectID = "50"; */
+/* Class = "NSTextFieldCell"; title = "Transfer"; ObjectID = "50"; */
 "50.title" = "Раздача";
 
-/* Class = "NSTextFieldCell"; title = "Активность:"; ObjectID = "51"; */
+/* Class = "NSTextFieldCell"; title = "Last Activity:"; ObjectID = "51"; */
 "51.title" = "Активность:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "52"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "52"; */
 "52.placeholderString" = "Нет данных";
 
-/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Прогресс"; ObjectID = "54"; */
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[0] = "Progress"; ObjectID = "54"; */
 "54.ibShadowedLabels[0]" = "Прогресс";
 
-/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Доступно"; ObjectID = "54"; */
+/* Class = "NSSegmentedCell"; 54.ibShadowedLabels[1] = "Available"; ObjectID = "54"; */
 "54.ibShadowedLabels[1]" = "Доступно";
 
-/* Class = "NSTextFieldCell"; title = "Прогресс:"; ObjectID = "55"; */
+/* Class = "NSTextFieldCell"; title = "Progress:"; ObjectID = "55"; */
 "55.title" = "Прогресс:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "56"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "56"; */
 "56.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Неудачно:"; ObjectID = "57"; */
+/* Class = "NSTextFieldCell"; title = "Failed DL:"; ObjectID = "57"; */
 "57.title" = "Неудачно:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "58"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "58"; */
 "58.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Продолжительность"; ObjectID = "85"; */
+/* Class = "NSTextFieldCell"; title = "Time Elapsed"; ObjectID = "85"; */
 "85.title" = "Продолжительность";
 
-/* Class = "NSTextFieldCell"; title = "Скачивания:"; ObjectID = "86"; */
+/* Class = "NSTextFieldCell"; title = "Downloading:"; ObjectID = "86"; */
 "86.title" = "Скачивания:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "87"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "87"; */
 "87.placeholderString" = "Нет данных";
 
-/* Class = "NSTextFieldCell"; title = "Раздачи:"; ObjectID = "89"; */
+/* Class = "NSTextFieldCell"; title = "Seeding:"; ObjectID = "89"; */
 "89.title" = "Раздачи:";
 
-/* Class = "NSTextFieldCell"; placeholderString = "Нет данных"; ObjectID = "90"; */
+/* Class = "NSTextFieldCell"; placeholderString = "N/A"; ObjectID = "90"; */
 "90.placeholderString" = "Нет данных";

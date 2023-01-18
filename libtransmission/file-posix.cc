@@ -12,7 +12,6 @@
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
 #include <cstdio>
-#include <cstring>
 #include <string_view>
 #include <string>
 #include <vector>
@@ -21,7 +20,6 @@
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
 #include <sys/file.h> /* flock() */
-#include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
@@ -59,7 +57,7 @@
 #include "log.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
-#include "utils.h"
+#include "utils.h" // for _(), tr_strerror()
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -99,7 +97,9 @@
 
 using namespace std::literals;
 
-static void set_system_error(tr_error** error, int code)
+namespace
+{
+void set_system_error(tr_error** error, int code)
 {
     if (error == nullptr)
     {
@@ -109,7 +109,7 @@ static void set_system_error(tr_error** error, int code)
     tr_error_set(error, code, tr_strerror(code));
 }
 
-static void set_system_error_if_file_found(tr_error** error, int code)
+void set_system_error_if_file_found(tr_error** error, int code)
 {
     if (code != ENOENT)
     {
@@ -117,26 +117,7 @@ static void set_system_error_if_file_found(tr_error** error, int code)
     }
 }
 
-static void stat_to_sys_path_info(struct stat const* sb, tr_sys_path_info* info)
-{
-    if (S_ISREG(sb->st_mode))
-    {
-        info->type = TR_SYS_PATH_IS_FILE;
-    }
-    else if (S_ISDIR(sb->st_mode))
-    {
-        info->type = TR_SYS_PATH_IS_DIRECTORY;
-    }
-    else
-    {
-        info->type = TR_SYS_PATH_IS_OTHER;
-    }
-
-    info->size = (uint64_t)sb->st_size;
-    info->last_modified_at = sb->st_mtime;
-}
-
-static void set_file_for_single_pass(tr_sys_file_t handle)
+void set_file_for_single_pass(tr_sys_file_t handle)
 {
     /* Set hints about the lookahead buffer and caching. It's okay
        for these to fail silently, so don't let them affect errno */
@@ -163,133 +144,13 @@ static void set_file_for_single_pass(tr_sys_file_t handle)
 
     errno = err;
 }
-
-#ifndef HAVE_MKDIRP
-
-static bool create_path_require_dir(char const* path, tr_error** error)
-{
-    struct stat sb;
-
-    if (stat(path, &sb) == -1)
-    {
-        set_system_error(error, errno);
-        return false;
-    }
-
-    if ((sb.st_mode & S_IFMT) != S_IFDIR)
-    {
-        tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
-        return false;
-    }
-
-    return true;
-}
-
-static bool create_path(char const* path_in, int permissions, tr_error** error)
-{
-    /* make a temporary copy of path */
-    char* const path = tr_strdup(path_in);
-
-    /* walk past the root */
-    char* p = path;
-
-    while (*p == TR_PATH_DELIMITER)
-    {
-        ++p;
-    }
-
-    char* path_end = p + strlen(p);
-
-    while (path_end > path && *path_end == TR_PATH_DELIMITER)
-    {
-        --path_end;
-    }
-
-    char* pp = nullptr;
-    bool ret = false;
-    tr_error* my_error = nullptr;
-
-    /* Go one level up on each iteration and attempt to create */
-    for (pp = path_end; pp != nullptr; pp = strrchr(p, TR_PATH_DELIMITER))
-    {
-        *pp = '\0';
-
-        ret = mkdir(path, permissions) != -1;
-
-        if (ret)
-        {
-            break;
-        }
-
-        if (errno == EEXIST)
-        {
-            ret = create_path_require_dir(path, &my_error);
-
-            if (ret)
-            {
-                break;
-            }
-
-            goto FAILURE;
-        }
-
-        if (errno != ENOENT)
-        {
-            set_system_error(&my_error, errno);
-            goto FAILURE;
-        }
-    }
-
-    if (ret && pp == path_end)
-    {
-        goto CLEANUP;
-    }
-
-    /* Go one level down on each iteration and attempt to create */
-    for (pp = pp == nullptr ? p + strlen(p) : pp; pp < path_end; pp += strlen(pp))
-    {
-        *pp = TR_PATH_DELIMITER;
-
-        if (mkdir(path, permissions) == -1)
-        {
-            break;
-        }
-    }
-
-    ret = create_path_require_dir(path, &my_error);
-
-    if (ret)
-    {
-        goto CLEANUP;
-    }
-
-FAILURE:
-
-    TR_ASSERT(!ret);
-    TR_ASSERT(my_error != nullptr);
-
-    tr_logAddError(fmt::format(
-        _("Couldn't create '{path}': {error} ({error_code})"),
-        fmt::arg("path", path),
-        fmt::arg("error", my_error->message),
-        fmt::arg("error_code", my_error->code)));
-    tr_error_propagate(error, &my_error);
-
-CLEANUP:
-
-    TR_ASSERT(my_error == nullptr);
-
-    tr_free(path);
-    return ret;
-}
-
-#endif
+} // namespace
 
 bool tr_sys_path_exists(char const* path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 
-    bool ret = access(path, F_OK) != -1;
+    bool const ret = access(path, F_OK) != -1;
 
     if (!ret)
     {
@@ -299,33 +160,47 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
     return ret;
 }
 
-bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, tr_error** error)
+std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-    TR_ASSERT(info != nullptr);
+    struct stat sb = {};
 
-    bool ret = false;
-    struct stat sb;
+    bool ok = false;
+    auto const szpath = tr_pathbuf{ path };
 
     if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
     {
-        ret = stat(path, &sb) != -1;
+        ok = stat(szpath, &sb) != -1;
     }
     else
     {
-        ret = lstat(path, &sb) != -1;
+        ok = lstat(szpath, &sb) != -1;
     }
 
-    if (ret)
-    {
-        stat_to_sys_path_info(&sb, info);
-    }
-    else
+    if (!ok)
     {
         set_system_error(error, errno);
+        return {};
     }
 
-    return ret;
+    auto info = tr_sys_path_info{};
+
+    if (S_ISREG(sb.st_mode))
+    {
+        info.type = TR_SYS_PATH_IS_FILE;
+    }
+    else if (S_ISDIR(sb.st_mode))
+    {
+        info.type = TR_SYS_PATH_IS_DIRECTORY;
+    }
+    else
+    {
+        info.type = TR_SYS_PATH_IS_OTHER;
+    }
+
+    info.size = static_cast<uint64_t>(sb.st_size);
+    info.last_modified_at = sb.st_mtime;
+
+    return info;
 }
 
 bool tr_sys_path_is_relative(std::string_view path)
@@ -339,8 +214,8 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
     TR_ASSERT(path2 != nullptr);
 
     bool ret = false;
-    struct stat sb1;
-    struct stat sb2;
+    struct stat sb1 = {};
+    struct stat sb2 = {};
 
     if (stat(path1, &sb1) != -1 && stat(path2, &sb2) != -1)
     {
@@ -354,48 +229,46 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_resolve(char const* path, tr_error** error)
+std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
+    auto const szpath = tr_pathbuf{ path };
+    auto buf = std::array<char, PATH_MAX>{};
 
-    char* ret = nullptr;
-
-#if defined(HAVE_CANONICALIZE_FILE_NAME)
-
-    ret = canonicalize_file_name(path);
-
-#endif
-
-    if (ret == nullptr)
-    {
-        char tmp[PATH_MAX];
-        ret = realpath(path, tmp);
-
-        if (ret != nullptr)
-        {
-            ret = tr_strdup(ret);
-        }
-    }
-
-    if (ret == nullptr)
-    {
-        set_system_error(error, errno);
-    }
-
-    return ret;
-}
-
-std::string tr_sys_path_basename(std::string_view path, tr_error** error)
-{
-    auto tmp = tr_pathbuf{ path };
-
-    if (char const* ret = basename(std::data(tmp)); ret != nullptr)
+    if (auto const* const ret = realpath(szpath, std::data(buf)); ret != nullptr)
     {
         return ret;
     }
 
     set_system_error(error, errno);
     return {};
+}
+
+std::string_view tr_sys_path_basename(std::string_view path, tr_error** /*error*/)
+{
+    // As per the basename() manpage:
+    // If path [is] an empty string, then basename() return[s] the string "."
+    if (std::empty(path))
+    {
+        return "."sv;
+    }
+
+    // Remove all trailing slashes.
+    // If nothing is left, return "/"
+    if (auto pos = path.find_last_not_of('/'); pos != std::string_view::npos)
+    {
+        path = path.substr(0, pos + 1);
+    }
+    else // all slashes
+    {
+        return "/"sv;
+    }
+
+    if (auto pos = path.find_last_of('/'); pos != std::string_view::npos)
+    {
+        path.remove_prefix(pos + 1);
+    }
+
+    return std::empty(path) ? "/"sv : path;
 }
 
 // This function is adapted from Node.js's path.posix.dirname() function,
@@ -478,23 +351,26 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
 #else /* USE_COPYFILE */
 
+    auto const info = tr_sys_path_get_info(src_path, 0, error);
+    if (!info)
+    {
+        tr_error_prefix(error, "Unable to get information on source file: ");
+        return false;
+    }
+
     /* Other OSes require us to copy between file descriptors, so open them. */
-    tr_sys_file_t in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
+    tr_sys_file_t const in = tr_sys_file_open(src_path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (in == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open source file: ");
         return false;
     }
 
-    tr_sys_path_info info;
-    if (!tr_sys_file_get_info(in, &info, error))
-    {
-        tr_error_prefix(error, "Unable to get information on source file: ");
-        tr_sys_file_close(in);
-        return false;
-    }
-
-    tr_sys_file_t out = tr_sys_file_open(dst_path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, error);
+    tr_sys_file_t const out = tr_sys_file_open(
+        dst_path,
+        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+        0666,
+        error);
     if (out == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open destination file: ");
@@ -502,66 +378,140 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         return false;
     }
 
-    uint64_t file_size = info.size;
+    uint64_t file_size = info->size;
+    int errno_cpy = 0; /* keep errno intact across copy attempts */
 
-#if defined(USE_COPY_FILE_RANGE) || defined(USE_SENDFILE64)
+#if defined(USE_COPY_FILE_RANGE)
 
-    while (file_size > 0)
+    /* Kernel copy by copy_file_range */
+    /* try this first if available, no need to check previous copy attempts */
+    /* might throw EXDEV when used between filesystems in most kernels */
+
+    while (file_size > 0U)
     {
         size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
-        ssize_t const copied =
-#ifdef USE_COPY_FILE_RANGE
-            copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
-#elif defined(USE_SENDFILE64)
-            sendfile64(out, in, nullptr, chunk_size);
-#else
-#error File copy mechanism not implemented.
-#endif
+        auto const copied = copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
+
         TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
         if (copied == -1)
         {
-            set_system_error(error, errno);
-            break;
+            errno_cpy = errno; /* remember me for later */
+            if (errno != EXDEV) /* EXDEV is expected, don't log error */
+            {
+                set_system_error(error, errno);
+            }
+            if (file_size > 0U)
+            {
+                file_size = info->size; /* restore file_size for next fallback */
+            }
+            break; /* break copy */
         }
 
         TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= file_size);
         TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= chunk_size);
         file_size -= copied;
-    }
+    } /* end file_size loop */
+    /* at this point errno_cpy is either set or file_size is 0 due to while condition */
 
-#else /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
+#endif /* USE_COPY_FILE_RANGE */
+
+#if defined(USE_SENDFILE64)
+
+    /* Kernel copy by sendfile64 */
+    /* if file_size>0 and errno_cpy==0, we probably never entered any previous copy attempt, also: */
+    /* if we (still) got something to copy and we encountered certain error in copy_file_range */
+
+    /* duplicated code, this could be refactored in a function */
+    /* keeping the copy paths in blocks helps with error tracing though */
+    /* trying sendfile after EXDEV is more efficient than falling to user-space straight away */
+
+    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV))
+    {
+        /* set file offsets to 0 in case previous copy did move them */
+        /* TR_BAD_SYS_FILE has previously been checked, we can directly lseek */
+        /* in case we have no pending errno, be kind enough to report any error */
+        if (lseek(in, 0, SEEK_SET) == -1 || lseek(out, 0, SEEK_SET) == -1)
+        {
+            if (errno_cpy == 0)
+            {
+                set_system_error(error, errno);
+            }
+        }
+        else
+        {
+            while (file_size > 0U)
+            {
+                size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
+                auto const copied = sendfile64(out, in, nullptr, chunk_size);
+                TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
+
+                if (copied == -1)
+                {
+                    errno_cpy = errno; /* remember me for later */
+                    set_system_error(error, errno);
+                    if (file_size > 0U)
+                    {
+                        file_size = info->size; /* restore file_size for next fallback */
+                    }
+                    break; /* break copy */
+                }
+
+                TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= file_size);
+                TR_ASSERT(copied >= 0 && ((uint64_t)copied) <= chunk_size);
+                file_size -= copied;
+            } /* end file_size loop */
+        } /* end lseek error */
+    } /* end fallback check */
+    /* at this point errno_cpy is either set or file_size is 0 due to while condition */
+
+#endif /* USE_SENDFILE64 */
 
     /* Fallback to user-space copy. */
-
-    size_t const buflen = 1024 * 1024; /* 1024 KiB buffer */
-    auto* buf = static_cast<char*>(tr_malloc(buflen));
-
-    while (file_size > 0)
+    /* if file_size>0 and errno_cpy==0, we probably never entered any copy attempt, also: */
+    /* if we (still) got something to copy and we encountered certain error in previous attempts */
+    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV))
     {
-        uint64_t const chunk_size = std::min(file_size, uint64_t{ buflen });
-        uint64_t bytes_read;
-        uint64_t bytes_written;
+        static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
+        auto buf = std::vector<char>{};
+        buf.resize(Buflen);
 
-        if (!tr_sys_file_read(in, buf, chunk_size, &bytes_read, error))
+        /* set file offsets to 0 in case previous copy did move them */
+        /* TR_BAD_SYS_FILE has previously been checked, we can directly lseek */
+        /* in case we have no pending errno, be kind enough to report any error */
+        if (lseek(in, 0, SEEK_SET) == -1 || lseek(out, 0, SEEK_SET) == -1)
         {
-            break;
+            if (errno_cpy == 0)
+            {
+                set_system_error(error, errno);
+            }
         }
-
-        if (!tr_sys_file_write(out, buf, bytes_read, &bytes_written, error))
+        else
         {
-            break;
-        }
+            while (file_size > 0U)
+            {
+                uint64_t const chunk_size = std::min(file_size, uint64_t{ Buflen });
+                uint64_t bytes_read = 0;
+                uint64_t bytes_written = 0;
 
-        TR_ASSERT(bytes_read == bytes_written);
-        TR_ASSERT(bytes_written <= file_size);
-        file_size -= bytes_written;
-    }
+                if (!tr_sys_file_read(in, std::data(buf), chunk_size, &bytes_read, error))
+                {
+                    break;
+                }
 
-    /* cleanup */
-    tr_free(buf);
+                if (!tr_sys_file_write(out, std::data(buf), bytes_read, &bytes_written, error))
+                {
+                    break;
+                }
 
-#endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
+                TR_ASSERT(bytes_read == bytes_written);
+                TR_ASSERT(bytes_written <= file_size);
+                file_size -= bytes_written;
+            } /* end file_size loop */
+        } /* end lseek error */
+    } /* end fallback check */
+
+    /* all copy paths will end here, file_size>0 signifies error */
 
     /* cleanup */
     tr_sys_file_close(out);
@@ -635,12 +585,11 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         int native_value;
     };
 
-    auto constexpr native_map = std::array<native_map_item, 8>{
+    auto constexpr NativeMap = std::array<native_map_item, 8>{
         { { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, O_RDWR },
           { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_READ, O_RDONLY },
           { TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, TR_SYS_FILE_WRITE, O_WRONLY },
           { TR_SYS_FILE_CREATE, TR_SYS_FILE_CREATE, O_CREAT },
-          { TR_SYS_FILE_CREATE_NEW, TR_SYS_FILE_CREATE_NEW, O_CREAT | O_EXCL },
           { TR_SYS_FILE_APPEND, TR_SYS_FILE_APPEND, O_APPEND },
           { TR_SYS_FILE_TRUNCATE, TR_SYS_FILE_TRUNCATE, O_TRUNC },
           { TR_SYS_FILE_SEQUENTIAL, TR_SYS_FILE_SEQUENTIAL, O_SEQUENTIAL } }
@@ -648,7 +597,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
 
     int native_flags = O_BINARY | O_LARGEFILE | O_CLOEXEC;
 
-    for (auto const& item : native_map)
+    for (auto const& item : NativeMap)
     {
         if ((flags & item.symbolic_mask) == item.symbolic_value)
         {
@@ -703,57 +652,6 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error** error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(info != nullptr);
-
-    struct stat sb;
-    bool const ret = fstat(handle, &sb) != -1;
-
-    if (ret)
-    {
-        stat_to_sys_path_info(&sb, info);
-    }
-    else
-    {
-        set_system_error(error, errno);
-    }
-
-    return ret;
-}
-
-bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)
-{
-    static_assert(TR_SEEK_SET == SEEK_SET, "values should match");
-    static_assert(TR_SEEK_CUR == SEEK_CUR, "values should match");
-    static_assert(TR_SEEK_END == SEEK_END, "values should match");
-
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
-
-    bool ret = false;
-
-    off_t const my_new_offset = lseek(handle, offset, origin);
-    static_assert(sizeof(*new_offset) >= sizeof(my_new_offset));
-
-    if (my_new_offset != -1)
-    {
-        if (new_offset != nullptr)
-        {
-            *new_offset = my_new_offset;
-        }
-
-        ret = true;
-    }
-    else
-    {
-        set_system_error(error, errno);
-    }
-
-    return ret;
-}
-
 bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
@@ -761,7 +659,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
 
     bool ret = false;
 
-    ssize_t const my_bytes_read = read(handle, buffer, size);
+    auto const my_bytes_read = read(handle, buffer, size);
     static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
     if (my_bytes_read != -1)
@@ -798,7 +696,7 @@ bool tr_sys_file_read_at(
 
 #ifdef HAVE_PREAD
 
-    ssize_t const my_bytes_read = pread(handle, buffer, size, offset);
+    auto const my_bytes_read = pread(handle, buffer, size, offset);
 
 #else
 
@@ -832,7 +730,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
 
     bool ret = false;
 
-    ssize_t const my_bytes_written = write(handle, buffer, size);
+    auto const my_bytes_written = write(handle, buffer, size);
     static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written));
 
     if (my_bytes_written != -1)
@@ -869,7 +767,7 @@ bool tr_sys_file_write_at(
 
 #ifdef HAVE_PWRITE
 
-    ssize_t const my_bytes_written = pwrite(handle, buffer, size, offset);
+    auto const my_bytes_written = pwrite(handle, buffer, size, offset);
 
 #else
 
@@ -900,7 +798,7 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    bool ret = fsync(handle) != -1;
+    bool const ret = (fsync(handle) != -1);
 
     if (!ret)
     {
@@ -910,11 +808,26 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
     return ret;
 }
 
+bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error** error)
+{
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+
+    struct stat statbuf;
+
+    if (fstat(handle, &statbuf) != 0)
+    {
+        set_system_error(error, errno);
+        return false;
+    }
+
+    return S_ISREG(statbuf.st_mode);
+}
+
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    bool ret = ftruncate(handle, size) != -1;
+    bool const ret = ftruncate(handle, size) != -1;
 
     if (!ret)
     {
@@ -1093,37 +1006,6 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
     return false;
 }
 
-void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, tr_error** error)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(size > 0);
-
-    void* ret = mmap(nullptr, size, PROT_READ, MAP_SHARED, handle, offset);
-
-    if (ret == MAP_FAILED) // NOLINT(performance-no-int-to-ptr)
-    {
-        set_system_error(error, errno);
-        ret = nullptr;
-    }
-
-    return ret;
-}
-
-bool tr_sys_file_unmap(void const* address, uint64_t size, tr_error** error)
-{
-    TR_ASSERT(address != nullptr);
-    TR_ASSERT(size > 0);
-
-    bool ret = munmap((void*)address, size) != -1;
-
-    if (!ret)
-    {
-        set_system_error(error, errno);
-    }
-
-    return ret;
-}
-
 bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] int operation, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
@@ -1208,43 +1090,62 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
     return ret;
 }
 
-char* tr_sys_dir_get_current(tr_error** error)
+std::string tr_sys_dir_get_current(tr_error** error)
 {
-    char* ret = getcwd(nullptr, 0);
+    auto buf = std::vector<char>{};
+    buf.resize(PATH_MAX);
 
-    if (ret == nullptr && (errno == EINVAL || errno == ERANGE))
+    for (;;)
     {
-        size_t size = PATH_MAX;
-        char* tmp = nullptr;
-
-        do
+        if (char const* const ret = getcwd(std::data(buf), std::size(buf)); ret != nullptr)
         {
-            tmp = tr_renew(char, tmp, size);
-
-            if (tmp == nullptr)
-            {
-                break;
-            }
-
-            ret = getcwd(tmp, size);
-            size += 2048;
-        } while (ret == nullptr && errno == ERANGE);
-
-        if (ret == nullptr)
-        {
-            int const err = errno;
-            tr_free(tmp);
-            errno = err;
+            return ret;
         }
-    }
 
-    if (ret == nullptr)
-    {
-        set_system_error(error, errno);
-    }
+        if (errno != ERANGE)
+        {
+            set_system_error(error, errno);
+            return {};
+        }
 
-    return ret;
+        buf.resize(std::size(buf) * 2);
+    }
 }
+
+namespace
+{
+#ifndef HAVE_MKDIRP
+[[nodiscard]] bool tr_mkdirp_(std::string_view path, int permissions, tr_error** error)
+{
+    auto walk = path.find_first_not_of('/'); // walk past the root
+    auto subpath = tr_pathbuf{};
+
+    while (walk < std::size(path))
+    {
+        auto const end = path.find('/', walk);
+        subpath.assign(path.substr(0, end));
+        auto const info = tr_sys_path_get_info(subpath, 0);
+        if (info && !info->isFolder())
+        {
+            tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
+            return false;
+        }
+        if (!info && mkdir(subpath, permissions) == -1)
+        {
+            set_system_error(error, errno);
+            return false;
+        }
+        if (end == std::string_view::npos)
+        {
+            break;
+        }
+        walk = end + 1;
+    }
+
+    return true;
+}
+#endif
+} // namespace
 
 bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
 {
@@ -1258,7 +1159,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 #ifdef HAVE_MKDIRP
         ret = mkdirp(path, permissions) != -1;
 #else
-        ret = create_path(path, permissions, &my_error);
+        ret = tr_mkdirp_(path, permissions, &my_error);
 #endif
     }
     else
@@ -1268,9 +1169,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 
     if (!ret && errno == EEXIST)
     {
-        struct stat sb;
-
-        if (stat(path, &sb) != -1 && S_ISDIR(sb.st_mode))
+        if (auto const info = tr_sys_path_get_info(path); info && info->type == TR_SYS_PATH_IS_DIRECTORY)
         {
             tr_error_clear(&my_error);
             ret = true;
@@ -1357,7 +1256,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    bool ret = closedir((DIR*)handle) != -1;
+    bool const ret = closedir((DIR*)handle) != -1;
 
     if (!ret)
     {

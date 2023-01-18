@@ -4,12 +4,13 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <utility>
 
 #include <QFileInfo>
 #include <QPushButton>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* mime64 */
+
 #include <libtransmission/variant.h>
 #include <libtransmission/torrent-metainfo.h>
 
@@ -38,18 +39,7 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
 {
     ui_.setupUi(this);
 
-    QString title;
-
-    if (add_.type == AddData::FILENAME)
-    {
-        title = tr("Open Torrent from File");
-    }
-    else
-    {
-        title = tr("Open Torrent from URL or Magnet Link");
-    }
-
-    setWindowTitle(title);
+    setWindowTitle(add_.type == AddData::FILENAME ? tr("Open Torrent from File") : tr("Open Torrent from URL or Magnet Link"));
 
     edit_timer_.setInterval(2000);
     edit_timer_.setSingleShot(true);
@@ -318,9 +308,9 @@ void OptionsDialog::onSourceChanged()
     {
         add_.set(ui_.sourceButton->path());
     }
-    else
+    else if (auto const text = ui_.sourceEdit->text(); text != add_.readableName())
     {
-        add_.set(ui_.sourceEdit->text());
+        add_.set(text);
     }
 
     reload();

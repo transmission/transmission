@@ -1,217 +1,242 @@
-project(trgtk)
-
-add_compile_options(${C_WARNING_FLAGS})
-
-if(WITH_LIBAPPINDICATOR)
-    add_definitions(-DHAVE_LIBAPPINDICATOR)
-endif()
-
-execute_process(
-    COMMAND
-        ${PKG_CONFIG_EXECUTABLE} gio-2.0 --variable glib_compile_resources
-    OUTPUT_VARIABLE
-        GLIB_COMPILE_RESOURCES_EXECUTABLE
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
-    message(SEND_ERROR "Unable to find glib-compile-resources executable")
-endif()
-
 find_program(APPSTREAM appstreamcli)
 
-add_custom_command(
-    OUTPUT
-        ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
-        ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
-    COMMAND
-        ${GLIB_COMPILE_RESOURCES_EXECUTABLE}
-        --target=${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
-        --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}
-        --generate-source
-        --c-name transmission
-        transmission.gresource.xml
-    COMMAND
-        ${GLIB_COMPILE_RESOURCES_EXECUTABLE}
-        --target=${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
-        --sourcedir=${CMAKE_CURRENT_SOURCE_DIR}
-        --generate-header
-        --c-name transmission
-        transmission.gresource.xml
-    DEPENDS
-        icons/hicolor_apps_scalable_transmission.svg
-        icons/lock.svg
-        icons/preferences-other-symbolic.svg
-        icons/ratio.svg
-        icons/turtle-silhouette.svg
-        icons/turtle.svg
-        transmission-ui.xml
-        transmission.gresource.xml
-    WORKING_DIRECTORY
-        ${CMAKE_CURRENT_SOURCE_DIR}
-)
+add_executable(${TR_NAME}-gtk WIN32)
+
+target_sources(${TR_NAME}-gtk
+    PRIVATE
+        Actions.cc
+        Actions.h
+        Application.cc
+        Application.h
+        DetailsDialog.cc
+        DetailsDialog.h
+        Dialogs.cc
+        Dialogs.h
+        FaviconCache.cc
+        FaviconCache.h
+        FileList.cc
+        FileList.h
+        FilterBar.cc
+        FilterBar.h
+        FilterBase.h
+        FilterBase.hh
+        FilterListModel.h
+        FilterListModel.hh
+        Flags.h
+        FreeSpaceLabel.cc
+        FreeSpaceLabel.h
+        GtkCompat.h
+        HigWorkarea.h
+        IconCache.cc
+        IconCache.h
+        ListModelAdapter.cc
+        ListModelAdapter.h
+        main.cc
+        MainWindow.cc
+        MainWindow.h
+        MakeDialog.cc
+        MakeDialog.h
+        MessageLogWindow.cc
+        MessageLogWindow.h
+        Notify.cc
+        Notify.h
+        OptionsDialog.cc
+        OptionsDialog.h
+        PathButton.cc
+        PathButton.h
+        Prefs.cc
+        Prefs.h
+        PrefsDialog.cc
+        PrefsDialog.h
+        RelocateDialog.cc
+        RelocateDialog.h
+        Session.cc
+        Session.h
+        SorterBase.h
+        SorterBase.hh
+        SortListModel.h
+        SortListModel.hh
+        StatsDialog.cc
+        StatsDialog.h
+        SystemTrayIcon.cc
+        SystemTrayIcon.h
+        Torrent.cc
+        Torrent.h
+        TorrentCellRenderer.cc
+        TorrentCellRenderer.h
+        TorrentFilter.cc
+        TorrentFilter.h
+        TorrentSorter.cc
+        TorrentSorter.h
+        Utils.cc
+        Utils.h)
+
+target_sources(${TR_NAME}-gtk
+    PRIVATE
+        ui/gtk3/AddTrackerDialog.ui
+        ui/gtk3/DetailsDialog.ui
+        ui/gtk3/EditTrackersDialog.ui
+        ui/gtk3/FilterBar.ui
+        ui/gtk3/MainWindow.ui
+        ui/gtk3/MakeDialog.ui
+        ui/gtk3/MakeProgressDialog.ui
+        ui/gtk3/MessageLogWindow.ui
+        ui/gtk3/OptionsDialog.ui
+        ui/gtk3/PrefsDialog.ui
+        ui/gtk3/RelocateDialog.ui
+        ui/gtk3/StatsDialog.ui
+        ui/gtk3/TorrentUrlChooserDialog.ui)
+
+source_group(Ui/GTK3
+    REGULAR_EXPRESSION [[ui/gtk3/.*\.ui$]])
+
+target_sources(${TR_NAME}-gtk
+    PRIVATE
+        ui/gtk4/AddTrackerDialog.ui
+        ui/gtk4/DetailsDialog.ui
+        ui/gtk4/EditTrackersDialog.ui
+        ui/gtk4/FilterBar.ui
+        ui/gtk4/MainWindow.ui
+        ui/gtk4/MakeDialog.ui
+        ui/gtk4/MakeProgressDialog.ui
+        ui/gtk4/MessageLogWindow.ui
+        ui/gtk4/OptionsDialog.ui
+        ui/gtk4/PrefsDialog.ui
+        ui/gtk4/RelocateDialog.ui
+        ui/gtk4/StatsDialog.ui
+        ui/gtk4/TorrentUrlChooserDialog.ui)
+
+source_group(Ui/GTK4
+    REGULAR_EXPRESSION [[ui/gtk4/.*\.ui$]])
+
+if(WITH_APPINDICATOR)
+    set_property(
+        SOURCE SystemTrayIcon.cc
+        APPEND
+        PROPERTY COMPILE_DEFINITIONS
+            HAVE_APPINDICATOR)
+    if(APPINDICATOR_IS_AYATANA)
+        set_property(
+            SOURCE SystemTrayIcon.cc
+            APPEND
+            PROPERTY COMPILE_DEFINITIONS
+                APPINDICATOR_IS_AYATANA)
+    endif()
+endif()
+
+if(GTK_VERSION EQUAL 4)
+    set(UI_SUBDIR ui/gtk4)
+else()
+    set(UI_SUBDIR ui/gtk3)
+endif()
+
+tr_target_glib_resources(${TR_NAME}-gtk
+    transmission.gresource.xml
+    ${UI_SUBDIR}/transmission-ui.gresource.xml)
 
 if(ENABLE_NLS)
-    set(${PROJECT_NAME}_DESKTOP_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
-    add_custom_command(
-        OUTPUT ${${PROJECT_NAME}_DESKTOP_FILE}
-        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --desktop -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in -o ${${PROJECT_NAME}_DESKTOP_FILE}
-        DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.desktop.in
-        VERBATIM
-    )
+    set(DESKTOP_FILE "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-gtk.desktop")
+    tr_gettext_msgfmt(${TR_NAME}-gtk
+        ${DESKTOP_FILE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/transmission-gtk.desktop.in)
+    target_sources(${TR_NAME}-gtk
+        PRIVATE
+            ${DESKTOP_FILE})
 
-    set(${PROJECT_NAME}_METAINFO_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
-    add_custom_command(
-        OUTPUT ${${PROJECT_NAME}_METAINFO_FILE}
-        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --xml -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in -o ${${PROJECT_NAME}_METAINFO_FILE}
-        DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in
-        VERBATIM
-    )
+    set(METAINFO_FILE "${CMAKE_CURRENT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
+    tr_gettext_msgfmt(${TR_NAME}-gtk
+        ${METAINFO_FILE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in)
+    target_sources(${TR_NAME}-gtk
+        PRIVATE
+            ${METAINFO_FILE})
 endif()
 
-set(${PROJECT_NAME}_SOURCES
-    Actions.cc
-    Application.cc
-    DetailsDialog.cc
-    Dialogs.cc
-    FaviconCache.cc
-    FileList.cc
-    FilterBar.cc
-    FreeSpaceLabel.cc
-    HigWorkarea.cc
-    IconCache.cc
-    main.cc
-    MainWindow.cc
-    MakeDialog.cc
-    MessageLogWindow.cc
-    Notify.cc
-    OptionsDialog.cc
-    Prefs.cc
-    PrefsDialog.cc
-    RelocateDialog.cc
-    Session.cc
-    StatsDialog.cc
-    SystemTrayIcon.cc
-    TorrentCellRenderer.cc
-    Utils.cc
-    ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
-)
+target_compile_definitions(${TR_NAME}-gtk
+    PRIVATE
+        TRANSMISSIONLOCALEDIR="${CMAKE_INSTALL_FULL_LOCALEDIR}"
+        GETTEXT_PACKAGE="${TR_NAME}-gtk"
+        G_DISABLE_DEPRECATED
+        GDK_PIXBUF_DISABLE_DEPRECATED
+        GDK_DISABLE_DEPRECATED
+        GTK_DISABLE_DEPRECATED
+        PANGO_DISABLE_DEPRECATED
+        # FIXME: these break libnotify's headers
+        # G_DISABLE_SINGLE_INCLUDES
+        # GTK_DISABLE_SINGLE_INCLUDES
+        GDKMM_DISABLE_DEPRECATED
+        GIOMM_DISABLE_DEPRECATED
+        GLIBMM_DISABLE_DEPRECATED
+        GTKMM_DISABLE_DEPRECATED
+        PANGOMM_DISABLE_DEPRECATED
+        SIGCXX_DISABLE_DEPRECATED
+        $<$<BOOL:${ENABLE_UTP}>:WITH_UTP>)
 
-set(${PROJECT_NAME}_HEADERS
-    Actions.h
-    Application.h
-    DetailsDialog.h
-    Dialogs.h
-    FaviconCache.h
-    FileList.h
-    FilterBar.h
-    FreeSpaceLabel.h
-    HigWorkarea.h
-    IconCache.h
-    MainWindow.h
-    MakeDialog.h
-    MessageLogWindow.h
-    Notify.h
-    OptionsDialog.h
-    Prefs.h
-    PrefsDialog.h
-    RelocateDialog.h
-    Session.h
-    StatsDialog.h
-    SystemTrayIcon.h
-    TorrentCellRenderer.h
-    Utils.h
-    ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
-)
+target_compile_options(${TR_NAME}-gtk
+    PRIVATE
+        $<$<BOOL:${ENABLE_WERROR}>:$<IF:$<CXX_COMPILER_ID:MSVC>,/WX,-Werror>>
+        $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-exit-time-destructors>)
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}
-    ${PROJECT_BINARY_DIR}
-)
-include_directories(
-    SYSTEM
-    ${LIBAPPINDICATOR_INCLUDE_DIRS}
-    ${GTK_INCLUDE_DIRS}
-    ${CURL_INCLUDE_DIRS}
-    ${EVENT2_INCLUDE_DIRS}
-)
+target_include_directories(${TR_NAME}-gtk
+    PRIVATE
+        ${CMAKE_CURRENT_BINARY_DIR})
 
-link_directories(
-    ${GTK_LIBRARY_DIRS}
-)
-
-add_definitions(
-    "-DTRANSMISSIONLOCALEDIR=\"${CMAKE_INSTALL_FULL_LOCALEDIR}\""
-    "-DGETTEXT_PACKAGE=\"${TR_NAME}-gtk\""
-    -DG_DISABLE_DEPRECATED
-    -DGDK_PIXBUF_DISABLE_DEPRECATED
-    -DGDK_DISABLE_DEPRECATED
-    -DGTK_DISABLE_DEPRECATED
-    -DPANGO_DISABLE_DEPRECATED
-    # FIXME: these break libnotify's headers
-    # -DG_DISABLE_SINGLE_INCLUDES
-    # -DGTK_DISABLE_SINGLE_INCLUDES
-    -DGDKMM_DISABLE_DEPRECATED
-    -DGIOMM_DISABLE_DEPRECATED
-    -DGLIBMM_DISABLE_DEPRECATED
-    -DGTKMM_DISABLE_DEPRECATED
-    -DPANGOMM_DISABLE_DEPRECATED
-    -DSIGCXX_DISABLE_DEPRECATED
-    ${GTK_CFLAGS_OTHER}
-)
-
-tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE
-    "Transmission GTK+ Client"
-    "${TR_NAME}-gtk"
-    "${TR_NAME}-gtk.exe"
-    "${TR_NAME}.ico")
-
-add_executable(${TR_NAME}-gtk WIN32
-    ${${PROJECT_NAME}_SOURCES}
-    ${${PROJECT_NAME}_HEADERS}
-    ${${PROJECT_NAME}_DESKTOP_FILE}
-    ${${PROJECT_NAME}_METAINFO_FILE}
-    ${${PROJECT_NAME}_WIN32_RC_FILE}
-)
+target_include_directories(${TR_NAME}-gtk SYSTEM
+    PRIVATE
+        $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_INCLUDE_DIRS}>)
 
 target_link_libraries(${TR_NAME}-gtk
-    ${TR_NAME}
-    ${LIBAPPINDICATOR_LIBRARIES}
-    ${GTK_LIBRARIES}
-    ${CURL_LIBRARIES}
-    ${EVENT2_LIBRARIES}
-)
-
-if(NOT MSVC)
-    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-exit-time-destructors)
-endif()
+    PRIVATE
+        ${TR_NAME}
+        transmission::gtk_impl
+        fmt::fmt-header-only
+        $<$<BOOL:${WITH_APPINDICATOR}>:${APPINDICATOR_LIBRARIES}>)
 
 if(MSVC)
     tr_append_target_property(${TR_NAME}-gtk LINK_FLAGS "/ENTRY:mainCRTStartup")
 endif()
 
-install(TARGETS ${TR_NAME}-gtk DESTINATION ${CMAKE_INSTALL_BINDIR})
+tr_win32_app_info(${TR_NAME}-gtk
+    "Transmission GTK+ Client"
+    "${TR_NAME}-gtk"
+    "${TR_NAME}-gtk.exe"
+    "${TR_NAME}.ico")
 
-set(${PROJECT_NAME}_PUBLIC_ICONS
+install(
+    TARGETS ${TR_NAME}-gtk
+    DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+set(PUBLIC_ICONS
     hicolor_apps_scalable_transmission.svg
     hicolor_apps_scalable_transmission-devel.svg
-    hicolor_apps_symbolic_transmission-symbolic.svg
-)
+    hicolor_apps_symbolic_transmission-symbolic.svg)
 
 set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")
-foreach(ICON ${${PROJECT_NAME}_PUBLIC_ICONS})
+foreach(ICON ${PUBLIC_ICONS})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\1/\\3/\\2" ICON_DIR ${ICON})
     string(REGEX REPLACE ${ICON_NAME_REGEX} "\\4" ICON_NAME ${ICON})
-    install(FILES icons/${ICON} DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/ RENAME ${ICON_NAME})
+    install(
+        FILES icons/${ICON}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/${ICON_DIR}/
+        RENAME ${ICON_NAME})
 endforeach()
 
 if(INSTALL_DOC)
-    install(FILES ${TR_NAME}-gtk.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+    install(
+        FILES ${TR_NAME}-gtk.1
+        DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif()
 
 if(ENABLE_NLS)
-    install(FILES ${${PROJECT_NAME}_DESKTOP_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-    install(FILES ${${PROJECT_NAME}_METAINFO_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+    install(
+        FILES ${DESKTOP_FILE}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    install(
+        FILES ${METAINFO_FILE}
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 else()
-    install(FILES transmission-gtk.desktop.in DESTINATION ${CMAKE_INSTALL_DATADIR}/applications RENAME ${TR_NAME}-gtk.desktop)
+    install(
+        FILES transmission-gtk.desktop.in
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+        RENAME ${TR_NAME}-gtk.desktop)
 endif()

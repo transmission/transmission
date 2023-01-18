@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -11,13 +11,15 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cstddef> // size_t, std::byte
 #include <memory>
 
 #include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-assert.h"
+#include "tr-arc4.h"
 
-struct arc4_context;
+class tr_arc4;
 
 // Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
 namespace tr_message_stream_encryption
@@ -47,7 +49,10 @@ public:
 
     // By default, a private key is randomly generated.
     // Providing a predefined one is useful for reproducible unit tests.
-    DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept;
+    constexpr DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept
+        : private_key_{ private_key }
+    {
+    }
 
     // Returns our own public key to be shared with a peer.
     [[nodiscard]] key_bigend_t publicKey() noexcept;
@@ -65,23 +70,47 @@ public:
     [[nodiscard]] static private_key_bigend_t randomPrivateKey() noexcept;
 
 private:
-    private_key_bigend_t const private_key_;
+    private_key_bigend_t private_key_;
     key_bigend_t public_key_ = {};
     key_bigend_t secret_ = {};
 };
 
-/// arc4 encryption for both incoming and outgoing stream
+// --- arc4 encryption for both incoming and outgoing stream
 class Filter
 {
 public:
     void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    void decrypt(size_t buflen, void* buf);
+
+    template<typename T>
+    constexpr void decrypt(size_t buf_len, T* buf)
+    {
+        if (dec_active_)
+        {
+            dec_key_.process(buf, buf, buf_len);
+        }
+    }
+
     void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    void encrypt(size_t buflen, void* buf);
+
+    template<typename T>
+    constexpr void encrypt(size_t buf_len, T* buf)
+    {
+        if (enc_active_)
+        {
+            enc_key_.process(buf, buf, buf_len);
+        }
+    }
+
+    [[nodiscard]] constexpr auto is_active() const noexcept
+    {
+        return dec_active_ || enc_active_;
+    }
 
 private:
-    std::shared_ptr<struct arc4_context> dec_key_;
-    std::shared_ptr<struct arc4_context> enc_key_;
+    tr_arc4 dec_key_ = {};
+    tr_arc4 enc_key_ = {};
+    bool dec_active_ = false;
+    bool enc_active_ = false;
 };
 
 } // namespace tr_message_stream_encryption

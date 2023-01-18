@@ -5,12 +5,6 @@
 
 #include "PrefsDialog.h"
 
-#ifdef _WIN32
-#include <winsock2.h> // FD_SETSIZE
-#else
-#include <sys/select.h> // FD_SETSIZE
-#endif
-
 #include <cassert>
 
 #include <QCheckBox>
@@ -450,7 +444,7 @@ void PrefsDialog::onPortTested(bool isOpen)
 
 void PrefsDialog::onPortTest()
 {
-    ui_.peerPortStatusLabel->setText(tr("Testing TCP Port..."));
+    ui_.peerPortStatusLabel->setText(tr("Testing TCP Port…"));
     ui_.testPeerPortButton->setEnabled(false);
     widgets_[Prefs::PEER_PORT]->setEnabled(false);
     session_.portTest();
@@ -458,8 +452,8 @@ void PrefsDialog::onPortTest()
 
 void PrefsDialog::initNetworkTab()
 {
-    ui_.torrentPeerLimitSpin->setRange(1, FD_SETSIZE);
-    ui_.globalPeerLimitSpin->setRange(1, FD_SETSIZE);
+    ui_.torrentPeerLimitSpin->setRange(1, INT_MAX);
+    ui_.globalPeerLimitSpin->setRange(1, INT_MAX);
 
     linkWidgetToPref(ui_.peerPortSpin, Prefs::PEER_PORT);
     linkWidgetToPref(ui_.randomPeerPortCheck, Prefs::PEER_PORT_RANDOM_ON_START);
@@ -500,7 +494,7 @@ void PrefsDialog::onUpdateBlocklistCancelled()
 
 void PrefsDialog::onBlocklistUpdated(int n)
 {
-    blocklist_dialog_->setText(tr("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).", nullptr, n));
+    blocklist_dialog_->setText(tr("<b>Update succeeded!</b><p>Blocklist now has %Ln rule(s).</p>", nullptr, n));
     blocklist_dialog_->setTextFormat(Qt::RichText);
 }
 
@@ -509,7 +503,7 @@ void PrefsDialog::onUpdateBlocklistClicked()
     blocklist_dialog_ = new QMessageBox(
         QMessageBox::Information,
         QString(),
-        tr("<b>Update Blocklist</b><p>Getting new blocklist..."),
+        tr("<b>Update Blocklist</b><p>Getting new blocklist…</p>"),
         QMessageBox::Close,
         this);
     connect(blocklist_dialog_, &QDialog::rejected, this, &PrefsDialog::onUpdateBlocklistCancelled);
@@ -819,7 +813,7 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    key2widget_t::iterator it(widgets_.find(key));
+    key2widget_t::iterator const it(widgets_.find(key));
 
     if (it != widgets_.end())
     {

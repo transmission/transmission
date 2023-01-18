@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -26,15 +26,15 @@ struct tr_torrent;
  * Reads the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.
  */
-int tr_ioRead(struct tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t* setme);
+[[nodiscard]] int tr_ioRead(struct tr_torrent* tor, tr_block_info::Location loc, size_t len, uint8_t* setme);
 
-int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location loc, uint32_t len);
+int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location loc, size_t len);
 
 /**
  * Writes the block specified by the piece index, offset, and length.
  * @return 0 on success, or an errno value on failure.
  */
-int tr_ioWrite(struct tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t const* writeme);
+[[nodiscard]] int tr_ioWrite(struct tr_torrent* tor, tr_block_info::Location loc, size_t len, uint8_t const* writeme);
 
 /**
  * @brief Test to see if the piece matches its metainfo's SHA1 checksum.

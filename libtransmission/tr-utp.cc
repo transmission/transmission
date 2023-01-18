@@ -3,8 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstdint>
-
-#include <event2/event.h>
+#include <chrono>
 
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -13,15 +12,18 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" /* tr_rand_int_weak() */
+#include "crypto-utils.h" // tr_rand_int()
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-socket.h"
 #include "session.h"
+#include "timer.h"
 #include "tr-utp.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 #ifndef WITH_UTP
 
@@ -71,76 +73,60 @@ void tr_utpClose(tr_session* /*session*/)
 
 #else
 
-/* Greg says 50ms works for them. */
-static auto constexpr UtpIntervalUs = int{ 500000 };
-
-static void utp_on_accept(tr_session* const session, UTPSocket* const s)
+namespace
 {
-    struct sockaddr_storage from_storage;
+/* Greg says 50ms works for them. */
+auto constexpr UtpInterval = 50ms;
+
+void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
+{
+    auto from_storage = sockaddr_storage{};
     auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
-    tr_address addr;
-    tr_port port;
 
-    if (!tr_sessionIsUTPEnabled(session))
+    if (!session->allowsUTP() || tr_peer_socket::limit_reached(session))
     {
-        utp_close(s);
+        utp_close(utp_sock);
         return;
     }
 
-    utp_getpeername(s, from, &fromlen);
+    utp_getpeername(utp_sock, from, &fromlen);
 
-    if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
+    if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
+    {
+        auto const& [addr, port] = *addrport;
+        session->addIncoming(tr_peer_socket{ addr, port, utp_sock });
+    }
+    else
     {
         tr_logAddWarn(_("Unknown socket family"));
-        utp_close(s);
-        return;
+        utp_close(utp_sock);
     }
-
-    tr_peerMgrAddIncoming(session->peerMgr, &addr, port, tr_peer_socket_utp_create(s));
 }
 
-static void utp_send_to(
-    tr_session* const ss,
+void utp_send_to(
+    tr_session const* const ss,
     uint8_t const* const buf,
     size_t const buflen,
     struct sockaddr const* const to,
     socklen_t const tolen)
 {
-    if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
-    {
-        (void)sendto(ss->udp_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
-    }
-    else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
-    {
-        (void)sendto(ss->udp6_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
-    }
+    ss->udp_core_->sendto(buf, buflen, to, tolen);
 }
 
-#ifdef TR_UTP_TRACE
-
-static void utp_log(tr_session* const /*session*/, char const* const msg)
-{
-    fmt::print(stderr, FMT_STRING("[utp] {}\n"), msg);
-}
-
-#endif
-
-static uint64 utp_callback(utp_callback_arguments* args)
+uint64 utp_callback(utp_callback_arguments* args)
 {
     auto* const session = static_cast<tr_session*>(utp_context_get_userdata(args->context));
 
-    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(session != nullptr);
     TR_ASSERT(session->utp_context == args->context);
 
     switch (args->callback_type)
     {
 #ifdef TR_UTP_TRACE
-
     case UTP_LOG:
-        utp_log(session, args->buf);
+        fmt::print(stderr, FMT_STRING("[µTP] {}\n"), args->buf);
         break;
-
 #endif
 
     case UTP_ON_ACCEPT:
@@ -155,31 +141,35 @@ static uint64 utp_callback(utp_callback_arguments* args)
     return 0;
 }
 
-static void reset_timer(tr_session* ss)
+void reset_timer(tr_session* session)
 {
-    int sec = 0;
-    int usec = 0;
+    auto interval = std::chrono::milliseconds{};
+    auto const random_percent = tr_rand_int(1000U) / 1000.0;
 
-    if (tr_sessionIsUTPEnabled(ss))
+    if (session->allowsUTP())
     {
-        sec = 0;
-        usec = UtpIntervalUs / 2 + tr_rand_int_weak(UtpIntervalUs);
+        static auto constexpr MinInterval = UtpInterval * 0.5;
+        static auto constexpr MaxInterval = UtpInterval * 1.5;
+        auto const target = MinInterval + random_percent * (MaxInterval - MinInterval);
+        interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
     else
     {
-        /* If somebody has disabled uTP, then we still want to run
+        /* If somebody has disabled µTP, then we still want to run
            utp_check_timeouts, in order to let closed sockets finish
            gracefully and so on.  However, since we're not particularly
            interested in that happening in a timely manner, we might as
            well use a large timeout. */
-        sec = 2;
-        usec = tr_rand_int_weak(1000000);
+        static auto constexpr MinInterval = 2s;
+        static auto constexpr MaxInterval = 3s;
+        auto const target = MinInterval + random_percent * (MaxInterval - MinInterval);
+        interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
 
-    tr_timerAdd(*ss->utp_timer, sec, usec);
+    session->utp_timer->startSingleShot(interval);
 }
 
-static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession)
+void timer_callback(void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
@@ -189,6 +179,7 @@ static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession
     utp_check_timeouts(session->utp_context);
     reset_timer(session);
 }
+} // namespace
 
 void tr_utpInit(tr_session* session)
 {
@@ -205,20 +196,15 @@ void tr_utpInit(tr_session* session)
     }
 
     utp_context_set_userdata(ctx, session);
-
     utp_set_callback(ctx, UTP_ON_ACCEPT, &utp_callback);
     utp_set_callback(ctx, UTP_SENDTO, &utp_callback);
-
-    tr_peerIoUtpInit(ctx);
+    tr_peerIo::utp_init(ctx);
 
 #ifdef TR_UTP_TRACE
-
     utp_set_callback(ctx, UTP_LOG, &utp_callback);
-
     utp_context_set_option(ctx, UTP_LOG_NORMAL, 1);
     utp_context_set_option(ctx, UTP_LOG_MTU, 1);
     utp_context_set_option(ctx, UTP_LOG_DEBUG, 1);
-
 #endif
 
     session->utp_context = ctx;
@@ -226,15 +212,9 @@ void tr_utpInit(tr_session* session)
 
 bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosed && ss->utp_timer == nullptr)
+    if (!ss->isClosing() && !ss->utp_timer)
     {
-        ss->utp_timer = evtimer_new(ss->event_base, timer_callback, ss);
-
-        if (ss->utp_timer == nullptr)
-        {
-            return false;
-        }
-
+        ss->utp_timer = ss->timerMaker().create(timer_callback, ss);
         reset_timer(ss);
     }
 
@@ -248,11 +228,7 @@ bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const
 
 void tr_utpClose(tr_session* session)
 {
-    if (session->utp_timer != nullptr)
-    {
-        evtimer_del(session->utp_timer);
-        session->utp_timer = nullptr;
-    }
+    session->utp_timer.reset();
 
     if (session->utp_context != nullptr)
     {

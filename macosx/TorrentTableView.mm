@@ -8,29 +8,38 @@
 #import "Controller.h"
 #import "FileListNode.h"
 #import "InfoOptionsViewController.h"
+#import "NSKeyedUnarchiverAdditions.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 #import "TorrentCell.h"
 #import "TorrentGroup.h"
+#import "GroupTextCell.h"
 
-#define MAX_GROUP 999999
+CGFloat const kGroupSeparatorHeight = 18.0;
+
+static NSInteger const kMaxGroup = 999999;
 
 //eliminate when Lion-only
-#define ACTION_MENU_GLOBAL_TAG 101
-#define ACTION_MENU_UNLIMITED_TAG 102
-#define ACTION_MENU_LIMIT_TAG 103
+typedef NS_ENUM(NSUInteger, ActionMenuTag) {
+    ActionMenuTagGlobal = 101,
+    ActionMenuTagUnlimited = 102,
+    ActionMenuTagLimit = 103,
+};
 
-#define ACTION_MENU_PRIORITY_HIGH_TAG 101
-#define ACTION_MENU_PRIORITY_NORMAL_TAG 102
-#define ACTION_MENU_PRIORITY_LOW_TAG 103
+typedef NS_ENUM(NSUInteger, ActionMenuPriorityTag) {
+    ActionMenuPriorityTagHigh = 101,
+    ActionMenuPriorityTagNormal = 102,
+    ActionMenuPriorityTagLow = 103,
+};
 
-#define TOGGLE_PROGRESS_SECONDS 0.175
+static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 @interface TorrentTableView ()
 
 @property(nonatomic) IBOutlet Controller* fController;
 
 @property(nonatomic) TorrentCell* fTorrentCell;
+@property(nonatomic) GroupTextCell* fGroupTextCell;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
@@ -55,10 +64,6 @@
 @property(nonatomic) BOOL fActionPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 
-- (BOOL)pointInGroupStatusRect:(NSPoint)point;
-
-- (void)setGroupStatusColumns;
-
 @end
 
 @implementation TorrentTableView
@@ -70,6 +75,7 @@
         _fDefaults = NSUserDefaults.standardUserDefaults;
 
         _fTorrentCell = [[TorrentCell alloc] init];
+        _fGroupTextCell = [[GroupTextCell alloc] init];
 
         NSData* groupData;
         if ((groupData = [_fDefaults dataForKey:@"CollapsedGroupIndexes"]))
@@ -78,7 +84,7 @@
         }
         else if ((groupData = [_fDefaults dataForKey:@"CollapsedGroups"])) //handle old groups
         {
-            _fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData:groupData] mutableCopy];
+            _fCollapsedGroups = [[NSKeyedUnarchiver deprecatedUnarchiveObjectWithData:groupData] mutableCopy];
             [_fDefaults removeObjectForKey:@"CollapsedGroups"];
             [self saveCollapsedGroups];
         }
@@ -117,6 +123,9 @@
     //set group columns to show ratio, needs to be in awakeFromNib to size columns correctly
     [self setGroupStatusColumns];
 
+    //disable highlight color and set manually in drawRow
+    [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
+
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setNeedsDisplay) name:@"RefreshTorrentTable" object:nil];
 }
 
@@ -124,7 +133,7 @@
 {
     if (value == -1)
     {
-        value = MAX_GROUP;
+        value = kMaxGroup;
     }
 
     return [self.fCollapsedGroups containsIndex:value];
@@ -134,7 +143,7 @@
 {
     if (value == -1)
     {
-        value = MAX_GROUP;
+        value = kMaxGroup;
     }
 
     [self.fCollapsedGroups removeIndex:value];
@@ -147,17 +156,20 @@
 
 - (void)saveCollapsedGroups
 {
-    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups] forKey:@"CollapsedGroupIndexes"];
+    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups requiringSecureCoding:YES error:nil]
+                       forKey:@"CollapsedGroupIndexes"];
 }
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
 {
-    return ![item isKindOfClass:[Torrent class]];
+    //return no and style the groupItem cell manually in willDisplayCell
+    //otherwise we get unwanted padding before each group header
+    return NO;
 }
 
 - (CGFloat)outlineView:(NSOutlineView*)outlineView heightOfRowByItem:(id)item
 {
-    return [item isKindOfClass:[Torrent class]] ? self.rowHeight : GROUP_SEPARATOR_HEIGHT;
+    return [item isKindOfClass:[Torrent class]] ? self.rowHeight : kGroupSeparatorHeight;
 }
 
 - (NSCell*)outlineView:(NSOutlineView*)outlineView dataCellForTableColumn:(NSTableColumn*)tableColumn item:(id)item
@@ -169,7 +181,16 @@
     }
     else
     {
-        return group ? [tableColumn dataCellForRow:[self rowForItem:item]] : nil;
+        NSString* ident = tableColumn.identifier;
+        NSArray* imageColumns = @[ @"Color", @"DL Image", @"UL Image" ];
+        if (![imageColumns containsObject:ident])
+        {
+            return group ? self.fGroupTextCell : nil;
+        }
+        else
+        {
+            return group ? [tableColumn dataCellForRow:[self rowForItem:item]] : nil;
+        }
     }
 }
 
@@ -190,8 +211,48 @@
             torrentCell.hoverControl = (row == self.controlButtonHoverRow);
             torrentCell.hoverReveal = (row == self.revealButtonHoverRow);
             torrentCell.hoverAction = (row == self.actionButtonHoverRow);
+
+            // if cell is selected, set backgroundStyle
+            // then can provide alternate font color in TorrentCell - drawInteriorWithFrame
+            NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
+            if ([selectedRowIndexes containsIndex:row])
+            {
+                torrentCell.backgroundStyle = NSBackgroundStyleEmphasized;
+            }
         }
     }
+}
+
+//we override row highlighting because we are custom drawing the group rows
+//see isGroupItem
+- (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect
+{
+    NSColor* highlightColor = nil;
+
+    id item = [self itemAtRow:row];
+
+    //we only highlight torrent cells
+    if ([item isKindOfClass:[Torrent class]])
+    {
+        //use system highlight color when Transmission is active
+        if (self == [self.window firstResponder] && [self.window isMainWindow] && [self.window isKeyWindow])
+        {
+            highlightColor = [NSColor alternateSelectedControlColor];
+        }
+        else
+        {
+            highlightColor = [NSColor disabledControlTextColor];
+        }
+
+        NSIndexSet* selectedRowIndexes = [self selectedRowIndexes];
+        if ([selectedRowIndexes containsIndex:row])
+        {
+            [highlightColor setFill];
+            NSRectFill([self rectOfRow:row]);
+        }
+    }
+
+    [super drawRow:row clipRect:clipRect];
 }
 
 - (NSRect)frameOfCellAtColumn:(NSInteger)column row:(NSInteger)row
@@ -254,7 +315,7 @@
         }
         else
         {
-            return [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
+            return [NSString localizedStringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
         }
     }
     else
@@ -411,7 +472,7 @@
 
 - (void)outlineViewSelectionIsChanging:(NSNotification*)notification
 {
-#warning elliminate when view-based?
+#warning eliminate when view-based?
     //if pushing a button, don't change the selected rows
     if (self.fSelectedValues)
     {
@@ -425,7 +486,7 @@
     NSInteger value = group.groupIndex;
     if (value < 0)
     {
-        value = MAX_GROUP;
+        value = kMaxGroup;
     }
 
     if ([self.fCollapsedGroups containsIndex:value])
@@ -441,7 +502,7 @@
     NSInteger value = group.groupIndex;
     if (value < 0)
     {
-        value = MAX_GROUP;
+        value = kMaxGroup;
     }
 
     [self.fCollapsedGroups addIndex:value];
@@ -814,17 +875,17 @@
         NSMenuItem* item;
         if (menu.numberOfItems == 3)
         {
-            NSInteger const speedLimitActionValue[] = { 50, 100, 250, 500, 1000, 2500, 5000, 10000, -1 };
+            static NSArray<NSNumber*>* const speedLimitActionValues = @[ @50, @100, @250, @500, @1000, @2500, @5000, @10000 ];
 
-            for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
+            for (NSNumber* i in speedLimitActionValues)
             {
                 item = [[NSMenuItem alloc]
-                    initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
-                                                             speedLimitActionValue[i]]
+                    initWithTitle:[NSString localizedStringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
+                                                                      i.integerValue]
                            action:@selector(setQuickLimit:)
                     keyEquivalent:@""];
                 item.target = self;
-                item.representedObject = @(speedLimitActionValue[i]);
+                item.representedObject = i;
                 [menu addItem:item];
             }
         }
@@ -832,12 +893,12 @@
         BOOL const upload = menu == self.fUploadMenu;
         BOOL const limit = [self.fMenuTorrent usesSpeedLimit:upload];
 
-        item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
+        item = [menu itemWithTag:ActionMenuTagLimit];
         item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
-                                                [self.fMenuTorrent speedLimit:upload]];
+        item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
+                                                         [self.fMenuTorrent speedLimit:upload]];
 
-        item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
+        item = [menu itemWithTag:ActionMenuTagUnlimited];
         item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
     }
     else if (menu == self.fRatioMenu)
@@ -845,43 +906,43 @@
         NSMenuItem* item;
         if (menu.numberOfItems == 4)
         {
-            float const ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
+            static NSArray<NSNumber*>* const ratioLimitActionValue = @[ @0.25, @0.5, @0.75, @1.0, @1.5, @2.0, @3.0 ];
 
-            for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0; i++)
+            for (NSNumber* i in ratioLimitActionValue)
             {
-                item = [[NSMenuItem alloc] initWithTitle:[NSString localizedStringWithFormat:@"%.2f", ratioLimitActionValue[i]]
+                item = [[NSMenuItem alloc] initWithTitle:[NSString localizedStringWithFormat:@"%.2f", i.floatValue]
                                                   action:@selector(setQuickRatio:)
                                            keyEquivalent:@""];
                 item.target = self;
-                item.representedObject = @(ratioLimitActionValue[i]);
+                item.representedObject = i;
                 [menu addItem:item];
             }
         }
 
         tr_ratiolimit const mode = self.fMenuTorrent.ratioSetting;
 
-        item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
+        item = [menu itemWithTag:ActionMenuTagLimit];
         item.state = mode == TR_RATIOLIMIT_SINGLE ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
                                                          self.fMenuTorrent.ratioLimit];
 
-        item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
+        item = [menu itemWithTag:ActionMenuTagUnlimited];
         item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSControlStateValueOn : NSControlStateValueOff;
 
-        item = [menu itemWithTag:ACTION_MENU_GLOBAL_TAG];
+        item = [menu itemWithTag:ActionMenuTagGlobal];
         item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSControlStateValueOn : NSControlStateValueOff;
     }
     else if (menu == self.fPriorityMenu)
     {
         tr_priority_t const priority = self.fMenuTorrent.priority;
 
-        NSMenuItem* item = [menu itemWithTag:ACTION_MENU_PRIORITY_HIGH_TAG];
+        NSMenuItem* item = [menu itemWithTag:ActionMenuPriorityTagHigh];
         item.state = priority == TR_PRI_HIGH ? NSControlStateValueOn : NSControlStateValueOff;
 
-        item = [menu itemWithTag:ACTION_MENU_PRIORITY_NORMAL_TAG];
+        item = [menu itemWithTag:ActionMenuPriorityTagNormal];
         item.state = priority == TR_PRI_NORMAL ? NSControlStateValueOn : NSControlStateValueOff;
 
-        item = [menu itemWithTag:ACTION_MENU_PRIORITY_LOW_TAG];
+        item = [menu itemWithTag:ActionMenuPriorityTagLow];
         item.state = priority == TR_PRI_LOW ? NSControlStateValueOn : NSControlStateValueOff;
     }
 }
@@ -889,7 +950,7 @@
 //the following methods might not be needed when Lion-only
 - (void)setQuickLimitMode:(id)sender
 {
-    BOOL const limit = [sender tag] == ACTION_MENU_LIMIT_TAG;
+    BOOL const limit = [sender tag] == ActionMenuTagLimit;
     [self.fMenuTorrent setUseSpeedLimit:limit upload:[sender menu] == self.fUploadMenu];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
@@ -916,13 +977,13 @@
     tr_ratiolimit mode;
     switch ([sender tag])
     {
-    case ACTION_MENU_UNLIMITED_TAG:
+    case ActionMenuTagUnlimited:
         mode = TR_RATIOLIMIT_UNLIMITED;
         break;
-    case ACTION_MENU_LIMIT_TAG:
+    case ActionMenuTagLimit:
         mode = TR_RATIOLIMIT_SINGLE;
         break;
-    case ACTION_MENU_GLOBAL_TAG:
+    case ActionMenuTagGlobal:
         mode = TR_RATIOLIMIT_GLOBAL;
         break;
     default:
@@ -947,13 +1008,13 @@
     tr_priority_t priority;
     switch ([sender tag])
     {
-    case ACTION_MENU_PRIORITY_HIGH_TAG:
+    case ActionMenuPriorityTagHigh:
         priority = TR_PRI_HIGH;
         break;
-    case ACTION_MENU_PRIORITY_NORMAL_TAG:
+    case ActionMenuPriorityTagNormal:
         priority = TR_PRI_NORMAL;
         break;
-    case ACTION_MENU_PRIORITY_LOW_TAG:
+    case ActionMenuPriorityTagLow:
         priority = TR_PRI_LOW;
         break;
     default:
@@ -975,7 +1036,7 @@
     }
 
     //this stops a previous animation
-    self.fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration:TOGGLE_PROGRESS_SECONDS animationCurve:NSAnimationEaseIn];
+    self.fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration:kToggleProgressSeconds animationCurve:NSAnimationEaseIn];
     self.fPiecesBarAnimation.animationBlockingMode = NSAnimationNonblocking;
     self.fPiecesBarAnimation.progressMarks = progressMarks;
     self.fPiecesBarAnimation.delegate = self;

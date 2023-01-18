@@ -65,7 +65,7 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
 
     if (icon.isNull())
     {
-        icon = fallback;
+        icon = std::move(fallback);
     }
 
     return icon;
@@ -82,7 +82,7 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
 
     if (!multifile)
     {
-        QMimeDatabase mime_db;
+        QMimeDatabase const mime_db;
         auto const type = mime_db.mimeTypeForName(mime_type_name);
         icon = getThemeIcon(type.iconName());
 
@@ -196,7 +196,7 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
     QIcon& icon = ext_to_icon_[ext];
     if (icon.isNull()) // cache miss
     {
-        QMimeDatabase mime_db;
+        QMimeDatabase const mime_db;
         auto const type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
         if (icon.isNull())
         {
@@ -224,7 +224,7 @@ QIcon IconCache::getThemeIcon(
     QString const& fallbackName,
     std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const
 {
-    auto const rtl_suffix = qApp->layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString();
+    auto const rtl_suffix = QApplication::layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString();
 
     auto icon = QIcon::fromTheme(name + rtl_suffix);
 
@@ -235,7 +235,7 @@ QIcon IconCache::getThemeIcon(
 
     if (icon.isNull() && fallbackPixmap.has_value())
     {
-        icon = qApp->style()->standardIcon(*fallbackPixmap, nullptr);
+        icon = QApplication::style()->standardIcon(*fallbackPixmap, nullptr);
     }
 
     return icon;

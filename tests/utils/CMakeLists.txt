@@ -1,13 +1,13 @@
 function(AddShowTest name file_basename)
-   add_test(
-      NAME ${name}
-      COMMAND ${CMAKE_COMMAND}
-      -D transmission_show:string=$<TARGET_FILE:transmission-show>
-      -D torrent_file:string=assets/${file_basename}.torrent
-      -D reference_file:string=${CMAKE_CURRENT_SOURCE_DIR}/assets/${file_basename}.show
-      -P "${CMAKE_CURRENT_SOURCE_DIR}/run_transmission_show.cmake"
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-   )
+    add_test(
+        NAME ${name}
+        COMMAND
+            ${CMAKE_COMMAND}
+            -D transmission_show:string=$<TARGET_FILE:transmission-show>
+            -D torrent_file:string=assets/${file_basename}.torrent
+            -D reference_file:string=${CMAKE_CURRENT_SOURCE_DIR}/assets/${file_basename}.show
+            -P "${CMAKE_CURRENT_SOURCE_DIR}/run_transmission_show.cmake"
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 endfunction()
 
 # disabled AddShowTest(transmission-show-bittorrent-v2 bittorrent-v2-test)

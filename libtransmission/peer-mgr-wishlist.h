@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -36,5 +36,5 @@ public:
     };
 
     // get a list of the next blocks that we should request from a peer
-    static std::vector<tr_block_span_t> next(Mediator const& peer_info, size_t n_wanted_blocks);
+    static std::vector<tr_block_span_t> next(Mediator const& mediator, size_t n_wanted_blocks);
 };

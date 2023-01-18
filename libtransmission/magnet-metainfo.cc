@@ -20,7 +20,6 @@
 #include "magnet-metainfo.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant.h"
 #include "web-utils.h"
 
 using namespace std::literals;
@@ -58,7 +57,7 @@ void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
     size_t offset = 0;
     for (size_t i = 0; i < inlen; ++i)
     {
-        int lookup = in[i] - '0';
+        int const lookup = in[i] - '0';
 
         /* Skip chars outside the lookup table */
         if (lookup < 0)
@@ -136,7 +135,7 @@ std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
 {
     // http://bittorrent.org/beps/bep_0009.html
     // Is the info-hash hex encoded, for a total of 40 characters.
-    // For compatability with existing links in the wild, clients
+    // For compatibility with existing links in the wild, clients
     // should also support the 32 character base32 encoded info-hash.
 
     if (auto const hash = tr_sha1_from_string(sv); hash)
@@ -177,19 +176,19 @@ tr_urlbuf tr_magnet_metainfo::magnet() const
     if (!std::empty(name_))
     {
         s += "&dn="sv;
-        tr_http_escape(std::back_inserter(s), name_, true);
+        tr_urlPercentEncode(std::back_inserter(s), name_);
     }
 
     for (auto const& tracker : this->announceList())
     {
         s += "&tr="sv;
-        tr_http_escape(std::back_inserter(s), tracker.announce.sv(), true);
+        tr_urlPercentEncode(std::back_inserter(s), tracker.announce.sv());
     }
 
     for (auto const& webseed : webseed_urls_)
     {
         s += "&ws="sv;
-        tr_http_escape(std::back_inserter(s), webseed, true);
+        tr_urlPercentEncode(std::back_inserter(s), webseed);
     }
 
     return s;
@@ -203,8 +202,8 @@ void tr_magnet_metainfo::addWebseed(std::string_view webseed)
     }
 
     auto& urls = webseed_urls_;
-    auto const it = std::find(std::begin(urls), std::end(urls), webseed);
-    if (it != std::end(urls))
+
+    if (auto const it = std::find(std::begin(urls), std::end(urls), webseed); it != std::end(urls))
     {
         return;
     }

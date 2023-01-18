@@ -9,21 +9,17 @@
 
 @interface Badger ()
 
-@property(nonatomic, readonly) tr_session* fLib;
-
 @property(nonatomic, readonly) NSMutableSet* fHashes;
 
 @end
 
 @implementation Badger
 
-- (instancetype)initWithLib:(tr_session*)lib
+- (instancetype)init
 {
     if ((self = [super init]))
     {
-        _fLib = lib;
-
-        BadgeView* view = [[BadgeView alloc] initWithLib:lib];
+        BadgeView* view = [[BadgeView alloc] init];
         NSApp.dockTile.contentView = view;
 
         _fHashes = [[NSMutableSet alloc] init];
@@ -49,7 +45,7 @@
     NSParameterAssert(torrent != nil);
 
     [self.fHashes addObject:torrent.hashString];
-    NSApp.dockTile.badgeLabel = [NSString formattedUInteger:self.fHashes.count];
+    NSApp.dockTile.badgeLabel = [NSString localizedStringWithFormat:@"%lu", self.fHashes.count];
 }
 
 - (void)removeTorrent:(Torrent*)torrent
@@ -59,7 +55,7 @@
         [self.fHashes removeObject:torrent.hashString];
         if (self.fHashes.count > 0)
         {
-            NSApp.dockTile.badgeLabel = [NSString formattedUInteger:self.fHashes.count];
+            NSApp.dockTile.badgeLabel = [NSString localizedStringWithFormat:@"%lu", self.fHashes.count];
         }
         else
         {

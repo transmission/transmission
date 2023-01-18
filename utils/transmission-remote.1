@@ -37,6 +37,7 @@ and
 .Op Fl if
 .Op Fl ip
 .Op Fl it
+.Op Fl j
 .Op Fl l
 .Op Fl m | M
 .Op Fl n Ar user:pass
@@ -187,6 +188,8 @@ List the specified torrent's peers
 List the specified torrent's pieces
 .It Fl it Fl -info-trackers
 List the specified torrent's trackers
+.It Fl j Fl -json
+Return the RPC response as JSON
 .It Fl si Fl -session-info
 List session information from the server
 .It Fl st Fl -session-stats
@@ -255,6 +258,12 @@ Remove the current torrent(s) and delete their downloaded data.
 Reannounce the current torrent(s). This is the same as the GUI's "ask tracker for more peers" button.
 .It Fl -move
 Move the current torrents' data from their current locations to the specified directory.
+.It Fl -rename Ar newname
+Rename files or root folder of a torrent
+.It Fl -path Ar oldname
+Provide original path for the rename command
+.It Fl -unix-socket
+Connect using a Unix domain socket.
 .It Fl -find
 Tell Transmission where to look for the current torrents' data.
 .It Fl sr Fl -seedratio Ar ratio
@@ -357,6 +366,10 @@ $ transmission-remote \-F l:abc \-l
 List all torrents with name containing "def" or with label "abc":
 .Bd -literal -offset indent
 $ transmission-remote -t $(\ transmission-remote \-F n:def \-ids )$(\ transmission-remote \-F l:abc \-ids ) \-l
+.Ed
+Rename torrent root folder from "test1/examplefile.txt" to "test2/examplefile.txt"
+.Bd -literal -offset indent
+$ transmission-remote -t1 --path test1 --rename test2
 .Ed
 Set download and upload limits to 400 kB/sec and 60 kB/sec:
 .Bd -literal -offset indent

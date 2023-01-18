@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="transmission-gtk">
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkDialog" id="OptionsDialog">
+    <property name="title" translatable="1">Torrent Options</property>
+    <child internal-child="content_area">
+      <object class="GtkBox" id="dialog_layout">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <property name="css-classes">tr-dialog-content</property>
+        <property name="vexpand">1</property>
+        <child>
+          <object class="GtkGrid" id="dialog_content_layout">
+            <property name="vexpand">1</property>
+            <property name="row-spacing">6</property>
+            <property name="column-spacing">12</property>
+            <child>
+              <object class="GtkLabel" id="source_label">
+                <property name="label" translatable="1">_Torrent file:</property>
+                <property name="use-underline">1</property>
+                <property name="mnemonic-widget">source_button</property>
+                <property name="xalign">0</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="gtkmm__CustomObject_10PathButton" id="source_button">
+                <property name="hexpand">1</property>
+                <property name="title" translatable="1">Select Source File</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">0</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="destination_label">
+                <property name="label" translatable="1">_Destination folder:</property>
+                <property name="use-underline">1</property>
+                <property name="mnemonic-widget">destination_button</property>
+                <property name="xalign">0</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">1</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="gtkmm__CustomObject_10PathButton" id="destination_button">
+                <property name="hexpand">1</property>
+                <property name="action">select-folder</property>
+                <property name="title" translatable="1">Select Destination Folder</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">1</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="files_view_scroll">
+                <property name="width-request">466</property>
+                <property name="height-request">300</property>
+                <property name="focusable">1</property>
+                <property name="has-frame">1</property>
+                <property name="child">
+                  <object class="GtkTreeView" id="files_view">
+                    <property name="focusable">1</property>
+                    <property name="hexpand">1</property>
+                    <property name="vexpand">1</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection" id="files_view_selection"/>
+                    </child>
+                  </object>
+                </property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">4</property>
+                  <property name="column-span">2</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="priority_label">
+                <property name="label" translatable="1">Torrent _priority:</property>
+                <property name="use-underline">1</property>
+                <property name="mnemonic-widget">priority_combo</property>
+                <property name="xalign">0</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">5</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkComboBox" id="priority_combo">
+                <property name="hexpand">1</property>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">5</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="start_check">
+                <property name="label" translatable="1">_Start when added</property>
+                <property name="focusable">1</property>
+                <property name="valign">center</property>
+                <property name="use-underline">1</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">6</property>
+                  <property name="column-span">2</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="trash_check">
+                <property name="label" translatable="1">Mo_ve torrent file to the trash</property>
+                <property name="focusable">1</property>
+                <property name="valign">center</property>
+                <property name="use-underline">1</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">7</property>
+                  <property name="column-span">2</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="free_space_label">
+                <property name="hexpand">1</property>
+                <property name="label">...</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="style" value="italic"></attribute>
+                </attributes>
+                <layout>
+                  <property name="column">1</property>
+                  <property name="row">2</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkFixed">
+                <property name="width-request">0</property>
+                <property name="height-request">0</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">2</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="GtkFixed">
+                <property name="height-request">6</property>
+                <layout>
+                  <property name="column">0</property>
+                  <property name="row">3</property>
+                  <property name="column-span">2</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child internal-child="action_area">
+      <object class="GtkBox" id="dialog_buttons">
+        <property name="css-classes">tr-button-box</property>
+        <property name="spacing">6</property>
+        <child>
+          <object class="GtkButton" id="cancel_button">
+            <property name="label" translatable="1">_Cancel</property>
+            <property name="focusable">1</property>
+            <property name="receives-default">1</property>
+            <property name="use-underline">1</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="open_button">
+            <property name="label" translatable="1">_Open</property>
+            <property name="focusable">1</property>
+            <property name="receives-default">1</property>
+            <property name="use-underline">1</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">cancel_button</action-widget>
+      <action-widget response="-3">open_button</action-widget>
+    </action-widgets>
+  </object>
+</interface>

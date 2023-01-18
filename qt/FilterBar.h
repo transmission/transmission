@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,6 +8,8 @@
 #include <bitset>
 #include <map>
 
+#include <QLineEdit>
+#include <QStandardItemModel>
 #include <QTimer>
 #include <QWidget>
 
@@ -18,8 +20,6 @@
 #include "Typedefs.h"
 
 class QLabel;
-class QLineEdit;
-class QStandardItemModel;
 class QString;
 
 class FilterBarComboBox;
@@ -58,12 +58,12 @@ private:
     TorrentFilter const& filter_;
 
     std::map<QString, int> sitename_counts_;
-    FilterBarComboBox* activity_combo_ = {};
+    FilterBarComboBox* const activity_combo_ = createActivityCombo();
     FilterBarComboBox* tracker_combo_ = {};
     QLabel* count_label_ = {};
-    QStandardItemModel* tracker_model_ = {};
+    QStandardItemModel* const tracker_model_ = new QStandardItemModel{ this };
     QTimer recount_timer_;
-    QLineEdit* line_edit_ = {};
+    QLineEdit* const line_edit_ = new QLineEdit{ this };
     Pending pending_ = {};
     bool is_bootstrapping_ = {};
 

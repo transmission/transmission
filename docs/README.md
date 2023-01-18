@@ -8,14 +8,20 @@ New to Transmission?
 
 Want to learn more?
   * Visit our [forums](https://forum.transmissionbt.com)
-  * Visit our [IRC](https://en.wikipedia.org/wiki/IRC) channel: [#transmission on Libera.Chat](https://irc.libera.chat/transmission)
+  * Visit our [IRC](https://en.wikipedia.org/wiki/IRC) channel: [#transmission on Libera.Chat](https://web.libera.chat/#transmission)
   * Follow us on [Twitter](https://twitter.com/transmissionbt)
 
 Want to contribute?
 
 Much of this documentation is out-of-date or could be improved. Pull requests are greatly appreciated!
+# 2. FAQ #
+* [Can I sequence the files I download?](./Can-I-sequence-the-files-I-download.md)
+* [Why are my speeds so slow?](./Why-Are-My-Speeds-So-Slow.md)
+* [Why is my port closed?](./Why-is-my-port-closed.md)
+* Q: How can I prevent the fragmentation of my downloaded files? 
 
-# 2. More documentation #
+  A: Use the [configuration option](./Editing-Configuration-Files.md) "preallocation": 2
+# 3. More documentation #
  * [Configuration files](./Configuration-Files.md)
  * [Editing configuration files](./Editing-Configuration-Files.md)
  * [Environment variables](Environment-Variables.md)
@@ -23,7 +29,7 @@ Much of this documentation is out-of-date or could be improved. Pull requests ar
  * [Blocklists](./Blocklists.md)
  * [How to build Transmission](Building-Transmission.md)
  * [RPC protocol specification](rpc-spec.md)
- * [Transmisson's Peer ID and User-Agent headers](Peer-ID-and-User-Agent.md)
+ * [Transmission's Peer ID and User-Agent headers](Peer-ID-and-User-Agent.md)
  * [Peer status text explained](Peer-Status-Text.md)
 
 # 3. Report a problem / request a feature #
@@ -37,7 +43,7 @@ Please contact us if you are interested in supporting Transmission in any of the
 
   * Code contribution
   * Testing
-  * [Language translations](Translating)
+  * [Language translations](Translating.md)
   * Bug and request management
   * Documentation and Wiki editing
   * [Donations](https://transmissionbt.com/donate/)

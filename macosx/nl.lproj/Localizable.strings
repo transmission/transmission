@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minuten";
 
 /* stats window -> times opened */
-"%llu times" = "";
+/* "%llu times" = ""; */
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu cache";
@@ -162,9 +162,6 @@
    Groups -> Button */
 "All Groups" = "Alle groepen";
 
-/* Create torrent -> failed -> warning */
-"An unknown error has occurred." = "Er trad een onbekende fout op.";
-
 /* Tracker last announce */
 "Announce error" = "Aankondigingsfout";
 
@@ -262,12 +259,6 @@
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "Kopie van \"%@\" kan niet gemaakt worden";
 
-/* Create torrent -> failed -> warning */
-"Could not read \"%s\": %s." = "Kon \"%1$s\" niet lezen: %2$s.";
-
-/* Create torrent -> failed -> warning */
-"Could not write \"%s\": %s." = "Kon \"%1$s\" niet schrijven: %2$s.";
-
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */
 "Create" = "Aanmaken";
@@ -304,6 +295,7 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string */
 "DL" = "DL";
 
@@ -409,9 +401,6 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "Van: tracker";
 
-/* File size - gigabytes */
-"GB" = "GB";
-
 /* Transfer speed (gigabytes per second) */
 "GB/s" = "GB/s";
 
@@ -486,9 +475,6 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Bestand ‘%1$@’ van %2$@ lijkt geen torrentbestand te zijn.";
 
-/* File size - kilobytes */
-"KB" = "KB";
-
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/s";
 
@@ -525,9 +511,6 @@
 /* Inspector -> selected torrents
    Torrent -> progress string */
 "Magnetized transfer" = "Gemagnetiseerde overdracht";
-
-/* File size - megabytes */
-"MB" = "MB";
 
 /* Transfer speed (megabytes per second) */
 "MB/s" = "MB/s";
@@ -702,6 +685,9 @@
 /* Preferences -> Network -> port status */
 "Port is open" = "Poort is open";
 
+/* No comment provided by engineer. */
+"PrefWindowSize" = "640";
+
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Prioriteit";
@@ -745,6 +731,7 @@
 
 /* Stats window -> label
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string
    Torrent table -> group row -> tooltip */
 "Ratio" = "Ratio";
@@ -923,9 +910,6 @@
 /* Donation beg -> title */
 "Support open-source indie software" = "Steun openbronsoftware";
 
-/* File size - terabytes */
-"TB" = "TB";
-
 /* Transfer speed (terabytes per second) */
 "TB/s" = "TB/s";
 
@@ -1045,9 +1029,8 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Totale overdracht";
 
-/* Message window -> level
-   Message window -> level string */
-"Trace" = "";
+/* Message window -> level */
+/* "Trace" = ""; */
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Tracker";
@@ -1085,6 +1068,7 @@
 
 /* inspector -> peer table -> header
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string */
 "UL" = "UL";
 
@@ -1126,7 +1110,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warning" = "";
+/* "Warning" = ""; */
 
 /* Drag overlay -> url */
 "Web Address" = "Webadres";
@@ -1148,7 +1132,4 @@
 
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "U wilt downloaden, maar de peer wil niets versturen (geïnteresseerd en verstikt)";
-
-/* Preferences window size*/
-"PrefWindowSize" = "606";
 

@@ -3,23 +3,36 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include "FaviconCache.h"
+
+#include "Utils.h" /* gtr_get_host_from_url() */
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/web-utils.h>
+#include <libtransmission/web.h> // tr_sessionFetch()
+
+#include <glibmm/error.h>
+#include <glibmm/fileutils.h>
+#include <glibmm/main.h>
+#include <glibmm/miscutils.h>
+
+#include <fmt/core.h>
+
 #include <array>
+#include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <glib/gstdio.h> /* g_remove() */
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/web.h> // tr_sessionFetch()
-#include <libtransmission/web-utils.h>
-
-#include "FaviconCache.h"
-#include "Utils.h" /* gtr_get_host_from_url() */
+using namespace std::literals;
 
 namespace
 {
 
-std::array<char const*, 4> const image_types = { "ico", "png", "gif", "jpg" };
+constexpr auto TimeoutSecs = 15s;
+constexpr auto ImageTypes = std::array<std::string_view, 4>{ "ico"sv, "png"sv, "gif"sv, "jpg"sv };
 
 struct favicon_data
 {
@@ -28,11 +41,12 @@ struct favicon_data
     std::string host;
     std::string contents;
     size_t type = 0;
+    long code = 0;
 };
 
 Glib::ustring get_url(std::string const& host, size_t image_type)
 {
-    return gtr_sprintf("http://%s/favicon.%s", host, image_types[image_type]);
+    return fmt::format("http://{}/favicon.{}", host, ImageTypes.at(image_type));
 }
 
 std::string favicon_get_cache_dir()
@@ -68,12 +82,17 @@ Glib::RefPtr<Gdk::Pixbuf> favicon_load_from_cache(std::string const& host)
     }
     catch (Glib::Error const&)
     {
-        g_remove(filename.c_str());
+        (void)g_remove(filename.c_str());
         return {};
     }
 }
 
 void favicon_web_done_cb(tr_web::FetchResponse const& response);
+
+constexpr bool should_keep_trying(long code)
+{
+    return code != 0 && code <= 500;
+}
 
 bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
 {
@@ -85,20 +104,17 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
         pixbuf = favicon_load_from_cache(fav->host);
     }
 
-    if (pixbuf == nullptr && ++fav->type < image_types.size()) /* keep trying */
+    if (pixbuf == nullptr && should_keep_trying(fav->code) && ++fav->type < ImageTypes.size()) /* keep trying */
     {
         fav->contents.clear();
         auto* const session = fav->session;
         auto const next_url = get_url(fav->host, fav->type);
-        tr_sessionFetch(session, { next_url.raw(), favicon_web_done_cb, fav.release() });
+        tr_sessionFetch(session, { next_url.raw(), favicon_web_done_cb, fav.release(), TimeoutSecs });
+        return false;
     }
 
     // Not released into the next web request, means we're done trying (even if `pixbuf` is still invalid)
-    if (fav != nullptr)
-    {
-        fav->func(pixbuf);
-    }
-
+    fav->func(pixbuf);
     return false;
 }
 
@@ -106,6 +122,7 @@ void favicon_web_done_cb(tr_web::FetchResponse const& response)
 {
     auto* const fav = static_cast<favicon_data*>(response.user_data);
     fav->contents = response.body;
+    fav->code = response.status;
     Glib::signal_idle().connect([fav]() { return favicon_web_done_idle_cb(std::unique_ptr<favicon_data>(fav)); });
 }
 
@@ -128,8 +145,7 @@ void gtr_get_favicon(
         data->session = session;
         data->func = pixbuf_ready_func;
         data->host = host;
-
-        tr_sessionFetch(session, { get_url(host, 0).raw(), favicon_web_done_cb, data.release() });
+        tr_sessionFetch(session, { get_url(host, 0).raw(), favicon_web_done_cb, data.release(), TimeoutSecs });
     }
 }
 
@@ -138,6 +154,13 @@ void gtr_get_favicon_from_url(
     Glib::ustring const& url,
     std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> const& pixbuf_ready_func)
 {
-    auto const host = std::string{ tr_urlParse(url.c_str())->host };
-    gtr_get_favicon(session, host, pixbuf_ready_func);
+    if (auto const parsed_url = tr_urlParse(url.c_str()); parsed_url.has_value())
+    {
+        auto const host = std::string{ parsed_url->host };
+        gtr_get_favicon(session, host, pixbuf_ready_func);
+    }
+    else
+    {
+        pixbuf_ready_func({});
+    }
 }

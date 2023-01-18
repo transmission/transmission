@@ -1,17 +1,18 @@
 // This file Copyright (C) 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <set>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "block-info.h"
-#include "completion.h"
-#include "crypto-utils.h"
+#include <libtransmission/block-info.h>
+#include <libtransmission/crypto-utils.h> // for tr_rand_obj()
+#include <libtransmission/completion.h>
 
 #include "gtest/gtest.h"
 
@@ -30,7 +31,7 @@ struct TestTorrent : public tr_completion::torrent_view
     }
 };
 
-auto constexpr BlockSize = uint64_t{ 16 * 1024 };
+auto constexpr BlockSize = uint64_t{ 16 } * 1024U;
 
 } // namespace
 
@@ -277,7 +278,7 @@ TEST_F(CompletionTest, leftUntilDone)
     // check that dnd-flagging a piece we DON'T already have adjusts by block_info.pieceSize()
     torrent.dnd_pieces.insert(1);
     completion.invalidateSizeWhenDone();
-    EXPECT_EQ(block_info.totalSize() - block_info.pieceSize() * 2, completion.leftUntilDone());
+    EXPECT_EQ(block_info.totalSize() - block_info.pieceSize() * uint64_t{ 2U }, completion.leftUntilDone());
     torrent.dnd_pieces.clear();
     completion.invalidateSizeWhenDone();
 
@@ -322,7 +323,7 @@ TEST_F(CompletionTest, sizeWhenDone)
         torrent.dnd_pieces.insert(i);
     }
     completion.invalidateSizeWhenDone();
-    EXPECT_EQ(block_info.totalSize() - 16 * block_info.pieceSize(), completion.sizeWhenDone());
+    EXPECT_EQ(block_info.totalSize() - uint64_t{ 16U } * block_info.pieceSize(), completion.sizeWhenDone());
 }
 
 TEST_F(CompletionTest, createPieceBitfield)
@@ -334,9 +335,8 @@ TEST_F(CompletionTest, createPieceBitfield)
 
     // make a completion object that has a random assortment of pieces
     auto completion = tr_completion(&torrent, &block_info);
-    auto buf = std::array<char, 65>{};
+    auto buf = tr_rand_obj<std::array<char, 65>>();
     ASSERT_EQ(std::size(buf), block_info.pieceCount());
-    EXPECT_TRUE(tr_rand_buffer(std::data(buf), std::size(buf)));
     for (uint64_t i = 0; i < block_info.pieceCount(); ++i)
     {
         if ((buf[i] % 2) != 0)
@@ -348,7 +348,7 @@ TEST_F(CompletionTest, createPieceBitfield)
     // serialize it to a raw bitfield, read it back into a bitfield,
     // and test that the new bitfield matches
     auto const pieces_raw_bitfield = completion.createPieceBitfield();
-    tr_bitfield pieces{ size_t(block_info.pieceCount()) };
+    tr_bitfield pieces{ size_t{ block_info.pieceCount() } };
     pieces.setRaw(std::data(pieces_raw_bitfield), std::size(pieces_raw_bitfield));
     for (uint64_t i = 0; i < block_info.pieceCount(); ++i)
     {

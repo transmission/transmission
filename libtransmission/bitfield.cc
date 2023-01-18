@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <climits> // SIZE_MAX
 #include <vector>
 
 #include "tr-popcount.h"
@@ -28,7 +29,7 @@ namespace
     return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
 }
 
-/* Used only in cases where it can be guranteed bit_count <= SIZE_MAX - 8 */
+/* Used only in cases where it can be guaranteed bit_count <= SIZE_MAX - 8 */
 [[nodiscard]] constexpr size_t getBytesNeededSafe(size_t bit_count) noexcept
 {
     return ((bit_count + 7) >> 3);
@@ -48,7 +49,7 @@ void setAllTrue(uint8_t* array, size_t bit_count)
            1 to replace -bitcount as linters warn about negating
            unsigned types. Any compiler will optimize ~x + 1 to -x in
            the backend. */
-        uint32_t shift = ((~bit_count) + 1) & 7U;
+        uint32_t const shift = ((~bit_count) + 1) & 7U;
         array[n - 1] = Val << shift;
     }
 }
@@ -132,7 +133,8 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
         for (size_t i = first_byte + 1; i < walk_end;)
         {
             tmp_accum += doPopcount(flags_[i]);
-            if ((i += 2) > walk_end)
+            i += 2;
+            if (i > walk_end)
             {
                 break;
             }
@@ -326,7 +328,7 @@ void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)
 
 void tr_bitfield::setFromBools(bool const* flags, size_t n)
 {
-    size_t trueCount = 0;
+    size_t true_count = 0;
 
     freeArray();
     ensureBitsAlloced(n);
@@ -335,12 +337,12 @@ void tr_bitfield::setFromBools(bool const* flags, size_t n)
     {
         if (flags[i])
         {
-            ++trueCount;
+            ++true_count;
             flags_[i >> 3U] |= (0x80 >> (i & 7U));
         }
     }
 
-    setTrueCount(trueCount);
+    setTrueCount(true_count);
 }
 
 void tr_bitfield::set(size_t nth, bool value)
@@ -453,4 +455,52 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
 
         decrementTrueCount(old_count);
     }
+}
+
+tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
+{
+    if (hasAll() || that.hasNone())
+    {
+        return *this;
+    }
+
+    if (that.hasAll() || hasNone())
+    {
+        *this = that;
+        return *this;
+    }
+
+    flags_.resize(std::max(std::size(flags_), std::size(that.flags_)));
+
+    for (size_t i = 0, n = std::size(that.flags_); i < n; ++i)
+    {
+        flags_[i] |= that.flags_[i];
+    }
+
+    rebuildTrueCount();
+    return *this;
+}
+
+tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
+{
+    if (hasNone() || that.hasAll())
+    {
+        return *this;
+    }
+
+    if (that.hasNone() || hasAll())
+    {
+        *this = that;
+        return *this;
+    }
+
+    flags_.resize(std::min(std::size(flags_), std::size(that.flags_)));
+
+    for (size_t i = 0, n = std::size(flags_); i < n; ++i)
+    {
+        flags_[i] &= that.flags_[i];
+    }
+
+    rebuildTrueCount();
+    return *this;
 }

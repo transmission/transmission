@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -125,7 +125,7 @@ private slots:
 private:
     QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
 
-    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
+    torrent_ids_t getSelectedTorrents(bool with_metadata_only = false) const;
     void updateNetworkIcon();
 
     QMenu* createOptionsMenu();
@@ -133,7 +133,7 @@ private:
     void initStatusBar();
 
     void clearSelection();
-    void addTorrent(AddData const& add_me, bool show_options);
+    void addTorrent(AddData add_me, bool show_options);
 
     // QWidget
     void hideEvent(QHideEvent* event) override;

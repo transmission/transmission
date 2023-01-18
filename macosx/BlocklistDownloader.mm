@@ -14,9 +14,6 @@
 @property(nonatomic) long long fExpectedSize;
 @property(nonatomic) blocklistDownloadState fState;
 
-- (void)startDownload;
-- (BOOL)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
-
 @end
 
 @implementation BlocklistDownloader
@@ -97,6 +94,7 @@ BlocklistDownloader* fBLDownloader = nil;
         [NSUserDefaults.standardUserDefaults setObject:[NSDate date] forKey:@"BlocklistNewLastUpdate"];
         [BlocklistScheduler.scheduler updateSchedule];
 
+        [self.fSession finishTasksAndInvalidate];
         fBLDownloader = nil;
     });
 }
@@ -133,7 +131,7 @@ BlocklistDownloader* fBLDownloader = nil;
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        int const count = tr_blocklistSetContent(((Controller*)NSApp.delegate).sessionHandle, blocklistFile.UTF8String);
+        auto const count = tr_blocklistSetContent(((Controller*)NSApp.delegate).sessionHandle, blocklistFile.UTF8String);
 
         //delete downloaded file
         [NSFileManager.defaultManager removeItemAtPath:blocklistFile error:nil];
@@ -156,6 +154,7 @@ BlocklistDownloader* fBLDownloader = nil;
 
         [NSNotificationCenter.defaultCenter postNotificationName:@"BlocklistUpdated" object:nil];
 
+        [self.fSession finishTasksAndInvalidate];
         fBLDownloader = nil;
     });
 }
@@ -284,7 +283,7 @@ BlocklistDownloader* fBLDownloader = nil;
     NSTask* gunzip = [[NSTask alloc] init];
     gunzip.launchPath = @"/usr/bin/gunzip";
     gunzip.currentDirectoryPath = destinationDir.path;
-    gunzip.arguments = @[ @"--keep", file.path ];
+    gunzip.arguments = @[ @"--keep", @"--force", file.path ];
 
     @try
     {
@@ -313,7 +312,7 @@ BlocklistDownloader* fBLDownloader = nil;
     zipinfo.launchPath = @"/usr/bin/zipinfo";
     zipinfo.arguments = @[
         @"-1", /* just the filename */
-        file /* source zip file */
+        file.path /* source zip file */
     ];
     NSPipe* pipe = [[NSPipe alloc] init];
     zipinfo.standardOutput = pipe;

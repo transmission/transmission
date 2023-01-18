@@ -1,17 +1,16 @@
 // This file Copyright (C) 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstring>
 #include <set>
 #include <string_view>
+#include <vector>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "torrent.h"
-#include "torrents.h"
-#include "utils.h"
+#include <libtransmission/torrent.h>
+#include <libtransmission/torrents.h>
 
 #include "gtest/gtest.h"
 
@@ -22,10 +21,13 @@ using TorrentsTest = ::testing::Test;
 TEST_F(TorrentsTest, simpleTests)
 {
     auto constexpr* const TorrentFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
+
+    auto owned = std::vector<std::unique_ptr<tr_torrent>>{};
+
     auto tm = tr_torrent_metainfo{};
     EXPECT_TRUE(tm.parseTorrentFile(TorrentFile));
-    auto* tor = new tr_torrent(std::move(tm));
-    EXPECT_NE(nullptr, tor);
+    owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
+    auto* const tor = owned.back().get();
 
     auto torrents = tr_torrents{};
     EXPECT_TRUE(std::empty(torrents));
@@ -49,7 +51,6 @@ TEST_F(TorrentsTest, simpleTests)
 
     // cleanup
     torrents.remove(tor, time(nullptr));
-    delete tor;
 }
 
 TEST_F(TorrentsTest, rangedLoop)
@@ -59,6 +60,7 @@ TEST_F(TorrentsTest, rangedLoop)
                                                                 "ubuntu-18.04.6-desktop-amd64.iso.torrent"sv,
                                                                 "ubuntu-20.04.4-desktop-amd64.iso.torrent"sv };
 
+    auto owned = std::vector<std::unique_ptr<tr_torrent>>{};
     auto torrents = tr_torrents{};
     auto torrents_set = std::set<tr_torrent const*>{};
 
@@ -67,7 +69,9 @@ TEST_F(TorrentsTest, rangedLoop)
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
         EXPECT_TRUE(tm.parseTorrentFile(path));
-        auto* const tor = new tr_torrent{ std::move(tm) };
+        owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
+
+        auto* const tor = owned.back().get();
         tor->unique_id_ = torrents.add(tor);
         EXPECT_EQ(tor, torrents.get(tor->id()));
         torrents_set.insert(tor);
@@ -76,9 +80,7 @@ TEST_F(TorrentsTest, rangedLoop)
     for (auto* const tor : torrents)
     {
         EXPECT_EQ(1U, torrents_set.erase(tor));
-        delete tor;
     }
-    EXPECT_EQ(0U, std::size(torrents_set));
     EXPECT_EQ(0U, std::size(torrents_set));
 }
 
@@ -89,6 +91,7 @@ TEST_F(TorrentsTest, removedSince)
                                                                 "ubuntu-18.04.6-desktop-amd64.iso.torrent"sv,
                                                                 "ubuntu-20.04.4-desktop-amd64.iso.torrent"sv };
 
+    auto owned = std::vector<std::unique_ptr<tr_torrent>>{};
     auto torrents = tr_torrents{};
     auto torrents_v = std::vector<tr_torrent const*>{};
     torrents_v.reserve(std::size(Filenames));
@@ -98,7 +101,10 @@ TEST_F(TorrentsTest, removedSince)
     {
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
-        auto* const tor = new tr_torrent{ std::move(tm) };
+        EXPECT_TRUE(tm.parseTorrentFile(path));
+        owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
+
+        auto* const tor = owned.back().get();
         tor->unique_id_ = torrents.add(tor);
         torrents_v.push_back(tor);
     }
@@ -121,6 +127,4 @@ TEST_F(TorrentsTest, removedSince)
     EXPECT_EQ(remove, torrents.removedSince(200));
     remove = { torrents_v[0]->id(), torrents_v[1]->id(), torrents_v[2]->id(), torrents_v[3]->id() };
     EXPECT_EQ(remove, torrents.removedSince(50));
-
-    std::for_each(std::begin(torrents_v), std::end(torrents_v), [](auto* tor) { delete tor; });
 }

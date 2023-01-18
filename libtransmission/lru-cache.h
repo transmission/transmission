@@ -1,5 +1,5 @@
 // This file Copyright © 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -10,13 +10,14 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <utility>
 
 // A fixed-size cache that erases least-recently-used items to make room for new ones.
 template<typename Key, typename Val, std::size_t N>
 class tr_lru_cache
 {
 public:
-    [[nodiscard]] Val* get(Key const& key) noexcept
+    [[nodiscard]] constexpr Val* get(Key const& key) noexcept
     {
         if (auto const found = find(key); found != nullptr)
         {
@@ -27,7 +28,7 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] bool contains(Key const& key) const noexcept
+    [[nodiscard]] constexpr bool contains(Key const& key) const noexcept
     {
         return !!find(key);
     }
@@ -99,7 +100,7 @@ private:
         entry.sequence_ = InvalidSeq;
     }
 
-    [[nodiscard]] Entry* find(Key const& key) noexcept
+    [[nodiscard]] constexpr Entry* find(Key const& key) noexcept
     {
         for (auto& entry : entries_)
         {
@@ -112,7 +113,7 @@ private:
         return nullptr;
     }
 
-    [[nodiscard]] Entry const* find(Key const& key) const noexcept
+    [[nodiscard]] constexpr Entry const* find(Key const& key) const noexcept
     {
         for (auto const& entry : entries_)
         {

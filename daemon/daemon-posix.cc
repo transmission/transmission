@@ -6,6 +6,10 @@
 #include <assert.h>
 #include <errno.h>
 #include <pthread.h>
+#ifdef HAVE_SYS_SIGNALFD_H
+#include <sys/signalfd.h>
+#endif /* signalfd API */
+#include <event2/event.h>
 #include <signal.h>
 #include <stdlib.h> /* abort(), daemon(), exit() */
 #include <fcntl.h> /* open() */
@@ -15,142 +19,112 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/utils.h>
-
 #include "daemon.h"
-
-using namespace std::literals;
-
-/***
-****
-***/
-
-static dtr_callbacks const* callbacks = nullptr;
-static void* callback_arg = nullptr;
-
-static int signal_pipe[2];
-
-/***
-****
-***/
 
 static void set_system_error(tr_error** error, int code, std::string_view message)
 {
     tr_error_set(error, code, fmt::format(FMT_STRING("{:s}: {:s} ({:d}"), message, tr_strerror(code), code));
 }
 
-/***
-****
-***/
+#ifdef HAVE_SYS_SIGNALFD_H
 
-static void handle_signal(int sig)
+static void handle_signals(evutil_socket_t fd, short /*what*/, void* arg)
 {
-    switch (sig)
+    struct signalfd_siginfo fdsi;
+    auto* const daemon = static_cast<tr_daemon*>(arg);
+
+    if (read(fd, &fdsi, sizeof(fdsi)) != sizeof(fdsi))
+        assert("Error reading signal descriptor" && 0);
+    else
     {
-    case SIGHUP:
-        callbacks->on_reconfigure(callback_arg);
-        break;
-
-    case SIGINT:
-    case SIGTERM:
-        callbacks->on_stop(callback_arg);
-        break;
-
-    default:
-        assert("Unexpected signal" && 0);
+        switch (fdsi.ssi_signo)
+        {
+        case SIGHUP:
+            daemon->reconfigure();
+            break;
+        case SIGINT:
+        case SIGTERM:
+            daemon->stop();
+            break;
+        default:
+            assert("Unexpected signal" && 0);
+        }
     }
 }
 
-static void send_signal_to_pipe(int sig)
+bool tr_daemon::setup_signals()
 {
-    int const old_errno = errno;
+    sigset_t mask = {};
+    struct event* sigev = nullptr;
+    struct event_base* base = ev_base_;
 
-    if (write(signal_pipe[1], &sig, sizeof(sig)) == -1)
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT);
+    sigaddset(&mask, SIGTERM);
+    sigaddset(&mask, SIGHUP);
+
+    if (sigprocmask(SIG_BLOCK, &mask, nullptr) < 0)
+        return false;
+
+    sigfd_ = signalfd(-1, &mask, 0);
+    if (sigfd_ < 0)
+        return false;
+
+    sigev = event_new(base, sigfd_, EV_READ | EV_PERSIST, handle_signals, this);
+    if (sigev == nullptr)
     {
-        abort();
+        close(sigfd_);
+        return false;
     }
 
-    errno = old_errno;
-}
-
-static void* signal_handler_thread_main(void* /*arg*/)
-{
-    int sig;
-
-    while (read(signal_pipe[0], &sig, sizeof(sig)) == sizeof(sig) && sig != 0)
+    if (event_add(sigev, nullptr) < 0)
     {
-        handle_signal(sig);
-    }
-
-    return nullptr;
-}
-
-static bool create_signal_pipe(tr_error** error)
-{
-    if (pipe(signal_pipe) == -1)
-    {
-        set_system_error(error, errno, "pipe() failed");
+        event_del(sigev);
+        close(sigfd_);
         return false;
     }
 
     return true;
 }
 
-static void destroy_signal_pipe(void)
+#else /* no signalfd API, use evsignal */
+
+static void reconfigureMarshall(evutil_socket_t /*fd*/, short /*events*/, void* arg)
 {
-    close(signal_pipe[0]);
-    close(signal_pipe[1]);
+    static_cast<tr_daemon*>(arg)->reconfigure();
 }
 
-static bool create_signal_handler_thread(pthread_t* thread, tr_error** error)
+static void stopMarshall(evutil_socket_t /*fd*/, short /*events*/, void* arg)
 {
-    if (!create_signal_pipe(error))
-    {
+    static_cast<tr_daemon*>(arg)->stop();
+}
+
+static bool setup_signal(struct event_base* base, int sig, void (*callback)(evutil_socket_t, short, void*), void* arg)
+{
+    struct event* sigev = evsignal_new(base, sig, callback, arg);
+
+    if (sigev == nullptr)
         return false;
-    }
 
-    if ((errno = pthread_create(thread, nullptr, &signal_handler_thread_main, nullptr)) != 0)
+    if (evsignal_add(sigev, nullptr) < 0)
     {
-        set_system_error(error, errno, "pthread_create() failed");
-        destroy_signal_pipe();
-        return false;
-    }
-
-    return true;
-}
-
-static void destroy_signal_handler_thread(pthread_t thread)
-{
-    send_signal_to_pipe(0);
-    pthread_join(thread, nullptr);
-
-    destroy_signal_pipe();
-}
-
-static bool setup_signal_handler(int sig, tr_error** error)
-{
-    assert(sig != 0);
-
-    if (signal(sig, &send_signal_to_pipe) == SIG_ERR)
-    {
-        set_system_error(error, errno, "signal() failed");
+        event_free(sigev);
         return false;
     }
 
     return true;
 }
 
-/***
-****
-***/
-
-bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exit_code, tr_error** error)
+bool tr_daemon::setup_signals()
 {
-    callbacks = cb;
-    callback_arg = cb_arg;
+    return setup_signal(ev_base_, SIGHUP, reconfigureMarshall, this) && setup_signal(ev_base_, SIGINT, stopMarshall, this) &&
+        setup_signal(ev_base_, SIGTERM, stopMarshall, this);
+}
 
+#endif /* HAVE_SYS_SIGNALFD_H */
+
+bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error** error)
+{
     *exit_code = 1;
 
     if (!foreground)
@@ -207,22 +181,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
 #endif
     }
 
-    pthread_t signal_thread;
-
-    if (!create_signal_handler_thread(&signal_thread, error))
-    {
-        return false;
-    }
-
-    if (!setup_signal_handler(SIGINT, error) || !setup_signal_handler(SIGTERM, error) || !setup_signal_handler(SIGHUP, error))
-    {
-        destroy_signal_handler_thread(signal_thread);
-        return false;
-    }
-
-    *exit_code = cb->on_start(cb_arg, foreground);
-
-    destroy_signal_handler_thread(signal_thread);
+    *exit_code = start(foreground);
 
     return true;
 }

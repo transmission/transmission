@@ -47,7 +47,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+330"/>
+        <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission, dosya paylaşım programıdır.&lt;/b&gt;</translation>
     </message>
@@ -61,23 +61,23 @@
         <source>I &amp;Agree</source>
         <translation>&amp;Kabul Ediyorum</translation>
     </message>
-    <message>
-        <location line="+132"/>
-        <source>Torrent Added</source>
-        <translation>Torrent Eklendi</translation>
-    </message>
     <message numerus="yes">
-        <location line="-29"/>
-        <source>Torrent Completed</source>
+        <location line="+105"/>
+        <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent Tamamlandı</numerusform>
         </translation>
+    </message>
+    <message>
+        <location line="+29"/>
+        <source>Torrent Added</source>
+        <translation>Torrent Eklendi</translation>
     </message>
 </context>
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+428"/>
+        <location filename="../DetailsDialog.cc" line="+429"/>
         <source>None</source>
         <translation>Yok</translation>
     </message>
@@ -212,21 +212,21 @@
         <source>Peer is an incoming connection</source>
         <translation>Eş, bir gelen bağlantıdır</translation>
     </message>
+    <message>
+        <location line="+4"/>
+        <source>Peer is connected over µTP</source>
+        <translation>Eş, µTP üstünden bağlandı</translation>
+    </message>
     <message numerus="yes">
-        <location line="+132"/>
+        <location line="+130"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform>dakika</numerusform>
+            <numerusform> dakika</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Add URL(s) </source>
-        <translation>URL Ekle</translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="+36"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>İzleyici duyuru URL&apos;si ekle:</translation>
     </message>
@@ -241,7 +241,7 @@
         <translation>Yeni URL bulunamadı.</translation>
     </message>
     <message>
-        <location line="-832"/>
+        <location line="-834"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (%100)</translation>
@@ -270,12 +270,12 @@
         <translation>Yok</translation>
     </message>
     <message>
-        <location line="+226"/>
-        <source>Peer is connected over uTP</source>
-        <translation>uTP üstünden eşe bağlanıldı</translation>
+        <location line="+391"/>
+        <source>Add URL(s)</source>
+        <translation>URL Ekle</translation>
     </message>
     <message>
-        <location line="+260"/>
+        <location line="+97"/>
         <source>High</source>
         <translation>Yüksek</translation>
     </message>
@@ -544,29 +544,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+296"/>
+        <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+257"/>
+        <location line="+254"/>
         <source>Low</source>
         <translation>Düşük</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-257"/>
-        <location line="+255"/>
+        <location filename="../FileTreeView.cc" line="-254"/>
+        <location line="+252"/>
         <source>High</source>
         <translation>Yüksek</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-255"/>
-        <location line="+256"/>
+        <location filename="../FileTreeView.cc" line="-252"/>
+        <location line="+253"/>
         <source>Normal</source>
         <translation>Normal</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-255"/>
+        <location filename="../FileTreeView.cc" line="-252"/>
         <source>Mixed</source>
         <translation>Karışık</translation>
     </message>
@@ -591,7 +591,7 @@
     <message>
         <location line="+3"/>
         <source>Download</source>
-        <translation>İndirme</translation>
+        <translation>İndir</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -602,7 +602,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+247"/>
+        <location filename="../FileTreeView.cc" line="+244"/>
         <source>Check Selected</source>
         <translation>Seçileni Denetle</translation>
     </message>
@@ -628,14 +628,14 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Rename...</source>
-        <translation>Adlandır...</translation>
+        <source>Rename…</source>
+        <translation>Yeniden Adlandır…</translation>
     </message>
 </context>
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+47"/>
+        <location filename="../FilterBar.cc" line="+48"/>
         <location line="+145"/>
         <source>All</source>
         <translation>Tümü</translation>
@@ -681,9 +681,9 @@
         <translation>Göster:</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Search...</source>
-        <translation>Ara...</translation>
+        <location line="+11"/>
+        <source>Search…</source>
+        <translation>Ara…</translation>
     </message>
 </context>
 <context>
@@ -772,53 +772,46 @@
         <translation>Yok</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location filename="../Formatter.h" line="+64"/>
         <location line="+7"/>
         <source>%1 %2</source>
         <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
-        <location line="+21"/>
+        <location filename="../Formatter.cc" line="+41"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>%Ln gün</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-5"/>
         <source>%Ln hour(s)</source>
         <translation>
             <numerusform>%Ln saat</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln minute(s)</source>
         <translation>
             <numerusform>%Ln dakika</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+1"/>
+        <location line="-7"/>
         <source>%Ln second(s)</source>
         <translation>
             <numerusform>%Ln saniye</numerusform>
         </translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <location line="+11"/>
-        <location line="+11"/>
-        <source>%1, %2</source>
-        <translation>%1, %2</translation>
     </message>
 </context>
 <context>
     <name>FreeSpaceLabel</name>
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
-        <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Boş Alan Hesaplanıyor...&lt;/i&gt;</translation>
+        <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
+        <translation>&lt;i&gt;Boş Alan Hesaplanıyor…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -867,12 +860,7 @@
         <translation>&amp;Dosya</translation>
     </message>
     <message>
-        <location line="+66"/>
-        <source>&amp;New...</source>
-        <translation>&amp;Yeni...</translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+69"/>
         <source>Create a new torrent</source>
         <translation>Yeni torrent oluştur</translation>
     </message>
@@ -908,8 +896,8 @@
     </message>
     <message>
         <location line="+171"/>
-        <source>&amp;Open...</source>
-        <translation>&amp;Aç...</translation>
+        <source>&amp;Open…</source>
+        <translation>&amp;Aç…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -922,7 +910,12 @@
         <translation>Torrent Aç</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+8"/>
+        <source>&amp;New…</source>
+        <translation>&amp;Yeni…</translation>
+    </message>
+    <message>
+        <location line="+22"/>
         <source>Open Fold&amp;er</source>
         <translation>Klasör Aç</translation>
     </message>
@@ -1159,32 +1152,32 @@
     </message>
     <message>
         <location line="+5"/>
-        <source>&amp;Change Session...</source>
-        <translation>&amp;Oturumu Değiştir...</translation>
+        <source>&amp;Change Session…</source>
+        <translation>Oturumu &amp;Değiştir…</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+8"/>
+        <source>Set &amp;Location…</source>
+        <translation>&amp;Konumu Ayarla…</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Open &amp;URL…</source>
+        <translation>&amp;URL Aç…</translation>
+    </message>
+    <message>
+        <location line="-15"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
         <translation>Seçilen Oturum</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Set &amp;Location...</source>
-        <translation>Konum &amp;Belirle...</translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
         <translation>&amp;Mıknatıs Bağlantısını Panoya Kopyala</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Open &amp;URL...</source>
-        <translation>&amp;URL Aç...</translation>
-    </message>
-    <message>
-        <location line="+8"/>
+        <location line="+13"/>
         <source>&amp;Donate</source>
         <translation>&amp;Bağış</translation>
     </message>
@@ -1224,7 +1217,7 @@
         <translation>&amp;Kuyruğa Göre Sırala</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+470"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>İndirme Hızını Sınırla</translation>
     </message>
@@ -1248,7 +1241,7 @@
     <message>
         <location line="+9"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>Belli Orana Ulaşıldığında Dağıtımı Durdur</translation>
+        <translation>Oranda Dağıtımı Durdur</translation>
     </message>
     <message>
         <location line="-40"/>
@@ -1344,7 +1337,7 @@
         <location line="-505"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
-            <numerusform>%Ln torrentden %L1 tanesi gösteriliyor</numerusform>
+            <numerusform>%Ln torrentin %L1 tanesi gösteriliyor</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1433,12 +1426,12 @@
         <translation>Yeni Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+230"/>
+        <location filename="../MakeDialog.cc" line="+304"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;Hiçbir kaynak seçilmedi&lt;/i&gt; </translation>
     </message>
     <message numerus="yes">
-        <location line="+4"/>
+        <location line="+5"/>
         <source>%Ln File(s)</source>
         <translation>
             <numerusform>%Ln Dosya</numerusform>
@@ -1477,7 +1470,12 @@
         <translation>Kaynak &amp;dosya:</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+36"/>
+        <source>Piece s&amp;ize:</source>
+        <translation>Parça b&amp;oyutu:</translation>
+    </message>
+    <message>
+        <location line="+31"/>
         <source>Properties</source>
         <translation>Özellikler</translation>
     </message>
@@ -1517,50 +1515,35 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>Yeni Torrent</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-136"/>
+        <location filename="../MakeDialog.cc" line="-184"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>&quot;%1&quot; oluşturuluyor</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+13"/>
         <source>Created &quot;%1&quot;!</source>
         <translation>&quot;%1&quot; oluşturuldu!</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Hata: geçersiz duyuru URL&apos;si &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <location line="-4"/>
-        <source>Cancelled</source>
-        <translation>İptal edildi</translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>&quot;%1&quot; okunurken hata: %2</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>&quot;%1&quot; yazılırken hata: %2</translation>
+        <location line="+5"/>
+        <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
+        <translation>&quot;%1&quot; yaratılamadı: %2 (%3)</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
-        <location filename="../OptionsDialog.cc" line="+62"/>
+        <location filename="../OptionsDialog.cc" line="+52"/>
         <source>Open Torrent</source>
         <translation>Torrent Aç</translation>
     </message>
     <message>
-        <location line="-17"/>
+        <location line="-10"/>
         <source>Open Torrent from File</source>
         <translation>Dosyadan Torrent Aç</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+0"/>
         <source>Open Torrent from URL or Magnet Link</source>
         <translation>URL veya Mıknatıs Bağlantısından Torrent Aç</translation>
     </message>
@@ -1575,7 +1558,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>&amp;Hedef klasör:</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+52"/>
+        <location filename="../OptionsDialog.cc" line="+49"/>
         <source>High</source>
         <translation>Yüksek</translation>
     </message>
@@ -1682,7 +1665,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>&amp;Şu günler:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+388"/>
+        <location filename="../PrefsDialog.cc" line="+382"/>
         <source>Every Day</source>
         <translation>Her Gün</translation>
     </message>
@@ -1742,7 +1725,12 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>Bağlantı noktası &lt;b&gt;kapalı&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+159"/>
+        <location line="+5"/>
+        <source>Testing TCP Port…</source>
+        <translation>TCP bağlantı noktası sınanıyor…</translation>
+    </message>
+    <message>
+        <location line="+154"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
         <translation>&quot;Torrent İndirildi&quot; Betiğini Seç</translation>
     </message>
@@ -1772,22 +1760,12 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Options</source>
         <translation>Seçenekler</translation>
     </message>
-    <message>
-        <location line="+15"/>
-        <source>Enable &amp;uTP for peer connections</source>
-        <translation>Eş bağlantıları için &amp;uTP&apos;yi etkinleştir</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP, ağ tıkanıklığını azaltmaya yarayan araçtır. </translation>
-    </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform>dakika</numerusform>
+            <numerusform> dakika</numerusform>
         </translation>
     </message>
     <message>
@@ -1804,7 +1782,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-663"/>
+        <location filename="../PrefsDialog.ui" line="-651"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>Torrentlerin kendiliğinden &amp;eklendiği yer:</translation>
     </message>
@@ -1852,7 +1830,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location filename="../PrefsDialog.cc" line="+168"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
-            <numerusform>&lt;i&gt;Karaliste %Ln kurallar içeriyor&lt;i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Engel listesi %Ln kural içeriyor&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -1875,20 +1853,8 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Maximum peers &amp;overall:</source>
         <translation>&amp;Genel azami eş sayısı</translation>
     </message>
-    <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-253"/>
-        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
-        <translation>
-            <numerusform>&lt;b&gt;Güncelleme başarılı!&lt;/b&gt;&lt;p&gt;Engelli listesinde şimdi %Ln kural var.</numerusform>
-        </translation>
-    </message>
     <message>
-        <location line="+9"/>
-        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Engel Listesini Güncelle&lt;b&gt;&lt;p&gt;Yeni engel listesi alınıyor...</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-193"/>
+        <location line="-193"/>
         <source>Blocklist</source>
         <translation>Engel Listesi</translation>
     </message>
@@ -1898,7 +1864,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>&amp;Kendiliğinden güncelleştirmeleri etkinleştir</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+17"/>
+        <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
         <translation>Şifrelemeye izin ver</translation>
     </message>
@@ -2019,7 +1985,17 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>Gönderim tamamlandığında &amp;betik dosyasını çağır:</translation>
     </message>
     <message>
-        <location line="+406"/>
+        <location line="+342"/>
+        <source>µTP is a tool for reducing network congestion.</source>
+        <translation>µTP, ağ sıkışmalarını azaltan araçtır.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable µ&amp;TP for peer connections</source>
+        <translation>Eş bağlantıları için µ&amp;TP&apos;yi etkinleştir</translation>
+    </message>
+    <message>
+        <location line="+61"/>
         <source>Default Public Trackers</source>
         <translation>Öntanımlı Genel İzleyiciler</translation>
     </message>
@@ -2054,12 +2030,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>Torrent bittiğinde &amp;ses çal</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-78"/>
-        <source>Testing TCP Port...</source>
-        <translation>TCP Bağlantı Noktası Sınanıyor…</translation>
-    </message>
-    <message>
-        <location filename="../PrefsDialog.ui" line="-281"/>
+        <location line="-281"/>
         <source>Peer Limits</source>
         <translation>Eş Sınırları</translation>
     </message>
@@ -2099,7 +2070,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>Şifreleme</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+153"/>
+        <location filename="../PrefsDialog.cc" line="+75"/>
         <source>Select Incomplete Directory</source>
         <translation>Tamamlanmayan Klasörünü Seç</translation>
     </message>
@@ -2108,8 +2079,20 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Select Watch Directory</source>
         <translation>İzlenen Klasörü Seç</translation>
     </message>
+    <message numerus="yes">
+        <location line="-101"/>
+        <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
+        <translation>
+            <numerusform>&lt;b&gt;Güncelleme başarılı!&lt;/b&gt;&lt;p&gt;Şu anda engel listesinde %Ln kural var.&lt;/p&gt;</numerusform>
+        </translation>
+    </message>
     <message>
-        <location line="+1"/>
+        <location line="+9"/>
+        <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
+        <translation>&lt;b&gt;Engel Listesini Güncelle&lt;/b&gt;&lt;p&gt;Yeni engel listesi alınıyor…&lt;/p&gt;</translation>
+    </message>
+    <message>
+        <location line="+93"/>
         <source>Select Destination</source>
         <translation>Hedef Seç</translation>
     </message>
@@ -2178,12 +2161,12 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-277"/>
+        <location filename="../Application.cc" line="-308"/>
         <source>Invalid option</source>
         <translation>Geçersiz seçenek</translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+307"/>
         <source>Start Now</source>
         <translation>Şimdi Başlat</translation>
     </message>
@@ -2191,7 +2174,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../RelocateDialog.cc" line="+63"/>
+        <location filename="../RelocateDialog.cc" line="+65"/>
         <source>Select Location</source>
         <translation>Konum Seç</translation>
     </message>
@@ -2224,17 +2207,17 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+498"/>
+        <location filename="../Session.cc" line="+494"/>
         <source>Error Renaming Path</source>
         <translation>Yolu Yeniden Adlandırırken Hata</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot;, &quot;%2&quot; olarak yeniden adlandırılamadı: %3.&lt;b&gt;&lt;p&gt;&lt;p&gt;Lütfen hataları düzeltip yeniden deneyin.&lt;p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot;, &quot;%2&quot; olarak yeniden adlandırılamadı: %3.&lt;/b&gt;&lt;/p&gt; &lt;p&gt;Lütfen hataları düzeltip yeniden deneyin.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+531"/>
+        <location line="+528"/>
         <source>Error Adding Torrent</source>
         <translation>Torrent Eklenirken Hata</translation>
     </message>
@@ -2351,14 +2334,14 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location filename="../StatsDialog.cc" line="+63"/>
         <source>Started %Ln time(s)</source>
         <translation>
-            <numerusform>%Ln defa başladı</numerusform>
+            <numerusform>%Ln kez başladı</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+300"/>
+        <location filename="../Torrent.cc" line="+323"/>
         <source>Verifying local data</source>
         <translation>Yerel veri doğrulanıyor</translation>
     </message>
@@ -2416,7 +2399,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+171"/>
+        <location filename="../TorrentDelegate.cc" line="+174"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Mıknatıslı aktarım - üst veri alınıyor (%%1)</translation>
@@ -2492,7 +2475,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>%Ln eşinden üstveri indiriliyor (%1% tamamlandı)</numerusform>
+            <numerusform>%Ln eşten üst veri indiriliyor (%%1 tamamlandı)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2500,7 +2483,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>%Ln bağlı eşten %1 tanesinden indiriliyor</numerusform>
+            <numerusform>%Ln bağlı eşin %1 tanesinden indiriliyor</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2508,7 +2491,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;, notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform>ve %Ln web beslemeleri</numerusform>
+            <numerusform> + %Ln web beslemesi</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2527,11 +2510,11 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+219"/>
+        <location filename="../TrackerDelegate.cc" line="+210"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>%1 %Ln eşitlerinin bir listesi var %2 %3 önce</numerusform>
+            <numerusform>%3 önce%1 %Ln eşin%2 listesi alındı</numerusform>
         </translation>
     </message>
     <message>
@@ -2544,7 +2527,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>%1&quot;%2&quot;%3 %4 önce hata alındı</translation>
+        <translation>%4 önce %1&quot;%2&quot;%3 hatası alındı</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2563,17 +2546,17 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <translation>Daha çok eş sayısının sorulması için kuyruğa alındı</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
+        <location line="+73"/>
+        <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Şimdi daha çok eş sayısı soruluyor... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Şimdi eş sayısı soruluyor… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+27"/>
+        <location line="-40"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform> İzleyicide %1 %Ln gönderici vardı %2</numerusform>
+            <numerusform>İzleyicide%1 %Ln besleyici%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2581,7 +2564,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform>ve %1 %Ln alıcılar %2 %3 önce</numerusform>
+            <numerusform> ve%1 %Ln alıcı%2 vardı, %3 önce</numerusform>
         </translation>
     </message>
     <message>
@@ -2594,10 +2577,16 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="-24"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>%1&quot;%2&quot;%3 %4 önce scrape hatası oluştu</translation>
+        <translation>%4 önce %1&quot;%2&quot;%3 scrape hatası alındı</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="-17"/>
+        <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
+        <extracomment>%1 is duration</extracomment>
+        <translation>Şimdi daha çok eş soruluyor… &lt;small&gt;%1&lt;/small&gt;</translation>
+    </message>
+    <message>
+        <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation>%1 içinde eş sayısı sorulacak</translation>
@@ -2606,12 +2595,6 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
         <translation>Eş sayısının sorulması için kuyruğa alındı</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
-        <extracomment>%1 is duration</extracomment>
-        <translation>Şimdi eş sayısı soruluyor... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

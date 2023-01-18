@@ -8,9 +8,10 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/error.h>
+#include <libtransmission/web-utils.h>
 
 #include "AddData.h"
 #include "Utils.h"
@@ -21,7 +22,7 @@ namespace
 QString getNameFromMetainfo(QByteArray const& benc)
 {
     auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parseBenc({ benc.constData(), size_t(benc.size()) }))
+    if (!metainfo.parseBenc({ benc.constData(), static_cast<size_t>(benc.size()) }))
     {
         return {};
     }

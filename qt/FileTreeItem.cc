@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <set>
+#include <utility>
 
 #include <QApplication>
 #include <QStyle>
@@ -84,7 +85,7 @@ int FileTreeItem::row() const
     if (parent_ != nullptr)
     {
         i = parent_->getMyChildRows().value(name(), -1);
-        assert(this == parent_->children_[i]);
+        assert(i == -1 || this == parent_->children_[i]);
     }
 
     return i;
@@ -336,11 +337,11 @@ int FileTreeItem::priority() const
     return i;
 }
 
-void FileTreeItem::setSubtreePriority(int i, QSet<int>& ids)
+void FileTreeItem::setSubtreePriority(int priority, QSet<int>& ids)
 {
-    if (priority_ != i)
+    if (priority_ != priority)
     {
-        priority_ = i;
+        priority_ = priority;
 
         if (file_index_ >= 0)
         {
@@ -350,7 +351,7 @@ void FileTreeItem::setSubtreePriority(int i, QSet<int>& ids)
 
     for (FileTreeItem* const child : children_)
     {
-        child->setSubtreePriority(i, ids);
+        child->setSubtreePriority(priority, ids);
     }
 }
 

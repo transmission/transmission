@@ -1,10 +1,10 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
-#include "tr-getopt.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/tr-getopt.h>
 
 #include "gtest/gtest.h"
 
@@ -39,8 +39,8 @@ protected:
         auto n = int{};
         tr_optind = 1;
 
-        int c;
-        char const* argstr;
+        auto c = int{};
+        char const* argstr = nullptr;
         while ((c = tr_getopt("summary", argc, argv, Options.data(), &argstr)) != TR_OPT_DONE)
         {
             EXPECT_LT(n, expected_n);

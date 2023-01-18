@@ -5,8 +5,9 @@
 
 #include <algorithm>
 #include <array>
-#include <cerrno>
 #include <cstdint> // uint8_t, uint64_t
+#include <string_view>
+#include <utility>
 
 #include <fmt/core.h>
 
@@ -90,9 +91,9 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** error)
         /* fallback: the old-fashioned way */
         while (success && length > 0)
         {
-            uint64_t const thisPass = std::min(length, uint64_t{ std::size(buf) });
+            uint64_t const this_pass = std::min(length, uint64_t{ std::size(buf) });
             uint64_t bytes_written = 0;
-            success = tr_sys_file_write(fd, std::data(buf), thisPass, &bytes_written, &my_error);
+            success = tr_sys_file_write(fd, std::data(buf), this_pass, &bytes_written, &my_error);
             length -= bytes_written;
         }
 
@@ -110,7 +111,7 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** error)
 
 } // unnamed namespace
 
-///
+// ---
 
 std::optional<tr_sys_file_t> tr_open_files::get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable)
 {
@@ -166,11 +167,11 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         }
     }
 
-    auto info = tr_sys_path_info{};
-    bool const already_existed = tr_sys_path_get_info(filename, 0, &info) && info.type == TR_SYS_PATH_IS_FILE;
+    auto const info = tr_sys_path_get_info(filename);
+    bool const already_existed = info && info->isFile();
 
     // we need write permissions to resize the file
-    bool const resize_needed = already_existed && (file_size < info.size);
+    bool const resize_needed = already_existed && (file_size < info->size);
     writable |= resize_needed;
 
     // open the file

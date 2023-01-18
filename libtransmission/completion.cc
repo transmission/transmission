@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include "transmission.h"
@@ -104,31 +105,12 @@ size_t tr_completion::countMissingBytesInPiece(tr_piece_index_t piece) const
     return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
 }
 
-tr_completeness tr_completion::status() const
-{
-    if (!hasMetainfo())
-    {
-        return TR_LEECH;
-    }
-
-    if (hasAll())
-    {
-        return TR_SEED;
-    }
-
-    if (size_now_ == sizeWhenDone())
-    {
-        return TR_PARTIAL_SEED;
-    }
-
-    return TR_LEECH;
-}
-
 std::vector<uint8_t> tr_completion::createPieceBitfield() const
 {
     size_t const n = block_info_->pieceCount();
     auto pieces = tr_bitfield{ n };
 
+    // NOLINTNEXTLINE modernize-avoid-c-arrays
     auto flags = std::make_unique<bool[]>(n);
     for (tr_piece_index_t piece = 0; piece < n; ++piece)
     {
@@ -139,7 +121,7 @@ std::vector<uint8_t> tr_completion::createPieceBitfield() const
     return pieces.raw();
 }
 
-/// mutators
+// --- mutators
 
 void tr_completion::addBlock(tr_block_index_t block)
 {
@@ -177,9 +159,9 @@ void tr_completion::setHasAll() noexcept
 
 void tr_completion::addPiece(tr_piece_index_t piece)
 {
-    auto const [begin, end] = block_info_->blockSpanForPiece(piece);
+    auto const span = block_info_->blockSpanForPiece(piece);
 
-    for (tr_block_index_t block = begin; block < end; ++block)
+    for (tr_block_index_t block = span.begin; block < span.end; ++block)
     {
         addBlock(block);
     }

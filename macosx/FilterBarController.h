@@ -4,17 +4,21 @@
 
 #import <AppKit/AppKit.h>
 
-#define FILTER_NONE @"None"
-#define FILTER_ACTIVE @"Active"
-#define FILTER_DOWNLOAD @"Download"
-#define FILTER_SEED @"Seed"
-#define FILTER_PAUSE @"Pause"
-#define FILTER_ERROR @"Error"
+typedef NSString* FilterType NS_TYPED_EXTENSIBLE_ENUM;
 
-#define FILTER_TYPE_NAME @"Name"
-#define FILTER_TYPE_TRACKER @"Tracker"
+extern FilterType const FilterTypeNone;
+extern FilterType const FilterTypeActive;
+extern FilterType const FilterTypeDownload;
+extern FilterType const FilterTypeSeed;
+extern FilterType const FilterTypePause;
+extern FilterType const FilterTypeError;
 
-#define GROUP_FILTER_ALL_TAG -2
+typedef NSString* FilterSearchType NS_TYPED_EXTENSIBLE_ENUM;
+
+extern FilterSearchType const FilterSearchTypeName;
+extern FilterSearchType const FilterSearchTypeTracker;
+
+extern const NSInteger kGroupFilterAllTag;
 
 @interface FilterBarController : NSViewController
 
@@ -22,13 +26,14 @@
 
 - (instancetype)init;
 
-- (void)setFilter:(id)sender;
+- (IBAction)setFilter:(id)sender;
 - (void)switchFilter:(BOOL)right;
-- (void)setSearchText:(id)sender;
-- (void)setSearchType:(id)sender;
-- (void)setGroupFilter:(id)sender;
+- (IBAction)setSearchText:(id)sender;
+- (IBAction)setSearchType:(id)sender;
+- (IBAction)setGroupFilter:(id)sender;
 - (void)reset:(BOOL)updateUI;
 - (void)focusSearchField;
+- (BOOL)isFocused;
 
 - (void)setCountAll:(NSUInteger)all
              active:(NSUInteger)active

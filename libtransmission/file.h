@@ -1,5 +1,5 @@
 // This file Copyright 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,16 +8,15 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
+#include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 #include "tr-macros.h"
-#include "tr-strbuf.h"
 
 struct tr_error;
 
@@ -34,10 +33,6 @@ using tr_sys_file_t = int;
 #define TR_BAD_SYS_FILE (-1)
 /** @brief Platform-specific directory descriptor type. */
 using tr_sys_dir_t = void*;
-/** @brief Platform-specific end-of-line sequence. */
-#define TR_NATIVE_EOL_STR "\n"
-/** @brief Platform-specific end-of-line sequence length. */
-#define TR_NATIVE_EOL_STR_SIZE 1
 
 #else
 
@@ -45,8 +40,6 @@ using tr_sys_file_t = HANDLE;
 #define TR_BAD_SYS_FILE INVALID_HANDLE_VALUE
 struct tr_sys_dir_win32;
 using tr_sys_dir_t = tr_sys_dir_win32*;
-#define TR_NATIVE_EOL_STR "\r\n"
-#define TR_NATIVE_EOL_STR_SIZE 2
 
 #endif
 
@@ -65,17 +58,9 @@ enum tr_sys_file_open_flags_t
     TR_SYS_FILE_READ = (1 << 0),
     TR_SYS_FILE_WRITE = (1 << 1),
     TR_SYS_FILE_CREATE = (1 << 2),
-    TR_SYS_FILE_CREATE_NEW = (1 << 3),
-    TR_SYS_FILE_APPEND = (1 << 4),
-    TR_SYS_FILE_TRUNCATE = (1 << 5),
-    TR_SYS_FILE_SEQUENTIAL = (1 << 6)
-};
-
-enum tr_seek_origin_t
-{
-    TR_SEEK_SET,
-    TR_SEEK_CUR,
-    TR_SEEK_END
+    TR_SYS_FILE_APPEND = (1 << 3),
+    TR_SYS_FILE_TRUNCATE = (1 << 4),
+    TR_SYS_FILE_SEQUENTIAL = (1 << 5)
 };
 
 enum tr_sys_file_lock_flags_t
@@ -117,8 +102,18 @@ enum tr_sys_path_type_t
 struct tr_sys_path_info
 {
     tr_sys_path_type_t type = {};
-    uint64_t size = 0;
-    time_t last_modified_at = 0;
+    uint64_t size = {};
+    time_t last_modified_at = {};
+
+    [[nodiscard]] constexpr auto isFile() const noexcept
+    {
+        return type == TR_SYS_PATH_IS_FILE;
+    }
+
+    [[nodiscard]] constexpr auto isFolder() const noexcept
+    {
+        return type == TR_SYS_PATH_IS_DIRECTORY;
+    }
 };
 
 /**
@@ -153,13 +148,15 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  *
  * @param[in]  path  Path to file or directory.
  * @param[in]  flags Combination of @ref tr_sys_path_get_info_flags_t values.
- * @param[out] info  Result buffer.
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
+ * @return info on success, or nullopt with `error` set accordingly.
  */
-bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr);
+[[nodiscard]] std::optional<tr_sys_path_info> tr_sys_path_get_info(
+    std::string_view path,
+    int flags = 0,
+    tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `access()`.
@@ -174,7 +171,7 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, s
  */
 bool tr_sys_path_exists(char const* path, struct tr_error** error = nullptr);
 
-template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+template<typename T, typename = decltype(&T::c_str)>
 bool tr_sys_path_exists(T const& path, struct tr_error** error = nullptr)
 {
     return tr_sys_path_exists(path.c_str(), error);
@@ -206,11 +203,7 @@ bool tr_sys_path_is_relative(std::string_view path);
  */
 bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error** error = nullptr);
 
-template<
-    typename T,
-    typename U,
-    typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
-    typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
+template<typename T, typename U, typename = decltype(&T::c_str), typename = decltype(&U::c_str)>
 bool tr_sys_path_is_same(T const& path1, U const& path2, struct tr_error** error = nullptr)
 {
     return tr_sys_path_is_same(path1.c_str(), path2.c_str(), error);
@@ -223,12 +216,10 @@ bool tr_sys_path_is_same(T const& path1, U const& path2, struct tr_error** error
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return Pointer to newly allocated buffer containing full path (with symbolic
- *         links, `.` and `..` resolved) on success (use @ref tr_free to free it
- *         when no longer needed), `nullptr` otherwise (with `error` set
- *         accordingly).
+ * @return Full path with symbolic links, `.` and `..` resolved on success,
+ *         or an empty string otherwise (with `error` set accordingly).
  */
-char* tr_sys_path_resolve(char const* path, struct tr_error** error = nullptr);
+std::string tr_sys_path_resolve(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `basename()`.
@@ -237,22 +228,18 @@ char* tr_sys_path_resolve(char const* path, struct tr_error** error = nullptr);
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
  *                   are not interested in error details.
  *
- * @return Pointer to newly allocated buffer containing base name (last path
- *         component; parent path removed) on success (use @ref tr_free to free
- *         it when no longer needed), `nullptr` otherwise (with `error` set
- *         accordingly).
+ * @return base name (last path component; parent path removed) on success,
+ *         or empty string otherwise (with `error` set accordingly).
  */
-std::string tr_sys_path_basename(std::string_view path, struct tr_error** error = nullptr);
+std::string_view tr_sys_path_basename(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `dirname()`.
  *
  * @param[in]  path  Path to file or directory.
  *
- * @return Pointer to newly allocated buffer containing directory (parent path;
- *         last path component removed) on success (use @ref tr_free to free it
- *         when no longer needed), `nullptr` otherwise (with `error` set
- *         accordingly).
+ * @return parent path substring of `path` (last path component removed) on
+ *         success, or empty string otherwise with `error` set accordingly).
  */
 std::string_view tr_sys_path_dirname(std::string_view path);
 
@@ -270,11 +257,7 @@ std::string_view tr_sys_path_dirname(std::string_view path);
  */
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_error** error = nullptr);
 
-template<
-    typename T,
-    typename U,
-    typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
-    typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
+template<typename T, typename U, typename = decltype(&T::c_str), typename = decltype(&U::c_str)>
 bool tr_sys_path_rename(T const& src_path, U const& dst_path, struct tr_error** error = nullptr)
 {
     return tr_sys_path_rename(src_path.c_str(), dst_path.c_str(), error);
@@ -293,7 +276,7 @@ bool tr_sys_path_rename(T const& src_path, U const& dst_path, struct tr_error** 
  */
 bool tr_sys_path_remove(char const* path, struct tr_error** error = nullptr);
 
-template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+template<typename T, typename = decltype(&T::c_str)>
 bool tr_sys_path_remove(T const& path, struct tr_error** error = nullptr)
 {
     return tr_sys_path_remove(path.c_str(), error);
@@ -364,38 +347,6 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, struct tr_error** error
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
 bool tr_sys_file_close(tr_sys_file_t handle, struct tr_error** error = nullptr);
-
-/**
- * @brief Portability wrapper for `fstat()`.
- *
- * @param[in]  handle Valid file descriptor.
- * @param[out] info   Result buffer.
- * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
- *                    are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, struct tr_error** error = nullptr);
-
-/**
- * @brief Portability wrapper for `lseek()`.
- *
- * @param[in]  handle     Valid file descriptor.
- * @param[in]  offset     Relative file offset in bytes to seek to.
- * @param[in]  origin     Offset origin.
- * @param[out] new_offset New offset in bytes from beginning of file. Optional,
- *                        pass `nullptr` if you are not interested.
- * @param[out] error      Pointer to error object. Optional, pass `nullptr` if
- *                        you are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_seek(
-    tr_sys_file_t handle,
-    int64_t offset,
-    tr_seek_origin_t origin,
-    uint64_t* new_offset,
-    struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `read()`.
@@ -494,6 +445,9 @@ bool tr_sys_file_write_at(
  */
 bool tr_sys_file_flush(tr_sys_file_t handle, struct tr_error** error = nullptr);
 
+/* @brief Check whether `handle` may be flushed via `tr_sys_file_flush()`. */
+bool tr_sys_file_flush_possible(tr_sys_file_t handle, struct tr_error** error = nullptr);
+
 /**
  * @brief Portability wrapper for `ftruncate()`.
  *
@@ -538,32 +492,6 @@ bool tr_sys_file_advise(
 bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, struct tr_error** error = nullptr);
 
 /**
- * @brief Portability wrapper for `mmap()` for files.
- *
- * @param[in]  handle Valid file descriptor.
- * @param[in]  offset Offset in file to map from.
- * @param[in]  size   Number of bytes to map.
- * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
- *                    are not interested in error details.
- *
- * @return Pointer to mapped file data on success, `nullptr` otherwise (with
- *         `error` set accordingly).
- */
-void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_t size, struct tr_error** error = nullptr);
-
-/**
- * @brief Portability wrapper for `munmap()` for files.
- *
- * @param[in]  address Pointer to mapped file data.
- * @param[in]  size    Size of mapped data in bytes.
- * @param[out] error   Pointer to error object. Optional, pass `nullptr` if you
- *                     are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_unmap(void const* address, uint64_t size, struct tr_error** error = nullptr);
-
-/**
  * @brief Portability wrapper for `flock()`.
  *
  * Don't try to upgrade or downgrade the lock unless you know what you are
@@ -579,29 +507,6 @@ bool tr_sys_file_unmap(void const* address, uint64_t size, struct tr_error** err
 bool tr_sys_file_lock(tr_sys_file_t handle, int operation, struct tr_error** error = nullptr);
 
 /* File-related wrappers (utility) */
-
-/**
- * @brief Portability wrapper for `fgets()`, removing EOL internally.
- *
- * Special care should be taken when reading from one of standard input streams
- * (@ref tr_std_sys_file_t) since no UTF-8 conversion is currently being made.
- *
- * Reading from other streams (files, pipes) also leaves data untouched, so it
- * should already be in UTF-8 encoding, or whichever else you expect.
- *
- * @param[in]  handle      Valid file descriptor.
- * @param[out] buffer      Buffer to store read zero-terminated string to.
- * @param[in]  buffer_size Buffer size in bytes, taking '\0' character into
- *                         account.
- * @param[out] error       Pointer to error object. Optional, pass `nullptr` if
- *                         you are not interested in error details.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- *         Note that `false` will also be returned in case of end of file; if
- *         you need to distinguish the two, check if `error` is `nullptr`
- *         afterwards.
- */
-bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `fputs()`, appending EOL internally.
@@ -629,11 +534,10 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, struc
  * @param[out] error Pointer to error object. Optional, pass `nullptr` if you are
  *                   not interested in error details.
  *
- * @return Pointer to newly allocated buffer containing path to current
- *         directory (use @ref tr_free to free it when no longer needed) on
- *         success, `nullptr` otherwise (with `error` set accordingly).
+ * @return current directory on success, or an empty string otherwise
+ *         (with `error` set accordingly).
  */
-char* tr_sys_dir_get_current(struct tr_error** error = nullptr);
+std::string tr_sys_dir_get_current(struct tr_error** error = nullptr);
 
 /**
  * @brief Like `mkdir()`, but makes parent directories if needed.
@@ -649,7 +553,7 @@ char* tr_sys_dir_get_current(struct tr_error** error = nullptr);
  */
 bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_error** error = nullptr);
 
-template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+template<typename T, typename = decltype(&T::c_str)>
 bool tr_sys_dir_create(T const& path, int flags, int permissions, struct tr_error** error = nullptr)
 {
     return tr_sys_dir_create(path.c_str(), flags, permissions, error);
@@ -689,11 +593,11 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, struct tr_error** error = nullptr
  * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
  *                    are not interested in error details.
  *
- * @return Pointer to next directory entry name (stored internally, DO NOT pass
- *         it to @ref tr_free) on success, `nullptr` otherwise (with `error` set
- *         accordingly). Note that `nullptr` will also be returned in case of end
- *         of directory; if you need to distinguish the two, check if `error`
- *         is `nullptr` afterwards.
+ * @return Pointer to next directory entry name (stored internally, DO NOT free
+ *         it) on success, `nullptr` otherwise (with `error` set accordingly).
+ *         Note that `nullptr` will also be returned in case of end of directory.
+ *         If you need to distinguish the two, check if `error` is `nullptr`
+ *         afterwards.
  */
 char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error = nullptr);
 

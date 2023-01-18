@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -50,7 +50,7 @@ struct tr_completion
         return hasMetainfo() && blocks_.hasAll();
     }
 
-    [[nodiscard]] bool hasBlock(tr_block_index_t block) const
+    [[nodiscard]] TR_CONSTEXPR20 bool hasBlock(tr_block_index_t block) const
     {
         return blocks_.test(block);
     }
@@ -96,7 +96,25 @@ struct tr_completion
 
     [[nodiscard]] uint64_t sizeWhenDone() const;
 
-    [[nodiscard]] tr_completeness status() const;
+    [[nodiscard]] tr_completeness status() const
+    {
+        if (!hasMetainfo())
+        {
+            return TR_LEECH;
+        }
+
+        if (hasAll())
+        {
+            return TR_SEED;
+        }
+
+        if (size_now_ == sizeWhenDone())
+        {
+            return TR_PARTIAL_SEED;
+        }
+
+        return TR_LEECH;
+    }
 
     [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const;
 
@@ -105,9 +123,9 @@ struct tr_completion
 
     void amountDone(float* tab, size_t n_tabs) const;
 
-    void addBlock(tr_block_index_t i);
-    void addPiece(tr_piece_index_t i);
-    void removePiece(tr_piece_index_t i);
+    void addBlock(tr_block_index_t block);
+    void addPiece(tr_piece_index_t piece);
+    void removePiece(tr_piece_index_t piece);
 
     void setHasPiece(tr_piece_index_t i, bool has)
     {

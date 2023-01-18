@@ -14,7 +14,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
     TorrentDeterminationUserSpecified
 };
 
-#define kTorrentDidChangeGroupNotification @"TorrentDidChangeGroup"
+extern NSString* const kTorrentDidChangeGroupNotification;
 
 @interface Torrent : NSObject<NSCopying, QLPreviewItem>
 
@@ -44,8 +44,13 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 - (void)startTransferNoQueue;
 - (void)startTransfer;
 - (void)stopTransfer;
+- (void)startQueue;
 - (void)sleep;
 - (void)wakeUp;
+- (void)idleLimitHit;
+- (void)ratioLimitHit;
+- (void)metadataRetrieved;
+- (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning;
 
 @property(nonatomic) NSUInteger queuePosition;
 
@@ -122,7 +127,10 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 
 @property(nonatomic, readonly) CGFloat availableDesired;
 
+/// True if non-paused. Running.
 @property(nonatomic, getter=isActive, readonly) BOOL active;
+/// True if downloading or uploading.
+@property(nonatomic, getter=isTransmitting, readonly) BOOL transmitting;
 @property(nonatomic, getter=isSeeding, readonly) BOOL seeding;
 @property(nonatomic, getter=isChecking, readonly) BOOL checking;
 @property(nonatomic, getter=isCheckingWaiting, readonly) BOOL checkingWaiting;
@@ -195,6 +203,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, readonly) NSInteger secondsSeeding;
 
 @property(nonatomic, readonly) NSInteger stalledMinutes;
+/// True if the torrent is running, but has been idle for long enough to be considered stalled.
 @property(nonatomic, getter=isStalled, readonly) BOOL stalled;
 
 - (void)updateTimeMachineExclude;

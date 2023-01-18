@@ -75,6 +75,9 @@
                                 <segment tag="5"/>
                             </segments>
                         </segmentedCell>
+                        <connections>
+                            <action selector="setTab:" target="-2" id="Vag-7z-279"/>
+                        </connections>
                     </segmentedControl>
                 </subviews>
                 <constraints>

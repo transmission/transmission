@@ -3,10 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cassert>
-#include <cstdlib>
 #include <string_view>
+#include <utility>
 
 #include <QDateTime>
 #include <QDir>
@@ -22,6 +23,7 @@
 #include <libtransmission/variant.h>
 
 #include "CustomVariantType.h"
+#include "Filters.h"
 #include "Prefs.h"
 #include "VariantHelpers.h"
 
@@ -37,7 +39,7 @@ namespace
 
 void ensureSoundCommandIsAList(tr_variant* dict)
 {
-    tr_quark key = TR_KEY_torrent_complete_sound_command;
+    tr_quark const key = TR_KEY_torrent_complete_sound_command;
 
     if (tr_variant* list = nullptr; tr_variantDictFindList(dict, key, &list))
     {
@@ -195,7 +197,7 @@ bool isValidUtf8(QByteArray const& byteArray)
 
     auto const* const codec = QTextCodec::codecForName("UTF-8");
     auto state = QTextCodec::ConverterState{};
-    auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
+    codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
     return state.invalidChars == 0;
 
 #endif
@@ -252,8 +254,8 @@ Prefs::Prefs(QString config_dir)
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
-                auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
-                values_[i] = QVariant::fromValue(SortMode(pair.first));
+                auto const& [mode, mode_str] = it == std::end(SortModes) ? SortModes.front() : *it;
+                values_[i] = QVariant::fromValue(SortMode{ mode });
             }
             break;
 
@@ -266,8 +268,8 @@ Prefs::Prefs(QString config_dir)
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
-                values_[i] = QVariant::fromValue(FilterMode(pair.first));
+                auto const& [mode, mode_str] = it == std::end(FilterModes) ? FilterModes.front() : *it;
+                values_[i] = QVariant::fromValue(FilterMode{ mode });
             }
             break;
 
@@ -316,7 +318,7 @@ Prefs::Prefs(QString config_dir)
         }
     }
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 Prefs::~Prefs()
@@ -350,8 +352,8 @@ Prefs::~Prefs()
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
-                auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
-                dictAdd(&current_settings, key, pair.second);
+                auto const& [mode_val, mode_str] = it == std::end(SortModes) ? SortModes.front() : *it;
+                dictAdd(&current_settings, key, mode_str);
                 break;
             }
 
@@ -364,8 +366,8 @@ Prefs::~Prefs()
                 };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
-                dictAdd(&current_settings, key, pair.second);
+                auto const& [mode_val, mode_str] = it == std::end(FilterModes) ? FilterModes.front() : *it;
+                dictAdd(&current_settings, key, mode_str);
                 break;
             }
 
@@ -410,10 +412,10 @@ Prefs::~Prefs()
 
     tr_variantMergeDicts(&file_settings, &current_settings);
     tr_variantToFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toStdString());
-    tr_variantFree(&file_settings);
+    tr_variantClear(&file_settings);
 
     // cleanup
-    tr_variantFree(&current_settings);
+    tr_variantClear(&current_settings);
 }
 
 /**
@@ -430,7 +432,7 @@ void Prefs::initDefaults(tr_variant* d) const
     auto constexpr StatsMode = std::string_view{ "total-ratio" };
     auto constexpr WindowLayout = std::string_view{ "menu,toolbar,filter,list,statusbar" };
 
-    auto const download_dir = std::string_view{ tr_getDefaultDownloadDir() };
+    auto const download_dir = tr_getDefaultDownloadDir();
 
     tr_variantDictReserve(d, 38);
     dictAdd(d, TR_KEY_blocklist_updates_enabled, true);

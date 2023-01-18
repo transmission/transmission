@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <utility>
+
 #include <QApplication>
 #include <QFont>
 #include <QFontMetrics>
@@ -15,6 +17,7 @@
 
 #include "Formatter.h"
 #include "IconCache.h"
+#include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
@@ -379,7 +382,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
     if (tor.isReadyToTransfer())
     {
-        QString s = shortTransferString(tor);
+        QString const s = shortTransferString(tor);
 
         if (!s.isEmpty())
         {
@@ -396,7 +399,7 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    auto const m = QSize(margin(*QApplication::style()));
+    auto const m = margin(*QApplication::style());
     auto const layout = ItemLayout(
         tor.name(),
         progressString(tor),
@@ -526,14 +529,14 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
     auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
-    QStyle::State progress_bar_state(option.state | QStyle::State_Horizontal);
+    QStyle::State progress_bar_state(option.state);
 
     if (is_paused)
     {
         progress_bar_state = QStyle::State_None;
     }
 
-    progress_bar_state |= QStyle::State_Small;
+    progress_bar_state |= QStyle::State_Small | QStyle::State_Horizontal;
 
     QIcon::Mode const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
     QIcon const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon();
@@ -598,7 +601,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
+    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
 
     painter->restore();
 }

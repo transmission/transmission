@@ -9,8 +9,6 @@
 #include <string_view>
 #include <optional>
 
-#include <event2/buffer.h>
-
 #include <fmt/compile.h>
 #include <fmt/format.h>
 
@@ -19,8 +17,9 @@
 #include "transmission.h"
 
 #include "benc.h"
-#include "tr-assert.h"
 #include "quark.h"
+#include "tr-assert.h"
+#include "tr-buffer.h"
 #include "utils.h"
 #include "variant-common.h"
 #include "variant.h"
@@ -29,10 +28,7 @@ using namespace std::literals;
 
 auto constexpr MaxBencStrLength = size_t{ 128 * 1024 * 1024 }; // arbitrary
 
-/***
-****
-****
-***/
+// ---
 
 namespace transmission::benc::impl
 {
@@ -67,13 +63,14 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
     }
 
     // leading zeroes are not allowed
-    if ((walk[0] == '0' && (isdigit(walk[1]) != 0)) || (walk[0] == '-' && walk[1] == '0' && (isdigit(walk[2]) != 0)))
+    if ((walk[0] == '0' && (isdigit(static_cast<unsigned char>(walk[1])) != 0)) ||
+        (walk[0] == '-' && walk[1] == '0' && (isdigit(static_cast<unsigned char>(walk[2])) != 0)))
     {
         return {};
     }
 
     // parse the string and make sure the next char is `Suffix`
-    auto const value = tr_parseNum<int64_t>(walk);
+    auto const value = tr_parseNum<int64_t>(walk, &walk);
     if (!value || !tr_strvStartsWith(walk, Suffix))
     {
         return {};
@@ -101,12 +98,12 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
     // get the string length
     auto svtmp = benc->substr(0, colon_pos);
-    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(ch) != 0; }))
+    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(static_cast<unsigned char>(ch)) != 0; }))
     {
         return {};
     }
 
-    auto const len = tr_parseNum<size_t>(svtmp);
+    auto const len = tr_parseNum<size_t>(svtmp, &svtmp);
     if (!len || *len >= MaxBencStrLength)
     {
         return {};
@@ -126,11 +123,12 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
 } // namespace transmission::benc::impl
 
-/***
-****  tr_variantParse()
-****  tr_variantLoad()
-***/
+// ---
 
+namespace
+{
+namespace parse_helpers
+{
 struct MyHandler : public transmission::benc::Handler
 {
     tr_variant* const top_;
@@ -143,6 +141,11 @@ struct MyHandler : public transmission::benc::Handler
         , parse_opts_{ parse_opts }
     {
     }
+
+    MyHandler(MyHandler&&) = delete;
+    MyHandler(MyHandler const&) = delete;
+    MyHandler& operator=(MyHandler&&) = delete;
+    MyHandler& operator=(MyHandler const&) = delete;
 
     ~MyHandler() override = default;
 
@@ -255,86 +258,80 @@ private:
         return node;
     }
 };
+} // namespace parse_helpers
+} // namespace
 
 bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error)
 {
+    using namespace parse_helpers;
     using Stack = transmission::benc::ParserStack<512>;
+
     auto stack = Stack{};
     auto handler = MyHandler{ &top, parse_opts };
     return transmission::benc::parse(benc, stack, handler, setme_end, error) && std::empty(stack);
 }
 
-/****
-*****
-****/
+// ---
 
-static void saveIntFunc(tr_variant const* val, void* vevbuf)
+namespace
+{
+namespace to_string_helpers
+{
+using Buffer = libtransmission::Buffer;
+
+void saveIntFunc(tr_variant const* val, void* vout)
 {
     auto buf = std::array<char, 64>{};
-    auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add(evbuf, std::data(buf), static_cast<size_t>(out - std::data(buf)));
+    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
+    static_cast<Buffer*>(vout)->add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
 }
 
-static void saveBoolFunc(tr_variant const* val, void* vevbuf)
+void saveBoolFunc(tr_variant const* val, void* vout)
 {
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    if (val->val.b)
-    {
-        evbuffer_add(evbuf, "i1e", 3);
-    }
-    else
-    {
-        evbuffer_add(evbuf, "i0e", 3);
-    }
+    static_cast<Buffer*>(vout)->add(val->val.b ? "i1e"sv : "i0e"sv);
 }
 
-static void saveStringImpl(evbuffer* evbuf, std::string_view sv)
+void saveStringImpl(Buffer* tgt, std::string_view sv)
 {
     // `${sv.size()}:${sv}`
     auto prefix = std::array<char, 32>{};
-    auto out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
-    evbuffer_add(evbuf, std::data(prefix), out - std::data(prefix));
-    evbuffer_add(evbuf, std::data(sv), std::size(sv));
+    auto const* const out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
+    tgt->add(std::data(prefix), out - std::data(prefix));
+    tgt->add(sv);
 }
 
-static void saveStringFunc(tr_variant const* v, void* vevbuf)
+void saveStringFunc(tr_variant const* v, void* vout)
 {
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    saveStringImpl(evbuf, sv);
+    saveStringImpl(static_cast<Buffer*>(vout), sv);
 }
 
-static void saveRealFunc(tr_variant const* val, void* vevbuf)
+void saveRealFunc(tr_variant const* val, void* vout)
 {
     // the benc spec doesn't handle floats; save it as a string.
 
     auto buf = std::array<char, 64>{};
-    auto out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    saveStringImpl(evbuf, { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
+    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
+    saveStringImpl(static_cast<Buffer*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 
-static void saveDictBeginFunc(tr_variant const* /*val*/, void* vevbuf)
+void saveDictBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add(evbuf, "d", 1);
+    static_cast<Buffer*>(vbuf)->push_back('d');
 }
 
-static void saveListBeginFunc(tr_variant const* /*val*/, void* vevbuf)
+void saveListBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add(evbuf, "l", 1);
+    static_cast<Buffer*>(vbuf)->push_back('l');
 }
 
-static void saveContainerEndFunc(tr_variant const* /*val*/, void* vevbuf)
+void saveContainerEndFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add(evbuf, "e", 1);
+    static_cast<Buffer*>(vbuf)->push_back('e');
 }
 
-static struct VariantWalkFuncs const walk_funcs = {
+struct VariantWalkFuncs const walk_funcs = {
     saveIntFunc, //
     saveBoolFunc, //
     saveRealFunc, //
@@ -344,7 +341,14 @@ static struct VariantWalkFuncs const walk_funcs = {
     saveContainerEndFunc, //
 };
 
-void tr_variantToBufBenc(tr_variant const* top, evbuffer* buf)
+} // namespace to_string_helpers
+} // namespace
+
+std::string tr_variantToStrBenc(tr_variant const* top)
 {
-    tr_variantWalk(top, &walk_funcs, buf, true);
+    using namespace to_string_helpers;
+
+    auto buf = libtransmission::Buffer{};
+    tr_variantWalk(top, &walk_funcs, &buf, true);
+    return buf.toString();
 }

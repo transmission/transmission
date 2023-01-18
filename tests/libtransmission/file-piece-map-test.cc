@@ -1,5 +1,5 @@
 // This file Copyright (C) 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -7,10 +7,10 @@
 #include <numeric>
 #include <cstdint>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "block-info.h"
-#include "file-piece-map.h"
+#include <libtransmission/block-info.h>
+#include <libtransmission/file-piece-map.h>
 
 #include "gtest/gtest.h"
 
@@ -286,7 +286,7 @@ TEST_F(FilePieceMapTest, wanted)
     // set the first file as not wanted.
     // since this begins and ends on a piece boundary,
     // this shouldn't affect any other files' pieces
-    bool wanted = false;
+    bool const wanted = false;
     files_wanted.set(0, wanted);
     expected_files_wanted.set(0, wanted);
     expected_pieces_wanted.setSpan(0, 5, wanted);

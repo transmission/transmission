@@ -1,5 +1,5 @@
 // This file Copyright © 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -13,6 +13,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "transmission.h"
@@ -28,17 +29,17 @@ struct tr_error;
 struct tr_torrent_files
 {
 public:
-    [[nodiscard]] bool empty() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
     {
         return std::empty(files_);
     }
 
-    [[nodiscard]] size_t fileCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 size_t fileCount() const noexcept
     {
         return std::size(files_);
     }
 
-    [[nodiscard]] uint64_t fileSize(tr_file_index_t file_index) const
+    [[nodiscard]] TR_CONSTEXPR20 uint64_t fileSize(tr_file_index_t file_index) const
     {
         return files_.at(file_index).size_;
     }
@@ -48,7 +49,7 @@ public:
         return total_size_;
     }
 
-    [[nodiscard]] std::string const& path(tr_file_index_t file_index) const
+    [[nodiscard]] TR_CONSTEXPR20 std::string const& path(tr_file_index_t file_index) const
     {
         return files_.at(file_index).path_;
     }
@@ -79,7 +80,7 @@ public:
         files_.shrink_to_fit();
     }
 
-    void clear() noexcept
+    TR_CONSTEXPR20 void clear() noexcept
     {
         files_.clear();
         total_size_ = uint64_t{};
@@ -109,14 +110,14 @@ public:
     }
 
     bool move(
-        std::string_view old_top_in,
-        std::string_view top_in,
+        std::string_view old_parent_in,
+        std::string_view parent_in,
         double volatile* setme_progress,
-        std::string_view log_name = "",
+        std::string_view parent_name = "",
         tr_error** error = nullptr) const;
 
     using FileFunc = std::function<void(char const* filename)>;
-    void remove(std::string_view top_in, std::string_view tmpdir_prefix, FileFunc const& func) const;
+    void remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func) const;
 
     struct FoundFile : public tr_sys_path_info
     {

@@ -4,21 +4,16 @@
 
 #import "GroupsController.h"
 #import "NSImageAdditions.h"
+#import "NSKeyedUnarchiverAdditions.h"
 #import "NSMutableArrayAdditions.h"
 
-#define ICON_WIDTH 16.0
-#define BORDER_WIDTH 1.25
-#define ICON_WIDTH_SMALL 12.0
+static CGFloat const kIconWidth = 16.0;
+static CGFloat const kBorderWidth = 1.25;
+static CGFloat const kIconWidthSmall = 12.0;
 
 @interface GroupsController ()
 
 @property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
-
-- (void)saveGroups;
-
-- (NSImage*)imageForGroup:(NSMutableDictionary*)dict;
-
-- (BOOL)torrent:(Torrent*)torrent doesMatchRulesForGroupAtIndex:(NSInteger)index;
 
 @end
 
@@ -54,7 +49,7 @@ GroupsController* fGroupsInstance = nil;
         }
         else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
         {
-            _fGroups = [NSUnarchiver unarchiveObjectWithData:data];
+            _fGroups = [NSKeyedUnarchiver deprecatedUnarchiveObjectWithData:data];
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Groups"];
             [self saveGroups];
         }
@@ -287,40 +282,17 @@ GroupsController* fGroupsInstance = nil;
 
 - (NSMenu*)groupMenuWithTarget:(id)target action:(SEL)action isSmall:(BOOL)small
 {
-    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Groups"];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@""];
 
-    NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"None", "Groups -> Menu") action:action
-                                           keyEquivalent:@""];
-    item.target = target;
-    item.tag = -1;
-
-    NSImage* icon = [self imageForGroupNone];
-    if (small)
-    {
-        icon = [icon copy];
-        icon.size = NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL);
-
-        item.image = icon;
-    }
-    else
-    {
-        item.image = icon;
-    }
-
-    [menu addItem:item];
-
-    for (NSMutableDictionary* dict in self.fGroups)
-    {
-        item = [[NSMenuItem alloc] initWithTitle:dict[@"Name"] action:action keyEquivalent:@""];
+    void (^addItemWithTitleTagIcon)(NSString*, NSInteger, NSImage*) = ^void(NSString* title, NSInteger tag, NSImage* icon) {
+        NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:action keyEquivalent:@""];
         item.target = target;
+        item.tag = tag;
 
-        item.tag = [dict[@"Index"] integerValue];
-
-        NSImage* icon = [self imageForGroup:dict];
         if (small)
         {
             icon = [icon copy];
-            icon.size = NSMakeSize(ICON_WIDTH_SMALL, ICON_WIDTH_SMALL);
+            icon.size = NSMakeSize(kIconWidthSmall, kIconWidthSmall);
 
             item.image = icon;
         }
@@ -330,6 +302,13 @@ GroupsController* fGroupsInstance = nil;
         }
 
         [menu addItem:item];
+    };
+
+    addItemWithTitleTagIcon(NSLocalizedString(@"None", "Groups -> Menu"), -1, [self imageForGroupNone]);
+
+    for (NSMutableDictionary* dict in self.fGroups)
+    {
+        addItemWithTitleTagIcon(dict[@"Name"], [dict[@"Index"] integerValue], [self imageForGroup:dict]);
     }
 
     return menu;
@@ -361,7 +340,9 @@ GroupsController* fGroupsInstance = nil;
         [groups addObject:tempDict];
     }
 
-    [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups] forKey:@"GroupDicts"];
+    [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups requiringSecureCoding:YES
+                                                                                         error:nil]
+                                            forKey:@"GroupDicts"];
 }
 
 - (NSImage*)imageForGroupNone
@@ -372,11 +353,11 @@ GroupsController* fGroupsInstance = nil;
         return icon;
     }
 
-    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+    icon = [NSImage imageWithSize:NSMakeSize(kIconWidth, kIconWidth) flipped:NO drawingHandler:^BOOL(NSRect rect) {
         //shape
-        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
+        rect = NSInsetRect(rect, kBorderWidth / 2, kBorderWidth / 2);
         NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
-        bp.lineWidth = BORDER_WIDTH;
+        bp.lineWidth = kBorderWidth;
 
         //border
         // code reference for dashed style

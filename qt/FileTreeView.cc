@@ -118,7 +118,7 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
         }
 
         QString const header_text = model_->headerData(column, Qt::Horizontal).toString();
-        int header_width = Utils::measureHeaderItem(this->header(), header_text);
+        int const header_width = Utils::measureHeaderItem(this->header(), header_text);
 
         int const width = std::max(min_width, std::max(item_width, header_width));
         setColumnWidth(column, width);
@@ -156,9 +156,8 @@ void FileTreeView::keyPressEvent(QKeyEvent* event)
 
 void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    auto const index = currentIndex();
-
-    if (!index.isValid() || index.column() == FileTreeModel::COL_WANTED || index.column() == FileTreeModel::COL_PRIORITY)
+    if (auto const index = currentIndex();
+        !index.isValid() || index.column() == FileTreeModel::COL_WANTED || index.column() == FileTreeModel::COL_PRIORITY)
     {
         return;
     }
@@ -173,9 +172,7 @@ void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 
 void FileTreeView::contextMenuEvent(QContextMenuEvent* event)
 {
-    QModelIndex const root_index = model_->index(0, 0);
-
-    if (!root_index.isValid())
+    if (auto const root_index = model_->index(0, 0); !root_index.isValid())
     {
         return;
     }
@@ -371,7 +368,7 @@ void FileTreeView::initContextMenu()
     context_menu_->addSeparator();
 
     open_action_ = context_menu_->addAction(tr("Open"), this, SLOT(openSelectedItem()));
-    rename_action_ = context_menu_->addAction(tr("Rename..."), this, SLOT(renameSelectedItem()));
+    rename_action_ = context_menu_->addAction(tr("Rename…"), this, SLOT(renameSelectedItem()));
 
     connect(context_menu_, &QMenu::aboutToShow, this, &FileTreeView::refreshContextMenuActionsSensitivity);
 }

@@ -4,15 +4,13 @@
 
 #import <Foundation/Foundation.h>
 
-#include <libtransmission/transmission.h>
-
 @class PrefsController;
 
 @interface BlocklistDownloaderViewController : NSObject
 
 + (void)downloadWithPrefsController:(PrefsController*)prefsController;
 
-- (void)cancelDownload:(id)sender;
+- (IBAction)cancelDownload:(id)sender;
 
 - (void)setStatusStarting;
 - (void)setStatusProgressForCurrentSize:(NSUInteger)currentSize expectedSize:(long long)expectedSize;

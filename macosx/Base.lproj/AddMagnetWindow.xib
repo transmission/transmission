@@ -8,18 +8,10 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="AddMagnetWindowController">
             <connections>
-                <outlet property="fAddButton" destination="19" id="111"/>
-                <outlet property="fCancelButton" destination="21" id="110"/>
-                <outlet property="fChangeDestinationButton" destination="9" id="104"/>
-                <outlet property="fDownloadToBox" destination="103" id="105"/>
-                <outlet property="fDownloadToLabel" destination="10" id="106"/>
-                <outlet property="fGroupLabel" destination="40" id="107"/>
                 <outlet property="fGroupPopUp" destination="33" id="39"/>
                 <outlet property="fLocationField" destination="12" id="25"/>
                 <outlet property="fLocationImageView" destination="11" id="28"/>
-                <outlet property="fMagnetLinkLabel" destination="100" id="108"/>
                 <outlet property="fNameField" destination="5" id="23"/>
-                <outlet property="fPriorityLabel" destination="84" id="109"/>
                 <outlet property="fPriorityPopUp" destination="85" id="99"/>
                 <outlet property="fStartCheck" destination="17" id="26"/>
                 <outlet property="window" destination="1" id="29"/>
@@ -27,11 +19,11 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" frameAutosaveName="AddMagnetWindow" animationBehavior="default" tabbingMode="disallowed" id="1" userLabel="Window">
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" frameAutosaveName="AddMagnetWindow" animationBehavior="default" tabbingMode="disallowed" id="1" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="173" y="705" width="414" height="232"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1470" height="919"/>
             <view key="contentView" verticalHuggingPriority="750" misplaced="YES" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="414" height="232"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -49,7 +41,7 @@
                         <constraints>
                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="370" id="5E7-V5-l02"/>
                         </constraints>
-                        <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="File Name" id="6">
+                        <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" id="6">
                             <font key="font" metaFont="system" size="18"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -96,18 +88,18 @@ Gw
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <box borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="102">
+                    <box borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="102">
                         <rect key="frame" x="17" y="55" width="380" height="100"/>
                         <view key="contentView" id="xWJ-qu-F1m">
-                            <rect key="frame" x="3" y="3" width="374" height="94"/>
+                            <rect key="frame" x="4" y="5" width="372" height="92"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="33">
-                                    <rect key="frame" x="65" y="32" width="99" height="25"/>
+                                    <rect key="frame" x="64" y="30" width="99" height="25"/>
                                     <popUpButtonCell key="cell" type="push" title="None" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="2zq-5y-smI" id="34" customClass="GroupPopUpButtonCell">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="menu"/>
-                                        <menu key="menu" title="OtherViews" id="35">
+                                        <menu key="menu" id="35">
                                             <items>
                                                 <menuItem title="None" state="on" image="circle.dashed" catalog="system" id="2zq-5y-smI">
                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -117,7 +109,7 @@ Gw
                                     </popUpButtonCell>
                                 </popUpButton>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="10">
-                                    <rect key="frame" x="10" y="67" width="84" height="16"/>
+                                    <rect key="frame" x="9" y="65" width="84" height="16"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Download to:" id="15">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -125,7 +117,7 @@ Gw
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="84">
-                                    <rect key="frame" x="10" y="13" width="52" height="16"/>
+                                    <rect key="frame" x="9" y="11" width="52" height="16"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Priority:" id="91">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -133,11 +125,11 @@ Gw
                                     </textFieldCell>
                                 </textField>
                                 <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="85">
-                                    <rect key="frame" x="65" y="6" width="99" height="25"/>
+                                    <rect key="frame" x="64" y="4" width="99" height="25"/>
                                     <popUpButtonCell key="cell" type="push" title="High" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="90" id="86" customClass="PriorityPopUpButtonCell">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="menu"/>
-                                        <menu key="menu" title="OtherViews" id="87">
+                                        <menu key="menu" id="87">
                                             <items>
                                                 <menuItem title="High" state="on" image="PriorityHighTemplate" id="90">
                                                     <modifierMask key="keyEquivalentModifierMask"/>
@@ -156,7 +148,7 @@ Gw
                                     </connections>
                                 </popUpButton>
                                 <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="40">
-                                    <rect key="frame" x="10" y="39" width="52" height="16"/>
+                                    <rect key="frame" x="9" y="37" width="52" height="16"/>
                                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Group:" id="41">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -164,24 +156,24 @@ Gw
                                     </textFieldCell>
                                 </textField>
                                 <box horizontalHuggingPriority="249" borderType="line" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="103">
-                                    <rect key="frame" x="97" y="58" width="194" height="30"/>
+                                    <rect key="frame" x="96" y="56" width="194" height="30"/>
                                     <view key="contentView" id="29A-0C-qoo">
-                                        <rect key="frame" x="3" y="3" width="188" height="24"/>
+                                        <rect key="frame" x="4" y="5" width="186" height="22"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="12">
-                                                <rect key="frame" x="28" y="6" width="154" height="14"/>
+                                                <rect key="frame" x="27" y="4" width="154" height="14"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="150" id="DBq-4X-8Uk"/>
                                                 </constraints>
-                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="File" id="13">
+                                                <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" id="13">
                                                     <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
                                             <imageView translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                                                <rect key="frame" x="8" y="5" width="16" height="16"/>
+                                                <rect key="frame" x="7" y="3" width="16" height="16"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="16" id="46x-pe-IRn"/>
                                                     <constraint firstAttribute="width" constant="16" id="xF7-UN-BfS"/>
@@ -202,7 +194,7 @@ Gw
                                     </constraints>
                                 </box>
                                 <button horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9">
-                                    <rect key="frame" x="290" y="58" width="78" height="27"/>
+                                    <rect key="frame" x="289" y="57" width="78" height="27"/>
                                     <buttonCell key="cell" type="push" title="Change…" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="16">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>

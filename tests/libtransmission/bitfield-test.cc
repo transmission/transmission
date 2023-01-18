@@ -1,5 +1,5 @@
 // This file Copyright (C) 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,10 +8,9 @@
 #include <limits>
 #include <vector>
 
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "bitfield.h"
-#include "utils.h" /* tr_free */
+#include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/bitfield.h>
 
 #include "gtest/gtest.h"
 
@@ -21,21 +20,21 @@ TEST(Bitfield, count)
 
     for (auto i = 0; i < IterCount; ++i)
     {
-        int const bit_count = 100 + tr_rand_int_weak(1000);
+        auto const bit_count = 100U + tr_rand_int(1000U);
 
         // generate a random bitfield
         tr_bitfield bf(bit_count);
 
-        for (int j = 0, n = tr_rand_int_weak(bit_count); j < n; ++j)
+        for (size_t j = 0, n = tr_rand_int(bit_count); j < n; ++j)
         {
-            bf.set(tr_rand_int_weak(bit_count));
+            bf.set(tr_rand_int(bit_count));
         }
 
-        int begin = tr_rand_int_weak(bit_count);
-        int end;
+        int begin = tr_rand_int(bit_count);
+        int end = 0;
         do
         {
-            end = tr_rand_int_weak(bit_count);
+            end = tr_rand_int(bit_count);
         } while (end == begin);
 
         // ensure end <= begin
@@ -137,7 +136,7 @@ TEST(Bitfield, setRaw)
 
     // check that the spare bits t the end are zero
     bf = tr_bitfield{ 1 };
-    uint8_t by = std::numeric_limits<uint8_t>::max();
+    uint8_t const by = std::numeric_limits<uint8_t>::max();
     bf.setRaw(&by, 1);
     EXPECT_TRUE(bf.hasAll());
     EXPECT_FALSE(bf.hasNone());
@@ -149,7 +148,7 @@ TEST(Bitfield, setRaw)
 
 TEST(Bitfield, bitfields)
 {
-    unsigned int bitcount = 500;
+    unsigned int const bitcount = 500;
     tr_bitfield field(bitcount);
 
     // test tr_bitfield::set()
@@ -319,4 +318,130 @@ TEST(Bitfield, hasAllNone)
         EXPECT_TRUE(field.hasAll());
         EXPECT_TRUE(!field.hasNone());
     }
+}
+
+TEST(Bitfield, percent)
+{
+    auto field = tr_bitfield{ 100 };
+    field.setHasAll();
+    EXPECT_NEAR(1.0F, field.percent(), 0.01);
+
+    field.setHasNone();
+    EXPECT_NEAR(0.0F, field.percent(), 0.01);
+
+    field.setSpan(0, std::size(field) / 2U);
+    EXPECT_NEAR(0.5F, field.percent(), 0.01);
+
+    field.setHasNone();
+    field.setSpan(0, std::size(field) / 4U);
+    EXPECT_NEAR(0.25F, field.percent(), 0.01);
+}
+
+TEST(Bitfield, bitwiseOr)
+{
+    auto a = tr_bitfield{ 100 };
+    auto b = tr_bitfield{ 100 };
+
+    a.setHasAll();
+    b.setHasNone();
+    a |= b;
+    EXPECT_TRUE(a.hasAll());
+
+    a.setHasNone();
+    b.setHasAll();
+    a |= b;
+    EXPECT_TRUE(a.hasAll());
+
+    a.setHasNone();
+    b.setHasNone();
+    a |= b;
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasNone();
+    b.setHasNone();
+    a.setSpan(0, std::size(a) / 2U);
+    b.setSpan(std::size(a) / 2U, std::size(a));
+    EXPECT_EQ(0.5, a.percent());
+    EXPECT_EQ(0.5, b.percent());
+    a |= b;
+    EXPECT_EQ(1.0, a.percent());
+    EXPECT_TRUE(a.hasAll());
+
+    a.setHasNone();
+    b.setHasNone();
+    for (size_t i = 0; i < std::size(a); ++i)
+    {
+        if ((i % 2U) != 0U)
+        {
+            a.set(i);
+        }
+        else
+        {
+            b.set(i);
+        }
+    }
+    EXPECT_NEAR(0.5F, a.percent(), 0.01);
+    EXPECT_NEAR(0.5F, b.percent(), 0.01);
+    a |= b;
+    EXPECT_TRUE(a.hasAll());
+}
+
+TEST(Bitfield, bitwiseAnd)
+{
+    auto a = tr_bitfield{ 100 };
+    auto b = tr_bitfield{ 100 };
+
+    a.setHasAll();
+    b.setHasNone();
+    a &= b;
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasNone();
+    b.setHasAll();
+    a &= b;
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasAll();
+    b.setHasAll();
+    a &= b;
+    EXPECT_TRUE(a.hasAll());
+
+    a.setHasNone();
+    b.setHasNone();
+    a.setSpan(0, std::size(a) / 2U);
+    b.setSpan(std::size(a) / 2U, std::size(a));
+    EXPECT_EQ(0.5, a.percent());
+    EXPECT_EQ(0.5, b.percent());
+    a &= b;
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasNone();
+    b.setHasNone();
+    for (size_t i = 0; i < std::size(a); ++i)
+    {
+        if ((i % 2U) != 0U)
+        {
+            a.set(i);
+        }
+        else
+        {
+            b.set(i);
+        }
+    }
+    a &= b;
+    EXPECT_TRUE(a.hasNone());
+
+    a.setHasNone();
+    a.setSpan(0U, std::size(a) / 10U);
+    b.setHasNone();
+    b.setSpan(0U, std::size(a) / 20U);
+    a &= b;
+    EXPECT_NEAR(0.05F, a.percent(), 0.01);
+
+    a.setHasNone();
+    a.setSpan(0U, std::size(a) / 10U);
+    b.setHasNone();
+    b.setSpan(0U, std::size(a) / 20U);
+    b &= a;
+    EXPECT_NEAR(0.1F, a.percent(), 0.01);
 }

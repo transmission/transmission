@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -40,6 +40,8 @@ enum
     TR_KEY_alt_speed_time_end, /* rpc, settings */
     TR_KEY_alt_speed_up, /* rpc, settings */
     TR_KEY_announce, /* metainfo */
+    TR_KEY_announce_ip, /* metainfo, settings */
+    TR_KEY_announce_ip_enabled, /* metainfo, settings */
     TR_KEY_announce_list, /* metainfo */
     TR_KEY_announceState, /* rpc */
     TR_KEY_anti_brute_force_enabled, /* rpc */
@@ -278,6 +280,10 @@ enum
     TR_KEY_recent_download_dir_2,
     TR_KEY_recent_download_dir_3,
     TR_KEY_recent_download_dir_4,
+    TR_KEY_recent_relocate_dir_1,
+    TR_KEY_recent_relocate_dir_2,
+    TR_KEY_recent_relocate_dir_3,
+    TR_KEY_recent_relocate_dir_4,
     TR_KEY_recheckProgress,
     TR_KEY_remote_session_enabled,
     TR_KEY_remote_session_host,
@@ -358,11 +364,13 @@ enum
     TR_KEY_status,
     TR_KEY_statusbar_stats,
     TR_KEY_tag,
+    TR_KEY_tcp_enabled,
     TR_KEY_tier,
     TR_KEY_time_checked,
     TR_KEY_torrent_added,
     TR_KEY_torrent_added_notification_command,
     TR_KEY_torrent_added_notification_enabled,
+    TR_KEY_torrent_added_verify_mode,
     TR_KEY_torrent_complete_notification_command,
     TR_KEY_torrent_complete_notification_enabled,
     TR_KEY_torrent_complete_sound_command,
@@ -413,6 +421,7 @@ enum
     TR_KEY_watch_dir_enabled,
     TR_KEY_webseeds,
     TR_KEY_webseedsSendingToUs,
+    TR_KEY_yourip,
     TR_N_KEYS
 };
 
@@ -422,11 +431,6 @@ enum
  * @return true if the specified string exists as a quark
  */
 [[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view key);
-
-/**
- * Get the string that corresponds to the specified quark
- */
-[[nodiscard]] char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
 
 /**
  * Get the string view that corresponds to the specified quark.

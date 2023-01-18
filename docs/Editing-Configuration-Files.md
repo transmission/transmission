@@ -32,7 +32,13 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
 ```
 
 ### Options
+#### IP Announce
+
+ * **announce-ip:** String (default = "") Alternative IP address to announce to tracker.
+ * **announce-ip-enabled:** Boolean (default = false) When enabled **announce-ip** value is used instead of client's address visible to tracker for announcement requests.
+
 #### Bandwidth
+
  * **alt-speed-enabled:** Boolean (default = false, aka 'Turtle Mode')
    _Note: Clicking the "Turtle" in the GUI when the [scheduler](#Scheduling) is enabled, will only temporarily remove the scheduled limit until the next cycle._
  * **alt-speed-up:** Number (KB/s, default = 50)
@@ -44,10 +50,12 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **upload-slots-per-torrent:** Number (default = 14)
 
 #### [Blocklists](./Blocklists.md)
+
  * **blocklist-url:** String (default = https://www.example.com/blocklist)
  * **blocklist-enabled:** Boolean (default = false)
 
 #### [Files and Locations](./ConfigFiles.md)
+
  * **download-dir:** String (default = [default locations](Configuration-Files.md#Locations))
  * **incomplete-dir:** String (default = [default locations](Configuration-Files.md#Locations)) Directory to keep files in until torrent is complete.
  * **incomplete-dir-enabled:** Boolean (default = false) When enabled, new torrents will download the files to **incomplete-dir**. When complete, the files will be moved to **download-dir**.
@@ -61,14 +69,14 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
    _Note: When **watch-dir-enabled** is true, only the transmission-daemon, transmission-gtk, and transmission-qt applications will monitor **watch-dir** for new .torrent files and automatically load them._
 
 #### Misc
- * **cache-size-mb:** Size (default = 4), in megabytes, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. Default is 2 if configured with --enable-lightweight.
+ * **cache-size-mb:** Size (default = 4), in megabytes, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes.
  * **dht-enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](https://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
  * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
  * **lazy-bitfield-enabled:** Boolean (default = true) May help get around some ISP filtering. [Vuze specification](https://wiki.vuze.com/w/Commandline_options#Network_Options).
  * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
  * **message-level:** Number (0 = None, 1 = Error, 2 = Info, 3 = Debug, default = 2) Set verbosity of transmission messages.
  * **pex-enabled:** Boolean (default =  true) Enable [https://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
- * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html). This defaults to false if configured with --enable-lightweight.
+ * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html).
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
  * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-added-filename:** String (default = "") Path to script.
@@ -76,6 +84,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **script-torrent-done-filename:** String (default = "") Path to script.
  * **script-torrent-done-seeding-enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-done-seeding-filename:** String (default = "") Path to script.
+ * **torrent-added-verify-mode:** String ("fast", "full", default: "fast") Whether newly-added torrents' local data should be fully verified when added, or wait and verify them on-demand later. See [#2626](https://github.com/transmission/transmission/pull/2626) for more discussion.
  * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol)
 
 #### Peers

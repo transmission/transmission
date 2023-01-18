@@ -1,13 +1,18 @@
-cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 
 if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW)
 endif()
 
+# Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
+set(MACOS_SUPPORT_MINIMUM 10.13)
+
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
-if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13")
+if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_SUPPORT_MINIMUM}
+        CACHE STRING "Minimum macOS version to target for deployment"
+        FORCE)
 endif()
 
 project(transmission)
@@ -24,56 +29,111 @@ include(ExternalProject)
 include(GNUInstallDirs)
 include(TrMacros)
 
-        option(ENABLE_DAEMON        "Build daemon" ON)
-tr_auto_option(ENABLE_GTK           "Build GTK+ client" AUTO)
-tr_auto_option(ENABLE_QT            "Build Qt client" AUTO)
-tr_auto_option(ENABLE_MAC           "Build Mac client" AUTO)
-        option(ENABLE_WEB           "Build Web client" OFF)
-        option(ENABLE_UTILS         "Build utils (create, edit, show)" ON)
-        option(ENABLE_CLI           "Build command-line client" OFF)
-        option(ENABLE_TESTS         "Build unit tests" ON)
-        option(ENABLE_LIGHTWEIGHT   "Optimize libtransmission for low-resource systems: smaller cache size, prefer unencrypted peer connections, etc." OFF)
-        option(ENABLE_UTP           "Build µTP support" ON)
-        option(ENABLE_NLS           "Enable native language support" ON)
-        option(INSTALL_DOC          "Build/install documentation" ON)
-        option(INSTALL_LIB          "Install the library" OFF)
-tr_auto_option(RUN_CLANG_TIDY       "Run clang-tidy on the code" AUTO)
-tr_auto_option(USE_SYSTEM_EVENT2    "Use system event2 library" AUTO)
-tr_auto_option(USE_SYSTEM_DEFLATE   "Use system deflate library" AUTO)
-tr_auto_option(USE_SYSTEM_DHT       "Use system dht library" AUTO)
+set(CURL_MINIMUM 7.28.0)
+set(WOLFSSL_MINIMUM 3.4)
+set(DEFLATE_MINIMUM 1.10)
+set(EVENT2_MINIMUM 2.1.0)
+set(GIOMM_MINIMUM 2.26.0)
+set(GLIBMM_MINIMUM 2.60.0)
+set(GTKMM_MINIMUM 3.24.0)
+set(OPENSSL_MINIMUM 0.9.7)
+set(MBEDTLS_MINIMUM 1.3)
+set(PSL_MINIMUM 0.21.1)
+set(QT_MINIMUM 5.6)
+
+option(ENABLE_DAEMON "Build daemon" ON)
+tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
+tr_auto_option(ENABLE_QT "Build Qt client" AUTO)
+tr_auto_option(ENABLE_MAC "Build Mac client" AUTO)
+option(ENABLE_WEB "Build Web client" OFF)
+option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
+option(ENABLE_CLI "Build command-line client" OFF)
+option(ENABLE_TESTS "Build unit tests" ON)
+option(ENABLE_UTP "Build µTP support" ON)
+option(ENABLE_WERROR "Treat warnings as errors" OFF)
+option(ENABLE_NLS "Enable native language support" ON)
+option(INSTALL_DOC "Build/install documentation" ON)
+option(INSTALL_LIB "Install the library" OFF)
+tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" AUTO)
+tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
+tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
+tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
-tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
-tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
-tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
-tr_auto_option(USE_SYSTEM_PSL       "Use system psl library" AUTO)
-tr_list_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
-tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl ccrypto)
-tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
-tr_auto_option(WITH_KQUEUE          "Enable kqueue support (on systems that support it)" AUTO)
-tr_auto_option(WITH_LIBAPPINDICATOR "Use libappindicator in GTK+ client" AUTO)
-tr_auto_option(WITH_SYSTEMD         "Add support for systemd startup notification (on systems that support it)" AUTO)
+tr_auto_option(USE_SYSTEM_NATPMP "Use system natpmp library" AUTO)
+tr_auto_option(USE_SYSTEM_UTP "Use system utp library" AUTO)
+tr_auto_option(USE_SYSTEM_B64 "Use system b64 library" AUTO)
+tr_auto_option(USE_SYSTEM_PSL "Use system psl library" AUTO)
+tr_list_option(USE_GTK_VERSION "Use specific GTK version" AUTO 3 4)
+tr_list_option(USE_QT_VERSION "Use specific Qt version" AUTO 5 6)
+tr_list_option(WITH_CRYPTO "Use specified crypto library" AUTO ccrypto mbedtls openssl wolfssl)
+tr_auto_option(WITH_INOTIFY "Enable inotify support (on systems that support it)" AUTO)
+tr_auto_option(WITH_KQUEUE "Enable kqueue support (on systems that support it)" AUTO)
+tr_auto_option(WITH_APPINDICATOR "Use appindicator for system tray icon in GTK client (GTK+ 3 only)" AUTO)
+tr_auto_option(WITH_SYSTEMD "Add support for systemd startup notification (on systems that support it)" AUTO)
 
 set(TR_NAME ${PROJECT_NAME})
 
-# convention: -TR MAJOR MINOR MAINT STATUS - (each a single char)
-# STATUS: "X" for prerelease beta builds,
-#         "Z" for unsupported trunk builds,
-#         "0" for stable, supported releases
-# these should be the only two lines you need to change
-set(TR_USER_AGENT_PREFIX "3.00+")
-set(TR_PEER_ID_PREFIX "-TR300Z-")
+# major.minor.patch[-[beta.N.]dev]+commit_hash
+# dev builds come between releases, e.g. autobuilds from CI
 
-string(REGEX MATCH "^([0-9]+)\\.([0-9]+).*" TR_VERSION "${TR_USER_AGENT_PREFIX}")
-set(TR_VERSION_MAJOR "${CMAKE_MATCH_1}")
-set(TR_VERSION_MINOR "${CMAKE_MATCH_2}")
+# these should be the only five lines you need to change
+set(TR_VERSION_MAJOR "4")
+set(TR_VERSION_MINOR "0")
+set(TR_VERSION_PATCH "0")
+set(TR_VERSION_BETA_NUMBER "3") # empty string for not beta
+set(TR_VERSION_DEV TRUE)
 
-if(TR_PEER_ID_PREFIX MATCHES "X-$")
-    set(TR_BETA_RELEASE 1)
-elseif(TR_PEER_ID_PREFIX MATCHES "Z-$")
+# derived from above: release type
+if(TR_VERSION_DEV)
     set(TR_NIGHTLY_RELEASE 1)
+elseif(NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+    set(TR_BETA_RELEASE 1)
 else()
     set(TR_STABLE_RELEASE 1)
 endif()
+
+# derived from above: semver version string. https://semver.org/
+# '4.0.0-beta.1'
+# '4.0.0-beta.1.dev' (a dev release between beta 1 and 2)
+# '4.0.0-beta.2'
+# '4.0.0'
+set(TR_SEMVER "${TR_VERSION_MAJOR}.${TR_VERSION_MINOR}.${TR_VERSION_PATCH}")
+if(TR_VERSION_DEV OR NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+    string(APPEND TR_SEMVER "-")
+    if(NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+        string(APPEND TR_SEMVER "beta.${TR_VERSION_BETA_NUMBER}")
+    endif()
+    if(TR_VERSION_DEV AND NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+        string(APPEND TR_SEMVER ".")
+    endif()
+    if(TR_VERSION_DEV)
+        string(APPEND TR_SEMVER "dev")
+    endif()
+endif()
+set(TR_USER_AGENT_PREFIX "${TR_SEMVER}")
+
+# derived from above: peer-id prefix. https://www.bittorrent.org/beps/bep_0020.html
+# chars 4, 5, 6 are major, minor, patch in https://en.wikipedia.org/wiki/Base62
+# char 7 is '0' for a stable release, 'B' for a beta release, or 'Z' for a dev build
+# '-TR400B-' (4.0.0 Beta)
+# '-TR400Z-' (4.0.0 Dev)
+# '-TR4000-' (4.0.0)
+set(TR_PEER_ID_PREFIX "-TR")
+set(BASE62 "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
+string(SUBSTRING "${BASE62}" "${TR_VERSION_MAJOR}" 1 TMPSTR)
+string(APPEND TR_PEER_ID_PREFIX "${TMPSTR}")
+string(SUBSTRING "${BASE62}" "${TR_VERSION_MINOR}" 1 TMPSTR)
+string(APPEND TR_PEER_ID_PREFIX "${TMPSTR}")
+string(SUBSTRING "${BASE62}" "${TR_VERSION_PATCH}" 1 TMPSTR)
+string(APPEND TR_PEER_ID_PREFIX "${TMPSTR}")
+if(TR_VERSION_DEV)
+    string(APPEND TR_PEER_ID_PREFIX "Z")
+elseif(NOT "${TR_VERSION_BETA_NUMBER}" STREQUAL "")
+    string(APPEND TR_PEER_ID_PREFIX "B")
+else()
+    string(APPEND TR_PEER_ID_PREFIX "0")
+endif()
+string(APPEND TR_PEER_ID_PREFIX "-")
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
@@ -87,14 +147,10 @@ elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUM
     set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
 elseif(GIT_FOUND)
     execute_process(
-        COMMAND
-            ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
-        WORKING_DIRECTORY
-            ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE
-            TR_VCS_REVISION
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
+        COMMAND ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE TR_VCS_REVISION
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")
@@ -114,19 +170,6 @@ string(SUBSTRING "${TR_VCS_REVISION}" 0 10 TR_VCS_REVISION)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(PSL_MINIMUM             0.21.1)
-set(CURL_MINIMUM            7.28.0)
-set(CYASSL_MINIMUM          3.0)
-set(DEFLATE_MINIMUM         1.10)
-set(EVENT2_MINIMUM          2.1.0)
-set(GIO_MINIMUM             2.26.0)
-set(GLIB_MINIMUM            2.50.1)
-set(GTK_MINIMUM             3.24.0)
-set(LIBAPPINDICATOR_MINIMUM 0.4.90)
-set(OPENSSL_MINIMUM         0.9.7)
-set(POLARSSL_MINIMUM        1.3)
-set(QT_MINIMUM              5.6)
-
 if(WIN32)
     foreach(L C CXX)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWIN32")
@@ -136,8 +179,6 @@ if(WIN32)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DUNICODE -D_UNICODE")
         # Ignore various deprecation and security warnings (at least for now)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS")
-        # Increase maximum FD_SET size
-        set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DFD_SETSIZE=1024")
         if(MSVC)
             # Reduce noise (at least for now)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /wd4244 /wd4267")
@@ -149,10 +190,9 @@ if(WIN32)
     endforeach()
 endif()
 
-find_package(Fmt)
-add_definitions(-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0)
-include_directories(SYSTEM ${LIBFMT_INCLUDE_DIRS})
+set(CMAKE_FOLDER "third-party")
 
+find_package(Fmt)
 find_package(WideInteger)
 find_package(FastFloat)
 find_package(UtfCpp)
@@ -160,17 +200,18 @@ find_package(Threads)
 find_package(PkgConfig QUIET)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
-if(TARGET CURL::libcurl)
-    set(CURL_LIBRARIES CURL::libcurl)
-    set(CURL_INCLUDE_DIRS)
+if(NOT TARGET CURL::libcurl)
+    add_library(CURL::libcurl INTERFACE IMPORTED)
+    target_link_libraries(CURL::libcurl INTERFACE ${CURL_LIBRARIES})
+    target_include_directories(CURL::libcurl INTERFACE ${CURL_INCLUDE_DIRS})
 endif()
-
-find_package(ICONV)
 
 set(CRYPTO_PKG "")
 if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "ccrypto")
     tr_get_required_flag(WITH_CRYPTO CCRYPTO_IS_REQUIRED)
-    find_path(CCRYPTO_INCLUDE_DIR NAMES CommonCrypto/CommonCrypto.h ${CCRYPTO_IS_REQUIRED})
+    find_path(CCRYPTO_INCLUDE_DIR
+        NAMES CommonCrypto/CommonCrypto.h
+        ${CCRYPTO_IS_REQUIRED})
     mark_as_advanced(CCRYPTO_INCLUDE_DIR)
     tr_fixup_list_option(WITH_CRYPTO "ccrypto" CCRYPTO_INCLUDE_DIR "AUTO" CCRYPTO_IS_REQUIRED)
     if(WITH_CRYPTO STREQUAL "ccrypto")
@@ -189,26 +230,27 @@ if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "openssl")
         set(CRYPTO_LIBRARIES ${OPENSSL_LIBRARIES})
     endif()
 endif()
-if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "cyassl")
-    tr_get_required_flag(WITH_CRYPTO CYASSL_IS_REQUIRED)
-    find_package(CyaSSL ${CYASSL_MINIMUM} ${CYASSL_IS_REQUIRED})
-    tr_fixup_list_option(WITH_CRYPTO "cyassl" CYASSL_FOUND "AUTO" CYASSL_IS_REQUIRED)
-    if(WITH_CRYPTO STREQUAL "cyassl")
-        set(CRYPTO_PKG "cyassl")
-        set(CRYPTO_INCLUDE_DIRS ${CYASSL_INCLUDE_DIRS})
-        set(CRYPTO_LIBRARIES ${CYASSL_LIBRARIES})
+if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "wolfssl")
+    tr_get_required_flag(WITH_CRYPTO WOLFSSL_IS_REQUIRED)
+    find_package(WolfSSL ${WOLFSSL_MINIMUM} ${WOLFSSL_IS_REQUIRED})
+    tr_fixup_list_option(WITH_CRYPTO "wolfssl" WOLFSSL_FOUND "AUTO" WOLFSSL_IS_REQUIRED)
+    if(WITH_CRYPTO STREQUAL "wolfssl")
+        set(CRYPTO_PKG "wolfssl")
+        set(CRYPTO_INCLUDE_DIRS ${WOLFSSL_INCLUDE_DIRS})
+        set(CRYPTO_LIBRARIES ${WOLFSSL_LIBRARIES})
     endif()
 endif()
-if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "polarssl")
-    tr_get_required_flag(WITH_CRYPTO POLARSSL_IS_REQUIRED)
-    find_package(PolarSSL ${POLARSSL_MINIMUM} ${POLARSSL_IS_REQUIRED})
-    tr_fixup_list_option(WITH_CRYPTO "polarssl" POLARSSL_FOUND "AUTO" POLARSSL_IS_REQUIRED)
-    if(WITH_CRYPTO STREQUAL "polarssl")
-        set(CRYPTO_PKG "polarssl")
-        set(CRYPTO_INCLUDE_DIRS ${POLARSSL_INCLUDE_DIRS})
-        set(CRYPTO_LIBRARIES ${POLARSSL_LIBRARIES})
+if(WITH_CRYPTO STREQUAL "AUTO" OR WITH_CRYPTO STREQUAL "mbedtls")
+    tr_get_required_flag(WITH_CRYPTO MBEDTLS_IS_REQUIRED)
+    find_package(MbedTLS ${MBEDTLS_MINIMUM} ${MBEDTLS_IS_REQUIRED})
+    tr_fixup_list_option(WITH_CRYPTO "mbedtls" MBEDTLS_FOUND "AUTO" MBEDTLS_IS_REQUIRED)
+    if(WITH_CRYPTO STREQUAL "mbedtls")
+        set(CRYPTO_PKG "mbedtls")
+        set(CRYPTO_INCLUDE_DIRS ${MBEDTLS_INCLUDE_DIRS})
+        set(CRYPTO_LIBRARIES ${MBEDTLS_LIBRARIES})
     endif()
 endif()
+
 # We should have found the library by now
 if(CRYPTO_PKG STREQUAL "")
     if(WITH_CRYPTO STREQUAL "AUTO")
@@ -216,25 +258,74 @@ if(CRYPTO_PKG STREQUAL "")
     else()
         message(FATAL_ERROR "Requested crypto library '${WITH_CRYPTO}' is not supported.")
     endif()
+else()
+    add_library(transmission::crypto_impl INTERFACE IMPORTED)
+
+    target_include_directories(transmission::crypto_impl
+        INTERFACE
+            ${CRYPTO_INCLUDE_DIRS})
+
+    target_link_libraries(transmission::crypto_impl
+        INTERFACE
+            ${CRYPTO_LIBRARIES})
 endif()
 
 if(ENABLE_GTK)
     tr_get_required_flag(ENABLE_GTK GTK_IS_REQUIRED)
 
-    pkg_check_modules(GTK ${GTK_IS_REQUIRED}
-        gtkmm-3.0>=${GTK_MINIMUM}
-        glibmm-2.4>=${GLIB_MINIMUM}
-        giomm-2.4>=${GIO_MINIMUM})
+    if(USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 4)
+        pkg_check_modules(GTK4
+            gtkmm-4.0>=${GTKMM_MINIMUM}
+            glibmm-2.68>=${GLIBMM_MINIMUM}
+            giomm-2.68>=${GIOMM_MINIMUM})
+        set(GTK_VERSION 4)
+        set(GTK_FOUND ${GTK4_FOUND})
+    endif()
+
+    if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
+        pkg_check_modules(GTK3
+            gtkmm-3.0>=${GTKMM_MINIMUM}
+            glibmm-2.4>=${GLIBMM_MINIMUM}
+            giomm-2.4>=${GIOMM_MINIMUM})
+        set(GTK_VERSION 3)
+        set(GTK_FOUND ${GTK3_FOUND})
+    endif()
+
+    if(GTK_IS_REQUIRED AND NOT GTK_FOUND)
+        message(FATAL_ERROR "GTK is required but wasn't found")
+    endif()
 
     tr_fixup_auto_option(ENABLE_GTK GTK_FOUND GTK_IS_REQUIRED)
 
-    if(ENABLE_GTK AND WITH_LIBAPPINDICATOR)
-        tr_get_required_flag(WITH_LIBAPPINDICATOR LIBAPPINDICATOR_IS_REQUIRED)
-        pkg_check_modules(LIBAPPINDICATOR appindicator3-0.1>=${LIBAPPINDICATOR_MINIMUM})
-        tr_fixup_auto_option(WITH_LIBAPPINDICATOR LIBAPPINDICATOR_FOUND LIBAPPINDICATOR_IS_REQUIRED)
+    if(ENABLE_GTK AND WITH_APPINDICATOR AND GTK_VERSION EQUAL 3)
+        tr_get_required_flag(WITH_APPINDICATOR APPINDICATOR_IS_REQUIRED)
+        find_package(APPINDICATOR ${APPINDICATOR_IS_REQUIRED})
+        tr_fixup_auto_option(WITH_APPINDICATOR APPINDICATOR_FOUND APPINDICATOR_IS_REQUIRED)
+    else()
+        set(WITH_APPINDICATOR OFF)
     endif()
 else()
-    set(WITH_LIBAPPINDICATOR OFF)
+    set(WITH_APPINDICATOR OFF)
+endif()
+
+if(GTK_FOUND)
+    add_library(transmission::gtk_impl INTERFACE IMPORTED)
+
+    target_compile_options(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_CFLAGS_OTHER})
+
+    target_include_directories(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_INCLUDE_DIRS})
+
+    target_link_directories(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_LIBRARY_DIRS})
+
+    target_link_libraries(transmission::gtk_impl
+        INTERFACE
+            ${GTK${GTK_VERSION}_LIBRARIES})
 endif()
 
 if(ENABLE_QT)
@@ -248,8 +339,17 @@ if(ENABLE_QT)
     set(ENABLE_QT_COM_INTEROP OFF)
     set(ENABLE_QT_DBUS_INTEROP OFF)
 
-    set(QT_REQUIRED_MODULES Core Gui Widgets Network LinguistTools)
-    set(QT_OPTIONAL_MODULES DBus AxContainer AxServer)
+    set(QT_REQUIRED_MODULES
+        Core
+        Gui
+        Widgets
+        Network
+        Svg
+        LinguistTools)
+    set(QT_OPTIONAL_MODULES
+        DBus
+        AxContainer
+        AxServer)
     set(MISSING_QT_MODULE)
 
     set(Qt_NAMES Qt6 Qt5)
@@ -310,6 +410,14 @@ if(ENABLE_QT)
     tr_fixup_auto_option(ENABLE_QT QT_FOUND QT_IS_REQUIRED)
 endif()
 
+if(QT_FOUND)
+    add_library(transmission::qt_impl INTERFACE IMPORTED)
+
+    target_link_libraries(transmission::qt_impl
+        INTERFACE
+            ${QT_TARGETS})
+endif()
+
 if(ENABLE_MAC)
     tr_get_required_flag(ENABLE_MAC MAC_IS_REQUIRED)
 
@@ -327,12 +435,19 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-tr_add_external_auto_library(DEFLATE libdeflate deflate)
-if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION 1.10)
+if(WIN32 AND NOT MINGW)
+    set(DEFLATE_LIB_NAME deflatestatic)
+else()
+    set(DEFLATE_LIB_NAME deflate)
 endif()
+tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
+    TARGET deflate::deflate
+    CMAKE_ARGS
+        -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
+        -DLIBDEFLATE_BUILD_GZIP=OFF)
 
 tr_add_external_auto_library(EVENT2 libevent event
+    TARGET libevent::event
     CMAKE_ARGS
         -DEVENT__DISABLE_OPENSSL:BOOL=ON
         -DEVENT__DISABLE_BENCHMARK:BOOL=ON
@@ -341,45 +456,51 @@ tr_add_external_auto_library(EVENT2 libevent event
         -DEVENT__DISABLE_SAMPLES:BOOL=ON
         -DEVENT__LIBRARY_TYPE:STRING=STATIC)
 
-tr_add_external_auto_library(NATPMP libnatpmp natpmp)
+tr_add_external_auto_library(NATPMP libnatpmp natpmp
+    TARGET natpmp::natpmp)
 if(NOT USE_SYSTEM_NATPMP)
-    set(NATPMP_DEFINITIONS -DNATPMP_STATICLIB)
+    target_compile_definitions(natpmp::natpmp
+        INTERFACE
+            NATPMP_STATICLIB)
 endif()
 
 tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+    TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
         -DUPNPC_BUILD_TESTS=OFF)
-set(MINIUPNPC_DEFINITIONS -DSYSTEM_MINIUPNP)
 if(NOT USE_SYSTEM_MINIUPNPC)
-    list(APPEND MINIUPNPC_DEFINITIONS -DMINIUPNP_STATICLIB)
+    target_compile_definitions(miniupnpc::libminiupnpc
+        INTERFACE
+            MINIUPNP_STATICLIB)
+
     set(MINIUPNPC_VERSION 1.9)
     set(MINIUPNPC_API_VERSION 12)
 endif()
 
-tr_add_external_auto_library(DHT dht dht)
+target_compile_definitions(miniupnpc::libminiupnpc
+    INTERFACE
+        SYSTEM_MINIUPNP
+        $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
 
-tr_add_external_auto_library(PSL libpsl psl)
+add_subdirectory(third-party/jsonsl)
+add_subdirectory(third-party/wildmat)
+
+tr_add_external_auto_library(DHT dht dht
+    TARGET dht::dht)
+
+tr_add_external_auto_library(PSL libpsl psl
+    TARGET psl::psl)
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp
-        CMAKE_ARGS
-            -DLIBUTP_BUILD_PROGRAMS=OFF)
-
-    if(UTP_UPSTREAM_TARGET)
-        # Use C++ linker for anything that depends on static libutp
-        # TODO: switch to imported targets for all the dependencies
-        add_library(UTP::UTP STATIC IMPORTED)
-        set_property(TARGET UTP::UTP PROPERTY IMPORTED_LOCATION "${UTP_LIBRARIES}")
-        set_property(TARGET UTP::UTP PROPERTY IMPORTED_LINK_INTERFACE_LANGUAGES "CXX")
-        set(UTP_LIBRARIES UTP::UTP)
-    endif()
+        TARGET libutp::libutp
+        CMAKE_ARGS -DLIBUTP_BUILD_PROGRAMS=OFF)
 endif()
 
-tr_add_external_auto_library(B64 libb64 b64)
-
-add_subdirectory(third-party/arc4)
+tr_add_external_auto_library(B64 libb64 b64
+    TARGET libb64::libb64)
 
 if(WITH_INOTIFY)
     tr_get_required_flag(WITH_INOTIFY INOTIFY_IS_REQUIRED)
@@ -413,14 +534,14 @@ if(WITH_SYSTEMD)
     tr_fixup_auto_option(WITH_SYSTEMD SYSTEMD_FOUND SYSTEMD_IS_REQUIRED)
 endif()
 
-include_directories(${CMAKE_BINARY_DIR})
-
 if(WIN32)
     foreach(L C CXX)
         # Filter out needless definitions
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
     endforeach()
 endif()
+
+unset(CMAKE_FOLDER)
 
 ## Compiler standard version
 
@@ -438,8 +559,7 @@ include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
 if(MSVC)
-    set(WARNING_CANDIDATES
-        /W4)
+    set(WARNING_CANDIDATES /W4)
 
     foreach(FLAG ${WARNING_CANDIDATES})
         list(APPEND C_WARNING_FLAGS ${FLAG})
@@ -502,7 +622,7 @@ else()
         set(CACHE_ID "${CMAKE_C_COMPILER_ID}_C_HAS${FLAG_ID}")
         string(TOLOWER "${CACHE_ID}" CACHE_ID)
         check_c_compiler_flag(${FLAG} ${CACHE_ID})
-        if (${CACHE_ID})
+        if(${CACHE_ID})
             # Make sure the next loop only adds flags that are relevant for a particular language
             set(CMAKE_REQUIRED_FLAGS ${FLAG})
             break()
@@ -516,7 +636,7 @@ else()
         set(CACHE_ID "${CMAKE_C_COMPILER_ID}_C_HAS${FLAG_ID}")
         string(TOLOWER "${CACHE_ID}" CACHE_ID)
         check_c_compiler_flag(${FLAG} ${CACHE_ID})
-        if (${CACHE_ID})
+        if(${CACHE_ID})
             list(APPEND C_WARNING_FLAGS ${FLAG})
         endif()
 
@@ -524,7 +644,7 @@ else()
         set(CACHE_ID "${CMAKE_CXX_COMPILER_ID}_CXX_HAS${FLAG_ID}")
         string(TOLOWER "${CACHE_ID}" CACHE_ID)
         check_cxx_compiler_flag(${FLAG} ${CACHE_ID})
-        if (${CACHE_ID})
+        if(${CACHE_ID})
             list(APPEND CXX_WARNING_FLAGS ${FLAG})
         endif()
 
@@ -535,79 +655,15 @@ else()
     unset(CMAKE_REQUIRED_FLAGS)
 endif()
 
+string(REPLACE ";" "$<SEMICOLON>" C_WARNING_FLAGS_GENEX "${C_WARNING_FLAGS}")
+string(REPLACE ";" "$<SEMICOLON>" CXX_WARNING_FLAGS_GENEX "${CXX_WARNING_FLAGS}")
+add_compile_options(
+    $<$<COMPILE_LANGUAGE:C>:${C_WARNING_FLAGS_GENEX}>
+    $<$<COMPILE_LANGUAGE:CXX>:${CXX_WARNING_FLAGS_GENEX}>)
+
 ###
 
 include(LargeFileSupport)
-
-set(NEEDED_HEADERS
-    sys/statvfs.h
-    xfs/xfs.h
-    xlocale.h)
-
-if(ENABLE_NLS)
-    check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
-    if(HAVE_LIBINTL)
-        set(LIBINTL_LIBRARY intl)
-        # check_function_exists() below may need this
-        # when looking for gettext() and ngettext()
-        list(APPEND CMAKE_REQUIRED_LIBRARIES intl)
-    endif()
-
-    list(APPEND NEEDED_HEADERS libintl.h)
-endif()
-
-foreach(H ${NEEDED_HEADERS})
-    tr_make_id("${H}" H_ID)
-    check_include_file(${H} HAVE_${H_ID})
-    if(HAVE_${H_ID})
-        add_definitions(-DHAVE_${H_ID})
-    endif()
-endforeach()
-
-set(NEEDED_FUNCTIONS
-    _configthreadlocale
-    canonicalize_file_name
-    copy_file_range
-    copyfile
-    daemon
-    fallocate64
-    flock
-    getmntent
-    gettext
-    htonll
-    mkdtemp
-    ngettext
-    ntohll
-    posix_fadvise
-    posix_fallocate
-    pread
-    pwrite
-    sendfile64
-    statvfs
-    strlcpy
-    syslog)
-
-foreach(F ${NEEDED_FUNCTIONS})
-    tr_make_id("${F}" F_ID)
-    check_function_exists(${F} HAVE_${F_ID})
-    if(HAVE_${F_ID})
-        add_definitions(-DHAVE_${F_ID})
-    endif()
-endforeach()
-
-if(ICONV_FOUND)
-    add_definitions(-DHAVE_ICONV)
-    if(ICONV_SECOND_ARGUMENT_IS_CONST)
-        add_definitions(-DICONV_SECOND_ARGUMENT_IS_CONST)
-    endif()
-endif()
-
-# if(MINGW)
-#     check_function_exists(__mingw_printf HAVE_MINGW_PRINTF)
-#     if(HAVE_MINGW_PRINTF)
-#         add_definitions(-D__USE_MINGW_ANSI_STDIO=1 -D__STDC_FORMAT_MACROS=1)
-#     endif()
-# endif()
 
 check_library_exists(m sqrt "" HAVE_LIBM)
 if(HAVE_LIBM)
@@ -630,7 +686,7 @@ else()
 endif()
 
 if(RUN_CLANG_TIDY STREQUAL "AUTO")
-    if (DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
+    if(DEFINED ENV{LGTM_SRC} OR DEFINED ENV{APPVEYOR}) # skip clang-tidy on LGTM/appveyor
         set(RUN_CLANG_TIDY OFF)
     else()
         set(RUN_CLANG_TIDY ON)
@@ -640,7 +696,7 @@ endif()
 if(RUN_CLANG_TIDY)
     message(STATUS "Looking for clang-tidy")
     find_program(CLANG_TIDY clang-tidy)
-    if (CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
+    if(CLANG_TIDY STREQUAL "CLANG_TIDY-NOTFOUND")
         message(STATUS "Looking for clang-tidy - not found")
     else()
         message(STATUS "Looking for clang-tidy - found")
@@ -649,13 +705,14 @@ if(RUN_CLANG_TIDY)
 endif()
 
 if(ENABLE_TESTS)
-    include(CTest)
     enable_testing()
     add_subdirectory(tests)
 endif()
 
 function(tr_install_web DST_DIR)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html DESTINATION ${DST_DIR})
+    install(
+        DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html
+        DESTINATION ${DST_DIR})
 endfunction()
 
 add_subdirectory(libtransmission)
@@ -682,8 +739,17 @@ if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
 endif()
 
 if(INSTALL_DOC)
-    install(FILES AUTHORS COPYING README.md docs/rpc-spec.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
-    install(DIRECTORY news DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(
+        FILES
+            AUTHORS
+            COPYING
+            README.md
+            docs/rpc-spec.md
+            extras/send-email-when-torrent-done.sh
+        DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(
+        DIRECTORY news
+        DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl")
@@ -691,39 +757,39 @@ if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUA
 endif()
 
 set(CPACK_SOURCE_GENERATOR TXZ)
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_USER_AGENT_PREFIX}")
-if(NOT TR_STABLE_RELEASE)
-    string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "-r${TR_VCS_REVISION}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${TR_NAME}-${TR_SEMVER}")
+if(NOT TR_STABLE_RELEASE AND NOT "${TR_VCS_REVISION}" STREQUAL "")
+    # https://semver.org/#spec-item-11
+    # Build metadata MAY be denoted by appending a plus sign and a series of dot
+    # separated identifiers immediately following the patch or pre-release version.
+    # Identifiers MUST comprise only ASCII alphanumerics and hyphens [0-9A-Za-z-].
+    # Identifiers MUST NOT be empty.
+    string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "+r${TR_VCS_REVISION}")
 endif()
 list(APPEND CPACK_SOURCE_IGNORE_FILES
     "${CMAKE_BINARY_DIR}"
     "[.]git"
-    "node_modules"
-)
+    "node_modules")
 
 ## Code Formatting
 
 if(GIT_FOUND)
-    execute_process(COMMAND
-        "${GIT_EXECUTABLE}" rev-parse --show-toplevel
+    execute_process(
+        COMMAND "${GIT_EXECUTABLE}" rev-parse --show-toplevel
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
         OUTPUT_VARIABLE TR_GIT_ROOT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
-        configure_file(
-            "${CMAKE_SOURCE_DIR}/extras/pre-commit"
-            "${TR_GIT_ROOT}/.git/hooks/pre-commit"
-            COPYONLY
-        )
+        configure_file("${CMAKE_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
         add_custom_target(check-format
             COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh" --check
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        )
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
         add_custom_target(format
             COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        )
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+        set_property(
+            TARGET check-format format
+            PROPERTY FOLDER "utility")
     endif()
     unset(TR_GIT_ROOT)
 endif()

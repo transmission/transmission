@@ -162,9 +162,6 @@
    Groups -> Button */
 "All Groups" = "Todos los grupos";
 
-/* Create torrent -> failed -> warning */
-"An unknown error has occurred." = "Ha ocurrido un error desconocido";
-
 /* Tracker last announce */
 "Announce error" = "Error en el anuncio";
 
@@ -262,12 +259,6 @@
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "No se puede hacer una copia de \"%@\"";
 
-/* Create torrent -> failed -> warning */
-"Could not read \"%s\": %s." = "No se ha podido leer \"%1$s\": %2$s.";
-
-/* Create torrent -> failed -> warning */
-"Could not write \"%s\": %s." = "No se ha podido escribir \"%1$s\": %2$s.";
-
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */
 "Create" = "Crear";
@@ -304,6 +295,7 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string */
 "DL" = "↓";
 
@@ -356,10 +348,10 @@
 "Downloading blocklist" = "Descargando lista de bloqueo";
 
 /* Torrent -> status string */
-"Downloading from %lu of %lu peers" = "Descargando de %1$lu de %2$lu clientes";
+"Downloading from %lu of %lu peers" = "Descargando de %1$lu de %2$lu pares";
 
 /* Torrent -> status string */
-"Downloading from %lu of 1 peer" = "Descargando de %lu de 1 peer";
+"Downloading from %lu of 1 peer" = "Descargando de %lu de 1 par";
 
 /* inspector -> peer table -> header tool tip */
 "Downloading From Peer" = "Descargando del cliente";
@@ -408,9 +400,6 @@
 
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "De: tracker";
-
-/* File size - gigabytes */
-"GB" = "GB";
 
 /* Transfer speed (gigabytes per second) */
 "GB/s" = "GB/s";
@@ -486,9 +475,6 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Parece que el archivo \"%1$@\" de %2$@ no es un torrent.";
 
-/* File size - kilobytes */
-"KB" = "KB";
-
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/s";
 
@@ -525,9 +511,6 @@
 /* Inspector -> selected torrents
    Torrent -> progress string */
 "Magnetized transfer" = "Tarea magnetizada";
-
-/* File size - megabytes */
-"MB" = "MB";
 
 /* Transfer speed (megabytes per second) */
 "MB/s" = "MB/s";
@@ -702,6 +685,9 @@
 /* Preferences -> Network -> port status */
 "Port is open" = "El puerto está abierto";
 
+/* No comment provided by engineer. */
+"PrefWindowSize" = "640";
+
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Prioridad";
@@ -745,6 +731,7 @@
 
 /* Stats window -> label
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string
    Torrent table -> group row -> tooltip */
 "Ratio" = "Ratio";
@@ -923,9 +910,6 @@
 /* Donation beg -> title */
 "Support open-source indie software" = "Apoya al software indie de código abierto";
 
-/* File size - terabytes */
-"TB" = "TB";
-
 /* Transfer speed (terabytes per second) */
 "TB/s" = "TB/s";
 
@@ -1045,8 +1029,7 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Descarga total";
 
-/* Message window -> level
-   Message window -> level string */
+/* Message window -> level */
 "Trace" = "Traza";
 
 /* Filter Bar -> filter menu */
@@ -1085,6 +1068,7 @@
 
 /* inspector -> peer table -> header
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string */
 "UL" = "↑";
 
@@ -1149,5 +1133,3 @@
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Quieres descargar, pero el cliente no quiere enviar (interesado y bloqueado)";
 
-/* Preferences window size*/
-"PrefWindowSize" = "628";

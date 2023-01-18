@@ -156,6 +156,7 @@ export class OverflowMenu extends EventTarget {
     // sort mode
 
     let div = document.createElement('div');
+    div.classList.add('table-row');
     options.append(div);
 
     let label = document.createElement('label');
@@ -194,6 +195,7 @@ export class OverflowMenu extends EventTarget {
     // sort direction
 
     div = document.createElement('div');
+    div.classList.add('table-row');
     options.append(div);
 
     let check = document.createElement('input');
@@ -218,6 +220,7 @@ export class OverflowMenu extends EventTarget {
     // compact
 
     div = document.createElement('div');
+    div.classList.add('table-row');
     options.append(div);
 
     const action = 'toggle-compact-rows';
@@ -245,6 +248,7 @@ export class OverflowMenu extends EventTarget {
     // fullscreen
 
     div = document.createElement('div');
+    div.classList.add('table-row');
     options.append(div);
 
     check = document.createElement('input');
@@ -446,26 +450,32 @@ export class OverflowMenu extends EventTarget {
     section = make_section('links', 'Links');
     root.append(section);
 
-    options = document.createElement('div');
+    options = document.createElement('ul');
     section.append(options);
 
     let e = document.createElement('a');
     e.href = 'https://transmissionbt.com/';
     e.tabindex = '0';
     e.textContent = 'Homepage';
-    options.append(e);
+    let li = document.createElement('li');
+    li.append(e);
+    options.append(li);
 
     e = document.createElement('a');
     e.href = 'https://transmissionbt.com/donate/';
     e.tabindex = '0';
     e.textContent = 'Tip Jar';
-    options.append(e);
+    li = document.createElement('li');
+    li.append(e);
+    options.append(li);
 
     e = document.createElement('a');
     e.href = 'https://github.com/transmission/transmission/';
     e.tabindex = '0';
     e.textContent = 'Source Code';
-    options.append(e);
+    li = document.createElement('li');
+    li.append(e);
+    options.append(li);
 
     this._updateElement = this._updateElement.bind(this);
 

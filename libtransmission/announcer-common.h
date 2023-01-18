@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -10,123 +10,50 @@
 #endif
 
 #include <array>
+#include <chrono>
 #include <cstdint> // uint64_t
+#include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "transmission.h"
 
+#include "announcer.h"
 #include "interned-string.h"
 #include "net.h"
 #include "peer-mgr.h" // tr_pex
-#include "web-utils.h"
 
-/***
-****  SCRAPE
-***/
+struct tr_url_parsed_t;
 
-/* pick a number small enough for common tracker software:
- *  - ocelot has no upper bound
- *  - opentracker has an upper bound of 64
- *  - udp protocol has an upper bound of 74
- *  - xbtt has no upper bound
- *
- * This is only an upper bound: if the tracker complains about
- * length, announcer will incrementally lower the batch size.
- */
-auto inline constexpr TR_MULTISCRAPE_MAX = 60;
+void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& req, tr_scrape_response_func on_response);
 
-struct tr_scrape_request
+void tr_tracker_http_announce(tr_session const* session, tr_announce_request const& req, tr_announce_response_func on_response);
+
+void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, std::string_view log_name);
+
+void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, std::string_view log_name);
+
+tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed);
+
+[[nodiscard]] constexpr std::string_view tr_announce_event_get_string(tr_announce_event e)
 {
-    /* the scrape URL */
-    tr_interned_string scrape_url;
+    switch (e)
+    {
+    case TR_ANNOUNCE_EVENT_COMPLETED:
+        return "completed";
 
-    /* the name to use when deep logging is enabled */
-    char log_name[128];
+    case TR_ANNOUNCE_EVENT_STARTED:
+        return "started";
 
-    /* info hashes of the torrents to scrape */
-    std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;
+    case TR_ANNOUNCE_EVENT_STOPPED:
+        return "stopped";
 
-    /* how many hashes to use in the info_hash field */
-    int info_hash_count = 0;
-};
-
-struct tr_scrape_response_row
-{
-    /* the torrent's info_hash */
-    tr_sha1_digest_t info_hash;
-
-    /* how many peers are seeding this torrent */
-    int seeders = 0;
-
-    /* how many peers are downloading this torrent */
-    int leechers = 0;
-
-    /* how many times this torrent has been downloaded */
-    int downloads = 0;
-
-    /* the number of active downloaders in the swarm.
-     * this is a BEP 21 extension that some trackers won't support.
-     * http://www.bittorrent.org/beps/bep_0021.html#tracker-scrapes  */
-    int downloaders = 0;
-};
-
-struct tr_scrape_response
-{
-    /* whether or not we managed to connect to the tracker */
-    bool did_connect = false;
-
-    /* whether or not the scrape timed out */
-    bool did_timeout = false;
-
-    /* how many info hashes are in the 'rows' field */
-    int row_count;
-
-    /* the individual torrents' scrape results */
-    std::array<tr_scrape_response_row, TR_MULTISCRAPE_MAX> rows;
-
-    /* the raw scrape url */
-    tr_interned_string scrape_url;
-
-    /* human-readable error string on failure, or nullptr */
-    std::string errmsg;
-
-    /* minimum interval (in seconds) allowed between scrapes.
-     * this is an unofficial extension that some trackers won't support. */
-    int min_request_interval;
-};
-
-using tr_scrape_response_func = void (*)(tr_scrape_response const* response, void* user_data);
-
-void tr_tracker_http_scrape(
-    tr_session* session,
-    tr_scrape_request const* req,
-    tr_scrape_response_func response_func,
-    void* user_data);
-
-void tr_tracker_udp_scrape(
-    tr_session* session,
-    tr_scrape_request const* req,
-    tr_scrape_response_func response_func,
-    void* user_data);
-
-/***
-****  ANNOUNCE
-***/
-
-enum tr_announce_event
-{
-    /* Note: the ordering of this enum's values is important to
-     * announcer.c's tr_tier.announce_event_priority. If changing
-     * the enum, ensure announcer.c is compatible with the change. */
-    TR_ANNOUNCE_EVENT_NONE,
-    TR_ANNOUNCE_EVENT_STARTED,
-    TR_ANNOUNCE_EVENT_COMPLETED,
-    TR_ANNOUNCE_EVENT_STOPPED,
-};
-
-char const* tr_announce_event_get_string(tr_announce_event);
+    default:
+        return "";
+    }
+}
 
 struct tr_announce_request
 {
@@ -136,8 +63,8 @@ struct tr_announce_request
     /* the port we listen for incoming peers on */
     tr_port port;
 
-    /* per-session key */
-    int key = 0;
+    // see discussion of tr_announce_key_t that type's declaration
+    tr_announce_key_t key;
 
     /* the number of peers we'd like to get back in the response */
     int numwant = 0;
@@ -221,24 +148,78 @@ struct tr_announce_response
     std::optional<tr_address> external_ip;
 };
 
-using tr_announce_response_func = void (*)(tr_announce_response const* response, void* userdata);
+// --- SCRAPE
 
-void tr_tracker_http_announce(
-    tr_session* session,
-    tr_announce_request const* req,
-    tr_announce_response_func response_func,
-    void* user_data);
+/* pick a number small enough for common tracker software:
+ *  - ocelot has no upper bound
+ *  - opentracker has an upper bound of 64
+ *  - udp protocol has an upper bound of 74
+ *  - xbtt has no upper bound
+ *
+ * This is only an upper bound: if the tracker complains about
+ * length, announcer will incrementally lower the batch size.
+ */
+auto inline constexpr TR_MULTISCRAPE_MAX = 60;
 
-void tr_tracker_udp_announce(
-    tr_session* session,
-    tr_announce_request const* req,
-    tr_announce_response_func response_func,
-    void* user_data);
+auto inline constexpr TR_ANNOUNCE_TIMEOUT_SEC = std::chrono::seconds{ 45 };
+auto inline constexpr TR_SCRAPE_TIMEOUT_SEC = std::chrono::seconds{ 30 };
 
-void tr_tracker_udp_start_shutdown(tr_session* session);
+struct tr_scrape_request
+{
+    /* the scrape URL */
+    tr_interned_string scrape_url;
 
-void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view msg, char const* log_name);
+    /* the name to use when deep logging is enabled */
+    char log_name[128];
 
-void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view msg, char const* log_name);
+    /* info hashes of the torrents to scrape */
+    std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;
 
-tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed);
+    /* how many hashes to use in the info_hash field */
+    int info_hash_count = 0;
+};
+
+struct tr_scrape_response_row
+{
+    /* the torrent's info_hash */
+    tr_sha1_digest_t info_hash;
+
+    /* how many peers are seeding this torrent */
+    int seeders = 0;
+
+    /* how many peers are downloading this torrent */
+    int leechers = 0;
+
+    /* how many times this torrent has been downloaded */
+    int downloads = 0;
+
+    /* the number of active downloaders in the swarm.
+     * this is a BEP 21 extension that some trackers won't support.
+     * http://www.bittorrent.org/beps/bep_0021.html#tracker-scrapes  */
+    int downloaders = 0;
+};
+
+struct tr_scrape_response
+{
+    /* whether or not we managed to connect to the tracker */
+    bool did_connect = false;
+
+    /* whether or not the scrape timed out */
+    bool did_timeout = false;
+
+    /* how many info hashes are in the 'rows' field */
+    int row_count;
+
+    /* the individual torrents' scrape results */
+    std::array<tr_scrape_response_row, TR_MULTISCRAPE_MAX> rows;
+
+    /* the raw scrape url */
+    tr_interned_string scrape_url;
+
+    /* human-readable error string on failure, or nullptr */
+    std::string errmsg;
+
+    /* minimum interval (in seconds) allowed between scrapes.
+     * this is an unofficial extension that some trackers won't support. */
+    int min_request_interval;
+};

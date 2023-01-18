@@ -1,21 +1,20 @@
 // This file Copyright (C) 2017-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
-#include "error.h"
-#include "file.h"
-#include "platform.h"
-#include "subprocess.h"
-#include "utils.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/platform.h>
+#include <libtransmission/subprocess.h>
 
 #include "gtest/internal/gtest-port.h" // GetArgvs()
 
 #include "test-fixtures.h"
 
 #include <array>
-#include <cstdlib>
+#include <fstream>
 #include <map>
 #include <string>
 #include <string_view>
@@ -25,15 +24,12 @@
 #define setenv(key, value, unused) SetEnvironmentVariableA(key, value)
 #endif
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 std::string getTestProgramPath(std::string const& filename)
 {
-    auto const exe_path = makeString(tr_sys_path_resolve(testing::internal::GetArgvs().front().data()));
+    auto const exe_path = tr_sys_path_resolve(testing::internal::GetArgvs().front().data());
     auto const exe_dir = tr_sys_path_dirname(exe_path);
     return std::string{ exe_dir } + TR_PATH_DELIMITER + filename;
 }
@@ -56,8 +52,8 @@ protected:
 
     [[nodiscard]] static std::string nativeCwd()
     {
-        auto path = makeString(tr_sys_dir_get_current(nullptr));
-        tr_sys_path_native_separators(&path.front());
+        auto path = tr_sys_dir_get_current();
+        tr_sys_path_native_separators(path.data());
         return path;
     }
 
@@ -67,11 +63,11 @@ protected:
 
     std::string self_path_;
 
-    static void waitForFileToExist(std::string const& path)
+    static void waitForFileToBeReadable(std::string const& path)
     {
-        auto const test = [path]()
+        auto const test = [&path]()
         {
-            return tr_sys_path_exists(path.data());
+            return std::ifstream{ path, std::ios_base::in }.is_open();
         };
         EXPECT_TRUE(waitFor(test, 30000));
     }
@@ -89,7 +85,7 @@ TEST_P(SubprocessTest, SpawnAsyncMissingExec)
     auto args = std::array<char const*, 2>{ missing_exe_path.data(), nullptr };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
+    auto const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_FALSE(ret);
     EXPECT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
@@ -101,7 +97,7 @@ TEST_P(SubprocessTest, SpawnAsyncMissingExec)
 TEST_P(SubprocessTest, SpawnAsyncArgs)
 {
     auto const result_path = buildSandboxPath("result.txt");
-    bool const allow_batch_metachars = TR_IF_WIN32(false, true) || !tr_str_has_suffix(self_path_.c_str(), ".cmd");
+    bool const allow_batch_metachars = TR_IF_WIN32(false, true) || !tr_strvEndsWith(tr_strlower(self_path_), ".cmd"sv);
 
     auto const test_arg1 = std::string{ "arg1 " };
     auto const test_arg2 = std::string{ " arg2" };
@@ -118,44 +114,32 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
                                                   nullptr };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
+    bool const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_TRUE(ret) << args[0] << ' ' << args[1];
     EXPECT_EQ(nullptr, error) << *error;
 
-    waitForFileToExist(result_path);
+    waitForFileToBeReadable(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
+    auto in = std::ifstream{ result_path, std::ios_base::in };
+    EXPECT_TRUE(in.is_open()) << strerror(errno);
 
-    auto buffer = std::array<char, 1024>{};
+    auto line = std::string{};
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_arg1, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    buffer.back() = '\0';
-    EXPECT_EQ(test_arg1, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_arg2, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    buffer.back() = '\0';
-    EXPECT_EQ(test_arg2, buffer.data());
-
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    buffer.back() = '\0';
-    EXPECT_EQ(test_arg3, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_arg3, line);
 
     if (allow_batch_metachars)
     {
-        buffer[0] = '\0';
-        EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-        buffer.back() = '\0';
-        EXPECT_EQ(test_arg4, buffer.data());
+        EXPECT_TRUE(std::getline(in, line));
+        EXPECT_EQ(test_arg4, line);
     }
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    buffer.back() = '\0';
-
-    tr_sys_file_close(fd);
+    EXPECT_FALSE(std::getline(in, line));
 }
 
 TEST_P(SubprocessTest, SpawnAsyncEnv)
@@ -199,44 +183,35 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     setenv("ZOO", "tar", 1 /*true*/); // overridden
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), env, nullptr, &error);
+    bool const ret = tr_spawn_async(std::data(args), env, {}, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
-    waitForFileToExist(result_path);
+    waitForFileToBeReadable(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
+    auto in = std::ifstream{ result_path, std::ios_base::in };
+    EXPECT_TRUE(in.is_open()) << strerror(errno);
 
-    auto buffer = std::array<char, 1024>{};
+    auto line = std::string{};
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value1, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value1, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value2, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value2, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value3, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value3, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value4, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value4, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ(test_env_value5, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(test_env_value5, buffer.data());
+    EXPECT_TRUE(std::getline(in, line));
+    EXPECT_EQ("<null>"sv, line);
 
-    buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_STREQ("<null>", buffer.data());
-
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-
-    tr_sys_file_close(fd);
+    EXPECT_FALSE(std::getline(in, line));
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
@@ -244,27 +219,27 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     auto const test_dir = sandbox_.path();
     auto const result_path = buildSandboxPath("result.txt");
 
-    auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
+    auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.c_str(), arg_dump_cwd_.c_str(), nullptr };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(std::data(args), {}, test_dir.c_str(), &error);
+    bool const ret = tr_spawn_async(std::data(args), {}, test_dir, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
-    waitForFileToExist(result_path);
+    waitForFileToBeReadable(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
+    auto in = std::ifstream{ result_path, std::ios_base::in };
+    EXPECT_TRUE(in.is_open()) << strerror(errno);
 
-    auto buffer = std::array<char, 1024>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(
-        makeString(tr_sys_path_native_separators(tr_strdup(test_dir.c_str()))),
-        tr_sys_path_native_separators(&buffer.front()));
+    auto line = std::string{};
+    EXPECT_TRUE(std::getline(in, line));
+    auto expected = std::string{ test_dir };
+    tr_sys_path_native_separators(std::data(expected));
+    auto actual = line;
+    tr_sys_path_native_separators(std::data(actual));
+    EXPECT_EQ(expected, actual);
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-
-    tr_sys_file_close(fd);
+    EXPECT_FALSE(std::getline(in, line));
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
@@ -275,20 +250,22 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
+    auto const ret = tr_spawn_async(std::data(args), {}, {}, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error) << *error;
 
-    waitForFileToExist(result_path);
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
-    EXPECT_NE(TR_BAD_SYS_FILE, fd);
+    waitForFileToBeReadable(result_path);
 
-    auto buffer = std::array<char, 1024>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
-    EXPECT_EQ(expected_cwd, tr_sys_path_native_separators(&buffer.front()));
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
+    auto in = std::ifstream{ result_path, std::ios_base::in };
+    EXPECT_TRUE(in.is_open()) << strerror(errno);
 
-    tr_sys_file_close(fd);
+    auto line = std::string{};
+    EXPECT_TRUE(std::getline(in, line));
+    auto actual = line;
+    tr_sys_path_native_separators(std::data(actual));
+    EXPECT_EQ(expected_cwd, actual);
+
+    EXPECT_FALSE(std::getline(in, line));
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
@@ -316,6 +293,4 @@ INSTANTIATE_TEST_SUITE_P(
         ::testing::Values( //
             getTestProgramPath("subprocess-test"))));
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

@@ -12,6 +12,15 @@ $global:LinkerFlags = @(
     '/PDBALTPATH:%_PDB%'
 )
 
-$global:VsInstallPrefix = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio' 2019 Community
+foreach ($VsType in @('Enterprise', 'Professional', 'Community', 'BuildTools')) {
+    $global:VsInstallPrefix = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio' 2022 $VsType
+    if (Test-Path $global:VsInstallPrefix) {
+        break
+    }
+    $global:VsInstallPrefix = Join-Path ${env:ProgramFiles} 'Microsoft Visual Studio' 2022 $VsType
+    if (Test-Path $global:VsInstallPrefix) {
+        break
+    }
+}
 $global:VsVersion = ((& (Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio' Installer vswhere) -Property catalog_productSemanticVersion -Path $VsInstallPrefix) -Split '[+]')[0]
 $global:VcVarsScript = Join-Path $VsInstallPrefix VC Auxiliary Build vcvarsall.bat

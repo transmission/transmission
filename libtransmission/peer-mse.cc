@@ -6,14 +6,13 @@
 #include <array>
 #include <memory>
 
-#include <arc4.h>
-
 #include <math/wide_integer/uintwide_t.h>
 
 #include "transmission.h"
 
 #include "crypto-utils.h" // tr_sha1
 #include "peer-mse.h"
+#include "tr-arc4.h"
 
 using namespace std::literals;
 
@@ -54,35 +53,30 @@ auto export_bits(UIntWide i)
     return ret;
 }
 
-auto WIDE_INTEGER_CONSTEXPR const G = wi::key_t{ "2" };
-auto WIDE_INTEGER_CONSTEXPR const P = wi::key_t{
+// NOLINTBEGIN(readability-identifier-naming)
+auto WIDE_INTEGER_CONSTEXPR const generator = wi::key_t{ "2" };
+auto WIDE_INTEGER_CONSTEXPR const prime = wi::key_t{
     "0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A63A36210000000000090563"
 };
+// NOLINTEND(readability-identifier-naming)
 
 } // namespace wi
 
 namespace tr_message_stream_encryption
 {
 
-/// DH
+// --- DH
 
 [[nodiscard]] DH::private_key_bigend_t DH::randomPrivateKey() noexcept
 {
-    auto key = DH::private_key_bigend_t{};
-    tr_rand_buffer(std::data(key), std::size(key));
-    return key;
+    return tr_rand_obj<DH::private_key_bigend_t>();
 }
 
 [[nodiscard]] auto generatePublicKey(DH::private_key_bigend_t const& private_key) noexcept
 {
     auto const private_key_wi = wi::import_bits<wi::private_key_t>(private_key);
-    auto const public_key_wi = math::wide_integer::powm(wi::G, private_key_wi, wi::P);
+    auto const public_key_wi = math::wide_integer::powm(wi::generator, private_key_wi, wi::prime);
     return wi::export_bits(public_key_wi);
-}
-
-DH::DH(private_key_bigend_t const& private_key) noexcept
-    : private_key_{ private_key }
-{
 }
 
 DH::key_bigend_t DH::publicKey() noexcept
@@ -100,46 +94,28 @@ void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
     auto const secret = math::wide_integer::powm(
         wi::import_bits<wi::key_t>(peer_public_key),
         wi::import_bits<wi::private_key_t>(private_key_),
-        wi::P);
+        wi::prime);
     secret_ = wi::export_bits(secret);
 }
 
-/// Filter
+// --- Filter
 
 void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
-
-    dec_key_ = std::make_shared<struct arc4_context>();
-    auto const buf = tr_sha1(key, dh.secret(), info_hash);
-    arc4_init(dec_key_.get(), std::data(*buf), std::size(*buf));
-    arc4_discard(dec_key_.get(), 1024);
-}
-
-void Filter::decrypt(size_t buf_len, void* buf)
-{
-    if (dec_key_)
-    {
-        arc4_process(dec_key_.get(), buf, buf, buf_len);
-    }
+    auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
+    dec_active_ = true;
+    dec_key_.init(std::data(buf), std::size(buf));
+    dec_key_.discard(1024);
 }
 
 void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
-
-    enc_key_ = std::make_shared<struct arc4_context>();
-    auto const buf = tr_sha1(key, dh.secret(), info_hash);
-    arc4_init(enc_key_.get(), std::data(*buf), std::size(*buf));
-    arc4_discard(enc_key_.get(), 1024);
-}
-
-void Filter::encrypt(size_t buf_len, void* buf)
-{
-    if (enc_key_)
-    {
-        arc4_process(enc_key_.get(), buf, buf, buf_len);
-    }
+    auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
+    enc_active_ = true;
+    enc_key_.init(std::data(buf), std::size(buf));
+    enc_key_.discard(1024);
 }
 
 } // namespace tr_message_stream_encryption

@@ -8,10 +8,12 @@
 #import "TrackerNode.h"
 #import "TrackerTableView.h"
 
-#define TRACKER_GROUP_SEPARATOR_HEIGHT 14.0
+static CGFloat const kTrackerGroupSeparatorHeight = 14.0;
 
-#define TRACKER_ADD_TAG 0
-#define TRACKER_REMOVE_TAG 1
+typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
+    TrackerSegmentTagAdd = 0,
+    TrackerSegmentTagRemove = 1,
+};
 
 @interface InfoTrackersViewController ()
 
@@ -25,11 +27,6 @@
 @property(nonatomic, readonly) TrackerCell* fTrackerCell;
 
 @property(nonatomic) IBOutlet NSSegmentedControl* fTrackerAddRemoveControl;
-
-- (void)setupInfo;
-
-- (void)addTrackers;
-- (void)removeTrackers;
 
 @end
 
@@ -50,9 +47,9 @@
 - (void)awakeFromNib
 {
     [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Add a tracker", "Inspector view -> tracker buttons")
-                                        forSegment:TRACKER_ADD_TAG];
+                                        forSegment:TrackerSegmentTagAdd];
     [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Remove selected trackers", "Inspector view -> tracker buttons")
-                                        forSegment:TRACKER_REMOVE_TAG];
+                                        forSegment:TrackerSegmentTagRemove];
 
     CGFloat const height = [NSUserDefaults.standardUserDefaults floatForKey:@"InspectorContentHeightTracker"];
     if (height != 0.0)
@@ -179,7 +176,7 @@
     //check for NSDictionary instead of TrackerNode because of display issue when adding a row
     if ([self.fTrackers[row] isKindOfClass:[NSDictionary class]])
     {
-        return TRACKER_GROUP_SEPARATOR_HEIGHT;
+        return kTrackerGroupSeparatorHeight;
     }
     else
     {
@@ -195,7 +192,7 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification*)notification
 {
-    [self.fTrackerAddRemoveControl setEnabled:self.fTrackerTable.numberOfSelectedRows > 0 forSegment:TRACKER_REMOVE_TAG];
+    [self.fTrackerAddRemoveControl setEnabled:self.fTrackerTable.numberOfSelectedRows > 0 forSegment:TrackerSegmentTagRemove];
 }
 
 - (BOOL)tableView:(NSTableView*)tableView isGroupRow:(NSInteger)row
@@ -272,7 +269,7 @@
 
     [self updateInfo];
 
-    if ([[sender cell] tagForSegment:[sender selectedSegment]] == TRACKER_REMOVE_TAG)
+    if ([[sender cell] tagForSegment:[sender selectedSegment]] == TrackerSegmentTagRemove)
     {
         [self removeTrackers];
     }
@@ -299,15 +296,15 @@
 
         self.fTrackerTable.torrent = nil;
 
-        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_ADD_TAG];
-        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_REMOVE_TAG];
+        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TrackerSegmentTagAdd];
+        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TrackerSegmentTagRemove];
     }
     else
     {
         self.fTrackerTable.torrent = self.fTorrents[0];
 
-        [self.fTrackerAddRemoveControl setEnabled:YES forSegment:TRACKER_ADD_TAG];
-        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_REMOVE_TAG];
+        [self.fTrackerAddRemoveControl setEnabled:YES forSegment:TrackerSegmentTagAdd];
+        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TrackerSegmentTagRemove];
     }
 
     [self.fTrackerTable deselectAll:self];
@@ -413,8 +410,8 @@
         if (removeTrackerCount > 1)
         {
             alert.messageText = [NSString
-                stringWithFormat:NSLocalizedString(@"Are you sure you want to remove %lu trackers?", "Remove trackers alert -> title"),
-                                 removeTrackerCount];
+                localizedStringWithFormat:NSLocalizedString(@"Are you sure you want to remove %lu trackers?", "Remove trackers alert -> title"),
+                                          removeTrackerCount];
             alert.informativeText = NSLocalizedString(
                 @"Once removed, Transmission will no longer attempt to contact them."
                  " This cannot be undone.",

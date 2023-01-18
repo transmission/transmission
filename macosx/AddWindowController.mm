@@ -10,11 +10,13 @@
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 
-#define UPDATE_SECONDS 1.0
+static NSTimeInterval const kUpdateSeconds = 1.0;
 
-#define POPUP_PRIORITY_HIGH 0
-#define POPUP_PRIORITY_NORMAL 1
-#define POPUP_PRIORITY_LOW 2
+typedef NS_ENUM(NSUInteger, PopupPriority) {
+    PopupPriorityHigh = 0,
+    PopupPriorityNormal = 1,
+    PopupPriorityLow = 2,
+};
 
 @interface AddWindowController ()
 
@@ -49,15 +51,6 @@
 @property(nonatomic, weak) NSTimer* fTimer;
 
 @property(nonatomic) TorrentDeterminationType fGroupValueDetermination;
-
-- (void)updateFiles;
-
-- (void)confirmAdd;
-
-- (void)setDestinationPath:(NSString*)destination determinationType:(TorrentDeterminationType)determinationType;
-
-- (void)setGroupsMenu;
-- (void)changeGroupValue:(id)sender;
 
 @end
 
@@ -131,21 +124,21 @@
     [self setGroupsMenu];
     [self.fGroupPopUp selectItemWithTag:self.fGroupValue];
 
-    NSInteger priorityIndex;
+    PopupPriority priorityIndex;
     switch (self.torrent.priority)
     {
     case TR_PRI_HIGH:
-        priorityIndex = POPUP_PRIORITY_HIGH;
+        priorityIndex = PopupPriorityHigh;
         break;
     case TR_PRI_NORMAL:
-        priorityIndex = POPUP_PRIORITY_NORMAL;
+        priorityIndex = PopupPriorityNormal;
         break;
     case TR_PRI_LOW:
-        priorityIndex = POPUP_PRIORITY_LOW;
+        priorityIndex = PopupPriorityLow;
         break;
     default:
         NSAssert1(NO, @"Unknown priority for adding torrent: %d", self.torrent.priority);
-        priorityIndex = POPUP_PRIORITY_NORMAL;
+        priorityIndex = PopupPriorityNormal;
     }
     [self.fPriorityPopUp selectItemAtIndex:priorityIndex];
 
@@ -166,7 +159,7 @@
         self.fLocationImageView.image = nil;
     }
 
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateFiles)
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateFiles)
                                                  userInfo:nil
                                                   repeats:YES];
     [self updateFiles];
@@ -294,13 +287,13 @@
     tr_priority_t priority;
     switch ([sender indexOfSelectedItem])
     {
-    case POPUP_PRIORITY_HIGH:
+    case PopupPriorityHigh:
         priority = TR_PRI_HIGH;
         break;
-    case POPUP_PRIORITY_NORMAL:
+    case PopupPriorityNormal:
         priority = TR_PRI_NORMAL;
         break;
-    case POPUP_PRIORITY_LOW:
+    case PopupPriorityLow:
         priority = TR_PRI_LOW;
         break;
     default:
@@ -327,7 +320,7 @@
         NSUInteger count = self.torrent.fileCount;
         if (count != 1)
         {
-            fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Add torrent -> info"), count];
+            fileString = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu files", "Add torrent -> info"), count];
         }
         else
         {

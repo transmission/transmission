@@ -1896,7 +1896,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Fixed "Progress increases every time I pause then resume"
   * Fixed "Sometimes crashes at exit"
   * Cleaner icon
-  * Show all sizes in human readable form
+  * Show all sizes in human-readable form
   * Keep downloading in the background when the window is closed
   * Miscellaneous bug fixes and internal enhancements
 

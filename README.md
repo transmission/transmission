@@ -3,9 +3,10 @@
 Transmission is a fast, easy, and free BitTorrent client. It comes in several flavors:
   * A native macOS GUI application
   * GTK+ and Qt GUI applications for Linux, BSD, etc.
+  * A Qt-based Windows-compatible GUI application
   * A headless daemon for servers and routers
   * A web UI for remote controlling any of the above
-
+  
 Visit https://transmissionbt.com/ for more information.
 
 ## Documentation
@@ -26,7 +27,7 @@ Different distributions may choose to package any or all of these tools in one o
 
 Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode.
 
-For a more detailed description, and dependencies, visit: https://github.com/transmission/transmission/tree/main/docs
+For a more detailed description, and dependencies, visit [How to Build Transmission](docs/Building-Transmission.md) in docs
 
 ### Building a Transmission release from the command line
 
@@ -76,6 +77,10 @@ If you're new to building programs from source code, this is typically easier th
 You would want to setup your editor to make use of the .clang-format file located in the root of this repository and the eslint/prettier rules in web/package.json.
 
 If for some reason you are unwilling or unable to do so, there is a shell script which you can use: `./code_style.sh`
+
+### Translations
+
+See [language translations](docs/Translating.md).
 
 ## Sponsors
 

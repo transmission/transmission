@@ -6,12 +6,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <string_view>
 
 #include "tr-assert.h"
 
 #if !defined(NDEBUG) || defined(TR_FORCE_ASSERTIONS)
 
-[[noreturn]] bool tr_assert_report(std::string_view file, int line, std::string_view message)
+[[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message)
 {
     std::cerr << "assertion failed: " << message << " (" << file << ':' << line << ')' << std::endl;
     abort();

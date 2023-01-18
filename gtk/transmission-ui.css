@@ -1,0 +1,33 @@
+.tr-workarea.frame {
+    border-left-width: 0;
+    border-right-width: 0;
+    border-radius: 0;
+}
+
+.tr-message-log.frame {
+    border-left-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-radius: 0;
+}
+
+.tr-pad-small {
+    padding: 3px;
+}
+
+.tr-pad-normal {
+    padding: 6px;
+}
+
+.tr-pad-large {
+    padding: 12px;
+}
+
+.tr-button-box,
+.tr-dialog-content {
+    margin: 6px;
+}
+
+.tr-small {
+    font-size: small;
+}

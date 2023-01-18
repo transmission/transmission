@@ -3,25 +3,29 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <memory>
+#include "StatsDialog.h"
 
-#include <glibmm.h>
+#include "GtkCompat.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h"
+
 #include <glibmm/i18n.h>
+#include <glibmm/main.h>
+#include <glibmm/ustring.h>
+#include <gtkmm/label.h>
+#include <gtkmm/messagedialog.h>
 
 #include <fmt/core.h>
 
-#include "HigWorkarea.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "StatsDialog.h"
-#include "Utils.h"
+#include <memory>
 
 static auto constexpr TR_RESPONSE_RESET = int{ 1 };
 
 class StatsDialog::Impl
 {
 public:
-    Impl(StatsDialog& dialog, Glib::RefPtr<Session> const& core);
+    Impl(StatsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -71,22 +75,18 @@ auto startedTimesText(uint64_t n)
 
 bool StatsDialog::Impl::updateStats()
 {
-    tr_session_stats one;
-    tr_session_stats all;
+    auto stats = tr_sessionGetStats(core_->get_session());
+    setLabel(one_up_lb_, tr_strlsize(stats.uploadedBytes));
+    setLabel(one_down_lb_, tr_strlsize(stats.downloadedBytes));
+    setLabel(one_time_lb_, tr_format_time(stats.secondsActive));
+    setLabelFromRatio(one_ratio_lb_, stats.ratio);
 
-    tr_sessionGetStats(core_->get_session(), &one);
-    tr_sessionGetCumulativeStats(core_->get_session(), &all);
-
-    setLabel(one_up_lb_, tr_strlsize(one.uploadedBytes));
-    setLabel(one_down_lb_, tr_strlsize(one.downloadedBytes));
-    setLabel(one_time_lb_, tr_format_time(one.secondsActive));
-    setLabelFromRatio(one_ratio_lb_, one.ratio);
-
-    setLabel(all_sessions_lb_, startedTimesText(all.sessionCount));
-    setLabel(all_up_lb_, tr_strlsize(all.uploadedBytes));
-    setLabel(all_down_lb_, tr_strlsize(all.downloadedBytes));
-    setLabel(all_time_lb_, tr_format_time(all.secondsActive));
-    setLabelFromRatio(all_ratio_lb_, all.ratio);
+    stats = tr_sessionGetCumulativeStats(core_->get_session());
+    setLabel(all_sessions_lb_, startedTimesText(stats.sessionCount));
+    setLabel(all_up_lb_, tr_strlsize(stats.uploadedBytes));
+    setLabel(all_down_lb_, tr_strlsize(stats.downloadedBytes));
+    setLabel(all_time_lb_, tr_format_time(stats.secondsActive));
+    setLabelFromRatio(all_ratio_lb_, stats.ratio);
 
     return true;
 }
@@ -100,90 +100,73 @@ void StatsDialog::Impl::dialogResponse(int response)
 {
     if (response == TR_RESPONSE_RESET)
     {
-        Gtk::MessageDialog w(dialog_, _("Reset your statistics?"), false, Gtk::MESSAGE_QUESTION, Gtk::BUTTONS_NONE, true);
-        w.add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
-        w.add_button(_("_Reset"), TR_RESPONSE_RESET);
-        w.set_secondary_text(
+        auto w = std::make_shared<Gtk::MessageDialog>(
+            dialog_,
+            _("Reset your statistics?"),
+            false,
+            TR_GTK_MESSAGE_TYPE(QUESTION),
+            TR_GTK_BUTTONS_TYPE(NONE),
+            true);
+        w->add_button(_("_Cancel"), TR_GTK_RESPONSE_TYPE(CANCEL));
+        w->add_button(_("_Reset"), TR_RESPONSE_RESET);
+        w->set_secondary_text(
             _("These statistics are for your information only. "
               "Resetting them doesn't affect the statistics logged by your BitTorrent trackers."));
-
-        if (w.run() == TR_RESPONSE_RESET)
-        {
-            tr_sessionClearStats(core_->get_session());
-            updateStats();
-        }
+        w->signal_response().connect(
+            [this, w](int inner_response) mutable
+            {
+                if (inner_response == TR_RESPONSE_RESET)
+                {
+                    tr_sessionClearStats(core_->get_session());
+                    updateStats();
+                }
+                w.reset();
+            });
+        w->show();
     }
 
-    if (response == Gtk::RESPONSE_CLOSE)
+    if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
     {
-        dialog_.hide();
+        dialog_.close();
     }
 }
 
-std::unique_ptr<StatsDialog> StatsDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
+StatsDialog::StatsDialog(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& builder,
+    Gtk::Window& parent,
+    Glib::RefPtr<Session> const& core)
+    : Gtk::Dialog(cast_item)
+    , impl_(std::make_unique<Impl>(*this, builder, core))
 {
-    return std::unique_ptr<StatsDialog>(new StatsDialog(parent, core));
-}
-
-StatsDialog::StatsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
-    : Gtk::Dialog(_("Statistics"), parent)
-    , impl_(std::make_unique<Impl>(*this, core))
-{
+    set_transient_for(parent);
 }
 
 StatsDialog::~StatsDialog() = default;
 
-StatsDialog::Impl::Impl(StatsDialog& dialog, Glib::RefPtr<Session> const& core)
+std::unique_ptr<StatsDialog> StatsDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
+{
+    auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("StatsDialog.ui"));
+    return std::unique_ptr<StatsDialog>(gtr_get_widget_derived<StatsDialog>(builder, "StatsDialog", parent, core));
+}
+
+StatsDialog::Impl::Impl(StatsDialog& dialog, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core)
     : dialog_(dialog)
     , core_(core)
+    , one_up_lb_(gtr_get_widget<Gtk::Label>(builder, "current_uploaded_value_label"))
+    , one_down_lb_(gtr_get_widget<Gtk::Label>(builder, "current_downloaded_value_label"))
+    , one_ratio_lb_(gtr_get_widget<Gtk::Label>(builder, "current_ratio_value_label"))
+    , one_time_lb_(gtr_get_widget<Gtk::Label>(builder, "current_duration_value_label"))
+    , all_up_lb_(gtr_get_widget<Gtk::Label>(builder, "total_uploaded_value_label"))
+    , all_down_lb_(gtr_get_widget<Gtk::Label>(builder, "total_downloaded_value_label"))
+    , all_ratio_lb_(gtr_get_widget<Gtk::Label>(builder, "total_ratio_value_label"))
+    , all_time_lb_(gtr_get_widget<Gtk::Label>(builder, "total_duration_value_label"))
+    , all_sessions_lb_(gtr_get_widget<Gtk::Label>(builder, "start_count_label"))
 {
-    guint row = 0;
-
-    dialog_.add_button(_("_Reset"), TR_RESPONSE_RESET);
-    dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
-    dialog_.set_default_response(Gtk::RESPONSE_CLOSE);
-
-    auto* t = Gtk::make_managed<HigWorkarea>();
-    t->add_section_title(row, _("Current Session"));
-
-    one_up_lb_ = Gtk::make_managed<Gtk::Label>();
-    one_up_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Uploaded:"), *one_up_lb_);
-    one_down_lb_ = Gtk::make_managed<Gtk::Label>();
-    one_down_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Downloaded:"), *one_down_lb_);
-    one_ratio_lb_ = Gtk::make_managed<Gtk::Label>();
-    one_ratio_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Ratio:"), *one_ratio_lb_);
-    one_time_lb_ = Gtk::make_managed<Gtk::Label>();
-    one_time_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Duration:"), *one_time_lb_);
-
-    t->add_section_divider(row);
-    t->add_section_title(row, _("Total"));
-
-    all_sessions_lb_ = Gtk::make_managed<Gtk::Label>(startedTimesText(1));
-    all_sessions_lb_->set_single_line_mode(true);
-    t->add_label_w(row, *all_sessions_lb_);
-    ++row;
-
-    all_up_lb_ = Gtk::make_managed<Gtk::Label>();
-    all_up_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Uploaded:"), *all_up_lb_);
-    all_down_lb_ = Gtk::make_managed<Gtk::Label>();
-    all_down_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Downloaded:"), *all_down_lb_);
-    all_ratio_lb_ = Gtk::make_managed<Gtk::Label>();
-    all_ratio_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Ratio:"), *all_ratio_lb_);
-    all_time_lb_ = Gtk::make_managed<Gtk::Label>();
-    all_time_lb_->set_single_line_mode(true);
-    t->add_row(row, _("Duration:"), *all_time_lb_);
-
-    gtr_dialog_set_content(dialog_, *t);
+    dialog_.set_default_response(TR_GTK_RESPONSE_TYPE(CLOSE));
+    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::dialogResponse));
 
     updateStats();
-    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::dialogResponse));
     update_stats_tag_ = Glib::signal_timeout().connect_seconds(
         sigc::mem_fun(*this, &Impl::updateStats),
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);

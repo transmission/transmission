@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <utility>
 
 #include <QApplication>
 #include <QBrush>
@@ -17,8 +18,10 @@
 #include <QStyleOptionProgressBar>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/utils.h>
 
+#include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegateMin.h"
 #include "TorrentModel.h"
@@ -106,7 +109,7 @@ ItemLayout::ItemLayout(
     int const icon_size = style->pixelMetric(QStyle::PM_SmallIconSize);
 
     auto const name_fm = QFontMetrics(name_font);
-    auto const name_size = QSize(name_fm.size(0, name_text_));
+    auto const name_size = name_fm.size(0, name_text_);
 
     status_font.setPointSize(static_cast<int>(status_font.pointSize() * 0.85));
     QFontMetrics const status_fm(status_font);
@@ -146,8 +149,8 @@ ItemLayout::ItemLayout(
 
 QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    auto const is_magnet = bool(!tor.hasMetadata());
-    auto const m = QSize(margin(*QApplication::style()));
+    auto const is_magnet = !tor.hasMetadata();
+    auto const m = margin(*QApplication::style());
     auto const layout = ItemLayout(
         is_magnet ? progressString(tor) : tor.name(),
         shortStatusString(tor),
@@ -215,14 +218,14 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
 
     auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
-    QStyle::State progress_bar_state(option.state | QStyle::State_Horizontal);
+    QStyle::State progress_bar_state(option.state);
 
     if (is_paused)
     {
         progress_bar_state = QStyle::State_None;
     }
 
-    progress_bar_state |= QStyle::State_Small;
+    progress_bar_state |= QStyle::State_Small | QStyle::State_Horizontal;
 
     QIcon::Mode const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
     QIcon const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon();
@@ -286,7 +289,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
-    style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
+    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
 
     painter->restore();
 }

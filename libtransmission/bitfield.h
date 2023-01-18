@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -12,6 +12,8 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
+
+#include "tr-macros.h"
 
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
@@ -43,7 +45,7 @@ public:
     void setHasNone() noexcept;
 
     // set one or more bits
-    void set(size_t bit, bool value = true);
+    void set(size_t nth, bool value = true);
     void setSpan(size_t begin, size_t end, bool value = true);
     void unset(size_t bit)
     {
@@ -53,12 +55,12 @@ public:
     {
         setSpan(begin, end, false);
     }
-    void setFromBools(bool const* bytes, size_t n);
+    void setFromBools(bool const* flags, size_t n);
 
     // "raw" here is in BEP0003 format: "The first byte of the bitfield
     // corresponds to indices 0 - 7 from high bit to low bit, respectively.
     // The next one 8-15, etc. Spare bits at the end are set to zero."
-    void setRaw(uint8_t const* bits, size_t byte_count);
+    void setRaw(uint8_t const* raw, size_t byte_count);
     [[nodiscard]] std::vector<uint8_t> raw() const;
 
     [[nodiscard]] constexpr bool hasAll() const noexcept
@@ -71,7 +73,7 @@ public:
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
-    [[nodiscard]] constexpr bool test(size_t bit) const
+    [[nodiscard]] TR_CONSTEXPR20 bool test(size_t bit) const
     {
         return hasAll() || (!hasNone() && testFlag(bit));
     }
@@ -95,11 +97,29 @@ public:
 
     [[nodiscard]] bool isValid() const;
 
+    [[nodiscard]] constexpr auto percent() const noexcept
+    {
+        if (hasAll())
+        {
+            return 1.0F;
+        }
+
+        if (hasNone() || empty())
+        {
+            return 0.0F;
+        }
+
+        return static_cast<float>(count()) / size();
+    }
+
+    tr_bitfield& operator|=(tr_bitfield const& that) noexcept;
+    tr_bitfield& operator&=(tr_bitfield const& that) noexcept;
+
 private:
     [[nodiscard]] size_t countFlags() const noexcept;
     [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
 
-    [[nodiscard]] bool testFlag(size_t n) const
+    [[nodiscard]] TR_CONSTEXPR20 bool testFlag(size_t n) const
     {
         if (n >> 3U >= std::size(flags_))
         {

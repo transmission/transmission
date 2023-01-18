@@ -417,7 +417,7 @@ export class Transmission extends EventTarget {
     if (last === -1) {
       this._selectRow(row);
     } else {
-      // select the range between the prevous & current
+      // select the range between the previous & current
       const next = this._rows.indexOf(row);
       const min = Math.min(last, next);
       const max = Math.max(last, next);

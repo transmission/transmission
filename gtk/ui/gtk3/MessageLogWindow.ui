@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface domain="transmission-gtk">
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkWindow" id="MessageLogWindow">
+    <property name="can-focus">False</property>
+    <property name="title" translatable="yes">Message Log</property>
+    <property name="role">message-log</property>
+    <property name="default-width">750</property>
+    <property name="default-height">350</property>
+    <child>
+      <object class="GtkBox" id="window_layout">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkToolbar" id="toolbar">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="show-arrow">False</property>
+            <child>
+              <object class="GtkToolButton" id="save_as_button">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="is-important">True</property>
+                <property name="action-name">win.save-message-log</property>
+                <property name="label" translatable="yes">Save _As</property>
+                <property name="use-underline">True</property>
+                <property name="icon-name">document-save-as</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="clear_button">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="is-important">True</property>
+                <property name="action-name">win.clear-message-log</property>
+                <property name="label" translatable="yes">Clear</property>
+                <property name="use-underline">True</property>
+                <property name="icon-name">edit-clear</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparatorToolItem">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToggleToolButton" id="pause_button">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="is-important">True</property>
+                <property name="action-name">win.pause-message-log</property>
+                <property name="label" translatable="yes">P_ause</property>
+                <property name="use-underline">True</property>
+                <property name="icon-name">media-playback-pause</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparatorToolItem">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolItem" id="level_label_item">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <child>
+                  <object class="GtkLabel" id="level_label">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="margin-start">6</property>
+                    <property name="margin-end">6</property>
+                    <property name="xpad">6</property>
+                    <property name="label" translatable="yes">Level</property>
+                    <property name="use-underline">True</property>
+                    <property name="mnemonic-widget">level_combo</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolItem" id="level_combo_item">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <child>
+                  <object class="GtkComboBox" id="level_combo">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <child>
+                      <object class="GtkCellRendererText" id="level_combo_renderer"/>
+                      <attributes>
+                        <attribute name="text">1</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <style>
+              <class name="primary-toolbar"/>
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="messages_view_scroll">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="shadow-type">in</property>
+            <child>
+              <object class="GtkTreeView" id="messages_view">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection" id="messages_view_selection"/>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

@@ -3,18 +3,21 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <memory>
-#include <string>
+#include "FreeSpaceLabel.h"
 
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
+#include "Session.h"
+#include "Utils.h"
 
 #include <libtransmission/utils.h>
 
-#include "FreeSpaceLabel.h"
-#include "Session.h"
-#include "Utils.h"
+#include <glibmm/i18n.h>
+#include <glibmm/main.h>
+
+#include <fmt/core.h>
+
+#include <memory>
+#include <string>
+#include <string_view>
 
 class FreeSpaceLabel::Impl
 {
@@ -55,7 +58,16 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
 }
 
 FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir)
-    : Gtk::Label()
+    : impl_(std::make_unique<Impl>(*this, core, dir))
+{
+}
+
+FreeSpaceLabel::FreeSpaceLabel(
+    BaseObjectType* cast_item,
+    Glib::RefPtr<Gtk::Builder> const& /*builder*/,
+    Glib::RefPtr<Session> const& core,
+    std::string_view dir)
+    : Gtk::Label(cast_item)
     , impl_(std::make_unique<Impl>(*this, core, dir))
 {
 }

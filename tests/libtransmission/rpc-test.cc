@@ -1,12 +1,11 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
-#include "rpcimpl.h"
-#include "utils.h"
-#include "variant.h"
+#include <libtransmission/transmission.h>
+#include <libtransmission/rpcimpl.h>
+#include <libtransmission/variant.h>
 
 #include "test-fixtures.h"
 
@@ -18,17 +17,14 @@
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-
-namespace test
+namespace libtransmission::test
 {
 
 using RpcTest = SessionTest;
 
 TEST_F(RpcTest, list)
 {
-    int64_t i;
+    auto i = int64_t{};
     auto sv = std::string_view{};
     tr_variant top;
 
@@ -36,7 +32,7 @@ TEST_F(RpcTest, list)
     EXPECT_TRUE(tr_variantIsInt(&top));
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     tr_rpc_parse_list_str(&top, "6,7"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
@@ -45,13 +41,13 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(6, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
     EXPECT_EQ(7, i);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     tr_rpc_parse_list_str(&top, "asdf"sv);
     EXPECT_TRUE(tr_variantIsString(&top));
     EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
     EXPECT_EQ("asdf"sv, sv);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 
     tr_rpc_parse_list_str(&top, "1,3-5"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
@@ -64,7 +60,7 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(4, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 3), &i));
     EXPECT_EQ(5, i);
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 /***
@@ -87,14 +83,14 @@ TEST_F(RpcTest, sessionGet)
     tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
     tr_variant response;
     tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
-    tr_variantFree(&request);
+    tr_variantClear(&request);
 
     EXPECT_TRUE(tr_variantIsDict(&response));
-    tr_variant* args;
+    tr_variant* args = nullptr;
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto const expected_keys = std::array<tr_quark, 58>{
+    auto const expected_keys = std::array<tr_quark, 59>{
         TR_KEY_alt_speed_down,
         TR_KEY_alt_speed_enabled,
         TR_KEY_alt_speed_time_begin,
@@ -149,6 +145,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_speed_limit_up,
         TR_KEY_speed_limit_up_enabled,
         TR_KEY_start_added_torrents,
+        TR_KEY_tcp_enabled,
         TR_KEY_trash_original_torrent_files,
         TR_KEY_units,
         TR_KEY_utp_enabled,
@@ -157,9 +154,9 @@ TEST_F(RpcTest, sessionGet)
 
     // what we got
     std::set<tr_quark> actual_keys;
-    tr_quark key;
-    tr_variant* val;
-    size_t n = 0;
+    auto key = tr_quark{};
+    tr_variant* val = nullptr;
+    auto n = size_t{};
     while ((tr_variantDictChild(args, n++, &key, &val)))
     {
         actual_keys.insert(key);
@@ -184,10 +181,8 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup
-    tr_variantFree(&response);
-    tr_torrentRemove(tor, false, nullptr);
+    tr_variantClear(&response);
+    tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
-} // namespace test
-
-} // namespace libtransmission
+} // namespace libtransmission::test

@@ -1,0 +1,28 @@
+name: Transmission issue report
+description: Issues are used to track todos, bugs, feature requests, and more.
+body:
+  - type: textarea
+    id: issue
+    attributes:
+      label: What is the issue?
+      description: |
+       For UI, attach a screenshot.
+       For crashes, attach a crash log.
+       For specific issues, attach a torrent or provide a magnet, with public domain content only.
+  - type: dropdown
+    id: client
+    attributes:
+      label: Which application of Transmission?
+      options:
+        - macOS app
+        - GTK+ app on Linux, BSD, etc.
+        - Qt app on Linux, BSD, etc.
+        - Qt app on Windows
+        - Web client
+        - transmission-daemon
+        - transmission-remote
+  - type: input
+    id: version
+    attributes:
+      label: Which version of Transmission?
+      description: Find it in "About Transmission" or specify which nightly build or specific commit.

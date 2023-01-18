@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <set>
 #include <string>
 #include <string_view>
 
@@ -15,6 +14,7 @@
 #include "torrent-metainfo.h"
 #include "utils.h"
 #include "variant.h"
+#include "web-utils.h"
 
 using namespace std::literals;
 
@@ -268,7 +268,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
 
     // confirm that it's good by parsing it back again
     auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
-    tr_variantFree(&metainfo);
+    tr_variantClear(&metainfo);
     if (auto tm = tr_torrent_metainfo{}; !tm.parseBenc(contents, error))
     {
         return false;

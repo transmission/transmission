@@ -14,6 +14,7 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
         "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
         "-DTR_THIRD_PARTY_DIR:PATH=${PrefixDir}"
         "-DTR_QT_DIR:PATH=${PrefixDir}"
+        '-DRUN_CLANG_TIDY=OFF'
     )
 
     Invoke-CMakeBuildAndInstall $SourceDir $BuildDir $ConfigOptions
@@ -29,18 +30,18 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
     }
 
     $OpenSslLibSuffix = if ($Arch -eq 'x86') { '' } else { '-x64' }
-    foreach ($x in @('libcurl', "libcrypto-1_1${OpenSslLibSuffix}", "libssl-1_1${OpenSslLibSuffix}", 'zlib', 'dbus-1')) {
+    foreach ($x in @('libcurl', "libcrypto-3${OpenSslLibSuffix}", "libssl-3${OpenSslLibSuffix}", 'zlib', 'dbus-1')) {
         if ($DepsPrefixDir -ne $PrefixDir) {
             Copy-Item -Path (Join-Path $DepsPrefixDir bin "${x}.dll") -Destination (Join-Path $PrefixDir bin)
         }
         Copy-Item -Path (Join-Path $DepsPrefixDir bin "${x}.pdb") -Destination $DebugSymbolsDir
     }
 
-    foreach ($x in @('Core', 'DBus', 'Gui', 'Network', 'Svg', 'Widgets', 'WinExtras')) {
+    foreach ($x in @('Core', 'DBus', 'Gui', 'Network', 'Svg', 'Widgets')) {
         if ($DepsPrefixDir -ne $PrefixDir) {
-            Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt5${x}.dll") -Destination (Join-Path $PrefixDir bin)
+            Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt6${x}.dll") -Destination (Join-Path $PrefixDir bin)
         }
-        Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt5${x}.pdb") -Destination $DebugSymbolsDir
+        Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt6${x}.pdb") -Destination $DebugSymbolsDir
     }
 
     foreach ($x in @('gif', 'ico', 'jpeg', 'svg')) {
@@ -49,6 +50,14 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
             Copy-Item -Path (Join-Path $DepsPrefixDir plugins imageformats "q${x}.dll") -Destination (Join-Path $PrefixDir plugins imageformats)
         }
         Copy-Item -Path (Join-Path $DepsPrefixDir plugins imageformats "q${x}.pdb") -Destination $DebugSymbolsDir
+    }
+
+    foreach ($x in @('openssl')) {
+        if ($DepsPrefixDir -ne $PrefixDir) {
+            New-Item -Path (Join-Path $PrefixDir plugins tls) -ItemType Directory -ErrorAction Ignore | Out-Null
+            Copy-Item -Path (Join-Path $DepsPrefixDir plugins tls "q${x}backend.dll") -Destination (Join-Path $PrefixDir plugins tls)
+        }
+        Copy-Item -Path (Join-Path $DepsPrefixDir plugins tls "q${x}backend.pdb") -Destination $DebugSymbolsDir
     }
 
     if ($DepsPrefixDir -ne $PrefixDir) {

@@ -63,7 +63,7 @@ export const Formatter = {
     return `${this.number(n)} ${this.ngettext(msgid, msgid_plural, n)}`;
   },
 
-  // Formats the a memory size into a human-readable string
+  // Formats a memory size into a human-readable string
   // @param {Number} bytes the filesize in bytes
   // @return {String} human-readable string
   mem(bytes) {
@@ -113,7 +113,7 @@ export const Formatter = {
   },
 
   /**
-   * Formats the a disk capacity or file size into a human-readable string
+   * Formats a disk capacity or file size into a human-readable string
    * @param {Number} bytes the filesize in bytes
    * @return {String} human-readable string
    */

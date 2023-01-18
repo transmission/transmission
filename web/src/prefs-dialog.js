@@ -6,7 +6,7 @@
 import { Formatter } from './formatter.js';
 import {
   OutsideClickListener,
-  createTabsContainer,
+  createTextualTabsContainer,
   makeUUID,
   setEnabled,
   setTextContent,
@@ -754,11 +754,11 @@ export class PrefsDialog extends EventTarget {
       torrents: PrefsDialog._createTorrentsPage(),
     };
 
-    const elements = createTabsContainer('prefs-dialog', [
-      ['prefs-tab-torrent', pages.torrents.root],
-      ['prefs-tab-speed', pages.speed.root],
-      ['prefs-tab-peers', pages.peers.root],
-      ['prefs-tab-network', pages.network.root],
+    const elements = createTextualTabsContainer('prefs-dialog', [
+      ['prefs-tab-torrent', pages.torrents.root, 'Torrents'],
+      ['prefs-tab-speed', pages.speed.root, 'Speed'],
+      ['prefs-tab-peers', pages.peers.root, 'Peers'],
+      ['prefs-tab-network', pages.network.root, 'Network'],
     ]);
 
     return { ...elements, ...pages };

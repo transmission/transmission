@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="transmission-gtk">
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkDialog" id="AddTrackerDialog">
+    <property name="modal">1</property>
+    <child internal-child="content_area">
+      <object class="GtkBox" id="dialog_layout">
+        <property name="orientation">vertical</property>
+        <property name="spacing">6</property>
+        <property name="css-classes">tr-dialog-content</property>
+        <property name="vexpand">1</property>
+        <child>
+          <object class="GtkBox" id="dialog_content_layout">
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkLabel" id="url_section_label">
+                <property name="label" translatable="1">Tracker</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"></attribute>
+                </attributes>
+              </object>
+            </child>
+            <child>
+              <object class="GtkGrid" id="url_section_layout">
+                <property name="margin-start">18</property>
+                <property name="row-spacing">6</property>
+                <property name="column-spacing">12</property>
+                <child>
+                  <object class="GtkLabel" id="url_label">
+                    <property name="label" translatable="1">_Announce URL:</property>
+                    <property name="use-underline">1</property>
+                    <property name="mnemonic-widget">url_entry</property>
+                    <layout>
+                      <property name="column">0</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="url_entry">
+                    <property name="width-request">400</property>
+                    <property name="focusable">1</property>
+                    <property name="hexpand">1</property>
+                    <layout>
+                      <property name="column">1</property>
+                      <property name="row">0</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child internal-child="action_area">
+      <object class="GtkBox" id="dialog_buttons">
+        <property name="css-classes">tr-button-box</property>
+        <property name="spacing">6</property>
+        <child>
+          <object class="GtkButton" id="cancel_button">
+            <property name="label" translatable="1">_Cancel</property>
+            <property name="focusable">1</property>
+            <property name="receives-default">1</property>
+            <property name="use-underline">1</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButton" id="open_button">
+            <property name="label" translatable="1">_Add</property>
+            <property name="focusable">1</property>
+            <property name="receives-default">1</property>
+            <property name="use-underline">1</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">cancel_button</action-widget>
+      <action-widget response="-3">open_button</action-widget>
+    </action-widgets>
+  </object>
+</interface>

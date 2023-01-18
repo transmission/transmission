@@ -1,16 +1,16 @@
 // This file copyright Transmission authors and contributors.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <string_view>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "error.h"
-#include "file.h"
-#include "tr-strbuf.h"
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/tr-strbuf.h>
 
 #include "test-fixtures.h"
 
@@ -170,7 +170,7 @@ TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
     // supplant older ones.
     for (int i = 0; i < LargerThanCacheLimit; ++i)
     {
-        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt", i) };
+        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt"sv, i) };
         EXPECT_TRUE(session_->openFiles().get(TorId, i, true, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
     }
 
@@ -182,7 +182,7 @@ TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
     auto sorted = std::array<bool, LargerThanCacheLimit>{};
     for (int i = 0; i < LargerThanCacheLimit; ++i)
     {
-        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt", i) };
+        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt"sv, i) };
         results[i] = !!session_->openFiles().get(TorId, i, false);
     }
     sorted = results;

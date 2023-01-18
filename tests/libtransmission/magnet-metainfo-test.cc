@@ -1,5 +1,5 @@
 // This file Copyright (C) 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,21 +8,20 @@
 
 #include "gtest/gtest.h"
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h"
-#include "magnet-metainfo.h"
-#include "utils.h"
+#include <libtransmission/magnet-metainfo.h>
+#include <libtransmission/crypto-utils.h> // tr_rand_buffer()
 
 using namespace std::literals;
 
 TEST(MagnetMetainfo, magnetParse)
 {
-    auto constexpr ExpectedHash = tr_sha1_digest_t{ std::byte(210), std::byte(53),  std::byte(64),  std::byte(16),
-                                                    std::byte(163), std::byte(202), std::byte(74),  std::byte(222),
-                                                    std::byte(91),  std::byte(116), std::byte(39),  std::byte(187),
-                                                    std::byte(9),   std::byte(58),  std::byte(98),  std::byte(163),
-                                                    std::byte(137), std::byte(159), std::byte(243), std::byte(129) };
+    auto constexpr ExpectedHash = tr_sha1_digest_t{ std::byte{ 210 }, std::byte{ 53 },  std::byte{ 64 },  std::byte{ 16 },
+                                                    std::byte{ 163 }, std::byte{ 202 }, std::byte{ 74 },  std::byte{ 222 },
+                                                    std::byte{ 91 },  std::byte{ 116 }, std::byte{ 39 },  std::byte{ 187 },
+                                                    std::byte{ 9 },   std::byte{ 58 },  std::byte{ 98 },  std::byte{ 163 },
+                                                    std::byte{ 137 }, std::byte{ 159 }, std::byte{ 243 }, std::byte{ 129 } };
 
     auto constexpr UriHex =
         "magnet:?xt=urn:btih:"
@@ -94,8 +93,6 @@ TEST(MagnetMetainfo, magnetParse)
 
 TEST(WebUtilsTest, parseMagnetFuzzRegressions)
 {
-    auto buf = std::vector<char>{};
-
     static auto constexpr Tests = std::array<std::string_view, 1>{
         "UICOl7RLjChs/QZZwNH4sSQwuH890UMHuoxoWBmMkr0=",
     };
@@ -109,13 +106,13 @@ TEST(WebUtilsTest, parseMagnetFuzzRegressions)
 
 TEST(WebUtilsTest, parseMagnetFuzz)
 {
-    auto buf = std::vector<char>{};
+    auto buf = std::array<char, 1024>{};
 
     for (size_t i = 0; i < 100000; ++i)
     {
-        buf.resize(tr_rand_int(1024));
-        tr_rand_buffer(std::data(buf), std::size(buf));
+        auto const len = static_cast<size_t>(tr_rand_int(1024U));
+        tr_rand_buffer(std::data(buf), len);
         auto mm = tr_magnet_metainfo{};
-        EXPECT_FALSE(mm.parseMagnet({ std::data(buf), std::size(buf) }));
+        EXPECT_FALSE(mm.parseMagnet({ std::data(buf), len }));
     }
 }

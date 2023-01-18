@@ -99,7 +99,7 @@ void TrackerModel::refresh(TorrentModel const& torrent_model, torrent_ids_t cons
     }
 
     // sort 'em
-    CompareTrackers comp;
+    CompareTrackers const comp;
     std::sort(trackers.begin(), trackers.end(), comp);
 
     // merge 'em with the existing list

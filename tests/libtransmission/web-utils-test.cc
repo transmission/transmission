@@ -1,5 +1,5 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -11,11 +11,11 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h"
-#include "platform.h"
-#include "web-utils.h"
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/platform.h>
+#include <libtransmission/web-utils.h>
 
 #include "test-fixtures.h"
 
@@ -126,11 +126,11 @@ TEST(WebUtilsTest, urlParseFuzz)
 {
     auto buf = std::vector<char>{};
 
-    for (size_t i = 0; i < 100000; ++i)
+    for (size_t i = 0; i < 100000U; ++i)
     {
-        buf.resize(tr_rand_int(1024));
+        buf.resize(tr_rand_int(1024U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        tr_urlParse({ std::data(buf), std::size(buf) });
+        (void)tr_urlParse({ std::data(buf), std::size(buf) });
     }
 }
 

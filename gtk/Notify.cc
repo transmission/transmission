@@ -3,16 +3,28 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <map>
-
-#include <giomm.h>
-#include <glibmm/i18n.h>
-
 #include "Notify.h"
+
+#include "GtkCompat.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
 #include "Utils.h"
+
+#include <giomm/asyncresult.h>
+#include <giomm/dbusproxy.h>
+#include <glibmm/error.h>
+#include <glibmm/i18n.h>
+#include <glibmm/miscutils.h>
+#include <glibmm/spawn.h>
+#include <glibmm/ustring.h>
+#include <glibmm/variant.h>
+
+#include <fmt/core.h>
+
+#include <map>
+#include <utility>
+#include <vector>
 
 using namespace std::literals;
 
@@ -23,9 +35,9 @@ using UInt32VariantType = Glib::Variant<guint32>;
 namespace
 {
 
-auto const NotificationsDbusName = Glib::ustring("org.freedesktop.Notifications"s);
-auto const NotificationsDbusCoreObject = Glib::ustring("/org/freedesktop/Notifications"s);
-auto const NotificationsDbusCoreInterface = Glib::ustring("org.freedesktop.Notifications"s);
+auto const NotificationsDbusName = "org.freedesktop.Notifications"sv; // TODO(C++20): Use ""s
+auto const NotificationsDbusCoreObject = "/org/freedesktop/Notifications"sv; // TODO(C++20): Use ""s
+auto const NotificationsDbusCoreInterface = "org.freedesktop.Notifications"sv; // TODO(C++20): Use ""s
 
 struct TrNotification
 {
@@ -46,7 +58,16 @@ Glib::VariantContainerBase make_variant_tuple(Ts&&... args)
 
 void get_capabilities_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 {
-    auto result = proxy->call_finish(res);
+    auto result = Glib::VariantContainerBase();
+
+    try
+    {
+        result = proxy->call_finish(res);
+    }
+    catch (Glib::Error const&)
+    {
+        return;
+    }
 
     if (!result || result.get_n_children() != 1 || !result.get_child(0).is_of_type(StringListVariantType::variant_type()))
     {
@@ -117,11 +138,17 @@ void g_signal_callback(
 
 void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 {
-    proxy = Gio::DBus::Proxy::create_for_bus_finish(res);
-
-    if (proxy == nullptr)
+    try
     {
-        g_warning("Failed to create proxy for %s", NotificationsDbusName.c_str());
+        proxy = Gio::DBus::Proxy::create_for_bus_finish(res);
+    }
+    catch (Glib::Error const& e)
+    {
+        gtr_warning(fmt::format(
+            _("Couldn't create proxy for '{bus}': {error} ({error_code})"),
+            fmt::arg("bus", NotificationsDbusName),
+            fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+            fmt::arg("error_code", e.code())));
         return;
     }
 
@@ -134,13 +161,13 @@ void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 void gtr_notify_init()
 {
     Gio::DBus::Proxy::create_for_bus(
-        Gio::DBus::BUS_TYPE_SESSION,
-        NotificationsDbusName,
-        NotificationsDbusCoreObject,
-        NotificationsDbusCoreInterface,
+        TR_GIO_DBUS_BUS_TYPE(SESSION),
+        std::string(NotificationsDbusName),
+        std::string(NotificationsDbusCoreObject),
+        std::string(NotificationsDbusCoreInterface),
         &dbus_proxy_ready_callback,
         {},
-        Gio::DBus::PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES);
+        TR_GIO_DBUS_PROXY_FLAGS(DO_NOT_LOAD_PROPERTIES));
 }
 
 namespace
@@ -148,7 +175,16 @@ namespace
 
 void notify_callback(Glib::RefPtr<Gio::AsyncResult>& res, TrNotification const& n)
 {
-    auto result = proxy->call_finish(res);
+    auto result = Glib::VariantContainerBase();
+
+    try
+    {
+        result = proxy->call_finish(res);
+    }
+    catch (Glib::Error const&)
+    {
+        return;
+    }
 
     if (!result || result.get_n_children() != 1 || !result.get_child(0).is_of_type(UInt32VariantType::variant_type()))
     {
@@ -170,7 +206,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
 
         try
         {
-            Glib::spawn_async({}, argv, Glib::SPAWN_SEARCH_PATH);
+            Glib::spawn_async({}, argv, TR_GLIB_SPAWN_FLAGS(SEARCH_PATH));
         }
         catch (Glib::SpawnError const&)
         {
@@ -211,7 +247,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_
         [n](auto& res) { notify_callback(res, n); },
         make_variant_tuple(
             Glib::ustring("Transmission"),
-            0u,
+            0U,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Complete")),
             Glib::ustring(tr_torrentName(tor)),
@@ -245,7 +281,7 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, tr_torrent_id_t
         [n](auto& res) { notify_callback(res, n); },
         make_variant_tuple(
             Glib::ustring("Transmission"),
-            0u,
+            0U,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Added")),
             Glib::ustring(tr_torrentName(tor)),

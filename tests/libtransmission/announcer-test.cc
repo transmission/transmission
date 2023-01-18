@@ -1,5 +1,5 @@
 // This file Copyright (C) 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -9,11 +9,10 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "announcer-common.h"
-#include "crypto-utils.h"
-#include "net.h"
+#include <libtransmission/announcer-common.h>
+#include <libtransmission/net.h>
 
 #include "test-fixtures.h"
 
@@ -45,7 +44,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponseNoPeers)
     EXPECT_EQ(3, response.seeders);
     EXPECT_EQ(0, response.leechers);
     EXPECT_EQ(2, response.downloads);
-    EXPECT_EQ(*tr_address::fromString("1.2.3.4"), response.external_ip);
+    EXPECT_EQ(*tr_address::from_string("1.2.3.4"), response.external_ip);
     EXPECT_EQ(0U, std::size(response.pex));
     EXPECT_EQ(0U, std::size(response.pex6));
     EXPECT_EQ(""sv, response.errmsg);
@@ -81,7 +80,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[127.0.0.1]:64551"sv, response.pex[0].readable());
+        EXPECT_EQ("[127.0.0.1]:64551"sv, response.pex[0].display_name());
     }
 }
 
@@ -120,7 +119,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexList)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[8.8.4.4]:53"sv, response.pex[0].readable());
+        EXPECT_EQ("[8.8.4.4]:53"sv, response.pex[0].display_name());
     }
 }
 

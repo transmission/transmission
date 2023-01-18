@@ -1,8 +1,8 @@
 
-/* Class = "NSTextFieldCell"; title = "Limites de envio"; ObjectID = "22"; */
+/* Class = "NSTextFieldCell"; title = "Seeding Limits"; ObjectID = "22"; */
 "22.title" = "Limites de envio";
 
-/* Class = "NSTextFieldCell"; title = "Largura de banda da transferência"; ObjectID = "23"; */
+/* Class = "NSTextFieldCell"; title = "Transfer Bandwidth"; ObjectID = "23"; */
 "23.title" = "Largura de banda da transferência";
 
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "26"; */
@@ -11,80 +11,65 @@
 /* Class = "NSTextFieldCell"; title = "KB/s"; ObjectID = "29"; */
 "29.title" = "KB/s";
 
-/* Class = "NSTextFieldCell"; title = "Rácio:"; ObjectID = "30"; */
+/* Class = "NSTextFieldCell"; title = "Ratio:"; ObjectID = "30"; */
 "30.title" = "Rácio:";
 
-/* Class = "NSTextFieldCell"; title = "Avançadas"; ObjectID = "31"; */
+/* Class = "NSTextFieldCell"; title = "Advanced"; ObjectID = "31"; */
 "31.title" = "Avançadas";
 
-/* Class = "NSTextFieldCell"; title = "Máximo de ligações:"; ObjectID = "32"; */
+/* Class = "NSTextFieldCell"; title = "Maximum connections:"; ObjectID = "32"; */
 "32.title" = "Máximo de ligações:";
 
 /* Class = "NSTextFieldCell"; title = "peers"; ObjectID = "35"; */
 "35.title" = "peers";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "39"; */
-"39.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Ilimitado"; ObjectID = "40"; */
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "40"; */
 "40.title" = "Ilimitado";
 
-/* Class = "NSMenuItem"; title = "Definição global"; ObjectID = "41"; */
+/* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "41"; */
 "41.title" = "Definição global";
 
-/* Class = "NSMenuItem"; title = "Parar no rácio"; ObjectID = "42"; */
+/* Class = "NSMenuItem"; title = "Stop at Ratio"; ObjectID = "42"; */
 "42.title" = "Parar no rácio";
 
-/* Class = "NSButtonCell"; title = "Limitar velocidade de envio:"; ObjectID = "43"; */
+/* Class = "NSButtonCell"; title = "Limit Upload:"; ObjectID = "43"; */
 "43.title" = "Limitar velocidade de envio:";
 
-/* Class = "NSButtonCell"; title = "Limitar velocidade de recepção:"; ObjectID = "44"; */
+/* Class = "NSButtonCell"; title = "Limit Download:"; ObjectID = "44"; */
 "44.title" = "Limitar velocidade de recepção:";
 
-/* Class = "NSButtonCell"; title = "Manter dentro do limites globais de largura de banda"; ObjectID = "45"; */
+/* Class = "NSButtonCell"; title = "Stay within the global bandwidth limits"; ObjectID = "45"; */
 "45.title" = "Manter dentro do limites globais de largura de banda";
 
-/* Class = "NSTextFieldCell"; title = "Prioridade"; ObjectID = "46"; */
+/* Class = "NSTextFieldCell"; title = "Priority"; ObjectID = "46"; */
 "46.title" = "Prioridade";
 
-/* Class = "NSTextFieldCell"; title = "Prioridade da transferência:"; ObjectID = "47"; */
+/* Class = "NSTextFieldCell"; title = "Transfer Priority:"; ObjectID = "47"; */
 "47.title" = "Prioridade da transferência:";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "49"; */
-"49.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Baixa"; ObjectID = "50"; */
+/* Class = "NSMenuItem"; title = "Low"; ObjectID = "50"; */
 "50.title" = "Baixa";
 
 /* Class = "NSMenuItem"; title = "Normal"; ObjectID = "51"; */
 "51.title" = "Normal";
 
-/* Class = "NSMenuItem"; title = "Alta"; ObjectID = "52"; */
+/* Class = "NSMenuItem"; title = "High"; ObjectID = "52"; */
 "52.title" = "Alta";
 
-/* Class = "NSMenu"; title = "OtherViews"; ObjectID = "85"; */
-"85.title" = "OtherViews";
-
-/* Class = "NSMenuItem"; title = "Parar se inactivo por"; ObjectID = "86"; */
+/* Class = "NSMenuItem"; title = "Stop When Inactive"; ObjectID = "86"; */
 "86.title" = "Parar se inactivo por";
 
-/* Class = "NSMenuItem"; title = "Definição global"; ObjectID = "87"; */
+/* Class = "NSMenuItem"; title = "Global Setting"; ObjectID = "87"; */
 "87.title" = "Definição global";
 
-/* Class = "NSMenuItem"; title = "Ilimitada"; ObjectID = "88"; */
+/* Class = "NSMenuItem"; title = "Unlimited"; ObjectID = "88"; */
 "88.title" = "Ilimitada";
 
-/* Class = "NSTextFieldCell"; title = "Inactividade:"; ObjectID = "89"; */
+/* Class = "NSTextFieldCell"; title = "Inactivity:"; ObjectID = "89"; */
 "89.title" = "Inactividade:";
 
-/* Class = "NSTextFieldCell"; title = "minutos"; ObjectID = "98"; */
+/* Class = "NSTextFieldCell"; title = "minutes"; ObjectID = "98"; */
 "98.title" = "minutos";
 
-/* Class = "NSTextFieldCell"; title = "informação global aqui"; ObjectID = "108"; */
-"108.title" = "informação global aqui";
-
-/* Class = "NSTextFieldCell"; title = "informação global aqui"; ObjectID = "110"; */
-"110.title" = "informação global aqui";
-
-/* Class = "NSButtonCell"; title = "Remover da lista de transferências ao parar de enviar"; ObjectID = "114"; */
+/* Class = "NSButtonCell"; title = "Remove from the transfer list when seeding completes"; ObjectID = "114"; */
 "114.title" = "Remover da lista de transferências ao parar de enviar";

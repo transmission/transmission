@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <string_view>
 
 #include <fmt/format.h>
@@ -14,6 +15,18 @@
 #include "tr-macros.h"
 #include "utils.h"
 
+namespace
+{
+[[nodiscard]] char* tr_strvdup(std::string_view in)
+{
+    auto const n = std::size(in);
+    auto* const ret = new char[n + 1];
+    std::copy(std::begin(in), std::end(in), ret);
+    ret[n] = '\0';
+    return ret;
+}
+} // namespace
+
 void tr_error_free(tr_error* error)
 {
     if (error == nullptr)
@@ -21,7 +34,7 @@ void tr_error_free(tr_error* error)
         return;
     }
 
-    tr_free(error->message);
+    delete[] error->message;
     delete error;
 }
 
@@ -33,7 +46,7 @@ void tr_error_set(tr_error** error, int code, std::string_view message)
     }
 
     TR_ASSERT(*error == nullptr);
-    *error = new tr_error{ code, tr_strvDup(message) };
+    *error = new tr_error{ code, tr_strvdup(message) };
 }
 
 void tr_error_propagate(tr_error** new_error, tr_error** old_error)
@@ -76,7 +89,7 @@ void tr_error_prefix(tr_error** error, char const* prefix)
     }
 
     auto* err = *error;
-    auto* const new_message = tr_strvDup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
-    tr_free(err->message);
+    auto* const new_message = tr_strvdup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
+    delete[] err->message;
     err->message = new_message;
 }

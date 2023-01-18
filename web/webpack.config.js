@@ -25,11 +25,9 @@ const config = {
       },
       {
         test: /\.css$/i,
-        use: [ 'style-loader', 'css-loader' ],
+        use: ['style-loader', 'css-loader'],
       },
-
       {
-        exclude: /(node_modules)/,
         include: /(assets)\/(img)/,
         test: /\.(jpe?g|png|gif|svg|webp)$/,
         type: 'asset/inline',
@@ -37,27 +35,24 @@ const config = {
     ],
   },
   optimization: {
-    minimizer: [
-      new TerserPlugin(),
-      new CssMinimizerPlugin(),
-    ],
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
   },
   output: {
-    filename: 'transmission-app.js' ,
+    filename: 'transmission-app.js',
     path: path.resolve(__dirname, 'public_html'),
-    sourceMapFilename: 'transmission-app.js.map'
+    sourceMapFilename: '[file].map',
   },
   plugins: [
     new MiniCssExtractPlugin({
       chunkFilename: '[id].css',
-      filename: '[name].css'
+      filename: '[name].css',
     }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
   ],
   resolve: {
-    extensions: ['.js', '.scss']
+    extensions: ['.js', '.scss'],
   },
 };
 
@@ -65,18 +60,15 @@ if (mode === 'development') {
   config.devServer = {
     compress: true,
     historyApiFallback: {
-      rewrites: [
-        { from: '/transmission/web', to: '/' },
-      ]
+      rewrites: [{ from: '/transmission/web', to: '/' }],
     },
     hot: true,
     port: devPort,
     proxy: {
-      '/rpc': rpcUrl
+      '/rpc': rpcUrl,
     },
-    static: './public_html'
+    static: './public_html',
   };
 }
 
 module.exports = config;
-

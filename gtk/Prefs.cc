@@ -2,20 +2,19 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <errno.h>
-#include <stdlib.h> /* strtol() */
-#include <string>
-#include <string_view>
+#include "Prefs.h"
 
-#include <glibmm.h>
-#include <glibmm/i18n.h>
+#include "GtkCompat.h"
+#include "PrefsDialog.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Utils.h"
+#include <glibmm/miscutils.h>
+
+#include <string>
+#include <string_view>
 
 using namespace std::literals;
 
@@ -38,11 +37,11 @@ void gtr_pref_init(std::string_view config_dir)
  */
 static void tr_prefs_init_defaults(tr_variant* d)
 {
-    auto dir = Glib::get_user_special_dir(Glib::USER_DIRECTORY_DOWNLOAD);
+    auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DOWNLOAD));
 
     if (dir.empty())
     {
-        dir = Glib::get_user_special_dir(Glib::USER_DIRECTORY_DESKTOP);
+        dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP));
     }
 
     if (dir.empty())
@@ -85,7 +84,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
 
 static void ensure_sound_cmd_is_a_list(tr_variant* dict)
 {
-    tr_quark key = TR_KEY_torrent_complete_sound_command;
+    tr_quark const key = TR_KEY_torrent_complete_sound_command;
     tr_variant* list = nullptr;
     if (tr_variantDictFindList(dict, key, &list))
     {
@@ -129,7 +128,7 @@ tr_variant* gtr_pref_get_all()
 
 int64_t gtr_pref_int_get(tr_quark const key)
 {
-    int64_t i;
+    int64_t i = 0;
 
     return tr_variantDictFindInt(getPrefs(), key, &i) ? i : 0;
 }
@@ -141,7 +140,7 @@ void gtr_pref_int_set(tr_quark const key, int64_t value)
 
 double gtr_pref_double_get(tr_quark const key)
 {
-    double d;
+    double d = 0;
 
     return tr_variantDictFindReal(getPrefs(), key, &d) ? d : 0.0;
 }
@@ -157,7 +156,7 @@ void gtr_pref_double_set(tr_quark const key, double value)
 
 bool gtr_pref_flag_get(tr_quark const key)
 {
-    bool boolVal;
+    bool boolVal = false;
 
     return tr_variantDictFindBool(getPrefs(), key, &boolVal) ? boolVal : false;
 }

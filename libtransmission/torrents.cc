@@ -1,5 +1,5 @@
 // This file Copyright © 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -42,23 +42,6 @@ struct CompareTorrentByHash
 
 } // namespace
 
-tr_torrent* tr_torrents::get(tr_torrent_id_t id)
-{
-    TR_ASSERT(0 < id);
-    TR_ASSERT(static_cast<size_t>(id) < std::size(by_id_));
-    if (static_cast<size_t>(id) >= std::size(by_id_))
-    {
-        return nullptr;
-    }
-
-    auto* const tor = by_id_.at(id);
-    TR_ASSERT(tor == nullptr || tor->id() == id);
-    TR_ASSERT(
-        std::count_if(std::begin(removed_), std::end(removed_), [&id](auto const& removed) { return id == removed.first; }) ==
-        (tor == nullptr ? 1 : 0));
-    return tor;
-}
-
 tr_torrent* tr_torrents::get(std::string_view magnet_link)
 {
     auto magnet = tr_magnet_metainfo{};
@@ -85,7 +68,7 @@ tr_torrent_id_t tr_torrents::add(tr_torrent* tor)
     return id;
 }
 
-void tr_torrents::remove(tr_torrent const* tor, time_t timestamp)
+void tr_torrents::remove(tr_torrent const* tor, time_t current_time)
 {
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(get(tor->id()) == tor);
@@ -93,7 +76,7 @@ void tr_torrents::remove(tr_torrent const* tor, time_t timestamp)
     by_id_[tor->id()] = nullptr;
     auto const [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{});
     by_hash_.erase(begin, end);
-    removed_.emplace_back(tor->id(), timestamp);
+    removed_.emplace_back(tor->id(), current_time);
 }
 
 std::vector<tr_torrent_id_t> tr_torrents::removedSince(time_t timestamp) const

@@ -79,6 +79,32 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="1">
+      <widget class="QSlider" name="pieceSizeSlider">
+       <property name="minimum">
+        <number>10</number>
+       </property>
+       <property name="maximum">
+        <number>26</number>
+       </property>
+       <property name="pageStep">
+        <number>1</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="pieceSizeLabel">
+       <property name="text">
+        <string>Piece s&amp;ize:</string>
+       </property>
+       <property name="buddy">
+        <cstring>pieceSizeSlider</cstring>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

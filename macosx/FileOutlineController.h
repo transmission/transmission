@@ -21,7 +21,7 @@
 - (void)uncheckAll;
 - (void)setPriority:(id)sender;
 
-- (void)revealFile:(id)sender;
+- (IBAction)revealFile:(id)sender;
 
 - (void)renameSelected:(id)sender;
 

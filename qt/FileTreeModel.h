@@ -1,15 +1,15 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <cstdint> // uint64_t
+#include <map>
 #include <memory>
 
 #include <QAbstractItemModel>
-#include <QMap>
 #include <QSet>
 
 #include <libtransmission/tr-macros.h>
@@ -54,7 +54,7 @@ public:
         int priority,
         uint64_t size,
         uint64_t have,
-        bool torrent_changed);
+        bool update_fields);
 
     bool openFile(QModelIndex const& index);
 
@@ -69,7 +69,7 @@ public:
     // QAbstractItemModel
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
     Qt::ItemFlags flags(QModelIndex const& index) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int column, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     QModelIndex index(int row, int column, QModelIndex const& parent = {}) const override;
     QModelIndex parent(QModelIndex const& child) const override;
     int rowCount(QModelIndex const& parent = {}) const override;
@@ -95,7 +95,7 @@ private:
     FileTreeItem* itemFromIndex(QModelIndex const&) const;
     QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
-    QMap<int, FileTreeItem*> index_cache_;
+    std::map<int, FileTreeItem*> index_cache_;
     std::unique_ptr<FileTreeItem> root_item_;
     bool is_editable_ = {};
 };

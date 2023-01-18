@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.38.2 -->
+<interface domain="transmission-gtk">
+  <requires lib="gtk+" version="3.24"/>
+  <template class="gtkmm__CustomObject_9FilterBar" parent="GtkBox">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="border-width">3</property>
+    <property name="spacing">3</property>
+    <child>
+      <object class="GtkLabel" id="show_label">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">_Show:</property>
+        <property name="use-underline">True</property>
+        <property name="mnemonic-widget">activity_combo</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkComboBox" id="activity_combo">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="margin-end">6</property>
+      </object>
+      <packing>
+        <property name="expand">True</property>
+        <property name="fill">True</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkComboBox" id="tracker_combo">
+        <property name="width-request">170</property>
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="margin-end">6</property>
+      </object>
+      <packing>
+        <property name="expand">True</property>
+        <property name="fill">True</property>
+        <property name="position">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkEntry" id="text_entry">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="secondary-icon-name">edit-clear</property>
+      </object>
+      <packing>
+        <property name="expand">True</property>
+        <property name="fill">True</property>
+        <property name="position">3</property>
+      </packing>
+    </child>
+  </template>
+</interface>

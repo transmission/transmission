@@ -200,7 +200,7 @@ export class Torrent extends EventTarget {
     return this.fields.pieceSize;
   }
   getPrimaryMimeType() {
-    return this.fields['primary-mime-type'];
+    return this.fields['primary-mime-type'] || 'application/octet-stream';
   }
   getPrivateFlag() {
     return this.fields.isPrivate;
@@ -383,7 +383,7 @@ export class Torrent extends EventTarget {
    * @return true if it passes the test, false if it fails
    */
   test(state, tracker, search, labels) {
-    // flter by state...
+    // filter by state...
     let pass = this.testState(state);
 
     // maybe filter by text...

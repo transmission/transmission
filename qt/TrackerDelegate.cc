@@ -9,9 +9,6 @@
 #include <QPixmap>
 #include <QTextDocument>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
-
 #include "FaviconCache.h"
 #include "Formatter.h"
 #include "Torrent.h"
@@ -119,7 +116,7 @@ void TrackerDelegate::drawTracker(QPainter* painter, QStyleOptionViewItem const&
     bool const is_item_enabled((option.state & QStyle::State_Enabled) != 0);
     bool const is_item_active((option.state & QStyle::State_Active) != 0);
 
-    QIcon tracker_icon(inf.st.getFavicon());
+    QIcon const tracker_icon(inf.st.getFavicon());
 
     QRect const content_rect(option.rect.adjusted(Margin.width(), Margin.height(), -Margin.width(), -Margin.height()));
     ItemLayout const layout(getText(inf), is_item_selected, option.direction, content_rect.topLeft(), content_rect.width());
@@ -174,7 +171,6 @@ QString timeToStringRounded(int seconds)
 
 QString TrackerDelegate::getText(TrackerInfo const& inf) const
 {
-    QString key;
     QString str;
     auto const err_markup_begin = QStringLiteral("<span style=\"color:red\">");
     auto const err_markup_end = QStringLiteral("</span>");
@@ -197,11 +193,6 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     str += inf.st.is_backup ? QStringLiteral("<i>") : QStringLiteral("<b>");
     auto const url = QUrl(inf.st.announce);
     str += QStringLiteral("%1:%2").arg(url.host()).arg(url.port(80));
-
-    if (!key.isEmpty())
-    {
-        str += QStringLiteral(" - ") + key;
-    }
 
     str += inf.st.is_backup ? QStringLiteral("</i>") : QStringLiteral("</b>");
 
@@ -261,7 +252,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
         case TR_TRACKER_ACTIVE:
             str += QStringLiteral("<br/>\n");
             //: %1 is duration
-            str += tr("Asking for more peers now... <small>%1</small>").arg(time_since(inf.st.last_announce_start_time));
+            str += tr("Asking for more peers now… <small>%1</small>").arg(time_since(inf.st.last_announce_start_time));
             break;
         }
 
@@ -328,7 +319,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
         case TR_TRACKER_ACTIVE:
             str += QStringLiteral("<br/>\n");
             //: %1 is duration
-            str += tr("Asking for peer counts now... <small>%1</small>").arg(time_since(inf.st.last_scrape_start_time));
+            str += tr("Asking for peer counts now… <small>%1</small>").arg(time_since(inf.st.last_scrape_start_time));
             break;
         }
     }

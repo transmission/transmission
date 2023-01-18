@@ -8,18 +8,25 @@ if(EVENT2_PREFER_STATIC_LIB)
 endif()
 
 if(UNIX)
-  find_package(PkgConfig QUIET)
-  pkg_check_modules(_EVENT2 QUIET libevent)
+    find_package(PkgConfig QUIET)
+    pkg_check_modules(_EVENT2 QUIET libevent)
 endif()
 
-find_path(EVENT2_INCLUDE_DIR NAMES event2/event.h HINTS ${_EVENT2_INCLUDEDIR})
-find_library(EVENT2_LIBRARY NAMES event-2.1 event HINTS ${_EVENT2_LIBDIR})
+find_path(EVENT2_INCLUDE_DIR
+    NAMES event2/event.h
+    HINTS ${_EVENT2_INCLUDEDIR})
+find_library(EVENT2_LIBRARY
+    NAMES
+        event-2.1
+        event
+    HINTS ${_EVENT2_LIBDIR})
 
 if(EVENT2_INCLUDE_DIR)
     if(_EVENT2_VERSION)
         set(EVENT2_VERSION ${_EVENT2_VERSION})
     else()
-        file(STRINGS "${EVENT2_INCLUDE_DIR}/event2/event-config.h" EVENT2_VERSION_STR REGEX "^#define[\t ]+_EVENT_VERSION[\t ]+\"[^\"]+\"")
+        file(STRINGS "${EVENT2_INCLUDE_DIR}/event2/event-config.h" EVENT2_VERSION_STR
+            REGEX "^#define[\t ]+_EVENT_VERSION[\t ]+\"[^\"]+\"")
         if(EVENT2_VERSION_STR MATCHES "\"([^\"]+)\"")
             set(EVENT2_VERSION "${CMAKE_MATCH_1}")
         endif()
@@ -35,9 +42,7 @@ find_package_handle_standard_args(EVENT2
     REQUIRED_VARS
         EVENT2_LIBRARY
         EVENT2_INCLUDE_DIR
-    VERSION_VAR
-        EVENT2_VERSION
-)
+    VERSION_VAR EVENT2_VERSION)
 
 mark_as_advanced(EVENT2_INCLUDE_DIR EVENT2_LIBRARY)
 

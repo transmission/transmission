@@ -5,7 +5,6 @@
 
 #include <array>
 #include <cassert>
-#include <functional>
 #include <memory>
 #include <utility>
 
@@ -114,7 +113,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
             QRect(QPoint(0, 0), size));
 
         QPixmap pixmap = base_icon.pixmap(size);
-        QPixmap emblem_pixmap = emblem_icon.pixmap(emblem_size);
+        QPixmap const emblem_pixmap = emblem_icon.pixmap(emblem_size);
         QPainter(&pixmap).drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
 
         icon.addPixmap(pixmap);
@@ -437,7 +436,7 @@ QMenu* MainWindow::createOptionsMenu()
     auto const init_seed_ratio_sub_menu =
         [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
     {
-        std::array<double, 7> stock_ratios = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
+        static constexpr std::array<double, 7> StockRatios = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
         auto const current_value = prefs_.get<double>(pref);
 
         auto* action_group = new QActionGroup(this);
@@ -456,7 +455,7 @@ QMenu* MainWindow::createOptionsMenu()
 
         menu->addSeparator();
 
-        for (double const i : stock_ratios)
+        for (double const i : StockRatios)
         {
             QAction* action = menu->addAction(Formatter::get().ratioToString(i));
             action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
@@ -493,7 +492,7 @@ QMenu* MainWindow::createOptionsMenu()
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    std::array<QPair<QAction*, QString>, 4> stats_modes = {
+    std::array<QPair<QAction*, QString>, 4> const stats_modes = {
         qMakePair(ui_.action_TotalRatio, total_ratio_stats_mode_name_),
         qMakePair(ui_.action_TotalTransfer, total_transfer_stats_mode_name_),
         qMakePair(ui_.action_SessionRatio, session_ratio_stats_mode_name_),
@@ -1274,19 +1273,19 @@ void MainWindow::openTorrent()
 
 void MainWindow::openURL()
 {
-    QString str = QApplication::clipboard()->text(QClipboard::Selection);
+    auto add = AddData::create(QApplication::clipboard()->text(QClipboard::Selection));
 
-    if (!AddData::isSupported(str))
+    if (!add)
     {
-        str = QApplication::clipboard()->text(QClipboard::Clipboard);
+        add = AddData::create(QApplication::clipboard()->text(QClipboard::Clipboard));
     }
 
-    if (!AddData::isSupported(str))
+    if (!add)
     {
-        str.clear();
+        add = AddData{};
     }
 
-    addTorrent(AddData(str), true);
+    addTorrent(std::move(*add), true);
 }
 
 void MainWindow::addTorrents(QStringList const& filenames)
@@ -1309,17 +1308,17 @@ void MainWindow::addTorrents(QStringList const& filenames)
     }
 }
 
-void MainWindow::addTorrent(AddData const& addMe, bool show_options)
+void MainWindow::addTorrent(AddData add_me, bool show_options)
 {
     if (show_options)
     {
-        auto* o = new OptionsDialog(session_, prefs_, addMe, this);
+        auto* o = new OptionsDialog(session_, prefs_, std::move(add_me), this);
         o->show();
         QApplication::alert(o);
     }
     else
     {
-        session_.addTorrent(addMe);
+        session_.addTorrent(std::move(add_me));
         QApplication::alert(this);
     }
 }

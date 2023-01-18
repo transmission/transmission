@@ -8,6 +8,7 @@
 #include <cstdint> // uint64_t
 #include <map>
 #include <unordered_map>
+#include <utility>
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -98,7 +99,7 @@ QString getCountString(size_t n)
 }
 
 Torrent::fields_t constexpr TrackerFields = {
-    uint64_t(1) << Torrent::TRACKER_STATS,
+    static_cast<uint64_t>(1) << Torrent::TRACKER_STATS,
 };
 
 auto constexpr ActivityFields = FilterMode::TorrentFields;
@@ -126,7 +127,7 @@ void FilterBar::refreshTrackers()
     // update the "All" row
     auto const num_trackers = torrents_per_sitename.size();
     auto* item = tracker_model_->item(ROW_TOTALS);
-    item->setData(int(num_trackers), FilterBarComboBox::CountRole);
+    item->setData(static_cast<int>(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
     auto update_tracker_item = [](QStandardItem* i, auto const& it)
@@ -139,7 +140,7 @@ void FilterBar::refreshTrackers()
         i->setData(display_name, TRACKER_ROLE);
         i->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
         i->setData(icon, Qt::DecorationRole);
-        i->setData(int(count), FilterBarComboBox::CountRole);
+        i->setData(static_cast<int>(count), FilterBarComboBox::CountRole);
 
         return i;
     };
@@ -220,18 +221,15 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     count_label_ = new QLabel(tr("Show:"), this);
     h->addWidget(count_label_);
 
-    activity_combo_ = createActivityCombo();
     h->addWidget(activity_combo_);
 
-    tracker_model_ = new QStandardItemModel(this);
     tracker_combo_ = createTrackerCombo(tracker_model_);
     h->addWidget(tracker_combo_);
 
     h->addStretch();
 
-    line_edit_ = new QLineEdit(this);
     line_edit_->setClearButtonEnabled(true);
-    line_edit_->setPlaceholderText(tr("Search..."));
+    line_edit_->setPlaceholderText(tr("Search…"));
     line_edit_->setMaximumWidth(250);
     h->addWidget(line_edit_, 1);
     connect(line_edit_, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
@@ -248,7 +246,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&trApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
 
     recountAllSoon();
-    is_bootstrapping_ = false;
+    is_bootstrapping_ = false; // NOLINT cppcoreguidelines-prefer-member-initializer
 
     // initialize our state
     for (int const key : { Prefs::FILTER_MODE, Prefs::FILTER_TRACKERS })
@@ -288,8 +286,8 @@ void FilterBar::refreshPref(int key)
     case Prefs::FILTER_TRACKERS:
         {
             auto const display_name = prefs_.getString(key);
-            auto rows = tracker_model_->findItems(display_name);
-            if (!rows.isEmpty())
+
+            if (auto rows = tracker_model_->findItems(display_name); !rows.isEmpty())
             {
                 tracker_combo_->setCurrentIndex(rows.front()->row());
             }
@@ -353,9 +351,9 @@ void FilterBar::onActivityIndexChanged(int i)
 ****
 ***/
 
-void FilterBar::recountSoon(Pending const& pending)
+void FilterBar::recountSoon(Pending const& fields)
 {
-    pending_ |= pending;
+    pending_ |= fields;
 
     if (!recount_timer_.isActive())
     {

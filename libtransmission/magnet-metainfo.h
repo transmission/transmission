@@ -1,5 +1,5 @@
 // This file Copyright 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -37,14 +37,14 @@ public:
         return name_;
     }
 
-    [[nodiscard]] constexpr auto webseedCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
     {
         return std::size(webseed_urls_);
     }
 
-    [[nodiscard]] auto const& webseed(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
     {
-        return webseed_urls_[i];
+        return webseed_urls_.at(i);
     }
 
     [[nodiscard]] constexpr auto& announceList() noexcept

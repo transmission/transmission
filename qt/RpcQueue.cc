@@ -7,12 +7,8 @@
 
 #include "RpcQueue.h"
 
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-RpcQueue::Tag RpcQueue::next_tag = {};
-
 RpcQueue::RpcQueue(QObject* parent)
     : QObject(parent)
-    , tag_(next_tag++)
 {
     connect(&future_watcher_, &QFutureWatcher<RpcResponse>::finished, this, &RpcQueue::stepFinished);
 }
@@ -24,7 +20,7 @@ void RpcQueue::stepFinished()
     if (future_watcher_.future().isResultReadyAt(0))
     {
         result = future_watcher_.result();
-        RpcResponseFuture future = future_watcher_.future();
+        RpcResponseFuture const future = future_watcher_.future();
 
         // we can't handle network errors, abort queue and pass the error upwards
         if (result.networkError != QNetworkReply::NoError)

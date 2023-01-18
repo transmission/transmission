@@ -172,4 +172,4 @@ Sum:            959.4 MB               0.0     0.0
 ```
 
 ### Everything else
-For all other RPCs, see the man page of `transmission-remote`. For more daemon options, see `transmission-daemon`'s man page. For instructions on autostart, i.e. system integration, see your distro's documentation. For most linux distributions, you'll probably want to see systemd's documentation.
+For all other RPCs, see the [RPC Specification](rpc-spec.md) page. For more daemon options, see `transmission-daemon`'s man page. For instructions on autostart, i.e. system integration, see your distro's documentation. For most linux distributions, you'll probably want to see systemd's documentation.

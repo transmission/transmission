@@ -3,13 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <cstdlib> // std::lldiv()
 #include <iterator> // std::distance(), std::next(), std::prev()
 #include <limits> // std::numeric_limits<size_t>::max()
+#include <memory>
 #include <numeric> // std::accumulate()
 #include <utility> // std::make_pair()
-
-#include <event2/buffer.h>
+#include <vector>
 
 #include <fmt/core.h>
 
@@ -20,7 +21,7 @@
 #include "torrent.h"
 #include "torrents.h"
 #include "tr-assert.h"
-#include "trevent.h"
+#include "utils.h" // tr_time(), tr_formatter
 
 Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {
@@ -87,8 +88,14 @@ int Cache::writeContiguous(CIter const begin, CIter const end) const
     TR_ASSERT(std::size(buf) == buflen);
 
     // save it
-    auto* const tor = torrents_.get(begin->key.first);
-    auto const loc = tor->blockLoc(begin->key.second);
+    auto const& [torrent_id, block] = begin->key;
+    auto* const tor = torrents_.get(torrent_id);
+    if (tor == nullptr)
+    {
+        return EINVAL;
+    }
+
+    auto const loc = tor->blockLoc(block);
 
     if (auto const err = tr_ioWrite(tor, loc, std::size(buf), std::data(buf)); err != 0)
     {
@@ -126,7 +133,7 @@ Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
 ****
 ***/
 
-void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& data)
+int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme)
 {
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
@@ -138,12 +145,12 @@ void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniq
 
     iter->time_added = tr_time();
 
-    iter->buf = std::move(data);
+    iter->buf = std::move(writeme);
 
     ++cache_writes_;
     cache_write_bytes_ += std::size(*iter->buf);
 
-    (void)cacheTrim();
+    return cacheTrim();
 }
 
 Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
@@ -204,18 +211,18 @@ int Cache::flushSpan(CIter const begin, CIter const end)
     return {};
 }
 
-int Cache::flushFile(tr_torrent* torrent, tr_file_index_t i)
+int Cache::flushFile(tr_torrent const* torrent, tr_file_index_t file)
 {
     auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
-    auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, i);
+    auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, file);
 
     return flushSpan(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), compare),
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), compare));
 }
 
-int Cache::flushTorrent(tr_torrent* torrent)
+int Cache::flushTorrent(tr_torrent const* torrent)
 {
     auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();

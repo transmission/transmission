@@ -1,18 +1,17 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "benc.h"
-#include "crypto-utils.h"
-#include "error.h"
-#include "utils.h" /* tr_free */
-#include "variant-common.h"
-#include "variant.h"
+#include <libtransmission/benc.h>
+#include <libtransmission/crypto-utils.h> // tr_rand_buffer(), tr_rand_int()
+#include <libtransmission/error.h>
+#include <libtransmission/variant-common.h>
+#include <libtransmission/variant.h>
 
 #include <algorithm>
 #include <array>
@@ -213,13 +212,13 @@ TEST_F(VariantTest, parse)
     auto benc = "i64e"sv;
     auto i = int64_t{};
     auto val = tr_variant{};
-    char const* end;
+    char const* end = nullptr;
     auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
     EXPECT_TRUE(ok);
     EXPECT_TRUE(tr_variantGetInt(&val, &i));
     EXPECT_EQ(int64_t(64), i);
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
-    tr_variantFree(&val);
+    tr_variantClear(&val);
 
     benc = "li64ei32ei16ee"sv;
     ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
@@ -234,7 +233,7 @@ TEST_F(VariantTest, parse)
     EXPECT_EQ(16, i);
     EXPECT_EQ(benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
 
-    tr_variantFree(&val);
+    tr_variantClear(&val);
     end = nullptr;
 
     benc = "lllee"sv;
@@ -246,7 +245,7 @@ TEST_F(VariantTest, parse)
     EXPECT_TRUE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end));
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
     EXPECT_EQ(benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-    tr_variantFree(&val);
+    tr_variantClear(&val);
 
     benc = "d20:"sv;
     end = nullptr;
@@ -286,7 +285,7 @@ TEST_F(VariantTest, bencParseAndReencode)
         {
             EXPECT_EQ(test.benc.data() + test.benc.size(), end);
             EXPECT_EQ(test.benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-            tr_variantFree(&val);
+            tr_variantClear(&val);
         }
     }
 }
@@ -297,13 +296,13 @@ TEST_F(VariantTest, bencSortWhenSerializing)
     auto constexpr ExpectedOut = "lld1:ai64e1:bi32eeee"sv;
 
     tr_variant val;
-    char const* end;
+    char const* end = nullptr;
     auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
     EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(In) + std::size(In), end);
     EXPECT_EQ(ExpectedOut, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
 
-    tr_variantFree(&val);
+    tr_variantClear(&val);
 }
 
 TEST_F(VariantTest, bencMalformedTooManyEndings)
@@ -312,13 +311,13 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
     auto constexpr ExpectedOut = "le"sv;
 
     tr_variant val;
-    char const* end;
+    char const* end = nullptr;
     auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
     EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(In) + std::size(ExpectedOut), end);
     EXPECT_EQ(ExpectedOut, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
 
-    tr_variantFree(&val);
+    tr_variantClear(&val);
 }
 
 TEST_F(VariantTest, bencMalformedNoEnding)
@@ -359,7 +358,7 @@ TEST_F(VariantTest, bencToJson)
 
         auto const str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
         EXPECT_EQ(test.expected, stripWhitespace(str));
-        tr_variantFree(&top);
+        tr_variantClear(&top);
     }
 }
 
@@ -396,7 +395,7 @@ TEST_F(VariantTest, merge)
 
     tr_variantMergeDicts(&dest, /*const*/ &src);
 
-    int64_t i;
+    auto i = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&dest, i1, &i));
     EXPECT_EQ(1, i);
     EXPECT_TRUE(tr_variantDictFindInt(&dest, i2, &i));
@@ -415,8 +414,8 @@ TEST_F(VariantTest, merge)
     EXPECT_TRUE(tr_variantDictFindStrView(&dest, s8, &sv));
     EXPECT_EQ("ghi"sv, sv);
 
-    tr_variantFree(&dest);
-    tr_variantFree(&src);
+    tr_variantClear(&dest);
+    tr_variantClear(&src);
 }
 
 TEST_F(VariantTest, stackSmash)
@@ -426,7 +425,7 @@ TEST_F(VariantTest, stackSmash)
     std::string const in = std::string(Depth, 'l') + std::string(Depth, 'e');
 
     // confirm that it fails instead of crashing
-    char const* end;
+    char const* end = nullptr;
     tr_variant val;
     tr_error* error = nullptr;
     auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, in, &end, &error);
@@ -444,7 +443,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     auto const key3 = tr_quark_new("key3"sv);
     auto const key4 = tr_quark_new("key4"sv);
 
-    tr_variant top;
+    auto top = tr_variant{};
     tr_variantInitDict(&top, 10);
     tr_variantDictAddBool(&top, key1, false);
     tr_variantDictAddBool(&top, key2, 0); // NOLINT modernize-use-bool-literals
@@ -452,7 +451,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     tr_variantDictAddInt(&top, key4, 1);
 
     // confirm we can read both bools and ints as bools
-    bool b;
+    auto b = bool{};
     EXPECT_TRUE(tr_variantDictFindBool(&top, key1, &b));
     EXPECT_FALSE(b);
     EXPECT_TRUE(tr_variantDictFindBool(&top, key2, &b));
@@ -463,7 +462,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     EXPECT_TRUE(b);
 
     // confirm we can read both bools and ints as ints
-    int64_t i;
+    auto i = int64_t{};
     EXPECT_TRUE(tr_variantDictFindInt(&top, key1, &i));
     EXPECT_EQ(0, i);
     EXPECT_TRUE(tr_variantDictFindInt(&top, key2, &i));
@@ -473,7 +472,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     EXPECT_TRUE(tr_variantDictFindInt(&top, key4, &i));
     EXPECT_NE(0, i);
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 TEST_F(VariantTest, dictFindType)
@@ -535,7 +534,7 @@ TEST_F(VariantTest, dictFindType)
     EXPECT_TRUE(tr_variantDictFindInt(&top, key_int, &i));
     EXPECT_EQ(ExpectedInt, i);
 
-    tr_variantFree(&top);
+    tr_variantClear(&top);
 }
 
 TEST_F(VariantTest, variantFromBufFuzz)
@@ -544,21 +543,20 @@ TEST_F(VariantTest, variantFromBufFuzz)
 
     for (size_t i = 0; i < 100000; ++i)
     {
-        buf.resize(tr_rand_int(4096));
+        buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const sv = std::string_view{ std::data(buf), std::size(buf) };
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
         if (auto top = tr_variant{};
-            tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr))
+            tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, buf, nullptr, nullptr))
         {
-            tr_variantFree(&top);
+            tr_variantClear(&top);
         }
 
         if (auto top = tr_variant{};
-            tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr))
+            tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, nullptr))
         {
-            tr_variantFree(&top);
+            tr_variantClear(&top);
         }
     }
 }

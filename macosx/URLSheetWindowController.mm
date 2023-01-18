@@ -12,13 +12,9 @@
 @property(nonatomic) IBOutlet NSButton* fOpenButton;
 @property(nonatomic) IBOutlet NSButton* fCancelButton;
 
-- (void)updateOpenButtonForURL:(NSString*)string;
-
 @end
 
 @implementation URLSheetWindowController
-
-NSString* urlString = nil;
 
 - (instancetype)init
 {
@@ -29,15 +25,6 @@ NSString* urlString = nil;
 - (void)awakeFromNib
 {
     self.fLabelField.stringValue = NSLocalizedString(@"Internet address of torrent file:", "URL sheet label");
-
-    if (self.urlString)
-    {
-        self.fTextField.stringValue = self.urlString;
-        [self.fTextField selectText:self];
-
-        [self updateOpenButtonForURL:self.urlString];
-    }
-
     self.fOpenButton.title = NSLocalizedString(@"Open", "URL sheet button");
     self.fCancelButton.title = NSLocalizedString(@"Cancel", "URL sheet button");
 
@@ -68,13 +55,11 @@ NSString* urlString = nil;
 
 - (void)openURLEndSheet:(id)sender
 {
-    [self.window orderOut:sender];
     [NSApp endSheet:self.window returnCode:1];
 }
 
 - (void)openURLCancelEndSheet:(id)sender
 {
-    [self.window orderOut:sender];
     [NSApp endSheet:self.window returnCode:0];
 }
 

@@ -5,10 +5,10 @@
 #include <array>
 #include <cstdio> /* fprintf () */
 #include <cstdlib> /* atoi () */
-#include <cstring> /* memcmp () */
-#include <signal.h>
 #include <string>
 #include <string_view>
+
+#include <signal.h>
 
 #include <fmt/format.h>
 
@@ -17,11 +17,13 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h> /* tr_wait_msec */
+#include <libtransmission/utils.h> /* tr_wait() */
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
+
+using namespace std::chrono_literals;
 
 /***
 ****
@@ -173,10 +175,9 @@ static std::string getStatusStr(tr_stat const* st)
     return "";
 }
 
-static char const* getConfigDir(int argc, char const** argv)
+static std::string getConfigDir(int argc, char const** argv)
 {
     int c;
-    char const* configDir = nullptr;
     char const* my_optarg;
     int const ind = tr_optind;
 
@@ -184,25 +185,19 @@ static char const* getConfigDir(int argc, char const** argv)
     {
         if (c == 'g')
         {
-            configDir = my_optarg;
+            return my_optarg;
             break;
         }
     }
 
     tr_optind = ind;
 
-    if (configDir == nullptr)
-    {
-        configDir = tr_getDefaultConfigDir(MyConfigName);
-    }
-
-    return configDir;
+    return tr_getDefaultConfigDir(MyConfigName);
 }
 
 int tr_main(int argc, char* argv[])
 {
     tr_variant settings;
-    char const* configDir;
 
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
@@ -219,8 +214,8 @@ int tr_main(int argc, char* argv[])
 
     /* load the defaults from config file + libtransmission defaults */
     tr_variantInitDict(&settings, 0);
-    configDir = getConfigDir(argc, (char const**)argv);
-    tr_sessionLoadSettings(&settings, configDir, MyConfigName);
+    auto const config_dir = getConfigDir(argc, (char const**)argv);
+    tr_sessionLoadSettings(&settings, config_dir.c_str(), MyConfigName);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
@@ -257,7 +252,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    auto* const h = tr_sessionInit(configDir, false, &settings);
+    auto* const h = tr_sessionInit(config_dir.c_str(), false, &settings);
     auto* const ctor = tr_ctorNew(h);
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);
@@ -273,7 +268,7 @@ int tr_main(int argc, char* argv[])
         waitingOnWeb = true;
         while (waitingOnWeb)
         {
-            tr_wait_msec(1000);
+            tr_wait(1s);
         }
     }
     else
@@ -315,7 +310,7 @@ int tr_main(int argc, char* argv[])
             "Error:",
         };
 
-        tr_wait_msec(200);
+        tr_wait(200ms);
 
         if (gotsig)
         {
@@ -354,10 +349,10 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    tr_sessionSaveSettings(h, configDir, &settings);
+    tr_sessionSaveSettings(h, config_dir.c_str(), &settings);
 
     printf("\n");
-    tr_variantFree(&settings);
+    tr_variantClear(&settings);
     tr_sessionClose(h);
     return EXIT_SUCCESS;
 }

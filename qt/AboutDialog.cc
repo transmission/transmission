@@ -61,5 +61,5 @@ void AboutDialog::showCredits()
 
 void AboutDialog::showLicense()
 {
-    Utils::openDialog(license_dialog_, this);
+    Utils::openDialog(license_dialog_, this); // NOLINT clang-analyzer-cplusplus.NewDelete
 }

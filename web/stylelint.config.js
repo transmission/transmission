@@ -27,6 +27,7 @@ module.exports = {
     "primer/no-undefined-vars": true,
     "primer/no-unused-vars": true,
     "property-no-unknown": true,
+    "property-no-vendor-prefix": null,
     "scss/at-rule-no-unknown": true,
     "selector-attribute-quotes": null,
     "selector-max-compound-selectors": null,

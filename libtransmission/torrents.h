@@ -1,5 +1,5 @@
 // This file Copyright © 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -11,6 +11,7 @@
 
 #include <ctime>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "transmission.h"
@@ -30,7 +31,11 @@ public:
     void remove(tr_torrent const* tor, time_t current_time);
 
     // O(1)
-    [[nodiscard]] tr_torrent* get(tr_torrent_id_t id);
+    [[nodiscard]] TR_CONSTEXPR20 tr_torrent* get(tr_torrent_id_t id)
+    {
+        auto const uid = static_cast<size_t>(id);
+        return uid >= std::size(by_id_) ? nullptr : by_id_.at(uid);
+    }
 
     // O(log n)
     [[nodiscard]] tr_torrent const* get(tr_sha1_digest_t const& hash) const;
@@ -59,40 +64,40 @@ public:
 
     [[nodiscard]] std::vector<tr_torrent_id_t> removedSince(time_t) const;
 
-    [[nodiscard]] auto cbegin() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto cbegin() const noexcept
     {
         return std::cbegin(by_hash_);
     }
-    [[nodiscard]] auto begin() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto begin() const noexcept
     {
         return cbegin();
     }
-    [[nodiscard]] auto begin() noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto begin() noexcept
     {
         return std::begin(by_hash_);
     }
 
-    [[nodiscard]] auto cend() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto cend() const noexcept
     {
         return std::cend(by_hash_);
     }
 
-    [[nodiscard]] auto end() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto end() const noexcept
     {
         return cend();
     }
 
-    [[nodiscard]] auto end() noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto end() noexcept
     {
         return std::end(by_hash_);
     }
 
-    [[nodiscard]] constexpr auto size() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
     {
         return std::size(by_hash_);
     }
 
-    [[nodiscard]] constexpr auto empty() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
     {
         return std::empty(by_hash_);
     }

@@ -9,6 +9,7 @@
 #include <array>
 #include <ctime>
 #include <memory>
+#include <utility>
 
 #include <QIcon>
 #include <QLibraryInfo>
@@ -24,8 +25,9 @@
 #include <QDBusReply>
 #endif
 
-#include <libtransmission/tr-getopt.h>
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -172,7 +174,7 @@ Application::Application(int& argc, char** argv)
 
     // try to delegate the work to an existing copy of Transmission
     // before starting ourselves...
-    InteropHelper interop_client;
+    InteropHelper const interop_client;
 
     if (interop_client.isConnected())
     {
@@ -218,11 +220,11 @@ Application::Application(int& argc, char** argv)
     // set the fallback config dir
     if (config_dir.isNull())
     {
-        config_dir = QString::fromUtf8(tr_getDefaultConfigDir("transmission"));
+        config_dir = QString::fromStdString(tr_getDefaultConfigDir("transmission"));
     }
 
     // ensure our config directory exists
-    QDir dir(config_dir);
+    QDir const dir(config_dir);
 
     if (!dir.exists())
     {
@@ -403,16 +405,16 @@ void Application::quitLater() const
     QTimer::singleShot(0, this, SLOT(quit()));
 }
 
-void Application::onTorrentsEdited(torrent_ids_t const& ids) const
+void Application::onTorrentsEdited(torrent_ids_t const& torrent_ids) const
 {
     // the backend's tr_info has changed, so reload those fields
-    session_->initTorrents(ids);
+    session_->initTorrents(torrent_ids);
 }
 
-QStringList Application::getNames(torrent_ids_t const& ids) const
+QStringList Application::getNames(torrent_ids_t const& torrent_ids) const
 {
     QStringList names;
-    for (auto const& id : ids)
+    for (auto const& id : torrent_ids)
     {
         names.push_back(model_->getTorrentFromId(id)->name());
     }
@@ -421,23 +423,25 @@ QStringList Application::getNames(torrent_ids_t const& ids) const
     return names;
 }
 
-void Application::onTorrentsAdded(torrent_ids_t const& ids) const
+void Application::onTorrentsAdded(torrent_ids_t const& torrent_ids) const
 {
-    if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
+    if (!prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_ADD))
     {
-        for (auto id : ids)
-        {
-            notifyTorrentAdded(model_->getTorrentFromId(id));
-        }
+        return;
+    }
+
+    for (auto id : torrent_ids)
+    {
+        notifyTorrentAdded(model_->getTorrentFromId(id));
     }
 }
 
-void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
+void Application::onTorrentsCompleted(torrent_ids_t const& torrent_ids) const
 {
     if (prefs_->getBool(Prefs::SHOW_NOTIFICATION_ON_COMPLETE))
     {
-        auto const title = tr("Torrent Completed", nullptr, static_cast<int>(ids.size()));
-        auto const body = getNames(ids).join(QStringLiteral("\n"));
+        auto const title = tr("Torrent(s) Completed", nullptr, static_cast<int>(std::size(torrent_ids)));
+        auto const body = getNames(torrent_ids).join(QStringLiteral("\n"));
         notifyApp(title, body);
     }
 
@@ -453,11 +457,11 @@ void Application::onTorrentsCompleted(torrent_ids_t const& ids) const
     }
 }
 
-void Application::onTorrentsNeedInfo(torrent_ids_t const& ids) const
+void Application::onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const
 {
-    if (!ids.empty())
+    if (!torrent_ids.empty())
     {
-        session_->initTorrents(ids);
+        session_->initTorrents(torrent_ids);
     }
 }
 
@@ -663,6 +667,6 @@ int tr_main(int argc, char** argv)
     Application::setAttribute(Qt::AA_EnableHighDpiScaling);
     Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-    Application app(argc, argv);
+    Application const app(argc, argv);
     return QApplication::exec();
 }

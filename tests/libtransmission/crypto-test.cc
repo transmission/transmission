@@ -1,8 +1,9 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cstring>
 #include <iostream>
@@ -12,11 +13,11 @@
 #include <string_view>
 #include <unordered_set>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "peer-mse.h"
-#include "crypto-utils.h"
-#include "utils.h"
+#include <libtransmission/peer-mse.h>
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/utils.h>
 
 #include "crypto-test-ref.h"
 
@@ -57,7 +58,7 @@ TEST(Crypto, DH)
     b.setPeerPublicKey(a.publicKey());
     EXPECT_EQ(toString(a.secret()), toString(b.secret()));
     EXPECT_EQ(a.secret(), b.secret());
-    EXPECT_EQ(96, std::size(a.secret()));
+    EXPECT_EQ(96U, std::size(a.secret()));
 
     auto c = tr_message_stream_encryption::DH{};
     c.setPeerPublicKey(b.publicKey());
@@ -102,42 +103,35 @@ TEST(Crypto, encryptDecrypt)
 
 TEST(Crypto, sha1)
 {
-    auto hash1 = tr_sha1("test"sv);
-    EXPECT_TRUE(hash1);
+    auto hash1 = tr_sha1::digest("test"sv);
     EXPECT_EQ(
         0,
         memcmp(
-            std::data(*hash1),
+            std::data(hash1),
             "\xa9\x4a\x8f\xe5\xcc\xb1\x9b\xa6\x1c\x4c\x08\x73\xd3\x91\xe9\x87\x98\x2f\xbb\xd3",
-            std::size(*hash1)));
+            std::size(hash1)));
 
-    auto hash2 = tr_sha1("test"sv);
-    EXPECT_TRUE(hash1);
-    EXPECT_EQ(*hash1, *hash2);
+    auto hash2 = tr_sha1::digest("test"sv);
+    EXPECT_EQ(hash1, hash2);
 
-    hash1 = tr_sha1("1"sv, "22"sv, "333"sv);
-    hash2 = tr_sha1("1"sv, "22"sv, "333"sv);
-    EXPECT_TRUE(hash1);
-    EXPECT_TRUE(hash2);
-    EXPECT_EQ(*hash1, *hash2);
+    hash1 = tr_sha1::digest("1"sv, "22"sv, "333"sv);
+    hash2 = tr_sha1::digest("1"sv, "22"sv, "333"sv);
+    EXPECT_EQ(hash1, hash2);
     EXPECT_EQ(
         0,
         memcmp(
-            std::data(*hash1),
+            std::data(hash1),
             "\x1f\x74\x64\x8e\x50\xa6\xa6\x70\x8e\xc5\x4a\xb3\x27\xa1\x63\xd5\x53\x6b\x7c\xed",
-            std::size(*hash1)));
+            std::size(hash1)));
 
-    auto const hash3 = tr_sha1("test"sv);
-    EXPECT_TRUE(hash3);
-    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash3));
+    auto const hash3 = tr_sha1::digest("test"sv);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(hash3));
 
-    auto const hash4 = tr_sha1("te"sv, "st"sv);
-    EXPECT_TRUE(hash4);
-    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash4));
+    auto const hash4 = tr_sha1::digest("te"sv, "st"sv);
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(hash4));
 
-    auto const hash5 = tr_sha1("t"sv, "e"sv, std::string{ "s" }, std::array<char, 1>{ { 't' } });
-    EXPECT_TRUE(hash5);
-    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(*hash5));
+    auto const hash5 = tr_sha1::digest("t"sv, "e"sv, std::string{ "s" }, std::array<char, 1>{ { 't' } });
+    EXPECT_EQ("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv, tr_sha1_to_string(hash5));
 }
 
 TEST(Crypto, ssha1)
@@ -148,12 +142,12 @@ TEST(Crypto, ssha1)
         std::string_view ssha1;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 2>{ {
+    static auto constexpr Tests = std::array<LocalTest, 2>{ {
         { "test"sv, "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy"sv },
         { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)"sv, "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL"sv },
     } };
 
-    auto constexpr HashCount = size_t{ 4 * 1024 };
+    static auto constexpr HashCount = size_t{ 4U } * 1024U;
 
     for (auto const& [plain_text, ssha1] : Tests)
     {
@@ -250,9 +244,36 @@ TEST(Crypto, random)
     /* test that tr_rand_int() stays in-bounds */
     for (int i = 0; i < 100000; ++i)
     {
-        int const val = tr_rand_int(100);
-        EXPECT_LE(0, val);
-        EXPECT_LT(val, 100);
+        auto const val = tr_rand_int(100U);
+        EXPECT_LE(0U, val);
+        EXPECT_LT(val, 100U);
+    }
+}
+
+TEST(Crypto, randBuf)
+{
+    static auto constexpr Width = 32U;
+    static auto constexpr Iterations = 100000U;
+    static auto constexpr Empty = std::array<uint8_t, Width>{};
+
+    auto buf = Empty;
+
+    for (size_t i = 0; i < Iterations; ++i)
+    {
+        auto tmp = buf;
+        tr_rand_buffer(std::data(tmp), std::size(tmp));
+        EXPECT_NE(tmp, Empty);
+        EXPECT_NE(tmp, buf);
+        buf = tmp;
+    }
+
+    for (size_t i = 0; i < Iterations; ++i)
+    {
+        auto tmp = buf;
+        tr_rand_buffer_std(std::data(tmp), std::size(tmp));
+        EXPECT_NE(tmp, Empty);
+        EXPECT_NE(tmp, buf);
+        buf = tmp;
     }
 }
 
@@ -272,14 +293,14 @@ TEST(Crypto, base64)
         auto buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf += char(tr_rand_int_weak(256));
+            buf += static_cast<char>(tr_rand_int(256U));
         }
         EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
 
         buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf += char(1 + tr_rand_int_weak(255));
+            buf += static_cast<char>(1U + tr_rand_int(255U));
         }
         EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
     }

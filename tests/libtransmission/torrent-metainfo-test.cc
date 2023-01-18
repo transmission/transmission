@@ -1,28 +1,25 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cstring>
 #include <string_view>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "crypto-utils.h"
-#include "error.h"
-#include "torrent-metainfo.h"
-#include "torrent.h"
-#include "tr-strbuf.h"
-#include "utils.h"
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/error.h>
+#include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/torrent.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission
-{
-namespace test
+namespace libtransmission::test
 {
 
 using TorrentMetainfoTest = SessionTest;
@@ -30,13 +27,13 @@ using TorrentMetainfoTest = SessionTest;
 TEST_F(TorrentMetainfoTest, magnetLink)
 {
     // background info @ http://wiki.theory.org/BitTorrent_Magnet-URI_Webseeding
-    char const constexpr* const MagnetLink =
+    auto constexpr MagnetLink =
         "magnet:?"
         "xt=urn:btih:14ffe5dd23188fd5cb53a1d47f1289db70abf31e"
         "&dn=ubuntu_12_04_1_desktop_32_bit"
         "&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce"
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
-        "&ws=http%3A%2F%2Ftransmissionbt.com";
+        "&ws=http%3A%2F%2Ftransmissionbt.com"sv;
 
     auto metainfo = tr_torrent_metainfo{};
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
@@ -102,9 +99,9 @@ TEST_F(TorrentMetainfoTest, parseBencFuzz)
 {
     auto buf = std::vector<char>{};
 
-    for (size_t i = 0; i < 100000; ++i)
+    for (size_t i = 0; i < 100000U; ++i)
     {
-        buf.resize(tr_rand_int(1024));
+        buf.resize(tr_rand_int(1024U));
         tr_rand_buffer(std::data(buf), std::size(buf));
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
@@ -255,5 +252,11 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
 }
 
-} // namespace test
-} // namespace libtransmission
+// Test for https://github.com/transmission/transmission/issues/3591
+TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
+{
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_FALSE(tm.parseBenc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
+}
+
+} // namespace libtransmission::test

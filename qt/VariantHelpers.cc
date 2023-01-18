@@ -31,10 +31,10 @@ bool change(double& setme, double const& value)
     return changed;
 }
 
-bool change(Speed& setme, tr_variant const* variant)
+bool change(Speed& setme, tr_variant const* value)
 {
-    auto const value = getValue<int>(variant);
-    return value && change(setme, Speed::fromBps(*value));
+    auto const bytes_per_second = getValue<int>(value);
+    return bytes_per_second && change(setme, Speed::fromBps(*bytes_per_second));
 }
 
 bool change(TorrentHash& setme, tr_variant const* value)

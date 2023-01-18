@@ -1,5 +1,5 @@
 // This file Copyright © 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -115,17 +115,17 @@ struct BasicHandler : public Handler
         return true;
     }
 
-    auto key(size_t i) const
+    constexpr auto key(size_t i) const
     {
         return keys_[i];
     }
 
-    auto depth() const
+    constexpr auto depth() const
     {
         return depth_;
     }
 
-    auto currentKey() const
+    constexpr auto currentKey() const
     {
         return key(depth());
     }
@@ -205,7 +205,7 @@ struct ParserStack
         return depth > 0 && stack[depth].parent_type == ParentType::Dict && (stack[depth].n_children_walked % 2) == 0;
     }
 
-    std::optional<ParentType> parentType() const
+    constexpr std::optional<ParentType> parentType() const
     {
         if (depth == 0)
         {

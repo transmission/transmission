@@ -3,39 +3,103 @@
 // License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
 
 #import "PiecesView.h"
 #import "Torrent.h"
 #import "InfoWindowController.h"
 #import "NSApplicationAdditions.h"
 
-#define MAX_ACROSS 18
-#define BETWEEN 1.0
+static NSInteger const kMaxAcross = 18;
+static NSInteger const kMaxCells = kMaxAcross * kMaxAcross;
 
-#define HIGH_PEERS 30
+static CGFloat const kBetweenPadding = 1.0;
 
-enum
+static int8_t const kHighPeers = 10;
+
+static NSColor* const DoneColor = NSColor.systemBlueColor;
+static NSColor* const BlinkColor = NSColor.systemOrangeColor;
+static NSColor* const HighColor = NSColor.systemGreenColor; // high availability
+
+typedef struct PieceInfo
 {
-    PIECE_NONE,
-    PIECE_SOME,
-    PIECE_HIGH_PEERS,
-    PIECE_FINISHED,
-    PIECE_FLASHING
-};
+    int8_t available[kMaxCells];
+    float complete[kMaxCells];
+} PieceInfo;
 
 @interface PiecesView ()
-
-@property(nonatomic) int8_t* fPieces;
-
-@property(nonatomic) NSInteger fNumPieces;
-@property(nonatomic) NSInteger fAcross;
-@property(nonatomic) NSInteger fWidth;
-@property(nonatomic) NSInteger fExtraBorder;
-
 @end
 
 @implementation PiecesView
+{
+    PieceInfo fPieceInfo;
+    NSString* fRenderedHashString;
+}
+
+- (NSColor*)backgroundColor
+{
+    return NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
+}
+
+- (BOOL)isCompletenessDone:(float)val
+{
+    return val >= 1.0F;
+}
+
+- (BOOL)isCompletenessNone:(float)val
+{
+    return val <= 0.0F;
+}
+
+- (NSColor*)completenessColor:(float)oldVal newVal:(float)newVal noBlink:(BOOL)noBlink
+{
+    if ([self isCompletenessDone:newVal])
+    {
+        return noBlink || [self isCompletenessDone:oldVal] ? DoneColor : BlinkColor;
+    }
+
+    if ([self isCompletenessNone:newVal])
+    {
+        return noBlink || [self isCompletenessNone:oldVal] ? [self backgroundColor] : BlinkColor;
+    }
+
+    return [[self backgroundColor] blendedColorWithFraction:newVal ofColor:DoneColor];
+}
+
+- (BOOL)isAvailabilityDone:(uint8_t)val
+{
+    return val == (uint8_t)-1;
+}
+
+- (BOOL)isAvailabilityNone:(uint8_t)val
+{
+    return val == 0;
+}
+
+- (BOOL)isAvailabilityHigh:(uint8_t)val
+{
+    return val >= kHighPeers;
+}
+
+- (NSColor*)availabilityColor:(int8_t)oldVal newVal:(int8_t)newVal noBlink:(bool)noBlink
+{
+    if ([self isAvailabilityDone:newVal])
+    {
+        return noBlink || [self isAvailabilityDone:oldVal] ? DoneColor : BlinkColor;
+    }
+
+    if ([self isAvailabilityNone:newVal])
+    {
+        return noBlink || [self isAvailabilityNone:oldVal] ? [self backgroundColor] : BlinkColor;
+    }
+
+    if ([self isAvailabilityHigh:newVal])
+    {
+        return noBlink || [self isAvailabilityHigh:oldVal] ? HighColor : BlinkColor;
+    }
+
+    CGFloat percent = CGFloat(newVal) / kHighPeers;
+    return [[self backgroundColor] blendedColorWithFraction:percent ofColor:HighColor];
+}
 
 - (void)drawRect:(NSRect)dirtyRect
 {
@@ -57,35 +121,21 @@ enum
 
 - (void)dealloc
 {
-    tr_free(_fPieces);
 }
 
 - (void)setTorrent:(Torrent*)torrent
 {
-    [self clearView];
-
     _torrent = (torrent && !torrent.magnet) ? torrent : nil;
-    if (_torrent)
-    {
-        //determine relevant values
-        _fNumPieces = MIN(_torrent.pieceCount, MAX_ACROSS * MAX_ACROSS);
-        _fAcross = ceil(sqrt(_fNumPieces));
+    self.image = [[NSImage alloc] initWithSize:self.bounds.size];
 
-        CGFloat const width = self.bounds.size.width;
-        _fWidth = (width - (_fAcross + 1) * BETWEEN) / _fAcross;
-        _fExtraBorder = (width - ((_fWidth + BETWEEN) * _fAcross + BETWEEN)) / 2;
-    }
-
-    NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
-    self.image = back;
-
+    [self clearView];
     [self setNeedsDisplay];
 }
 
 - (void)clearView
 {
-    tr_free(self.fPieces);
-    self.fPieces = NULL;
+    fRenderedHashString = nil;
+    memset(&fPieceInfo, 0, sizeof(PieceInfo));
 }
 
 - (void)updateView
@@ -95,107 +145,63 @@ enum
         return;
     }
 
-    //determine if first time
-    BOOL const first = self.fPieces == NULL;
-    if (first)
-    {
-        self.fPieces = (int8_t*)tr_malloc(self.fNumPieces * sizeof(int8_t));
-    }
+    // get the previous state
+    PieceInfo const oldInfo = fPieceInfo;
+    BOOL const first = ![self.torrent.hashString isEqualToString:fRenderedHashString];
 
-    int8_t* pieces = NULL;
-    float* piecesPercent = NULL;
-
+    // get the current state
     BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
-    if (showAvailability)
+    NSInteger const numCells = MIN(_torrent.pieceCount, kMaxCells);
+    PieceInfo info;
+    [self.torrent getAvailability:info.available size:numCells];
+    [self.torrent getAmountFinished:info.complete size:numCells];
+
+    // compute bounds and color of each cell
+    NSInteger const across = (NSInteger)ceil(sqrt(numCells));
+    CGFloat const fullWidth = self.bounds.size.width;
+    NSInteger const cellWidth = (NSInteger)((fullWidth - (across + 1) * kBetweenPadding) / across);
+    NSInteger const extraBorder = (NSInteger)((fullWidth - ((cellWidth + kBetweenPadding) * across + kBetweenPadding)) / 2);
+    NSMutableArray<NSValue*>* cellBounds = [NSMutableArray arrayWithCapacity:numCells];
+    NSMutableArray<NSColor*>* cellColors = [NSMutableArray arrayWithCapacity:numCells];
+    for (NSInteger index = 0; index < numCells; index++)
     {
-        pieces = (int8_t*)tr_malloc(self.fNumPieces * sizeof(int8_t));
-        [self.torrent getAvailability:pieces size:self.fNumPieces];
-    }
-    else
-    {
-        piecesPercent = (float*)tr_malloc(self.fNumPieces * sizeof(float));
-        [self.torrent getAmountFinished:piecesPercent size:self.fNumPieces];
-    }
+        NSInteger const row = index / across;
+        NSInteger const col = index % across;
 
-    NSImage* image = self.image;
+        cellBounds[index] = [NSValue valueWithRect:NSMakeRect(
+                                                       col * (cellWidth + kBetweenPadding) + kBetweenPadding + extraBorder,
+                                                       fullWidth - (row + 1) * (cellWidth + kBetweenPadding) - extraBorder,
+                                                       cellWidth,
+                                                       cellWidth)];
 
-    NSRect fillRects[self.fNumPieces];
-    NSColor* fillColors[self.fNumPieces];
-
-    NSColor* defaultColor = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
-
-    NSInteger usedCount = 0;
-
-    for (NSInteger index = 0; index < self.fNumPieces; index++)
-    {
-        NSColor* pieceColor = nil;
-
-        if (showAvailability ? pieces[index] == -1 : piecesPercent[index] == 1.0)
-        {
-            if (first || self.fPieces[index] != PIECE_FINISHED)
-            {
-                if (!first && self.fPieces[index] != PIECE_FLASHING)
-                {
-                    pieceColor = NSColor.systemOrangeColor;
-                    self.fPieces[index] = PIECE_FLASHING;
-                }
-                else
-                {
-                    pieceColor = NSColor.systemBlueColor;
-                    self.fPieces[index] = PIECE_FINISHED;
-                }
-            }
-        }
-        else if (showAvailability ? pieces[index] == 0 : piecesPercent[index] == 0.0)
-        {
-            if (first || self.fPieces[index] != PIECE_NONE)
-            {
-                pieceColor = defaultColor;
-                self.fPieces[index] = PIECE_NONE;
-            }
-        }
-        else if (showAvailability && pieces[index] >= HIGH_PEERS)
-        {
-            if (first || self.fPieces[index] != PIECE_HIGH_PEERS)
-            {
-                pieceColor = NSColor.systemGreenColor;
-                self.fPieces[index] = PIECE_HIGH_PEERS;
-            }
-        }
-        else
-        {
-            //always redraw "mixed"
-            CGFloat percent = showAvailability ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
-            NSColor* fullColor = showAvailability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
-            pieceColor = [defaultColor blendedColorWithFraction:percent ofColor:fullColor];
-            self.fPieces[index] = PIECE_SOME;
-        }
-
-        if (pieceColor)
-        {
-            NSInteger const across = index % self.fAcross;
-            NSInteger const down = index / self.fAcross;
-            fillRects[usedCount] = NSMakeRect(
-                across * (self.fWidth + BETWEEN) + BETWEEN + self.fExtraBorder,
-                image.size.width - (down + 1) * (self.fWidth + BETWEEN) - self.fExtraBorder,
-                self.fWidth,
-                self.fWidth);
-            fillColors[usedCount] = pieceColor;
-
-            usedCount++;
-        }
+        cellColors[index] = showAvailability ?
+            [self availabilityColor:oldInfo.available[index] newVal:info.available[index] noBlink:first] :
+            [self completenessColor:oldInfo.complete[index] newVal:info.complete[index] noBlink:first];
     }
 
-    if (usedCount > 0)
+    // build an image with the cells
+    if (numCells > 0)
     {
-        [image lockFocus];
-        NSRectFillListWithColors(fillRects, fillColors, usedCount);
-        [image unlockFocus];
+        self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
+            NSRect cFillRects[numCells];
+            for (NSInteger i = 0; i < numCells; ++i)
+            {
+                cFillRects[i] = cellBounds[i].rectValue;
+            }
+            NSColor* cFillColors[numCells];
+            for (NSInteger i = 0; i < numCells; ++i)
+            {
+                cFillColors[i] = cellColors[i];
+            }
+            NSRectFillListWithColors(cFillRects, cFillColors, numCells);
+            return YES;
+        }];
         [self setNeedsDisplay];
     }
 
-    tr_free(pieces);
-    tr_free(piecesPercent);
+    // save the current state so we can compare it later
+    fPieceInfo = info;
+    fRenderedHashString = self.torrent.hashString;
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent*)event

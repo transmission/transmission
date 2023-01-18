@@ -1,5 +1,5 @@
 // This file Copyright © 2017-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -11,7 +11,7 @@
 
 #include "tr-macros.h"
 
-[[noreturn]] bool tr_assert_report(std::string_view file, int line, std::string_view message);
+[[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message);
 
 #define TR_ASSERT(x) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, #x)))
 #define TR_ASSERT_MSG(x, message) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, message)))

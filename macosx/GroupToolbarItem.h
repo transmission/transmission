@@ -4,9 +4,7 @@
 
 #import <AppKit/AppKit.h>
 
-@interface GroupToolbarItem : NSToolbarItem
-
-@property(nonatomic, copy) NSArray* identifiers;
+@interface GroupToolbarItem : NSToolbarItemGroup
 
 - (void)createMenu:(NSArray*)labels;
 

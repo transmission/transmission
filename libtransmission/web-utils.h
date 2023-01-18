@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -11,11 +11,9 @@
 #include <string_view>
 #include <utility>
 
-#include "tr-macros.h" // tr_sha1_digest_t
-#include "tr-strbuf.h" // tr_urlbuf
-#include "utils.h"
+#include <fmt/format.h>
 
-struct evbuffer;
+#include "tr-macros.h" // tr_sha1_digest_t
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);
@@ -41,11 +39,15 @@ struct tr_url_parsed_t
     uint16_t port = 0;
 };
 
-std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
+[[nodiscard]] std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
 
 // like tr_urlParse(), but with the added constraint that 'scheme'
 // must be one we that Transmission supports for announce and scrape
-std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url);
+[[nodiscard]] std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url);
+
+// Convenience function to get a log-safe version of a tracker URL.
+// This is to avoid logging sensitive info, e.g. a personal announcer id in the URL.
+[[nodiscard]] std::string tr_urlTrackerLogName(std::string_view url);
 
 // example use: `for (auto const [key, val] : tr_url_query_view{ querystr })`
 struct tr_url_query_view
@@ -64,56 +66,70 @@ struct tr_url_query_view
 
         iterator& operator++();
 
-        constexpr auto const& operator*() const
+        [[nodiscard]] constexpr auto const& operator*() const
         {
             return keyval;
         }
 
-        constexpr auto const* operator->() const
+        [[nodiscard]] constexpr auto const* operator->() const
         {
             return &keyval;
         }
 
-        constexpr bool operator==(iterator const& that) const
+        [[nodiscard]] constexpr bool operator==(iterator const& that) const
         {
             return this->remain == that.remain && this->keyval == that.keyval;
         }
 
-        constexpr bool operator!=(iterator const& that) const
+        [[nodiscard]] constexpr bool operator!=(iterator const& that) const
         {
             return !(*this == that);
         }
     };
 
-    iterator begin() const;
+    [[nodiscard]] iterator begin() const;
 
-    constexpr iterator end() const
+    [[nodiscard]] constexpr iterator end() const
     {
         return iterator{};
     }
 };
 
-template<typename OutputIt>
-void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
+template<typename BackInsertIter>
+constexpr void tr_urlPercentEncode(BackInsertIter out, std::string_view input, bool escape_reserved = true)
 {
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : in)
+    auto constexpr is_unreserved = [](unsigned char ch)
     {
-        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
+        return ('0' <= ch && ch <= '9') || ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '-' || ch == '_' ||
+            ch == '.' || ch == '~';
+    };
+
+    auto constexpr is_reserved = [](unsigned char ch)
+    {
+        return ch == '!' || ch == '*' || ch == '(' || ch == ')' || ch == ';' || ch == ':' || ch == '@' || ch == '&' ||
+            ch == '=' || ch == '+' || ch == '$' || ch == ',' || ch == '/' || ch == '?' || ch == '%' || ch == '#' || ch == '[' ||
+            ch == ']' || ch == '\'';
+    };
+
+    for (unsigned char ch : input)
+    {
+        if (is_unreserved(ch) || (!escape_reserved && is_reserved(ch)))
         {
             out = ch;
         }
         else
         {
-            fmt::format_to(out, "%{:02X}", unsigned(ch & 0xFF));
+            fmt::format_to(out, "%{:02X}", ch);
         }
     }
 }
 
-void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
+template<typename BackInsertIter>
+constexpr void tr_urlPercentEncode(BackInsertIter out, tr_sha1_digest_t const& digest)
+{
+    tr_urlPercentEncode(out, std::string_view{ reinterpret_cast<char const*>(digest.data()), std::size(digest) });
+}
 
-char const* tr_webGetResponseStr(long response_code);
+[[nodiscard]] char const* tr_webGetResponseStr(long response_code);
 
-std::string tr_urlPercentDecode(std::string_view);
+[[nodiscard]] std::string tr_urlPercentDecode(std::string_view);

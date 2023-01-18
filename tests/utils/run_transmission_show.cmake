@@ -1,10 +1,10 @@
 # compare the output of transmission-show to a reference file.
-# returns 0 if the files match, nonzero otherwise. 
+# returns 0 if the files match, nonzero otherwise.
 ##
 
-if (CMAKE_VERSION VERSION_LESS 3.14)
-   # --ignore-eol was introduced in CMake 3.14
-   message(status "skipping transmission-show test; cmake version too old")
+if(CMAKE_VERSION VERSION_LESS 3.14)
+    # --ignore-eol was introduced in CMake 3.14
+    message(status "skipping transmission-show test; cmake version too old")
 else()
    get_filename_component(torrent_basename "${torrent_file}" NAME)
    set(output_file ${CMAKE_CURRENT_BINARY_DIR}/${torrent_basename}.out)

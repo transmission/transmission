@@ -1,11 +1,12 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <cstddef> // size_t
+#include <utility>
 
 #include <QHash>
 #include <QPointer>
@@ -63,7 +64,7 @@ public:
     {
         if (dialog.isNull())
         {
-            dialog = new DialogT(std::forward<ArgsT>(args)...);
+            dialog = new DialogT(std::forward<ArgsT>(args)...); // NOLINT clang-analyzer-cplusplus.NewDelete
             dialog->setAttribute(Qt::WA_DeleteOnClose);
             dialog->show();
         }

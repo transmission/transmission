@@ -9,9 +9,11 @@
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 
-#define POPUP_PRIORITY_HIGH 0
-#define POPUP_PRIORITY_NORMAL 1
-#define POPUP_PRIORITY_LOW 2
+typedef NS_ENUM(NSUInteger, PopupPriority) {
+    PopupPriorityHigh = 0,
+    PopupPriorityNormal = 1,
+    PopupPriorityLow = 2,
+};
 
 @interface AddMagnetWindowController ()
 
@@ -22,29 +24,12 @@
 @property(nonatomic) IBOutlet NSPopUpButton* fGroupPopUp;
 @property(nonatomic) IBOutlet NSPopUpButton* fPriorityPopUp;
 
-//remove these when switching to auto layout
-@property(nonatomic) IBOutlet NSTextField* fMagnetLinkLabel;
-@property(nonatomic) IBOutlet NSTextField* fDownloadToLabel;
-@property(nonatomic) IBOutlet NSTextField* fGroupLabel;
-@property(nonatomic) IBOutlet NSTextField* fPriorityLabel;
-@property(nonatomic) IBOutlet NSButton* fChangeDestinationButton;
-@property(nonatomic) IBOutlet NSBox* fDownloadToBox;
-@property(nonatomic) IBOutlet NSButton* fAddButton;
-@property(nonatomic) IBOutlet NSButton* fCancelButton;
-
 @property(nonatomic, readonly) Controller* fController;
 
 @property(nonatomic) NSString* fDestination;
 
 @property(nonatomic) NSInteger fGroupValue;
 @property(nonatomic) TorrentDeterminationType fGroupDeterminationType;
-
-- (void)confirmAdd;
-
-- (void)setDestinationPath:(NSString*)destination determinationType:(TorrentDeterminationType)determinationType;
-
-- (void)setGroupsMenu;
-- (void)changeGroupValue:(id)sender;
 
 @end
 
@@ -80,21 +65,21 @@
     [self setGroupsMenu];
     [self.fGroupPopUp selectItemWithTag:self.fGroupValue];
 
-    NSInteger priorityIndex;
+    PopupPriority priorityIndex;
     switch (self.torrent.priority)
     {
     case TR_PRI_HIGH:
-        priorityIndex = POPUP_PRIORITY_HIGH;
+        priorityIndex = PopupPriorityHigh;
         break;
     case TR_PRI_NORMAL:
-        priorityIndex = POPUP_PRIORITY_NORMAL;
+        priorityIndex = PopupPriorityNormal;
         break;
     case TR_PRI_LOW:
-        priorityIndex = POPUP_PRIORITY_LOW;
+        priorityIndex = PopupPriorityLow;
         break;
     default:
         NSAssert1(NO, @"Unknown priority for adding torrent: %d", self.torrent.priority);
-        priorityIndex = POPUP_PRIORITY_NORMAL;
+        priorityIndex = PopupPriorityNormal;
     }
     [self.fPriorityPopUp selectItemAtIndex:priorityIndex];
 
@@ -110,64 +95,6 @@
         self.fLocationField.stringValue = @"";
         self.fLocationImageView.image = nil;
     }
-
-    // TODO: adopt auto layout instead
-    [self.fMagnetLinkLabel sizeToFit];
-
-    CGFloat const downloadToLabelOldWidth = self.fDownloadToLabel.frame.size.width;
-    [self.fDownloadToLabel sizeToFit];
-    CGFloat const changeDestOldWidth = self.fChangeDestinationButton.frame.size.width;
-    [self.fChangeDestinationButton sizeToFit];
-    NSRect changeDestFrame = self.fChangeDestinationButton.frame;
-    changeDestFrame.origin.x -= changeDestFrame.size.width - changeDestOldWidth;
-    self.fChangeDestinationButton.frame = changeDestFrame;
-
-    NSRect downloadToBoxFrame = self.fDownloadToBox.frame;
-    CGFloat const downloadToBoxSizeDiff = (self.fDownloadToLabel.frame.size.width - downloadToLabelOldWidth) +
-        (changeDestFrame.size.width - changeDestOldWidth);
-    downloadToBoxFrame.size.width -= downloadToBoxSizeDiff;
-    downloadToBoxFrame.origin.x -= downloadToLabelOldWidth - self.fDownloadToLabel.frame.size.width;
-    self.fDownloadToBox.frame = downloadToBoxFrame;
-
-    NSRect groupPopUpFrame = self.fGroupPopUp.frame;
-    NSRect priorityPopUpFrame = self.fPriorityPopUp.frame;
-    CGFloat const popUpOffset = groupPopUpFrame.origin.x - NSMaxX(self.fGroupLabel.frame);
-    [self.fGroupLabel sizeToFit];
-    [self.fPriorityLabel sizeToFit];
-    NSRect groupLabelFrame = self.fGroupLabel.frame;
-    NSRect priorityLabelFrame = self.fPriorityLabel.frame;
-    //first bring them both to the left edge
-    groupLabelFrame.origin.x = MIN(groupLabelFrame.origin.x, priorityLabelFrame.origin.x);
-    priorityLabelFrame.origin.x = MIN(groupLabelFrame.origin.x, priorityLabelFrame.origin.x);
-    //then align on the right
-    CGFloat const labelWidth = MAX(groupLabelFrame.size.width, priorityLabelFrame.size.width);
-    groupLabelFrame.origin.x += labelWidth - groupLabelFrame.size.width;
-    priorityLabelFrame.origin.x += labelWidth - priorityLabelFrame.size.width;
-    groupPopUpFrame.origin.x = NSMaxX(groupLabelFrame) + popUpOffset;
-    priorityPopUpFrame.origin.x = NSMaxX(priorityLabelFrame) + popUpOffset;
-    self.fGroupLabel.frame = groupLabelFrame;
-    self.fGroupPopUp.frame = groupPopUpFrame;
-    self.fPriorityLabel.frame = priorityLabelFrame;
-    self.fPriorityPopUp.frame = priorityPopUpFrame;
-
-    CGFloat const minButtonWidth = 82.0;
-    CGFloat const oldAddButtonWidth = self.fAddButton.bounds.size.width;
-    CGFloat const oldCancelButtonWidth = self.fCancelButton.bounds.size.width;
-    [self.fAddButton sizeToFit];
-    [self.fCancelButton sizeToFit];
-    NSRect addButtonFrame = self.fAddButton.frame;
-    NSRect cancelButtonFrame = self.fCancelButton.frame;
-    CGFloat buttonWidth = MAX(addButtonFrame.size.width, cancelButtonFrame.size.width);
-    buttonWidth = MAX(buttonWidth, minButtonWidth);
-    addButtonFrame.size.width = buttonWidth;
-    cancelButtonFrame.size.width = buttonWidth;
-    CGFloat const addButtonWidthIncrease = buttonWidth - oldAddButtonWidth;
-    addButtonFrame.origin.x -= addButtonWidthIncrease;
-    cancelButtonFrame.origin.x -= addButtonWidthIncrease + (buttonWidth - oldCancelButtonWidth);
-    self.fAddButton.frame = addButtonFrame;
-    self.fCancelButton.frame = cancelButtonFrame;
-
-    [self.fStartCheck sizeToFit];
 }
 
 - (void)windowDidLoad
@@ -263,13 +190,13 @@
     tr_priority_t priority;
     switch ([sender indexOfSelectedItem])
     {
-    case POPUP_PRIORITY_HIGH:
+    case PopupPriorityHigh:
         priority = TR_PRI_HIGH;
         break;
-    case POPUP_PRIORITY_NORMAL:
+    case PopupPriorityNormal:
         priority = TR_PRI_NORMAL;
         break;
-    case POPUP_PRIORITY_LOW:
+    case PopupPriorityLow:
         priority = TR_PRI_LOW;
         break;
     default:

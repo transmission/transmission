@@ -8,13 +8,17 @@ if(DEFLATE_PREFER_STATIC_LIB)
 endif()
 
 if(UNIX)
-  find_package(PkgConfig QUIET)
-  # pkg-config support added in libdeflate v1.9
-  pkg_check_modules(_DEFLATE libdeflate>=${DEFLATE_MINIMUM})
+    find_package(PkgConfig QUIET)
+    # pkg-config support added in libdeflate v1.9
+    pkg_check_modules(_DEFLATE libdeflate>=${DEFLATE_MINIMUM})
 endif()
 
-find_path(DEFLATE_INCLUDE_DIR NAMES libdeflate.h HINTS ${_DEFLATE_INCLUDEDIR})
-find_library(DEFLATE_LIBRARY NAMES deflate HINTS ${_DEFLATE_LIBDIR})
+find_path(DEFLATE_INCLUDE_DIR
+    NAMES libdeflate.h
+    HINTS ${_DEFLATE_INCLUDEDIR})
+find_library(DEFLATE_LIBRARY
+    NAMES deflate
+    HINTS ${_DEFLATE_LIBDIR})
 
 set(DEFLATE_INCLUDE_DIRS ${DEFLATE_INCLUDE_DIR})
 set(DEFLATE_LIBRARIES ${DEFLATE_LIBRARY})
@@ -26,8 +30,7 @@ find_package_handle_standard_args(DEFLATE
     REQUIRED_VARS
         DEFLATE_INCLUDE_DIR
         DEFLATE_LIBRARY
-        DEFLATE_VERSION
-)
+        DEFLATE_VERSION)
 
 mark_as_advanced(DEFLATE_INCLUDE_DIR DEFLATE_LIBRARY)
 

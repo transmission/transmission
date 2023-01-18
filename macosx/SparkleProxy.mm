@@ -1,15 +1,17 @@
-// This file Copyright © 2005-2022 Transmission authors and contributors.
+// This file Copyright © 2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 @import ObjectiveC;
 @import AppKit;
+#import "NSStringAdditions.h"
 
-void SUUpdater_checkForUpdates(id self, SEL _cmd, ...)
+// Development-only proxy when app is not signed for running Sparkle
+void SUUpdater_checkForUpdates(id /*self*/, SEL /*_cmd*/, ...)
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAlert* alert = [[NSAlert alloc] init];
-        alert.messageText = @"Sparkle not configured";
+        alert.messageText = LocalizationNotNeeded(@"Sparkle not configured");
         alert.informativeText = [NSString
             stringWithFormat:@"App needs to be codesigned for Development to support Sparkle with Hardened Runtime. Alternatively, re-codesign without the Hardened Runtime option: `sudo codesign -s - %@`",
                              NSBundle.mainBundle.bundleURL.lastPathComponent];

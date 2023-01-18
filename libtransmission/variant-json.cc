@@ -7,43 +7,50 @@
 #include <cctype>
 #include <cerrno> /* EILSEQ, EINVAL */
 #include <cmath> /* fabs() */
+#include <cstdlib>
 #include <cstring>
 #include <deque>
+#include <string>
 #include <string_view>
+#include <utility>
 
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
-#include <event2/buffer.h>
-
 #include <fmt/compile.h>
 #include <fmt/format.h>
+#include <jsonsl.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 
 #include "error.h"
-#include "jsonsl.h"
 #include "log.h"
 #include "quark.h"
 #include "tr-assert.h"
+#include "tr-buffer.h"
 #include "utils.h"
 #include "variant-common.h"
 #include "variant.h"
 
 using namespace std::literals;
+using Buffer = libtransmission::Buffer;
 
+namespace
+{
+namespace parse_helpers
+{
 /* arbitrary value... this is much deeper than our code goes */
-static auto constexpr MaxDepth = int{ 64 };
+auto constexpr MaxDepth = size_t{ 64 };
 
 struct json_wrapper_data
 {
     bool has_content;
     size_t size;
     std::string_view key;
-    evbuffer* keybuf;
-    evbuffer* strbuf;
+    std::string keybuf;
+    std::string strbuf;
     tr_error* error;
     std::deque<tr_variant*> stack;
     tr_variant* top;
@@ -56,7 +63,7 @@ struct json_wrapper_data
     std::array<size_t, MaxDepth> preallocGuess;
 };
 
-static tr_variant* get_node(struct jsonsl_st* jsn)
+tr_variant* get_node(struct jsonsl_st* jsn)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -80,7 +87,7 @@ static tr_variant* get_node(struct jsonsl_st* jsn)
     return node;
 }
 
-static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /*state*/, jsonsl_char_t const* buf)
+void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /*state*/, jsonsl_char_t const* buf)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -95,17 +102,13 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
             fmt::arg("error_code", error)));
 }
 
-static int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t* at)
+int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t* at)
 {
     error_handler(jsn, error, state, at);
     return 0; /* bail */
 }
 
-static void action_callback_PUSH(
-    jsonsl_t jsn,
-    jsonsl_action_t /*action*/,
-    struct jsonsl_state_st* state,
-    jsonsl_char_t const* /*buf*/)
+void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl_state_st* state, jsonsl_char_t const* /*buf*/)
 {
     auto* const data = static_cast<json_wrapper_data*>(jsn->data);
 
@@ -129,7 +132,7 @@ static void action_callback_PUSH(
 }
 
 /* like sscanf(in+2, "%4x", &val) but less slow */
-static bool decode_hex_string(char const* in, unsigned int* setme)
+[[nodiscard]] constexpr bool decode_hex_string(char const* in, unsigned int* setme)
 {
     TR_ASSERT(in != nullptr);
 
@@ -166,11 +169,11 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
     return true;
 }
 
-static std::string_view extract_escaped_string(char const* in, size_t in_len, evbuffer* buf)
+[[nodiscard]] std::string_view extract_escaped_string(char const* in, size_t in_len, std::string& buf)
 {
     char const* const in_end = in + in_len;
 
-    evbuffer_drain(buf, evbuffer_get_length(buf));
+    buf.clear();
 
     while (in < in_end)
     {
@@ -181,49 +184,49 @@ static std::string_view extract_escaped_string(char const* in, size_t in_len, ev
             switch (in[1])
             {
             case 'b':
-                evbuffer_add(buf, "\b", 1);
+                buf.push_back('\b');
                 in += 2;
                 unescaped = true;
                 break;
 
             case 'f':
-                evbuffer_add(buf, "\f", 1);
+                buf.push_back('\f');
                 in += 2;
                 unescaped = true;
                 break;
 
             case 'n':
-                evbuffer_add(buf, "\n", 1);
+                buf.push_back('\n');
                 in += 2;
                 unescaped = true;
                 break;
 
             case 'r':
-                evbuffer_add(buf, "\r", 1);
+                buf.push_back('\r');
                 in += 2;
                 unescaped = true;
                 break;
 
             case 't':
-                evbuffer_add(buf, "\t", 1);
+                buf.push_back('\t');
                 in += 2;
                 unescaped = true;
                 break;
 
             case '/':
-                evbuffer_add(buf, "/", 1);
+                buf.push_back('/');
                 in += 2;
                 unescaped = true;
                 break;
 
             case '"':
-                evbuffer_add(buf, "\"", 1);
+                buf.push_back('"');
                 in += 2;
                 unescaped = true;
                 break;
 
             case '\\':
-                evbuffer_add(buf, "\\", 1);
+                buf.push_back('\\');
                 in += 2;
                 unescaped = true;
                 break;
@@ -239,11 +242,11 @@ static std::string_view extract_escaped_string(char const* in, size_t in_len, ev
                         {
                             auto buf8 = std::array<char, 8>{};
                             auto const it = utf8::append(val, std::data(buf8));
-                            evbuffer_add(buf, std::data(buf8), it - std::data(buf8));
+                            buf.append(std::data(buf8), it - std::data(buf8));
                         }
-                        catch (utf8::exception const&)
-                        { // invalid codepoint
-                            evbuffer_add(buf, "?", 1);
+                        catch (utf8::exception const&) // invalid codepoint
+                        {
+                            buf.push_back('?');
                         }
                         unescaped = true;
                         in += 6;
@@ -255,15 +258,15 @@ static std::string_view extract_escaped_string(char const* in, size_t in_len, ev
 
         if (!unescaped)
         {
-            evbuffer_add(buf, in, 1);
+            buf.push_back(*in);
             ++in;
         }
     }
 
-    return { (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf) };
+    return buf;
 }
 
-static std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, evbuffer* buf)
+[[nodiscard]] std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, std::string& buf)
 {
     // figure out where the string is
     char const* in_begin = jsn->base + state->pos_begin;
@@ -283,11 +286,7 @@ static std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jso
     return std::make_pair(extract_escaped_string(in_begin, in_len, buf), false);
 }
 
-static void action_callback_POP(
-    jsonsl_t jsn,
-    jsonsl_action_t /*action*/,
-    struct jsonsl_state_st* state,
-    jsonsl_char_t const* /*buf*/)
+void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl_state_st* state, jsonsl_char_t const* /*buf*/)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -312,7 +311,7 @@ static void action_callback_POP(
     }
     else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
     {
-        int const depth = std::size(data->stack);
+        auto const depth = std::size(data->stack);
         auto const* const v = data->stack.back();
         data->stack.pop_back();
         if (depth < MaxDepth)
@@ -325,8 +324,7 @@ static void action_callback_POP(
         if ((state->special_flags & JSONSL_SPECIALf_NUMNOINT) != 0)
         {
             auto sv = std::string_view{ jsn->base + state->pos_begin, jsn->pos - state->pos_begin };
-            auto const val = tr_parseNum<double>(sv);
-            tr_variantInitReal(get_node(jsn), val ? *val : double{});
+            tr_variantInitReal(get_node(jsn), tr_parseNum<double>(sv).value_or(0.0));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {
@@ -348,8 +346,13 @@ static void action_callback_POP(
     }
 }
 
-bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error)
+} // namespace parse_helpers
+} // namespace
+
+bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view json, char const** setme_end, tr_error** error)
 {
+    using namespace parse_helpers;
+
     TR_ASSERT((parse_opts & TR_VARIANT_PARSE_JSON) != 0);
 
     auto data = json_wrapper_data{};
@@ -362,18 +365,16 @@ bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view ben
     jsonsl_enable_all_callbacks(jsn);
 
     data.error = nullptr;
-    data.size = std::size(benc);
+    data.size = std::size(json);
     data.has_content = false;
     data.key = ""sv;
-    data.keybuf = evbuffer_new();
     data.parse_opts = parse_opts;
     data.preallocGuess = {};
     data.stack = {};
-    data.strbuf = evbuffer_new();
     data.top = &setme;
 
     /* parse it */
-    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(benc)), std::size(benc));
+    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(json)), std::size(json));
 
     /* EINVAL if there was no content */
     if (data.error == nullptr && !data.has_content)
@@ -384,7 +385,7 @@ bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view ben
     /* maybe set the end ptr */
     if (setme_end != nullptr)
     {
-        *setme_end = std::data(benc) + jsn->pos;
+        *setme_end = std::data(json) + jsn->pos;
     }
 
     /* cleanup */
@@ -393,16 +394,16 @@ bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view ben
     {
         tr_error_propagate(error, &data.error);
     }
-    evbuffer_free(data.keybuf);
-    evbuffer_free(data.strbuf);
     jsonsl_destroy(jsn);
     return success;
 }
 
-/****
-*****
-****/
+// ---
 
+namespace
+{
+namespace to_string_helpers
+{
 struct ParentState
 {
     int variantType;
@@ -410,30 +411,35 @@ struct ParentState
     int childCount;
 };
 
-struct jsonWalk
+struct JsonWalk
 {
-    bool doIndent;
+    explicit JsonWalk(bool do_indent)
+        : doIndent{ do_indent }
+    {
+    }
+
     std::deque<ParentState> parents;
-    evbuffer* out;
+    Buffer out;
+    bool doIndent;
 };
 
-static void jsonIndent(struct jsonWalk* data)
+void jsonIndent(struct JsonWalk* data)
 {
-    static char buf[1024] = { '\0' };
+    static auto buf = std::array<char, 1024>{};
 
-    if (*buf == '\0')
+    if (buf.front() == '\0')
     {
-        memset(buf, ' ', sizeof(buf));
+        memset(std::data(buf), ' ', std::size(buf));
         buf[0] = '\n';
     }
 
     if (data->doIndent)
     {
-        evbuffer_add(data->out, buf, std::size(data->parents) * 4 + 1);
+        data->out.add(std::data(buf), std::size(data->parents) * 4 + 1);
     }
 }
 
-static void jsonChildFunc(struct jsonWalk* data)
+void jsonChildFunc(struct JsonWalk* data)
 {
     if (!std::empty(data->parents))
     {
@@ -448,14 +454,14 @@ static void jsonChildFunc(struct jsonWalk* data)
 
                 if (i % 2 == 0)
                 {
-                    evbuffer_add(data->out, ": ", data->doIndent ? 2 : 1);
+                    data->out.add(data->doIndent ? ": "sv : ":"sv);
                 }
                 else
                 {
                     bool const is_last = pstate.childIndex == pstate.childCount;
                     if (!is_last)
                     {
-                        evbuffer_add(data->out, ",", 1);
+                        data->out.push_back(',');
                         jsonIndent(data);
                     }
                 }
@@ -467,7 +473,7 @@ static void jsonChildFunc(struct jsonWalk* data)
             ++pstate.childIndex;
             if (bool const is_last = pstate.childIndex == pstate.childCount; !is_last)
             {
-                evbuffer_add(data->out, ",", 1);
+                data->out.push_back(',');
                 jsonIndent(data);
             }
 
@@ -479,154 +485,143 @@ static void jsonChildFunc(struct jsonWalk* data)
     }
 }
 
-static void jsonPushParent(struct jsonWalk* data, tr_variant const* v)
+void jsonPushParent(struct JsonWalk* data, tr_variant const* v)
 {
     int const n_children = tr_variantIsDict(v) ? v->val.l.count * 2 : v->val.l.count;
     data->parents.push_back({ v->type, 0, n_children });
 }
 
-static void jsonPopParent(struct jsonWalk* data)
+void jsonPopParent(struct JsonWalk* data)
 {
     data->parents.pop_back();
 }
 
-static void jsonIntFunc(tr_variant const* val, void* vdata)
+void jsonIntFunc(tr_variant const* val, void* vdata)
 {
     auto buf = std::array<char, 64>{};
-    auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
-    auto* const data = static_cast<jsonWalk*>(vdata);
-    evbuffer_add(data->out, std::data(buf), static_cast<size_t>(out - std::data(buf)));
+    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
+    auto* const data = static_cast<JsonWalk*>(vdata);
+    data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     jsonChildFunc(data);
 }
 
-static void jsonBoolFunc(tr_variant const* val, void* vdata)
+void jsonBoolFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct jsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     if (val->val.b)
     {
-        evbuffer_add(data->out, "true", 4);
+        data->out.add("true"sv);
     }
     else
     {
-        evbuffer_add(data->out, "false", 5);
+        data->out.add("false"sv);
     }
 
     jsonChildFunc(data);
 }
 
-static void jsonRealFunc(tr_variant const* val, void* vdata)
+void jsonRealFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct jsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     if (fabs(val->val.d - (int)val->val.d) < 0.00001)
     {
         auto buf = std::array<char, 64>{};
-        auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
-        evbuffer_add(data->out, std::data(buf), static_cast<size_t>(out - std::data(buf)));
+        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
+        data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
     else
     {
         auto buf = std::array<char, 64>{};
-        auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
-        evbuffer_add(data->out, std::data(buf), static_cast<size_t>(out - std::data(buf)));
+        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
+        data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
 
     jsonChildFunc(data);
 }
 
-static void jsonStringFunc(tr_variant const* val, void* vdata)
+void jsonStringFunc(tr_variant const* val, void* vdata)
 {
-    evbuffer_iovec vec[1];
-    auto* data = static_cast<struct jsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(val, &sv);
 
-    evbuffer_reserve_space(data->out, std::size(sv) * 6 + 2, vec, 1);
-    auto* out = static_cast<char*>(vec[0].iov_base);
-    char const* const outend = out + vec[0].iov_len;
-
-    char* outwalk = out;
-    *outwalk++ = '"';
+    auto& out = data->out;
+    out.reserve(std::size(data->out) + std::size(sv) * 6 + 2);
+    out.push_back('"');
 
     for (; !std::empty(sv); sv.remove_prefix(1))
     {
         switch (sv.front())
         {
         case '\b':
-            *outwalk++ = '\\';
-            *outwalk++ = 'b';
+            out.add(R"(\b)"sv);
             break;
 
         case '\f':
-            *outwalk++ = '\\';
-            *outwalk++ = 'f';
+            out.add(R"(\f)"sv);
             break;
 
         case '\n':
-            *outwalk++ = '\\';
-            *outwalk++ = 'n';
+            out.add(R"(\n)"sv);
             break;
 
         case '\r':
-            *outwalk++ = '\\';
-            *outwalk++ = 'r';
+            out.add(R"(\r)"sv);
             break;
 
         case '\t':
-            *outwalk++ = '\\';
-            *outwalk++ = 't';
+            out.add(R"(\t)"sv);
             break;
 
         case '"':
-            *outwalk++ = '\\';
-            *outwalk++ = '"';
+            out.add(R"(\")"sv);
             break;
 
         case '\\':
-            *outwalk++ = '\\';
-            *outwalk++ = '\\';
+            out.add(R"(\\)"sv);
             break;
 
         default:
             if (isprint((unsigned char)sv.front()) != 0)
             {
-                *outwalk++ = sv.front();
+                out.push_back(sv.front());
             }
             else
             {
                 try
                 {
+                    auto arr = std::array<char, 16>{};
                     auto const* const begin8 = std::data(sv);
                     auto const* const end8 = begin8 + std::size(sv);
                     auto const* walk8 = begin8;
                     auto const uch32 = utf8::next(walk8, end8);
-                    outwalk = fmt::format_to_n(outwalk, outend - outwalk - 1, FMT_COMPILE("\\u{:04x}"), uch32).out;
+                    auto const result = fmt::format_to_n(std::data(arr), std::size(arr), FMT_COMPILE("\\u{:04x}"), uch32);
+                    out.add(std::data(arr), result.size);
                     sv.remove_prefix(walk8 - begin8 - 1);
                 }
                 catch (utf8::exception const&)
                 {
-                    *outwalk++ = '?';
+                    out.push_back('?');
                 }
             }
             break;
         }
     }
 
-    *outwalk++ = '"';
-    vec[0].iov_len = outwalk - out;
-    evbuffer_commit_space(data->out, vec, 1);
+    out.push_back('"');
 
     jsonChildFunc(data);
 }
 
-static void jsonDictBeginFunc(tr_variant const* val, void* vdata)
+void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct jsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPushParent(data, val);
-    evbuffer_add(data->out, "{", 1);
+    data->out.push_back('{');
 
     if (val->val.l.count != 0)
     {
@@ -634,23 +629,23 @@ static void jsonDictBeginFunc(tr_variant const* val, void* vdata)
     }
 }
 
-static void jsonListBeginFunc(tr_variant const* val, void* vdata)
+void jsonListBeginFunc(tr_variant const* val, void* vdata)
 {
-    size_t const nChildren = tr_variantListSize(val);
-    auto* data = static_cast<struct jsonWalk*>(vdata);
+    size_t const n_children = tr_variantListSize(val);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPushParent(data, val);
-    evbuffer_add(data->out, "[", 1);
+    data->out.push_back('[');
 
-    if (nChildren != 0)
+    if (n_children != 0)
     {
         jsonIndent(data);
     }
 }
 
-static void jsonContainerEndFunc(tr_variant const* val, void* vdata)
+void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct jsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPopParent(data);
 
@@ -658,17 +653,17 @@ static void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 
     if (tr_variantIsDict(val))
     {
-        evbuffer_add(data->out, "}", 1);
+        data->out.push_back('}');
     }
     else /* list */
     {
-        evbuffer_add(data->out, "]", 1);
+        data->out.push_back(']');
     }
 
     jsonChildFunc(data);
 }
 
-static struct VariantWalkFuncs const walk_funcs = {
+struct VariantWalkFuncs const walk_funcs = {
     jsonIntFunc, //
     jsonBoolFunc, //
     jsonRealFunc, //
@@ -678,17 +673,21 @@ static struct VariantWalkFuncs const walk_funcs = {
     jsonContainerEndFunc, //
 };
 
-void tr_variantToBufJson(tr_variant const* top, evbuffer* buf, bool lean)
-{
-    struct jsonWalk data;
+} // namespace to_string_helpers
+} // namespace
 
-    data.doIndent = !lean;
-    data.out = buf;
+std::string tr_variantToStrJson(tr_variant const* top, bool lean)
+{
+    using namespace to_string_helpers;
+
+    auto data = JsonWalk{ !lean };
 
     tr_variantWalk(top, &walk_funcs, &data, true);
 
-    if (evbuffer_get_length(buf) != 0)
+    auto& buf = data.out;
+    if (!std::empty(buf))
     {
-        evbuffer_add_printf(buf, "\n");
+        buf.push_back('\n');
     }
+    return buf.toString();
 }

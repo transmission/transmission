@@ -3,8 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // std::sort
+#include <algorithm> // for std::sort, std::transform
 #include <array> // std::array
+#include <cctype>
 #include <cerrno>
 #include <cfloat> // DBL_DIG
 #include <chrono>
@@ -13,6 +14,8 @@
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
 #include <ctime> // nanosleep()
+#include <iterator> // for std::back_inserter
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -29,19 +32,13 @@
 #include <sys/stat.h> // mode_t
 #endif
 
-#ifdef HAVE_ICONV
-#include <iconv.h>
-#endif
-
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
-
-#include <event2/buffer.h>
-#include <event2/event.h>
 
 #include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
+#include <wildmat.h>
 
 #include "transmission.h"
 
@@ -59,197 +56,56 @@
 
 using namespace std::literals;
 
-time_t __tr_current_time = 0;
-
-/***
-****
-***/
-
-struct timeval tr_gettimeofday()
-{
-    auto const d = std::chrono::system_clock::now().time_since_epoch();
-    auto const s = std::chrono::duration_cast<std::chrono::seconds>(d);
-    auto ret = timeval{};
-    ret.tv_sec = s.count();
-    ret.tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(d - s).count();
-    return ret;
-}
-
-/***
-****
-***/
-
-void* tr_malloc(size_t size)
-{
-    return size != 0 ? malloc(size) : nullptr;
-}
-
-void* tr_malloc0(size_t size)
-{
-    return size != 0 ? calloc(1, size) : nullptr;
-}
-
-void* tr_realloc(void* p, size_t size)
-{
-    void* result = size != 0 ? realloc(p, size) : nullptr;
-
-    if (result == nullptr)
-    {
-        tr_free(p);
-    }
-
-    return result;
-}
-
-void tr_free(void* p)
-{
-    if (p != nullptr)
-    {
-        free(p);
-    }
-}
-
-void* tr_memdup(void const* src, size_t byteCount)
-{
-    return memcpy(tr_malloc(byteCount), src, byteCount);
-}
-
-/***
-****
-***/
-
-void tr_timerAdd(struct event& timer, int seconds, int microseconds)
-{
-    auto tv = timeval{};
-    tv.tv_sec = seconds;
-    tv.tv_usec = microseconds;
-
-    TR_ASSERT(tv.tv_sec >= 0);
-    TR_ASSERT(tv.tv_usec >= 0);
-    TR_ASSERT(tv.tv_usec < 1000000);
-
-    evtimer_add(&timer, &tv);
-}
-
-void tr_timerAddMsec(struct event& timer, int msec)
-{
-    int const seconds = msec / 1000;
-    int const usec = (msec % 1000) * 1000;
-    tr_timerAdd(timer, seconds, usec);
-}
+time_t libtransmission::detail::tr_time::current_time = {};
 
 /**
 ***
 **/
 
-uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
+bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error)
 {
-    auto const path = tr_pathbuf{ path_in };
+    auto const szfilename = tr_pathbuf{ filename };
 
     /* try to stat the file */
-    auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
+    auto const info = tr_sys_path_get_info(szfilename, 0, &my_error);
+    if (my_error != nullptr)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_propagate(error, &my_error);
-        return nullptr;
-    }
-
-    if (info.type != TR_SYS_PATH_IS_FILE)
-    {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
-        tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
-        return nullptr;
-    }
-
-    /* file size should be able to fit into size_t */
-    if constexpr (sizeof(info.size) > sizeof(*size))
-    {
-        TR_ASSERT(info.size <= SIZE_MAX);
-    }
-
-    /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
-    if (fd == TR_BAD_SYS_FILE)
-    {
-        tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_propagate(error, &my_error);
-        return nullptr;
-    }
-
-    auto* buf = static_cast<uint8_t*>(tr_malloc(info.size + 1));
-    if (!tr_sys_file_read(fd, buf, info.size, nullptr, &my_error))
-    {
-        tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_sys_file_close(fd);
-        tr_free(buf);
-        tr_error_propagate(error, &my_error);
-        return nullptr;
-    }
-
-    tr_sys_file_close(fd);
-    buf[info.size] = '\0';
-    *size = info.size;
-    return buf;
-}
-
-bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** error)
-{
-    auto const path = tr_pathbuf{ path_in };
-
-    /* try to stat the file */
-    auto info = tr_sys_path_info{};
-    tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
-    {
-        tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return false;
     }
 
-    if (info.type != TR_SYS_PATH_IS_FILE)
+    if (!info || !info->isFile())
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
 
     /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return false;
     }
 
-    setme.resize(info.size);
-    if (!tr_sys_file_read(fd, std::data(setme), info.size, nullptr, &my_error))
+    contents.resize(info->size);
+    if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", filename),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd);
@@ -261,26 +117,18 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
     return true;
 }
 
-bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_error** error)
+bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error)
 {
-    auto const filename = tr_pathbuf{ filename_in };
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
-    if (char* const real_filename = tr_sys_path_resolve(filename.c_str()); real_filename != nullptr)
+    if (auto const realname = tr_sys_path_resolve(filename); !std::empty(realname) && realname != filename)
     {
-        if (filename_in != real_filename)
-        {
-            auto const saved = tr_saveFile(real_filename, contents, error);
-            tr_free(real_filename);
-            return saved;
-        }
-
-        tr_free(real_filename);
+        return tr_saveFile(realname, contents, error);
     }
 
     // Write it to a temp file first.
     // This is a safeguard against edge cases, e.g. disk full, crash while writing, etc.
-    auto tmp = tr_pathbuf{ filename.sv(), ".tmp.XXXXXX"sv };
+    auto tmp = tr_pathbuf{ filename, ".tmp.XXXXXX"sv };
     auto const fd = tr_sys_file_open_temp(std::data(tmp), error);
     if (fd == TR_BAD_SYS_FILE)
     {
@@ -301,7 +149,7 @@ bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_err
     }
 
     // If we saved it to disk successfully, move it from '.tmp' to the correct filename
-    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, filename, error))
+    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, tr_pathbuf{ filename }, error))
     {
         return false;
     }
@@ -310,38 +158,36 @@ bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_err
     return true;
 }
 
-tr_disk_space tr_dirSpace(std::string_view dir)
+tr_disk_space tr_dirSpace(std::string_view directory)
 {
-    if (std::empty(dir))
+    if (std::empty(directory))
     {
         errno = EINVAL;
         return { -1, -1 };
     }
 
-    return tr_device_info_get_disk_space(tr_device_info_create(dir));
+    return tr_device_info_get_disk_space(tr_device_info_create(directory));
 }
 
 /****
 *****
 ****/
 
-char* tr_strvDup(std::string_view in)
+size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
 {
-    auto const n = std::size(in);
-    auto* const ret = tr_new(char, n + 1);
-    std::copy(std::begin(in), std::end(in), ret);
-    ret[n] = '\0';
-    return ret;
-}
+    size_t const len = std::size(src);
 
-char* tr_strdup(void const* in)
-{
-    return in == nullptr ? nullptr : tr_strvDup(static_cast<char const*>(in));
-}
+    if (buflen >= len)
+    {
+        auto const out = std::copy(std::begin(src), std::end(src), buf);
 
-extern "C"
-{
-    int DoMatch(char const* text, char const* p);
+        if (buflen > len)
+        {
+            *out = '\0';
+        }
+    }
+
+    return len;
 }
 
 /* User-level routine. returns whether or not 'text' and 'p' matched */
@@ -349,19 +195,17 @@ bool tr_wildmat(std::string_view text, std::string_view pattern)
 {
     // TODO(ckerr): replace wildmat with base/strings/pattern.cc
     // wildmat wants these to be zero-terminated.
-    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) != 0;
+    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) > 0;
 }
 
-char const* tr_strerror(int i)
+char const* tr_strerror(int errnum)
 {
-    char const* ret = strerror(i);
-
-    if (ret == nullptr)
+    if (char const* const ret = strerror(errnum); ret != nullptr)
     {
-        ret = "Unknown Error";
+        return ret;
     }
 
-    return ret;
+    return "Unknown Error";
 }
 
 /****
@@ -370,41 +214,18 @@ char const* tr_strerror(int i)
 
 std::string_view tr_strvStrip(std::string_view str)
 {
-    auto constexpr test = [](auto ch)
+    auto constexpr Test = [](auto ch)
     {
-        return isspace(ch);
+        return isspace(static_cast<unsigned char>(ch));
     };
 
-    auto const it = std::find_if_not(std::begin(str), std::end(str), test);
+    auto const it = std::find_if_not(std::begin(str), std::end(str), Test);
     str.remove_prefix(std::distance(std::begin(str), it));
 
-    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), test);
+    auto const rit = std::find_if_not(std::rbegin(str), std::rend(str), Test);
     str.remove_suffix(std::distance(std::rbegin(str), rit));
 
     return str;
-}
-
-bool tr_str_has_suffix(char const* str, char const* suffix)
-{
-    if (str == nullptr)
-    {
-        return false;
-    }
-
-    if (suffix == nullptr)
-    {
-        return true;
-    }
-
-    auto const str_len = strlen(str);
-    auto const suffix_len = strlen(suffix);
-
-    if (str_len < suffix_len)
-    {
-        return false;
-    }
-
-    return evutil_ascii_strncasecmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
 }
 
 /****
@@ -413,24 +234,7 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
 
 uint64_t tr_time_msec()
 {
-    auto const tv = tr_gettimeofday();
-    return uint64_t(tv.tv_sec) * 1000 + (tv.tv_usec / 1000);
-}
-
-void tr_wait_msec(long int msec)
-{
-#ifdef _WIN32
-
-    Sleep((DWORD)msec);
-
-#else
-
-    struct timespec ts;
-    ts.tv_sec = msec / 1000;
-    ts.tv_nsec = (msec % 1000) * 1000000;
-    nanosleep(&ts, nullptr);
-
-#endif
+    return std::chrono::system_clock::now().time_since_epoch() / 1ms;
 }
 
 /***
@@ -450,44 +254,9 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
     TR_ASSERT(dst != nullptr);
     TR_ASSERT(src != nullptr);
 
-#ifdef HAVE_STRLCPY
-
-    return strlcpy(dst, src, siz);
-
-#else
-
-    auto* d = dst;
-    auto const* s = src;
-    size_t n = siz;
-
-    /* Copy as many bytes as will fit */
-    if (n != 0)
-    {
-        while (--n != 0)
-        {
-            if ((*d++ = *s++) == '\0')
-            {
-                break;
-            }
-        }
-    }
-
-    /* Not enough room in dst, add NUL and traverse rest of src */
-    if (n == 0)
-    {
-        if (siz != 0)
-        {
-            *d = '\0'; /* NUL-terminate dst */
-        }
-
-        while (*s++ != '\0')
-        {
-        }
-    }
-
-    return s - (char const*)src - 1; /* count does not include NUL */
-
-#endif
+    auto const res = fmt::format_to_n(dst, siz - 1, FMT_STRING("{:s}"), src);
+    *res.out = '\0';
+    return res.size;
 }
 
 /***
@@ -513,226 +282,38 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 ****
 ***/
 
-void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb)
+std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
-    auto* a = static_cast<char*>(array);
-
-    memmove(
-        a + sizeof_element * index_to_remove,
-        a + sizeof_element * (index_to_remove + 1),
-        sizeof_element * (--nmemb - index_to_remove));
-}
-
-/***
-****
-***/
-
-bool tr_utf8_validate(std::string_view sv, char const** good_end)
-{
-    auto const* begin = std::data(sv);
-    auto const* const end = begin + std::size(sv);
-    auto const* walk = begin;
-    auto all_good = false;
-
-    try
-    {
-        while (walk < end)
-        {
-            utf8::next(walk, end);
-        }
-
-        all_good = true;
-    }
-    catch (utf8::exception const&)
-    {
-        all_good = false;
-    }
-
-    if (good_end != nullptr)
-    {
-        *good_end = walk;
-    }
-
-    return all_good;
-}
-
-static char* strip_non_utf8(std::string_view sv)
-{
-    auto* const ret = tr_new(char, std::size(sv) + 1);
-    if (ret != nullptr)
-    {
-        auto const it = utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), ret, '?');
-        *it = '\0';
-    }
-    return ret;
-}
-
-static char* to_utf8(std::string_view sv)
-{
-#ifdef HAVE_ICONV
-    size_t const buflen = std::size(sv) * 4 + 10;
-    auto* const out = tr_new(char, buflen);
-
-    auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
-    for (auto const* test_encoding : Encodings)
-    {
-        iconv_t cd = iconv_open("UTF-8", test_encoding);
-        if (cd == (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
-        {
-            continue;
-        }
-
-#ifdef ICONV_SECOND_ARGUMENT_IS_CONST
-        auto const* inbuf = std::data(sv);
-#else
-        auto* inbuf = const_cast<char*>(std::data(sv));
-#endif
-        char* outbuf = out;
-        size_t inbytesleft = std::size(sv);
-        size_t outbytesleft = buflen;
-        auto const rv = iconv(cd, &inbuf, &inbytesleft, &outbuf, &outbytesleft);
-        iconv_close(cd);
-        if (rv != size_t(-1))
-        {
-            char* const ret = tr_strvDup({ out, buflen - outbytesleft });
-            tr_free(out);
-            return ret;
-        }
-    }
-
-    tr_free(out);
-
-#endif
-
-    return strip_non_utf8(sv);
-}
-
-std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
-{
-    if (tr_utf8_validate(cleanme, nullptr))
-    {
-        setme = cleanme;
-    }
-    else
-    {
-        auto* const tmp = to_utf8(cleanme);
-        setme.assign(tmp != nullptr ? tmp : "");
-        tr_free(tmp);
-    }
-
-    return setme;
+    auto out = std::string{};
+    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
+    return out;
 }
 
 #ifdef _WIN32
 
-char* tr_win32_native_to_utf8(wchar_t const* text, int text_size)
+std::string tr_win32_native_to_utf8(std::wstring_view in)
 {
-    return tr_win32_native_to_utf8_ex(text, text_size, 0, 0, nullptr);
+    auto out = std::string{};
+    out.resize(WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), nullptr, 0, nullptr, nullptr));
+    [[maybe_unused]] auto
+        len = WideCharToMultiByte(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out), nullptr, nullptr);
+    TR_ASSERT(len == std::size(out));
+    return out;
 }
 
-char* tr_win32_native_to_utf8_ex(
-    wchar_t const* text,
-    int text_size,
-    int extra_chars_before,
-    int extra_chars_after,
-    int* real_result_size)
+std::wstring tr_win32_utf8_to_native(std::string_view in)
 {
-    char* ret = nullptr;
-    int size;
-
-    if (text_size == -1)
-    {
-        text_size = wcslen(text);
-    }
-
-    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, nullptr, 0, nullptr, nullptr);
-
-    if (size == 0)
-    {
-        goto fail;
-    }
-
-    ret = tr_new(char, size + extra_chars_before + extra_chars_after + 1);
-    size = WideCharToMultiByte(CP_UTF8, 0, text, text_size, ret + extra_chars_before, size, nullptr, nullptr);
-
-    if (size == 0)
-    {
-        goto fail;
-    }
-
-    ret[size + extra_chars_before + extra_chars_after] = '\0';
-
-    if (real_result_size != nullptr)
-    {
-        *real_result_size = size;
-    }
-
-    return ret;
-
-fail:
-    tr_free(ret);
-
-    return nullptr;
+    auto out = std::wstring{};
+    out.resize(MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), nullptr, 0));
+    [[maybe_unused]] auto len = MultiByteToWideChar(CP_UTF8, 0, std::data(in), std::size(in), std::data(out), std::size(out));
+    TR_ASSERT(len == std::size(out));
+    return out;
 }
 
-wchar_t* tr_win32_utf8_to_native(char const* text, int text_size)
-{
-    return tr_win32_utf8_to_native_ex(text, text_size, 0, 0, nullptr);
-}
-
-wchar_t* tr_win32_utf8_to_native_ex(
-    char const* text,
-    int text_size,
-    int extra_chars_before,
-    int extra_chars_after,
-    int* real_result_size)
-{
-    wchar_t* ret = nullptr;
-    int size;
-
-    if (text_size == -1)
-    {
-        text_size = strlen(text);
-    }
-
-    size = MultiByteToWideChar(CP_UTF8, 0, text, text_size, nullptr, 0);
-
-    if (size == 0)
-    {
-        goto fail;
-    }
-
-    ret = tr_new(wchar_t, size + extra_chars_before + extra_chars_after + 1);
-    size = MultiByteToWideChar(CP_UTF8, 0, text, text_size, ret + extra_chars_before, size);
-
-    if (size == 0)
-    {
-        goto fail;
-    }
-
-    ret[size + extra_chars_before + extra_chars_after] = L'\0';
-
-    if (real_result_size != nullptr)
-    {
-        *real_result_size = size;
-    }
-
-    return ret;
-
-fail:
-    tr_free(ret);
-
-    return nullptr;
-}
-
-char* tr_win32_format_message(uint32_t code)
+std::string tr_win32_format_message(uint32_t code)
 {
     wchar_t* wide_text = nullptr;
-    DWORD wide_size;
-    char* text = nullptr;
-    size_t text_size;
-
-    wide_size = FormatMessageW(
+    auto const wide_size = FormatMessageW(
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         nullptr,
         code,
@@ -743,84 +324,89 @@ char* tr_win32_format_message(uint32_t code)
 
     if (wide_size == 0)
     {
-        return tr_strvDup(fmt::format(FMT_STRING("Unknown error ({:#08x})"), code));
+        return fmt::format(FMT_STRING("Unknown error ({:#08x})"), code);
     }
+
+    auto text = std::string{};
 
     if (wide_size != 0 && wide_text != nullptr)
     {
-        text = tr_win32_native_to_utf8(wide_text, wide_size);
+        text = tr_win32_native_to_utf8({ wide_text, wide_size });
     }
 
     LocalFree(wide_text);
 
-    if (text != nullptr)
+    // Most (all?) messages contain "\r\n" in the end, chop it
+    while (!std::empty(text) && isspace(text.back()))
     {
-        /* Most (all?) messages contain "\r\n" in the end, chop it */
-        text_size = strlen(text);
-
-        while (text_size > 0 && isspace((uint8_t)text[text_size - 1]))
-        {
-            text[--text_size] = '\0';
-        }
+        text.resize(text.size() - 1);
     }
 
     return text;
 }
 
-void tr_win32_make_args_utf8(int* argc, char*** argv)
+namespace
 {
-    int my_argc;
-    wchar_t** my_wide_argv;
+namespace tr_main_win32_impl
+{
 
-    my_wide_argv = CommandLineToArgvW(GetCommandLineW(), &my_argc);
-
-    if (my_wide_argv == nullptr)
+std::optional<std::vector<std::string>> win32MakeUtf8Argv()
+{
+    int argc;
+    auto argv = std::vector<std::string>{};
+    if (wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &argc); wargv != nullptr)
     {
-        return;
-    }
-
-    TR_ASSERT(*argc == my_argc);
-
-    char** my_argv = tr_new(char*, my_argc + 1);
-    int processed_argc = 0;
-
-    for (int i = 0; i < my_argc; ++i, ++processed_argc)
-    {
-        my_argv[i] = tr_win32_native_to_utf8(my_wide_argv[i], -1);
-
-        if (my_argv[i] == nullptr)
+        for (int i = 0; i < argc; ++i)
         {
-            break;
-        }
-    }
+            if (wargv[i] == nullptr)
+            {
+                break;
+            }
 
-    if (processed_argc < my_argc)
-    {
-        for (int i = 0; i < processed_argc; ++i)
-        {
-            tr_free(my_argv[i]);
+            auto str = tr_win32_native_to_utf8(wargv[i]);
+            if (std::empty(str))
+            {
+                break;
+            }
+
+            argv.emplace_back(std::move(str));
         }
 
-        tr_free(my_argv);
+        LocalFree(wargv);
     }
-    else
+
+    if (static_cast<int>(std::size(argv)) == argc)
     {
-        my_argv[my_argc] = nullptr;
-
-        *argc = my_argc;
-        *argv = my_argv;
-
-        /* TODO: Add atexit handler to cleanup? */
+        return argv;
     }
 
-    LocalFree(my_wide_argv);
+    return {};
 }
+
+} // namespace tr_main_win32_impl
+} // namespace
 
 int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
 {
-    tr_win32_make_args_utf8(&argc, &argv);
+    using namespace tr_main_win32_impl;
+
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
+
+    // build an argv from GetCommandLineW + CommandLineToArgvW
+    if (auto argv_strs = win32MakeUtf8Argv(); argv_strs)
+    {
+        auto argv_cstrs = std::vector<char*>{};
+        argv_cstrs.reserve(std::size(*argv_strs));
+        std::transform(
+            std::begin(*argv_strs),
+            std::end(*argv_strs),
+            std::back_inserter(argv_cstrs),
+            [](auto& str) { return std::data(str); });
+        argv_cstrs.push_back(nullptr); // argv is nullptr-terminated
+        return (*real_main)(std::size(*argv_strs), std::data(argv_cstrs));
+    }
+
     return (*real_main)(argc, argv);
 }
 
@@ -829,6 +415,11 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
 /***
 ****
 ***/
+
+namespace
+{
+namespace tr_parseNumberRange_impl
+{
 
 struct number_range
 {
@@ -840,11 +431,11 @@ struct number_range
  * This should be a single number (ex. "6") or a range (ex. "6-9").
  * Anything else is an error and will return failure.
  */
-static bool parseNumberSection(std::string_view str, number_range& range)
+bool parseNumberSection(std::string_view str, number_range& range)
 {
     auto constexpr Delimiter = "-"sv;
 
-    auto const first = tr_parseNum<size_t>(str);
+    auto const first = tr_parseNum<int>(str, &str);
     if (!first)
     {
         return false;
@@ -862,7 +453,7 @@ static bool parseNumberSection(std::string_view str, number_range& range)
     }
 
     str.remove_prefix(std::size(Delimiter));
-    auto const second = tr_parseNum<size_t>(str);
+    auto const second = tr_parseNum<int>(str);
     if (!second)
     {
         return false;
@@ -872,15 +463,19 @@ static bool parseNumberSection(std::string_view str, number_range& range)
     return true;
 }
 
+} // namespace tr_parseNumberRange_impl
+} // namespace
+
 /**
  * Given a string like "1-4" or "1-4,6,9,14-51", this allocates and returns an
  * array of setmeCount ints of all the values in the array.
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
- * It's the caller's responsibility to call tr_free () on the returned array.
  * If a fragment of the string can't be parsed, nullptr is returned.
  */
 std::vector<int> tr_parseNumberRange(std::string_view str)
 {
+    using namespace tr_parseNumberRange_impl;
+
     auto values = std::set<int>{};
     auto token = std::string_view{};
     auto range = number_range{};
@@ -899,7 +494,7 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
 ****
 ***/
 
-double tr_truncd(double x, int precision)
+double tr_truncd(double x, int decimal_places)
 {
     auto buf = std::array<char, 128>{};
     auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
@@ -907,10 +502,10 @@ double tr_truncd(double x, int precision)
 
     if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
     {
-        pt[precision != 0 ? precision + 1 : 0] = '\0';
+        pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
-    return atof(std::data(buf));
+    return tr_parseNum<double>(std::data(buf)).value_or(0.0);
 }
 
 std::string tr_strpercent(double x)
@@ -955,13 +550,13 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
     auto const newpath = tr_pathbuf{ newpath_in };
 
     // make sure the old file exists
-    auto info = tr_sys_path_info{};
-    if (!tr_sys_path_get_info(oldpath, 0, &info, error))
+    auto const info = tr_sys_path_get_info(oldpath, 0, error);
+    if (!info)
     {
         tr_error_prefix(error, "Unable to get information on old file: ");
         return false;
     }
-    if (info.type != TR_SYS_PATH_IS_FILE)
+    if (!info->isFile())
     {
         tr_error_set(error, TR_ERROR_EINVAL, "Old path does not point to a file."sv);
         return false;
@@ -1017,9 +612,9 @@ uint64_t tr_htonll(uint64_t x)
     /* fallback code by bdonlan at https://stackoverflow.com/questions/809902/64-bit-ntohl-in-c/875505#875505 */
     union
     {
-        uint32_t lx[2];
+        std::array<uint32_t, 2> lx;
         uint64_t llx;
-    } u;
+    } u = {};
     u.lx[0] = htonl(x >> 32);
     u.lx[1] = htonl(x & 0xFFFFFFFFULL);
     return u.llx;
@@ -1038,9 +633,9 @@ uint64_t tr_ntohll(uint64_t x)
     /* fallback code by bdonlan at https://stackoverflow.com/questions/809902/64-bit-ntohl-in-c/875505#875505 */
     union
     {
-        uint32_t lx[2];
+        std::array<uint32_t, 2> lx;
         uint64_t llx;
-    } u;
+    } u = {};
     u.llx = x;
     return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]);
 
@@ -1049,9 +644,12 @@ uint64_t tr_ntohll(uint64_t x)
 
 /***
 ****
-****
-****
 ***/
+
+namespace
+{
+namespace formatter_impl
+{
 
 struct formatter_unit
 {
@@ -1069,13 +667,7 @@ enum
     TR_FMT_TB
 };
 
-static void formatter_init(
-    formatter_units& units,
-    uint64_t kilo,
-    char const* kb,
-    char const* mb,
-    char const* gb,
-    char const* tb)
+void formatter_init(formatter_units& units, uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     uint64_t value = kilo;
     tr_strlcpy(std::data(units[TR_FMT_KB].name), kb, std::size(units[TR_FMT_KB].name));
@@ -1094,7 +686,7 @@ static void formatter_init(
     units[TR_FMT_TB].value = value;
 }
 
-static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes, size_t buflen)
+char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes, size_t buflen)
 {
     formatter_unit const* unit = nullptr;
 
@@ -1115,7 +707,7 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
         unit = &u[3];
     }
 
-    double value = double(bytes) / unit->value;
+    double const value = double(bytes) / unit->value;
     auto const* const units = std::data(unit->name);
 
     auto precision = int{};
@@ -1137,40 +729,48 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
     return buf;
 }
 
-static formatter_units size_units;
+formatter_units size_units;
+formatter_units speed_units;
+formatter_units mem_units;
+
+} // namespace formatter_impl
+} // namespace
+
+size_t tr_speed_K = 0;
 
 void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
+    using namespace formatter_impl;
     formatter_init(size_units, kilo, kb, mb, gb, tb);
 }
 
 std::string tr_formatter_size_B(uint64_t bytes)
 {
+    using namespace formatter_impl;
     auto buf = std::array<char, 64>{};
     return formatter_get_size_str(size_units, std::data(buf), bytes, std::size(buf));
 }
 
-static formatter_units speed_units;
-
-size_t tr_speed_K = 0;
-
 void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
+    using namespace formatter_impl;
     tr_speed_K = kilo;
     formatter_init(speed_units, kilo, kb, mb, gb, tb);
 }
 
-std::string tr_formatter_speed_KBps(double KBps)
+std::string tr_formatter_speed_KBps(double kilo_per_second)
 {
-    auto speed = KBps;
+    using namespace formatter_impl;
+
+    auto speed = kilo_per_second;
 
     if (speed <= 999.95) // 0.0 KB to 999.9 KB
     {
         return fmt::format("{:d} {:s}", int(speed), std::data(speed_units[TR_FMT_KB].name));
     }
 
-    double const K = speed_units[TR_FMT_KB].value;
-    speed /= K;
+    double const kilo = speed_units[TR_FMT_KB].value;
+    speed /= kilo;
 
     if (speed <= 99.995) // 0.98 MB to 99.99 MB
     {
@@ -1182,27 +782,31 @@ std::string tr_formatter_speed_KBps(double KBps)
         return fmt::format("{:.1f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
 
-    return fmt::format("{:.1f} {:s}", speed / K, std::data(speed_units[TR_FMT_GB].name));
+    return fmt::format("{:.1f} {:s}", speed / kilo, std::data(speed_units[TR_FMT_GB].name));
 }
-
-static formatter_units mem_units;
 
 size_t tr_mem_K = 0;
 
 void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
+    using namespace formatter_impl;
+
     tr_mem_K = kilo;
     formatter_init(mem_units, kilo, kb, mb, gb, tb);
 }
 
 std::string tr_formatter_mem_B(size_t bytes_per_second)
 {
+    using namespace formatter_impl;
+
     auto buf = std::array<char, 64>{};
     return formatter_get_size_str(mem_units, std::data(buf), bytes_per_second, std::size(buf));
 }
 
 void tr_formatter_get_units(void* vdict)
 {
+    using namespace formatter_impl;
+
     auto* dict = static_cast<tr_variant*>(vdict);
 
     tr_variantDictReserve(dict, 6);
@@ -1248,74 +852,48 @@ int tr_env_get_int(char const* key, int default_value)
 {
     TR_ASSERT(key != nullptr);
 
-#ifdef _WIN32
-
-    char value[16];
-
-    if (GetEnvironmentVariableA(key, value, TR_N_ELEMENTS(value)) > 1)
+    if (auto const valstr = tr_env_get_string(key); !std::empty(valstr))
     {
-        return atoi(value);
+        if (auto const valint = tr_parseNum<int>(valstr); valint)
+        {
+            return *valint;
+        }
     }
-
-#else
-
-    if (char const* value = getenv(key); !tr_str_is_empty(value))
-    {
-        return atoi(value);
-    }
-
-#endif
 
     return default_value;
 }
 
-char* tr_env_get_string(char const* key, char const* default_value)
+std::string tr_env_get_string(std::string_view key, std::string_view default_value)
 {
-    TR_ASSERT(key != nullptr);
-
 #ifdef _WIN32
 
-    wchar_t* wide_key = tr_win32_utf8_to_native(key, -1);
-    char* value = nullptr;
-
-    if (wide_key != nullptr)
+    if (auto const wide_key = tr_win32_utf8_to_native(key); !std::empty(wide_key))
     {
-        DWORD const size = GetEnvironmentVariableW(wide_key, nullptr, 0);
-
-        if (size != 0)
+        if (auto const size = GetEnvironmentVariableW(wide_key.c_str(), nullptr, 0); size != 0)
         {
-            wchar_t* const wide_value = tr_new(wchar_t, size);
-
-            if (GetEnvironmentVariableW(wide_key, wide_value, size) == size - 1)
+            auto wide_val = std::wstring{};
+            wide_val.resize(size);
+            if (GetEnvironmentVariableW(wide_key.c_str(), std::data(wide_val), std::size(wide_val)) == std::size(wide_val) - 1)
             {
-                value = tr_win32_native_to_utf8(wide_value, size);
+                TR_ASSERT(wide_val.back() == L'\0');
+                wide_val.resize(std::size(wide_val) - 1);
+                return tr_win32_native_to_utf8(wide_val);
             }
-
-            tr_free(wide_value);
         }
-
-        tr_free(wide_key);
     }
-
-    if (value == nullptr && default_value != nullptr)
-    {
-        value = tr_strdup(default_value);
-    }
-
-    return value;
 
 #else
 
-    char const* value = getenv(key);
+    auto const szkey = tr_strbuf<char, 256>{ key };
 
-    if (value == nullptr)
+    if (auto const* const value = getenv(szkey); value != nullptr)
     {
-        value = default_value;
+        return value;
     }
 
-    return value != nullptr ? tr_strvDup(value) : nullptr;
-
 #endif
+
+    return std::string{ default_value };
 }
 
 /***
@@ -1324,24 +902,24 @@ char* tr_env_get_string(char const* key, char const* default_value)
 
 void tr_net_init()
 {
+#ifdef _WIN32
     static bool initialized = false;
 
     if (!initialized)
     {
-#ifdef _WIN32
         WSADATA wsaData;
         WSAStartup(MAKEWORD(2, 2), &wsaData);
-#endif
 
         initialized = true;
     }
+#endif
 }
 
-/// mime-type
+// --- mime-type
 
 std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 {
-    auto constexpr compare = [](mime_type_suffix const& entry, auto const& suffix)
+    auto constexpr Compare = [](mime_type_suffix const& entry, auto const& suffix)
     {
         return entry.suffix < suffix;
     };
@@ -1349,7 +927,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
         auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
-        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, compare);
+        auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, Compare);
         if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
         {
             return it->mime_type;
@@ -1363,7 +941,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     return Fallback;
 }
 
-/// parseNum()
+// --- parseNum()
 
 #if defined(__GNUC__) && !__has_include(<charconv>)
 
@@ -1371,11 +949,11 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 #include <sstream>
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
-    auto const str = std::string(std::data(sv), std::min(std::size(sv), size_t{ 64 }));
-    auto sstream = std::stringstream{ str };
+    auto const tmpstr = std::string(std::data(str), std::min(std::size(str), size_t{ 64 }));
+    auto sstream = std::stringstream{ tmpstr };
     auto const oldpos = sstream.tellg();
     /* The base parameter only works for bases 8, 10 and 16.
        All other bases will be converted to 0 which activates the
@@ -1387,7 +965,11 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
     {
         return std::nullopt;
     }
-    sv.remove_prefix(sstream.eof() ? std::size(sv) : newpos - oldpos);
+    if (remainder != nullptr)
+    {
+        *remainder = str;
+        remainder->remove_prefix(sstream.eof() ? std::size(str) : newpos - oldpos);
+    }
     return val;
 }
 
@@ -1396,11 +978,11 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 #include <charconv> // std::from_chars()
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
-    auto const* const begin_ch = std::data(sv);
-    auto const* const end_ch = begin_ch + std::size(sv);
+    auto const* const begin_ch = std::data(str);
+    auto const* const end_ch = begin_ch + std::size(str);
     /* The base parameter works for any base from 2 to 36 (inclusive).
        This is different from the behaviour of the stringstream
        based solution above. */
@@ -1409,35 +991,44 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
     {
         return std::nullopt;
     }
-    sv.remove_prefix(result.ptr - std::data(sv));
+    if (remainder != nullptr)
+    {
+        *remainder = str;
+        remainder->remove_prefix(result.ptr - std::data(str));
+    }
     return val;
 }
 
 #endif // #if defined(__GNUC__) && !__has_include(<charconv>)
 
-template std::optional<long long> tr_parseNum(std::string_view& sv, int base);
-template std::optional<long> tr_parseNum(std::string_view& sv, int base);
-template std::optional<int> tr_parseNum(std::string_view& sv, int base);
-template std::optional<char> tr_parseNum(std::string_view& sv, int base);
+template std::optional<long long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<int> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<char> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
 
-template std::optional<unsigned long long> tr_parseNum(std::string_view& sv, int base);
-template std::optional<unsigned long> tr_parseNum(std::string_view& sv, int base);
-template std::optional<unsigned int> tr_parseNum(std::string_view& sv, int base);
-template std::optional<unsigned char> tr_parseNum(std::string_view& sv, int base);
+template std::optional<unsigned long long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned int> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned short> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned char> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
 
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder)
 {
-    auto const* const begin_ch = std::data(sv);
-    auto const* const end_ch = begin_ch + std::size(sv);
+    auto const* const begin_ch = std::data(str);
+    auto const* const end_ch = begin_ch + std::size(str);
     auto val = T{};
     auto const result = fast_float::from_chars(begin_ch, end_ch, val);
     if (result.ec != std::errc{})
     {
         return std::nullopt;
     }
-    sv.remove_prefix(result.ptr - std::data(sv));
+    if (remainder != nullptr)
+    {
+        *remainder = str;
+        remainder->remove_prefix(result.ptr - std::data(str));
+    }
     return val;
 }
 
-template std::optional<double> tr_parseNum(std::string_view& sv);
+template std::optional<double> tr_parseNum(std::string_view sv, std::string_view* remainder);

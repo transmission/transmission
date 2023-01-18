@@ -41,6 +41,54 @@ export const Utils = {
   },
 };
 
+export function createTextualTabsContainer(id, tabs, callback) {
+  const root = document.createElement('div');
+  root.id = id;
+  root.classList.add('tabs-container');
+
+  const buttons = document.createElement('div');
+  buttons.classList.add('tabs-buttons');
+  root.append(buttons);
+
+  const pages = document.createElement('div');
+  pages.classList.add('tabs-pages');
+  root.append(pages);
+
+  const button_array = [];
+  for (const [button_id, page, tabname] of tabs) {
+    const button = document.createElement('button');
+    button.id = button_id;
+    button.classList.add('tabs-button');
+    button.setAttribute('type', 'button');
+    button.textContent = tabname;
+    buttons.append(button);
+    button_array.push(button);
+
+    page.classList.add('hidden', 'tabs-page');
+    pages.append(page);
+
+    button.addEventListener('click', () => {
+      for (const element of buttons.children) {
+        element.classList.toggle('selected', element === button);
+      }
+      for (const element of pages.children) {
+        element.classList.toggle('hidden', element !== page);
+      }
+      if (callback) {
+        callback(page);
+      }
+    });
+  }
+
+  button_array[0].classList.add('selected');
+  pages.children[0].classList.remove('hidden');
+
+  return {
+    buttons: button_array,
+    root,
+  };
+}
+
 export function createTabsContainer(id, tabs, callback) {
   const root = document.createElement('div');
   root.id = id;

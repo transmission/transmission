@@ -59,7 +59,7 @@
 "%lu LTEP" = "%lu LTEP";
 
 /* Inspector -> selected torrents */
-"%lu magnetized transfers" = "%lu maget-разд.";
+"%lu magnetized transfers" = "%lu магент-разд.";
 
 /* Inspector -> Peers tab -> peers */
 "%lu PEX" = "%lu PEX";
@@ -71,7 +71,7 @@
 "%lu Torrent Files" = "%lu торрент-файлов";
 
 /* Inspector -> selected torrents */
-"%lu Torrents Selected" = "%lu разд.";
+"%lu Torrents Selected" = "%lu торрентов выбрано";
 
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu от трекера";
@@ -161,9 +161,6 @@
 /* Filter Bar -> group filter menu
    Groups -> Button */
 "All Groups" = "Все группы";
-
-/* Create torrent -> failed -> warning */
-"An unknown error has occurred." = "Произошла неизвестная ошибка.";
 
 /* Tracker last announce */
 "Announce error" = "Ошибка анонса";
@@ -262,12 +259,6 @@
 /* Torrent file copy alert -> title */
 "Copy of \"%@\" Cannot Be Created" = "Копия «%@» не может быть создана";
 
-/* Create torrent -> failed -> warning */
-"Could not read \"%s\": %s." = "Не могу прочитать «%1$s»: %2$s.";
-
-/* Create torrent -> failed -> warning */
-"Could not write \"%s\": %s." = "Не могу записать «%1$s»: %2$s.";
-
 /* Create toolbar item -> label
    Create torrent -> blank address -> button */
 "Create" = "Создать";
@@ -304,6 +295,7 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string */
 "DL" = "С";
 
@@ -409,9 +401,6 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "Источник: трекер";
 
-/* File size - gigabytes */
-"GB" = "ГБ";
-
 /* Transfer speed (gigabytes per second) */
 "GB/s" = "ГБ/с";
 
@@ -486,9 +475,6 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Файл «%1$@» из %2$@ не является торрент-файлом.";
 
-/* File size - kilobytes */
-"KB" = "КБ";
-
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "КБ/с";
 
@@ -525,9 +511,6 @@
 /* Inspector -> selected torrents
    Torrent -> progress string */
 "Magnetized transfer" = "Magnet-раздача";
-
-/* File size - megabytes */
-"MB" = "МБ";
 
 /* Transfer speed (megabytes per second) */
 "MB/s" = "МБ/с";
@@ -702,6 +685,9 @@
 /* Preferences -> Network -> port status */
 "Port is open" = "Порт открыт";
 
+/* No comment provided by engineer. */
+"PrefWindowSize" = "640";
+
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Приоритет";
@@ -745,6 +731,7 @@
 
 /* Stats window -> label
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string
    Torrent table -> group row -> tooltip */
 "Ratio" = "Рейтинг";
@@ -923,9 +910,6 @@
 /* Donation beg -> title */
 "Support open-source indie software" = "Поддержите независимую программу с открытым исходным кодом";
 
-/* File size - terabytes */
-"TB" = "ТБ";
-
 /* Transfer speed (terabytes per second) */
 "TB/s" = "ТБ/с";
 
@@ -1045,9 +1029,8 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Роздано за все время";
 
-/* Message window -> level
-   Message window -> level string */
-"Trace" = "";
+/* Message window -> level */
+"Trace" = "Отслеживающий";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Трекер";
@@ -1085,6 +1068,7 @@
 
 /* inspector -> peer table -> header
    status bar -> status label
+   Torrent -> status image
    Torrent -> status string */
 "UL" = "Р";
 
@@ -1126,7 +1110,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warning" = "";
+"Warning" = "Предупреждение";
 
 /* Drag overlay -> url */
 "Web Address" = "URL";
@@ -1148,7 +1132,4 @@
 
 /* Inspector -> peer -> status */
 "You want to download, but peer does not want to send (interested and choked)" = "Вы заинтересованы в имеющихся у пользователя частях торрента, но он вас блокирует";
-
-/* Preferences window size*/
-"PrefWindowSize" = "616";
 

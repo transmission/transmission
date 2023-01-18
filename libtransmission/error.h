@@ -1,5 +1,5 @@
 // This file Copyright © 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -64,7 +64,7 @@ void tr_error_propagate(tr_error** new_error, tr_error** old_error);
 void tr_error_clear(tr_error** error);
 
 /**
- * @brief Prefix message of exising error object.
+ * @brief Prefix message of existing error object.
  *
  * If passed pointer to error object is not `nullptr`, prefix its message with
  * `printf`-style formatted text. Otherwise, do nothing.

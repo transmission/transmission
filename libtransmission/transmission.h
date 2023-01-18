@@ -1,23 +1,15 @@
-/*
- * This file Copyright © Transmission authors and contributors.
- *
- * It may be used under the 3-Clause BSD License, the GNU Public License v2,
- * or v3, or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © Transmission authors and contributors.
+// It may be used under the 3-Clause BSD (SPDX: BSD-3-Clause),
+// GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-/*
- * This file defines the public API for the libtransmission library.
- * The other public API headers are variant.h and utils.h.
- * Most of the remaining headers in libtransmission are private.
- */
+// This file defines the public API for the libtransmission library.
 
 #pragma once
 
 /***
-****
 ****  Basic Types
-****
 ***/
 
 #include <stdbool.h> /* bool */
@@ -25,17 +17,25 @@
 #include <stdint.h> /* uintN_t */
 #include <time.h> /* time_t */
 
+#ifdef __cplusplus
+#include <string>
+#include <string_view>
+#endif
+
 #include "tr-macros.h"
 
-using tr_file_index_t = uint32_t;
+using tr_file_index_t = size_t;
 using tr_piece_index_t = uint32_t;
 /* Assuming a 16 KiB block (tr_block_info::BlockSize), a 32-bit block index gives us a maximum torrent size of 64 TiB.
  * When we ever need to grow past that, change tr_block_index_t and  tr_piece_index_t to uint64_t. */
 using tr_block_index_t = uint32_t;
+using tr_byte_index_t = uint64_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
-using tr_byte_index_t = uint64_t;
 using tr_torrent_id_t = int;
+using tr_bytes_per_second_t = size_t;
+using tr_kilobytes_per_second_t = size_t;
+using tr_mode_t = uint16_t;
 
 struct tr_block_span_t
 {
@@ -49,8 +49,6 @@ struct tr_byte_span_t
     uint64_t end;
 };
 
-class tr_announce_list;
-
 struct tr_ctor;
 struct tr_error;
 struct tr_session;
@@ -61,6 +59,16 @@ struct tr_variant;
 using tr_priority_t = int8_t;
 
 #define TR_RPC_SESSION_ID_HEADER "X-Transmission-Session-Id"
+
+enum tr_verify_added_mode
+{
+    // See discussion @ https://github.com/transmission/transmission/pull/2626
+    // Let newly-added torrents skip upfront verify do it on-demand later.
+    TR_VERIFY_ADDED_FAST = 0,
+
+    // Force torrents to be fully verified as they are added.
+    TR_VERIFY_ADDED_FULL = 1
+};
 
 enum tr_preallocation_mode
 {
@@ -97,7 +105,7 @@ enum tr_encryption_mode
  */
 
 /**
- * @brief returns Transmission's default configuration file directory.
+ * @brief get Transmission's default configuration file directory.
  *
  * The default configuration directory is determined this way:
  * -# If the TRANSMISSION_HOME environment variable is set, its value is used.
@@ -106,28 +114,37 @@ enum tr_encryption_mode
  * -# If XDG_CONFIG_HOME is set, "${XDG_CONFIG_HOME}/${appname}" is used.
  * -# ${HOME}/.config/${appname}" is used as a last resort.
  */
-char const* tr_getDefaultConfigDir(char const* appname);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
+#endif
+
+/** @brief buffer variant of tr_getDefaultConfigDir(). See tr_strvToBuf(). */
+size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
- * @brief returns Transmisson's default download directory.
+ * @brief returns Transmission's default download directory.
  *
  * The default download directory is determined this way:
  * -# If the HOME environment variable is set, "${HOME}/Downloads" is used.
  * -# On Windows, "${CSIDL_MYDOCUMENTS}/Downloads" is used.
  * -# Otherwise, getpwuid(getuid())->pw_dir + "/Downloads" is used.
  */
-char const* tr_getDefaultDownloadDir(void);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_getDefaultDownloadDir();
+#endif
 
-#define TR_DEFAULT_BIND_ADDRESS_IPV4 "0.0.0.0"
-#define TR_DEFAULT_BIND_ADDRESS_IPV6 "::"
+/** @brief buffer variant of tr_getDefaultDownloadDir(). See tr_strvToBuf(). */
+size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
+
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
-#define TR_DEFAULT_RPC_HOST_WHITELIST ""
 #define TR_DEFAULT_RPC_PORT_STR "9091"
 #define TR_DEFAULT_RPC_PORT 9091
 #define TR_DEFAULT_RPC_URL_STR "/transmission/"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
+#define TR_DEFAULT_PEER_PORT 51413
 #define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"
+#define TR_DEFAULT_PEER_LIMIT_GLOBAL 200
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT 50
 
@@ -143,7 +160,7 @@ char const* tr_getDefaultDownloadDir(void);
  *     tr_sessionGetDefaultSettings(&settings);
  *     if (tr_variantDictFindInt(&settings, TR_PREFS_KEY_PEER_PORT, &i))
  *         fprintf(stderr, "the default peer port is %d\n", (int)i);
- *     tr_variantFree(&settings);
+ *     tr_variantClear(&settings);
  * @endcode
  *
  * @param setme_dictionary pointer to a tr_variant dictionary
@@ -178,7 +195,7 @@ void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_d
  * @see tr_sessionInit()
  * @see tr_sessionSaveSettings()
  */
-bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* configDir, char const* appName);
+bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_dir, char const* app_name);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -191,7 +208,7 @@ bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* configDir
  * @param dictionary the dictionary to save
  * @see tr_sessionLoadSettings()
  */
-void tr_sessionSaveSettings(tr_session* session, char const* configDir, struct tr_variant const* dictionary);
+void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct tr_variant const* client_settings);
 
 /**
  * @brief Initialize a libtransmission session.
@@ -207,7 +224,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, struct t
  *     configDir = tr_getDefaultConfigDir("Transmission");
  *     session = tr_sessionInit(configDir, true, &settings);
  *
- *     tr_variantFree(&settings);
+ *     tr_variantClear(&settings);
  * @endcode
  *
  * @param configDir where Transmission will look for resume files, blocklists, etc.
@@ -217,7 +234,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* configDir, struct t
  * @see tr_sessionLoadSettings()
  * @see tr_getDefaultConfigDir()
  */
-tr_session* tr_sessionInit(char const* configDir, bool messageQueueingEnabled, struct tr_variant* settings);
+tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, struct tr_variant* settings);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in tr_sessionInit() */
@@ -227,9 +244,15 @@ void tr_sessionSet(tr_session* session, struct tr_variant* settings);
            reload whatever blocklist files are found there */
 void tr_sessionReloadBlocklists(tr_session* session);
 
-/** @brief End a libtransmission session
-    @see tr_sessionInit() */
-void tr_sessionClose(tr_session*);
+/**
+ * @brief End a libtransmission session.
+ * @see tr_sessionInit()
+ *
+ * This may take some time while &event=stopped announces are sent to trackers.
+ *
+ * @param `timeout_secs` specifies how long to wait on these announces.
+ */
+void tr_sessionClose(tr_session*, size_t timeout_secs = 15);
 
 /**
  * @brief Return the session's configuration directory.
@@ -255,16 +278,6 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* downloadDir);
  * and can be overridden on a per-torrent basis by tr_ctorSetDownloadDir().
  */
 char const* tr_sessionGetDownloadDir(tr_session const* session);
-
-/**
- * @brief Set the torrent's bandwidth priority.
- */
-void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
-
-/**
- * @brief Get the torrent's bandwidth priority.
- */
-tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
 
 /**
  * @brief set the per-session incomplete download folder.
@@ -305,7 +318,7 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session);
  *
  * @see tr_sessionIsIncompleteFileNamingEnabled()
  */
-void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool);
+void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled);
 
 /** @brief return true if files will end in ".part" until they're complete */
 bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
@@ -316,10 +329,10 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
  * @details If true, libtransmission will open a server socket to listen
  * for incoming http RPC requests as described in docs/rpc-spec.md.
  *
- * This is intially set by tr_sessionInit() and can be
+ * This is initially set by tr_sessionInit() and can be
  * queried by tr_sessionIsRPCEnabled().
  */
-void tr_sessionSetRPCEnabled(tr_session* session, bool isEnabled);
+void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled);
 
 /** @brief Get whether or not RPC calls are allowed in this session.
     @see tr_sessionInit()
@@ -337,29 +350,12 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
 uint16_t tr_sessionGetRPCPort(tr_session const* session);
 
 /**
- * @brief Specify which base URL to use.
- *
- * @param session the session to set
- * @param url     the base url to use. The RPC API is accessible under <url>/rpc, the web interface under * <url>/web.
- *
- *  @see tr_sessionGetRPCUrl
- */
-void tr_sessionSetRPCUrl(tr_session* session, char const* url);
-
-/**
- * @brief Get the base URL.
- * @see tr_sessionInit()
- * @see tr_sessionSetRPCUrl
- */
-char const* tr_sessionGetRPCUrl(tr_session const* session);
-
-/**
  * @brief Specify a whitelist for remote RPC access
  *
  * The whitelist is a comma-separated list of dotted-quad IP addresses
  * to be allowed. Wildmat notation is supported, meaning that
  * '?' is interpreted as a single-character wildcard and
- * '*' is interprted as a multi-character wildcard.
+ * '*' is interpreted as a multi-character wildcard.
  */
 void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist);
 
@@ -446,14 +442,14 @@ struct tr_session_stats
     uint64_t downloadedBytes; /* total down */
     uint64_t filesAdded; /* number of files added */
     uint64_t sessionCount; /* program started N times */
-    uint64_t secondsActive; /* how long Transmisson's been running */
+    uint64_t secondsActive; /* how long Transmission's been running */
 };
 
 /** @brief Get bandwidth use statistics for the current session */
-void tr_sessionGetStats(tr_session const* session, tr_session_stats* setme);
+tr_session_stats tr_sessionGetStats(tr_session const* session);
 
 /** @brief Get cumulative bandwidth statistics for current and past sessions */
-void tr_sessionGetCumulativeStats(tr_session const* session, tr_session_stats* setme);
+tr_session_stats tr_sessionGetCumulativeStats(tr_session const* session);
 
 void tr_sessionClearStats(tr_session* session);
 
@@ -475,8 +471,8 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool);
 bool tr_sessionIsLPDEnabled(tr_session const* session);
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
 
-void tr_sessionSetCacheLimit_MB(tr_session* session, int mb);
-int tr_sessionGetCacheLimit_MB(tr_session const* session);
+void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
+size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
 
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
@@ -499,7 +495,7 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
 
-enum tr_port_forwarding
+enum tr_port_forwarding_state
 {
     TR_PORT_ERROR,
     TR_PORT_UNMAPPED,
@@ -508,7 +504,7 @@ enum tr_port_forwarding
     TR_PORT_MAPPED
 };
 
-tr_port_forwarding tr_sessionGetPortForwarding(tr_session const* session);
+tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
 
 enum tr_direction
 {
@@ -526,8 +522,8 @@ enum tr_direction
 ****  Primary session speed limits
 ***/
 
-void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, unsigned int KBps);
-unsigned int tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
+void tr_sessionSetSpeedLimit_KBps(tr_session*, tr_direction, tr_kilobytes_per_second_t limit);
+tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const*, tr_direction);
 
 void tr_sessionLimitSpeed(tr_session*, tr_direction, bool);
 bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
@@ -536,8 +532,8 @@ bool tr_sessionIsSpeedLimited(tr_session const*, tr_direction);
 ****  Alternative speed limits that are used during scheduled times
 ***/
 
-void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, unsigned int Bps);
-unsigned int tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
+void tr_sessionSetAltSpeed_KBps(tr_session*, tr_direction, tr_kilobytes_per_second_t limit);
+tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const*, tr_direction);
 
 void tr_sessionUseAltSpeed(tr_session*, bool);
 bool tr_sessionUsesAltSpeed(tr_session const*);
@@ -545,11 +541,11 @@ bool tr_sessionUsesAltSpeed(tr_session const*);
 void tr_sessionUseAltSpeedTime(tr_session*, bool);
 bool tr_sessionUsesAltSpeedTime(tr_session const*);
 
-void tr_sessionSetAltSpeedBegin(tr_session*, int minsSinceMidnight);
-int tr_sessionGetAltSpeedBegin(tr_session const*);
+void tr_sessionSetAltSpeedBegin(tr_session*, size_t minutes_since_midnight);
+size_t tr_sessionGetAltSpeedBegin(tr_session const*);
 
-void tr_sessionSetAltSpeedEnd(tr_session*, int minsSinceMidnight);
-int tr_sessionGetAltSpeedEnd(tr_session const*);
+void tr_sessionSetAltSpeedEnd(tr_session*, size_t minutes_since_midnight);
+size_t tr_sessionGetAltSpeedEnd(tr_session const*);
 
 enum tr_sched_day
 {
@@ -570,9 +566,7 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const*);
 
 using tr_altSpeedFunc = void (*)(tr_session*, bool active, bool userDriven, void*);
 
-void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void*);
-
-bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction dir, double* setme);
+void tr_sessionSetAltSpeedFunc(tr_session*, tr_altSpeedFunc, void* user_data);
 
 /***
 ****
@@ -580,34 +574,33 @@ bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction 
 
 double tr_sessionGetRawSpeed_KBps(tr_session const*, tr_direction);
 
-void tr_sessionSetRatioLimited(tr_session*, bool isLimited);
+void tr_sessionSetRatioLimited(tr_session*, bool is_limited);
 bool tr_sessionIsRatioLimited(tr_session const*);
 
-void tr_sessionSetRatioLimit(tr_session*, double desiredRatio);
+void tr_sessionSetRatioLimit(tr_session*, double desired_ratio);
 double tr_sessionGetRatioLimit(tr_session const*);
 
-void tr_sessionSetIdleLimited(tr_session*, bool isLimited);
+void tr_sessionSetIdleLimited(tr_session*, bool is_limited);
 bool tr_sessionIsIdleLimited(tr_session const*);
 
-void tr_sessionSetIdleLimit(tr_session*, uint16_t idleMinutes);
+void tr_sessionSetIdleLimit(tr_session*, uint16_t idle_minutes);
 uint16_t tr_sessionGetIdleLimit(tr_session const*);
 
-void tr_sessionSetPeerLimit(tr_session*, uint16_t maxGlobalPeers);
+void tr_sessionSetPeerLimit(tr_session*, uint16_t max_global_peers);
 uint16_t tr_sessionGetPeerLimit(tr_session const*);
 
-void tr_sessionSetPeerLimitPerTorrent(tr_session*, uint16_t maxPeers);
+void tr_sessionSetPeerLimitPerTorrent(tr_session*, uint16_t max_peers);
 uint16_t tr_sessionGetPeerLimitPerTorrent(tr_session const*);
 
-void tr_sessionSetPaused(tr_session*, bool isPaused);
+void tr_sessionSetPaused(tr_session*, bool is_paused);
 bool tr_sessionGetPaused(tr_session const*);
 
-void tr_sessionSetDeleteSource(tr_session*, bool deleteSource);
-bool tr_sessionGetDeleteSource(tr_session const*);
+void tr_sessionSetDeleteSource(tr_session*, bool delete_source);
 
 tr_priority_t tr_torrentGetPriority(tr_torrent const*);
 void tr_torrentSetPriority(tr_torrent*, tr_priority_t);
 
-void tr_sessionSetAntiBruteForceThreshold(tr_session*, int bad_requests);
+void tr_sessionSetAntiBruteForceThreshold(tr_session*, int max_bad_requests);
 int tr_sessionGetAntiBruteForceThreshold(tr_session const*);
 
 void tr_sessionSetAntiBruteForceEnabled(tr_session*, bool enabled);
@@ -639,38 +632,38 @@ bool tr_sessionGetAntiBruteForceEnabled(tr_session const*);
 void tr_torrentStartNow(tr_torrent*);
 
 /** @brief Return the queued torrent's position in the queue it's in. [0...n) */
-int tr_torrentGetQueuePosition(tr_torrent const*);
+size_t tr_torrentGetQueuePosition(tr_torrent const*);
 
 /** @brief Set the queued torrent's position in the queue it's in.
  * Special cases: pos <= 0 moves to the front; pos >= queue length moves to the back */
-void tr_torrentSetQueuePosition(tr_torrent*, int queuePosition);
+void tr_torrentSetQueuePosition(tr_torrent*, size_t queue_position);
 
 /**
 **/
 
 /** @brief Convenience function for moving a batch of torrents to the front of their queue(s) */
-void tr_torrentsQueueMoveTop(tr_torrent* const* torrents, size_t torrentCount);
+void tr_torrentsQueueMoveTop(tr_torrent* const* torrents, size_t torrent_count);
 
 /** @brief Convenience function for moving a batch of torrents ahead one step in their queue(s) */
-void tr_torrentsQueueMoveUp(tr_torrent* const* torrents, size_t torrentCount);
+void tr_torrentsQueueMoveUp(tr_torrent* const* torrents, size_t torrent_count);
 
 /** @brief Convenience function for moving a batch of torrents back one step in their queue(s) */
-void tr_torrentsQueueMoveDown(tr_torrent* const* torrents, size_t torrentCount);
+void tr_torrentsQueueMoveDown(tr_torrent* const* torrents, size_t torrent_count);
 
 /** @brief Convenience function for moving a batch of torrents to the back of their queue(s) */
-void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrentCount);
+void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrent_count);
 
 /**
 **/
 
 /** @brief Set the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
-void tr_sessionSetQueueSize(tr_session*, tr_direction, int max_simultaneous_seed_torrents);
+void tr_sessionSetQueueSize(tr_session*, tr_direction, size_t max_simultaneous_torrents);
 
 /** @brief Return the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
-int tr_sessionGetQueueSize(tr_session const*, tr_direction);
+size_t tr_sessionGetQueueSize(tr_session const*, tr_direction);
 
 /** @brief Set whether or not to limit how many torrents can download (TR_DOWN) or seed (TR_UP) at the same time  */
-void tr_sessionSetQueueEnabled(tr_session*, tr_direction, bool do_limit_simultaneous_seed_torrents);
+void tr_sessionSetQueueEnabled(tr_session*, tr_direction, bool do_limit_simultaneous_torrents);
 
 /** @brief Return true if we're limiting how many torrents can concurrently download (TR_DOWN) or seed (TR_UP) at the same time */
 bool tr_sessionGetQueueEnabled(tr_session const*, tr_direction);
@@ -683,7 +676,7 @@ bool tr_sessionGetQueueEnabled(tr_session const*, tr_direction);
 void tr_sessionSetQueueStalledMinutes(tr_session*, int minutes);
 
 /** @return the number of minutes a torrent can be idle before being considered as stalled */
-int tr_sessionGetQueueStalledMinutes(tr_session const*);
+size_t tr_sessionGetQueueStalledMinutes(tr_session const*);
 
 /** @brief Set whether or not to count torrents idle for over N minutes as 'stalled' */
 void tr_sessionSetQueueStalledEnabled(tr_session*, bool);
@@ -691,11 +684,8 @@ void tr_sessionSetQueueStalledEnabled(tr_session*, bool);
 /** @return true if we're torrents idle for over N minutes will be flagged as 'stalled' */
 bool tr_sessionGetQueueStalledEnabled(tr_session const*);
 
-/**
-**/
-
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_torrent*, void*), void* user_data);
+void tr_sessionSetQueueStartCallback(tr_session*, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
 
 /***
 ****
@@ -703,11 +693,23 @@ void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_to
 ***/
 
 /**
- *  Load all the torrents in tr_getTorrentDir().
- *  This can be used at startup to kickstart all the torrents
- *  from the previous session.
+ * Load all the torrents in the session's torrent folder.
+ * This can be used at startup to kickstart all the torrents
+ * from the previous session.
+ *
+ * @return the number of torrents in the session
  */
-tr_torrent** tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, int* setmeCount);
+size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor);
+
+/**
+ * Get pointers to all the torrents in a session.
+ *
+ * Iff `buflen` is large enough to hold the torrents pointers,
+ * then all of them are copied into `buf`.
+ *
+ * @return the number of torrents in the session
+ */
+size_t tr_sessionGetAllTorrents(tr_session* session, tr_torrent** buf, size_t buflen);
 
 /**
 ***
@@ -755,7 +757,7 @@ bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
  *
  * Passing nullptr for a filename will clear the blocklist.
  */
-size_t tr_blocklistSetContent(tr_session* session, char const* filename);
+size_t tr_blocklistSetContent(tr_session* session, char const* content_filename);
 
 size_t tr_blocklistGetRuleCount(tr_session const* session);
 
@@ -765,7 +767,7 @@ bool tr_blocklistIsEnabled(tr_session const* session);
 
 void tr_blocklistSetEnabled(tr_session* session, bool isEnabled);
 
-/** @brief The blocklist that ges updated when an RPC client
+/** @brief The blocklist that gets updated when an RPC client
            invokes the "blocklist-update" method */
 void tr_blocklistSetURL(tr_session*, char const* url);
 
@@ -803,7 +805,7 @@ void tr_ctorFree(tr_ctor* ctor);
 
 /** @brief Set whether or not to delete the source torrent file
            when the torrent is added. (Default: False) */
-void tr_ctorSetDeleteSource(tr_ctor* ctor, bool doDelete);
+void tr_ctorSetDeleteSource(tr_ctor* ctor, bool delete_source);
 
 /** @brief Set the constructor's metainfo from a magnet link */
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet, tr_error** error);
@@ -839,10 +841,10 @@ void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory);
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool isPaused);
 
 /** @brief Set the priorities for files in a torrent */
-void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority);
+void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority);
 
 /** @brief Set the download flag for files in a torrent */
-void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* fileIndices, tr_file_index_t fileCount, bool wanted);
+void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, bool wanted);
 
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeCount);
@@ -889,10 +891,10 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 /** @addtogroup tr_torrent Torrents
     @{ */
 
-using tr_fileFunc = bool (*)(char const* filename, struct tr_error** error);
+using tr_fileFunc = bool (*)(char const* filename, void* user_data, struct tr_error** error);
 
 /** @brief Removes our torrent and .resume files for this torrent */
-void tr_torrentRemove(tr_torrent* torrent, bool removeLocalData, tr_fileFunc removeFunc);
+void tr_torrentRemove(tr_torrent* torrent, bool delete_flag, tr_fileFunc delete_func, void* user_data);
 
 /** @brief Start a torrent */
 void tr_torrentStart(tr_torrent* torrent);
@@ -954,7 +956,7 @@ void tr_torrentRenamePath(
     char const* oldpath,
     char const* newname,
     tr_torrent_rename_done_func callback,
-    void* callback_data);
+    void* callback_user_data);
 
 enum
 {
@@ -973,7 +975,7 @@ enum
 void tr_torrentSetLocation(
     tr_torrent* torrent,
     char const* location,
-    bool move_from_previous_location,
+    bool move_from_old_path,
     double volatile* setme_progress,
     int volatile* setme_state);
 
@@ -987,7 +989,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
  */
 tr_torrent_id_t tr_torrentId(tr_torrent const* torrent);
 
-tr_torrent* tr_torrentFindFromId(tr_session* session, int id);
+tr_torrent* tr_torrentFindFromId(tr_session* session, tr_torrent_id_t id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session*, tr_torrent_metainfo const*);
 
@@ -998,7 +1000,7 @@ tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
  * @return True if given metainfo was set.
  *
  */
-bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo* metainfo, char const* filename);
+bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo const* metainfo, char const* filename);
 
 /**
  * @return this torrent's name.
@@ -1010,21 +1012,24 @@ uint64_t tr_torrentTotalSize(tr_torrent const*);
 /**
  * @brief find the location of a torrent's file by looking with and without
  *        the ".part" suffix, looking in downloadDir and incompleteDir, etc.
- * @return a newly-allocated string (that must be tr_free()d by the caller
- *         when done) that gives the location of this file on disk,
- *         or nullptr if no file exists yet.
+ * @return the path of this file, or an empty string if no file exists yet.
  * @param tor the torrent whose file we're looking for
  * @param fileNum the fileIndex, in [0...tr_torrentFileCount())
  */
-char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
+#endif
+
+/** @brief buffer variant of tr_torrentFindFile(). See tr_strvToBuf(). */
+size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
 /***
 ****  Torrent speed limits
 ****
 ***/
 
-void tr_torrentSetSpeedLimit_KBps(tr_torrent*, tr_direction, unsigned int KBps);
-unsigned int tr_torrentGetSpeedLimit_KBps(tr_torrent const*, tr_direction);
+void tr_torrentSetSpeedLimit_KBps(tr_torrent*, tr_direction, tr_kilobytes_per_second_t kilo_per_second);
+tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const*, tr_direction);
 
 void tr_torrentUseSpeedLimit(tr_torrent*, tr_direction, bool);
 bool tr_torrentUsesSpeedLimit(tr_torrent const*, tr_direction);
@@ -1050,7 +1055,7 @@ void tr_torrentSetRatioMode(tr_torrent* tor, tr_ratiolimit mode);
 
 tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor);
 
-void tr_torrentSetRatioLimit(tr_torrent* tor, double ratio);
+void tr_torrentSetRatioLimit(tr_torrent* tor, double desired_ratio);
 
 double tr_torrentGetRatioLimit(tr_torrent const* tor);
 
@@ -1074,7 +1079,7 @@ void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode);
 
 tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* tor);
 
-void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idleMinutes);
+void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes);
 
 uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor);
 
@@ -1084,7 +1089,7 @@ bool tr_torrentGetSeedIdle(tr_torrent const*, uint16_t* minutes);
 *****  Peer Limits
 ****/
 
-void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t peerLimit);
+void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
 
@@ -1107,11 +1112,11 @@ enum
 void tr_torrentSetFilePriorities(
     tr_torrent* torrent,
     tr_file_index_t const* files,
-    tr_file_index_t fileCount,
+    tr_file_index_t file_count,
     tr_priority_t priority);
 
 /** @brief Set a batch of files to be downloaded or not. */
-void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t fileCount, bool do_download);
+void tr_torrentSetFileDLs(tr_torrent* torrent, tr_file_index_t const* files, tr_file_index_t n_files, bool wanted);
 
 /* Raw function to change the torrent's downloadDir field.
    This should only be used by libtransmission or to bootstrap
@@ -1130,17 +1135,21 @@ char const* tr_torrentGetDownloadDir(tr_torrent const* torrent);
 char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 
 /**
- * Returns a newly-allocated string with a magnet link of the torrent.
- * Use tr_free() to free the string when done.
+ * Returns a the magnet link to the torrent.
  */
-char* tr_torrentGetMagnetLink(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
+#endif
+
+/** @brief buffer variant of tr_torrentGetMagnetLink(). See tr_strvToBuf().  */
+size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
 ***
 **/
 
 /**
- * Returns a newly-allocated string listing its tracker's announce URLs.
+ * Returns a string listing its tracker's announce URLs.
  * One URL per line, with a blank line between tiers.
  *
  * NOTE: this only includes the trackers included in the torrent and,
@@ -1149,7 +1158,12 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
  * are applied to all public torrents. If you want a full display of all
  * trackers, use tr_torrentTracker() and tr_torrentTrackerCount()
  */
-char* tr_torrentGetTrackerList(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
+#endif
+
+/** @brief buffer variant of tr_torrentGetTrackerList(). See tr_strvToBuf(). */
+size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
  * Sets a torrent's tracker list from a list of announce URLs with one
@@ -1181,9 +1195,9 @@ using tr_torrent_completeness_func = void (*)( //
     bool wasRunning,
     void* user_data);
 
-using tr_torrent_ratio_limit_hit_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_ratio_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
 
-using tr_torrent_idle_limit_hit_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_idle_limit_hit_func = void (*)(tr_session*, tr_torrent* torrent, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's "completeness"
@@ -1198,11 +1212,9 @@ using tr_torrent_idle_limit_hit_func = void (*)(tr_torrent* torrent, void* user_
  *
  * @see tr_completeness
  */
-void tr_torrentSetCompletenessCallback(tr_torrent* torrent, tr_torrent_completeness_func func, void* user_data);
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_torrent_completeness_func callback, void* user_data);
 
-void tr_torrentClearCompletenessCallback(tr_torrent* torrent);
-
-using tr_torrent_metadata_func = void (*)(tr_torrent* torrent, void* user_data);
+using tr_session_metadata_func = void (*)(tr_session* session, tr_torrent* torrent, void* user_data);
 
 /**
  * Register to be notified whenever a torrent changes from
@@ -1210,25 +1222,25 @@ using tr_torrent_metadata_func = void (*)(tr_torrent* torrent, void* user_data);
  * This happens when a magnet link finishes downloading
  * metadata from its peers.
  */
-void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func func, void* user_data);
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func callback, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's ratio limit
  * has been hit. This will be called when the torrent's
  * ul/dl ratio has met or exceeded the designated ratio limit.
  *
- * Has the same restrictions as tr_torrentSetCompletenessCallback
+ * Has the same restrictions as tr_sessionSetCompletenessCallback
  */
-void tr_torrentSetRatioLimitHitCallback(tr_torrent* torrent, tr_torrent_ratio_limit_hit_func func, void* user_data);
+void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session_ratio_limit_hit_func callback, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's idle limit
  * has been hit. This will be called when the seeding torrent's
  * idle time has met or exceeded the designated idle limit.
  *
- * Has the same restrictions as tr_torrentSetCompletenessCallback
+ * Has the same restrictions as tr_sessionSetCompletenessCallback
  */
-void tr_torrentSetIdleLimitHitCallback(tr_torrent* torrent, tr_torrent_idle_limit_hit_func func, void* user_data);
+void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session_idle_limit_hit_func callback, void* user_data);
 
 /**
  * MANUAL ANNOUNCE
@@ -1291,15 +1303,15 @@ struct tr_peer_stat
     uint32_t cancelsToClient;
 
     /* how many requests the peer has made that we haven't responded to yet */
-    int activeReqsToClient;
+    size_t activeReqsToClient;
 
     /* how many requests we've made and are currently awaiting a response for */
-    int activeReqsToPeer;
+    size_t activeReqsToPeer;
 };
 
-tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, int* peerCount);
+tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, size_t* peer_count);
 
-void tr_torrentPeersFree(tr_peer_stat* peerStats, int peerCount);
+void tr_torrentPeersFree(tr_peer_stat* peerStats, size_t peerCount);
 
 /***
 ****  tr_tracker_stat
@@ -1352,7 +1364,7 @@ struct tr_tracker_view
     int leecherCount; // number of leechers the tracker knows of, or -1 if unknown
     int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
-    int tier; // which tier this tracker is in
+    size_t tier; // which tier this tracker is in
     tr_torrent_id_t id; // unique transmission-generated ID for use in libtransmission API
 
     tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.
@@ -1403,7 +1415,7 @@ struct tr_webseed_view
 {
     char const* url; // the url to download from
     bool is_downloading; // can be true even if speed is 0, e.g. slow download
-    unsigned download_bytes_per_second; // current download speed
+    tr_bytes_per_second_t download_bytes_per_second; // current download speed
 };
 
 struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);
@@ -1438,9 +1450,13 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 
 /*
  * Get the filename of Transmission's internal copy of the torrent file.
- * This is a duplicate that must be freed with tr_free() when done.
  */
-char* tr_torrentFilename(tr_torrent const* tor);
+#ifdef __cplusplus
+[[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
+#endif
+
+/** @brief buffer variant of tr_torrentFilename(). See tr_strvToBuf(). */
+size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /***********************************************************************
  * tr_torrentAvailability
@@ -1452,7 +1468,7 @@ char* tr_torrentFilename(tr_torrent const* tor);
  **********************************************************************/
 void tr_torrentAvailability(tr_torrent const* torrent, int8_t* tab, int size);
 
-void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int size);
+void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs);
 
 /**
  * Queue a torrent for verification.
@@ -1477,7 +1493,6 @@ enum tr_torrent_activity
     TR_STATUS_SEED_WAIT = 5, /* Queued to seed */
     TR_STATUS_SEED = 6 /* Seeding */
 };
-
 enum
 {
     TR_PEER_FROM_INCOMING = 0, /* connections made to the listening port */
@@ -1488,6 +1503,11 @@ enum
     TR_PEER_FROM_RESUME, /* peers found in the .resume file */
     TR_PEER_FROM_LTEP, /* peer address provided in an LTEP handshake */
     TR_PEER_FROM__MAX
+};
+enum tr_eta : time_t
+{
+    TR_ETA_NOT_AVAIL = -1,
+    TR_ETA_UNKNOWN = -2,
 };
 
 enum tr_stat_errtype
@@ -1545,11 +1565,6 @@ struct tr_stat
         are moved to `corrupt' or `haveValid'. */
     uint64_t haveUnchecked;
 
-    /** time when one or more of the torrent's trackers will
-        allow you to manually ask for more peers,
-        or 0 if you can't */
-    time_t manualAnnounceTime;
-
     /** When the torrent was first added. */
     time_t addedDate;
 
@@ -1596,14 +1611,6 @@ struct tr_stat
         Range is [0..1] */
     float seedRatioPercentDone;
 
-    /** Speed all data being sent for this torrent.
-        This includes piece data, protocol messages, and TCP overhead */
-    float rawUploadSpeed_KBps;
-
-    /** Speed all data being received for this torrent.
-        This includes piece data, protocol messages, and TCP overhead */
-    float rawDownloadSpeed_KBps;
-
     /** Speed all piece being sent for this torrent.
         This ONLY counts piece data. */
     float pieceUploadSpeed_KBps;
@@ -1623,26 +1630,24 @@ struct tr_stat
 
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */
-    int idleSecs;
+    time_t idleSecs;
 
     /** Cumulative seconds the torrent's ever spent downloading */
-    int secondsDownloading;
+    time_t secondsDownloading;
 
     /** Cumulative seconds the torrent's ever spent seeding */
-    int secondsSeeding;
+    time_t secondsSeeding;
 
     /** This torrent's queue position.
         All torrents have a queue position, even if it's not queued. */
-    int queuePosition;
+    size_t queuePosition;
 
-#define TR_ETA_NOT_AVAIL (-1)
-#define TR_ETA_UNKNOWN (-2)
     /** If downloading, estimated number of seconds left until the torrent is done.
         If seeding, estimated number of seconds left until seed ratio is reached. */
-    int eta;
+    time_t eta;
 
     /** If seeding, number of seconds left until the idle time limit is reached. */
-    int etaIdle;
+    time_t etaIdle;
 
     /** What is this torrent doing right now? */
     tr_torrent_activity activity;

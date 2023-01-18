@@ -55,15 +55,15 @@ SqueezeLabel::SqueezeLabel(QWidget* parent)
 {
 }
 
-void SqueezeLabel::paintEvent(QPaintEvent* paintEvent)
+void SqueezeLabel::paintEvent(QPaintEvent* paint_event)
 {
     if (hasFocus() && (textInteractionFlags() & (Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse)) != 0)
     {
-        return QLabel::paintEvent(paintEvent);
+        return QLabel::paintEvent(paint_event);
     }
 
     QPainter painter(this);
-    QFontMetrics fm = fontMetrics();
+    QFontMetrics const fm = fontMetrics();
     QStyleOption opt;
     opt.initFrom(this);
     auto const full_text = text();

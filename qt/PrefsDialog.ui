@@ -946,10 +946,10 @@
          <item>
           <widget class="QCheckBox" name="enableUtpCheck">
            <property name="toolTip">
-            <string>uTP is a tool for reducing network congestion.</string>
+            <string>µTP is a tool for reducing network congestion.</string>
            </property>
            <property name="text">
-            <string>Enable &amp;uTP for peer connections</string>
+            <string>Enable µ&amp;TP for peer connections</string>
            </property>
           </widget>
          </item>

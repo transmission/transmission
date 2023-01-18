@@ -5,8 +5,6 @@
 
 #include <algorithm>
 #include <cstddef>
-#include <iterator>
-#include <numeric>
 #include <set>
 #include <utility>
 #include <vector>
@@ -15,7 +13,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" // tr_rand_buffer()
+#include "crypto-utils.h" // for tr_salt_shaker
 #include "peer-mgr-wishlist.h"
 #include "tr-assert.h"
 
@@ -88,15 +86,14 @@ std::vector<Candidate> getCandidates(Wishlist::Mediator const& mediator)
     }
 
     // transform them into candidates
+    auto salter = tr_salt_shaker{};
     auto const n = std::size(wanted_pieces);
-    auto saltbuf = std::vector<char>(n);
-    tr_rand_buffer(std::data(saltbuf), n);
     auto candidates = std::vector<Candidate>{};
     candidates.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
         auto const [piece, n_missing] = wanted_pieces[i];
-        candidates.emplace_back(piece, n_missing, mediator.priority(piece), saltbuf[i]);
+        candidates.emplace_back(piece, n_missing, mediator.priority(piece), salter());
     }
 
     return candidates;

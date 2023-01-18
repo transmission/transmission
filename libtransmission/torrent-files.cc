@@ -1,13 +1,17 @@
 // This file Copyright © 2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::find()
+#include <cctype>
+#include <functional>
 #include <iterator>
 #include <optional>
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <fmt/format.h>
 
@@ -25,15 +29,15 @@ namespace
 
 using file_func_t = std::function<void(char const* filename)>;
 
-bool isDirectory(char const* path)
+bool isFolder(std::string_view path)
 {
-    auto info = tr_sys_path_info{};
-    return tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY);
+    auto const info = tr_sys_path_get_info(path);
+    return info && info->isFolder();
 }
 
-bool isEmptyDirectory(char const* path)
+bool isEmptyFolder(char const* path)
 {
-    if (!isDirectory(path))
+    if (!isFolder(path))
     {
         return false;
     }
@@ -58,7 +62,7 @@ bool isEmptyDirectory(char const* path)
 
 void depthFirstWalk(char const* path, file_func_t const& func, std::optional<int> max_depth = {})
 {
-    if (isDirectory(path) && (!max_depth || *max_depth > 0))
+    if (isFolder(path) && (!max_depth || *max_depth > 0))
     {
         if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
@@ -104,7 +108,7 @@ bool isJunkFile(std::string_view filename)
 
 } // unnamed namespace
 
-///
+// ---
 
 std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     tr_file_index_t file_index,
@@ -112,7 +116,6 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     size_t n_paths) const
 {
     auto filename = tr_pathbuf{};
-    auto file_info = tr_sys_path_info{};
     auto const& subpath = path(file_index);
 
     for (size_t path_idx = 0; path_idx < n_paths; ++path_idx)
@@ -120,15 +123,15 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
         auto const base = search_paths[path_idx];
 
         filename.assign(base, '/', subpath);
-        if (tr_sys_path_get_info(filename, 0, &file_info))
+        if (auto const info = tr_sys_path_get_info(filename); info)
         {
-            return FoundFile{ file_info, std::move(filename), std::size(base) };
+            return FoundFile{ *info, std::move(filename), std::size(base) };
         }
 
-        filename.assign(filename, base, '/', subpath, PartialFileSuffix);
-        if (tr_sys_path_get_info(filename, 0, &file_info))
+        filename.assign(base, '/', subpath, PartialFileSuffix);
+        if (auto const info = tr_sys_path_get_info(filename); info)
         {
-            return FoundFile{ file_info, std::move(filename), std::size(base) };
+            return FoundFile{ *info, std::move(filename), std::size(base) };
         }
     }
 
@@ -148,7 +151,7 @@ bool tr_torrent_files::hasAnyLocalData(std::string_view const* search_paths, siz
     return false;
 }
 
-///
+// ---
 
 bool tr_torrent_files::move(
     std::string_view old_parent_in,
@@ -218,7 +221,7 @@ bool tr_torrent_files::move(
     {
         auto const remove_empty_directories = [](char const* filename)
         {
-            if (isEmptyDirectory(filename))
+            if (isEmptyFolder(filename))
             {
                 tr_sys_path_remove(filename, nullptr);
             }
@@ -230,7 +233,7 @@ bool tr_torrent_files::move(
     return !err;
 }
 
-///
+// ---
 
 /**
  * This convoluted code does something (seemingly) simple:
@@ -302,7 +305,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     // Remove the first two categories and leave the third alone.
     auto const remove_junk = [](char const* filename)
     {
-        if (isEmptyDirectory(filename) || isJunkFile(filename))
+        if (isEmptyFolder(filename) || isJunkFile(filename))
         {
             tr_sys_path_remove(filename);
         }
@@ -353,7 +356,7 @@ namespace
 
     static auto constexpr ReservedPrefixes = std::array<std::string_view, 22>{
         "AUX."sv,  "CON."sv,  "NUL."sv,  "PRN."sv, //
-        "COM1."sv, "COM2"sv,  "COM3."sv, "COM4."sv, "COM5."sv, "COM6."sv, "COM7."sv, "COM8."sv, "COM9."sv, //
+        "COM1."sv, "COM2."sv, "COM3."sv, "COM4."sv, "COM5."sv, "COM6."sv, "COM7."sv, "COM8."sv, "COM9."sv, //
         "LPT1."sv, "LPT2."sv, "LPT3."sv, "LPT4."sv, "LPT5."sv, "LPT6."sv, "LPT7."sv, "LPT8."sv, "LPT9."sv, //
     };
     return std::any_of(
@@ -402,11 +405,11 @@ void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
     }
 
     // replace reserved characters with an underscore
-    static auto constexpr add_char = [](auto ch)
+    static auto constexpr AddChar = [](auto ch)
     {
         return isReservedChar(ch) ? '_' : ch;
     };
-    std::transform(std::begin(in), std::end(in), std::back_inserter(out), add_char);
+    std::transform(std::begin(in), std::end(in), std::back_inserter(out), AddChar);
 }
 
 } // namespace

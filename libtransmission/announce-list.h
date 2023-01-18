@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -15,9 +15,9 @@
 
 #include "quark.h"
 #include "interned-string.h"
-#include "web-utils.h"
 
 struct tr_error;
+struct tr_url_parsed_t;
 
 class tr_announce_list
 {
@@ -61,34 +61,34 @@ private:
     using trackers_t = std::vector<tracker_info>;
 
 public:
-    [[nodiscard]] auto begin() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto begin() const noexcept
     {
         return std::begin(trackers_);
     }
 
-    [[nodiscard]] auto end() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto end() const noexcept
     {
         return std::end(trackers_);
     }
 
-    [[nodiscard]] bool empty() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
     {
         return std::empty(trackers_);
     }
 
-    [[nodiscard]] size_t size() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 size_t size() const noexcept
     {
         return std::size(trackers_);
     }
 
-    [[nodiscard]] tracker_info const& at(size_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 tracker_info const& at(size_t i) const
     {
         return trackers_.at(i);
     }
 
     [[nodiscard]] tr_tracker_tier_t nextTier() const;
 
-    [[nodiscard]] bool operator==(tr_announce_list const& that) const
+    [[nodiscard]] TR_CONSTEXPR20 bool operator==(tr_announce_list const& that) const
     {
         return trackers_ == that.trackers_;
     }
@@ -104,12 +104,13 @@ public:
     }
 
     bool add(std::string_view announce_url_sv, tr_tracker_tier_t tier);
-    void add(tr_announce_list const& that);
+    void add(tr_announce_list const& src);
     bool remove(std::string_view announce_url);
     bool remove(tr_tracker_id_t id);
     bool replace(tr_tracker_id_t id, std::string_view announce_url_sv);
     size_t set(char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n);
-    void clear()
+
+    TR_CONSTEXPR20 void clear()
     {
         return trackers_.clear();
     }

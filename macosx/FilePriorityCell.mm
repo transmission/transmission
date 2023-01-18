@@ -8,7 +8,7 @@
 #import "NSImageAdditions.h"
 #import "Torrent.h"
 
-#define IMAGE_OVERLAP 1.0
+static CGFloat const kImageOverlap = 1.0;
 
 @implementation FilePriorityCell
 
@@ -145,7 +145,7 @@
 
         if (count > 1)
         {
-            totalWidth -= IMAGE_OVERLAP * (count - 1);
+            totalWidth -= kImageOverlap * (count - 1);
         }
 
         CGFloat currentWidth = floor(NSMidX(cellFrame) - totalWidth * 0.5);
@@ -163,7 +163,7 @@
                 respectFlipped:YES
                          hints:nil];
 
-            currentWidth += imageSize.width - IMAGE_OVERLAP;
+            currentWidth += imageSize.width - kImageOverlap;
         }
     }
 }

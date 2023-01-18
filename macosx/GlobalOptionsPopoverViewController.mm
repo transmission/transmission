@@ -35,8 +35,8 @@
 
 - (void)awakeFromNib
 {
-    self.fUploadLimitField.intValue = [self.fDefaults integerForKey:@"UploadLimit"];
-    self.fDownloadLimitField.intValue = [self.fDefaults integerForKey:@"DownloadLimit"];
+    self.fUploadLimitField.integerValue = [self.fDefaults integerForKey:@"UploadLimit"];
+    self.fDownloadLimitField.integerValue = [self.fDefaults integerForKey:@"DownloadLimit"];
 
     self.fRatioStopField.floatValue = [self.fDefaults floatForKey:@"RatioLimit"];
     self.fIdleStopField.integerValue = [self.fDefaults integerForKey:@"IdleLimitMinutes"];

@@ -1,11 +1,12 @@
 // This file Copyright (C) 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <chrono>
+#include <condition_variable>
 #include <cstdlib> // getenv()
 #include <cstring> // strlen()
 #include <iostream>
@@ -15,17 +16,20 @@
 #include <string_view>
 #include <thread>
 
-#include "crypto-utils.h" // tr_base64_decode()
-#include "error.h"
-#include "file.h" // tr_sys_file_*()
-#include "platform.h" // TR_PATH_DELIMITER
-#include "quark.h"
-#include "torrent.h"
-#include "trevent.h" // tr_amInEventThread()
-#include "utils.h"
-#include "variant.h"
+#include <event2/event.h>
+
+#include <libtransmission/crypto-utils.h> // tr_base64_decode()
+#include <libtransmission/error.h>
+#include <libtransmission/file.h> // tr_sys_file_*()
+#include <libtransmission/platform.h> // TR_PATH_DELIMITER
+#include <libtransmission/quark.h>
+#include <libtransmission/torrent.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
+
+using namespace std::literals;
 
 inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
 {
@@ -43,17 +47,22 @@ using file_func_t = std::function<void(char const* filename)>;
 
 static void depthFirstWalk(char const* path, file_func_t func)
 {
-    auto info = tr_sys_path_info{};
-    if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+    if (auto const info = tr_sys_path_get_info(path); info && info->isFolder())
     {
         if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
-            char const* name;
-            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+            for (;;)
             {
-                if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+                char const* const name = tr_sys_dir_read_name(odir);
+                if (name == nullptr)
                 {
-                    depthFirstWalk(tr_strvPath(path, name).c_str(), func);
+                    break;
+                }
+
+                if ("."sv != name && ".."sv != name)
+                {
+                    auto const child = fmt::format("{:s}/{:s}"sv, path, name);
+                    depthFirstWalk(child.c_str(), func);
                 }
             }
 
@@ -64,17 +73,9 @@ static void depthFirstWalk(char const* path, file_func_t func)
     func(path);
 }
 
-inline std::string makeString(char*&& s)
+inline bool waitFor(std::function<bool()> const& test, std::chrono::milliseconds msec)
 {
-    auto const ret = std::string(s != nullptr ? s : "");
-    tr_free(s);
-    return ret;
-}
-
-inline bool waitFor(std::function<bool()> const& test, int msec)
-{
-    auto const deadline = std::chrono::milliseconds{ msec };
-    auto const begin = std::chrono::steady_clock::now();
+    auto const deadline = std::chrono::steady_clock::now() + msec;
 
     for (;;)
     {
@@ -83,12 +84,40 @@ inline bool waitFor(std::function<bool()> const& test, int msec)
             return true;
         }
 
-        if ((std::chrono::steady_clock::now() - begin) >= deadline)
+        if (std::chrono::steady_clock::now() > deadline)
         {
             return false;
         }
 
-        tr_wait_msec(10);
+        tr_wait(10ms);
+    }
+}
+
+inline bool waitFor(std::function<bool()> const& test, int msec)
+{
+    return waitFor(test, std::chrono::milliseconds{ msec });
+}
+
+inline bool waitFor(
+    struct event_base* evb,
+    std::function<bool()> const& test,
+    std::chrono::milliseconds msec = std::chrono::seconds{ 5 })
+{
+    auto const deadline = std::chrono::steady_clock::now() + msec;
+
+    for (;;)
+    {
+        if (test())
+        {
+            return true;
+        }
+
+        if (std::chrono::steady_clock::now() > deadline)
+        {
+            return false;
+        }
+
+        event_base_loop(evb, EVLOOP_ONCE | EVLOOP_NONBLOCK);
     }
 }
 
@@ -120,22 +149,17 @@ protected:
         }
 
         tr_error* error = nullptr;
-
-        if (auto* path = tr_sys_dir_get_current(&error); path != nullptr)
+        auto path = tr_sys_dir_get_current(&error);
+        if (error != nullptr)
         {
-            auto ret = std::string{ path };
-            tr_free(path);
-            return ret;
+            tr_error_free(error);
         }
-
-        std::cerr << "tr_sys_dir_get_current error: '" << error->message << "'" << std::endl;
-        tr_error_free(error);
-        return {};
+        return path;
     }
 
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
     {
-        auto path = tr_strvPath(parent_dir, tmpl);
+        auto path = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_resolve(parent_dir), tmpl);
         tr_sys_dir_create_temp(std::data(path));
         tr_sys_path_native_separators(std::data(path));
         return path;
@@ -184,14 +208,18 @@ protected:
 
         auto dir = tr_pathbuf{ path };
         dir.popdir();
-        tr_error* error = nullptr;
-        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-        EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
+        if (auto const info = tr_sys_path_get_info(path); !info)
+        {
+            tr_error* error = nullptr;
+            tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+            EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
+            tr_error_clear(&error);
+        }
 
         errno = tmperr;
     }
 
-    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len)
+    static void blockingFileWrite(tr_sys_file_t fd, void const* data, size_t data_len, tr_error** error = nullptr)
     {
         uint64_t n_left = data_len;
         auto const* left = static_cast<uint8_t const*>(data);
@@ -199,11 +227,12 @@ protected:
         while (n_left > 0)
         {
             uint64_t n = {};
-            tr_error* error = nullptr;
-            if (!tr_sys_file_write(fd, left, n_left, &n, &error))
+            tr_error* local_error = nullptr;
+            if (!tr_sys_file_write(fd, left, n_left, &n, &local_error))
             {
-                fprintf(stderr, "Error writing file: '%s'\n", error->message);
-                tr_error_free(error);
+                fprintf(stderr, "Error writing file: '%s'\n", local_error->message);
+                tr_error_propagate(error, &local_error);
+                tr_error_free(local_error);
                 break;
             }
 
@@ -218,10 +247,21 @@ protected:
 
         buildParentDir(tmpl);
 
-        // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(tmpl);
-        blockingFileWrite(fd, payload, n);
-        tr_sys_file_close(fd);
+        tr_error* error = nullptr;
+        auto const fd = tr_sys_file_open_temp(tmpl, &error);
+        blockingFileWrite(fd, payload, n, &error);
+        tr_sys_file_flush(fd, &error);
+        tr_sys_file_flush(fd, &error);
+        tr_sys_file_close(fd, &error);
+        if (error != nullptr)
+        {
+            fmt::print(
+                "Couldn't create '{path}': {error} ({error_code})\n",
+                fmt::arg("path", tmpl),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code));
+            tr_error_free(error);
+        }
         sync();
 
         errno = tmperr;
@@ -239,6 +279,8 @@ protected:
             0600,
             nullptr);
         blockingFileWrite(fd, payload, n);
+        tr_sys_file_flush(fd);
+        tr_sys_file_flush(fd);
         tr_sys_file_close(fd);
         sync();
 
@@ -310,18 +352,18 @@ private:
         ensureFormattersInited();
 
         // download dir
-        auto sv = std::string_view{};
+        auto sv = "Downloads"sv;
         auto q = TR_KEY_download_dir;
-        auto const download_dir = tr_variantDictFindStrView(settings, q, &sv) ? tr_strvPath(sandboxDir(), sv) :
-                                                                                tr_strvPath(sandboxDir(), "Downloads");
+        (void)tr_variantDictFindStrView(settings, q, &sv);
+        auto const download_dir = tr_pathbuf{ sandboxDir(), '/', sv };
         tr_sys_dir_create(download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700);
-        tr_variantDictAddStr(settings, q, download_dir.data());
+        tr_variantDictAddStr(settings, q, download_dir);
 
         // incomplete dir
+        sv = "Incomplete"sv;
         q = TR_KEY_incomplete_dir;
-        auto const incomplete_dir = tr_variantDictFindStrView(settings, q, &sv) ? tr_strvPath(sandboxDir(), sv) :
-                                                                                  tr_strvPath(sandboxDir(), "Incomplete");
-        tr_variantDictAddStr(settings, q, incomplete_dir.c_str());
+        (void)tr_variantDictFindStrView(settings, q, &sv);
+        tr_variantDictAddStr(settings, q, tr_pathbuf{ sandboxDir(), '/', sv });
 
         // blocklists
         tr_sys_dir_create(tr_pathbuf{ sandboxDir(), "/blocklists" }, TR_SYS_DIR_CREATE_PARENTS, 0700);
@@ -363,7 +405,23 @@ protected:
         Complete
     };
 
-    tr_torrent* zeroTorrentInit(ZeroTorrentState state) const
+    [[nodiscard]] tr_torrent* createTorrentAndWaitForVerifyDone(tr_ctor* ctor)
+    {
+        auto verified_lock = std::unique_lock(verified_mutex_);
+        auto const n_previously_verified = std::size(verified_);
+        auto* const tor = tr_torrentNew(ctor, nullptr);
+
+        auto const stop_waiting = [this, tor, n_previously_verified]()
+        {
+            return std::size(verified_) > n_previously_verified && verified_.back() == tor;
+        };
+
+        EXPECT_NE(nullptr, tor);
+        verified_cv_.wait_for(verified_lock, 20s, stop_waiting);
+        return tor;
+    }
+
+    [[nodiscard]] tr_torrent* zeroTorrentInit(ZeroTorrentState state)
     {
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
@@ -428,35 +486,25 @@ protected:
             }
         }
 
-        // create the torrent
-        auto* const tor = tr_torrentNew(ctor, nullptr);
-        EXPECT_NE(nullptr, tor);
-        waitForVerify(tor);
-
-        // cleanup
+        auto* const tor = createTorrentAndWaitForVerifyDone(ctor);
         tr_ctorFree(ctor);
         return tor;
     }
 
-    void waitForVerify(tr_torrent* tor) const
+    void blockingTorrentVerify(tr_torrent* tor)
     {
         EXPECT_NE(nullptr, tor->session);
-        tr_wait_msec(100);
-        EXPECT_TRUE(waitFor(
-            [tor]()
-            {
-                auto const activity = tr_torrentGetActivity(tor);
-                return activity != TR_STATUS_CHECK && activity != TR_STATUS_CHECK_WAIT && tor->checked_pieces_.hasAll();
-            },
-            4000));
-    }
+        EXPECT_FALSE(tor->session->amInSessionThread());
 
-    void blockingTorrentVerify(tr_torrent* tor) const
-    {
-        EXPECT_NE(nullptr, tor->session);
-        EXPECT_FALSE(tr_amInEventThread(tor->session));
+        auto verified_lock = std::unique_lock(verified_mutex_);
+
+        auto const n_previously_verified = std::size(verified_);
+        auto const stop_waiting = [this, tor, n_previously_verified]()
+        {
+            return std::size(verified_) > n_previously_verified && verified_.back() == tor;
+        };
         tr_torrentVerify(tor);
-        waitForVerify(tor);
+        verified_cv_.wait_for(verified_lock, 20s, stop_waiting);
     }
 
     tr_session* session_ = nullptr;
@@ -469,7 +517,7 @@ protected:
             tr_variantInitDict(settings, 10);
             auto constexpr deleter = [](tr_variant* v)
             {
-                tr_variantFree(v);
+                tr_variantClear(v);
                 delete v;
             };
             settings_.reset(settings, deleter);
@@ -482,7 +530,15 @@ protected:
     {
         SandboxedTest::SetUp();
 
+        auto callback = [this](tr_torrent* tor, bool /*aborted*/)
+        {
+            auto verified_lock = std::scoped_lock(verified_mutex_);
+            verified_.emplace_back(tor);
+            verified_cv_.notify_one();
+        };
+
         session_ = sessionInit(settings());
+        session_->verifier_->addCallback(callback);
     }
 
     virtual void TearDown() override
@@ -493,6 +549,11 @@ protected:
 
         SandboxedTest::TearDown();
     }
+
+private:
+    std::mutex verified_mutex_;
+    std::condition_variable verified_cv_;
+    std::vector<tr_torrent*> verified_;
 };
 
 } // namespace test

@@ -1,5 +1,5 @@
 // This file Copyright (C) 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,9 +8,9 @@
 #include <algorithm>
 #include <type_traits>
 
-#include "transmission.h"
+#include <libtransmission/transmission.h>
 
-#include "peer-mgr-active-requests.h"
+#include <libtransmission/peer-mgr-active-requests.h>
 
 #include "gtest/gtest.h"
 
@@ -30,7 +30,7 @@ TEST_F(PeerMgrActiveRequestsTest, requestsAreNotAddedTwice)
 
     auto const block = tr_block_index_t{ 100 };
     auto const peer = static_cast<tr_peer*>(nullptr);
-    auto const when = time_t(0);
+    auto const when = time_t{};
     EXPECT_TRUE(requests.add(block, peer, when));
     EXPECT_FALSE(requests.add(block, peer, when));
     EXPECT_FALSE(requests.add(block, peer, when));
@@ -62,7 +62,7 @@ TEST_F(PeerMgrActiveRequestsTest, requestsAreRemoved)
 
     auto const block = tr_block_index_t{ 100 };
     auto const peer = static_cast<tr_peer*>(nullptr);
-    auto const when = time_t(0);
+    auto const when = time_t{};
 
     EXPECT_TRUE(requests.add(block, peer, when));
     EXPECT_EQ(1U, requests.count(block));
@@ -86,7 +86,7 @@ TEST_F(PeerMgrActiveRequestsTest, peersAreRemoved)
 
     auto const block = tr_block_index_t{ 100 };
     auto const peer = static_cast<tr_peer*>(nullptr);
-    auto const when = time_t(0);
+    auto const when = time_t{};
 
     // setup: add a request
     EXPECT_TRUE(requests.add(block, peer, when));

@@ -49,7 +49,7 @@ void FreeSpaceLabel::setPath(QString const& path)
 {
     if (path_ != path)
     {
-        setText(tr("<i>Calculating Free Space...</i>"));
+        setText(tr("<i>Calculating Free Space…</i>"));
         path_ = path;
         onTimer();
     }
@@ -87,7 +87,7 @@ void FreeSpaceLabel::onTimer()
 
             // update the tooltip
             auto const path = dictFind<QString>(r.args.get(), TR_KEY_path);
-            setToolTip(QDir::toNativeSeparators(path ? *path : QString()));
+            setToolTip(QDir::toNativeSeparators(path.value_or(QString{})));
 
             timer_.start();
         });

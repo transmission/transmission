@@ -5,14 +5,13 @@
 
 #include <array>
 #include <cerrno>
+#include <chrono>
 #include <cstdio>
 #include <map>
 #include <mutex>
 #include <string>
 #include <string_view>
 #include <utility>
-
-#include <event2/buffer.h>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -56,7 +55,7 @@ public:
 
 auto log_state = tr_log_state{};
 
-///
+// ---
 
 tr_sys_file_t tr_logGetFile()
 {
@@ -88,7 +87,7 @@ tr_sys_file_t tr_logGetFile()
 
 void logAddImpl(
     [[maybe_unused]] char const* file,
-    [[maybe_unused]] int line,
+    [[maybe_unused]] long line,
     [[maybe_unused]] tr_log_level level,
     std::string_view msg,
     [[maybe_unused]] std::string_view name)
@@ -126,22 +125,23 @@ void logAddImpl(
     }
 
 #ifdef NDEBUG
-    __android_log_print(prio, "transmission", "%" TR_PRIsv, TR_PRIsv_ARG(msg));
+    auto const szmsg = fmt::format("{:s}", msg);
 #else
-    __android_log_print(prio, "transmission", "[%s:%d] %" TR_PRIsv, file, line, TR_PRIsv_ARG(msg));
+    auto const szmsg = fmt::format("[{:s}:{:d}] {:s}", file, line, msg);
 #endif
+    __android_log_write(prio, "transmission", szmsg.c_str());
 
 #else
 
     if (tr_logGetQueueEnabled())
     {
-        auto* const newmsg = tr_new0(tr_log_message, 1);
+        auto* const newmsg = new tr_log_message{};
         newmsg->level = level;
         newmsg->when = tr_time();
-        newmsg->message = tr_strvDup(msg);
+        newmsg->message = msg;
         newmsg->file = file;
         newmsg->line = line;
-        newmsg->name = tr_strvDup(name);
+        newmsg->name = name;
 
         *log_state.queue_tail_ = newmsg;
         log_state.queue_tail_ = &newmsg->next;
@@ -159,8 +159,6 @@ void logAddImpl(
     }
     else
     {
-        char timestr[64];
-
         tr_sys_file_t fp = tr_logGetFile();
 
         if (fp == TR_BAD_SYS_FILE)
@@ -168,12 +166,12 @@ void logAddImpl(
             fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
         }
 
-        tr_logGetTimeStr(timestr, sizeof(timestr));
-
+        auto timestr = std::array<char, 64>{};
+        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
         tr_sys_file_write_line(
             fp,
-            !std::empty(name) ? fmt::format(FMT_STRING("[{:s}] {:s}: {:s}"), timestr, name, msg) :
-                                fmt::format(FMT_STRING("[{:s}] {:s}"), timestr, msg));
+            !std::empty(name) ? fmt::format(FMT_STRING("[{:s}] {:s}: {:s}"), std::data(timestr), name, msg) :
+                                fmt::format(FMT_STRING("[{:s}] {:s}"), std::data(timestr), msg));
         tr_sys_file_flush(fp);
     }
 #endif
@@ -196,9 +194,9 @@ void tr_logSetLevel(tr_log_level level)
     log_state.level = level;
 }
 
-void tr_logSetQueueEnabled(bool isEnabled)
+void tr_logSetQueueEnabled(bool is_enabled)
 {
-    log_state.queue_enabled_ = isEnabled;
+    log_state.queue_enabled_ = is_enabled;
 }
 
 bool tr_logGetQueueEnabled()
@@ -218,15 +216,13 @@ tr_log_message* tr_logGetQueue()
     return ret;
 }
 
-void tr_logFreeQueue(tr_log_message* list)
+void tr_logFreeQueue(tr_log_message* freeme)
 {
-    while (list != nullptr)
+    while (freeme != nullptr)
     {
-        tr_log_message* next = list->next;
-        tr_free(list->message);
-        tr_free(list->name);
-        tr_free(list);
-        list = next;
+        auto* const next = freeme->next;
+        delete freeme;
+        freeme = next;
     }
 }
 
@@ -247,7 +243,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     return buf;
 }
 
-void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view msg, std::string_view name)
+void tr_logAddMessage(char const* file, long line, tr_log_level level, std::string_view msg, std::string_view name)
 {
     TR_ASSERT(!std::empty(msg));
 
@@ -299,7 +295,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
     errno = err;
 }
 
-///
+// ---
 
 namespace
 {
@@ -342,9 +338,4 @@ std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key_in)
     }
 
     return std::nullopt;
-}
-
-std::string_view tr_logLevelToKey(tr_log_level key)
-{
-    return LogKeys[key].first;
 }

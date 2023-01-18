@@ -6,12 +6,13 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <cstdlib> // for strtoul()
 #include <cstddef>
-#include <cstdlib>
 #include <limits>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <fmt/format.h>
 
@@ -27,14 +28,11 @@
 
 using namespace std::literals;
 
-/***
-****
-***/
+// ---
 
-bool tr_addressIsIP(char const* str)
+bool tr_addressIsIP(char const* address)
 {
-    tr_address tmp;
-    return tr_address_from_string(&tmp, str);
+    return address != nullptr && tr_address::from_string(address).has_value();
 }
 
 char const* tr_webGetResponseStr(long code)
@@ -172,30 +170,7 @@ char const* tr_webGetResponseStr(long code)
     }
 }
 
-static bool is_rfc2396_alnum(uint8_t ch)
-{
-    return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
-        ch == '_' || ch == '~';
-}
-
-void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest)
-{
-    for (auto const b : digest)
-    {
-        if (is_rfc2396_alnum(uint8_t(b)))
-        {
-            *out++ = (char)b;
-        }
-        else
-        {
-            out = fmt::format_to(out, FMT_STRING("%{:02x}"), unsigned(b));
-        }
-    }
-
-    *out = '\0';
-}
-
-//// URLs
+// --- URLs
 
 namespace
 {
@@ -271,15 +246,14 @@ std::string_view getSiteName(std::string_view host)
         return host;
     }
 
-    // psl needs a zero-terminated hostname
-    auto const szhost = tr_urlbuf{ host };
-
     // is it an IP?
-    auto addr = tr_address{};
-    if (tr_address_from_string(&addr, std::data(szhost)))
+    if (auto const addr = tr_address::from_string(host); addr)
     {
         return host;
     }
+
+    // psl needs a zero-terminated hostname
+    auto const szhost = tr_urlbuf{ host };
 
     // is it a registered name?
     if (isAsciiNonUpperCase(host))
@@ -397,6 +371,17 @@ bool tr_urlIsValid(std::string_view url)
     auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
     auto const parsed = tr_urlParse(url);
     return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
+}
+
+std::string tr_urlTrackerLogName(std::string_view url)
+{
+    if (auto const parsed = tr_urlParse(url); parsed)
+    {
+        return fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed->scheme, parsed->host, parsed->port);
+    }
+
+    // we have an invalid URL, we log the full string
+    return std::string{ url };
 }
 
 tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()

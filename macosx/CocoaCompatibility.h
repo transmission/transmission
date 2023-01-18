@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2022 Transmission authors and contributors.
+// This file Copyright © 2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, NSImageSymbolScale) {
 
 typedef NS_ENUM(NSInteger, NSWindowToolbarStyle) {
     NSWindowToolbarStylePreference = 2,
+    NSWindowToolbarStyleUnified = 3,
 } API_AVAILABLE(macos(11.0));
 
 @interface NSWindow ()

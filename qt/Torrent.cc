@@ -4,8 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cassert>
-#include <iterator>
 #include <set>
 
 #include <QApplication>
@@ -13,7 +11,6 @@
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> /* tr_new0, tr_strdup */
 #include <libtransmission/variant.h>
 
 #include "Application.h"
@@ -57,27 +54,53 @@ bool Torrent::includesTracker(QString const& sitename) const
     return std::binary_search(std::begin(sitenames_), std::end(sitenames_), sitename);
 }
 
-int Torrent::compareSeedRatio(Torrent const& that) const
+int Torrent::compareSeedProgress(Torrent const& that) const
 {
-    auto const a = getSeedRatioLimit();
-    auto const b = that.getSeedRatioLimit();
+    auto const a_ratio_limit = getSeedRatioLimit();
+    auto const b_ratio_limit = that.getSeedRatioLimit();
 
-    if (!a && !b)
+    if (!a_ratio_limit && !b_ratio_limit)
     {
-        return 0;
+        return compareRatio(that);
     }
 
-    if (!a || !b)
+    auto const a_ratio = ratio();
+    auto const b_ratio = that.ratio();
+
+    if (!a_ratio_limit)
     {
-        return a ? -1 : 1;
+        return b_ratio < *b_ratio_limit ? 1 : -1;
     }
 
-    if (*a < *b)
+    if (!b_ratio_limit)
+    {
+        return a_ratio < *a_ratio_limit ? -1 : 1;
+    }
+
+    if (!(*a_ratio_limit > 0) && !(*b_ratio_limit > 0))
+    {
+        return compareRatio(that);
+    }
+
+    if (!(*a_ratio_limit > 0))
+    {
+        return 1;
+    }
+
+    if (!(*b_ratio_limit > 0))
     {
         return -1;
     }
 
-    if (*a > *b)
+    double const a_progress = a_ratio / *a_ratio_limit;
+    double const b_progress = b_ratio / *b_ratio_limit;
+
+    if (a_progress < b_progress)
+    {
+        return -1;
+    }
+
+    if (a_progress > b_progress)
     {
         return 1;
     }
@@ -165,7 +188,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
     for (size_t pos = 0; pos < n; ++pos)
     {
-        tr_quark key = keys[pos];
+        tr_quark const key = keys[pos];
         tr_variant const* child = values[pos];
         bool field_changed = false;
 
