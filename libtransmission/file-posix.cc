@@ -798,7 +798,7 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    bool const ret = (isatty(handle) != 0) || (fsync(handle) != -1);
+    bool const ret = (fsync(handle) != -1);
 
     if (!ret)
     {
@@ -806,6 +806,21 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
     }
 
     return ret;
+}
+
+bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error** error)
+{
+    TR_ASSERT(handle != TR_BAD_SYS_FILE);
+
+    struct stat statbuf;
+
+    if (fstat(handle, &statbuf) != 0)
+    {
+        set_system_error(error, errno);
+        return false;
+    }
+
+    return S_ISREG(statbuf.st_mode);
 }
 
 bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
