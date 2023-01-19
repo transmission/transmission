@@ -240,35 +240,46 @@ bool isAsciiNonUpperCase(std::string_view host)
 // 127.0.0.1 -> 127.0.0.1
 std::string_view getSiteName(std::string_view host)
 {
+    fmt::print("{:s}:{:d} host '{:s}'\n", __FILE__, __LINE__, host);
+
     // is it empty?
     if (std::empty(host))
     {
+        fmt::print("{:s}:{:d} returning host '{:s}'\n", __FILE__, __LINE__, host);
         return host;
     }
 
     // is it an IP?
     if (auto const addr = tr_address::from_string(host); addr)
     {
+        fmt::print("{:s}:{:d} returning host '{:s}'\n", __FILE__, __LINE__, host);
         return host;
     }
 
     // psl needs a zero-terminated hostname
     auto const szhost = tr_urlbuf{ host };
+    fmt::print("{:s}:{:d} szhost '{:s}'\n", __FILE__, __LINE__, szhost.c_str());
 
     // is it a registered name?
     if (isAsciiNonUpperCase(host))
     {
+        fmt::print("{:s}:{:d}\n", __FILE__, __LINE__);
         if (char const* const top = psl_registrable_domain(psl_builtin(), std::data(szhost)); top != nullptr)
         {
+            fmt::print("{:s}:{:d} host '{:s}'\n", __FILE__, __LINE__, host);
             host.remove_prefix(top - std::data(szhost));
+            fmt::print("{:s}:{:d} host '{:s}'\n", __FILE__, __LINE__, host);
         }
     }
     else if (char* lower = nullptr; psl_str_to_utf8lower(std::data(szhost), nullptr, nullptr, &lower) == PSL_SUCCESS)
     {
         // www.example.com -> example.com
+        fmt::print("{:s}:{:d}\n", __FILE__, __LINE__);
         if (char const* const top = psl_registrable_domain(psl_builtin(), lower); top != nullptr)
         {
+            fmt::print("{:s}:{:d} host '{:s}'\n", __FILE__, __LINE__, host);
             host.remove_prefix(top - lower);
+            fmt::print("{:s}:{:d} host '{:s}'\n", __FILE__, __LINE__, host);
         }
 
         psl_free_string(lower);
@@ -277,9 +288,12 @@ std::string_view getSiteName(std::string_view host)
     // example.com -> example
     if (auto const dot_pos = host.find('.'); dot_pos != std::string_view::npos)
     {
+        fmt::print("{:s}:{:d} host '{:s}'\n", __FILE__, __LINE__, host);
         host = host.substr(0, dot_pos);
+        fmt::print("{:s}:{:d} host '{:s}'\n", __FILE__, __LINE__, host);
     }
 
+    fmt::print("{:s}:{:d} returning host '{:s}'\n", __FILE__, __LINE__, host);
     return host;
 }
 
