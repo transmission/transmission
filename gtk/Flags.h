@@ -8,7 +8,7 @@
 #include <initializer_list>
 #include <type_traits>
 
-// NOLINTBEGIN(bugprone-macro-parentheses)
+// NOLINTBEGIN(bugprone-macro-parentheses, cppcoreguidelines-macro-usage)
 
 #define DEFINE_FLAGS_OPERATORS(FlagType) \
     constexpr inline Flags<FlagType> operator|(FlagType lhs, FlagType rhs) noexcept \
@@ -16,7 +16,7 @@
         return { lhs, rhs }; \
     }
 
-// NOLINTEND(bugprone-macro-parentheses)
+// NOLINTEND(bugprone-macro-parentheses, cppcoreguidelines-macro-usage)
 
 template<typename T>
 class Flags
