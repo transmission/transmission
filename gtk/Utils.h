@@ -78,7 +78,7 @@ enum class GtrUnicode
     Bullet
 };
 
-Glib::ustring gtr_get_unicode_string(GtrUnicode);
+Glib::ustring gtr_get_unicode_string(GtrUnicode uni);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size_in_bytes);
@@ -127,8 +127,8 @@ void gtr_priority_combo_init(Gtk::ComboBox& combo);
 #define gtr_priority_combo_set_value(w, val) gtr_combo_box_set_active_enum(w, val)
 
 void gtr_combo_box_set_enum(Gtk::ComboBox& combo, std::vector<std::pair<Glib::ustring, int>> const& items);
-int gtr_combo_box_get_active_enum(Gtk::ComboBox const&);
-void gtr_combo_box_set_active_enum(Gtk::ComboBox&, int value);
+int gtr_combo_box_get_active_enum(Gtk::ComboBox const& combo);
+void gtr_combo_box_set_active_enum(Gtk::ComboBox& combo, int value);
 
 /***
 ****
