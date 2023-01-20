@@ -44,6 +44,7 @@ public:
     static Glib::RefPtr<ListModelAdapter> create(Glib::RefPtr<Gio::ListModel> const& adaptee)
     {
         return Glib::make_refptr_for_instance(
+            // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
             new ListModelAdapter(adaptee, T::get_columns(), &T::get_item_id, &T::get_item_value));
     }
 
