@@ -8,11 +8,15 @@
 #include <initializer_list>
 #include <type_traits>
 
+// NOLINTBEGIN(bugprone-macro-parentheses)
+
 #define DEFINE_FLAGS_OPERATORS(FlagType) \
     constexpr inline Flags<FlagType> operator|(FlagType lhs, FlagType rhs) noexcept \
     { \
         return { lhs, rhs }; \
     }
+
+// NOLINTEND(bugprone-macro-parentheses)
 
 template<typename T>
 class Flags
