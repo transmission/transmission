@@ -43,22 +43,22 @@ public:
         }
     }
 
-    constexpr bool none() const noexcept
+    [[nodiscard]] constexpr bool none() const noexcept
     {
         return value_ == 0;
     }
 
-    constexpr bool any() const noexcept
+    [[nodiscard]] constexpr bool any() const noexcept
     {
         return !none();
     }
 
-    constexpr bool test(FlagType flag) const noexcept
+    [[nodiscard]] constexpr bool test(FlagType flag) const noexcept
     {
         return (value_ & get_mask(flag)) != 0;
     }
 
-    constexpr bool test(Flags rhs) const noexcept
+    [[nodiscard]] constexpr bool test(Flags rhs) const noexcept
     {
         return (value_ & rhs.value_) != 0;
     }
@@ -68,7 +68,7 @@ public:
         value_ |= get_mask(flag);
     }
 
-    constexpr Flags operator|(Flags rhs) noexcept
+    [[nodiscard]] constexpr Flags operator|(Flags rhs) noexcept
     {
         return Flags(value_ | rhs.value_);
     }
@@ -79,7 +79,7 @@ public:
         return *this;
     }
 
-    constexpr Flags operator~() const noexcept
+    [[nodiscard]] constexpr Flags operator~() const noexcept
     {
         return Flags(~value_);
     }
@@ -90,7 +90,7 @@ private:
     {
     }
 
-    static constexpr ValueType get_mask(FlagType flag) noexcept
+    [[nodiscard]] static constexpr ValueType get_mask(FlagType flag) noexcept
     {
         return ValueType{ 1 } << static_cast<ValueType>(flag);
     }
