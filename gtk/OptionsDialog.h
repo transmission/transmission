@@ -17,7 +17,8 @@
 #include <memory>
 
 class Session;
-typedef struct tr_ctor tr_ctor;
+
+struct tr_ctor;
 
 class TorrentUrlChooserDialog : public Gtk::Dialog
 {
