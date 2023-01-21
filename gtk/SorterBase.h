@@ -7,6 +7,8 @@
 
 #include "GtkCompat.h"
 
+#include <libtransmission/tr-macros.h>
+
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/sorter.h>
 #else
@@ -27,7 +29,10 @@ public:
 #endif
 
 public:
+    SorterBase() = default;
     ~SorterBase() override = default;
+
+    TR_DISABLE_COPY_MOVE(SorterBase)
 
     virtual int compare(T const& lhs, T const& rhs) const = 0;
 
