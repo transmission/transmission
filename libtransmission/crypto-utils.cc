@@ -33,10 +33,14 @@ using namespace std::literals;
 
 namespace
 {
+constexpr auto TrSha1DigestStrlen = size_t{ 40 };
+
+constexpr auto TrSha256DigestStrlen = size_t{ 64 };
+
 namespace ssha1_impl
 {
 
-auto constexpr DigestStringSize = TR_SHA1_DIGEST_STRLEN;
+auto constexpr DigestStringSize = TrSha1DigestStrlen;
 auto constexpr SaltedPrefix = "{"sv;
 
 std::string tr_salt(std::string_view plaintext, std::string_view salt)
@@ -210,7 +214,7 @@ std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
 {
     using namespace hex_impl;
 
-    if (std::size(hex) != TR_SHA1_DIGEST_STRLEN)
+    if (std::size(hex) != TrSha1DigestStrlen)
     {
         return {};
     }
@@ -229,7 +233,7 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
 {
     using namespace hex_impl;
 
-    if (std::size(hex) != TR_SHA256_DIGEST_STRLEN)
+    if (std::size(hex) != TrSha256DigestStrlen)
     {
         return {};
     }
