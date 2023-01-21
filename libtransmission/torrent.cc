@@ -247,12 +247,12 @@ tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr
     return tr_toSpeedKBps(tor->speedLimitBps(dir));
 }
 
-void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
+void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    tor->useSpeedLimit(dir, do_use);
+    tor->useSpeedLimit(dir, enabled);
 }
 
 bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
@@ -262,11 +262,11 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
     return tor->usesSpeedLimit(dir);
 }
 
-void tr_torrentUseSessionLimits(tr_torrent* tor, bool do_use)
+void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->bandwidth_.honorParentLimits(TR_UP, do_use) || tor->bandwidth_.honorParentLimits(TR_DOWN, do_use))
+    if (tor->bandwidth_.honorParentLimits(TR_UP, enabled) || tor->bandwidth_.honorParentLimits(TR_DOWN, enabled))
     {
         tor->setDirty();
     }
@@ -1741,9 +1741,9 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, size_t* peer_count)
     return tr_peerMgrPeerStats(tor, peer_count);
 }
 
-void tr_torrentPeersFree(tr_peer_stat* peers, size_t /*peerCount*/)
+void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t /*peer_count*/)
 {
-    delete[] peers;
+    delete[] peer_stats;
 }
 
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
