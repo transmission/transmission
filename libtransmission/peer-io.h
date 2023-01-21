@@ -239,6 +239,11 @@ public:
         return socket_.address();
     }
 
+    [[nodiscard]] constexpr auto const& port() const noexcept
+    {
+        return socket_.port();
+    }
+
     [[nodiscard]] constexpr auto socket_address() const noexcept
     {
         return socket_.socketAddress();

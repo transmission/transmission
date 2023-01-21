@@ -263,8 +263,8 @@ public:
 
         if (io->supports_utp())
         {
-            tr_peerMgrSetUtpSupported(torrent, io->address());
-            tr_peerMgrSetUtpFailed(torrent, io->address(), false);
+            tr_peerMgrSetUtpSupported(torrent, io->address(), io->port());
+            tr_peerMgrSetUtpFailed(torrent, io->address(), io->port(), false);
         }
 
         if (io->supports_ltep())
@@ -1028,7 +1028,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len)
         {
             /* Mysterious µTorrent extension that we don't grok.  However,
                it implies support for µTP, so use it to indicate that. */
-            tr_peerMgrSetUtpFailed(msgs->torrent, msgs->io->address(), false);
+            tr_peerMgrSetUtpFailed(msgs->torrent, msgs->io->address(), msgs->io->port(), false);
         }
     }
 

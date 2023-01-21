@@ -526,7 +526,7 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
     if (auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash); info)
     {
         bool const client_is_seed = info->is_done;
-        bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->address());
+        bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->address(), peer_io->port());
         tr_logAddTraceHand(this, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
         peer_io->set_torrent_hash(info->info_hash);
 
@@ -798,7 +798,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((error.code == ETIMEDOUT || error.code == ECONNREFUSED) && info)
         {
-            handshake->mediator_->set_utp_failed(info_hash, io->address());
+            handshake->mediator_->set_utp_failed(info_hash, io->address(), io->port());
         }
 
         if (handshake->mediator_->allows_tcp() && io->reconnect())
