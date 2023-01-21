@@ -1736,7 +1736,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_utp_enabled, &boolVal))
         {
-            fmt::print("  µTP enabled: {:d}\n", (boolVal ? "Yes" : "No"));
+            fmt::print("  µTP enabled: {:s}\n", boolVal ? "Yes" : "No");
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_dht_enabled, &boolVal))
