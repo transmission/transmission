@@ -12,6 +12,8 @@ check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
 
 add_library(${TR_NAME} STATIC)
 
+add_dependencies(${TR_NAME} ${TR_NAME}-web)
+
 target_sources(${TR_NAME}
     PRIVATE
         announce-list.cc

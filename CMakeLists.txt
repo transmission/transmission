@@ -45,7 +45,6 @@ option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC "Build Mac client" AUTO)
-option(ENABLE_WEB "Build Web client" OFF)
 option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
@@ -709,12 +708,7 @@ if(ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
 
-function(tr_install_web DST_DIR)
-    install(
-        DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html
-        DESTINATION ${DST_DIR})
-endfunction()
-
+add_subdirectory(web)
 add_subdirectory(libtransmission)
 
 set(MAC_PROJECT_DIR macosx)
@@ -724,7 +718,7 @@ if(ENABLE_GTK AND ENABLE_NLS)
     add_subdirectory(po)
 endif()
 
-foreach(P cli daemon gtk mac qt utils web)
+foreach(P cli daemon gtk mac qt utils)
     string(TOUPPER "${P}" P_ID)
     if(ENABLE_${P_ID})
         if(DEFINED ${P_ID}_PROJECT_DIR)
@@ -733,10 +727,6 @@ foreach(P cli daemon gtk mac qt utils web)
         add_subdirectory(${P})
     endif()
 endforeach()
-
-if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
-    tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
-endif()
 
 if(INSTALL_DOC)
     install(
