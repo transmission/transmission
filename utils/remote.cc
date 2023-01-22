@@ -1602,7 +1602,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     break;
 
                 case TR_TRACKER_WAITING:
-                    fmt::print("  Asking for more peers in {:s)\n", tr_strltime(nextAnnounceTime - now));
+                    fmt::print("  Asking for more peers in {:s}\n", tr_strltime(nextAnnounceTime - now));
                     break;
 
                 case TR_TRACKER_QUEUED:
