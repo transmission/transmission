@@ -103,13 +103,8 @@ using tr_announce_key_t = uint32_t;
 // A string of length 20 which this downloader uses as its id. Each
 // downloader generates its own id at random at the start of a new
 // download. This value will also almost certainly have to be escaped.
-auto inline constexpr PEER_ID_LEN = size_t{ 20 };
-using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
+using tr_peer_id_t = std::array<char, 20>;
 
-auto inline constexpr TR_SHA1_DIGEST_STRLEN = size_t{ 40 };
 using tr_sha1_digest_t = std::array<std::byte, 20>;
-using tr_sha1_digest_string_t = std::array<char, TR_SHA1_DIGEST_STRLEN + 1>; // +1 for '\0'
 
-auto inline constexpr TR_SHA256_DIGEST_STRLEN = size_t{ 64 };
 using tr_sha256_digest_t = std::array<std::byte, 32>;
-using tr_sha256_digest_string_t = std::array<char, TR_SHA256_DIGEST_STRLEN + 1>; // +1 for '\0'

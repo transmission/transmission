@@ -118,7 +118,7 @@ bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announ
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response->errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s}"), status, response_str);
+        response->errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s})"), status, response_str);
 
         return false;
     }
