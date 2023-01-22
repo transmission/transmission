@@ -48,13 +48,28 @@ set(TRANSMISSION_WEB_IMAGES
     assets/img/type.svg)
 
 add_custom_target(transmission-web ALL
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package.json" "${CMAKE_CURRENT_BINARY_DIR}/package.json"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json" "${CMAKE_CURRENT_BINARY_DIR}/package-lock.json"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
+                "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json"
+                "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js"
+
+                "${CMAKE_CURRENT_BINARY_DIR}"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND npm install
     COMMAND npm run build -- --context "${CMAKE_CURRENT_SOURCE_DIR}"
     BYPRODUCTS
         public_html/transmission-app.js
+        public_html/transmission-app.js.map
         public_html/transmission-app.js.LICENSE.txt
-    DEPENDS ${TRANSMISSION_WEB_IMAGES}
+        package.json
+        package-lock.json
+        webpack.config.js
+    DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
+        "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json"
+        "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js"
+        ${TRANSMISSION_WEB_IMAGES}
     SOURCES ${TRANSMISSION_WEB_SOURCES})
+
+set_property(TARGET transmission-web
+    APPEND PROPERTY ADDITIONAL_CLEAN_FILES node_modules)
