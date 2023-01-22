@@ -788,6 +788,13 @@ public:
         return announce_key_;
     }
 
+    // should be called when done modifying the torrent's announce list.
+    void on_announce_list_changed()
+    {
+        markEdited();
+        session->announcer_->resetTorrent(this);
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
