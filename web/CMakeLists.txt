@@ -77,7 +77,7 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/public_html"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMAND npm install --no-fund --no-audit --no-progress
+    COMMAND npm install --no-audit --no-fund --no-progress
     COMMAND npm run --silent build -- --no-stats)
 
 add_custom_target("${TR_NAME}-web"
