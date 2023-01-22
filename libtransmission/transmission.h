@@ -8,9 +8,7 @@
 
 #pragma once
 
-/***
-****  Basic Types
-***/
+// --- Basic Types
 
 #include <stdbool.h> /* bool */
 #include <stddef.h> /* size_t */
@@ -87,11 +85,7 @@ enum tr_encryption_mode
 #define TR_RATIO_NA -1
 #define TR_RATIO_INF -2
 
-/***
-****
-****  Startup & Shutdown
-****
-***/
+// --- Startup & Shutdown
 
 /**
  * @addtogroup tr_session Session
@@ -430,9 +424,7 @@ using tr_rpc_func = tr_rpc_callback_status (*)( //
  */
 void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data);
 
-/**
-***
-**/
+// ---
 
 /** @brief Used by tr_sessionGetStats() and tr_sessionGetCumulativeStats() */
 struct tr_session_stats
@@ -477,9 +469,7 @@ void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
 
-/***********************************************************************
-** Incoming Peer Connections Port
-*/
+// --- Incoming Peer Connections Port
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled);
 
@@ -514,13 +504,7 @@ enum tr_direction
     TR_DOWN = 1
 };
 
-/***
-****
-***/
-
-/***
-****  Primary session speed limits
-***/
+// --- Session primary speed limits
 
 void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit);
 tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
@@ -528,9 +512,7 @@ tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session
 void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
 bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir);
 
-/***
-****  Alternative speed limits that are used during scheduled times
-***/
+// --- Session alt speed limits
 
 void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit);
 tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
@@ -568,9 +550,7 @@ using tr_altSpeedFunc = void (*)(tr_session* session, bool active, bool user_dri
 
 void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
 
-/***
-****
-***/
+// ---
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir);
 
@@ -606,27 +586,24 @@ int tr_sessionGetAntiBruteForceThreshold(tr_session const* session);
 void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool enabled);
 bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
 
-/**
-**/
+// ---
 
-/***
-****
-****  Torrent Queueing
-****
-****  There are independent queues for seeding (TR_UP) and leeching (TR_DOWN).
-****
-****  If the session already has enough non-stalled seeds/leeches when
-****  tr_torrentStart() is called, the torrent will be moved into the
-****  appropriate queue and its state will be TR_STATUS_{DOWNLOAD,SEED}_WAIT.
-****
-****  To bypass the queue and unconditionally start the torrent use
-****  tr_torrentStartNow().
-****
-****  Torrents can be moved in the queue using the simple functions
-****  tr_torrentQueueMove{Top,Up,Down,Bottom}. They can be moved to
-****  arbitrary points in the queue with tr_torrentSetQueuePosition().
-****
-***/
+/**
+ * Torrent Queueing
+ *
+ * There are independent queues for seeding (TR_UP) and leeching (TR_DOWN).
+ *
+ * If the session already has enough non-stalled seeds/leeches when
+ * tr_torrentStart() is called, the torrent will be moved into the
+ * appropriate queue and its state will be TR_STATUS_{DOWNLOAD,SEED}_WAIT.
+ *
+ * To bypass the queue and unconditionally start the torrent use
+ * tr_torrentStartNow().
+ *
+ * Torrents can be moved in the queue using the simple functions
+ * tr_torrentQueueMove{Top,Up,Down,Bottom}. They can be moved to
+ * arbitrary points in the queue with tr_torrentSetQueuePosition().
+ */
 
 /** @brief Like tr_torrentStart(), but resumes right away regardless of the queues. */
 void tr_torrentStartNow(tr_torrent* tor);
@@ -638,8 +615,7 @@ size_t tr_torrentGetQueuePosition(tr_torrent const* tor);
  * Special cases: pos <= 0 moves to the front; pos >= queue length moves to the back */
 void tr_torrentSetQueuePosition(tr_torrent* tor, size_t queue_position);
 
-/**
-**/
+// ---
 
 /** @brief Convenience function for moving a batch of torrents to the front of their queue(s) */
 void tr_torrentsQueueMoveTop(tr_torrent* const* torrents, size_t torrent_count);
@@ -653,8 +629,7 @@ void tr_torrentsQueueMoveDown(tr_torrent* const* torrents, size_t torrent_count)
 /** @brief Convenience function for moving a batch of torrents to the back of their queue(s) */
 void tr_torrentsQueueMoveBottom(tr_torrent* const* torrents, size_t torrent_count);
 
-/**
-**/
+// ---
 
 /** @brief Set the number of torrents allowed to download (if direction is TR_DOWN) or seed (if direction is TR_UP) at the same time */
 void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents);
@@ -668,8 +643,7 @@ void tr_sessionSetQueueEnabled(tr_session* session, tr_direction dir, bool do_li
 /** @brief Return true if we're limiting how many torrents can concurrently download (TR_DOWN) or seed (TR_UP) at the same time */
 bool tr_sessionGetQueueEnabled(tr_session const* session, tr_direction dir);
 
-/**
-**/
+// ---
 
 /** @brief Consider torrent as 'stalled' when it's been inactive for N minutes.
     Stalled torrents are left running but are not counted by tr_sessionGetQueueSize(). */
@@ -687,10 +661,7 @@ bool tr_sessionGetQueueStalledEnabled(tr_session const* session);
 /** @brief Set a callback that is invoked when the queue starts a torrent */
 void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
 
-/***
-****
-****
-***/
+// ---
 
 /**
  * Load all the torrents in the session's torrent folder.
@@ -711,9 +682,7 @@ size_t tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor);
  */
 size_t tr_sessionGetAllTorrents(tr_session* session, tr_torrent** buf, size_t buflen);
 
-/**
-***
-**/
+// ---
 
 enum TrScript
 {
@@ -734,9 +703,7 @@ bool tr_sessionIsScriptEnabled(tr_session const* session, TrScript type);
 
 /** @} */
 
-/**
-***
-**/
+// ---
 
 /** @addtogroup Blocklists
     @{ */
@@ -883,10 +850,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 
 /** @} */
 
-/***********************************************************************
- ***
- ***  TORRENTS
- **/
+// --- Torrents
 
 /** @addtogroup tr_torrent Torrents
     @{ */
@@ -1023,10 +987,7 @@ uint64_t tr_torrentTotalSize(tr_torrent const* tor);
 /** @brief buffer variant of tr_torrentFindFile(). See tr_strvToBuf(). */
 size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
-/***
-****  Torrent speed limits
-****
-***/
+// --- Torrent speed limits
 
 void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobytes_per_second_t kilo_per_second);
 tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir);
@@ -1037,9 +998,7 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir);
 void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled);
 bool tr_torrentUsesSessionLimits(tr_torrent const* tor);
 
-/****
-*****  Ratio Limits
-****/
+// --- Ratio Limits
 
 enum tr_ratiolimit
 {
@@ -1061,9 +1020,7 @@ double tr_torrentGetRatioLimit(tr_torrent const* tor);
 
 bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio);
 
-/****
-*****  Idle Time Limits
-****/
+// --- Idle Time Limits
 
 enum tr_idlelimit
 {
@@ -1085,17 +1042,13 @@ uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor);
 
 bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* minutes);
 
-/****
-*****  Peer Limits
-****/
+// --- Peer Limits
 
 void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
 
-/****
-*****  File Priorities
-****/
+// --- File Priorities
 
 enum
 {
@@ -1144,9 +1097,7 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 /** @brief buffer variant of tr_torrentGetMagnetLink(). See tr_strvToBuf().  */
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
-/**
-***
-**/
+// ---
 
 /**
  * Returns a string listing its tracker's announce URLs.
@@ -1174,9 +1125,7 @@ size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t bu
  */
 bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
 
-/**
-***
-**/
+// ---
 
 enum tr_completeness
 {
@@ -1259,9 +1208,7 @@ void tr_torrentManualUpdate(tr_torrent* torrent);
 
 bool tr_torrentCanManualUpdate(tr_torrent const* torrent);
 
-/***
-****  tr_peer_stat
-***/
+// --- tr_peer_stat
 
 struct tr_peer_stat
 {
@@ -1289,10 +1236,8 @@ struct tr_peer_stat
     double rateToPeer_KBps;
     double rateToClient_KBps;
 
-    /***
-    ****  THESE NEXT FOUR FIELDS ARE EXPERIMENTAL.
-    ****  Don't rely on them; they'll probably go away
-    ***/
+    // THESE NEXT FOUR FIELDS ARE EXPERIMENTAL.
+    // Don't rely on them; they'll probably go away
     /* how many blocks we've sent to this peer in the last 120 seconds */
     uint32_t blocksToPeer;
     /* how many blocks this client's sent to us in the last 120 seconds */
@@ -1313,9 +1258,7 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, size_t* peer_count);
 
 void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t peer_count);
 
-/***
-****  tr_tracker_stat
-***/
+// --- tr_tracker_stat
 
 enum tr_tracker_state
 {
@@ -1458,14 +1401,12 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 /** @brief buffer variant of tr_torrentFilename(). See tr_strvToBuf(). */
 size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
-/***********************************************************************
- * tr_torrentAvailability
- ***********************************************************************
+/**
  * Use this to draw an advanced progress bar which is 'size' pixels
  * wide. Fills 'tab' which you must have allocated: each byte is set
  * to either -1 if we have the piece, otherwise it is set to the number
  * of connected peers who have the piece.
- **********************************************************************/
+ */
 void tr_torrentAvailability(tr_torrent const* torrent, int8_t* tab, int size);
 
 void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs);

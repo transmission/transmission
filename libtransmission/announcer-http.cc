@@ -72,9 +72,7 @@ void verboseLog(std::string_view description, tr_direction direction, std::strin
 auto constexpr MaxBencDepth = 8;
 } // namespace
 
-/****
-*****  ANNOUNCE
-****/
+// --- Announce
 
 namespace
 {

@@ -129,9 +129,7 @@ Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
 {
 }
 
-/***
-****
-***/
+// ---
 
 int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme)
 {
@@ -189,9 +187,7 @@ int Cache::prefetchBlock(tr_torrent* torrent, tr_block_info::Location loc, uint3
     return tr_ioPrefetch(torrent, loc, len);
 }
 
-/***
-****
-***/
+// ---
 
 int Cache::flushSpan(CIter const begin, CIter const end)
 {

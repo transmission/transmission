@@ -99,9 +99,7 @@ struct tr_variant
  */
 void tr_variantClear(tr_variant*);
 
-/***
-****  Serialization / Deserialization
-***/
+// --- Serialization / Deserialization
 
 enum tr_variant_fmt
 {
@@ -160,9 +158,7 @@ bool tr_variantFromBuf(
     return b == nullptr || b->type == '\0';
 }
 
-/***
-****  Strings
-***/
+// --- Strings
 
 [[nodiscard]] constexpr bool tr_variantIsString(tr_variant const* b)
 {
@@ -192,9 +188,7 @@ constexpr void tr_variantInitStrView(tr_variant* initme, std::string_view in)
 bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
 
-/***
-****  Real Numbers
-***/
+// --- Real Numbers
 
 [[nodiscard]] constexpr bool tr_variantIsReal(tr_variant const* v)
 {
@@ -209,9 +203,7 @@ constexpr void tr_variantInitReal(tr_variant* initme, double value)
     initme->val.d = value;
 }
 
-/***
-****  Booleans
-***/
+// --- Booleans
 
 [[nodiscard]] constexpr bool tr_variantIsBool(tr_variant const* v)
 {
@@ -226,9 +218,7 @@ constexpr void tr_variantInitBool(tr_variant* initme, bool value)
     initme->val.b = value;
 }
 
-/***
-****  Ints
-***/
+// --- Ints
 
 [[nodiscard]] constexpr bool tr_variantIsInt(tr_variant const* v)
 {
@@ -243,9 +233,7 @@ constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
     initme->val.i = value;
 }
 
-/***
-****  Lists
-***/
+// --- Lists
 
 [[nodiscard]] constexpr bool tr_variantIsList(tr_variant const* v)
 {
@@ -274,9 +262,7 @@ bool tr_variantListRemove(tr_variant* list, size_t pos);
     return tr_variantIsList(list) ? list->val.l.count : 0;
 }
 
-/***
-****  Dictionaries
-***/
+// --- Dictionaries
 
 [[nodiscard]] constexpr bool tr_variantIsDict(tr_variant const* v)
 {

@@ -15,9 +15,7 @@
 #include "bitfield.h"
 #include "tr-assert.h"
 
-/****
-*****
-****/
+// ---
 
 namespace
 {
@@ -76,9 +74,7 @@ void setAllTrue(uint8_t* array, size_t bit_count)
 
 } // namespace
 
-/****
-*****
-****/
+// ---
 
 size_t tr_bitfield::countFlags() const noexcept
 {
@@ -176,9 +172,7 @@ size_t tr_bitfield::count(size_t begin, size_t end) const
     return countFlags(begin, end);
 }
 
-/***
-****
-***/
+// ---
 
 bool tr_bitfield::isValid() const
 {
@@ -276,9 +270,7 @@ void tr_bitfield::decrementTrueCount(size_t dec) noexcept
     setTrueCount(true_count_ - dec);
 }
 
-/****
-*****
-****/
+// ---
 
 tr_bitfield::tr_bitfield(size_t bit_count)
     : bit_count_{ bit_count }
