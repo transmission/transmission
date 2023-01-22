@@ -41,9 +41,7 @@ using namespace std::literals;
 #define USE_LIBCURL_SOCKOPT
 #endif
 
-/***
-****
-***/
+// ---
 
 namespace curl_helpers
 {
@@ -150,9 +148,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 }
 #endif
 
-/***
-****
-***/
+// ---
 
 class tr_web::Impl
 {

@@ -26,9 +26,7 @@ class tr_announcer;
 class tr_announcer_udp;
 struct tr_torrent_announcer;
 
-/**
-***  Tracker Publish / Subscribe
-**/
+// --- Tracker Publish / Subscribe
 
 struct tr_pex;
 
@@ -80,9 +78,7 @@ public:
 
 std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
-/**
-***  For torrent customers
-**/
+// --- For torrent customers
 
 void tr_announcerChangeMyPort(tr_torrent*);
 

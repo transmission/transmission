@@ -113,11 +113,7 @@ tr_handshake::ParseResult tr_handshake::parse_handshake(tr_peerIo* peer_io)
     return ParseResult::Ok;
 }
 
-/***
-****
-****  OUTGOING CONNECTIONS
-****
-***/
+// --- Outgoing Connections
 
 // 1 A->B: our public key (Ya) and some padding (PadA)
 void tr_handshake::send_ya(tr_peerIo* io)
@@ -325,11 +321,7 @@ ReadState tr_handshake::read_pad_d(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-/***
-****
-****  INCOMING CONNECTIONS
-****
-***/
+// --- Incoming Connections
 
 ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
 {
@@ -399,9 +391,7 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
         }
     }
 
-    /**
-    ***  If it's an incoming message, we need to send a response handshake
-    **/
+    // If it's an incoming message, we need to send a response handshake
 
     if (!have_sent_bittorrent_handshake_)
     {
@@ -599,9 +589,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    /**
-    ***  B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
-    **/
+    // B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
 
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
@@ -682,11 +670,7 @@ ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
     return done(true);
 }
 
-/***
-****
-****
-****
-***/
+// ---
 
 ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
 {
@@ -907,9 +891,7 @@ uint32_t tr_handshake::crypto_provide() const noexcept
     return provide;
 }
 
-/**
-***
-**/
+// ---
 
 tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode, DoneFunc on_done)
     : dh_{ tr_handshake::get_dh(mediator) }

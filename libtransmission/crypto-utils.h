@@ -19,9 +19,9 @@
 #include "transmission.h" // tr_sha1_digest_t
 
 /**
-*** @addtogroup utils Utilities
-*** @{
-**/
+ * @addtogroup utils Utilities
+ * @{
+ */
 
 class tr_sha1
 {
