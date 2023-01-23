@@ -69,11 +69,11 @@ add_custom_command(
         "${WEB_IMAGES}"
     COMMAND "${CMAKE_COMMAND}" -E copy
         "${CMAKE_CURRENT_SOURCE_DIR}/babel.config.js"
-        "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json"
         "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
         "${CMAKE_CURRENT_SOURCE_DIR}/prettier.config.js"
         "${CMAKE_CURRENT_SOURCE_DIR}/stylelint.config.js"
         "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/yarn.lock"
         "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
