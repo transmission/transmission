@@ -12,9 +12,7 @@
 #include "crypto-utils.h"
 #include "tr-macros.h"
 
-/***
-****
-***/
+// ---
 
 #ifdef TR_CRYPTO_X509_FALLBACK
 

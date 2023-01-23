@@ -115,9 +115,7 @@ int readOrWriteBytes(
         return 0;
     }
 
-    /***
-    ****  Find the fd
-    ***/
+    // --- Find the fd
 
     auto fd = session->openFiles().get(tor->id(), file_index, do_write);
     auto filename = tr_pathbuf{};

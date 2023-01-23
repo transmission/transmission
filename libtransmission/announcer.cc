@@ -857,7 +857,8 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     using namespace announce_helpers;
 
     auto* current_tracker = tier->currentTracker();
-    std::string announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) : "nullptr";
+    std::string const announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) :
+                                                                  "nullptr";
 
     /* increment the error count */
     if (current_tracker != nullptr)

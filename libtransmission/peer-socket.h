@@ -32,12 +32,28 @@ public:
     tr_peer_socket() = default;
     tr_peer_socket(tr_session const* session, tr_address const& address, tr_port port, tr_socket_t sock);
     tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock);
-    tr_peer_socket(tr_peer_socket&&) = default;
+    tr_peer_socket(tr_peer_socket&& s)
+    {
+        *this = std::move(s);
+    }
     tr_peer_socket(tr_peer_socket const&) = delete;
-    tr_peer_socket& operator=(tr_peer_socket&&) = default;
+    tr_peer_socket& operator=(tr_peer_socket&& s)
+    {
+        close();
+        handle = s.handle;
+        address_ = s.address_;
+        port_ = s.port_;
+        type_ = s.type_;
+        // invalidate s.type_, s.handle so s.close() won't break anything
+        s.type_ = Type::None;
+        s.handle = {};
+        return *this;
+    }
     tr_peer_socket& operator=(tr_peer_socket const&) = delete;
-    ~tr_peer_socket() = default;
-
+    ~tr_peer_socket()
+    {
+        close();
+    }
     void close();
 
     size_t try_write(Buffer& buf, size_t max, tr_error** error) const;

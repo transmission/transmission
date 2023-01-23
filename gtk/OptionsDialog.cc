@@ -12,7 +12,7 @@
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"
-#include "Utils.h" /* gtr_priority_combo_get_value() */
+#include "Utils.h"
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/file.h> /* tr_sys_path_is_same() */
@@ -118,7 +118,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
     {
         if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
         {
-            tr_torrentSetPriority(tor_, gtr_priority_combo_get_value(*priority_combo_));
+            tr_torrentSetPriority(tor_, gtr_combo_box_get_active_enum(*priority_combo_));
 
             if (run_check_->get_active())
             {
@@ -284,7 +284,7 @@ OptionsDialog::Impl::Impl(
     dialog.signal_response().connect(sigc::mem_fun(*this, &Impl::addResponseCB));
 
     gtr_priority_combo_init(*priority_combo_);
-    gtr_priority_combo_set_value(*priority_combo_, TR_PRI_NORMAL);
+    gtr_combo_box_set_active_enum(*priority_combo_, TR_PRI_NORMAL);
 
     auto* source_chooser = gtr_get_widget_derived<PathButton>(builder, "source_button");
     addTorrentFilters(source_chooser);

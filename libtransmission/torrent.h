@@ -40,9 +40,7 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
-/**
-***  Package-visible
-**/
+// --- Package-visible
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
@@ -56,9 +54,7 @@ tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
 
-/**
-***
-**/
+// ---
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
@@ -788,6 +784,13 @@ public:
         return announce_key_;
     }
 
+    // should be called when done modifying the torrent's announce list.
+    void on_announce_list_changed()
+    {
+        markEdited();
+        session->announcer_->resetTorrent(this);
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -948,9 +951,7 @@ private:
     bool needs_completeness_check_ = true;
 };
 
-/***
-****
-***/
+// ---
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
