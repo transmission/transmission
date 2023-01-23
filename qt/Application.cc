@@ -370,7 +370,7 @@ Application::Application(int& argc, char** argv)
 
 void Application::loadTranslations()
 {
-    QStringList const qt_qm_dirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
+    QStringList const qt_qm_dirs = QStringList() << QLibraryInfo::path(QLibraryInfo::TranslationsPath) <<
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
