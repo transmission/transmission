@@ -52,9 +52,11 @@ set(WEB_IMAGES
     assets/img/type.svg)
 
 if(DEFINED ENV{GITHUB_ACTIONS})
-    SET(NPM_INSTALL_CMD "ci")
+    SET(NPM_INSTALL_CMD "ci --no-progress")
+    set(NPM_BUILD_CMD "run build")
 else()
-    SET(NPM_INSTALL_CMD "install")
+    SET(NPM_INSTALL_CMD "install --no-audit --no-fund --no-progress")
+    set(NPM_BUILD_CMD "run --silent build -- --no-stats")
 endif()
 
 add_custom_command(
@@ -83,8 +85,8 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/public_html"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMAND "${NPM}" "${NPM_INSTALL_CMD}" --no-audit --no-fund --no-progress
-    COMMAND "${NPM}" run --silent build -- --no-stats)
+    COMMAND "${NPM}" "${NPM_INSTALL_CMD}"
+    COMMAND "${NPM}" "${NPM_BUILD_CMD}")
 
 add_custom_target("${TR_NAME}-web"
     DEPENDS
