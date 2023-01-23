@@ -53,6 +53,7 @@ set(WEB_IMAGES
 
 add_custom_command(
     OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
