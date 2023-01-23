@@ -85,7 +85,7 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/public_html"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMAND "${YARN}" yarn --silent install --frozen-lockfile --no-progress --prefer-offline
+    COMMAND "${YARN}" --silent install --frozen-lockfile --no-progress --prefer-offline
     COMMAND "${YARN}" build --prefer-offline)
 
 add_custom_target("${TR_NAME}-web"

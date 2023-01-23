@@ -137,7 +137,8 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            ninja-build
+            ninja-build \
+            yarnpkg
       - name: Get Source
         uses: actions/checkout@v3
         with:
