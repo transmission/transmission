@@ -28,7 +28,6 @@ const config = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        include: /(assets)\/(img)/,
         test: /\.(png|svg)/,
         type: 'asset/inline',
       },
