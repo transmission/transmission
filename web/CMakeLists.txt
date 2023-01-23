@@ -51,7 +51,7 @@ set(WEB_IMAGES
     assets/img/router.svg
     assets/img/type.svg)
 
-if(DEFINED ENV{GITHUB_ACTIONS})
+if(DEFINED ENV{GITHUB_ACTIONS} OR DEFINED{TEAMCITY_PROJECT_NAME})
     SET(NPM_INSTALL_CMD "ci --no-progress")
     set(NPM_BUILD_CMD "run build")
 else()
