@@ -187,7 +187,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl@0.21.1 miniupnpc ninja
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -460,7 +460,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl@0.21.1 miniupnpc ninja
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg

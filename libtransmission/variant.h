@@ -19,7 +19,7 @@ struct tr_error;
  *
  * An object that acts like a union for
  * integers, strings, lists, dictionaries, booleans, and floating-point numbers.
- * The structure is named tr_variant due to the historical reason that it was
+ * The structure is named `tr_variant` due to the historical reason that it was
  * originally tightly coupled with bencoded data. It currently supports
  * being parsed from, and serialized to, both bencoded notation and json notation.
  *
