@@ -72,7 +72,7 @@ jobs:
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
     env:
       # needed by npm
-      NODE_PATH="/usr/lib/nodejs:/usr/share/nodejs"
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -119,7 +119,7 @@ jobs:
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
     env:
       # needed by npm
-      NODE_PATH="/usr/lib/nodejs:/usr/share/nodejs"
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -513,7 +513,7 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       # needed by npm
-      NODE_PATH="/usr/lib/nodejs:/usr/share/nodejs"
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
       image: debian:11-slim
     steps:
