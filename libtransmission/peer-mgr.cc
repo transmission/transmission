@@ -2521,7 +2521,7 @@ struct peer_candidate
     score = addValToKey(score, 1, i);
 
     /* Prefer peers that we got from more trusted sources.
-     * lower `fromBest' values indicate more trusted sources */
+     * lower `fromBest` values indicate more trusted sources */
     score = addValToKey(score, 4, atom.fromBest);
 
     /* salt */

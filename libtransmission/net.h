@@ -327,7 +327,7 @@ bool tr_net_hasIPv6(tr_port);
 // --- TOS / DSCP
 
 /**
- * A toString() / from_string() convenience wrapper around the TOS int value
+ * A `toString()` / `from_string()` convenience wrapper around the TOS int value
  */
 class tr_tos_t
 {
