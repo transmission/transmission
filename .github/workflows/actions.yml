@@ -255,6 +255,8 @@ jobs:
             linux-headers \
             miniupnpc-dev \
             ninja \
+            nodejs \
+            npm \
             pkgconfig \
             xz
       - name: Get Dependencies (GTK)
@@ -529,6 +531,7 @@ jobs:
             libssl-dev \
             ninja-build \
             nodejs \
+            npm \
             pkg-config \
             xz-utils
       - name: Get Dependencies (GTK)
@@ -601,6 +604,7 @@ jobs:
             libpsl-devel \
             miniupnpc-devel \
             nodejs \
+            npm \
             ninja-build \
             openssl-devel \
             pkgconf-pkg-config \
