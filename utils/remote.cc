@@ -1602,7 +1602,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     break;
 
                 case TR_TRACKER_WAITING:
-                    fmt::print("  Asking for more peers in {:s)\n", tr_strltime(nextAnnounceTime - now));
+                    fmt::print("  Asking for more peers in {:s}\n", tr_strltime(nextAnnounceTime - now));
                     break;
 
                 case TR_TRACKER_QUEUED:
@@ -1736,7 +1736,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_utp_enabled, &boolVal))
         {
-            fmt::print("  µTP enabled: {:d}\n", (boolVal ? "Yes" : "No"));
+            fmt::print("  µTP enabled: {:s}\n", boolVal ? "Yes" : "No");
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_dht_enabled, &boolVal))

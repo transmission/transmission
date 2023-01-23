@@ -77,12 +77,11 @@ fi
 
 # format JS
 cd "${root}/web" || exit 1
-yarn_args='--silent --no-progress --non-interactive'
-yarn_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
-if ! yarn $yarn_args install; then
-  [ -n "$fix" ] || echo 'JS code could not be checked -- "yarn install" failed'
+npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
+if ! npm install &>/dev/null; then
+  [ -n "$fix" ] || echo 'JS code could not be checked -- "npm install" failed'
   exitcode=1
-elif ! yarn $yarn_args $yarn_lint_args; then
+elif ! npm run $npm_lint_args &>/dev/null; then
   [ -n "$fix" ] || echo 'JS code needs formatting'
   exitcode=1
 fi

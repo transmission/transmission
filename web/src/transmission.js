@@ -179,9 +179,9 @@ export class Transmission extends EventTarget {
           break;
         case 'toggle-compact-rows':
           this.prefs.display_mode =
-            this.prefs.display_mode !== Prefs.DisplayCompact
-              ? Prefs.DisplayCompact
-              : Prefs.DisplayFull;
+            this.prefs.display_mode === Prefs.DisplayCompact
+              ? Prefs.DisplayFull
+              : Prefs.DisplayCompact;
           break;
         case 'trash-selected-torrents':
           this._removeSelectedTorrents(true);
@@ -916,8 +916,9 @@ TODO: fix this when notifications get fixed
         : '<option value="private" selected="selected">Private</option>';
 
     // Single tracker options
-    string +=
-      '<option style="font-size: 1pt; background-color: #000000;" disabled>&nbsp;</option>';
+    string += this.filterTracker
+      ? '<option value="all">All</option>'
+      : '<option value="all" selected="selected">All</option>';
     for (const sitename of sitenames) {
       string += `<option value="${sitename}"`;
       if (sitename === this.filterTracker) {
@@ -1067,10 +1068,10 @@ TODO: fix this when notifications get fixed
         const row = dirty_rows[di++];
         const e = row.getElement();
 
-        if (ci !== cmax) {
-          list.insertBefore(e, clean_rows[ci].getElement());
-        } else {
+        if (ci === cmax) {
           frag.append(e);
+        } else {
+          list.insertBefore(e, clean_rows[ci].getElement());
         }
 
         rows.push(row);

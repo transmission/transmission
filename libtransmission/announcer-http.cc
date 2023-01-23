@@ -72,9 +72,7 @@ void verboseLog(std::string_view description, tr_direction direction, std::strin
 auto constexpr MaxBencDepth = 8;
 } // namespace
 
-/****
-*****  ANNOUNCE
-****/
+// --- Announce
 
 namespace
 {
@@ -118,7 +116,7 @@ bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announ
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response->errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s}"), status, response_str);
+        response->errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s})"), status, response_str);
 
         return false;
     }

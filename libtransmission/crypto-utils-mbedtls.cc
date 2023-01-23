@@ -24,9 +24,7 @@
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
-/***
-****
-***/
+// ---
 
 static void log_mbedtls_error(int error_code, char const* file, int line)
 {
@@ -64,9 +62,7 @@ static bool check_mbedtls_result(int result, int expected_result, char const* fi
 #define check_result(result) check_mbedtls_result((result), 0, __FILE__, __LINE__)
 #define check_result_eq(result, x_result) check_mbedtls_result((result), (x_result), __FILE__, __LINE__)
 
-/***
-****
-***/
+// ---
 
 static int my_rand(void* /*context*/, unsigned char* buffer, size_t buffer_size)
 {
@@ -102,9 +98,7 @@ static mbedtls_ctr_drbg_context* get_rng()
 
 static std::recursive_mutex rng_mutex_;
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -223,9 +217,7 @@ std::unique_ptr<tr_sha256> tr_sha256::create()
     return std::make_unique<Sha256Impl>();
 }
 
-/***
-****
-***/
+// ---
 
 bool tr_rand_buffer_crypto(void* buffer, size_t length)
 {

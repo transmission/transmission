@@ -72,7 +72,8 @@ struct tr_variant;
     V(TR_KEY_trash_original_torrent_files, should_delete_source_torrents, bool, false, "") \
     V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
-    V(TR_KEY_utp_enabled, utp_enabled, bool, true, "")
+    V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
+    V(TR_KEY_torrent_added_verify_mode, torrent_added_verify_mode, tr_verify_added_mode, TR_VERIFY_ADDED_FAST, "")
 
 struct tr_session_settings
 {

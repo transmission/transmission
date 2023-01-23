@@ -83,9 +83,7 @@ tr_file_piece_map::file_offset_t tr_file_piece_map::fileOffset(uint64_t offset) 
     return file_offset_t{ file_index, file_offset };
 }
 
-/***
-****
-***/
+// ---
 
 void tr_file_priorities::reset(tr_file_piece_map const* fpm)
 {
@@ -147,9 +145,7 @@ tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
     return *it;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_files_wanted::reset(tr_file_piece_map const* fpm)
 {
