@@ -6,7 +6,6 @@ Software prerequisites:
  * macOS 10.14.4 or newer
  * Xcode 11.3.1 or newer
  * Node.js 10 or newer
- * Yarn
 
 Building the project on Mac requires the source to be retrieved from GitHub. Pre-packaged source code will not compile.
 ```console
