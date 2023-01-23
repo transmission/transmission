@@ -78,15 +78,10 @@ fi
 # format JS
 cd "${root}/web" || exit 1
 npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
-if [ -z "${GITHUB_ACTIONS}" ] && [ -z "${TEAMCITY_PROJECT_NAME}" ]; then
-  npm_install_cmd='install'
-else
-  npm_install_cmd='ci'
-fi
-if ! npm "${npm_install_cmd}" &>/dev/null; then
+if ! yarn --silent install --frozen-lockfile --no-progress --prefer-offline &>/dev/null; then
   [ -n "$fix" ] || echo 'JS code could not be checked -- "npm install" failed'
   exitcode=1
-elif ! npm run $npm_lint_args &>/dev/null; then
+elif ! yarn run $npm_lint_args &>/dev/null; then
   [ -n "$fix" ] || echo 'JS code needs formatting'
   exitcode=1
 fi

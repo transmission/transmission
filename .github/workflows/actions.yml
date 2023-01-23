@@ -85,7 +85,7 @@ jobs:
           set -ex
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
-          sudo apt-get install -y clang-format-15 npm
+          sudo apt-get install -y clang-format-15 npm yarnpkg
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
@@ -180,7 +180,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node yarn
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -255,9 +255,8 @@ jobs:
             linux-headers \
             miniupnpc-dev \
             ninja \
-            nodejs \
-            npm \
             pkgconfig \
+            yarn \
             xz
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
@@ -325,7 +324,7 @@ jobs:
           choco install `
             jom `
             nasm `
-            nodejs
+            yarn
           choco uninstall `
             openssl.light
           (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
@@ -454,7 +453,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja
+        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node yarn
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -531,8 +530,7 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build \
-            nodejs \
-            npm \
+            yarnpkg \
             pkg-config \
             xz-utils
       - name: Get Dependencies (GTK)
@@ -604,8 +602,7 @@ jobs:
             libnatpmp-devel \
             libpsl-devel \
             miniupnpc-devel \
-            nodejs \
-            npm \
+            yarnpkg \
             ninja-build \
             openssl-devel \
             pkgconf-pkg-config \
