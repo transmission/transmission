@@ -329,7 +329,7 @@ jobs:
           choco install `
             jom `
             nasm `
-            nodejs `
+            nodejs
           choco uninstall `
             openssl.light
           (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
