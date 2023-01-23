@@ -5,6 +5,8 @@ The source code for both official and nightly releases can be found on our [down
 Software prerequisites:
  * macOS 10.14.4 or newer
  * Xcode 11.3.1 or newer
+ * Node.js 10 or newer
+ * Yarn
 
 Building the project on Mac requires the source to be retrieved from GitHub. Pre-packaged source code will not compile.
 ```console
@@ -37,14 +39,14 @@ ninja -C build transmission-gtk
 ```
 
 ## On Unix ##
-### Prerequisites ###
+### Prerequisites
 
 #### Debian 11 / Bullseye ####
 On Debian, you can build transmission with a few dependencies on top of a base installation.
 
 For building transmission-daemon you will need basic dependencies
 ```console
-$ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev
+$ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev yarnpkg
 ```
 You likely want to install transmission as a native GUI application. There are two options, GTK and QT.
 
@@ -68,20 +70,22 @@ $ sudo apt-get install build-essential automake autoconf libtool pkg-config intl
 
 Then you can begin [building.](#building-transmission-from-git-first-time)
 
-#### CentOS 5.4 ####
+#### CentOS
 The packages you need are:
+ * cmake
  * gcc
  * gcc-c++
+ * gettext
+ * libtool
  * m4
  * make
- * automake
- * libtool
- * gettext
+ * nodejs
  * openssl-devel
+ * yarn
 
 Or simply run the following command:
 ```console
-$ yum install gcc gcc-c++ m4 make automake libtool gettext openssl-devel
+$ yum install cmake gcc gcc-c++ gettext libtool m4 make nodejs openssl-devel yarn
 ```
 
 However, Transmission needs other packages unavailable in `yum`:
