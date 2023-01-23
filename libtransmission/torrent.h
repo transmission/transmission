@@ -959,7 +959,7 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
 }
 
 /**
- * Tell the tr_torrent that it's gotten a block
+ * Tell the `tr_torrent` that it's gotten a block
  */
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
 
