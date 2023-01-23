@@ -423,7 +423,6 @@ install(
 install(
     DIRECTORY TransmissionHelp
     DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
-tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 
 install(CODE
     "list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
