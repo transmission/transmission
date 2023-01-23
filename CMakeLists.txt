@@ -724,6 +724,10 @@ if(ENABLE_GTK AND ENABLE_NLS)
     add_subdirectory(po)
 endif()
 
+if(ENABLE_WEB)
+    find_program(NPM npm REQUIRED)
+endif()
+
 foreach(P cli daemon gtk mac qt utils web)
     string(TOUPPER "${P}" P_ID)
     if(ENABLE_${P_ID})
