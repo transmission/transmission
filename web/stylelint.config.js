@@ -5,8 +5,8 @@ module.exports = {
     "stylelint-config-prettier"
   ],
   "plugins":  [
-    "@primer/stylelint-config/plugins/no-undefined-vars",
-    "@primer/stylelint-config/plugins/no-unused-vars"
+    "stylelint-config-primer/plugins/no-undefined-vars",
+    "stylelint-config-primer/plugins/no-unused-vars"
   ],
   "rules": {
     "block-no-empty": true,

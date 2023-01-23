@@ -28,7 +28,7 @@ const config = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.(png|svg)$/,
+        test: /\.(png|svg)/,
         type: 'asset/inline',
       },
     ],
