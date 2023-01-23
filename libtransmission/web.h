@@ -105,9 +105,9 @@ public:
     ~tr_web();
 
     /**
-     * Mediates between tr_web and its clients.
+     * Mediates between `tr_web` and its clients.
      *
-     * NB: Note that tr_web calls all these methods from its own thread.
+     * NB: Note that `tr_web` calls all these methods from its own thread.
      * Overridden methods should take care to be threadsafe.
      */
     class Mediator

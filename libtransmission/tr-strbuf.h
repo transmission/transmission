@@ -288,10 +288,10 @@ public:
 private:
     /**
      * Ensure that the buffer's string is zero-terminated, e.g. for
-     * external APIs that require char* strings.
+     * external APIs that require `char*` strings.
      *
-     * Note that the added trailing '\0' does not increment size().
-     * This is to ensure that strlen(buf.c_str()) == buf.size().
+     * Note that the added trailing '\0' does not increment `size()`.
+     * This is to ensure that `strlen(buf.c_str()) == buf.size()`.
      */
     void ensure_sz()
     {

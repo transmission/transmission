@@ -1102,6 +1102,7 @@ char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
     }
 
     tor->announceList().save(tor->torrentFile());
+    tor->on_announce_list_changed();
 
     return nullptr;
 }
@@ -1128,6 +1129,7 @@ char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
     }
 
     tor->announceList().save(tor->torrentFile());
+    tor->on_announce_list_changed();
 
     return nullptr;
 }
@@ -1154,6 +1156,7 @@ char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     }
 
     tor->announceList().save(tor->torrentFile());
+    tor->on_announce_list_changed();
 
     return nullptr;
 }

@@ -1,4 +1,4 @@
-set(TRWEB_SRCS
+set(TRANSMISSION_WEB_SOURCES
     src/about-dialog.js
     src/action-manager.js
     src/alert-dialog.js
@@ -24,7 +24,7 @@ set(TRWEB_SRCS
     src/utils.js
     assets/css/transmission-app.scss)
 
-set(TRWEB_IMGS
+set(TRANSMISSION_WEB_IMAGES
     assets/img/box.svg
     assets/img/film.svg
     assets/img/modern-tortoise-blue.png
@@ -47,13 +47,14 @@ set(TRWEB_IMGS
     assets/img/router.svg
     assets/img/type.svg)
 
-add_custom_target(trweb ALL
+add_custom_target(transmission-web ALL
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package.json" "${CMAKE_CURRENT_BINARY_DIR}/package.json"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/yarn.lock" "${CMAKE_CURRENT_BINARY_DIR}/yarn.lock"
-    COMMAND yarn install
-    COMMAND yarn webpack --config "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js" --context "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json" "${CMAKE_CURRENT_BINARY_DIR}/package-lock.json"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMAND npm install
+    COMMAND npm run build -- --context "${CMAKE_CURRENT_SOURCE_DIR}"
     BYPRODUCTS
         public_html/transmission-app.js
         public_html/transmission-app.js.LICENSE.txt
-    DEPENDS ${TRWEB_IMGS}
-    SOURCES ${TRWEB_SRCS})
+    DEPENDS ${TRANSMISSION_WEB_IMAGES}
+    SOURCES ${TRANSMISSION_WEB_SOURCES})
