@@ -260,6 +260,7 @@ jobs:
             linux-headers \
             miniupnpc-dev \
             ninja \
+            npm \
             pkgconfig \
             xz
       - name: Get Dependencies (GTK)
