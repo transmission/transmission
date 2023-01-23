@@ -252,12 +252,38 @@ std::string_view getSiteName(std::string_view host)
         return host;
     }
 
+    if (!psl_builtin())
+    {
+        // www.example.co.uk -> www.example.co
+        if (auto const dot_pos = host.find_last_of('.'); dot_pos != std::string_view::npos)
+        {
+            host = host.substr(0, dot_pos);
+        }
+
+        // in the absence of psl_builtin(), we assume trackers rarely use 1 or 2 letters domain names: this is only a best guess attempt which works for co.uk and eu.org but not for everything.
+
+        // www.example.co -> www.example
+        if (auto const dot_pos = host.find_last_of('.'); dot_pos != std::string_view::npos && host.size() - dot_pos <= 3)
+        {
+            host = host.substr(0, dot_pos);
+        }
+
+        // www.example -> example
+        if (auto const dot_pos = host.find_last_of('.'); dot_pos != std::string_view::npos)
+        {
+            host = host.substr(dot_pos + 1, std::string_view::npos);
+        }
+
+        return host;
+    }
+
     // psl needs a zero-terminated hostname
     auto const szhost = tr_urlbuf{ host };
 
     // is it a registered name?
     if (isAsciiNonUpperCase(host))
     {
+        // www.example.co.uk -> example.co.uk
         if (char const* const top = psl_registrable_domain(psl_builtin(), std::data(szhost)); top != nullptr)
         {
             host.remove_prefix(top - std::data(szhost));
@@ -265,7 +291,7 @@ std::string_view getSiteName(std::string_view host)
     }
     else if (char* lower = nullptr; psl_str_to_utf8lower(std::data(szhost), nullptr, nullptr, &lower) == PSL_SUCCESS)
     {
-        // www.example.com -> example.com
+        // www.example.co.uk -> example.co.uk
         if (char const* const top = psl_registrable_domain(psl_builtin(), lower); top != nullptr)
         {
             host.remove_prefix(top - lower);
@@ -274,7 +300,7 @@ std::string_view getSiteName(std::string_view host)
         psl_free_string(lower);
     }
 
-    // example.com -> example
+    // example.co.uk -> example
     if (auto const dot_pos = host.find('.'); dot_pos != std::string_view::npos)
     {
         host = host.substr(0, dot_pos);
