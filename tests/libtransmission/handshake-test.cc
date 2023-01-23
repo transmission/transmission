@@ -99,7 +99,7 @@ public:
             return private_key_;
         }
 
-        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, tr_address const& /*addr*/, tr_port const /*port*/) override
+        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, tr_address const& /*addr*/, tr_port /*port*/) override
         {
         }
 
