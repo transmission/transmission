@@ -78,10 +78,10 @@ fi
 # format JS
 cd "${root}/web" || exit 1
 npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
-if ! npm install &>/dev/null; then
+if ! npm install --no-audit --no-fund --no-progress &>/dev/null; then
   [ -n "$fix" ] || echo 'JS code could not be checked -- "npm install" failed'
   exitcode=1
-elif ! npm run $npm_lint_args &>/dev/null; then
+elif ! npm run --silent $npm_lint_args; then
   [ -n "$fix" ] || echo 'JS code needs formatting'
   exitcode=1
 fi
