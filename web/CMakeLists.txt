@@ -54,11 +54,10 @@ set(WEB_IMAGES
 add_custom_command(
     OUTPUT
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
-    DEPENDS
-        "${WEB_SOURCES}"
-        "${WEB_STYLES}"
-        "${WEB_IMAGES}"
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy
         "${CMAKE_CURRENT_SOURCE_DIR}/babel.config.js"
         "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json"
@@ -68,19 +67,23 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js"
         "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/src"
-        "${CMAKE_CURRENT_BINARY_DIR}/src"
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets" "assets"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-        "${CMAKE_CURRENT_BINARY_DIR}/assets"
+        "${CMAKE_CURRENT_SOURCE_DIR}/public_html" "public_html"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/public_html"
-        "${CMAKE_CURRENT_BINARY_DIR}/public_html"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src" "src"
     COMMAND "${NPM}" ci --no-audit --no-fund --no-progress
-    COMMAND "${NPM}" run --silent build)
+    COMMAND "${NPM}" run build
+    DEPENDS
+        ${WEB_SOURCES}
+        ${WEB_STYLES}
+        ${WEB_IMAGES})
 
 add_custom_target("${TR_NAME}-web"
+    ALL
     DEPENDS
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
-        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt")
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
+    SOURCES
+        ${WEB_SOURCES})

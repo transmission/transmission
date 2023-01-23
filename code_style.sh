@@ -76,19 +76,14 @@ if [ -n "$fix" ]; then
 fi
 
 # format JS
-npm_cache="$(npm get cache)"
-if [ -n "${GITHUB_ACTIONS}" ] || [ -n "${TEAMCITY_PROJECT_NAME}" ]; then
-  npm set cache '.npm'
-fi
 cd "${root}/web" || exit 1
-web_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
-if ! npm ci --no-progress --prefer-offline &>/dev/null; then
-  [ -n "$fix" ] || echo 'JS code could not be checked -- "npm ci" failed'
+npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
+if ! npm ci --no-audit --no-fund --no-progress &>/dev/null; then
+  [ -n "$fix" ] || echo 'JS code could not be checked -- "npm install" failed'
   exitcode=1
-elif ! npm run --silent $web_lint_args &>/dev/null; then
+elif ! npm run --silent $npm_lint_args; then
   [ -n "$fix" ] || echo 'JS code needs formatting'
   exitcode=1
 fi
-npm set cache "${npm_cache}"
 
 exit $exitcode

@@ -1,9 +1,9 @@
 # Notes
 
 - Node.js and npm are only needed for building.
-  The result is a static file, `transmission-app.js`.
+  The result is a static file, `transmission-app.js`, which can be
+  served from an Transmission session, e.g. transmission-daemon.
 
-- The packages in `devDependencies` are intentionally old so that
-  building is possible on older systems that ship with Node.js 10,
-  such as Ubuntu 20.04. Please don't bump the Node.js requirement
-  without asking the maintainers first.
+- package.json's `devDependencies` are *intentionally* old to make
+  building on older stock systems possible, e.g. Ubuntu 20.04 which
+  ships with Node.js 10. Please don't bump deps without asking first.
