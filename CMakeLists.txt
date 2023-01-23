@@ -708,7 +708,7 @@ if(ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
 
-find_program(YARN yarnpkg yarn REQUIRED)
+find_program(NPM npm REQUIRED)
 add_subdirectory(web)
 
 add_subdirectory(libtransmission)

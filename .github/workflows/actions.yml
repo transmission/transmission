@@ -70,6 +70,9 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    env:
+      # needed by npm
+      NODE_PATH="/usr/lib/nodejs:/usr/share/nodejs"
     steps:
       - name: Show Configuration
         run: |
@@ -85,7 +88,7 @@ jobs:
           set -ex
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
-          sudo apt-get install -y clang-format-15 npm yarnpkg
+          sudo apt-get install -y clang-format-15 npm
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
@@ -114,6 +117,9 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    env:
+      # needed by npm
+      NODE_PATH="/usr/lib/nodejs:/usr/share/nodejs"
     steps:
       - name: Show Configuration
         run: |
@@ -138,7 +144,7 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build \
-            yarnpkg
+            npm
       - name: Get Source
         uses: actions/checkout@v3
         with:
@@ -181,7 +187,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node yarn
+        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -256,8 +262,8 @@ jobs:
             linux-headers \
             miniupnpc-dev \
             ninja \
+            npm \
             pkgconfig \
-            yarn \
             xz
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
@@ -325,7 +331,7 @@ jobs:
           choco install `
             jom `
             nasm `
-            yarn
+            nodejs
           choco uninstall `
             openssl.light
           (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
@@ -454,7 +460,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node yarn
+        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -505,6 +511,9 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
+    env:
+      # needed by npm
+      NODE_PATH="/usr/lib/nodejs:/usr/share/nodejs"
     container:
       image: debian:11-slim
     steps:
@@ -531,7 +540,7 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build \
-            yarnpkg \
+            npm \
             pkg-config \
             xz-utils
       - name: Get Dependencies (GTK)
@@ -603,8 +612,8 @@ jobs:
             libnatpmp-devel \
             libpsl-devel \
             miniupnpc-devel \
-            yarnpkg \
             ninja-build \
+            npm \
             openssl-devel \
             pkgconf-pkg-config \
             xz

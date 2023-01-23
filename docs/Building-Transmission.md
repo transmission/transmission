@@ -46,7 +46,7 @@ On Debian, you can build transmission with a few dependencies on top of a base i
 
 For building transmission-daemon you will need basic dependencies
 ```console
-$ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev yarnpkg
+$ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev npm
 ```
 You likely want to install transmission as a native GUI application. There are two options, GTK and QT.
 
@@ -80,12 +80,12 @@ The packages you need are:
  * m4
  * make
  * nodejs
+ * npm
  * openssl-devel
- * yarn
 
 Or simply run the following command:
 ```console
-$ yum install cmake gcc gcc-c++ gettext libtool m4 make nodejs openssl-devel yarn
+$ yum install cmake gcc gcc-c++ gettext libtool m4 make nodejs npm openssl-devel
 ```
 
 However, Transmission needs other packages unavailable in `yum`:

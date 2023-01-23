@@ -51,14 +51,6 @@ set(WEB_IMAGES
     assets/img/router.svg
     assets/img/type.svg)
 
-if(DEFINED ENV{GITHUB_ACTIONS} OR DEFINED{TEAMCITY_PROJECT_NAME})
-    SET(NPM_INSTALL_CMD "ci --no-progress")
-    set(NPM_BUILD_CMD "run build")
-else()
-    SET(NPM_INSTALL_CMD "install --no-audit --no-fund --no-progress")
-    set(NPM_BUILD_CMD "run --silent build -- --no-stats")
-endif()
-
 add_custom_command(
     OUTPUT
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
@@ -69,11 +61,11 @@ add_custom_command(
         "${WEB_IMAGES}"
     COMMAND "${CMAKE_COMMAND}" -E copy
         "${CMAKE_CURRENT_SOURCE_DIR}/babel.config.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json"
         "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
         "${CMAKE_CURRENT_SOURCE_DIR}/prettier.config.js"
         "${CMAKE_CURRENT_SOURCE_DIR}/stylelint.config.js"
         "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js"
-        "${CMAKE_CURRENT_SOURCE_DIR}/yarn.lock"
         "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
@@ -85,8 +77,8 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/public_html"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMAND "${YARN}" --silent install --frozen-lockfile --no-progress --prefer-offline
-    COMMAND "${YARN}" --prefer-offline run build)
+    COMMAND "${NPM}" ci --no-audit --no-fund --no-progress
+    COMMAND "${NPM}" run --silent build)
 
 add_custom_target("${TR_NAME}-web"
     DEPENDS

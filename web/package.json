@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "WEBPACK_MODE=development webpack serve --config webpack.config.js",
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js --no-stats",
     "css": "sass --no-source-map assets/css/",
     "css:map": "sass assets/css/",
     "lint": "run-p --silent lint:eslint lint:stylelint lint:prettier",
