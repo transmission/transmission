@@ -80,6 +80,7 @@ add_custom_command(
         ${WEB_IMAGES})
 
 add_custom_target("${TR_NAME}-web"
+    ALL
     DEPENDS
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
