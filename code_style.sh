@@ -78,7 +78,11 @@ fi
 # format JS
 cd "${root}/web" || exit 1
 npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
-if ! npm install &>/dev/null; then
+npm_install_cmd='install'
+if [[ -z "${GITHUB_ACTIONS}" ]]; then
+  npm_install_cmd='ci'
+fi
+if ! npm "${npm_install_cmd}" &>/dev/null; then
   [ -n "$fix" ] || echo 'JS code could not be checked -- "npm install" failed'
   exitcode=1
 elif ! npm run $npm_lint_args &>/dev/null; then

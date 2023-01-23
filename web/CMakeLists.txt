@@ -51,6 +51,12 @@ set(WEB_IMAGES
     assets/img/router.svg
     assets/img/type.svg)
 
+if(DEFINED ENV{GITHUB_ACTIONS})
+    SET(NPM_INSTALL_CMD "ci")
+else()
+    SET(NPM_INSTALL_CMD "install")
+endif()
+
 add_custom_command(
     OUTPUT
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
@@ -77,7 +83,7 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/public_html"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    COMMAND "${NPM}" install --no-audit --no-fund --no-progress
+    COMMAND "${NPM}" "${NPM_INSTALL_CMD}" --no-audit --no-fund --no-progress
     COMMAND "${NPM}" run --silent build -- --no-stats)
 
 add_custom_target("${TR_NAME}-web"
