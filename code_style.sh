@@ -78,10 +78,10 @@ fi
 # format JS
 cd "${root}/web" || exit 1
 npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
-if ! yarn --silent install --frozen-lockfile --no-progress --prefer-offline &>/dev/null; then
+if ! yarnpkg --silent install --frozen-lockfile --no-progress --prefer-offline &>/dev/null; then
   [ -n "$fix" ] || echo 'JS code could not be checked -- "npm install" failed'
   exitcode=1
-elif ! yarn run $npm_lint_args &>/dev/null; then
+elif ! yarnpkg run $npm_lint_args &>/dev/null; then
   [ -n "$fix" ] || echo 'JS code needs formatting'
   exitcode=1
 fi
