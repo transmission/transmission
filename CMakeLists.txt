@@ -708,7 +708,9 @@ if(ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
 
+find_program(NPM npm REQUIRED)
 add_subdirectory(web)
+
 add_subdirectory(libtransmission)
 
 set(MAC_PROJECT_DIR macosx)
