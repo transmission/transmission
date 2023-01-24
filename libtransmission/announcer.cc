@@ -622,7 +622,7 @@ struct tr_torrent_announcer
 
     std::vector<tr_tier> tiers;
 
-    tr_tracker_callback callback = nullptr;
+    tr_tracker_callback callback;
 
 private:
     [[nodiscard]] static tr_announce_list getAnnounceList(tr_torrent const* tor)
@@ -660,7 +660,7 @@ void publishMessage(tr_tier* tier, std::string_view msg, tr_tracker_event::Type 
             event.announce_url = current_tracker->announce_url;
         }
 
-        (*ta->callback)(tier->tor, &event);
+        ta->callback(*tier->tor, &event);
     }
 }
 
@@ -689,7 +689,7 @@ void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
         e.leechers = leechers;
         tr_logAddDebugTier(tier, fmt::format("peer counts: {} seeders, {} leechers.", seeders, leechers));
 
-        (*tier->tor->torrent_announcer->callback)(tier->tor, &e);
+        tier->tor->torrent_announcer->callback(*tier->tor, &e);
     }
 }
 
@@ -710,7 +710,7 @@ void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pe
                 leechers,
                 std::size(pex)));
 
-        (*tier->tor->torrent_announcer->callback)(tier->tor, &e);
+        tier->tor->torrent_announcer->callback(*tier->tor, &e);
     }
 }
 } // namespace publish_helpers
@@ -856,8 +856,11 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
 {
     using namespace announce_helpers;
 
-    /* increment the error count */
     auto* current_tracker = tier->currentTracker();
+    std::string const announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) :
+                                                                  "nullptr";
+
+    /* increment the error count */
     if (current_tracker != nullptr)
     {
         ++current_tracker->consecutive_failures;
@@ -871,12 +874,14 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
 
     if (isUnregistered(err))
     {
-        tr_logAddErrorTier(tier, fmt::format(_("Announce error: {error}"), fmt::arg("error", err)));
+        tr_logAddErrorTier(
+            tier,
+            fmt::format(_("Announce error: {error}"), fmt::arg("error", err)).append(fmt::format(" ({})", announce_url)));
     }
     else
     {
         /* schedule a reannounce */
-        int const interval = current_tracker->getRetryInterval();
+        auto const interval = current_tracker->getRetryInterval();
         tr_logAddWarnTier(
             tier,
             fmt::format(
@@ -885,7 +890,8 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
                     "Announce error: {error} (Retrying in {count} seconds)",
                     interval),
                 fmt::arg("error", err),
-                fmt::arg("count", interval)));
+                fmt::arg("count", interval))
+                .append(fmt::format(" ({})", announce_url)));
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
@@ -1275,13 +1281,7 @@ void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const&
     if (multiscrape_max != n)
     {
         // don't log the full URL, since that might have a personal announce id
-        // (note: we know 'parsed' will be successful since this url has a scrape_info)
-        if (auto const parsed = tr_urlParse(url); parsed)
-        {
-            tr_logAddDebug(
-                fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n),
-                fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed->scheme, parsed->host, parsed->port));
-        }
+        tr_logAddDebug(fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n), tr_urlTrackerLogName(url));
 
         multiscrape_max = n;
     }

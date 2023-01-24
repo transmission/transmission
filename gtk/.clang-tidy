@@ -1,4 +1,6 @@
 ---
+HeaderFilterRegex: .*/gtk/.*
+
 Checks: >
   -*,
   bugprone-*,

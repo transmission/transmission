@@ -26,9 +26,7 @@ class tr_announcer;
 class tr_announcer_udp;
 struct tr_torrent_announcer;
 
-/**
-***  Tracker Publish / Subscribe
-**/
+// --- Tracker Publish / Subscribe
 
 struct tr_pex;
 
@@ -59,7 +57,7 @@ struct tr_tracker_event
     int seeders;
 };
 
-using tr_tracker_callback = void (*)(tr_torrent* tor, tr_tracker_event const* event);
+using tr_tracker_callback = std::function<void(tr_torrent&, tr_tracker_event const*)>;
 
 class tr_announcer
 {
@@ -80,9 +78,7 @@ public:
 
 std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
-/**
-***  For torrent customers
-**/
+// --- For torrent customers
 
 void tr_announcerChangeMyPort(tr_torrent*);
 

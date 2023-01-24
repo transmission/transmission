@@ -14,9 +14,40 @@
 
 using namespace std::literals;
 
+namespace
+{
+auto constexpr EncryptionKeys = std::array<std::pair<std::string_view, tr_encryption_mode>, 3>{ {
+    { "required", TR_ENCRYPTION_REQUIRED },
+    { "preferred", TR_ENCRYPTION_PREFERRED },
+    { "allowed", TR_CLEAR_PREFERRED },
+} };
+
+auto constexpr LogKeys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ {
+    { "critical", TR_LOG_CRITICAL },
+    { "debug", TR_LOG_DEBUG },
+    { "error", TR_LOG_ERROR },
+    { "info", TR_LOG_INFO },
+    { "off", TR_LOG_OFF },
+    { "trace", TR_LOG_TRACE },
+    { "warn", TR_LOG_WARN },
+} };
+
+auto constexpr PreallocationKeys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 5>{ {
+    { "off", TR_PREALLOCATE_NONE },
+    { "none", TR_PREALLOCATE_NONE },
+    { "fast", TR_PREALLOCATE_SPARSE },
+    { "sparse", TR_PREALLOCATE_SPARSE },
+    { "full", TR_PREALLOCATE_FULL },
+} };
+
+auto constexpr VerifyModeKeys = std::array<std::pair<std::string_view, tr_verify_added_mode>, 2>{ {
+    { "fast", TR_VERIFY_ADDED_FAST },
+    { "full", TR_VERIFY_ADDED_FULL },
+} };
+} // namespace
+
 namespace libtransmission
 {
-
 template<>
 std::optional<bool> VariantConverter::load<bool>(tr_variant* src)
 {
@@ -55,21 +86,10 @@ void VariantConverter::save<double>(tr_variant* tgt, double const& val)
 
 // ---
 
-namespace EncryptionHelpers
-{
-// clang-format off
-static auto constexpr Keys = std::array<std::pair<std::string_view, tr_encryption_mode>, 3>{{
-    { "required", TR_ENCRYPTION_REQUIRED },
-    { "preferred", TR_ENCRYPTION_PREFERRED },
-    { "allowed", TR_CLEAR_PREFERRED }
-}};
-// clang-format on
-} // namespace EncryptionHelpers
-
 template<>
 std::optional<tr_encryption_mode> VariantConverter::load<tr_encryption_mode>(tr_variant* src)
 {
-    using namespace EncryptionHelpers;
+    static constexpr auto Keys = EncryptionKeys;
 
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
@@ -106,25 +126,10 @@ void VariantConverter::save<tr_encryption_mode>(tr_variant* tgt, tr_encryption_m
 
 // ---
 
-namespace LogLevelHelpers
-{
-// clang-format off
-static auto constexpr Keys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ {
-    { "critical", TR_LOG_CRITICAL },
-    { "debug", TR_LOG_DEBUG },
-    { "error", TR_LOG_ERROR },
-    { "info", TR_LOG_INFO },
-    { "off", TR_LOG_OFF },
-    { "trace", TR_LOG_TRACE },
-    { "warn", TR_LOG_WARN },
-}};
-// clang-format on
-} // namespace LogLevelHelpers
-
 template<>
 std::optional<tr_log_level> VariantConverter::load<tr_log_level>(tr_variant* src)
 {
-    using namespace LogLevelHelpers;
+    static constexpr auto Keys = LogKeys;
 
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
@@ -207,23 +212,10 @@ void VariantConverter::save<tr_port>(tr_variant* tgt, tr_port const& val)
 
 // ---
 
-namespace PreallocationModeHelpers
-{
-// clang-format off
-static auto constexpr Keys = std::array<std::pair<std::string_view, tr_preallocation_mode>, 5>{{
-    { "off", TR_PREALLOCATE_NONE },
-    { "none", TR_PREALLOCATE_NONE },
-    { "fast", TR_PREALLOCATE_SPARSE },
-    { "sparse", TR_PREALLOCATE_SPARSE },
-    { "full", TR_PREALLOCATE_FULL },
-}};
-// clang-format on
-} // namespace PreallocationModeHelpers
-
 template<>
 std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mode>(tr_variant* src)
 {
-    using namespace PreallocationModeHelpers;
+    static constexpr auto Keys = PreallocationKeys;
 
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
@@ -318,6 +310,55 @@ template<>
 void VariantConverter::save<tr_tos_t>(tr_variant* tgt, tr_tos_t const& val)
 {
     tr_variantInitStr(tgt, val.toString());
+}
+
+// ---
+
+template<>
+std::optional<tr_verify_added_mode> VariantConverter::load<tr_verify_added_mode>(tr_variant* src)
+{
+    static constexpr auto& Keys = VerifyModeKeys;
+
+    if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
+    {
+        auto const needle = tr_strlower(tr_strvStrip(val));
+
+        for (auto const& [name, value] : Keys)
+        {
+            if (name == needle)
+            {
+                return value;
+            }
+        }
+    }
+
+    if (auto val = int64_t{}; tr_variantGetInt(src, &val))
+    {
+        for (auto const& [name, value] : Keys)
+        {
+            if (value == val)
+            {
+                return value;
+            }
+        }
+    }
+
+    return {};
+}
+
+template<>
+void VariantConverter::save<tr_verify_added_mode>(tr_variant* tgt, tr_verify_added_mode const& val)
+{
+    for (auto const& [key, value] : VerifyModeKeys)
+    {
+        if (value == val)
+        {
+            tr_variantInitStrView(tgt, key);
+            return;
+        }
+    }
+
+    tr_variantInitInt(tgt, val);
 }
 
 } // namespace libtransmission

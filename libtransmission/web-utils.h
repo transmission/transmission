@@ -45,6 +45,10 @@ struct tr_url_parsed_t
 // must be one we that Transmission supports for announce and scrape
 [[nodiscard]] std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url);
 
+// Convenience function to get a log-safe version of a tracker URL.
+// This is to avoid logging sensitive info, e.g. a personal announcer id in the URL.
+[[nodiscard]] std::string tr_urlTrackerLogName(std::string_view url);
+
 // example use: `for (auto const [key, val] : tr_url_query_view{ querystr })`
 struct tr_url_query_view
 {

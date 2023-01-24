@@ -41,6 +41,18 @@ export const Utils = {
   },
 };
 
+function toggleClass(buttons, button, pages, page, callback) {
+  for (const element of buttons.children) {
+    element.classList.toggle('selected', element === button);
+  }
+  for (const element of pages.children) {
+    element.classList.toggle('hidden', element !== page);
+  }
+  if (callback) {
+    callback(page);
+  }
+}
+
 export function createTextualTabsContainer(id, tabs, callback) {
   const root = document.createElement('div');
   root.id = id;
@@ -67,17 +79,9 @@ export function createTextualTabsContainer(id, tabs, callback) {
     page.classList.add('hidden', 'tabs-page');
     pages.append(page);
 
-    button.addEventListener('click', () => {
-      for (const element of buttons.children) {
-        element.classList.toggle('selected', element === button);
-      }
-      for (const element of pages.children) {
-        element.classList.toggle('hidden', element !== page);
-      }
-      if (callback) {
-        callback(page);
-      }
-    });
+    button.addEventListener('click', () =>
+      toggleClass(buttons, button, pages, page, callback)
+    );
   }
 
   button_array[0].classList.add('selected');
@@ -114,17 +118,9 @@ export function createTabsContainer(id, tabs, callback) {
     page.classList.add('hidden', 'tabs-page');
     pages.append(page);
 
-    button.addEventListener('click', () => {
-      for (const element of buttons.children) {
-        element.classList.toggle('selected', element === button);
-      }
-      for (const element of pages.children) {
-        element.classList.toggle('hidden', element !== page);
-      }
-      if (callback) {
-        callback(page);
-      }
-    });
+    button.addEventListener('click', () =>
+      toggleClass(buttons, button, pages, page, callback)
+    );
   }
 
   button_array[0].classList.add('selected');
@@ -266,6 +262,10 @@ export function setEnabled(element, b) {
 }
 export function setChecked(element, b) {
   setOrDeleteAttribute(element, 'checked', b);
+}
+
+export function addCheckedClass(element, b) {
+  element.classList.toggle('checked', b);
 }
 
 function getBestMenuPos(r, bounds) {

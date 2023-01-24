@@ -172,6 +172,7 @@ bool tr_daemon::reopen_log_file(char const* filename)
     }
 
     logfile_ = new_log_file;
+    logfile_flush_ = tr_sys_file_flush_possible(logfile_);
 
     if (old_log_file != TR_BAD_SYS_FILE)
     {
@@ -362,7 +363,7 @@ static void printMessage(
 #endif
 }
 
-static void pumpLogMessages(tr_sys_file_t file)
+static void pumpLogMessages(tr_sys_file_t file, bool flush)
 {
     tr_log_message* list = tr_logGetQueue();
 
@@ -371,7 +372,7 @@ static void pumpLogMessages(tr_sys_file_t file)
         printMessage(file, l->level, l->name, l->message, l->file, l->line);
     }
 
-    if (file != TR_BAD_SYS_FILE)
+    if (flush && file != TR_BAD_SYS_FILE)
     {
         tr_sys_file_flush(file);
     }
@@ -396,7 +397,7 @@ void tr_daemon::report_status(void)
 
 void tr_daemon::periodic_update(void)
 {
-    pumpLogMessages(logfile_);
+    pumpLogMessages(logfile_, logfile_flush_);
     report_status();
 }
 
@@ -852,7 +853,7 @@ CLEANUP:
 
     tr_sessionSaveSettings(my_session_, cdir, &settings_);
     tr_sessionClose(my_session_);
-    pumpLogMessages(logfile_);
+    pumpLogMessages(logfile_, logfile_flush_);
     printf(" done.\n");
 
     /* shutdown */
@@ -899,6 +900,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     if (*foreground && logfile_ == TR_BAD_SYS_FILE)
     {
         logfile_ = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
+        logfile_flush_ = tr_sys_file_flush_possible(logfile_);
     }
 
     if (!loaded)

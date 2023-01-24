@@ -71,7 +71,7 @@ public:
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
 
-    // The client name. This is the app name derived from the `v' string in LTEP's handshake dictionary
+    /// The client name. This is the app name derived from the `v` string in LTEP's handshake dictionary
     tr_interned_string client;
 
 protected:

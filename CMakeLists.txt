@@ -45,7 +45,7 @@ option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC "Build Mac client" AUTO)
-option(ENABLE_WEB "Build Web client" OFF)
+tr_auto_option(ENABLE_WEB "Build Web client" AUTO)
 option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
@@ -435,11 +435,16 @@ endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
-tr_add_external_auto_library(DEFLATE libdeflate deflate
-    TARGET deflate::deflate)
-if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION ${DEFLATE_MINIMUM})
+if(WIN32 AND NOT MINGW)
+    set(DEFLATE_LIB_NAME deflatestatic)
+else()
+    set(DEFLATE_LIB_NAME deflate)
 endif()
+tr_add_external_auto_library(DEFLATE libdeflate ${DEFLATE_LIB_NAME}
+    TARGET deflate::deflate
+    CMAKE_ARGS
+        -DLIBDEFLATE_BUILD_SHARED_LIB=OFF
+        -DLIBDEFLATE_BUILD_GZIP=OFF)
 
 tr_add_external_auto_library(EVENT2 libevent event
     TARGET libevent::event
@@ -717,6 +722,22 @@ set(MAC_PROJECT_DIR macosx)
 if(ENABLE_GTK AND ENABLE_NLS)
     find_package(Gettext 0.19.7 REQUIRED)
     add_subdirectory(po)
+endif()
+
+if("${ENABLE_WEB}" STREQUAL "AUTO")
+    message(STATUS "searching for npm")
+    find_program(NPM npm)
+    message(STATUS "searching for npm - ${NPM}")
+    if ("${NPM}" STREQUAL "NPM-NOTFOUND")
+        set(ENABLE_WEB OFF)
+    else()
+        set(ENABLE_WEB ON)
+    endif()
+endif()
+if ("${ENABLE_WEB}" STREQUAL "ON")
+    message(STATUS "searching for npm")
+    find_program(NPM npm REQUIRED)
+    message(STATUS "searching for npm - ${NPM}")
 endif()
 
 foreach(P cli daemon gtk mac qt utils web)

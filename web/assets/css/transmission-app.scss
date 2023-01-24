@@ -513,11 +513,6 @@ $video-image: '../img/film.svg';
     &.selected {
       background-color: var(--color-bg-selected);
     }
-
-    &.selected .torrent-progress-details.error,
-    &.selected .torrent-peer-details.error {
-      color: $white;
-    }
   }
 
   .icon {
@@ -1189,7 +1184,7 @@ $video-image: '../img/film.svg';
 
   > * {
     appearance: none;
-    background-color: var(--color-bg-primary);
+    background-color: var(--color-border-selected);
     background-position: center;
     background-repeat: no-repeat;
     background-size: $halfsize, $size;
@@ -1214,9 +1209,9 @@ $video-image: '../img/film.svg';
     border-left-width: 0;
   }
 
-  //if input is not checked, change background color
-  > *:not(:checked) {
-    background-color: var(--color-border-selected);
+  //if input is checked then change the background color
+  > .checked {
+    background-color: var(--color-bg-hover);
   }
 }
 

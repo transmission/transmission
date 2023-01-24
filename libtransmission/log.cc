@@ -226,9 +226,7 @@ void tr_logFreeQueue(tr_log_message* freeme)
     }
 }
 
-/**
-***
-**/
+// ---
 
 char* tr_logGetTimeStr(char* buf, size_t buflen)
 {
