@@ -50,7 +50,7 @@ std::string tr_net_strerror(int err)
 #ifdef _WIN32
 
     auto buf = std::array<char, 512>{};
-    auto const len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
+    (void)FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
     return std::string{ tr_strvStrip(std::data(buf)) };
 
 #else

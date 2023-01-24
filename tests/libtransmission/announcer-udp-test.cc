@@ -409,7 +409,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     auto buf = libtransmission::Buffer{};
     buf.addUint32(ScrapeAction);
     buf.addUint32(scrape_transaction_id);
-    for (size_t i = 0; i < expected_response.row_count; ++i)
+    for (int i = 0; i < expected_response.row_count; ++i)
     {
         buf.addUint32(expected_response.rows[i].seeders);
         buf.addUint32(expected_response.rows[i].downloads);
