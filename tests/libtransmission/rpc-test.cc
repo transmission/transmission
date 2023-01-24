@@ -90,7 +90,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto const expected_keys = std::array<tr_quark, 59>{
+    auto const expected_keys = std::array<tr_quark, 61>{
         TR_KEY_alt_speed_down,
         TR_KEY_alt_speed_enabled,
         TR_KEY_alt_speed_time_begin,
@@ -112,6 +112,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_download_queue_enabled,
         TR_KEY_download_queue_size,
         TR_KEY_encryption,
+        TR_KEY_httracker_enabled,
         TR_KEY_idle_seeding_limit,
         TR_KEY_idle_seeding_limit_enabled,
         TR_KEY_incomplete_dir,
@@ -147,6 +148,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_start_added_torrents,
         TR_KEY_tcp_enabled,
         TR_KEY_trash_original_torrent_files,
+        TR_KEY_udptracker_enabled,
         TR_KEY_units,
         TR_KEY_utp_enabled,
         TR_KEY_version,

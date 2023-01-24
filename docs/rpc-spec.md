@@ -534,6 +534,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `download-queue-enabled` | boolean | if true, limit how many torrents can be downloaded at once
 | `download-queue-size` | number | max number of torrents to download at once (see download-queue-enabled)
 | `encryption` | string | `required`, `preferred`, `tolerated`
+| `httracker-enabled` |  boolean | true means allow http trackers
 | `idle-seeding-limit-enabled` | boolean | true if the seeding inactivity limit is honored by default
 | `idle-seeding-limit` | number | torrents we're seeding will be stopped if they're idle for this long
 | `incomplete-dir-enabled` | boolean | true means keep torrents in incomplete-dir until done
@@ -567,6 +568,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `speed-limit-up` | number | max global upload speed (KBps)
 | `start-added-torrents` | boolean | true means added torrents will be started right away
 | `trash-original-torrent-files` | boolean | true means the .torrent file of added torrents will be deleted
+| `udptracker-enabled` | boolean | true means allow UDP trackers
 | `units` | object | see below
 | `utp-enabled` | boolean | true means allow utp
 | `version` | string | long version string `$version ($revision)`

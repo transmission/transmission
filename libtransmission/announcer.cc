@@ -177,12 +177,12 @@ public:
     {
         TR_ASSERT(!is_shutting_down_);
 
-        if (auto const scrape_sv = request.scrape_url.sv();
-            tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
+        if (auto const scrape_sv = request.scrape_url.sv(); session->allowsHTTracker() &&
+            (tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv)))
         {
             tr_tracker_http_scrape(session, request, std::move(on_response));
         }
-        else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
+        else if (session->allowsUDPTracker() && tr_strvStartsWith(scrape_sv, "udp://"sv))
         {
             announcer_udp_.scrape(request, std::move(on_response));
         }
@@ -211,12 +211,12 @@ public:
             };
         }
 
-        if (auto const announce_sv = request.announce_url.sv();
-            tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
+        if (auto const announce_sv = request.announce_url.sv(); session->allowsHTTracker() &&
+            (tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv)))
         {
             tr_tracker_http_announce(session, request, std::move(on_response));
         }
-        else if (tr_strvStartsWith(announce_sv, "udp://"sv))
+        else if (session->allowsUDPTracker() && tr_strvStartsWith(announce_sv, "udp://"sv))
         {
             announcer_udp_.announce(request, std::move(on_response));
         }
@@ -1394,6 +1394,11 @@ namespace
 {
 void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tiers)
 {
+    if (!(announcer->session->allowsHTTracker() || announcer->session->allowsUDPTracker()))
+    {
+        return;
+    }
+
     auto const now = tr_time();
     auto requests = std::array<tr_scrape_request, MaxScrapesPerUpkeep>{};
     auto request_count = size_t{};
@@ -1518,6 +1523,11 @@ void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
     TR_ASSERT(!tier->isAnnouncing);
     TR_ASSERT(!std::empty(tier->announce_events));
     TR_ASSERT(tier->currentTracker() != nullptr);
+
+    if (!(announcer->session->allowsHTTracker() || announcer->session->allowsUDPTracker()))
+    {
+        return;
+    }
 
     auto const now = tr_time();
 
