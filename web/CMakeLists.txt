@@ -73,7 +73,7 @@ add_custom_command(
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/src" "src"
     COMMAND "${NPM}" ci --no-audit --no-fund --no-progress
-    COMMAND "${NPM}" run --silent build
+    COMMAND "${NPM}" run build
     DEPENDS
         ${WEB_SOURCES}
         ${WEB_STYLES}
