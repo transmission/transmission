@@ -14,9 +14,6 @@ jobs:
       test-generated-files: ${{ steps.check-diffs.outputs.web-changed == '1' && steps.check-main-push.outputs.is-main-push == '0'}}
       update-generated-files: ${{ steps.check-diffs.outputs.web-changed == '1' && steps.check-main-push.outputs.is-main-push == '1'}}
     steps:
-      - name: Show env
-        run: |
-          env | sort
       - name: Get source
         uses: actions/checkout@v3
         with:
@@ -33,7 +30,6 @@ jobs:
       - name: Check for diffs
         id: check-diffs
         run: |
-          git --no-pager log -n100
           set -x # echo all executed commands to the terminal
           function get_changes() { # name, paths...
             local name="$1"
