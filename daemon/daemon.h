@@ -47,6 +47,7 @@ private:
     bool seen_hup_ = false;
     std::string config_dir_;
     tr_variant settings_ = {};
+    bool logfile_flush_ = false;
     tr_session* my_session_ = nullptr;
     char const* log_file_name_ = nullptr;
     struct event_base* ev_base_ = nullptr;

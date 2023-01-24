@@ -17,7 +17,8 @@
 #include <memory>
 
 class Session;
-typedef struct tr_ctor tr_ctor;
+
+struct tr_ctor;
 
 class TorrentUrlChooserDialog : public Gtk::Dialog
 {
@@ -27,6 +28,7 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core);
+    ~TorrentUrlChooserDialog() override = default;
 
     TR_DISABLE_COPY_MOVE(TorrentUrlChooserDialog)
 
@@ -39,6 +41,8 @@ private:
 class TorrentFileChooserDialog : public Gtk::FileChooserDialog
 {
 public:
+    ~TorrentFileChooserDialog() override = default;
+
     TR_DISABLE_COPY_MOVE(TorrentFileChooserDialog)
 
     static std::unique_ptr<TorrentFileChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);

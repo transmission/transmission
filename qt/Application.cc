@@ -370,7 +370,7 @@ Application::Application(int& argc, char** argv)
 
 void Application::loadTranslations()
 {
-    QStringList const qt_qm_dirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
+    auto const qt_qm_dirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
@@ -663,9 +663,6 @@ FaviconCache& Application::faviconCache()
 int tr_main(int argc, char** argv)
 {
     InteropHelper::initialize();
-
-    Application::setAttribute(Qt::AA_EnableHighDpiScaling);
-    Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     Application const app(argc, argv);
     return QApplication::exec();

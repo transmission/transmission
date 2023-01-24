@@ -21,9 +21,7 @@
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -95,9 +93,7 @@ bool check_ccrypto_result(CCCryptorStatus result, char const* file, long line)
 
 } // namespace
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -194,9 +190,7 @@ std::unique_ptr<tr_sha256> tr_sha256::create()
     return std::make_unique<Sha256Impl>();
 }
 
-/***
-****
-***/
+// ---
 
 bool tr_rand_buffer_crypto(void* buffer, size_t length)
 {

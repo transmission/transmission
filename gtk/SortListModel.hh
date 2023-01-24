@@ -67,5 +67,6 @@ Glib::RefPtr<SortListModel<ItemT>> SortListModel<ItemT>::create(
     Glib::RefPtr<ModelT> const& model,
     Glib::RefPtr<SorterType> const& sorter)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new SortListModel(model, sorter));
 }

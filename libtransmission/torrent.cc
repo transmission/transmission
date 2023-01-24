@@ -247,12 +247,12 @@ tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr
     return tr_toSpeedKBps(tor->speedLimitBps(dir));
 }
 
-void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool do_use)
+void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    tor->useSpeedLimit(dir, do_use);
+    tor->useSpeedLimit(dir, enabled);
 }
 
 bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
@@ -262,11 +262,11 @@ bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
     return tor->usesSpeedLimit(dir);
 }
 
-void tr_torrentUseSessionLimits(tr_torrent* tor, bool do_use)
+void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->bandwidth_.honorParentLimits(TR_UP, do_use) || tor->bandwidth_.honorParentLimits(TR_DOWN, do_use))
+    if (tor->bandwidth_.honorParentLimits(TR_UP, enabled) || tor->bandwidth_.honorParentLimits(TR_DOWN, enabled))
     {
         tor->setDirty();
     }
@@ -1025,46 +1025,6 @@ bool isNewTorrentASeed(tr_torrent* tor)
     return tor->ensurePieceIsChecked(0);
 }
 
-void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* /*user_data*/)
-{
-    switch (event->type)
-    {
-    case tr_tracker_event::Type::Peers:
-        tr_logAddTraceTor(tor, fmt::format("Got {} peers from tracker", std::size(event->pex)));
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, std::data(event->pex), std::size(event->pex));
-        break;
-
-    case tr_tracker_event::Type::Counts:
-        if (tor->isPrivate() && (event->leechers == 0))
-        {
-            tr_peerMgrSetSwarmIsAllSeeds(tor);
-        }
-
-        break;
-
-    case tr_tracker_event::Type::Warning:
-        tr_logAddWarnTor(tor, fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", event->text)));
-        tor->error = TR_STAT_TRACKER_WARNING;
-        tor->error_announce_url = event->announce_url;
-        tor->error_string = event->text;
-        break;
-
-    case tr_tracker_event::Type::Error:
-        tor->error = TR_STAT_TRACKER_ERROR;
-        tor->error_announce_url = event->announce_url;
-        tor->error_string = event->text;
-        break;
-
-    case tr_tracker_event::Type::ErrorClear:
-        if (tor->error != TR_STAT_LOCAL_ERROR)
-        {
-            tr_torrentClearError(tor);
-        }
-
-        break;
-    }
-}
-
 void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->completion = tr_completion{ tor, &tor->blockInfo() };
@@ -1212,7 +1172,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         }
     }
 
-    tor->torrent_announcer = session->announcer_->addTorrent(tor, onTrackerResponse, nullptr);
+    tor->torrent_announcer = session->announcer_->addTorrent(tor, &tr_torrent::onTrackerResponse);
 
     if (is_new_torrent)
     {
@@ -1228,7 +1188,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             opts.has_local_data = has_local_data;
             torrentStart(tor, opts);
         }
-        else if (isNewTorrentASeed(tor))
+        else if (!session->shouldFullyVerifyAddedTorrents() && isNewTorrentASeed(tor))
         {
             tor->completion.setHasAll();
             tor->doneDate = tor->addedDate;
@@ -1522,6 +1482,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     using namespace stat_helpers;
 
     TR_ASSERT(tr_isTorrent(tor));
+    auto const lock = tor->unique_lock();
 
     auto const now = tr_time_msec();
     auto const now_sec = tr_time();
@@ -1780,9 +1741,9 @@ tr_peer_stat* tr_torrentPeers(tr_torrent const* tor, size_t* peer_count)
     return tr_peerMgrPeerStats(tor, peer_count);
 }
 
-void tr_torrentPeersFree(tr_peer_stat* peers, size_t /*peerCount*/)
+void tr_torrentPeersFree(tr_peer_stat* peer_stats, size_t /*peer_count*/)
 {
-    delete[] peers;
+    delete[] peer_stats;
 }
 
 void tr_torrentAvailability(tr_torrent const* tor, int8_t* tab, int size)
@@ -2228,10 +2189,52 @@ bool tr_torrent::setTrackerList(std::string_view text)
         }
     }
 
-    /* tell the announcer to reload this torrent's tracker list */
-    this->session->announcer_->resetTorrent(this);
+    on_announce_list_changed();
 
     return true;
+}
+
+void tr_torrent::onTrackerResponse(tr_tracker_event const* event)
+{
+    switch (event->type)
+    {
+    case tr_tracker_event::Type::Peers:
+        tr_logAddTraceTor(this, fmt::format("Got {} peers from tracker", std::size(event->pex)));
+        tr_peerMgrAddPex(this, TR_PEER_FROM_TRACKER, std::data(event->pex), std::size(event->pex));
+        break;
+
+    case tr_tracker_event::Type::Counts:
+        if (isPrivate() && (event->leechers == 0))
+        {
+            tr_peerMgrSetSwarmIsAllSeeds(this);
+        }
+
+        break;
+
+    case tr_tracker_event::Type::Warning:
+        tr_logAddWarnTor(
+            this,
+            fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", event->text))
+                .append(fmt::format(" ({})", tr_urlTrackerLogName(event->announce_url))));
+        error = TR_STAT_TRACKER_WARNING;
+        error_announce_url = event->announce_url;
+        error_string = event->text;
+        break;
+
+    case tr_tracker_event::Type::Error:
+        error = TR_STAT_TRACKER_ERROR;
+        error_announce_url = event->announce_url;
+        error_string = event->text;
+        break;
+
+    case tr_tracker_event::Type::ErrorClear:
+        if (error != TR_STAT_LOCAL_ERROR)
+        {
+            tr_torrentClearError(this);
+        }
+
+        break;
+    }
 }
 
 bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)

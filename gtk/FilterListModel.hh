@@ -92,5 +92,6 @@ Glib::RefPtr<FilterListModel<ItemT>> FilterListModel<ItemT>::create(
     Glib::RefPtr<ModelT> const& model,
     Glib::RefPtr<FilterType> const& filter)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new FilterListModel(model, filter));
 }
