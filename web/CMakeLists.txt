@@ -1,4 +1,4 @@
-set(TRANSMISSION_WEB_SOURCES
+set(WEB_SOURCES
     src/about-dialog.js
     src/action-manager.js
     src/alert-dialog.js
@@ -6,6 +6,7 @@ set(TRANSMISSION_WEB_SOURCES
     src/file-row.js
     src/formatter.js
     src/inspector.js
+    src/labels-dialog.js
     src/main.js
     src/move-dialog.js
     src/notifications.js
@@ -21,40 +22,68 @@ set(TRANSMISSION_WEB_SOURCES
     src/torrent.js
     src/torrent-row.js
     src/transmission.js
-    src/utils.js
+    src/utils.js)
+
+set(WEB_STYLES
     assets/css/transmission-app.scss)
 
-set(TRANSMISSION_WEB_IMAGES
+set(WEB_IMAGES
     assets/img/box.svg
-    assets/img/film.svg
-    assets/img/modern-tortoise-blue.png
-    assets/img/modern-tortoise.png
     assets/img/chevron-down.svg
     assets/img/chevron-up.svg
+    assets/img/file-text.svg
+    assets/img/film.svg
+    assets/img/folder.svg
     assets/img/horizontal-rule.svg
+    assets/img/image.svg
     assets/img/lock-fill.svg
     assets/img/logo.png
-    assets/img/image.svg
     assets/img/magnet.svg
+    assets/img/modern-tortoise-blue.png
+    assets/img/modern-tortoise.png
     assets/img/music.svg
-    assets/img/file-text.svg
     assets/img/package.svg
-    assets/img/folder.svg
     assets/img/pause-circle-active.svg
     assets/img/pause-circle-idle.svg
     assets/img/play-circle-active.svg
     assets/img/play-circle-idle.svg
+    assets/img/README.md
     assets/img/router.svg
     assets/img/type.svg)
 
-add_custom_target(transmission-web ALL
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package.json" "${CMAKE_CURRENT_BINARY_DIR}/package.json"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json" "${CMAKE_CURRENT_BINARY_DIR}/package-lock.json"
-    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    COMMAND npm install
-    COMMAND npm run build -- --context "${CMAKE_CURRENT_SOURCE_DIR}"
-    BYPRODUCTS
-        public_html/transmission-app.js
-        public_html/transmission-app.js.LICENSE.txt
-    DEPENDS ${TRANSMISSION_WEB_IMAGES}
-    SOURCES ${TRANSMISSION_WEB_SOURCES})
+add_custom_command(
+    OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMAND "${CMAKE_COMMAND}" -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/babel.config.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json"
+        "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
+        "${CMAKE_CURRENT_SOURCE_DIR}/prettier.config.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/stylelint.config.js"
+        "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js"
+        "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets" "assets"
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/public_html" "public_html"
+    COMMAND "${CMAKE_COMMAND}" -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/src" "src"
+    COMMAND "${NPM}" ci --no-audit --no-fund --no-progress
+    COMMAND "${NPM}" run --silent build
+    DEPENDS
+        ${WEB_SOURCES}
+        ${WEB_STYLES}
+        ${WEB_IMAGES})
+
+add_custom_target("${TR_NAME}-web"
+    ALL
+    DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
+    SOURCES
+        ${WEB_SOURCES})

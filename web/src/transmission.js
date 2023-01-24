@@ -61,7 +61,7 @@ export class Transmission extends EventTarget {
     );
 
     // listen to actions
-    // TODO: consider adding a mutator listener here to pick up dynamic additions
+    // TODO: consider adding a mutator listener here to see dynamic additions
     for (const element of document.querySelectorAll(`button[data-action]`)) {
       const { action } = element.dataset;
       setEnabled(element, this.action_manager.isEnabled(action));

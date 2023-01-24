@@ -240,7 +240,7 @@ public:
     tr_recentHistory<uint16_t> cancels_sent_to_client;
 
     /// The following fields are only to be used in peer-mgr.cc.
-    /// TODO(ckerr): refactor them out of tr_peer
+    /// TODO(ckerr): refactor them out of `tr_peer`
 
     // hook to private peer-mgr information
     peer_atom* const atom;

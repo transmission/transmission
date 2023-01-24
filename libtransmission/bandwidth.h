@@ -36,42 +36,42 @@ struct tr_bandwidth_limits
 };
 
 /**
- * tr_bandwidth is an object for measuring and constraining bandwidth speeds.
+ * `tr_bandwidth` is an object for measuring and constraining bandwidth speeds.
  *
- * tr_bandwidth objects can be "stacked" so that a peer can be made to obey
+ * `tr_bandwidth` objects can be "stacked" so that a peer can be made to obey
  * multiple constraints (for example, obeying the global speed limit and a
  * per-torrent speed limit).
  *
  * HIERARCHY
  *
  *   Transmission's bandwidth hierarchy is a tree.
- *   At the top is the global bandwidth object owned by tr_session.
- *   Its children are per-torrent bandwidth objects owned by tr_torrent.
- *   Underneath those are per-peer bandwidth objects owned by tr_peer.
+ *   At the top is the global bandwidth object owned by `tr_session`.
+ *   Its children are per-torrent bandwidth objects owned by `tr_torrent`.
+ *   Underneath those are per-peer bandwidth objects owned by `tr_peer`.
  *
- *   tr_session also owns a tr_handshake's bandwidths, so that the handshake
+ *   `tr_session` also owns a `tr_handshake`'s bandwidths, so that the handshake
  *   I/O can be counted in the global raw totals. When the handshake is done,
- *   the bandwidth's ownership passes to a tr_peer.
+ *   the bandwidth's ownership passes to a `tr_peer`.
  *
  * MEASURING
  *
  *   When you ask a bandwidth object for its speed, it gives the speed of the
  *   subtree underneath it as well. So you can get Transmission's overall
- *   speed by querying tr_session's bandwidth, per-torrent speeds by asking
- *   tr_torrent's bandwidth, and per-peer speeds by asking tr_peer's bandwidth.
+ *   speed by querying `tr_session`'s bandwidth, per-torrent speeds by asking
+ *   `tr_torrent`'s bandwidth, and per-peer speeds by asking `tr_peer`'s bandwidth.
  *
  * CONSTRAINING
  *
- *   Call tr_bandwidth::allocate() periodically. tr_bandwidth knows its current
+ *   Call `tr_bandwidth::allocate()` periodically. `tr_bandwidth` knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
  *   If appropriate, it notifies its peer-ios that new bandwidth is available.
  *
- *   tr_bandwidth::allocate() operates on the tr_bandwidth subtree, so usually
- *   you'll only need to invoke it for the top-level tr_session bandwidth.
+ *   `tr_bandwidth::allocate()` operates on the `tr_bandwidth` subtree, so usually
+ *   you'll only need to invoke it for the top-level `tr_session` bandwidth.
  *
- *   The peer-ios all have a pointer to their associated tr_bandwidth object,
- *   and call tr_bandwidth::clamp() before performing I/O to see how much
+ *   The peer-ios all have a pointer to their associated `tr_bandwidth` object,
+ *   and call `tr_bandwidth::clamp()` before performing I/O to see how much
  *   bandwidth they can safely use.
  */
 struct tr_bandwidth
@@ -113,7 +113,7 @@ public:
     void notifyBandwidthConsumed(tr_direction dir, size_t byte_count, bool is_piece_data, uint64_t now);
 
     /**
-     * @brief allocate the next period_msec's worth of bandwidth for the peer-ios to consume
+     * @brief allocate the next `period_msec`'s worth of bandwidth for the peer-ios to consume
      */
     void allocate(unsigned int period_msec);
 
@@ -132,7 +132,7 @@ public:
     }
 
     /**
-     * @brief clamps byte_count down to a number that this bandwidth will allow to be consumed
+     * @brief clamps `byte_count` down to a number that this bandwidth will allow to be consumed
      */
     [[nodiscard]] size_t clamp(tr_direction dir, size_t byte_count) const noexcept
     {
@@ -157,8 +157,8 @@ public:
 
     /**
      * @brief Set the desired speed for this bandwidth subtree.
-     * @see tr_bandwidth::allocate
-     * @see tr_bandwidth::getDesiredSpeed
+     * @see `tr_bandwidth::allocate`
+     * @see `tr_bandwidth::getDesiredSpeed`
      */
     constexpr bool setDesiredSpeedBytesPerSecond(tr_direction dir, tr_bytes_per_second_t desired_speed)
     {
@@ -182,7 +182,7 @@ public:
 
     /**
      * @brief Get the desired speed for the bandwidth subtree.
-     * @see tr_bandwidth::setDesiredSpeed
+     * @see `tr_bandwidth::setDesiredSpeed`
      */
     [[nodiscard]] constexpr tr_bytes_per_second_t getDesiredSpeedBytesPerSecond(tr_direction dir) const
     {
@@ -211,7 +211,7 @@ public:
     /**
      * Almost all the time we do want to honor a parents' bandwidth cap, so that
      * (for example) a peer is constrained by a per-torrent cap and the global cap.
-     * But when we set a torrent's speed mode to TR_SPEEDLIMIT_UNLIMITED, then
+     * But when we set a torrent's speed mode to `TR_SPEEDLIMIT_UNLIMITED`, then
      * in that particular case we want to ignore the global speed limit...
      */
     constexpr bool honorParentLimits(tr_direction direction, bool is_enabled)
