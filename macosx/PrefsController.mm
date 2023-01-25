@@ -398,6 +398,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     }
     windowRect.size.width = [sizeString floatValue];
     [self.window setFrame:windowRect display:YES animate:NO];
+    [self.window center];
 }
 
 //for a beta release, always use the beta appcast
