@@ -20,7 +20,7 @@
 #include "block-info.h"
 #include "file.h"
 #include "torrent-files.h"
-#include "utils.h" // tr_saveFile()
+#include "utils.h" // for tr_saveFile()
 
 class tr_metainfo_builder
 {
