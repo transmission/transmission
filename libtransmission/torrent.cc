@@ -2398,6 +2398,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
                 tr_peerMgrGotBadPiece(tor, piece);
+                tor->setHasPiece(piece, false);
             }
         }
     }
