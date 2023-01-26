@@ -338,7 +338,8 @@ TEST_F(AnnouncerUdpTest, canScrape)
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
 
     // confirm that announcer processed the response
-    EXPECT_TRUE(response);
+    EXPECT_TRUE(response.has_value());
+    assert(response.has_value());
     expectEqual(expected_response, *response);
 
     // Now scrape again.
@@ -421,7 +422,8 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
 
     // Confirm that announcer processed the response
-    EXPECT_TRUE(response);
+    EXPECT_TRUE(response.has_value());
+    assert(response.has_value());
     expectEqual(expected_response, *response);
 }
 
@@ -470,7 +472,8 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     EXPECT_TRUE(sendError(*announcer, scrape_transaction_id, expected_response.errmsg));
 
     // confirm that announcer processed the response
-    EXPECT_TRUE(response);
+    EXPECT_TRUE(response.has_value());
+    assert(response.has_value());
     expectEqual(expected_response, *response);
 }
 
@@ -510,7 +513,8 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     EXPECT_TRUE(sendError(*announcer, transaction_id, expected_response.errmsg));
 
     // Confirm that announcer processed the response
-    EXPECT_TRUE(response);
+    EXPECT_TRUE(response.has_value());
+    assert(response.has_value());
     expectEqual(expected_response, *response);
 }
 
@@ -643,6 +647,7 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
 
     // Confirm that announcer processed the response
-    EXPECT_TRUE(response);
+    EXPECT_TRUE(response.has_value());
+    assert(response.has_value());
     expectEqual(expected_response, *response);
 }
