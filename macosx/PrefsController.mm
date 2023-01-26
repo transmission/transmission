@@ -209,6 +209,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     self.window.toolbar = toolbar;
 
     [self setWindowSize];
+    [self.window center];
+
     [self setPrefView:nil];
 
     //set special-handling of magnet link add window checkbox

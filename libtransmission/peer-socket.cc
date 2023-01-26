@@ -99,7 +99,7 @@ size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error) cons
 
         if (n_written < 0 && error_code != 0)
         {
-            tr_error_set(error, error_code, tr_strerror(error_code));
+            tr_error_set_from_errno(error, error_code);
         }
     }
 #endif
