@@ -91,6 +91,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { FILTER_TRACKERS, TR_KEY_filter_trackers, QVariant::String },
     { FILTER_TEXT, TR_KEY_filter_text, QVariant::String },
     { SESSION_IS_REMOTE, TR_KEY_remote_session_enabled, QVariant::Bool },
+    { SESSION_REMOTE_HTTPS, TR_KEY_remote_session_https, QVariant::Bool },
     { SESSION_REMOTE_HOST, TR_KEY_remote_session_host, QVariant::String },
     { SESSION_REMOTE_PORT, TR_KEY_remote_session_port, QVariant::Int },
     { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QVariant::Bool },
@@ -466,6 +467,7 @@ void Prefs::initDefaults(tr_variant* d) const
     dictAdd(d, TR_KEY_filter_mode, FilterMode);
     dictAdd(d, TR_KEY_main_window_layout_order, WindowLayout);
     dictAdd(d, TR_KEY_open_dialog_dir, QDir::home().absolutePath());
+    dictAdd(d, TR_KEY_remote_session_https, false);
     dictAdd(d, TR_KEY_remote_session_host, SessionHost);
     dictAdd(d, TR_KEY_remote_session_password, SessionPassword);
     dictAdd(d, TR_KEY_remote_session_username, SessionUsername);

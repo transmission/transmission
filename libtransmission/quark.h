@@ -287,6 +287,7 @@ enum
     TR_KEY_recheckProgress,
     TR_KEY_remote_session_enabled,
     TR_KEY_remote_session_host,
+    TR_KEY_remote_session_https,
     TR_KEY_remote_session_password,
     TR_KEY_remote_session_port,
     TR_KEY_remote_session_requres_authentication,

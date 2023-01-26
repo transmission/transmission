@@ -83,13 +83,15 @@ TEST_F(TorrentFilesTest, find)
 
     auto search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
     auto found = files.find(file_index, std::data(search_path), std::size(search_path));
-    EXPECT_TRUE(found);
+    EXPECT_TRUE(found.has_value());
+    assert(found.has_value());
     EXPECT_EQ(filename, found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
     found = files.find(file_index, std::data(search_path), std::size(search_path));
-    EXPECT_TRUE(found);
+    EXPECT_TRUE(found.has_value());
+    assert(found.has_value());
     EXPECT_EQ(filename, found->filename());
 
     // now make it an incomplete file
@@ -97,13 +99,15 @@ TEST_F(TorrentFilesTest, find)
     EXPECT_TRUE(tr_sys_path_rename(filename, partial_filename));
     search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
     found = files.find(file_index, std::data(search_path), std::size(search_path));
-    EXPECT_TRUE(found);
+    EXPECT_TRUE(found.has_value());
+    assert(found.has_value());
     EXPECT_EQ(partial_filename, found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
     found = files.find(file_index, std::data(search_path), std::size(search_path));
-    EXPECT_TRUE(found);
+    EXPECT_TRUE(found.has_value());
+    assert(found.has_value());
     EXPECT_EQ(partial_filename, found->filename());
 
     // what about if we look for a file that does not exist

@@ -277,7 +277,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     menu->addAction(ui_.action_AddURL);
     menu->addSeparator();
     menu->addAction(ui_.action_ShowMainWindow);
-    menu->addAction(ui_.action_ShowMessageLog);
     menu->addAction(ui_.action_About);
     menu->addSeparator();
     menu->addAction(ui_.action_StartAll);

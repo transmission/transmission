@@ -38,6 +38,7 @@ set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM_MINIMUM 3.24.0)
 set(OPENSSL_MINIMUM 0.9.7)
 set(MBEDTLS_MINIMUM 1.3)
+set(NPM_MINIMUM 8.1.307) # Node.js 14
 set(PSL_MINIMUM 0.21.1)
 set(QT_MINIMUM 5.6)
 
@@ -45,7 +46,7 @@ option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC "Build Mac client" AUTO)
-option(ENABLE_WEB "Build Web client" OFF)
+tr_auto_option(ENABLE_WEB "Build Web client" AUTO)
 option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
@@ -501,6 +502,30 @@ endif()
 
 tr_add_external_auto_library(B64 libb64 b64
     TARGET libb64::libb64)
+
+if(NOT ${ENABLE_WEB} STREQUAL "OFF")
+    find_program(NPM npm)
+    if ("${NPM}" STREQUAL "NPM-NOTFOUND")
+        if ("${ENABLE_WEB}" STREQUAL "ON")
+            message(FATAL_ERROR "Could NOT find NPM, minimum required is \"${NPM_MINIMUM}\"")
+        else() # AUTO
+            set(ENABLE_WEB OFF)
+        endif()
+    else()
+        execute_process(COMMAND "${NPM}" --version
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            OUTPUT_VARIABLE NPM_VERSION_STRING)
+        if ("${NPM_VERSION_STRING}" VERSION_GREATER_EQUAL "${NPM_MINIMUM}")
+            message(STATUS "Found NPM: ${NPM} (found suitable version \"${NPM_VERSION_STRING}\", minimum required is \"${NPM_MINIMUM}\")")
+            set(ENABLE_WEB ON)
+        elseif ("${ENABLE_WEB}" STREQUAL "ON")
+            message(FATAL_ERROR "Found NPM: ${NPM} Found unsuitable version \"${NPM_VERSION_STRING}\", but required is at least \"${NPM_MINIMUM}\"")
+        else() # AUTO
+            message(STATUS "Found NPM: ${NPM} Found unsuitable version \"${NPM_VERSION_STRING}\", but required is at least \"${NPM_MINIMUM}\"")
+            set(ENABLE_WEB OFF)
+        endif()
+    endif()
+endif()
 
 if(WITH_INOTIFY)
     tr_get_required_flag(WITH_INOTIFY INOTIFY_IS_REQUIRED)
