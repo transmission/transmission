@@ -17,7 +17,7 @@
 #include "error.h"
 #include "net.h" // tr_socket_t
 #include "utils-ev.h"
-#include "utils.h"
+#include "utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission
 {
@@ -282,7 +282,7 @@ public:
 
         if (res == 0)
         {
-            tr_error_set(error, ENOTCONN, tr_strerror(ENOTCONN));
+            tr_error_set_from_errno(error, ENOTCONN);
         }
         else
         {

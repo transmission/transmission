@@ -25,7 +25,7 @@
 #include "peer-io.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
-#include "utils.h"
+#include "utils.h" // for _()
 
 #ifdef _WIN32
 #undef EAGAIN
@@ -660,7 +660,7 @@ void tr_peerIo::on_utp_state_change(int state)
     else if (state == UTP_STATE_EOF)
     {
         tr_error* error = nullptr;
-        tr_error_set(&error, ENOTCONN, tr_strerror(ENOTCONN));
+        tr_error_set_from_errno(&error, ENOTCONN);
         call_error_callback(*error);
         tr_error_clear(&error);
     }
