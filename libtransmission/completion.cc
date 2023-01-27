@@ -94,17 +94,6 @@ void tr_completion::amountDone(float* tab, size_t n_tabs) const
     }
 }
 
-size_t tr_completion::countMissingBlocksInPiece(tr_piece_index_t piece) const
-{
-    auto const [begin, end] = block_info_->blockSpanForPiece(piece);
-    return (end - begin) - blocks_.count(begin, end);
-}
-
-size_t tr_completion::countMissingBytesInPiece(tr_piece_index_t piece) const
-{
-    return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
-}
-
 std::vector<uint8_t> tr_completion::createPieceBitfield() const
 {
     size_t const n = block_info_->pieceCount();
