@@ -16,6 +16,8 @@
 
 using namespace std::literals;
 
+namespace
+{
 namespace wi
 {
 using key_t = math::wide_integer::uintwide_t<
@@ -61,6 +63,7 @@ auto WIDE_INTEGER_CONSTEXPR const prime = wi::key_t{
 // NOLINTEND(readability-identifier-naming)
 
 } // namespace wi
+} // namespace
 
 namespace tr_message_stream_encryption
 {
