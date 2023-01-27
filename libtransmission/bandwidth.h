@@ -119,8 +119,6 @@ public:
 
     void setParent(tr_bandwidth* new_parent);
 
-    void deparent() noexcept;
-
     [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {
         return this->priority_;
@@ -140,7 +138,7 @@ public:
     }
 
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] tr_bytes_per_second_t getRawSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] auto getRawSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
@@ -148,7 +146,7 @@ public:
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] tr_bytes_per_second_t getPieceSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] auto getPieceSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
@@ -168,6 +166,15 @@ public:
         return did_change;
     }
 
+    /**
+     * @brief Get the desired speed for the bandwidth subtree.
+     * @see `tr_bandwidth::setDesiredSpeed`
+     */
+    [[nodiscard]] constexpr auto getDesiredSpeedBytesPerSecond(tr_direction dir) const
+    {
+        return this->band_[dir].desired_speed_bps_;
+    }
+
     [[nodiscard]] bool is_maxed_out(tr_direction dir, uint64_t now_msec) const noexcept
     {
         if (!isLimited(dir))
@@ -178,15 +185,6 @@ public:
         auto const got = getPieceSpeedBytesPerSecond(now_msec, dir);
         auto const want = getDesiredSpeedBytesPerSecond(dir);
         return got >= want;
-    }
-
-    /**
-     * @brief Get the desired speed for the bandwidth subtree.
-     * @see `tr_bandwidth::setDesiredSpeed`
-     */
-    [[nodiscard]] constexpr tr_bytes_per_second_t getDesiredSpeedBytesPerSecond(tr_direction dir) const
-    {
-        return this->band_[dir].desired_speed_bps_;
     }
 
     /**
@@ -229,6 +227,11 @@ public:
         return this->band_[direction].honor_parent_limits_;
     }
 
+    [[nodiscard]] tr_bandwidth_limits getLimits() const;
+
+    void setLimits(tr_bandwidth_limits const* limits);
+
+private:
     struct RateControl
     {
         std::array<uint64_t, HistorySize> date_;
@@ -248,17 +251,14 @@ public:
         bool honor_parent_limits_ = true;
     };
 
-    [[nodiscard]] tr_bandwidth_limits getLimits() const;
-
-    void setLimits(tr_bandwidth_limits const* limits);
+    static tr_bytes_per_second_t getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
 
     [[nodiscard]] constexpr auto* parent() noexcept
     {
         return parent_;
     }
 
-private:
-    static tr_bytes_per_second_t getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
+    void deparent() noexcept;
 
     static void notifyBandwidthConsumedBytes(uint64_t now, RateControl* r, size_t size);
 

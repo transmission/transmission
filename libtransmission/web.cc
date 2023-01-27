@@ -43,6 +43,8 @@ using namespace std::literals;
 
 // ---
 
+namespace
+{
 namespace curl_helpers
 {
 
@@ -92,6 +94,7 @@ struct EasyDeleter
 using easy_unique_ptr = std::unique_ptr<CURL, EasyDeleter>;
 
 } // namespace curl_helpers
+} // namespace
 
 #ifdef _WIN32
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
