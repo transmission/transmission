@@ -239,7 +239,8 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
 #endif
         sockerrno != EINPROGRESS)
     {
-        if (auto const tmperrno = sockerrno; (tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.is_ipv4())
+        if (auto const tmperrno = sockerrno;
+            (tmperrno != ECONNREFUSED && tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.is_ipv4())
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
