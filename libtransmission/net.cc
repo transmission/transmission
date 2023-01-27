@@ -417,6 +417,8 @@ void tr_net_close_socket(tr_socket_t sockfd)
     evutil_closesocket(sockfd);
 }
 
+namespace
+{
 // code in global_ipv6_herlpers is written by Juliusz Chroboczek
 // and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
@@ -482,6 +484,7 @@ namespace global_ipv6_helpers
 }
 
 } // namespace global_ipv6_helpers
+} // namespace
 
 /* Return our global IPv6 address, with caching. */
 std::optional<tr_address> tr_globalIPv6()
@@ -503,6 +506,8 @@ std::optional<tr_address> tr_globalIPv6()
 
 // ---
 
+namespace
+{
 namespace is_valid_for_peers_helpers
 {
 
@@ -543,6 +548,7 @@ namespace is_valid_for_peers_helpers
 }
 
 } // namespace is_valid_for_peers_helpers
+} // namespace
 
 bool tr_address::is_valid_for_peers(tr_port port) const noexcept
 {
