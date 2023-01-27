@@ -119,8 +119,6 @@ public:
 
     void setParent(tr_bandwidth* new_parent);
 
-    void deparent() noexcept;
-
     [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {
         return this->priority_;
@@ -233,11 +231,6 @@ public:
 
     void setLimits(tr_bandwidth_limits const* limits);
 
-    [[nodiscard]] constexpr auto* parent() noexcept
-    {
-        return parent_;
-    }
-
 private:
     struct RateControl
     {
@@ -259,6 +252,13 @@ private:
     };
 
     static tr_bytes_per_second_t getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
+
+    [[nodiscard]] constexpr auto* parent() noexcept
+    {
+        return parent_;
+    }
+
+    void deparent() noexcept;
 
     static void notifyBandwidthConsumedBytes(uint64_t now, RateControl* r, size_t size);
 
