@@ -53,12 +53,15 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
     return std::string{ url };
 }
 
-static auto constexpr MaxBencDepth = 32;
+namespace
+{
+auto constexpr MaxBencDepth = 32;
 
 bool tr_error_is_set(tr_error const* const* error)
 {
     return (error != nullptr) && (*error != nullptr);
 }
+} // namespace
 
 struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
 {
