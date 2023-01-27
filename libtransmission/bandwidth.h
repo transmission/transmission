@@ -138,7 +138,7 @@ public:
     }
 
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] tr_bytes_per_second_t getRawSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] auto getRawSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
@@ -146,7 +146,7 @@ public:
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] tr_bytes_per_second_t getPieceSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] auto getPieceSpeedBytesPerSecond(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
@@ -166,6 +166,15 @@ public:
         return did_change;
     }
 
+    /**
+     * @brief Get the desired speed for the bandwidth subtree.
+     * @see `tr_bandwidth::setDesiredSpeed`
+     */
+    [[nodiscard]] constexpr auto getDesiredSpeedBytesPerSecond(tr_direction dir) const
+    {
+        return this->band_[dir].desired_speed_bps_;
+    }
+
     [[nodiscard]] bool is_maxed_out(tr_direction dir, uint64_t now_msec) const noexcept
     {
         if (!isLimited(dir))
@@ -176,15 +185,6 @@ public:
         auto const got = getPieceSpeedBytesPerSecond(now_msec, dir);
         auto const want = getDesiredSpeedBytesPerSecond(dir);
         return got >= want;
-    }
-
-    /**
-     * @brief Get the desired speed for the bandwidth subtree.
-     * @see `tr_bandwidth::setDesiredSpeed`
-     */
-    [[nodiscard]] constexpr tr_bytes_per_second_t getDesiredSpeedBytesPerSecond(tr_direction dir) const
-    {
-        return this->band_[dir].desired_speed_bps_;
     }
 
     /**
