@@ -94,7 +94,8 @@ TEST_F(VariantTest, parseInt)
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value);
+    EXPECT_TRUE(value.has_value());
+    assert(value.has_value());
     EXPECT_EQ(ExpectVal, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
@@ -133,7 +134,8 @@ TEST_F(VariantTest, parseNegativeInt)
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value);
+    EXPECT_TRUE(value.has_value());
+    assert(value.has_value());
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
@@ -154,7 +156,8 @@ TEST_F(VariantTest, parseIntZero)
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value);
+    EXPECT_TRUE(value.has_value());
+    assert(value.has_value());
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
@@ -182,7 +185,8 @@ TEST_F(VariantTest, str)
     // good string
     inout = benc = "4:boat";
     value = ParseString(&inout);
-    EXPECT_TRUE(value);
+    EXPECT_TRUE(value.has_value());
+    assert(value.has_value());
     EXPECT_EQ("boat"sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
@@ -195,14 +199,16 @@ TEST_F(VariantTest, str)
     // empty string
     inout = benc = "0:"sv;
     value = ParseString(&inout);
-    EXPECT_TRUE(value);
+    EXPECT_TRUE(value.has_value());
+    assert(value.has_value());
     EXPECT_EQ(""sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
     // short string
     inout = benc = "3:boat";
     value = ParseString(&inout);
-    EXPECT_TRUE(value);
+    EXPECT_TRUE(value.has_value());
+    assert(value.has_value());
     EXPECT_EQ("boa"sv, *value);
     EXPECT_EQ(std::data(benc) + benc.find('t'), std::data(inout));
 }

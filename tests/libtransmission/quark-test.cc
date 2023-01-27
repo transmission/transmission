@@ -28,7 +28,8 @@ TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
     {
         auto const str = quarkGetString(i);
         auto const q = tr_quark_lookup(str);
-        EXPECT_TRUE(q);
+        ASSERT_TRUE(q.has_value());
+        assert(q.has_value());
         EXPECT_EQ(i, *q);
     }
 }

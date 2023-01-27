@@ -294,7 +294,7 @@ void tr_tracker_http_announce(
      * is expensive (disabling DNS cache), so instead we have to make do with
      * a request that we don't know if will go through IPv6 or IPv4.
      */
-    static bool const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < CURL_VERSION_BITS(7, 77, 0);
+    static auto const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < 0x074D00 /* 7.77.0 */;
     if (use_curl_workaround)
     {
         if (session->useAnnounceIP())
