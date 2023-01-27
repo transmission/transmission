@@ -694,21 +694,16 @@ std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) con
     return { ss, sizeof(sockaddr_in6) };
 }
 
-static int tr_address_compare(tr_address const* a, tr_address const* b) noexcept // <=>
-{
-    // IPv6 addresses are always "greater than" IPv4
-    if (a->type != b->type)
-    {
-        return a->is_ipv4() ? 1 : -1;
-    }
-
-    return a->is_ipv4() ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
-                          memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
-}
-
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
-    return tr_address_compare(this, &that);
+    // IPv6 addresses are always "greater than" IPv4
+    if (this->type != that.type)
+    {
+        return this->is_ipv4() ? 1 : -1;
+    }
+
+    return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :
+                             memcmp(&this->addr.addr6.s6_addr, &that.addr.addr6.s6_addr, sizeof(this->addr.addr6.s6_addr));
 }
 
 // https://en.wikipedia.org/wiki/Reserved_IP_addresses
