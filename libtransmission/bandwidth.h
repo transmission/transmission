@@ -229,6 +229,16 @@ public:
         return this->band_[direction].honor_parent_limits_;
     }
 
+    [[nodiscard]] tr_bandwidth_limits getLimits() const;
+
+    void setLimits(tr_bandwidth_limits const* limits);
+
+    [[nodiscard]] constexpr auto* parent() noexcept
+    {
+        return parent_;
+    }
+
+private:
     struct RateControl
     {
         std::array<uint64_t, HistorySize> date_;
@@ -248,16 +258,6 @@ public:
         bool honor_parent_limits_ = true;
     };
 
-    [[nodiscard]] tr_bandwidth_limits getLimits() const;
-
-    void setLimits(tr_bandwidth_limits const* limits);
-
-    [[nodiscard]] constexpr auto* parent() noexcept
-    {
-        return parent_;
-    }
-
-private:
     static tr_bytes_per_second_t getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
 
     static void notifyBandwidthConsumedBytes(uint64_t now, RateControl* r, size_t size);
