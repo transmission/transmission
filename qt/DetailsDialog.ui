@@ -649,14 +649,14 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QCheckBox" name="singleDownCheck">
+          <widget class="QCheckBox" name="singleUpCheck">
            <property name="text">
-            <string>Limit &amp;download speed:</string>
+            <string>Limit &amp;upload speed:</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QSpinBox" name="singleDownSpin">
+          <widget class="QSpinBox" name="singleUpSpin">
            <property name="enabled">
             <bool>false</bool>
            </property>
@@ -669,14 +669,14 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QCheckBox" name="singleUpCheck">
+          <widget class="QCheckBox" name="singleDownCheck">
            <property name="text">
-            <string>Limit &amp;upload speed:</string>
+            <string>Limit &amp;download speed:</string>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QSpinBox" name="singleUpSpin">
+          <widget class="QSpinBox" name="singleDownSpin">
            <property name="enabled">
             <bool>false</bool>
            </property>
