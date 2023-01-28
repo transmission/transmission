@@ -79,7 +79,7 @@ size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error) cons
 
     if (is_tcp())
     {
-        return buf.toSocket(handle.tcp, max, error);
+        return buf.to_socket(handle.tcp, max, error);
     }
 
 #ifdef WITH_UTP
@@ -116,7 +116,7 @@ size_t tr_peer_socket::try_read(Buffer& buf, size_t max, tr_error** error) const
 
     if (is_tcp())
     {
-        return buf.addSocket(handle.tcp, max, error);
+        return buf.add_socket(handle.tcp, max, error);
     }
 
 #ifdef WITH_UTP

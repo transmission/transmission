@@ -212,13 +212,13 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     peer_io->write(outbuf, false);
     peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
     outbuf.add(VC);
-    outbuf.addUint32(crypto_provide());
-    outbuf.addUint16(0);
+    outbuf.add_uint32(crypto_provide());
+    outbuf.add_uint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
     if (auto msg = std::array<uint8_t, HandshakeSize>{}; build_handshake_message(peer_io, std::data(msg)))
     {
-        outbuf.addUint16(std::size(msg));
+        outbuf.add_uint16(std::size(msg));
         outbuf.add(msg);
         have_sent_bittorrent_handshake_ = true;
     }
@@ -606,7 +606,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     if (crypto_select != 0)
     {
         tr_logAddTraceHand(this, fmt::format("selecting crypto mode '{}'", crypto_select));
-        outbuf.addUint32(crypto_select);
+        outbuf.add_uint32(crypto_select);
     }
     else
     {
@@ -619,7 +619,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     /* ENCRYPT(VC, crypto_provide, len(PadD), PadD
      * PadD is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
-    outbuf.addUint16(0);
+    outbuf.add_uint16(0);
 
     /* maybe de-encrypt our connection */
     if (crypto_select == CryptoProvidePlaintext)
