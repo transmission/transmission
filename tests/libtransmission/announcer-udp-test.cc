@@ -113,9 +113,9 @@ protected:
 
     [[nodiscard]] static uint32_t parseConnectionRequest(libtransmission::Buffer& buf)
     {
-        EXPECT_EQ(ProtocolId, buf.toUint64());
-        EXPECT_EQ(ConnectAction, buf.toUint32());
-        return buf.toUint32();
+        EXPECT_EQ(ProtocolId, buf.to_uint64());
+        EXPECT_EQ(ConnectAction, buf.to_uint32());
+        return buf.to_uint32();
     }
 
     [[nodiscard]] static auto buildScrapeRequestFromResponse(tr_scrape_response const& response)
@@ -149,14 +149,14 @@ protected:
 
     [[nodiscard]] static auto parseScrapeRequest(libtransmission::Buffer& buf, uint64_t expected_connection_id)
     {
-        EXPECT_EQ(expected_connection_id, buf.toUint64());
-        EXPECT_EQ(ScrapeAction, buf.toUint32());
-        auto const transaction_id = buf.toUint32();
+        EXPECT_EQ(expected_connection_id, buf.to_uint64());
+        EXPECT_EQ(ScrapeAction, buf.to_uint32());
+        auto const transaction_id = buf.to_uint32();
         auto info_hashes = std::vector<tr_sha1_digest_t>{};
         while (!std::empty(buf))
         {
             auto tmp = tr_sha1_digest_t{};
-            buf.toBuf(std::data(tmp), std::size(tmp));
+            buf.to_buf(std::data(tmp), std::size(tmp));
             info_hashes.emplace_back(tmp);
         }
         return std::make_pair(transaction_id, info_hashes);
@@ -173,13 +173,13 @@ protected:
     [[nodiscard]] static bool sendError(tr_announcer_udp& announcer, uint32_t transaction_id, std::string_view errmsg)
     {
         auto buf = libtransmission::Buffer{};
-        buf.addUint32(ErrorAction);
-        buf.addUint32(transaction_id);
+        buf.add_uint32(ErrorAction);
+        buf.add_uint32(transaction_id);
         buf.add(errmsg);
 
         auto const response_size = std::size(buf);
         auto arr = std::array<uint8_t, 256>{};
-        buf.toBuf(std::data(arr), response_size);
+        buf.to_buf(std::data(arr), response_size);
 
         return announcer.handleMessage(std::data(arr), response_size);
     }
@@ -188,13 +188,13 @@ protected:
     {
         auto const connection_id = tr_rand_obj<uint64_t>();
         auto buf = libtransmission::Buffer{};
-        buf.addUint32(ConnectAction);
-        buf.addUint32(transaction_id);
-        buf.addUint64(connection_id);
+        buf.add_uint32(ConnectAction);
+        buf.add_uint32(transaction_id);
+        buf.add_uint64(connection_id);
 
         auto arr = std::array<uint8_t, 128>{};
         auto response_size = std::size(buf);
-        buf.toBuf(std::data(arr), response_size);
+        buf.to_buf(std::data(arr), response_size);
         EXPECT_TRUE(announcer.handleMessage(std::data(arr), response_size));
 
         return connection_id;
@@ -253,19 +253,19 @@ protected:
     [[nodiscard]] static auto parseAnnounceRequest(libtransmission::Buffer& buf, uint64_t connection_id)
     {
         auto req = UdpAnnounceReq{};
-        req.connection_id = buf.toUint64();
-        req.action = buf.toUint32();
-        req.transaction_id = buf.toUint32();
-        buf.toBuf(std::data(req.info_hash), std::size(req.info_hash));
-        buf.toBuf(std::data(req.peer_id), std::size(req.peer_id));
-        req.downloaded = buf.toUint64();
-        req.left = buf.toUint64();
-        req.uploaded = buf.toUint64();
-        req.event = buf.toUint32();
-        req.ip_address = buf.toUint32();
-        req.key = buf.toUint32();
-        req.num_want = buf.toUint32();
-        req.port = buf.toUint16();
+        req.connection_id = buf.to_uint64();
+        req.action = buf.to_uint32();
+        req.transaction_id = buf.to_uint32();
+        buf.to_buf(std::data(req.info_hash), std::size(req.info_hash));
+        buf.to_buf(std::data(req.peer_id), std::size(req.peer_id));
+        req.downloaded = buf.to_uint64();
+        req.left = buf.to_uint64();
+        req.uploaded = buf.to_uint64();
+        req.event = buf.to_uint32();
+        req.ip_address = buf.to_uint32();
+        req.key = buf.to_uint32();
+        req.num_want = buf.to_uint32();
+        req.port = buf.to_uint16();
 
         EXPECT_EQ(AnnounceAction, req.action);
         EXPECT_EQ(connection_id, req.connection_id);
@@ -327,14 +327,14 @@ TEST_F(AnnouncerUdpTest, canScrape)
 
     // Have the tracker respond to the request
     auto buf = libtransmission::Buffer{};
-    buf.addUint32(ScrapeAction);
-    buf.addUint32(scrape_transaction_id);
-    buf.addUint32(expected_response.rows[0].seeders);
-    buf.addUint32(expected_response.rows[0].downloads);
-    buf.addUint32(expected_response.rows[0].leechers);
+    buf.add_uint32(ScrapeAction);
+    buf.add_uint32(scrape_transaction_id);
+    buf.add_uint32(expected_response.rows[0].seeders);
+    buf.add_uint32(expected_response.rows[0].downloads);
+    buf.add_uint32(expected_response.rows[0].leechers);
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
-    buf.toBuf(std::data(arr), response_size);
+    buf.to_buf(std::data(arr), response_size);
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
 
     // confirm that announcer processed the response
@@ -408,17 +408,17 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
 
     // Have the tracker respond to the request
     auto buf = libtransmission::Buffer{};
-    buf.addUint32(ScrapeAction);
-    buf.addUint32(scrape_transaction_id);
+    buf.add_uint32(ScrapeAction);
+    buf.add_uint32(scrape_transaction_id);
     for (int i = 0; i < expected_response.row_count; ++i)
     {
-        buf.addUint32(expected_response.rows[i].seeders);
-        buf.addUint32(expected_response.rows[i].downloads);
-        buf.addUint32(expected_response.rows[i].leechers);
+        buf.add_uint32(expected_response.rows[i].seeders);
+        buf.add_uint32(expected_response.rows[i].downloads);
+        buf.add_uint32(expected_response.rows[i].leechers);
     }
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
-    buf.toBuf(std::data(arr), response_size);
+    buf.to_buf(std::data(arr), response_size);
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
 
     // Confirm that announcer processed the response
@@ -542,21 +542,21 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
 
     // send a connection response but with an *invalid* transaction id
     auto buf = libtransmission::Buffer{};
-    buf.addUint32(ConnectAction);
-    buf.addUint32(transaction_id + 1);
-    buf.addUint64(tr_rand_obj<uint64_t>());
+    buf.add_uint32(ConnectAction);
+    buf.add_uint32(transaction_id + 1);
+    buf.add_uint64(tr_rand_obj<uint64_t>());
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
-    buf.toBuf(std::data(arr), response_size);
+    buf.to_buf(std::data(arr), response_size);
     EXPECT_FALSE(announcer->handleMessage(std::data(arr), response_size));
 
     // send a connection response but with an *invalid* action
     buf.clear();
-    buf.addUint32(ScrapeAction);
-    buf.addUint32(transaction_id);
-    buf.addUint64(tr_rand_obj<uint64_t>());
+    buf.add_uint32(ScrapeAction);
+    buf.add_uint32(transaction_id);
+    buf.add_uint64(tr_rand_obj<uint64_t>());
     response_size = std::size(buf);
-    buf.toBuf(std::data(arr), response_size);
+    buf.to_buf(std::data(arr), response_size);
     EXPECT_FALSE(announcer->handleMessage(std::data(arr), response_size));
 
     // but after discarding invalid messages,
@@ -629,21 +629,21 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
 
     // Have the tracker respond to the request
     auto buf = libtransmission::Buffer{};
-    buf.addUint32(AnnounceAction);
-    buf.addUint32(udp_ann_req.transaction_id);
-    buf.addUint32(expected_response.interval);
-    buf.addUint32(expected_response.leechers);
-    buf.addUint32(expected_response.seeders);
+    buf.add_uint32(AnnounceAction);
+    buf.add_uint32(udp_ann_req.transaction_id);
+    buf.add_uint32(expected_response.interval);
+    buf.add_uint32(expected_response.leechers);
+    buf.add_uint32(expected_response.seeders);
     for (auto const& [addr, port] : addresses)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
         buf.add(&addr.addr.addr4.s_addr, sizeof(addr.addr.addr4.s_addr));
-        buf.addUint16(port.host());
+        buf.add_uint16(port.host());
     }
 
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 512>{};
-    buf.toBuf(std::data(arr), response_size);
+    buf.to_buf(std::data(arr), response_size);
     EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
 
     // Confirm that announcer processed the response

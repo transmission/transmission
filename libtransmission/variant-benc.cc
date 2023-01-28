@@ -350,5 +350,5 @@ std::string tr_variantToStrBenc(tr_variant const* top)
 
     auto buf = libtransmission::Buffer{};
     tr_variantWalk(top, &walk_funcs, &buf, true);
-    return buf.toString();
+    return buf.to_string();
 }

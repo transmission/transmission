@@ -603,7 +603,7 @@ void tr_peerIo::read_bytes(void* bytes, size_t byte_count)
 {
     TR_ASSERT(read_buffer_size() >= byte_count);
 
-    inbuf_.toBuf(bytes, byte_count);
+    inbuf_.to_buf(bytes, byte_count);
 
     if (is_encrypted())
     {

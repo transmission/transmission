@@ -103,7 +103,7 @@ public:
     template<typename T>
     [[nodiscard]] auto read_buffer_starts_with(T const& t) const noexcept
     {
-        return inbuf_.startsWith(t);
+        return inbuf_.starts_with(t);
     }
 
     void read_buffer_drain(size_t byte_count);
