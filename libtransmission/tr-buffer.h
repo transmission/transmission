@@ -10,7 +10,6 @@
 #include <limits>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <event2/buffer.h>
 
