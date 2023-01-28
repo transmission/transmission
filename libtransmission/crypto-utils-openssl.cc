@@ -232,7 +232,7 @@ tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
 {
     TR_ASSERT(der != nullptr);
 
-    X509* const ret = d2i_X509(nullptr, (unsigned char const**)&der, der_length);
+    X509* const ret = d2i_X509(nullptr, reinterpret_cast<unsigned char const**>(&der), der_length);
 
     if (ret == nullptr)
     {

@@ -1296,7 +1296,7 @@ struct tr_tracker_view
     int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
     size_t tier; // which tier this tracker is in
-    tr_torrent_id_t id; // unique transmission-generated ID for use in libtransmission API
+    tr_tracker_id_t id; // unique transmission-generated ID for use in libtransmission API
 
     tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.
     tr_tracker_state scrapeState; // whether we're scraping, waiting to scrape, etc.

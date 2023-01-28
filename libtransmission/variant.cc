@@ -51,7 +51,7 @@ void tr_variant_string_clear(struct tr_variant_string* str)
 {
     if (str->type == TR_STRING_TYPE_HEAP)
     {
-        delete[] ((char*)(str->str.str));
+        delete[] const_cast<char*>(str->str.str);
     }
 
     *str = StringInit;
@@ -278,7 +278,7 @@ bool tr_variantGetRaw(tr_variant const* v, std::byte const** setme_raw, size_t* 
 
     if (success)
     {
-        *setme_raw = (std::byte const*)getStr(v);
+        *setme_raw = reinterpret_cast<std::byte const*>(getStr(v));
         *setme_len = v->val.s.len;
     }
 
@@ -291,7 +291,7 @@ bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* se
 
     if (success)
     {
-        *setme_raw = (uint8_t const*)getStr(v);
+        *setme_raw = reinterpret_cast<uint8_t const*>(getStr(v));
         *setme_len = v->val.s.len;
     }
 
@@ -876,7 +876,7 @@ void freeDummyFunc(tr_variant const* /*v*/, void* /*buf*/)
 
 void freeStringFunc(tr_variant const* v, void* /*user_data*/)
 {
-    tr_variant_string_clear(&((tr_variant*)v)->val.s);
+    tr_variant_string_clear(&const_cast<tr_variant*>(v)->val.s);
 }
 
 void freeContainerEndFunc(tr_variant const* v, void* /*user_data*/)

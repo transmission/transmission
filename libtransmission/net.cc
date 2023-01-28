@@ -302,7 +302,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
-    if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
+    if (bind(fd, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1)
     {
         int const err = sockerrno;
 
@@ -393,7 +393,7 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
     // accept the incoming connection
     auto sock = sockaddr_storage{};
     socklen_t len = sizeof(struct sockaddr_storage);
-    auto const sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
+    auto const sockfd = accept(listening_sockfd, reinterpret_cast<sockaddr*>(&sock), &len);
     if (sockfd == TR_BAD_SOCKET)
     {
         return {};
@@ -531,13 +531,13 @@ namespace is_valid_for_peers_helpers
     {
     case TR_AF_INET:
         {
-            auto const* const address = (unsigned char const*)&addr.addr.addr4;
+            auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr4);
             return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
         }
 
     case TR_AF_INET6:
         {
-            auto const* const address = (unsigned char const*)&addr.addr.addr6;
+            auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr6);
             return address[0] == 0xFF ||
                 (memcmp(address, std::data(Zeroes), 15) == 0 && (address[15] == 0 || address[15] == 1));
         }

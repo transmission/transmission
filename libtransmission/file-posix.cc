@@ -1228,7 +1228,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
 
     errno = 0;
 
-    if (auto const* const entry = readdir((DIR*)handle); entry != nullptr)
+    if (auto const* const entry = readdir(static_cast<DIR*>(handle)); entry != nullptr)
     {
         ret = entry->d_name;
     }
@@ -1244,7 +1244,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    bool const ret = closedir((DIR*)handle) != -1;
+    bool const ret = closedir(static_cast<DIR*>(handle)) != -1;
 
     if (!ret)
     {

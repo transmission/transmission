@@ -342,7 +342,7 @@ bool isIPAddressWithOptionalPort(char const* host)
     int address_len = sizeof(address);
 
     /* TODO: move to net.{c,h} */
-    return evutil_parse_sockaddr_port(host, (struct sockaddr*)&address, &address_len) != -1;
+    return evutil_parse_sockaddr_port(host, reinterpret_cast<sockaddr*>(&address), &address_len) != -1;
 }
 
 bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
