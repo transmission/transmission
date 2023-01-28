@@ -157,7 +157,7 @@ public:
         return *this != std::string_view{ that != nullptr ? that : "" };
     }
 
-    constexpr operator std::string_view() const noexcept
+    [[nodiscard]] constexpr operator std::string_view() const noexcept
     {
         return sv();
     }

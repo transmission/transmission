@@ -51,7 +51,7 @@ public:
     {
         for (size_t i = 0; i < data_length; ++i)
         {
-            ((uint8_t*)dst_data)[i] = ((uint8_t const*)src_data)[i] ^ arc4_next();
+            static_cast<uint8_t*>(dst_data)[i] = static_cast<uint8_t const*>(src_data)[i] ^ arc4_next();
         }
     }
 
