@@ -583,7 +583,7 @@ uint64_t tr_htonll(uint64_t hostlonglong)
 {
 #ifdef HAVE_HTONLL
 
-    return htonll(x);
+    return htonll(hostlonglong);
 
 #else
 
