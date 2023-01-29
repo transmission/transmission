@@ -447,6 +447,7 @@ namespace global_ipv6_helpers
             {
                 if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
                 {
+                    evutil_closesocket(sock);
                     errno = save;
                     return addrport->first;
                 }
