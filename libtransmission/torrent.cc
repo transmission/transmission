@@ -2316,7 +2316,7 @@ namespace
 {
 namespace got_block_helpers
 {
-void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
+void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
 {
     /* close the file so that we can reopen in read-only mode as needed */
     tor->session->closeTorrentFile(tor, i);
@@ -2352,19 +2352,30 @@ void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     }
 }
 
-void tr_torrentPieceCompleted(tr_torrent* tor, tr_piece_index_t piece_index)
+void onPieceCompleted(tr_torrent* tor, tr_piece_index_t piece)
 {
-    tr_peerMgrPieceCompleted(tor, piece_index);
+    tr_peerMgrPieceCompleted(tor, piece);
 
     // if this piece completes any file, invoke the fileCompleted func for it
-    auto const span = tor->fpm_.fileSpan(piece_index);
+    auto const span = tor->fpm_.fileSpan(piece);
     for (auto file = span.begin; file < span.end; ++file)
     {
         if (tor->completion.hasBlocks(tr_torGetFileBlockSpan(tor, file)))
         {
-            tr_torrentFileCompleted(tor, file);
+            onFileCompleted(tor, file);
         }
     }
+}
+
+void onPieceFailed(tr_torrent* tor, tr_piece_index_t piece)
+{
+    tr_logAddDebugTor(tor, fmt::format("Piece {}, which was just downloaded, failed its checksum test", piece));
+
+    auto const n = tor->pieceSize(piece);
+    tor->corruptCur += n;
+    tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
+    tr_peerMgrGotBadPiece(tor, piece);
+    tor->setHasPiece(piece, false);
 }
 } // namespace got_block_helpers
 } // namespace
@@ -2376,36 +2387,27 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->session->amInSessionThread());
 
-    bool const block_is_new = !tor->hasBlock(block);
-
-    if (block_is_new)
+    if (tor->hasBlock(block))
     {
-        tor->completion.addBlock(block);
-        tor->setDirty();
-
-        auto const piece = tor->blockLoc(block).piece;
-
-        if (tor->hasPiece(piece))
-        {
-            if (tor->checkPiece(piece))
-            {
-                tr_torrentPieceCompleted(tor, piece);
-            }
-            else
-            {
-                uint32_t const n = tor->pieceSize(piece);
-                tr_logAddDebugTor(tor, fmt::format("Piece {}, which was just downloaded, failed its checksum test", piece));
-                tor->corruptCur += n;
-                tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
-                tr_peerMgrGotBadPiece(tor, piece);
-            }
-        }
-    }
-    else
-    {
-        uint32_t const n = tor->blockSize(block);
-        tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
         tr_logAddDebugTor(tor, "we have this block already...");
+        auto const n = tor->blockSize(block);
+        tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
+        return;
+    }
+
+    tor->setDirty();
+
+    tor->completion.addBlock(block);
+    if (auto const piece = tor->blockLoc(block).piece; tor->hasPiece(piece))
+    {
+        if (tor->checkPiece(piece))
+        {
+            onPieceCompleted(tor, piece);
+        }
+        else
+        {
+            onPieceFailed(tor, piece);
+        }
     }
 }
 
