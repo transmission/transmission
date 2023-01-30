@@ -56,14 +56,12 @@ struct tr_error;
 #define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 
-/****
-*****
-****/
+// ---
 
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
 /**
- * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
+ * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
  */
 [[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
@@ -122,19 +120,17 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**));
 
 #endif
 
-/***
-****
-***/
+// ---
 
 [[nodiscard]] constexpr bool tr_str_is_empty(char const* value)
 {
     return value == nullptr || *value == '\0';
 }
 
-/** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
+/** @brief Portability wrapper for `strlcpy()` that uses the system implementation if available */
 size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
-/** @brief Convenience wrapper around strerorr() guaranteed to not return nullptr
+/** @brief Convenience wrapper around `strerorr()` guaranteed to not return nullptr
     @param errnum the error number to describe */
 [[nodiscard]] char const* tr_strerror(int errnum);
 
@@ -154,14 +150,12 @@ template<typename T>
     return out;
 }
 
-/***
-****  std::string_view utils
-***/
+// --- std::string_view utils
 
 template<typename T>
 [[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
 {
-    return sv.find(key) != sv.npos;
+    return sv.find(key) != std::string_view::npos;
 }
 
 [[nodiscard]] constexpr bool tr_strvStartsWith(std::string_view sv, char key) // c++20
@@ -221,12 +215,10 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
  */
 size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
 
-/***
-****
-***/
+// ---
 
-/** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
-    @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */
+/** @brief return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1]
+    @return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1] */
 [[nodiscard]] double tr_getRatio(uint64_t numerator, uint64_t denominator);
 
 /**
@@ -241,9 +233,9 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
 /**
  * @brief truncate a double value at a given number of decimal places.
  *
- * this can be used to prevent a printf() call from rounding up:
- * call with the decimal_places argument equal to the number of
- * decimal places in the printf()'s precision:
+ * this can be used to prevent a `printf()` call from rounding up:
+ * call with the `decimal_places` argument equal to the number of
+ * decimal places in the `printf()`'s precision:
  *
  * - printf("%.2f%%", 99.999) ==> "100.00%"
  *
@@ -269,9 +261,7 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
  */
 bool tr_moveFile(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
 
-/***
-****
-***/
+// ---
 
 namespace libtransmission::detail::tr_time
 {
@@ -293,21 +283,19 @@ extern time_t current_time;
     return libtransmission::detail::tr_time::current_time;
 }
 
-/** @brief Private libtransmission function to update tr_time()'s counter */
+/** @brief Private libtransmission function to update `tr_time()`'s counter */
 constexpr void tr_timeUpdate(time_t now) noexcept
 {
     libtransmission::detail::tr_time::current_time = now;
 }
 
-/** @brief Portability wrapper for htonll() that uses the system implementation if available */
-[[nodiscard]] uint64_t tr_htonll(uint64_t);
+/** @brief Portability wrapper for `htonll()` that uses the system implementation if available */
+[[nodiscard]] uint64_t tr_htonll(uint64_t hostlonglong);
 
-/** @brief Portability wrapper for htonll() that uses the system implementation if available */
-[[nodiscard]] uint64_t tr_ntohll(uint64_t);
+/** @brief Portability wrapper for `ntohll()` that uses the system implementation if available */
+[[nodiscard]] uint64_t tr_ntohll(uint64_t netlonglong);
 
-/***
-****
-***/
+// ---
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
 
@@ -358,9 +346,7 @@ void tr_formatter_get_units(void* dict);
     return size_t(B / (tr_mem_K * tr_mem_K));
 }
 
-/***
-****
-***/
+// ---
 
 /** @brief Check if environment variable exists. */
 [[nodiscard]] bool tr_env_key_exists(char const* key);
@@ -371,8 +357,6 @@ void tr_formatter_get_units(void* dict);
 /** @brief Get environment variable value as string. */
 [[nodiscard]] std::string tr_env_get_string(std::string_view key, std::string_view default_value = {});
 
-/***
-****
-***/
+// ---
 
 void tr_net_init();

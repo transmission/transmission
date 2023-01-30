@@ -755,9 +755,7 @@ private:
     static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
 };
 
-/**
-*** tr_peer virtual functions
-**/
+// --- tr_peer virtual functions
 
 tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     : session{ tor->session }
@@ -826,23 +824,21 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed
 }
 
 /**
-***  REQUESTS
-***
-*** There are two data structures associated with managing block requests:
-***
-*** 1. tr_swarm::active_requests, an opaque class that tracks what requests
-***    we currently have, i.e. which blocks and from which peers.
-***    This is used for cancelling requests that have been waiting
-***    for too long and avoiding duplicate requests.
-***
-*** 2. tr_swarm::pieces, an array of "struct weighted_piece" which lists the
-***    pieces that we want to request. It's used to decide which blocks to
-***    return next when tr_peerMgrGetBlockRequests() is called.
-**/
+ * REQUESTS
+ *
+ * There are two data structures associated with managing block requests:
+ * 
+ * 1. tr_swarm::active_requests, an opaque class that tracks what requests
+ *    we currently have, i.e. which blocks and from which peers.
+ *    This is used for cancelling requests that have been waiting
+ *    for too long and avoiding duplicate requests.
+ *
+ * 2. tr_swarm::pieces, an array of "struct weighted_piece" which lists the
+ *    pieces that we want to request. It's used to decide which blocks to
+ *    return next when tr_peerMgrGetBlockRequests() is called.
+ */
 
-/**
-*** struct block_request
-**/
+// --- struct block_request
 
 // TODO: if we keep this, add equivalent API to ActiveRequest
 void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span)
@@ -924,11 +920,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     return Wishlist::next(MediatorImpl(torrent, peer), numwant);
 }
 
-/****
-*****
-*****  Piece List Manipulation / Accessors
-*****
-****/
+// --- Piece List Manipulation / Accessors
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* tor, tr_peer const* peer, tr_block_index_t block)
 {
@@ -1241,6 +1233,8 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index)
     tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
 }
 
+namespace
+{
 namespace get_peers_helpers
 {
 
@@ -1304,6 +1298,7 @@ struct CompareAtomsByUsefulness
 }
 
 } // namespace get_peers_helpers
+} // namespace
 
 std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_type, uint8_t list_mode, size_t max_peer_count)
 {
@@ -1317,9 +1312,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
     tr_swarm const* s = tor->swarm;
 
-    /**
-    ***  build a list of atoms
-    **/
+    // build a list of atoms
 
     auto atoms = std::vector<peer_atom const*>{};
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
@@ -1344,9 +1337,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
     std::sort(std::begin(atoms), std::end(atoms), CompareAtomsByUsefulness{});
 
-    /**
-    ***  add the first N of them into our return list
-    **/
+    // add the first N of them into our return list
 
     auto const n = std::min(std::size(atoms), max_peer_count);
     auto pex = std::vector<tr_pex>{};
@@ -1545,6 +1536,8 @@ tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i)
     return i >= n ? tr_webseed_view{} : tr_webseedView(tor->swarm->webseeds[i].get());
 }
 
+namespace
+{
 namespace peer_stat_helpers
 {
 
@@ -1646,6 +1639,7 @@ namespace peer_stat_helpers
 }
 
 } // namespace peer_stat_helpers
+} // namespace
 
 tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
 {
@@ -1678,11 +1672,10 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
     std::for_each(std::begin(peers), std::end(peers), [](auto* const peer) { peer->set_interested(false); });
 }
 
-namespace rechoke_downloads_helpers
-{
 namespace
 {
-
+namespace rechoke_downloads_helpers
+{
 /* does this peer have any pieces that we want? */
 [[nodiscard]] bool isPeerInteresting(
     tr_torrent const* const tor,
@@ -1749,8 +1742,6 @@ struct tr_rechoke_info
     int rechoke_state;
     uint8_t salt;
 };
-
-} // namespace
 
 /* determines who we send "interested" messages to */
 void rechokeDownloads(tr_swarm* s)
@@ -1908,16 +1899,15 @@ void rechokeDownloads(tr_swarm* s)
         rechoke[i].peer->set_interested(i < s->interested_count);
     }
 }
-
 } // namespace rechoke_downloads_helpers
+} // namespace
 
 // ---
 
-namespace rechoke_uploads_helpers
-{
 namespace
 {
-
+namespace rechoke_uploads_helpers
+{
 struct ChokeData
 {
     ChokeData(tr_peerMsgs* msgs_in, int rate_in, uint8_t salt_in, bool is_interested_in, bool was_choked_in, bool is_choked_in)
@@ -1986,8 +1976,6 @@ struct ChokeData
 // an optimistically unchoked peer is immune from rechoking
 // for this many calls to rechokeUploads().
 auto constexpr OptimisticUnchokeMultiplier = uint8_t{ 4 };
-
-} // namespace
 
 void rechokeUploads(tr_swarm* s, uint64_t const now)
 {
@@ -2102,8 +2090,8 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         item.msgs->set_choke(item.is_choked);
     }
 }
-
 } // namespace rechoke_uploads_helpers
+} // namespace
 
 void tr_peerMgr::rechokePulse() const
 {
@@ -2132,15 +2120,11 @@ void tr_peerMgr::rechokePulse() const
     }
 }
 
-/***
-****
-****  Life and Death
-****
-***/
+// --- Life and Death
 
-namespace disconnect_helpers
-{
 namespace
+{
+namespace disconnect_helpers
 {
 // when many peers are available, keep idle ones this long
 auto constexpr MinUploadIdleSecs = time_t{ 60 };
@@ -2264,8 +2248,6 @@ struct ComparePeerByActivity
     return peers_to_close;
 }
 
-} // namespace
-
 void closeBadPeers(tr_swarm* s, time_t const now_sec)
 {
     for (auto* peer : getPeersToClose(s, now_sec))
@@ -2312,8 +2294,8 @@ void enforceSessionPeerLimit(tr_session* session)
         std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
     }
 }
-
 } // namespace disconnect_helpers
+} // namespace
 
 void tr_peerMgr::reconnectPulse()
 {
@@ -2354,12 +2336,10 @@ void tr_peerMgr::reconnectPulse()
     makeNewPeerConnections(max_connections_per_pulse);
 }
 
-/****
-*****
-*****  BANDWIDTH ALLOCATION
-*****
-****/
+// --- Bandwidth Allocation
 
+namespace
+{
 namespace bandwidth_helpers
 {
 
@@ -2393,6 +2373,7 @@ void queuePulse(tr_session* session, tr_direction dir)
 }
 
 } // namespace bandwidth_helpers
+} // namespace
 
 void tr_peerMgr::bandwidthPulse()
 {
@@ -2425,11 +2406,10 @@ bool tr_swarm::peer_is_in_use(peer_atom const& atom) const
         manager->incoming_handshakes.count(atom.addr) != 0U;
 }
 
-namespace connect_helpers
-{
 namespace
 {
-
+namespace connect_helpers
+{
 /* is this atom someone that we'd want to initiate a connection to? */
 [[nodiscard]] bool isPeerCandidate(tr_torrent const* tor, peer_atom const& atom, time_t const now)
 {
@@ -2541,7 +2521,7 @@ struct peer_candidate
     score = addValToKey(score, 1, i);
 
     /* Prefer peers that we got from more trusted sources.
-     * lower `fromBest' values indicate more trusted sources */
+     * lower `fromBest` values indicate more trusted sources */
     score = addValToKey(score, 4, atom.fromBest);
 
     /* salt */
@@ -2549,8 +2529,6 @@ struct peer_candidate
 
     return score;
 }
-
-} // namespace
 
 /** @return an array of all the atoms we might want to connect to */
 [[nodiscard]] std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t max)
@@ -2675,8 +2653,8 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     atom.lastConnectionAttemptAt = now;
     atom.time = now;
 }
-
 } // namespace connect_helpers
+} // namespace
 
 void tr_peerMgr::makeNewPeerConnections(size_t max)
 {

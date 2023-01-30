@@ -579,11 +579,11 @@ private:
         TR_ASSERT(isValidRequest(req));
 
         auto& out = outMessages;
-        out.addUint32(sizeof(uint8_t) + 3 * sizeof(uint32_t));
-        out.addUint8(BtPeerMsgs::Request);
-        out.addUint32(req.index);
-        out.addUint32(req.offset);
-        out.addUint32(req.length);
+        out.add_uint32(sizeof(uint8_t) + 3 * sizeof(uint32_t));
+        out.add_uint8(BtPeerMsgs::Request);
+        out.add_uint32(req.index);
+        out.add_uint32(req.offset);
+        out.add_uint32(req.length);
 
         logtrace(this, fmt::format(FMT_STRING("requesting {:d}:{:d}->{:d}..."), req.index, req.offset, req.length));
         dbgOutMessageLen();
@@ -706,9 +706,7 @@ private:
     static auto constexpr SendPexInterval = 90s;
 };
 
-/**
-***
-**/
+// ---
 
 void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
@@ -716,11 +714,11 @@ void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 
     auto& out = msgs->outMessages;
 
-    out.addUint32(sizeof(uint8_t) + 3 * sizeof(uint32_t));
-    out.addUint8(BtPeerMsgs::FextReject);
-    out.addUint32(req->index);
-    out.addUint32(req->offset);
-    out.addUint32(req->length);
+    out.add_uint32(sizeof(uint8_t) + 3 * sizeof(uint32_t));
+    out.add_uint8(BtPeerMsgs::FextReject);
+    out.add_uint32(req->index);
+    out.add_uint32(req->offset);
+    out.add_uint32(req->length);
 
     logtrace(msgs, fmt::format(FMT_STRING("rejecting {:d}:{:d}->{:d}..."), req->index, req->offset, req->length));
     msgs->dbgOutMessageLen();
@@ -730,11 +728,11 @@ void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
 {
     auto& out = msgs->outMessages;
 
-    out.addUint32(sizeof(uint8_t) + 3 * sizeof(uint32_t));
-    out.addUint8(BtPeerMsgs::Cancel);
-    out.addUint32(req.index);
-    out.addUint32(req.offset);
-    out.addUint32(req.length);
+    out.add_uint32(sizeof(uint8_t) + 3 * sizeof(uint32_t));
+    out.add_uint8(BtPeerMsgs::Cancel);
+    out.add_uint32(req.index);
+    out.add_uint32(req.offset);
+    out.add_uint32(req.length);
 
     logtrace(msgs, fmt::format(FMT_STRING("cancelling {:d}:{:d}->{:d}..."), req.index, req.offset, req.length));
     msgs->dbgOutMessageLen();
@@ -746,18 +744,18 @@ void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port)
     auto& out = msgs->outMessages;
 
     logtrace(msgs, fmt::format(FMT_STRING("sending Port {:d}"), port.host()));
-    out.addUint32(3);
-    out.addUint8(BtPeerMsgs::Port);
-    out.addPort(port);
+    out.add_uint32(3);
+    out.add_uint8(BtPeerMsgs::Port);
+    out.add_port(port);
 }
 
 void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
 {
     auto& out = msgs->outMessages;
 
-    out.addUint32(sizeof(uint8_t) + sizeof(uint32_t));
-    out.addUint8(BtPeerMsgs::Have);
-    out.addUint32(index);
+    out.add_uint32(sizeof(uint8_t) + sizeof(uint32_t));
+    out.add_uint8(BtPeerMsgs::Have);
+    out.add_uint32(index);
 
     logtrace(msgs, fmt::format(FMT_STRING("sending Have {:d}"), index));
     msgs->dbgOutMessageLen();
@@ -768,8 +766,8 @@ void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
 {
     auto& out = msgs->outMessages;
 
-    out.addUint32(sizeof(uint8_t));
-    out.addUint8(choke ? BtPeerMsgs::Choke : BtPeerMsgs::Unchoke);
+    out.add_uint32(sizeof(uint8_t));
+    out.add_uint8(choke ? BtPeerMsgs::Choke : BtPeerMsgs::Unchoke);
 
     logtrace(msgs, choke ? "sending choke" : "sending unchoked");
     msgs->dbgOutMessageLen();
@@ -782,8 +780,8 @@ void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
 
     auto& out = msgs->outMessages;
 
-    out.addUint32(sizeof(uint8_t));
-    out.addUint8(BtPeerMsgs::FextHaveAll);
+    out.add_uint32(sizeof(uint8_t));
+    out.add_uint8(BtPeerMsgs::FextHaveAll);
 
     logtrace(msgs, "sending HAVE_ALL...");
     msgs->dbgOutMessageLen();
@@ -796,8 +794,8 @@ void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
 
     auto& out = msgs->outMessages;
 
-    out.addUint32(sizeof(uint8_t));
-    out.addUint8(BtPeerMsgs::FextHaveNone);
+    out.add_uint32(sizeof(uint8_t));
+    out.add_uint8(BtPeerMsgs::FextHaveNone);
 
     logtrace(msgs, "sending HAVE_NONE...");
     msgs->dbgOutMessageLen();
@@ -813,8 +811,8 @@ void sendInterest(tr_peerMsgsImpl* msgs, bool b)
     auto& out = msgs->outMessages;
 
     logtrace(msgs, b ? "Sending Interested" : "Sending Not Interested");
-    out.addUint32(sizeof(uint8_t));
-    out.addUint8(b ? BtPeerMsgs::Interested : BtPeerMsgs::NotInterested);
+    out.add_uint32(sizeof(uint8_t));
+    out.add_uint8(b ? BtPeerMsgs::Interested : BtPeerMsgs::NotInterested);
 
     msgs->pokeBatchPeriod(HighPriorityIntervalSecs);
     msgs->dbgOutMessageLen();
@@ -960,9 +958,9 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     auto payload = tr_variantToStr(&val, TR_VARIANT_FMT_BENC);
 
-    out.addUint32(2 * sizeof(uint8_t) + std::size(payload));
-    out.addUint8(BtPeerMsgs::Ltep);
-    out.addUint8(LtepMessages::Handshake);
+    out.add_uint32(2 * sizeof(uint8_t) + std::size(payload));
+    out.add_uint8(BtPeerMsgs::Ltep);
+    out.add_uint8(LtepMessages::Handshake);
     out.add(payload);
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
     msgs->dbgOutMessageLen();
@@ -1133,9 +1131,9 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen)
             auto const payload = tr_variantToStr(&v, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */
-            out.addUint32(2 * sizeof(uint8_t) + std::size(payload));
-            out.addUint8(BtPeerMsgs::Ltep);
-            out.addUint8(msgs->ut_metadata_id);
+            out.add_uint32(2 * sizeof(uint8_t) + std::size(payload));
+            out.add_uint8(BtPeerMsgs::Ltep);
+            out.add_uint8(msgs->ut_metadata_id);
             out.add(payload);
             msgs->pokeBatchPeriod(HighPriorityIntervalSecs);
             msgs->dbgOutMessageLen();
@@ -1884,9 +1882,9 @@ void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         logtrace(msgs, fmt::format(FMT_STRING("requesting metadata piece #{:d}"), *piece));
 
         /* write it out as a LTEP message to our outMessages buffer */
-        out.addUint32(2 * sizeof(uint8_t) + std::size(payload));
-        out.addUint8(BtPeerMsgs::Ltep);
-        out.addUint8(msgs->ut_metadata_id);
+        out.add_uint32(2 * sizeof(uint8_t) + std::size(payload));
+        out.add_uint8(BtPeerMsgs::Ltep);
+        out.add_uint8(msgs->ut_metadata_id);
         out.add(payload);
         msgs->pokeBatchPeriod(HighPriorityIntervalSecs);
         msgs->dbgOutMessageLen();
@@ -1933,9 +1931,7 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     bool const have_messages = !std::empty(msgs->outMessages);
     bool const fext = msgs->io->supports_fext();
 
-    /**
-    ***  Protocol messages
-    **/
+    // --- Protocol messages
 
     if (have_messages && msgs->outMessagesBatchedAt == 0) /* fresh batch */
     {
@@ -1954,9 +1950,7 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         bytes_written += len;
     }
 
-    /**
-    ***  Metadata Pieces
-    **/
+    // --- Metadata Pieces
 
     if (auto piece = int{};
         msgs->io->get_write_buffer_space(now) >= METADATA_PIECE_SIZE && popNextMetadataRequest(msgs, &piece))
@@ -1976,9 +1970,9 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             auto const payload = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */
-            out.addUint32(2 * sizeof(uint8_t) + std::size(payload) + std::size(*piece_data));
-            out.addUint8(BtPeerMsgs::Ltep);
-            out.addUint8(msgs->ut_metadata_id);
+            out.add_uint32(2 * sizeof(uint8_t) + std::size(payload) + std::size(*piece_data));
+            out.add_uint8(BtPeerMsgs::Ltep);
+            out.add_uint8(msgs->ut_metadata_id);
             out.add(payload);
             out.add(*piece_data);
             msgs->pokeBatchPeriod(HighPriorityIntervalSecs);
@@ -2001,9 +1995,9 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             auto payload = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */
-            out.addUint32(2 * sizeof(uint8_t) + std::size(payload));
-            out.addUint8(BtPeerMsgs::Ltep);
-            out.addUint8(msgs->ut_metadata_id);
+            out.add_uint32(2 * sizeof(uint8_t) + std::size(payload));
+            out.add_uint8(BtPeerMsgs::Ltep);
+            out.add_uint8(msgs->ut_metadata_id);
             out.add(payload);
             msgs->pokeBatchPeriod(HighPriorityIntervalSecs);
             msgs->dbgOutMessageLen();
@@ -2012,9 +2006,7 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         }
     }
 
-    /**
-    ***  Data Blocks
-    **/
+    // --- Data Blocks
 
     if (msgs->io->get_write_buffer_space(now) >= tr_block_info::BlockSize && !std::empty(msgs->peer_requested_))
     {
@@ -2028,10 +2020,10 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             auto out = libtransmission::Buffer{};
             out.reserve(msglen);
 
-            out.addUint32(sizeof(uint8_t) + 2 * sizeof(uint32_t) + req.length);
-            out.addUint8(BtPeerMsgs::Piece);
-            out.addUint32(req.index);
-            out.addUint32(req.offset);
+            out.add_uint32(sizeof(uint8_t) + 2 * sizeof(uint32_t) + req.length);
+            out.add_uint8(BtPeerMsgs::Piece);
+            out.add_uint32(req.index);
+            out.add_uint32(req.offset);
             auto buf = std::array<uint8_t, tr_block_info::BlockSize>{};
             bool err = msgs->session->cache->readBlock(
                            msgs->torrent,
@@ -2086,14 +2078,12 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         }
     }
 
-    /**
-    ***  Keepalive
-    **/
+    // --- Keepalive
 
     if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now - msgs->clientSentAnythingAt > KeepaliveIntervalSecs)
     {
         logtrace(msgs, "sending a keepalive message");
-        msgs->outMessages.addUint32(0);
+        msgs->outMessages.add_uint32(0);
         msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
     }
 
@@ -2130,8 +2120,8 @@ void sendBitfield(tr_peerMsgsImpl* msgs)
     auto& out = msgs->outMessages;
 
     auto bytes = msgs->torrent->createPieceBitfield();
-    out.addUint32(sizeof(uint8_t) + bytes.size());
-    out.addUint8(BtPeerMsgs::Bitfield);
+    out.add_uint32(sizeof(uint8_t) + bytes.size());
+    out.add_uint8(BtPeerMsgs::Bitfield);
     out.add(bytes);
     logtrace(msgs, fmt::format(FMT_STRING("sending bitfield... outMessage size is now {:d}"), std::size(out)));
     msgs->pokeBatchPeriod(ImmediatePriorityIntervalSecs);
@@ -2286,9 +2276,9 @@ void tr_peerMsgsImpl::sendPex()
 
     /* write the pex message */
     auto payload = tr_variantToStr(&val, TR_VARIANT_FMT_BENC);
-    out.addUint32(2 * sizeof(uint8_t) + std::size(payload));
-    out.addUint8(BtPeerMsgs::Ltep);
-    out.addUint8(this->ut_pex_id);
+    out.add_uint32(2 * sizeof(uint8_t) + std::size(payload));
+    out.add_uint8(BtPeerMsgs::Ltep);
+    out.add_uint8(this->ut_pex_id);
     out.add(payload);
     this->pokeBatchPeriod(HighPriorityIntervalSecs);
     logtrace(this, fmt::format(FMT_STRING("sending a pex message; outMessage size is now {:d}"), std::size(out)));
@@ -2301,7 +2291,7 @@ void tr_peerMsgsImpl::sendPex()
 
 tr_peerMsgs::~tr_peerMsgs()
 {
-    [[maybe_unused]] auto const n_prev = n_peers_--;
+    [[maybe_unused]] auto const n_prev = n_peers--;
     TR_ASSERT(n_prev > 0U);
 }
 

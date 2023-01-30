@@ -23,12 +23,15 @@
 
 using namespace std::literals;
 
+namespace
+{
 struct optional_args
 {
     std::optional<bool> paused;
     std::optional<uint16_t> peer_limit;
     std::string download_dir;
 };
+} // namespace
 
 /** Opaque class used when instantiating torrents.
  * @ingroup tr_ctor */

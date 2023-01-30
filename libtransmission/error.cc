@@ -49,6 +49,11 @@ void tr_error_set(tr_error** error, int code, std::string_view message)
     *error = new tr_error{ code, tr_strvdup(message) };
 }
 
+void tr_error_set_from_errno(tr_error** error, int errnum)
+{
+    tr_error_set(error, errnum, tr_strerror(errnum));
+}
+
 void tr_error_propagate(tr_error** new_error, tr_error** old_error)
 {
     TR_ASSERT(old_error != nullptr);

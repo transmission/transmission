@@ -58,9 +58,7 @@ using namespace std::literals;
 
 time_t libtransmission::detail::tr_time::current_time = {};
 
-/**
-***
-**/
+// ---
 
 bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error)
 {
@@ -169,9 +167,7 @@ tr_disk_space tr_dirSpace(std::string_view directory)
     return tr_device_info_get_disk_space(tr_device_info_create(directory));
 }
 
-/****
-*****
-****/
+// ---
 
 size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
 {
@@ -208,9 +204,7 @@ char const* tr_strerror(int errnum)
     return "Unknown Error";
 }
 
-/****
-*****
-****/
+// ---
 
 std::string_view tr_strvStrip(std::string_view str)
 {
@@ -228,18 +222,14 @@ std::string_view tr_strvStrip(std::string_view str)
     return str;
 }
 
-/****
-*****
-****/
+// ---
 
 uint64_t tr_time_msec()
 {
     return std::chrono::system_clock::now().time_since_epoch() / 1ms;
 }
 
-/***
-****
-***/
+// ---
 
 /*
  * Copy src to string dst of size siz. At most siz-1 characters
@@ -259,9 +249,7 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
     return res.size;
 }
 
-/***
-****
-***/
+// ---
 
 double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
@@ -278,9 +266,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
     return TR_RATIO_NA;
 }
 
-/***
-****
-***/
+// ---
 
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
@@ -412,9 +398,7 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
 
 #endif
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -490,9 +474,7 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
     return { std::begin(values), std::end(values) };
 }
 
-/***
-****
-***/
+// ---
 
 double tr_truncd(double x, int decimal_places)
 {
@@ -540,9 +522,7 @@ std::string tr_strratio(double ratio, char const* infinity)
     return tr_strpercent(ratio);
 }
 
-/***
-****
-***/
+// ---
 
 bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
 {
@@ -597,15 +577,13 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
     return true;
 }
 
-/***
-****
-***/
+// ---
 
-uint64_t tr_htonll(uint64_t x)
+uint64_t tr_htonll(uint64_t hostlonglong)
 {
 #ifdef HAVE_HTONLL
 
-    return htonll(x);
+    return htonll(hostlonglong);
 
 #else
 
@@ -615,18 +593,18 @@ uint64_t tr_htonll(uint64_t x)
         std::array<uint32_t, 2> lx;
         uint64_t llx;
     } u = {};
-    u.lx[0] = htonl(x >> 32);
-    u.lx[1] = htonl(x & 0xFFFFFFFFULL);
+    u.lx[0] = htonl(hostlonglong >> 32);
+    u.lx[1] = htonl(hostlonglong & 0xFFFFFFFFULL);
     return u.llx;
 
 #endif
 }
 
-uint64_t tr_ntohll(uint64_t x)
+uint64_t tr_ntohll(uint64_t netlonglong)
 {
 #ifdef HAVE_NTOHLL
 
-    return ntohll(x);
+    return ntohll(netlonglong);
 
 #else
 
@@ -636,15 +614,13 @@ uint64_t tr_ntohll(uint64_t x)
         std::array<uint32_t, 2> lx;
         uint64_t llx;
     } u = {};
-    u.llx = x;
+    u.llx = netlonglong;
     return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]);
 
 #endif
 }
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -833,9 +809,7 @@ void tr_formatter_get_units(void* vdict)
     }
 }
 
-/***
-****  ENVIRONMENT
-***/
+// --- ENVIRONMENT
 
 bool tr_env_key_exists(char const* key)
 {
@@ -896,9 +870,7 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
     return std::string{ default_value };
 }
 
-/***
-****
-***/
+// ---
 
 void tr_net_init()
 {

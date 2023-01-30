@@ -62,7 +62,7 @@ public:
         return get(key) != nullptr;
     }
 
-    [[nodiscard]] std::vector<tr_torrent_id_t> removedSince(time_t) const;
+    [[nodiscard]] std::vector<tr_torrent_id_t> removedSince(time_t timestamp) const;
 
     [[nodiscard]] TR_CONSTEXPR20 auto cbegin() const noexcept
     {

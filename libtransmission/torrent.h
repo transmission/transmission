@@ -40,9 +40,7 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
-/**
-***  Package-visible
-**/
+// --- Package-visible
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
@@ -54,11 +52,9 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_erro
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
-bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
+bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme_incomplete_dir);
 
-/**
-***
-**/
+// ---
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
@@ -348,9 +344,9 @@ public:
         return file_priorities_.piecePriority(piece);
     }
 
-    void setFilePriorities(tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority)
+    void setFilePriorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
     {
-        file_priorities_.set(files, fileCount, priority);
+        file_priorities_.set(files, file_count, priority);
         setDirty();
     }
 
@@ -788,6 +784,13 @@ public:
         return announce_key_;
     }
 
+    // should be called when done modifying the torrent's announce list.
+    void on_announce_list_changed()
+    {
+        markEdited();
+        session->announcer_->resetTorrent(this);
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -823,7 +826,7 @@ public:
      * peer_id that was registered by the peer. The peer_id from the tracker
      * and in the handshake are expected to match.
      */
-    tr_peer_id_t peer_id_;
+    tr_peer_id_t peer_id_ = {};
 
     tr_session* session = nullptr;
 
@@ -949,9 +952,7 @@ private:
     bool needs_completeness_check_ = true;
 };
 
-/***
-****
-***/
+// ---
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
@@ -959,9 +960,9 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
 }
 
 /**
- * Tell the tr_torrent that it's gotten a block
+ * Tell the `tr_torrent` that it's gotten a block
  */
-void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
+void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 

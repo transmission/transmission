@@ -28,11 +28,14 @@
 #include "utils.h"
 #include "variant.h"
 
+namespace
+{
 struct metadata_node
 {
     time_t requested_at = 0U;
     int piece = 0;
 };
+} // namespace
 
 struct tr_incomplete_metadata
 {

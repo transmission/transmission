@@ -97,7 +97,7 @@ public:
     // Notify tr_web that it's going to be destroyed soon.
     // New fetch() tasks will be rejected, but already-running tasks
     // are left alone so that they can finish.
-    void startShutdown(std::chrono::milliseconds);
+    void startShutdown(std::chrono::milliseconds /*deadline*/);
 
     // If you want to give running tasks a chance to finish, call closeSoon()
     // before destroying the tr_web object. Deleting the object will cancel
@@ -105,9 +105,9 @@ public:
     ~tr_web();
 
     /**
-     * Mediates between tr_web and its clients.
+     * Mediates between `tr_web` and its clients.
      *
-     * NB: Note that tr_web calls all these methods from its own thread.
+     * NB: Note that `tr_web` calls all these methods from its own thread.
      * Overridden methods should take care to be threadsafe.
      */
     class Mediator
