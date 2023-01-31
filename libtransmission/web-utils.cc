@@ -23,6 +23,7 @@
 
 #include "log.h"
 #include "net.h"
+#include "tr-assert.h"
 #include "tr-strbuf.h"
 #include "utils.h"
 #include "web-utils.h"
@@ -253,30 +254,10 @@ std::string_view getSiteName(std::string_view host)
         return host;
     }
 
+    TR_ASSERT(psl_builtin() != nullptr);
     if (psl_builtin() == nullptr)
     {
         tr_logAddWarn("psl_builtin is null");
-
-        // www.example.co.uk -> www.example.co
-        if (auto const dot_pos = host.find_last_of('.'); dot_pos != std::string_view::npos)
-        {
-            host = host.substr(0, dot_pos);
-        }
-
-        // in the absence of psl_builtin(), we assume trackers rarely use 1 or 2 letters domain names: this is only a best guess attempt which works for co.uk and eu.org but not for everything.
-
-        // www.example.co -> www.example
-        if (auto const dot_pos = host.find_last_of('.'); dot_pos != std::string_view::npos && host.size() - dot_pos <= 3)
-        {
-            host = host.substr(0, dot_pos);
-        }
-
-        // www.example -> example
-        if (auto const dot_pos = host.find_last_of('.'); dot_pos != std::string_view::npos)
-        {
-            host = host.substr(dot_pos + 1, std::string_view::npos);
-        }
-
         return host;
     }
 
