@@ -21,6 +21,7 @@
 
 #include "transmission.h"
 
+#include "log.h"
 #include "net.h"
 #include "tr-strbuf.h"
 #include "utils.h"
@@ -252,8 +253,10 @@ std::string_view getSiteName(std::string_view host)
         return host;
     }
 
-    if (!psl_builtin())
+    if (psl_builtin() == nullptr)
     {
+        tr_logAddWarn("psl_builtin is null");
+
         // www.example.co.uk -> www.example.co
         if (auto const dot_pos = host.find_last_of('.'); dot_pos != std::string_view::npos)
         {
