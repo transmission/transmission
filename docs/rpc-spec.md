@@ -13,13 +13,14 @@ If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, i
 Lastly, using devtools in the Transmission web client is always an option.
 
 ### 1.3 Libraries of ready-made wrappers
-In order not to waste time and effort on parsing RPC calls, we offer the following ready-made wrappers for transmission:
+Some people outside of the Transmission project have written libraries that wrap this RPC API. These aren't supported by the Transmission project, but are listed herer in the hope that they may be useful:
 
-For C#:
-https://www.nuget.org/packages/Transmission.API.RPC
-
-For Python:
-https://github.com/Trim21/transmission-rpc
+| Language | Link
+|:---|:---
+| C# | https://www.nuget.org/packages/Transmission.API.RPC
+| Go | https://github.com/hekmon/transmissionrpc
+| Python | https://github.com/Trim21/transmission-rpc
+| Rust | https://crates.io/crates/transmission-rpc
 
 
 ## 2 Message format
