@@ -549,7 +549,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
 | `rename-partial-files` | boolean | true means append `.part` to incomplete files
 | `rpc-version-minimum` | number | the minimum RPC API version supported
-| `rpc-version-semver` | string | the current RPC API version in a semver-compatible string
+| `rpc-version-semver` | string | the current RPC API version in a [semver](https://semver.org)-compatible string
 | `rpc-version` | number | the current RPC API version
 | `script-torrent-added-enabled` | boolean | whether or not to call the `added` script
 | `script-torrent-added-filename` | string | filename of the script to run
@@ -750,8 +750,9 @@ A bandwidth group description object has:
 This section lists the changes that have been made to the RPC protocol.
 
 There are two ways to check for API compatibility. Since most developers know
-semver, session-get's `rpc-version-semver` is the recommended way. That value
-is a semver-compatible string of the RPC protocol version number.
+[semver](https://semver.org/), session-get's `rpc-version-semver` is the
+recommended way. That value is a semver-compatible string of the RPC protocol
+version number.
 
 Since Transmission predates the semver 1.0 spec, the previous scheme was for
 the RPC version to be a whole number and to increment it whenever a change was
