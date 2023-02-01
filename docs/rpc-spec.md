@@ -974,7 +974,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | Method | Description
 |:---|:---
 | `/upload` | :warning: undocumented `/upload` endpoint removed
-| `session-get` | **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
+| `session-get` | :warning: **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
 | `free-space` | new return arg `total-capacity`
 | `session-get` | new arg `default-trackers`
 | `session-get` | new arg `rpc-version-semver`
@@ -993,9 +993,9 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `torrent-get` | new arg `trackerList`
 | `torrent-set` | new arg `group`
 | `torrent-set` | new arg `trackerList`
-| `torrent-set` | **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
-| `torrent-set` | **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
-| `torrent-set` | **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
+| `torrent-set` | :warning: **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
+| `torrent-set` | :warning: **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
+| `torrent-set` | :warning: **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
 | `group-set` | new method
 | `group-get` | new method
 
