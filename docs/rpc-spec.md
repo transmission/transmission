@@ -155,10 +155,10 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
-| `trackerAdd`          | array    | add a new tracker URL in its own new tier
-| `trackerList`         | string   | rebuild the torrent's tracker list with a string of announce URLs, one per line, with a blank line between tiers
-| `trackerRemove`       | array    | remove a tracker URL
-| `trackerReplace`      | array    | modify a tracker URL
+| `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
+| `trackerList`         | string   | string of announce URLs, one per line, with a blank line between tiers
+| `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
+| `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
 | `uploadLimit`         | number   | maximum upload speed (KBps)
 | `uploadLimited`       | boolean  | true if `uploadLimit` is honored
 
@@ -991,6 +991,9 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `torrent-get` | new arg `trackerList`
 | `torrent-set` | new arg `group`
 | `torrent-set` | new arg `trackerList`
+| `torrent-set` | **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
+| `torrent-set` | **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
+| `torrent-set` | **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
 | `group-set` | new method
 | `group-get` | new method
 
