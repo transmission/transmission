@@ -23,7 +23,7 @@ https://github.com/Trim21/transmission-rpc
 
 
 ## 2 Message format
-Messages are formatted as objects. There are two types: requests (described in 2.1) and responses (described in 2.2).
+Messages are formatted as objects. There are two types: requests (described in [section 2.1](#21-requests)) and responses (described in [section 2.2](#22-responses)).
 
 All text **must** be UTF-8 encoded.
 
@@ -73,7 +73,7 @@ since the port and path may be changed to allow mapping and/or multiple
 daemons to run on a single server.
 
 #### 2.3.1 CSRF protection
-Most Transmission RPC servers require a X-Transmission-Session-Id
+Most Transmission RPC servers require a `X-Transmission-Session-Id`
 header to be sent with requests, to prevent CSRF attacks.
 
 When your request has the wrong id -- such as when you send your first
@@ -123,6 +123,7 @@ Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
 
 `ids` should be one of the following:
+
 1. an integer referring to a torrent id
 2. a list of torrent id numbers, SHA1 hash strings, or both
 3. a string, `recently-active`, for recently-active torrents
