@@ -210,6 +210,29 @@ BlocklistDownloader* fBLDownloader = nil;
 
 - (BOOL)untarFrom:(NSURL*)file to:(NSURL*)destination
 {
+    // We need to check validity of archive before listing or unpacking.
+    NSTask* tarListCheck = [[NSTask alloc] init];
+
+    tarListCheck.launchPath = @"/usr/bin/tar";
+    tarListCheck.arguments = @[ @"--list", @"--file", file.path ];
+    tarListCheck.standardOutput = nil;
+    tarListCheck.standardError = nil;
+
+    @try
+    {
+        [tarListCheck launch];
+        [tarListCheck waitUntilExit];
+
+        if (tarListCheck.terminationStatus != 0)
+        {
+            return NO;
+        }
+    }
+    @catch (NSException* exception)
+    {
+        return NO;
+    }
+
     NSTask* tarList = [[NSTask alloc] init];
 
     tarList.launchPath = @"/usr/bin/tar";
