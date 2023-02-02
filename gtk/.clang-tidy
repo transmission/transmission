@@ -10,6 +10,7 @@ Checks: >
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-narrowing-conversions,
+  hicpp-explicit-conversions,
   hicpp-vararg,
   misc-*,
   modernize-*,

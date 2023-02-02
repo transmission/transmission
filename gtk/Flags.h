@@ -30,6 +30,7 @@ public:
 public:
     constexpr Flags() noexcept = default;
 
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     constexpr Flags(FlagType flag) noexcept
     {
         set(flag);
