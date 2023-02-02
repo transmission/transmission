@@ -4225,7 +4225,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     return [self toolbarButtonWithIdentifier:ident forToolbarButtonClass:[ButtonToolbarItem class]];
 }
 
-- (id)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)klass
+- (__kindof ButtonToolbarItem*)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)klass
 {
     ButtonToolbarItem* item = [[klass alloc] initWithItemIdentifier:ident];
 
@@ -4349,7 +4349,19 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
         groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
         groupItem.subitems = @[ itemPause, itemResume ];
-        groupItem.view = segmentedControl;
+        if ([toolbar isKindOfClass:Toolbar.class] && !((Toolbar*)toolbar).customizationPaletteIsRunning_fixed)
+        {
+            groupItem.view = segmentedControl;
+        }
+        else
+        {
+            ((NSButton*)itemPause.view).image = [NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"];
+            ((NSButton*)itemResume.view).image = [NSImage systemSymbol:@"arrow.clockwise.circle.fill"
+                                                          withFallback:@"ToolbarResumeAllTemplate"];
+            // on macOS 13.2, in French, the palette autolayout will hang unless the title length is at least 12 spaces long
+            ((NSButton*)itemPause.view).title = @"            ";
+            ((NSButton*)itemResume.view).title = @"            ";
+        }
         groupItem.target = self;
         groupItem.action = @selector(allToolbarClicked:);
 
@@ -4395,12 +4407,22 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
 
-        groupItem.view = segmentedControl;
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
         groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
         groupItem.subitems = @[ itemPause, itemResume ];
-        groupItem.view = segmentedControl;
+        if ([toolbar isKindOfClass:Toolbar.class] && !((Toolbar*)toolbar).customizationPaletteIsRunning_fixed)
+        {
+            groupItem.view = segmentedControl;
+        }
+        else
+        {
+            ((NSButton*)itemPause.view).image = [NSImage systemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"];
+            ((NSButton*)itemResume.view).image = [NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"];
+            // on macOS 13.2, in French, the palette autolayout will hang unless the title length is at least 12 spaces long
+            ((NSButton*)itemPause.view).title = @"            ";
+            ((NSButton*)itemResume.view).title = @"            ";
+        }
         groupItem.target = self;
         groupItem.action = @selector(selectedToolbarClicked:);
 

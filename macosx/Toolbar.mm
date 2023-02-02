@@ -4,6 +4,10 @@
 
 #import "Toolbar.h"
 
+@interface Toolbar ()
+@property(nonatomic) BOOL customizationPaletteIsRunning_fixed;
+@end
+
 @implementation Toolbar
 
 - (void)setVisible:(BOOL)visible
@@ -13,6 +17,13 @@
     [NSNotificationCenter.defaultCenter postNotificationName:@"ToolbarDidChange" object:nil];
 
     super.visible = visible;
+}
+
+- (void)runCustomizationPalette:(nullable id)sender
+{
+    _customizationPaletteIsRunning_fixed = YES;
+    [super runCustomizationPalette:sender];
+    _customizationPaletteIsRunning_fixed = NO;
 }
 
 @end
