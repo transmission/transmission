@@ -23,7 +23,7 @@ class Flags
 {
 public:
     using FlagType = T;
-    using ValueType = std::underlying_type_t<FlagType>;
+    using ValueType = std::make_unsigned_t<std::underlying_type_t<FlagType>>;
 
     static_assert(std::is_enum_v<FlagType> && !std::is_convertible_v<FlagType, ValueType>);
 

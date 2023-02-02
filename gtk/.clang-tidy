@@ -11,6 +11,7 @@ Checks: >
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-narrowing-conversions,
   hicpp-explicit-conversions,
+  hicpp-signed-bitwise,
   hicpp-vararg,
   misc-*,
   modernize-*,
