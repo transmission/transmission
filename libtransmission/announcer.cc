@@ -932,7 +932,7 @@ void append_random_upload(tr_torrent* const tor,tr_tier const* const tier){
     auto const* const current_tracker = tier->currentTracker();
     TR_ASSERT(current_tracker != nullptr);
 
-    if ((event == TR_ANNOUNCE_EVENT_NONE || event == NULL) && tor->isVirtual() && current_tracker->leecher_count > 3
+    if ((event == TR_ANNOUNCE_EVENT_NONE) && tor->isVirtual() && current_tracker->leecher_count > 3
             && current_tracker->seeder_count > 10) {
         append_random_upload(tor, tier);
     }

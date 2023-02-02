@@ -1672,6 +1672,10 @@ void tr_torrentSave(tr_torrent *tor) {
     }
 }
 
+bool isVirtualDir(const char* dir) {
+    return strcmp(dir, "/Volumes/pt") == 0;
+}
+
 // --- Completeness
 
 namespace {

@@ -69,9 +69,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
-bool isVirtualDir(const char* dir) {
-    return strcmp(dir, "/Volumes/pt") == 0;
-}
+[[nodiscard]] bool isVirtualDir(const char* dir);
 
 enum tr_verify_state : uint8_t
 {
@@ -159,7 +157,7 @@ public:
 //    size_t speedLimitBps(tr_direction dir);
 
     [[nodiscard]] auto speedLimitBps(tr_direction dir) const {
-        if (dir == TR_UP && isVirtual() && completion.hasAll()) {
+        if (dir == TR_UP && this->isVirtual() && completion.hasAll()) {
             size_t zero = 0;
             return zero;
         }
@@ -170,7 +168,7 @@ public:
         return bandwidth().areParentLimitsHonored(TR_UP);
     }
 
-    [[nodiscard]] auto usesSpeedLimit(tr_direction dir) const noexcept {
+    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept {
         if (dir == TR_CLIENT_TO_PEER && isVirtual() && completion.hasAll()) {
             return true;
         }
