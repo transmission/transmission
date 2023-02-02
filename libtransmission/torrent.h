@@ -69,6 +69,10 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
+bool isVirtualDir(const char* dir) {
+    return strcmp(dir, "/Volumes/pt") == 0;
+}
+
 enum tr_verify_state : uint8_t
 {
     TR_VERIFY_NONE,
@@ -116,6 +120,14 @@ public:
         return session->unique_lock();
     }
 
+    /// Virtual Torrent
+
+    [[nodiscard]] constexpr bool const isVirtual() const noexcept
+    {
+        return isVirtualDir(this->download_dir.c_str());
+    }
+
+
     /// SPEED LIMIT
 
     [[nodiscard]] constexpr auto& bandwidth() noexcept
@@ -144,8 +156,14 @@ public:
         }
     }
 
+//    size_t speedLimitBps(tr_direction dir);
+
     [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const
     {
+        if(dir==TR_UP && isVirtual()){
+            size_t zero = 0;
+            return zero;
+        }
         return bandwidth().getDesiredSpeedBytesPerSecond(dir);
     }
 
@@ -156,6 +174,9 @@ public:
 
     [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
     {
+        if(dir==TR_UP && isVirtual()){
+            return true;
+        }
         return bandwidth().isLimited(dir);
     }
 
@@ -395,7 +416,16 @@ public:
         metainfo_.setFileSubpath(i, subpath);
     }
 
+    void removeFiles(std::function<void(char const* filename)> const& delete_func_wrapper)
+    {
+        if(!this->isVirtual()){
+            metainfo_.files().remove(currentDir(), metainfo_.name(), delete_func_wrapper);
+        }
+    }
+
     [[nodiscard]] std::optional<tr_torrent_files::FoundFile> findFile(tr_file_index_t file_index) const;
+
+    [[nodiscard]] bool sameSize(tr_file_index_t file_index);
 
     [[nodiscard]] bool hasAnyLocalData() const;
 

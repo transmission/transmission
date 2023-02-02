@@ -297,6 +297,14 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session);
  */
 void tr_sessionSetIncompleteDir(tr_session* session, char const* dir);
 
+void tr_sessionSetHttpProxy(tr_session* session,std::string_view http_proxy);
+
+char const* tr_sessionGetHttpProxy(tr_session const* session);
+
+void tr_sessionSetHttpProxyEnabled(tr_session* session, bool enabled);
+
+bool tr_sessionGetHttpProxyEnabled(tr_session const* session);
+
 /** @brief get whether or not the incomplete download folder is enabled */
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session);
 

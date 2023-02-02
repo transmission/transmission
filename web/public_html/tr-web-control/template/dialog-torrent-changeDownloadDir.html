@@ -1,0 +1,231 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:3px;border:0px;">
+		<div id="" class="dialog" style="width:100%;padding:0px;">
+			<table style="width:100%;">
+				<tr>
+					<td width="20%" class="title"><span id="dialog-torrent-changeDownloadDir-old-download-dir"></span></td>
+					<td width="80%">
+						<span id="old-download-dir"></span>
+					</td>
+				</tr>
+				<tr>
+					<td class="title"><span id="dialog-torrent-changeDownloadDir-new-download-dir"></span></td>
+					<td>
+						<select id="download-dir"  style="width:400px;"></select>
+					</td>
+				</tr>
+				<tr>
+					<td class="title"></td>
+					<td>
+						<input type="checkbox" id="move-data" style="width:20px;"/><label for="move-data" id="dialog-torrent-changeDownloadDir-move-data"></label>
+					</td>
+				</tr>
+				<tr>
+					<td class="title"></td>
+					<td>
+						<input type="checkbox" id="recheck-data" style="width:20px;"/><label for="recheck-data" id="dialog-torrent-changeDownloadDir-recheck-data"></label>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><hr/></td>
+				</tr>
+			</table>
+		</div>
+	</div>  
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<span id="text-nochange" style="display:none;"></span>
+		<span id="text-count"></span>
+		<a id="torrent-button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);">Ok</a>
+		<a id="torrent-button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);">Cancel</a>  
+	</div>
+</div>
+<script type="text/javascript">
+	(function(thisDialog){
+		var title = "old-download-dir,new-download-dir,move-data,recheck-data".split(",");
+		var ids = thisDialog.data("ids");
+		var allIds = new Array();
+		var issimple = false;
+		var torrent = null;
+		var recheck = false;
+		if (typeof(ids)=="object")
+		{
+			torrent = transmission.torrents.all[ids[0]];
+		}
+		else
+		{
+			torrent = transmission.torrents.all[ids];
+			issimple = true;
+		}
+
+		if (!torrent)
+		{
+			thisDialog.dialog("close");
+			return;
+		}
+		
+		$.each(title, function(i, item){
+			thisDialog.find("#dialog-torrent-changeDownloadDir-"+item).html(system.lang.dialog["torrent-changeDownloadDir"][item]);
+		});
+		
+		thisDialog.find("#text-count").text("");
+		
+		title = "button-ok,button-cancel".split(",");
+		$.each(title, function(i, item){
+			thisDialog.find("#torrent-"+item).html(system.lang.dialog["public"][item]);
+		});
+		
+		thisDialog.find("#text-nochange").html(system.lang.dialog["public"]["text-nochange"]);
+
+		thisDialog.find("#old-download-dir").text(torrent.downloadDir);
+		thisDialog.find("#download-dir").val(torrent.downloadDir);
+		
+		$.each(transmission.downloadDirs, function(i, item){
+			$("<option/>").text(item).val(item).attr("selected",(item==torrent.downloadDir?true:false)).appendTo(thisDialog.find("#download-dir"));
+		});
+		if (transmission.downloadDirs.length==0)
+		{
+			$("<option/>").text(torrent.downloadDir).val(torrent.downloadDir).attr("selected",true).appendTo(thisDialog.find("#download-dir"));
+		}
+		thisDialog.find("#download-dir").combobox();
+
+
+		// 确认
+		thisDialog.find("#torrent-button-ok").click(function()
+		{
+			var dir = thisDialog.find("#download-dir").combobox("getValue");
+			var olddir = torrent.downloadDir;
+			var isnewdir =olddir!=dir;
+			var movedata = thisDialog.find("#move-data").prop("checked");
+			var button = $(this);
+			var icon = button.linkbutton("options").iconCls;
+
+			recheck = thisDialog.find("#recheck-data").prop("checked");
+			
+			// 新目录
+			if (isnewdir)
+			{
+				button.linkbutton({disabled:true,iconCls:"icon-loading"});
+				
+				if (issimple)
+				{
+					// 开始设置参数
+					transmission.exec(
+						{
+							method:"torrent-set-location"
+							,arguments:{
+								ids:torrent.id
+								,location:dir
+								,move:movedata
+							}
+						}
+						,function(data){
+							button.linkbutton({iconCls:icon,disabled:false});
+							if (data.result=="success")
+							{
+								system.getTorrentInfos(torrent.id);
+								torrent.downloadDir = dir;
+								if (recheck)
+								{
+									transmission.exec({
+											method:"torrent-verify"
+											,arguments:{
+												ids:torrent.id
+											}
+										}
+										,function(data){
+											system.control.torrentlist.datagrid("uncheckAll");
+											system.reloadTorrentBaseInfos();
+										}
+									);
+								}
+								thisDialog.dialog("close");
+							}
+							else
+							{
+								$.messager.alert("",system.lang.error["data-post-error"]+": "+data.result,'error'); 
+							}
+						}
+					);
+				}
+				else
+				{
+					doSetFolder(ids,ids.length,button,icon,dir,movedata);
+				}
+			}
+			else
+			{
+				thisDialog.find("#text-nochange").fadeInAndOut();
+			}
+			
+		});
+
+		function doSetFolder(ids,count,button,icon,dir,movedata)
+		{
+			//var id = ids;
+			var index = count-ids.length;
+			var id = ids.shift();
+			if (!id)
+			{
+				button.linkbutton({iconCls:icon,disabled:false});
+				system.control.torrentlist.datagrid("uncheckAll");
+
+				if (recheck)
+				{
+					transmission.exec({
+							method:"torrent-verify"
+							,arguments:{
+								ids:allIds
+							}
+						}
+						,function(data){
+							system.control.torrentlist.datagrid("uncheckAll");
+							system.reloadTorrentBaseInfos();
+						}
+					);
+				}
+
+				thisDialog.dialog("close");
+				return;
+			}
+			allIds.push(id);
+			var torrent = transmission.torrents.all[id];
+
+			thisDialog.find("#text-count").text("-> "+torrent.name + " [" + (index+1)+"/"+count + "] ");
+
+			if (torrent.downloadDir==dir)
+			{
+				doSetFolder(ids,count,button,icon,dir,movedata);
+				return;
+			}
+			// 开始设置参数
+			transmission.exec(
+				{
+					method:"torrent-set-location"
+					,arguments:{
+						ids:id
+						,location:dir
+						,move:movedata
+					}
+				}
+				,function(data){
+					if (data.result=="success")
+					{
+						doSetFolder(ids,count,button,icon,dir,movedata);
+						torrent.downloadDir = dir;
+					}
+					else
+					{
+						button.linkbutton({iconCls:icon,disabled:false});
+						$.messager.alert("",system.lang.error["data-post-error"]+": "+data.result,'error'); 
+					}
+				}
+			);
+		}
+
+		thisDialog.find("#torrent-button-cancel").click(function()
+		{
+			thisDialog.dialog("close");
+		});
+		
+	})($("#dialog-torrent-changeDownloadDir"));
+</script>

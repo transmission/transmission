@@ -323,6 +323,11 @@ public:
             }
         }
 
+        [[nodiscard]] constexpr auto const& httpProxy() const{
+            return options.http_proxy;
+        }
+
+
         void done()
         {
             if (!options.done_func)
@@ -501,7 +506,7 @@ public:
     {
         TR_ASSERT(std::this_thread::get_id() == curl_thread->get_id());
         auto* const e = task.easy();
-
+        (void)curl_easy_setopt(e, CURLOPT_PROXY, task.httpProxy()->c_str());
         (void)curl_easy_setopt(e, CURLOPT_SHARE, shared());
         (void)curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, DnsCacheTimeoutSecs);
         (void)curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);

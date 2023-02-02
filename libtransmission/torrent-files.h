@@ -15,6 +15,7 @@
 #include <string_view>
 #include <utility>
 #include <vector>
+#include <sys/stat.h>
 
 #include "transmission.h"
 
@@ -133,6 +134,12 @@ public:
         {
             // /home/foo/Downloads/torrent/01-file-one.txt
             return filename_;
+        }
+
+        [[nodiscard]] uint64_t filesize() const noexcept {
+            tr_error *error = nullptr;
+            auto const file_info = tr_sys_path_get_info(filename(), 0, &error);
+            return file_info->size;
         }
 
         [[nodiscard]] constexpr auto base() const noexcept

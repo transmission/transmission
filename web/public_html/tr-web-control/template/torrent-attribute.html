@@ -1,0 +1,671 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;" id="torrent-attribute-layout">
+	<div data-options="region:'center'" style="padding:0px;border:0px;">
+		<div id="torrent-attribute-tabs" class="easyui-tabs" style="width:100%;height:100%;" data-options="fit:true,plain:true,tabPosition:'left',border:0,headerWidth:105">
+			<div title="常规" style="padding:2px;" class="dialog">
+				<table style="width:100%;">
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-name"></span></td>
+						<td colspan="3"><span id="torrent-attribute-value-name"></span></td>
+					</tr>
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-downloadDir"></span></td>
+						<td colspan="3">
+							<span id="torrent-attribute-value-downloadDir"></span>
+							<a id="torrent-attribute-config-button-changeDownloadDir" class="easyui-linkbutton" data-options="iconCls:'iconfont tr-icon-folder-change',plain:true" href="javascript:void(0);" system-tip-lang="toolbar.tip['change-download-dir']"></a>
+							<a id="torrent-attribute-config-button-copyPath" class="easyui-linkbutton" data-options="iconCls:'iconfont tr-icon-clippy',plain:true" href="javascript:void(0);" data-clipboard-action="copy" data-clipboard-target="#torrent-attribute-value-downloadDir" system-tip-lang="toolbar.tip['copy-path-to-clipboard']"></a>
+						</td>
+					</tr>
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-status"></span></td>
+						<td><span id="torrent-attribute-value-status"></span></td>
+						<td class="title"><span id="torrent-attribute-label-hashString"></span></td>
+						<td><span id="torrent-attribute-value-hashString"></span></td>
+					</tr>
+					<tr id="torrent-attribute-tr-error" style="display:none;">
+						<td class="title" style="color:red;"><span id="torrent-attribute-label-errorString"></span></td>
+						<td colspan="3" style="color:red;"><span id="torrent-attribute-value-errorString"></span> (<span id="torrent-attribute-value-error"></span>)</td>
+					</tr>
+					<tr>
+						<td width="12%" class="title"><span id="torrent-attribute-label-totalSize"></span></td>
+						<td width="38%"><span id="torrent-attribute-value-totalSize"></span></td>
+						<td width="12%" class="title"><span id="torrent-attribute-label-addedDate"></span></td>
+						<td width="38%"><span id="torrent-attribute-value-addedDate"></span></td>
+					</tr>
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-leftUntilDone"></span></td>
+						<td><span id="torrent-attribute-value-leftUntilDone"></span> (<span id="torrent-attribute-value-remainingTime"></span>)</td>
+						<td class="title"><span id="torrent-attribute-label-completeSize"></span></td>
+						<td><span id="torrent-attribute-value-completeSize"></span></td>
+					</tr>
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-rateDownload"></span></td>
+						<td><span id="torrent-attribute-value-rateDownload"></span></td>
+						<td class="title"><span id="torrent-attribute-label-rateUpload"></span></td>
+						<td><span id="torrent-attribute-value-rateUpload"></span></td>
+					</tr>
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-leecherCount"></span></td>
+						<td><span id="torrent-attribute-value-leecherCount"></span></td>
+						<td class="title"><span id="torrent-attribute-label-seederCount"></span></td>
+						<td><span id="torrent-attribute-value-seederCount"></span></td>
+					</tr>
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-uploadedEver"></span></td>
+						<td><span id="torrent-attribute-value-uploadedEver"></span></td>
+						<td class="title"><span id="torrent-attribute-label-uploadRatio"></span></td>
+						<td><span id="torrent-attribute-value-uploadRatio"></span></td>
+					</tr>
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-creator"></span></td>
+						<td><span id="torrent-attribute-value-creator"></span></td>
+						<td class="title"><span id="torrent-attribute-label-dateCreated"></span></td>
+						<td><span id="torrent-attribute-value-dateCreated"></span></td>
+					</tr>
+					<tr>
+						<td class="title"><span id="torrent-attribute-label-comment"></span></td>
+						<td colspan="3"><span id="torrent-attribute-value-comment"></span></td>
+					</tr>
+					<tr>
+						<td colspan="4">
+							<hr/>
+							<div id="torrent-attribute-pieces">
+								<i style="filter:saturate(0)" title="100MB x 0%"></i><i  style="filter:saturate(0.5)" title="100MB x 50%"></i><br/>
+								<i style="filter:saturate(1)" title="100MB x 100%"></i>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div title="服务器" style="padding:0px;" id="torrent-attribute-servers">
+
+			</div>
+			<div title="文件" style="padding:0px;" id="torrent-attribute-files">
+
+			</div>
+			<div title="用户" style="padding:0px;" id="torrent-attribute-peers">
+
+			</div>
+			<div title="设置" style="padding:0px;" id="torrent-attribute-config" class="dialog">
+				<div class="easyui-layout" data-options="fit:true" style="width:100%;">
+					<div data-options="region:'center'" style="padding:2px;border:0px;">
+						<table style="width:100%;">
+							<tr>
+								<td width="30%" class="title">
+									<input id="downloadLimited" type="checkbox" style="width:16px;"/><label id="torrent-attribute-label-downloadLimited" for="downloadLimited"></label>
+								</td>
+								<td width="20%"><input id="downloadLimit" type="text" class="easyui-numberspinner" enabledof="downloadLimited"/> KB/s</td>
+								<td width="30%" class="title">
+									<input id="seedRatioMode" type="checkbox" style="width:16px;"/><label id="torrent-attribute-label-seedRatioMode" for="seedRatioMode"></label>
+								</td>
+								<td width="20%"><input id="seedRatioLimit" type="text" class="easyui-numberspinner" enabledof="seedRatioMode"/></td>
+							</tr>
+							<tr>
+								<td class="title">
+									<input id="uploadLimited" type="checkbox" style="width:16px;"/><label id="torrent-attribute-label-uploadLimited" for="uploadLimited"></label>
+								</td>
+								<td><input id="uploadLimit" type="text" class="easyui-numberspinner" enabledof="uploadLimited"/> KB/s</td>
+								<td class="title">
+									<input id="seedIdleMode" type="checkbox" style="width:16px;"/><label id="torrent-attribute-label-seedIdleMode" for="seedIdleMode"></label>
+								</td>
+								<td><input id="seedIdleLimit" type="text" class="easyui-numberspinner" enabledof="seedIdleMode"/> <span name="system-config-minutes"></span></td>
+							</tr>
+							<tr>
+								<td class="title">
+									<span id="torrent-attribute-label-peer-limit"></span>
+								</td>
+								<td>
+									<input id="peer-limit" value="" type="text" class="easyui-numberspinner"/>
+								</td>
+								<td></td>
+								<td></td>
+							</tr>
+						</table>
+					</div>
+					<div data-options="region:'south'" style="padding:2px;height:32px;">
+						<a id="torrent-attribute-config-button-save" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" href="javascript:void(0);">Ok</a>
+						<span id="torrent-attribute-config-nochange" style="display:none;"></span>
+						<span id="torrent-attribute-config-saved" style="display:none;"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>  
+</div>
+<script type="text/javascript">
+	(function(thisLayout){
+		var labels = system.lang.torrent.attribute.label;
+		system.resetLangText(thisLayout);
+		var clipboard = new ClipboardJS('#torrent-attribute-config-button-copyPath');
+
+		$.each(labels, function(key, item){
+			thisLayout.find("#torrent-attribute-label-"+key).html(item);
+		});
+
+		thisLayout.find("#torrent-attribute-config-button-save").html(system.lang.dialog["public"]["button-save"]);
+		thisLayout.find("#torrent-attribute-config-nochange").html(system.lang["public"]["text-nochange"]);
+		thisLayout.find("#torrent-attribute-config-saved").html(system.lang["public"]["text-saved"]);
+
+		thisLayout.find(".title").css({
+			// background:"#e6e6e6"
+			"border-bottom": "1px solid #ccc"
+		});
+
+		var tabs = thisLayout.find("#torrent-attribute-tabs");
+		tabs.tabs();
+
+		tabs.tabs("update",{
+			tab:tabs.tabs("getTab",0)
+			,options:{
+				title:system.lang.torrent["attribute"]["tabs"].base
+			}
+		});
+		tabs.tabs("update",{
+			tab:tabs.tabs("getTab",1)
+			,options:{
+				title:system.lang.torrent["attribute"]["tabs"].servers
+			}
+		});
+		tabs.tabs("update",{
+			tab:tabs.tabs("getTab",2)
+			,options:{
+				title:system.lang.torrent["attribute"]["tabs"].files
+			}
+		});
+		tabs.tabs("update",{
+			tab:tabs.tabs("getTab",3)
+			,options:{
+				title:system.lang.torrent["attribute"]["tabs"].users
+			}
+		});
+		tabs.tabs("update",{
+			tab:tabs.tabs("getTab",4)
+			,options:{
+				title:system.lang.torrent["attribute"]["tabs"]["config"]
+			}
+		});
+		tabs.tabs({
+			onSelect:function(title,index){
+				thisLayout.find("#torrent-attribute-tabs").data("selectedIndex",index);
+				switch (index)
+				{
+					// 设置
+					case 4:
+						if (system.currentTorrentId==0)
+						{
+							return;
+						}
+
+						system.fillTorrentConfig(transmission.torrents.all[system.currentTorrentId]);
+						
+						break;
+				
+				}
+			}
+		});
+
+		var title = ("downloadLimited,seedIdleMode,seedRatioMode,uploadLimited").split(",");
+		$.each(title, function(i, item){
+			thisLayout.find("#"+item)
+			.click(function(){
+				var checked = this.checked;
+				var indeterminate = false;
+				var tag = $(this).data("_tag");
+				// 用作3态
+				switch (tag)
+				{
+					case 0:
+						tag = 1;
+						checked = true;
+						break;
+
+					case 1:
+						tag = 2;
+						checked = false;
+						break;
+
+					case 2:
+						tag = 0;
+						indeterminate = true;
+						checked = false;
+						break;
+				}
+				$(this).prop("checked",checked).prop("indeterminate",indeterminate).data("_tag",tag);
+				thisLayout.find("input[enabledof='"+this.id+"']").prop("disabled",!checked);
+			});
+		});
+		
+		// 初始化文件显示列表
+		var filelist = $("<table/>").attr("class","torrent-list").attr("id","torrent-files-table").appendTo(thisLayout.find("#torrent-attribute-files"));
+		$.get(system.rootPath+"template/torrent-attribute-files-fields.json?time="+(new Date()),function(data){
+			var fields = data.fields;
+			var config = data.config;
+
+			for (var key in fields)
+			{
+				fields[key].title = system.lang.torrent.attribute["files-fields"][fields[key].field];
+				system.setFieldFormat(fields[key]);
+			}
+
+			config.pageSize = system.config.pageSize;
+			config.columns = [fields];
+			config.fit = true;
+			filelist.datagrid(config);
+			var pager = filelist.datagrid("getPager");
+			var buttons = [{
+					id:"pager-button-allow",
+					iconCls:'icon-allow',
+					title: system.lang.torrent.attribute["tip"]["button-allow"],
+					handler:function(){
+						changeSelectedFilesWanted(true,$(this));
+					}
+				},'-',{
+					id:"pager-button-deny",
+					iconCls:'icon-deny',
+					title: system.lang.torrent.attribute["tip"]["button-deny"],
+					handler:function(){
+						changeSelectedFilesWanted(false,$(this));
+					}
+				},'-',{
+					id:"pager-button-priority",
+					iconCls:'icon-flag-edit',
+					title: system.lang.torrent.attribute["tip"]["button-priority"],
+					handler:function(){
+						priorityMenu.menu("show",$(this).offset());
+					}
+				},'-',{
+					id:"torrent-files-filter",
+					iconCls:"icon-filter",
+					title: system.lang.torrent.attribute["tip"]["button-filter"],
+					handler:function(){
+						filelist.datagrid("getPager").find(".pagination-load").click();
+					}
+				}];
+			var priorityMenu = $("<div/>").attr("id","priorityMenu").appendTo(thisLayout.find("#torrent-attribute-files"));
+			priorityMenu.menu({
+				onClick:function(item)
+				{
+					changeSelectedFilesPriority(item.id);
+				}
+			});
+			priorityMenu.menu("appendItem",{
+				id: "0",
+				text: system.lang.torrent.attribute["priority"]["0"],
+				iconCls: 'iconlabel icon-flag-0'
+			});
+			priorityMenu.menu("appendItem",{
+				id: "1",
+				text: system.lang.torrent.attribute["priority"]["1"],
+				iconCls: 'iconlabel icon-flag-1'
+			});
+			priorityMenu.menu("appendItem",{
+				id: "-1",
+				text: system.lang.torrent.attribute["priority"]["-1"],
+				iconCls: 'iconlabel icon-flag--1'
+			});
+
+			filelist.data("buttons",buttons);
+			//system.debug("pager",pager);
+			pager.pagination({  
+				buttons:buttons
+			});
+			
+			// pager.find("#pager-button-allow").attr({"title":system.lang.torrent.attribute["tip"]["button-allow"],"alt":system.lang.torrent.attribute["tip"]["button-allow"]});
+			// pager.find("#pager-button-deny").attr({"title":system.lang.torrent.attribute["tip"]["button-deny"],"alt":system.lang.torrent.attribute["tip"]["button-deny"]});
+			// pager.find("#pager-button-priority").attr({"title":system.lang.torrent.attribute["tip"]["button-priority"],"alt":system.lang.torrent.attribute["tip"]["button-priority"]});
+		},"json");
+
+		// 设置已选中的文件是否下载
+		function changeSelectedFilesWanted(wanted,button)
+		{
+			var rows = filelist.datagrid("getChecked");
+			var files = new Array();
+			var arguments = null;
+
+			for (var i in rows)
+			{
+				files.push(parseInt(rows[i].index));
+			}
+			if (files.length>0)
+			{
+				if (wanted)
+				{
+					arguments = {
+						ids:system.currentTorrentId
+						,"files-wanted":files
+					};
+				}
+				else
+				{
+					arguments = {
+						ids:system.currentTorrentId
+						,"files-unwanted":files
+					};
+				}
+				var icon = button.linkbutton("options").iconCls;
+				button.linkbutton({disabled:true,iconCls:"icon-loading"});
+				transmission.exec({
+						method:"torrent-set"
+						,arguments:arguments
+					}
+					,function(data){
+						if (data.result=="success")
+						{
+							system.getTorrentInfos(system.currentTorrentId);
+						}
+						button.linkbutton({iconCls:icon,disabled:false});
+					}
+				);
+			}
+		}
+
+		// 设置已选中的文件优先级别
+		function changeSelectedFilesPriority(priority)
+		{
+			var rows = filelist.datagrid("getChecked");
+			var files = new Array();
+			var arguments = null;
+
+			for (var i in rows)
+			{
+				files.push(parseInt(rows[i].index));
+			}
+			if (files.length>0)
+			{
+				switch (priority)
+				{
+					case "0":
+						arguments = {
+							ids:system.currentTorrentId
+							,"priority-normal":files
+						};
+						break;
+					case "1":
+						arguments = {
+							ids:system.currentTorrentId
+							,"priority-high":files
+						};
+						break;
+					case "-1":
+						arguments = {
+							ids:system.currentTorrentId
+							,"priority-low":files
+						};
+						break;
+				}
+				transmission.exec({
+						method:"torrent-set"
+						,arguments:arguments
+					}
+					,function(data){
+						if (data.result=="success")
+						{
+							system.getTorrentInfos(system.currentTorrentId);
+						}
+					}
+				);
+			}
+		}
+		
+		// 服务器列表
+		var serverlist = $("<table/>").attr("class","torrent-list").attr("id","torrent-servers-table").appendTo(thisLayout.find("#torrent-attribute-servers"));
+		$.get(system.rootPath+"template/torrent-attribute-servers-fields.json?time="+(new Date()),function(data){
+			var fields = data.fields;
+			var config = data.config;
+			
+			for (var key in fields)
+			{
+				var title = system.lang.torrent.attribute["servers-fields"][fields[key].field];
+				if (!title)
+					title = fields[key].field;
+				fields[key].title = title;
+				system.setFieldFormat(fields[key]);
+			}
+			config.pageSize = system.config.pageSize;
+			config.columns = [fields];
+			config.fit = true;
+			serverlist.datagrid(config);
+
+			var pager = serverlist.datagrid("getPager");
+			var buttons = [{
+					id:"pager-button-trackerAdd",
+					iconCls:'icon-tracker-add',
+					title: system.lang.torrent.attribute["tip"]["button-tracker-add"],
+					handler:function(){
+						addTracker();
+					}
+				},'-',{
+					id:"pager-button-trackerReplace",
+					iconCls:'icon-tracker-edit',
+					title: system.lang.torrent.attribute["tip"]["button-tracker-edit"],
+					handler:function(){
+						changeSelectedTracker($(this));
+					}
+				},'-',{
+					id:"pager-button-trackerRemove",
+					iconCls:'icon-tracker-remove',
+					title: system.lang.torrent.attribute["tip"]["button-tracker-remove"],
+					handler:function(){
+						var tracker = serverlist.datagrid("getSelected");
+						if (tracker)
+						{
+							if (confirm(system.lang.torrent.attribute["other"]["tracker-remove-confim"])==false)
+							{
+								return;
+							}
+							var button = $(this);
+							var icon = button.linkbutton("options").iconCls;
+							button.linkbutton({disabled:true,iconCls:"icon-loading"});
+							transmission.exec({
+									method:"torrent-set"
+									,arguments:{
+										ids:system.currentTorrentId
+										,trackerRemove:[tracker.id]
+									}
+								}
+								,function(data){
+									if (data.result=="success")
+									{
+										system.getTorrentInfos(system.currentTorrentId);
+									}
+									button.linkbutton({iconCls:icon,disabled:false});
+								}
+							);
+						}
+					}
+				}];
+
+			serverlist.data("buttons",buttons);
+			//system.debug("pager",pager);
+			pager.pagination({  
+				buttons:buttons
+			});
+		},"json");
+		
+		// 替换已选中的服务器地址
+		function changeSelectedTracker(button)
+		{
+			var tracker = serverlist.datagrid("getSelected");
+
+			if (tracker)
+			{
+				var URL = prompt("Tracker:",tracker.announce);
+				if (URL!=""&&URL!=tracker.announce)
+				{
+					var icon = button.linkbutton("options").iconCls;
+					button.linkbutton({disabled:true,iconCls:"icon-loading"});
+					transmission.exec({
+							method:"torrent-set"
+							,arguments:{
+								ids:system.currentTorrentId
+								,trackerReplace:[tracker.id,URL]
+							}
+						}
+						,function(data){
+							if (data.result=="success")
+							{
+								system.getTorrentInfos(system.currentTorrentId);
+							}
+							button.linkbutton({iconCls:icon,disabled:false});
+						}
+					);
+				}
+			}
+		}
+
+		/**
+		 * 添加Tracker 
+		 */
+		function addTracker() {
+			if (system.currentTorrentId==0) return;
+			
+			var dialog = $("#dialog-torrent-attribute-add-tracker");
+			if (dialog.length)
+			{
+				dialog.dialog("open");
+				dialog.data("ids",system.currentTorrentId);
+				dialog.dialog({content:system.templates["dialog-torrent-attribute-add-tracker.html"]});
+				return;
+			}
+			
+			$("<div/>").attr("id","dialog-torrent-attribute-add-tracker").appendTo(document.body).dialog({  
+				title: system.lang.dialog["torrent-attribute-add-tracker"].title,  
+				width: 520,
+				height: 240,
+				resizable: false,
+				cache: true,
+				content:"loading...",  
+				modal: true
+			});
+			
+			$.get(system.rootPath+"template/dialog-torrent-attribute-add-tracker.html?time="+(new Date()),function(data){
+				system.templates["dialog-torrent-attribute-add-tracker.html"] = data;
+				$("#dialog-torrent-attribute-add-tracker").data("ids",system.currentTorrentId);
+				$("#dialog-torrent-attribute-add-tracker").dialog({content:data});
+			});
+		}
+
+		// 用户列表
+		var peerslist = $("<table/>").attr("class","torrent-list").attr("id","torrent-peers-table").appendTo(thisLayout.find("#torrent-attribute-peers"));
+		$.get(system.rootPath+"template/torrent-attribute-users-fields.json?time="+(new Date()),function(data){
+			var fields = data.fields;
+			var config = data.config;
+			
+			for (var key in fields)
+			{
+				var title = system.lang.torrent.attribute["peers-fields"][fields[key].field];
+				if (!title)
+					title = fields[key].field;
+				fields[key].title = title;
+				system.setFieldFormat(fields[key]);
+			}
+			config.pageSize = system.config.pageSize;
+			config.columns = [fields];
+			config.fit = true;
+			peerslist.datagrid(config);
+		},"json");
+
+		// 变更保存目录
+		thisLayout.find("#torrent-attribute-config-button-changeDownloadDir").click(function(){
+			if (system.currentTorrentId==0) return;
+			
+			var dialog = $("#dialog-torrent-changeDownloadDir");
+			if (dialog.length)
+			{
+				dialog.dialog("open");
+				dialog.data("ids",system.currentTorrentId);
+				dialog.dialog({content:system.templates["dialog-torrent-changeDownloadDir.html"]});
+				return;
+			}
+			
+			$("<div/>").attr("id","dialog-torrent-changeDownloadDir").appendTo(document.body).dialog({  
+				title: system.lang.dialog["torrent-changeDownloadDir"].title,  
+				width: 600,
+				height: 200,
+				resizable: false,
+				cache: true,
+				content:"loading...",  
+				modal: true
+			});
+			
+			$.get(system.rootPath+"template/dialog-torrent-changeDownloadDir.html?time="+(new Date()),function(data){
+				system.templates["dialog-torrent-changeDownloadDir.html"] = data;
+				$("#dialog-torrent-changeDownloadDir").data("ids",system.currentTorrentId);
+				$("#dialog-torrent-changeDownloadDir").dialog({content:data});
+			});
+		});
+		
+		// 保存参数
+		thisLayout.find("#torrent-attribute-config-button-save").click(function()
+		{
+			if (system.currentTorrentId==0)
+			{
+				return;
+			}
+
+			var torrent = transmission.torrents.all[system.currentTorrentId];
+			var inputs = thisLayout.find("#torrent-attribute-config").find("input");
+			var config = {};
+			var value = null;
+			for (var key in inputs)
+			{
+				var input = inputs[key];
+				value = null;
+				if (input.id!=undefined&&input.id!="")
+				{
+					switch (input.type)
+					{
+						case "checkbox":
+							switch (input.id)
+							{
+								// 
+								case "seedIdleMode":
+								case "seedRatioMode":
+									value = $(input).data("_tag");
+									break;
+								default:
+									value = input.checked;
+									break;
+							}
+							break;
+						default:
+							value = ($.isNumeric(input.value)?parseFloat(input.value):input.value);
+							break;
+					}
+
+					if (value!=torrent[input.id]&&value!=null)
+					{
+						config[input.id] = value;
+					}
+				}
+			}
+			
+			// 如果参数有改变则保存
+			if (!$.isEmptyObject(config))
+			{
+				jQuery.extend(torrent,config);
+				config["ids"] = torrent.id;
+				$(this).linkbutton({text:system.lang.dialog["system-config"].saving,disabled:true});
+				// 开始设置参数
+				transmission.exec(
+					{
+						method:"torrent-set"
+						,arguments:config
+					}
+					,function(data){
+						thisLayout.find("#torrent-attribute-config-button-save").linkbutton({text:system.lang.dialog["public"]["button-save"],disabled:false});
+						if (data.result=="success")
+						{
+							thisLayout.find("#torrent-attribute-config-saved").fadeInAndOut();
+						}
+					}
+				);
+			}
+			else
+			{
+				thisLayout.find("#torrent-attribute-config-nochange").fadeInAndOut();
+			}
+
+			//console.log("config:",config);
+		});
+	})($("#torrent-attribute-layout"));
+</script>

@@ -23,7 +23,7 @@ struct tr_variant;
     V(TR_KEY_bind_address_ipv6, bind_address_ipv6, std::string, "::", "") \
     V(TR_KEY_blocklist_enabled, blocklist_enabled, bool, false, "") \
     V(TR_KEY_blocklist_url, blocklist_url, std::string, "http://www.example.com/blocklist", "") \
-    V(TR_KEY_cache_size_mb, cache_size_mb, size_t, 4U, "") \
+    V(TR_KEY_cache_size_mb, cache_size_mb, size_t, 64U, "") \
     V(TR_KEY_default_trackers, default_trackers_str, std::string, "", "") \
     V(TR_KEY_dht_enabled, dht_enabled, bool, true, "") \
     V(TR_KEY_download_dir, download_dir, std::string, tr_getDefaultDownloadDir(), "") \
@@ -47,6 +47,8 @@ struct tr_variant;
     V(TR_KEY_peer_socket_tos, peer_socket_tos, tr_tos_t, 0x04, "") \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true, "") \
     V(TR_KEY_port_forwarding_enabled, port_forwarding_enabled, bool, true, "") \
+    V(TR_KEY_http_proxy, http_proxy, std::string, "", "") \
+    V(TR_KEY_http_proxy_enabled, http_proxy_enabled, bool, false, "") \
     V(TR_KEY_preallocation, preallocation_mode, tr_preallocation_mode, TR_PREALLOCATE_SPARSE, "") \
     V(TR_KEY_prefetch_enabled, is_prefetch_enabled, bool, true, "") \
     V(TR_KEY_queue_stalled_enabled, queue_stalled_enabled, bool, true, "") \

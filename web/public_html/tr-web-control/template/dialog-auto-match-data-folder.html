@@ -1,0 +1,549 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:3px;border:0px;">
+		<div id="" class="dialog" style="width:100%;padding:0px;">
+			<table style="width:100%;">
+				<tr>
+					<td _width="30%" class="title"><span id="dialog-auto-match-data-folder-torrent-count" system-lang="dialog['auto-match-data-folder']['torrent-count']"></span></td>
+					<td _width="50%">
+						<span id="torrent-count"></span>
+					</td>
+					<td _width="20%"></td>
+				</tr>
+				<tr>
+					<td class="title"><span id="dialog-auto-match-data-folder-folder-count" system-lang="dialog['auto-match-data-folder']['folder-count']"></span></td>
+					<td>
+						<span id="folder-count"></span>
+					</td>
+					<td>
+						<a id="button-config" class="easyui-linkbutton" data-options="iconCls:'icon-system-config',plain:true" href="javascript:void(0);"><span system-lang="dialog['public']['button-config']"></span></a>
+					</td>
+				</tr>
+				<tr style="display:none;">
+					<td class="title"><span id="dialog-auto-match-data-folder-time-begin" system-lang="dialog['auto-match-data-folder']['time-begin']"></span></td>
+					<td>
+						<span id="time-begin"></span>
+					</td>
+					<td></td>
+				</tr>
+				<tr style="display:none;">
+					<td class="title"><span id="dialog-auto-match-data-folder-time-now" system-lang="dialog['auto-match-data-folder']['time-now']"></span></td>
+					<td>
+						<span id="time-now"></span>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="title">
+						<span system-lang="dialog['auto-match-data-folder']['work-mode-title']"></span>
+					</td>
+					<td>
+						<select id="work-mode" class="easyui-combobox" data-options="editable:false" style="width:200px;"></select>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="title">
+						<span system-lang="dialog['auto-match-data-folder']['time-interval']"></span>
+					</td>
+					<td>
+						<input id="time-interval" value="3" type="text" class="easyui-numberspinner" style="width:200px;" data-options="min:0.5,precision:1,increment:0.5"/>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td class="title" colspan="3" style="text-align:left;"><span id="dialog-auto-match-data-folder-status" system-lang="dialog['auto-match-data-folder']['status']"></span></td>
+				</tr>
+				<tr>
+					<td colspan="3" id="td-status" style="display:none;">
+						<span id="cus-torrent"></span><a id="button-ignore" class="easyui-linkbutton" data-options="iconCls:'icon-ignore',plain:true" href="javascript:void(0);"><span system-lang="dialog['auto-match-data-folder']['ignore']"></span></a><br/>
+						<span id="cus-folder"></span>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>  
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<span id="text-nochange" style="display:none;"></span>
+		<span id="text-count"></span>
+		<a id="button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);">Ok</a>
+		<a id="button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);">Cancel</a>  
+	</div>
+</div>
+<script type="text/javascript">
+	(function(thisDialog){
+		var ids = thisDialog.data("ids");
+		var notMatchedTorrents = new Array();
+		var notMatchedFolders = new Array();
+		var torrent = null;
+		var isworking = false;
+		var ignore = false;
+		var timeInterval = parseInt(system.getStorageData("auto-match-data-folder-time-interval",3000));
+
+		if (typeof(ids)=="object")
+		{
+			torrent = transmission.torrents.all[ids[0]];
+			thisDialog.find("#torrent-count").html(ids.length);
+		}
+		else
+		{
+			torrent = transmission.torrents.all[ids];
+			thisDialog.find("#torrent-count").html(1);
+			ids = null;
+			ids = new Array();
+			ids.push(torrent.id);
+		}
+
+		if (!torrent)
+		{
+			thisDialog.dialog("close");
+			return;
+		}
+
+		$.each(ids,function(key,value){
+			torrent = transmission.torrents.all[value];
+			if (torrent.status==0&&torrent.percentDone==0)
+			{
+				notMatchedTorrents.push(value);
+			}
+		});
+
+		system.resetLangText(thisDialog);
+
+		var mode = system.lang.dialog["auto-match-data-folder"]["work-mode"];
+		for (var key in mode)
+		{
+			$("<option/>").val(key).attr("selected",(key==system.getStorageData("auto-match-data-folder-work-mode",1)?true:false)).text(mode[key]).appendTo(thisDialog.find("#work-mode"));
+		}
+		thisDialog.find("#time-interval").val(timeInterval/1000);
+
+		$.each("button-ok,button-cancel".split(","), function(i, item){
+			thisDialog.find("#"+item).html(system.lang.dialog["public"][item]);
+		});
+
+		// Cancel
+		thisDialog.find("#button-cancel").click(function()
+		{
+			
+			if (isworking)
+			{
+				if (confirm(system.lang.dialog["auto-match-data-folder"]["working-close-confirm"]))
+				{
+					isworking = false;
+					thisDialog.dialog("close");
+					return;
+				}
+			}
+			else
+			{
+				thisDialog.dialog("close");
+			}
+		});
+
+		// Ignore
+		thisDialog.find("#button-ignore").click(function()
+		{
+			if (isworking&&!ignore)
+			{
+				ignore = true;
+			}
+		});
+
+		// Set up
+		thisDialog.find("#button-config").click(function()
+		{
+			system.openDialogFromTemplate({
+				id: "dialog-auto-match-data-folder-dictionary",
+				options: {
+					title: system.lang.dialog["auto-match-data-folder"]["dictionary"],  
+					width: 530,
+					height: 280
+				},
+				datas: {
+					callback: function(){
+						notMatchedFolders = system.dictionary.folders.split("\n");
+						thisDialog.find("#folder-count").html(notMatchedFolders.length);
+					}
+				}
+			});
+		});
+
+		if (system.dictionary.folders==null)
+		{
+			thisDialog.find("#button-ok").prop("disabled",true);
+			thisDialog.find("#folder-count").html(0);	
+			return;
+		}
+		var notMatchedFolders = system.dictionary.folders.split("\n");
+		var torrentIndex = 0;
+		var folderIndex = 0;
+		thisDialog.find("#folder-count").html(notMatchedFolders.length);
+
+		// Confirm
+		thisDialog.find("#button-ok").click(function()
+		{
+			system.control.torrentlist.datagrid("uncheckAll");
+			var button = $(this);
+			var icon = button.linkbutton("options").iconCls;
+			button.linkbutton({disabled:true,iconCls:"icon-loading"});
+			isworking = true;
+			thisDialog.find("#td-status").show();
+			var modeType = thisDialog.find("#work-mode").combobox("getValue");
+			timeInterval = thisDialog.find("#time-interval").val()*1000;
+			switch (parseInt(modeType))
+			{
+				// method one
+				case 1:
+					thisDialog.find("#button-ignore").show();
+					thisDialog.find("#cus-torrent").html("-> "+torrent.name + " [" + (torrentIndex+1)+"/"+notMatchedTorrents.length + "] ");
+					var _arrSource = $.map(notMatchedFolders, function(n){return n;});
+					execMatchDataFolderMode1(_arrSource,_arrSource.length,button,icon,notMatchedTorrents[torrentIndex]);
+					_arrSource = null;
+					break;
+
+				// method two
+				case 2:
+					thisDialog.find("#button-ignore").hide();
+					thisDialog.find("#cus-folder").html("-> "+notMatchedFolders[folderIndex] + " [" + (folderIndex+1)+"/"+notMatchedFolders.length + "] ");
+					var _arrSource = $.map(notMatchedTorrents, function(n){return n;});
+					execMatchDataFolderMode3(_arrSource,_arrSource.length,button,icon,notMatchedFolders[folderIndex]);
+					_arrSource = null;
+					break;
+			}
+
+			system.setStorageData("auto-match-data-folder-work-mode",modeType);
+			system.setStorageData("auto-match-data-folder-time-interval",timeInterval);
+			
+		});
+
+		// method one
+		function execMatchDataFolderMode1(folders,count,button,icon,id)
+		{
+			if (isworking==false) return;
+			//alert("count:"+count+",ids.length:"+ids.length+",notMatchedTorrents.length:"+notMatchedTorrents.length);
+			//var id = ids;
+			var index = count-folders.length;
+			var dir = folders.shift();
+			var torrent = transmission.torrents.all[id];
+			if (!dir||ignore||torrent.percentDone!=0)
+			{
+				ignore = false;
+				torrentIndex++;
+				if (torrentIndex<notMatchedTorrents.length&&isworking)
+				{
+					system.debug("torrent:",torrent.name);
+					thisDialog.find("#cus-torrent").html("-> "+torrent.name + " [" + (torrentIndex+1)+"/"+notMatchedTorrents.length + "] ");
+					
+					var _arrSource = $.map(notMatchedFolders, function(n){return n;});
+					execMatchDataFolderMode1(_arrSource,_arrSource.length,button,icon,notMatchedTorrents[torrentIndex]);
+					_arrSource = null;
+				}
+				else
+				{
+					button.linkbutton({iconCls:icon,disabled:false});
+					thisDialog.dialog("close");
+				}
+				return;
+			}
+
+			thisDialog.find("#cus-folder").html("-> "+dir + " [" + (index+1)+"/"+count + "] ");
+
+			if (torrent.downloadDir==dir)
+			{
+				execMatchDataFolderMode1(folders,count,button,icon,id);
+				return;
+			}
+			// Start setting parameters
+			transmission.exec(
+				{
+					method:"torrent-set-location"
+					,arguments:{
+						ids:id
+						,location:dir
+						,move:false
+					}
+				}
+				,function(data){
+					if (data.result=="success")
+					{
+						torrent.downloadDir = dir;
+						transmission.exec(
+							{
+								method:"torrent-verify"
+								,arguments:{
+									ids:id
+								}
+							}
+							,function(data1){
+								setTimeout(function(){
+									transmission.exec(
+										{
+											method:"torrent-get"
+											,arguments:{
+												ids:id
+												,fields: ["percentDone"]
+											}
+										}
+										,function(data2){
+											if (data2.result=="success")
+											{
+												// 
+												if (data2.arguments.torrents[0].percentDone!=0)
+												{
+													torrentIndex++;
+													if (torrentIndex<notMatchedTorrents.length&&isworking)
+													{
+														system.debug("torrent:",torrent.name);
+														thisDialog.find("#cus-torrent").html("-> "+torrent.name + " [" + (torrentIndex+1)+"/"+notMatchedTorrents.length + "] ");
+														
+														var _arrSource = $.map(notMatchedFolders, function(n){return n;});
+														execMatchDataFolderMode1(_arrSource,_arrSource.length,button,icon,notMatchedTorrents[torrentIndex]);
+														_arrSource = null;
+													}
+													else
+													{
+														button.linkbutton({iconCls:icon,disabled:false});
+														thisDialog.dialog("close");
+													}
+												}
+												else
+												{
+													execMatchDataFolderMode1(folders,count,button,icon,id);
+												}
+											}
+										}
+									);
+								},timeInterval)
+								
+							}
+						);
+					}
+					else
+					{
+						button.linkbutton({iconCls:icon,disabled:false});
+						$.messager.alert("",system.lang.error["data-post-error"]+": "+data.result,'error'); 
+					}
+				}
+			);
+		}
+
+		// method two
+		function execMatchDataFolderMode2(ids,count,button,icon,dir)
+		{
+			if (isworking==false) return;
+			//alert("count:"+count+",ids.length:"+ids.length+",notMatchedTorrents.length:"+notMatchedTorrents.length);
+			//var id = ids;
+			var index = count-ids.length;
+			var id = ids.shift();
+			if (!id)
+			{
+				folderIndex++;
+				if (folderIndex<notMatchedFolders.length&&isworking)
+				{
+					setTimeout(function(){
+						transmission.exec(
+							{
+								method:"torrent-get"
+								,arguments:{
+									ids:notMatchedTorrents
+									,fields: ["status","id","percentDone"]
+								}
+							}
+							,function(data){
+								if (data.result=="success")
+								{
+									notMatchedTorrents = null;
+									notMatchedTorrents = new Array();
+									$.each(data.arguments.torrents,function(key,item){
+										if (item.status==0&&item.percentDone==0)
+										{
+											if (jQuery.inArray(item.id,notMatchedTorrents)==-1)
+												notMatchedTorrents.push(item.id);
+										}
+									});
+									if (notMatchedTorrents.length>0)
+									{
+										thisDialog.find("#cus-folder").html("-> "+notMatchedFolders[folderIndex] + " [" + (folderIndex+1)+"/"+notMatchedFolders.length + "] ");
+										system.debug("folder:",notMatchedFolders[folderIndex]);
+										var _arrSource = $.map(notMatchedTorrents, function(n){return n;});
+										execMatchDataFolderMode2(_arrSource,_arrSource.length,button,icon,notMatchedFolders[folderIndex]);
+										_arrSource = null;	
+									}
+									else
+									{
+										system.control.torrentlist.datagrid("uncheckAll");
+										button.linkbutton({iconCls:icon,disabled:false});
+										thisDialog.dialog("close");
+									}
+								}
+								else
+								{
+									system.control.torrentlist.datagrid("uncheckAll");
+									button.linkbutton({iconCls:icon,disabled:false});
+									thisDialog.dialog("close");
+								}
+							}
+						);
+					},timeInterval);
+				}
+				else
+				{
+					system.control.torrentlist.datagrid("uncheckAll");
+					button.linkbutton({iconCls:icon,disabled:false});
+					thisDialog.dialog("close");
+				}
+				return;
+			}
+
+			var torrent = transmission.torrents.all[id];
+
+			system.debug("torrent:",torrent.name);
+			thisDialog.find("#cus-torrent").html("-> "+torrent.name + " [" + (index+1)+"/"+count + "] ");
+
+			if (torrent.downloadDir==dir)
+			{
+				if (torrent.percentDone==0&&torrent.status==0)
+				{
+					if (jQuery.inArray(id,notMatchedTorrents)==-1)
+						notMatchedTorrents.push(id);
+				}
+				execMatchDataFolderMode2(ids,count,button,icon,dir);
+				return;
+			}
+			else if (torrent.percentDone!=0)
+			{
+				execMatchDataFolderMode2(ids,count,button,icon,dir);
+				return;
+			}
+
+			// Start setting parameters
+			transmission.exec(
+				{
+					method:"torrent-set-location"
+					,arguments:{
+						ids:id
+						,location:dir
+						,move:false
+					}
+				}
+				,function(data){
+					if (data.result=="success")
+					{
+						torrent.downloadDir = dir;
+						transmission.exec(
+							{
+								method:"torrent-verify"
+								,arguments:{
+									ids:id
+								}
+							}
+							,function(data){
+								execMatchDataFolderMode2(ids,count,button,icon,dir);
+							}
+						);
+					}
+					else
+					{
+						button.linkbutton({iconCls:icon,disabled:false});
+						$.messager.alert("",system.lang.error["data-post-error"]+": "+data.result,'error'); 
+					}
+				}
+			);
+		}
+
+		// method two
+		function execMatchDataFolderMode3(ids,count,button,icon,dir)
+		{
+			if (isworking==false) return;
+
+			thisDialog.find("#cus-torrent").html("-> "+count);
+			// Start setting parameters
+			transmission.exec(
+				{
+					method:"torrent-set-location"
+					,arguments:{
+						ids:ids
+						,location:dir
+						,move:false
+					}
+				}
+				,function(data){
+					if (data.result=="success")
+					{
+						torrent.downloadDir = dir;
+						transmission.exec(
+							{
+								method:"torrent-verify"
+								,arguments:{
+									ids:ids
+								}
+							}
+							,function(data){
+								folderIndex++;
+								if (folderIndex<notMatchedFolders.length&&isworking)
+								{
+									setTimeout(function(){
+										transmission.exec(
+											{
+												method:"torrent-get"
+												,arguments:{
+													ids:ids
+													,fields: ["status","id","percentDone"]
+												}
+											}
+											,function(data){
+												if (data.result=="success")
+												{
+													notMatchedTorrents = null;
+													notMatchedTorrents = new Array();
+													$.each(data.arguments.torrents,function(key,item){
+														if (item.status==0&&item.percentDone==0)
+														{
+															if (jQuery.inArray(item.id,notMatchedTorrents)==-1)
+																notMatchedTorrents.push(item.id);
+														}
+													});
+													if (notMatchedTorrents.length>0)
+													{
+														thisDialog.find("#cus-folder").html("-> "+notMatchedFolders[folderIndex] + " [" + (folderIndex+1)+"/"+notMatchedFolders.length + "] ");
+														system.debug("folder:",notMatchedFolders[folderIndex]);
+														var _arrSource = $.map(notMatchedTorrents, function(n){return n;});
+														execMatchDataFolderMode3(_arrSource,_arrSource.length,button,icon,notMatchedFolders[folderIndex]);
+														_arrSource = null;	
+													}
+													else
+													{
+														system.control.torrentlist.datagrid("uncheckAll");
+														button.linkbutton({iconCls:icon,disabled:false});
+														thisDialog.dialog("close");
+													}
+												}
+												else
+												{
+													system.control.torrentlist.datagrid("uncheckAll");
+													button.linkbutton({iconCls:icon,disabled:false});
+													thisDialog.dialog("close");
+												}
+											}
+										);
+									},timeInterval);
+								}
+								else
+								{
+									system.control.torrentlist.datagrid("uncheckAll");
+									button.linkbutton({iconCls:icon,disabled:false});
+									thisDialog.dialog("close");
+								}
+							}
+						);
+					}
+					else
+					{
+						button.linkbutton({iconCls:icon,disabled:false});
+						$.messager.alert("",system.lang.error["data-post-error"]+": "+data.result,'error'); 
+					}
+				}
+			);
+		}
+
+	})($("#dialog-auto-match-data-folder"));
+</script>

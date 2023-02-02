@@ -1,0 +1,123 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:3px;border:0px;overflow: hidden;">
+		<div id="" class="dialog" style="width:100%;padding:0px;height:100%;border-bottom: 1px dotted #ccc;">
+			<div style="position: absolute;width:50%;height: 100%;">
+				<div system-lang="dialog['torrent-setLabels']['available']"></div>
+				<div id="divAvailableList" style="padding-top: 5px;"></div>
+			</div>
+			<div style="position: absolute;left:50%;width:50%;height: 100%;border-left: 1px dotted #ccc;padding-left: 5px;">
+				<div system-lang="dialog['torrent-setLabels']['selected']"></div>
+				<div id="divSelectedList" style="padding-top: 5px;"></div>
+			</div>
+		</div>
+	</div>  
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<span id="text-nochange" style="display:none;"></span>
+		<span id="text-count"></span>
+		<a id="button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);" system-lang="dialog['public']['button-ok']">Ok</a>
+		<a id="button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);" system-lang="dialog['public']['button-cancel']">Cancel</a>  
+	</div>
+</div>
+<script type="text/javascript">
+	(function(thisDialog) {
+		var page = {
+			hashs: thisDialog.data("hashs")||[],
+			divSelectedList: $("#divSelectedList", thisDialog),
+			init: function() {
+				system.resetLangText(thisDialog);
+				this.initEvents();
+				this.initLabels();
+			},
+			// 初始化事件
+			initEvents: function() {
+				// Cancel
+				thisDialog.find("#button-cancel").click(function () {
+					page.close();
+				});
+
+				$("#button-ok", thisDialog).click(function(){
+					page.save();
+					page.close();
+				});
+			},
+			// 初始化标签列表
+			initLabels: function() {
+				var box = $("#divAvailableList", thisDialog);
+				for (var index = 0; index < system.config.labels.length; index++) {
+					var item = system.config.labels[index];
+					if (item) {
+						item.index = index;
+						var label = this.createLabel(item);
+						label.on("click", function(){
+							page.setLabel("#divAvailableList", "#divSelectedList", $(this).data("label"));
+							$(this).remove();
+						}).appendTo(box);
+					}
+				}
+
+				if (this.hashs.length==1) {
+					var labels = system.config.labelMaps[this.hashs[0]];
+					if (labels) {
+						for (var i = 0; i < labels.length; i++) {
+							var index = labels[i];
+							var item = system.config.labels[index];
+							if (item) {
+								this.setLabel("#divAvailableList", "#divSelectedList", item);
+								$(".label-index-"+index, box).remove();
+							}
+						}
+					}
+				}
+			},
+			createLabel: function(label) {
+				return $("<a href='javascript:void(0);' class='user-label-big label-index-"+label.index+"'/>").data("label", label).html(label.name).css({
+							"background-color": label.color,
+							"color": (getGrayLevel(label.color) > 0.5 ? "#000" : "#fff")
+						});
+			},
+			setLabel: function(from, to, item) {
+				var box = $(to, thisDialog);
+				var label = this.createLabel(item);
+				label.on("click", function(){
+					page.setLabel(to, from, $(this).data("label"));
+					$(this).remove();
+				}).appendTo(box);
+			},
+			save: function() {
+				var items = $(".user-label-big", this.divSelectedList);
+				var labels = [];
+
+				for (var index = 0; index < items.length; index++) {
+					var item = $(items[index]);
+					var label = item.data("label");
+					labels.push(label.index);
+				}
+
+				for (var index = 0; index < this.hashs.length; index++) {
+					var item = this.hashs[index];
+					if (labels.length==0) {
+						delete system.config.labelMaps[item];
+					} else {
+						system.config.labelMaps[item] = labels;
+					}
+				}
+
+				system.saveConfig();
+
+				setTimeout(function(){
+					system.control.torrentlist.refresh();
+				}, 200);
+			},
+			close: function() {
+				var source = thisDialog.data("popoverSource");
+
+				if (source) {
+					$(source).webuiPopover("hide");
+				} else {
+					thisDialog.dialog("close");
+				}
+			}
+		};
+		page.init();
+	})($("#dialog-torrent-setLabels"));
+</script>

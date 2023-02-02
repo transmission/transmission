@@ -1,0 +1,230 @@
+.icon-pause-all{
+	background:url('images/pause-all.png') no-repeat;
+}
+.ui-icon-pause-one{
+	background:url('images/pause.png') no-repeat;
+}
+.icon-start-all{
+	background:url('images/start-all.png') no-repeat;
+}
+.icon-start-one{
+	background:url('images/start.png') no-repeat;
+}
+.icon-alt-speed-true{
+	background:url('images/alt-speed-true.png') no-repeat;
+}
+.icon-alt-speed-false{
+	background:url('images/alt-speed-false.png') no-repeat;
+}
+.icon-system-config{
+	background:url('images/system-config.png') no-repeat;
+}
+.icon-test-port{
+	background:url('images/test-port.png') no-repeat;
+}
+.icon-loading{
+	background:url('images/loading.gif') no-repeat;
+}
+.icon-about{
+	background:url('images/about.png') no-repeat;
+}
+.icon-close{
+	background:url('images/close.png') no-repeat;
+}
+.icon-enabled{
+	background:url('images/enabled.png') no-repeat;
+}
+.icon-disabled{
+	background:url('images/disabled.png') no-repeat;
+}
+.icon-remove-torrent{
+	background:url('images/remove.png') no-repeat;
+}
+.icon-recheck-torrent{
+	background:url('images/checking.png') no-repeat;
+}
+
+.torrent-list{
+	height:100%;width:100%;
+}
+.torrent-progress{
+	margin:1px 0px 3px 0px;
+	height:13px;
+	width:100%; 
+	border:1px #c0c0c0 solid;
+	text-align:center; 
+	position:relative;
+	font-size:9px;font-family:Arial,Verdana,Tahoma;-webkit-text-size-adjust:none;
+}
+.torrent-progress-text{
+	height:100%;
+	position:absolute;
+	left:0; 
+	top:0; 
+	width:100%; 
+	line-height:13px;
+	z-index:1;
+}
+.torrent-progress-bar{
+	height:100%;
+	width:0;
+	position:absolute;
+	left:0;
+	top:0;
+	z-index:0;
+}
+.torrent-progress-download{
+	background-color: #77bbff;
+}
+.torrent-progress-error{
+	background-color: #bf4040;
+}
+.torrent-progress-warning{
+	background-color: #cc9900;
+}
+.torrent-progress-seed{
+	background-color: #acffac;
+}
+.torrent-progress-stop{
+	background-color: #808080;
+}
+.torrent-progress-check{
+	background-color: #808040;
+}
+
+.nav-total-size{
+	color:#757575;float:right;padding-right:2px;font-family:arial,sans-serif;
+}
+
+.nav-torrents-number{
+	color:#757575;font-family:arial,sans-serif;padding-top:2px;
+}
+
+.tree-title-toolbar{
+	float:right;padding-right:24px;margin-top:-5px;
+}
+
+.text-status-error{
+	color:red;
+}
+
+.text-status-warning{
+	color:#cc9900;
+}
+
+.iconlabel{
+	display:inline-block;
+	width:auto;
+	padding-left:19px;
+	min-height: 16px;
+	margin-top:2px;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	outline: 0 !important;
+}
+
+.icon-up{
+	background:url('images/up.png') no-repeat;
+}
+
+.icon-down{
+	background:url('images/down.png') no-repeat;
+}
+
+.icon-drive{
+	background:url('images/drive.png') no-repeat;
+}
+
+.icon-exclamation{
+	background:url('images/error.png') no-repeat;
+}
+
+.icon-warning-type1{
+	background:url('images/warning.png') no-repeat;
+}
+
+.icon-pause-small{
+	background:url('images/pause-small.png') no-repeat;
+}
+
+.icon-checking{
+	background:url('images/checking.png') no-repeat;
+}
+
+.icon-deny{
+	background:url('images/deny.png') no-repeat;
+}
+
+.icon-allow{
+	background:url('images/allow.png') no-repeat;
+}
+
+.icon-flag-0{
+	background:url('images/flag-0.png') no-repeat;
+}
+.icon-flag-1{
+	background:url('images/flag-1.png') no-repeat;
+}
+.icon-flag--1{
+	background:url('images/flag--1.png') no-repeat;
+}
+.icon-flag-edit{
+	background:url('images/flag-edit.png') no-repeat;
+}
+
+.icon-folder-change{
+	background:url('images/folder-change.png') no-repeat;
+}
+
+.icon-tracker-add{
+	background:url('images/tracker-add.png') no-repeat;
+}
+
+.icon-tracker-edit{
+	background:url('images/tracker-edit.png') no-repeat;
+}
+
+.icon-tracker-remove{
+	background:url('images/tracker-remove.png') no-repeat;
+}
+
+.icon-tracker-replace{
+	background:url('images/tracker-replace.png') no-repeat;
+}
+
+.tip{
+	padding:5px;text-align:left;border:1px solid #FF9900;font-size:12px;margin-bottom:2px;display:block;
+	padding-left:25px;
+	background: #FFFFCC url('images/balloon.png') left no-repeat;
+	background-position: 5px 6px; 
+	color:#555555;
+}
+
+#icon-computer .ui-icon{
+	background:url('images/computer.png') 50% 50% no-repeat;
+}
+
+.icon-arrow-left{
+	background:url('images/arrow-left.png') no-repeat;
+}
+
+.icon-arrow-right{
+	background:url('images/arrow-right.png') no-repeat;
+}
+
+.page-bar{
+	float:right;padding:0px;position:absolute;width:100%;z-index:10;top:46px;text-align:right;
+}
+
+.page-bar .page-number{
+	font-size:12px;vertical-align: text-top;
+}
+
+.torrent-list-infos{
+	font-size:12px;font-family:arial,sans-serif;
+}
+
+.ui-select span{
+	text-align:left !important;
+}

@@ -169,13 +169,13 @@ tr_port tr_session::randomPort() const
    characters, where x is the major version number, y is the
    minor version number, z is the maintenance number, and b
    designates beta (Azureus-style) */
-tr_peer_id_t tr_peerIdInit()
+tr_peer_id_t tr_peerIdInit(std::string hash_string)
 {
     auto peer_id = tr_peer_id_t{};
     auto* it = std::data(peer_id);
 
     // starts with -TRXXXX-
-    auto constexpr Prefix = std::string_view{ PEERID_PREFIX };
+    auto constexpr Prefix = std::string_view{ "-TR3000-" };
     auto const* const end = it + std::size(peer_id);
     it = std::copy_n(std::data(Prefix), std::size(Prefix), it);
 
@@ -183,15 +183,18 @@ tr_peer_id_t tr_peerIdInit()
     auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
     auto total = int{ 0 };
     tr_rand_buffer(it, end - it);
-    while (it + 1 < end)
+    auto length = std::size(hash_string);
+//    auto constexpr Pool2 = std::string_view{ hash_string };
+    while (it < end)
     {
-        int const val = *it % std::size(Pool);
-        total += val;
-        *it++ = Pool[val];
+//        int const val = *it % std::size(Pool);
+//        total += val;
+//        *it++ = Pool[val];
+//          total += val;
+          *it++ = hash_string[--length];
     }
-    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
-    *it = Pool[val];
-
+//    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
+//    *it = Pool[val];
     return peer_id;
 }
 
@@ -873,6 +876,34 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
     TR_ASSERT(session != nullptr);
 
     return session->useIncompleteDir();
+}
+
+void tr_sessionSetHttpProxy(tr_session* session,std::string_view http_proxy)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->setHttpProxy(http_proxy != nullptr ? http_proxy : "");
+}
+
+char const* tr_sessionGetHttpProxy(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->httpProxy().c_str();
+}
+
+void tr_sessionSetHttpProxyEnabled(tr_session* session, bool enabled)
+{
+    TR_ASSERT(session != nullptr);
+
+    session->useHttpProxy(enabled);
+}
+
+bool tr_sessionGetHttpProxyEnabled(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->useHttpProxy();
 }
 
 // --- Peer Port

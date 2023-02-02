@@ -1,3 +1,11 @@
+针对PT的使用环境做了一些魔改，这些特性官方也不会接受PR，所以仅供个人使用：
+1. 支持TR的快速检测（只要文件名和文件大小一致就通过检测）
+2. 支持固定的peer_id,解决TR重复重启后，大量种子重复做种的问题
+3. 支持http_proxy,部分场景下tracker需要用代理，所以支持http_proxy的配置
+4. 默认的cache_size调整到512M
+5. 默认集成了TWC的页面，里面增加了http_proxy的配置项
+6. 因为代码是TR4版本的，PT站点都没有支持这个版本，所有协议上降级为3.0，不会被Ban
+
 ## About
 
 Transmission is a fast, easy, and free BitTorrent client. It comes in several flavors:

@@ -60,6 +60,7 @@ private:
         }
     }
 
+    static bool skipVerifyTorrent(tr_torrent *tor);
     void verifyThreadFunc();
     [[nodiscard]] static bool verifyTorrent(tr_torrent* tor, std::atomic<bool> const& stop_flag);
 

@@ -48,6 +48,7 @@ struct tr_ctor
 
     std::array<struct optional_args, 2> optional_args{};
 
+    std::string http_proxy;
     std::string incomplete_dir;
     std::string torrent_filename;
 
@@ -215,6 +216,11 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
     ctor->optional_args[mode].download_dir.assign(directory != nullptr ? directory : "");
+}
+
+void tr_ctorSetHttpProxy(tr_ctor* ctor, char const* http_proxy)
+{
+    ctor->http_proxy.assign(http_proxy != nullptr ? http_proxy : "");
 }
 
 void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)

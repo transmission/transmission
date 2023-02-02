@@ -1,0 +1,87 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:3px;border:0px;">
+		<div id="" class="dialog" style="width:100%;">
+			<table style="width:100%;">
+				<tr>
+					<td width="20%" class="title"><span system-lang="dialog['torrent-rename']['oldname']"></span></td>
+					<td width="80%">
+						<span id="oldname" ></span>
+					</td>
+				</tr>
+				<tr>
+					<td class="title"><span system-lang="dialog['torrent-rename']['newname']"></span></td>
+					<td>
+						<textarea id="newname" style="width:98%;height:50px;"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2"><hr/></td>
+				</tr>
+			</table>
+		</div>
+	</div>  
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<span id="text-infos" style="display:none;" system-lang="['public']['text-nochange']"></span>
+		<a id="button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);" system-lang="dialog['public']['button-ok']"></a>
+		<a id="button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);" system-lang="dialog['public']['button-cancel']"></a>  
+	</div>
+</div>
+<script type="text/javascript">
+	(function(thisDialog){
+		system.resetLangText(thisDialog);
+
+		var torrent = transmission.torrents.all[thisDialog.data("id")];
+		
+		thisDialog.find("#oldname").text(torrent.name);
+		thisDialog.find("#newname").val(torrent.name);
+
+		// 确认
+		thisDialog.find("#button-ok").click(function()
+		{
+			var oldValue = thisDialog.find("#oldname").text();
+			var newValue = thisDialog.find("#newname").val();
+			var button = $(this);
+
+			// 如果有指定參數時，開始替換
+			if (oldValue&&newValue&&(oldValue!=newValue))
+			{
+				if (confirm(system.lang["public"]["text-confirm"])==false)
+				{
+					return;
+				}
+
+				var icon = button.linkbutton("options").iconCls;
+				button.linkbutton({disabled:true,iconCls:"icon-loading"});
+				// 开始设置参数
+				transmission.renameTorrent(
+					torrent.id
+					,""
+					,newValue
+					,function(data){
+						button.linkbutton({iconCls:icon,disabled:false});
+						if (data.result!="success")
+						{
+							thisDialog.find("#text-infos").html(system.lang["error"]["rename-error"]).fadeInAndOut();
+							return;
+						}
+						
+						torrent.moreInfosTag = false;
+						system.reloadTorrentBaseInfos(data.arguments.id, ["name"]);						
+						thisDialog.dialog("close");
+					}
+				);
+			}
+			else
+			{
+				thisDialog.find("#text-infos").fadeInAndOut();
+			}
+			
+		});
+
+		thisDialog.find("#button-cancel").click(function()
+		{
+			thisDialog.dialog("close");
+		});
+		
+	})($("#dialog-torrent-rename"));
+</script>

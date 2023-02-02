@@ -1,0 +1,22 @@
+{
+	"config":{
+		"autoRowHeight":"false"
+		,"rownumbers":"true"
+		,"pagination":"true"
+		,"striped":"true"
+		,"singleSelect":"true"
+	}
+	,"fields":[
+		{"field":"announce","width":"300"}
+		,{"field":"announceState","width":"50"}
+		,{"field":"lastAnnounceResult","width":"180"}
+		,{"field":"downloadCount","width":"60","align":"left"}
+		,{"field":"leecherCount","width":"60","align":"left"}
+		,{"field":"seederCount","width":"60","align":"left"}
+		,{"field":"lastAnnounceSucceeded","width":"60","align":"center"}
+		,{"field":"lastAnnounceTime","width":"120","align":"center"}
+		,{"field":"lastAnnounceTimedOut","width":"60","align":"center"}
+		,{"field":"nextAnnounceTime","width":"120","align":"center"}
+		,{"field":"id","width":"50","hidden":"true"}
+	]
+}

@@ -1,0 +1,100 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:3px;border:0px;">
+		<div id="" class="dialog" style="width:100%;padding:0px;">
+			<span id="dialog-system-replaceTracker-tip" class="tip"></span>
+			<table style="width:100%;">
+				<tr>
+					<td width="20%" class="title"><span id="dialog-system-replaceTracker-old-tracker"></span></td>
+					<td width="80%">
+						<input type="text" id="old-tracker-url" />
+					</td>
+				</tr>
+				<tr>
+					<td class="title"><span id="dialog-system-replaceTracker-new-tracker"></span></td>
+					<td>
+						<input type="text" id="new-tracker-url" />
+					</td>
+				</tr>
+				
+				<tr>
+					<td colspan="2"><hr/></td>
+				</tr>
+			</table>
+		</div>
+	</div>  
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<span id="text-nochange" style="display:none;"></span>
+		<a id="replaceTracker-button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);">Ok</a>
+		<a id="replaceTracker-button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);">Cancel</a>  
+	</div>
+</div>
+<script type="text/javascript">
+	(function(thisDialog){
+		var title = "old-tracker,new-tracker,tip".split(",");
+		var torrent = transmission.torrents.all[system.currentTorrentId];
+		
+		$.each(title, function(i, item){
+			thisDialog.find("#dialog-system-replaceTracker-"+item).html(system.lang.dialog["system-replaceTracker"][item]);
+		});
+		
+		title = "button-ok,button-cancel".split(",");
+		$.each(title, function(i, item){
+			thisDialog.find("#replaceTracker-"+item).html(system.lang.dialog["public"][item]);
+		});
+		
+		thisDialog.find("#text-nochange").html(system.lang["public"]["text-nochange"]);
+
+		// 确认
+		thisDialog.find("#replaceTracker-button-ok").click(function()
+		{
+			var oldValue = thisDialog.find("#old-tracker-url").val();
+			var newValue = thisDialog.find("#new-tracker-url").val();
+			var button = $(this);
+
+			// 如果有指定參數時，開始替換
+			if (oldValue&&newValue&&(oldValue!=newValue))
+			{
+				if (confirm(system.lang["public"]["text-confirm"])==false)
+				{
+					return;
+				}
+
+				var icon = button.linkbutton("options").iconCls;
+				button.linkbutton({disabled:true,iconCls:"icon-loading"});
+				// 开始设置参数
+				transmission.torrents.searchAndReplaceTrackers(
+					oldValue
+					,newValue
+					,function(ids,count){
+						button.linkbutton({iconCls:icon,disabled:false});
+						if (count==0)
+						{
+							thisDialog.find("#text-nochange").html(system.lang["public"]["not-found"]).fadeInAndOut();
+							return;
+						}
+
+						if (ids==null)
+						{
+							thisDialog.find("#text-nochange").html(system.lang.dialog["error"]["data-error"]).fadeInAndOut();
+							return;
+						}
+						
+						system.reloadTorrentBaseInfos(ids);						
+						thisDialog.dialog("close");
+					}
+				);
+			}
+			else
+			{
+				thisDialog.find("#text-nochange").html(system.lang["public"]["text-nochange"]).fadeInAndOut();
+			}
+			
+		});
+
+		thisDialog.find("#replaceTracker-button-cancel").click(function()
+		{
+			thisDialog.dialog("close");
+		});
+		
+	})($("#dialog-system-replaceTracker"));
+</script>

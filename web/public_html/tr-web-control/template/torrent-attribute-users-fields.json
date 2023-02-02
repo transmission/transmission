@@ -1,0 +1,18 @@
+{
+	"config":{
+		"autoRowHeight":"false"
+		,"rownumbers":"true"
+		,"pagination":"true"
+		,"striped":"true"
+	}
+	,"fields":[
+		{"field":"address","width":"260"}
+		,{"field":"port","width":"60"}
+		,{"field":"isUTP","width":"60","align":"center"}
+		,{"field":"clientName","width":"120"}
+		,{"field":"flagStr","width":"60"}
+		,{"field":"progress","width":"70","align":"center"}
+		,{"field":"rateToClient","width":"80","align":"right","formatter":"speed"}
+		,{"field":"rateToPeer","width":"80","align":"right","formatter":"speed"}
+	]
+}

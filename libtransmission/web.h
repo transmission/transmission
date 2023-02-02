@@ -78,6 +78,8 @@ public:
         std::optional<int> sndbuf;
         std::optional<int> rcvbuf;
 
+        std::optional<std::string> http_proxy;
+
         // Maximum time to wait before timeout
         std::chrono::seconds timeout_secs = DefaultTimeoutSecs;
 

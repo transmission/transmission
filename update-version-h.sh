@@ -12,22 +12,27 @@ replace_if_differs() {
 
 echo "creating libtransmission/version.h"
 
-major_version=$(grep 'set[(]TR_VERSION_MAJOR' CMakeLists.txt | cut -d \" -f 2)
-minor_version=$(grep 'set[(]TR_VERSION_MINOR' CMakeLists.txt | cut -d \" -f 2)
-patch_version=$(grep 'set[(]TR_VERSION_PATCH' CMakeLists.txt | cut -d \" -f 2)
-beta_number=$(grep 'set[(]TR_VERSION_BETA_NUMBER' CMakeLists.txt | cut -d \" -f 2)
+#major_version=$(grep 'set[(]TR_VERSION_MAJOR' CMakeLists.txt | cut -d \" -f 2)
+#minor_version=$(grep 'set[(]TR_VERSION_MINOR' CMakeLists.txt | cut -d \" -f 2)
+#patch_version=$(grep 'set[(]TR_VERSION_PATCH' CMakeLists.txt | cut -d \" -f 2)
+#beta_number=$(grep 'set[(]TR_VERSION_BETA_NUMBER' CMakeLists.txt | cut -d \" -f 2)
+major_version=3
+minor_version=00
+patch_version=
+beta_number=
 if grep -q 'set[(]TR_VERSION_DEV TRUE)' CMakeLists.txt; then
   is_dev=true
 else
   is_dev=false
 fi
+is_dev=false
 
 # derived from above: semver version string. https://semver.org/
 # '4.0.0-beta.1'
 # '4.0.0-beta.1.dev' (a dev release between beta 1 and 2)
 # '4.0.0-beta.2'
 # '4.0.0'
-user_agent_prefix="${major_version}.${minor_version}.${patch_version}"
+user_agent_prefix="${major_version}.${minor_version}"
 if [ "$is_dev" = true ] || [ -n "${beta_number}" ]; then
   user_agent_prefix="${user_agent_prefix}-"
   if [ -n "${beta_number}" ]; then

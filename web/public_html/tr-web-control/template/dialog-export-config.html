@@ -1,0 +1,102 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:3px;border:0px;overflow: hidden;">
+		<div id="" class="dialog" style="width:100%;padding:0px;height:100%;border-bottom: 1px dotted #ccc;">
+			<div>
+				<input id="chk-export-system" type="checkbox" checked="checked" />
+				<label for="chk-export-system" system-lang="dialog['export-config']['option-system']"></label>
+			</div>
+			<div>
+				<input id="chk-export-dictionary" type="checkbox" checked="checked"/>
+				<label for="chk-export-dictionary" system-lang="dialog['export-config']['option-dictionary']"></label>
+			</div>
+			<div>
+				<input id="chk-export-server" type="checkbox" checked="checked"/>
+				<label for="chk-export-server" system-lang="dialog['export-config']['option-server']"></label>
+			</div>
+		</div>
+	</div>
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<span id="text-nochange" style="display:none;"></span>
+		<span id="text-count"></span>
+		<a id="button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);"
+		   system-lang="dialog['public']['button-ok']">Ok</a>
+		<a id="button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);"
+		   system-lang="dialog['public']['button-cancel']">Cancel</a>
+	</div>
+</div>
+<script type="text/javascript">
+	(function (thisDialog) {
+		var page = {
+			init: function () {
+				system.resetLangText(thisDialog);
+				this.initEvents();
+			},
+			// 初始化事件
+			initEvents: function () {
+				// Cancel
+				$("#button-cancel", thisDialog).click(function () {
+					page.close();
+				});
+
+				$("#button-ok", thisDialog).click(function () {
+					if (page.done()) {
+						page.close();
+					}
+				});
+			},
+			done: function () {
+				var data = {};
+
+				// 系统
+				if ($("#chk-export-system", thisDialog).prop("checked")) {
+					data["system"] = system.config;
+					data["user"] = system.userConfig;
+				}
+
+				// 目录字典
+				if ($("#chk-export-dictionary", thisDialog).prop("checked")) {
+					data["dictionary-folders"] = system.dictionary.folders.split("\n");
+				}
+
+				// 服务器
+				if ($("#chk-export-server", thisDialog).prop("checked")) {
+					data["server"] = $.extend({}, system.serverConfig);
+
+					// 排除一些不需要的参数
+					var except = ["blocklist-size", "config-dir", "rpc-version", 
+									  "rpc-version-minimum", "version", "session-id", "units",
+									  "download-dir-free-space"];
+
+					for (const key in except) {
+						if (except.hasOwnProperty(key)) {
+							const item = except[key];
+							data.server.hasOwnProperty(item) &&	delete data.server[item];
+						}
+					}
+				}
+
+				if ($.isEmptyObject(data)) {
+					thisDialog.find("#text-nochange").html(system.lang.dialog["export-config"].title).fadeInAndOut();
+					return false;
+				}
+
+				data["configVersion"] = 1;
+
+				var exportData = JSON.parse(JSON.stringify(data));
+
+				saveFileAs("tr-web-control-config.json", JSON.stringify(exportData));
+				return true;
+			},
+			close: function () {
+				var source = thisDialog.data("popoverSource");
+
+				if (source) {
+					$(source).webuiPopover("hide");
+				} else {
+					thisDialog.dialog("close");
+				}
+			}
+		};
+		page.init();
+	})($("#dialog-export-config"));
+</script>

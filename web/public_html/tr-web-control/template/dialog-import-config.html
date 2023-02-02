@@ -1,0 +1,119 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:3px;border:0px;overflow: hidden;">
+		<div id="" class="dialog" style="width:100%;padding:0px;height:100%;border-bottom: 1px dotted #ccc;">
+			<div id="div-option-system" style="display:none;">
+				<input id="chk-option-system" type="checkbox" />
+				<label for="chk-option-system" system-lang="dialog['export-config']['option-system']"></label>
+			</div>
+			<div id="div-option-dictionary-folders" style="display:none;">
+				<input id="chk-option-dictionary-folders" type="checkbox" />
+				<label for="chk-option-dictionary-folders" system-lang="dialog['export-config']['option-dictionary']"></label>
+			</div>
+			<div id="div-option-server" style="display:none;">
+				<input id="chk-option-server" type="checkbox" />
+				<label for="chk-option-server" system-lang="dialog['export-config']['option-server']"></label>
+			</div>
+		</div>
+	</div>
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<span id="text-nochange" style="display:none;"></span>
+		<span id="text-count"></span>
+		<a id="button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);"
+		   system-lang="dialog['public']['button-ok']">Ok</a>
+		<a id="button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);"
+		   system-lang="dialog['public']['button-cancel']">Cancel</a>
+	</div>
+</div>
+<script type="text/javascript">
+	(function (thisDialog) {
+		var page = {
+			config: thisDialog.data("config"),
+			init: function () {
+				system.resetLangText(thisDialog);
+				this.initEvents();
+				this.initValues();
+			},
+			// 初始化事件
+			initEvents: function () {
+				// Cancel
+				$("#button-cancel", thisDialog).click(function () {
+					page.close();
+				});
+
+				$("#button-ok", thisDialog).click(function () {
+					if (page.done()) {
+						page.close();
+					}
+				});
+			},
+			initValues: function () {
+				for (const key in this.config) {
+					if (this.config.hasOwnProperty(key)) {
+						$("#div-option-" + key, thisDialog).show();
+						$("#chk-option-" + key, thisDialog).prop("checked", true);
+					}
+				}
+			},
+			done: function () {
+				var data = {};
+
+				// 系统
+				if ($("#chk-option-system", thisDialog).prop("checked")) {
+					data["system"] = this.config.system;
+					data["user"] = this.config.user;
+				}
+
+				// 目录字典
+				if ($("#chk-option-dictionary-folders", thisDialog).prop("checked")) {
+					data["dictionary-folders"] = (this.config["dictionary-folders"]).join("\n");
+				}
+
+				// 服务器
+				if ($("#chk-option-server", thisDialog).prop("checked")) {
+					data["server"] = this.config.server;
+				}
+
+				if ($.isEmptyObject(data)) {
+					thisDialog.find("#text-nochange").html(system.lang.dialog["import-config"].title).fadeInAndOut();
+					return false;
+				}
+
+				if (confirm(system.lang.dialog["system-config"]["import-config-confirm"])) {
+					system.config = data["system"] || system.config;
+					system.userConfig = data["user"] || system.userConfig;
+					system.dictionary.folders = data["dictionary-folders"] || system.dictionary.folders;
+					system.saveConfig();
+					system.saveUserConfig();
+
+					if (data["server"]) {
+						this.updateServerConfig(data["server"]);
+					} else {
+						location.href = location.href;
+					}
+				}
+				return true;
+			},
+			updateServerConfig: function(config) {
+				// Start setting parameters
+				transmission.exec({
+					method: "session-set",
+					arguments: config
+				}, function (data) {
+					if (data.result == "success") {
+						location.href = location.href;
+					}
+				});
+			},
+			close: function () {
+				var source = thisDialog.data("popoverSource");
+
+				if (source) {
+					$(source).webuiPopover("hide");
+				} else {
+					thisDialog.dialog("close");
+				}
+			}
+		};
+		page.init();
+	})($("#dialog-import-config"));
+</script>

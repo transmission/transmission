@@ -1,0 +1,312 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:5px 6px 0px 6px;border:0px;">
+		<div id="" class="dialog" style="width:100%;padding:0px;">
+			<div id="dialog-torrent-add-tip-title" style="border:1px #c0c0c0 solid;background-color: #ffffcc;padding:3px;width:99%;color:black;"></div>
+			<table style="width:100%;">
+				<tr>
+					<td width="20%" class="title"><span id="dialog-torrent-add-download-dir"></span></td>
+					<td width="80%">
+						<select id="download-dir"  style="width:450px;"></select>
+						<input type="checkbox" id="set-default-download-dir" style="width:20px;"/><label for="set-default-download-dir" id="dialog-torrent-add-set-default-download-dir"></label>
+					</td>
+				</tr>
+				<tr>
+					<td class="title"><label id="dialog-torrent-add-upload-file" for="torrent_upload_file"></label></td>
+					<td>
+						<form action="#" method="post" id="torrent_upload_form" enctype="multipart/form-data" target="torrent_upload_frame">
+							<input type="file" name="torrent_files[]" id="torrent_upload_file" multiple="multiple" />
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td class="title"><span id="dialog-torrent-add-torrent-url"></span></td>
+					<td>
+						<textarea id="torrent_url" style="height:130px;"></textarea>
+						<span id="dialog-torrent-add-tip-torrent-url"></span>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<hr/>
+					</td>
+				</tr>
+				<tr>
+					<td class="title"><span id="dialog-torrent-add-autostart"></span></td>
+					<td>
+						<input type="checkbox" id="chkautostart" style="width:20px;"/><label for="chkautostart" id="dialog-torrent-add-tip-autostart"></label>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<!-- label -->
+		<div data-options="region:'center'" style="padding:3px;border:0px;overflow: hidden;">
+			<div id="label_page" class="dialog" style="width:100%;padding:0px;height:50%;border-bottom: 1px dotted #ccc;">
+				<div style="position: absolute;width:50%;height: 100%;">
+					<div system-lang="dialog['torrent-setLabels']['available']"></div>
+					<div id="divAvailableList" style="padding-top: 5px;"></div>
+				</div>
+				<div style="position: absolute;left:50%;width:50%;height: 50%;border-left: 1px dotted #ccc;padding-left: 5px;">
+					<div system-lang="dialog['torrent-setLabels']['selected']"></div>
+					<div id="divSelectedList" style="padding-top: 5px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<span id="dialog-torrent-add-nosource" style="display:none;"></span>
+		<span id="dialog-torrent-add-queue" style="display:none;"></span>
+		<a id="torrent-button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);">Ok</a>
+		<a id="torrent-button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);">Cancel</a>  
+	</div>
+</div>
+<script type="text/javascript">
+	(function(thisDialog){
+		var title = "download-dir,torrent-url,tip-torrent-url,autostart,tip-autostart,set-default-download-dir,upload-file,nosource,tip-title".split(",");
+		$.each(title, function(i, item){
+			thisDialog.find("#dialog-torrent-add-"+item).html(system.lang.dialog["torrent-add"][item]);
+		});
+
+		title = "button-ok,button-cancel".split(",");
+		$.each(title, function(i, item){
+			thisDialog.find("#torrent-"+item).html(system.lang.dialog.public[item]);
+		});
+
+		thisDialog.find("#download-dir").val(system.downloadDir);
+
+		var downloadDirs = $.merge([],transmission.downloadDirs);
+		if (system.dictionary.folders != null && system.dictionary.folders != "")
+		{
+			$.merge(downloadDirs,system.dictionary.folders.split("\n"));
+		}
+		downloadDirs = uniq(downloadDirs);
+
+		if (system.config.hideSubfolders == false && system.currentListDir != null && system.currentListDir != "") {
+			// 增加 当前数据目录为第一候选
+			downloadDirs.unshift(system.currentListDir);
+		}
+
+		if (downloadDirs == null)
+		{
+			$("<option/>").text(system.downloadDir).val(system.downloadDir).attr("selected",true).appendTo(thisDialog.find("#download-dir"));
+    } else {
+      $.each(downloadDirs, function(i, item){
+          $("<option/>").text(item).val(item).attr("selected",(item==system.downloadDir?true:false)).appendTo(thisDialog.find("#download-dir"));
+          });
+    }
+
+		thisDialog.find("#chkautostart").prop("checked", system.serverConfig["start-added-torrents"]);
+		thisDialog.find("#download-dir").combobox();
+
+		// label 
+		var labelPage = {
+			divSelectedList: $("#divSelectedList", thisDialog),
+			init: function() {
+				if(system.config.nav.labels){
+					system.resetLangText(thisDialog);
+					this.initLabels();
+				}
+				else{
+					$("#label_page").css("display", "none");
+				}
+			},
+			// 初始化标签列表
+			initLabels: function() {
+				var box = $("#divAvailableList", thisDialog);
+				for (var index = 0; index < system.config.labels.length; index++) {
+					var item = system.config.labels[index];
+					if (item) {
+						item.index = index;
+						var label = this.createLabel(item);
+						label.on("click", function(){
+							labelPage.setLabel("#divAvailableList", "#divSelectedList", $(this).data("label"));
+							$(this).remove();
+						}).appendTo(box);
+					}
+				}
+			},
+			createLabel: function(label) {
+				return $("<a href='javascript:void(0);' class='user-label-big label-index-"+label.index+"'/>").data("label", label).html(label.name).css({
+							"background-color": label.color,
+							"color": (getGrayLevel(label.color) > 0.5 ? "#000" : "#fff")
+						});
+			},
+			setLabel: function(from, to, item) {
+				var box = $(to, thisDialog);
+				var label = this.createLabel(item);
+				label.on("click", function(){
+					labelPage.setLabel(to, from, $(this).data("label"));
+					$(this).remove();
+				}).appendTo(box);
+			},
+			getLabels: function() {
+				if(!system.config.nav.labels)
+					return null;
+				var items = $(".user-label-big", this.divSelectedList);
+				var labels = [];
+
+				for (var index = 0; index < items.length; index++) {
+					var item = $(items[index]);
+					var label = item.data("label");
+					labels.push(label.index);
+				}
+				return labels;
+			}
+		};
+		labelPage.init();
+
+		// Confirm
+		thisDialog.find("#torrent-button-ok").click(function()
+		{
+			var dir = thisDialog.find("#download-dir").combobox("getValue");
+			var olddir = system.downloadDir;
+			var isnewdir = system.serverConfig["download-dir"]!=dir;
+			var isupload = thisDialog.find("#torrent_upload_file")[0].value!="";
+			var autostart = thisDialog.find("#chkautostart").prop("checked");
+
+			if (autostart!=system.serverConfig["start-added-torrents"])
+			{
+				system.serverConfig["start-added-torrents"] = autostart;
+				// Start setting parameters
+				transmission.exec(
+					{
+						method:"session-set"
+						,arguments: {
+							"start-added-torrents": autostart
+						}
+					}
+				);
+			}
+
+			var button = $(this);
+			var icon = button.linkbutton("options").iconCls;
+			button.linkbutton({disabled:true,iconCls:"icon-loading"});
+			
+			if (thisDialog.find("#set-default-download-dir").prop("checked")&&isnewdir)
+			{
+				updateDownloadDir(dir,function(){
+					if (isupload)
+					{
+						uploadFile(!autostart,function(){
+							button.linkbutton({iconCls:icon,disabled:false});
+						});
+						thisDialog.dialog("close");
+					}
+				});
+			}
+			var url = thisDialog.find("#torrent_url").val();
+			// When there is a file to upload
+			if (isupload)
+			{
+				// rpc-version 15 stopped using the ../upload interface
+				if (system.serverConfig["rpc-version"]>=15)
+				{
+					var uploaded = 0;
+					system.uploadTorrentFile("torrent_upload_file",dir,!autostart,function(data,count){
+						button.linkbutton({iconCls:icon,disabled:false});
+						uploaded++;
+						thisDialog.find("#dialog-torrent-add-queue").html(uploaded+"/"+count).show();
+						if (uploaded==count)
+						{
+							thisDialog.find("#dialog-torrent-add-queue").html("").hide();
+							thisDialog.dialog("close");
+						}
+						if(system.config.nav.labels && data.hashString != null){
+							system.saveLabelsConfig(data.hashString, labelPage.getLabels());
+							system.saveConfig();
+						}
+						system.reloadData();
+					});
+					return;
+				}
+				// New directory, but no hooks to save when you first save the directory
+				if (isnewdir)
+				{
+					updateDownloadDir(dir,function(){
+						if (isupload)
+						{
+							uploadFile(!autostart,function(){
+								button.linkbutton({iconCls:icon,disabled:false});
+								updateDownloadDir(olddir);
+							});
+							//thisDialog.dialog("close");
+						}
+					});
+				}
+				else
+				{
+					uploadFile(!autostart);
+					//thisDialog.dialog("close");
+				}
+			}
+			else if (url!="")
+			{
+				var urls = url.split("\n");
+				system.addTorrentsToServer(urls,urls.length,autostart,dir,labelPage.getLabels());
+				urls = null;
+				thisDialog.dialog("close");
+			}
+			else if(!isupload)
+			{
+				thisDialog.find("#dialog-torrent-add-nosource").fadeInAndOut();
+			}
+			
+		});
+
+		thisDialog.find("#torrent-button-cancel").click(function()
+		{
+			thisDialog.dialog("close");
+		});
+		
+		// Save the upload directory
+		function updateDownloadDir(dir,callback)
+		{
+			transmission.exec(
+				{
+					method:"session-set"
+					,arguments:{"download-dir":dir}
+				}
+				,function(data){
+					if (data.result=="success")
+					{
+						system.downloadDir = dir;
+						system.serverConfig["download-dir"] = dir;
+						if (callback)
+						{
+							callback();
+						}
+					}
+				}
+			);
+		}
+		
+		// Upload files
+		function uploadFile(paused,callback){
+			var options = {
+				// The upload should be by TR interface
+				url:"../upload?paused=" + paused
+				,type:"POST"
+				,dataType:"json"
+				,data:{
+					"X-Transmission-Session-Id":transmission.SessionId
+				}
+				,success:function(data){
+					//alert(data);
+					if (callback)
+						callback();
+					if(system.config.nav.labels && data.hashString != null){
+						system.saveLabelsConfig(data.hashString, labelPage.getLabels());
+						system.saveConfig();
+					}
+					thisDialog.dialog("close");
+					system.reloadData();
+				}
+				,error:function(data){
+					//alert("error:"+data);
+					console.log("data:",data);
+				}
+			};
+			$('#torrent_upload_form').ajaxSubmit(options);
+		}
+	})($("#dialog-torrent-add"));
+</script>

@@ -1,0 +1,42 @@
+.icon-servers{
+        background:url('icons/servers.png') no-repeat;
+}
+.icon-server{
+        background:url('icons/server.png') no-repeat;
+}
+.icon-server-error{
+        background:url('icons/server_error.png') no-repeat;
+}
+.icon-home{
+        background:url('icons/home.png') no-repeat;
+}
+.icon-download{
+        background:url('icons/download1.png') no-repeat;
+}
+.icon-seed{
+        background:url('icons/seed.png') no-repeat;
+}
+.icon-warning{
+        background:url('icons/warning.png') no-repeat;
+}
+.icon-error{
+        background:url('icons/stop.png') no-repeat;
+}
+.icon-pause{
+        background:url('icons/pause.png') no-repeat;
+}
+.icon-check{
+        background:url('icons/yin-yang.png') no-repeat;
+}
+.icon-actively{
+        background:url('icons/actively.png') no-repeat;
+}
+.icon-wait{
+        background:url('icons/wait.png') no-repeat;
+}
+.icon-chart{
+        background:url('icons/chart.png') no-repeat;
+}
+.icon-filter{
+        background:url('icons/filter.png') no-repeat center center;
+}

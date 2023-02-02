@@ -261,6 +261,13 @@ std::string_view getSiteName(std::string_view host)
         return host;
     }
 
+    TR_ASSERT(psl_builtin() != nullptr);
+    if (psl_builtin() == nullptr)
+    {
+        tr_logAddWarn("psl_builtin is null");
+        return host;
+    }
+
     // psl needs a zero-terminated hostname
     auto const szhost = tr_urlbuf{ host };
 

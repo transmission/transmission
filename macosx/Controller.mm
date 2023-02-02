@@ -470,6 +470,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_global, [_fDefaults integerForKey:@"PeersTotal"]);
         tr_variantDictAddInt(&settings, TR_KEY_peer_limit_per_torrent, [_fDefaults integerForKey:@"PeersTorrent"]);
 
+        tr_variantDictAddBool(&settings, TR_KEY_http_proxy_enabled, [_fDefaults boolForKey:@"UseHttpProxy"]);
+        tr_variantDictAddStr(&settings, TR_KEY_http_proxy, [_fDefaults stringForKey:@"HttpProxy"].stringByExpandingTildeInPath.UTF8String);
+
+        NSInteger cacheSize = [_fDefaults integerForKey:@"CacheSizeMB"];
+        tr_variantDictAddInt(&settings, TR_KEY_cache_size_mb, cacheSize <= 0 ? 64 : cacheSize);
+
         BOOL const randomPort = [_fDefaults boolForKey:@"RandomPort"];
         tr_variantDictAddBool(&settings, TR_KEY_peer_port_random_on_start, randomPort);
         if (!randomPort)

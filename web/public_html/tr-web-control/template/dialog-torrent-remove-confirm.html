@@ -1,0 +1,54 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:10px 6px 0px 10px;border:0px;">
+		<div class="messager-icon messager-question"></div>
+		<div id="torrent-remove-confirm-confirm-text" style="width:100%;padding:0px;">
+		</div>
+		<hr/>
+		<input id="remove-data" type="checkbox" style="width:16px;"/><label id="torrent-remove-confirm-remove-data" for="remove-data"></label>
+	</div>  
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<a id="torrent-remove-confirm-button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);">Ok</a>
+		<a id="torrent-remove-confirm-button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);">Cancel</a>
+	</div>
+</div>
+<script type="text/javascript">
+	(function(thisDialog){
+		var title = "confirm-text,remove-data".split(",");
+		$.each(title, function(i, item){
+			thisDialog.find("#torrent-remove-confirm-"+item).html(system.lang.dialog["torrent-remove"][item]);
+		});
+
+		thisDialog.find("#torrent-remove-ids").val(thisDialog.data);
+		thisDialog.find("#torrent-remove-confirm-button-ok").html(system.lang.dialog.public["button-ok"])
+		.click(function()
+		{
+			if (!thisDialog.data("ids"))
+			{
+				thisDialog.dialog("close");
+				return;
+			}
+			var button = $(this);
+			var icon = button.linkbutton("options").iconCls;
+			button.linkbutton({disabled:true,iconCls:"icon-loading"});
+			transmission.removeTorrent(thisDialog.data("ids"),thisDialog.find("#remove-data")[0].checked,function(status){
+				button.linkbutton({iconCls:icon,disabled:false});
+				if (status=="success")
+				{
+					thisDialog.dialog("close");
+					system.reloadTorrentBaseInfos();
+					system.control.torrentlist.datagrid("uncheckAll");
+				}
+				else
+				{
+					$.messager.alert("",system.lang.dialog["torrent-remove"]["remove-error"],'error'); 
+				}
+			});
+		});
+		
+		thisDialog.find("#torrent-remove-confirm-button-cancel").html(system.lang.dialog.public["button-cancel"])
+		.click(function()
+		{
+			thisDialog.dialog("close");
+		});
+	})($("#dialog-torrent-remove-confirm"));
+</script>

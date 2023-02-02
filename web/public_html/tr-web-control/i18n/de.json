@@ -1,0 +1,449 @@
+{
+	"name": "de",
+	"author": "LibertyX",
+	"system": {
+		"title": "Transmission WEB Control",
+		"status": {
+			"connect": "Verbinde...",
+			"connected": "Verbunden",
+			"queue": "Warteschlange:",
+			"queuefinish": "Die Warteschlange(n) wurden erledigt.",
+			"notfinal": "unvollständig",
+			"checked": "%n überprüft:"
+		}
+	},
+	"error": {
+		"data-error": "Empfangsfehler!",
+		"data-post-error": "Sendefehler!",
+		"rename-error": "Fehler beim umbenennen!"
+	},
+	"config": {
+		"save-path": "Speicherordner"
+	},
+	"toolbar": {
+		"start": "Start",
+		"pause": "Pause",
+		"recheck": "neu Prüfen",
+		"start-all": "Alle starten",
+		"pause-all": "Alle anhalten",
+		"remove": "entfernen",
+		"remove-all": "Alle entfernen",
+		"remove-data": "Daten entfernen",
+		"add-torrent": "Torrent hinzufügen",
+		"attribute": "Eigenschaften",
+		"alt-speed": "Alt-Speed",
+		"system-config": "Einstellungen",
+		"system-reload": "Neu laden",
+		"about": "ÜBER",
+		"reload-time": "Seite neu laden alle:",
+		"reload-time-unit": "sekunden",
+		"autoreload-disabled": "deaktiviert",
+		"autoreload-enabled": "aktiviert",
+		"search-prompt": "Durchsuche lokale Torrents",
+		"tracker-replace": "Tracker ersetzen",
+		"queue": "Warteschlange",
+		"ui-mobile": "Mobile UI",
+		"ui-original": "Original UI",
+		"ui-computer": "Desktop UI",
+		"plugin": "Erweiterungen",
+		"rename": "Umbenennen",
+		"copy-path-to-clipboard": "Kopiere Speicherort in Zwischenablage",
+		"tip": {
+			"start": "Ausgewählte(n) Torrents straten",
+			"pause": "Ausgewählte(n) Torrents anhalten",
+			"recheck": "Ausgewählte Torrents neu prüfen",
+			"recheck-confirm": "Ausgewählte Torrents wirklich neu überprüfen? Das kann länger dauern!",
+			"start-all": "Alle starten",
+			"pause-all": "Alle anhalten",
+			"remove": "entfernen",
+			"delete-all": "Alle löschen",
+			"delete-data": "Nur Daten löschen",
+			"add-torrent": "Torrent(s) hinzufügen",
+			"attribute": "Eigenschaften",
+			"alt-speed": "Alt-speed",
+			"system-config": "Einstellungen",
+			"system-reload": "neu laden",
+			"about": "ÜBER",
+			"autoreload-disabled": "Klicken um automatisches neuladen zu deaktivieren",
+			"autoreload-enabled": "Klicken um automatisches neuladen zu aktivieren",
+			"tracker-replace": "Trackers ersetzten",
+			"change-download-dir": "Speicherort ändern",
+			"ui-mobile": "Mobile UI",
+			"ui-original": "Original UI",
+			"more-peers": "Tracker nach Verbindungen fragen",
+			"rename": "Torrent umbenennen (Pfad)",
+			"copy-path-to-clipboard": "Speicherordner in Zwichenablage kopieren"
+		}
+	},
+	"menus": {
+		"queue": {
+			"move-top": "An den Anfang",
+			"move-up": "höher",
+			"move-down": "tiefer",
+			"move-bottom": "An das Ende"
+		},
+		"plugin": {
+			"auto-match-data-folder": "Automatically matches data directory"
+		},
+		"setLabels": "Etikett auswählen"
+	},
+	"title": {
+		"left": "Navigation",
+		"list": "Torrents",
+		"attribute": "Eigenschaften",
+		"status": "Status"
+	},
+	"tree": {
+		"all": "Alle",
+		"active": "Aktiv",
+		"paused": "Angehalten",
+		"downloading": "Ladend",
+		"sending": "Seeding",
+		"error": "Fehler",
+		"warning": "Warnung",
+		"actively": "Aktiv",
+		"check": "Prüfung",
+		"wait": "Warte...",
+		"search-result": "Suchergebniss",
+		"status": {
+			"loading": "Lade..."
+		},
+		"statistics": {
+			"title": "Statistiken",
+			"cumulative": "Gesamt",
+			"current": "Aktuelle Sitzung",
+			"uploadedBytes": "gesendet:",
+			"downloadedBytes": "empfangen:",
+			"filesAdded": "Dateien hinzugefügt:",
+			"sessionCount": "Sitzungen:",
+			"secondsActive": "Aktiv seit:"
+		},
+		"servers": "Tracker",
+		"folders": "Ordner",
+		"toolbar": {
+			"nav": {
+				"folders": "Ordner"
+			}
+		},
+		"labels": "Etiketten"
+	},
+	"statusbar": {
+		"downloadspeed": "Download speed:",
+		"uploadspeed": "Seed speed:",
+		"version": "Version:"
+	},
+	"dialog": {
+		"torrent-add": {
+			"download-dir": "Speicherort:",
+			"torrent-url": "Torrent URL:",
+			"tip-torrent-url": "Tip: Mehrere Einträge durch Drücken der 'Eingabe' Taste trennen",
+			"autostart": "Torrent starten:",
+			"tip-autostart": "Nach dem bestätigen mit 'OK' wird der Torrent direkt gestartet",
+			"set-default-download-dir": "Diesen Ornder als standard setzen",
+			"upload-file": "Datei(en):",
+			"nosource": "Keine torrent Datei oder URL.",
+			"tip-title": "Das hochladen einer Torrent Datei hat Vorrang vor einem Link"
+		},
+		"system-config": {
+			"title": "Server Einstellungen",
+			"tabs": {
+				"base": "Base",
+				"network": "Netzwerk",
+				"limit": "Limit",
+				"alt-speed": "Alternative Limit´s",
+				"dictionary-folders": "Ordner Liste",
+				"more": "Mehr",
+				"labels": "Etiketten"
+			},
+			"config-dir": "Speicherort der Konfigurationsdateien:",
+			"download-dir": "Standard Speicherort für Torrents:",
+			"download-dir-free-space": "Speicher verfügbar:",
+			"incomplete-dir-enabled": "Benutze eigenes Verzeichnis für unvollständige Torrents",
+			"cache-size-mb": "Größe des Festplattencache:",
+			"rename-partial-files": "Unvollständigen Dateien '.part' anhängen",
+			"start-added-torrents": "Hinzugefügte Torrents automatisch starten",
+			"download-queue-enabled": "Download Warteschlage benutzen, max Länge:",
+			"seed-queue-enabled": "Seed Warteschlange benutzen, max Länge:",
+			"peer-port-random-on-start": "Benutze zufälligen Port",
+			"port-forwarding-enabled": "Port-Weiterleitung aktivieren",
+			"test-port": "Port testen",
+			"port-is-open-true": "Port offen",
+			"port-is-open-false": "Port geschlossen",
+			"testing": "Teste...",
+			"encryption": "Verschlüsselung:",
+			"encryption-type": {
+				"required": "Erforderlich",
+				"preferred": "Bevorzugt",
+				"tolerated": "Akzeptiert"
+			},
+			"utp-enabled": "µTP (UPnP) aktiv",
+			"dht-enabled": "DHT aktiv",
+			"lpd-enabled": "LPD aktiv",
+			"pex-enabled": "PEX aktiv",
+			"peer-limit-global": "Max Verbindungen (global):",
+			"peer-limit-per-torrent": "Max Verbindungen je Torrent :",
+			"speed-limit-down-enabled": "Max Download Geschwindigkeit (Global):",
+			"speed-limit-up-enabled": "Max Upload Geschwindigkeit (Global):",
+			"alt-speed-enabled": "Aktiviere alternative Limit´s",
+			"alt-speed-down": "Alternative Downloadgeschwindigkeit (Global):",
+			"alt-speed-up": "Alternative Uploadgeschwindigkeit (Global):",
+			"alt-speed-time-enabled": "Zeitsteuerung benutzen",
+			"alt-speed-time": "Zeit",
+			"weekday": {
+				"1": "Montag",
+				"2": "Dienstag",
+				"3": "Mittwoch",
+				"4": "Donnerstag",
+				"5": "Freitag",
+				"6": "Samstag",
+				"0": "Sonntag"
+			},
+			"blocklist-enabled": "Blocklist aktiv",
+			"blocklist-size": "Blocklist hat %n Regeln.",
+			"seedRatioLimited": "Standard Upload-Ratio für Torrents:",
+			"queue-stalled-enabled": "Torrents gelten als inaktiv wenn im Leerlauf für:",
+			"idle-seeding-limit-enabled": "Inaktive Torrents (seeding) nach dieser Zeit anhalten:",
+			"minutes": "Minuten",
+			"nochange": "Keine Änderung",
+			"saving": "Speichern...",
+			"show-bt-servers": "Zeige 'Server (BT)' unter Tracker:",
+			"restore-default-settings": "Standardeinstellungen der UI wiederherstellen",
+			"language": "Sprache:",
+			"loading": "Lade...",
+			"hide-subfolders": "Beim klick auf einen Speicher-Ordner, den Inhalt des Unterordners nicht anzeigen:",
+			"simple-check-mode": "Beim rechts Klick in der Torrent Liste, einen Torrent fest auswählen:",
+			"nav-contents": "In Navigationsleiste anzeigen:",
+			"labels-manage": {
+				"name": "Name",
+				"description": "Beschreibung",
+				"color": "Farbe",
+				"actions": "Aktion(en)",
+				"import-confirm": "Etiketten wirklich importieren? Das überschreibt die aktuelle Liste!"
+			},
+			"import-config": "Einstellungen importieren",
+			"export-config": "Einstellungen exportieren",
+			"import-config-confirm": "Einstellungen importieren und aktuelle Konfiguration überschreiben?"
+		},
+		"public": {
+			"button-ok": "OK",
+			"button-cancel": "Abbrechen",
+			"button-reload": "neu Laden",
+			"button-save": "Speichern",
+			"button-close": "Schließen",
+			"button-update": "Aktualisieren",
+			"button-config": "Einstellung",
+			"button-addnew": "Hinzufügen",
+			"button-edit": "Bearbeiten",
+			"button-delete": "Löschen",
+			"button-export": "Export",
+			"button-import": "Import"
+		},
+		"about": {
+			"infos": "Author：culturist<br/>Statement：Most of the icons used in this program from the network, if any violation of your rights, please contact me delete.",
+			"check-update": "Update prüfen",
+			"home": "Project Seite",
+			"help": "Wiki",
+			"donate": "Spenden",
+			"pt-plugin": "PT Plugin"
+		},
+		"torrent-remove": {
+			"title": "Remove confirm",
+			"confirm-text": "Willst du die ausgewählten Torrent(s) wirklich entfernen?",
+			"remove-data": "herutergeladene Daten entfernen",
+			"remove-error": "Löschen fehlgeschlagen!"
+		},
+		"torrent-changeDownloadDir": {
+			"title": "Neuer Speicherort",
+			"old-download-dir": "Aktuell",
+			"new-download-dir": "Neu:",
+			"move-data": "Daten in neuen Speicherort verschieben",
+			"set-error": "Änderung fehlgeschlagen!",
+			"recheck-data": "Daten neu prüfen."
+		},
+		"system-replaceTracker": {
+			"title": "Tracker ersetzen",
+			"old-tracker": "Aktuell:",
+			"new-tracker": "Neuer:",
+			"tip": "Diese Option findet Tracker <b>aller Torrents</b>.",
+			"not-found": "Tracker nicht gefunden"
+		},
+		"auto-match-data-folder": {
+			"title": "Automatically matches data directory",
+			"torrent-count": "Torrent count:",
+			"folder-count": "Folder count:",
+			"dictionary": "Ordner Liste",
+			"time-begin": "Begin time:",
+			"time-now": "Aktuell:",
+			"status": "Status:",
+			"ignore": "Ignorieren",
+			"working-close-confirm": "Es werden gerade Daten heruntergeladen, willst du Transmission wirklich beenden?",
+			"time-interval": "Intervall (sekunden):",
+			"work-mode-title": "Modus:",
+			"work-mode": {
+				"1": "Individually matched by torrent",
+				"2": "Individually matched by folder"
+			}
+		},
+		"torrent-rename": {
+			"title": "Torrent umbenennen (Pfad)",
+			"oldname": "Aktuell",
+			"newname": "Neu"
+		},
+		"torrent-attribute-add-tracker": {
+			"title": "Trackers hinzufügen",
+			"tip": "Einen Tracker pro Zeile"
+		},
+		"torrent-setLabels": {
+			"title": "Etikett auswählen",
+			"available": "Verfügbar:",
+			"selected": "Ausgewählt:"
+		},
+		"export-config": {
+			"title": "Was soll exportiert werden?",
+			"option-all": "Alles",
+			"option-system": "Nur System (Web-Controll",
+			"option-dictionary": "Ordner Liste",
+			"option-server": "Transmission Einstellungen (Speicherort, Cache, Limit´s, usw.)"
+		},
+		"import-config": {
+			"title": "Importdatei auswählen",
+			"invalid-file": "Dateifehler"
+		}
+	},
+	"torrent": {
+		"fields": {
+			"id": "#",
+			"name": "Name",
+			"hashString": "HASH",
+			"downloadDir": "Speicherort",
+			"totalSize": "Größe",
+			"status": "Status",
+			"percentDone": "erledigt(%)",
+			"remainingTime": "Zeit bis vollständig",
+			"addedDate": "Hinzugefügt am",
+			"completeSize": "geladen",
+			"rateDownload": "Download Rate",
+			"rateUpload": "Upload Rate",
+			"leecherCount": "Leecher",
+			"seederCount": "Seeder",
+			"uploadedEver": "gesendet",
+			"uploadRatio": "Ratio",
+			"queuePosition": "Warteschlange",
+			"activityDate": "Aktiv seit",
+			"trackers": "Tracker",
+			"labels": "Etiketten"
+		},
+		"status-text": {
+			"0": "Angehalten",
+			"1": "Warte auf Prüfung",
+			"2": "Prüfe",
+			"3": "Warte auf Download",
+			"4": "Lade",
+			"5": "Warte auf Seed",
+			"6": "Seeding"
+		},
+		"attribute": {
+			"tabs": {
+				"base": "Allgemein",
+				"servers": "Tracker",
+				"files": "Dateien",
+				"users": "Verbindungen",
+				"config": "Einstellungen"
+			},
+			"files-fields": {
+				"name": "Name",
+				"length": "Größe",
+				"percentDone": "erledigt (%)",
+				"bytesCompleted": "Größe (gesamt)",
+				"wanted": "Wanted",
+				"priority": "Priorität"
+			},
+			"servers-fields": {
+				"announce": "Announce",
+				"announceState": "Status",
+				"lastAnnounceResult": "Infos",
+				"lastAnnounceSucceeded": "Succeeded",
+				"lastAnnounceTime": "AnnounceTime",
+				"lastAnnounceTimedOut": "TimedOut",
+				"downloadCount": "Download count",
+				"nextAnnounceTime": "Next announce"
+			},
+			"peers-fields": {
+				"address": "IP Adresse",
+				"clientName": "Client",
+				"flagStr": "Flag",
+				"progress": "In Bearbeitung",
+				"rateToClient": "RateToClient",
+				"rateToPeer": "RateToPeer"
+			},
+			"status": {
+				"true": "Richtig",
+				"false": "Falsch"
+			},
+			"priority": {
+				"0": "Normal",
+				"1": "Hoch",
+				"-1": "Niedrig"
+			},
+			"label": {
+				"name": "Name:",
+				"addedDate": "Hinzugefügt am:",
+				"totalSize": "Größe (gesamt):",
+				"completeSize": "Bereits geladen:",
+				"leftUntilDone": "Zeit bis vollständig:",
+				"hashString": "HASH:",
+				"downloadDir": "Speicherort:",
+				"status": "Status:",
+				"rateDownload": "Downloadrate:",
+				"rateUpload": "Uploadrate:",
+				"leecherCount": "Leecher:",
+				"seederCount": "Seeder:",
+				"uploadedEver": "Gesendet (gesamt):",
+				"uploadRatio": "Upload Ratio:",
+				"creator": "Erstellt mit:",
+				"dateCreated": "Erstellt am:",
+				"comment": "Kommentar:",
+				"errorString": "Error string:",
+				"downloadLimited": "Max Downloadgeschwindigkeit (Global):",
+				"uploadLimited": "Max Uploadgeschwindigkeit (Global):",
+				"peer-limit": "Max Verbindungen für diesen Torrent:",
+				"seedRatioMode": "Seed ratio für diesen Torrent:",
+				"seedIdleMode": "Seedender Torrent wird gestoppt, wenn er Inaktiv ist für:",
+				"doneDate": "Beendet am:",
+				"seedTime": "Seed Time:"
+			},
+			"tip": {
+				"button-allow": "Gewählte Datei(en) erunterladen",
+				"button-deny": "Gewählte Datei(en) überspringen",
+				"button-priority": "Priorität setzen",
+				"button-tracker-add": "Neuen Tracker hinzufügen",
+				"button-tracker-edit": "Tracker bearbeiten",
+				"button-tracker-remove": "Tracker entfernen"
+			},
+			"other": {
+				"tracker-remove-confim": "Du willst diesen Tracker wirklich entfernen?"
+			}
+		}
+	},
+	"torrent-head": {
+		"buttons": {
+			"autoExpandAttribute": "Eigenschaften automatisch Erweitern"
+		}
+	},
+	"public": {
+		"text-unknown": "Unbekannt",
+		"text-drop-title": "Drag and drop the file in the region to add to the Transmission.",
+		"text-saved": "gespeichert",
+		"text-nochange": "keine Änderung",
+		"text-info": "Infos",
+		"text-confirm": "Bist du sicher?",
+		"text-browsers-not-support-features": "Der aktuelle Browser unterstützt diese Funktion nicht!",
+		"text-download-update": "Dieses Update herunterladen",
+		"text-have-update": "Ein Update ist verfügbar",
+		"text-on": "AN",
+		"text-off": "AUS",
+		"text-how-to-update": "Wie soll aktualisiert werden?",
+		"text-ignore-this-version": "Diese Version ignorieren",
+		"text-json-file-parsing-failed": "Laden der JSON Datei fehlgeschlagen!"
+	}
+}

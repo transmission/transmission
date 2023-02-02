@@ -1,0 +1,210 @@
+.c1,.c1:hover,.c1>.panel-header{
+	color: #fff;
+	border-color: #3c8b3c;
+	background: #4cae4c;
+	background: -webkit-linear-gradient(top,#4cae4c 0,#449d44 100%);
+	background: -moz-linear-gradient(top,#4cae4c 0,#449d44 100%);
+	background: -o-linear-gradient(top,#4cae4c 0,#449d44 100%);
+	background: linear-gradient(to bottom,#4cae4c 0,#449d44 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#4cae4c,endColorstr=#449d44,GradientType=0);
+}
+a.c1:hover{
+	background: #449d44;
+	filter: none;
+}
+.c1>.panel-body{
+	border-color: #3c8b3c;
+}
+.c1>.dialog-toolbar,.c1>.dialog-button{
+	border-left-color: #3c8b3c;
+	border-right-color: #3c8b3c;
+}
+.c1>.dialog-button{
+	border-bottom-color: #3c8b3c;
+}
+.c2,.c2:hover,.c2>.panel-header{
+	color: #fff;
+	border-color: #5f5f5f;
+	background: #747474;
+	background: -webkit-linear-gradient(top,#747474 0,#676767 100%);
+	background: -moz-linear-gradient(top,#747474 0,#676767 100%);
+	background: -o-linear-gradient(top,#747474 0,#676767 100%);
+	background: linear-gradient(to bottom,#747474 0,#676767 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#747474,endColorstr=#676767,GradientType=0);
+}
+a.c2:hover{
+	background: #676767;
+	filter: none;
+}
+.c2>.panel-body{
+	border-color: #5f5f5f;
+}
+.c2>.dialog-toolbar,.c2>.dialog-button{
+	border-left-color: #5f5f5f;
+	border-right-color: #5f5f5f;
+}
+.c2>.dialog-button{
+	border-bottom-color: #5f5f5f;
+}
+.c3,.c3:hover,.c3>.panel-header{
+	color: #333;
+	border-color: #ff8080;
+	background: #ffb3b3;
+	background: -webkit-linear-gradient(top,#ffb3b3 0,#ff9999 100%);
+	background: -moz-linear-gradient(top,#ffb3b3 0,#ff9999 100%);
+	background: -o-linear-gradient(top,#ffb3b3 0,#ff9999 100%);
+	background: linear-gradient(to bottom,#ffb3b3 0,#ff9999 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffb3b3,endColorstr=#ff9999,GradientType=0);
+}
+a.c3:hover{
+	background: #ff9999;
+	filter: none;
+}
+.c3>.panel-body{
+	border-color: #ff8080;
+}
+.c3>.dialog-toolbar,.c3>.dialog-button{
+	border-left-color: #ff8080;
+	border-right-color: #ff8080;
+}
+.c3>.dialog-button{
+	border-bottom-color: #ff8080;
+}
+.c4,.c4:hover,.c4>.panel-header{
+	color: #333;
+	border-color: #52d689;
+	background: #b8eecf;
+	background: -webkit-linear-gradient(top,#b8eecf 0,#a4e9c1 100%);
+	background: -moz-linear-gradient(top,#b8eecf 0,#a4e9c1 100%);
+	background: -o-linear-gradient(top,#b8eecf 0,#a4e9c1 100%);
+	background: linear-gradient(to bottom,#b8eecf 0,#a4e9c1 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#b8eecf,endColorstr=#a4e9c1,GradientType=0);
+}
+a.c4:hover{
+	background: #a4e9c1;
+	filter: none;
+}
+.c4>.panel-body{
+	border-color: #52d689;
+}
+.c4>.dialog-toolbar,.c4>.dialog-button{
+	border-left-color: #52d689;
+	border-right-color: #52d689;
+}
+.c4>.dialog-button{
+	border-bottom-color: #52d689;
+}
+.c5,.c5:hover,.c5>.panel-header{
+	color: #fff;
+	border-color: #b52b27;
+	background: #d84f4b;
+	background: -webkit-linear-gradient(top,#d84f4b 0,#c9302c 100%);
+	background: -moz-linear-gradient(top,#d84f4b 0,#c9302c 100%);
+	background: -o-linear-gradient(top,#d84f4b 0,#c9302c 100%);
+	background: linear-gradient(to bottom,#d84f4b 0,#c9302c 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#d84f4b,endColorstr=#c9302c,GradientType=0);
+}
+a.c5:hover{
+	background: #c9302c;
+	filter: none;
+}
+.c5>.panel-body{
+	border-color: #b52b27;
+}
+.c5>.dialog-toolbar,.c5>.dialog-button{
+	border-left-color: #b52b27;
+	border-right-color: #b52b27;
+}
+.c5>.dialog-button{
+	border-bottom-color: #b52b27;
+}
+.c6,.c6:hover,.c6>.panel-header{
+	color: #fff;
+	border-color: #1f637b;
+	background: #2984a4;
+	background: -webkit-linear-gradient(top,#2984a4 0,#24748f 100%);
+	background: -moz-linear-gradient(top,#2984a4 0,#24748f 100%);
+	background: -o-linear-gradient(top,#2984a4 0,#24748f 100%);
+	background: linear-gradient(to bottom,#2984a4 0,#24748f 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#2984a4,endColorstr=#24748f,GradientType=0);
+}
+a.c6:hover{
+	background: #24748f;
+	filter: none;
+}
+.c6>.panel-body{
+	border-color: #1f637b;
+}
+.c6>.dialog-toolbar,.c6>.dialog-button{
+	border-left-color: #1f637b;
+	border-right-color: #1f637b;
+}
+.c6>.dialog-button{
+	border-bottom-color: #1f637b;
+}
+.c7,.c7:hover,.c7>.panel-header{
+	color: #333;
+	border-color: #e68900;
+	background: #ffab2e;
+	background: -webkit-linear-gradient(top,#ffab2e 0,#ff9900 100%);
+	background: -moz-linear-gradient(top,#ffab2e 0,#ff9900 100%);
+	background: -o-linear-gradient(top,#ffab2e 0,#ff9900 100%);
+	background: linear-gradient(to bottom,#ffab2e 0,#ff9900 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#ffab2e,endColorstr=#ff9900,GradientType=0);
+}
+a.c7:hover{
+	background: #ff9900;
+	filter: none;
+}
+.c7>.panel-body{
+	border-color: #e68900;
+}
+.c7>.dialog-toolbar,.c7>.dialog-button{
+	border-left-color: #e68900;
+	border-right-color: #e68900;
+}
+.c7>.dialog-button{
+	border-bottom-color: #e68900;
+}
+.c8,.c8:hover,.c8>.panel-header{
+	color: #fff;
+	border-color: #4b72a4;
+	background: #698cba;
+	background: -webkit-linear-gradient(top,#698cba 0,#577eb2 100%);
+	background: -moz-linear-gradient(top,#698cba 0,#577eb2 100%);
+	background: -o-linear-gradient(top,#698cba 0,#577eb2 100%);
+	background: linear-gradient(to bottom,#698cba 0,#577eb2 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#698cba,endColorstr=#577eb2,GradientType=0);
+}
+a.c8:hover{
+	background: #577eb2;
+	filter: none;
+}
+.c8>.panel-body{
+	border-color: #4b72a4;
+}
+.c8>.dialog-toolbar,.c8>.dialog-button{
+	border-left-color: #4b72a4;
+	border-right-color: #4b72a4;
+}
+.c8>.dialog-button{
+	border-bottom-color: #4b72a4;
+}
+.c1>.panel-header>.panel-title,.c2>.panel-header>.panel-title,
+.c5>.panel-header>.panel-title,.c6>.panel-header>.panel-title,.c8>.panel-header>.panel-title{
+	color: #fff;
+}
+.c-plain{
+	border-color: #fff;
+	background: #fff;
+}
+.c-plain>.panel-header,
+.c-plain>.panel-body,
+.c-plain>.dialog-button,
+.c-plain>.dialog-toolbar{
+	border-color: transparent;
+	background: transparent;
+}
+.c-raised{
+	box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}

@@ -1,0 +1,269 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="cache-control" content="no-cache" />
+	<meta http-equiv="expires" content="0" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<link rel='shortcut icon' href='favicon.ico' type='image/x-icon'/ >
+	<title>Transmission Web Control Mobile</title>
+	<!-- Style sheet -->
+	<link rel="stylesheet" type="text/css" href="tr-web-control/style/base.mobile.css?v=20180906" />
+    <link rel="stylesheet" type="text/css" href="tr-web-control/script/jquery/mobile/jquery.mobile-1.4.5.min.css?v=20170426"/>  
+	<!-- Base class library -->
+	<script type="text/javascript" src="tr-web-control/script/jquery/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/jquery/jquery.form.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/jquery/json2.min.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/jquery/Base64.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/jquery/mobile/jquery.mobile-1.4.5.min.js?v=20170426"></script>
+	<!-- -->
+	<!-- System class library -->
+	<script type="text/javascript" src="tr-web-control/script/min/public.min.js?v=20180906"></script>
+	<script type="text/javascript" src="tr-web-control/script/other/ua-parser.min.js?v=20170522"></script>
+	<script type="text/javascript" src="tr-web-control/script/min/transmission.min.js?v=20180906"></script>
+	<script type="text/javascript" src="tr-web-control/script/min/transmission.torrents.min.js?v=20180906"></script>
+	<script type="text/javascript" src="tr-web-control/script/min/system.mobile.min.js?v=20180906"></script>
+</head>
+<body>
+	<!-- Home -->
+	<div data-role="page" id="main-page">
+		<div data-role="header" data-theme="b" data-position="fixed" data-tap-toggle="false">
+			<h1 id="page-title">Transmission Web Control Mobile</h1>
+			<a href="#" data-icon="home" data-iconpos="notext" data-direction="reverse" onclick="system.showContent('home');"></a>
+			<a href="#navPanel" data-icon="bars" data-iconpos="notext" data-direction="reverse"></a>
+		</div>
+		<div data-role="header"  data-theme="z" data-position="fixed" data-tap-toggle="false" data-fullscreen="true">
+			<div id="torrent-page-bar" class="page-bar" style="display:none;">
+				<a id="page-prev" href="javascript:void(0);" class="iconlabel icon-arrow-left"></a>
+				<a id="page-number" class="page-number"></a>
+				<a id="page-next" href="javascript:void(0);" class="iconlabel icon-arrow-right"></a>
+			</div>
+		</div>
+		<!-- 导航栏 -->
+		<div data-role="panel" id="navPanel" data-display="overlay" data-position="right">
+			<ul data-role="listview" data-divider-theme="a" data-theme="c">
+				<li data-role='list-divider'><span system-lang="title.left"></span></li>
+				<li data-icon="plus"><a href="#" onclick="showAddTorrent();"><span system-lang="toolbar['add-torrent']"></span></a></li>
+				<li data-icon="gear" style="display:none;"><a href="#"><span system-lang="toolbar['system-config']"></span></a></li>
+			</ul>
+			<ul data-role="listview" data-divider-theme="e" data-theme="e" data-icon="false" style="margin-top:15px;">
+				<li data-role='list-divider' style="padding:0px 10px;">
+					<table style="width:100%;">
+						<tr>
+							<td style="width:70%;"><span system-lang="toolbar['reload-time']"></span></td>
+							<td style="width:30%;">
+								<select name="autoreload" id="autoreload" data-role="slider" data-mini="true">
+									<option value="false" system-lang="toolbar['autoreload-disabled']">Off</option>
+									<option value="true" system-lang="toolbar['autoreload-enabled']">On</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td><input type="range" name="auto-reload-time" id="auto-reload-time" value="1" min="1" max="100"/></td>
+							<td><label for="auto-reload-time" system-lang="toolbar['reload-time-unit']"></label></td>
+						</tr>
+					</table>
+				</li>
+			</ul>
+			<ul data-role="listview" data-divider-theme="a" data-theme="c" data-icon="false" style="margin-top:15px;">
+				<li data-role='list-divider'>UI</li>
+				<li><a href="#" onclick="location.href = 'index.html?devicetype=computer';"><img src="tr-web-control/style/images/computer.png" class="ui-li-icon"/><span system-lang="toolbar['ui-computer']"></span></a></li>
+				<li><a href="#" onclick="location.href = 'index.original.html';"><img src="tr-web-control/style/images/transmission.png" class="ui-li-icon"/><span system-lang="toolbar['ui-original']"></span></a></li>
+			</ul>
+			<ul data-role="listview" data-divider-theme="a" data-theme="c" data-icon="false" style="margin-top:15px;">
+				<li data-role='list-divider'><span system-lang="title.status"></span></li>
+				<li id="status" style="display:none;"><span id="status-msg"></span><span id="status-count" class="ui-li-count">0</span></li>
+			</ul>
+		</div>
+		<div data-role="content" style="padding:0px;">
+			<!-- 种子分类列表 -->
+			<div id="content-home" style="padding:15px;">
+				<ul data-role="listview" data-count-theme="e">
+					<li><a href="#" onclick="system.showContent({page:'torrent-list',type:'torrent-list',data:'all'});"><span system-lang="tree.all"></span><span id="count-all" class="ui-li-count" style="display:none;">0</span></a></li>
+					<li><a href="" onclick="system.showContent({page:'torrent-list',type:'torrent-list',data:'downloading'});"><span system-lang="tree.downloading"></span><span id="count-downloading" class="ui-li-count" style="display:none;">0</span></a></li>
+					<li><a href="" onclick="system.showContent({page:'torrent-list',type:'torrent-list',data:'paused'});"><span system-lang="tree.paused"></span><span id="count-paused" class="ui-li-count" style="display:none;">0</span></a></li>
+					<li><a href="" onclick="system.showContent({page:'torrent-list',type:'torrent-list',data:'sending'});"><span system-lang="tree.sending"></span><span id="count-sending" class="ui-li-count" style="display:none;">0</span></a></li>
+					<li><a href="" onclick="system.showContent({page:'torrent-list',type:'torrent-list',data:'check'});"><span system-lang="tree.check"></span><span id="count-check" class="ui-li-count" style="display:none;">0</span></a></li>
+					<li><a href="" onclick="system.showContent({page:'torrent-list',type:'torrent-list',data:'actively'});"><span system-lang="tree.actively"></span><span id="count-actively" class="ui-li-count" style="display:none;">0</span></a></li>
+					<li><a href="" onclick="system.showContent({page:'torrent-list',type:'torrent-list',data:'error'});"><span system-lang="tree.error"></span><span id="count-error" class="ui-li-count" style="display:none;">0</span></a></li>
+					<li><a href="" onclick="system.showContent({page:'torrent-list',type:'torrent-list',data:'warning'});"><span system-lang="tree.warning"></span><span id="count-warning" class="ui-li-count" style="display:none;">0</span></a></li>
+				</ul>
+			</div>
+			<!-- 种子明细列表 -->
+			<div id="content-torrent-list" _style="padding:0px;overflow: hidden;" data-role="content">
+				<ul data-role="listview"
+					data-theme="c" data-dividertheme="d"
+					data-split-icon="gear" data-split-theme="d"
+					id="torrent-list"
+				/>
+			</div>
+			<!-- 添加种子 -->
+			<div id="content-add-torrent" style="padding:15px;display:none;">
+				<label for="torrent-url" system-lang="dialog['torrent-add']['torrent-url']"></label>
+				<textarea id="torrent-url" style="height:130px;"></textarea>
+				<label for="download-dir" system-lang="dialog['torrent-add']['download-dir']"></label>
+				<input id="download-dir"/>
+                <label for="used-download-dir" system-lang="dialog['torrent-add']['used-download-dir']"></label>
+                <select id="used-download-dir" data-mini="true"></select>
+				<div data-role="fieldcontain">
+					<label for="autostart" system-lang="dialog['torrent-add']['autostart']"></label>
+					<select name="autostart" id="autostart" data-role="slider">
+						<option value="false"></option>
+						<option value="true"></option>
+					</select>
+				</div>
+				<span system-lang="dialog['torrent-add']['tip-torrent-url']"></span><br/>
+				<button onclick="addUrl();"><label system-lang="dialog['public']['button-ok']"></label></button>
+				<button onclick="system.showContent('home');"><label system-lang="dialog['public']['button-cancel']"></label></button>
+			</div>
+		</div>
+		<div data-theme="c" data-role="footer" data-position="fixed" data-tap-toggle="false" style="background:#f3f3f3;">
+			<!-- 种子操作工具栏 -->
+			<div id="torrent-toolbar"  data-role="content" style="display:none;padding:0px 10px;" data-theme="a">
+				<div data-role="controlgroup" data-type="horizontal">
+					<a id="torrent-check-all" data-role="button" data-inline="true" href="#" data-icon="check" data-theme="b">
+						<span id="torrent-checked-count"></span>
+					</a>
+					<a data-role="button" data-inline="true" id="toolbar_start" href="#" onclick="system.changeSelectedTorrentStatus('start',this);">
+						<span system-lang="toolbar.start"></span>
+					</a>
+					<a data-role="button" data-inline="true" id="toolbar_pause" href="#" onclick="system.changeSelectedTorrentStatus('stop',this);">
+						<span system-lang="toolbar.pause"></span>
+					</a>
+					<a data-role="button" data-inline="true" id="toolbar_recheck" href="#" onclick="system.changeSelectedTorrentStatus('verify',this);">
+						<span system-lang="toolbar.recheck"></span>
+					</a>
+					<a data-role="button" data-inline="true" id="toolbar_remove" href="#dialog-torrent-remove-confirm" data-icon="delete" data-iconpos="right">
+						<span system-lang="toolbar.remove"></span>
+					</a>
+				</div>
+			</div>
+			<div id="m_statusbar">
+				<span id="status_alt_speed" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+				<span id="status_downloadspeed" class="iconlabel icon-down"></span>
+				<span id="status_uploadspeed" class="iconlabel icon-up"></span>
+				<span id="status_freespace" class="iconlabel icon-drive"></span>
+			</div>
+		</div>
+	</div>
+	<!-- 删除种子确认 -->
+	<div data-role="popup" id="dialog-torrent-remove-confirm" data-overlay-theme="a" data-theme="c" data-dismissible="false" style="max-width:400px;" class="ui-corner-all">
+		<div data-role="header" data-theme="a" class="ui-corner-top">
+			<h1 system-lang="dialog['torrent-remove']['title']"></h1>
+		</div>
+		<div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
+			<h3 class="ui-title" system-lang="dialog['torrent-remove']['confirm-text']"></h3>
+			<div data-role="fieldcontain">
+				<label for="remove-data" system-lang="dialog['torrent-remove']['remove-data']"></label>
+				<select name="remove-data" id="remove-data" data-role="slider" data-mini="true">
+					<option value="false"></option>
+					<option value="true"></option>
+				</select>
+			</div>
+			<a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="c" system-lang="dialog.public['button-cancel']"></a>
+			<a href="#" onclick="system.changeSelectedTorrentStatus('remove',this,{removeData:$('#remove-data').val()});" data-role="button" data-inline="true" data-rel="back" data-transition="flow" data-theme="b" system-lang="dialog.public['button-ok']"></a>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+	function showAddTorrent()
+	{
+		var autostart = system.serverConfig['start-added-torrents'];
+		$("#autostart").val(autostart.toString()).slider('refresh');
+		$('#download-dir').val(system.downloadDir);
+		system.showContent('add-torrent');
+		$("#navPanel").panel("close");
+
+        //将常用目录初始化,并设置默认目录
+        var $usedDownloadDir = $("#used-download-dir");
+        $usedDownloadDir.empty();
+        $.each(transmission.downloadDirs, function( index, dir ) {
+            $usedDownloadDir.append(new Option(dir, dir));
+        });
+        $usedDownloadDir.val(system.downloadDir).selectmenu('refresh', true);
+
+	}
+	function addUrl()
+	{
+		var urls = $("#torrent-url").val();
+		if (urls=="")
+		{
+			$("#torrent-url").fadeOut("fast").fadeIn("fast").fadeOut("fast").fadeIn("fast").select();
+			return;
+		}
+		urls = urls.split("\n");
+		var autostart = ($("#autostart").val()=="true"?true:false);
+		system.addTorrentsToServer(urls,urls.length,autostart,$("#download-dir").val(),function(){
+			$("#status").hide();
+			$("#navPanel").panel("close");
+		});
+		$("#torrent-url").val("");
+		system.showContent('home');
+		$("#navPanel").panel("open");
+	}
+
+	(function(){
+		$("#navPanel").on("panelbeforeopen", function(event, ui) {
+			$("#autoreload").val(system.config.autoReload.toString()).slider('refresh');
+			$("#auto-reload-time").val(system.config.reloadStep/1000);
+			if (system.config.autoReload)
+			{
+				$("#auto-reload-time").slider("enable");
+			}
+			else
+			{
+				$("#auto-reload-time").slider("disable");
+			}
+		});
+
+		$("#autoreload").change(function(){
+			saveConfig();
+		});
+
+		$("#auto-reload-time").on("slidestop", function(event, ui) {
+			saveConfig();
+		});
+
+		$("#torrent-check-all").click(function(){
+			var checked = $(this).data("checked");
+			if (checked==true)
+			{
+				checked = false;
+			}
+			else
+			{
+				checked = true;
+			}
+			$(this).data("checked",checked);
+			system.control.torrentlist.find("input[type='checkbox']").prop("checked",checked).checkboxradio("refresh");
+			system.changeTorrentToolbar();
+		});
+
+        $("#used-download-dir").change(function(){
+            $('#download-dir').val($(this).val());
+        });
+
+		function saveConfig()
+		{
+			system.config.autoReload = ($("#autoreload").val()=="true"?true:false);
+			var value = $("#auto-reload-time").val();
+			if ($.isNumeric(value))
+			{
+				system.config.reloadStep = value * 1000;
+			}
+			if (system.config.autoReload)
+			{
+				system.reloadData();
+				$("#auto-reload-time").slider("enable");
+			}
+			else
+			{
+				clearTimeout(system.autoReloadTimer);
+				$("#auto-reload-time").slider("disable");
+			}
+			system.saveConfig();
+		};
+	})();
+</script>
+</html>

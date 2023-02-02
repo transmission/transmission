@@ -280,6 +280,10 @@ void tr_tracker_http_announce(
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
 
+    if(session->useHttpProxy()){
+        options.http_proxy = session->httpProxy();
+    }
+
     auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& opt)
     {
         tr_logAddTrace(fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, opt.url), request.log_name);

@@ -1,0 +1,24 @@
+{
+	"fields": [{
+		"field": "ck",
+		"checkbox": true
+	}, {
+		"field": "name",
+		"width": "100",
+		"editor": {
+			"type": "textbox",
+			"options": {
+				"required": true
+			}
+		}
+	}, {
+		"field": "description",
+		"width": "120",
+		"editor": "textbox"
+	}, {
+		"field": "color",
+		"width": "80",
+		"editor": "textbox",
+		"formatter": "color"
+	}]
+}

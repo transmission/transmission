@@ -1,0 +1,55 @@
+<style>
+	.iconfont-big {
+		font-size: 35px;
+		border: 0px;
+		padding: 3px 5px;
+		margin-top: 10px;
+	}
+
+	.iconfont-big:hover {
+		border: 0px;
+	}
+</style>
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:5px 6px 0px 6px;border:0px;">
+		<div style="width:100%;padding:5px 0 0 0;text-align:center;line-height: 25px;">
+			<img id="logo" src="tr-web-control/style/images/logo.png"/>
+			<div id="dialog-about-tr-version">Transmission</div>
+			<div id="dialog-about-version">Web Control</div>
+			<div>Copyright © 2012-2019 栽培者</div>
+			<div style="padding: 10px 0 5px 0px;">
+				<a href="https://github.com/ronggang/transmission-web-control" target="_blank" class="easyui-linkbutton" data-options="iconCls:'iconfont tr-icon-github'" system-tip-lang="dialog['about']['home']" system-lang="dialog['about']['home']"></a>
+				<a href="https://github.com/ronggang/transmission-web-control/wiki" target="_blank" class="easyui-linkbutton" data-options="iconCls:'iconfont tr-icon-help'" system-tip-lang="dialog['about']['help']" system-lang="dialog['about']['help']"></a>
+				<a href="https://github.com/ronggang/transmission-web-control/releases" target="_blank" class="easyui-linkbutton" data-options="iconCls:'iconfont tr-icon-update'" system-tip-lang="dialog['about']['check-update']" system-lang="dialog['about']['check-update']"></a>
+				<a href="https://github.com/ronggang/PT-Plugin-Plus" target="_blank" class="easyui-linkbutton" data-options="iconCls:'iconfont tr-icon-pt-plugin'" system-tip-lang="dialog['about']['pt-plugin']" system-lang="dialog['about']['pt-plugin']"></a>
+				<br/>
+				<a href="https://github.com/ronggang/transmission-web-control/wiki/Donate" target="_blank" class="l-btn iconfont iconfont-big tr-icon-aixinjuanzeng" system-tip-lang="dialog['about']['donate']"></a>
+			</div>
+			<hr/>
+			<div style="padding-top: 5px;">
+				<span>Thanks: </span>
+				<a href="http://www.transmissionbt.com/" target="_blank" title="Transmission" class="easyui-linkbutton" >Transmission</a>
+				<a href="http://jquery.com/" target="_blank" title="jQuery" class="easyui-linkbutton" >jQuery</a>
+				<a href="http://www.jeasyui.com/" target="_blank" title="jQuery EasyUI" class="easyui-linkbutton" >EasyUI</a>
+				<a href="http://iconfont.cn/" target="_blank" title="Alimama Iconfont" class="easyui-linkbutton" >Iconfont</a>
+			</div>
+		</div>
+	</div>
+	
+	<!-- <div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<a id="dialog-about-button-close" class="easyui-linkbutton" data-options="iconCls:'icon-close',plain:true" href="javascript:void(0);"><span system-lang="dialog['public']['button-close']"></span></a>
+	</div> -->
+</div>
+<script type="text/javascript">
+	(function(thisDialog){
+		system.resetLangText(thisDialog);
+
+		thisDialog.find("#dialog-about-tr-version").html("Transmission: "+system.serverConfig.version+", RPC: "+system.serverConfig["rpc-version"]);
+		thisDialog.find("#dialog-about-version").html("Web Control: "+system.version+" ("+system.codeupdate+")");
+	
+		thisDialog.find("#dialog-about-button-close").click(function()
+		{
+			thisDialog.dialog("close");
+		});
+	})($("#dialog-about"));
+</script>

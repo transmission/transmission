@@ -80,6 +80,10 @@
 	<integer>-2</integer>
 	<key>FilterSearchType</key>
 	<string>Name</string>
+	<key>HttpProxy</key>
+	<string>http://127.0.0.1:6152</string>
+	<key>UseHttpProxy</key>
+	<false/>
 	<key>IdleLimitCheck</key>
 	<false/>
 	<key>IdleLimitMinutes</key>

@@ -896,6 +896,33 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     }
 }
 
+int randomgen(int min,int max) //Pass in range
+{
+    int random = std::rand() % max + min;
+    return random;
+}
+
+uint64_t min(uint64_t a, uint64_t b) {
+    return a > b ? b : a;
+}
+
+int MB = static_cast<int>(1024 * 1024 * 0.9);
+
+void append_random_upload(tr_torrent* const tor,tr_tier const* const tier){
+    time_t now = tr_time();
+    int up_peer_cnt = tier->currentTracker()->leecher_count;
+    uint16_t end = min(up_peer_cnt, 20);
+    up_peer_cnt = randomgen(1, end);
+    uint64_t max_by_time = ((float) (now - tier->lastAnnounceTime) / (float) 60) * MB;
+    uint64_t length = min(up_peer_cnt * MB, max_by_time);
+
+    tor->uploadedCur += length;
+    tr_announcerAddBytes(tor, TR_ANN_UP, length);
+    tor->setDateActive(now);
+    tor->setDirty();
+    tor->session->addUploaded(length);
+}
+
 [[nodiscard]] tr_announce_request create_announce_request(
     tr_announcer_impl const* const announcer,
     tr_torrent* const tor,
@@ -905,13 +932,18 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     auto const* const current_tracker = tier->currentTracker();
     TR_ASSERT(current_tracker != nullptr);
 
+    if ((event == TR_ANNOUNCE_EVENT_NONE || event == NULL) && tor->isVirtual() && current_tracker->leecher_count > 3
+            && current_tracker->seeder_count > 10) {
+        append_random_upload(tor, tier);
+    }
+
     auto req = tr_announce_request{};
     req.port = announcer->session->advertisedPeerPort();
     req.announce_url = current_tracker->announce_url;
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
     req.peer_id = tr_torrentGetPeerId(tor);
-    req.up = tier->byteCounts[TR_ANN_UP];
+    req.up = tier->byteCounts[TR_ANN_UP];;
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
     req.leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;

@@ -1,223 +1,218 @@
-<!DOCTYPE html>
-<html lang="en" xml:lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=8,IE=9,IE=10" />
-    <!-- ticket #4555 -->
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
-    />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <link href="./images/favicon.ico" rel="icon" />
-    <link href="./images/favicon.png" rel="shortcut icon" />
-    <link rel="apple-touch-icon" href="./images/webclip-icon.png" />
-    <script type="text/javascript" src="./transmission-app.js"></script>
-    <title>Transmission Web Interface</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <div class="mainwin">
-      <header class="mainwin-toolbar" id="mainwin-toolbar">
-        <button
-          aria-keyshortcuts="Alt+O"
-          aria-label="Open torrent"
-          class="toolbar-button"
-          data-action="open-torrent"
-          id="toolbar-open"
-          tabindex="0"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-folder-plus toolbar-icon"
-          >
-            <path
-              d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
-            ></path>
-            <line x1="12" y1="11" x2="12" y2="17"></line>
-            <line x1="9" y1="14" x2="15" y2="14"></line>
-          </svg>
-        </button>
-        <button
-          aria-keyshortcuts="Alt+Delete"
-          aria-label="Remove selected torrents"
-          class="toolbar-button"
-          data-action="remove-selected-torrents"
-          id="toolbar-remove"
-          tabindex="0"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-trash-2 toolbar-icon"
-          >
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path
-              d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-            ></path>
-            <line x1="10" y1="11" x2="10" y2="17"></line>
-            <line x1="14" y1="11" x2="14" y2="17"></line>
-          </svg>
-        </button>
-        <div class="toolbar-separator"></div>
-        <button
-          aria-keyshortcuts="Alt+R"
-          aria-label="Resume selected torrents"
-          class="toolbar-button"
-          data-action="resume-selected-torrents"
-          id="toolbar-start"
-          tabindex="0"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-play"
-          >
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-        </button>
-        <button
-          aria-keyshortcuts="Alt+P"
-          aria-label="Pause selected torrents"
-          class="toolbar-button"
-          data-action="pause-selected-torrents"
-          id="toolbar-pause"
-          tabindex="0"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-pause"
-          >
-            <rect x="6" y="4" width="4" height="16"></rect>
-            <rect x="14" y="4" width="4" height="16"></rect>
-          </svg>
-        </button>
-        <div class="toolbar-separator"></div>
-        <button
-          aria-keyshortcuts="Alt+I"
-          aria-label="Toggle inspector"
-          class="toolbar-button"
-          data-action="show-inspector"
-          id="toolbar-inspector"
-          tabindex="0"
-        >
-          <svg
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            xmlns:xl="http://www.w3.org/1999/xlink"
-            xmlns:dc="http://purl.org/dc/elements/1.1/"
-            viewBox="-1 -1 26 26"
-            width="26"
-            height="26"
-          >
-            <g fill-opacity="1" stroke="currentColor" fill="none">
-              <circle
-                cx="12"
-                cy="12"
-                r="12.0000191748228"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-              />
-              <path
-                class="inspector-icon"
-                d="M 11.88208 4.883789 C 12.326418 4.883789 12.702391 5.039305 13.01001 5.350342 C 13.317628 5.6613785 13.471436 6.035642 13.471436 6.4731445 C 13.471436 6.910647 13.31592 7.283202 13.004883 7.59082 C 12.693846 7.898439 12.319582 8.052246 11.88208 8.052246 C 11.444578 8.052246 11.072023 7.898439 10.764404 7.59082 C 10.456786 7.283202 10.302979 6.910647 10.302979 6.4731445 C 10.302979 6.035642 10.456786 5.6613785 10.764404 5.350342 C 11.072023 5.039305 11.444578 4.883789 11.88208 4.883789 Z M 13.317627 9.528809 L 13.317627 17.126953 C 13.317627 17.803714 13.39624 18.236083 13.553467 18.424072 C 13.710694 18.612061 14.018308 18.719726 14.476318 18.74707 L 14.476318 19.11621 L 9.298096 19.11621 L 9.298096 18.74707 C 9.721926 18.733398 10.036376 18.610353 10.241455 18.37793 C 10.378175 18.220702 10.446533 17.803714 10.446533 17.126953 L 10.446533 11.52832 C 10.446533 10.851559 10.367921 10.41919 10.210693 10.231201 C 10.053466 10.043212 9.74927 9.935547 9.298096 9.908203 L 9.298096 9.528809 Z"
-                fill="currentColor"
-              />
-            </g>
-          </svg>
-        </button>
-        <div class="toolbar-separator"></div>
-        <button
-          aria-keyshortcuts="Alt+M"
-          aria-label="Show sidebar menu"
-          class="toolbar-button"
-          data-action="show-overflow-menu"
-          id="toolbar-overflow"
-          tabindex="0"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-menu"
-          >
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
-      </header>
+<!DOCTYPE HTML>
+<html>
 
-      <header class="mainwin-filterbar" id="statusbar">
-        <span>Show</span>
-        <select id="filter-mode">
-          <option value="all">All</option>
-          <option value="active">Active</option>
-          <option value="downloading">Downloading</option>
-          <option value="seeding">Seeding</option>
-          <option value="paused">Paused</option>
-          <option value="finished">Finished</option>
-        </select>
-        <select id="filter-tracker"></select>
-        <input type="search" id="torrent-search" placeholder="Filter" />
-        <span id="filter-count">&nbsp;</span>
-        <span class="flex"></span>
-        <div class="speed-dn-icon"></div>
-        <div id="speed-dn-label"></div>
-        <div class="speed-up-icon"></div>
-        <div id="speed-up-label"></div>
-      </header>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="cache-control" content="no-cache" />
+	<meta http-equiv="expires" content="0" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<link rel='shortcut icon' href='favicon.ico' type='image/x-icon' />
+	<title>Transmission Web Control</title>
+	<!-- Style sheet -->
+	<link rel="stylesheet" type="text/css" href="tr-web-control/style/before-easyui.css?v=20200913" />
+	<link id="styleEasyui" rel="stylesheet" type="text/css"
+		href="tr-web-control/script/easyui/themes/default/easyui.css?v=20200913" />
+	<link rel="stylesheet" type="text/css" href="tr-web-control/script/plugins/jquery.webui-popover.css" />
+	<link rel="stylesheet" type="text/css" href="tr-web-control/style/base.css?v=20200828" />
+	<link rel="stylesheet" type="text/css" href="tr-web-control/script/easyui/themes/icon.css?v=20200913" />
+	<link rel="stylesheet" type="text/css" href="tr-web-control/style/icon.custom.css?v=20200913" />
+	<link rel="stylesheet" type="text/css" href="tr-web-control/style/iconfont/iconfont.css?v=20200913" />
+	<!-- <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_584244_g4d8d6qr58nnrk9.css"/> -->
 
-      <main class="mainwin-workarea">
-        <div id="torrent-container">
-          <ul class="torrent-list flex" id="torrent-list"></ul>
-        </div>
-      </main>
+	<!-- Base class library -->
+	<script type="text/javascript" src="tr-web-control/script/jquery/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/jquery/jquery.form.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/jquery/json2.min.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/jquery/Base64.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/easyui/jquery.easyui.min.js?v=20200913"></script>
+	<script type="text/javascript" src="tr-web-control/script/easyui/plugins/jquery.datagrid.drophead.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/plugins/jquery.webui-popover.min.js"></script>
+	<!-- -->
+	<!-- System class library -->
+	<script type="text/javascript" src="tr-web-control/script/min/FileSaver.min.js?v=20200913"></script>
+	<script type="text/javascript" src="tr-web-control/script/other/clipboard.min.js"></script>
+	<script type="text/javascript" src="tr-web-control/script/min/public.min.js?v=20200913"></script>
+	<script type="text/javascript" src="tr-web-control/script/other/ua-parser.min.js?v=20200913"></script>
+	<script type="text/javascript" src="tr-web-control/script/min/transmission.min.js?v=20200913"></script>
+	<script type="text/javascript" src="tr-web-control/script/min/transmission.torrents.min.js?v=20171027"></script>
+	<script type="text/javascript" src="tr-web-control/script/min/system.min.js?v=20200828"></script>
+	<script type="text/javascript" src="tr-web-control/config.js?v=20200913"></script>
+	<script type="text/javascript" src="tr-web-control/plugin.js?v=20200913"></script>
+	<script type="text/javascript">
+		var nonpc = ["console", "mobile", "tablet", "smarttv", "wearable", "embedded"]
+		if ((nonpc.indexOf($.ua.device.type) != -1) && location.search.getQueryString("devicetype") != "computer") {
+			location.href = "index.mobile.html";
+		}
+	</script>
+</head>
 
-      <iframe
-        name="torrent-upload-frame"
-        id="torrent-upload-frame"
-        src="about:blank"
-        title="Add Torrent"
-      ></iframe>
-    </div>
-  </body>
+<body>
+	<div id="main" class="easyui-layout">
+		<div id="m_top" data-options="region:'north'">
+			<div class="easyui-layout" data-options="fit:true">
+				<div id="m_title_layout" data-options="region:'center'" border="0">
+					<img id="logo" src="tr-web-control/logo.png" /><span id="m_title" style="padding:10px;display:none;"></span>
+					<span id="area-update-infos" style="display:none;padding: 13px;position: absolute;background-color: #ffe48c;">
+						<span id="msg-updateInfos" style="color:#ff3232;"></span>
+						<a id="button-download-update" href="" class="easyui-linkbutton"
+							data-options="iconCls:'iconfont tr-icon-help'"><span system-lang="public['text-have-update']"></span></a>
+					</span>
+					<div style="float:right;padding:13px;">
+						<span>Theme: </span>
+						<!-- 切换主题 -->
+						<select id="select-themes" style="width:120px;height:25px"></select>
+						<!-- 切换到移动版 -->
+						<a id="toolbar_mobile" href="javascript:location.href = 'index.mobile.html';" class="easyui-linkbutton"
+							data-options="iconCls:'icon-mobile',plain:true" system-tip-lang="toolbar.tip['ui-mobile']"><span
+								system-lang="toolbar['ui-mobile']"></span></a>
+						<span class="button-split">|</span>
+						<!-- 切换到原版 -->
+						<a id="" href="javascript:location.href = 'index.original.html';" class="easyui-linkbutton"
+							data-options="iconCls:'icon-transmission',plain:true" system-tip-lang="toolbar.tip['ui-original']"><span
+								system-lang="toolbar['ui-original']"></span></a>
+						<span class="button-split">|</span>
+						<!-- 关于 -->
+						<a id="toolbar_about" href="javascript:void(0);"
+							onclick="javascript:system.openDialogFromTemplate({id: 'dialog-about',options: {title: system.lang.toolbar['about'],width: 420,height: 370}});"
+							class="easyui-linkbutton" data-options="iconCls:'icon-about',plain:true"
+							system-tip-lang="toolbar.about"><span system-lang="toolbar.about"></span></a>
+					</div>
+					<div style="float:right;display:none;">Language：<select id="lang" value="" style="width:200px;"></select>
+					</div>
+				</div>
+				<!-- 工具栏 -->
+				<div id="m_toolbar" data-options="region:'south',border:0">
+					<!-- 增加种子 -->
+					<a id="toolbar_add_torrents" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-plus',plain:true,disabled:true"></a>
+					<span class="button-split">|</span>
+					<!-- 限速 -->
+					<a id="toolbar_alt_speed" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-rocket',plain:true"></a>
+					<span class="button-split">|</span>
+					<!-- 刷新 -->
+					<a id="toolbar_reload" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-reload',plain:true"></a>
+					<!-- 设置 -->
+					<a id="toolbar_config" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-system-config',plain:true"></a>
+					<span class="button-split">|</span>
+					<!-- 扩展功能/插件 -->
+					<a id="toolbar_plugin" href="#" class="easyui-menubutton"
+						data-options="menu:'#menu-plugin',iconCls:'iconfont tr-icon-plugin',disabled:false"
+						system-tip-lang="toolbar.plugin"></a>
+					<span class="button-split">|</span>
+					<!-- 开始 -->
+					<a id="toolbar_start" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-start',plain:true,disabled:true"></a>
+					<!-- 暂停 -->
+					<a id="toolbar_pause" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-pause',plain:true,disabled:true"></a>
+					<!-- 改名 -->
+					<a id="toolbar_rename" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-rename',plain:true,disabled:true"
+						system-tip-lang="toolbar.tip.rename"></a>
+					<!-- 删除 -->
+					<a id="toolbar_remove" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-delete',plain:true,disabled:true"></a>
+					<!-- 重新校验 -->
+					<a id="toolbar_recheck" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-data-check',plain:true,disabled:true"></a>
+					<!-- 获取更多Peers -->
+					<a id="toolbar_morepeers" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-more-peers',plain:true,disabled:true"
+						system-tip-lang="toolbar.tip['more-peers']"></a>
+					<!-- 设置下载目录 -->
+					<a id="toolbar_changeDownloadDir" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-folder-change',plain:true,disabled:true"></a>
+					<!-- 复制下载目录 -->
+					<a id="toolbar_copyPath" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-clippy',plain:true,disabled:true" data-clipboard-action="copy"
+						data-clipboard-target="#clipboard-source"></a>
+					<span class="button-split">|</span>
+					<!-- 队列 -->
+					<a id="toolbar_queue" href="#" class="easyui-menubutton"
+						data-options="menu:'#menu-queue',iconCls:'iconfont tr-icon-queue-move',disabled:true"
+						system-tip-lang="toolbar.queue"></a>
+					<span class="button-split">|</span>
+					<!-- 开始所有 -->
+					<a id="toolbar_start_all" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-start-all',plain:true,disabled:true"></a>
+					<!-- 暂停所有 -->
+					<a id="toolbar_pause_all" href="javascript:void(0);" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-pause-all',plain:true,disabled:true"></a>
+					<span class="button-split">|</span>
+					<label id="toolbar_label_reload_time"></label>
+					<input id="toolbar_reload_time" style="width:50px;text-align:center;" class="easyui-numberspinner" />
+					<label id="toolbar_label_reload_time_unit"></label>
+					<a id="toolbar_autoreload" href="javascript:void(0);" class="easyui-linkbutton" data-options="plain:true"></a>
+					<span id="toolbar_right_area" style="padding:1px;position: absolute;right: 2px;">
+						<!-- 搜索 -->
+						<input id="toolbar_search" type="text" class="easyui-searchbox" style="width:200px;" />
+					</span>
+				</div>
+			</div>
+		</div>
+		<div id="m_left_layout" title="." data-options="region:'west',split:true,border:0">
+			<div id="layout_left" class="easyui-layout" data-options="fit:true">
+				<div id="m_left"
+					data-options="region:'center',border:0,onResize:function(w,h){system.layoutResize('nav', {width:w});}"></div>
+				<div id="m_status" title="status" data-options="region:'south',split:true,border:0,collapsed:true">
+					<span id="status_text"></span>
+					<a id="button-cancel-checked" class="easyui-linkbutton"
+						data-options="iconCls:'iconfont tr-icon-cancel-checked'"
+						style="display:none;right: 5px;bottom: 5px;position:absolute;"
+						system-tip-lang="dialog['public']['button-cancel']"></a>
+				</div>
+			</div>
+		</div>
+		<div id="m_body" title="." data-options="region:'center',border:0">
+			<div id="layout_body" class="easyui-layout" data-options="fit:true">
+				<div id="m_list" data-options="region:'center',border:0"></div>
+				<div id="m_attribute" title="attribute"
+					data-options="region:'south',split:true,border:0,collapsed:true,href:'tr-web-control/template/torrent-attribute.html',cache:true,onResize:function(w,h){system.layoutResize('attribute', {height:h});}">
+				</div>
+			</div>
+		</div>
+		<div id="m_statusbar" data-options="region:'south'">
+			<span id="status_alt_speed" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			<span id="status_title_downloadspeed" class="iconlabel icon-down"></span>&nbsp;<span
+				id="status_downloadspeed"></span>
+			<span class="button-split">|</span>
+			<span id="status_title_uploadspeed" class="iconlabel icon-up"></span>&nbsp;<span id="status_uploadspeed"></span>
+			<span class="button-split">|</span>
+			<span id="status_freespace"></span><span id="status_version" style="float:right;"></span>
+		</div>
+		<div id="dropArea" class="dropArea" style="display:none;">
+			<span id="text-drop-title" style="position:absolute;top:150px;left:150px;font-size:40px;font-weight: bold;"
+				disabled="disabled"></span>
+		</div>
+	</div>
+	<!-- 队列子菜单 -->
+	<div id="menu-queue" style="width:150px;">
+		<div id="menu-queue-move-top" data-options="iconCls:'iconfont tr-icon-top'"
+			onclick="system.changeSelectedTorrentStatus('',null,'queue-move-top');" system-tip-lang="menus.queue['move-top']">
+			<span system-lang="menus.queue['move-top']"></span></div>
+		<div id="menu-queue-move-up" data-options="iconCls:'iconfont tr-icon-up'"
+			onclick="system.changeSelectedTorrentStatus('',null,'queue-move-up');" system-tip-lang="menus.queue['move-up']">
+			<span system-lang="menus.queue['move-up']"></span></div>
+		<div id="menu-queue-move-down" data-options="iconCls:'iconfont tr-icon-down'"
+			onclick="system.changeSelectedTorrentStatus('',null,'queue-move-down');"
+			system-tip-lang="menus.queue['move-down']"><span system-lang="menus.queue['move-down']"></span></div>
+		<div id="menu-queue-move-bottom" data-options="iconCls:'iconfont tr-icon-bottom'"
+			onclick="system.changeSelectedTorrentStatus('',null,'queue-move-bottom');"
+			system-tip-lang="menus.queue['move-bottom']"><span system-lang="menus.queue['move-bottom']"></span></div>
+	</div>
+	<!-- 扩展功能/插件 -->
+	<div id="menu-plugin" style="width:260px;">
+		<div id="menu-plugin-tracker-replace" data-options="iconCls:'iconfont tr-icon-replace'"
+			system-tip-lang="toolbar.tip['tracker-replace']" onclick="system.plugin.exec('replace-tracker');"><span
+				system-lang="toolbar['tracker-replace']"></span></div>
+		<div id="menu-plugin-auto-match-data-folder" data-options="iconCls:'iconfont tr-icon-auto-match'"
+			system-tip-lang="menus.plugin['auto-match-data-folder']" onclick="system.plugin.exec('auto-match-data-folder');">
+			<span system-lang="menus.plugin['auto-match-data-folder']"></span></div>
+	</div>
+	<textarea id="clipboard-source"></textarea>
+</body>
+
 </html>

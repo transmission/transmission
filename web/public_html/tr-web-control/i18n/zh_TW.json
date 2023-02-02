@@ -1,0 +1,454 @@
+{
+	"name": "zh-TW",
+	"author": "Sean, vodek3, Csineneo",
+	"system": {
+		"title": "Transmission WEB 控制台",
+		"status": {
+			"connect": "正在連線伺服器...",
+			"connected": "已連線至伺服器",
+			"queue": "佇列：",
+			"queuefinish": "本次佇列完成。",
+			"notfinal": "未完成",
+			"checked": "已選中 %n 項任務："
+		}
+	},
+	"error": {
+		"data-error": "資料錯誤",
+		"data-post-error": "資料提交錯誤",
+		"rename-error": "更改名稱失敗！"
+	},
+	"config": {
+		"save-path": "儲存資料夾"
+	},
+	"toolbar": {
+		"start": "開始",
+		"pause": "暫停",
+		"recheck": "檢查",
+		"start-all": "全部開始",
+		"pause-all": "全部暫停",
+		"remove": "刪除",
+		"remove-all": "全部刪除",
+		"remove-data": "刪除任務和資料",
+		"add-torrent": "新增種子",
+		"attribute": "屬性",
+		"alt-speed": "限速",
+		"system-config": "系統設定",
+		"system-reload": "重新整理",
+		"about": "關於",
+		"reload-time": "自動重整：",
+		"reload-time-unit": "秒/次",
+		"autoreload-disabled": "已停用",
+		"autoreload-enabled": "已啟用",
+		"search-prompt": "搜尋本機種子",
+		"tracker-replace": "更換 Tracker",
+		"queue": "佇列",
+		"ui-mobile": "行動介面",
+		"ui-original": "原版介面",
+		"ui-computer": "桌面介面",
+		"plugin": "擴充功能",
+		"rename": "重新命名",
+		"copy-path-to-clipboard": "複製儲存資料夾至剪貼簿",
+		"tip": {
+			"start": "重新開始已選取的任務",
+			"pause": "暫停已選取的任務",
+			"recheck": "重新檢查已選取的任務",
+			"recheck-confirm": "確定要重新檢查選取的任務嗎？這可能需要些時間！",
+			"start-all": "全部開始",
+			"pause-all": "全部暫停",
+			"remove": "刪除已選取的任務",
+			"delete-all": "刪除全部任務（不刪除檔案）",
+			"delete-data": "刪除已選取的任務和檔案",
+			"add-torrent": "新增種子",
+			"attribute": "屬性",
+			"alt-speed": "以系統設定的速度限制上傳和下載",
+			"system-config": "系統設定",
+			"system-reload": "重新整理",
+			"about": "關於本程式",
+			"autoreload-disabled": "停用自動重整",
+			"autoreload-enabled": "啟用自動重整",
+			"tracker-replace": "取代 Tracker",
+			"change-download-dir": "變更下載資料夾",
+			"ui-mobile": "切換至行動介面",
+			"ui-original": "切換至原版介面",
+			"more-peers": "取得更多 Peer",
+			"rename": "重新命名",
+			"copy-path-to-clipboard": "複製資料夾路徑至剪貼簿"
+		}
+	},
+	"menus": {
+		"queue": {
+			"move-top": "置頂",
+			"move-up": "上移",
+			"move-down": "下移",
+			"move-bottom": "置底"
+		},
+		"plugin": {
+			"auto-match-data-folder": "自動配對資料夾"
+		},
+		"setLabels": "設定使用者標籤",
+		"copyMagnetLink": "複製磁力連結至剪貼簿"
+	},
+	"title": {
+		"left": "分類資料夾",
+		"list": "種子清單",
+		"attribute": "種子屬性",
+		"status": "狀態"
+	},
+	"tree": {
+		"all": "全部",
+		"active": "正在使用",
+		"paused": "暫停",
+		"downloading": "正在下載",
+		"sending": "正在做種",
+		"error": "錯誤",
+		"warning": "警告",
+		"actively": "正在使用",
+		"check": "正在檢查",
+		"wait": "正在等待",
+		"search-result": "搜尋結果",
+		"status": {
+			"loading": "正在載入..."
+		},
+		"statistics": {
+			"title": "資料統計",
+			"cumulative": "累計",
+			"current": "目前工作階段",
+			"uploadedBytes": "已上傳：",
+			"downloadedBytes": "已下載：",
+			"filesAdded": "已增加檔案：",
+			"sessionCount": "工作階段次數：",
+			"secondsActive": "使用時間："
+		},
+		"servers": "伺服器",
+		"folders": "資料夾",
+		"toolbar": {
+			"nav": {
+				"folders": "資料夾"
+			}
+		},
+		"labels": "使用者標籤"
+	},
+	"statusbar": {
+		"downloadspeed": "下載速度：",
+		"uploadspeed": "上傳速度：",
+		"version": "版本："
+	},
+	"dialog": {
+		"torrent-add": {
+			"download-dir": "下載資料夾：",
+            "used-download-dir": "常用資料夾：",
+			"torrent-url": "磁力連結：",
+			"tip-torrent-url": "註：貼上磁力連結，多個磁力連結用「換行」分隔。",
+			"autostart": "自動開始：",
+			"set-default-download-dir": "設為預設儲存資料夾",
+			"upload-file": "種子檔案：",
+			"nosource": "沒有選擇種子或沒有輸入磁力連結",
+			"tip-title": "上傳檔案優先於磁力連結"
+		},
+		"system-config": {
+			"title": "伺服器參數設定",
+			"tabs": {
+				"base": "基本設定",
+				"network": "網路傳輸",
+				"limit": "頻寬限制",
+				"alt-speed": "時段限制",
+				"dictionary-folders": "資料夾字典",
+				"more": "額外設定",
+				"labels": "使用者標籤"
+			},
+			"config-dir": "Transmission 設定檔資料夾：",
+			"download-dir": "預設儲存資料夾：",
+			"download-dir-free-space": "可用空間：",
+			"incomplete-dir-enabled": "啟用臨時資料夾",
+			"cache-size-mb": "磁碟快取大小：",
+			"rename-partial-files": "在未完成的檔案名後加上「.part」副檔名",
+			"start-added-torrents": "自動開始新增任務",
+			"download-queue-enabled": "啟用下載佇列，最大同時下載數：",
+			"seed-queue-enabled": "啟用上傳佇列，最大同時上傳數：",
+			"peer-port-random-on-start": "隨機選擇連接埠，或使用固定連接埠：",
+			"port-forwarding-enabled": "啟用連接埠轉送",
+			"test-port": "測試連接埠",
+			"port-is-open-true": "連接埠可連接",
+			"port-is-open-false": "連接埠不可連接",
+			"testing": "正在測試...",
+			"encryption": "資料傳輸加密方式：",
+			"encryption-type": {
+				"required": "強制(required)",
+				"preferred": "優先(preferred)",
+				"tolerated": "允許(tolerated)"
+			},
+			"utp-enabled": "啟用 µT（UPnP）",
+			"dht-enabled": "啟用分散式雜湊表（DHT）",
+			"lpd-enabled": "啟用本機點探索（LPD）",
+			"pex-enabled": "啟用用戶交換（PEX）",
+			"peer-limit-global": "全域連線數限制為：",
+			"peer-limit-per-torrent": "每個任務最大連線數：",
+			"speed-limit-down-enabled": "啟用最大下載速度限制：",
+			"speed-limit-up-enabled": "啟用最大上傳速度限制：",
+			"alt-speed-enabled": "啟用備用頻寬",
+			"alt-speed-down": "最大下載速度限制為：",
+			"alt-speed-up": "最大上傳速度限制為：",
+			"alt-speed-time-enabled": "啟用時段限制",
+			"alt-speed-time": "時間：",
+			"weekday": {
+				"1": "星期一",
+				"2": "星期二",
+				"3": "星期三",
+				"4": "星期四",
+				"5": "星期五",
+				"6": "星期六",
+				"0": "星期天"
+			},
+			"blocklist-enabled": "啟用黑名單：",
+			"blocklist-size": "可用規則數量： %n",
+			"seedRatioLimited": "當種子的分享率達到這個數時，自動停止做種：",
+			"queue-stalled-enabled": "當未完成的種子超過這個時間沒有收到資料時，自動停止下載：",
+			"idle-seeding-limit-enabled": "當種子超過這個時間沒有流量時，自動停止做種：",
+			"minutes": "分鐘",
+			"nochange": "未更改",
+			"saving": "正在儲存...",
+			"show-bt-servers": "在「伺服器」中顯示「BT 伺服器」列表",
+			"restore-default-settings": "恢復介面預設設定（含主題）",
+			"language": "介面語言：",
+			"loading": "正在載入...",
+			"hide-subfolders": "點選資料夾時，在列表中不顯示子資料夾下的任務",
+			"simple-check-mode": "在種子列表上點一下滑鼠右鍵時，僅選擇一個任務",
+			"nav-contents": "導覽列顯示內容：",
+			"labels-manage": {
+				"name": "標籤名稱",
+				"description": "描述",
+				"color": "顏色",
+				"actions": "動作",
+				"import-confirm": "是否確認匯入標籤資訊？ 這將覆蓋目前的設定。"
+			}
+		},
+		"public": {
+			"button-ok": "確定",
+			"button-cancel": "取消",
+			"button-reload": "重新整理",
+			"button-save": "儲存",
+			"button-close": "關閉",
+			"button-update": "更新",
+			"button-config": "設定",
+			"button-addnew": "新增",
+			"button-edit": "編輯",
+			"button-delete": "刪除",
+			"button-export": "匯出",
+			"button-import": "匯入"
+		},
+		"about": {
+			"infos": "程式設計、製作：栽培者<br/>聲明：本程式使用的大部分圖示來自網路，如有侵犯您的權益，請與本人聯繫刪除。<br/>如您有什麼意見建議，也歡迎與我聯繫。",
+			"check-update": "檢查更新",
+			"home": "專案首頁",
+			"help": "使用幫助",
+			"donate": "捐助",
+			"pt-plugin": "PT 助手"
+		},
+		"torrent-remove": {
+			"title": "刪除任務確認",
+			"confirm-text": "確認要刪除已選取的任務嗎？",
+			"remove-data": "同時刪除資料",
+			"remove-error": "任務刪除失敗！"
+		},
+		"torrent-changeDownloadDir": {
+			"title": "設定新資料夾",
+			"old-download-dir": "原資料夾：",
+			"new-download-dir": "新資料夾：",
+			"move-data": "同時移動資料（如不勾選，則從新資料夾下搜尋資料）",
+			"set-error": "設定資料夾失敗！",
+			"recheck-data": "設定完成後重新檢查。"
+		},
+		"system-replaceTracker": {
+			"title": "取代 Tracker 地址",
+			"old-tracker": "原 Tracker：",
+			"new-tracker": "新 Tracker：",
+			"tip": "此功能將搜尋<b>全部任務</b>的 Tracker，如果找到相等的，則取代。",
+			"not-found": "未找到符合條件的 Tracker。"
+		},
+		"auto-match-data-folder": {
+			"title": "自動配對資料夾",
+			"torrent-count": "將被操作的任務數量：",
+			"folder-count": "資料夾字典數量：",
+			"dictionary": "資料夾字典",
+			"time-begin": "開始時間：",
+			"time-now": "目前時間：",
+			"status": "狀態：",
+			"ignore": "忽略",
+			"working-close-confirm": "系統正在進行資料夾配對，確定要終止並關閉嗎？",
+			"time-interval": "時間間隔（秒）：",
+			"work-mode-title": "處理方式：",
+			"work-mode": {
+				"1": "按種子逐一配對資料夾",
+				"2": "按目錄逐一配對任務"
+			}
+		},
+		"torrent-rename": {
+			"title": "重新命名",
+			"oldname": "原名稱",
+			"newname": "新名稱"
+		},
+		"torrent-attribute-add-tracker": {
+			"button-search-best-ip": "精選(IP)",
+			"button-search-all-ip": "全部(IP)",
+			"title": "新增 Tracker",
+			"tip": "每行一個 Tracker"
+		},
+		"torrent-setLabels": {
+			"title": "設定使用者標籤",
+			"available": "可用標籤：",
+			"selected": "已選擇："
+		}
+	},
+	"torrent": {
+		"fields": {
+			"id": "ID",
+			"name": "名稱",
+			"hashString": "雜湊",
+			"downloadDir": "資料夾",
+			"totalSize": "大小",
+			"status": "狀態",
+			"percentDone": "進度",
+			"remainingTime": "剩餘時間",
+			"addedDate": "加入時間",
+			"completeSize": "已下載",
+			"rateDownload": "下載速度",
+			"rateUpload": "上傳速度",
+			"leecherCount": "下載|活躍",
+			"seederCount": "種子|活躍",
+			"uploadedEver": "已上傳",
+			"uploadRatio": "分享率",
+			"queuePosition": "佇列",
+			"activityDate": "最後使用時間",
+			"trackers": "伺服器",
+			"labels": "使用者標籤",
+			"doneDate": "完成時間"
+		},
+		"status-text": {
+			"0": "已暫停",
+			"1": "等待檢查",
+			"2": "正在檢查",
+			"3": "等待下載",
+			"4": "正在下載",
+			"5": "等待做種",
+			"6": "正在做種"
+		},
+		"attribute": {
+			"tabs": {
+				"base": "基本",
+				"servers": "伺服器",
+				"files": "檔案",
+				"users": "連線",
+				"config": "設定"
+			},
+			"files-fields": {
+				"name": "名稱",
+				"length": "大小",
+				"percentDone": "進度",
+				"bytesCompleted": "已下載",
+				"wanted": "需要下載",
+				"priority": "優先順序"
+			},
+			"servers-fields": {
+				"announce": "伺服器",
+				"announceState": "狀態",
+				"lastAnnounceResult": "訊息",
+				"lastAnnounceSucceeded": "已連接",
+				"lastAnnounceTime": "更新時間",
+				"lastAnnounceTimedOut": "超時",
+				"downloadCount": "下載數",
+				"leecherCount": "吸血數",
+				"seederCount": "種子數",
+				"nextAnnounceTime": "下次更新時間",
+				"announceStateText": {
+					"0": "非活動",
+					"1": "待機",
+					"2": "佇列中",
+					"3": "活動中"
+				}
+			},
+			"peers-fields": {
+				"address": "IP 地址",
+				"port": "連接埠",
+				"isUTP": "UTP連接",
+				"clientName": "用戶端",
+				"flagStr": "標記",
+				"progress": "進度",
+				"rateToClient": "下載速度",
+				"rateToPeer": "上傳速度"
+			},
+			"status": {
+				"true": "是",
+				"false": "否"
+			},
+			"priority": {
+				"0": "正常",
+				"1": "高",
+				"-1": "低"
+			},
+			"filter-template-text": {
+				"1": "全部",
+				"2": "BitComet 填充檔案",
+				"3": "不需要的檔案"
+			},
+			"label": {
+				"name": "名稱：",
+				"addedDate": "新增時間：",
+				"totalSize": "大小：",
+				"completeSize": "已下載：",
+				"leftUntilDone": "剩餘：",
+				"hashString": "雜湊：",
+				"downloadDir": "資料夾：",
+				"status": "狀態：",
+				"rateDownload": "下載速度：",
+				"rateUpload": "上傳速度：",
+				"leecherCount": "下載（活躍）：",
+				"seederCount": "種子（活躍）：",
+				"uploadedEver": "已上傳：",
+				"uploadRatio": "分享率：",
+				"creator": "建立者：",
+				"dateCreated": "建立時間：",
+				"comment": "說明：",
+				"errorString": "錯誤資訊：",
+				"downloadLimited": "啟用最大下載速度限制：",
+				"uploadLimited": "啟用最大上傳速度限制：",
+				"peer-limit": "最大連線數：",
+				"seedRatioMode": "當種子的分享率達到這個數時，自動停止做種：",
+				"seedIdleMode": "當種子超過這個時間沒有流量時，自動停止做種：",
+				"doneDate": "完成時間：",
+				"seedTime": "做種時間："
+			},
+			"tip": {
+				"button-allow": "下載已選取的檔案",
+				"button-deny": "忽略已選取的檔案",
+				"button-priority": "設定優先順序",
+				"button-filter": "輸入規則運算式後點左側分頁工具按鈕以刷新",
+				"button-tracker-add": "新增 Tracker",
+				"button-tracker-edit": "修改已選取的 Tracker",
+				"button-tracker-remove": "刪除已選取的 Tracker"
+			},
+			"other": {
+				"tracker-remove-confim": "確認要刪除這個 Tracker 嗎？"
+			}
+		}
+	},
+	"torrent-head": {
+		"buttons": {
+			"autoExpandAttribute": "自動顯示種子屬性"
+		}
+	},
+	"public": {
+		"text-unknown": "未知",
+		"text-drop-title": "將檔案拖放至該區域內即可新增任務。",
+		"text-saved": "已儲存",
+		"text-nochange": "未更改",
+		"text-info": "資訊",
+		"text-confirm": "確定要這樣做嗎？",
+		"text-browsers-not-support-features": "目前瀏覽器不支援該功能！",
+		"text-download-update": "下載這個更新",
+		"text-have-update": "有可用的更新",
+		"text-on": "開",
+		"text-off": "關",
+		"text-how-to-update": "如何更新？",
+		"text-ignore-this-version": "忽略這個版本"
+	}
+}

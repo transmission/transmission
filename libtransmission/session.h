@@ -50,7 +50,7 @@
 #include "verify.h"
 #include "web.h"
 
-tr_peer_id_t tr_peerIdInit();
+tr_peer_id_t tr_peerIdInit(std::string);
 
 struct event_base;
 
@@ -393,6 +393,22 @@ public:
 
     void setDefaultTrackers(std::string_view trackers);
 
+    void setHttpProxy(std::string_view http_proxy) {
+        settings_.http_proxy = http_proxy;
+    }
+
+    [[nodiscard]] constexpr auto const &httpProxy() const noexcept {
+        return settings_.http_proxy;
+    }
+
+    [[nodiscard]] constexpr auto useHttpProxy() const noexcept{
+        return settings_.http_proxy_enabled;
+    }
+
+    constexpr void useHttpProxy(bool enabled) noexcept
+    {
+        settings_.http_proxy_enabled = enabled;
+    }
     // incomplete dir
 
     [[nodiscard]] constexpr auto const& incompleteDir() const noexcept

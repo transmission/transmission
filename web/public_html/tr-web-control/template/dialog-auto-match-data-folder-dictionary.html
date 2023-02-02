@@ -1,0 +1,42 @@
+<div class="easyui-layout" data-options="fit:true" style="width:100%;height:100%;">
+	<div data-options="region:'center'" style="padding:3px;border:0px;">
+		<div id="" class="dialog" style="width:100%;padding:0px;">
+			<table style="width:100%;">
+				<tr>
+					<td width="100%">
+						<textarea id="folders" style="width:100%;" rows="10"></textarea>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>  
+	<div data-options="region:'south',border:false" style="text-align:right;padding:6px;">
+		<a id="button-ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true" href="javascript:void(0);"><span system-lang="dialog['public']['button-ok']"></span></a>
+		<a id="button-cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel',plain:true" href="javascript:void(0);"><span system-lang="dialog['public']['button-cancel']"></span></a>  
+	</div>
+</div>
+<script type="text/javascript">
+	(function(thisDialog){
+		var callback = thisDialog.data("callback");
+		system.resetLangText(thisDialog);
+		// Local setting information
+		thisDialog.find("#folders").val(system.dictionary.folders);
+
+		thisDialog.find("#button-cancel").click(function()
+		{
+			thisDialog.dialog("close");
+		});
+
+		// Confirm
+		thisDialog.find("#button-ok").click(function()
+		{
+			system.dictionary.folders = thisDialog.find("#folders").val();
+			system.saveConfig();
+			thisDialog.dialog("close");
+			if (callback)
+				callback();
+		});
+
+
+	})($("#dialog-auto-match-data-folder-dictionary"));
+</script>

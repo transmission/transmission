@@ -1281,6 +1281,16 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.fDefaults setBool:encryptionMode != TR_CLEAR_PREFERRED forKey:@"EncryptionPrefer"];
     [self.fDefaults setBool:encryptionMode == TR_ENCRYPTION_REQUIRED forKey:@"EncryptionRequire"];
 
+    //http_proxy
+    NSString* httpProxy = @(tr_sessionGetHttpProxy(self.fHandle));
+    [self.fDefaults setObject:httpProxy forKey:@"HttpProxy"];
+
+    BOOL const useHttpProxy = tr_sessionIsIncompleteDirEnabled(self.fHandle);
+    [self.fDefaults setBool:useHttpProxy forKey:@"UseHttpProxy"];
+
+    auto const cacheSize = @(tr_sessionGetCacheLimit_MB(self.fHandle));
+    [self.fDefaults setObject:cacheSize forKey:@"CacheSizeMB"];
+
     //download directory
     NSString* downloadLocation = @(tr_sessionGetDownloadDir(self.fHandle)).stringByStandardizingPath;
     [self.fDefaults setObject:downloadLocation forKey:@"DownloadFolder"];

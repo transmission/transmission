@@ -1892,6 +1892,15 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
         tr_sessionSetQueueEnabled(session, TR_DOWN, val);
     }
 
+    if (tr_variantDictFindStrView(args_in, TR_KEY_http_proxy, &sv)){
+        session->setHttpProxy(sv);
+    }
+
+    if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_http_proxy_enabled, &val))
+    {
+        session->useHttpProxy(val);
+    }
+
     if (!std::empty(incomplete_dir))
     {
         session->setIncompleteDir(incomplete_dir);
@@ -2175,6 +2184,14 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_download_queue_size:
         tr_variantDictAddInt(d, key, s->queueSize(TR_DOWN));
+        break;
+
+    case TR_KEY_http_proxy:
+        tr_variantDictAddStr(d, key, s->httpProxy());
+        break;
+
+    case TR_KEY_http_proxy_enabled:
+        tr_variantDictAddBool(d, key, s->useHttpProxy());
         break;
 
     case TR_KEY_peer_limit_global:
