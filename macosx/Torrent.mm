@@ -276,6 +276,18 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     [self startTransferIgnoringQueue:NO];
 }
 
+- (void)startMagnetTransferAfterMetaDownload
+{
+    if ([self alertForRemainingDiskSpace])
+    {
+        tr_torrentStartMagnet(self.fHandle);
+        [self update];
+
+        //capture, specifically, stop-seeding settings changing to unlimited
+        [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
+    }
+}
+
 - (void)stopTransfer
 {
     tr_torrentStop(self.fHandle);

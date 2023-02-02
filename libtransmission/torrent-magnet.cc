@@ -312,7 +312,7 @@ void on_have_all_metainfo(tr_torrent* tor, tr_incomplete_metadata* m)
         tor->incompleteMetadata = nullptr;
         tor->isStopping = true;
         tor->magnetVerify = true;
-        if (tor->session->shouldPauseAddedTorrents())
+        if (tor->session->shouldPauseAddedTorrents() && !tor->magnetStartAfterVerify)
         {
             tor->startAfterVerify = false;
         }
