@@ -158,23 +158,20 @@ public:
 
 //    size_t speedLimitBps(tr_direction dir);
 
-    [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const
-    {
-        if(dir==TR_UP && isVirtual()){
+    [[nodiscard]] auto speedLimitBps(tr_direction dir) const {
+        if (dir == TR_UP && isVirtual() && completion.hasAll()) {
             size_t zero = 0;
             return zero;
         }
         return bandwidth().getDesiredSpeedBytesPerSecond(dir);
     }
 
-    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
-    {
+    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept {
         return bandwidth().areParentLimitsHonored(TR_UP);
     }
 
-    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
-    {
-        if(dir==TR_UP && isVirtual()){
+    [[nodiscard]] auto usesSpeedLimit(tr_direction dir) const noexcept {
+        if (dir == TR_CLIENT_TO_PEER && isVirtual() && completion.hasAll()) {
             return true;
         }
         return bandwidth().isLimited(dir);

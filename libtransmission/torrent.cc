@@ -134,6 +134,9 @@ namespace {
     }
 
     bool setLocalErrorIfFilesDisappeared(tr_torrent *tor, std::optional<bool> has_local_data = {}) {
+        if (tor->isVirtual()) {
+            return false;
+        }
         auto const has = has_local_data ? *has_local_data : tor->hasAnyLocalData();
         bool const files_disappeared = tor->hasTotal() > 0 && !has;
 

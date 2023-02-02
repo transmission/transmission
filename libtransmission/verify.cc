@@ -173,14 +173,15 @@ bool tr_verify_worker::verifyTorrent(tr_torrent *tor, std::atomic<bool> const &s
     return changed;
 }
 
-bool tr_verify_worker::skipVerifyTorrent(tr_torrent *tor){
+bool tr_verify_worker::skipVerifyTorrent(tr_torrent *tor, float percent) {
     bool changed = false;
-    for (int i = 0; i < tor->pieceCount(); i++) {
+    int total = tor->pieceCount() * percent;
+    for (int i = 0; i < total; i++) {
         tor->setHasPiece(i, true);
         tor->checked_pieces_.set(i, true);
         changed |= true != tor->hasPiece(i);
+        tor->setVerifyProgress((float) (i + 1) / (float) tor->pieceCount());
     }
-    tor->setVerifyProgress(1);
     tor->markChanged();
     return changed;
 }
