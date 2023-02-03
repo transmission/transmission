@@ -58,7 +58,7 @@ unsigned int build_torrent_trackers_hash(tr_torrent const& torrent)
     {
         for (auto const ch : std::string_view{ tr_torrentTracker(&torrent, i).announce })
         {
-            hash = (hash << 4) ^ (hash >> 28) ^ ch;
+            hash = (hash << 4U) ^ (hash >> 28U) ^ static_cast<unsigned char>(ch);
         }
     }
 
