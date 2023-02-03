@@ -69,7 +69,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
-[[nodiscard]] bool isVirtualDir(const char* dir);
+[[nodiscard]] bool isVirtualDir(char const* dir);
 
 enum tr_verify_state : uint8_t
 {
@@ -125,7 +125,6 @@ public:
         return isVirtualDir(this->download_dir.c_str());
     }
 
-
     /// SPEED LIMIT
 
     [[nodiscard]] constexpr auto& bandwidth() noexcept
@@ -154,22 +153,27 @@ public:
         }
     }
 
-//    size_t speedLimitBps(tr_direction dir);
+    //    size_t speedLimitBps(tr_direction dir);
 
-    [[nodiscard]] auto speedLimitBps(tr_direction dir) const {
-        if (dir == TR_UP && this->isVirtual() && completion.hasAll()) {
+    [[nodiscard]] auto speedLimitBps(tr_direction dir) const
+    {
+        if (dir == TR_UP && this->isVirtual() && completion.hasAll())
+        {
             size_t zero = 0;
             return zero;
         }
         return bandwidth().getDesiredSpeedBytesPerSecond(dir);
     }
 
-    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept {
+    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
+    {
         return bandwidth().areParentLimitsHonored(TR_UP);
     }
 
-    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept {
-        if (dir == TR_CLIENT_TO_PEER && isVirtual() && completion.hasAll()) {
+    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
+    {
+        if (dir == TR_CLIENT_TO_PEER && isVirtual() && completion.hasAll())
+        {
             return true;
         }
         return bandwidth().isLimited(dir);
@@ -413,7 +417,8 @@ public:
 
     void removeFiles(std::function<void(char const* filename)> const& delete_func_wrapper)
     {
-        if(!this->isVirtual()){
+        if (!this->isVirtual())
+        {
             metainfo_.files().remove(currentDir(), metainfo_.name(), delete_func_wrapper);
         }
     }

@@ -280,7 +280,8 @@ void tr_tracker_http_announce(
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
 
-    if(session->useHttpProxy()){
+    if (session->useHttpProxy())
+    {
         options.http_proxy = session->httpProxy();
     }
 

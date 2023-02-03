@@ -159,8 +159,9 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
 
 tr_disk_space tr_dirSpace(std::string_view directory)
 {
-    if(isVirtualDir(std::string(directory).c_str())){
-        return {  std::numeric_limits<long long>::max(),  std::numeric_limits<long long>::max() };
+    if (isVirtualDir(std::string(directory).c_str()))
+    {
+        return { std::numeric_limits<long long>::max(), std::numeric_limits<long long>::max() };
     }
     if (std::empty(directory))
     {

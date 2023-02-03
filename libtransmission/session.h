@@ -393,15 +393,18 @@ public:
 
     void setDefaultTrackers(std::string_view trackers);
 
-    void setHttpProxy(std::string_view http_proxy) {
+    void setHttpProxy(std::string_view http_proxy)
+    {
         settings_.http_proxy = http_proxy;
     }
 
-    [[nodiscard]] constexpr auto const &httpProxy() const noexcept {
+    [[nodiscard]] constexpr auto const& httpProxy() const noexcept
+    {
         return settings_.http_proxy;
     }
 
-    [[nodiscard]] constexpr auto useHttpProxy() const noexcept{
+    [[nodiscard]] constexpr auto useHttpProxy() const noexcept
+    {
         return settings_.http_proxy_enabled;
     }
 

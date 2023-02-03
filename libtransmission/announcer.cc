@@ -896,31 +896,49 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     }
 }
 
-int randomgen(int min,int max) //Pass in range
+int randomgen(int min, int max) //Pass in range
 {
     int random = std::rand() % max + min;
     return random;
 }
 
-uint64_t min(uint64_t a, uint64_t b) {
+uint64_t min(uint64_t a, uint64_t b)
+{
     return a > b ? b : a;
 }
 
 int MB = static_cast<int>(1024 * 1024 * 0.9);
 
-void append_random_upload(tr_torrent* const tor,tr_tier const* const tier){
+[[nodiscard]] uint64_t random_upload(int seeder_cnt, int leecher_cnt, time_t lastAnnounceTime, uint32_t block_size)
+{
     time_t now = tr_time();
-    int up_peer_cnt = tier->currentTracker()->leecher_count;
-    uint16_t end = min(up_peer_cnt, 20);
-    up_peer_cnt = randomgen(1, end);
-    uint64_t max_by_time = ((float) (now - tier->lastAnnounceTime) / (float) 60) * MB;
-    uint64_t length = min(up_peer_cnt * MB, max_by_time);
+    leecher_cnt = randomgen(1, min(leecher_cnt, 20) * 1.5); //随机生成一个1~up_peer_cnt(最大20个)的leecher数量
+    uint64_t max_by_time = ((float)(now - lastAnnounceTime) / (float)60) * MB;
+    uint64_t max_length = min(leecher_cnt * MB, max_by_time);
+    int rand_piece_cnt = randomgen(0, max_length / block_size);
+    return rand_piece_cnt * block_size;
+}
 
-    tor->uploadedCur += length;
-    tr_announcerAddBytes(tor, TR_ANN_UP, length);
-    tor->setDateActive(now);
-    tor->setDirty();
-    tor->session->addUploaded(length);
+void append_random_upload(tr_announce_event const event, tr_torrent* const tor, tr_tier const* const tier)
+{
+    if (event != TR_ANNOUNCE_EVENT_NONE || !tor->isVirtual())
+    {
+        return;
+    }
+    auto const* const current_tracker = tier->currentTracker();
+    if (current_tracker->leecher_count > 3 && current_tracker->seeder_count > 10)
+    {
+        uint64_t length = random_upload(
+            current_tracker->seeder_count,
+            current_tracker->leecher_count,
+            tier->lastAnnounceTime,
+            tor->metainfo_.blockSize(0));
+        tor->uploadedCur += length;
+        tr_announcerAddBytes(tor, TR_ANN_UP, length);
+        tor->setDateActive(tr_time());
+        tor->setDirty();
+        tor->session->addUploaded(length);
+    }
 }
 
 [[nodiscard]] tr_announce_request create_announce_request(
@@ -931,11 +949,7 @@ void append_random_upload(tr_torrent* const tor,tr_tier const* const tier){
 {
     auto const* const current_tracker = tier->currentTracker();
     TR_ASSERT(current_tracker != nullptr);
-
-    if ((event == TR_ANNOUNCE_EVENT_NONE) && tor->isVirtual() && current_tracker->leecher_count > 3
-            && current_tracker->seeder_count > 10) {
-        append_random_upload(tor, tier);
-    }
+    append_random_upload(event, tor, tier);
 
     auto req = tr_announce_request{};
     req.port = announcer->session->advertisedPeerPort();
@@ -943,7 +957,7 @@ void append_random_upload(tr_torrent* const tor,tr_tier const* const tier){
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
     req.peer_id = tr_torrentGetPeerId(tor);
-    req.up = tier->byteCounts[TR_ANN_UP];;
+    req.up = tier->byteCounts[TR_ANN_UP];
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
     req.leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;

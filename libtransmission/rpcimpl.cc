@@ -1892,7 +1892,8 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
         tr_sessionSetQueueEnabled(session, TR_DOWN, val);
     }
 
-    if (tr_variantDictFindStrView(args_in, TR_KEY_http_proxy, &sv)){
+    if (tr_variantDictFindStrView(args_in, TR_KEY_http_proxy, &sv))
+    {
         session->setHttpProxy(sv);
     }
 

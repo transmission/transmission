@@ -184,17 +184,17 @@ tr_peer_id_t tr_peerIdInit(std::string hash_string)
     auto total = int{ 0 };
     tr_rand_buffer(it, end - it);
     auto length = std::size(hash_string);
-//    auto constexpr Pool2 = std::string_view{ hash_string };
+    //    auto constexpr Pool2 = std::string_view{ hash_string };
     while (it < end)
     {
-//        int const val = *it % std::size(Pool);
-//        total += val;
-//        *it++ = Pool[val];
-//          total += val;
-          *it++ = hash_string[--length];
+        //        int const val = *it % std::size(Pool);
+        //        total += val;
+        //        *it++ = Pool[val];
+        //          total += val;
+        *it++ = hash_string[--length];
     }
-//    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
-//    *it = Pool[val];
+    //    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
+    //    *it = Pool[val];
     return peer_id;
 }
 
@@ -878,7 +878,7 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
     return session->useIncompleteDir();
 }
 
-void tr_sessionSetHttpProxy(tr_session* session,std::string_view http_proxy)
+void tr_sessionSetHttpProxy(tr_session* session, std::string_view http_proxy)
 {
     TR_ASSERT(session != nullptr);
 

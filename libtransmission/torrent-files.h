@@ -136,8 +136,9 @@ public:
             return filename_;
         }
 
-        [[nodiscard]] uint64_t filesize() const noexcept {
-            tr_error *error = nullptr;
+        [[nodiscard]] uint64_t filesize() const noexcept
+        {
+            tr_error* error = nullptr;
             auto const file_info = tr_sys_path_get_info(filename(), 0, &error);
             return file_info->size;
         }

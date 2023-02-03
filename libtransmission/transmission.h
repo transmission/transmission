@@ -297,7 +297,7 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session);
  */
 void tr_sessionSetIncompleteDir(tr_session* session, char const* dir);
 
-void tr_sessionSetHttpProxy(tr_session* session,std::string_view http_proxy);
+void tr_sessionSetHttpProxy(tr_session* session, std::string_view http_proxy);
 
 char const* tr_sessionGetHttpProxy(tr_session const* session);
 

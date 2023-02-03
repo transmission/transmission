@@ -323,10 +323,10 @@ public:
             }
         }
 
-        [[nodiscard]] constexpr auto const& httpProxy() const{
+        [[nodiscard]] constexpr auto const& httpProxy() const
+        {
             return options.http_proxy;
         }
-
 
         void done()
         {
