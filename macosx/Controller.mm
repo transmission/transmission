@@ -4358,9 +4358,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             ((NSButton*)itemPause.view).image = [NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"];
             ((NSButton*)itemResume.view).image = [NSImage systemSymbol:@"arrow.clockwise.circle.fill"
                                                           withFallback:@"ToolbarResumeAllTemplate"];
-            // on macOS 13.2, in French, the palette autolayout will hang unless the title length is at least 12 spaces long
-            ((NSButton*)itemPause.view).title = @"            ";
-            ((NSButton*)itemResume.view).title = @"            ";
+            // On macOS 13.2, the palette autolayout will hang unless the title length is at least 14 spaces long in Russian (12 spaces long or less in French and other languages).
+            ((NSButton*)itemPause.view).title = @"              ";
+            ((NSButton*)itemResume.view).title = @"              ";
         }
         groupItem.target = self;
         groupItem.action = @selector(allToolbarClicked:);
@@ -4419,9 +4419,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             ((NSButton*)itemPause.view).image = [NSImage systemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"];
             ((NSButton*)itemResume.view).image = [NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"];
-            // on macOS 13.2, in French, the palette autolayout will hang unless the title length is at least 12 spaces long
-            ((NSButton*)itemPause.view).title = @"            ";
-            ((NSButton*)itemResume.view).title = @"            ";
+            // On macOS 13.2, the palette autolayout will hang unless the title length is at least 14 spaces long in Russian (12 spaces long or less in French and other languages).
+            ((NSButton*)itemPause.view).title = @"              ";
+            ((NSButton*)itemResume.view).title = @"              ";
         }
         groupItem.target = self;
         groupItem.action = @selector(selectedToolbarClicked:);
