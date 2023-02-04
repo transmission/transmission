@@ -4344,24 +4344,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
+        if (![toolbar isKindOfClass:Toolbar.class] || ((Toolbar*)toolbar).customizationPaletteIsRunning_fixed)
+        {
+            // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
+            [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
+            [segmentedControl setWidth:64 forSegment:TOOLBAR_RESUME_TAG];
+        }
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
         groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
         groupItem.subitems = @[ itemPause, itemResume ];
-        if ([toolbar isKindOfClass:Toolbar.class] && !((Toolbar*)toolbar).customizationPaletteIsRunning_fixed)
-        {
-            groupItem.view = segmentedControl;
-        }
-        else
-        {
-            ((NSButton*)itemPause.view).image = [NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"];
-            ((NSButton*)itemResume.view).image = [NSImage systemSymbol:@"arrow.clockwise.circle.fill"
-                                                          withFallback:@"ToolbarResumeAllTemplate"];
-            // On macOS 13.2, the palette autolayout will hang unless the title length is at least 14 spaces long in Russian (12 spaces long or less in French and other languages).
-            ((NSButton*)itemPause.view).title = @"              ";
-            ((NSButton*)itemResume.view).title = @"              ";
-        }
+        groupItem.view = segmentedControl;
         groupItem.target = self;
         groupItem.action = @selector(allToolbarClicked:);
 
@@ -4406,23 +4400,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
+        if (![toolbar isKindOfClass:Toolbar.class] || ((Toolbar*)toolbar).customizationPaletteIsRunning_fixed)
+        {
+            // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
+            [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
+            [segmentedControl setWidth:64 forSegment:TOOLBAR_RESUME_TAG];
+        }
 
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
         groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
         groupItem.subitems = @[ itemPause, itemResume ];
-        if ([toolbar isKindOfClass:Toolbar.class] && !((Toolbar*)toolbar).customizationPaletteIsRunning_fixed)
-        {
-            groupItem.view = segmentedControl;
-        }
-        else
-        {
-            ((NSButton*)itemPause.view).image = [NSImage systemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"];
-            ((NSButton*)itemResume.view).image = [NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"];
-            // On macOS 13.2, the palette autolayout will hang unless the title length is at least 14 spaces long in Russian (12 spaces long or less in French and other languages).
-            ((NSButton*)itemPause.view).title = @"              ";
-            ((NSButton*)itemResume.view).title = @"              ";
-        }
+        groupItem.view = segmentedControl;
         groupItem.target = self;
         groupItem.action = @selector(selectedToolbarClicked:);
 
