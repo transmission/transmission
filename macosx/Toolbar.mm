@@ -5,7 +5,7 @@
 #import "Toolbar.h"
 
 @interface Toolbar ()
-@property(nonatomic) BOOL customizationPaletteIsRunning_fixed;
+@property(nonatomic) BOOL isRunningCustomizationPalette;
 @end
 
 @implementation Toolbar
@@ -21,9 +21,9 @@
 
 - (void)runCustomizationPalette:(nullable id)sender
 {
-    _customizationPaletteIsRunning_fixed = YES;
+    _isRunningCustomizationPalette = YES;
     [super runCustomizationPalette:sender];
-    _customizationPaletteIsRunning_fixed = NO;
+    _isRunningCustomizationPalette = NO;
 }
 
 @end

@@ -6,6 +6,6 @@
 
 @interface Toolbar : NSToolbar
 
-@property(readonly) BOOL customizationPaletteIsRunning_fixed;
+@property(readonly) BOOL isRunningCustomizationPalette;
 
 @end

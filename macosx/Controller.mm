@@ -4344,7 +4344,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
-        if (![toolbar isKindOfClass:Toolbar.class] || ((Toolbar*)toolbar).customizationPaletteIsRunning_fixed)
+        if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
         {
             // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
             [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
@@ -4400,7 +4400,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
-        if (![toolbar isKindOfClass:Toolbar.class] || ((Toolbar*)toolbar).customizationPaletteIsRunning_fixed)
+        if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
         {
             // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
             [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
