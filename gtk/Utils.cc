@@ -86,19 +86,19 @@ char const* const speed_T_str = N_("TB/s");
 
 void gtr_message(std::string const& message)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    // NOLINTNEXTLINE(*-vararg)
     g_message("%s", message.c_str());
 }
 
 void gtr_warning(std::string const& message)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    // NOLINTNEXTLINE(*-vararg)
     g_warning("%s", message.c_str());
 }
 
 void gtr_error(std::string const& message)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    // NOLINTNEXTLINE(*-vararg)
     g_error("%s", message.c_str());
 }
 
@@ -488,7 +488,7 @@ Glib::SignalProxy<TrObjectSignalNotifyCallback> gtr_object_signal_notify(Glib::O
 
 void gtr_object_notify_emit(Glib::ObjectBase& object)
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    // NOLINTNEXTLINE(*-vararg)
     g_signal_emit_by_name(object.gobj(), "notify", nullptr);
 }
 
