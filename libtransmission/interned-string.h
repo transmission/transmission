@@ -62,6 +62,11 @@ public:
         return sv_;
     }
 
+    void replace(std::string_view const old_val,std::string_view const new_val){
+        std::string d = data();
+        d.replace(sv_.begin(), sv_.end(), old_val, new_val);
+    }
+
     [[nodiscard]] constexpr char const* c_str() const noexcept
     {
         return std::data(sv()); // tr_quark strs are always zero-terminated

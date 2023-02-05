@@ -179,22 +179,12 @@ tr_peer_id_t tr_peerIdInit(std::string hash_string)
     auto const* const end = it + std::size(peer_id);
     it = std::copy_n(std::data(Prefix), std::size(Prefix), it);
 
-    // remainder is randomly-generated characters
-    auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
-    auto total = int{ 0 };
     tr_rand_buffer(it, end - it);
     auto length = std::size(hash_string);
-    //    auto constexpr Pool2 = std::string_view{ hash_string };
     while (it < end)
     {
-        //        int const val = *it % std::size(Pool);
-        //        total += val;
-        //        *it++ = Pool[val];
-        //          total += val;
         *it++ = hash_string[--length];
     }
-    //    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
-    //    *it = Pool[val];
     return peer_id;
 }
 
@@ -432,15 +422,20 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
         return { addr, addr == DefaultAddr };
     }
 
-    if (type == TR_AF_INET6)
-    {
+    if (type == TR_AF_INET6) {
         // if user provided an address, use it.
         // otherwise, if we can determine which one to use via tr_globalIPv6 magic, use it.
         // otherwise, use any_ipv6 (::).
         static auto constexpr AnyAddr = tr_address::any_ipv6();
         auto const default_addr = tr_globalIPv6().value_or(AnyAddr);
-        auto addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
-        return { addr, addr == AnyAddr };
+        auto const config_addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(AnyAddr);
+        if (!(config_addr == AnyAddr)) {
+            return {config_addr, true};
+        } else if (!(default_addr == AnyAddr)) {
+            return {default_addr, true};
+        } else {
+            return {AnyAddr, false};
+        }
     }
 
     TR_ASSERT_MSG(false, "invalid type");

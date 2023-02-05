@@ -159,7 +159,7 @@ public:
 
     void upkeep();
 
-    void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success, tr_announce_response const& response);
+    void onAnnounceDone(int tier_id, tr_announce_event event, bool is_running_on_success,tr_announce_request const& request, tr_announce_response const& response);
     void onScrapeDone(tr_scrape_response const& response);
 
     [[nodiscard]] tr_scrape_info* scrape_info(tr_interned_string url)
@@ -467,8 +467,24 @@ struct tr_tier
         this->scrapeAt = getNextScrapeTime(tor->session, this, interval_secs);
     }
 
+    tr_web::FetchOptions::IPProtocol preferIPProto() const
+    {
+        if(lastAnnounceSucceeded){
+            return last_ip_protocol;
+        }else{
+            if (last_ip_protocol == tr_web::FetchOptions::IPProtocol::V4){
+                return tr_web::FetchOptions::IPProtocol::V6;
+            }else if(last_ip_protocol == tr_web::FetchOptions::IPProtocol::V6){
+                return tr_web::FetchOptions::IPProtocol::V4;
+            }
+            return tr_web::FetchOptions::IPProtocol::V6;
+        }
+    }
+
+    tr_web::FetchOptions::IPProtocol last_ip_protocol;
     std::deque<tr_announce_event> announce_events;
 
+    std::string last_announce_url;
     std::string last_announce_str;
     std::string last_scrape_str;
 
@@ -491,6 +507,7 @@ struct tr_tier
     time_t lastAnnounceStartTime = 0;
     time_t lastAnnounceTime = 0;
 
+    tr_web::FetchOptions::IPProtocol lastIPProto;
     int const id = next_key++;
 
     int announce_event_priority = 0;
@@ -857,8 +874,8 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     using namespace announce_helpers;
 
     auto* current_tracker = tier->currentTracker();
-    std::string const announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) :
-                                                                  "nullptr";
+    std::string const announce_url = !tier->last_announce_url.empty() ? tier->last_announce_url :
+            tr_urlTrackerLogName(current_tracker->announce_url);
 
     /* increment the error count */
     if (current_tracker != nullptr)
@@ -926,7 +943,7 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
         return;
     }
     auto const* const current_tracker = tier->currentTracker();
-    if (current_tracker->leecher_count > 3 && current_tracker->seeder_count > 10)
+    if (current_tracker->leecher_count > 2 && current_tracker->seeder_count > 10)
     {
         uint64_t length = random_upload(
             current_tracker->seeder_count,
@@ -953,7 +970,11 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
 
     auto req = tr_announce_request{};
     req.port = announcer->session->advertisedPeerPort();
-    req.announce_url = current_tracker->announce_url;
+    if(tor->isPrivate()){
+        req.announce_url = current_tracker->announce_url;
+    }else{
+        req.announce_url = current_tracker->announce_url;
+    }
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
     req.peer_id = tr_torrentGetPeerId(tor);
@@ -965,6 +986,7 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
     req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req.key = tor->announce_key();
     req.partial_seed = tor->isPartialSeed();
+    req.prefer_ip_proto = tier->preferIPProto();
     tier->buildLogName(req.log_name, sizeof(req.log_name));
     return req;
 }
@@ -1002,6 +1024,7 @@ void tr_announcer_impl::onAnnounceDone(
     int tier_id,
     tr_announce_event event,
     bool is_running_on_success,
+    tr_announce_request const& request,
     tr_announce_response const& response)
 {
     using namespace announce_helpers;
@@ -1049,6 +1072,8 @@ void tr_announcer_impl::onAnnounceDone(
     tier->lastAnnounceSucceeded = false;
     tier->isAnnouncing = false;
     tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
+    tier->last_ip_protocol = response.request_ip_proto;
+    tier->last_announce_url = response.request_url;
 
     if (response.external_ip)
     {
@@ -1558,7 +1583,7 @@ void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
 
     tr_torrent* tor = tier->tor;
     auto const event = tier_announce_event_pull(tier);
-    auto const req = create_announce_request(announcer, tor, tier, event);
+    auto const& req = create_announce_request(announcer, tor, tier, event);
 
     tier->isAnnouncing = true;
     tier->lastAnnounceStartTime = now;
@@ -1568,11 +1593,11 @@ void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
 
     announcer->announce(
         req,
-        [session = announcer->session, announcer, tier_id, event, is_running_on_success](tr_announce_response const& response)
+        [session = announcer->session, announcer, tier_id, event, is_running_on_success,req](tr_announce_response const& response)
         {
             if (session->announcer_)
             {
-                announcer->onAnnounceDone(tier_id, event, is_running_on_success, response);
+                announcer->onAnnounceDone(tier_id, event, is_running_on_success,req, response);
             }
         });
 }

@@ -570,10 +570,10 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, &tr_web::Impl::onDataReceived);
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
 
-        if (auto const addrstr = task.publicAddress(); addrstr)
-        {
-            (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
-        }
+//        if (auto const addrstr = task.publicAddress(); addrstr)
+//        {
+//            (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
+//        }
 
         if (auto const& cookies = task.cookies(); cookies)
         {

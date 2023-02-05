@@ -23,6 +23,7 @@
 #include "announcer.h"
 #include "interned-string.h"
 #include "net.h"
+#include "web.h"
 #include "peer-mgr.h" // tr_pex
 
 struct tr_url_parsed_t;
@@ -95,6 +96,8 @@ struct tr_announce_request
     /* the torrent's info_hash */
     tr_sha1_digest_t info_hash;
 
+    tr_web::FetchOptions::IPProtocol prefer_ip_proto;
+
     /* the name to use when deep logging is enabled */
     char log_name[128];
 };
@@ -146,6 +149,9 @@ struct tr_announce_response
     /* tracker extension that returns the client's public IP address.
      * https://www.bittorrent.org/beps/bep_0024.html */
     std::optional<tr_address> external_ip;
+
+    tr_web::FetchOptions::IPProtocol request_ip_proto;
+    std::string request_url;
 };
 
 // --- SCRAPE

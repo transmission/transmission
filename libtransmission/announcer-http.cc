@@ -101,7 +101,11 @@ struct http_announce_data
     uint8_t requests_sent_count = {};
     uint8_t requests_answered_count = {};
 
+    tr_web::FetchOptions::IPProtocol request_ip_proto;
+
     std::string log_name;
+    std::string url;
+
 };
 
 bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response* const response)
@@ -149,6 +153,8 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
     {
         tr_announce_response response;
         response.info_hash = data->info_hash;
+        response.request_ip_proto = data->request_ip_proto;
+        response.request_url = data->url;
 
         data->http_success = handleAnnounceResponse(web_response, &response);
 
@@ -291,8 +297,6 @@ void tr_tracker_http_announce(
         session->fetch(std::move(opt));
     };
 
-    auto const [ipv6, ipv6_is_any] = session->publicAddress(TR_AF_INET6);
-
     /*
      * Before Curl 7.77.0, if we explicitly choose the IP version we want
      * to use, it is still possible that the wrong one is used. The workaround
@@ -312,46 +316,35 @@ void tr_tracker_http_announce(
     }
     else
     {
-        if (session->useAnnounceIP() || ipv6_is_any)
-//        if (false)
-        {
-            if (session->useAnnounceIP())
-            {
-                options.url += format_ip_arg(session->announceIP());
-            }else{
-                static auto constexpr AnyAddr = tr_address::any_ipv4();
-                auto const source_addr = tr_globalIPv4().value_or(AnyAddr);
-                if (source_addr == AnyAddr) {
-                    options.url += format_ip_arg(source_addr.display_name());
-                }
-            }
-            d->requests_sent_count = 1;
-            if(ipv6_is_any){
-                options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-            }
-            do_make_request(""sv, std::move(options));
-        }
-        else
-        {
-            d->requests_sent_count = 2;
+        d->requests_sent_count = 1;
+        tr_web::FetchOptions::IPProtocol proto = request.prefer_ip_proto;
+        auto const [ipv6, ipv6_is_any] = session->publicAddress(TR_AF_INET6);
+        auto announceIP = std::string();
+        std::string_view protocol_name;
+        if((tr_web::FetchOptions::IPProtocol::V6==proto || tr_web::FetchOptions::IPProtocol::ANY==proto)&& ipv6_is_any){
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
             static auto constexpr AnyAddr = tr_address::any_ipv4();
             auto const source_addr = tr_globalIPv4().value_or(AnyAddr);
-
-            // First try to send the announce via IPv4:
-            auto ipv4_options = options;
-            ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-            if (source_addr == AnyAddr) {
-                ipv4_options.url += format_ip_arg(source_addr.display_name());
+            if (!(source_addr == AnyAddr)) {
+                announceIP = source_addr.display_name();
             }
-            do_make_request("IPv4"sv, std::move(ipv4_options));
-
-            // Then try to send via IPv6:
-            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-            if (source_addr == AnyAddr) {
-                options.url += format_ip_arg(source_addr.display_name());
+            protocol_name = std::string_view{"IPV6"};
+        }else{
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            if(ipv6_is_any){
+                announceIP = ipv6.display_name();
             }
-            do_make_request("IPv6"sv, std::move(options));
+            protocol_name = std::string_view{"IPV4"};
         }
+        if (!session->announceIP().empty())
+        {
+            options.url += format_ip_arg(session->announceIP());
+        }else if (!announceIP.empty()){
+            options.url += format_ip_arg(announceIP);
+        }
+        d->url = options.url;
+        d->request_ip_proto = options.ip_proto;
+        do_make_request(protocol_name, std::move(options));
     }
 }
 
