@@ -399,3 +399,5 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
 [[nodiscard]] std::string tr_net_strerror(int err);
 
 [[nodiscard]] std::optional<tr_address> tr_globalIPv6();
+
+[[nodiscard]] std::optional<tr_address> tr_globalIPv4();

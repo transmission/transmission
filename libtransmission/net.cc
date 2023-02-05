@@ -38,6 +38,8 @@
 #include "tr-utp.h"
 #include "utils.h"
 #include "variant.h"
+#include <curl/curl.h>
+#include <algorithm>
 
 using namespace std::literals;
 
@@ -461,26 +463,74 @@ namespace global_ipv6_helpers
     return {};
 }
 
+size_t writefunc(void *contents, size_t size, size_t nmemb, std::string *s)
+{
+    size_t newLength = size*nmemb;
+    try
+    {
+        s->append((char*)contents, newLength);
+    }
+    catch(std::bad_alloc &e)
+    {
+        //handle memory problem
+        return 0;
+    }
+    return newLength;
+}
+
+[[nodiscard]] std::optional<tr_address> detective_source_address(std::string url)
+{
+    CURL *curl;
+    CURLcode res;
+
+    curl = curl_easy_init();
+    std::string s;
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); //only for https
+        curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L); //only for https
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
+        curl_easy_setopt (curl, CURLOPT_VERBOSE, 1L); //remove this to disable verbose output
+        res = curl_easy_perform(curl);
+        if (CURLE_OK == res)
+            printf("We received Content-Type: %s\n", s.c_str());
+
+        /* always cleanup */
+        curl_easy_cleanup(curl);
+    }
+    s.erase(std::remove(s.begin(), s.end(), '\n'), s.end());
+    return tr_address::from_string(s);
+}
+
 [[nodiscard]] std::optional<tr_address> global_address(int af)
 {
     // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
+    static auto constexpr DstIPv4 = "114.114.114.114"sv;
+//    static auto constexpr DstIPv4 = "91.121.74.28"sv;
+    static auto constexpr DstIPv6 = "2400:3200::1"sv;
+//    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
     auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6);
-    auto const dst_port = tr_port::fromHost(6969);
+//    auto const dst_port = tr_port::fromHost(6969);
+    auto const dst_port = tr_port::fromHost(53);
 
     // In order for address selection to work right,
     // this should be a native IPv6 address, not Teredo or 6to4
     TR_ASSERT(dst_addr.has_value() && dst_addr->is_global_unicast_address());
-
-    if (dst_addr)
-    {
-        if (auto addr = get_source_address(*dst_addr, dst_port); addr && addr->is_global_unicast_address())
+    if (dst_addr) {
+        if (auto addr = get_source_address(*dst_addr, dst_port); addr && addr->is_global_unicast_address()) {
+            return addr;
+        }
+    }
+    auto ipv4_url = "https://ipv4.icanhazip.com/";
+    auto ipv6_url = "https://ipv6.icanhazip.com/";
+    auto const dst_url = (af == AF_INET) ? ipv4_url : ipv6_url;
+    if (dst_url) {
+        if (auto addr = detective_source_address(dst_url); addr && addr->is_global_unicast_address())
         {
             return addr;
         }
     }
-
     return {};
 }
 
@@ -488,21 +538,41 @@ namespace global_ipv6_helpers
 } // namespace
 
 /* Return our global IPv6 address, with caching. */
-std::optional<tr_address> tr_globalIPv6()
+std::optional<tr_address> tr_globalIP(int af)
 {
     using namespace global_ipv6_helpers;
-
-    // recheck our cached value every half hour
     static auto constexpr CacheSecs = 1800;
-    static auto cache_val = std::optional<tr_address>{};
-    static auto cache_expires_at = time_t{};
-    if (auto const now = tr_time(); cache_expires_at <= now)
-    {
-        cache_expires_at = now + CacheSecs;
-        cache_val = global_address(AF_INET6);
+    static auto constexpr AnyV4Addr = tr_address::any_ipv4();
+    static auto constexpr AnyV6Addr = tr_address::any_ipv6();
+    if (AF_INET6 == af) {
+        static auto cache_val_v6 = std::optional<tr_address>{};
+        static auto cache_expires_at_v6 = time_t{};
+        if (auto const now = tr_time(); cache_expires_at_v6 <= now) {
+            cache_expires_at_v6 = now + CacheSecs;
+            cache_val_v6 = global_address(af);
+            tr_logAddInfo(cache_val_v6.value_or(AnyV6Addr).display_name(), _("Global V6 IP"));
+        }
+        return cache_val_v6;
+    } else if (AF_INET == af) {
+        static auto cache_val_v4 = std::optional<tr_address>{};
+        static auto cache_expires_at_v4 = time_t{};
+        if (auto const now = tr_time(); cache_expires_at_v4 <= now) {
+            cache_expires_at_v4 = now + CacheSecs;
+            cache_val_v4 = global_address(af);
+            tr_logAddInfo(cache_val_v4.value_or(AnyV4Addr).display_name(), _("Global V4 IP"));
+        }
+        return cache_val_v4;
     }
+}
 
-    return cache_val;
+std::optional<tr_address> tr_globalIPv4()
+{
+    return tr_globalIP(AF_INET);
+}
+
+std::optional<tr_address> tr_globalIPv6()
+{
+    return tr_globalIP(AF_INET6);
 }
 
 // ---

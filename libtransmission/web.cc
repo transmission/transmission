@@ -506,7 +506,6 @@ public:
     {
         TR_ASSERT(std::this_thread::get_id() == curl_thread->get_id());
         auto* const e = task.easy();
-        (void)curl_easy_setopt(e, CURLOPT_PROXY, task.httpProxy()->c_str());
         (void)curl_easy_setopt(e, CURLOPT_SHARE, shared());
         (void)curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, DnsCacheTimeoutSecs);
         (void)curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
@@ -517,6 +516,9 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
 
+        if (task.ipProtocol()!=CURL_IPRESOLVE_V6){
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, task.httpProxy()->c_str());
+        }
 #ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, &task);

@@ -313,25 +313,43 @@ void tr_tracker_http_announce(
     else
     {
         if (session->useAnnounceIP() || ipv6_is_any)
+//        if (false)
         {
             if (session->useAnnounceIP())
             {
                 options.url += format_ip_arg(session->announceIP());
+            }else{
+                static auto constexpr AnyAddr = tr_address::any_ipv4();
+                auto const source_addr = tr_globalIPv4().value_or(AnyAddr);
+                if (source_addr == AnyAddr) {
+                    options.url += format_ip_arg(source_addr.display_name());
+                }
             }
             d->requests_sent_count = 1;
+            if(ipv6_is_any){
+                options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            }
             do_make_request(""sv, std::move(options));
         }
         else
         {
             d->requests_sent_count = 2;
+            static auto constexpr AnyAddr = tr_address::any_ipv4();
+            auto const source_addr = tr_globalIPv4().value_or(AnyAddr);
 
             // First try to send the announce via IPv4:
             auto ipv4_options = options;
             ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            if (source_addr == AnyAddr) {
+                ipv4_options.url += format_ip_arg(source_addr.display_name());
+            }
             do_make_request("IPv4"sv, std::move(ipv4_options));
 
             // Then try to send via IPv6:
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            if (source_addr == AnyAddr) {
+                options.url += format_ip_arg(source_addr.display_name());
+            }
             do_make_request("IPv6"sv, std::move(options));
         }
     }
