@@ -58,7 +58,7 @@ struct tr_pex
     tr_pex() = default;
 
     tr_pex(tr_address addr_in, tr_port port_in, uint8_t flags_in = {})
-        : addr{ std::move(addr_in) }
+        : addr{ addr_in }
         , port{ port_in }
         , flags{ flags_in }
     {

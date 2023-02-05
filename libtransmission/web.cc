@@ -43,6 +43,8 @@ using namespace std::literals;
 
 // ---
 
+namespace
+{
 namespace curl_helpers
 {
 
@@ -92,6 +94,7 @@ struct EasyDeleter
 using easy_unique_ptr = std::unique_ptr<CURL, EasyDeleter>;
 
 } // namespace curl_helpers
+} // namespace
 
 #ifdef _WIN32
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
@@ -772,7 +775,7 @@ public:
         }
     }
 
-    static std::once_flag curl_init_flag;
+    static inline auto curl_init_flag = std::once_flag{};
 
     std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
 
@@ -786,8 +789,6 @@ public:
         }
     }
 };
-
-std::once_flag tr_web::Impl::curl_init_flag;
 
 tr_web::tr_web(Mediator& mediator)
     : impl_{ std::make_unique<Impl>(mediator) }

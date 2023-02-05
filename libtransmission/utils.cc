@@ -579,11 +579,11 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
 
 // ---
 
-uint64_t tr_htonll(uint64_t x)
+uint64_t tr_htonll(uint64_t hostlonglong)
 {
 #ifdef HAVE_HTONLL
 
-    return htonll(x);
+    return htonll(hostlonglong);
 
 #else
 
@@ -593,18 +593,18 @@ uint64_t tr_htonll(uint64_t x)
         std::array<uint32_t, 2> lx;
         uint64_t llx;
     } u = {};
-    u.lx[0] = htonl(x >> 32);
-    u.lx[1] = htonl(x & 0xFFFFFFFFULL);
+    u.lx[0] = htonl(hostlonglong >> 32);
+    u.lx[1] = htonl(hostlonglong & 0xFFFFFFFFULL);
     return u.llx;
 
 #endif
 }
 
-uint64_t tr_ntohll(uint64_t x)
+uint64_t tr_ntohll(uint64_t netlonglong)
 {
 #ifdef HAVE_NTOHLL
 
-    return ntohll(x);
+    return ntohll(netlonglong);
 
 #else
 
@@ -614,7 +614,7 @@ uint64_t tr_ntohll(uint64_t x)
         std::array<uint32_t, 2> lx;
         uint64_t llx;
     } u = {};
-    u.llx = x;
+    u.llx = netlonglong;
     return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]);
 
 #endif

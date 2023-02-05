@@ -13,17 +13,18 @@ If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, i
 Lastly, using devtools in the Transmission web client is always an option.
 
 ### 1.3 Libraries of ready-made wrappers
-In order not to waste time and effort on parsing RPC calls, we offer the following ready-made wrappers for transmission:
+Some people outside of the Transmission project have written libraries that wrap this RPC API. These aren't supported by the Transmission project, but are listed herer in the hope that they may be useful:
 
-For C#:
-https://www.nuget.org/packages/Transmission.API.RPC
-
-For Python:
-https://github.com/Trim21/transmission-rpc
+| Language | Link
+|:---|:---
+| C# | https://www.nuget.org/packages/Transmission.API.RPC
+| Go | https://github.com/hekmon/transmissionrpc
+| Python | https://github.com/Trim21/transmission-rpc
+| Rust | https://crates.io/crates/transmission-rpc
 
 
 ## 2 Message format
-Messages are formatted as objects. There are two types: requests (described in 2.1) and responses (described in 2.2).
+Messages are formatted as objects. There are two types: requests (described in [section 2.1](#21-requests)) and responses (described in [section 2.2](#22-responses)).
 
 All text **must** be UTF-8 encoded.
 
@@ -73,7 +74,7 @@ since the port and path may be changed to allow mapping and/or multiple
 daemons to run on a single server.
 
 #### 2.3.1 CSRF protection
-Most Transmission RPC servers require a X-Transmission-Session-Id
+Most Transmission RPC servers require a `X-Transmission-Session-Id`
 header to be sent with requests, to prevent CSRF attacks.
 
 When your request has the wrong id -- such as when you send your first
@@ -123,6 +124,7 @@ Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
 
 `ids` should be one of the following:
+
 1. an integer referring to a torrent id
 2. a list of torrent id numbers, SHA1 hash strings, or both
 3. a string, `recently-active`, for recently-active torrents
@@ -155,10 +157,10 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
-| `trackerAdd`          | array    | add a new tracker URL in its own new tier
-| `trackerList`         | string   | rebuild the torrent's tracker list with a string of announce URLs, one per line, with a blank line between tiers
-| `trackerRemove`       | array    | remove a tracker URL
-| `trackerReplace`      | array    | modify a tracker URL
+| `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
+| `trackerList`         | string   | string of announce URLs, one per line, with a blank line between tiers
+| `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
+| `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
 | `uploadLimit`         | number   | maximum upload speed (KBps)
 | `uploadLimited`       | boolean  | true if `uploadLimit` is honored
 
@@ -547,7 +549,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
 | `rename-partial-files` | boolean | true means append `.part` to incomplete files
 | `rpc-version-minimum` | number | the minimum RPC API version supported
-| `rpc-version-semver` | string | the current RPC API version in a semver-compatible string
+| `rpc-version-semver` | string | the current RPC API version in a [semver](https://semver.org)-compatible string
 | `rpc-version` | number | the current RPC API version
 | `script-torrent-added-enabled` | boolean | whether or not to call the `added` script
 | `script-torrent-added-filename` | string | filename of the script to run
@@ -748,8 +750,9 @@ A bandwidth group description object has:
 This section lists the changes that have been made to the RPC protocol.
 
 There are two ways to check for API compatibility. Since most developers know
-semver, session-get's `rpc-version-semver` is the recommended way. That value
-is a semver-compatible string of the RPC protocol version number.
+[semver](https://semver.org/), session-get's `rpc-version-semver` is the
+recommended way. That value is a semver-compatible string of the RPC protocol
+version number.
 
 Since Transmission predates the semver 1.0 spec, the previous scheme was for
 the RPC version to be a whole number and to increment it whenever a change was
@@ -972,7 +975,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | Method | Description
 |:---|:---
 | `/upload` | :warning: undocumented `/upload` endpoint removed
-| `session-get` | **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
+| `session-get` | :warning: **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
 | `free-space` | new return arg `total-capacity`
 | `session-get` | new arg `default-trackers`
 | `session-get` | new arg `rpc-version-semver`
@@ -991,6 +994,9 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `torrent-get` | new arg `trackerList`
 | `torrent-set` | new arg `group`
 | `torrent-set` | new arg `trackerList`
+| `torrent-set` | :warning: **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
+| `torrent-set` | :warning: **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
+| `torrent-set` | :warning: **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
 | `group-set` | new method
 | `group-get` | new method
 

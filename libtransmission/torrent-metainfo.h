@@ -128,7 +128,10 @@ public:
         return is_private_;
     }
 
-    [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
+    [[nodiscard]] TR_CONSTEXPR20 tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const
+    {
+        return pieces_[piece];
+    }
 
     [[nodiscard]] TR_CONSTEXPR20 bool hasV1Metadata() const noexcept
     {
@@ -213,7 +216,7 @@ private:
         BasenameFormat format,
         std::string_view suffix);
 
-    auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    [[nodiscard]] auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
         return makeFilename(dirname, name(), infoHashString(), format, suffix);
     }

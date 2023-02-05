@@ -601,6 +601,9 @@ void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool enabled);
 /** @brief Like `tr_torrentStart()`, but resumes right away regardless of the queues. */
 void tr_torrentStartNow(tr_torrent* tor);
 
+/** @brief Like tr_torrentStart(), but sets magnetStartAfterVerify to true. */
+void tr_torrentStartMagnet(tr_torrent*);
+
 /** @brief Return the queued torrent's position in the queue it's in. [0...n) */
 size_t tr_torrentGetQueuePosition(tr_torrent const* tor);
 
@@ -1296,7 +1299,7 @@ struct tr_tracker_view
     int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
     size_t tier; // which tier this tracker is in
-    tr_torrent_id_t id; // unique transmission-generated ID for use in libtransmission API
+    tr_tracker_id_t id; // unique transmission-generated ID for use in libtransmission API
 
     tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.
     tr_tracker_state scrapeState; // whether we're scraping, waiting to scrape, etc.

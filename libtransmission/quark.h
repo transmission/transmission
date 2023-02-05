@@ -445,4 +445,4 @@ enum
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-[[nodiscard]] tr_quark tr_quark_new(std::string_view);
+[[nodiscard]] tr_quark tr_quark_new(std::string_view str);

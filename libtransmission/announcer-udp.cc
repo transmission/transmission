@@ -85,8 +85,8 @@ struct tau_scrape_request
 
         // build the payload
         auto buf = libtransmission::Buffer{};
-        buf.addUint32(TAU_ACTION_SCRAPE);
-        buf.addUint32(transaction_id);
+        buf.add_uint32(TAU_ACTION_SCRAPE);
+        buf.add_uint32(transaction_id);
         for (int i = 0; i < in.info_hash_count; ++i)
         {
             buf.add(in.info_hash[i]);
@@ -130,16 +130,16 @@ struct tau_scrape_request
                 }
 
                 auto& row = response.rows[i];
-                row.seeders = buf.toUint32();
-                row.downloads = buf.toUint32();
-                row.leechers = buf.toUint32();
+                row.seeders = buf.to_uint32();
+                row.downloads = buf.to_uint32();
+                row.leechers = buf.to_uint32();
             }
 
             requestFinished();
         }
         else
         {
-            std::string const errmsg = action == TAU_ACTION_ERROR && !std::empty(buf) ? buf.toString() : _("Unknown error");
+            std::string const errmsg = action == TAU_ACTION_ERROR && !std::empty(buf) ? buf.to_string() : _("Unknown error");
             fail(true, false, errmsg);
         }
     }
@@ -179,18 +179,18 @@ struct tau_announce_request
 
         // build the payload
         auto buf = libtransmission::Buffer{};
-        buf.addUint32(TAU_ACTION_ANNOUNCE);
-        buf.addUint32(transaction_id);
+        buf.add_uint32(TAU_ACTION_ANNOUNCE);
+        buf.add_uint32(transaction_id);
         buf.add(in.info_hash);
         buf.add(in.peer_id);
-        buf.addUint64(in.down);
-        buf.addUint64(in.leftUntilComplete);
-        buf.addUint64(in.up);
-        buf.addUint32(get_tau_announce_event(in.event));
-        buf.addUint32(announce_ip);
-        buf.addUint32(in.key);
-        buf.addUint32(in.numwant);
-        buf.addPort(in.port);
+        buf.add_uint64(in.down);
+        buf.add_uint64(in.leftUntilComplete);
+        buf.add_uint64(in.up);
+        buf.add_uint32(get_tau_announce_event(in.event));
+        buf.add_uint32(announce_ip);
+        buf.add_uint32(in.key);
+        buf.add_uint32(in.numwant);
+        buf.add_port(in.port);
         payload.insert(std::end(payload), std::begin(buf), std::end(buf));
     }
 
@@ -224,9 +224,9 @@ struct tau_announce_request
 
         if (action == TAU_ACTION_ANNOUNCE && buflen >= 3 * sizeof(uint32_t))
         {
-            response.interval = buf.toUint32();
-            response.leechers = buf.toUint32();
-            response.seeders = buf.toUint32();
+            response.interval = buf.to_uint32();
+            response.leechers = buf.to_uint32();
+            response.seeders = buf.to_uint32();
 
             auto const [bytes, n_bytes] = buf.pullup();
             response.pex = tr_pex::from_compact_ipv4(bytes, n_bytes, nullptr, 0);
@@ -234,7 +234,7 @@ struct tau_announce_request
         }
         else
         {
-            std::string const errmsg = action == TAU_ACTION_ERROR && !std::empty(buf) ? buf.toString() : _("Unknown error");
+            std::string const errmsg = action == TAU_ACTION_ERROR && !std::empty(buf) ? buf.to_string() : _("Unknown error");
             fail(true, false, errmsg);
         }
     }
@@ -318,13 +318,13 @@ struct tau_tracker
 
         if (action == TAU_ACTION_CONNECT)
         {
-            this->connection_id = buf.toUint64();
+            this->connection_id = buf.to_uint64();
             this->connection_expiration_time = tr_time() + TauConnectionTtlSecs;
             logdbg(this->key, fmt::format("Got a new connection ID from tracker: {}", this->connection_id));
         }
         else if (action == TAU_ACTION_ERROR)
         {
-            std::string const errmsg = !std::empty(buf) ? buf.toString() : _("Connection failed");
+            std::string const errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
             logdbg(this->key, errmsg);
             this->failAll(true, false, errmsg);
         }
@@ -375,9 +375,9 @@ struct tau_tracker
             logtrace(this->key, fmt::format("Trying to connect. Transaction ID is {}", this->connection_transaction_id));
 
             auto buf = libtransmission::Buffer{};
-            buf.addUint64(0x41727101980LL);
-            buf.addUint32(TAU_ACTION_CONNECT);
-            buf.addUint32(this->connection_transaction_id);
+            buf.add_uint64(0x41727101980LL);
+            buf.add_uint32(TAU_ACTION_CONNECT);
+            buf.add_uint32(this->connection_transaction_id);
 
             auto const [bytes, n_bytes] = buf.pullup();
             this->sendto(bytes, n_bytes);
@@ -537,7 +537,7 @@ private:
         logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
 
         auto buf = libtransmission::Buffer{};
-        buf.addUint64(this->connection_id);
+        buf.add_uint64(this->connection_id);
         buf.add(payload, payload_len);
 
         auto const [bytes, n_bytes] = buf.pullup();
@@ -626,7 +626,7 @@ public:
         // extract the action_id and see if it makes sense
         auto buf = libtransmission::Buffer{};
         buf.add(msg, msglen);
-        auto const action_id = static_cast<tau_action_t>(buf.toUint32());
+        auto const action_id = static_cast<tau_action_t>(buf.to_uint32());
 
         if (!isResponseMessage(action_id, msglen))
         {
@@ -634,7 +634,7 @@ public:
         }
 
         /* extract the transaction_id and look for a match */
-        tau_transaction_t const transaction_id = buf.toUint32();
+        tau_transaction_t const transaction_id = buf.to_uint32();
 
         for (auto& tracker : trackers_)
         {
