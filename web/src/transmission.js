@@ -899,9 +899,9 @@ TODO: fix this when notifications get fixed
     let string = '';
 
     // All trackers option
-    string += !this.filterTracker
-      ? '<option value="all" selected="selected">All</option>'
-      : '<option value="all">All</option>';
+    string += this.filterTracker
+      ? '<option value="all">All</option>'
+      : '<option value="all" selected="selected">All</option>';
     string +=
       '<option style="font-size: 1pt; background-color: #000000;" disabled>&nbsp;</option>';
 
