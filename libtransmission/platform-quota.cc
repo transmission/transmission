@@ -318,7 +318,7 @@ extern "C"
 
     close(fd);
 #else
-    if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) != 0)
+    if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), reinterpret_cast<caddr_t>(&dq)) != 0)
     {
         return disk_space;
     }

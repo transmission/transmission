@@ -322,7 +322,7 @@ private:
             mcast_addr_.sin_port = McastPort.network();
             mcast_addr_.sin_addr.s_addr = INADDR_ANY;
 
-            if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
+            if (bind(mcast_rcv_socket_, reinterpret_cast<sockaddr*>(&mcast_addr_), sizeof(mcast_addr_)) == -1)
             {
                 return false;
             }
@@ -408,15 +408,15 @@ private:
 
         // process announcement from foreign peer
         struct sockaddr_in foreign_addr = {};
-        int addr_len = sizeof(foreign_addr);
+        auto addr_len = socklen_t{ sizeof(foreign_addr) };
         auto foreign_msg = std::array<char, MaxDatagramLength>{};
         auto const res = recvfrom(
             mcast_rcv_socket_,
             std::data(foreign_msg),
             MaxDatagramLength,
             0,
-            (struct sockaddr*)&foreign_addr,
-            (socklen_t*)&addr_len);
+            reinterpret_cast<sockaddr*>(&foreign_addr),
+            &addr_len);
 
         // If we couldn't read it or it was too big, discard it
         if (res < 1 || static_cast<size_t>(res) > MaxDatagramLength)
@@ -557,7 +557,7 @@ private:
             std::data(announce),
             std::size(announce),
             0,
-            (struct sockaddr const*)&mcast_addr_,
+            reinterpret_cast<sockaddr const*>(&mcast_addr_),
             sizeof(mcast_addr_));
         auto const sent = res == static_cast<int>(std::size(announce));
         return sent;

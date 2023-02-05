@@ -43,6 +43,8 @@ using namespace std::literals;
 
 // ---
 
+namespace
+{
 namespace curl_helpers
 {
 
@@ -92,6 +94,7 @@ struct EasyDeleter
 using easy_unique_ptr = std::unique_ptr<CURL, EasyDeleter>;
 
 } // namespace curl_helpers
+} // namespace
 
 #ifdef _WIN32
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
@@ -516,8 +519,10 @@ public:
 
         if (!curl_ssl_verify)
         {
+#if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
+#endif
         }
         else if (!std::empty(curl_ca_bundle))
         {
@@ -534,12 +539,16 @@ public:
         {
             (void)curl_easy_setopt(e, CURLOPT_CAINFO, NULL);
             (void)curl_easy_setopt(e, CURLOPT_CAPATH, NULL);
+#if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
+#endif
         }
         else if (!std::empty(curl_ca_bundle))
         {
+#if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, curl_ca_bundle.c_str());
+#endif
         }
 
         if (auto const& ua = user_agent; !std::empty(ua))
@@ -766,7 +775,7 @@ public:
         }
     }
 
-    static std::once_flag curl_init_flag;
+    static inline auto curl_init_flag = std::once_flag{};
 
     std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
 
@@ -780,8 +789,6 @@ public:
         }
     }
 };
-
-std::once_flag tr_web::Impl::curl_init_flag;
 
 tr_web::tr_web(Mediator& mediator)
     : impl_{ std::make_unique<Impl>(mediator) }

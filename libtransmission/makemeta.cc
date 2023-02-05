@@ -24,7 +24,7 @@
 #include "makemeta.h"
 #include "session.h" // TR_NAME
 #include "tr-assert.h"
-#include "utils.h"
+#include "utils.h" // for _()
 #include "variant.h"
 #include "version.h"
 
@@ -176,7 +176,7 @@ bool tr_metainfo_builder::blockingMakeChecksums(tr_error** error)
 
     if (totalSize() == 0U)
     {
-        tr_error_set(error, ENOENT, tr_strerror(ENOENT));
+        tr_error_set_from_errno(error, ENOENT);
         return false;
     }
 
@@ -265,7 +265,7 @@ bool tr_metainfo_builder::blockingMakeChecksums(tr_error** error)
 
     if (cancel_)
     {
-        tr_error_set(error, ECANCELED, tr_strerror(ECANCELED));
+        tr_error_set_from_errno(error, ECANCELED);
         return false;
     }
 
@@ -284,7 +284,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
     if (totalSize() == 0)
     {
-        tr_error_set(error, ENOENT, tr_strerror(ENOENT));
+        tr_error_set_from_errno(error, ENOENT);
         return {};
     }
 

@@ -118,8 +118,16 @@ struct tr_completion
 
     [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const;
 
-    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t) const;
-    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t) const;
+    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
+    {
+        auto const [begin, end] = block_info_->blockSpanForPiece(piece);
+        return (end - begin) - blocks_.count(begin, end);
+    }
+
+    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t piece) const
+    {
+        return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
+    }
 
     void amountDone(float* tab, size_t n_tabs) const;
 

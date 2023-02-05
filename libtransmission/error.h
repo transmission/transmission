@@ -42,6 +42,11 @@ void tr_error_free(tr_error* error);
 void tr_error_set(tr_error** error, int code, std::string_view message);
 
 /**
+ * @brief shorthand for `tr_error_set(error, errno, tr_strerror(errno))`
+ */
+void tr_error_set_from_errno(tr_error** error, int errnum);
+
+/**
  * @brief Propagate existing error object upwards.
  *
  * If passed pointer to new error object is not `nullptr`, copy old error object

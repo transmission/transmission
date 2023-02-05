@@ -183,7 +183,7 @@ public:
             sin.sin_family = AF_INET;
             sin.sin_addr = addr.addr.addr4;
             sin.sin_port = port.network();
-            mediator_.api().ping_node((struct sockaddr*)&sin, sizeof(sin));
+            mediator_.api().ping_node(reinterpret_cast<sockaddr*>(&sin), sizeof(sin));
         }
         else if (addr.is_ipv6())
         {
@@ -191,7 +191,7 @@ public:
             sin6.sin6_family = AF_INET6;
             sin6.sin6_addr = addr.addr.addr6;
             sin6.sin6_port = port.network();
-            mediator_.api().ping_node((struct sockaddr*)&sin6, sizeof(sin6));
+            mediator_.api().ping_node(reinterpret_cast<sockaddr*>(&sin6), sizeof(sin6));
         }
     }
 

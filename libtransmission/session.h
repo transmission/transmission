@@ -86,7 +86,7 @@ private:
     {
     public:
         using IncomingCallback = void (*)(tr_socket_t, void*);
-        BoundSocket(struct event_base*, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
+        BoundSocket(struct event_base* base, tr_address const& addr, tr_port port, IncomingCallback cb, void* cb_data);
         BoundSocket(BoundSocket&&) = delete;
         BoundSocket(BoundSocket const&) = delete;
         BoundSocket operator=(BoundSocket&&) = delete;
@@ -281,7 +281,7 @@ private:
         tr_udp_core(tr_session& session, tr_port udp_port);
         ~tr_udp_core();
 
-        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
+        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t tolen) const;
 
         [[nodiscard]] constexpr auto socket4() const noexcept
         {

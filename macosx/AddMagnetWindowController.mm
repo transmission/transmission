@@ -225,7 +225,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
     if (self.fStartCheck.state == NSControlStateValueOn)
     {
-        [self.torrent startTransfer];
+        [self.torrent startMagnetTransferAfterMetaDownload];
     }
 
     [self close];
