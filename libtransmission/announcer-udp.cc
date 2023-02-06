@@ -409,7 +409,7 @@ private:
         *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
 
         auto hints = addrinfo{};
-        hints.ai_family = AF_UNSPEC;
+        hints.ai_family = AF_INET; // https://github.com/transmission/transmission/issues/4719
         hints.ai_protocol = IPPROTO_UDP;
         hints.ai_socktype = SOCK_DGRAM;
 
