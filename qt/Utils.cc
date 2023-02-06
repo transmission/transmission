@@ -42,12 +42,16 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
 {
     QVariant const variant = index.data(Qt::DecorationRole);
 
-    switch (variant.type())
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+    switch (variant.typeId())
+#else
+    switch (static_cast<QMetaType::Type>(variant.type()))
+#endif
     {
-    case QVariant::Icon:
+    case QMetaType::QIcon:
         return qvariant_cast<QIcon>(variant);
 
-    case QVariant::Pixmap:
+    case QMetaType::QPixmap:
         return qvariant_cast<QPixmap>(variant);
 
     default:

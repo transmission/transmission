@@ -12,7 +12,7 @@ class CustomVariantType
 public:
     enum
     {
-        TrackerStatsList = QVariant::UserType,
+        TrackerStatsList = QMetaType::User,
         PeerList,
         FileList,
         FilterModeType,
