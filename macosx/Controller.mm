@@ -4225,7 +4225,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     return [self toolbarButtonWithIdentifier:ident forToolbarButtonClass:[ButtonToolbarItem class]];
 }
 
-- (id)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)klass
+- (__kindof ButtonToolbarItem*)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)klass
 {
     ButtonToolbarItem* item = [[klass alloc] initWithItemIdentifier:ident];
 
@@ -4344,6 +4344,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
+        if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
+        {
+            // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
+            [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
+            [segmentedControl setWidth:64 forSegment:TOOLBAR_RESUME_TAG];
+        }
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
@@ -4394,8 +4400,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
+        if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
+        {
+            // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
+            [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
+            [segmentedControl setWidth:64 forSegment:TOOLBAR_RESUME_TAG];
+        }
 
-        groupItem.view = segmentedControl;
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
         groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
