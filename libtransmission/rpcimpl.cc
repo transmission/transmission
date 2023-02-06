@@ -2468,6 +2468,8 @@ void tr_rpc_request_exec_json(
     tr_rpc_response_func callback,
     void* callback_user_data)
 {
+    auto const lock = session->unique_lock();
+
     auto* const mutable_request = const_cast<tr_variant*>(request);
     tr_variant* args_in = tr_variantDictFind(mutable_request, TR_KEY_arguments);
     char const* result = nullptr;
