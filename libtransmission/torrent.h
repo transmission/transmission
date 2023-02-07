@@ -120,7 +120,7 @@ public:
 
     /// Virtual Torrent
 
-    [[nodiscard]] constexpr bool const isVirtual() const noexcept
+    [[nodiscard]] auto isVirtual() const
     {
         return isVirtualDir(this->download_dir.c_str());
     }
