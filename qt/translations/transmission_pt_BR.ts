@@ -505,17 +505,17 @@
         <translation>Respeitar limites globais</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>Limitar velocidade de download:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Limitar velocidade de &amp;upload:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;prioridade do Torrent:</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>Ordenar por &amp;Fila</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>Limitar Download</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Abrir Torrent</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>Limites de Velocidade</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>Erro de Rede</translation>
     </message>
@@ -2224,7 +2224,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>Erro ao renomear caminho</translation>
     </message>
