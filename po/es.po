@@ -9,6 +9,7 @@
 # GPL-advocate <adrlopgal@disroot.org>, 2022
 # picodotdev <pico.dev@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Rodrigo Lledó <rodhos92@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -17,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-07 20:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Rodrigo Lledó <rodhos92@gmail.com>, 2023\n"
 "Language-Team: Spanish (https://www.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -95,11 +96,11 @@ msgstr "No se pudo añadir el evento: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:834
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr "No se pudo lanzar el bucle de eventos del deominio: {error} ({error_code})"
+msgstr "No se pudo lanzar el bucle de eventos del demonio: {error} ({error_code})"
 
 #: ../gtk/Application.cc:393
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr "No se pudo registrar Transmission como un manejador {content_type}: {error} ({error_code})"
+msgstr "No se pudo registrar Transmission como un gestor de {content_type}: {error} ({error_code})"
 
 #: ../gtk/Application.cc:550
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
@@ -270,7 +271,7 @@ msgstr "Verificar datos locales"
 
 #: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:328
 msgid "Queued for download"
-msgstr "Encolado para descargar"
+msgstr "En cola para descargar"
 
 #: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:473
 msgctxt "Verb"
@@ -364,7 +365,7 @@ msgstr "{downloaded_size} (+{discarded_size} descartados después de suma de com
 
 #: ../gtk/DetailsDialog.cc:1013
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr "{uploaded_size} (Proporcion: {ratio})"
+msgstr "{uploaded_size} (Proporción: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1054
 msgid "No errors"
@@ -412,11 +413,11 @@ msgstr "Conexión cifrada"
 
 #: ../gtk/DetailsDialog.cc:1521
 msgid "Peer was found through Peer Exchange (PEX)"
-msgstr "El cliente se ha encontrado a través del intercambio de clientes (PEX)"
+msgstr "El par se ha encontrado a través del intercambio de pares (PEX)"
 
 #: ../gtk/DetailsDialog.cc:1525
 msgid "Peer was found through DHT"
-msgstr "El cliente se ha encontrado a través de DHT"
+msgstr "El par se ha encontrado a través de DHT"
 
 #: ../gtk/DetailsDialog.cc:1529
 msgid "Peer is an incoming connection"
@@ -489,7 +490,7 @@ msgstr[2] "Se obtuvo una lista de {markup_begin}{peer_count} pares{markup_end} {
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1835
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr "Petición de lista de pares {markup_begin} expiró {time_span_ago}{markup_end}, se reintentará"
+msgstr "La petición de lista de pares {markup_begin} expiró {time_span_ago}{markup_end}, se reintentará"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1844
@@ -506,17 +507,17 @@ msgstr "Solicitando más pares {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1871
 msgid "Queued to ask for more peers"
-msgstr "Encolado para pedir más pares"
+msgstr "En cola para solicitar más pares"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1879
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr "Solicitado por más pares {markup_begin}{time_span_ago}{markup_end}"
+msgstr "Se han solicitado más pares {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1904
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr "El rastreador {markup_begin}{seeder_count} {seeder_or_seeders} y {leecher_count}{leecher_or_leechers}{markup_end} {time_span_ago}"
+msgstr "El rastreador tuvo {markup_begin}{seeder_count} {seeder_or_seeders} y {leecher_count}{leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1906
 msgid "seeder"
@@ -535,7 +536,7 @@ msgstr[2] "sanguijuelas"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1917
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "Se obtuvo un error de rastreo «{markup_begin}{error}{markup_end}» {time_span_ago}"
+msgstr "Se obtuvo un error de raspado «{markup_begin}{error}{markup_end}» {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Asking for peer counts in {time_span_from_now}"
@@ -543,19 +544,19 @@ msgstr "Solicitando recuento de pares en {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1941
 msgid "Queued to ask for peer counts"
-msgstr "Encolado para preguntar el recuento de pares"
+msgstr "En cola para solicitar el recuento de pares"
 
 #: ../gtk/DetailsDialog.cc:1948
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr "Slicitado por recuento de pares {markup_begin}{time_span_ago}{markup_end}"
+msgstr "Se solicitó el recuento de pares {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2231
 msgid "{torrent_name} - Edit Trackers"
-msgstr "{torrent_name} - Editar rastreador"
+msgstr "{torrent_name} - Editar rastreadores"
 
 #: ../gtk/DetailsDialog.cc:2265
 msgid "List contains invalid URLs"
-msgstr "La lista contiene URL inválidas"
+msgstr "La lista contiene URL no válidas"
 
 #: ../gtk/DetailsDialog.cc:2270 ../gtk/FileList.cc:849
 msgid "Please correct the errors and try again."
@@ -2530,7 +2531,7 @@ msgstr "No se pudo mover «{old_path}» a «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/tr-dht.cc:528
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "No se pudo analizar «{filename}» en la línea: «{line}»"
 
 #: ../libtransmission/tr-lpd.cc:259
 msgid "Couldn't initialize LPD: {error} ({error_code})"
@@ -2542,7 +2543,7 @@ msgstr "No se pudo asociar «socket» IPv4 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "No se pudo asociar el «socket» IPv6 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
@@ -2658,15 +2659,3 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "¡Añadido «{entry}» a la lista blanca de «hosts» y tiene un «+» o «-»! ¿Está usando una ACL antigua por error?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "No se pudo crear «socket» IPv4"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "No se pudo reasociar «socket» IPv6  {address}: {error} ({error_code}) "
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Actualizar lista de bloqueo"

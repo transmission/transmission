@@ -2521,15 +2521,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "已添加“{entry}”到主机白名单，但它有个“+”或“-”！你是否误用了旧的 ACL 规则？"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "无法创建 IPv4 socket"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "无法重新绑定 IPv6 socket {address}：{error}（{error_code}）"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "更新屏蔽列表"

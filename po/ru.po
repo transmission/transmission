@@ -9,8 +9,8 @@
 # hlm hlmfn, 2022
 # Виктор, 2022
 # Sergey Alyoshin <alyoshin.s@gmail.com>, 2022
-# Andrei Stepanov, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Andrei Stepanov, 2023
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-07 20:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Andrei Stepanov, 2023\n"
 "Language-Team: Russian (https://www.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -2506,7 +2506,7 @@ msgstr "Не удалось привязать сокет IPv4 {address}: {error
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Не удалось привязать сокет IPv6 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
@@ -2628,15 +2628,3 @@ msgstr[0] "день"
 msgstr[1] "дня"
 msgstr[2] "дней"
 msgstr[3] "дней"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "«{entry}» добавлен в белый список хостов, и в нём есть «+» или «-»! Вы используете старый ACL по ошибке?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "Не удалось создать сокет IPv4"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "Не удалось перепривязать сокет IPv6 {address}: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Обновить чёрный список"

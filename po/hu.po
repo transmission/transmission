@@ -2560,15 +2560,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "'{entry}' hozzáadva a kiszolgáló fehérlistájára, viszont '+'-t vagy '-'-t tartalmaz. Véletlenül nem egy régi ACL-t használ?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "Nem sikerült az IPv4-socket létrehozása"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "Nem sikerült a {address} IPv6-foglalat újbóli lefoglalása: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Tiltólista frissítése"

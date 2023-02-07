@@ -16,7 +16,7 @@
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Быстрый и простой клиент BitTorrent</translation>
+        <translation>Быстрый и простой торрент-клиент</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
@@ -49,12 +49,12 @@
     <message>
         <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Transmission — программа обмена файлами.&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Transmission — приложение для обмена файлами.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Когда вы запускаете торрент, его данные становятся доступны другим пользователям посредством раздачи. Вы несёте персональную ответственность за всю информацию, которой делитесь.</translation>
+        <translation>Когда вы запускаете торрент, имеющиеся данные становятся доступны другим пользователям посредством раздачи. Вы несёте личную ответственность за всё переданное.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -341,7 +341,7 @@
     <message>
         <location line="+0"/>
         <source>Status</source>
-        <translation>Статус</translation>
+        <translation>Состояние</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -1054,47 +1054,47 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Activity</source>
-        <translation>Сортировать по &amp;активности</translation>
+        <translation>Упорядочивать по &amp;активности</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>Сортировать по &amp;возрасту</translation>
+        <translation>Упорядочивать по &amp;возрасту</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
-        <translation>Сортировать по &amp;оставшемуся времени</translation>
+        <translation>Упорядочивать по &amp;оставшемуся времени</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Name</source>
-        <translation>Сортировать по &amp;названию</translation>
+        <translation>Упорядочивать по &amp;названию</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>Сортировать по степени &amp;загрузки</translation>
+        <translation>Упорядочивать по степени &amp;загрузки</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>Сортировать по ре&amp;йтингу</translation>
+        <translation>Упорядочивать по ре&amp;йтингу</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
-        <translation>Сортировать по &amp;размеру</translation>
+        <translation>Упорядочивать по &amp;размеру</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
-        <translation>Сортировать по &amp;состоянию</translation>
+        <translation>Упорядочивать по &amp;состоянию</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>Сортировать по &amp;последовательности</translation>
+        <translation>Упорядочивать по &amp;последовательности</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1114,12 +1114,12 @@
     <message>
         <location line="+8"/>
         <source>&amp;About</source>
-        <translation>О програ&amp;мме</translation>
+        <translation>О пр&amp;иложении</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
-        <translation>Обра&amp;тный порядок сортировки</translation>
+        <translation>Обра&amp;тное упорядочивание</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1190,7 +1190,7 @@
     <message>
         <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>&amp;Копировать магнет-ссылку в буфер обмена</translation>
+        <translation>С&amp;Копировать магнет-ссылку в буфер обмена</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1230,7 +1230,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>Сортировать по очерёдности</translation>
+        <translation>Упорядочивать по очерёдности</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+468"/>

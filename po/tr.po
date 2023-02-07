@@ -2530,15 +2530,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "gün"
 msgstr[1] "gün"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "'{entry}' ana makine beyaz listesine eklendi ve bunda '+' veya '-' var! Yanlışlıkla eski ACL'yi mi kullanıyorsunuz?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "IPv4 yuvası yaratılamadı"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "{address} IPv6 yuvası yeniden sarılamadı: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Engel Listesini Güncelle"

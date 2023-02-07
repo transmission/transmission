@@ -8,7 +8,7 @@
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2022
 # Josef Andersson <josef.andersson@fripost.org>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
-# Jonatan Nyberg <jonatan@autistici.org>, 2022
+# Jonatan Nyberg <jonatan@autistici.org>, 2023
 #
 #, fuzzy
 msgid ""
@@ -17,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-07 20:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2022\n"
+"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2023\n"
 "Language-Team: Swedish (https://www.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -2415,7 +2415,7 @@ msgstr "Det gick inte att binda IPv4-socketen {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Det gick inte att binda IPv6-socketen {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
@@ -2525,15 +2525,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dagar"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "Lade till '{entry}' till värdvitlista och den har ett '+' eller '-'! Använder du en gammal ACL av misstag?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "Det gick inte att skapa IPv4-socket"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "Det gick inte att binda om IPv6-socketen {address}: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Uppdatera blocklista"

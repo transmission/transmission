@@ -2476,15 +2476,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "「{entry}」をホストのホワイトリストに追加しました。また値に + か - が含まれます！ 誤って古いACLを使っていませんか？"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "IPv4 ソケットを作成できません"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "IPv6 ソケットを再バインドできません {address}: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "ブロックリストの更新"

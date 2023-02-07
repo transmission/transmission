@@ -2548,15 +2548,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "päivä"
 msgstr[1] "päivää"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "Lisätty '{entry}' sallittujen luetteloon, ja siinä on '+' tai '-'! Käytätkö vahingossa vanhaa ACL:ää?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "Ei voitu luoda IPv4-pistoketta"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "IPv6-porttia ei voitu sitoa uudelleen {address}: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Päivitä estolista"

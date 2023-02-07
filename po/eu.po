@@ -2537,15 +2537,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "egun"
 msgstr[1] "egun"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "'{entry}' gehitu da hostalariaren zerrenda zurira eta '+' edo '-' dauka! Nahi gabe ACL zaharra erabiltzen ari zara agian?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "Ezin izan da IPv4 socket-a sortu"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "Ezin izan da IPv6 socket-a {address} lotu: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Eguneratu blokeo-zerrenda"

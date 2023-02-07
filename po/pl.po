@@ -6,7 +6,7 @@
 # Translators:
 # Piotr Drąg <piotrdrag@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
-# Marek Adamski, 2022
+# Marek Adamski, 2023
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-07 20:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Marek Adamski, 2022\n"
+"Last-Translator: Marek Adamski, 2023\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -722,7 +722,7 @@ msgstr "Zatrzymanie przy udziale ({ratio})"
 
 #: ../gtk/MainWindow.cc:516
 msgid "Total Ratio"
-msgstr "Całkowity udział"
+msgstr "Udział całkowity"
 
 #: ../gtk/MainWindow.cc:517
 msgid "Session Ratio"
@@ -730,7 +730,7 @@ msgstr "Udział w sesji"
 
 #: ../gtk/MainWindow.cc:518
 msgid "Total Transfer"
-msgstr "Razem przesłano"
+msgstr "Przesłano całkowicie"
 
 #: ../gtk/MainWindow.cc:519
 msgid "Session Transfer"
@@ -2543,7 +2543,7 @@ msgstr "Nie można dowiązać gniazda IPv4 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Nie można dowiązać gniazda IPv6 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
@@ -2665,15 +2665,3 @@ msgstr[0] "dzień"
 msgstr[1] "dni"
 msgstr[2] "dni"
 msgstr[3] "dni"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "Dodano „{entry}” do białej listy komputerów, ale ma znak „+” lub „-”. Czy przez pomyłkę używana jest stara lista ACL?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "Nie można utworzyć gniazda IPv4"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "Nie można ponownie dowiązać gniazda IPv6 {address}: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Aktualizacja listy blokowania"

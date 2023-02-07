@@ -1139,7 +1139,7 @@
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>Całkowity udział</translation>
+        <translation>Udział całkowity</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1149,7 +1149,7 @@
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Razem przesłano</translation>
+        <translation>Przesłano całkowicie</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1774,7 +1774,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="-20"/>
         <source>&amp;Port for incoming connections:</source>
-        <translation>&amp;Port dla połączeń przychodzących:</translation>
+        <translation>&amp;Port połączeń przychodzących:</translation>
     </message>
     <message>
         <location line="+44"/>
