@@ -27,7 +27,7 @@ Some of the highlights include:
 
 ### Code Modernization
 
-- The entire codebase has been migrated from C to C++. In the process, we've removed thousands of lines of custom code and used standard C++ tools instead. The core's code has shrunk by 18%. The core codebase has extensively refactored to be more testable and maintainable.
+- The entire codebase has been migrated from C to C++. In the process, we've removed thousands of lines of custom code and used standard C++ tools instead. The core's code has shrunk by 18%. The core codebase has been extensively refactored to be more testable and maintainable.
 - The GTK client has been ported to [gtkmm](http://www.gtkmm.org/en/).
 - The Web client has been rewritten in modern JavaScript and no longer uses jQuery. The entire gzipped bundle is now 68K.
 - The unit tests have been expanded and ported to [Google Test](https://github.com/google/googletest). Clang sanitizer builds are run during CI.
