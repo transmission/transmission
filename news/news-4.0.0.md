@@ -9,7 +9,7 @@ Some of the highlights include:
 - [**Resource Efficiency**](#resource-efficiency) - Use less memory and fewer CPU cycles
 - [**Better Community**](#community) - Pull requests welcomed and used
 - [**Code Modernization**](#code-modernization) - Migrated from C90 to modern C++
-- [**New Features**](#newfFeatures) - What would a major release be without them?
+- [**New Features**](#new-features) - What would a major release be without them?
 
 ### Resource Efficiency
 
@@ -75,7 +75,7 @@ Some of the highlights include:
 
 ### Qt Client
 
-* Made display order of  speed limits consistent between Properties, Details dialogs. ([#4677](https://github.com/transmission/transmission/pull/4677))
+* Made display order of speed limits consistent between Properties, Details dialogs. ([#4677](https://github.com/transmission/transmission/pull/4677))
 
 ### GTK Client
 
