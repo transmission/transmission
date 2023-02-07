@@ -505,17 +505,17 @@
         <translation>G&amp;lobale Beschränkungen beachten</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>&amp;Download-Geschwindigkeit beschränken:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>&amp;Upload-Geschwindigkeit beschränken:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>Torrent-&amp;Priorität:</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>Nach War&amp;teschlange sortieren</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>Download-Geschwindigkeit begrenzen</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Torrent öffnen</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>Geschwindigkeitsbegrenzungen</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>Netzwerkfehler</translation>
     </message>
@@ -2224,7 +2224,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>Fehler beim Umbenennen des Pfades</translation>
     </message>

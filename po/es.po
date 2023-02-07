@@ -9,15 +9,16 @@
 # GPL-advocate <adrlopgal@disroot.org>, 2022
 # picodotdev <pico.dev@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Rodrigo Lledó <rodhos92@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-04 21:55+0000\n"
+"POT-Creation-Date: 2023-02-07 20:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Rodrigo Lledó <rodhos92@gmail.com>, 2023\n"
 "Language-Team: Spanish (https://www.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -25,81 +26,81 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: ../cli/cli.cc:105 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:644
+#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:512
 msgid "None"
 msgstr "Ninguno"
 
-#: ../cli/cli.cc:110
+#: ../cli/cli.cc:112
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:233 ../gtk/Session.cc:826 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:80 ../libtransmission/utils.cc:100 ../libtransmission/utils.cc:112 ../libtransmission/watchdir.cc:119 ../libtransmission/watchdir.cc:146
+#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:162 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "No se pudo leer «{path}»: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:259 ../gtk/Session.cc:877 ../gtk/Utils.cc:285 ../libtransmission/watchdir.cc:97
+#: ../daemon/daemon.cc:260 ../gtk/Session.cc:863 ../gtk/Utils.cc:285 ../libtransmission/watchdir.cc:95
 msgid "Couldn't add torrent file '{path}'"
 msgstr "No se pudo añadir el archivo torrent «{path}»"
 
-#: ../daemon/daemon.cc:270
+#: ../daemon/daemon.cc:271
 msgid "Removing torrent file '{path}'"
 msgstr "Eliminado archivo torrent «{path}»"
 
-#: ../daemon/daemon.cc:275 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:704
+#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:570
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "No se pudo eliminar «{path}»: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:603
+#: ../daemon/daemon.cc:604
 msgid "Couldn't parse log level '{level}'"
 msgstr "No se pudo analizar el nivel de traza «{level}»"
 
-#: ../daemon/daemon.cc:644
+#: ../daemon/daemon.cc:645
 msgid "Deferring reload until session is fully started."
 msgstr "Aplazando recarga hasta que la sesión esté completamente iniciada."
 
-#: ../daemon/daemon.cc:659
+#: ../daemon/daemon.cc:660
 msgid "Reloading settings from '{path}'"
 msgstr "Recargando preferencias desde «{path}»"
 
-#: ../daemon/daemon.cc:695
+#: ../daemon/daemon.cc:696
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr "No se pudo inicializar demonio: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:708
+#: ../daemon/daemon.cc:709
 msgid "Loading settings from '{path}'"
 msgstr "Cargando preferencias desde «{path}»"
 
-#: ../daemon/daemon.cc:728
+#: ../daemon/daemon.cc:729
 msgid "Saved pidfile '{path}'"
 msgstr "Archivo pid guardado «{path}»"
 
-#: ../daemon/daemon.cc:734 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1460 ../libtransmission/torrent.cc:757 ../libtransmission/torrent.cc:1939 ../libtransmission/variant.cc:1097
+#: ../daemon/daemon.cc:735 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1167 ../libtransmission/torrent.cc:2178 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "No se pudo guardar «{path}»: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:744
+#: ../daemon/daemon.cc:745
 msgid "Requiring authentication"
 msgstr "Requiere autenticación"
 
-#: ../daemon/daemon.cc:765
+#: ../daemon/daemon.cc:766
 msgid "Watching '{path}' for new torrent files"
 msgstr "Observar «{path}» para nuevos archivos torrent"
 
-#: ../daemon/daemon.cc:809 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr "No se pudo crear el evento: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:819 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr "No se pudo añadir el evento: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:833
+#: ../daemon/daemon.cc:834
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr "No se pudo lanzar el bucle de eventos del deominio: {error} ({error_code})"
+msgstr "No se pudo lanzar el bucle de eventos del demonio: {error} ({error_code})"
 
 #: ../gtk/Application.cc:393
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr "No se pudo registrar Transmission como un manejador {content_type}: {error} ({error_code})"
+msgstr "No se pudo registrar Transmission como un gestor de {content_type}: {error} ({error_code})"
 
 #: ../gtk/Application.cc:550
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
@@ -270,9 +271,9 @@ msgstr "Verificar datos locales"
 
 #: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:328
 msgid "Queued for download"
-msgstr "Encolado para descargar"
+msgstr "En cola para descargar"
 
-#: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:475
+#: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:473
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "Descargando"
@@ -281,16 +282,16 @@ msgstr "Descargando"
 msgid "Queued for seeding"
 msgstr "En cola para compartir"
 
-#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:476
+#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:474
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "Compartiendo"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:478 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:322
 msgid "Finished"
 msgstr "Terminado"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:477 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:322
 msgid "Paused"
 msgstr "Pausado"
 
@@ -364,7 +365,7 @@ msgstr "{downloaded_size} (+{discarded_size} descartados después de suma de com
 
 #: ../gtk/DetailsDialog.cc:1013
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr "{uploaded_size} (Proporcion: {ratio})"
+msgstr "{uploaded_size} (Proporción: {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1054
 msgid "No errors"
@@ -412,11 +413,11 @@ msgstr "Conexión cifrada"
 
 #: ../gtk/DetailsDialog.cc:1521
 msgid "Peer was found through Peer Exchange (PEX)"
-msgstr "El cliente se ha encontrado a través del intercambio de clientes (PEX)"
+msgstr "El par se ha encontrado a través del intercambio de pares (PEX)"
 
 #: ../gtk/DetailsDialog.cc:1525
 msgid "Peer was found through DHT"
-msgstr "El cliente se ha encontrado a través de DHT"
+msgstr "El par se ha encontrado a través de DHT"
 
 #: ../gtk/DetailsDialog.cc:1529
 msgid "Peer is an incoming connection"
@@ -489,7 +490,7 @@ msgstr[2] "Se obtuvo una lista de {markup_begin}{peer_count} pares{markup_end} {
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1835
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr "Petición de lista de pares {markup_begin} expiró {time_span_ago}{markup_end}, se reintentará"
+msgstr "La petición de lista de pares {markup_begin} expiró {time_span_ago}{markup_end}, se reintentará"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1844
@@ -506,17 +507,17 @@ msgstr "Solicitando más pares {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1871
 msgid "Queued to ask for more peers"
-msgstr "Encolado para pedir más pares"
+msgstr "En cola para solicitar más pares"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1879
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr "Solicitado por más pares {markup_begin}{time_span_ago}{markup_end}"
+msgstr "Se han solicitado más pares {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1904
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr "El rastreador {markup_begin}{seeder_count} {seeder_or_seeders} y {leecher_count}{leecher_or_leechers}{markup_end} {time_span_ago}"
+msgstr "El rastreador tuvo {markup_begin}{seeder_count} {seeder_or_seeders} y {leecher_count}{leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1906
 msgid "seeder"
@@ -535,7 +536,7 @@ msgstr[2] "sanguijuelas"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1917
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr "Se obtuvo un error de rastreo «{markup_begin}{error}{markup_end}» {time_span_ago}"
+msgstr "Se obtuvo un error de raspado «{markup_begin}{error}{markup_end}» {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Asking for peer counts in {time_span_from_now}"
@@ -543,19 +544,19 @@ msgstr "Solicitando recuento de pares en {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1941
 msgid "Queued to ask for peer counts"
-msgstr "Encolado para preguntar el recuento de pares"
+msgstr "En cola para solicitar el recuento de pares"
 
 #: ../gtk/DetailsDialog.cc:1948
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr "Slicitado por recuento de pares {markup_begin}{time_span_ago}{markup_end}"
+msgstr "Se solicitó el recuento de pares {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2231
 msgid "{torrent_name} - Edit Trackers"
-msgstr "{torrent_name} - Editar rastreador"
+msgstr "{torrent_name} - Editar rastreadores"
 
 #: ../gtk/DetailsDialog.cc:2265
 msgid "List contains invalid URLs"
-msgstr "La lista contiene URL inválidas"
+msgstr "La lista contiene URL no válidas"
 
 #: ../gtk/DetailsDialog.cc:2270 ../gtk/FileList.cc:849
 msgid "Please correct the errors and try again."
@@ -649,7 +650,7 @@ msgstr "Normal"
 msgid "Low"
 msgstr "Baja"
 
-#: ../gtk/FileList.cc:840 ../gtk/Session.cc:330
+#: ../gtk/FileList.cc:840 ../gtk/Session.cc:329
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "No se puede renombrar «{old_path}» como «{path}»: {error} ({error_code})"
 
@@ -676,28 +677,28 @@ msgstr "Descargar"
 msgid "Priority"
 msgstr "Prioridad"
 
-#: ../gtk/FilterBar.cc:326 ../gtk/FilterBar.cc:472
+#: ../gtk/FilterBar.cc:324 ../gtk/FilterBar.cc:470
 msgid "All"
 msgstr "Todos"
 
-#: ../gtk/FilterBar.cc:474
+#: ../gtk/FilterBar.cc:472
 msgid "Active"
 msgstr "Activo"
 
-#: ../gtk/FilterBar.cc:479
+#: ../gtk/FilterBar.cc:477
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "Verificado"
 
-#: ../gtk/FilterBar.cc:480 ../gtk/FreeSpaceLabel.cc:54
+#: ../gtk/FilterBar.cc:478 ../gtk/FreeSpaceLabel.cc:54
 msgid "Error"
 msgstr "Error"
 
-#: ../gtk/FilterBar.cc:589 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
+#: ../gtk/FilterBar.cc:586 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
 msgid "_Show:"
 msgstr "Mo_strar:"
 
-#: ../gtk/FilterBar.cc:590
+#: ../gtk/FilterBar.cc:587
 msgid "_Show {count:L} of:"
 msgstr "_Mostrar {count:L} de:"
 
@@ -963,29 +964,29 @@ msgstr "Moviendo «{torrent_name}»"
 msgid "Couldn't move torrent"
 msgstr "No se pudo mover el torrent"
 
-#: ../gtk/RelocateDialog.cc:143
+#: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
 msgstr "Esto puede tomar algunos momentos…"
 
-#: ../gtk/Session.cc:812 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
+#: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
 msgstr "No se pudo leer «{path}»"
 
 #. logging
-#: ../gtk/Session.cc:1071
+#: ../gtk/Session.cc:1057
 msgid "Inhibiting desktop hibernation"
 msgstr "Inhibiendo la hibernación del escritorio"
 
-#: ../gtk/Session.cc:1077 ../gtk/Session.cc:1102
+#: ../gtk/Session.cc:1063 ../gtk/Session.cc:1088
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "No se pudo inhibir la hibernación del escritorio: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1098
+#: ../gtk/Session.cc:1084
 msgid "Allowing desktop hibernation"
 msgstr "Permitir hibernación de escritorio"
 
-#: ../gtk/Session.cc:1216
+#: ../gtk/Session.cc:1202
 msgid "Couldn't find pending RPC request for tag {tag}"
 msgstr "No se pudo encontrar petición RPC pendiente para la etiqueta {tag}"
 
@@ -1051,7 +1052,7 @@ msgstr "{download_speed} ▼ {upload_speed} ▲"
 msgid "Stalled"
 msgstr "Estancado"
 
-#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:481
+#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:2227
 msgid "Tracker warning: '{warning}'"
 msgstr "Advertencia de rastreador: «{warning}»"
 
@@ -1279,7 +1280,7 @@ msgstr "No se pudo mover «{path}» a la papelera: {error} ({error_code})"
 msgid "Couldn't open '{url}'"
 msgstr "No se pudo abrir «{url}»"
 
-#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:198 ../libtransmission/announcer.cc:232
+#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
 msgstr "URL no soportada: «{url}»"
 
@@ -2208,46 +2209,46 @@ msgstr "Abrir torrent desde un URL"
 msgid "_URL"
 msgstr "_URL"
 
-#: ../libtransmission/announcer-http.cc:211
+#: ../libtransmission/announcer-http.cc:465
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "No se pudo analizar la respuesta de anuncio: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:572
+#: ../libtransmission/announcer-http.cc:676
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "No se pudo analizar la respuesta de rastreo: {error} ({error_code})"
 
-#: ../libtransmission/announcer-udp.cc:142 ../libtransmission/announcer-udp.cc:239
+#: ../libtransmission/announcer-udp.cc:142 ../libtransmission/announcer-udp.cc:237
 msgid "Unknown error"
 msgstr "Error Desconocido"
 
-#: ../libtransmission/announcer-udp.cc:331
+#: ../libtransmission/announcer-udp.cc:327
 msgid "Connection failed"
 msgstr "Conexión fallida"
 
-#: ../libtransmission/announcer-udp.cc:426 ../libtransmission/tr-dht.cc:554
+#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:554
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr "No se pudo recuperar «{address}:{port}»: {error} ({error_code})"
 
-#: ../libtransmission/announcer.cc:1000
+#: ../libtransmission/announcer.cc:879
 msgid "Announce error: {error}"
 msgstr "Error de anuncio: {error}"
 
-#: ../libtransmission/announcer.cc:1010
+#: ../libtransmission/announcer.cc:889
 msgid "Announce error: {error} (Retrying in {count} second)"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] "Error de anuncio: {error} (Reintentando en {count} segundo)"
 msgstr[1] "Error de anuncio: {error} (Reintentando en {count} segundos)"
 msgstr[2] "Error de anuncio: {error} (Reintentando en {count} segundos)"
 
-#: ../libtransmission/announcer.cc:1075 ../libtransmission/announcer.cc:1373
+#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1345
 msgid "Could not connect to tracker"
 msgstr "No se pudo conectar con el rastreador"
 
-#: ../libtransmission/announcer.cc:1079 ../libtransmission/announcer.cc:1377
+#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1349
 msgid "Tracker did not respond"
 msgstr "El rastreador no respondió:"
 
-#: ../libtransmission/announcer.cc:1140
+#: ../libtransmission/announcer.cc:1079
 msgid "Success"
 msgstr "Éxito"
 
@@ -2267,15 +2268,15 @@ msgstr "No se pudo analizar la linea: «{line}»"
 msgid "Rewriting old blocklist file format to new format"
 msgstr "Reescribiendo antiguo formato de archivo de lista de bloqueo a nuevo formato"
 
-#: ../libtransmission/crypto-utils-ccrypto.cc:75 ../libtransmission/crypto-utils-mbedtls.cc:43 ../libtransmission/crypto-utils-openssl.cc:58 ../libtransmission/crypto-utils-wolfssl.cc:46
+#: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:41 ../libtransmission/crypto-utils-openssl.cc:56 ../libtransmission/crypto-utils-wolfssl.cc:44
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr "{crypto_library} error: {error} ({error_code})"
 
-#: ../libtransmission/inout.cc:148
+#: ../libtransmission/inout.cc:146
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "No se pudo obtener «{path}»:  {error} ({error_code})"
 
-#: ../libtransmission/log.cc:292
+#: ../libtransmission/log.cc:290
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "¡Demasiados mensajes como este! No se registrará más este mensaje en esta sesión."
 
@@ -2283,23 +2284,23 @@ msgstr "¡Demasiados mensajes como este! No se registrará más este mensaje en 
 msgid "Skipping '{path}': {error} ({error_code})"
 msgstr "Omitiendo «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:153
+#: ../libtransmission/net.cc:151
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr "No se pudo crear conexión: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:228
+#: ../libtransmission/net.cc:226
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr "No se pudo establecer la dirección fuente {address} en {socket}: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:247
+#: ../libtransmission/net.cc:246
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr "No se pudo conectar {socket} a {address}: {port}:{error} ({error_code})"
 
-#: ../libtransmission/net.cc:314
+#: ../libtransmission/net.cc:313
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr "No se pudo unir puerto {port} en {address}: {error} ({error_code}) -- ¿Hay otra instancia de Transmission en ejecución?"
 
-#: ../libtransmission/net.cc:315
+#: ../libtransmission/net.cc:314
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr "No se pudo unir puerto {port} en {address}: {error} ({error_code})"
 
@@ -2315,47 +2316,47 @@ msgstr "No se pudo prereservar «{path}»: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "No se pudo truncar «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:670
+#: ../libtransmission/peer-io.cc:673
 msgid "Unknown state: {state}"
 msgstr "Estado desconocido: {state}"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:83
+#: ../libtransmission/port-forwarding-natpmp.cc:86
 msgid "Found public address '{address}'"
 msgstr "Dirección pública encontrada «{address}»"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:120
+#: ../libtransmission/port-forwarding-natpmp.cc:123
 msgid "Port {port} is no longer forwarded"
 msgstr "El puerto {port} ya no está reenviado"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:174
+#: ../libtransmission/port-forwarding-natpmp.cc:177
 msgid "Port {port} forwarded successfully"
 msgstr "Puerto {port} reenviado correctamente"
 
-#: ../libtransmission/port-forwarding-upnp.cc:290
+#: ../libtransmission/port-forwarding-upnp.cc:281
 msgid "Found Internet Gateway Device '{url}'"
 msgstr "Se encontró «Internet Gateway Device» «{url}»"
 
-#: ../libtransmission/port-forwarding-upnp.cc:291
+#: ../libtransmission/port-forwarding-upnp.cc:282
 msgid "Local Address is '{address}'"
 msgstr "La dirección local es «{address}»"
 
-#: ../libtransmission/port-forwarding-upnp.cc:315
+#: ../libtransmission/port-forwarding-upnp.cc:306
 msgid "Port {port} is not forwarded"
 msgstr "El puerto {port} no está reenviado"
 
-#: ../libtransmission/port-forwarding-upnp.cc:325
+#: ../libtransmission/port-forwarding-upnp.cc:316
 msgid "Stopping port forwarding through '{url}', service '{type}'"
 msgstr "Parando reenvio de puertos a traves de «{url}»: servicio «{type}»"
 
-#: ../libtransmission/port-forwarding-upnp.cc:357
+#: ../libtransmission/port-forwarding-upnp.cc:348
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
 msgstr "Renvio de puertos a través de «{url}»: servicio «{type}». (dirección local: {address}:{port})"
 
-#: ../libtransmission/port-forwarding-upnp.cc:365
+#: ../libtransmission/port-forwarding-upnp.cc:356
 msgid "Port {port} is forwarded"
 msgstr "El puerto {port} está reenviado"
 
-#: ../libtransmission/port-forwarding-upnp.cc:371
+#: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr "Si su router soporta  UPnP, confirme que UPnP está habilitado!"
 
@@ -2383,66 +2384,66 @@ msgstr "Puerto privado mapeado {private_port} a puerto público {public_port}"
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr "Estado cambiado de «{old_state}» a «{state}»"
 
-#: ../libtransmission/rpc-server.cc:584
+#: ../libtransmission/rpc-server.cc:578
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "La ruta del «socket» Unix debe ser menor de {count} caracteres (incluyendo el prefijo «{prefix}»)"
 
-#: ../libtransmission/rpc-server.cc:618
+#: ../libtransmission/rpc-server.cc:612
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Los «sockets» Unix no está soportados en Windows. Cambie «{key}» en sus preferencias."
 
-#: ../libtransmission/rpc-server.cc:645
+#: ../libtransmission/rpc-server.cc:639
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "No se pudo establecer el modo de «socket» a {mode:#o}, estableciendolo a 0755"
 
-#: ../libtransmission/rpc-server.cc:708
+#: ../libtransmission/rpc-server.cc:702
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "No se pudo unir a {address} después de {count} intento, renunciando"
 msgstr[1] "No se pudo unir a {address} después de {count} intentos, renunciando"
 msgstr[2] "No se pudo unir a {address} después de {count} intentos, renunciando"
 
-#: ../libtransmission/rpc-server.cc:719
+#: ../libtransmission/rpc-server.cc:713
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "Escuchando peticiones RPC y Web en «{address}»"
 
-#: ../libtransmission/rpc-server.cc:747
+#: ../libtransmission/rpc-server.cc:741
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "Detenida la escucha de peticiones RPC y Web en «{address}»"
 
-#: ../libtransmission/rpc-server.cc:769
+#: ../libtransmission/rpc-server.cc:763
 msgid "Added '{entry}' to host whitelist"
 msgstr "Añadido «{entry}» a la lista blanca de «host»"
 
-#: ../libtransmission/rpc-server.cc:899
+#: ../libtransmission/rpc-server.cc:893
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "La preferencia «{key}» es «{value}» pero debe ser una dirección IPv4 o IPv6 o una ruta de «socket» Unix. Usando por defecto el valor «0.0.0.0»"
 
-#: ../libtransmission/rpc-server.cc:913
+#: ../libtransmission/rpc-server.cc:907
 msgid "Serving RPC and Web requests on {address}"
 msgstr "Sirviendo peticiones RPC y Web en {address}"
 
-#: ../libtransmission/rpc-server.cc:918
+#: ../libtransmission/rpc-server.cc:912
 msgid "Whitelist enabled"
 msgstr "Lista Blanca activada"
 
-#: ../libtransmission/rpc-server.cc:923
+#: ../libtransmission/rpc-server.cc:917
 msgid "Password required"
 msgstr "Contraseña requerida"
 
-#: ../libtransmission/rpc-server.cc:929
+#: ../libtransmission/rpc-server.cc:923
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "Sirviendo peticiones RPC y Web desde «{path}»"
 
-#: ../libtransmission/rpcimpl.cc:1381
+#: ../libtransmission/rpcimpl.cc:1384
 msgid "Couldn't test port: {error} ({error_code})"
 msgstr "No se pudo probar puerto: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1415
+#: ../libtransmission/rpcimpl.cc:1418
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "No se pudo obtener lista de bloqueos: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1549
+#: ../libtransmission/rpcimpl.cc:1552
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "No se pudo obtener torrent: {error} ({error_code})"
 
@@ -2458,106 +2459,106 @@ msgstr "Tiempo para encender el modo tortuga"
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr "No se pudo abrir sesión de archivo cerradura «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/session.cc:324
+#: ../libtransmission/session.cc:405
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "Escuchando conexiones entrantes de pares en {hostport}"
 
-#: ../libtransmission/session.cc:555
+#: ../libtransmission/session.cc:646
 msgid "Transmission version {version} starting"
 msgstr "Iniciando versión {version} de Transmission"
 
-#: ../libtransmission/session.cc:1282
+#: ../libtransmission/session.cc:1328
 msgid "Transmission version {version} shutting down"
 msgstr "Versión de Tranmission {version} cerrando"
 
-#: ../libtransmission/session.cc:1331
+#: ../libtransmission/session.cc:1381
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "Cargado {count} torrent"
 msgstr[1] "Cargados {count} torrents "
 msgstr[2] "Cargados {count} torrents"
 
-#: ../libtransmission/torrent-magnet.cc:324
+#: ../libtransmission/torrent-magnet.cc:332
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] "No se pudo analizar metainfo de magnet «{error}». Redescargando {piece_count} pieza"
 msgstr[1] "No se pudo analizar metainfo de magnet «{error}». Redescargando {piece_count} piezas"
 msgstr[2] "No se pudo analizar la metainformación del enlace magnético «{error}». Redescargando {piece_count} piezas"
 
-#: ../libtransmission/torrent-metainfo.cc:678
+#: ../libtransmission/torrent-metainfo.cc:676
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Migrado archivo torrent de «{old_path}» a «{path}»"
 
-#: ../libtransmission/torrent.cc:124
+#: ../libtransmission/torrent.cc:122
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "No se pudo usar metainformación de «{path}» para «{magnet}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:432
-msgid "Seed ratio reached; pausing torrent"
-msgstr "Proporción de sembrado alcanzado; pausando torrent"
-
-#: ../libtransmission/torrent.cc:439
-msgid "Seeding idle limit reached; pausing torrent"
-msgstr "Límite de inactividad de sembrado alcanzado; pausando torrent"
-
-#: ../libtransmission/torrent.cc:581
+#: ../libtransmission/torrent.cc:159
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "No se encontraron datos. Asegúrese de que sus unidades estén conectadas o use «Establecer ubicación». Para volver a descargar, quite el torrent y vuelva a añadirlo."
 
-#: ../libtransmission/torrent.cc:1340
-msgid "Restarted manually -- disabling its seed ratio"
-msgstr "Se ha reiniciado manualmente, desactivando su relación de compartición"
-
-#: ../libtransmission/torrent.cc:1460
-msgid "Pausing torrent"
-msgstr "Pausando torrent"
-
-#: ../libtransmission/torrent.cc:1511
-msgid "Removing torrent"
-msgstr "Eliminando torrent"
-
-#: ../libtransmission/torrent.cc:1654
+#: ../libtransmission/torrent.cc:491
 msgid "Calling script '{path}'"
 msgstr "Invicando script «{path}»"
 
-#: ../libtransmission/torrent.cc:1663
+#: ../libtransmission/torrent.cc:500
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "No se pudo invocar script «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:2043 ../libtransmission/torrent.cc:2163
+#: ../libtransmission/torrent.cc:552
+msgid "Seed ratio reached; pausing torrent"
+msgstr "Proporción de sembrado alcanzado; pausando torrent"
+
+#: ../libtransmission/torrent.cc:559
+msgid "Seeding idle limit reached; pausing torrent"
+msgstr "Límite de inactividad de sembrado alcanzado; pausando torrent"
+
+#: ../libtransmission/torrent.cc:877
+msgid "Restarted manually -- disabling its seed ratio"
+msgstr "Se ha reiniciado manualmente, desactivando su relación de compartición"
+
+#: ../libtransmission/torrent.cc:900
+msgid "Pausing torrent"
+msgstr "Pausando torrent"
+
+#: ../libtransmission/torrent.cc:965
+msgid "Removing torrent"
+msgstr "Eliminando torrent"
+
+#: ../libtransmission/torrent.cc:1295 ../libtransmission/torrent.cc:2354
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "No se pudo mover «{old_path}» a «{path}»: {error} ({error_code})"
 
 #: ../libtransmission/tr-dht.cc:528
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "No se pudo analizar «{filename}» en la línea: «{line}»"
 
 #: ../libtransmission/tr-lpd.cc:259
 msgid "Couldn't initialize LPD: {error} ({error_code})"
 msgstr "No se pudo inicializar LPD: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:157
+#: ../libtransmission/tr-udp.cc:159
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
 msgstr "No se pudo asociar «socket» IPv4 {address}: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:191
+#: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "No se pudo asociar el «socket» IPv6 {address}: {error} ({error_code})"
 
-#: ../libtransmission/tr-utp.cc:100
+#: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
 msgstr "Familia de «socket» desconocida"
 
-#: ../libtransmission/utils.cc:90
+#: ../libtransmission/utils.cc:83
 msgid "Couldn't read '{path}': Not a regular file"
 msgstr "No se pudo leer «{path}»: No es un archivo normal"
 
-#: ../libtransmission/variant-json.cc:95
+#: ../libtransmission/variant-json.cc:98
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
 msgstr "No se pudo analizar JSON en la posición {position} «{text}»: {error} ({error_code})"
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/variant.cc:868
+#: ../libtransmission/variant.cc:860
 msgid "Invalid metadata"
 msgstr "Metadatos no válidos"
 
@@ -2601,17 +2602,21 @@ msgstr "No se pudo leer cambios en el directorio"
 msgid "Couldn't wait for directory changes"
 msgstr "No se pudo esparar a cambios en el directorio"
 
-#: ../libtransmission/web.cc:176
+#: ../libtransmission/web.cc:175
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "Se verificar certificados del rastreador usando envvar CURL_CA_BUNDLE: {bundle}"
 
-#: ../libtransmission/web.cc:177
+#: ../libtransmission/web.cc:176
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "NB: esto solo funciona si construye contra libcurl con openssl o gnutls, no nss"
 
-#: ../libtransmission/web.cc:178
+#: ../libtransmission/web.cc:177
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "NB: certificados inválidos aparecerán como «No se pudo conectar al rastreador» como otros varios errores"
+
+#: ../libtransmission/web.cc:446
+msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
+msgstr ""
 
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
@@ -2654,15 +2659,3 @@ msgid_plural "days"
 msgstr[0] "día"
 msgstr[1] "días"
 msgstr[2] "días"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "¡Añadido «{entry}» a la lista blanca de «hosts» y tiene un «+» o «-»! ¿Está usando una ACL antigua por error?"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "No se pudo crear «socket» IPv4"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "No se pudo reasociar «socket» IPv6  {address}: {error} ({error_code}) "
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Actualizar lista de bloqueo"
