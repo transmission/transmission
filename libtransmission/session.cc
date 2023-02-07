@@ -417,24 +417,30 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
         static auto constexpr DefaultAddr = tr_address::any_ipv4();
-//        auto const default_addr = tr_globalIPv4().value_or(DefaultAddr);
+        //        auto const default_addr = tr_globalIPv4().value_or(DefaultAddr);
         auto addr = tr_address::from_string(settings_.bind_address_ipv4).value_or(DefaultAddr);
         return { addr, addr == DefaultAddr };
     }
 
-    if (type == TR_AF_INET6) {
+    if (type == TR_AF_INET6)
+    {
         // if user provided an address, use it.
         // otherwise, if we can determine which one to use via tr_globalIPv6 magic, use it.
         // otherwise, use any_ipv6 (::).
         static auto constexpr AnyAddr = tr_address::any_ipv6();
         auto const default_addr = tr_globalIPv6().value_or(AnyAddr);
         auto const config_addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(AnyAddr);
-        if (!(config_addr == AnyAddr)) {
-            return {config_addr, true};
-        } else if (!(default_addr == AnyAddr)) {
-            return {default_addr, true};
-        } else {
-            return {AnyAddr, false};
+        if (!(config_addr == AnyAddr))
+        {
+            return { config_addr, true };
+        }
+        else if (!(default_addr == AnyAddr))
+        {
+            return { default_addr, true };
+        }
+        else
+        {
+            return { AnyAddr, false };
         }
     }
 

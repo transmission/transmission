@@ -516,7 +516,8 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
 
-        if (task.ipProtocol()!=CURL_IPRESOLVE_V6){
+        if (task.ipProtocol() != CURL_IPRESOLVE_V6)
+        {
             (void)curl_easy_setopt(e, CURLOPT_PROXY, task.httpProxy()->c_str());
         }
 #ifdef USE_LIBCURL_SOCKOPT
@@ -570,10 +571,10 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, &tr_web::Impl::onDataReceived);
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
 
-//        if (auto const addrstr = task.publicAddress(); addrstr)
-//        {
-//            (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
-//        }
+        //        if (auto const addrstr = task.publicAddress(); addrstr)
+        //        {
+        //            (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
+        //        }
 
         if (auto const& cookies = task.cookies(); cookies)
         {

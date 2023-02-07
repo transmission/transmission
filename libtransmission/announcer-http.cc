@@ -105,7 +105,6 @@ struct http_announce_data
 
     std::string log_name;
     std::string url;
-
 };
 
 bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response* const response)
@@ -321,25 +320,32 @@ void tr_tracker_http_announce(
         auto const [ipv6, ipv6_is_any] = session->publicAddress(TR_AF_INET6);
         auto announceIP = std::string();
         std::string_view protocol_name;
-        if((tr_web::FetchOptions::IPProtocol::V6==proto || tr_web::FetchOptions::IPProtocol::ANY==proto)&& ipv6_is_any){
+        if ((tr_web::FetchOptions::IPProtocol::V6 == proto || tr_web::FetchOptions::IPProtocol::ANY == proto) && ipv6_is_any)
+        {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
             static auto constexpr AnyAddr = tr_address::any_ipv4();
             auto const source_addr = tr_globalIPv4().value_or(AnyAddr);
-            if (!(source_addr == AnyAddr)) {
+            if (!(source_addr == AnyAddr))
+            {
                 announceIP = source_addr.display_name();
             }
-            protocol_name = std::string_view{"IPV6"};
-        }else{
+            protocol_name = std::string_view{ "IPV6" };
+        }
+        else
+        {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-            if(ipv6_is_any){
+            if (ipv6_is_any)
+            {
                 announceIP = ipv6.display_name();
             }
-            protocol_name = std::string_view{"IPV4"};
+            protocol_name = std::string_view{ "IPV4" };
         }
         if (!session->announceIP().empty())
         {
             options.url += format_ip_arg(session->announceIP());
-        }else if (!announceIP.empty()){
+        }
+        else if (!announceIP.empty())
+        {
             options.url += format_ip_arg(announceIP);
         }
         d->url = options.url;
