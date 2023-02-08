@@ -160,7 +160,6 @@ To configure which components are built use the flags below.
 Each option can be set to `ON` or `OFF`, values shown below are the defaults.
 * `-DENABLE_DAEMON=ON` - build transmission daemon
 * `-DENABLE_QT=AUTO` - build the Qt client
-* `-DENABLE_WEB=OFF` - build the Web client
 * `-DENABLE_UTILS=ON` - build transmission-remote, transmission-create, transmission-edit and transmission-show cli tools
 * `-DENABLE_CLI=OFF` - build the cli client
 
