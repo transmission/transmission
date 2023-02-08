@@ -76,7 +76,13 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfig)
 TEST_F(PlatformTest, defaultConfigDirXdgConfigHome)
 {
     auto const home = tr_pathbuf{ sandboxDir(), "/home/user" };
-    setenv("HOME", home, 1);
+    fmt::print("{:s}:{:d} home '{:s}'\n", __FILE__, __LINE__, home.c_str());
+    auto const old_errno = errno;
+    errno = 0;
+    auto const did_set = setenv("HOME", home.c_str(), 1);
+    fmt::print("{:s}:{:d} did_set {:d} errno {:d} {:s}\n", __FILE__, __LINE__, did_set, errno, tr_strerror(errno));
+    errno = old_errno;
+
 
     auto const expected = fmt::format("{:s}/.config/appname", home.sv());
     auto const actual = tr_getDefaultConfigDir("appname");
