@@ -75,11 +75,8 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfig)
 
 TEST_F(PlatformTest, defaultConfigDirXdgConfigHome)
 {
-    // this tests the fallback home directory when XDG_CONFIG_HOME isn't set
-
     auto const home = tr_pathbuf{ sandboxDir(), "/home/user" };
-    unsetenv("XDG_CONFIG_HOME");
-    setenv("HOME", home.c_str(), 1);
+    setenv("HOME", home, 1);
 
     auto const expected = fmt::format("{:s}/.config/appname", home.sv());
     auto const actual = tr_getDefaultConfigDir("appname");

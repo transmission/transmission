@@ -77,7 +77,30 @@ target_link_libraries(libtransmission-test
         libevent::event
         WideInteger::WideInteger)
 
-gtest_discover_tests(libtransmission-test TEST_PREFIX "LT.")
+gtest_discover_tests(
+    libtransmission-test
+    TEST_PREFIX "LT."
+)
+
+set_test_properties(
+    # These tests set environment variables and can conflict
+    # with each other when run in parallel
+    PlatformTest.defaultConfigDirEnv
+    PlatformTest.defaultConfigDirXdgConfig
+    PlatformTest.defaultConfigDirXdgConfigHome
+    PlatformTest.defaultDownloadDir
+    PlatformTest.defaultDownloadDirXdg
+    PlatformTest.webClientDirEnvClutch
+    PlatformTest.webClientDirEnvTr
+    PlatformTest.webClientDirXdgDataHome
+
+    # Has a test to ensure that reading from a closed file handle will fail.
+    # Possible for a parallel test to open a file that reuses that handle.
+    FileTest.readFile
+
+    PROPERTIES
+    RUN_SERIAL TRUE
+)
 
 add_custom_command(
     TARGET libtransmission-test
