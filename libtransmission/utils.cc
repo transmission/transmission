@@ -860,13 +860,16 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
     auto const szkey = tr_strbuf<char, 256>{ key };
 
+    fmt::print("{:s}:{:d} key '{:s}'\n", __FILE__, __LINE__, szkey.sv());
     if (auto const* const value = getenv(szkey); value != nullptr)
     {
+        fmt::print("{:s}:{:d} key '{:s}'\n", __FILE__, __LINE__, value);
         return value;
     }
 
 #endif
 
+    fmt::print("{:s}:{:d} default_value '{:s}'\n", __FILE__, __LINE__, default_value);
     return std::string{ default_value };
 }
 

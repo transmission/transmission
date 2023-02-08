@@ -68,8 +68,11 @@ auto win32_get_known_folder(REFKNOWNFOLDERID folder_id)
 
 std::string getHomeDir()
 {
+    fmt::print("{:s}:{:d}\n", __FILE__, __LINE__);
+
     if (auto dir = tr_env_get_string("HOME"sv); !std::empty(dir))
     {
+        fmt::print("{:s}:{:d} dir '{:s}'\n", __FILE__, __LINE__, dir);
         return dir;
     }
 
@@ -88,6 +91,7 @@ std::string getHomeDir()
     getpwuid_r(getuid(), &pwent, std::data(buf), std::size(buf), &pw);
     if (pw != nullptr)
     {
+        fmt::print("{:s}:{:d} dir '{:s}'\n", __FILE__, __LINE__, pw->pw_dir);
         return pw->pw_dir;
     }
 
