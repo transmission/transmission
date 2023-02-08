@@ -329,7 +329,7 @@ void TorrentCellRenderer::Impl::render_progress_bar(
 
     auto const temp_area = Gdk::Rectangle(0, 0, area.get_width(), area.get_height());
     auto const temp_surface = Cairo::Surface::create(
-        IF_GTKMM4(context, snapshot)->get_target(),
+        context->get_target(),
         Cairo::CONTENT_COLOR_ALPHA,
         area.get_width(),
         area.get_height());
