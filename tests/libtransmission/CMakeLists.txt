@@ -1,3 +1,5 @@
+include(GoogleTest)
+
 add_executable(libtransmission-test)
 
 target_sources(libtransmission-test
@@ -75,9 +77,12 @@ target_link_libraries(libtransmission-test
         libevent::event
         WideInteger::WideInteger)
 
-add_test(
-    NAME libtransmission-test
-    COMMAND libtransmission-test)
+gtest_discover_tests(
+    libtransmission-test
+    TEST_PREFIX "LT."
+    PROPERTIES
+    RUN_SERIAL TRUE
+)
 
 add_custom_command(
     TARGET libtransmission-test
