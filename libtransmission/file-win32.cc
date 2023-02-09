@@ -944,7 +944,17 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
+namespace
+{
+namespace read_file_helpers
+{
+bool file_read_impl(
+    tr_sys_file_t handle,
+    void* buffer,
+    uint64_t size,
+    OVERLAPPED* overlapped,
+    uint64_t* bytes_read,
+    tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != nullptr || size == 0);
@@ -958,7 +968,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     bool ret = false;
     DWORD my_bytes_read;
 
-    if (ReadFile(handle, buffer, (DWORD)size, &my_bytes_read, nullptr))
+    if (ReadFile(handle, buffer, (DWORD)size, &my_bytes_read, overlapped))
     {
         if (bytes_read != nullptr)
         {
@@ -974,6 +984,15 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
 
     return ret;
 }
+} // namespace read_file_helpers
+} // namespace
+
+bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
+{
+    using namespace read_file_helpers;
+
+    return file_read_impl(handle, buffer, size, nullptr, bytes_read, error);
+}
 
 bool tr_sys_file_read_at(
     tr_sys_file_t handle,
@@ -983,39 +1002,15 @@ bool tr_sys_file_read_at(
     uint64_t* bytes_read,
     tr_error** error)
 {
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != nullptr || size == 0);
+    using namespace read_file_helpers;
 
-    if (size > MAXDWORD)
-    {
-        set_system_error(error, ERROR_INVALID_PARAMETER);
-        return false;
-    }
-
-    bool ret = false;
-    OVERLAPPED overlapped;
-    DWORD my_bytes_read;
-
+    auto overlapped = OVERLAPPED{};
     overlapped.Offset = (DWORD)offset;
     offset >>= 32;
     overlapped.OffsetHigh = (DWORD)offset;
     overlapped.hEvent = nullptr;
 
-    if (ReadFile(handle, buffer, (DWORD)size, &my_bytes_read, &overlapped))
-    {
-        if (bytes_read != nullptr)
-        {
-            *bytes_read = my_bytes_read;
-        }
-
-        ret = true;
-    }
-    else
-    {
-        set_system_error(error, GetLastError());
-    }
-
-    return ret;
+    return file_read_impl(handle, buffer, size, &overlapped, bytes_read, error);
 }
 
 bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written, tr_error** error)
