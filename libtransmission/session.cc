@@ -188,6 +188,32 @@ tr_peer_id_t tr_peerIdInit(std::string hash_string)
     return peer_id;
 }
 
+tr_peer_id_t tr_peerIdInit()
+{
+    auto peer_id = tr_peer_id_t{};
+    auto* it = std::data(peer_id);
+
+    // starts with -TRXXXX-
+    auto constexpr Prefix = std::string_view{ PEERID_PREFIX };
+    auto const* const end = it + std::size(peer_id);
+    it = std::copy_n(std::data(Prefix), std::size(Prefix), it);
+
+    // remainder is randomly-generated characters
+    auto constexpr Pool = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyz" };
+    auto total = int{ 0 };
+    tr_rand_buffer(it, end - it);
+    while (it + 1 < end)
+    {
+        int const val = *it % std::size(Pool);
+        total += val;
+        *it++ = Pool[val];
+    }
+    int const val = total % std::size(Pool) != 0 ? std::size(Pool) - total % std::size(Pool) : 0;
+    *it = Pool[val];
+
+    return peer_id;
+}
+
 // ---
 
 std::vector<tr_torrent_id_t> tr_session::DhtMediator::torrentsAllowingDHT() const

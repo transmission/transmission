@@ -52,6 +52,8 @@
 
 tr_peer_id_t tr_peerIdInit(std::string);
 
+tr_peer_id_t tr_peerIdInit();
+
 struct event_base;
 
 class tr_lpd;
