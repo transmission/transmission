@@ -338,7 +338,7 @@ TEST_F(FileTest, readFile)
     EXPECT_EQ(std::size(Expected), n_read);
     EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_file_close(fd);
+    EXPECT_TRUE(tr_sys_file_close(fd));
 
     // read from closed file
     n_read = 0;
