@@ -501,17 +501,17 @@
         <translation>速度制限の全体設定を尊重(&amp;L)</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>ダウンロード速度制限 (&amp;D):</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>アップロード速度制限 (&amp;U):</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>トレントの優先度 (&amp;P):</translation>
     </message>
@@ -1217,7 +1217,7 @@
         <translation>処理待ち順(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>ダウンロード速度制限</translation>
     </message>
@@ -1293,12 +1293,12 @@
         <translation>トレントを開く</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>速度制限</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>ネットワークエラー</translation>
     </message>
@@ -2207,7 +2207,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>パスの改名時のエラー</translation>
     </message>
