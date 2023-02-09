@@ -192,7 +192,7 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     // hostname
     str += inf.st.is_backup ? QStringLiteral("<i>") : QStringLiteral("<b>");
     auto const url = QUrl(inf.st.announce);
-    str += QStringLiteral("%1:%2").arg(url.host()).arg(url.port(80));
+    str += QStringLiteral("%1:%2").arg(url.host()).arg(url.port(url.scheme == "https" ? 443 : 80));
 
     str += inf.st.is_backup ? QStringLiteral("</i>") : QStringLiteral("</b>");
 
