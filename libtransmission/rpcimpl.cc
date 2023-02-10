@@ -47,9 +47,9 @@ using namespace std::literals;
 namespace
 {
 auto constexpr RecentlyActiveSeconds = time_t{ 60 };
-auto constexpr RpcVersion = int64_t{ 17 };
+auto constexpr RpcVersion = int64_t{ 18 };
 auto constexpr RpcVersionMin = int64_t{ 14 };
-auto constexpr RpcVersionSemver = "5.3.0"sv;
+auto constexpr RpcVersionSemver = "5.4.0"sv;
 
 enum class TrFormat
 {
@@ -611,7 +611,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
         break;
 
     case TR_KEY_sequentialDownload:
-        tr_variantDictAddBool(initme, TR_KEY_sequentialDownload, tor->sequentialDownload);
+        tr_variantDictAddBool(initme, TR_KEY_sequentialDownload, tor->isSequentialDownload());
         break;
 
     case TR_KEY_haveValid:
@@ -1232,12 +1232,7 @@ char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_sequentialDownload, &val))
         {
-            tor->setSequentialDownload();
-        }
-
-        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_randomDownload, &val))
-        {
-            tor->setRandomDownload();
+            tor->setSequentialDownload(val);
         }
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &val))

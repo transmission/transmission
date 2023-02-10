@@ -68,7 +68,7 @@ static sig_atomic_t manualUpdate = false;
 
 static char const* torrentPath = nullptr;
 
-static auto constexpr Options = std::array<tr_option, 19>{
+static auto constexpr Options = std::array<tr_option, 20>{
     { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
       { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
@@ -93,8 +93,7 @@ static auto constexpr Options = std::array<tr_option, 19>{
       { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
-      { 500, "sequential-download", "Download pieces sequentialy", "seq", 0, nullptr },
-      { 501, "random-download", "Download pieces randomly (default)", "rnd", 0, nullptr },
+      { 500, "sequential-download", "Download pieces sequentially", "seq", false, nullptr },
 
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };

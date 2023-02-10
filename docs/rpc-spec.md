@@ -157,6 +157,7 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
+| `sequentialDownload`  | boolean  | download torrent pieces sequentially
 | `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
 | `trackerList`         | string   | string of announce URLs, one per line, with a blank line between tiers
 | `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
@@ -267,6 +268,7 @@ The 'source' column here corresponds to the data structure there.
 | `seedIdleMode`| number| tr_inactvelimit
 | `seedRatioLimit`| double| tr_torrent
 | `seedRatioMode`| number| tr_ratiolimit
+| `sequentialDownload`| boolean| tr_torrent
 | `sizeWhenDone`| number| tr_stat
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
@@ -1000,3 +1002,8 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `group-set` | new method
 | `group-get` | new method
 
+Transmission 4.0.1 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
+| Method | Description
+|:---|:---
+| `torrent-get` | new arg `sequentialDownload`
+| `torrent-set` | new arg `sequentialDownload`

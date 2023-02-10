@@ -268,7 +268,6 @@ enum
     TR_KEY_queue_stalled_enabled,
     TR_KEY_queue_stalled_minutes,
     TR_KEY_queuePosition,
-    TR_KEY_randomDownload,
     TR_KEY_rateDownload,
     TR_KEY_rateToClient,
     TR_KEY_rateToPeer,
