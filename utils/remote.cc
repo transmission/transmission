@@ -978,7 +978,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindBool(t, TR_KEY_sequentialDownload, &boolVal))
             {
-                fmt::print("  Sequential Download: {:s}\n", (boolVal ? "No" : "Yes"));
+                fmt::print("  Sequential Download: {:s}\n", (boolVal ? "Yes" : "No"));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &j))
