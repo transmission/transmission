@@ -497,12 +497,16 @@ tr_add_external_auto_library(PSL libpsl psl
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp
         SUBPROJECT
-        TARGET libutp::libutp)
+        TARGET libutp::libutp
+        CMAKE_ARGS
+            -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
 tr_add_external_auto_library(B64 libb64 b64
     SUBPROJECT
-    TARGET libb64::libb64)
+    TARGET libb64::libb64
+    CMAKE_ARGS
+        -DLIBB64_SHARED:BOOL=OFF)
 
 if(NOT ${REBUILD_WEB} STREQUAL "OFF")
     find_program(NPM npm)
