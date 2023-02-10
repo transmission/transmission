@@ -910,7 +910,7 @@ void tr_sessionSetHttpProxy(tr_session* session, std::string_view http_proxy)
 {
     TR_ASSERT(session != nullptr);
 
-    session->setHttpProxy(http_proxy != nullptr ? http_proxy : "");
+    session->setHttpProxy(http_proxy.empty() ? "" : http_proxy);
 }
 
 char const* tr_sessionGetHttpProxy(tr_session const* session)

@@ -516,7 +516,7 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
 
-        if (task.ipProtocol() != CURL_IPRESOLVE_V6)
+        if (task.ipProtocol() != CURL_IPRESOLVE_V6 && task.httpProxy())
         {
             (void)curl_easy_setopt(e, CURLOPT_PROXY, task.httpProxy()->c_str());
         }
