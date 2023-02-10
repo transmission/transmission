@@ -275,7 +275,7 @@ Gdk::RGBA const& get_progress_bar_color(Torrent const& torrent)
 
 Cairo::RefPtr<Cairo::Surface> get_mask_surface(Cairo::RefPtr<Cairo::Surface> const& surface, Gdk::Rectangle const& area)
 {
-    auto const mask_surface = Cairo::ImageSurface::create(TR_CAIRO_SURFACE_FORMAT(A8), area.get_width(), area.get_height());
+    auto const mask_surface = Cairo::Surface::create(surface, Cairo::CONTENT_ALPHA, area.get_width(), area.get_height());
     auto const mask_context = Cairo::Context::create(mask_surface);
 
     mask_context->set_source_rgb(0, 0, 0);
@@ -325,8 +325,14 @@ void TorrentCellRenderer::Impl::render_progress_bar(
     Gtk::CellRendererState flags,
     Gdk::RGBA const& color)
 {
+    auto const context = IF_GTKMM4(snapshot->append_cairo(area), snapshot);
+
     auto const temp_area = Gdk::Rectangle(0, 0, area.get_width(), area.get_height());
-    auto const temp_surface = Cairo::ImageSurface::create(TR_CAIRO_SURFACE_FORMAT(ARGB32), area.get_width(), area.get_height());
+    auto const temp_surface = Cairo::Surface::create(
+        context->get_target(),
+        Cairo::CONTENT_COLOR_ALPHA,
+        area.get_width(),
+        area.get_height());
     auto const temp_context = Cairo::Context::create(temp_surface);
 
     {
@@ -344,8 +350,6 @@ void TorrentCellRenderer::Impl::render_progress_bar(
         gsk_render_node_draw(render_node.get(), temp_context->cobj());
 #endif
     }
-
-    auto const context = IF_GTKMM4(snapshot->append_cairo(area), snapshot);
 
     adjust_progress_bar_hue(temp_context, color, temp_area);
 
