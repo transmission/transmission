@@ -451,10 +451,6 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
             break;
 
-        case 501:
-            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, false);
-            break;
-
         case TR_OPT_UNK:
             if (torrentPath == nullptr)
             {
