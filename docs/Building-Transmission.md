@@ -44,7 +44,7 @@ On Debian, you can build transmission with a few dependencies on top of a base i
 
 For building transmission-daemon you will need basic dependencies
 ```console
-$ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev
+$ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev python3
 ```
 You likely want to install transmission as a native GUI application. There are two options, GTK and QT.
 
