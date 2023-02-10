@@ -639,6 +639,11 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did
     }
 
     auto const filename = tor->resumeFile();
+    if (!tr_sys_path_exists(filename))
+    {
+        return fields_loaded;
+    }
+
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
