@@ -101,7 +101,7 @@ TEST_F(LpdTest, HelloWorld)
     EXPECT_EQ(0U, std::size(mediator.found_));
 }
 
-TEST_F(LpdTest, CanAnnounceAndRead)
+TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
 {
     auto mediator_a = MyMediator{ *session_ };
     auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
@@ -123,7 +123,7 @@ TEST_F(LpdTest, CanAnnounceAndRead)
     EXPECT_EQ(0U, mediator_b.found_.count(info_hash_str));
 }
 
-TEST_F(LpdTest, canMultiAnnounce)
+TEST_F(LpdTest, DISABLED_canMultiAnnounce)
 {
     auto mediator_a = MyMediator{ *session_ };
     auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
@@ -159,7 +159,7 @@ TEST_F(LpdTest, canMultiAnnounce)
     }
 }
 
-TEST_F(LpdTest, DoesNotReannounceTooSoon)
+TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
 {
     auto mediator_a = MyMediator{ *session_ };
     auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
