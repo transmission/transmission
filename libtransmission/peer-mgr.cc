@@ -2144,6 +2144,12 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     auto const* tor = s->tor;
     auto const* const atom = peer->atom;
 
+    /* Disconnect if global session setting dictates so. */
+    if (peer_count > tor->session->peerLimitPerTorrent())
+    {
+        return true;
+    }
+
     /* disconnect if we're both seeds and enough time has passed for PEX */
     if (tor->isDone() && peer->isSeed())
     {
@@ -2236,12 +2242,15 @@ struct ComparePeerByActivity
 {
     auto peers_to_close = std::vector<tr_peer*>{};
 
-    auto const peer_count = swarm->peerCount();
+    auto peer_count = swarm->peerCount();
     for (auto* peer : swarm->peers)
     {
         if (shouldPeerBeClosed(swarm, peer, peer_count, now_sec))
         {
             peers_to_close.push_back(peer);
+            /* This peer will be closed soon, so take it into an
+               overall account before looking for the next victim. */
+            peer_count--;
         }
     }
 
