@@ -27,6 +27,7 @@ public:
         [[nodiscard]] virtual bool clientCanRequestBlock(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual bool clientCanRequestPiece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool isEndgame() const = 0;
+        [[nodiscard]] virtual bool isSequentialDownload() const = 0;
         [[nodiscard]] virtual size_t countActiveRequests(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual size_t countMissingBlocks(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_block_span_t blockSpan(tr_piece_index_t) const = 0;

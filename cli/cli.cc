@@ -93,6 +93,9 @@ static auto constexpr Options = std::array<tr_option, 19>{
       { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+      { 500, "sequential-download", "Download pieces sequentialy", "seq", 0, nullptr },
+      { 501, "random-download", "Download pieces randomly (default)", "rnd", 0, nullptr },
+
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
@@ -443,6 +446,14 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
 
         case 912:
             tr_variantDictAddInt(d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            break;
+
+        case 500:
+            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
+            break;
+
+        case 501:
+            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, false);
             break;
 
         case TR_OPT_UNK:

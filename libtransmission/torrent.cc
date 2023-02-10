@@ -1067,6 +1067,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->bandwidth_.setPriority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
+    tor->sequentialDownload = false;
 
     auto const& labels = tr_ctorGetLabels(ctor);
     tor->setLabels(labels);

@@ -610,6 +610,10 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
         tr_variantInitInt(initme, st->haveUnchecked);
         break;
 
+    case TR_KEY_sequentialDownload:
+        tr_variantDictAddBool(initme, TR_KEY_sequentialDownload, tor->sequentialDownload);
+        break;
+
     case TR_KEY_haveValid:
         tr_variantInitInt(initme, st->haveValid);
         break;
@@ -1224,6 +1228,16 @@ char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
         if (tr_variantDictFindInt(args_in, TR_KEY_downloadLimit, &tmp))
         {
             tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, tmp);
+        }
+
+        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_sequentialDownload, &val))
+        {
+            tor->setSequentialDownload();
+        }
+
+        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_randomDownload, &val))
+        {
+            tor->setRandomDownload();
         }
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &val))

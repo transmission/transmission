@@ -669,6 +669,21 @@ public:
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
 
+    constexpr void setSequentialDownload() noexcept
+    {
+        this->sequentialDownload = true;
+    }
+
+    constexpr void setRandomDownload() noexcept
+    {
+        this->sequentialDownload = false;
+    }
+
+    [[nodiscard]] constexpr auto isSequentialDownload() const noexcept
+    {
+        return this->sequentialDownload;
+    }
+
     constexpr void setDirty() noexcept
     {
         this->isDirty = true;
@@ -897,6 +912,8 @@ public:
     uint16_t idle_limit_minutes_ = 0;
 
     bool finishedSeedingByIdle = false;
+
+    bool sequentialDownload = false;
 
     bool isDeleting = false;
     bool isDirty = false;

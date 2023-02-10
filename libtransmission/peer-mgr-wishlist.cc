@@ -134,12 +134,20 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, 
         return {};
     }
 
-    // We usually won't need all the candidates until endgame, so don't
-    // waste cycles sorting all of them here. partial sort is enough.
     auto candidates = getCandidates(mediator);
-    auto constexpr MaxSortedPieces = size_t{ 30 };
-    auto const middle = std::min(std::size(candidates), MaxSortedPieces);
-    std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
+
+    if (mediator.isSequentialDownload())
+    {
+        // no sorting - sequential order
+    }
+    else
+    {
+        // We usually won't need all the candidates to be sorted until endgame, so don't
+        // waste cycles sorting all of them here. partial sort is enough.
+        auto constexpr MaxSortedPieces = size_t{ 30 };
+        auto const middle = std::min(std::size(candidates), MaxSortedPieces);
+        std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
+    }
 
     auto blocks = std::set<tr_block_index_t>{};
     for (auto const& candidate : candidates)
