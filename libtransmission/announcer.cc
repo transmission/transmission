@@ -1401,10 +1401,21 @@ void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tier
     // batch as many info_hashes into a request as we can
     for (auto* tier : tiers)
     {
-        auto const* const scrape_info = tier->currentTracker()->scrape_info;
-        bool found = false;
+        auto const* const current_tracker = tier->currentTracker();
+        TR_ASSERT(current_tracker != nullptr);
+        if (current_tracker == nullptr)
+        {
+            continue;
+        }
 
+        auto const* const scrape_info = current_tracker->scrape_info;
         TR_ASSERT(scrape_info != nullptr);
+        if (scrape_info == nullptr)
+        {
+            continue;
+        }
+
+        bool found = false;
 
         /* if there's a request with this scrape URL and a free slot, use it */
         for (size_t j = 0; !found && j < request_count; ++j)
