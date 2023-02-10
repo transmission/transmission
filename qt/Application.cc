@@ -370,7 +370,12 @@ Application::Application(int& argc, char** argv)
 
 void Application::loadTranslations()
 {
-    auto const qt_qm_dirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
+    auto const qt_qm_dirs = QStringList() <<
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QLibraryInfo::path(QLibraryInfo::TranslationsPath) <<
+#else
+        QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
+#endif
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
