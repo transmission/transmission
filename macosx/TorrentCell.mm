@@ -772,7 +772,8 @@ static NSInteger const kMaxPieces = 18 * 18;
     result.origin.y = NSMinY(bounds) + kPaddingAboveTitle + kHeightTitle + kPaddingBetweenTitleAndProgress + kHeightStatus +
         kPaddingBetweenProgressAndBar;
 
-    result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal - 2.0 * (kPaddingBetweenButtons + kNormalButtonWidth + kPaddingEdgeMax));
+    result.size.width = floor(
+        NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal - 2.0 * (kPaddingBetweenButtons + kNormalButtonWidth + kPaddingEdgeMax));
 
     return result;
 }
