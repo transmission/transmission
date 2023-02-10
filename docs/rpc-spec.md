@@ -1002,7 +1002,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `group-set` | new method
 | `group-get` | new method
 
-Transmission 4.0.1 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
+Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | Method | Description
 |:---|:---
 | `torrent-get` | new arg `sequentialDownload`
