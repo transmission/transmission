@@ -505,17 +505,17 @@
         <translation>Kunnioita yleisiä &amp;rajoituksia</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+7"/>
         <source>Limit &amp;download speed:</source>
         <translation>Rajoita &amp;latausnopeutta:</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Rajoita &amp;lähetysnopeutta:</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+20"/>
         <source>Torrent &amp;priority:</source>
         <translation>Torrentin &amp;tärkeysjärjestys:</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>Järjestä jonotuksen &amp;mukaan</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>Rajoita latausnopeutta</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Avaa torrent</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Nopeusrajoitukset</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Verkkovirhe</translation>
     </message>
@@ -2224,7 +2224,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+494"/>
         <source>Error Renaming Path</source>
         <translation>Virhe uudelleennimettäessä polkua</translation>
     </message>
