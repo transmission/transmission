@@ -91,7 +91,7 @@ public:
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    void set_torrent(tr_torrent_id_t torrent_id);
+    void set_torrent(tr_torrent_id_t tor_id);
 
 private:
     void clearData();
@@ -173,7 +173,7 @@ bool refreshFilesForeach(
         auto const index = iter->get_value(file_cols.index);
         auto const file = tr_torrentFile(refresh_data.tor, index);
 
-        new_enabled = static_cast<int>(file.wanted);
+        new_enabled = file.wanted;
         new_priority = file.priority;
         new_have = file.have;
         new_size = file.length;
@@ -194,7 +194,7 @@ bool refreshFilesForeach(
             auto const child_priority = child[file_cols.priority];
             auto const child_enabled = child[file_cols.enabled];
 
-            if (child_enabled != static_cast<int>(false) && (child_enabled != NOT_SET))
+            if ((child_enabled != false) && (child_enabled != NOT_SET))
             {
                 new_size += child_size;
                 new_have += child_have;
@@ -408,9 +408,11 @@ std::vector<tr_file_index_t> FileList::Impl::getActiveFilesForPath(Gtk::TreeMode
         /* clicked in a selected row... use the current selection */
         return getSelectedFilesAndDescendants();
     }
-
-    /* clicked OUTSIDE of the selected row... just use the clicked row */
-    return getSubtree(path);
+    else
+    {
+        /* clicked OUTSIDE of the selected row... just use the clicked row */
+        return getSubtree(path);
+    }
 }
 
 /***
@@ -462,7 +464,7 @@ void buildTree(FileRowNode& node, build_data& build)
     (*child_iter)[file_cols.size_str] = tr_strlsize(child_data.length);
     (*child_iter)[file_cols.icon] = icon;
     (*child_iter)[file_cols.priority] = priority;
-    (*child_iter)[file_cols.enabled] = static_cast<int>(enabled);
+    (*child_iter)[file_cols.enabled] = enabled;
 
     if (!isLeaf)
     {
@@ -474,9 +476,9 @@ void buildTree(FileRowNode& node, build_data& build)
 
 } // namespace
 
-void FileList::set_torrent(tr_torrent_id_t torrent_id)
+void FileList::set_torrent(tr_torrent_id_t tor_id)
 {
-    impl_->set_torrent(torrent_id);
+    impl_->set_torrent(tor_id);
 }
 
 struct PairHash
@@ -488,9 +490,9 @@ struct PairHash
     }
 };
 
-void FileList::Impl::set_torrent(tr_torrent_id_t torrent_id)
+void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
 {
-    if (torrent_id_ == torrent_id && store_ != nullptr && !store_->children().empty())
+    if (torrent_id_ == tor_id && store_ != nullptr && store_->children().size() != 0)
     {
         return;
     }
@@ -500,7 +502,7 @@ void FileList::Impl::set_torrent(tr_torrent_id_t torrent_id)
 
     /* instantiate the model */
     store_ = Gtk::TreeStore::create(file_cols);
-    torrent_id_ = torrent_id;
+    torrent_id_ = tor_id;
 
     /* populate the model */
     if (torrent_id_ > 0)
@@ -578,7 +580,7 @@ void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator 
 {
     auto const enabled = iter->get_value(file_cols.enabled);
     static_cast<Gtk::CellRendererToggle*>(renderer)->property_inconsistent() = enabled == MIXED;
-    static_cast<Gtk::CellRendererToggle*>(renderer)->property_active() = enabled == static_cast<int>(true);
+    static_cast<Gtk::CellRendererToggle*>(renderer)->property_active() = enabled == true;
 }
 
 void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
@@ -695,8 +697,10 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
         }
         else
         {
-            auto const enabled = iter->get_value(file_cols.enabled);
-            tr_torrentSetFileDLs(tor, indexBuf.data(), indexBuf.size(), enabled == static_cast<int>(false));
+            auto enabled = iter->get_value(file_cols.enabled);
+            enabled = !enabled;
+
+            tr_torrentSetFileDLs(tor, indexBuf.data(), indexBuf.size(), enabled);
         }
 
         refresh();
