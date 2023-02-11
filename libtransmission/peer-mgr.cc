@@ -599,6 +599,7 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     , atom{ atom_in }
     , blame{ tor->blockCount() }
 {
+    ++n_peers_;
 }
 
 tr_peer::~tr_peer()
@@ -612,6 +613,9 @@ tr_peer::~tr_peer()
     {
         atom->is_connected = false;
     }
+
+    [[maybe_unused]] auto const n_prev = n_peers_--;
+    TR_ASSERT(n_prev > 0U);
 }
 
 /**
@@ -2365,9 +2369,10 @@ void closeBadPeers(tr_swarm* s, time_t const now_sec)
     }
 }
 
-void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
+void enforceTorrentPeerLimit(tr_swarm* swarm)
 {
     // do we have too many peers?
+    auto const max = swarm->tor->peerLimit();
     if (auto const n = swarm->peerCount(); n <= max)
     {
         return;
@@ -2381,27 +2386,25 @@ void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
 
 void enforceSessionPeerLimit(tr_session* session)
 {
-    // No need to disconnect if we are under the peer limit
+    // do we have too many peers?
+    auto const n_peers = tr_peer::peer_count();
     auto const max = session->peerLimit();
-    if (tr_peerMsgs::size() <= max)
+    if (n_peers <= max)
     {
         return;
     }
 
-    // Make a list of all the peers.
+    // make a list of all the peers
     auto peers = std::vector<tr_peer*>{};
-    peers.reserve(tr_peerMsgs::size());
+    peers.reserve(n_peers);
     for (auto const* const tor : session->torrents())
     {
         peers.insert(std::end(peers), std::begin(tor->swarm->peers), std::end(tor->swarm->peers));
     }
 
-    TR_ASSERT(tr_peerMsgs::size() == std::size(peers));
-    if (std::size(peers) > max)
-    {
-        std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity{});
-        std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
-    }
+    // close all but the `max` most active
+    std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity{});
+    std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
 }
 
 } // namespace disconnect_helpers
@@ -2433,7 +2436,7 @@ void tr_peerMgr::reconnectPulse()
     {
         if (tor->isRunning)
         {
-            enforceSwarmPeerLimit(tor->swarm, tor->peerLimit());
+            enforceTorrentPeerLimit(tor->swarm);
         }
     }
 
@@ -2651,7 +2654,8 @@ struct peer_candidate
     auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95);
 
     // don't start any new handshakes if we're full up
-    if (max_candidates <= tr_peerMsgs::size())
+    auto const peer_count = tr_peer::peer_count();
+    if (max_candidates <= peer_count)
     {
         return {};
     }
