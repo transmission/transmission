@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <atomic>
 #include <array>
 #include <condition_variable>
 #include <list>
@@ -308,7 +307,7 @@ public:
         CloseNow // exit now even if tasks are running
     };
 
-    std::atomic<RunMode> run_mode = RunMode::Run;
+    RunMode run_mode = RunMode::Run;
 
     static size_t onDataReceived(void* data, size_t size, size_t nmemb, void* vtask)
     {
@@ -596,7 +595,7 @@ public:
 
     static std::once_flag curl_init_flag;
 
-    std::atomic<bool> is_closed_ = false;
+    bool is_closed_ = false;
 
     std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
 
