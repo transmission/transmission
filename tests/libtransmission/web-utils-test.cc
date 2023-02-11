@@ -126,9 +126,9 @@ TEST(WebUtilsTest, urlParseFuzz)
 {
     auto buf = std::vector<char>{};
 
-    for (size_t i = 0; i < 100000U; ++i)
+    for (size_t i = 0; i < 100000; ++i)
     {
-        buf.resize(tr_rand_int(1024U));
+        buf.resize(tr_rand_int(1024));
         tr_rand_buffer(std::data(buf), std::size(buf));
         (void)tr_urlParse({ std::data(buf), std::size(buf) });
     }

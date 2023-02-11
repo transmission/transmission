@@ -292,30 +292,30 @@ struct tr_tracker
     {
     }
 
-    [[nodiscard]] time_t getRetryInterval() const
+    [[nodiscard]] int getRetryInterval() const
     {
         switch (consecutive_failures)
         {
         case 0:
-            return 0U;
+            return 0;
 
         case 1:
-            return 20U;
+            return 20;
 
         case 2:
-            return tr_rand_int(60U) + 60U * 5U;
+            return tr_rand_int(60) + 60 * 5;
 
         case 3:
-            return tr_rand_int(60U) + 60U * 15U;
+            return tr_rand_int(60) + 60 * 15;
 
         case 4:
-            return tr_rand_int(60U) + 60U * 30U;
+            return tr_rand_int(60) + 60 * 30;
 
         case 5:
-            return tr_rand_int(60U) + 60U * 60U;
+            return tr_rand_int(60) + 60 * 60;
 
         default:
-            return tr_rand_int(60U) + 60U * 120U;
+            return tr_rand_int(60) + 60 * 120;
         }
     }
 
