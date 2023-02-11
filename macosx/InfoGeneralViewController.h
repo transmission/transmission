@@ -11,6 +11,6 @@
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
-- (IBAction)revealDataFile:(id)sender;
+- (void)revealDataFile:(id)sender;
 
 @end

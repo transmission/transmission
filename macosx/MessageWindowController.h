@@ -8,10 +8,10 @@
 
 - (void)updateLog:(NSTimer*)timer;
 
-- (IBAction)changeLevel:(id)sender;
-- (IBAction)changeFilter:(id)sender;
-- (IBAction)clearLog:(id)sender;
+- (void)changeLevel:(id)sender;
+- (void)changeFilter:(id)sender;
+- (void)clearLog:(id)sender;
 
-- (IBAction)writeToFile:(id)sender;
+- (void)writeToFile:(id)sender;
 
 @end

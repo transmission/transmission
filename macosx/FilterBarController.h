@@ -26,11 +26,11 @@ extern const NSInteger kGroupFilterAllTag;
 
 - (instancetype)init;
 
-- (IBAction)setFilter:(id)sender;
+- (void)setFilter:(id)sender;
 - (void)switchFilter:(BOOL)right;
-- (IBAction)setSearchText:(id)sender;
-- (IBAction)setSearchType:(id)sender;
-- (IBAction)setGroupFilter:(id)sender;
+- (void)setSearchText:(id)sender;
+- (void)setSearchType:(id)sender;
+- (void)setGroupFilter:(id)sender;
 - (void)reset:(BOOL)updateUI;
 - (void)focusSearchField;
 

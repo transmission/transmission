@@ -10,7 +10,7 @@
 
 - (instancetype)init;
 
-- (IBAction)openURLEndSheet:(id)sender;
-- (IBAction)openURLCancelEndSheet:(id)sender;
+- (void)openURLEndSheet:(id)sender;
+- (void)openURLCancelEndSheet:(id)sender;
 
 @end

@@ -14,6 +14,6 @@
 - (void)saveViewSize;
 - (void)clearView;
 
-- (IBAction)addRemoveTracker:(id)sender;
+- (void)addRemoveTracker:(id)sender;
 
 @end

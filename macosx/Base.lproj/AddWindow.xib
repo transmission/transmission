@@ -146,7 +146,6 @@ Gw
                                         </tableColumn>
                                     </tableColumns>
                                     <connections>
-                                        <action trigger="doubleAction" selector="revealFile:" target="53" id="uKI-cw-UrF"/>
                                         <outlet property="dataSource" destination="53" id="56"/>
                                         <outlet property="delegate" destination="53" id="55"/>
                                     </connections>
