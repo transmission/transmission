@@ -1,0 +1,92 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - 'docs/**'
+      - '.github/**'
+  pull_request:
+    branches: [ "main" ]
+    paths-ignore:
+      - 'docs/**'
+      - '.github/**'
+  schedule:
+    - cron: '29 14 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp', 'javascript' ]
+
+    steps:
+    - name: Checkout repository and submodules
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Update and Install Dependencies
+      if: ${{ matrix.language == 'cpp' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            g++ \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libglibmm-2.4-dev \
+            libgtkmm-3.0-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            pkg-config \
+            qtbase5-dev \
+            qttools5-dev
+
+    - name: Configure Project
+      if: ${{ matrix.language == 'cpp' }}
+      run: |
+        cmake -S . -B _build -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_NLS=OFF \
+            -DRUN_CLANG_TIDY=OFF
+
+    - name: Build Dependencies
+      if: ${{ matrix.language == 'cpp' }}
+      run: |
+        ninja -C _build -t targets all |
+            grep -E 'third-party/.*-build:|third-party/.*/all:' |
+            cut -d: -f1 |
+            xargs -L1 ninja -C _build
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        config-file: ./.github/codeql/codeql-config.yml
+
+    - name: Build Project
+      if: ${{ matrix.language == 'cpp' }}
+      run: |
+        ninja -C _build
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"
