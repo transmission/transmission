@@ -305,15 +305,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
 
 void doScrape(tr_torrent_metainfo const& metainfo)
 {
-    class Mediator final : public tr_web::Mediator
-    {
-        [[nodiscard]] time_t now() const override
-        {
-            return time(nullptr);
-        }
-    };
-
-    auto mediator = Mediator{};
+    auto mediator = tr_web::Mediator{};
     auto web = tr_web::create(mediator);
 
     for (auto const& tracker : metainfo.announceList())

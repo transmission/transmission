@@ -199,14 +199,14 @@ public:
 
     ~Impl()
     {
-        deadline_ = mediator.now();
+        deadline_ = tr_time();
         queued_tasks_cv_.notify_one();
         curl_thread->join();
     }
 
     void startShutdown(std::chrono::milliseconds deadline)
     {
-        deadline_ = mediator.now() + std::chrono::duration_cast<std::chrono::seconds>(deadline).count();
+        deadline_ = tr_time() + std::chrono::duration_cast<std::chrono::seconds>(deadline).count();
         queued_tasks_cv_.notify_one();
     }
 
@@ -402,7 +402,7 @@ public:
 
     [[nodiscard]] bool deadline_reached() const
     {
-        return deadline_exists() && deadline() <= mediator.now();
+        return deadline_exists() && deadline() <= tr_time();
     }
 
     [[nodiscard]] CURL* get_easy(std::string_view host)
@@ -764,10 +764,7 @@ tr_web::tr_web(Mediator& mediator)
 {
 }
 
-tr_web::~tr_web()
-{
-    impl_->startShutdown(0ms);
-}
+tr_web::~tr_web() = default;
 
 std::unique_ptr<tr_web> tr_web::create(Mediator& mediator)
 {
