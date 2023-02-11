@@ -284,11 +284,34 @@ GroupsController* fGroupsInstance = nil;
 {
     NSMenu* menu = [[NSMenu alloc] initWithTitle:@""];
 
-    void (^addItemWithTitleTagIcon)(NSString*, NSInteger, NSImage*) = ^void(NSString* title, NSInteger tag, NSImage* icon) {
-        NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:action keyEquivalent:@""];
-        item.target = target;
-        item.tag = tag;
+    NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"None", "Groups -> Menu") action:action
+                                           keyEquivalent:@""];
+    item.target = target;
+    item.tag = -1;
 
+    NSImage* icon = [self imageForGroupNone];
+    if (small)
+    {
+        icon = [icon copy];
+        icon.size = NSMakeSize(kIconWidthSmall, kIconWidthSmall);
+
+        item.image = icon;
+    }
+    else
+    {
+        item.image = icon;
+    }
+
+    [menu addItem:item];
+
+    for (NSMutableDictionary* dict in self.fGroups)
+    {
+        item = [[NSMenuItem alloc] initWithTitle:dict[@"Name"] action:action keyEquivalent:@""];
+        item.target = target;
+
+        item.tag = [dict[@"Index"] integerValue];
+
+        NSImage* icon = [self imageForGroup:dict];
         if (small)
         {
             icon = [icon copy];
@@ -302,13 +325,6 @@ GroupsController* fGroupsInstance = nil;
         }
 
         [menu addItem:item];
-    };
-
-    addItemWithTitleTagIcon(NSLocalizedString(@"None", "Groups -> Menu"), -1, [self imageForGroupNone]);
-
-    for (NSMutableDictionary* dict in self.fGroups)
-    {
-        addItemWithTitleTagIcon(dict[@"Name"], [dict[@"Index"] integerValue], [self imageForGroup:dict]);
     }
 
     return menu;

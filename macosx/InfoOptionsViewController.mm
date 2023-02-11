@@ -52,7 +52,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 @property(nonatomic) IBOutlet NSStackView* fOptionsStackView;
 @property(nonatomic) IBOutlet NSView* fSeedingView;
-@property(nonatomic, readonly) CGFloat fHeightChange;
+@property(nonatomic, readwrite) CGFloat fHeightChange;
 @property(nonatomic, readwrite) CGFloat fCurrentHeight;
 @property(nonatomic, readonly) CGFloat fHorizLayoutHeight;
 @property(nonatomic, readonly) CGFloat fHorizLayoutWidth;
@@ -111,13 +111,13 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 - (NSRect)viewRect
 {
-    NSRect viewRect = self.view.frame;
-
     CGFloat difference = self.fHeightChange;
+
+    NSRect windowRect = self.view.window.frame, viewRect = self.view.frame;
     if (difference != 0)
     {
         viewRect.size.height -= difference;
-        viewRect.size.width = NSWidth(self.view.window.frame);
+        viewRect.size.width = NSWidth(windowRect);
     }
 
     return viewRect;
@@ -143,7 +143,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
     [self checkLayout];
 
-    if (self.fHeightChange != 0)
+    if (self.oldHeight != self.fCurrentHeight)
     {
         [self updateWindowLayout];
     }
@@ -199,16 +199,14 @@ static CGFloat const kStackViewSpacing = 8.0;
     Torrent* torrent = [enumerator nextObject]; //first torrent
 
     NSInteger uploadUseSpeedLimit = [torrent usesSpeedLimit:YES] ? NSControlStateValueOn : NSControlStateValueOff;
-    NSUInteger uploadSpeedLimit = [torrent speedLimit:YES];
-    BOOL multipleUploadSpeedLimits = NO;
+    NSInteger uploadSpeedLimit = [torrent speedLimit:YES];
     NSInteger downloadUseSpeedLimit = [torrent usesSpeedLimit:NO] ? NSControlStateValueOn : NSControlStateValueOff;
-    NSUInteger downloadSpeedLimit = [torrent speedLimit:NO];
-    BOOL multipleDownloadSpeedLimits = NO;
+    NSInteger downloadSpeedLimit = [torrent speedLimit:NO];
     NSInteger globalUseSpeedLimit = torrent.usesGlobalSpeedLimit ? NSControlStateValueOn : NSControlStateValueOff;
 
     while ((torrent = [enumerator nextObject]) &&
-           (uploadUseSpeedLimit != NSControlStateValueMixed || !multipleUploadSpeedLimits || downloadUseSpeedLimit != NSControlStateValueMixed ||
-            !multipleDownloadSpeedLimits || globalUseSpeedLimit != NSControlStateValueMixed))
+           (uploadUseSpeedLimit != NSControlStateValueMixed || uploadSpeedLimit != kInvalidValue || downloadUseSpeedLimit != NSControlStateValueMixed ||
+            downloadSpeedLimit != kInvalidValue || globalUseSpeedLimit != NSControlStateValueMixed))
     {
         if (uploadUseSpeedLimit != NSControlStateValueMixed &&
             uploadUseSpeedLimit != ([torrent usesSpeedLimit:YES] ? NSControlStateValueOn : NSControlStateValueOff))
@@ -216,9 +214,9 @@ static CGFloat const kStackViewSpacing = 8.0;
             uploadUseSpeedLimit = NSControlStateValueMixed;
         }
 
-        if (!multipleUploadSpeedLimits && uploadSpeedLimit != [torrent speedLimit:YES])
+        if (uploadSpeedLimit != kInvalidValue && uploadSpeedLimit != [torrent speedLimit:YES])
         {
-            multipleUploadSpeedLimits = YES;
+            uploadSpeedLimit = kInvalidValue;
         }
 
         if (downloadUseSpeedLimit != NSControlStateValueMixed &&
@@ -227,9 +225,9 @@ static CGFloat const kStackViewSpacing = 8.0;
             downloadUseSpeedLimit = NSControlStateValueMixed;
         }
 
-        if (!multipleDownloadSpeedLimits && downloadSpeedLimit != [torrent speedLimit:NO])
+        if (downloadSpeedLimit != kInvalidValue && downloadSpeedLimit != [torrent speedLimit:NO])
         {
-            multipleDownloadSpeedLimits = YES;
+            downloadSpeedLimit = kInvalidValue;
         }
 
         if (globalUseSpeedLimit != NSControlStateValueMixed &&
@@ -245,7 +243,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
     self.fUploadLimitLabel.enabled = uploadUseSpeedLimit == NSControlStateValueOn;
     self.fUploadLimitField.enabled = uploadUseSpeedLimit == NSControlStateValueOn;
-    if (!multipleUploadSpeedLimits)
+    if (uploadSpeedLimit != kInvalidValue)
     {
         self.fUploadLimitField.integerValue = uploadSpeedLimit;
     }
@@ -260,7 +258,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
     self.fDownloadLimitLabel.enabled = downloadUseSpeedLimit == NSControlStateValueOn;
     self.fDownloadLimitField.enabled = downloadUseSpeedLimit == NSControlStateValueOn;
-    if (!multipleDownloadSpeedLimits)
+    if (downloadSpeedLimit != kInvalidValue)
     {
         self.fDownloadLimitField.integerValue = downloadSpeedLimit;
     }
@@ -281,21 +279,19 @@ static CGFloat const kStackViewSpacing = 8.0;
     NSInteger checkIdle = torrent.idleSetting;
     NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff;
     CGFloat ratioLimit = torrent.ratioLimit;
-    BOOL multipleRatioLimits = NO;
     NSUInteger idleLimit = torrent.idleLimitMinutes;
-    BOOL multipleIdleLimits = NO;
 
     while ((torrent = [enumerator nextObject]) &&
-           (checkRatio != kInvalidValue || !multipleRatioLimits || checkIdle != kInvalidValue || !multipleIdleLimits))
+           (checkRatio != kInvalidValue || ratioLimit != kInvalidValue || checkIdle != kInvalidValue || idleLimit != kInvalidValue))
     {
         if (checkRatio != kInvalidValue && checkRatio != torrent.ratioSetting)
         {
             checkRatio = kInvalidValue;
         }
 
-        if (!multipleRatioLimits && ratioLimit != torrent.ratioLimit)
+        if (ratioLimit != kInvalidValue && ratioLimit != torrent.ratioLimit)
         {
-            multipleRatioLimits = YES;
+            ratioLimit = kInvalidValue;
         }
 
         if (checkIdle != kInvalidValue && checkIdle != torrent.idleSetting)
@@ -303,9 +299,9 @@ static CGFloat const kStackViewSpacing = 8.0;
             checkIdle = kInvalidValue;
         }
 
-        if (!multipleIdleLimits && idleLimit != torrent.idleLimitMinutes)
+        if (idleLimit != kInvalidValue && idleLimit != torrent.idleLimitMinutes)
         {
-            multipleIdleLimits = YES;
+            idleLimit = kInvalidValue;
         }
 
         if (removeWhenFinishSeeding != NSControlStateValueMixed &&
@@ -337,7 +333,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     self.fRatioPopUp.enabled = YES;
 
     self.fRatioLimitField.hidden = checkRatio != TR_RATIOLIMIT_SINGLE;
-    if (!multipleRatioLimits)
+    if (ratioLimit != kInvalidValue)
     {
         self.fRatioLimitField.floatValue = ratioLimit;
     }
@@ -369,7 +365,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     self.fIdlePopUp.enabled = YES;
 
     self.fIdleLimitField.hidden = checkIdle != TR_IDLELIMIT_SINGLE;
-    if (!multipleIdleLimits)
+    if (idleLimit != kInvalidValue)
     {
         self.fIdleLimitField.integerValue = idleLimit;
     }

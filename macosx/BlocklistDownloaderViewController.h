@@ -4,6 +4,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <libtransmission/transmission.h>
+
 @class PrefsController;
 
 @interface BlocklistDownloaderViewController : NSObject

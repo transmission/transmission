@@ -44,7 +44,7 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 
 @property(nonatomic) IBOutlet NSStackView* fActivityStackView;
 @property(nonatomic) IBOutlet NSView* fDatesView;
-@property(nonatomic, readonly) CGFloat fHeightChange;
+@property(nonatomic, readwrite) CGFloat fHeightChange;
 @property(nonatomic, readwrite) CGFloat fCurrentHeight;
 @property(nonatomic, readonly) CGFloat fHorizLayoutHeight;
 @property(nonatomic, readonly) CGFloat fHorizLayoutWidth;
@@ -96,13 +96,14 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 
 - (NSRect)viewRect
 {
-    NSRect viewRect = self.view.frame;
-
     CGFloat difference = self.fHeightChange;
+
+    NSRect windowRect = self.view.window.frame;
+    NSRect viewRect = self.view.frame;
     if (difference != 0)
     {
         viewRect.size.height -= difference;
-        viewRect.size.width = NSWidth(self.view.window.frame);
+        viewRect.size.width = NSWidth(windowRect);
     }
 
     return viewRect;
@@ -132,7 +133,7 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 
     [self checkLayout];
 
-    if (self.fHeightChange != 0)
+    if (self.oldHeight != self.fCurrentHeight)
     {
         [self updateWindowLayout];
     }

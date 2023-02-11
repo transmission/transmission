@@ -9,17 +9,21 @@
 
 @interface Badger ()
 
+@property(nonatomic, readonly) tr_session* fLib;
+
 @property(nonatomic, readonly) NSMutableSet* fHashes;
 
 @end
 
 @implementation Badger
 
-- (instancetype)init
+- (instancetype)initWithLib:(tr_session*)lib
 {
     if ((self = [super init]))
     {
-        BadgeView* view = [[BadgeView alloc] init];
+        _fLib = lib;
+
+        BadgeView* view = [[BadgeView alloc] initWithLib:lib];
         NSApp.dockTile.contentView = view;
 
         _fHashes = [[NSMutableSet alloc] init];
