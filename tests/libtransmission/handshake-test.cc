@@ -199,7 +199,7 @@ public:
     }
 
     static auto runHandshake(
-        tr_handshake_mediator& mediator,
+        std::unique_ptr<tr_handshake_mediator> mediator,
         std::shared_ptr<tr_peerIo> io,
         tr_encryption_mode encryption_mode = TR_CLEAR_PREFERRED)
     {
@@ -211,7 +211,7 @@ public:
             return true;
         };
 
-        tr_handshakeNew(mediator, std::move(io), encryption_mode, DoneCallback, &result);
+        tr_handshakeNew(std::move(mediator), std::move(io), encryption_mode, DoneCallback, &result);
 
         waitFor([&result]() { return result.has_value(); }, MaxWaitMsec);
 
@@ -222,8 +222,8 @@ public:
 TEST_F(HandshakeTest, incomingPlaintext)
 {
     auto const peer_id = makeRandomPeerId();
-    auto mediator = MediatorMock{ session_ };
-    mediator.torrents.emplace(TorrentWeAreSeeding.info_hash, TorrentWeAreSeeding);
+    auto mediator = std::make_unique<MediatorMock>(session_);
+    mediator->torrents.emplace(TorrentWeAreSeeding.info_hash, TorrentWeAreSeeding);
 
     // The simplest handshake there is. "The handshake starts with character
     // nineteen (decimal) followed by the string 'BitTorrent protocol'.
@@ -240,7 +240,7 @@ TEST_F(HandshakeTest, incomingPlaintext)
     sendToClient(sock, TorrentWeAreSeeding.info_hash);
     sendToClient(sock, peer_id);
 
-    auto const res = runHandshake(mediator, io);
+    auto const res = runHandshake(std::move(mediator), io);
 
     // check the results
     EXPECT_TRUE(res);
@@ -258,8 +258,8 @@ TEST_F(HandshakeTest, incomingPlaintext)
 // but this time we don't recognize the infohash sent by the peer.
 TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
 {
-    auto mediator = MediatorMock{ session_ };
-    mediator.torrents.emplace(TorrentWeAreSeeding.info_hash, TorrentWeAreSeeding);
+    auto mediator = std::make_unique<MediatorMock>(session_);
+    mediator->torrents.emplace(TorrentWeAreSeeding.info_hash, TorrentWeAreSeeding);
 
     auto [io, sock] = createIncomingIo(session_);
     sendToClient(sock, PlaintextProtocolName);
@@ -267,7 +267,7 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     sendToClient(sock, tr_sha1::digest("some other torrent unknown to us"sv));
     sendToClient(sock, makeRandomPeerId());
 
-    auto const res = runHandshake(mediator, io);
+    auto const res = runHandshake(std::move(mediator), io);
 
     // check the results
     EXPECT_TRUE(res);
@@ -283,8 +283,8 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
 TEST_F(HandshakeTest, outgoingPlaintext)
 {
     auto const peer_id = makeRandomPeerId();
-    auto mediator = MediatorMock{ session_ };
-    mediator.torrents.emplace(UbuntuTorrent.info_hash, TorrentWeAreSeeding);
+    auto mediator = std::make_unique<MediatorMock>(session_);
+    mediator->torrents.emplace(UbuntuTorrent.info_hash, TorrentWeAreSeeding);
 
     auto [io, sock] = createOutgoingIo(session_, UbuntuTorrent.info_hash);
     sendToClient(sock, PlaintextProtocolName);
@@ -292,7 +292,7 @@ TEST_F(HandshakeTest, outgoingPlaintext)
     sendToClient(sock, UbuntuTorrent.info_hash);
     sendToClient(sock, peer_id);
 
-    auto const res = runHandshake(mediator, io);
+    auto const res = runHandshake(std::move(mediator), io);
 
     // check the results
     EXPECT_TRUE(res);
@@ -311,9 +311,9 @@ TEST_F(HandshakeTest, incomingEncrypted)
 {
     static auto constexpr ExpectedPeerId = makePeerId("-TR300Z-w4bd4mkebkbi"sv);
 
-    auto mediator = MediatorMock{ session_ };
-    mediator.torrents.emplace(UbuntuTorrent.info_hash, UbuntuTorrent);
-    mediator.setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
+    auto mediator = std::make_unique<MediatorMock>(session_);
+    mediator->torrents.emplace(UbuntuTorrent.info_hash, UbuntuTorrent);
+    mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
 
     auto [io, sock] = createIncomingIo(session_);
 
@@ -330,7 +330,7 @@ TEST_F(HandshakeTest, incomingEncrypted)
         "VGwrTPstEPu3V5lmzjtMGVLaL5EErlpJ93Xrz+ea6EIQEUZA+D4jKaV/to9NVi"
         "04/1W1A2PHgg+I9puac/i9BsFPcjdQeoVtU73lNCbTDQgTieyjDWmwo="sv);
 
-    auto const res = runHandshake(mediator, io);
+    auto const res = runHandshake(std::move(mediator), io);
 
     // check the results
     EXPECT_TRUE(res);
@@ -349,8 +349,8 @@ TEST_F(HandshakeTest, incomingEncrypted)
 // but this time we don't recognize the infohash sent by the peer.
 TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
 {
-    auto mediator = MediatorMock{ session_ };
-    mediator.setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
+    auto mediator = std::make_unique<MediatorMock>(session_);
+    mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
 
     auto [io, sock] = createIncomingIo(session_);
 
@@ -367,7 +367,7 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
         "VGwrTPstEPu3V5lmzjtMGVLaL5EErlpJ93Xrz+ea6EIQEUZA+D4jKaV/to9NVi"
         "04/1W1A2PHgg+I9puac/i9BsFPcjdQeoVtU73lNCbTDQgTieyjDWmwo="sv);
 
-    auto const res = runHandshake(mediator, io);
+    auto const res = runHandshake(std::move(mediator), io);
 
     // check the results
     EXPECT_TRUE(res);
@@ -382,9 +382,9 @@ TEST_F(HandshakeTest, outgoingEncrypted)
 {
     static auto constexpr ExpectedPeerId = makePeerId("-qB4250-scysDI_JuVN3"sv);
 
-    auto mediator = MediatorMock{ session_ };
-    mediator.torrents.emplace(UbuntuTorrent.info_hash, UbuntuTorrent);
-    mediator.setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
+    auto mediator = std::make_unique<MediatorMock>(session_);
+    mediator->torrents.emplace(UbuntuTorrent.info_hash, UbuntuTorrent);
+    mediator->setPrivateKeyFromBase64("0EYKCwBWQ4Dg9kX3c5xxjVtBDKw="sv);
 
     auto [io, sock] = createOutgoingIo(session_, UbuntuTorrent.info_hash);
 
@@ -406,7 +406,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
         "3+o/RdiKQJAsGxMIU08scBc5VOmrAmjeYrLNpFnpXVuavH5if7490zMCu3DEn"
         "G9hpbYbiX95T+EUcRbM6pSCvr3Twq1Q="sv);
 
-    auto const res = runHandshake(mediator, io, TR_ENCRYPTION_PREFERRED);
+    auto const res = runHandshake(std::move(mediator), io, TR_ENCRYPTION_PREFERRED);
 
     // check the results
     EXPECT_TRUE(res);
