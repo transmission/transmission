@@ -262,7 +262,6 @@ sigc::signal<void()>& TorrentSorter::signal_changed()
 
 Glib::RefPtr<TorrentSorter> TorrentSorter::create()
 {
-    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new TorrentSorter());
 }
 
