@@ -33,7 +33,6 @@ extern const NSInteger kGroupFilterAllTag;
 - (IBAction)setGroupFilter:(id)sender;
 - (void)reset:(BOOL)updateUI;
 - (void)focusSearchField;
-- (BOOL)isFocused;
 
 - (void)setCountAll:(NSUInteger)all
              active:(NSUInteger)active

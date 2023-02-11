@@ -4772,11 +4772,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         BOOL warning = NO;
 
-        if (self.fFilterBar.isFocused == YES)
-        {
-            return NO;
-        }
-
         for (Torrent* torrent in self.fTableView.selectedTorrents)
         {
             if (torrent.active)
