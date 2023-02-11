@@ -1,3 +1,5 @@
+project(tr-dist-msi)
+
 include(UtilityFunctions.cmake)
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -54,9 +56,7 @@ else()
     set(TR_OPENSSL_SSL_NAME "ssleay32.dll")
 endif()
 
-file(
-    COPY "${CMAKE_SOURCE_DIR}/qt/icons/transmission.ico"
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY "${CMAKE_SOURCE_DIR}/qt/icons/transmission.ico" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/public_html")
 set(TRQMSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/translations")
@@ -66,11 +66,11 @@ configure_file(TransmissionConfig.wxi.in TransmissionConfig.wxi)
 
 wix_heat(WebUi.wxs "${WEBSRCDIR}" WebUiComponents WEBINSTALLDIR var.WebSrcDir)
 wix_heat(QtClientTranslations.wxs "${TRQMSRCDIR}" QtClientTranslationsComponents QMINSTALLDIR var.TrQmSrcDir)
-wix_heat(QtTranslations.wxs "${QTQMSRCDIR}" QtTranslationsComponents QMINSTALLDIR var.QtQmSrcDir
-    XSL_TRANSFORM QtTranslations.xsl)
+wix_heat(QtTranslations.wxs "${QTQMSRCDIR}" QtTranslationsComponents QMINSTALLDIR var.QtQmSrcDir XSL_TRANSFORM QtTranslations.xsl)
 
-wix_candle(WIX_OBJS
-    ARCHITECTURE ${ARCH}
+wix_candle(${PROJECT_NAME}_OBJS
+    ARCHITECTURE
+        ${ARCH}
     SOURCES
         components/CliTools.wxs
         components/CommonLibs.wxs
@@ -95,11 +95,14 @@ wix_candle(WIX_OBJS
         "MsvcCrtMsmFile=${TR_MSVC_CRT_MSM_FILE}"
         "OpenSslCryptoName=${TR_OPENSSL_CRYPTO_NAME}"
         "OpenSslSslName=${TR_OPENSSL_SSL_NAME}"
-    EXTRA_DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")
+    EXTRA_DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/TransmissionConfig.wxi")
 
-wix_light(WIX_OUTPUT
-    NAME transmission-${MSI_FILENAME_VERSION}-${ARCH}
-    OBJECTS ${WIX_OBJS}
+wix_light(${PROJECT_NAME}_OUTPUT
+    NAME
+        transmission-${MSI_FILENAME_VERSION}-${ARCH}
+    OBJECTS
+        ${${PROJECT_NAME}_OBJS}
     EXTENSIONS
         WixUIExtension
         WixUtilExtension
@@ -116,4 +119,5 @@ add_custom_target(pack-msi
         QtTranslations.xsl
         Transmission.wxs
         TransmissionConfig.wxi.in
-    DEPENDS "${WIX_OUTPUT}")
+    DEPENDS
+        "${${PROJECT_NAME}_OUTPUT}")

@@ -8,16 +8,12 @@ if(PSL_PREFER_STATIC_LIB)
 endif()
 
 if(UNIX)
-    find_package(PkgConfig QUIET)
-    pkg_check_modules(_PSL QUIET libpsl)
+  find_package(PkgConfig QUIET)
+  pkg_check_modules(_PSL QUIET libpsl)
 endif()
 
-find_path(PSL_INCLUDE_DIR
-    NAMES libpsl.h
-    HINTS ${_PSL_INCLUDEDIR})
-find_library(PSL_LIBRARY
-    NAMES psl
-    HINTS ${_PSL_LIBDIR})
+find_path(PSL_INCLUDE_DIR NAMES libpsl.h HINTS ${_PSL_INCLUDEDIR})
+find_library(PSL_LIBRARY NAMES psl HINTS ${_PSL_LIBDIR})
 
 set(PSL_INCLUDE_DIRS ${PSL_INCLUDE_DIR})
 set(PSL_LIBRARIES ${PSL_LIBRARY})
@@ -27,7 +23,8 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PSL
     REQUIRED_VARS
         PSL_LIBRARY
-        PSL_INCLUDE_DIR)
+        PSL_INCLUDE_DIR
+)
 
 mark_as_advanced(PSL_INCLUDE_DIR PSL_LIBRARY)
 

@@ -1,14 +1,17 @@
-add_library(${TR_NAME}-mac-ql MODULE)
+project(trmacql)
 
-target_sources(${TR_NAME}-mac-ql
-    PRIVATE
-        ../NSDataAdditions.mm
-        ../NSStringAdditions.mm
-        GeneratePreviewForURL.mm
-        GenerateThumbnailForURL.mm
-        main.cc)
+set(${PROJECT_NAME}_SOURCES
+    ../NSDataAdditions.mm
+    ../NSStringAdditions.mm
+    GeneratePreviewForURL.mm
+    GenerateThumbnailForURL.mm
+    main.cc
+)
 
-set(LINGUAS
+set(${PROJECT_NAME}_HEADERS
+)
+
+set(${PROJECT_NAME}_LINGUAS
     da
     de
     en
@@ -18,83 +21,77 @@ set(LINGUAS
     nl
     pt_PT
     ru
-    tr)
+    tr
+)
 
 if(ENABLE_NLS)
-    set(ENABLED_LINGUAS ${LINGUAS})
+    set(${PROJECT_NAME}_ENABLED_LINGUAS ${${PROJECT_NAME}_LINGUAS})
 else()
-    set(ENABLED_LINGUAS en)
+    set(${PROJECT_NAME}_ENABLED_LINGUAS en)
 endif()
 
-set(LANG_STRINGS_FILES
-    Localizable.strings)
+set(${PROJECT_NAME}_LANG_STRINGS_FILES
+    Localizable.strings
+)
 
-set(RESOURCES
-    style.css)
-source_group(Resources
-    FILES ${RESOURCES})
+set(${PROJECT_NAME}_RESOURCES
+    style.css
+)
+source_group(Resources FILES ${${PROJECT_NAME}_RESOURCES})
 
-set_source_files_properties(
-    ${RESOURCES}
-    PROPERTIES
-        MACOSX_PACKAGE_LOCATION Resources)
+set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources)
 
-foreach(LANG ${ENABLED_LINGUAS})
-    set(${LANG}_STRINGS_FILES)
+foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
+    set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
     set(STRINGS_FILES_RESOURCES_DIR Resources)
     if(NOT CMAKE_GENERATOR STREQUAL Xcode)
         string(APPEND STRINGS_FILES_RESOURCES_DIR /${LANG}.lproj)
     endif()
-    foreach(F ${LANG_STRINGS_FILES})
-        list(APPEND ${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
-        list(APPEND RESOURCES ${${LANG}_STRINGS_FILES})
-        set_source_files_properties(
-            ${${LANG}_STRINGS_FILES}
-            PROPERTIES
-                MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
+    foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
+        list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+        list(APPEND ${PROJECT_NAME}_RESOURCES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
+        set_source_files_properties(${${PROJECT_NAME}_${LANG}_STRINGS_FILES} PROPERTIES
+            MACOSX_PACKAGE_LOCATION ${STRINGS_FILES_RESOURCES_DIR})
     endforeach()
-    source_group(Resources/${LANG}.lproj
-        FILES ${${LANG}_STRINGS_FILES})
+    source_group(Resources/${LANG}.lproj FILES ${${PROJECT_NAME}_${LANG}_STRINGS_FILES})
 endforeach()
 
-target_sources(${TR_NAME}-mac-ql
-    PRIVATE
-        ${RESOURCES})
+add_library(${TR_NAME}-mac-ql MODULE
+    ${${PROJECT_NAME}_SOURCES}
+    ${${PROJECT_NAME}_HEADERS}
+    ${${PROJECT_NAME}_RESOURCES}
+)
 
 set(MAC_QL_BUNDLE_NAME QuickLookPlugin)
 
-set_target_properties(
-    ${TR_NAME}-mac-ql
-    PROPERTIES
-        OUTPUT_NAME ${MAC_QL_BUNDLE_NAME}
-        MACOSX_BUNDLE ON
-        BUNDLE ON
-        BUNDLE_EXTENSION qlgenerator
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
-        INSTALL_RPATH "@loader_path/../../../../../MacOS;@loader_path/../../../../../Frameworks")
+set_target_properties(${TR_NAME}-mac-ql PROPERTIES
+    OUTPUT_NAME ${MAC_QL_BUNDLE_NAME}
+    MACOSX_BUNDLE ON
+    BUNDLE ON
+    BUNDLE_EXTENSION qlgenerator
+    MACOSX_BUNDLE_INFO_PLIST "${PROJECT_SOURCE_DIR}/Info.plist.in"
+    INSTALL_RPATH "@loader_path/../../../../../MacOS;@loader_path/../../../../../Frameworks"
+)
 
-target_include_directories(${TR_NAME}-mac-ql
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}
-        ..)
+target_include_directories(${TR_NAME}-mac-ql PRIVATE
+    ..
+)
 
 target_link_libraries(${TR_NAME}-mac-ql
-    PRIVATE
-        ${TR_NAME}
-        "-framework Foundation"
-        "-framework CoreFoundation"
-        "-framework CoreServices"
-        "-framework AppKit"
-        "-framework QuickLook")
+    ${TR_NAME}
+    "-framework Foundation"
+    "-framework CoreFoundation"
+    "-framework CoreServices"
+    "-framework AppKit"
+    "-framework QuickLook"
+)
 
-install(
-    TARGETS ${TR_NAME}-mac-ql
-    DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Library/QuickLook)
+install(TARGETS ${TR_NAME}-mac-ql DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Library/QuickLook)
 
-install(CODE
-    "list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
+install(CODE "
+    list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
     include(TrMacros)
     include(GetPrerequisites)
-    tr_fixup_bundle_item(
-        \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/Applications/${MAC_BUNDLE_NAME}.app\"
-        \"Contents/Library/QuickLook/${MAC_QL_BUNDLE_NAME}.qlgenerator/Contents/MacOS/${MAC_QL_BUNDLE_NAME}\" \"\")")
+    tr_fixup_bundle_item(\"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/Applications/${MAC_BUNDLE_NAME}.app\" \"Contents/Library/QuickLook/${MAC_QL_BUNDLE_NAME}.qlgenerator/Contents/MacOS/${MAC_QL_BUNDLE_NAME}\" \"\")
+")
