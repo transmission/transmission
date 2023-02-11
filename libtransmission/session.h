@@ -464,6 +464,11 @@ public:
 
     [[nodiscard]] bool useRpcWhitelist() const;
 
+    [[nodiscard]] constexpr auto externalIP() const noexcept
+    {
+        return external_ip_;
+    }
+
     void setExternalIP(tr_address external_ip)
     {
         external_ip_ = external_ip;
