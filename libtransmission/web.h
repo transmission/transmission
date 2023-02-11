@@ -161,7 +161,7 @@ public:
 
     // Note that tr_web does no management of the `mediator` reference.
     // The caller must ensure `mediator` is valid for tr_web's lifespan.
-    [[nodiscard]] static std::unique_ptr<tr_web> create(Mediator& mediator);
+    static std::unique_ptr<tr_web> create(Mediator& mediator);
 
 private:
     class Impl;
