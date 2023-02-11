@@ -4,16 +4,7 @@
 
 #import "FilterBarView.h"
 
-@interface FilterBarView ()
-@property(weak) IBOutlet NSLayoutConstraint* searchFieldVerticalConstraint;
-@end
-
 @implementation FilterBarView
-
-- (void)awakeFromNib
-{
-    _searchFieldVerticalConstraint.constant = -.5;
-}
 
 - (BOOL)mouseDownCanMoveWindow
 {
