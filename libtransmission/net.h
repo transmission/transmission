@@ -243,11 +243,6 @@ struct tr_address
         return this->compare(that) < 0;
     }
 
-    [[nodiscard]] bool operator<=(tr_address const& that) const noexcept
-    {
-        return this->compare(that) <= 0;
-    }
-
     [[nodiscard]] bool operator>(tr_address const& that) const noexcept
     {
         return this->compare(that) > 0;
