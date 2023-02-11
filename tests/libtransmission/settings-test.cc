@@ -128,9 +128,9 @@ TEST_F(SettingsTest, canSaveEncryptionMode)
     auto dict = tr_variant{};
     tr_variantInitDict(&dict, 100);
     settings.save(&dict);
-    auto val = int64_t{};
-    EXPECT_TRUE(tr_variantDictFindInt(&dict, Key, &val));
-    EXPECT_EQ(ExpectedValue, val);
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
+    EXPECT_EQ("required"sv, val);
     tr_variantClear(&dict);
 }
 
@@ -171,9 +171,9 @@ TEST_F(SettingsTest, canSaveLogLevel)
     tr_variantInitDict(&dict, 100);
     settings.log_level = ExpectedValue;
     settings.save(&dict);
-    auto val = int64_t{};
-    EXPECT_TRUE(tr_variantDictFindInt(&dict, Key, &val));
-    EXPECT_EQ(ExpectedValue, val);
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
+    EXPECT_EQ("debug", val);
     tr_variantClear(&dict);
 }
 
@@ -293,9 +293,9 @@ TEST_F(SettingsTest, canSavePreallocation)
     tr_variantInitDict(&dict, 100);
     settings.preallocation_mode = ExpectedValue;
     settings.save(&dict);
-    auto val = int64_t{};
-    EXPECT_TRUE(tr_variantDictFindInt(&dict, Key, &val));
-    EXPECT_EQ(ExpectedValue, val);
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&dict, Key, &val));
+    EXPECT_EQ("full", val);
     tr_variantClear(&dict);
 }
 
