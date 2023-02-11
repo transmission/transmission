@@ -9,8 +9,6 @@
 @interface InfoActivityViewController : NSViewController<InfoViewController>
 
 - (NSRect)viewRect;
-- (void)checkLayout;
-- (void)checkWindowSize;
 - (void)updateWindowLayout;
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
@@ -21,6 +19,5 @@
 - (void)clearView;
 
 @property(nonatomic) IBOutlet NSView* fTransferView;
-@property(nonatomic) CGFloat oldHeight;
 
 @end
