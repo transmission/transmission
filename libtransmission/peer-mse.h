@@ -70,7 +70,7 @@ public:
     [[nodiscard]] static private_key_bigend_t randomPrivateKey() noexcept;
 
 private:
-    private_key_bigend_t const private_key_;
+    private_key_bigend_t private_key_;
     key_bigend_t public_key_ = {};
     key_bigend_t secret_ = {};
 };
