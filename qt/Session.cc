@@ -52,25 +52,21 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
     tr_variant args;
     tr_variantInitDict(&args, 1);
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
-    switch (value.typeId())
-#else
-    switch (static_cast<QMetaType::Type>(value.type()))
-#endif
+    switch (value.type())
     {
-    case QMetaType::Bool:
+    case QVariant::Bool:
         dictAdd(&args, key, value.toBool());
         break;
 
-    case QMetaType::Int:
+    case QVariant::Int:
         dictAdd(&args, key, value.toInt());
         break;
 
-    case QMetaType::Double:
+    case QVariant::Double:
         dictAdd(&args, key, value.toDouble());
         break;
 
-    case QMetaType::QString:
+    case QVariant::String:
         dictAdd(&args, key, value.toString());
         break;
 
@@ -899,7 +895,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
         switch (prefs_.type(i))
         {
-        case QMetaType::Int:
+        case QVariant::Int:
             if (auto const value = getValue<int>(b); value)
             {
                 prefs_.set(i, *value);
@@ -907,7 +903,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
             break;
 
-        case QMetaType::Double:
+        case QVariant::Double:
             if (auto const value = getValue<double>(b); value)
             {
                 prefs_.set(i, *value);
@@ -915,7 +911,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
             break;
 
-        case QMetaType::Bool:
+        case QVariant::Bool:
             if (auto const value = getValue<bool>(b); value)
             {
                 prefs_.set(i, *value);
@@ -925,7 +921,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
         case CustomVariantType::FilterModeType:
         case CustomVariantType::SortModeType:
-        case QMetaType::QString:
+        case QVariant::String:
             if (auto const value = getValue<QString>(b); value)
             {
                 prefs_.set(i, *value);
