@@ -46,7 +46,7 @@ static int const kETAIdleDisplaySec = 2 * 60;
 
 @property(nonatomic) BOOL fResumeOnWake;
 
-@property(nonatomic) dispatch_queue_t timeMachineExcludeQueue;
+@property(nonatomic) BOOL fTimeMachineExcludeInitialized;
 
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
@@ -252,6 +252,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
                                                  postingStyle:NSPostASAP
                                                  coalesceMask:NSNotificationCoalescingOnName
                                                      forModes:nil];
+    }
+
+    //when the torrent is first loaded, update the time machine exclusion
+    if (!self.fTimeMachineExcludeInitialized)
+    {
+        [self updateTimeMachineExclude];
     }
 }
 
@@ -1767,9 +1773,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
                                                name:@"GroupValueRemoved"
                                              object:nil];
 
-    _timeMachineExcludeQueue = dispatch_queue_create("updateTimeMachineExclude", DISPATCH_QUEUE_CONCURRENT);
+    _fTimeMachineExcludeInitialized = NO;
     [self update];
-    [self updateTimeMachineExclude];
 
     return self;
 }
@@ -2108,10 +2113,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     NSString* path;
     if ((path = self.dataLocation))
     {
-        dispatch_async(_timeMachineExcludeQueue, ^{
-            CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:path];
-            CSBackupSetItemExcluded(url, exclude, false);
-        });
+        CSBackupSetItemExcluded((__bridge CFURLRef)[NSURL fileURLWithPath:path], exclude, false);
+        self.fTimeMachineExcludeInitialized = YES;
     }
 }
 
