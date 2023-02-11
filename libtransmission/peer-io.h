@@ -67,7 +67,7 @@ public:
     static std::shared_ptr<tr_peerIo> newOutgoing(
         tr_session* session,
         tr_bandwidth* parent,
-        tr_address const& addr,
+        struct tr_address const* addr,
         tr_port port,
         tr_sha1_digest_t const& torrent_hash,
         bool is_seed,
@@ -222,7 +222,7 @@ public:
         setCallbacks(nullptr, nullptr, nullptr, nullptr);
     }
 
-    tr_peer_socket socket = {};
+    struct tr_peer_socket socket = {};
 
     tr_session* const session;
 
@@ -286,7 +286,15 @@ public:
         bool is_incoming,
         bool is_seed,
         tr_bandwidth* parent_bandwidth,
-        tr_peer_socket sock);
+        tr_peer_socket sock)
+        : socket{ sock }
+        , session{ session_in }
+        , bandwidth_{ parent_bandwidth }
+        , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
+        , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
+    {
+    }
 
 private:
     friend class libtransmission::test::HandshakeTest;
