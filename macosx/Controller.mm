@@ -42,6 +42,7 @@
 #import "ShareToolbarItem.h"
 #import "ShareTorrentFileHelper.h"
 #import "Toolbar.h"
+#import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
 #import "FilterBarController.h"
