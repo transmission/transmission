@@ -460,6 +460,33 @@ namespace global_ipv6_helpers
     return -1;
 }
 
+/* We all hate NATs. */
+[[nodiscard]] int global_unicast_address(struct sockaddr_storage* ss)
+{
+    if (ss->ss_family == AF_INET)
+    {
+        unsigned char const* a = (unsigned char*)&((struct sockaddr_in*)ss)->sin_addr;
+
+        if (a[0] == 0 || a[0] == 127 || a[0] >= 224 || a[0] == 10 || (a[0] == 172 && a[1] >= 16 && a[1] <= 31) ||
+            (a[0] == 192 && a[1] == 168))
+        {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    if (ss->ss_family == AF_INET6)
+    {
+        unsigned char const* a = (unsigned char*)&((struct sockaddr_in6*)ss)->sin6_addr;
+        /* 2000::/3 */
+        return (a[0] & 0xE0) == 0x20 ? 1 : 0;
+    }
+
+    errno = EAFNOSUPPORT;
+    return -1;
+}
+
 [[nodiscard]] int global_address(int af, void* addr, int* addr_len)
 {
     auto ss = sockaddr_storage{};
@@ -500,9 +527,7 @@ namespace global_ipv6_helpers
         return -1;
     }
 
-    // We all hate NATs.
-    if (auto const tmp = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss));
-        !tmp || !tmp->first.is_global_unicast_address())
+    if (global_unicast_address(&ss) == 0)
     {
         return -1;
     }
@@ -789,139 +814,4 @@ static int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
     return tr_address_compare(this, &that);
-}
-
-// https://en.wikipedia.org/wiki/Reserved_IP_addresses
-[[nodiscard]] bool tr_address::is_global_unicast_address() const noexcept
-{
-    if (is_ipv4())
-    {
-        auto const* const a = reinterpret_cast<uint8_t const*>(&addr.addr4.s_addr);
-
-        // [0.0.0.0–0.255.255.255]
-        // Current network.
-        if (a[0] == 0)
-        {
-            return false;
-        }
-
-        // [10.0.0.0 – 10.255.255.255]
-        // Used for local communications within a private network.
-        if (a[0] == 10)
-        {
-            return false;
-        }
-
-        // [100.64.0.0–100.127.255.255]
-        // Shared address space for communications between a service provider
-        // and its subscribers when using a carrier-grade NAT.
-        if ((a[0] == 100) && (64 <= a[1] && a[1] <= 127))
-        {
-            return false;
-        }
-
-        // [169.254.0.0–169.254.255.255]
-        // Used for link-local addresses[5] between two hosts on a single link
-        // when no IP address is otherwise specified, such as would have
-        // normally been retrieved from a DHCP server.
-        if (a[0] == 169 && a[1] == 254)
-        {
-            return false;
-        }
-
-        // [172.16.0.0–172.31.255.255]
-        // Used for local communications within a private network.
-        if ((a[0] == 172) && (16 <= a[1] && a[1] <= 31))
-        {
-            return false;
-        }
-
-        // [192.0.0.0–192.0.0.255]
-        // IETF Protocol Assignments.
-        if (a[0] == 192 && a[1] == 0 && a[2] == 0)
-        {
-            return false;
-        }
-
-        // [192.0.2.0–192.0.2.255]
-        // Assigned as TEST-NET-1, documentation and examples.
-        if (a[0] == 192 && a[1] == 0 && a[2] == 2)
-        {
-            return false;
-        }
-
-        // [192.88.99.0–192.88.99.255]
-        // Reserved. Formerly used for IPv6 to IPv4 relay.
-        if (a[0] == 192 && a[1] == 88 && a[2] == 99)
-        {
-            return false;
-        }
-
-        // [192.168.0.0–192.168.255.255]
-        // Used for local communications within a private network.
-        if (a[0] == 192 && a[1] == 168)
-        {
-            return false;
-        }
-
-        // [198.18.0.0–198.19.255.255]
-        // Used for benchmark testing of inter-network communications
-        // between two separate subnets.
-        if (a[0] == 198 && (18 <= a[1] && a[1] <= 19))
-        {
-            return false;
-        }
-
-        // [198.51.100.0–198.51.100.255]
-        // Assigned as TEST-NET-2, documentation and examples.
-        if (a[0] == 198 && a[1] == 51 && a[2] == 100)
-        {
-            return false;
-        }
-
-        // [203.0.113.0–203.0.113.255]
-        // Assigned as TEST-NET-3, documentation and examples.
-        if (a[0] == 203 && a[1] == 0 && a[2] == 113)
-        {
-            return false;
-        }
-
-        // [224.0.0.0–239.255.255.255]
-        // In use for IP multicast. (Former Class D network.)
-        if (224 <= a[0] && a[0] <= 230)
-        {
-            return false;
-        }
-
-        // [233.252.0.0-233.252.0.255]
-        // Assigned as MCAST-TEST-NET, documentation and examples.
-        if (a[0] == 233 && a[1] == 252 && a[2] == 0)
-        {
-            return false;
-        }
-
-        // [240.0.0.0–255.255.255.254]
-        // Reserved for future use. (Former Class E network.)
-        // [255.255.255.255]
-        // Reserved for the "limited broadcast" destination address.
-        if (240 <= a[0])
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    if (is_ipv6())
-    {
-        auto const* const a = addr.addr6.s6_addr;
-
-        // TODO: 2000::/3 is commonly used for global unicast but technically
-        // other spaces would be allowable too, so we should test those here.
-        // See RFC 4291 in the Section 2.4 lising global unicast as everything
-        // that's not link-local, multicast, loopback, or unspecified.
-        return (a[0] & 0xE0) == 0x20;
-    }
-
-    return false;
 }
