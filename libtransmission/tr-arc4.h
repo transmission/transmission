@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2022 Mike Gelfand
+// This file Copyright © 2021-2023 Mike Gelfand
 // It may be used under the 3-clause BSD (SPDX: BSD-3-Clause).
 // License text can be found in the licenses/ folder.
 

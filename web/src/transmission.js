@@ -1,4 +1,4 @@
-/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+/* @license This file Copyright © 2020-2023 Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
    It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
