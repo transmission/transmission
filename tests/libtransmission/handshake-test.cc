@@ -238,8 +238,7 @@ TEST_F(HandshakeTest, incomingPlaintext)
     auto const res = runHandshake(&mediator, io);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    EXPECT_TRUE(res);
     EXPECT_TRUE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
@@ -266,8 +265,7 @@ TEST_F(HandshakeTest, incomingPlaintextUnknownInfoHash)
     auto const res = runHandshake(&mediator, io);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    EXPECT_TRUE(res);
     EXPECT_FALSE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
@@ -292,8 +290,7 @@ TEST_F(HandshakeTest, outgoingPlaintext)
     auto const res = runHandshake(&mediator, io);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    EXPECT_TRUE(res);
     EXPECT_TRUE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
@@ -331,8 +328,7 @@ TEST_F(HandshakeTest, incomingEncrypted)
     auto const res = runHandshake(&mediator, io);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    EXPECT_TRUE(res);
     EXPECT_TRUE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);
@@ -369,8 +365,7 @@ TEST_F(HandshakeTest, incomingEncryptedUnknownInfoHash)
     auto const res = runHandshake(&mediator, io);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    EXPECT_TRUE(res);
     EXPECT_FALSE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(tr_sha1_digest_t{}, io->torrent_hash());
@@ -409,8 +404,7 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     auto const res = runHandshake(&mediator, io, TR_ENCRYPTION_PREFERRED);
 
     // check the results
-    EXPECT_TRUE(res.has_value());
-    assert(res.has_value());
+    EXPECT_TRUE(res);
     EXPECT_TRUE(res->is_connected);
     EXPECT_TRUE(res->read_anything_from_peer);
     EXPECT_EQ(io, res->io);

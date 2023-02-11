@@ -225,7 +225,7 @@ TEST_F(FileTest, getInfo)
     // Can't get info of non-existent file/directory
     tr_error* err = nullptr;
     auto info = tr_sys_path_get_info(path1, 0, &err);
-    ASSERT_FALSE(info.has_value());
+    EXPECT_FALSE(info);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
@@ -234,8 +234,7 @@ TEST_F(FileTest, getInfo)
 
     // Good file info
     info = tr_sys_path_get_info(path1, 0, &err);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
     EXPECT_EQ(4U, info->size);
@@ -248,8 +247,7 @@ TEST_F(FileTest, getInfo)
     t = time(nullptr);
     tr_sys_dir_create(path1, 0, 0777);
     info = tr_sys_path_get_info(path1, 0, &err);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info->type);
     EXPECT_NE(uint64_t(-1), info->size);
@@ -261,7 +259,7 @@ TEST_F(FileTest, getInfo)
     {
         // Can't get info of non-existent file/directory
         info = tr_sys_path_get_info(path1, 0, &err);
-        ASSERT_FALSE(info.has_value());
+        EXPECT_FALSE(info);
         EXPECT_NE(nullptr, err);
         tr_error_clear(&err);
 
@@ -270,8 +268,7 @@ TEST_F(FileTest, getInfo)
 
         // Good file info
         info = tr_sys_path_get_info(path1, 0, &err);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
         EXPECT_EQ(4, info->size);
@@ -280,8 +277,7 @@ TEST_F(FileTest, getInfo)
 
         // Symlink
         info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &err);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_OTHER, info->type);
 
@@ -293,8 +289,7 @@ TEST_F(FileTest, getInfo)
         tr_sys_dir_create(path2, 0, 0777);
         EXPECT_TRUE(createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
         info = tr_sys_path_get_info(path1, 0, &err);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info->type);
         EXPECT_NE(uint64_t(-1), info->size);
@@ -1139,8 +1134,7 @@ TEST_F(FileTest, fileOpen)
 
     /* Pointer is at the end of file */
     auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(4U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
@@ -1150,20 +1144,17 @@ TEST_F(FileTest, fileOpen)
 
     /* File gets truncated */
     info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(5U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_path_get_info(path1);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(0U, info->size);
     tr_sys_file_close(fd);
     info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(0U, info->size);
 
     /* TODO: symlink and hardlink tests */
@@ -1182,22 +1173,19 @@ TEST_F(FileTest, fileTruncate)
     EXPECT_TRUE(tr_sys_file_truncate(fd, 10, &err));
     EXPECT_EQ(nullptr, err) << *err;
     auto info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(10U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 20, &err));
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(20U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 0, &err));
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(0U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 50, &err));
@@ -1206,8 +1194,7 @@ TEST_F(FileTest, fileTruncate)
     tr_sys_file_close(fd);
 
     info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(50U, info->size);
 
     fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
@@ -1218,8 +1205,7 @@ TEST_F(FileTest, fileTruncate)
     tr_sys_file_close(fd);
 
     info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(25U, info->size);
 
     // try to truncate a closed file
@@ -1243,8 +1229,7 @@ TEST_F(FileTest, filePreallocate)
     {
         EXPECT_EQ(nullptr, err) << *err;
         auto info = tr_sys_path_get_info(path1);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(prealloc_size, info->size);
     }
     else
@@ -1270,8 +1255,7 @@ TEST_F(FileTest, filePreallocate)
     {
         EXPECT_EQ(nullptr, err) << *err;
         auto info = tr_sys_path_get_info(path1);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(prealloc_size, info->size);
     }
     else
