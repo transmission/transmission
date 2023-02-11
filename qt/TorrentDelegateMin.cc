@@ -21,7 +21,6 @@
 
 #include <libtransmission/utils.h>
 
-#include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegateMin.h"
 #include "TorrentModel.h"
@@ -289,7 +288,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_style_.textVisible = true;
     progress_bar_style_.textAlignment = Qt::AlignCenter;
     setProgressBarPercentDone(option, tor);
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+    style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
 
     painter->restore();
 }

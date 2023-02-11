@@ -17,7 +17,6 @@
 
 #include "Formatter.h"
 #include "IconCache.h"
-#include "StyleHelper.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
@@ -601,7 +600,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     progress_bar_style_.state = progress_bar_state;
     setProgressBarPercentDone(option, tor);
 
-    StyleHelper::drawProgressBar(*style, *painter, progress_bar_style_);
+    style->drawControl(QStyle::CE_ProgressBar, &progress_bar_style_, painter);
 
     painter->restore();
 }
