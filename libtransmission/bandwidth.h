@@ -134,7 +134,7 @@ public:
     /**
      * @brief clamps byte_count down to a number that this bandwidth will allow to be consumed
      */
-    [[nodiscard]] size_t clamp(tr_direction dir, size_t byte_count) const noexcept
+    [[nodiscard]] unsigned int clamp(tr_direction dir, unsigned int byte_count) const noexcept
     {
         return this->clamp(0, dir, byte_count);
     }
@@ -230,7 +230,7 @@ public:
     {
         RateControl raw_;
         RateControl piece_;
-        size_t bytes_left_;
+        unsigned int bytes_left_;
         tr_bytes_per_second_t desired_speed_bps_;
         bool is_limited_ = false;
         bool honor_parent_limits_ = true;
@@ -250,7 +250,7 @@ private:
 
     static void notifyBandwidthConsumedBytes(uint64_t now, RateControl* r, size_t size);
 
-    [[nodiscard]] size_t clamp(uint64_t now, tr_direction dir, size_t byte_count) const;
+    [[nodiscard]] unsigned int clamp(uint64_t now, tr_direction dir, unsigned int byte_count) const;
 
     static void phaseOne(std::vector<tr_peerIo*>& peer_array, tr_direction dir);
 

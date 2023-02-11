@@ -1453,7 +1453,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const checkStalled = tr_sessionGetQueueStalledEnabled(self.fHandle);
     [self.fDefaults setBool:checkStalled forKey:@"CheckStalled"];
 
-    NSInteger const stalledMinutes = tr_sessionGetQueueStalledMinutes(self.fHandle);
+    int const stalledMinutes = tr_sessionGetQueueStalledMinutes(self.fHandle);
     [self.fDefaults setInteger:stalledMinutes forKey:@"StalledMinutes"];
 
     //done script
