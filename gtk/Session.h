@@ -144,7 +144,7 @@ private:
 class TorrentModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
-    TorrentModelColumns() noexcept;
+    TorrentModelColumns();
 
     Gtk::TreeModelColumn<Glib::ustring> name_collated;
     Gtk::TreeModelColumn<gpointer> torrent;

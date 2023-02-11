@@ -1078,7 +1078,7 @@ namespace
 class WebseedModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
-    WebseedModelColumns() noexcept
+    WebseedModelColumns()
     {
         add(key);
         add(was_updated);
@@ -1099,7 +1099,7 @@ WebseedModelColumns const webseed_cols;
 class PeerModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
-    PeerModelColumns() noexcept
+    PeerModelColumns()
     {
         add(key);
         add(was_updated);
@@ -1958,7 +1958,7 @@ void buildTrackerSummary(
 class TrackerModelColumns : public Gtk::TreeModelColumnRecord
 {
 public:
-    TrackerModelColumns() noexcept
+    TrackerModelColumns()
     {
         add(torrent_id);
         add(text);

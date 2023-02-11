@@ -257,7 +257,7 @@ void PageBase::init_time_combo(Gtk::ComboBox& combo, tr_quark const key)
     class TimeModelColumns : public Gtk::TreeModelColumnRecord
     {
     public:
-        TimeModelColumns() noexcept
+        TimeModelColumns()
         {
             add(offset);
             add(title);
@@ -641,7 +641,7 @@ class RemotePage : public PageBase
     class WhitelistModelColumns : public Gtk::TreeModelColumnRecord
     {
     public:
-        WhitelistModelColumns() noexcept
+        WhitelistModelColumns()
         {
             add(address);
         }

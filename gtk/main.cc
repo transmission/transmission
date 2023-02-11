@@ -2,10 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <clocale>
 #include <cstdio>
 #include <string>
-#include <tuple>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -43,7 +41,7 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 int main(int argc, char** argv)
 {
     /* init i18n */
-    std::ignore = std::setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "");
     bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);
     bind_textdomain_codeset(AppTranslationDomainName, "UTF-8");
     textdomain(AppTranslationDomainName);
