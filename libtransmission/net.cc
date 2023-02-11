@@ -60,7 +60,9 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
-// - TCP Sockets
+/***********************************************************************
+ * TCP sockets
+ **********************************************************************/
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
 {

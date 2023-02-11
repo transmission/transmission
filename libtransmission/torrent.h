@@ -40,7 +40,9 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
-// --- Package-visible
+/**
+***  Package-visible
+**/
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
@@ -54,7 +56,9 @@ tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
 
-// ---
+/**
+***
+**/
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
@@ -951,7 +955,9 @@ private:
     bool needs_completeness_check_ = true;
 };
 
-// ---
+/***
+****
+***/
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {

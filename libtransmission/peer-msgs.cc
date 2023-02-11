@@ -706,7 +706,9 @@ private:
     static auto constexpr SendPexInterval = 90s;
 };
 
-// ---
+/**
+***
+**/
 
 void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
@@ -1931,7 +1933,9 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     bool const have_messages = !std::empty(msgs->outMessages);
     bool const fext = msgs->io->supports_fext();
 
-    // --- Protocol messages
+    /**
+    ***  Protocol messages
+    **/
 
     if (have_messages && msgs->outMessagesBatchedAt == 0) /* fresh batch */
     {
@@ -1950,7 +1954,9 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         bytes_written += len;
     }
 
-    // --- Metadata Pieces
+    /**
+    ***  Metadata Pieces
+    **/
 
     if (auto piece = int{};
         msgs->io->get_write_buffer_space(now) >= METADATA_PIECE_SIZE && popNextMetadataRequest(msgs, &piece))
@@ -2006,7 +2012,9 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         }
     }
 
-    // --- Data Blocks
+    /**
+    ***  Data Blocks
+    **/
 
     if (msgs->io->get_write_buffer_space(now) >= tr_block_info::BlockSize && !std::empty(msgs->peer_requested_))
     {
@@ -2078,7 +2086,9 @@ size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         }
     }
 
-    // --- Keepalive
+    /**
+    ***  Keepalive
+    **/
 
     if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now - msgs->clientSentAnythingAt > KeepaliveIntervalSecs)
     {

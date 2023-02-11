@@ -308,7 +308,9 @@ struct tr_address
     [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
 };
 
-// --- Sockets
+/***********************************************************************
+ * Sockets
+ **********************************************************************/
 
 struct tr_session;
 

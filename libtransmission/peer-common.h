@@ -30,7 +30,9 @@ class tr_swarm;
 struct peer_atom;
 struct tr_bandwidth;
 
-// --- Peer Publish / Subscribe
+/**
+***  Peer Publish / Subscribe
+**/
 
 class tr_peer_event
 {
@@ -261,7 +263,9 @@ public:
     tr_recentHistory<uint16_t> cancels_sent_to_peer;
 };
 
-// ---
+/***
+****
+***/
 
 struct tr_swarm_stats
 {
@@ -275,7 +279,9 @@ tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm);
 
 void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active);
 
-// ---
+/***
+****
+***/
 
 #ifdef _WIN32
 #undef EMSGSIZE

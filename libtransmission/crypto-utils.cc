@@ -96,7 +96,9 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
     return tr_salt(plaintext, salt) == ssha1;
 }
 
-// ---
+/***
+****
+***/
 
 namespace
 {
@@ -143,7 +145,9 @@ std::string tr_base64_decode(std::string_view input)
     return std::string{ std::data(buf), len };
 }
 
-// ---
+/***
+****
+***/
 
 namespace
 {

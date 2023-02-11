@@ -165,7 +165,9 @@ std::optional<tr_sha256_digest_t> parseHash2(std::string_view sv)
 
 } // namespace
 
-// ---
+/***
+****
+***/
 
 tr_urlbuf tr_magnet_metainfo::magnet() const
 {
