@@ -871,6 +871,11 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
 
     /* switch to the next tracker */
     current_tracker = tier->useNextTracker();
+    TR_ASSERT(current_tracker != nullptr);
+    if (current_tracker == nullptr)
+    {
+        return;
+    }
 
     if (isUnregistered(err))
     {
@@ -1243,6 +1248,11 @@ void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* e
 
     // switch to the next tracker
     current_tracker = tier->useNextTracker();
+    TR_ASSERT(current_tracker != nullptr);
+    if (current_tracker == nullptr)
+    {
+        return;
+    }
 
     // schedule a rescrape
     auto const interval = current_tracker->getRetryInterval();
