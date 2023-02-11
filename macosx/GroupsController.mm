@@ -4,7 +4,6 @@
 
 #import "GroupsController.h"
 #import "NSImageAdditions.h"
-#import "NSKeyedUnarchiverAdditions.h"
 #import "NSMutableArrayAdditions.h"
 
 static CGFloat const kIconWidth = 16.0;
@@ -49,7 +48,7 @@ GroupsController* fGroupsInstance = nil;
         }
         else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
         {
-            _fGroups = [NSKeyedUnarchiver deprecatedUnarchiveObjectWithData:data];
+            _fGroups = [NSUnarchiver unarchiveObjectWithData:data];
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Groups"];
             [self saveGroups];
         }
