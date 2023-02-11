@@ -27,7 +27,6 @@
 #include "session-thread.h"
 #include "tr-assert.h"
 #include "utils.h" // for tr_net_init()
-#include "utils-ev.h"
 
 using namespace std::literals;
 
@@ -136,7 +135,7 @@ auto makeEventBase()
 {
     tr_session_thread::tr_evthread_init();
 
-    return libtransmission::evhelpers::evbase_unique_ptr{ event_base_new() };
+    return std::unique_ptr<event_base, void (*)(event_base*)>{ event_base_new(), event_base_free };
 }
 
 } // namespace
@@ -154,7 +153,7 @@ class tr_session_thread_impl final : public tr_session_thread
 public:
     explicit tr_session_thread_impl()
         : evbase_{ makeEventBase() }
-        , work_queue_event_{ event_new(evbase_.get(), -1, 0, onWorkAvailableStatic, this) }
+        , work_queue_event_{ event_new(evbase_.get(), -1, 0, onWorkAvailableStatic, this), event_free }
     {
         auto lock = std::unique_lock(is_looping_mutex_);
 
@@ -274,8 +273,8 @@ private:
         }
     }
 
-    libtransmission::evhelpers::evbase_unique_ptr const evbase_;
-    libtransmission::evhelpers::event_unique_ptr work_queue_event_;
+    std::unique_ptr<event_base, void (*)(event_base*)> const evbase_;
+    std::unique_ptr<event, void (*)(event*)> const work_queue_event_;
 
     work_queue_t work_queue_;
     std::mutex work_queue_mutex_;

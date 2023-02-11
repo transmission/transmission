@@ -18,6 +18,7 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
+#include <event2/event.h>
 #include <event2/util.h>
 
 #include <fmt/format.h>
@@ -31,7 +32,6 @@
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h" // for tr_net_init()
-#include "utils-ev.h" // for tr_net_init()
 
 using namespace std::literals;
 
@@ -227,7 +227,10 @@ public:
 
     ~tr_lpd_impl() override
     {
-        event_.reset();
+        if (event_ != nullptr)
+        {
+            event_free(event_);
+        }
 
         if (mcast_rcv_socket_ != TR_BAD_SOCKET)
         {
@@ -379,8 +382,8 @@ private:
         /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
          * any announcement received during the initial interval will be discarded. */
 
-        event_.reset(event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, this));
-        event_add(event_.get(), nullptr);
+        event_ = event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, this);
+        event_add(event_, nullptr);
 
         tr_logAddDebug("Local Peer Discovery initialised");
 
@@ -568,7 +571,7 @@ private:
     Mediator& mediator_;
     tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
     tr_socket_t mcast_snd_socket_ = TR_BAD_SOCKET; /**<and multicast send socket */
-    libtransmission::evhelpers::event_unique_ptr event_;
+    event* event_ = nullptr;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
     sockaddr_in mcast_addr_ = {}; /**<initialized from the above constants in init() */

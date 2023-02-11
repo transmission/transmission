@@ -209,7 +209,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     tr-dht.h
     tr-lpd.h
     tr-utp.h
-    utils-ev.h
     variant-common.h
     verify.h
     version.h
