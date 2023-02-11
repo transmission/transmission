@@ -671,7 +671,7 @@ public:
                 ++repeats;
                 if (repeats > 1U)
                 {
-                    tr_wait(100ms);
+                    tr_wait_msec(100);
                 }
             }
             else

@@ -21,15 +21,13 @@
 #include "log.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "utils.h" // tr_time(), tr_wait()
+#include "utils.h" // tr_time(), tr_wait_msec()
 #include "verify.h"
-
-using namespace std::chrono_literals;
 
 namespace
 {
 
-auto constexpr SleepPerSecondDuringVerify = 100ms;
+auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
 }
 
@@ -135,7 +133,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
             if (auto const now = tr_time(); last_slept_at != now)
             {
                 last_slept_at = now;
-                tr_wait(SleepPerSecondDuringVerify);
+                tr_wait_msec(MsecToSleepPerSecondDuringVerify);
             }
 
             sha->clear();
@@ -277,6 +275,6 @@ tr_verify_worker::~tr_verify_worker()
 
     while (verify_thread_id_.has_value())
     {
-        tr_wait(20ms);
+        tr_wait_msec(20);
     }
 }

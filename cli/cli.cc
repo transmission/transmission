@@ -17,13 +17,11 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h> /* tr_wait() */
+#include <libtransmission/utils.h> /* tr_wait_msec */
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
-
-using namespace std::chrono_literals;
 
 /***
 ****
@@ -268,7 +266,7 @@ int tr_main(int argc, char* argv[])
         waitingOnWeb = true;
         while (waitingOnWeb)
         {
-            tr_wait(1s);
+            tr_wait_msec(1000);
         }
     }
     else
@@ -310,7 +308,7 @@ int tr_main(int argc, char* argv[])
             "Error:",
         };
 
-        tr_wait(200ms);
+        tr_wait_msec(200);
 
         if (gotsig)
         {
