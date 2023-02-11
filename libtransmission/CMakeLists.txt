@@ -5,7 +5,7 @@ configure_file(
   version.h
 )
 
-set(${PROJECT_NAME}_SOURCES
+set(PROJECT_FILES
   announce-list.cc
   announcer-http.cc
   announcer-udp.cc
@@ -87,6 +87,16 @@ set(${PROJECT_NAME}_SOURCES
   web-utils.cc
   web.cc
   webseed.cc
+)
+
+set(THIRD_PARTY_FILES
+  jsonsl.c
+  wildmat.c
+)
+
+set(${PROJECT_NAME}_SOURCES
+  ${PROJECT_FILES}
+  ${THIRD_PARTY_FILES}
 )
 
 set_source_files_properties(crypto-utils-fallback.cc PROPERTIES HEADER_FILE_ONLY ON)
@@ -307,8 +317,6 @@ target_link_libraries(${TR_NAME}
     ${LIBINTL_LIBRARY}
     ${LIBM_LIBRARY}
     ${TR_NETWORK_LIBRARIES}
-    jsonsl
-    wildmat
 )
 
 if(ICONV_FOUND)
