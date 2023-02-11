@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::max()
+#include <climits> /* INT_MAX */
 #include <cstring> // strchr()
 #include <memory>
 #include <optional>
