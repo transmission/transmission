@@ -398,7 +398,10 @@ void DownloadingPage::on_core_prefs_changed(tr_quark const key)
 
 DownloadingPage::~DownloadingPage()
 {
-    core_prefs_tag_.disconnect();
+    if (core_prefs_tag_.connected())
+    {
+        core_prefs_tag_.disconnect();
+    }
 }
 
 DownloadingPage::DownloadingPage(
@@ -532,7 +535,10 @@ void PrivacyPage::updateBlocklistText()
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
 PrivacyPage::~PrivacyPage()
 {
-    updateBlocklistTag_.disconnect();
+    if (updateBlocklistTag_.connected())
+    {
+        updateBlocklistTag_.disconnect();
+    }
 }
 
 /* user hit "close" in the blocklist-update dialog */
@@ -895,8 +901,15 @@ void NetworkPage::onCorePrefsChanged(tr_quark const key)
 
 NetworkPage::~NetworkPage()
 {
-    prefsTag_.disconnect();
-    portTag_.disconnect();
+    if (prefsTag_.connected())
+    {
+        prefsTag_.disconnect();
+    }
+
+    if (portTag_.connected())
+    {
+        portTag_.disconnect();
+    }
 }
 
 void NetworkPage::onPortTested(bool isOpen)

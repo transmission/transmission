@@ -90,7 +90,6 @@ class Session::Impl
 {
 public:
     Impl(Session& core, tr_session* session);
-    ~Impl();
 
     tr_session* close();
 
@@ -848,11 +847,6 @@ Session::Impl::Impl(Session& core, tr_session* session)
         [](auto* tor, auto completeness, bool was_running, gpointer impl)
         { static_cast<Impl*>(impl)->on_torrent_completeness_changed(tor, completeness, was_running); },
         this);
-}
-
-Session::Impl::~Impl()
-{
-    monitor_idle_tag_.disconnect();
 }
 
 tr_session* Session::close()
