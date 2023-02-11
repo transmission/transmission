@@ -2492,9 +2492,10 @@ void tr_peerMgr::bandwidthPulse()
 
     pumpAllPeers(this);
 
-    // allocate bandwidth to the peers
+    /* allocate bandwidth to the peers */
     static auto constexpr Msec = std::chrono::duration_cast<std::chrono::milliseconds>(BandwidthPeriod).count();
-    session->top_bandwidth_.allocate(Msec);
+    session->top_bandwidth_.allocate(TR_UP, Msec);
+    session->top_bandwidth_.allocate(TR_DOWN, Msec);
 
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
