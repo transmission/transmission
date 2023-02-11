@@ -52,12 +52,12 @@
 #include <fmt/format.h>
 
 #include "transmission.h"
-
 #include "error.h"
 #include "file.h"
 #include "log.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
+#include "utils.h" // for _(), tr_strerror()
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -99,11 +99,21 @@ using namespace std::literals;
 
 namespace
 {
+void set_system_error(tr_error** error, int code)
+{
+    if (error == nullptr)
+    {
+        return;
+    }
+
+    tr_error_set(error, code, tr_strerror(code));
+}
+
 void set_system_error_if_file_found(tr_error** error, int code)
 {
     if (code != ENOENT)
     {
-        tr_error_set_from_errno(error, code);
+        set_system_error(error, code);
     }
 }
 
@@ -168,7 +178,7 @@ std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int 
 
     if (!ok)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
         return {};
     }
 
@@ -229,7 +239,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
         return ret;
     }
 
-    tr_error_set_from_errno(error, errno);
+    set_system_error(error, errno);
     return {};
 }
 
@@ -316,7 +326,7 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
 
     if (!ret)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -333,7 +343,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 #if defined(USE_COPYFILE)
     if (copyfile(src_path, dst_path, nullptr, COPYFILE_CLONE | COPYFILE_ALL) < 0)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
         return false;
     }
 
@@ -389,7 +399,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
             errno_cpy = errno; /* remember me for later */
             if (errno != EXDEV) /* EXDEV is expected, don't log error */
             {
-                tr_error_set_from_errno(error, errno);
+                set_system_error(error, errno);
             }
             if (file_size > 0U)
             {
@@ -425,7 +435,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         {
             if (errno_cpy == 0)
             {
-                tr_error_set_from_errno(error, errno);
+                set_system_error(error, errno);
             }
         }
         else
@@ -439,7 +449,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
                 if (copied == -1)
                 {
                     errno_cpy = errno; /* remember me for later */
-                    tr_error_set_from_errno(error, errno);
+                    set_system_error(error, errno);
                     if (file_size > 0U)
                     {
                         file_size = info->size; /* restore file_size for next fallback */
@@ -473,7 +483,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         {
             if (errno_cpy == 0)
             {
-                tr_error_set_from_errno(error, errno);
+                set_system_error(error, errno);
             }
         }
         else
@@ -526,7 +536,7 @@ bool tr_sys_path_remove(char const* path, tr_error** error)
 
     if (!ret)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -557,7 +567,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
 
     default:
         TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
-        tr_error_set_from_errno(error, EINVAL);
+        set_system_error(error, EINVAL);
     }
 
     return ret;
@@ -606,7 +616,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
     }
     else
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -620,7 +630,7 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
 
     if (ret == TR_BAD_SYS_FILE)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     set_file_for_single_pass(ret);
@@ -636,7 +646,7 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
 
     if (!ret)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -663,7 +673,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     }
     else
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -707,7 +717,7 @@ bool tr_sys_file_read_at(
     }
     else if (my_bytes_read == -1)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -734,7 +744,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     }
     else
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -778,7 +788,7 @@ bool tr_sys_file_write_at(
     }
     else
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -792,7 +802,7 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
 
     if (!ret)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -807,7 +817,7 @@ bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error** error)
         return S_ISREG(statbuf.st_mode);
     }
 
-    tr_error_set_from_errno(error, errno);
+    set_system_error(error, errno);
     return false;
 }
 
@@ -819,7 +829,7 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
 
     if (!ret)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -848,7 +858,7 @@ bool tr_sys_file_advise(
 
     if (int const code = posix_fadvise(handle, offset, size, native_advice); code != 0)
     {
-        tr_error_set_from_errno(error, code);
+        set_system_error(error, code);
         ret = false;
     }
 
@@ -864,7 +874,7 @@ bool tr_sys_file_advise(
 
         if (!ret)
         {
-            tr_error_set_from_errno(error, errno);
+            set_system_error(error, errno);
         }
     }
 
@@ -990,7 +1000,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
         }
     }
 
-    tr_error_set_from_errno(error, errno);
+    set_system_error(error, errno);
     return false;
 }
 
@@ -1072,7 +1082,7 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
 
     if (!ret)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -1092,7 +1102,7 @@ std::string tr_sys_dir_get_current(tr_error** error)
 
         if (errno != ERANGE)
         {
-            tr_error_set_from_errno(error, errno);
+            set_system_error(error, errno);
             return {};
         }
 
@@ -1120,7 +1130,7 @@ namespace
         }
         if (!info && mkdir(subpath, permissions) == -1)
         {
-            tr_error_set_from_errno(error, errno);
+            set_system_error(error, errno);
             return false;
         }
         if (end == std::string_view::npos)
@@ -1176,7 +1186,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
         }
         else
         {
-            tr_error_set_from_errno(error, errno);
+            set_system_error(error, errno);
         }
     }
 
@@ -1199,7 +1209,7 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 
     if (!ret)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -1213,7 +1223,7 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 
     if (ret == nullptr)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
         return TR_BAD_SYS_DIR;
     }
 
@@ -1234,7 +1244,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     }
     else if (errno != 0)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
@@ -1248,7 +1258,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 
     if (!ret)
     {
-        tr_error_set_from_errno(error, errno);
+        set_system_error(error, errno);
     }
 
     return ret;
