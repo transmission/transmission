@@ -64,8 +64,8 @@
     <message numerus="yes">
         <location line="+105"/>
         <source>Torrent(s) Completed</source>
-        <translation>
-            <numerusform>Torrent 已完成</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -215,7 +215,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation>通过 µTP 连接的用户</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+130"/>
@@ -272,7 +272,7 @@
     <message>
         <location line="+391"/>
         <source>Add URL(s)</source>
-        <translation>添加链接</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+97"/>
@@ -629,7 +629,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>重命名…</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -683,7 +683,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>搜索…</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -811,7 +811,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;正在计算剩余空间…&lt;/i&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -897,7 +897,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>打开(&amp;O)…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -912,7 +912,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation>新建(&amp;N)…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1153,17 +1153,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation>更改会话(&amp;C)…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>设置位置(&amp;L)…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation>打开链接(&amp;U)…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1472,7 +1472,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation>区块大小(&amp;I):</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1527,7 +1527,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation>无法创建 &quot;%1&quot;: %2 (%3)</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1727,7 +1727,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation>正在测试 TCP 端口…</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+154"/>
@@ -1987,12 +1987,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation>µTP 是一种减少网络拥堵的工具。</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation>为用户连接启用 µTP(&amp;T）</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2082,14 +2082,14 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="-101"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation>
-            <numerusform>&lt;b&gt;更新成功！&lt;/b&gt;&lt;p&gt;现在黑名单拥有 %Ln 条规则。&lt;/p&gt;</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation>&lt;b&gt;更新黑名单&lt;/b&gt;&lt;p&gt;正在获取新的黑名单…&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2229,15 +2229,15 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>重复的 Torrent</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>无法添加 %n 个重复的 Torrent</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2549,7 +2549,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>正在请求用户数量… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2583,7 +2583,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>正在请求更多用户… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+56"/>

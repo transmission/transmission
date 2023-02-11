@@ -64,9 +64,9 @@
     <message numerus="yes">
         <location line="+105"/>
         <source>Torrent(s) Completed</source>
-        <translation>
-            <numerusform>Osatutako Torrent-a</numerusform>
-            <numerusform>Osatutako Torrent-ak</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -218,7 +218,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation>Kidea µTP bitartez konektatuta dago</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+130"/>
@@ -276,7 +276,7 @@
     <message>
         <location line="+391"/>
         <source>Add URL(s)</source>
-        <translation>Gehitu URLa(k)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+97"/>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>Berrizendatu...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Bilatu...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -819,7 +819,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Libre dagoen Espazioa kalkulatzen…&lt;/i&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>&amp;Ireki</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -920,7 +920,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation>&amp;Berria...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1161,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation>&amp;Aldatu Saioa...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Zehaztu &amp;Kokapena...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation>Ireki &amp;URLa...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1347,7 +1347,7 @@
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
             <numerusform>Erakusten %L1 -&gt; %Ln torrent</numerusform>
-            <numerusform> %L1 erakusten guztirako %Ln torrent-etik</numerusform>
+            <numerusform>Erakusten %L1 -&gt; %Ln torrent</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -1740,7 +1740,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation>TCP Ataka probatzen...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2003,12 +2003,12 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation>µTP sarearen pilaketa txikiagotzeko tresna bat da.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation>Gaitu µ&amp;TP kideen konexioetarako</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2098,15 +2098,15 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
     <message numerus="yes">
         <location line="-101"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation>
-            <numerusform>&lt;b&gt;Eguneraketa ondo egin da!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.&lt;/p&gt;</numerusform>
-            <numerusform>&lt;b&gt;Eguneraketa ondo egin da!&lt;/b&gt;&lt;p&gt;Blokeo-zerrendak orain %Ln arau ditu.&lt;/p&gt;</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation>&lt;b&gt;Eguneratu Blokeo-zerrenda&lt;/b&gt;&lt;p&gt;Blokeo-zerrenda berria eskuratzen…&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2236,7 +2236,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
     <message>
         <location line="+528"/>
         <source>Error Adding Torrent</source>
-        <translation>Errorea Torrenta Gehitzerakoan</translation>
+        <translation>Akatsa Torrenta Gehitzerakoan</translation>
     </message>
     <message>
         <location line="+57"/>
@@ -2246,17 +2246,17 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Bikoiztu Torrenta</numerusform>
-            <numerusform>Bikoiztu Torrentak</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Ezin izan da %n bikoiztutako Torrent gehitu</numerusform>
-            <numerusform>Ezin izan da %n bikoiztutako Torrent gehitu</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2576,7 +2576,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Kide kopuruaz orain galdetzen… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2612,7 +2612,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Kide gehiago eskatzen orain… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+56"/>
