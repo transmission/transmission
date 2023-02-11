@@ -1612,28 +1612,46 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         return 0;
     }
 
-    tr_swarm const* const swarm = tor->swarm;
-    if (swarm == nullptr || swarm->peerCount() == 0U)
+    tr_swarm const* const s = tor->swarm;
+    if (s == nullptr || !s->is_running)
     {
         return 0;
     }
 
-    auto available = swarm->peers.front()->has();
-    for (auto const* const peer : swarm->peers)
+    auto const n_peers = s->peerCount();
+    if (n_peers == 0)
     {
-        available |= peer->has();
+        return 0;
     }
 
-    if (available.hasAll())
+    for (auto const* const peer : s->peers)
     {
-        return tor->leftUntilDone();
+        if (peer->atom != nullptr && peer->atom->isSeed())
+        {
+            return tor->leftUntilDone();
+        }
     }
+
+    // do it the hard way
 
     auto desired_available = uint64_t{};
+    auto const n_pieces = tor->pieceCount();
+    auto have = std::vector<bool>(n_pieces);
 
-    for (tr_piece_index_t i = 0, n = tor->pieceCount(); i < n; ++i)
+    for (auto const* const peer : s->peers)
     {
-        if (tor->pieceIsWanted(i) && available.test(i))
+        for (tr_piece_index_t j = 0; j < n_pieces; ++j)
+        {
+            if (peer->hasPiece(j))
+            {
+                have[j] = true;
+            }
+        }
+    }
+
+    for (tr_piece_index_t i = 0; i < n_pieces; ++i)
+    {
+        if (tor->pieceIsWanted(i) && have.at(i))
         {
             desired_available += tor->countMissingBytesInPiece(i);
         }

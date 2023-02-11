@@ -154,7 +154,7 @@ private:
 void task_request_next_chunk(tr_webseed_task* task);
 void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask);
 
-class tr_webseed final : public tr_peer
+class tr_webseed : public tr_peer
 {
 public:
     tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback callback_in, void* callback_data_in)
@@ -163,12 +163,10 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
-        , idle_timer_{ session->timerMaker().create([this]() { on_idle(this); }) }
-        , have_{ tor->pieceCount() }
         , bandwidth_{ &tor->bandwidth_ }
+        , idle_timer{ session->timerMaker().create([this]() { on_idle(this); }) }
     {
-        have_.setHasAll();
-        idle_timer_->startRepeating(IdleTimerInterval);
+        idle_timer->startRepeating(IdleTimerInterval);
     }
 
     tr_webseed(tr_webseed&&) = delete;
@@ -240,9 +238,9 @@ public:
         return base_url;
     }
 
-    [[nodiscard]] tr_bitfield const& has() const noexcept override
+    [[nodiscard]] bool hasPiece(tr_piece_index_t /*piece*/) const noexcept override
     {
-        return have_;
+        return true;
     }
 
     void gotPieceData(uint32_t n_bytes)
@@ -317,13 +315,9 @@ public:
     std::set<tr_webseed_task*> tasks;
 
 private:
-    static auto constexpr IdleTimerInterval = 2s;
-
-    std::unique_ptr<libtransmission::Timer> const idle_timer_;
-
-    tr_bitfield have_;
-
     tr_bandwidth bandwidth_;
+    std::unique_ptr<libtransmission::Timer> idle_timer;
+    static auto constexpr IdleTimerInterval = 2s;
 };
 
 /***

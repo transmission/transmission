@@ -423,9 +423,24 @@ public:
         return addr.readable(port);
     }
 
-    [[nodiscard]] tr_bitfield const& has() const noexcept override
+    [[nodiscard]] bool isSeed() const noexcept override
     {
-        return have_;
+        return have_.hasAll();
+    }
+
+    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const noexcept override
+    {
+        return have_.test(piece);
+    }
+
+    [[nodiscard]] float percentDone() const noexcept override
+    {
+        if (!percent_done_)
+        {
+            percent_done_ = calculatePercentDone();
+        }
+
+        return *percent_done_;
     }
 
     void onTorrentGotMetainfo() noexcept override
@@ -435,6 +450,7 @@ public:
 
     void invalidatePercentDone()
     {
+        percent_done_.reset();
         updateInterest();
     }
 
@@ -602,6 +618,24 @@ private:
         pokeBatchPeriod(ImmediatePriorityIntervalSecs);
     }
 
+    [[nodiscard]] float calculatePercentDone() const noexcept
+    {
+        if (have_.hasAll())
+        {
+            return 1.0F;
+        }
+
+        if (have_.hasNone())
+        {
+            return 0.0F;
+        }
+
+        auto const true_count = have_.count();
+        auto const percent_done = torrent->hasMetainfo() ? true_count / static_cast<float>(torrent->pieceCount()) :
+                                                           true_count / static_cast<float>(std::size(have_) + 1);
+        return std::clamp(percent_done, 0.0F, 1.0F);
+    }
+
     [[nodiscard]] bool calculate_active(tr_direction direction) const
     {
         if (direction == TR_CLIENT_TO_PEER)
@@ -713,6 +747,8 @@ private:
 
     tr_peer_callback const callback_;
     void* const callback_data_;
+
+    mutable std::optional<float> percent_done_;
 
     // seconds between periodic sendPex() calls
     static auto constexpr SendPexInterval = 90s;
