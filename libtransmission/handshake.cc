@@ -256,21 +256,21 @@ static bool buildHandshakeMessage(tr_handshake const* const handshake, uint8_t* 
 
 static ReadState tr_handshakeDone(tr_handshake* handshake, bool is_connected);
 
-enum class ParseResult
+enum handshake_parse_err_t
 {
-    Ok,
-    EncryptionWrong,
-    BadTorrent,
-    PeerIsSelf,
+    HANDSHAKE_OK,
+    HANDSHAKE_ENCRYPTION_WRONG,
+    HANDSHAKE_BAD_TORRENT,
+    HANDSHAKE_PEER_IS_SELF,
 };
 
-static ParseResult parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
+static handshake_parse_err_t parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
 {
     tr_logAddTraceHand(handshake, fmt::format("payload: need {}, got {}", HandshakeSize, peer_io->readBufferSize()));
 
     if (peer_io->readBufferSize() < HandshakeSize)
     {
-        return ParseResult::EncryptionWrong;
+        return HANDSHAKE_ENCRYPTION_WRONG;
     }
 
     /* confirm the protocol */
@@ -278,7 +278,7 @@ static ParseResult parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     peer_io->readBytes(std::data(name), std::size(name));
     if (name != HandshakeName)
     {
-        return ParseResult::EncryptionWrong;
+        return HANDSHAKE_ENCRYPTION_WRONG;
     }
 
     /* read the reserved bytes */
@@ -291,7 +291,7 @@ static ParseResult parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     if (info_hash == tr_sha1_digest_t{} || info_hash != peer_io->torrentHash())
     {
         tr_logAddTraceHand(handshake, "peer returned the wrong hash. wtf?");
-        return ParseResult::BadTorrent;
+        return HANDSHAKE_BAD_TORRENT;
     }
 
     // peer_id
@@ -306,7 +306,7 @@ static ParseResult parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     if (auto const info = handshake->mediator->torrentInfo(info_hash); info && info->client_peer_id == peer_id)
     {
         tr_logAddTraceHand(handshake, "streuth!  we've connected to ourselves.");
-        return ParseResult::PeerIsSelf;
+        return HANDSHAKE_PEER_IS_SELF;
     }
 
     /**
@@ -317,7 +317,7 @@ static ParseResult parseHandshake(tr_handshake* handshake, tr_peerIo* peer_io)
     peer_io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
     peer_io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
 
-    return ParseResult::Ok;
+    return HANDSHAKE_OK;
 }
 
 /***
@@ -906,7 +906,7 @@ static ReadState readPayloadStream(tr_handshake* handshake, tr_peerIo* peer_io)
     auto const i = parseHandshake(handshake, peer_io);
     tr_logAddTraceHand(handshake, fmt::format("parseHandshake returned {}", static_cast<int>(i)));
 
-    if (i != ParseResult::Ok)
+    if (i != HANDSHAKE_OK)
     {
         return tr_handshakeDone(handshake, false);
     }

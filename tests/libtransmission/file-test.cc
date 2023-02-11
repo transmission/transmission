@@ -1030,18 +1030,26 @@ TEST_F(FileTest, pathNativeSeparators)
 {
     EXPECT_EQ(nullptr, tr_sys_path_native_separators(nullptr));
 
-    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 5>{ {
-        { "", "" },
+    struct LocalTest
+    {
+        std::string input;
+        std::string expected_output;
+    };
+
+    auto const tests = std::array<LocalTest, 5>{
+        LocalTest{ "", "" },
         { "a", TR_IF_WIN32("a", "a") },
         { "/", TR_IF_WIN32("\\", "/") },
         { "/a/b/c", TR_IF_WIN32("\\a\\b\\c", "/a/b/c") },
         { "C:\\a/b\\c", TR_IF_WIN32("C:\\a\\b\\c", "C:\\a/b\\c") },
-    } };
+    };
 
-    for (auto const& [input, expected] : Tests)
+    for (auto const& test : tests)
     {
-        auto buf = tr_pathbuf{ input };
-        EXPECT_EQ(expected, tr_sys_path_native_separators(std::data(buf)));
+        auto buf = std::string(test.input);
+        char* const output = tr_sys_path_native_separators(buf.data());
+        EXPECT_EQ(test.expected_output, output);
+        EXPECT_EQ(buf.data(), output);
     }
 }
 
