@@ -1,0 +1,42 @@
+name: Update copyright year(s) in license file
+
+on:
+  schedule:
+    - cron: '0 3 1 1 *' # 03:00 AM on January 1
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  update-license-year:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: FantasticFiasco/action-update-license-year@v2
+        with:
+          commitTitle: 'chore: update copyright year(s) in headers'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: |
+            cli/*.cc
+            daemon/*.cc
+            daemon/*.h
+            gtk/*.cc
+            gtk/*.h
+            libtransmission/*.cc
+            libtransmission/*.h
+            libtransmission/*.mm
+            macosx/*.mm
+            macosx/*.h
+            qt/*.cc
+            qt/*.h
+            utils/*.cc
+            utils/*.h
+            web/src/*.js
+          transform: (?<=This file Copyright © )(?<from>\d{4})?-?(\d{4})?
+      - uses: FantasticFiasco/action-update-license-year@v2
+        with:
+          commitTitle: 'chore: update copyright year(s) in COPYING'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: COPYING
+          transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})?
