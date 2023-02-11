@@ -15,6 +15,8 @@
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
 
+using namespace std::literals;
+
 class tr_daemon
 {
 public:
@@ -33,7 +35,7 @@ public:
 
     bool spawn(bool foreground, int* exit_code, tr_error** error);
     bool init(int argc, char* argv[], bool* foreground, int* ret);
-    void handle_error(tr_error*) const;
+    void handle_error(tr_error*);
     int start(bool foreground);
     void periodic_update();
     void reconfigure();
@@ -51,8 +53,8 @@ private:
     char const* log_file_name_ = nullptr;
     struct event_base* ev_base_ = nullptr;
     tr_sys_file_t logfile_ = TR_BAD_SYS_FILE;
-    tr_quark key_pidfile_ = tr_quark_new("pidfile");
-    tr_quark key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic");
+    tr_quark key_pidfile_ = tr_quark_new("pidfile"sv);
+    tr_quark key_watch_dir_force_generic_ = tr_quark_new("watch-dir-force-generic"sv);
 
     bool parse_args(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);

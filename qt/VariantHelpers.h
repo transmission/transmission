@@ -24,7 +24,10 @@ struct Peer;
 struct TorrentFile;
 struct TrackerStat;
 
-namespace trqt::variant_helpers
+namespace trqt
+{
+
+namespace variant_helpers
 {
 
 template<typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
@@ -220,4 +223,6 @@ void dictAdd(tr_variant* dict, tr_quark key, T const& value)
     variantInit(tr_variantDictAdd(dict, key), value);
 }
 
-} // namespace trqt::variant_helpers
+} // namespace variant_helpers
+
+} // namespace trqt
