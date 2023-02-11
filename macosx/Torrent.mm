@@ -2068,16 +2068,20 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (NSString*)etaString
 {
-    time_t eta = self.fStat->eta;
-    // if there's a regular ETA, the torrent isn't idle
-    BOOL fromIdle = NO;
-    if (eta == TR_ETA_NOT_AVAIL || eta == TR_ETA_UNKNOWN)
+    NSInteger eta;
+    BOOL fromIdle;
+    //don't check for both, since if there's a regular ETA, the torrent isn't idle so it's meaningless
+    if (self.fStat->eta != TR_ETA_NOT_AVAIL && self.fStat->eta != TR_ETA_UNKNOWN)
+    {
+        eta = self.fStat->eta;
+        fromIdle = NO;
+    }
+    else if (self.fStat->etaIdle != TR_ETA_NOT_AVAIL && self.fStat->etaIdle < kETAIdleDisplaySec)
     {
         eta = self.fStat->etaIdle;
         fromIdle = YES;
     }
-    // Foundation undocumented behavior: values above INT_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451)
-    if (eta < 0 || eta > INT_MAX || (fromIdle && eta >= kETAIdleDisplaySec))
+    else
     {
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
     }
@@ -2091,8 +2095,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         formatter.collapsesLargestUnit = YES;
         formatter.includesTimeRemainingPhrase = YES;
     });
-    // the duration of months being variable, setting the reference date to now (instead of 00:00:00 UTC on 1 January 2001)
-    formatter.referenceDate = NSDate.date;
     NSString* idleString = [formatter stringFromTimeInterval:eta];
 
     if (fromIdle)
