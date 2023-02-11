@@ -43,19 +43,14 @@ public:
     MakeProgressDialog(
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
+        Gtk::Window& parent,
         tr_metainfo_builder& metainfo_builder,
         std::future<tr_error*> future,
-        std::string_view target,
+        std::string_view const& target,
         Glib::RefPtr<Session> const& core);
     ~MakeProgressDialog() override;
 
     TR_DISABLE_COPY_MOVE(MakeProgressDialog)
-
-    static std::unique_ptr<MakeProgressDialog> create(
-        std::string_view target,
-        tr_metainfo_builder& metainfo_builder,
-        std::future<tr_error*> future,
-        Glib::RefPtr<Session> const& core);
 
     [[nodiscard]] bool success() const
     {
@@ -113,7 +108,8 @@ private:
 
     void setFilename(std::string_view filename);
 
-    void configurePieceSizeScale(uint32_t piece_size);
+    void makeProgressDialog(std::string_view target, std::future<tr_error*> future);
+    void configurePieceSizeScale();
     void onPieceSizeUpdated();
 
 private:
@@ -255,9 +251,10 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
 MakeProgressDialog::MakeProgressDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
+    Gtk::Window& parent,
     tr_metainfo_builder& metainfo_builder,
     std::future<tr_error*> future,
-    std::string_view target,
+    std::string_view const& target,
     Glib::RefPtr<Session> const& core)
     : Gtk::Dialog(cast_item)
     , builder_(metainfo_builder)
@@ -267,6 +264,7 @@ MakeProgressDialog::MakeProgressDialog(
     , progress_label_(gtr_get_widget<Gtk::Label>(builder, "progress_label"))
     , progress_bar_(gtr_get_widget<Gtk::ProgressBar>(builder, "progress_bar"))
 {
+    set_transient_for(parent);
     signal_response().connect(sigc::mem_fun(*this, &MakeProgressDialog::onProgressDialogResponse));
 
     progress_tag_ = Glib::signal_timeout().connect_seconds(
@@ -275,62 +273,17 @@ MakeProgressDialog::MakeProgressDialog(
     onProgressDialogRefresh();
 }
 
-std::unique_ptr<MakeProgressDialog> MakeProgressDialog::create(
-    std::string_view target,
-    tr_metainfo_builder& metainfo_builder,
-    std::future<tr_error*> future,
-    Glib::RefPtr<Session> const& core)
+void MakeDialog::Impl::makeProgressDialog(std::string_view target, std::future<tr_error*> future)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MakeProgressDialog.ui"));
-    return std::unique_ptr<MakeProgressDialog>(gtr_get_widget_derived<MakeProgressDialog>(
+    progress_dialog_ = std::unique_ptr<MakeProgressDialog>(gtr_get_widget_derived<MakeProgressDialog>(
         builder,
         "MakeProgressDialog",
-        metainfo_builder,
+        dialog_,
+        *builder_,
         std::move(future),
         target,
-        core));
-}
-
-void MakeDialog::Impl::onResponse(int response)
-{
-    if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
-    {
-        dialog_.close();
-        return;
-    }
-
-    if (response != TR_GTK_RESPONSE_TYPE(ACCEPT) || !builder_.has_value())
-    {
-        return;
-    }
-
-    // destination file
-    auto const dir = destination_chooser_->get_filename();
-    auto const base = Glib::path_get_basename(builder_->top());
-    auto const target = fmt::format("{:s}/{:s}.torrent", dir, base);
-
-    // build the announce list
-    auto trackers = tr_announce_list{};
-    trackers.parse(announce_text_buffer_->get_text(false).raw());
-    builder_->setAnnounceList(std::move(trackers));
-
-    // comment
-    if (comment_check_->get_active())
-    {
-        builder_->setComment(comment_entry_->get_text().raw());
-    }
-
-    // source
-    if (source_check_->get_active())
-    {
-        builder_->setSource(source_entry_->get_text().raw());
-    }
-
-    builder_->setPrivate(private_check_->get_active());
-
-    // build the .torrent
-    progress_dialog_ = MakeProgressDialog::create(target, *builder_, builder_->makeChecksums(), core_);
-    progress_dialog_->set_transient_for(dialog_);
+        core_));
     gtr_window_on_close(
         *progress_dialog_,
         [this]()
@@ -345,15 +298,57 @@ void MakeDialog::Impl::onResponse(int response)
     progress_dialog_->show();
 }
 
+void MakeDialog::Impl::onResponse(int response)
+{
+    if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
+    {
+        if (builder_)
+        {
+            // destination file
+            auto const dir = destination_chooser_->get_filename();
+            auto const base = Glib::path_get_basename(builder_->top());
+            auto const target = fmt::format("{:s}/{:s}.torrent", dir, base);
+
+            // build the announce list
+            auto trackers = tr_announce_list{};
+            trackers.parse(announce_text_buffer_->get_text(false).raw());
+            builder_->setAnnounceList(std::move(trackers));
+
+            // comment
+            if (comment_check_->get_active())
+            {
+                builder_->setComment(comment_entry_->get_text().raw());
+            }
+
+            // source
+            if (source_check_->get_active())
+            {
+                builder_->setSource(source_entry_->get_text().raw());
+            }
+
+            builder_->setPrivate(private_check_->get_active());
+
+            // build the .torrent
+            makeProgressDialog(target, builder_->makeChecksums());
+        }
+    }
+    else if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
+    {
+        dialog_.close();
+    }
+}
+
 /***
 ****
 ***/
 
 void MakeDialog::Impl::updatePiecesLabel()
 {
+    auto const filename = builder_ ? builder_->top() : ""sv;
+
     auto gstr = Glib::ustring();
 
-    if (!builder_.has_value() || std::empty(builder_->top()))
+    if (std::empty(filename))
     {
         gstr += _("No source selected");
         piece_size_scale_->set_visible(false);
@@ -377,10 +372,10 @@ void MakeDialog::Impl::updatePiecesLabel()
     pieces_lb_->set_text(gstr);
 }
 
-void MakeDialog::Impl::configurePieceSizeScale(uint32_t piece_size)
+void MakeDialog::Impl::configurePieceSizeScale()
 {
     // the below lower & upper bounds would allow piece size selection between approx 1KiB - 64MiB
-    auto adjustment = Gtk::Adjustment::create(log2(piece_size), 10, 26, 1.0, 1.0);
+    auto adjustment = Gtk::Adjustment::create(log2(builder_->pieceSize()), 10, 26, 1.0, 1.0);
     piece_size_scale_->set_adjustment(adjustment);
     piece_size_scale_->set_visible(true);
 }
@@ -392,7 +387,7 @@ void MakeDialog::Impl::setFilename(std::string_view filename)
     if (!filename.empty())
     {
         builder_.emplace(filename);
-        configurePieceSizeScale(builder_->pieceSize());
+        configurePieceSizeScale();
     }
 
     updatePiecesLabel();
