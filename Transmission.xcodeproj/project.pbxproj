@@ -11,8 +11,6 @@
 		0A6169A80FE5C9A200C66CE6 /* bitfield.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A6169A60FE5C9A200C66CE6 /* bitfield.h */; };
 		0A89346B736DBCF81F3A4850 /* torrent-metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */; };
 		0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */; };
-		11524394C75E57E52CD9ADF0 /* dns.h in Headers */ = {isa = PBXBuildFile; fileRef = 11524394C75E57E52CD9ADF1 /* dns.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		11524394C75E57E52CD9ADF2 /* dns-ev.h in Headers */ = {isa = PBXBuildFile; fileRef = 11524394C75E57E52CD9ADF3 /* dns-ev.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
 		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
@@ -604,8 +602,6 @@
 		0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-metainfo.cc"; sourceTree = "<group>"; };
 		0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-metainfo.h"; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		11524394C75E57E52CD9ADF1 /* dns.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = dns.h; sourceTree = "<group>"; };
-		11524394C75E57E52CD9ADF3 /* dns-ev.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "dns-ev.h"; sourceTree = "<group>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
@@ -1711,8 +1707,6 @@
 				C11DEA151FCD31C0009E22B9 /* subprocess.h */,
 				E975121263DD973CAF4AEBA5 /* timer-ev.cc */,
 				E975121263DD973CAF4AEBA3 /* timer-ev.h */,
-				11524394C75E57E52CD9ADF1 /* dns.h */,
-				11524394C75E57E52CD9ADF3 /* dns-ev.h */,
 				E975121263DD973CAF4AEBA1 /* timer.h */,
 				A20152790D1C26EB0081714F /* torrent-ctor.cc */,
 				A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */,
@@ -2229,8 +2223,6 @@
 				2856E0656A49F2665D69E760 /* benc.h in Headers */,
 				E975121263DD973CAF4AEBA0 /* timer.h in Headers */,
 				E975121263DD973CAF4AEBA2 /* timer-ev.h in Headers */,
-				11524394C75E57E52CD9ADF0 /* dns.h in Headers */,
-				11524394C75E57E52CD9ADF2 /* dns-ev.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,
 				A263C6B1F6718E2486DB20E0 /* tr-buffer.h in Headers */,
