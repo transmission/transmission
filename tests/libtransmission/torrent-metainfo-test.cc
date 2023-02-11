@@ -19,7 +19,9 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 using TorrentMetainfoTest = SessionTest;
@@ -259,4 +261,5 @@ TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
     EXPECT_FALSE(tm.parseBenc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

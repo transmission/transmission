@@ -15,13 +15,13 @@ using BlockInfoTest = ::testing::Test;
 
 TEST_F(BlockInfoTest, fieldsAreSet)
 {
-    static auto constexpr ExpectedBlockSize = uint64_t{ 1024 } * 16U;
-    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
-    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    static auto constexpr PieceCount = uint64_t{ 4U };
-    static auto constexpr TotalSize = PieceSize * PieceCount;
-
     auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 4;
+    uint64_t constexpr TotalSize = PieceSize * PieceCount;
     info.initSizes(TotalSize, PieceSize);
 
     EXPECT_EQ(ExpectedBlockSize, info.blockSize(info.blockCount() - 1));
@@ -40,13 +40,13 @@ TEST_F(BlockInfoTest, fieldsAreSet)
 
 TEST_F(BlockInfoTest, handlesOddSize)
 {
-    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
-    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
-    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
-
     auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
     info.initSizes(TotalSize, PieceSize);
 
     EXPECT_EQ(1U, info.blockSize(info.blockCount() - 1));
@@ -58,13 +58,13 @@ TEST_F(BlockInfoTest, handlesOddSize)
 
 TEST_F(BlockInfoTest, pieceSize)
 {
-    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
-    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
-    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
-
     auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
     info.initSizes(TotalSize, PieceSize);
 
     EXPECT_EQ(PieceSize, info.pieceSize(info.pieceCount() - 2));
@@ -73,13 +73,13 @@ TEST_F(BlockInfoTest, pieceSize)
 
 TEST_F(BlockInfoTest, blockSize)
 {
-    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
-    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
-    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
-
     auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
     info.initSizes(TotalSize, PieceSize);
 
     EXPECT_EQ(ExpectedBlockSize, info.blockSize(info.blockCount() - 2));
@@ -88,13 +88,13 @@ TEST_F(BlockInfoTest, blockSize)
 
 TEST_F(BlockInfoTest, blockSpanForPiece)
 {
-    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
-    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
-    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
-
     auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
     info.initSizes(TotalSize, PieceSize);
 
     EXPECT_EQ(0U, info.blockSpanForPiece(0).begin);
@@ -112,13 +112,13 @@ TEST_F(BlockInfoTest, blockSpanForPiece)
 
 TEST_F(BlockInfoTest, blockLoc)
 {
-    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
-    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
-    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
-
     auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
     info.initSizes(TotalSize, PieceSize);
 
     // begin
@@ -144,13 +144,13 @@ TEST_F(BlockInfoTest, blockLoc)
 
 TEST_F(BlockInfoTest, pieceLoc)
 {
-    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
-    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
-    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
-
     auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
     info.initSizes(TotalSize, PieceSize);
 
     // begin
@@ -192,13 +192,13 @@ TEST_F(BlockInfoTest, pieceLoc)
 
 TEST_F(BlockInfoTest, byteLoc)
 {
-    static auto constexpr ExpectedBlockSize = uint64_t{ 1024U } * 16U;
-    static auto constexpr ExpectedBlocksPerPiece = uint64_t{ 4U };
-    static auto constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    static auto constexpr PieceCount = uint64_t{ 5U };
-    static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
-
     auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
     info.initSizes(TotalSize, PieceSize);
 
     auto loc = info.byteLoc(0);

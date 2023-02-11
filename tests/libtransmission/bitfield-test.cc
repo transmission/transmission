@@ -31,7 +31,7 @@ TEST(Bitfield, count)
         }
 
         int begin = tr_rand_int_weak(bit_count);
-        int end = 0;
+        int end;
         do
         {
             end = tr_rand_int_weak(bit_count);

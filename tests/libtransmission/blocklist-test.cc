@@ -17,7 +17,10 @@
 
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 class BlocklistTest : public SessionTest
@@ -123,4 +126,6 @@ TEST_F(BlocklistTest, updating)
     // cleanup
 }
 
-} // namespace libtransmission::test
+} // namespace test
+
+} // namespace libtransmission

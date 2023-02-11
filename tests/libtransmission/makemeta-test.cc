@@ -26,7 +26,10 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 class MakemetaTest : public SandboxedTest
@@ -216,4 +219,6 @@ TEST_F(MakemetaTest, singleFile)
     testBuilder(builder);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+
+} // namespace libtransmission

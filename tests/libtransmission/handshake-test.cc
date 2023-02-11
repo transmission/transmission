@@ -27,7 +27,9 @@ using namespace std::literals;
 #define LOCAL_SOCKETPAIR_AF AF_UNIX
 #endif
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 auto constexpr MaxWaitMsec = int{ 5000 };
@@ -426,4 +428,5 @@ TEST_F(HandshakeTest, outgoingEncrypted)
     evutil_closesocket(sock);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission
