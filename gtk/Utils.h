@@ -177,7 +177,7 @@ Glib::ustring gtr_get_help_uri();
 ***/
 
 /* backwards-compatible wrapper around gtk_widget_set_visible() */
-void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible);
+void gtr_widget_set_visible(Gtk::Widget&, bool);
 
 Gtk::Window& gtr_widget_get_window(Gtk::Widget& widget);
 

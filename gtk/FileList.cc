@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <list>
 #include <memory>
-#include <stack>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -92,7 +91,6 @@ public:
     TR_DISABLE_COPY_MOVE(Impl)
 
     void set_torrent(tr_torrent_id_t torrent_id);
-    void reset_torrent();
 
 private:
     void clearData();
@@ -271,34 +269,26 @@ bool refreshFilesForeach(
     return false; /* keep walking */
 }
 
-void gtr_tree_model_foreach_postorder(Glib::RefPtr<Gtk::TreeModel> const& model, Gtk::TreeModel::SlotForeachIter const& func)
+void gtr_tree_model_foreach_postorder_subtree(
+    Gtk::TreeModel::iterator const& parent,
+    Gtk::TreeModel::SlotForeachIter const& func)
 {
-    auto items = std::stack<Gtk::TreeModel::iterator>();
-    if (auto const root_child_it = model->children().begin(); root_child_it)
+    for (auto& child : parent->children())
     {
-        items.push(root_child_it);
+        gtr_tree_model_foreach_postorder_subtree(TR_GTK_TREE_MODEL_CHILD_ITER(child), func);
     }
 
-    while (!items.empty())
+    if (parent)
     {
-        while (items.top())
-        {
-            if (auto const child_it = items.top()->children().begin(); child_it)
-            {
-                items.push(child_it);
-            }
-            else
-            {
-                func(items.top()++);
-            }
-        }
+        func(parent);
+    }
+}
 
-        items.pop();
-
-        if (!items.empty())
-        {
-            func(items.top()++);
-        }
+void gtr_tree_model_foreach_postorder(Glib::RefPtr<Gtk::TreeModel> const& model, Gtk::TreeModel::SlotForeachIter const& func)
+{
+    for (auto& iter : model->children())
+    {
+        gtr_tree_model_foreach_postorder_subtree(TR_GTK_TREE_MODEL_CHILD_ITER(iter), func);
     }
 }
 
@@ -428,7 +418,7 @@ std::vector<tr_file_index_t> FileList::Impl::getActiveFilesForPath(Gtk::TreeMode
 
 void FileList::clear()
 {
-    impl_->reset_torrent();
+    impl_->set_torrent(-1);
 }
 
 namespace
@@ -574,14 +564,6 @@ void FileList::Impl::set_torrent(tr_torrent_id_t torrent_id)
 
     view_->expand_row(Gtk::TreeModel::Path("0"), false);
     // view_->expand_all();
-}
-
-void FileList::Impl::reset_torrent()
-{
-    clearData();
-
-    store_ = Gtk::TreeStore::create(file_cols);
-    view_->set_model(store_);
 }
 
 /***
