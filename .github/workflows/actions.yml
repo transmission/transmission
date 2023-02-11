@@ -24,8 +24,8 @@ jobs:
       make-web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
       test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' }}
     steps:
-      - name: Check Push to Main Branch
-        id: check-main-push
+      - name: Check State
+        id: check-state
         run: |
           set -x
           if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then \
