@@ -70,8 +70,6 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -87,7 +85,7 @@ jobs:
           set -ex
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
-          sudo apt-get install -y clang-format-15 npm
+          sudo apt-get install -y clang-format-15 npm yarn
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
@@ -116,8 +114,6 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -141,8 +137,7 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            ninja-build \
-            npm
+            ninja-build
       - name: Get Source
         uses: actions/checkout@v3
         with:
@@ -185,7 +180,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl@0.21.1 miniupnpc ninja
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -214,7 +209,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -260,7 +255,6 @@ jobs:
             linux-headers \
             miniupnpc-dev \
             ninja \
-            npm \
             pkgconfig \
             xz
       - name: Get Dependencies (GTK)
@@ -290,7 +284,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -328,8 +322,7 @@ jobs:
 
           choco install `
             jom `
-            nasm `
-            nodejs
+            nasm
           choco uninstall `
             openssl.light
           (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
@@ -383,7 +376,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_TESTS=ON `
             -DENABLE_UTILS=ON `
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_WEB=OFF `
             -DENABLE_WERROR=ON `
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -458,7 +451,7 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl@0.21.1 miniupnpc ninja
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -488,7 +481,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -509,8 +502,6 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
       image: debian:11-slim
     steps:
@@ -537,7 +528,6 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build \
-            npm \
             pkg-config \
             xz-utils
       - name: Get Dependencies (GTK)
@@ -567,7 +557,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
@@ -586,8 +576,6 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
-    env:
-      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
       image: fedora:36
     steps:
@@ -612,7 +600,6 @@ jobs:
             libpsl-devel \
             miniupnpc-devel \
             ninja-build \
-            npm \
             openssl-devel \
             pkgconf-pkg-config \
             xz
@@ -643,7 +630,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=OFF \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
