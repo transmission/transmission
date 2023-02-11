@@ -3728,6 +3728,7 @@
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
+					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -3972,6 +3973,7 @@
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
+					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
@@ -4288,6 +4290,7 @@
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
+					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (

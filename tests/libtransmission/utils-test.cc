@@ -113,53 +113,53 @@ TEST_F(UtilsTest, trStrvStrip)
     EXPECT_EQ("test"sv, tr_strvStrip("test"sv));
 }
 
-TEST_F(UtilsTest, strvReplaceInvalid)
+TEST_F(UtilsTest, trStrvUtf8Clean)
 {
     auto in = "hello world"sv;
-    auto out = tr_strv_replace_invalid(in);
+    auto out = tr_strvUtf8Clean(in);
     EXPECT_EQ(in, out);
 
     in = "hello world"sv;
-    out = tr_strv_replace_invalid(in.substr(0, 5));
+    out = tr_strvUtf8Clean(in.substr(0, 5));
     EXPECT_EQ("hello"sv, out);
 
     // this version is not utf-8 (but cp866)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
-    out = tr_strv_replace_invalid(in, '?');
-    EXPECT_EQ(17U, std::size(out));
-    EXPECT_EQ(out, tr_strv_replace_invalid(out));
+    out = tr_strvUtf8Clean(in);
+    EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
+    EXPECT_EQ(out, tr_strvUtf8Clean(out));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом"sv;
-    out = tr_strv_replace_invalid(in);
+    out = tr_strvUtf8Clean(in);
     EXPECT_NE(0U, std::size(out));
-    EXPECT_EQ(out, tr_strv_replace_invalid(out));
+    EXPECT_EQ(out, tr_strvUtf8Clean(out));
     EXPECT_EQ(in, out);
 
     // https://trac.transmissionbt.com/ticket/6064
     // This was a fuzzer-generated string that crashed Transmission.
     // Even invalid strings shouldn't cause a crash.
     in = "\xF4\x00\x81\x82"sv;
-    out = tr_strv_replace_invalid(in);
+    out = tr_strvUtf8Clean(in);
     EXPECT_NE(0U, std::size(out));
-    EXPECT_EQ(out, tr_strv_replace_invalid(out));
+    EXPECT_EQ(out, tr_strvUtf8Clean(out));
 
     in = "\xF4\x33\x81\x82"sv;
-    out = tr_strv_replace_invalid(in, '?');
+    out = tr_strvUtf8Clean(in);
     EXPECT_NE(nullptr, out.data());
-    EXPECT_EQ(4U, std::size(out));
-    EXPECT_EQ(out, tr_strv_replace_invalid(out));
+    EXPECT_TRUE(out.size() == 4 || out.size() == 7);
+    EXPECT_EQ(out, tr_strvUtf8Clean(out));
 }
 
-TEST_F(UtilsTest, strvReplaceInvalidFuzz)
+TEST_F(UtilsTest, trStrvUtf8CleanFuzz)
 {
     auto buf = std::vector<char>{};
     for (size_t i = 0; i < 1000; ++i)
     {
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const out = tr_strv_replace_invalid({ std::data(buf), std::size(buf) });
-        EXPECT_EQ(out, tr_strv_replace_invalid(out));
+        auto const out = tr_strvUtf8Clean({ std::data(buf), std::size(buf) });
+        EXPECT_EQ(out, tr_strvUtf8Clean(out));
     }
 }
 
