@@ -11,7 +11,6 @@
 
 #include <array>
 #include <cstdint> // uint8_t, uint32_t, uint64_t
-#include <string>
 
 #include "transmission.h"
 

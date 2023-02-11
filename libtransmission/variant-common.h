@@ -11,7 +11,6 @@
 
 #include <cstdint> // int64_t
 #include <optional>
-#include <string>
 #include <string_view>
 
 #include "transmission.h"

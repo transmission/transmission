@@ -689,5 +689,5 @@ std::string tr_variantToStrJson(tr_variant const* top, bool lean)
     {
         buf.push_back('\n');
     }
-    return buf.to_string();
+    return buf.toString();
 }
