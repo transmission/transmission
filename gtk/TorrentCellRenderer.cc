@@ -119,9 +119,12 @@ private:
 
     static void set_icon(Gtk::CellRendererPixbuf& renderer, Glib::RefPtr<Gio::Icon> const& icon, IconSize icon_size);
     static void adjust_progress_bar_hue(
+        Cairo::RefPtr<Cairo::Surface> const& bg_surface,
         Cairo::RefPtr<Cairo::Context> const& context,
         Gdk::RGBA const& color,
-        Gdk::Rectangle const& area);
+        Gdk::Rectangle const& area,
+        double bg_x,
+        double bg_y);
 
 private:
     TorrentCellRenderer& renderer_;
@@ -298,13 +301,22 @@ void render_impl(Gtk::CellRenderer& renderer, Ts&&... args)
 } // namespace
 
 void TorrentCellRenderer::Impl::adjust_progress_bar_hue(
+    Cairo::RefPtr<Cairo::Surface> const& bg_surface,
     Cairo::RefPtr<Cairo::Context> const& context,
     Gdk::RGBA const& color,
-    Gdk::Rectangle const& area)
+    Gdk::Rectangle const& area,
+    double bg_x,
+    double bg_y)
 {
     using TrCairoContextOperator = IF_GTKMM4(Cairo::Context::Operator, Cairo::Operator);
 
     auto const mask_surface = get_mask_surface(context->get_target(), area);
+
+    // Add background under the progress bar, for better results around the transparent areas
+    context->set_source(bg_surface, bg_x, bg_y);
+    context->set_operator(TR_CAIRO_CONTEXT_OPERATOR(DEST_OVER));
+    context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
+    context->fill();
 
     // Adjust surface color
     context->set_source_rgb(color.get_red(), color.get_green(), color.get_blue());
@@ -345,9 +357,24 @@ void TorrentCellRenderer::Impl::render_progress_bar(
 #endif
     }
 
-    auto const context = IF_GTKMM4(snapshot->append_cairo(area), snapshot);
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+    auto const context = snapshot->append_cairo(area);
+    auto const surface = context->get_target();
+#else
+    auto const context = snapshot;
+    auto const surface = Cairo::Surface::create(
+        context->get_target(),
+        area.get_x(),
+        area.get_y(),
+        area.get_width(),
+        area.get_height());
+#endif
 
-    adjust_progress_bar_hue(temp_context, color, temp_area);
+    double dx = 0;
+    double dy = 0;
+    context->device_to_user(dx, dy);
+
+    adjust_progress_bar_hue(surface, temp_context, color, temp_area, dx - area.get_x(), dy - area.get_y());
 
     context->set_source(temp_context->get_target(), area.get_x(), area.get_y());
     context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
