@@ -300,16 +300,16 @@ export class Inspector extends EventTarget {
         (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
       string = fmt.percentString(d);
 
-      if (unverified) {
-        string = `${fmt.size(verified)} of ${fmt.size(
-          sizeWhenDone
-        )} (${string}%), ${fmt.size(unverified)} Unverified`;
-      } else if (leftUntilDone) {
+      if (!unverified && !leftUntilDone) {
+        string = `${fmt.size(verified)} (100%)`;
+      } else if (!unverified) {
         string = `${fmt.size(verified)} of ${fmt.size(
           sizeWhenDone
         )} (${string}%)`;
       } else {
-        string = `${fmt.size(verified)} (100%)`;
+        string = `${fmt.size(verified)} of ${fmt.size(
+          sizeWhenDone
+        )} (${string}%), ${fmt.size(unverified)} Unverified`;
       }
     }
     setTextContent(e.info.have, string);
@@ -374,9 +374,9 @@ export class Inspector extends EventTarget {
     } else {
       const get = (t) => t.getStartDate();
       const first = get(torrents[0]);
-      string = torrents.every((t) => get(t) === first)
-        ? fmt.timeInterval(now / 1000 - first)
-        : mixed;
+      string = !torrents.every((t) => get(t) === first)
+        ? mixed
+        : fmt.timeInterval(now / 1000 - first);
     }
     setTextContent(e.info.running_time, string);
 
@@ -433,7 +433,9 @@ export class Inspector extends EventTarget {
         (accumulator, t) => accumulator + t.getTotalSize(),
         0
       );
-      if (size) {
+      if (!size) {
+        string = 'None';
+      } else {
         const get = (t) => t.getPieceSize();
         const pieceCount = torrents.reduce(
           (accumulator, t) => accumulator + t.getPieceCount(),
@@ -444,8 +446,6 @@ export class Inspector extends EventTarget {
         string = torrents.every((t) => get(t) === pieceSize)
           ? `${fmt.size(size)} (${pieceString} pieces @ ${fmt.mem(pieceSize)})`
           : `${fmt.size(size)} (${pieceString} pieces)`;
-      } else {
-        string = 'None';
       }
     }
     setTextContent(e.info.size, string);
