@@ -212,7 +212,7 @@ public:
 
     tr_session* const session;
 
-    uint32_t const key = tr_rand_obj<uint32_t>();
+    int const key = tr_rand_int(INT_MAX);
 
 private:
     void flushCloseMessages()
