@@ -116,7 +116,7 @@ inline bool waitFor(
             return false;
         }
 
-        event_base_loop(evb, EVLOOP_ONCE | EVLOOP_NONBLOCK);
+        event_base_loop(evb, EVLOOP_ONCE);
     }
 }
 
