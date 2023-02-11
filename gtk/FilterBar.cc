@@ -113,6 +113,7 @@ private:
     Glib::RefPtr<TorrentFilter> filter_ = TorrentFilter::create();
     Glib::RefPtr<FilterListModel<Torrent>> filter_model_;
 
+    sigc::connection filter_model_items_changed_tag_;
     sigc::connection update_count_label_tag_;
     sigc::connection update_filter_models_tag_;
     sigc::connection update_filter_models_on_add_remove_tag_;
@@ -582,13 +583,10 @@ bool FilterBar::Impl::update_count_label()
     }
 
     /* set the text */
-    if (auto const new_markup = visibleCount == std::min(activityCount, trackerCount) ?
+    show_lb_->set_markup_with_mnemonic(
+        visibleCount == std::min(activityCount, trackerCount) ?
             _("_Show:") :
-            fmt::format(_("_Show {count:L} of:"), fmt::arg("count", visibleCount));
-        new_markup != show_lb_->get_label().raw())
-    {
-        show_lb_->set_markup_with_mnemonic(new_markup);
-    }
+            fmt::format(_("_Show {count:L} of:"), fmt::arg("count", visibleCount)));
 
     return false;
 }
@@ -619,11 +617,6 @@ void FilterBar::Impl::update_filter_models(Torrent::ChangeFlags changes)
     }
 
     filter_->update(changes);
-
-    if (changes.test(activity_flags | tracker_flags))
-    {
-        update_count_label_idle();
-    }
 }
 
 void FilterBar::Impl::update_filter_models_idle(Torrent::ChangeFlags changes)
@@ -707,9 +700,9 @@ FilterBar::Impl::Impl(FilterBar& widget, Glib::RefPtr<Session> const& core)
     activity_combo_box_init(*activity_);
     tracker_combo_box_init(*tracker_);
 
-    filter_->signal_changed().connect([this](auto /*changes*/) { update_count_label_idle(); });
-
     filter_model_ = FilterListModel<Torrent>::create(core_->get_sorted_model(), filter_);
+    filter_model_items_changed_tag_ = filter_model_->signal_items_changed().connect(
+        [this](guint /*position*/, guint /*removed*/, guint /*added*/) { update_count_label_idle(); });
 
     tracker_->signal_changed().connect(sigc::mem_fun(*this, &Impl::update_filter_tracker));
     activity_->signal_changed().connect(sigc::mem_fun(*this, &Impl::update_filter_activity));
@@ -728,6 +721,7 @@ FilterBar::Impl::~Impl()
     update_filter_models_on_add_remove_tag_.disconnect();
     update_filter_models_tag_.disconnect();
     update_count_label_tag_.disconnect();
+    filter_model_items_changed_tag_.disconnect();
 }
 
 Glib::RefPtr<FilterBar::Model> FilterBar::get_filter_model() const

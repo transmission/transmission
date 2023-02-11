@@ -68,7 +68,7 @@ public:
         value_ |= get_mask(flag);
     }
 
-    [[nodiscard]] constexpr Flags operator|(Flags rhs) const noexcept
+    [[nodiscard]] constexpr Flags operator|(Flags rhs) noexcept
     {
         return Flags(value_ | rhs.value_);
     }
