@@ -52,7 +52,7 @@ struct tr_log_message
 
     // location in the source code
     std::string_view file;
-    long line;
+    size_t line;
 
     // when the message was generated
     time_t when;
@@ -91,7 +91,7 @@ void tr_logSetLevel(tr_log_level);
 
 void tr_logAddMessage(
     char const* source_file,
-    long source_line,
+    int source_line,
     tr_log_level level,
     std::string_view msg,
     std::string_view module_name = {});
