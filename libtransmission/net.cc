@@ -39,8 +39,6 @@
 #include "utils.h"
 #include "variant.h"
 
-using namespace std::literals;
-
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
@@ -437,89 +435,153 @@ void tr_netClose(tr_session* session, tr_socket_t sockfd)
 namespace global_ipv6_helpers
 {
 
-// Get the source address used for a given destination address.
-// Since there is no official interface to get this information,
-// we create a connected UDP socket (connected UDP... hmm...)
-// and check its source address.
-//
-// Since it's a UDP socket, this doesn't actually send any packets
-[[nodiscard]] std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port)
+/* Get the source address used for a given destination address. Since
+   there is no official interface to get this information, we create
+   a connected UDP socket (connected UDP... hmm...) and check its source
+   address. */
+[[nodiscard]] int get_source_address(struct sockaddr const* dst, socklen_t dst_len, struct sockaddr* src, socklen_t* src_len)
 {
-    auto const save = errno;
-
-    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    tr_socket_t const s = socket(dst->sa_family, SOCK_DGRAM, 0);
+    if (s == TR_BAD_SOCKET)
     {
-        if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
-        {
-            auto src_ss = sockaddr_storage{};
-            auto src_sslen = socklen_t{ sizeof(src_ss) };
-            if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
-            {
-                if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
-                {
-                    errno = save;
-                    return addrport->first;
-                }
-            }
-        }
-
-        evutil_closesocket(sock);
+        return -1;
     }
 
+    // since it's a UDP socket, this doesn't actually send any packets
+    if (connect(s, dst, dst_len) == 0 && getsockname(s, src, src_len) == 0)
+    {
+        evutil_closesocket(s);
+        return 0;
+    }
+
+    auto const save = errno;
+    evutil_closesocket(s);
     errno = save;
-    return {};
+    return -1;
 }
 
-[[nodiscard]] auto global_address(int af)
+[[nodiscard]] int global_address(int af, void* addr, int* addr_len)
 {
-    // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6);
-    auto const dst_port = tr_port::fromHost(6969);
+    auto ss = sockaddr_storage{};
+    socklen_t sslen = sizeof(ss);
+    auto sin = sockaddr_in{};
+    auto sin6 = sockaddr_in6{};
+    struct sockaddr const* sa = nullptr;
+    socklen_t salen = 0;
 
-    // In order for address selection to work right,
-    // this should be a native IPv6 address, not Teredo or 6to4
-    TR_ASSERT(dst_addr.has_value());
-    TR_ASSERT(dst_addr->is_global_unicast_address());
+    switch (af)
+    {
+    case AF_INET:
+        memset(&sin, 0, sizeof(sin));
+        sin.sin_family = AF_INET;
+        evutil_inet_pton(AF_INET, "91.121.74.28", &sin.sin_addr);
+        sin.sin_port = htons(6969);
+        sa = (struct sockaddr const*)&sin;
+        salen = sizeof(sin);
+        break;
 
-    auto src_addr = get_source_address(*dst_addr, dst_port);
-    return src_addr && src_addr->is_global_unicast_address() ? *src_addr : std::optional<tr_address>{};
+    case AF_INET6:
+        memset(&sin6, 0, sizeof(sin6));
+        sin6.sin6_family = AF_INET6;
+        /* In order for address selection to work right, this should be
+           a native IPv6 address, not Teredo or 6to4. */
+        evutil_inet_pton(AF_INET6, "2001:1890:1112:1::20", &sin6.sin6_addr);
+        sin6.sin6_port = htons(6969);
+        sa = (struct sockaddr const*)&sin6;
+        salen = sizeof(sin6);
+        break;
+
+    default:
+        return -1;
+    }
+
+    if (int const rc = get_source_address(sa, salen, (struct sockaddr*)&ss, &sslen); rc < 0)
+    {
+        return -1;
+    }
+
+    // We all hate NATs.
+    if (auto const tmp = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss));
+        !tmp || !tmp->first.is_global_unicast_address())
+    {
+        return -1;
+    }
+
+    switch (af)
+    {
+    case AF_INET:
+        if (*addr_len < 4)
+        {
+            return -1;
+        }
+
+        memcpy(addr, &((struct sockaddr_in*)&ss)->sin_addr, 4);
+        *addr_len = 4;
+        return 1;
+
+    case AF_INET6:
+        if (*addr_len < 16)
+        {
+            return -1;
+        }
+
+        memcpy(addr, &((struct sockaddr_in6*)&ss)->sin6_addr, 16);
+        *addr_len = 16;
+        return 1;
+
+    default:
+        return -1;
+    }
 }
 
 } // namespace global_ipv6_helpers
 
 /* Return our global IPv6 address, with caching. */
-std::optional<tr_address> tr_globalIPv6(tr_session const* session)
+std::optional<in6_addr> tr_globalIPv6(tr_session const* session)
 {
     using namespace global_ipv6_helpers;
 
-    // recheck our cached value every half hour
-    static auto constexpr CacheSecs = 1800;
-    static auto cache_val = std::optional<tr_address>{};
-    static auto cache_expires_at = time_t{};
-    if (auto const now = tr_time(); cache_expires_at <= now)
+    static auto ipv6 = in6_addr{};
+    static time_t last_time = 0;
+    static bool have_ipv6 = false;
+
+    /* Re-check every half hour */
+    if (auto const now = tr_time(); last_time < now - 1800)
     {
-        cache_expires_at = now + CacheSecs;
-        cache_val = global_address(AF_INET6);
+        int addrlen = sizeof(ipv6);
+        int const rc = global_address(AF_INET6, &ipv6, &addrlen);
+        have_ipv6 = rc >= 0 && addrlen == sizeof(ipv6);
+        last_time = now;
     }
 
-    auto ret = cache_val;
-
-    // check to see if the session is overriding this address
-    if (session != nullptr)
+    if (!have_ipv6)
     {
-        if (auto const [ipv6_bindaddr, is_default] = session->publicAddress(TR_AF_INET6); !is_default)
-        {
-            ret = ipv6_bindaddr;
-        }
+        return {}; // no IPv6 address at all
     }
 
-    return ret;
+    // Return the default address.
+    // This is useful for checking for connectivity in general.
+    if (session == nullptr)
+    {
+        return ipv6;
+    }
+
+    // We have some sort of address.
+    // Now make sure that we return our bound address if non-default.
+    auto const [ipv6_bindaddr, is_default] = session->publicAddress(TR_AF_INET6);
+    if (!is_default)
+    {
+        // return this explicitly-bound address
+        ipv6 = ipv6_bindaddr.addr.addr6;
+    }
+
+    return ipv6;
 }
 
-///
+/***
+****
+****
+***/
 
 namespace is_valid_for_peers_helpers
 {
