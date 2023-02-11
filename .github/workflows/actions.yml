@@ -1,0 +1,663 @@
+name: Sanity
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+env:
+  GTEST_OUTPUT: xml:./
+jobs:
+  what-to-make:
+    runs-on: ubuntu-22.04
+    outputs:
+      make-cli: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.cli-changed == '1' }}
+      make-daemon: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.daemon-changed == '1' }}
+      make-dist: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.dist-changed == '1' }}
+      make-docs: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.docs-changed == '1' }}
+      make-gtk: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.gtk-changed == '1' }}
+      make-mac: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.mac-changed == '1' }}
+      make-qt: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.qt-changed == '1' }}
+      make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' }}
+      make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' }}
+      make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' }}
+      make-web: 'false' # this is handled in the webapp workflow
+      test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' }}
+    steps:
+      - name: Check Push to Main Branch
+        id: check-main-push
+        run: |
+          set -x
+          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then
+            echo is-main-push=1 >> "$GITHUB_OUTPUT"
+          else
+            echo is-main-push=0 >> "$GITHUB_OUTPUT"
+          fi
+      - name: Get Source
+        id: get-source
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: src
+          submodules: recursive
+      - name: Check for diffs
+        id: check-diffs
+        run: |
+          set +e
+          cd src
+          MERGE_BASE=`git merge-base origin/main HEAD`
+          function get_changes() { # name, paths...
+            local name="$1"
+            shift
+            git diff --exit-code "$MERGE_BASE" -- "$@"
+            echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
+          }
+          get_changes cli      CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
+          get_changes any-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
+          get_changes our-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
+          get_changes daemon   CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
+          get_changes dist     dist
+          get_changes docs     docs
+          get_changes gtk      CMakeLists.txt third-party libtransmission gtk
+          get_changes mac      CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
+          get_changes qt       CMakeLists.txt third-party libtransmission qt
+          get_changes tests    CMakeLists.txt third-party libtransmission utils tests
+          get_changes utils    CMakeLists.txt third-party libtransmission utils
+          get_changes web      CMakeLists.txt third-party libtransmission web
+
+  code-style:
+    runs-on: ubuntu-22.04
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Get Dependencies
+        run: |
+          set -ex
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+          sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
+          sudo apt-get install -y clang-format-15 npm
+      - name: Check for style diffs
+        id: check-for-diffs
+        working-directory: .
+        run: |
+          ./code_style.sh
+          set +e
+          git diff --exit-code > style.diff
+          echo "differs=$?" >> $GITHUB_OUTPUT
+          cat style.diff
+          set -e
+      - name: Upload Diffs
+        uses: actions/upload-artifact@v2
+        if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
+        with:
+          name: code-style.diff
+          path: 'style.diff'
+      - name: Fail if diffs exist
+        if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
+        run: |
+          echo "code style does not match expected."
+          cat style.diff
+          echo "When CI is done, the above patch will be uploaded as 'code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
+          exit 1
+
+  sanitizer-tests:
+    runs-on: ubuntu-22.04
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            clang \
+            cmake \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            npm
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          path: src
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=OFF \
+            -DENABLE_DAEMON=OFF \
+            -DENABLE_GTK=OFF \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=OFF \
+            -DENABLE_TESTS=ON \
+            -DENABLE_UTILS=ON \
+            -DENABLE_WEB=OFF \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+      - name: Test with sanitizers
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
+
+  macos-11:
+    runs-on: macos-11
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          sw_vers
+      - name: Get Dependencies
+        run: |
+          brew update
+          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+      - name: Get Dependencies (GTK)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        run: brew install gtkmm3 libjpeg
+      - name: Get Dependencies (Qt)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        run: brew install qt@5
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_OSX_ARCHITECTURES='x86_64' \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        env:
+          TMPDIR: /private/tmp
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+
+  alpine-musl:
+    needs: [ what-to-make ]
+    runs-on: ubuntu-22.04
+    container:
+      image: radupopescu/musl-builder
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          apk update
+          apk add \
+            ca-certificates \
+            cmake \
+            curl-dev \
+            fmt-dev \
+            g++ \
+            gettext-dev \
+            git \
+            libevent-dev \
+            libpsl \
+            linux-headers \
+            miniupnpc-dev \
+            ninja \
+            npm \
+            pkgconfig \
+            xz
+      - name: Get Dependencies (GTK)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        run: apk add --upgrade glibmm-dev gtkmm3-dev
+      - name: Get Dependencies (Qt)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        run: apk add --upgrade qt5-qtbase-dev qt5-qtsvg-dev qt5-qttools-dev
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        env:
+          TMPDIR: /private/tmp
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+
+  windows:
+    needs: [ what-to-make ]
+    runs-on: windows-2022
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, x86]
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+      - name: Get Build Tools
+        run: |
+          $DepsPrefix = (Join-Path (Get-Item .).Root.Name "${{ matrix.arch }}-prefix")
+          "DEPS_PREFIX=${DepsPrefix}" | Out-File $Env:GITHUB_ENV -Append
+          (Join-Path $DepsPrefix bin) | Out-File $Env:GITHUB_PATH -Append
+
+          choco install `
+            jom `
+            nasm `
+            nodejs
+          choco uninstall `
+            openssl.light
+          (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
+          (Join-Path ${Env:ProgramFiles(x86)} 'WiX Toolset v3.11' bin) | Out-File $Env:GITHUB_PATH -Append
+
+          Install-Module -Name Pscx -RequiredVersion 4.0.0-beta4 -AllowPrerelease -Force
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Get Cache Key
+        id: cache-key
+        run: |
+          try {
+              $DepsHash = & (Join-Path . src release windows main.ps1) -Mode DepsHash -BuildArch ${{ matrix.arch }}
+              "hash=${DepsHash}" | Out-File $Env:GITHUB_OUTPUT -Append
+          } catch {
+              Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
+              exit 1
+          }
+      - name: Get Cache
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: ${{ env.DEPS_PREFIX }}
+          key: ${{ github.job }}-${{ matrix.arch }}-${{ steps.cache-key.outputs.hash }}
+      - name: Build Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          try {
+              & (Join-Path . src release windows main.ps1) -Mode Build -BuildArch ${{ matrix.arch }} -BuildPart Deps
+          } catch {
+              Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
+              exit 1
+          }
+      - name: Configure
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
+          cmake `
+            -S src `
+            -B obj `
+            -G Ninja `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DCMAKE_INSTALL_PREFIX=pfx `
+            -DCMAKE_PREFIX_PATH="${Env:DepsPrefix}" `
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-dist == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_GTK=OFF `
+            -DENABLE_MAC=OFF `
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_TESTS=ON `
+            -DENABLE_UTILS=ON `
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
+            -DENABLE_WERROR=ON `
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
+          cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install
+      - name: Package
+        if: ${{ needs.what-to-make.outputs.make-dist == 'true' || (needs.what-to-make.outputs.make-daemon == 'true' && needs.what-to-make.outputs.make-qt == 'true') }}
+        run: |
+          Import-VisualStudioVars -VisualStudioVersion 2022 -Architecture ${{ matrix.arch }}
+          cmake --build obj --config RelWithDebInfo --target pack-msi
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.arch }}
+          path: pfx/**/*
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}-${{ matrix.arch }}-msi
+          path: obj/dist/msi/*.msi
+
+  make-source-tarball:
+    runs-on: ubuntu-22.04
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-source-tarball == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            ninja-build
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja
+      - name: Create source tarball
+        run: cmake --build obj --target package_source
+      - uses: actions/upload-artifact@v3
+        with:
+          name: source-tarball
+          path: obj/transmission*.tar.*
+
+  macos-11-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    runs-on: macos-11
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          sw_vers
+      - name: Get Dependencies
+        run: |
+          brew update
+          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+      - name: Get Dependencies (GTK)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        run: brew install gtkmm3 libjpeg
+      - name: Get Dependencies (Qt)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        run: brew install qt@5
+      - name: Get Source
+        uses: actions/download-artifact@v3
+        with:
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_OSX_ARCHITECTURES='x86_64' \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=${{ (needs.what-to-make.outputs.make-mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        env:
+          TMPDIR: /private/tmp
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+
+  debian-11-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    runs-on: ubuntu-22.04
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
+    container:
+      image: debian:11-slim
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            g++ \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            npm \
+            pkg-config \
+            xz-utils
+      - name: Get Dependencies (GTK)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
+      - name: Get Dependencies (Qt)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        run: apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
+      - name: Get Source
+        uses: actions/download-artifact@v3
+        with:
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+
+  fedora-36-from-tarball:
+    needs: [ make-source-tarball, what-to-make ]
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
+    runs-on: ubuntu-22.04
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
+    container:
+      image: fedora:36
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          dnf install -y \
+            ca-certificates \
+            cmake \
+            fmt-devel \
+            gcc-c++ \
+            gettext \
+            libcurl-devel \
+            libdeflate-devel \
+            libevent-devel \
+            libnatpmp-devel \
+            libpsl-devel \
+            miniupnpc-devel \
+            ninja-build \
+            npm \
+            openssl-devel \
+            pkgconf-pkg-config \
+            xz
+      - name: Get Dependencies (GTK)
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
+        run: dnf install -y glibmm2.68-devel gtkmm4.0-devel
+      - name: Get Dependencies (Qt)
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
+        run: dnf install -y qt6-qtbase-devel qt6-qtsvg-devel qt6-qttools-devel
+      - name: Get Source
+        uses: actions/download-artifact@v3
+        with:
+          name: source-tarball
+      - name: Extract Source
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WERROR=ON \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
