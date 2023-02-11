@@ -28,7 +28,9 @@
 
 using namespace std::literals;
 
-// ---
+/***
+****
+***/
 
 bool tr_addressIsIP(char const* address)
 {
@@ -170,7 +172,7 @@ char const* tr_webGetResponseStr(long code)
     }
 }
 
-// --- URLs
+//// URLs
 
 namespace
 {
