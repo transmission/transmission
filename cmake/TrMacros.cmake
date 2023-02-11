@@ -173,6 +173,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
             PREFIX "${${ID}_PREFIX}"
             CMAKE_ARGS
                 -Wno-dev # We don't want to be warned over unused variables
+                --no-warn-unused-cli
                 "-DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}"
                 "-DCMAKE_USER_MAKE_RULES_OVERRIDE=${CMAKE_USER_MAKE_RULES_OVERRIDE}"
                 "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
