@@ -5330,7 +5330,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     if ([self.fDefaults boolForKey:@"AutoSize"])
     {
-        NSUInteger groups = ![self.fDisplayedTorrents.firstObject isKindOfClass:[Torrent class]] ? self.fDisplayedTorrents.count : 0;
+        NSUInteger groups = (self.fDisplayedTorrents.count > 0 && ![self.fDisplayedTorrents[0] isKindOfClass:[Torrent class]]) ?
+            self.fDisplayedTorrents.count :
+            0;
 
         height = (kGroupSeparatorHeight + self.fTableView.intercellSpacing.height) * groups +
             (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
