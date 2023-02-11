@@ -14,10 +14,6 @@ Param(
     [string] $BuildPart = 'All',
 
     [Parameter()]
-    [ValidateSet('None', 'All', 'Deps', 'App')]
-    [string] $CCachePart = 'None',
-
-    [Parameter()]
     [string] $SourceDir,
 
     [Parameter()]
@@ -270,14 +266,6 @@ if ($Mode -eq 'Build') {
     $env:CXXFLAGS = $CompilerFlags -join ' '
     $env:LDFLAGS = $LinkerFlags -join ' '
 
-    if (@('All', 'Deps') -contains $CCachePart) {
-        $Env:CMAKE_C_COMPILER_LAUNCHER = 'ccache'
-        $Env:CMAKE_CXX_COMPILER_LAUNCHER = 'ccache'
-    } else {
-        $Env:CMAKE_C_COMPILER_LAUNCHER = ''
-        $Env:CMAKE_CXX_COMPILER_LAUNCHER = ''
-    }
-
     if (@('All', 'Deps') -contains $BuildPart) {
         Invoke-Build Expat
         Invoke-Build DBus
@@ -285,14 +273,6 @@ if ($Mode -eq 'Build') {
         Invoke-Build OpenSsl
         Invoke-Build Curl
         Invoke-Build Qt
-    }
-
-    if (@('All', 'App') -contains $CCachePart) {
-        $Env:CMAKE_C_COMPILER_LAUNCHER = 'ccache'
-        $Env:CMAKE_CXX_COMPILER_LAUNCHER = 'ccache'
-    } else {
-        $Env:CMAKE_C_COMPILER_LAUNCHER = ''
-        $Env:CMAKE_CXX_COMPILER_LAUNCHER = ''
     }
 
     if (@('All', 'App') -contains $BuildPart) {
