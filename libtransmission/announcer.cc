@@ -68,6 +68,24 @@ static auto constexpr TrMultiscrapeStep = int{ 5 };
 ****
 ***/
 
+std::string_view tr_announce_event_get_string(tr_announce_event e)
+{
+    switch (e)
+    {
+    case TR_ANNOUNCE_EVENT_COMPLETED:
+        return "completed"sv;
+
+    case TR_ANNOUNCE_EVENT_STARTED:
+        return "started"sv;
+
+    case TR_ANNOUNCE_EVENT_STOPPED:
+        return "stopped"sv;
+
+    default:
+        return ""sv;
+    }
+}
+
 namespace
 {
 
@@ -110,9 +128,9 @@ struct StopsCompare
         return 0;
     }
 
-    [[nodiscard]] bool operator()(tr_announce_request const* one, tr_announce_request const* two) const noexcept
+    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b) const noexcept // less than
     {
-        return compare(one, two) < 0;
+        return compare(a, b) < 0;
     }
 };
 
@@ -280,6 +298,7 @@ struct tr_tier
 {
     tr_tier(tr_announcer* announcer, tr_torrent* tor_in, std::vector<tr_announce_list::tracker_info const*> const& infos)
         : tor{ tor_in }
+        , id{ next_key++ }
     {
         trackers.reserve(std::size(infos));
         for (auto const* info : infos)
@@ -431,7 +450,7 @@ struct tr_tier
     time_t lastAnnounceStartTime = 0;
     time_t lastAnnounceTime = 0;
 
-    int const id = next_key++;
+    int const id;
 
     int announce_event_priority = 0;
 
@@ -472,8 +491,10 @@ private:
         return ret;
     }
 
-    static inline int next_key = 0;
+    static int next_key;
 };
+
+int tr_tier::next_key = 0;
 
 /***
 ****
@@ -962,189 +983,186 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
 static void onAnnounceDone(tr_announce_response const* response, void* vdata)
 {
     auto* const data = static_cast<announce_data*>(vdata);
+
     tr_announcer* announcer = data->session->announcer;
-
-    tr_tier* const tier = getTier(announcer, response->info_hash, data->tier_id);
-    if (tier == nullptr)
-    {
-        delete data;
-        return;
-    }
-
-    auto const now = tr_time();
+    tr_tier* tier = getTier(announcer, response->info_hash, data->tier_id);
+    time_t const now = tr_time();
     tr_announce_event const event = data->event;
 
-    tr_logAddTraceTier(
-        tier,
-        fmt::format(
-            "Got announce response: "
-            "connected:{} "
-            "timeout:{} "
-            "seeders:{} "
-            "leechers:{} "
-            "downloads:{} "
-            "interval:{} "
-            "min_interval:{} "
-            "tracker_id_str:{} "
-            "pex:{} "
-            "pex6:{} "
-            "err:{} "
-            "warn:{}",
-            response->did_connect,
-            response->did_timeout,
-            response->seeders,
-            response->leechers,
-            response->downloads,
-            response->interval,
-            response->min_interval,
-            (!std::empty(response->tracker_id) ? response->tracker_id.c_str() : "none"),
-            std::size(response->pex),
-            std::size(response->pex6),
-            (!std::empty(response->errmsg) ? response->errmsg.c_str() : "none"),
-            (!std::empty(response->warning) ? response->warning.c_str() : "none")));
+    if (tier != nullptr)
+    {
+        tr_logAddTraceTier(
+            tier,
+            fmt::format(
+                "Got announce response: "
+                "connected:{} "
+                "timeout:{} "
+                "seeders:{} "
+                "leechers:{} "
+                "downloads:{} "
+                "interval:{} "
+                "min_interval:{} "
+                "tracker_id_str:{} "
+                "pex:{} "
+                "pex6:{} "
+                "err:{} "
+                "warn:{}",
+                response->did_connect,
+                response->did_timeout,
+                response->seeders,
+                response->leechers,
+                response->downloads,
+                response->interval,
+                response->min_interval,
+                (!std::empty(response->tracker_id) ? response->tracker_id.c_str() : "none"),
+                std::size(response->pex),
+                std::size(response->pex6),
+                (!std::empty(response->errmsg) ? response->errmsg.c_str() : "none"),
+                (!std::empty(response->warning) ? response->warning.c_str() : "none")));
 
-    tier->lastAnnounceTime = now;
-    tier->lastAnnounceTimedOut = response->did_timeout;
-    tier->lastAnnounceSucceeded = false;
-    tier->isAnnouncing = false;
-    tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
+        tier->lastAnnounceTime = now;
+        tier->lastAnnounceTimedOut = response->did_timeout;
+        tier->lastAnnounceSucceeded = false;
+        tier->isAnnouncing = false;
+        tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
 
-    if (response->external_ip)
-    {
-        data->session->setExternalIP(*response->external_ip);
-    }
-
-    if (!response->did_connect)
-    {
-        on_announce_error(tier, _("Could not connect to tracker"), event);
-    }
-    else if (response->did_timeout)
-    {
-        on_announce_error(tier, _("Tracker did not respond"), event);
-    }
-    else if (!std::empty(response->errmsg))
-    {
-        /* If the torrent's only tracker returned an error, publish it.
-           Don't bother publishing if there are other trackers -- it's
-           all too common for people to load up dozens of dead trackers
-           in a torrent's metainfo... */
-        if (tier->tor->trackerCount() < 2)
+        if (response->external_ip)
         {
-            publishError(tier, response->errmsg);
+            data->session->setExternalIP(*response->external_ip);
         }
 
-        on_announce_error(tier, response->errmsg.c_str(), event);
-    }
-    else
-    {
-        auto const is_stopped = event == TR_ANNOUNCE_EVENT_STOPPED;
-        auto leechers = int{};
-        auto scrape_fields = int{};
-        auto seeders = int{};
-
-        publishErrorClear(tier);
-
-        auto* const tracker = tier->currentTracker();
-        if (tracker != nullptr)
+        if (!response->did_connect)
         {
-            tracker->consecutive_failures = 0;
-
-            if (response->seeders >= 0)
-            {
-                tracker->seeder_count = seeders = response->seeders;
-                ++scrape_fields;
-            }
-
-            if (response->leechers >= 0)
-            {
-                tracker->leecher_count = leechers = response->leechers;
-                ++scrape_fields;
-            }
-
-            if (response->downloads >= 0)
-            {
-                tracker->download_count = response->downloads;
-                ++scrape_fields;
-            }
-
-            if (!std::empty(response->tracker_id))
-            {
-                tracker->tracker_id = response->tracker_id;
-            }
+            on_announce_error(tier, _("Could not connect to tracker"), event);
         }
-
-        if (auto const& warning = response->warning; !std::empty(warning))
+        else if (response->did_timeout)
         {
-            tier->last_announce_str = warning;
-            tr_logAddTraceTier(tier, fmt::format("tracker gave '{}'", warning));
-            publishWarning(tier, warning);
+            on_announce_error(tier, _("Tracker did not respond"), event);
+        }
+        else if (!std::empty(response->errmsg))
+        {
+            /* If the torrent's only tracker returned an error, publish it.
+               Don't bother publishing if there are other trackers -- it's
+               all too common for people to load up dozens of dead trackers
+               in a torrent's metainfo... */
+            if (tier->tor->trackerCount() < 2)
+            {
+                publishError(tier, response->errmsg);
+            }
+
+            on_announce_error(tier, response->errmsg.c_str(), event);
         }
         else
         {
-            tier->last_announce_str = _("Success");
-        }
+            auto const is_stopped = event == TR_ANNOUNCE_EVENT_STOPPED;
+            auto leechers = int{};
+            auto scrape_fields = int{};
+            auto seeders = int{};
 
-        if (response->min_interval != 0)
-        {
-            tier->announceMinIntervalSec = response->min_interval;
-        }
+            publishErrorClear(tier);
 
-        if (response->interval != 0)
-        {
-            tier->announceIntervalSec = response->interval;
-        }
+            auto* const tracker = tier->currentTracker();
+            if (tracker != nullptr)
+            {
+                tracker->consecutive_failures = 0;
 
-        if (!std::empty(response->pex))
-        {
-            publishPeersPex(tier, seeders, leechers, response->pex);
-        }
+                if (response->seeders >= 0)
+                {
+                    tracker->seeder_count = seeders = response->seeders;
+                    ++scrape_fields;
+                }
 
-        if (!std::empty(response->pex6))
-        {
-            publishPeersPex(tier, seeders, leechers, response->pex6);
-        }
+                if (response->leechers >= 0)
+                {
+                    tracker->leecher_count = leechers = response->leechers;
+                    ++scrape_fields;
+                }
 
-        publishPeerCounts(tier, seeders, leechers);
+                if (response->downloads >= 0)
+                {
+                    tracker->download_count = response->downloads;
+                    ++scrape_fields;
+                }
 
-        tier->isRunning = data->is_running_on_success;
+                if (!std::empty(response->tracker_id))
+                {
+                    tracker->tracker_id = response->tracker_id;
+                }
+            }
 
-        /* if the tracker included scrape fields in its announce response,
-           then a separate scrape isn't needed */
-        if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == nullptr))
-        {
-            tr_logAddTraceTier(
-                tier,
-                fmt::format(
-                    "Announce response has scrape info; bumping next scrape to {} seconds from now.",
-                    tier->scrapeIntervalSec));
-            tier->scheduleNextScrape();
-            tier->lastScrapeTime = now;
-            tier->lastScrapeSucceeded = true;
-        }
-        else if (tier->lastScrapeTime + tier->scrapeIntervalSec <= now)
-        {
-            tier->scrapeSoon();
-        }
+            if (auto const& warning = response->warning; !std::empty(warning))
+            {
+                tier->last_announce_str = warning;
+                tr_logAddTraceTier(tier, fmt::format("tracker gave '{}'", warning));
+                publishWarning(tier, warning);
+            }
+            else
+            {
+                tier->last_announce_str = _("Success");
+            }
 
-        tier->lastAnnounceSucceeded = true;
-        tier->lastAnnouncePeerCount = std::size(response->pex) + std::size(response->pex6);
+            if (response->min_interval != 0)
+            {
+                tier->announceMinIntervalSec = response->min_interval;
+            }
 
-        if (is_stopped)
-        {
-            /* now that we've successfully stopped the torrent,
-             * we can reset the up/down/corrupt count we've kept
-             * for this tracker */
-            tier->byteCounts[TR_ANN_UP] = 0;
-            tier->byteCounts[TR_ANN_DOWN] = 0;
-            tier->byteCounts[TR_ANN_CORRUPT] = 0;
-        }
+            if (response->interval != 0)
+            {
+                tier->announceIntervalSec = response->interval;
+            }
 
-        if (!is_stopped && std::empty(tier->announce_events))
-        {
-            /* the queue is empty, so enqueue a periodic update */
-            int const i = tier->announceIntervalSec;
-            tr_logAddTraceTier(tier, fmt::format("Sending periodic reannounce in {} seconds", i));
-            tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
+            if (!std::empty(response->pex))
+            {
+                publishPeersPex(tier, seeders, leechers, response->pex);
+            }
+
+            if (!std::empty(response->pex6))
+            {
+                publishPeersPex(tier, seeders, leechers, response->pex6);
+            }
+
+            publishPeerCounts(tier, seeders, leechers);
+
+            tier->isRunning = data->is_running_on_success;
+
+            /* if the tracker included scrape fields in its announce response,
+               then a separate scrape isn't needed */
+            if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == nullptr))
+            {
+                tr_logAddTraceTier(
+                    tier,
+                    fmt::format(
+                        "Announce response has scrape info; bumping next scrape to {} seconds from now.",
+                        tier->scrapeIntervalSec));
+                tier->scheduleNextScrape();
+                tier->lastScrapeTime = now;
+                tier->lastScrapeSucceeded = true;
+            }
+            else if (tier->lastScrapeTime + tier->scrapeIntervalSec <= now)
+            {
+                tier->scrapeSoon();
+            }
+
+            tier->lastAnnounceSucceeded = true;
+            tier->lastAnnouncePeerCount = std::size(response->pex) + std::size(response->pex6);
+
+            if (is_stopped)
+            {
+                /* now that we've successfully stopped the torrent,
+                 * we can reset the up/down/corrupt count we've kept
+                 * for this tracker */
+                tier->byteCounts[TR_ANN_UP] = 0;
+                tier->byteCounts[TR_ANN_DOWN] = 0;
+                tier->byteCounts[TR_ANN_CORRUPT] = 0;
+            }
+
+            if (!is_stopped && std::empty(tier->announce_events))
+            {
+                /* the queue is empty, so enqueue a periodic update */
+                int const i = tier->announceIntervalSec;
+                tr_logAddTraceTier(tier, fmt::format("Sending periodic reannounce in {} seconds", i));
+                tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
+            }
         }
     }
 
@@ -1302,90 +1320,89 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     for (int i = 0; i < response->row_count; ++i)
     {
         auto const& row = response->rows[i];
-
         auto* const tor = session->torrents().get(row.info_hash);
-        if (tor == nullptr)
-        {
-            continue;
-        }
 
-        auto* const tier = tor->torrent_announcer->getTierFromScrape(response->scrape_url);
-        if (tier == nullptr)
+        if (tor != nullptr)
         {
-            continue;
-        }
+            auto* tier = tor->torrent_announcer->getTierFromScrape(response->scrape_url);
 
-        tr_logAddTraceTier(
-            tier,
-            fmt::format(
-                "scraped url:{} "
-                " -- "
-                "did_connect:{} "
-                "did_timeout:{} "
-                "seeders:{} "
-                "leechers:{} "
-                "downloads:{} "
-                "downloaders:{} "
-                "min_request_interval:{} "
-                "err:{} ",
-                response->scrape_url.sv(),
-                response->did_connect,
-                response->did_timeout,
-                row.seeders,
-                row.leechers,
-                row.downloads,
-                row.downloaders,
-                response->min_request_interval,
-                std::empty(response->errmsg) ? "none"sv : response->errmsg));
-
-        tier->isScraping = false;
-        tier->lastScrapeTime = now;
-        tier->lastScrapeSucceeded = false;
-        tier->lastScrapeTimedOut = response->did_timeout;
-
-        if (!response->did_connect)
-        {
-            on_scrape_error(session, tier, _("Could not connect to tracker"));
-        }
-        else if (response->did_timeout)
-        {
-            on_scrape_error(session, tier, _("Tracker did not respond"));
-        }
-        else if (!std::empty(response->errmsg))
-        {
-            on_scrape_error(session, tier, response->errmsg.c_str());
-        }
-        else
-        {
-            tier->lastScrapeSucceeded = true;
-            tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
-            tier->scheduleNextScrape();
-            tr_logAddTraceTier(tier, fmt::format("Scrape successful. Rescraping in {} seconds.", tier->scrapeIntervalSec));
-
-            if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
+            if (tier == nullptr)
             {
-                if (row.seeders >= 0)
-                {
-                    tracker->seeder_count = row.seeders;
-                }
-
-                if (row.leechers >= 0)
-                {
-                    tracker->leecher_count = row.leechers;
-                }
-
-                if (row.downloads >= 0)
-                {
-                    tracker->download_count = row.downloads;
-                }
-
-                tracker->downloader_count = row.downloaders;
-                tracker->consecutive_failures = 0;
+                continue;
             }
 
-            if (row.seeders >= 0 && row.leechers >= 0 && row.downloads >= 0)
+            tr_logAddTraceTier(
+                tier,
+                fmt::format(
+                    "scraped url:{} "
+                    " -- "
+                    "did_connect:{} "
+                    "did_timeout:{} "
+                    "seeders:{} "
+                    "leechers:{} "
+                    "downloads:{} "
+                    "downloaders:{} "
+                    "min_request_interval:{} "
+                    "err:{} ",
+                    response->scrape_url.sv(),
+                    response->did_connect,
+                    response->did_timeout,
+                    row.seeders,
+                    row.leechers,
+                    row.downloads,
+                    row.downloaders,
+                    response->min_request_interval,
+                    std::empty(response->errmsg) ? "none"sv : response->errmsg));
+
+            tier->isScraping = false;
+            tier->lastScrapeTime = now;
+            tier->lastScrapeSucceeded = false;
+            tier->lastScrapeTimedOut = response->did_timeout;
+
+            if (!response->did_connect)
             {
-                publishPeerCounts(tier, row.seeders, row.leechers);
+                on_scrape_error(session, tier, _("Could not connect to tracker"));
+            }
+            else if (response->did_timeout)
+            {
+                on_scrape_error(session, tier, _("Tracker did not respond"));
+            }
+            else if (!std::empty(response->errmsg))
+            {
+                on_scrape_error(session, tier, response->errmsg.c_str());
+            }
+            else
+            {
+                tier->lastScrapeSucceeded = true;
+                tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
+                tier->scheduleNextScrape();
+                tr_logAddTraceTier(tier, fmt::format("Scrape successful. Rescraping in {} seconds.", tier->scrapeIntervalSec));
+
+                if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
+                {
+                    if (row.seeders >= 0)
+                    {
+                        tracker->seeder_count = row.seeders;
+                    }
+
+                    if (row.leechers >= 0)
+                    {
+                        tracker->leecher_count = row.leechers;
+                    }
+
+                    if (row.downloads >= 0)
+                    {
+                        tracker->download_count = row.downloads;
+                    }
+
+                    tracker->downloader_count = row.downloaders;
+                    tracker->consecutive_failures = 0;
+                }
+
+                if (row.seeders >= 0 && row.leechers >= 0 && row.downloads >= 0)
+                {
+                    publishPeerCounts(tier, row.seeders, row.leechers);
+                }
             }
         }
     }

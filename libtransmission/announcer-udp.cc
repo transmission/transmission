@@ -303,7 +303,7 @@ struct tau_tracker
         return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
     }
 
-    void sendto(std::byte const* buf, size_t buflen)
+    void sendto(void const* buf, size_t buflen)
     {
         TR_ASSERT(addr_);
         if (!addr_)
@@ -349,16 +349,29 @@ struct tau_tracker
             addr_expires_at_ = now + DnsRetryIntervalSecs;
         }
 
+        // if the address info is too old, expire it
+        if (addr_ && (closing || addr_expires_at_ <= now))
+        {
+            logtrace(this->host, "Expiring old DNS result");
+            addr_.reset();
+            addr_expires_at_ = 0;
+        }
+
         // are there any requests pending?
         if (this->isIdle())
         {
             return;
         }
 
-        // update the addr if our lookup is past its shelf date
-        if (!closing && !addr_pending_dns_ && addr_expires_at_ <= now)
+        // if DNS lookup *recently* failed for this host, do nothing
+        if (!addr_ && now < addr_expires_at_)
         {
-            addr_.reset();
+            return;
+        }
+
+        // if we don't have an address yet, try & get one now.
+        if (!closing && !addr_ && !addr_pending_dns_)
+        {
             addr_pending_dns_ = std::async(std::launch::async, lookup, this->host, this->port, this->key);
             return;
         }
@@ -367,13 +380,13 @@ struct tau_tracker
             this->key,
             fmt::format(
                 "connected {} ({} {}) -- connecting_at {}",
-                is_connected(now),
+                this->connection_expiration_time > now,
                 this->connection_expiration_time,
                 now,
                 this->connecting_at));
 
         /* also need a valid connection ID... */
-        if (addr_ && !is_connected(now) && this->connecting_at == 0)
+        if (addr_ && this->connection_expiration_time <= now && this->connecting_at == 0)
         {
             this->connecting_at = now;
             this->connection_transaction_id = tau_transaction_new();
@@ -386,14 +399,16 @@ struct tau_tracker
 
             auto const contiguous = std::vector<std::byte>(std::begin(buf), std::end(buf));
             this->sendto(std::data(contiguous), std::size(contiguous));
+
+            return;
         }
 
         if (timeout_reqs)
         {
-            timeout_requests(now);
+            timeout_requests();
         }
 
-        if (addr_ && is_connected(now))
+        if (addr_ && this->connection_expiration_time > now)
         {
             send_requests();
         }
@@ -402,11 +417,6 @@ struct tau_tracker
 private:
     using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
     using MaybeSockaddr = std::optional<Sockaddr>;
-
-    [[nodiscard]] constexpr bool is_connected(time_t now) const noexcept
-    {
-        return connection_id != tau_connection_t{} && now < connection_expiration_time;
-    }
 
     [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
     {
@@ -459,8 +469,9 @@ private:
 
     ///
 
-    void timeout_requests(time_t now)
+    void timeout_requests()
     {
+        time_t const now = time(nullptr);
         bool const cancel_all = this->close_at != 0 && (this->close_at <= now);
 
         if (this->connecting_at != 0 && this->connecting_at + TauRequestTtl < now)
@@ -535,7 +546,7 @@ private:
         }
     }
 
-    void send_request(std::byte const* payload, size_t payload_len)
+    void send_request(void const* payload, size_t payload_len)
     {
         logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
 
