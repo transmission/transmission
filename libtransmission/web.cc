@@ -516,10 +516,8 @@ public:
 
         if (!curl_ssl_verify)
         {
-#if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
-#endif
         }
         else if (!std::empty(curl_ca_bundle))
         {
@@ -541,9 +539,7 @@ public:
         }
         else if (!std::empty(curl_ca_bundle))
         {
-#if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, curl_ca_bundle.c_str());
-#endif
         }
 
         if (auto const& ua = user_agent; !std::empty(ua))
