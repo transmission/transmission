@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include "Torrent.h"
-#include "Utils.h"
-
 #include <glibmm.h>
 #include <gtkmm.h>
+
+#include "Utils.h"
+
+class Torrent;
 
 class TorrentSorter : public IF_GTKMM4(Gtk::Sorter, Glib::Object)
 {

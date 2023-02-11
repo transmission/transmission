@@ -5,13 +5,12 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
+#include <memory>
+#include <vector>
 
 #include <gtkmm.h>
 
-#include <memory>
-#include <vector>
+#include <libtransmission/tr-macros.h>
 
 class Session;
 

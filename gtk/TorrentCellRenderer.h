@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include "Utils.h"
-
-#include <libtransmission/tr-macros.h>
+#include <memory>
 
 #include <glibmm.h>
 #include <gtkmm.h>
 
-#include <memory>
+#include <libtransmission/tr-macros.h>
+
+#include "Utils.h"
 
 class Torrent;
 

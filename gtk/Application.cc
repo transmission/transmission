@@ -2,9 +2,38 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include "Application.h"
+#include <algorithm>
+#include <csignal>
+#include <cstdlib> // exit()
+#include <ctime>
+#include <iterator> // std::back_inserter
+#include <map>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#include <fmt/core.h>
+
+#include <giomm.h>
+#include <glib/gmessages.h>
+#ifdef G_OS_UNIX
+#include <glib-unix.h>
+#endif
+#include <glibmm/i18n.h>
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/log.h>
+#include <libtransmission/rpcimpl.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/version.h>
 
 #include "Actions.h"
+#include "Application.h"
 #include "DetailsDialog.h"
 #include "Dialogs.h"
 #include "FilterBar.h"
@@ -22,37 +51,6 @@
 #include "SystemTrayIcon.h"
 #include "Torrent.h"
 #include "Utils.h"
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/log.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/version.h>
-
-#include <giomm.h>
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
-
-#include <algorithm>
-#include <csignal>
-#include <cstdlib> // exit()
-#include <ctime>
-#include <iterator> // std::back_inserter
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <thread>
-#include <tuple>
-#include <utility>
-#include <vector>
-
-#include <glib/gmessages.h>
-
-#ifdef G_OS_UNIX
-#include <glib-unix.h>
-#endif
 
 using namespace std::literals;
 

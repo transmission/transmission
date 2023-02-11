@@ -3,12 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "PathButton.h"
+#include <vector>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
-#include <vector>
+#include "PathButton.h"
 
 class PathButton::Impl
 {

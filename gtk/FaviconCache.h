@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
+#include <functional>
+#include <string>
 
 #include <gdkmm.h>
 #include <glibmm.h>
 
-#include <functional>
-#include <string>
+#include <libtransmission/transmission.h>
 
 void gtr_get_favicon(
     tr_session* session,

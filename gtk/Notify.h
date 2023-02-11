@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
-
 #include <glibmm.h>
+
+#include <libtransmission/transmission.h>
 
 class Session;
 

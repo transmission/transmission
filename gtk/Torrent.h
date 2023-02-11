@@ -5,18 +5,18 @@
 
 #pragma once
 
-#include "Flags.h"
-
-#include <libtransmission/transmission.h>
-
-#include <glibmm.h>
-#include <gtkmm.h>
-
 #include <algorithm>
 #include <bitset>
 #include <initializer_list>
 #include <memory>
 #include <vector>
+
+#include <glibmm.h>
+#include <gtkmm.h>
+
+#include <libtransmission/transmission.h>
+
+#include "Flags.h"
 
 class Torrent : public Glib::Object
 {

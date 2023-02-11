@@ -35,10 +35,8 @@ struct tr_error;
 #endif
 #endif
 
-#if defined(HAVE_NGETTEXT)
-#define tr_ngettext ngettext
-#else
-#define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
+#if !defined(HAVE_NGETTEXT)
+#define ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 
 /* #define DISABLE_GETTEXT */
@@ -49,9 +47,9 @@ struct tr_error;
 #endif
 #ifdef DISABLE_GETTEXT
 #undef _
-#undef tr_ngettext
+#undef ngettext
 #define _(a) (a)
-#define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
+#define ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 
 /****

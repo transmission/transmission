@@ -3,27 +3,26 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "FilterBar.h"
-
-#include "FaviconCache.h" // gtr_get_favicon()
-#include "HigWorkarea.h" // GUI_PAD
-#include "ListModelAdapter.h"
-#include "Session.h" // torrent_cols
-#include "Torrent.h"
-#include "TorrentFilter.h"
-#include "Utils.h"
-
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
-
 #include <algorithm> // std::transform()
 #include <array>
 #include <memory>
 #include <set>
 #include <string>
 #include <unordered_map>
+
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+
+#include <fmt/core.h>
+
+#include "FaviconCache.h" // gtr_get_favicon()
+#include "FilterBar.h"
+#include "HigWorkarea.h" // GUI_PAD
+#include "ListModelAdapter.h"
+#include "Session.h" // torrent_cols
+#include "Torrent.h"
+#include "TorrentFilter.h"
+#include "Utils.h"
 
 class FilterBar::Impl
 {

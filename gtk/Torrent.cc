@@ -3,20 +3,17 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "Torrent.h"
+#include <array>
+#include <functional>
 
-#include "IconCache.h"
-#include "Utils.h"
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
-
-#include <array>
-#include <functional>
+#include "IconCache.h"
+#include "Torrent.h"
+#include "Utils.h"
 
 using namespace std::string_view_literals;
 

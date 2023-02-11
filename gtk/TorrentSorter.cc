@@ -3,11 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "TorrentSorter.h"
+#include <algorithm>
 
 #include <libtransmission/transmission.h>
 
-#include <algorithm>
+#include "Torrent.h"
+#include "TorrentSorter.h"
 
 using namespace std::string_view_literals;
 

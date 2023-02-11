@@ -3,29 +3,28 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "PrefsDialog.h"
-
-#include "FreeSpaceLabel.h"
-#include "PathButton.h"
-#include "Prefs.h"
-#include "Session.h"
-#include "SystemTrayIcon.h"
-#include "Utils.h"
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/version.h>
-#include <libtransmission/web-utils.h>
+#include <limits>
+#include <map>
+#include <memory>
+#include <sstream>
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
 #include <fmt/core.h>
 
-#include <limits>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
+#include <libtransmission/transmission.h>
+#include <libtransmission/version.h>
+#include <libtransmission/web-utils.h>
+
+#include "FreeSpaceLabel.h"
+#include "PathButton.h"
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "SystemTrayIcon.h"
+#include "Utils.h"
 
 /**
 ***

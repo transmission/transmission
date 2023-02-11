@@ -3,18 +3,17 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "StatsDialog.h"
-
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
+#include <memory>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
 #include <fmt/core.h>
 
-#include <memory>
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "StatsDialog.h"
+#include "Utils.h"
 
 static auto constexpr TR_RESPONSE_RESET = int{ 1 };
 

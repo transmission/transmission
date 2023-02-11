@@ -3,20 +3,19 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "FreeSpaceLabel.h"
-
-#include "Session.h"
-#include "Utils.h"
-
-#include <libtransmission/utils.h>
+#include <memory>
+#include <string>
+#include <string_view>
 
 #include <glibmm/i18n.h>
 
 #include <fmt/core.h>
 
-#include <memory>
-#include <string>
-#include <string_view>
+#include <libtransmission/utils.h>
+
+#include "FreeSpaceLabel.h"
+#include "Session.h"
+#include "Utils.h"
 
 class FreeSpaceLabel::Impl
 {

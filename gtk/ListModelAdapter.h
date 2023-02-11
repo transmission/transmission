@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include "Utils.h"
+#include <optional>
+#include <unordered_map>
+#include <vector>
 
 #include <glibmm.h>
 #include <gtkmm.h>
 
-#include <optional>
-#include <unordered_map>
-#include <vector>
+#include "Utils.h"
 
 class ListModelAdapter
     : public Gtk::TreeModel

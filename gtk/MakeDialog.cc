@@ -3,29 +3,29 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "MakeDialog.h"
-
-#include "PathButton.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/makemeta.h>
-#include <libtransmission/utils.h> /* tr_formatter_mem_B() */
-
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
-#include <fmt/core.h>
-
 #include <chrono>
 #include <future>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
+
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+
+#include <fmt/core.h>
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/error.h>
+#include <libtransmission/makemeta.h>
+#include <libtransmission/utils.h> /* tr_formatter_mem_B() */
+
+#include "PathButton.h"
+#include "MakeDialog.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h"
 
 using namespace std::literals;
 

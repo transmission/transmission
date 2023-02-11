@@ -3,23 +3,22 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "Actions.h"
-
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
-
-#include <libtransmission/transmission.h>
-
-#include <glibmm.h>
-#include <glibmm/i18n.h>
-
 #include <array>
 #include <stack>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+
+#include <libtransmission/transmission.h>
+
+#include "Actions.h"
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h"
 
 using namespace std::string_view_literals;
 
