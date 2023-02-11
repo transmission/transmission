@@ -390,7 +390,7 @@ public:
         return tor->unique_lock();
     }
 
-    [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
+    [[nodiscard]] size_t countActiveWebseeds(uint64_t now) const noexcept
     {
         if (!tor->isRunning || tor->isDone())
         {
@@ -2545,10 +2545,12 @@ void tr_peerMgr::bandwidthPulse()
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
     {
-        // run the completeness check for any torrents that need it
-        if (auto& needs_check = tor->swarm->needs_completeness_check; needs_check)
+        auto* const swarm = tor->swarm;
+
+        /* run the completeness check for any torrents that need it */
+        if (swarm->needs_completeness_check)
         {
-            needs_check = false;
+            swarm->needs_completeness_check = false;
             tor->recheckCompleteness();
         }
 

@@ -81,8 +81,7 @@ class Filter
 public:
     void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
-    template<typename T>
-    constexpr void decrypt(size_t buf_len, T* buf)
+    constexpr void decrypt(size_t buf_len, void* buf)
     {
         if (dec_active_)
         {
@@ -92,8 +91,7 @@ public:
 
     void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
-    template<typename T>
-    constexpr void encrypt(size_t buf_len, T* buf)
+    constexpr void encrypt(size_t buf_len, void* buf)
     {
         if (enc_active_)
         {

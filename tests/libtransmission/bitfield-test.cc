@@ -337,7 +337,7 @@ TEST(Bitfield, percent)
     EXPECT_NEAR(0.25F, field.percent(), 0.01);
 }
 
-TEST(Bitfield, bitwiseOr)
+TEST(Bitfield, bitwise_or)
 {
     auto a = tr_bitfield{ 100 };
     auto b = tr_bitfield{ 100 };
@@ -386,7 +386,7 @@ TEST(Bitfield, bitwiseOr)
     EXPECT_TRUE(a.hasAll());
 }
 
-TEST(Bitfield, bitwiseAnd)
+TEST(Bitfield, bitwise_and)
 {
     auto a = tr_bitfield{ 100 };
     auto b = tr_bitfield{ 100 };

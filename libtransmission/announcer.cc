@@ -1647,6 +1647,7 @@ static tr_tracker_view trackerView(tr_torrent const& tor, size_t tier_index, tr_
         }
     }
 
+    TR_ASSERT(0 <= view.tier);
     return view;
 }
 
