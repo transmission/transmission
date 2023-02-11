@@ -12,7 +12,6 @@
 #include <libtransmission/tr-macros.h>
 
 class Session;
-class Torrent;
 
 class MainWindow : public Gtk::ApplicationWindow
 {
@@ -32,16 +31,10 @@ public:
         Glib::RefPtr<Gio::ActionGroup> const& actions,
         Glib::RefPtr<Session> const& core);
 
-    void for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> callback) const;
-    bool for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> callback) const;
-
-    void select_all();
-    void unselect_all();
+    Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
 
     void set_busy(bool isBusy);
     void refresh();
-
-    sigc::signal<void()>& signal_selection_changed();
 
 private:
     class Impl;
