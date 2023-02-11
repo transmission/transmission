@@ -49,6 +49,9 @@ option(ENABLE_WEB "Build Web client" OFF)
 option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
+option(ENABLE_LIGHTWEIGHT
+    "Optimize libtransmission for low-resource systems: smaller cache size, prefer unencrypted peer connections, etc."
+    OFF)
 option(ENABLE_UTP "Build µTP support" ON)
 option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
