@@ -67,11 +67,13 @@
 #include "utils.h"
 #include "platform-quota.h"
 
-namespace
-{
+/***
+****
+***/
+
 #ifndef _WIN32
 
-[[nodiscard]] char const* getdev(std::string_view path)
+static char const* getdev(std::string_view path)
 {
 #ifdef HAVE_GETMNTENT
 
@@ -139,7 +141,7 @@ namespace
 #endif
 }
 
-[[nodiscard]] char const* getfstype(std::string_view device)
+static char const* getfstype(std::string_view device)
 {
 #ifdef HAVE_GETMNTENT
 
@@ -207,7 +209,7 @@ namespace
 #endif
 }
 
-std::string getblkdev(std::string_view path)
+static std::string getblkdev(std::string_view path)
 {
     for (;;)
     {
@@ -233,7 +235,7 @@ extern "C"
 #include <quota.h>
 }
 
-[[nodiscard]] tr_disk_space getquota(char const* device)
+struct tr_disk_space getquota(char const* device)
 {
     struct quotahandle* qh;
     struct quotakey qk;
@@ -283,7 +285,7 @@ extern "C"
 
 #else
 
-[[nodiscard]] tr_disk_space getquota(char const* device)
+static struct tr_disk_space getquota(char const* device)
 {
 #if defined(__DragonFly__)
     struct ufs_dqblk dq = {};
@@ -369,7 +371,7 @@ extern "C"
 
 #ifdef HAVE_XQM
 
-[[nodiscard]] tr_disk_space getxfsquota(char const* device)
+static struct tr_disk_space getxfsquota(char const* device)
 {
     struct tr_disk_space disk_space = { -1, -1 };
     struct fs_disk_quota dq;
@@ -408,7 +410,7 @@ extern "C"
 
 #endif /* _WIN32 */
 
-[[nodiscard]] tr_disk_space getQuotaSpace([[maybe_unused]] tr_device_info const& info)
+static tr_disk_space getQuotaSpace([[maybe_unused]] tr_device_info const& info)
 {
     struct tr_disk_space ret = { -1, -1 };
 
@@ -430,7 +432,7 @@ extern "C"
     return ret;
 }
 
-[[nodiscard]] tr_disk_space getDiskSpace(char const* path)
+static struct tr_disk_space getDiskSpace(char const* path)
 {
 #ifdef _WIN32
 
@@ -465,8 +467,6 @@ extern "C"
 
 #endif
 }
-
-} // namespace
 
 tr_device_info tr_device_info_create(std::string_view path)
 {
