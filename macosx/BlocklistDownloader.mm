@@ -94,7 +94,6 @@ BlocklistDownloader* fBLDownloader = nil;
         [NSUserDefaults.standardUserDefaults setObject:[NSDate date] forKey:@"BlocklistNewLastUpdate"];
         [BlocklistScheduler.scheduler updateSchedule];
 
-        [self.fSession finishTasksAndInvalidate];
         fBLDownloader = nil;
     });
 }
@@ -154,7 +153,6 @@ BlocklistDownloader* fBLDownloader = nil;
 
         [NSNotificationCenter.defaultCenter postNotificationName:@"BlocklistUpdated" object:nil];
 
-        [self.fSession finishTasksAndInvalidate];
         fBLDownloader = nil;
     });
 }
