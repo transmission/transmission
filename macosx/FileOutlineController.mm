@@ -603,7 +603,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
 - (NSMenu*)menu
 {
-    NSMenu* menu = [[NSMenu alloc] initWithTitle:@""];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"File Outline Menu"];
 
     //check and uncheck
     NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check Selected", "File Outline -> Menu")
@@ -631,7 +631,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
     //priority
     item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Priority", "File Outline -> Menu") action:NULL keyEquivalent:@""];
-    NSMenu* priorityMenu = [[NSMenu alloc] initWithTitle:@""];
+    NSMenu* priorityMenu = [[NSMenu alloc] initWithTitle:@"File Priority Menu"];
     item.submenu = priorityMenu;
     [menu addItem:item];
 

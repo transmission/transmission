@@ -349,7 +349,6 @@ typedef NS_ENUM(NSInteger, FilterTypeTag) {
 {
     if (menu == self.fGroupsButton.menu)
     {
-        //remove all items except first three
         for (NSInteger i = menu.numberOfItems - 1; i >= 3; i--)
         {
             [menu removeItemAtIndex:i];
