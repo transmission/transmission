@@ -202,12 +202,20 @@ endif()
 
 target_include_directories(${TR_NAME}-qt
     PRIVATE
+        ${CMAKE_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_include_directories(${TR_NAME}-qt SYSTEM
+    PRIVATE
+        ${CURL_INCLUDE_DIRS}
+        ${EVENT2_INCLUDE_DIRS})
 
 target_link_libraries(${TR_NAME}-qt
     PRIVATE
         ${TR_NAME}
-        transmission::qt_impl)
+        ${QT_TARGETS}
+        ${CURL_LIBRARIES}
+        ${EVENT2_LIBRARIES})
 
 target_compile_definitions(${TR_NAME}-qt
     PRIVATE

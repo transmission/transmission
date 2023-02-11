@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <string_view>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
-#include <libtransmission/tr-strbuf.h>
+#include "error.h"
+#include "file.h"
+#include "tr-strbuf.h"
 
 #include "test-fixtures.h"
 

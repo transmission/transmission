@@ -5,13 +5,13 @@
 
 #include <string>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/error.h>
-#include <libtransmission/torrent-magnet.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/torrent.h>
+#include "crypto-utils.h"
+#include "error.h"
+#include "torrent-magnet.h"
+#include "torrent-metainfo.h"
+#include "torrent.h"
 
 #include "test-fixtures.h"
 

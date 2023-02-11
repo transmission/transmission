@@ -7,9 +7,9 @@
 #include <cstring>
 #include <vector>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
+#include "transmission.h"
+#include "error.h"
+#include "file.h"
 
 #include "test-fixtures.h"
 

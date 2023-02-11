@@ -7,10 +7,10 @@
 #include <string_view>
 #include <vector>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/torrent.h>
-#include <libtransmission/torrents.h>
+#include "torrent.h"
+#include "torrents.h"
 
 #include "gtest/gtest.h"
 

@@ -3,8 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/tr-getopt.h>
+#include "transmission.h"
+#include "tr-getopt.h"
 
 #include "gtest/gtest.h"
 

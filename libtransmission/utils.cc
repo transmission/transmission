@@ -307,28 +307,6 @@ namespace
 namespace tr_strvUtf8Clean_impl
 {
 
-class SecondIconvArg
-{
-public:
-    explicit SecondIconvArg(char const* arg)
-        : arg_(arg)
-    {
-    }
-
-    operator char**() &&
-    {
-        return const_cast<char**>(&arg_);
-    }
-
-    operator char const**() &&
-    {
-        return &arg_;
-    }
-
-private:
-    char const* arg_;
-};
-
 bool validateUtf8(std::string_view sv, char const** good_end)
 {
     auto const* begin = std::data(sv);
@@ -381,10 +359,15 @@ std::string to_utf8(std::string_view sv)
             continue;
         }
 
+#ifdef ICONV_SECOND_ARGUMENT_IS_CONST
+        auto const* inbuf = std::data(sv);
+#else
+        auto* inbuf = const_cast<char*>(std::data(sv));
+#endif
         size_t inbytesleft = std::size(sv);
         char* out = std::data(buf);
         size_t outbytesleft = std::size(buf);
-        auto const rv = iconv(cd, SecondIconvArg(std::data(sv)), &inbytesleft, &out, &outbytesleft);
+        auto const rv = iconv(cd, &inbuf, &inbytesleft, &out, &outbytesleft);
         iconv_close(cd);
         if (rv != size_t(-1))
         {

@@ -7,10 +7,10 @@
 #include <string_view>
 #include <utility>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/net.h>
-#include <libtransmission/peer-mgr.h>
+#include "net.h"
+#include "peer-mgr.h"
 
 #include "test-fixtures.h"
 

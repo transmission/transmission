@@ -8,11 +8,11 @@
 #include <cstdint>
 #include <set>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/block-info.h>
-#include <libtransmission/crypto-utils.h> // for tr_rand_obj()
-#include <libtransmission/completion.h>
+#include "block-info.h"
+#include "crypto-utils.h" // for tr_rand_obj()
+#include "completion.h"
 
 #include "gtest/gtest.h"
 

@@ -13,11 +13,11 @@
 #include <string_view>
 #include <unordered_set>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/peer-mse.h>
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/utils.h>
+#include "peer-mse.h"
+#include "crypto-utils.h"
+#include "utils.h"
 
 #include "crypto-test-ref.h"
 

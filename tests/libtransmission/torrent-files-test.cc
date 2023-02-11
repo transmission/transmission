@@ -7,9 +7,9 @@
 #include <string_view>
 #include <utility>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/torrent-files.h>
+#include "torrent-files.h"
 
 #include "test-fixtures.h"
 

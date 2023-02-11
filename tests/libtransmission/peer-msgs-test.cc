@@ -5,8 +5,8 @@
 
 #include <cstring>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/peer-msgs.h>
+#include "transmission.h"
+#include "peer-msgs.h"
 
 #include "gtest/gtest.h"
 

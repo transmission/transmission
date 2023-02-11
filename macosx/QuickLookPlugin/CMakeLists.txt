@@ -75,6 +75,7 @@ set_target_properties(
 
 target_include_directories(${TR_NAME}-mac-ql
     PRIVATE
+        ${CMAKE_SOURCE_DIR}
         ..)
 
 target_link_libraries(${TR_NAME}-mac-ql

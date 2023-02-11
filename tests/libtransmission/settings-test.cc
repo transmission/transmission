@@ -3,9 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/session-settings.h>
+#include "session-settings.h"
 
 #include "test-fixtures.h"
 
