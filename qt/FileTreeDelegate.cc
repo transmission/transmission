@@ -52,7 +52,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         p.rect = option.rect;
         p.rect.setSize(QSize(option.rect.width() - 4, option.rect.height() - 8));
         p.rect.moveCenter(option.rect.center());
-        p.fontMetrics = QFontMetrics{ QApplication::font() };
+        p.fontMetrics = QApplication::fontMetrics();
         p.minimum = 0;
         p.maximum = 100;
         p.textAlignment = Qt::AlignCenter;
