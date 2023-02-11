@@ -725,7 +725,7 @@ void tr_dhtUpkeep()
 
     auto lock = impl.session->unique_lock();
     auto const now = tr_time();
-    auto const incoming_peer_port = impl.session->advertisedPeerPort();
+    auto const incoming_peer_port = impl.session->peerPort();
 
     for (auto* const tor : impl.session->torrents())
     {

@@ -51,8 +51,6 @@ set(PROJECT_FILES
   rpc-server.cc
   rpcimpl.cc
   session-id.cc
-  session-alt-speeds.cc
-  session-settings.cc
   session.cc
   stats.cc
   subprocess-posix.cc
@@ -76,7 +74,6 @@ set(PROJECT_FILES
   variant-benc.cc
   variant-json.cc
   variant.cc
-  variant-converters.cc
   verify.cc
   watchdir-generic.cc
   watchdir-inotify.cc
@@ -198,7 +195,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     port-forwarding.h
     resume.h
     rpc-server.h
-    session-alt-speeds.h
     session.h
     stats.h
     subprocess.h
