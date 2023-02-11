@@ -26,6 +26,7 @@
 #include <sys/stat.h> /* umask() */
 #endif
 
+#include <event2/dns.h>
 #include <event2/event.h>
 
 #include <fmt/chrono.h>
@@ -39,6 +40,7 @@
 #include "blocklist.h"
 #include "cache.h"
 #include "crypto-utils.h"
+#include "dns-ev.h"
 #include "error-types.h"
 #include "error.h"
 #include "file.h"
@@ -2173,6 +2175,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     , blocklist_dir_{ makeBlocklistDir(config_dir) }
     , session_thread_{ tr_session_thread::create() }
     , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
+    , dns_{ std::make_unique<libtransmission::EvDns>(eventBase(), tr_time) }
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), tr_peerMgrFree }

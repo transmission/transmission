@@ -23,6 +23,11 @@
 struct tr_announcer;
 struct tr_torrent_announcer;
 
+namespace libtransmission
+{
+class Dns;
+} // namespace libtransmission
+
 /**
  * ***  Tracker Publish / Subscribe
  * **/
@@ -296,6 +301,7 @@ public:
     public:
         virtual ~Mediator() noexcept = default;
         virtual void sendto(void const* buf, size_t buflen, sockaddr const* addr, socklen_t addrlen) = 0;
+        [[nodiscard]] virtual libtransmission::Dns& dns() = 0;
         [[nodiscard]] virtual std::optional<tr_address> announceIP() const = 0;
     };
 
