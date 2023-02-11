@@ -54,6 +54,12 @@ typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
++ (NSURL*)chooseFile;
+
+- (void)updateLocationField;
+- (void)createReal;
+- (void)checkProgress;
+
 @end
 
 NSMutableSet* creatorWindowControllerSet = nil;

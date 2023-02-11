@@ -14,6 +14,12 @@ static CGFloat const kIconWidthSmall = 12.0;
 
 @property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
 
+- (void)saveGroups;
+
+- (NSImage*)imageForGroup:(NSMutableDictionary*)dict;
+
+- (BOOL)torrent:(Torrent*)torrent doesMatchRulesForGroupAtIndex:(NSInteger)index;
+
 @end
 
 @implementation GroupsController

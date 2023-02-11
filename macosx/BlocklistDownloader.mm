@@ -14,6 +14,9 @@
 @property(nonatomic) long long fExpectedSize;
 @property(nonatomic) blocklistDownloadState fState;
 
+- (void)startDownload;
+- (BOOL)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
+
 @end
 
 @implementation BlocklistDownloader

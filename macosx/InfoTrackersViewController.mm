@@ -28,6 +28,11 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
 
 @property(nonatomic) IBOutlet NSSegmentedControl* fTrackerAddRemoveControl;
 
+- (void)setupInfo;
+
+- (void)addTrackers;
+- (void)removeTrackers;
+
 @end
 
 @implementation InfoTrackersViewController

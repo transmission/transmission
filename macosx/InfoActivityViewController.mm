@@ -68,6 +68,8 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 @property(nonatomic, readonly) CGFloat horizLayoutWidth;
 @property(nonatomic, readonly) CGFloat vertLayoutHeight;
 
+- (void)setupInfo;
+
 @end
 
 @implementation InfoActivityViewController

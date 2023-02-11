@@ -11,6 +11,8 @@
 @property(nonatomic, readonly) NSMutableIndexSet* indexesInternal;
 @property(nonatomic) NSImage* iconInternal;
 
+- (instancetype)initWithFolder:(BOOL)isFolder name:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent;
+
 @end
 
 @implementation FileListNode

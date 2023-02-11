@@ -33,6 +33,10 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
 @property(nonatomic) IBOutlet NSLayoutConstraint* fWebSeedTableTopConstraint;
 @property(nonatomic, readonly) NSArray<NSSortDescriptor*>* peerSortDescriptors;
 
+- (void)setupInfo;
+
+- (void)setWebSeedTableHidden:(BOOL)hide animate:(BOOL)animate;
+
 @end
 
 @implementation InfoPeersViewController
