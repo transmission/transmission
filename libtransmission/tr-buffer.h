@@ -25,6 +25,8 @@ namespace libtransmission
 class Buffer
 {
 public:
+    using Iovec = evbuffer_iovec;
+
     class Iterator
     {
     public:
@@ -130,7 +132,7 @@ public:
 
         evbuffer* buf_;
         evbuffer_ptr ptr_ = {};
-        evbuffer_iovec iov_ = {};
+        Iovec iov_ = {};
         size_t iov_offset_ = 0;
     };
 
@@ -245,9 +247,21 @@ public:
         return 0;
     }
 
+    [[nodiscard]] Iovec alloc(size_t n_bytes)
+    {
+        auto iov = Iovec{};
+        evbuffer_reserve_space(buf_.get(), static_cast<ev_ssize_t>(n_bytes), &iov, 1);
+        return iov;
+    }
+
     [[nodiscard]] std::pair<std::byte*, size_t> pullup()
     {
         return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
+    }
+
+    void commit(Iovec iov)
+    {
+        evbuffer_commit_space(buf_.get(), &iov, 1);
     }
 
     void reserve(size_t n_bytes)

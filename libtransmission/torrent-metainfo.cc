@@ -53,15 +53,12 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
     return std::string{ url };
 }
 
-namespace
-{
-auto constexpr MaxBencDepth = 32;
+static auto constexpr MaxBencDepth = 32;
 
 bool tr_error_is_set(tr_error const* const* error)
 {
     return (error != nullptr) && (*error != nullptr);
 }
-} // namespace
 
 struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
 {
@@ -632,6 +629,11 @@ bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vecto
     }
 
     return tr_loadFile(filename, *contents, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
+}
+
+tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) const
+{
+    return this->pieces_[piece];
 }
 
 tr_pathbuf tr_torrent_metainfo::makeFilename(

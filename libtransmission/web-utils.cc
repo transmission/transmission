@@ -204,7 +204,7 @@ constexpr std::string_view getPortForScheme(std::string_view scheme)
     return "-1"sv;
 }
 
-TR_CONSTEXPR20 bool urlCharsAreValid(std::string_view url)
+bool urlCharsAreValid(std::string_view url)
 {
     // rfc2396
     auto constexpr ValidChars = std::string_view{

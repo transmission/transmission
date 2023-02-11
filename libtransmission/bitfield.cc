@@ -228,6 +228,11 @@ bool tr_bitfield::ensureNthBitAlloced(size_t nth)
     return true;
 }
 
+void tr_bitfield::freeArray() noexcept
+{
+    flags_ = std::vector<uint8_t>{};
+}
+
 void tr_bitfield::setTrueCount(size_t n) noexcept
 {
     TR_ASSERT(bit_count_ == 0 || n <= bit_count_);
@@ -242,6 +247,11 @@ void tr_bitfield::setTrueCount(size_t n) noexcept
     }
 
     TR_ASSERT(isValid());
+}
+
+void tr_bitfield::rebuildTrueCount() noexcept
+{
+    setTrueCount(countFlags());
 }
 
 void tr_bitfield::incrementTrueCount(size_t inc) noexcept
