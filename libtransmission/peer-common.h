@@ -10,7 +10,6 @@
 #endif
 
 #include <array>
-#include <atomic>
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 
 #include "transmission.h"
@@ -214,12 +213,6 @@ public:
 
     virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
-    [[nodiscard]] static auto peer_count() noexcept
-    {
-        // the number of currently-connected peers
-        return n_peers_.load();
-    }
-
     struct RequestLimit
     {
         // How many blocks we could request.
@@ -261,9 +254,6 @@ public:
 
     // how many requests we made to this peer and then canceled
     tr_recentHistory<uint16_t> cancels_sent_to_peer;
-
-private:
-    static inline auto n_peers_ = std::atomic<size_t>{};
 };
 
 /***

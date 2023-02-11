@@ -15,6 +15,7 @@
 #include <map>
 #include <iterator> // std::back_inserter
 #include <memory>
+#include <numeric> // std::accumulate
 #include <optional>
 #include <tuple> // std::tie
 #include <utility>
@@ -158,18 +159,6 @@ struct peer_atom
         , fromBest{ from }
         , flags{ flags_in }
     {
-        ++n_atoms_;
-    }
-
-    ~peer_atom()
-    {
-        [[maybe_unused]] auto const n_prev = n_atoms_--;
-        TR_ASSERT(n_prev > 0U);
-    }
-
-    [[nodiscard]] static auto atom_count() noexcept
-    {
-        return n_atoms_.load();
     }
 
     [[nodiscard]] constexpr auto isSeed() const noexcept
@@ -298,8 +287,6 @@ private:
 
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
-
-    static auto inline n_atoms_ = std::atomic<size_t>{};
 };
 
 using Handshakes = std::map<tr_address, tr_handshake>;
@@ -600,7 +587,6 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     , atom{ atom_in }
     , blame{ tor->blockCount() }
 {
-    ++n_peers_;
 }
 
 tr_peer::~tr_peer()
@@ -614,9 +600,6 @@ tr_peer::~tr_peer()
     {
         atom->is_connected = false;
     }
-
-    [[maybe_unused]] auto const n_prev = n_peers_--;
-    TR_ASSERT(n_prev > 0U);
 }
 
 /**
@@ -2388,8 +2371,13 @@ void enforceTorrentPeerLimit(tr_swarm* swarm)
 void enforceSessionPeerLimit(tr_session* session)
 {
     // do we have too many peers?
-    auto const n_peers = tr_peer::peer_count();
-    auto const max = session->peerLimit();
+    auto const& torrents = session->torrents();
+    size_t const n_peers = std::accumulate(
+        std::begin(torrents),
+        std::end(torrents),
+        size_t{},
+        [](size_t sum, tr_torrent const* tor) { return sum + tor->swarm->peerCount(); });
+    size_t const max = session->peerLimit();
     if (n_peers <= max)
     {
         return;
@@ -2668,15 +2656,24 @@ struct peer_candidate
     // leave 5% of connection slots for incoming connections -- ticket #2609
     auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95);
 
-    // don't start any new handshakes if we're full up
-    auto const peer_count = tr_peer::peer_count();
+    /* count how many peers and atoms we've got */
+    auto atom_count = size_t{};
+    auto peer_count = size_t{};
+    for (auto const* const tor : session->torrents())
+    {
+        auto const* const swarm = tor->swarm;
+        atom_count += std::size(swarm->pool);
+        peer_count += swarm->peerCount();
+    }
+
+    /* don't start any new handshakes if we're full up */
     if (max_candidates <= peer_count)
     {
         return {};
     }
 
     auto candidates = std::vector<peer_candidate>{};
-    candidates.reserve(peer_atom::atom_count());
+    candidates.reserve(atom_count);
 
     /* populate the candidate array */
     auto salter = tr_salt_shaker{};
