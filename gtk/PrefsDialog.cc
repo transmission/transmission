@@ -496,8 +496,6 @@ DesktopPage::DesktopPage(
 
 class PrivacyPage : public PageBase
 {
-    static auto const BlocklistUpdateResultDisplayTimeoutInSeconds = 3U;
-
 public:
     PrivacyPage(BaseObjectType* cast_item, Glib::RefPtr<Gtk::Builder> const& builder, Glib::RefPtr<Session> const& core);
     ~PrivacyPage() override;
@@ -506,7 +504,8 @@ public:
 
 private:
     void updateBlocklistText();
-    void onBlocklistUpdated(bool success);
+    void onBlocklistUpdateResponse();
+    void onBlocklistUpdated(int n);
     void onBlocklistUpdate();
     void on_blocklist_url_changed(Gtk::Editable* e);
 
@@ -518,7 +517,7 @@ private:
     Gtk::CheckButton* check_ = nullptr;
 
     sigc::connection updateBlocklistTag_;
-    sigc::connection blocklist_update_result_tag_;
+    std::unique_ptr<Gtk::MessageDialog> updateBlocklistDialog_;
 };
 
 void PrivacyPage::updateBlocklistText()
@@ -527,36 +526,54 @@ void PrivacyPage::updateBlocklistText()
     auto const msg = fmt::format(
         ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", n),
         fmt::arg("count", n));
-    label_->set_text(msg);
+    label_->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), msg));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
 PrivacyPage::~PrivacyPage()
 {
-    blocklist_update_result_tag_.disconnect();
+    updateBlocklistTag_.disconnect();
+}
+
+/* user hit "close" in the blocklist-update dialog */
+void PrivacyPage::onBlocklistUpdateResponse()
+{
+    updateBlocklistButton_->set_sensitive(true);
+    updateBlocklistDialog_.reset();
     updateBlocklistTag_.disconnect();
 }
 
 /* core says the blocklist was updated */
-void PrivacyPage::onBlocklistUpdated(bool success)
+void PrivacyPage::onBlocklistUpdated(int n)
 {
+    bool const success = n >= 0;
+    int const count = n >= 0 ? n : tr_blocklistGetRuleCount(core_->get_session());
+    auto const msg = fmt::format(
+        ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", count),
+        fmt::arg("count", count));
     updateBlocklistButton_->set_sensitive(true);
-    label_->set_text(success ? _("Blocklist updated!") : _("Couldn't update blocklist"));
-
-    blocklist_update_result_tag_ = Glib::signal_timeout().connect_seconds(
-        sigc::bind_return(sigc::mem_fun(*this, &PrivacyPage::updateBlocklistText), false),
-        BlocklistUpdateResultDisplayTimeoutInSeconds);
+    updateBlocklistDialog_->set_message(
+        fmt::format(FMT_STRING("<b>{:s}</b>"), success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
+        true);
+    updateBlocklistDialog_->set_secondary_text(msg);
+    updateBlocklistText();
 }
 
 /* user pushed a button to update the blocklist */
 void PrivacyPage::onBlocklistUpdate()
 {
+    updateBlocklistDialog_ = std::make_unique<Gtk::MessageDialog>(
+        gtr_widget_get_window(*this),
+        _("Update Blocklist"),
+        false,
+        TR_GTK_MESSAGE_TYPE(INFO),
+        TR_GTK_BUTTONS_TYPE(CLOSE));
     updateBlocklistButton_->set_sensitive(false);
-
-    label_->set_text(_("Getting new blocklist…"));
-    blocklist_update_result_tag_.disconnect();
-
+    updateBlocklistDialog_->set_secondary_text(_("Getting new blocklist…"));
+    updateBlocklistDialog_->signal_response().connect([this](int /*response*/) { onBlocklistUpdateResponse(); });
+    updateBlocklistDialog_->show();
     core_->blocklist_update();
+    updateBlocklistTag_ = core_->signal_blocklist_updated().connect([this](auto n) { onBlocklistUpdated(n); });
 }
 
 void PrivacyPage::on_blocklist_url_changed(Gtk::Editable* e)
@@ -580,6 +597,7 @@ PrivacyPage::PrivacyPage(
     auto* const blocklist_url_entry = init_entry("blocklist_url_entry", TR_KEY_blocklist_url);
 
     updateBlocklistText();
+    updateBlocklistButton_->set_data("session", core_->get_session());
     updateBlocklistButton_->signal_clicked().connect([this]() { onBlocklistUpdate(); });
     updateBlocklistButton_->set_sensitive(check_->get_active());
     blocklist_url_entry->signal_changed().connect([this, blocklist_url_entry]()
@@ -587,8 +605,6 @@ PrivacyPage::PrivacyPage(
     on_blocklist_url_changed(blocklist_url_entry);
 
     init_check_button("blocklist_autoupdate_check", TR_KEY_blocklist_updates_enabled);
-
-    updateBlocklistTag_ = core_->signal_blocklist_updated().connect(sigc::mem_fun(*this, &PrivacyPage::onBlocklistUpdated));
 }
 
 /****
