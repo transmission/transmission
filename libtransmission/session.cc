@@ -218,7 +218,8 @@ std::optional<std::string_view> tr_session::WebMediator::userAgent() const
 
 std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 {
-    if (auto const [addr, is_any] = session_->publicAddress(TR_AF_INET); !is_any)
+    auto const [addr, is_default_value] = session_->publicAddress(TR_AF_INET);
+    if (!is_default_value)
     {
         return addr.display_name();
     }
@@ -228,7 +229,8 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 
 std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
 {
-    if (auto const [addr, is_any] = session_->publicAddress(TR_AF_INET6); !is_any)
+    auto const [addr, is_default_value] = session_->publicAddress(TR_AF_INET6);
+    if (!is_default_value)
     {
         return addr.display_name();
     }
@@ -340,8 +342,6 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
 {
     if (type == TR_AF_INET)
     {
-        // if user provided an address, use it.
-        // otherwise, use any_ipv4 (0.0.0.0).
         static auto constexpr DefaultAddr = tr_address::any_ipv4();
         auto addr = tr_address::from_string(settings_.bind_address_ipv4).value_or(DefaultAddr);
         return { addr, addr == DefaultAddr };
@@ -349,13 +349,9 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
 
     if (type == TR_AF_INET6)
     {
-        // if user provided an address, use it.
-        // otherwise, if we can determine which one to use via tr_globalIPv6 magic, use it.
-        // otherwise, use any_ipv6 (::).
-        static auto constexpr AnyAddr = tr_address::any_ipv6();
-        auto const default_addr = tr_globalIPv6().value_or(AnyAddr);
-        auto addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
-        return { addr, addr == AnyAddr };
+        static auto constexpr DefaultAddr = tr_address::any_ipv6();
+        auto addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(DefaultAddr);
+        return { addr, addr == DefaultAddr };
     }
 
     TR_ASSERT_MSG(false, "invalid type");
