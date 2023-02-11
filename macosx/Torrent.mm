@@ -16,6 +16,7 @@
 #import "Torrent.h"
 #import "GroupsController.h"
 #import "FileListNode.h"
+#import "NSDataAdditions.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
 
@@ -1785,7 +1786,19 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         {
             auto const file = tr_torrentFile(self.fHandle, i);
 
-            NSString* fullPath = [NSString convertedStringFromCString:file.name];
+            // UTF-8 encoding
+            NSString* fullPath = @(file.name);
+            if (!fullPath)
+            {
+                // autodetection of the encoding (#3434)
+                NSData* data = [NSData dataWithBytes:(void const*)file.name length:sizeof(unsigned char) * strlen(file.name)];
+                [NSString stringEncodingForData:data encodingOptions:nil convertedString:&fullPath usedLossyConversion:nil];
+                if (!fullPath)
+                {
+                    // hexa encoding
+                    fullPath = data.hexString;
+                }
+            }
             NSArray* pathComponents = fullPath.pathComponents;
             while (pathComponents.count <= 1)
             {

@@ -24,8 +24,6 @@
 // like componentsSeparatedByCharactersInSet:, but excludes blank values
 - (NSArray<NSString*>*)nonEmptyComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators;
 
-+ (NSString*)convertedStringFromCString:(char const*)bytes;
-
 @end
 
 __attribute__((annotate("returns_localized_nsstring"))) static inline NSString* LocalizationNotNeeded(NSString* s)

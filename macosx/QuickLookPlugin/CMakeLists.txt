@@ -1,7 +1,6 @@
 project(trmacql)
 
 set(${PROJECT_NAME}_SOURCES
-    ../NSDataAdditions.mm
     ../NSStringAdditions.mm
     GeneratePreviewForURL.mm
     GenerateThumbnailForURL.mm
