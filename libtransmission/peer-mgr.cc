@@ -12,7 +12,6 @@
 #include <cstdint>
 #include <ctime> // time_t
 #include <deque>
-#include <map>
 #include <iterator> // std::back_inserter
 #include <memory>
 #include <numeric> // std::accumulate
@@ -67,17 +66,17 @@ static auto constexpr CancelHistorySec = int{ 60 };
 
 static bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr);
 
-class HandshakeMediator final : public tr_handshake::Mediator
+class tr_handshake_mediator_impl final : public tr_handshake_mediator
 {
 private:
-    [[nodiscard]] static std::optional<TorrentInfo> torrent_info(tr_torrent* tor)
+    [[nodiscard]] static std::optional<torrent_info> torrentInfo(tr_torrent* tor)
     {
         if (tor == nullptr)
         {
             return {};
         }
 
-        auto info = TorrentInfo{};
+        auto info = torrent_info{};
         info.info_hash = tor->infoHash();
         info.client_peer_id = tr_torrentGetPeerId(tor);
         info.id = tor->id();
@@ -86,33 +85,33 @@ private:
     }
 
 public:
-    explicit HandshakeMediator(tr_session& session) noexcept
+    explicit tr_handshake_mediator_impl(tr_session& session) noexcept
         : session_{ session }
     {
     }
 
-    [[nodiscard]] std::optional<TorrentInfo> torrent_info(tr_sha1_digest_t const& info_hash) const override
+    [[nodiscard]] std::optional<torrent_info> torrentInfo(tr_sha1_digest_t const& info_hash) const override
     {
-        return torrent_info(session_.torrents().get(info_hash));
+        return torrentInfo(session_.torrents().get(info_hash));
     }
 
-    [[nodiscard]] std::optional<TorrentInfo> torrent_info_from_obfuscated(
+    [[nodiscard]] std::optional<torrent_info> torrentInfoFromObfuscated(
         tr_sha1_digest_t const& obfuscated_info_hash) const override
     {
-        return torrent_info(tr_torrentFindFromObfuscatedHash(&session_, obfuscated_info_hash));
+        return torrentInfo(tr_torrentFindFromObfuscatedHash(&session_, obfuscated_info_hash));
     }
 
-    [[nodiscard]] bool allows_dht() const override
+    [[nodiscard]] bool allowsDHT() const override
     {
         return session_.allowsDHT();
     }
 
-    [[nodiscard]] bool allows_tcp() const override
+    [[nodiscard]] bool allowsTCP() const override
     {
         return session_.allowsTCP();
     }
 
-    void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const& addr) override
+    void setUTPFailed(tr_sha1_digest_t const& info_hash, tr_address addr) override
     {
         if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
         {
@@ -120,13 +119,13 @@ public:
         }
     }
 
-    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const override
+    [[nodiscard]] bool isPeerKnownSeed(tr_torrent_id_t tor_id, tr_address addr) const override
     {
         auto const* const tor = session_.torrents().get(tor_id);
         return tor != nullptr && tr_peerMgrPeerIsSeed(tor, addr);
     }
 
-    [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+    [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
     {
         return session_.timerMaker();
     }
@@ -297,7 +296,58 @@ private:
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 };
 
-using Handshakes = std::map<tr_address, tr_handshake>;
+// a container for keeping track of tr_handshakes
+class Handshakes
+{
+public:
+    void add(tr_address const& address, tr_handshake* handshake)
+    {
+        TR_ASSERT(!contains(address));
+
+        handshakes_.emplace_back(address, handshake);
+    }
+
+    [[nodiscard]] bool contains(tr_address const& address) const noexcept
+    {
+        return std::any_of(
+            std::begin(handshakes_),
+            std::end(handshakes_),
+            [&address](auto const& pair) { return pair.first == address; });
+    }
+
+    void erase(tr_address const& address)
+    {
+        for (auto iter = std::begin(handshakes_), end = std::end(handshakes_); iter != end; ++iter)
+        {
+            if (iter->first == address)
+            {
+                handshakes_.erase(iter);
+                return;
+            }
+        }
+    }
+
+    [[nodiscard]] auto empty() const noexcept
+    {
+        return std::empty(handshakes_);
+    }
+
+    void abortAll()
+    {
+        // make a tmp copy so that calls to tr_handshakeAbort() won't
+        // be able to invalidate its loop iteration
+        auto tmp = handshakes_;
+        for (auto& [addr, handshake] : tmp)
+        {
+            tr_handshakeAbort(handshake);
+        }
+
+        handshakes_ = {};
+    }
+
+private:
+    std::vector<std::pair<tr_address, tr_handshake*>> handshakes_;
+};
 
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
@@ -364,7 +414,7 @@ public:
 
         is_running = false;
         removeAllPeers();
-        outgoing_handshakes.clear();
+        outgoing_handshakes.abortAll();
     }
 
     void removePeer(tr_peer* peer)
@@ -536,7 +586,7 @@ struct tr_peerMgr
     ~tr_peerMgr()
     {
         auto const lock = unique_lock();
-        incoming_handshakes.clear();
+        incoming_handshakes.abortAll();
     }
 
     void rechokeSoon() noexcept
@@ -553,7 +603,7 @@ struct tr_peerMgr
     tr_session* const session;
     Handshakes incoming_handshakes;
 
-    HandshakeMediator handshake_mediator_;
+    tr_handshake_mediator_impl handshake_mediator_;
 
 private:
     void rechokePulseMarshall()
@@ -634,8 +684,8 @@ static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address cons
 
 static bool peerIsInUse(tr_swarm const* swarm, struct peer_atom const* atom)
 {
-    return atom->is_connected || swarm->outgoing_handshakes.count(atom->addr) != 0U ||
-        swarm->manager->incoming_handshakes.count(atom->addr) != 0U;
+    return atom->is_connected || swarm->outgoing_handshakes.contains(atom->addr) ||
+        swarm->manager->incoming_handshakes.contains(atom->addr);
 }
 
 static void swarmFree(tr_swarm* s)
@@ -1083,12 +1133,13 @@ static void createBitTorrentPeer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io,
 }
 
 /* FIXME: this is kind of a mess. */
-static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& result)
+static bool on_handshake_done(tr_handshake_result const& result)
 {
     TR_ASSERT(result.io != nullptr);
 
-    bool const ok = result.is_connected;
+    bool const ok = result.isConnected;
     bool success = false;
+    auto* manager = static_cast<tr_peerMgr*>(result.userData);
 
     tr_swarm* const s = getExistingSwarm(manager, result.io->torrentHash());
 
@@ -1115,7 +1166,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
             {
                 ++atom->num_fails;
 
-                if (!result.read_anything_from_peer)
+                if (!result.readAnythingFromPeer)
                 {
                     tr_logAddTraceSwarm(
                         s,
@@ -1193,19 +1244,21 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket.display_name()));
         socket.close(session);
     }
-    else if (manager->incoming_handshakes.count(socket.address()) != 0U)
+    else if (manager->incoming_handshakes.contains(socket.address()))
     {
         socket.close(session);
     }
     else /* we don't have a connection to them yet... */
     {
         auto address = socket.address();
-        manager->incoming_handshakes.try_emplace(
+        manager->incoming_handshakes.add(
             address,
-            &manager->handshake_mediator_,
-            tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
-            session->encryptionMode(),
-            [manager](tr_handshake::Result const& result) { return on_handshake_done(manager, result); });
+            tr_handshakeNew(
+                manager->handshake_mediator_,
+                tr_peerIo::newIncoming(session, &session->top_bandwidth_, std::move(socket)),
+                session->encryptionMode(),
+                on_handshake_done,
+                manager));
     }
 }
 
@@ -2760,7 +2813,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
         s,
         fmt::format("Starting an OUTGOING {} connection with {}", utp ? " µTP" : "TCP", atom.display_name()));
 
-    auto peer_io = tr_peerIo::newOutgoing(
+    auto io = tr_peerIo::newOutgoing(
         mgr->session,
         &mgr->session->top_bandwidth_,
         atom.addr,
@@ -2769,7 +2822,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
         s->tor->completeness == TR_SEED,
         utp);
 
-    if (!peer_io)
+    if (io == nullptr)
     {
         tr_logAddTraceSwarm(s, fmt::format("peerIo not created; marking peer {} as unreachable", atom.display_name()));
         atom.flags2 |= MyflagUnreachable;
@@ -2777,12 +2830,13 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     }
     else
     {
-        s->outgoing_handshakes.try_emplace(
-            atom.addr,
-            &mgr->handshake_mediator_,
-            peer_io,
+        auto* const handshake = tr_handshakeNew(
+            mgr->handshake_mediator_,
+            std::move(io),
             mgr->session->encryptionMode(),
-            [mgr](tr_handshake::Result const& result) { return on_handshake_done(mgr, result); });
+            on_handshake_done,
+            mgr);
+        s->outgoing_handshakes.add(atom.addr, handshake);
     }
 
     atom.lastConnectionAttemptAt = now;
