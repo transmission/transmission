@@ -496,12 +496,11 @@ tr_add_external_auto_library(PSL libpsl psl
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp
-        SUBPROJECT
-        TARGET libutp::libutp)
+        TARGET libutp::libutp
+        CMAKE_ARGS -DLIBUTP_BUILD_PROGRAMS=OFF)
 endif()
 
 tr_add_external_auto_library(B64 libb64 b64
-    SUBPROJECT
     TARGET libb64::libb64)
 
 if(NOT ${REBUILD_WEB} STREQUAL "OFF")
