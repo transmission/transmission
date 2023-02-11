@@ -42,6 +42,8 @@ enum tr_log_level
 
 std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key);
 
+std::string_view tr_logLevelToKey(tr_log_level);
+
 ///
 
 struct tr_log_message

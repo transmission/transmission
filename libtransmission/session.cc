@@ -1174,6 +1174,13 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
     session->settings_.should_delete_source_torrents = delete_source;
 }
 
+bool tr_sessionGetDeleteSource(tr_session const* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->shouldDeleteSource();
+}
+
 /***
 ****
 ***/
