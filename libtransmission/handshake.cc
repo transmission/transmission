@@ -833,8 +833,6 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 
 bool tr_handshake::fire_done(bool is_connected)
 {
-    maybe_recycle_dh();
-
     if (!on_done_)
     {
         return false;
@@ -912,7 +910,7 @@ uint32_t tr_handshake::crypto_provide() const noexcept
 **/
 
 tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode, DoneFunc on_done)
-    : dh_{ tr_handshake::get_dh(mediator) }
+    : dh_{ mediator->private_key() }
     , on_done_{ std::move(on_done) }
     , peer_io_{ std::move(peer_io) }
     , timeout_timer_{ mediator->timer_maker().create([this]() { fire_done(false); }) }
