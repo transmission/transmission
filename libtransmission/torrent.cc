@@ -909,6 +909,39 @@ void tr_torrent::setVerifyState(tr_verify_state state)
     this->markChanged();
 }
 
+tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
+{
+    tr_torrent_activity ret = TR_STATUS_STOPPED;
+
+    bool const is_seed = tor->isDone();
+
+    if (tor->verifyState() == TR_VERIFY_NOW)
+    {
+        ret = TR_STATUS_CHECK;
+    }
+    else if (tor->verifyState() == TR_VERIFY_WAIT)
+    {
+        ret = TR_STATUS_CHECK_WAIT;
+    }
+    else if (tor->isRunning)
+    {
+        ret = is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+    }
+    else if (tor->isQueued())
+    {
+        if (is_seed && tor->session->queueEnabled(TR_UP))
+        {
+            ret = TR_STATUS_SEED_WAIT;
+        }
+        else if (!is_seed && tor->session->queueEnabled(TR_DOWN))
+        {
+            ret = TR_STATUS_DOWNLOAD_WAIT;
+        }
+    }
+
+    return ret;
+}
+
 static time_t torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
 {
     return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
@@ -938,7 +971,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
-    s->activity = tor->activity();
+    s->activity = tr_torrentGetActivity(tor);
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
     s->idleSecs = torrentGetIdleSecs(tor, s->activity);
@@ -1292,7 +1325,7 @@ static bool torrentShouldQueue(tr_torrent const* const tor)
 
 static void torrentStart(tr_torrent* tor, torrent_start_opts opts)
 {
-    switch (tor->activity())
+    switch (tr_torrentGetActivity(tor))
     {
     case TR_STATUS_SEED:
     case TR_STATUS_DOWNLOAD:

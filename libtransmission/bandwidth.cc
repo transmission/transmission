@@ -144,10 +144,11 @@ void tr_bandwidth::allocateBandwidth(
     tr_priority_t const priority = std::max(parent_priority, this->priority_);
 
     /* set the available bandwidth */
-    if (auto& bandwidth = band_[dir]; bandwidth.is_limited_)
+    auto bandwidth = &this->band_[dir];
+    if (bandwidth->is_limited_)
     {
-        auto const next_pulse_speed = bandwidth.desired_speed_bps_;
-        bandwidth.bytes_left_ = next_pulse_speed * period_msec / 1000U;
+        auto const next_pulse_speed = bandwidth->desired_speed_bps_;
+        bandwidth->bytes_left_ = next_pulse_speed * period_msec / 1000U;
     }
 
     /* add this bandwidth's peer, if any, to the peer pool */
