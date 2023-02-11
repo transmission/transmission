@@ -1,5 +1,7 @@
 project(trutils)
 
+add_compile_options(${CXX_WARNING_FLAGS})
+
 include_directories(
     ${CMAKE_SOURCE_DIR}
 )
