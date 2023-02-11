@@ -268,10 +268,6 @@ export function setChecked(element, b) {
   setOrDeleteAttribute(element, 'checked', b);
 }
 
-export function addCheckedClass(element, b) {
-  element.classList.toggle('checked', b);
-}
-
 function getBestMenuPos(r, bounds) {
   let { x, y } = r;
   const { width, height } = r;
