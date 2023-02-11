@@ -1208,7 +1208,7 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
     return tr_toSpeedKBps(tr_sessionGetRawSpeed_Bps(session, dir));
 }
 
-void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
+void tr_session::closeImplPart1(std::promise<void>* closed_promise)
 {
     is_closing_ = true;
 
@@ -1250,20 +1250,20 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // ...and now that those are queued, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
-    this->web_->startShutdown(10s);
+    this->web_->startShutdown();
     this->cache.reset();
 
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
-    save_timer_ = timerMaker().create([this, closed_promise, deadline]() { closeImplPart2(closed_promise, deadline); });
+    save_timer_ = timerMaker().create([this, closed_promise]() { closeImplPart2(closed_promise); });
     save_timer_->startRepeating(50ms);
 }
 
-void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
+void tr_session::closeImplPart2(std::promise<void>* closed_promise)
 {
     // try to keep the UDP announcer alive long enough to send out
     // all the &event=stopped tracker announces
-    if (n_pending_stops_ != 0U && std::chrono::steady_clock::now() < deadline)
+    if (announcer_->pendingAnnounces() != 0U)
     {
         announcer_udp_->upkeep();
         return;
@@ -1284,7 +1284,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     closed_promise->set_value();
 }
 
-void tr_sessionClose(tr_session* session, size_t timeout_secs)
+void tr_sessionClose(tr_session* session)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(!session->amInSessionThread());
@@ -1293,9 +1293,8 @@ void tr_sessionClose(tr_session* session, size_t timeout_secs)
 
     auto closed_promise = std::promise<void>{};
     auto closed_future = closed_promise.get_future();
-    auto const deadline = std::chrono::steady_clock::now() + std::chrono::seconds{ timeout_secs };
-    session->runInSessionThread([&closed_promise, deadline, session]() { session->closeImplPart1(&closed_promise, deadline); });
-    closed_future.wait();
+    session->runInSessionThread([session, &closed_promise]() { session->closeImplPart1(&closed_promise); });
+    closed_future.wait_for(12s);
 
     delete session;
 }

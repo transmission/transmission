@@ -135,11 +135,10 @@ struct tr_scrape_info
 class tr_announcer_impl final : public tr_announcer
 {
 public:
-    explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp, std::atomic<size_t>& n_pending_stops)
+    explicit tr_announcer_impl(tr_session* session_in, tr_announcer_udp& announcer_udp)
         : session{ session_in }
         , announcer_udp_{ announcer_udp }
         , upkeep_timer_{ session_in->timerMaker().create() }
-        , n_pending_stops_{ n_pending_stops }
     {
         upkeep_timer_->setCallback([this]() { this->upkeep(); });
         upkeep_timer_->startRepeating(UpkeepInterval);
@@ -165,6 +164,11 @@ public:
     {
         is_shutting_down_ = true;
         flushCloseMessages();
+    }
+
+    [[nodiscard]] size_t pendingAnnounces() const override
+    {
+        return pending_announces_;
     }
 
     void upkeep();
@@ -204,31 +208,25 @@ public:
 
     void announce(tr_announce_request const& request, tr_announce_response_func on_response)
     {
-        auto const is_stop = request.event == TR_ANNOUNCE_EVENT_STOPPED;
-        TR_ASSERT(!is_shutting_down_ || is_stop);
+        TR_ASSERT(!is_shutting_down_ || request.event == TR_ANNOUNCE_EVENT_STOPPED);
 
-        if (is_stop)
+        auto callback = [this, on_response = std::move(on_response)](tr_announce_response const& response)
         {
-            ++n_pending_stops_;
-
-            on_response =
-                [&n_stops = n_pending_stops_, on_response = std::move(on_response)](tr_announce_response const& response)
-            {
-                TR_ASSERT(n_stops > 0U);
-                --n_stops;
-
-                on_response(response);
-            };
-        }
+            TR_ASSERT(pending_announces_ > 0U);
+            --pending_announces_;
+            on_response(response);
+        };
 
         if (auto const announce_sv = request.announce_url.sv();
             tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
         {
-            tr_tracker_http_announce(session, request, std::move(on_response));
+            ++pending_announces_;
+            tr_tracker_http_announce(session, request, std::move(callback));
         }
         else if (tr_strvStartsWith(announce_sv, "udp://"sv))
         {
-            announcer_udp_.announce(request, std::move(on_response));
+            ++pending_announces_;
+            announcer_udp_.announce(request, std::move(callback));
         }
         else
         {
@@ -245,7 +243,7 @@ private:
     {
         for (auto& stop : stops_)
         {
-            announce(stop, [](tr_announce_response const&) {});
+            announce(stop, {});
         }
 
         stops_.clear();
@@ -261,19 +259,16 @@ private:
 
     std::set<tr_announce_request, StopsCompare> stops_;
 
-    std::atomic<size_t>& n_pending_stops_;
+    size_t pending_announces_ = {};
 
     bool is_shutting_down_ = false;
 };
 
-std::unique_ptr<tr_announcer> tr_announcer::create(
-    tr_session* session,
-    tr_announcer_udp& announcer_udp,
-    std::atomic<size_t>& n_pending_stops)
+std::unique_ptr<tr_announcer> tr_announcer::create(tr_session* session, tr_announcer_udp& announcer_udp)
 {
     TR_ASSERT(session != nullptr);
 
-    return std::make_unique<tr_announcer_impl>(session, announcer_udp, n_pending_stops);
+    return std::make_unique<tr_announcer_impl>(session, announcer_udp);
 }
 
 /***
@@ -960,7 +955,7 @@ void tr_announcer_impl::removeTorrent(tr_torrent* tor)
 
     for (auto const& tier : ta->tiers)
     {
-        if (tier.isRunning && tier.lastAnnounceSucceeded)
+        if (tier.isRunning)
         {
             stops_.emplace(create_announce_request(this, tor, &tier, TR_ANNOUNCE_EVENT_STOPPED));
         }
