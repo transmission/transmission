@@ -153,6 +153,8 @@ class tr_session_thread_impl final : public tr_session_thread
 {
 public:
     explicit tr_session_thread_impl()
+        : evbase_{ makeEventBase() }
+        , work_queue_event_{ event_new(evbase_.get(), -1, 0, onWorkAvailableStatic, this) }
     {
         auto lock = std::unique_lock(is_looping_mutex_);
 
@@ -225,7 +227,7 @@ private:
 #endif
         tr_evthread_init();
 
-        constexpr auto ToggleLooping = [](evutil_socket_t, short /*evtype*/, void* vself)
+        constexpr auto ToggleLooping = [](evutil_socket_t, short, void* vself)
         {
             auto* const self = static_cast<tr_session_thread_impl*>(vself);
             self->is_looping_mutex_.lock();
@@ -272,10 +274,8 @@ private:
         }
     }
 
-    libtransmission::evhelpers::evbase_unique_ptr const evbase_{ makeEventBase() };
-    libtransmission::evhelpers::event_unique_ptr const work_queue_event_{
-        event_new(evbase_.get(), -1, 0, onWorkAvailableStatic, this)
-    };
+    libtransmission::evhelpers::evbase_unique_ptr const evbase_;
+    libtransmission::evhelpers::event_unique_ptr work_queue_event_;
 
     work_queue_t work_queue_;
     std::mutex work_queue_mutex_;

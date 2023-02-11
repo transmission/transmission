@@ -63,7 +63,7 @@
 
 using namespace std::literals;
 
-std::recursive_mutex tr_session::session_mutex;
+std::recursive_mutex tr_session::session_mutex_;
 
 static auto constexpr SaveIntervalSecs = 360s;
 

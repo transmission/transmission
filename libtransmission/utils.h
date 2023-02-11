@@ -265,10 +265,8 @@ bool tr_moveFile(std::string_view oldpath, std::string_view newpath, struct tr_e
 ****
 ***/
 
-namespace libtransmission::detail::tr_time
-{
-extern time_t current_time;
-}
+/** @brief Private libtransmission variable that's visible only for inlining in tr_time() */
+extern time_t __tr_current_time;
 
 /**
  * @brief very inexpensive form of time(nullptr)
@@ -282,13 +280,13 @@ extern time_t current_time;
  */
 [[nodiscard]] static inline time_t tr_time() noexcept
 {
-    return libtransmission::detail::tr_time::current_time;
+    return __tr_current_time;
 }
 
 /** @brief Private libtransmission function to update tr_time()'s counter */
 constexpr void tr_timeUpdate(time_t now) noexcept
 {
-    libtransmission::detail::tr_time::current_time = now;
+    __tr_current_time = now;
 }
 
 /** @brief Portability wrapper for htonll() that uses the system implementation if available */

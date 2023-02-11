@@ -316,7 +316,7 @@ public:
 
     [[nodiscard]] auto unique_lock() const
     {
-        return std::unique_lock(session_mutex);
+        return std::unique_lock(session_mutex_);
     }
 
     // paths
@@ -1001,7 +1001,7 @@ private:
 
     /// static fields
 
-    static std::recursive_mutex session_mutex;
+    static std::recursive_mutex session_mutex_;
 
     /// trivial type fields
 
