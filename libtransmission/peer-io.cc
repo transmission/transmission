@@ -796,8 +796,11 @@ size_t tr_peerIo::getWriteBufferSpace(uint64_t now) const noexcept
 
 void tr_peerIo::write(libtransmission::Buffer& buf, bool is_piece_data)
 {
-    auto [bytes, len] = buf.pullup();
-    encrypt(len, bytes);
+    for (auto& ch : buf)
+    {
+        encrypt(1, &ch);
+    }
+
     outbuf_info.emplace_back(std::size(buf), is_piece_data);
     outbuf.add(buf);
 }
