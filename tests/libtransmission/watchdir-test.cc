@@ -215,7 +215,7 @@ TEST_P(WatchDirTest, watch)
     EXPECT_TRUE(std::empty(names));
 }
 
-TEST_P(WatchDirTest, DISABLED_retry)
+TEST_P(WatchDirTest, retry)
 {
     auto const path = sandboxDir();
 
