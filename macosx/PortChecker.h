@@ -4,8 +4,6 @@
 
 #import <Foundation/Foundation.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
 typedef NS_ENUM(unsigned int, port_status_t) { //
     PORT_STATUS_CHECKING,
     PORT_STATUS_OPEN,
@@ -29,5 +27,3 @@ typedef NS_ENUM(unsigned int, port_status_t) { //
 - (void)portCheckerDidFinishProbing:(PortChecker*)portChecker;
 
 @end
-
-NS_ASSUME_NONNULL_END
