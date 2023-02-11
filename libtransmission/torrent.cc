@@ -1593,7 +1593,7 @@ static std::string buildLabelsString(tr_torrent const* tor)
 
     for (auto it = std::begin(tor->labels), end = std::end(tor->labels); it != end;)
     {
-        buf << tr_quark_get_string_view(*it);
+        buf << *it;
 
         if (++it != end)
         {
