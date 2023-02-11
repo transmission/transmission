@@ -2189,7 +2189,8 @@ bool tr_torrent::setTrackerList(std::string_view text)
         }
     }
 
-    on_announce_list_changed();
+    /* tell the announcer to reload this torrent's tracker list */
+    this->session->announcer_->resetTorrent(this);
 
     return true;
 }

@@ -845,10 +845,7 @@ public:
 
     void fetch(tr_web::FetchOptions&& options) const
     {
-        if (web_)
-        {
-            web_->fetch(std::move(options));
-        }
+        web_->fetch(std::move(options));
     }
 
     [[nodiscard]] constexpr auto const& bandwidthGroups() const noexcept
