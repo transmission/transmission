@@ -105,7 +105,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
             data.buf = std::make_unique<std::vector<uint8_t>>(tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
-            session_->runInSessionThread(test_incomplete_dir_threadfunc, &data);
+            tr_runInEventThread(session_, test_incomplete_dir_threadfunc, &data);
 
             auto const test = [&data]()
             {

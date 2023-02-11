@@ -14,23 +14,6 @@
 
 using namespace std::literals;
 
-namespace
-{
-
-struct EventDeleter
-{
-    void operator()(struct event* event)
-    {
-        if (event != nullptr)
-        {
-            event_del(event);
-            event_free(event);
-        }
-    }
-};
-
-} // namespace
-
 namespace libtransmission
 {
 
@@ -48,11 +31,15 @@ public:
     EvTimer& operator=(EvTimer&&) = delete;
     EvTimer& operator=(EvTimer const&) = delete;
 
-    ~EvTimer() override = default;
+    ~EvTimer() override
+    {
+        stop();
+        event_free(evtimer_);
+    }
 
     void stop() override
     {
-        evtimer_.reset();
+        evtimer_del(evtimer_);
     }
 
     void start() override
@@ -76,7 +63,8 @@ public:
 
         interval_ = interval;
 
-        if (evtimer_) // update the timer if it's already running
+        // if evtimer_ is already running, update its interval
+        if (auto const is_pending = event_pending(evtimer_, EV_TIMEOUT, nullptr); is_pending != 0)
         {
             restart();
         }
@@ -90,20 +78,28 @@ public:
     void setRepeating(bool repeating) override
     {
         is_repeating_ = repeating;
-        evtimer_.reset();
+
+        if (evtimer_ != nullptr)
+        {
+            event_del(evtimer_);
+            event_free(evtimer_);
+        }
+
+        evtimer_ = repeating ? event_new(base_, -1, EV_TIMEOUT | EV_PERSIST, onTimer, this) :
+                               event_new(base_, -1, EV_TIMEOUT, onTimer, this);
     }
 
 private:
     void restart()
     {
-        evtimer_.reset(event_new(base_, -1, EV_TIMEOUT | (isRepeating() ? EV_PERSIST : 0), onTimer, this));
+        stop();
 
         using namespace std::chrono;
         auto const secs = duration_cast<seconds>(interval_);
         auto tv = timeval{};
         tv.tv_sec = secs.count();
         tv.tv_usec = static_cast<decltype(tv.tv_usec)>(duration_cast<microseconds>(interval_ - secs).count());
-        evtimer_add(evtimer_.get(), &tv);
+        evtimer_add(evtimer_, &tv);
     }
 
     static void onTimer(evutil_socket_t /*unused*/, short /*unused*/, void* vself)
@@ -118,7 +114,7 @@ private:
     }
 
     struct event_base* const base_;
-    std::unique_ptr<struct event, EventDeleter> evtimer_;
+    struct event* evtimer_ = nullptr;
 
     std::function<void()> callback_;
     std::chrono::milliseconds interval_ = 100ms;

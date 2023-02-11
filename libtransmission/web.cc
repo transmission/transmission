@@ -154,7 +154,7 @@ public:
         curl_thread->join();
     }
 
-    void startShutdown()
+    void closeSoon()
     {
         run_mode = RunMode::CloseSoon;
         queued_tasks_cv.notify_one();
@@ -635,7 +635,7 @@ bool tr_web::isClosed() const noexcept
     return impl_->isClosed();
 }
 
-void tr_web::startShutdown()
+void tr_web::closeSoon()
 {
-    impl_->startShutdown();
+    impl_->closeSoon();
 }

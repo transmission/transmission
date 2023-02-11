@@ -25,6 +25,7 @@
 #include "peer-mgr.h"
 #include "timer.h"
 #include "torrent.h"
+#include "trevent.h" // tr_runInEventThread()
 #include "utils.h"
 #include "web-utils.h"
 #include "web.h"
@@ -395,7 +396,7 @@ void useFetchedBlocks(tr_webseed_task* task)
             block_buf->resize(block_size);
             evbuffer_remove(task->content(), std::data(*block_buf), std::size(*block_buf));
             auto* const data = new write_block_data{ session, tor->id(), task->loc.block, block_buf, webseed };
-            session->runInSessionThread(&write_block_data::write_block_func, data);
+            tr_runInEventThread(session, &write_block_data::write_block_func, data);
         }
 
         task->loc = tor->byteLoc(task->loc.byte + block_size);

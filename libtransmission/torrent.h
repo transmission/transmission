@@ -40,10 +40,10 @@ struct tr_torrent;
 struct tr_torrent_announcer;
 
 /**
-***  Package-visible
+***  Package-visible ctor API
 **/
 
-void tr_torrentFreeInSessionThread(tr_torrent* tor);
+void tr_torrentFree(tr_torrent* tor);
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor);
 

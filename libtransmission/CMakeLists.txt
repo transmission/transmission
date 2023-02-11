@@ -53,7 +53,6 @@ set(PROJECT_FILES
   session-id.cc
   session-alt-speeds.cc
   session-settings.cc
-  session-thread.cc
   session.cc
   stats.cc
   subprocess-posix.cc
@@ -72,6 +71,7 @@ set(PROJECT_FILES
   tr-lpd.cc
   tr-udp.cc
   tr-utp.cc
+  trevent.cc
   utils.cc
   variant-benc.cc
   variant-json.cc
@@ -197,7 +197,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     resume.h
     rpc-server.h
     session-alt-speeds.h
-    session-thread.h
     session.h
     stats.h
     subprocess.h
@@ -209,6 +208,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     tr-dht.h
     tr-lpd.h
     tr-utp.h
+    trevent.h
     variant-common.h
     verify.h
     version.h
