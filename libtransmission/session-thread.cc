@@ -107,8 +107,7 @@ int cond_wait(void* vcond, void* vlock, struct timeval const* tv)
 
 unsigned long thread_current_id()
 {
-    thread_local auto const hashed = std::hash<std::thread::id>()(std::this_thread::get_id());
-    return hashed;
+    return std::hash<std::thread::id>()(std::this_thread::get_id());
 }
 
 void initEvthreadsOnce()
