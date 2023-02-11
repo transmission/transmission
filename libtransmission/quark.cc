@@ -18,7 +18,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, 400>{ ""sv,
+auto constexpr MyStatic = std::array<std::string_view, 399>{ ""sv,
                                                              "activeTorrentCount"sv,
                                                              "activity-date"sv,
                                                              "activityDate"sv,
@@ -416,8 +416,7 @@ auto constexpr MyStatic = std::array<std::string_view, 400>{ ""sv,
                                                              "watch-dir"sv,
                                                              "watch-dir-enabled"sv,
                                                              "webseeds"sv,
-                                                             "webseedsSendingToUs"sv,
-                                                             "yourip"sv };
+                                                             "webseedsSendingToUs"sv };
 
 bool constexpr quarks_are_sorted()
 {
