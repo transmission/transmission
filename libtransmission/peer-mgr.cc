@@ -1170,7 +1170,7 @@ static bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& r
                 client = tr_quark_new(std::data(buf));
             }
 
-            result.io->set_bandwidth(&s->tor->bandwidth_);
+            result.io->set_parent(&s->tor->bandwidth_);
             createBitTorrentPeer(s->tor, result.io, atom, client);
 
             success = true;
