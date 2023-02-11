@@ -382,7 +382,10 @@ static bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const*
     }
 
     auto const& src = server->host_whitelist_;
-    return std::any_of(std::begin(src), std::end(src), [&hostname](auto const& str) { return tr_wildmat(hostname, str); });
+    return std::any_of(
+        std::begin(src),
+        std::end(src),
+        [&hostname](auto const& str) { return tr_wildmat(hostname.c_str(), str.c_str()); });
 }
 
 static bool test_session_id(tr_rpc_server const* server, evhttp_request const* req)
