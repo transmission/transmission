@@ -99,7 +99,11 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
     NSRect viewRect = self.view.frame;
 
     CGFloat difference = self.fHeightChange;
-    viewRect.size.height -= difference;
+    if (difference != 0)
+    {
+        viewRect.size.height -= difference;
+        viewRect.size.width = NSWidth(self.view.window.frame);
+    }
 
     return viewRect;
 }
@@ -126,24 +130,32 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 {
     self.oldHeight = self.fCurrentHeight;
 
-    [self updateWindowLayout];
+    [self checkLayout];
+
+    if (self.fHeightChange != 0)
+    {
+        [self updateWindowLayout];
+    }
 }
 
 - (void)updateWindowLayout
 {
-    [self checkLayout];
+    if (self.fCurrentHeight != 0)
+    {
+        [self checkLayout];
 
-    CGFloat difference = self.fHeightChange;
+        CGFloat difference = self.fHeightChange;
 
-    NSRect windowRect = self.view.window.frame;
-    windowRect.origin.y += difference;
-    windowRect.size.height -= difference;
+        NSRect windowRect = self.view.window.frame;
+        windowRect.origin.y += difference;
+        windowRect.size.height -= difference;
 
-    self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
-    self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
+        self.view.window.minSize = NSMakeSize(self.view.window.minSize.width, NSHeight(windowRect));
+        self.view.window.maxSize = NSMakeSize(FLT_MAX, NSHeight(windowRect));
 
-    self.view.frame = [self viewRect];
-    [self.view.window setFrame:windowRect display:YES animate:YES];
+        self.view.frame = [self viewRect];
+        [self.view.window setFrame:windowRect display:YES animate:YES];
+    }
 }
 
 - (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
