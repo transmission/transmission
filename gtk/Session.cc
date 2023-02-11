@@ -42,21 +42,18 @@ using namespace std::literals;
 namespace
 {
 
-class TrVariantDeleter
-{
-public:
-    void operator()(tr_variant* ptr) const
-    {
-        tr_variantClear(ptr);
-        std::default_delete<tr_variant>()(ptr);
-    }
-};
+using TrVariantPtr = std::shared_ptr<tr_variant>;
 
-using TrVariantPtr = std::unique_ptr<tr_variant, TrVariantDeleter>;
-
-TrVariantPtr create_variant(tr_variant& other)
+TrVariantPtr create_variant(tr_variant&& other)
 {
-    auto result = TrVariantPtr(new tr_variant(other));
+    auto result = TrVariantPtr(
+        new tr_variant{},
+        [](tr_variant* ptr)
+        {
+            tr_variantClear(ptr);
+            std::default_delete<tr_variant>()(ptr);
+        });
+    *result = std::move(other);
     tr_variantInitBool(&other, false);
     return result;
 }
@@ -108,7 +105,7 @@ public:
     void add_torrent(tr_torrent* tor, bool do_notify);
     bool add_from_url(Glib::ustring const& url);
 
-    void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant&)> const& response_func);
+    void send_rpc_request(tr_variant const* request, int64_t tag, std::function<void(tr_variant*)> const& response_func);
 
     void commit_prefs_change(tr_quark key);
 
@@ -1559,17 +1556,17 @@ namespace
 
 int64_t nextTag = 1;
 
-std::map<int64_t, std::function<void(tr_variant&)>> pendingRequests;
+std::map<int64_t, std::function<void(tr_variant*)>> pendingRequests;
 
-bool core_read_rpc_response_idle(tr_variant& response)
+bool core_read_rpc_response_idle(TrVariantPtr const& response)
 {
-    if (int64_t tag = 0; tr_variantDictFindInt(&response, TR_KEY_tag, &tag))
+    if (int64_t tag = 0; tr_variantDictFindInt(response.get(), TR_KEY_tag, &tag))
     {
         if (auto const data_it = pendingRequests.find(tag); data_it != pendingRequests.end())
         {
             if (auto const& response_func = data_it->second; response_func)
             {
-                response_func(response);
+                response_func(response.get());
             }
 
             pendingRequests.erase(data_it);
@@ -1585,8 +1582,8 @@ bool core_read_rpc_response_idle(tr_variant& response)
 
 void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
 {
-    Glib::signal_idle().connect([owned_response = std::shared_ptr(create_variant(*response))]() mutable
-                                { return core_read_rpc_response_idle(*owned_response); });
+    Glib::signal_idle().connect([response_copy = create_variant(std::move(*response))]() mutable
+                                { return core_read_rpc_response_idle(response_copy); });
 }
 
 } // namespace
@@ -1594,7 +1591,7 @@ void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpoin
 void Session::Impl::send_rpc_request(
     tr_variant const* request,
     int64_t tag,
-    std::function<void(tr_variant&)> const& response_func)
+    std::function<void(tr_variant*)> const& response_func)
 {
     if (session_ == nullptr)
     {
@@ -1630,12 +1627,12 @@ void Session::port_test()
     impl_->send_rpc_request(
         &request,
         tag,
-        [this](auto& response)
+        [this](auto* response)
         {
             tr_variant* args = nullptr;
             bool is_open = false;
 
-            if (!tr_variantDictFindDict(&response, TR_KEY_arguments, &args) ||
+            if (!tr_variantDictFindDict(response, TR_KEY_arguments, &args) ||
                 !tr_variantDictFindBool(args, TR_KEY_port_is_open, &is_open))
             {
                 is_open = false;
@@ -1662,12 +1659,12 @@ void Session::blocklist_update()
     impl_->send_rpc_request(
         &request,
         tag,
-        [this](auto& response)
+        [this](auto* response)
         {
             tr_variant* args = nullptr;
             int64_t ruleCount = 0;
 
-            if (!tr_variantDictFindDict(&response, TR_KEY_arguments, &args) ||
+            if (!tr_variantDictFindDict(response, TR_KEY_arguments, &args) ||
                 !tr_variantDictFindInt(args, TR_KEY_blocklist_size, &ruleCount))
             {
                 ruleCount = -1;

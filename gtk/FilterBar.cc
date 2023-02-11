@@ -288,7 +288,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
 
 Glib::RefPtr<Gtk::TreeStore> tracker_filter_model_new(Glib::RefPtr<Gtk::TreeModel> const& tmodel)
 {
-    auto store = Gtk::TreeStore::create(tracker_filter_cols);
+    auto const store = Gtk::TreeStore::create(tracker_filter_cols);
 
     auto iter = store->append();
     iter->set_value(tracker_filter_cols.displayname, Glib::ustring(_("All")));
@@ -531,7 +531,7 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
         { ACTIVITY_FILTER_ERROR, nullptr, N_("Error"), "dialog-error" },
     } });
 
-    auto store = Gtk::ListStore::create(activity_filter_cols);
+    auto const store = Gtk::ListStore::create(activity_filter_cols);
 
     for (auto const& type : types)
     {

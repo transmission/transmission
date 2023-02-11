@@ -7,7 +7,6 @@ Checks: >
   -cppcoreguidelines-narrowing-conversions,
   modernize-*,
   -modernize-use-trailing-return-type,
-  performance-*,
   readability-*,
   -readability-function-cognitive-complexity,
   -readability-identifier-length,

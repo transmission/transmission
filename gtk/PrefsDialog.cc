@@ -686,7 +686,7 @@ RemotePage::WhitelistModelColumns const RemotePage::whitelist_cols;
 
 Glib::RefPtr<Gtk::ListStore> RemotePage::whitelist_tree_model_new(std::string const& whitelist)
 {
-    auto store = Gtk::ListStore::create(whitelist_cols);
+    auto const store = Gtk::ListStore::create(whitelist_cols);
 
     std::istringstream stream(whitelist);
     std::string s;
