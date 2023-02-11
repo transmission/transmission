@@ -228,7 +228,6 @@
 - (void)setupInfo
 {
     self.fFileFilterField.stringValue = @"";
-    [self setFileFilterText:self.fFileFilterField];
 
     if (self.fTorrents.count == 1)
     {
