@@ -281,27 +281,17 @@ public:
         evbuffer_expand(buf_.get(), n_bytes - size());
     }
 
-    size_t addSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    // -1 on error, 0 on eof, >0 for num bytes read
+    auto addSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);
         auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
         auto const err = EVUTIL_SOCKET_ERROR();
-
-        if (res > 0)
-        {
-            return static_cast<size_t>(res);
-        }
-
-        if (res == 0)
-        {
-            tr_error_set(error, ENOTCONN, tr_strerror(ENOTCONN));
-        }
-        else
+        if (res == -1)
         {
             tr_error_set(error, err, tr_net_strerror(err));
         }
-
-        return {};
+        return res;
     }
 
     // Move all data from one buffer into another.
