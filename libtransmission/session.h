@@ -21,10 +21,8 @@
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <utility> // for std::pair
+#include <utility> // std::pair
 #include <vector>
-
-#include <event2/util.h> // for evutil_socket_t
 
 #include "transmission.h"
 
