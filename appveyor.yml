@@ -14,11 +14,6 @@ environment:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     TR_ARCH: x64
 
-branches:
-  only:
-  - main
-  - /^\d+\.\d+.*/
-
 for:
 -
   matrix:
