@@ -262,27 +262,27 @@ public:
 
     void decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        filter_.decryptInit(is_incoming, dh, info_hash);
+        filter().decryptInit(is_incoming, dh, info_hash);
     }
 
     void decrypt(size_t buflen, void* buf)
     {
-        filter_.decrypt(buflen, buf);
+        filter().decrypt(buflen, buf);
     }
 
     void encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        filter_.encryptInit(is_incoming, dh, info_hash);
+        filter().encryptInit(is_incoming, dh, info_hash);
     }
 
     void encrypt(size_t buflen, void* buf)
     {
-        filter_.encrypt(buflen, buf);
+        filter().encrypt(buflen, buf);
     }
 
     [[nodiscard]] bool isEncrypted() const noexcept
     {
-        return filter_.is_active();
+        return filter_.get() != nullptr;
     }
 
     static void utpInit(struct_utp_context* ctx);
@@ -323,9 +323,19 @@ private:
     {
     }
 
+    Filter& filter()
+    {
+        if (!filter_)
+        {
+            filter_ = std::make_unique<Filter>();
+        }
+
+        return *filter_;
+    }
+
     tr_bandwidth bandwidth_;
 
-    Filter filter_;
+    std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
 
     tr_sha1_digest_t torrent_hash_;
 

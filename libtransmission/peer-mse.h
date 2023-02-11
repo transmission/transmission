@@ -49,10 +49,7 @@ public:
 
     // By default, a private key is randomly generated.
     // Providing a predefined one is useful for reproducible unit tests.
-    constexpr DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept
-        : private_key_{ private_key }
-    {
-    }
+    DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept;
 
     // Returns our own public key to be shared with a peer.
     [[nodiscard]] key_bigend_t publicKey() noexcept;
@@ -83,9 +80,9 @@ public:
 
     void decrypt(size_t buf_len, void* buf)
     {
-        if (dec_active_)
+        if (dec_key_)
         {
-            dec_key_.process(buf, buf, buf_len);
+            dec_key_->process(buf, buf, buf_len);
         }
     }
 
@@ -93,22 +90,15 @@ public:
 
     void encrypt(size_t buf_len, void* buf)
     {
-        if (enc_active_)
+        if (enc_key_)
         {
-            enc_key_.process(buf, buf, buf_len);
+            enc_key_->process(buf, buf, buf_len);
         }
     }
 
-    [[nodiscard]] constexpr auto is_active() const noexcept
-    {
-        return dec_active_ || enc_active_;
-    }
-
 private:
-    tr_arc4 dec_key_ = {};
-    tr_arc4 enc_key_ = {};
-    bool dec_active_ = false;
-    bool enc_active_ = false;
+    std::unique_ptr<tr_arc4> dec_key_;
+    std::unique_ptr<tr_arc4> enc_key_;
 };
 
 } // namespace tr_message_stream_encryption
