@@ -122,19 +122,9 @@ public:
 
     /// SPEED LIMIT
 
-    [[nodiscard]] constexpr auto& bandwidth() noexcept
-    {
-        return bandwidth_;
-    }
-
-    [[nodiscard]] constexpr auto const& bandwidth() const noexcept
-    {
-        return bandwidth_;
-    }
-
     constexpr void setSpeedLimitBps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
     {
-        if (bandwidth().setDesiredSpeedBytesPerSecond(dir, bytes_per_second))
+        if (bandwidth_.setDesiredSpeedBytesPerSecond(dir, bytes_per_second))
         {
             setDirty();
         }
@@ -142,7 +132,7 @@ public:
 
     constexpr void useSpeedLimit(tr_direction dir, bool do_use)
     {
-        if (bandwidth().setLimited(dir, do_use))
+        if (bandwidth_.setLimited(dir, do_use))
         {
             setDirty();
         }
@@ -150,17 +140,17 @@ public:
 
     [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const
     {
-        return bandwidth().getDesiredSpeedBytesPerSecond(dir);
+        return bandwidth_.getDesiredSpeedBytesPerSecond(dir);
     }
 
     [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
     {
-        return bandwidth().areParentLimitsHonored(TR_UP);
+        return bandwidth_.areParentLimitsHonored(TR_UP);
     }
 
     [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
     {
-        return bandwidth().isLimited(dir);
+        return bandwidth_.isLimited(dir);
     }
 
     /// BLOCK INFO
@@ -683,7 +673,7 @@ public:
 
     [[nodiscard]] constexpr auto getPriority() const noexcept
     {
-        return bandwidth().getPriority();
+        return bandwidth_.getPriority();
     }
 
     [[nodiscard]] constexpr auto const& bandwidthGroup() const noexcept

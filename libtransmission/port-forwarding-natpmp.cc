@@ -24,9 +24,7 @@
 #include "port-forwarding.h"
 #include "utils.h"
 
-namespace
-{
-void log_val(char const* func, int ret)
+static void logVal(char const* func, int ret)
 {
     if (ret == NATPMP_TRYAGAIN)
     {
@@ -48,7 +46,6 @@ void log_val(char const* func, int ret)
             tr_strerror(errno)));
     }
 }
-} // namespace
 
 bool tr_natpmp::canSendCommand() const
 {
@@ -65,9 +62,9 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
     if (is_enabled && state_ == State::Discover)
     {
         int val = initnatpmp(&natpmp_, 0, 0);
-        log_val("initnatpmp", val);
+        logVal("initnatpmp", val);
         val = sendpublicaddressrequest(&natpmp_);
-        log_val("sendpublicaddressrequest", val);
+        logVal("sendpublicaddressrequest", val);
         state_ = val < 0 ? State::Err : State::RecvPub;
         has_discovered_ = true;
         setCommandTime();
@@ -77,7 +74,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
     {
         natpmpresp_t response;
         auto const val = readnatpmpresponseorretry(&natpmp_, &response);
-        log_val("readnatpmpresponseorretry", val);
+        logVal("readnatpmpresponseorretry", val);
 
         if (val >= 0)
         {
@@ -105,7 +102,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
             local_port_.host(),
             advertised_port_.host(),
             0);
-        log_val("sendnewportmappingrequest", val);
+        logVal("sendnewportmappingrequest", val);
         state_ = val < 0 ? State::Err : State::RecvUnmap;
         setCommandTime();
     }
@@ -114,7 +111,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
     {
         auto resp = natpmpresp_t{};
         auto const val = readnatpmpresponseorretry(&natpmp_, &resp);
-        log_val("readnatpmpresponseorretry", val);
+        logVal("readnatpmpresponseorretry", val);
 
         if (val >= 0)
         {
@@ -156,7 +153,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
             local_port.host(),
             local_port.host(),
             LifetimeSecs);
-        log_val("sendnewportmappingrequest", val);
+        logVal("sendnewportmappingrequest", val);
         state_ = val < 0 ? State::Err : State::RecvMap;
         setCommandTime();
     }
@@ -165,7 +162,7 @@ tr_natpmp::PulseResult tr_natpmp::pulse(tr_port local_port, bool is_enabled)
     {
         auto resp = natpmpresp_t{};
         auto const val = readnatpmpresponseorretry(&natpmp_, &resp);
-        log_val("readnatpmpresponseorretry", val);
+        logVal("readnatpmpresponseorretry", val);
 
         if (val >= 0)
         {

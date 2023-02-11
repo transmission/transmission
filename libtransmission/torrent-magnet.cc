@@ -28,6 +28,13 @@
 #include "utils.h"
 #include "variant.h"
 
+/***
+****
+***/
+
+/* don't ask for the same metadata piece more than this often */
+static auto constexpr MinRepeatIntervalSecs = int{ 3 };
+
 struct metadata_node
 {
     time_t requested_at = 0U;
@@ -44,12 +51,7 @@ struct tr_incomplete_metadata
     int piece_count = 0;
 };
 
-namespace
-{
-// don't ask for the same metadata piece more than this often
-auto constexpr MinRepeatIntervalSecs = int{ 3 };
-
-auto create_all_needed(int n_pieces)
+static auto create_all_needed(int n_pieces)
 {
     auto ret = std::deque<metadata_node>{};
 
@@ -62,7 +64,6 @@ auto create_all_needed(int n_pieces)
 
     return ret;
 }
-} // namespace
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
@@ -150,54 +151,14 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
     return buf;
 }
 
-bool tr_torrentUseMetainfoFromFile(
-    tr_torrent* tor,
-    tr_torrent_metainfo const* metainfo,
-    char const* filename_in,
-    tr_error** error)
-{
-    // add .torrent file
-    if (!tr_sys_path_copy(filename_in, tor->torrentFile(), error))
-    {
-        return false;
-    }
-
-    // remove .magnet file
-    tr_sys_path_remove(tor->magnetFile());
-
-    // tor should keep this metainfo
-    tor->setMetainfo(*metainfo);
-
-    if (tor->incompleteMetadata != nullptr)
-    {
-        delete tor->incompleteMetadata;
-        tor->incompleteMetadata = nullptr;
-    }
-    tor->isStopping = true;
-    tor->magnetVerify = true;
-    if (tor->session->shouldPauseAddedTorrents())
-    {
-        tor->startAfterVerify = false;
-    }
-    tor->markEdited();
-
-    return true;
-}
-
-// ---
-
-namespace
-{
-namespace set_metadata_piece_helpers
-{
-[[nodiscard]] constexpr size_t get_piece_length(struct tr_incomplete_metadata const* m, int piece)
+static size_t getPieceLength(struct tr_incomplete_metadata const* m, int piece)
 {
     return piece + 1 == m->piece_count ? // last piece
         std::size(m->metadata) - (piece * METADATA_PIECE_SIZE) :
         METADATA_PIECE_SIZE;
 }
 
-void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* top)
+static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_variant* top)
 {
     tr_variantInitDict(top, 6);
 
@@ -255,7 +216,41 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
     }
 }
 
-bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
+bool tr_torrentUseMetainfoFromFile(
+    tr_torrent* tor,
+    tr_torrent_metainfo const* metainfo,
+    char const* filename_in,
+    tr_error** error)
+{
+    // add .torrent file
+    if (!tr_sys_path_copy(filename_in, tor->torrentFile(), error))
+    {
+        return false;
+    }
+
+    // remove .magnet file
+    tr_sys_path_remove(tor->magnetFile());
+
+    // tor should keep this metainfo
+    tor->setMetainfo(*metainfo);
+
+    if (tor->incompleteMetadata != nullptr)
+    {
+        delete tor->incompleteMetadata;
+        tor->incompleteMetadata = nullptr;
+    }
+    tor->isStopping = true;
+    tor->magnetVerify = true;
+    if (tor->session->shouldPauseAddedTorrents())
+    {
+        tor->startAfterVerify = false;
+    }
+    tor->markEdited();
+
+    return true;
+}
+
+static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
 {
     // test the info_dict checksum
     if (tr_sha1::digest(m->metadata) != tor->infoHash())
@@ -272,7 +267,7 @@ bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error
 
     // yay we have an info dict. Let's make a torrent file
     auto top_v = tr_variant{};
-    build_metainfo_except_info_dict(tor->metainfo_, &top_v);
+    tr_buildMetainfoExceptInfoDict(tor->metainfo_, &top_v);
     tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &info_dict_v);
     auto const benc = tr_variantToStr(&top_v, TR_VARIANT_FMT_BENC);
     tr_variantClear(&top_v);
@@ -300,10 +295,10 @@ bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error
     return true;
 }
 
-void on_have_all_metainfo(tr_torrent* tor, tr_incomplete_metadata* m)
+static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
 {
     tr_error* error = nullptr;
-    if (use_new_metainfo(tor, m, &error))
+    if (useNewMetainfo(tor, m, &error))
     {
         delete tor->incompleteMetadata;
         tor->incompleteMetadata = nullptr;
@@ -334,13 +329,9 @@ void on_have_all_metainfo(tr_torrent* tor, tr_incomplete_metadata* m)
         tr_error_clear(&error);
     }
 }
-} // namespace set_metadata_piece_helpers
-} // namespace
 
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len)
 {
-    using namespace set_metadata_piece_helpers;
-
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(data != nullptr);
 
@@ -360,7 +351,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
     }
 
     // sanity test: is `len` the right size?
-    if (get_piece_length(m, piece) != len)
+    if (getPieceLength(m, piece) != len)
     {
         return;
     }
@@ -386,11 +377,9 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
     if (std::empty(needed))
     {
         tr_logAddDebugTor(tor, fmt::format("metainfo piece {} was the last one", piece));
-        on_have_all_metainfo(tor, m);
+        onHaveAllMetainfo(tor, m);
     }
 }
-
-// ---
 
 std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
 {
