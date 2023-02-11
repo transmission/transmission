@@ -713,6 +713,7 @@ if(RUN_CLANG_TIDY)
 endif()
 
 if(ENABLE_TESTS)
+    include(CTest)
     enable_testing()
     add_subdirectory(tests)
 endif()
@@ -792,7 +793,6 @@ if(GIT_FOUND)
             COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
             WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
         )
-        set_property(TARGET check-format format PROPERTY FOLDER "utility")
     endif()
     unset(TR_GIT_ROOT)
 endif()
