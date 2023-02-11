@@ -432,8 +432,6 @@ public:
 
     bool setTrackerList(std::string_view text);
 
-    void onTrackerResponse(tr_tracker_event const* event);
-
     /// METAINFO - WEBSEEDS
 
     [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
