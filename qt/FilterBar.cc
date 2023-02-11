@@ -286,8 +286,8 @@ void FilterBar::refreshPref(int key)
     case Prefs::FILTER_TRACKERS:
         {
             auto const display_name = prefs_.getString(key);
-
-            if (auto rows = tracker_model_->findItems(display_name); !rows.isEmpty())
+            auto rows = tracker_model_->findItems(display_name);
+            if (!rows.isEmpty())
             {
                 tracker_combo_->setCurrentIndex(rows.front()->row());
             }

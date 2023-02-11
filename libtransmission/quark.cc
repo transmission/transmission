@@ -443,8 +443,8 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
     // is it in our static array?
     auto constexpr Sbegin = std::begin(MyStatic);
     auto constexpr Send = std::end(MyStatic);
-
-    if (auto const sit = std::lower_bound(Sbegin, Send, key); sit != Send && *sit == key)
+    auto const sit = std::lower_bound(Sbegin, Send, key);
+    if (sit != Send && *sit == key)
     {
         return std::distance(Sbegin, sit);
     }
@@ -452,7 +452,8 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
     /* was it added during runtime? */
     auto const rbegin = std::begin(my_runtime);
     auto const rend = std::end(my_runtime);
-    if (auto const rit = std::find(rbegin, rend, key); rit != rend)
+    auto const rit = std::find(rbegin, rend, key);
+    if (rit != rend)
     {
         return TR_N_KEYS + std::distance(rbegin, rit);
     }

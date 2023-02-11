@@ -39,13 +39,14 @@ void DBusInteropHelper::registerObject(QObject* parent)
         return;
     }
 
-    if (auto const service_name = QStringLiteral("com.transmissionbt.Transmission"); !bus.registerService(service_name))
+    auto const service_name = QStringLiteral("com.transmissionbt.Transmission");
+    if (!bus.registerService(service_name))
     {
         qWarning() << "couldn't register" << qPrintable(service_name);
     }
 
-    if (auto const object_path = QStringLiteral("/com/transmissionbt/Transmission");
-        !bus.registerObject(object_path, new InteropObject(parent), QDBusConnection::ExportAllSlots))
+    auto const object_path = QStringLiteral("/com/transmissionbt/Transmission");
+    if (!bus.registerObject(object_path, new InteropObject(parent), QDBusConnection::ExportAllSlots))
     {
         qWarning() << "couldn't register" << qPrintable(object_path);
     }

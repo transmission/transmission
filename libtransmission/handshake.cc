@@ -497,7 +497,9 @@ static ReadState readVC(tr_handshake* handshake, tr_peerIo* peer_io)
 
 static ReadState readCryptoSelect(tr_handshake* handshake, tr_peerIo* peer_io)
 {
-    if (static size_t constexpr NeedLen = sizeof(uint32_t) + sizeof(uint16_t); peer_io->readBufferSize() < NeedLen)
+    static size_t const needlen = sizeof(uint32_t) + sizeof(uint16_t);
+
+    if (peer_io->readBufferSize() < needlen)
     {
         return READ_LATER;
     }

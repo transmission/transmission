@@ -152,7 +152,8 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
     }
 
     // If we saved it to disk successfully, move it from '.tmp' to the correct filename
-    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, tr_pathbuf{ filename }, error))
+    auto const szfilename = tr_pathbuf{ filename };
+    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, szfilename, error))
     {
         return false;
     }
