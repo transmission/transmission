@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cinttypes> // PRIu64
 #include <climits> // INT_MAX
 #include <cstdio>
 #include <ctime>

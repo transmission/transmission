@@ -24,7 +24,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" // for tr_rand_obj()
+#include "crypto-utils.h" // for tr_rand_buffer()
 #include "log.h"
 #include "net.h"
 #include "timer.h"
@@ -48,7 +48,8 @@ auto makeCookie()
 {
     static auto constexpr Pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"sv;
 
-    auto buf = tr_rand_obj<std::array<char, 12>>();
+    auto buf = std::array<char, 12>{};
+    tr_rand_buffer(std::data(buf), std::size(buf));
     for (auto& ch : buf)
     {
         ch = Pool[static_cast<unsigned char>(ch) % std::size(Pool)];

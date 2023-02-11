@@ -106,13 +106,13 @@ TEST(WebUtilsTest, parseMagnetFuzzRegressions)
 
 TEST(WebUtilsTest, parseMagnetFuzz)
 {
-    auto buf = std::array<char, 1024>{};
+    auto buf = std::vector<char>{};
 
     for (size_t i = 0; i < 100000; ++i)
     {
-        auto const len = static_cast<size_t>(tr_rand_int(1024));
-        tr_rand_buffer(std::data(buf), len);
+        buf.resize(tr_rand_int(1024));
+        tr_rand_buffer(std::data(buf), std::size(buf));
         auto mm = tr_magnet_metainfo{};
-        EXPECT_FALSE(mm.parseMagnet({ std::data(buf), len }));
+        EXPECT_FALSE(mm.parseMagnet({ std::data(buf), std::size(buf) }));
     }
 }

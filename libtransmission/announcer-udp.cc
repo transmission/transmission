@@ -28,7 +28,7 @@
 
 #include "announcer.h"
 #include "announcer-common.h"
-#include "crypto-utils.h" // for tr_rand_obj()
+#include "crypto-utils.h" /* tr_rand_buffer() */
 #include "log.h"
 #include "peer-io.h"
 #include "peer-mgr.h" // for tr_pex::fromCompact4()
@@ -52,7 +52,9 @@ static auto constexpr TauConnectionTtlSecs = int{ 60 };
 
 static tau_transaction_t tau_transaction_new()
 {
-    return tr_rand_obj<tau_transaction_t>();
+    auto tmp = tau_transaction_t{};
+    tr_rand_buffer(&tmp, sizeof(tau_transaction_t));
+    return tmp;
 }
 
 // used in the "action" field of a request. Values defined in bep 15.
