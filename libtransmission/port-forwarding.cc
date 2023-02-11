@@ -208,7 +208,7 @@ private:
             mediator_.localPeerPort(),
             is_enabled,
             do_check,
-            mediator_.incomingPeerAddress().display_name());
+            mediator_.incomingPeerAddress().readable());
 
         if (auto const new_state = state(); new_state != old_state)
         {

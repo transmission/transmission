@@ -109,14 +109,14 @@ struct tr_pex
         size_t added_f_len);
 
     template<typename OutputIt>
-    [[nodiscard]] OutputIt display_name(OutputIt out) const
+    [[nodiscard]] OutputIt readable(OutputIt out) const
     {
-        return addr.display_name(out, port);
+        return addr.readable(out, port);
     }
 
-    [[nodiscard]] std::string display_name() const
+    [[nodiscard]] std::string readable() const
     {
-        return addr.display_name(port);
+        return addr.readable(port);
     }
 
     [[nodiscard]] int compare(tr_pex const& that) const noexcept // <=>

@@ -298,7 +298,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
-            fmt::arg("address", source_addr.display_name()),
+            fmt::arg("address", source_addr.readable()),
             fmt::arg("socket", s),
             fmt::arg("error", tr_net_strerror(sockerrno)),
             fmt::arg("error_code", sockerrno)));
@@ -318,7 +318,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
                 fmt::arg("socket", s),
-                fmt::arg("address", addr.display_name()),
+                fmt::arg("address", addr.readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(tmperrno)),
                 fmt::arg("error_code", tmperrno)));
@@ -331,7 +331,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
         ret = tr_peer_socket{ session, addr, port, s };
     }
 
-    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.display_name(port)));
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.readable(port)));
 
     return ret;
 }
@@ -409,7 +409,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
                 err == EADDRINUSE ?
                     _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
                     _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
-                fmt::arg("address", addr.display_name()),
+                fmt::arg("address", addr.readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(err)),
                 fmt::arg("error_code", err)));
@@ -422,7 +422,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
     if (!suppress_msgs)
     {
-        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr.display_name()));
+        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr.readable()));
     }
 
 #ifdef TCP_FASTOPEN
@@ -776,7 +776,7 @@ std::optional<tr_address> tr_address::fromString(std::string_view address_sv)
     return {};
 }
 
-std::string_view tr_address::display_name(char* out, size_t outlen, tr_port port) const
+std::string_view tr_address::readable(char* out, size_t outlen, tr_port port) const
 {
     if (std::empty(port))
     {
@@ -784,26 +784,26 @@ std::string_view tr_address::display_name(char* out, size_t outlen, tr_port port
     }
 
     auto buf = std::array<char, INET6_ADDRSTRLEN>{};
-    auto const addr_sv = display_name(std::data(buf), std::size(buf));
+    auto const addr_sv = readable(std::data(buf), std::size(buf));
     auto const [end, size] = fmt::format_to_n(out, outlen - 1, FMT_STRING("[{:s}]:{:d}"), addr_sv, port.host());
     return { out, size };
 }
 
 template<typename OutputIt>
-OutputIt tr_address::display_name(OutputIt out, tr_port port) const
+OutputIt tr_address::readable(OutputIt out, tr_port port) const
 {
     auto addrbuf = std::array<char, TR_ADDRSTRLEN + 16>{};
-    auto const addr_sv = display_name(std::data(addrbuf), std::size(addrbuf), port);
+    auto const addr_sv = readable(std::data(addrbuf), std::size(addrbuf), port);
     return std::copy(std::begin(addr_sv), std::end(addr_sv), out);
 }
 
-template char* tr_address::display_name<char*>(char*, tr_port) const;
+template char* tr_address::readable<char*>(char*, tr_port) const;
 
-[[nodiscard]] std::string tr_address::display_name(tr_port port) const
+[[nodiscard]] std::string tr_address::readable(tr_port port) const
 {
     auto buf = std::string{};
     buf.reserve(INET6_ADDRSTRLEN + 16);
-    this->display_name(std::back_inserter(buf), port);
+    this->readable(std::back_inserter(buf), port);
     return buf;
 }
 

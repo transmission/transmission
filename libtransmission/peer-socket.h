@@ -51,19 +51,19 @@ public:
     }
 
     template<typename OutputIt>
-    OutputIt display_name(OutputIt out)
+    OutputIt readable(OutputIt out)
     {
-        return address_.display_name(out, port_);
+        return address_.readable(out, port_);
     }
 
-    [[nodiscard]] std::string_view display_name(char* out, size_t outlen) const
+    [[nodiscard]] std::string_view readable(char* out, size_t outlen) const
     {
-        return address_.display_name(out, outlen, port_);
+        return address_.readable(out, outlen, port_);
     }
 
-    [[nodiscard]] std::string display_name() const
+    [[nodiscard]] std::string readable() const
     {
-        return address_.display_name(port_);
+        return address_.readable(port_);
     }
 
     [[nodiscard]] constexpr auto is_utp() const noexcept

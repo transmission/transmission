@@ -101,9 +101,9 @@ public:
         return socket.socketAddress();
     }
 
-    [[nodiscard]] auto display_name() const
+    [[nodiscard]] auto addrStr() const
     {
-        return socket.display_name();
+        return socket.readable();
     }
 
     void readBufferDrain(size_t byte_count);

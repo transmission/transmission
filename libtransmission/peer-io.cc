@@ -42,10 +42,10 @@
 
 static constexpr auto UtpReadBufferSize = 256 * 1024;
 
-#define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
-#define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())
-#define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
-#define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
+#define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->addrStr())
+#define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->addrStr())
+#define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->addrStr())
+#define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->addrStr())
 
 static constexpr size_t guessPacketOverhead(size_t d)
 {
