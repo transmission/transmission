@@ -873,11 +873,11 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session)
     return session->incompleteDir().c_str();
 }
 
-void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool enabled)
+void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool b)
 {
     TR_ASSERT(session != nullptr);
 
-    session->useIncompleteDir(enabled);
+    session->useIncompleteDir(b);
 }
 
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
