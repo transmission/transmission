@@ -175,7 +175,22 @@ static std::string strlratio2(double ratio)
 
 static std::string strlratio(int64_t numerator, int64_t denominator)
 {
-    return strlratio2(tr_getRatio(numerator, denominator));
+    double ratio;
+
+    if (denominator != 0)
+    {
+        ratio = numerator / (double)denominator;
+    }
+    else if (numerator != 0)
+    {
+        ratio = TR_RATIO_INF;
+    }
+    else
+    {
+        ratio = TR_RATIO_NA;
+    }
+
+    return strlratio2(ratio);
 }
 
 static std::string strlmem(int64_t bytes)
