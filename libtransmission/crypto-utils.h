@@ -89,8 +89,7 @@ void tr_x509_cert_free(tr_x509_cert_t handle);
 /**
  * @brief Returns a random number in the range of [0...upper_bound).
  */
-template<class IntType>
-[[nodiscard]] IntType tr_rand_int(IntType upper_bound);
+[[nodiscard]] int tr_rand_int(int upper_bound);
 
 /**
  * @brief Returns a pseudorandom number in the range of [0...upper_bound).
@@ -98,8 +97,7 @@ template<class IntType>
  * This is faster, BUT WEAKER, than tr_rand_int() and never be used in sensitive cases.
  * @see tr_rand_int()
  */
-template<class IntType>
-[[nodiscard]] IntType tr_rand_int_weak(IntType upper_bound);
+[[nodiscard]] int tr_rand_int_weak(int upper_bound);
 
 /**
  * @brief Fill a buffer with random bytes.
