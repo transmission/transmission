@@ -40,7 +40,7 @@ const config = {
   output: {
     filename: 'transmission-app.js',
     path: path.resolve(__dirname, 'public_html'),
-    sourceMapFilename: '[file].map',
+    sourceMapFilename: 'transmission-app.js.map'
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -52,7 +52,7 @@ const config = {
     }),
   ],
   resolve: {
-    extensions: ['.js', '.scss'],
+    extensions: ['.js', '.scss']
   },
 };
 
@@ -60,15 +60,18 @@ if (mode === 'development') {
   config.devServer = {
     compress: true,
     historyApiFallback: {
-      rewrites: [{ from: '/transmission/web', to: '/' }],
+      rewrites: [
+        { from: '/transmission/web', to: '/' },
+      ]
     },
     hot: true,
     port: devPort,
     proxy: {
-      '/rpc': rpcUrl,
+      '/rpc': rpcUrl
     },
-    static: './public_html',
+    static: './public_html'
   };
 }
 
 module.exports = config;
+
