@@ -12,8 +12,6 @@
 
 #include <cstddef>
 
-// NOLINTBEGIN(cppcoreguidelines-macro-usage)
-
 #ifndef GTKMM_CHECK_VERSION
 #define GTKMM_CHECK_VERSION(major, minor, micro) \
     (GTKMM_MAJOR_VERSION > (major) || (GTKMM_MAJOR_VERSION == (major) && GTKMM_MINOR_VERSION > (minor)) || \
@@ -104,8 +102,6 @@
 #define TR_PANGO_ALIGNMENT(Code) IF_PANGOMM2_48(Pango::Alignment::Code, Pango::ALIGN_##Code)
 #define TR_PANGO_ELLIPSIZE_MODE(Code) IF_PANGOMM2_48(Pango::EllipsizeMode::Code, Pango::ELLIPSIZE_##Code)
 #define TR_PANGO_WEIGHT(Code) IF_PANGOMM2_48(Pango::Weight::Code, Pango::WEIGHT_##Code)
-
-// NOLINTEND(cppcoreguidelines-macro-usage)
 
 namespace Glib
 {

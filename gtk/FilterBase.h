@@ -7,8 +7,6 @@
 
 #include "GtkCompat.h"
 
-#include <libtransmission/tr-macros.h>
-
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 #include <gtkmm/filter.h>
 #else
@@ -28,10 +26,7 @@ public:
 #endif
 
 public:
-    FilterBase() = default;
     ~FilterBase() override = default;
-
-    TR_DISABLE_COPY_MOVE(FilterBase)
 
     virtual bool match(T const& item) const = 0;
 
