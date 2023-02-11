@@ -904,7 +904,6 @@ public:
     bool isRunning = false;
     bool isStopping = false;
     bool startAfterVerify = false;
-    bool magnetStartAfterVerify = false;
 
     bool magnetVerify = false;
 
