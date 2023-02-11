@@ -4512,7 +4512,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         ToolbarItemIdentifierOpenWeb,
         ToolbarItemIdentifierRemove,
         ToolbarItemIdentifierPauseResumeSelected,
-        ToolbarItemIdentifierPauseResumeAll,
+        ToolbarItemIdentifierResumeAll,
         ToolbarItemIdentifierShare,
         ToolbarItemIdentifierQuickLook,
         ToolbarItemIdentifierFilter,
