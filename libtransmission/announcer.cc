@@ -462,9 +462,9 @@ struct tr_tier
         scheduleNextScrape(0);
     }
 
-    void scheduleNextScrape(time_t interval_secs)
+    void scheduleNextScrape(int interval)
     {
-        this->scrapeAt = getNextScrapeTime(tor->session, this, interval_secs);
+        this->scrapeAt = getNextScrapeTime(tor->session, this, interval);
     }
 
     std::deque<tr_announce_event> announce_events;
@@ -518,7 +518,7 @@ private:
     // unless the tracker says otherwise, this is the announce min_interval
     static auto constexpr DefaultAnnounceMinIntervalSec = int{ 60 * 2 };
 
-    [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, time_t interval_secs)
+    [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, int interval)
     {
         // Maybe don't scrape paused torrents
         if (!tier->isRunning && !session->shouldScrapePausedTorrents())
@@ -529,8 +529,8 @@ private:
         /* Add the interval, and then increment to the nearest 10th second.
          * The latter step is to increase the odds of several torrents coming
          * due at the same time to improve multiscrape. */
-        auto ret = tr_time() + interval_secs;
-        while (ret % 10U != 0U)
+        auto ret = tr_time() + interval;
+        while (ret % 10 != 0)
         {
             ++ret;
         }

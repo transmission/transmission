@@ -775,7 +775,7 @@ public:
         }
     }
 
-    static inline auto curl_init_flag = std::once_flag{};
+    static std::once_flag curl_init_flag;
 
     std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
 
@@ -789,6 +789,8 @@ public:
         }
     }
 };
+
+std::once_flag tr_web::Impl::curl_init_flag;
 
 tr_web::tr_web(Mediator& mediator)
     : impl_{ std::make_unique<Impl>(mediator) }

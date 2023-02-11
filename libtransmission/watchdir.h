@@ -63,7 +63,8 @@ public:
         std::chrono::milliseconds rescan_interval = generic_rescan_interval);
 
 private:
-    static inline auto generic_rescan_interval = std::chrono::milliseconds{ 1000 };
+    static constexpr std::chrono::milliseconds DefaultGenericRescanInterval{ 1000 };
+    static std::chrono::milliseconds generic_rescan_interval;
 };
 
 } // namespace libtransmission

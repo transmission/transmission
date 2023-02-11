@@ -64,6 +64,8 @@ namespace
 
 } // namespace
 
+std::chrono::milliseconds Watchdir::generic_rescan_interval = Watchdir::DefaultGenericRescanInterval;
+
 namespace impl
 {
 
