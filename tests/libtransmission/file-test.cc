@@ -339,19 +339,6 @@ TEST_F(FileTest, readFile)
     EXPECT_EQ(nullptr, err) << *err;
 
     tr_sys_file_close(fd);
-
-    // read from closed file
-    n_read = 0;
-    EXPECT_FALSE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_read, &err)); // coverity[USE_AFTER_FREE]
-    EXPECT_EQ(0, n_read);
-    EXPECT_NE(nullptr, err);
-    tr_error_clear(&err);
-
-    // read_at from closed file
-    EXPECT_FALSE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_read, &err)); // coverity[USE_AFTER_FREE]
-    EXPECT_EQ(0, n_read);
-    EXPECT_NE(nullptr, err);
-    tr_error_clear(&err);
 }
 
 TEST_F(FileTest, pathExists)

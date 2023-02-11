@@ -172,7 +172,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
-        run: cmake -E chdir obj ctest --build-config Debug --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
 
   macos-11:
     runs-on: macos-11
@@ -225,7 +225,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -301,7 +301,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -394,7 +394,7 @@ jobs:
           cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure --timeout 600
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
       - name: Package
@@ -501,7 +501,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -578,7 +578,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -654,7 +654,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
