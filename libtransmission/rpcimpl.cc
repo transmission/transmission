@@ -217,7 +217,7 @@ static char const* queueMoveBottom(
 
 struct CompareTorrentByQueuePosition
 {
-    constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const
+    bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
         return a->queuePosition < b->queuePosition;
     }
@@ -569,7 +569,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_bandwidthPriority:
-        tr_variantInitInt(initme, tor->getPriority());
+        tr_variantInitInt(initme, tr_torrentGetPriority(tor));
         break;
 
     case TR_KEY_comment:
@@ -609,7 +609,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_downloadLimited:
-        tr_variantInitBool(initme, tor->usesSpeedLimit(TR_DOWN));
+        tr_variantInitBool(initme, tr_torrentUsesSpeedLimit(tor, TR_DOWN));
         break;
 
     case TR_KEY_error:
@@ -655,7 +655,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_honorsSessionLimits:
-        tr_variantInitBool(initme, tor->usesSessionLimits());
+        tr_variantInitBool(initme, tr_torrentUsesSessionLimits(tor));
         break;
 
     case TR_KEY_id:
@@ -691,8 +691,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_maxConnectedPeers:
-    case TR_KEY_peer_limit:
-        tr_variantInitInt(initme, tor->peerLimit());
+        tr_variantInitInt(initme, tr_torrentGetPeerLimit(tor));
         break;
 
     case TR_KEY_magnetLink:
@@ -713,6 +712,10 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
 
     case TR_KEY_percentDone:
         tr_variantInitReal(initme, st->percentDone);
+        break;
+
+    case TR_KEY_peer_limit:
+        tr_variantInitInt(initme, tr_torrentGetPeerLimit(tor));
         break;
 
     case TR_KEY_peers:
@@ -803,11 +806,11 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_seedIdleLimit:
-        tr_variantInitInt(initme, tor->idleLimitMinutes());
+        tr_variantInitInt(initme, tr_torrentGetIdleLimit(tor));
         break;
 
     case TR_KEY_seedIdleMode:
-        tr_variantInitInt(initme, tor->idleLimitMode());
+        tr_variantInitInt(initme, tr_torrentGetIdleMode(tor));
         break;
 
     case TR_KEY_seedRatioLimit:
@@ -880,7 +883,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_uploadLimited:
-        tr_variantInitBool(initme, tor->usesSpeedLimit(TR_UP));
+        tr_variantInitBool(initme, tr_torrentUsesSpeedLimit(tor, TR_UP));
         break;
 
     case TR_KEY_uploadRatio:
@@ -1271,7 +1274,7 @@ static char const* torrentSet(
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &val))
         {
-            tor->useSpeedLimit(TR_DOWN, val);
+            tr_torrentUseSpeedLimit(tor, TR_DOWN, val);
         }
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &val))
@@ -1286,12 +1289,12 @@ static char const* torrentSet(
 
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_uploadLimited, &val))
         {
-            tor->useSpeedLimit(TR_UP, val);
+            tr_torrentUseSpeedLimit(tor, TR_UP, val);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
         {
-            tor->setIdleLimit(static_cast<uint16_t>(tmp));
+            tr_torrentSetIdleLimit(tor, static_cast<uint16_t>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
@@ -1306,7 +1309,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedRatioMode, &tmp))
         {
-            tor->setRatioMode(static_cast<tr_ratiolimit>(tmp));
+            tr_torrentSetRatioMode(tor, (tr_ratiolimit)tmp);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))

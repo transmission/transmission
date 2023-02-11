@@ -14,7 +14,7 @@
 struct tr_session;
 
 /** @brief return the directory where the Web Client's web ui files are kept */
-[[nodiscard]] std::string tr_getWebClientDir(tr_session const*);
+std::string tr_getWebClientDir(tr_session const*);
 
 /** @brief return the directory where session id lock files are stored */
-[[nodiscard]] std::string tr_getSessionIdDir();
+std::string tr_getSessionIdDir();

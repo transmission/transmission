@@ -147,7 +147,7 @@ public:
     // This is a destructive add: `buf` is empty after this call.
     void write(libtransmission::Buffer& buf, bool is_piece_data);
 
-    [[nodiscard]] size_t getWriteBufferSpace(uint64_t now) const noexcept;
+    size_t getWriteBufferSpace(uint64_t now) const;
 
     [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
