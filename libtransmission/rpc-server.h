@@ -65,7 +65,7 @@ public:
         return port_;
     }
 
-    void setPort(tr_port port) noexcept;
+    void setPort(tr_port) noexcept;
 
     [[nodiscard]] constexpr auto isEnabled() const noexcept
     {

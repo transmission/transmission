@@ -2291,7 +2291,7 @@ void tr_peerMsgsImpl::sendPex()
 
 tr_peerMsgs::~tr_peerMsgs()
 {
-    [[maybe_unused]] auto const n_prev = n_peers--;
+    [[maybe_unused]] auto const n_prev = n_peers_--;
     TR_ASSERT(n_prev > 0U);
 }
 
