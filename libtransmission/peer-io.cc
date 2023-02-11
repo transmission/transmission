@@ -144,9 +144,9 @@ static void canReadWrapper(tr_peerIo* io_in)
     while (!done && !err)
     {
         size_t piece = 0;
-        auto const old_len = io->readBufferSize();
-        auto const read_state = io->canRead == nullptr ? READ_ERR : io->canRead(io.get(), io->userData, &piece);
-        auto const used = old_len - io->readBufferSize();
+        size_t const old_len = io->readBufferSize();
+        int const ret = io->canRead(io.get(), io->userData, &piece);
+        size_t const used = old_len - io->readBufferSize();
         auto const overhead = guessPacketOverhead(used);
 
         if (piece != 0 || piece != used)
@@ -167,7 +167,7 @@ static void canReadWrapper(tr_peerIo* io_in)
             io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
         }
 
-        switch (read_state)
+        switch (ret)
         {
         case READ_NOW:
             if (io->readBufferSize() != 0)
@@ -246,7 +246,10 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
                 fmt::format("event_read_cb err: res:{}, what:{}, errno:{} ({})", res, what, error->code, error->message));
         }
 
-        io->call_error_callback(what);
+        if (io->gotError != nullptr)
+        {
+            io->gotError(io, what, io->userData);
+        }
     }
 
     tr_error_clear(&error);
@@ -309,7 +312,10 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
                 (error != nullptr ? error->code : 0),
                 (error != nullptr ? error->message : "EOF")));
 
-        io->call_error_callback(what);
+        if (io->gotError != nullptr)
+        {
+            io->gotError(io, what, io->userData);
+        }
     }
 
     tr_error_clear(&error);
@@ -373,7 +379,10 @@ static void utp_on_state_change(tr_peerIo* const io, int const state)
     }
     else if (state == UTP_STATE_EOF)
     {
-        io->call_error_callback(BEV_EVENT_EOF);
+        if (io->gotError != nullptr)
+        {
+            io->gotError(io, BEV_EVENT_EOF, io->userData);
+        }
     }
     else if (state == UTP_STATE_DESTROYING)
     {
@@ -392,7 +401,7 @@ static void utp_on_error(tr_peerIo* const io, int const errcode)
     if (io->gotError != nullptr)
     {
         errno = errcode;
-        io->call_error_callback(BEV_EVENT_ERROR);
+        io->gotError(io, BEV_EVENT_ERROR, io->userData);
     }
 }
 
@@ -898,7 +907,10 @@ static size_t tr_peerIoTryRead(tr_peerIo* io, size_t howmuch, tr_error** error)
                     my_error->message);
                 tr_logAddTraceIo(io, msg);
 
-                io->call_error_callback(what);
+                if (io->gotError != nullptr)
+                {
+                    io->gotError(io, what, io->userData);
+                }
 
                 tr_error_propagate(error, &my_error);
             }
@@ -961,7 +973,10 @@ static size_t tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch, tr_error** error)
                         my_error->code,
                         my_error->message));
 
-                io->call_error_callback(What);
+                if (io->gotError != nullptr)
+                {
+                    io->gotError(io, What, io->userData);
+                }
 
                 tr_error_propagate(error, &my_error);
             }
