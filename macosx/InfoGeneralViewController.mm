@@ -160,9 +160,9 @@
     {
         Torrent* torrent = self.fTorrents[0];
 
-        // Associated Press Style: "Use a semicolon to clarify a series that includes a number of commas."
+#warning candidate for localizedStringWithFormat (although then we'll get two commas)
         NSString* piecesString = !torrent.magnet ?
-            [NSString localizedStringWithFormat:@"%ld; %@", torrent.pieceCount, [NSString stringForFileSize:torrent.pieceSize]] :
+            [NSString stringWithFormat:@"%ld, %@", torrent.pieceCount, [NSString stringForFileSize:torrent.pieceSize]] :
             @"";
         self.fPiecesField.stringValue = piecesString;
 

@@ -257,7 +257,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         }
         else
         {
-            return [NSString localizedStringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
+            return [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
         }
     }
     else
@@ -817,17 +817,17 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSMenuItem* item;
         if (menu.numberOfItems == 3)
         {
-            static NSArray<NSNumber*>* const speedLimitActionValues = @[ @50, @100, @250, @500, @1000, @2500, @5000, @10000 ];
+            NSInteger const speedLimitActionValue[] = { 50, 100, 250, 500, 1000, 2500, 5000, 10000, -1 };
 
-            for (NSNumber* i in speedLimitActionValues)
+            for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {
                 item = [[NSMenuItem alloc]
-                    initWithTitle:[NSString localizedStringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
-                                                                      i.integerValue]
+                    initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
+                                                             speedLimitActionValue[i]]
                            action:@selector(setQuickLimit:)
                     keyEquivalent:@""];
                 item.target = self;
-                item.representedObject = i;
+                item.representedObject = @(speedLimitActionValue[i]);
                 [menu addItem:item];
             }
         }
@@ -837,8 +837,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
         item = [menu itemWithTag:ActionMenuTagLimit];
         item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
-                                                         [self.fMenuTorrent speedLimit:upload]];
+        item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
+                                                [self.fMenuTorrent speedLimit:upload]];
 
         item = [menu itemWithTag:ActionMenuTagUnlimited];
         item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
@@ -848,15 +848,15 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSMenuItem* item;
         if (menu.numberOfItems == 4)
         {
-            static NSArray<NSNumber*>* const ratioLimitActionValue = @[ @0.25, @0.5, @0.75, @1.0, @1.5, @2.0, @3.0 ];
+            float const ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
 
-            for (NSNumber* i in ratioLimitActionValue)
+            for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
-                item = [[NSMenuItem alloc] initWithTitle:[NSString localizedStringWithFormat:@"%.2f", i.floatValue]
+                item = [[NSMenuItem alloc] initWithTitle:[NSString localizedStringWithFormat:@"%.2f", ratioLimitActionValue[i]]
                                                   action:@selector(setQuickRatio:)
                                            keyEquivalent:@""];
                 item.target = self;
-                item.representedObject = i;
+                item.representedObject = @(ratioLimitActionValue[i]);
                 [menu addItem:item];
             }
         }

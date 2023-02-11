@@ -9,6 +9,8 @@
 @property(nonatomic, class, readonly) NSString* ellipsis;
 @property(nonatomic, readonly, copy) NSString* stringByAppendingEllipsis;
 
++ (NSString*)formattedUInteger:(NSUInteger)value;
+
 + (NSString*)stringForFileSize:(uint64_t)size;
 + (NSString*)stringForFilePartialSize:(uint64_t)partialSize fullSize:(uint64_t)fullSize;
 

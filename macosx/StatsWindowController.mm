@@ -222,7 +222,7 @@ tr_session* fLib = NULL;
     else
     {
         self.fNumOpenedField.stringValue = [NSString
-            localizedStringWithFormat:NSLocalizedString(@"%llu times", "stats window -> times opened"), statsAll.sessionCount];
+            stringWithFormat:NSLocalizedString(@"%llu times", "stats window -> times opened"), statsAll.sessionCount];
     }
 }
 
