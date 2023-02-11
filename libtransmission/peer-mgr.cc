@@ -1190,7 +1190,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
         /* In principle, this flag specifies whether the peer groks µTP,
            not whether it's currently connected over µTP. */
-        if (result.io->socket.is_utp())
+        if (result.io->socket.type == TR_PEER_SOCKET_TYPE_UTP)
         {
             atom->flags |= ADDED_F_UTP_FLAGS;
         }
@@ -1227,7 +1227,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
     return success;
 }
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port port, tr_peer_socket socket)
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port port, struct tr_peer_socket const socket)
 {
     TR_ASSERT(manager->session != nullptr);
     auto const lock = manager->unique_lock();
@@ -1237,17 +1237,17 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port 
     if (session->addressIsBlocked(addr))
     {
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", addr.readable(port)));
-        socket.close(session);
+        tr_netClosePeerSocket(session, socket);
     }
     else if (manager->incoming_handshakes.contains(addr))
     {
-        socket.close(session);
+        tr_netClosePeerSocket(session, socket);
     }
     else /* we don't have a connection to them yet... */
     {
         auto* const handshake = tr_handshakeNew(
             manager->handshake_mediator_,
-            tr_peerIo::newIncoming(session, &session->top_bandwidth_, socket),
+            tr_peerIo::newIncoming(session, &session->top_bandwidth_, &addr, port, socket),
             session->encryptionMode(),
             on_handshake_done,
             manager);

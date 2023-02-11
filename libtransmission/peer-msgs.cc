@@ -374,7 +374,7 @@ public:
 
     [[nodiscard]] bool is_utp_connection() const noexcept override
     {
-        return io->socket.is_utp();
+        return io->socket.type == TR_PEER_SOCKET_TYPE_UTP;
     }
 
     [[nodiscard]] bool is_encrypted() const override
