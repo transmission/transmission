@@ -142,8 +142,10 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 #endif
 }
 
-static tr_socket_t createSocket(int domain, int type)
+static tr_socket_t createSocket(tr_session* session, int domain, int type)
 {
+    TR_ASSERT(session != nullptr);
+
     auto const sockfd = socket(domain, type, 0);
     if (sockfd == TR_BAD_SOCKET)
     {
@@ -158,9 +160,9 @@ static tr_socket_t createSocket(int domain, int type)
         return TR_BAD_SOCKET;
     }
 
-    if (evutil_make_socket_nonblocking(sockfd) == -1)
+    if ((evutil_make_socket_nonblocking(sockfd) == -1) || !session->incPeerCount())
     {
-        tr_net_close_socket(sockfd);
+        tr_netClose(session, sockfd);
         return TR_BAD_SOCKET;
     }
 
@@ -191,15 +193,19 @@ static tr_socket_t createSocket(int domain, int type)
 tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
 {
     TR_ASSERT(addr.is_valid());
-    TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !addr.is_valid_for_peers(port))
+    if (!session->allowsTCP())
+    {
+        return {};
+    }
+
+    if (!addr.is_valid_for_peers(port))
     {
         return {};
     }
 
     static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(Domains[addr.type], SOCK_STREAM);
+    auto const s = createSocket(session, Domains[addr.type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
@@ -230,7 +236,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
             fmt::arg("socket", s),
             fmt::arg("error", tr_net_strerror(sockerrno)),
             fmt::arg("error_code", sockerrno)));
-        tr_net_close_socket(s);
+        tr_netClose(session, s);
         return {};
     }
 
@@ -252,7 +258,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
                 fmt::arg("error_code", tmperrno)));
         }
 
-        tr_net_close_socket(s);
+        tr_netClose(session, s);
     }
     else
     {
@@ -280,7 +286,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
     if (evutil_make_socket_nonblocking(fd) == -1)
     {
         *err_out = sockerrno;
-        tr_net_close_socket(fd);
+        tr_netCloseSocket(fd);
         return TR_BAD_SOCKET;
     }
 
@@ -295,7 +301,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
         (sockerrno != ENOPROTOOPT)) // if the kernel doesn't support it, ignore it
     {
         *err_out = sockerrno;
-        tr_net_close_socket(fd);
+        tr_netCloseSocket(fd);
         return TR_BAD_SOCKET;
     }
 
@@ -319,7 +325,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
                 fmt::arg("error_code", err)));
         }
 
-        tr_net_close_socket(fd);
+        tr_netCloseSocket(fd);
         *err_out = err;
         return TR_BAD_SOCKET;
     }
@@ -348,7 +354,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 #endif /* _WIN32 */
     {
         *err_out = sockerrno;
-        tr_net_close_socket(fd);
+        tr_netCloseSocket(fd);
         return TR_BAD_SOCKET;
     }
 
@@ -378,7 +384,7 @@ bool tr_net_hasIPv6(tr_port port)
 
         if (fd != TR_BAD_SOCKET)
         {
-            tr_net_close_socket(fd);
+            tr_netCloseSocket(fd);
         }
 
         already_done = true;
@@ -404,18 +410,24 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
     // make the socket unblocking,
     // and confirm we don't have too many peers
     auto const addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
-    if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || tr_peer_socket::limit_reached(session))
+    if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || !session->incPeerCount())
     {
-        tr_net_close_socket(sockfd);
+        tr_netCloseSocket(sockfd);
         return {};
     }
 
     return std::make_tuple(addrport->first, addrport->second, sockfd);
 }
 
-void tr_net_close_socket(tr_socket_t sockfd)
+void tr_netCloseSocket(tr_socket_t sockfd)
 {
     evutil_closesocket(sockfd);
+}
+
+void tr_netClose(tr_session* session, tr_socket_t sockfd)
+{
+    tr_netCloseSocket(sockfd);
+    session->decPeerCount();
 }
 
 // code in global_ipv6_herlpers is written by Juliusz Chroboczek

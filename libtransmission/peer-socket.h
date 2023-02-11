@@ -9,7 +9,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <atomic>
 #include <string>
 #include <string_view>
 #include <utility> // for std::make_pair()
@@ -38,7 +37,7 @@ public:
     tr_peer_socket& operator=(tr_peer_socket const&) = delete;
     ~tr_peer_socket() = default;
 
-    void close();
+    void close(tr_session* session);
 
     size_t try_write(Buffer& buf, size_t max, tr_error** error) const;
     size_t try_read(Buffer& buf, size_t max, tr_error** error) const;
@@ -125,8 +124,6 @@ public:
         struct UTPSocket* utp;
     } handle = {};
 
-    [[nodiscard]] static bool limit_reached(tr_session* const session) noexcept;
-
 private:
     enum class Type
     {
@@ -139,8 +136,6 @@ private:
     tr_port port_;
 
     enum Type type_ = Type::None;
-
-    static inline std::atomic<size_t> n_open_sockets_ = {};
 };
 
 tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);
