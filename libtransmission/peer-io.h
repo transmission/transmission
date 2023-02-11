@@ -95,7 +95,7 @@ public:
 
     ///
 
-    [[nodiscard]] TR_CONSTEXPR20 auto read_buffer_size() const noexcept
+    [[nodiscard]] auto read_buffer_size() const noexcept
     {
         return std::size(inbuf_);
     }

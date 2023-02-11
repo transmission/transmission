@@ -43,17 +43,17 @@ public:
         return children_.at(row);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 int childCount() const noexcept
+    [[nodiscard]] int childCount() const noexcept
     {
         return std::size(children_);
     }
 
-    [[nodiscard]] constexpr auto* parent() noexcept
+    [[nodiscard]] auto* parent() noexcept
     {
         return parent_;
     }
 
-    [[nodiscard]] constexpr auto const* parent() const noexcept
+    [[nodiscard]] auto const* parent() const noexcept
     {
         return parent_;
     }

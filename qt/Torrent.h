@@ -135,14 +135,14 @@ public:
         }
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto operator==(TorrentHash const& that) const
+    [[nodiscard]] auto operator==(TorrentHash const& that) const
     {
         return data_ == that.data_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto operator!=(TorrentHash const& that) const
+    [[nodiscard]] auto operator!=(TorrentHash const& that) const
     {
-        return !(*this == that);
+        return data_ != that.data_;
     }
 
     [[nodiscard]] auto operator<(TorrentHash const& that) const

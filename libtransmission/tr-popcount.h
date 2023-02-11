@@ -11,7 +11,6 @@
 #define TR_POPCNT_H
 
 #include <cstdint>
-#include <type_traits>
 
 /* Avoid defining irrelevant helpers that might interfere with other
  * preprocessor logic. */
@@ -59,7 +58,7 @@ struct tr_popcnt
 
 #if defined(TR_HAVE_STD_POPCOUNT)
     /* If we have std::popcount just use that. */
-    static constexpr inline unsigned count(T v)
+    static inline unsigned count(T v)
     {
         unsigned_T unsigned_v = static_cast<unsigned_T>(v);
         return static_cast<unsigned>(std::popcount(unsigned_v));

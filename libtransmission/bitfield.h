@@ -13,8 +13,6 @@
 #include <cstdint>
 #include <vector>
 
-#include "tr-macros.h"
-
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
  *
@@ -119,7 +117,7 @@ private:
     [[nodiscard]] size_t countFlags() const noexcept;
     [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
 
-    [[nodiscard]] TR_CONSTEXPR20 bool testFlag(size_t n) const
+    [[nodiscard]] bool testFlag(size_t n) const
     {
         if (n >> 3U >= std::size(flags_))
         {

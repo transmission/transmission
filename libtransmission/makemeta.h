@@ -123,12 +123,12 @@ public:
         return comment_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
+    [[nodiscard]] auto fileCount() const noexcept
     {
         return files_.fileCount();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const noexcept
+    [[nodiscard]] auto fileSize(tr_file_index_t i) const noexcept
     {
         return files_.fileSize(i);
     }

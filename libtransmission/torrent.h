@@ -386,17 +386,17 @@ public:
 
     /// METAINFO - FILES
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
+    [[nodiscard]] tr_file_index_t fileCount() const noexcept
     {
         return metainfo_.fileCount();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& fileSubpath(tr_file_index_t i) const
+    [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const
     {
         return metainfo_.fileSubpath(i);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const
+    [[nodiscard]] auto fileSize(tr_file_index_t i) const
     {
         return metainfo_.fileSize(i);
     }
@@ -412,22 +412,22 @@ public:
 
     /// METAINFO - TRACKERS
 
-    [[nodiscard]] constexpr auto const& announceList() const noexcept
+    [[nodiscard]] auto const& announceList() const noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] constexpr auto& announceList() noexcept
+    [[nodiscard]] auto& announceList() noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto trackerCount() const noexcept
+    [[nodiscard]] auto trackerCount() const noexcept
     {
         return std::size(this->announceList());
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& tracker(size_t i) const
+    [[nodiscard]] auto const& tracker(size_t i) const
     {
         return this->announceList().at(i);
     }
@@ -441,12 +441,12 @@ public:
 
     /// METAINFO - WEBSEEDS
 
-    [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
+    [[nodiscard]] auto webseedCount() const noexcept
     {
         return metainfo_.webseedCount();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
+    [[nodiscard]] auto const& webseed(size_t i) const
     {
         return metainfo_.webseed(i);
     }

@@ -878,7 +878,7 @@ public:
         web_->fetch(std::move(options));
     }
 
-    [[nodiscard]] constexpr auto const& bandwidthGroups() const noexcept
+    [[nodiscard]] auto const& bandwidthGroups() const noexcept
     {
         return bandwidth_groups_;
     }
