@@ -13,12 +13,6 @@
 #include <string_view>
 #include <vector>
 
-#ifdef _WIN32
-#include <ws2tcpip.h>
-#undef gai_strerror
-#define gai_strerror gai_strerrorA
-#endif
-
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -438,7 +432,7 @@ private:
                     fmt::arg("address", host.sv()),
                     fmt::arg("port", port.host()),
                     fmt::arg("error", gai_strerror(rc)),
-                    fmt::arg("error_code", static_cast<int>(rc))));
+                    fmt::arg("error_code", rc)));
             return {};
         }
 
