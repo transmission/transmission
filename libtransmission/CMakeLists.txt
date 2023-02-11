@@ -146,7 +146,6 @@ target_sources(${TR_NAME}
         tr-utp.cc
         tr-utp.h
         transmission.h
-        utils-ev.cc
         utils-ev.h
         utils.cc
         utils.h
