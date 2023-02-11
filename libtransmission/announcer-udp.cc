@@ -72,8 +72,9 @@ enum tau_action_t
 
 struct tau_scrape_request
 {
-    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func on_response)
-        : on_response_{ std::move(on_response) }
+    tau_scrape_request(tr_scrape_request const& in, tr_scrape_response_func callback, void* user_data)
+        : callback_{ callback }
+        , user_data_{ user_data }
     {
         this->response.scrape_url = in.scrape_url;
         this->response.row_count = in.info_hash_count;
@@ -96,16 +97,16 @@ struct tau_scrape_request
         this->payload.insert(std::end(this->payload), std::begin(buf), std::end(buf));
     }
 
-    [[nodiscard]] auto has_callback() const noexcept
+    [[nodiscard]] constexpr auto hasCallback() const noexcept
     {
-        return !!on_response_;
+        return callback_ != nullptr;
     }
 
     void requestFinished()
     {
-        if (on_response_)
+        if (callback_ != nullptr)
         {
-            on_response_(response);
+            callback_(&response, user_data_);
         }
     }
 
@@ -155,7 +156,8 @@ struct tau_scrape_request
     tr_scrape_response response = {};
 
 private:
-    tr_scrape_response_func on_response_;
+    tr_scrape_response_func const callback_;
+    void* const user_data_;
 };
 
 /****
@@ -164,8 +166,13 @@ private:
 
 struct tau_announce_request
 {
-    tau_announce_request(uint32_t announce_ip, tr_announce_request const& in, tr_announce_response_func on_response)
-        : on_response_{ std::move(on_response) }
+    tau_announce_request(
+        uint32_t announce_ip,
+        tr_announce_request const& in,
+        tr_announce_response_func callback,
+        void* user_data)
+        : callback_{ callback }
+        , user_data_{ user_data }
     {
         response.seeders = -1;
         response.leechers = -1;
@@ -189,16 +196,16 @@ struct tau_announce_request
         payload.insert(std::end(payload), std::begin(buf), std::end(buf));
     }
 
-    [[nodiscard]] auto has_callback() const noexcept
+    [[nodiscard]] constexpr auto hasCallback() const noexcept
     {
-        return !!on_response_;
+        return callback_ != nullptr;
     }
 
     void requestFinished()
     {
-        if (on_response_)
+        if (callback_ != nullptr)
         {
-            on_response_(this->response);
+            callback_(&this->response, user_data_);
         }
     }
 
@@ -271,7 +278,8 @@ private:
         }
     }
 
-    tr_announce_response_func on_response_;
+    tr_announce_response_func const callback_;
+    void* const user_data_;
 };
 
 /****
@@ -516,7 +524,7 @@ private:
             req.sent_at = now;
             send_request(std::data(req.payload), std::size(req.payload));
 
-            if (req.has_callback())
+            if (req.hasCallback())
             {
                 ++it;
                 continue;
@@ -578,7 +586,7 @@ public:
     {
     }
 
-    void announce(tr_announce_request const& request, tr_announce_response_func on_response) override
+    void announce(tr_announce_request const& request, tr_announce_response_func response_func, void* user_data) override
     {
         auto* const tracker = getTrackerFromUrl(request.announce_url);
         if (tracker == nullptr)
@@ -589,11 +597,11 @@ public:
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
         auto const addr = mediator_.announceIP();
         uint32_t const announce_ip = addr && addr->isIPv4() ? addr->addr.addr4.s_addr : 0;
-        tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
+        tracker->announces.emplace_back(announce_ip, request, response_func, user_data);
         tracker->upkeep(false);
     }
 
-    void scrape(tr_scrape_request const& request, tr_scrape_response_func on_response) override
+    void scrape(tr_scrape_request const& request, tr_scrape_response_func response_func, void* user_data) override
     {
         auto* const tracker = getTrackerFromUrl(request.scrape_url);
         if (tracker == nullptr)
@@ -601,7 +609,7 @@ public:
             return;
         }
 
-        tracker->scrapes.emplace_back(request, std::move(on_response));
+        tracker->scrapes.emplace_back(request, response_func, user_data);
         tracker->upkeep(false);
     }
 
