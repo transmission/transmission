@@ -795,8 +795,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const baseline = stats.front()->eta;
-        auto const is_uniform = std::all_of(
+        int const baseline = stats.front()->eta;
+        bool const is_uniform = std::all_of(
             stats.begin(),
             stats.end(),
             [baseline](auto const* st) { return baseline == st->eta; });
@@ -811,7 +811,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
         else
         {
-            str = tr_format_time_left(baseline);
+            str = tr_format_time_relative(now, baseline);
         }
     }
 
