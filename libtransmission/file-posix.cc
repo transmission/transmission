@@ -240,32 +240,17 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
     return {};
 }
 
-std::string_view tr_sys_path_basename(std::string_view path, tr_error** /*error*/)
+std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    // As per the basename() manpage:
-    // If path [is] an empty string, then basename() return[s] the string "."
-    if (std::empty(path))
+    auto tmp = tr_pathbuf{ path };
+
+    if (char const* const ret = basename(std::data(tmp)); ret != nullptr)
     {
-        return "."sv;
+        return ret;
     }
 
-    // Remove all trailing slashes.
-    // If nothing is left, return "/"
-    if (auto pos = path.find_last_not_of('/'); pos != std::string_view::npos)
-    {
-        path = path.substr(0, pos + 1);
-    }
-    else // all slashes
-    {
-        return "/"sv;
-    }
-
-    if (auto pos = path.find_last_of('/'); pos != std::string_view::npos)
-    {
-        path.remove_prefix(pos + 1);
-    }
-
-    return std::empty(path) ? "/"sv : path;
+    set_system_error(error, errno);
+    return {};
 }
 
 // This function is adapted from Node.js's path.posix.dirname() function,
