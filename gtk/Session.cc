@@ -600,45 +600,33 @@ namespace
 
 time_t get_file_mtime(Glib::RefPtr<Gio::File> const& file)
 {
-    try
-    {
-        return file->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED)->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED);
-    }
-    catch (Glib::Error const&)
-    {
-        return 0;
-    }
+    auto const info = file->query_info(G_FILE_ATTRIBUTE_TIME_MODIFIED);
+    return info != nullptr ? info->get_attribute_uint64(G_FILE_ATTRIBUTE_TIME_MODIFIED) : 0;
 }
 
 void rename_torrent(Glib::RefPtr<Gio::File> const& file)
 {
-    auto info = Glib::RefPtr<Gio::FileInfo>();
+    auto const info = file->query_info(G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
 
-    try
+    if (info != nullptr)
     {
-        info = file->query_info(G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
-    }
-    catch (Glib::Error const&)
-    {
-        return;
-    }
+        auto const old_name = info->get_attribute_as_string(G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
+        auto const new_name = fmt::format("{}.added", old_name);
 
-    auto const old_name = info->get_attribute_as_string(G_FILE_ATTRIBUTE_STANDARD_EDIT_NAME);
-    auto const new_name = fmt::format("{}.added", old_name);
-
-    try
-    {
-        file->set_display_name(new_name);
-    }
-    catch (Glib::Error const& e)
-    {
-        auto const errmsg = fmt::format(
-            _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
-            fmt::arg("old_path", old_name),
-            fmt::arg("path", new_name),
-            fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code()));
-        g_message("%s", errmsg.c_str());
+        try
+        {
+            file->set_display_name(new_name);
+        }
+        catch (Glib::Error const& e)
+        {
+            auto const errmsg = fmt::format(
+                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", old_name),
+                fmt::arg("path", new_name),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", e.code()));
+            g_message("%s", errmsg.c_str());
+        }
     }
 }
 
