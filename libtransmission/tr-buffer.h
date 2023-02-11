@@ -44,96 +44,79 @@ public:
 
         [[nodiscard]] value_type& operator*() noexcept
         {
-            return reinterpret_cast<value_type*>(iov_.iov_base)[iov_offset_];
+            return *reinterpret_cast<value_type*>(iov_.iov_base);
         }
 
         [[nodiscard]] value_type operator*() const noexcept
         {
-            return reinterpret_cast<value_type*>(iov_.iov_base)[iov_offset_];
+            return *reinterpret_cast<value_type*>(iov_.iov_base);
         }
 
-        [[nodiscard]] Iterator operator+(size_t n_bytes)
+        [[nodiscard]] Iterator operator+(int n_bytes)
         {
-            return Iterator{ buf_, offset() + n_bytes };
+            return Iterator(buf_, offset_ + n_bytes);
         }
 
-        [[nodiscard]] Iterator operator-(size_t n_bytes)
+        [[nodiscard]] Iterator operator-(int n_bytes)
         {
-            return Iterator{ buf_, offset() - n_bytes };
+            return Iterator(buf_, offset_ - n_bytes);
         }
 
         [[nodiscard]] constexpr auto operator-(Iterator const& that) const noexcept
         {
-            return offset() - that.offset();
+            return offset_ - that.offset_;
         }
 
         Iterator& operator++() noexcept
         {
-            *this += 1U;
-            return *this;
-        }
-
-        Iterator& operator+=(size_t n_bytes)
-        {
-            if (iov_offset_ + n_bytes < iov_.iov_len)
+            if (iov_.iov_len > 1)
             {
-                iov_offset_ += n_bytes;
+                iov_.iov_base = reinterpret_cast<value_type*>(iov_.iov_base) + 1;
+                --iov_.iov_len;
+                ++offset_;
             }
             else
             {
-                incOffset(n_bytes);
+                setOffset(offset_ + 1);
             }
+            return *this;
+        }
 
+        Iterator& operator+=(int n_bytes)
+        {
+            setOffset(offset_ + n_bytes);
             return *this;
         }
 
         Iterator& operator--() noexcept
         {
-            if (iov_offset_ > 0)
-            {
-                --iov_offset_;
-            }
-            else
-            {
-                setOffset(offset() - 1);
-            }
+            // TODO(ckerr) inefficient; calls evbuffer_ptr_peek() every time
+            setOffset(offset_ - 1);
             return *this;
         }
 
         [[nodiscard]] constexpr bool operator==(Iterator const& that) const noexcept
         {
-            return offset() == that.offset();
+            return offset_ == that.offset_;
         }
 
         [[nodiscard]] constexpr bool operator!=(Iterator const& that) const noexcept
         {
-            return offset() != that.offset();
+            return !(*this == that);
         }
 
     private:
-        [[nodiscard]] constexpr size_t offset() const noexcept
-        {
-            return ptr_.pos + iov_offset_;
-        }
-
-        void incOffset(size_t increment)
-        {
-            evbuffer_ptr_set(buf_, &ptr_, iov_offset_ + increment, EVBUFFER_PTR_ADD);
-            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
-            iov_offset_ = 0;
-        }
-
         void setOffset(size_t offset)
         {
-            evbuffer_ptr_set(buf_, &ptr_, offset, EVBUFFER_PTR_SET);
-            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
-            iov_offset_ = 0;
+            offset_ = offset;
+            auto ptr = evbuffer_ptr{};
+            evbuffer_ptr_set(buf_, &ptr, offset, EVBUFFER_PTR_SET);
+            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov_, 1);
         }
 
         evbuffer* buf_;
-        evbuffer_ptr ptr_ = {};
         Iovec iov_ = {};
-        size_t iov_offset_ = 0;
+        size_t offset_ = 0;
     };
 
     Buffer() = default;
@@ -368,8 +351,11 @@ public:
     [[nodiscard]] std::string toString() const
     {
         auto str = std::string{};
-        str.resize(size());
-        evbuffer_copyout(buf_.get(), std::data(str), std::size(str));
+        str.reserve(size());
+        for (auto const& by : *this)
+        {
+            str.push_back(*reinterpret_cast<char const*>(&by));
+        }
         return str;
     }
 
