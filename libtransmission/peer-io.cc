@@ -474,6 +474,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     tr_bandwidth* parent,
     tr_address const* addr,
     tr_port port,
+    time_t current_time,
     tr_sha1_digest_t const* torrent_hash,
     bool is_incoming,
     bool is_seed,
@@ -491,7 +492,9 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto io = std::shared_ptr<tr_peerIo>{ new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, parent } };
+    auto io = std::shared_ptr<tr_peerIo>{
+        new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, current_time, parent }
+    };
     io->socket = socket;
     io->bandwidth().setPeer(io);
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
@@ -540,12 +543,13 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newIncoming(
     tr_bandwidth* parent,
     tr_address const* addr,
     tr_port port,
+    time_t current_time,
     struct tr_peer_socket const socket)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_address_is_valid(addr));
 
-    return tr_peerIo::create(session, parent, addr, port, nullptr, true, false, socket);
+    return tr_peerIo::create(session, parent, addr, port, current_time, nullptr, true, false, socket);
 }
 
 std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
@@ -553,6 +557,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
     tr_bandwidth* parent,
     tr_address const* addr,
     tr_port port,
+    time_t current_time,
     tr_sha1_digest_t const& torrent_hash,
     bool is_seed,
     bool utp)
@@ -581,7 +586,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::newOutgoing(
         return nullptr;
     }
 
-    return create(session, parent, addr, port, &torrent_hash, false, is_seed, socket);
+    return create(session, parent, addr, port, current_time, &torrent_hash, false, is_seed, socket);
 }
 
 /***
