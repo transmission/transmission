@@ -925,12 +925,11 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto const now = tr_time_msec();
-    auto const now_sec = tr_time();
+    uint64_t const now = tr_time_msec();
 
     auto swarm_stats = tr_swarm_stats{};
 
-    tor->lastStatTime = now_sec;
+    tor->lastStatTime = tr_time();
 
     if (tor->swarm != nullptr)
     {
@@ -975,8 +974,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->doneDate = tor->doneDate;
     s->editDate = tor->editDate;
     s->startDate = tor->startDate;
-    s->secondsSeeding = tor->secondsSeeding(now_sec);
-    s->secondsDownloading = tor->secondsDownloading(now_sec);
+    s->secondsSeeding = tor->secondsSeeding;
+    s->secondsDownloading = tor->secondsDownloading;
 
     s->corruptEver = tor->corruptCur + tor->corruptPrev;
     s->downloadedEver = tor->downloadedCur + tor->downloadedPrev;
