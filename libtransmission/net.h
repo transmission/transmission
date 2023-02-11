@@ -58,6 +58,21 @@ using tr_socket_t = int;
 #define sockerrno errno
 #endif
 
+/****
+*****
+*****  tr_address
+*****
+****/
+
+enum tr_address_type
+{
+    TR_AF_INET,
+    TR_AF_INET6,
+    NUM_TR_AF_INET_TYPES
+};
+
+struct tr_address;
+
 /**
  * Literally just a port number.
  *
@@ -132,13 +147,6 @@ private:
     }
 
     uint16_t hport_ = 0;
-};
-
-enum tr_address_type
-{
-    TR_AF_INET,
-    TR_AF_INET6,
-    NUM_TR_AF_INET_TYPES
 };
 
 struct tr_address

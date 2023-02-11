@@ -903,8 +903,10 @@ static void peerSuggestedPiece(
 void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 {
     bool piece_came_from_peers = false;
+    tr_swarm* const s = tor->swarm;
 
-    for (auto* const peer : tor->swarm->peers)
+    /* walk through our peers */
+    for (auto* const peer : s->peers)
     {
         // notify the peer that we now have this piece
         peer->on_piece_completed(p);
@@ -2646,7 +2648,10 @@ struct peer_candidate
     auto const now_msec = tr_time_msec();
 
     // leave 5% of connection slots for incoming connections -- ticket #2609
-    if (auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95); max_candidates <= tr_peerMsgs::size())
+    auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95);
+
+    // don't start any new handshakes if we're full up
+    if (max_candidates <= tr_peerMsgs::size())
     {
         return {};
     }
