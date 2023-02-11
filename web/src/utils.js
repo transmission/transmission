@@ -240,7 +240,7 @@ export function debounce(callback, wait = 100) {
     if (!timeout) {
       timeout = setTimeout(() => {
         timeout = null;
-        callback(arguments_);
+        callback(...arguments_);
       }, wait);
     }
   };
