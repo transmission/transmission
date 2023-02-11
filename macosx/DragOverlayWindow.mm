@@ -59,7 +59,7 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (void)setTorrents:(NSArray<NSString*>*)files
+- (void)setTorrents:(NSArray*)files
 {
     uint64_t size = 0;
     NSUInteger count = 0;
