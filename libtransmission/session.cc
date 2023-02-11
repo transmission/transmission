@@ -1213,8 +1213,6 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     is_closing_ = true;
 
     // close the low-hanging fruit that can be closed immediately w/o consequences
-    utp_timer.reset();
-    tr_utpClose(this);
     verifier_.reset();
     save_timer_.reset();
     now_timer_.reset();
@@ -1279,6 +1277,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
 
     stats().saveIfDirty();
     peer_mgr_.reset();
+    tr_utpClose(this);
     openFiles().closeAll();
 
     // tada we are done!
