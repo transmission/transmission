@@ -5,12 +5,13 @@
 
 #include <algorithm>
 #include <array>
-#include <condition_variable>
 #include <ctime>
-#include <chrono>
-#include <mutex>
 #include <string>
 #include <string_view>
+
+#include <curl/curl.h>
+
+#include <event2/buffer.h>
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
@@ -27,7 +28,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
-#include <libtransmission/web.h>
 #include <libtransmission/web-utils.h>
 
 #include "units.h"
@@ -37,10 +37,11 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr TimeoutSecs = std::chrono::seconds{ 30 };
+auto constexpr TimeoutSecs = long{ 30 };
 
 char constexpr MyName[] = "transmission-show";
 char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
+char constexpr UserAgent[] = "transmission-show/" LONG_VERSION_STRING;
 
 auto options = std::array<tr_option, 14>{
     { { 'd', "header", "Show only header section", "d", false, nullptr },
@@ -303,10 +304,30 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     }
 }
 
+size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
+{
+    auto* buf = static_cast<evbuffer*>(vbuf);
+    size_t const byteCount = size * nmemb;
+    evbuffer_add(buf, ptr, byteCount);
+    return byteCount;
+}
+
+CURL* tr_curl_easy_init(struct evbuffer* writebuf)
+{
+    CURL* curl = curl_easy_init();
+    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
+    (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
+    (void)curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
+    (void)curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+    (void)curl_easy_setopt(curl, CURLOPT_VERBOSE, tr_env_key_exists("TR_CURL_VERBOSE"));
+    (void)curl_easy_setopt(curl, CURLOPT_ENCODING, "");
+    return curl;
+}
+
 void doScrape(tr_torrent_metainfo const& metainfo)
 {
-    auto mediator = tr_web::Mediator{};
-    auto web = tr_web::create(mediator);
+    auto* const buf = evbuffer_new();
+    auto* const curl = tr_curl_easy_init(buf);
 
     for (auto const& tracker : metainfo.announceList())
     {
@@ -324,30 +345,28 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         fflush(stdout);
 
         // execute the http scrape
-        auto response = tr_web::FetchResponse{};
-        auto response_mutex = std::mutex{};
-        auto response_cv = std::condition_variable{};
-        auto lock = std::unique_lock(response_mutex);
-        web->fetch({ scrape_url,
-                     [&response, &response_cv](tr_web::FetchResponse const& resp)
-                     {
-                         response = resp;
-                         response_cv.notify_one();
-                     },
-                     nullptr,
-                     TimeoutSecs });
-        response_cv.wait(lock);
+        (void)curl_easy_setopt(curl, CURLOPT_URL, scrape_url.c_str());
+        (void)curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
+        if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
+        {
+            fmt::print("error: {:s}\n", curl_easy_strerror(res));
+            continue;
+        }
 
         // check the response code
-        if (auto const code = response.status; code != 200 /*HTTP OK*/)
+        long response;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+        if (response != 200 /*HTTP OK*/)
         {
-            fmt::print("error: unexpected response {:d} '{:s}'\n", code, tr_webGetResponseStr(code));
+            fmt::print("error: unexpected response {:d} '{:s}'\n", response, tr_webGetResponseStr(response));
             continue;
         }
 
         // print it out
-        auto top = tr_variant{};
-        if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, response.body))
+        tr_variant top;
+        auto* const begin = (char const*)evbuffer_pullup(buf, -1);
+        if (auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
+            !tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
         {
             fmt::print("error parsing scrape response\n");
             continue;
@@ -385,13 +404,15 @@ void doScrape(tr_torrent_metainfo const& metainfo)
             fmt::print("no match\n");
         }
     }
+
+    curl_easy_cleanup(curl);
+    evbuffer_free(buf);
 }
 
 } // namespace
 
 int tr_main(int argc, char* argv[])
 {
-    tr_logSetQueueEnabled(false);
     tr_logSetLevel(TR_LOG_ERROR);
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
