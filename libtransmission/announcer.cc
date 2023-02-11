@@ -145,7 +145,7 @@ public:
     tr_announcer_impl& operator=(tr_announcer_impl&&) = delete;
     tr_announcer_impl& operator=(tr_announcer_impl const&) = delete;
 
-    tr_torrent_announcer* addTorrent(tr_torrent* tor, tr_tracker_callback callback) override;
+    tr_torrent_announcer* addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data) override;
     void startTorrent(tr_torrent* tor) override;
     void stopTorrent(tr_torrent* tor) override;
     void resetTorrent(tr_torrent* tor) override;
@@ -623,6 +623,7 @@ struct tr_torrent_announcer
     std::vector<tr_tier> tiers;
 
     tr_tracker_callback callback = nullptr;
+    void* callback_data = nullptr;
 
 private:
     [[nodiscard]] static tr_announce_list getAnnounceList(tr_torrent const* tor)
@@ -660,7 +661,7 @@ void publishMessage(tr_tier* tier, std::string_view msg, tr_tracker_event::Type 
             event.announce_url = current_tracker->announce_url;
         }
 
-        (*ta->callback)(tier->tor, &event);
+        (*ta->callback)(tier->tor, &event, ta->callback_data);
     }
 }
 
@@ -689,7 +690,7 @@ void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
         e.leechers = leechers;
         tr_logAddDebugTier(tier, fmt::format("peer counts: {} seeders, {} leechers.", seeders, leechers));
 
-        (*tier->tor->torrent_announcer->callback)(tier->tor, &e);
+        (*tier->tor->torrent_announcer->callback)(tier->tor, &e, nullptr);
     }
 }
 
@@ -710,7 +711,7 @@ void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pe
                 leechers,
                 std::size(pex)));
 
-        (*tier->tor->torrent_announcer->callback)(tier->tor, &e);
+        (*tier->tor->torrent_announcer->callback)(tier->tor, &e, nullptr);
     }
 }
 } // namespace publish_helpers
@@ -718,12 +719,13 @@ void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pe
 
 // ---
 
-tr_torrent_announcer* tr_announcer_impl::addTorrent(tr_torrent* tor, tr_tracker_callback callback)
+tr_torrent_announcer* tr_announcer_impl::addTorrent(tr_torrent* tor, tr_tracker_callback callback, void* callback_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     auto* ta = new tr_torrent_announcer{ this, tor };
     ta->callback = callback;
+    ta->callback_data = callback_data;
     return ta;
 }
 

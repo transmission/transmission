@@ -1025,7 +1025,7 @@ bool isNewTorrentASeed(tr_torrent* tor)
     return tor->ensurePieceIsChecked(0);
 }
 
-void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event)
+void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, void* /*user_data*/)
 {
     switch (event->type)
     {
@@ -1212,7 +1212,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         }
     }
 
-    tor->torrent_announcer = session->announcer_->addTorrent(tor, onTrackerResponse);
+    tor->torrent_announcer = session->announcer_->addTorrent(tor, onTrackerResponse, nullptr);
 
     if (is_new_torrent)
     {
