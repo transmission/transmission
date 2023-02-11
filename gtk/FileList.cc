@@ -5,7 +5,6 @@
 
 #include "FileList.h"
 
-#include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG
 #include "IconCache.h"
 #include "PrefsDialog.h"

@@ -6,7 +6,6 @@
 #include "MessageLogWindow.h"
 
 #include "Actions.h"
-#include "GtkCompat.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Session.h"

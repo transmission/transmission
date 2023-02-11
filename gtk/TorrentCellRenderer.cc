@@ -7,6 +7,7 @@
 
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_SMALL
 #include "Torrent.h"
+#include "Utils.h"
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_truncd() */

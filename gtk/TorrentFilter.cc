@@ -5,8 +5,6 @@
 
 #include "TorrentFilter.h"
 
-#include "Utils.h"
-
 #include <libtransmission/transmission.h>
 
 void TorrentFilter::set_activity(Activity type)

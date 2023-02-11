@@ -7,7 +7,7 @@
 
 #include "IconCache.h"
 
-#include "GtkCompat.h"
+#include "Utils.h"
 
 #include <giomm/contenttype.h>
 

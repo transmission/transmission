@@ -7,7 +7,6 @@
 
 #include "FileList.h"
 #include "FreeSpaceLabel.h"
-#include "GtkCompat.h"
 #include "PathButton.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"

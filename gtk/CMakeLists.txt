@@ -143,7 +143,6 @@ set(${PROJECT_NAME}_HEADERS
     FilterBar.h
     Flags.h
     FreeSpaceLabel.h
-    GtkCompat.h
     HigWorkarea.h
     IconCache.h
     ListModelAdapter.h

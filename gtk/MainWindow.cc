@@ -6,7 +6,6 @@
 
 #include "Actions.h"
 #include "FilterBar.h"
-#include "GtkCompat.h"
 #include "ListModelAdapter.h"
 #include "Prefs.h"
 #include "PrefsDialog.h"

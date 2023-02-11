@@ -9,7 +9,7 @@ IncludeCategories:
   - Regex: '^<libtransmission/'
     Priority: 3
     SortPriority: 4
-  - Regex: '^<(cairo|gdk|gio|glib|gtk|pango)mm([-./]|config)'
+  - Regex: '^<(cairo|gdk|gio|glib|gtk|pango)mm[-./]'
     Priority: 5
   - Regex: '^<(fmt)/'
     Priority: 6

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "GtkCompat.h"
+#include "Utils.h"
 
 #include <giomm/listmodel.h>
 #include <glibmm/object.h>

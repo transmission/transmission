@@ -5,8 +5,6 @@
 
 #include "TorrentSorter.h"
 
-#include "Utils.h"
-
 #include <libtransmission/transmission.h>
 
 #include <algorithm>
