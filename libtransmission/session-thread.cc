@@ -110,6 +110,8 @@ unsigned long thread_current_id()
     return std::hash<std::thread::id>()(std::this_thread::get_id());
 }
 
+auto evthread_flag = std::once_flag{};
+
 void initEvthreadsOnce()
 {
     tr_net_init();
@@ -145,8 +147,6 @@ auto makeEventBase()
 void tr_session_thread::tr_evthread_init()
 {
     using namespace tr_evthread_init_helpers;
-
-    static auto evthread_flag = std::once_flag{};
     std::call_once(evthread_flag, initEvthreadsOnce);
 }
 

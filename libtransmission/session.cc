@@ -593,7 +593,7 @@ void tr_session::setSettings(tr_variant* settings_dict, bool force)
     rpc_server_->load(settings_dict);
 }
 
-void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
+void tr_session::setSettings(tr_session_settings settings_in, bool force)
 {
     auto const lock = unique_lock();
 
@@ -1317,8 +1317,10 @@ static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise
                 continue;
             }
 
+            auto const path = tr_pathbuf{ dirname, '/', name };
+
             // is a magnet link?
-            if (auto const path = tr_pathbuf{ dirname, '/', name }; !tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr))
+            if (!tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr))
             {
                 if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
                 {
@@ -1326,7 +1328,7 @@ static void sessionLoadTorrents(tr_session* session, tr_ctor* ctor, std::promise
                 }
             }
 
-            if (tr_torrentNew(ctor, nullptr) != nullptr)
+            if (tr_torrent* const tor = tr_torrentNew(ctor, nullptr); tor != nullptr)
             {
                 ++n_torrents;
             }

@@ -18,6 +18,7 @@
 #include <ctime>
 #include <deque>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility> // std::make_pair
 
@@ -307,12 +308,15 @@ private:
         : session{ session_in }
         , time_created{ current_time }
         , bandwidth_{ parent_bandwidth }
-        , torrent_hash_{ torrent_hash != nullptr ? *torrent_hash : tr_sha1_digest_t{} }
         , addr_{ addr }
         , port_{ port }
         , is_seed_{ is_seed }
         , is_incoming_{ is_incoming }
     {
+        if (torrent_hash != nullptr)
+        {
+            torrent_hash_ = *torrent_hash;
+        }
     }
 
     Filter& filter()
@@ -329,7 +333,7 @@ private:
 
     std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
 
-    tr_sha1_digest_t torrent_hash_;
+    std::optional<tr_sha1_digest_t> torrent_hash_;
 
     tr_address const addr_;
     tr_port const port_;

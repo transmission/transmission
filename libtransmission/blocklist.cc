@@ -250,11 +250,11 @@ auto parseFile(std::string_view filename)
     }
 
     // safeguard against some joker swapping the begin & end ranges
-    for (auto& [low, high] : ranges)
+    for (auto& range : ranges)
     {
-        if (low > high)
+        if (range.first > range.second)
         {
-            std::swap(low, high);
+            std::swap(range.first, range.second);
         }
     }
 
@@ -279,9 +279,9 @@ auto parseFile(std::string_view filename)
     ranges.resize(keep + 1);
 
 #ifdef TR_ENABLE_ASSERTS
-    for (auto const& [low, high] : ranges)
+    for (auto const& range : ranges)
     {
-        TR_ASSERT(low <= high);
+        TR_ASSERT(range.first <= range.second);
     }
     for (size_t i = 1, n = std::size(ranges); i < n; ++i)
     {
@@ -336,9 +336,6 @@ void Blocklist::ensureLoaded() const
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_clear(&error);
-    }
-    if (!file_info)
-    {
         return;
     }
 
@@ -375,8 +372,8 @@ void Blocklist::ensureLoaded() const
     {
         // bad binary file; try to rebuild it
         in.close();
-        if (auto const sz_src_file = std::string{ std::data(bin_file_), std::size(bin_file_) - std::size(BinFileSuffix) };
-            tr_sys_path_exists(sz_src_file))
+        auto const sz_src_file = std::string{ std::data(bin_file_), std::size(bin_file_) - std::size(BinFileSuffix) };
+        if (tr_sys_path_exists(sz_src_file))
         {
             rules_ = parseFile(sz_src_file);
             if (!std::empty(rules_))
@@ -390,7 +387,7 @@ void Blocklist::ensureLoaded() const
     }
 
     auto range = address_range_t{};
-    rules_.reserve(file_info->size - std::size(BinContentsPrefix) / sizeof(address_range_t));
+    rules_.reserve((file_info->size - std::size(BinContentsPrefix) / sizeof(address_range_t)));
     while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
     {
         rules_.emplace_back(range);
@@ -495,18 +492,17 @@ std::optional<Blocklist> Blocklist::saveNew(std::string_view external_file, std:
     auto const src_file = std::string{ std::data(bin_file), std::size(bin_file) - std::size(BinFileSuffix) };
     tr_sys_path_remove(src_file.c_str());
     tr_error* error = nullptr;
-    auto const copied = tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error);
-    if (error != nullptr)
+    if (!tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error))
     {
-        tr_logAddWarn(fmt::format(
-            _("Couldn't save '{path}': {error} ({error_code})"),
-            fmt::arg("path", src_file),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
-    }
-    if (!copied)
-    {
+        if (error != nullptr)
+        {
+            tr_logAddWarn(fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", src_file),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_clear(&error);
+        }
         return {};
     }
 

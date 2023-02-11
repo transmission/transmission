@@ -374,12 +374,6 @@ struct tau_tracker
 
     void sendto(void const* buf, size_t buflen)
     {
-        TR_ASSERT(addr_);
-        if (!addr_)
-        {
-            return;
-        }
-
         auto [ss, sslen] = *addr_;
 
         if (ss.ss_family == AF_INET)
