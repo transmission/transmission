@@ -17,7 +17,7 @@ class Session;
 class FreeSpaceLabel : public Gtk::Label
 {
 public:
-    explicit FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir = {});
+    FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir = {});
     FreeSpaceLabel(
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
