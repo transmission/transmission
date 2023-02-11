@@ -302,8 +302,8 @@ void FileList::Impl::refresh()
     }
     else
     {
-        Gtk::SortType order = TR_GTK_SORT_TYPE(ASCENDING);
-        int sort_column_id = 0;
+        Gtk::SortType order;
+        int sort_column_id;
         store_->get_sort_column_id(sort_column_id, order);
 
         RefreshData refresh_data{ sort_column_id, false, tor };
@@ -426,8 +426,8 @@ namespace
 
 struct build_data
 {
-    Gtk::Widget* w = nullptr;
-    tr_torrent* tor = nullptr;
+    Gtk::Widget* w;
+    tr_torrent* tor;
     Gtk::TreeStore::iterator iter;
     Glib::RefPtr<Gtk::TreeStore> store;
 };
@@ -575,27 +575,13 @@ namespace
 
 void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
-    auto* const toggle_renderer = dynamic_cast<Gtk::CellRendererToggle*>(renderer);
-    g_assert(toggle_renderer != nullptr);
-    if (toggle_renderer == nullptr)
-    {
-        return;
-    }
-
     auto const enabled = iter->get_value(file_cols.enabled);
-    toggle_renderer->property_inconsistent() = enabled == MIXED;
-    toggle_renderer->property_active() = enabled == static_cast<int>(true);
+    static_cast<Gtk::CellRendererToggle*>(renderer)->property_inconsistent() = enabled == MIXED;
+    static_cast<Gtk::CellRendererToggle*>(renderer)->property_active() = enabled == static_cast<int>(true);
 }
 
 void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator const& iter)
 {
-    auto* const text_renderer = dynamic_cast<Gtk::CellRendererText*>(renderer);
-    g_assert(text_renderer != nullptr);
-    if (text_renderer == nullptr)
-    {
-        return;
-    }
-
     Glib::ustring text;
 
     switch (auto const priority = iter->get_value(file_cols.priority); priority)
@@ -617,7 +603,7 @@ void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::const_iterator 
         break;
     }
 
-    text_renderer->property_text() = text;
+    static_cast<Gtk::CellRendererText*>(renderer)->property_text() = text;
 }
 
 /* build a filename from tr_torrentGetCurrentDir() + the model's FC_LABELs */
@@ -724,8 +710,8 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
  */
 bool FileList::Impl::getAndSelectEventPath(double view_x, double view_y, Gtk::TreeViewColumn*& col, Gtk::TreeModel::Path& path)
 {
-    int cell_x = 0;
-    int cell_y = 0;
+    int cell_x;
+    int cell_y;
 
     if (view_->get_path_at_pos(view_x, view_y, path, col, cell_x, cell_y))
     {
@@ -743,7 +729,7 @@ bool FileList::Impl::getAndSelectEventPath(double view_x, double view_y, Gtk::Tr
 
 bool FileList::Impl::onViewButtonPressed(guint button, TrGdkModifierType state, double view_x, double view_y)
 {
-    Gtk::TreeViewColumn* col = nullptr;
+    Gtk::TreeViewColumn* col;
     Gtk::TreeModel::Path path;
     bool handled = false;
 
@@ -761,7 +747,7 @@ struct rename_data
 {
     Glib::ustring newname;
     Glib::ustring path_string;
-    gpointer impl = nullptr;
+    gpointer impl;
 };
 
 bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
@@ -786,7 +772,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
     else
     {
         auto w = std::make_shared<Gtk::MessageDialog>(
-            gtr_widget_get_window(widget_),
+            *static_cast<Gtk::Window*>(TR_GTK_WIDGET_GET_ROOT(widget_)),
             fmt::format(
                 _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
                 fmt::arg("old_path", path_string),
@@ -945,8 +931,8 @@ FileList::Impl::Impl(
     {
         /* add "progress" column */
         auto const* title = _("Have");
-        int width = 0;
-        int height = 0;
+        int width;
+        int height;
         view_->create_pango_layout(title)->get_pixel_size(width, height);
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererProgress>();
@@ -962,8 +948,8 @@ FileList::Impl::Impl(
     {
         /* add "enabled" column */
         auto const* title = _("Download");
-        int width = 0;
-        int height = 0;
+        int width;
+        int height;
         view_->create_pango_layout(title)->get_pixel_size(width, height);
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererToggle>();
@@ -979,8 +965,8 @@ FileList::Impl::Impl(
     {
         /* add priority column */
         auto const* title = _("Priority");
-        int width = 0;
-        int height = 0;
+        int width;
+        int height;
         view_->create_pango_layout(title)->get_pixel_size(width, height);
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererText>();

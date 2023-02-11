@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     Gio::File::create_for_path(".");
     Glib::wrap_register(
         g_type_from_name("GLocalFile"),
-        [](GObject* object) -> Glib::ObjectBase* { return new Gio::File(G_FILE(object)); });
+        [](GObject* object) -> Glib::ObjectBase* { return new Gio::File((GFile*)object); });
     g_type_ensure(Gio::File::get_type());
 
     /* default settings */
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
         fmt::print(
             stderr,
             _("Run '{program} --help' to see a full list of available command line options.\n"),
-            fmt::arg("program", *argv));
+            fmt::arg("program", argv[0]));
         return 1;
     }
 

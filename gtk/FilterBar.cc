@@ -185,7 +185,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
         for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
         {
             auto const view = tr_torrentTracker(tor, i);
-            torrent_sites_and_hosts.try_emplace(std::data(view.sitename), view.host);
+            torrent_sites_and_hosts.try_emplace(view.sitename, view.host);
         }
 
         for (auto const& [sitename, host] : torrent_sites_and_hosts)
@@ -391,7 +391,7 @@ bool test_tracker(tr_torrent const* tor, int active_tracker_type, Glib::ustring 
 
     for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
     {
-        if (auto const tracker = tr_torrentTracker(tor, i); std::data(tracker.sitename) == host)
+        if (tr_torrentTracker(tor, i).sitename == host)
         {
             return true;
         }
@@ -696,17 +696,25 @@ bool FilterBar::Impl::update_count_label()
     auto const visibleCount = static_cast<int>(filter_model_->children().size());
 
     /* get the tracker count */
-    int trackerCount = 0;
+    int trackerCount;
     if (auto const iter = tracker_->get_active(); iter)
     {
         trackerCount = iter->get_value(tracker_filter_cols.count);
     }
+    else
+    {
+        trackerCount = 0;
+    }
 
     /* get the activity count */
-    int activityCount = 0;
+    int activityCount;
     if (auto const iter = activity_->get_active(); iter)
     {
         activityCount = iter->get_value(activity_filter_cols.count);
+    }
+    else
+    {
+        activityCount = 0;
     }
 
     /* set the text */
@@ -794,7 +802,7 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     filter_model_row_inserted_tag_ = filter_model_->signal_row_inserted().connect(
         [this](auto const& /*path*/, auto const& /*iter*/) { update_count_label_idle(); });
 
-    gtr_ptr_dynamic_cast<Gtk::TreeStore>(tracker_->get_model())->set_data(SESSION_KEY, session);
+    static_cast<Gtk::TreeStore*>(tracker_->get_model().get())->set_data(SESSION_KEY, session);
 
     filter_model_->set_visible_func(sigc::mem_fun(*this, &Impl::is_row_visible));
 
@@ -847,8 +855,6 @@ T* FilterBar::Impl::get_template_child(char const* name) const
     auto full_type_name = std::string("gtkmm__CustomObject_");
     Glib::append_canonical_typename(full_type_name, typeid(FilterBar).name());
 
-    return Glib::wrap(G_TYPE_CHECK_INSTANCE_CAST(
-        gtk_widget_get_template_child(GTK_WIDGET(widget_.gobj()), g_type_from_name(full_type_name.c_str()), name),
-        T::get_base_type(),
-        typename T::BaseObjectType));
+    return Glib::wrap(reinterpret_cast<typename T::BaseObjectType*>(
+        gtk_widget_get_template_child(GTK_WIDGET(widget_.gobj()), g_type_from_name(full_type_name.c_str()), name)));
 }
