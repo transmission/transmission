@@ -65,44 +65,44 @@ struct tr_pex
     }
 
     template<typename OutputIt>
-    OutputIt to_compact_ipv4(OutputIt out) const
+    OutputIt toCompact4(OutputIt out) const
     {
-        return this->addr.to_compact_ipv4(out, this->port);
+        return this->addr.toCompact4(out, this->port);
     }
 
     template<typename OutputIt>
-    OutputIt to_compact_ipv6(OutputIt out) const
+    OutputIt toCompact6(OutputIt out) const
     {
-        return this->addr.to_compact_ipv6(out, this->port);
+        return this->addr.toCompact6(out, this->port);
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, tr_pex const* pex, size_t n_pex)
+    static OutputIt toCompact4(OutputIt out, tr_pex const* pex, size_t n_pex)
     {
         for (size_t i = 0; i < n_pex; ++i)
         {
-            out = pex[i].to_compact_ipv4(out);
+            out = pex[i].toCompact4(out);
         }
         return out;
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, tr_pex const* pex, size_t n_pex)
+    static OutputIt toCompact6(OutputIt out, tr_pex const* pex, size_t n_pex)
     {
         for (size_t i = 0; i < n_pex; ++i)
         {
-            out = pex[i].to_compact_ipv6(out);
+            out = pex[i].toCompact6(out);
         }
         return out;
     }
 
-    [[nodiscard]] static std::vector<tr_pex> from_compact_ipv4(
+    [[nodiscard]] static std::vector<tr_pex> fromCompact4(
         void const* compact,
         size_t compact_len,
         uint8_t const* added_f,
         size_t added_f_len);
 
-    [[nodiscard]] static std::vector<tr_pex> from_compact_ipv6(
+    [[nodiscard]] static std::vector<tr_pex> fromCompact6(
         void const* compact,
         size_t compact_len,
         uint8_t const* added_f,
@@ -144,11 +144,6 @@ struct tr_pex
         return compare(that) < 0;
     }
 
-    [[nodiscard]] bool is_valid_for_peers() const noexcept
-    {
-        return addr.is_valid_for_peers(port);
-    }
-
     tr_address addr = {};
     tr_port port = {}; /* this field is in network byte order */
     uint8_t flags = 0;
@@ -156,7 +151,7 @@ struct tr_pex
 
 constexpr bool tr_isPex(tr_pex const* pex)
 {
-    return pex != nullptr && pex->addr.is_valid();
+    return pex && tr_address_is_valid(&pex->addr);
 }
 
 [[nodiscard]] tr_peerMgr* tr_peerMgrNew(tr_session* session);

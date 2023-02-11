@@ -337,15 +337,15 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
 {
     if (type == TR_AF_INET)
     {
-        static auto constexpr DefaultAddr = tr_address::any_ipv4();
-        auto addr = tr_address::from_string(settings_.bind_address_ipv4).value_or(DefaultAddr);
+        static auto constexpr DefaultAddr = tr_address::AnyIPv4();
+        auto addr = tr_address::fromString(settings_.bind_address_ipv4).value_or(DefaultAddr);
         return { addr, addr == DefaultAddr };
     }
 
     if (type == TR_AF_INET6)
     {
-        static auto constexpr DefaultAddr = tr_address::any_ipv6();
-        auto addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(DefaultAddr);
+        static auto constexpr DefaultAddr = tr_address::AnyIPv6();
+        auto addr = tr_address::fromString(settings_.bind_address_ipv6).value_or(DefaultAddr);
         return { addr, addr == DefaultAddr };
     }
 
