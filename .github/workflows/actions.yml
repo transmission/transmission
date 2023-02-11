@@ -44,12 +44,11 @@ jobs:
         id: check-diffs
         run: |
           set +e
-          cd src
           MERGE_BASE=`git merge-base origin/main HEAD`
           function get_changes() { # name, paths...
             local name="$1"
             shift
-            git diff --exit-code "$MERGE_BASE" -- "$@"
+            git -C "$GITHUB_WORKSPACE/src" diff --exit-code "$MERGE_BASE" -- "$@"
             echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
           }
           get_changes cli      CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
