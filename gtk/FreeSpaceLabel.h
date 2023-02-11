@@ -5,9 +5,8 @@
 
 #include <libtransmission/tr-macros.h>
 
-#include <glibmm/refptr.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/label.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <memory>
 #include <string_view>

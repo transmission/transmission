@@ -8,10 +8,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
-#include <glibmm/refptr.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/dialog.h>
-#include <gtkmm/window.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <memory>
 #include <vector>

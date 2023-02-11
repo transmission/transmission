@@ -8,17 +8,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
-#include <glibmm/objectbase.h>
-#include <glibmm/refptr.h>
-#include <glibmm/signalproxy.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/combobox.h>
-#include <gtkmm/entry.h>
-#include <gtkmm/label.h>
-#include <gtkmm/treeview.h>
-#include <gtkmm/widget.h>
-#include <gtkmm/window.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <fmt/core.h>
 #include <fmt/format.h>

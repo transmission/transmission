@@ -16,29 +16,8 @@
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 
-#include <glibmm/date.h>
+#include <glibmm.h>
 #include <glibmm/i18n.h>
-#include <glibmm/main.h>
-#include <glibmm/timer.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/adjustment.h>
-#include <gtkmm/box.h>
-#include <gtkmm/button.h>
-#include <gtkmm/cellrenderertext.h>
-#include <gtkmm/checkbutton.h>
-#include <gtkmm/combobox.h>
-#include <gtkmm/editable.h>
-#include <gtkmm/entry.h>
-#include <gtkmm/label.h>
-#include <gtkmm/liststore.h>
-#include <gtkmm/spinbutton.h>
-#include <gtkmm/textview.h>
-#include <gtkmm/treemodelcolumn.h>
-#include <gtkmm/widget.h>
-
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-#include <gtkmm/eventcontrollerfocus.h>
-#endif
 
 #include <fmt/core.h>
 

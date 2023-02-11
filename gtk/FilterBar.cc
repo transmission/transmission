@@ -13,28 +13,8 @@
 #include "TorrentFilter.h"
 #include "Utils.h"
 
-#include <gdkmm/pixbuf.h>
+#include <glibmm.h>
 #include <glibmm/i18n.h>
-#include <glibmm/main.h>
-#include <glibmm/unicode.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/cellrendererpixbuf.h>
-#include <gtkmm/cellrenderertext.h>
-#include <gtkmm/combobox.h>
-#include <gtkmm/entry.h>
-#include <gtkmm/label.h>
-#include <gtkmm/liststore.h>
-#include <gtkmm/treemodel.h>
-#include <gtkmm/treemodelcolumn.h>
-#include <gtkmm/treemodelfilter.h>
-#include <gtkmm/treerowreference.h>
-#include <gtkmm/treestore.h>
-
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-#include <gtkmm/filterlistmodel.h>
-#else
-#include <gtkmm/treemodelfilter.h>
-#endif
 
 #include <fmt/core.h>
 

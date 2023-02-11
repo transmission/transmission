@@ -7,9 +7,8 @@
 
 #include <libtransmission/transmission.h>
 
-#include <gdkmm/pixbuf.h>
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
+#include <gdkmm.h>
+#include <glibmm.h>
 
 #include <functional>
 #include <string>

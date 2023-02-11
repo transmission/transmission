@@ -11,7 +11,8 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include <glibmm/miscutils.h>
+#include <glibmm.h>
+#include <glibmm/i18n.h>
 
 #include <string>
 #include <string_view>

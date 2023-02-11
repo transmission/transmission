@@ -8,10 +8,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/scrolledwindow.h>
+#include <gtkmm.h>
 
 #include <memory>
 

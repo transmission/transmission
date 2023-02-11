@@ -7,7 +7,7 @@
 
 #include <libtransmission/transmission.h>
 
-#include <glibmm/refptr.h>
+#include <glibmm.h>
 
 class Session;
 

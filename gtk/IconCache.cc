@@ -9,7 +9,8 @@
 
 #include "Utils.h"
 
-#include <giomm/contenttype.h>
+#include <giomm.h>
+#include <glibmm.h>
 
 #include <algorithm>
 #include <map>

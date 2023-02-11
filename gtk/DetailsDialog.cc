@@ -17,34 +17,7 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h>
 
-#include <gdkmm/pixbuf.h>
 #include <glibmm/i18n.h>
-#include <glibmm/main.h>
-#include <glibmm/markup.h>
-#include <glibmm/quark.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/adjustment.h>
-#include <gtkmm/button.h>
-#include <gtkmm/cellrendererpixbuf.h>
-#include <gtkmm/cellrendererprogress.h>
-#include <gtkmm/cellrenderertext.h>
-#include <gtkmm/checkbutton.h>
-#include <gtkmm/combobox.h>
-#include <gtkmm/entry.h>
-#include <gtkmm/label.h>
-#include <gtkmm/liststore.h>
-#include <gtkmm/messagedialog.h>
-#include <gtkmm/notebook.h>
-#include <gtkmm/scrolledwindow.h>
-#include <gtkmm/spinbutton.h>
-#include <gtkmm/textbuffer.h>
-#include <gtkmm/textview.h>
-#include <gtkmm/tooltip.h>
-#include <gtkmm/treemodel.h>
-#include <gtkmm/treemodelfilter.h>
-#include <gtkmm/treemodelsort.h>
-#include <gtkmm/treerowreference.h>
-#include <gtkmm/treeview.h>
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>

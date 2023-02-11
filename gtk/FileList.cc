@@ -13,23 +13,8 @@
 
 #include <libtransmission/utils.h>
 
-#include <giomm/icon.h>
-#include <glibmm/fileutils.h>
+#include <glibmm.h>
 #include <glibmm/i18n.h>
-#include <glibmm/main.h>
-#include <glibmm/markup.h>
-#include <glibmm/miscutils.h>
-#include <glibmm/nodetree.h>
-#include <gtkmm/cellrendererpixbuf.h>
-#include <gtkmm/cellrendererprogress.h>
-#include <gtkmm/cellrenderertext.h>
-#include <gtkmm/cellrenderertoggle.h>
-#include <gtkmm/messagedialog.h>
-#include <gtkmm/treemodel.h>
-#include <gtkmm/treemodelcolumn.h>
-#include <gtkmm/treeselection.h>
-#include <gtkmm/treestore.h>
-#include <gtkmm/treeview.h>
 
 #include <fmt/core.h>
 

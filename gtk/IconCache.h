@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <giomm/icon.h>
-#include <glibmm/refptr.h>
+#include <gtkmm.h>
 
 #include <string_view>
 

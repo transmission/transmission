@@ -17,18 +17,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
+#include <glibmm.h>
 #include <glibmm/i18n.h>
-#include <glibmm/ustring.h>
-
-#if !GTKMM_CHECK_VERSION(4, 0, 0)
-#include <giomm/menu.h>
-#include <glibmm/miscutils.h>
-#include <gtkmm/icontheme.h>
-#include <gtkmm/menu.h>
-#if !defined(HAVE_APPINDICATOR)
-#include <gtkmm/statusicon.h>
-#endif
-#endif
 
 #include <string>
 

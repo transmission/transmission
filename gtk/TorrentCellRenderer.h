@@ -9,8 +9,8 @@
 
 #include <libtransmission/tr-macros.h>
 
-#include <glibmm/propertyproxy.h>
-#include <gtkmm/cellrenderer.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <memory>
 

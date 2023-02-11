@@ -6,8 +6,7 @@
 
 #include <libtransmission/transmission.h>
 
-#include <glibmm/refptr.h>
-#include <gtkmm/window.h>
+#include <gtkmm.h>
 
 #include <vector>
 

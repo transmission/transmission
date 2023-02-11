@@ -6,11 +6,8 @@
 
 #include <libtransmission/tr-macros.h>
 
-#include <giomm/actiongroup.h>
-#include <glibmm/refptr.h>
-#include <gtkmm/application.h>
-#include <gtkmm/applicationwindow.h>
-#include <gtkmm/builder.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <memory>
 

@@ -11,12 +11,9 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
 
-#include <giomm/file.h>
-#include <giomm/listmodel.h>
-#include <glibmm/object.h>
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/treemodel.h>
+#include <giomm.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <cstddef>
 #include <memory>

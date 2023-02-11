@@ -9,18 +9,7 @@
 
 #include <libtransmission/tr-macros.h>
 
-#include <glibmm/propertyproxy.h>
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/filechooser.h>
-#include <gtkmm/filefilter.h>
-
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-#include <gtkmm/button.h>
-#else
-#include <gtkmm/filechooserbutton.h>
-#endif
+#include <gtkmm.h>
 
 #include <list>
 #include <memory>

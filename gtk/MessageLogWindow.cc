@@ -14,24 +14,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
 
-#include <giomm/simpleaction.h>
-#include <glibmm/convert.h>
-#include <glibmm/datetime.h>
+#include <glibmm.h>
 #include <glibmm/i18n.h>
-#include <glibmm/main.h>
-#include <glibmm/miscutils.h>
-#include <glibmm/ustring.h>
-#include <glibmm/variant.h>
-#include <gtkmm/cellrenderertext.h>
-#include <gtkmm/combobox.h>
-#include <gtkmm/filechooserdialog.h>
-#include <gtkmm/liststore.h>
-#include <gtkmm/messagedialog.h>
-#include <gtkmm/treemodel.h>
-#include <gtkmm/treemodelcolumn.h>
-#include <gtkmm/treemodelfilter.h>
-#include <gtkmm/treemodelsort.h>
-#include <gtkmm/treeview.h>
 
 #include <fmt/core.h>
 #include <fmt/ostream.h>

@@ -9,11 +9,8 @@
 
 #include <libtransmission/transmission.h>
 
-#include <giomm/icon.h>
-#include <glibmm/object.h>
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/treemodelcolumn.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <algorithm>
 #include <bitset>
