@@ -5,6 +5,12 @@
 
 #include "PrefsDialog.h"
 
+#ifdef _WIN32
+#include <winsock2.h> // FD_SETSIZE
+#else
+#include <sys/select.h> // FD_SETSIZE
+#endif
+
 #include <cassert>
 
 #include <QCheckBox>
@@ -452,8 +458,8 @@ void PrefsDialog::onPortTest()
 
 void PrefsDialog::initNetworkTab()
 {
-    ui_.torrentPeerLimitSpin->setRange(1, INT_MAX);
-    ui_.globalPeerLimitSpin->setRange(1, INT_MAX);
+    ui_.torrentPeerLimitSpin->setRange(1, FD_SETSIZE);
+    ui_.globalPeerLimitSpin->setRange(1, FD_SETSIZE);
 
     linkWidgetToPref(ui_.peerPortSpin, Prefs::PEER_PORT);
     linkWidgetToPref(ui_.randomPeerPortCheck, Prefs::PEER_PORT_RANDOM_ON_START);
