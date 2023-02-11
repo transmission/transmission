@@ -7,6 +7,12 @@
 #include <cstdint>
 #include <cstring> /* memcmp(), memset() */
 
+#ifdef _WIN32
+#include <io.h> /* dup2() */
+#else
+#include <unistd.h> /* dup2() */
+#endif
+
 #include <event2/event.h>
 
 #include <fmt/core.h>
@@ -16,6 +22,7 @@
 #include "net.h"
 #include "session.h"
 #include "tr-assert.h"
+#include "tr-dht.h"
 #include "tr-utp.h"
 #include "utils.h"
 
@@ -81,6 +88,11 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 #endif
         }
     }
+}
+
+void tr_session::tr_udp_core::addDhtNode(tr_address const& addr, tr_port port)
+{
+    tr_dhtAddNode(addr, port, false);
 }
 
 void tr_session::tr_udp_core::set_socket_buffers()
@@ -176,16 +188,13 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     TR_ASSERT(vsession != nullptr);
     TR_ASSERT(type == EV_READ);
 
-    auto buf = std::array<unsigned char, 8192>{};
+    auto buf = std::array<unsigned char, 4096>{};
     auto from = sockaddr_storage{};
-    auto fromlen = socklen_t{ sizeof(from) };
-    auto const rc = recvfrom(
-        s,
-        reinterpret_cast<char*>(std::data(buf)),
-        std::size(buf) - 1,
-        0,
-        reinterpret_cast<sockaddr*>(&from),
-        &fromlen);
+    auto* session = static_cast<tr_session*>(vsession);
+
+    socklen_t fromlen = sizeof(from);
+    auto const
+        rc = recvfrom(s, reinterpret_cast<char*>(std::data(buf)), std::size(buf) - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are µTP, make quick inline
        checks for the other protocols. The logic is as follows:
@@ -194,15 +203,14 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
          is between 0 and 3
        - the above cannot be µTP packets, since these start with a 4-bit
          version number (1). */
-    auto* session = static_cast<tr_session*>(vsession);
     if (rc > 0)
     {
         if (buf[0] == 'd')
         {
-            if (session->dht_)
+            if (session->allowsDHT())
             {
-                buf[rc] = '\0'; // libdht requires zero-terminated messages
-                session->dht_->handleMessage(std::data(buf), rc, reinterpret_cast<sockaddr*>(&from), fromlen);
+                buf[rc] = '\0'; /* required by the DHT code */
+                tr_dhtCallback(std::data(buf), rc, (struct sockaddr*)&from, fromlen);
             }
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
@@ -286,7 +294,12 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     set_socket_buffers();
     set_socket_tos();
 
-    if (udp4_event_ != nullptr)
+    if (session_.allowsDHT())
+    {
+        tr_dhtInit(&session_, udp_socket_, udp6_socket_);
+    }
+
+    if (udp4_event_)
     {
         event_add(udp4_event_.get(), nullptr);
     }
@@ -296,8 +309,26 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     }
 }
 
+void tr_session::tr_udp_core::dhtUpkeep()
+{
+    if (tr_dhtEnabled())
+    {
+        tr_dhtUpkeep();
+    }
+}
+
+void tr_session::tr_udp_core::startShutdown()
+{
+    if (tr_dhtEnabled())
+    {
+        tr_dhtUninit();
+    }
+}
+
 tr_session::tr_udp_core::~tr_udp_core()
 {
+    startShutdown();
+
     udp6_event_.reset();
 
     if (udp6_socket_ != TR_BAD_SOCKET)

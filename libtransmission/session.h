@@ -42,7 +42,6 @@
 #include "session-thread.h"
 #include "stats.h"
 #include "torrents.h"
-#include "tr-dht.h"
 #include "tr-lpd.h"
 #include "utils-ev.h"
 #include "verify.h"
@@ -151,36 +150,6 @@ private:
         tr_session& session_;
     };
 
-    class DhtMediator : public tr_dht::Mediator
-    {
-    public:
-        DhtMediator(tr_session& session) noexcept
-            : session_{ session }
-        {
-        }
-
-        ~DhtMediator() noexcept override = default;
-
-        [[nodiscard]] std::vector<tr_torrent_id_t> torrentsAllowingDHT() const override;
-
-        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t id) const override;
-
-        [[nodiscard]] std::string_view configDir() const override
-        {
-            return session_.config_dir_;
-        }
-
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
-        {
-            return session_.timerMaker();
-        }
-
-        void addPex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override;
-
-    private:
-        tr_session& session_;
-    };
-
     class PortForwardingMediator final : public tr_port_forwarding::Mediator
     {
     public:
@@ -206,11 +175,7 @@ private:
 
         void onPortForwarded(tr_port public_port) override
         {
-            if (session_.advertised_peer_port_ != public_port)
-            {
-                session_.advertised_peer_port_ = public_port;
-                session_.onAdvertisedPeerPortChanged();
-            }
+            session_.advertised_peer_port_ = public_port;
         }
 
     private:
@@ -276,21 +241,12 @@ private:
     {
     public:
         tr_udp_core(tr_session& session, tr_port udp_port);
+
         ~tr_udp_core();
 
-        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
+        static void startShutdown();
+        static void dhtUpkeep();
 
-        [[nodiscard]] constexpr auto socket4() const noexcept
-        {
-            return udp_socket_;
-        }
-
-        [[nodiscard]] constexpr auto socket6() const noexcept
-        {
-            return udp6_socket_;
-        }
-
-    private:
         void set_socket_buffers();
 
         void set_socket_tos()
@@ -299,6 +255,11 @@ private:
             session_.setSocketTOS(udp6_socket_, TR_AF_INET6);
         }
 
+        void sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const;
+
+        void addDhtNode(tr_address const& addr, tr_port port);
+
+    private:
         tr_port const udp_port_;
         tr_session& session_;
         tr_socket_t udp_socket_ = TR_BAD_SOCKET;
@@ -886,9 +847,9 @@ public:
 
     void addDhtNode(tr_address const& addr, tr_port port)
     {
-        if (dht_)
+        if (udp_core_)
         {
-            dht_->addNode(addr, port);
+            udp_core_->addDhtNode(addr, port);
         }
     }
 
@@ -925,7 +886,7 @@ private:
 
     [[nodiscard]] tr_port randomPort() const;
 
-    void onAdvertisedPeerPortChanged();
+    void setPeerPort(tr_port port);
 
     struct init_data;
     void initImpl(init_data&);
@@ -1100,7 +1061,7 @@ private:
     std::optional<BoundSocket> bound_ipv6_;
 
 public:
-    // depends-on: settings_, announcer_udp_
+    // depends-on: announcer_udp_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
     std::unique_ptr<tr_udp_core> udp_core_;
 
@@ -1143,18 +1104,12 @@ private:
     // depends-on: udp_core_
     AnnouncerUdpMediator announcer_udp_mediator_{ *this };
 
-    // depends-on: timer_maker_, torrents_, peer_mgr_
-    DhtMediator dht_mediator_{ *this };
-
 public:
     // depends-on: announcer_udp_mediator_
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
     // depends-on: settings_, torrents_, web_, announcer_udp_
     struct tr_announcer* announcer = nullptr;
-
-    // depends-on: public_peer_port_, udp_core_, dht_mediator_
-    std::unique_ptr<tr_dht> dht_;
 
 private:
     // depends-on: session_thread_, timer_maker_, settings_, torrents_, web_
