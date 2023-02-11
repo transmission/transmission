@@ -7,7 +7,6 @@
 #include <functional>
 #include <memory>
 #include <string>
-#include <string_view>
 
 #include <glib/gstdio.h> /* g_remove() */
 
@@ -20,13 +19,10 @@
 #include "FaviconCache.h"
 #include "Utils.h" /* gtr_get_host_from_url() */
 
-using namespace std::literals;
-
 namespace
 {
 
-constexpr auto TimeoutSecs = 15s;
-constexpr auto ImageTypes = std::array<std::string_view, 4>{ "ico"sv, "png"sv, "gif"sv, "jpg"sv };
+std::array<char const*, 4> const image_types = { "ico", "png", "gif", "jpg" };
 
 struct favicon_data
 {
@@ -35,12 +31,11 @@ struct favicon_data
     std::string host;
     std::string contents;
     size_t type = 0;
-    long code = 0;
 };
 
 Glib::ustring get_url(std::string const& host, size_t image_type)
 {
-    return fmt::format("http://{}/favicon.{}", host, ImageTypes.at(image_type));
+    return fmt::format("http://{}/favicon.{}", host, image_types.at(image_type));
 }
 
 std::string favicon_get_cache_dir()
@@ -93,12 +88,12 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
         pixbuf = favicon_load_from_cache(fav->host);
     }
 
-    if (fav->code == 404 && pixbuf == nullptr && ++fav->type < ImageTypes.size()) /* keep trying */
+    if (pixbuf == nullptr && ++fav->type < image_types.size()) /* keep trying */
     {
         fav->contents.clear();
         auto* const session = fav->session;
         auto const next_url = get_url(fav->host, fav->type);
-        tr_sessionFetch(session, { next_url.raw(), favicon_web_done_cb, fav.release(), TimeoutSecs });
+        tr_sessionFetch(session, { next_url.raw(), favicon_web_done_cb, fav.release() });
         return false;
     }
 
@@ -111,7 +106,6 @@ void favicon_web_done_cb(tr_web::FetchResponse const& response)
 {
     auto* const fav = static_cast<favicon_data*>(response.user_data);
     fav->contents = response.body;
-    fav->code = response.status;
     Glib::signal_idle().connect([fav]() { return favicon_web_done_idle_cb(std::unique_ptr<favicon_data>(fav)); });
 }
 
@@ -134,7 +128,8 @@ void gtr_get_favicon(
         data->session = session;
         data->func = pixbuf_ready_func;
         data->host = host;
-        tr_sessionFetch(session, { get_url(host, 0).raw(), favicon_web_done_cb, data.release(), TimeoutSecs });
+
+        tr_sessionFetch(session, { get_url(host, 0).raw(), favicon_web_done_cb, data.release() });
     }
 }
 
