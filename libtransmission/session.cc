@@ -1279,12 +1279,12 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
 
     this->announcer_.reset();
     this->announcer_udp_.reset();
+    this->udp_core_.reset();
 
     stats().saveIfDirty();
     peer_mgr_.reset();
-    openFiles().closeAll();
     tr_utpClose(this);
-    this->udp_core_.reset();
+    openFiles().closeAll();
 
     // tada we are done!
     closed_promise->set_value();

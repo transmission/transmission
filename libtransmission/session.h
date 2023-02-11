@@ -1126,7 +1126,6 @@ private:
     tr_session_alt_speeds alt_speeds_{ alt_speed_mediator_ };
 
 public:
-    // depends-on: udp_core_
     struct struct_utp_context* utp_context = nullptr;
 
 private:
@@ -1142,7 +1141,7 @@ public:
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
 private:
-    // depends-on: timer_maker_, top_bandwidth_, utp_context, torrents_, web_
+    // depends-on: timer_maker_, top_bandwidth_, utp_comntext, torrents_, web_
     std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 
     // depends-on: peer_mgr_, advertised_peer_port_, torrents_
