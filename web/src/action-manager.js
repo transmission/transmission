@@ -41,7 +41,7 @@ export class ActionManager extends EventTarget {
       'select-all': { enabled: false, shortcut: 'Alt+A', text: 'Select all' },
       'show-about-dialog': { enabled: true, text: 'About' },
       'show-inspector': {
-        enabled: false,
+        enabled: true,
         shortcut: 'Alt+I',
         text: 'Torrent Inspector',
       },
