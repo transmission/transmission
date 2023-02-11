@@ -158,23 +158,18 @@ struct peer_atom
         , fromBest{ from }
         , flags{ flags_in }
     {
-        ++n_atoms;
+        ++n_atoms_;
     }
-
-    peer_atom(peer_atom&&) = delete;
-    peer_atom(peer_atom const&) = delete;
-    peer_atom& operator=(peer_atom&&) = delete;
-    peer_atom& operator=(peer_atom const&) = delete;
 
     ~peer_atom()
     {
-        [[maybe_unused]] auto const n_prev = n_atoms--;
+        [[maybe_unused]] auto const n_prev = n_atoms_--;
         TR_ASSERT(n_prev > 0U);
     }
 
     [[nodiscard]] static auto atom_count() noexcept
     {
-        return n_atoms.load();
+        return n_atoms_.load();
     }
 
     [[nodiscard]] constexpr auto isSeed() const noexcept
@@ -304,7 +299,7 @@ private:
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 
-    static auto inline n_atoms = std::atomic<size_t>{};
+    static auto inline n_atoms_ = std::atomic<size_t>{};
 };
 
 using Handshakes = std::map<tr_address, tr_handshake>;
