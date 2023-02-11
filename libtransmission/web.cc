@@ -245,7 +245,7 @@ public:
             easy_dispose(easy_);
         }
 
-        [[nodiscard]] constexpr auto* easy() const
+        [[nodiscard]] auto* easy() const
         {
             return easy_;
         }
@@ -255,42 +255,42 @@ public:
             return options.buffer != nullptr ? options.buffer : privbuf.get();
         }
 
-        [[nodiscard]] constexpr auto const& speedLimitTag() const
+        [[nodiscard]] auto const& speedLimitTag() const
         {
             return options.speed_limit_tag;
         }
 
-        [[nodiscard]] constexpr auto const& url() const
+        [[nodiscard]] auto const& url() const
         {
             return options.url;
         }
 
-        [[nodiscard]] constexpr auto const& range() const
+        [[nodiscard]] auto const& range() const
         {
             return options.range;
         }
 
-        [[nodiscard]] constexpr auto const& cookies() const
+        [[nodiscard]] auto const& cookies() const
         {
             return options.cookies;
         }
 
-        [[nodiscard]] constexpr auto const& sndbuf() const
+        [[nodiscard]] auto const& sndbuf() const
         {
             return options.sndbuf;
         }
 
-        [[nodiscard]] constexpr auto const& rcvbuf() const
+        [[nodiscard]] auto const& rcvbuf() const
         {
             return options.rcvbuf;
         }
 
-        [[nodiscard]] constexpr auto const& timeoutSecs() const
+        [[nodiscard]] auto const& timeoutSecs() const
         {
             return options.timeout_secs;
         }
 
-        [[nodiscard]] constexpr auto ipProtocol() const
+        [[nodiscard]] auto ipProtocol() const
         {
             switch (options.ip_proto)
             {
