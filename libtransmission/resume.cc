@@ -28,15 +28,18 @@
 
 using namespace std::literals;
 
-namespace tr_resume
-{
 namespace
 {
+
 constexpr int MaxRememberedPeers = 200;
 
-///
+} // unnamed namespace
 
-void savePeers(tr_variant* dict, tr_torrent const* tor)
+/***
+****
+***/
+
+static void savePeers(tr_variant* dict, tr_torrent const* tor)
 {
     if (auto const pex = tr_peerMgrGetPeers(tor, TR_AF_INET, TR_PEERS_INTERESTING, MaxRememberedPeers); !std::empty(pex))
     {
@@ -49,7 +52,7 @@ void savePeers(tr_variant* dict, tr_torrent const* tor)
     }
 }
 
-size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
+static size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
 {
     size_t const n_in = buflen / sizeof(tr_pex);
     size_t const n_pex = std::min(n_in, size_t{ MaxRememberedPeers });
@@ -59,7 +62,7 @@ size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
     return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, std::data(pex), n_pex);
 }
 
-auto loadPeers(tr_variant* dict, tr_torrent* tor)
+static auto loadPeers(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -82,9 +85,11 @@ auto loadPeers(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+/***
+****
+***/
 
-void saveLabels(tr_variant* dict, tr_torrent const* tor)
+static void saveLabels(tr_variant* dict, tr_torrent const* tor)
 {
     auto const& labels = tor->labels;
     tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
@@ -94,7 +99,7 @@ void saveLabels(tr_variant* dict, tr_torrent const* tor)
     }
 }
 
-auto loadLabels(tr_variant* dict, tr_torrent* tor)
+static auto loadLabels(tr_variant* dict, tr_torrent* tor)
 {
     tr_variant* list = nullptr;
     if (!tr_variantDictFindList(dict, TR_KEY_labels, &list))
@@ -118,14 +123,16 @@ auto loadLabels(tr_variant* dict, tr_torrent* tor)
     return tr_resume::Labels;
 }
 
-///
+/***
+****
+***/
 
-void saveGroup(tr_variant* dict, tr_torrent const* tor)
+static void saveGroup(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variantDictAddStrView(dict, TR_KEY_group, tor->bandwidthGroup());
 }
 
-auto loadGroup(tr_variant* dict, tr_torrent* tor)
+static auto loadGroup(tr_variant* dict, tr_torrent* tor)
 {
     if (std::string_view group_name; tr_variantDictFindStrView(dict, TR_KEY_group, &group_name) && !std::empty(group_name))
     {
@@ -136,9 +143,11 @@ auto loadGroup(tr_variant* dict, tr_torrent* tor)
     return tr_resume::fields_t{};
 }
 
-///
+/***
+****
+***/
 
-void saveDND(tr_variant* dict, tr_torrent const* tor)
+static void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
     auto const n = tor->fileCount();
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_dnd, n);
@@ -149,7 +158,7 @@ void saveDND(tr_variant* dict, tr_torrent const* tor)
     }
 }
 
-auto loadDND(tr_variant* dict, tr_torrent* tor)
+static auto loadDND(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
     tr_variant* list = nullptr;
@@ -193,9 +202,11 @@ auto loadDND(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+/***
+****
+***/
 
-void saveFilePriorities(tr_variant* dict, tr_torrent const* tor)
+static void saveFilePriorities(tr_variant* dict, tr_torrent const* tor)
 {
     auto const n = tor->fileCount();
 
@@ -206,7 +217,7 @@ void saveFilePriorities(tr_variant* dict, tr_torrent const* tor)
     }
 }
 
-auto loadFilePriorities(tr_variant* dict, tr_torrent* tor)
+static auto loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -229,9 +240,11 @@ auto loadFilePriorities(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+/***
+****
+***/
 
-void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direction dir)
+static void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direction dir)
 {
     tr_variantDictReserve(d, 3);
     tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speedLimitBps(dir));
@@ -239,27 +252,27 @@ void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direction dir
     tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tor->usesSpeedLimit(dir));
 }
 
-void saveSpeedLimits(tr_variant* dict, tr_torrent const* tor)
+static void saveSpeedLimits(tr_variant* dict, tr_torrent const* tor)
 {
     saveSingleSpeedLimit(tr_variantDictAddDict(dict, TR_KEY_speed_limit_down, 0), tor, TR_DOWN);
     saveSingleSpeedLimit(tr_variantDictAddDict(dict, TR_KEY_speed_limit_up, 0), tor, TR_UP);
 }
 
-void saveRatioLimits(tr_variant* dict, tr_torrent const* tor)
+static void saveRatioLimits(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_ratio_limit, 2);
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, tr_torrentGetRatioLimit(tor));
     tr_variantDictAddInt(d, TR_KEY_ratio_mode, tr_torrentGetRatioMode(tor));
 }
 
-void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
+static void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_idle_limit, 2);
     tr_variantDictAddInt(d, TR_KEY_idle_limit, tor->idleLimitMinutes());
     tr_variantDictAddInt(d, TR_KEY_idle_mode, tor->idleLimitMode());
 }
 
-void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* tor)
+static void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* tor)
 {
     if (auto val = int64_t{}; tr_variantDictFindInt(d, TR_KEY_speed_Bps, &val))
     {
@@ -281,7 +294,7 @@ void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* tor)
     }
 }
 
-auto loadSpeedLimits(tr_variant* dict, tr_torrent* tor)
+static auto loadSpeedLimits(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -300,7 +313,7 @@ auto loadSpeedLimits(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-auto loadRatioLimits(tr_variant* dict, tr_torrent* tor)
+static auto loadRatioLimits(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -322,7 +335,7 @@ auto loadRatioLimits(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
+static auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -344,14 +357,16 @@ auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+/***
+****
+***/
 
-void saveName(tr_variant* dict, tr_torrent const* tor)
+static void saveName(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variantDictAddStrView(dict, TR_KEY_name, tr_torrentName(tor));
 }
 
-auto loadName(tr_variant* dict, tr_torrent* tor)
+static auto loadName(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -373,9 +388,11 @@ auto loadName(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+/***
+****
+***/
 
-void saveFilenames(tr_variant* dict, tr_torrent const* tor)
+static void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 {
     auto const n = tor->fileCount();
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_files, n);
@@ -385,7 +402,7 @@ void saveFilenames(tr_variant* dict, tr_torrent const* tor)
     }
 }
 
-auto loadFilenames(tr_variant* dict, tr_torrent* tor)
+static auto loadFilenames(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -410,9 +427,11 @@ auto loadFilenames(tr_variant* dict, tr_torrent* tor)
     return ret;
 }
 
-///
+/***
+****
+***/
 
-void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
+static void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
 {
     if (b.hasNone() || (std::empty(b) != 0U))
     {
@@ -429,7 +448,7 @@ void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
     }
 }
 
-void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawlen)
+static void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawlen)
 {
     if (raw == nullptr || rawlen == 0 || (rawlen == 4 && memcmp(raw, "none", 4) == 0))
     {
@@ -445,7 +464,7 @@ void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawlen)
     }
 }
 
-void saveProgress(tr_variant* dict, tr_torrent const* tor)
+static void saveProgress(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
@@ -491,7 +510,7 @@ void saveProgress(tr_variant* dict, tr_torrent const* tor)
  * First approach (pre-2.20) had an "mtimes" list identical to
  * 3.10, but not the 'pieces' bitfield.
  */
-auto loadProgress(tr_variant* dict, tr_torrent* tor)
+static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 {
     if (tr_variant* prog = nullptr; tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
     {
@@ -619,9 +638,11 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
     return tr_resume::fields_t{};
 }
 
-///
+/***
+****
+***/
 
-auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did_migrate_filename)
+static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did_migrate_filename)
 {
     auto fields_loaded = tr_resume::fields_t{};
 
@@ -818,7 +839,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did
     return fields_loaded;
 }
 
-auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor, tr_ctorMode mode)
+static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor, tr_ctorMode mode)
 {
     auto ret = tr_resume::fields_t{};
 
@@ -849,16 +870,18 @@ auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* cto
     return ret;
 }
 
-auto useMandatoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+static auto useMandatoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
 {
     return setFromCtor(tor, fields, ctor, TR_FORCE);
 }
 
-auto useFallbackFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+static auto useFallbackFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
 {
     return setFromCtor(tor, fields, ctor, TR_FALLBACK);
 }
-} // namespace
+
+namespace tr_resume
+{
 
 fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, bool* did_rename_to_hash_only_name)
 {
