@@ -112,7 +112,9 @@ private:
     tr_sha1_digest_t data_ = {};
 
 public:
-    TorrentHash() = default;
+    TorrentHash()
+    {
+    }
 
     explicit TorrentHash(tr_sha1_digest_t const& data)
         : data_{ data }
