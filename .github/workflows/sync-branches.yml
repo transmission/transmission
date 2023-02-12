@@ -8,13 +8,33 @@ on:
 jobs:
   sync-branches:
     runs-on: ubuntu-latest
+    name: Mirror changes to 4.1 branch
     steps:
-    - uses: actions/checkout@v3
+      - name: git checkout
+        uses: actions/checkout@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Create PR
+        id: pull
+        uses: tretuna/sync-branches@1.4.0 # https://github.com/marketplace/actions/sync-branches
+        with:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          FROM_BRANCH: 'main'
+          TO_BRANCH: 'dev/4-1-0'
+          CONTENT_COMPARISON: true
+  merge:
+    runs-on: ubuntu-latest
+    name: Automatically merge PR
+    steps:
+    - name: Integration check
+      uses: squalrus/merge-bot@v0.1.0
       with:
-        persist-credentials: false
-    - name: sync-branches
-      uses: repo-sync/github-sync@v2
-      with:
-        source_branch: "main"
-        destination_branch: "dev/4-1-0"
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        test: false
+        reviewers: false
+        blocking_labels: do not merge
+        checks_enabled: false
+        method: merge
+        delete_source_branch: false
