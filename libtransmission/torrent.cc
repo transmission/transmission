@@ -918,10 +918,7 @@ void torrentStop(tr_torrent* const tor)
     {
         tor->magnetVerify = false;
         tr_logAddTraceTor(tor, "Magnet Verify");
-        tor->refreshCurrentDir();
         tr_torrentVerify(tor);
-
-        callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
     }
 }
 } // namespace
@@ -1216,16 +1213,30 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 } // namespace torrent_init_helpers
 } // namespace
 
-void tr_torrent::setMetainfo(tr_torrent_metainfo const& tm)
+void tr_torrent::setMetainfo(tr_torrent_metainfo tm)
 {
     using namespace torrent_init_helpers;
 
-    metainfo_ = tm;
+    TR_ASSERT(!hasMetainfo());
+    metainfo_ = std::move(tm);
 
     torrentInitFromInfoDict(this);
     tr_peerMgrOnTorrentGotMetainfo(this);
     session->onMetadataCompleted(this);
     this->setDirty();
+
+    this->isStopping = true;
+    this->magnetVerify = true;
+    if (this->session->shouldPauseAddedTorrents() && !this->magnetStartAfterVerify)
+    {
+        this->startAfterVerify = false;
+    }
+    this->markEdited();
+
+    // We can look for files now that we know what files are in the torrent
+    this->refreshCurrentDir();
+
+    callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_ADDED);
 }
 
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)

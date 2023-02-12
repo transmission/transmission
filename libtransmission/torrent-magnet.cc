@@ -176,13 +176,6 @@ bool tr_torrentUseMetainfoFromFile(
         delete tor->incompleteMetadata;
         tor->incompleteMetadata = nullptr;
     }
-    tor->isStopping = true;
-    tor->magnetVerify = true;
-    if (tor->session->shouldPauseAddedTorrents())
-    {
-        tor->startAfterVerify = false;
-    }
-    tor->markEdited();
 
     return true;
 }
@@ -310,13 +303,6 @@ void on_have_all_metainfo(tr_torrent* tor, tr_incomplete_metadata* m)
     {
         delete tor->incompleteMetadata;
         tor->incompleteMetadata = nullptr;
-        tor->isStopping = true;
-        tor->magnetVerify = true;
-        if (tor->session->shouldPauseAddedTorrents() && !tor->magnetStartAfterVerify)
-        {
-            tor->startAfterVerify = false;
-        }
-        tor->markEdited();
     }
     else /* drat. */
     {
