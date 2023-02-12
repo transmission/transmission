@@ -24,23 +24,15 @@ jobs:
           FROM_BRANCH: 'main'
           TO_BRANCH: 'dev/4-1-0'
           CONTENT_COMPARISON: true
-  label_issues:
-    needs: sync-branches
+  label-pr:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - uses: actions/github-script@v6
+      - uses: actions/checkout@v2
+      - uses: actions-ecosystem/action-add-labels@v1
         with:
-          script: |
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ["automerge"]
-            })
+          labels: automerge
   merge:
-    needs: label_issues
+    needs: label-pr
     runs-on: ubuntu-latest
     name: Automatically merge PR
     steps:
