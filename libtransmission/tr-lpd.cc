@@ -1,4 +1,4 @@
-// Except where noted, this file Copyright © 2010-2023 Johannes Lieder.
+// Except where noted, This file Copyright © Johannes Lieder.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
