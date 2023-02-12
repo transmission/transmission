@@ -1045,6 +1045,10 @@ void on_metainfo_completed(tr_torrent* tor)
         {
             torrentStart(tor);
         }
+        else if (tor->isRunning)
+        {
+            tr_torrentStop(tor);
+        }
     }
 }
 
@@ -1815,6 +1819,11 @@ void torrentVerifyImpl(tr_torrent* const tor)
 
     // if the torrent's already being verified, stop it
     tor->session->verifyRemove(tor);
+
+    if (!tor->hasMetainfo())
+    {
+        return;
+    }
 
     if (tor->isRunning)
     {

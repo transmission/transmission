@@ -326,6 +326,19 @@ void on_have_all_metainfo(tr_torrent* tor, tr_incomplete_metadata* m)
 } // namespace set_metadata_piece_helpers
 } // namespace
 
+void tr_torrentMagnetDoIdleWork(tr_torrent* const tor)
+{
+    using namespace set_metadata_piece_helpers;
+
+    TR_ASSERT(tr_isTorrent(tor));
+
+    if (auto* const m = tor->incompleteMetadata; m != nullptr && std::empty(m->pieces_needed))
+    {
+        tr_logAddDebugTor(tor, fmt::format("we now have all the metainfo!"));
+        on_have_all_metainfo(tor, m);
+    }
+}
+
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len)
 {
     using namespace set_metadata_piece_helpers;
@@ -370,13 +383,6 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
 
     needed.erase(iter);
     tr_logAddDebugTor(tor, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));
-
-    // are we done?
-    if (std::empty(needed))
-    {
-        tr_logAddDebugTor(tor, fmt::format("metainfo piece {} was the last one", piece));
-        on_have_all_metainfo(tor, m);
-    }
 }
 
 // ---
