@@ -1,10 +1,9 @@
-name: Update copyright year in license file
+name: Copyright year update
 
 on:
   schedule:
     - cron: '0 3 1 1 *' # 03:00 AM on January 1
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
 jobs:
   update-license-year:
