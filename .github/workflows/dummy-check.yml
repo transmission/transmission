@@ -1,3 +1,5 @@
+timeout-minutes: 1
+
 name: Dummy
 on:
   push:
