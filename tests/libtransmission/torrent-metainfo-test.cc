@@ -42,6 +42,19 @@ TEST_F(TorrentMetainfoTest, magnetLink)
     EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
 }
 
+TEST_F(TorrentMetainfoTest, magnetInfoHash)
+{
+    auto const tests = std::array<std::string_view, 1>{
+        "d13:announce-listll42:udp://tracker.opentrackr.org:1337/announceee11:magnet-infod12:display-name24:gimp-2.10.32-1-arm64.dmg9:info_hash20:¿G∏uòÙ¬∫Â≠Ù…˙i“Àe8:url-listl43:https://download.gimp.org/gimp/v2.10/macos/ee"sv,
+    };
+
+    for (auto const& test : tests)
+    {
+        auto metainfo = tr_torrent_metainfo{};
+        EXPECT_TRUE(metainfo.parseBenc(test));
+    }
+}
+
 #define BEFORE_PATH \
     "d10:created by25:Transmission/2.82 (14160)13:creation datei1402280218e8:encoding5:UTF-84:infod5:filesld6:lengthi2e4:pathl"
 #define AFTER_PATH \
