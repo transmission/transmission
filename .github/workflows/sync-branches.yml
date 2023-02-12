@@ -6,33 +6,14 @@ on:
       - 'main'
 
 jobs:
-  sync-branches:
+  sync-with-main:
     runs-on: ubuntu-latest
-    name: Mirror changes to 4.1 branch
     steps:
-      - name: git checkout
-        uses: actions/checkout@v3
-      - name: Set up Node
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@master
+      - name: Merge branch 'main' into dev/4-1-0
+        uses: devmasx/merge-branch@v1.4.0 # https://github.com/marketplace/actions/merge-branch
         with:
-          node-version: 16
-      - name: Create PR
-        id: create-pr
-        uses: tretuna/sync-branches@1.4.0 # https://github.com/marketplace/actions/sync-branches
-        with:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          FROM_BRANCH: 'main'
-          TO_BRANCH: 'dev/4-1-0'
-          CONTENT_COMPARISON: true
-      - name: Add Label
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          number: ${{ steps.create-pr.outputs.PULL_REQUEST_NUMBER }}
-          labels: automerge
-      - name: Automerge PR
-        id: automerge
-        uses: "pascalgn/automerge-action@v0.15.5"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          BASE_BRANCHES: "dev/4-1-0"
-          LOG: "TRACE"
+          type: now
+          from_branch: main
+          target_branch: dev/4-1-0
+          github_token: ${{secrets.GITHUB_TOKEN}}
