@@ -1574,7 +1574,12 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    session->runInSessionThread([session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
+    session->runInSessionThread(
+        [session, enabled]()
+        {
+            session->settings_.port_forwarding_enabled = enabled;
+            session->port_forwarding_->setEnabled(enabled);
+        });
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
