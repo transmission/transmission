@@ -8,18 +8,13 @@ on:
 jobs:
   sync-branches:
     runs-on: ubuntu-latest
-    name: Mirror changes to 4.1 branch
     steps:
-      - name: git checkout
-        uses: actions/checkout@v3
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Create PR
-        id: pull
-        uses: tretuna/sync-branches@1.4.0 # https://github.com/marketplace/actions/sync-branches
-        with:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          FROM_BRANCH: 'main'
-          TO_BRANCH: 'dev/4-1-0'
+    - uses: actions/checkout@v3
+      with:
+        persist-credentials: false
+    - name: sync-branches
+      uses: repo-sync/github-sync@v2
+      with:
+        source_branch: "main"
+        destination_branch: "dev/4-1-0"
+        github_token: ${{ secrets.GITHUB_TOKEN }}
