@@ -1,4 +1,4 @@
-## Aboutt
+## About
 
 Transmission is a fast, easy, and free BitTorrent client. It comes in several flavors:
   * A native macOS GUI application
