@@ -878,7 +878,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
             tier,
             fmt::format(_("Announce error: {error}"), fmt::arg("error", err)).append(fmt::format(" ({})", announce_url)));
     }
-    else
+    else if (current_tracker != nullptr)
     {
         /* schedule a reannounce */
         auto const interval = current_tracker->getRetryInterval();
@@ -893,6 +893,10 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
                 fmt::arg("count", interval))
                 .append(fmt::format(" ({})", announce_url)));
         tier_announce_event_push(tier, e, tr_time() + interval);
+    }
+    else
+    {
+        tr_logAddDebugTier(tier, fmt::format("No next tracker on announce error: {}", err));
     }
 }
 
@@ -1244,14 +1248,22 @@ void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* e
     // switch to the next tracker
     current_tracker = tier->useNextTracker();
 
-    // schedule a rescrape
-    auto const interval = current_tracker->getRetryInterval();
-    auto const* const host_cstr = current_tracker->host.c_str();
-    tr_logAddDebugTier(
-        tier,
-        fmt::format("Tracker '{}' scrape error: {} (Retrying in {} seconds)", host_cstr, errmsg, interval));
     tier->lastScrapeSucceeded = false;
-    tier->scheduleNextScrape(interval);
+
+    if (current_tracker != nullptr)
+    {
+        // schedule a rescrape
+        auto const interval = current_tracker->getRetryInterval();
+        auto const* const host_cstr = current_tracker->host.c_str();
+        tr_logAddDebugTier(
+            tier,
+            fmt::format("Tracker '{}' scrape error: {} (Retrying in {} seconds)", host_cstr, errmsg, interval));
+        tier->scheduleNextScrape(interval);
+    }
+    else
+    {
+        tr_logAddDebugTier(tier, fmt::format("No next tracker on scrape error: {}", errmsg));
+    }
 }
 
 void checkMultiscrapeMax(tr_announcer_impl* announcer, tr_scrape_response const& response)
