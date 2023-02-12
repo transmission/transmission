@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 16
       - name: Create PR
-        id: pull
+        id: create-pr
         uses: tretuna/sync-branches@1.4.0 # https://github.com/marketplace/actions/sync-branches
         with:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -27,7 +27,7 @@ jobs:
       - name: Add Label
         uses: actions-ecosystem/action-add-labels@v1
         with:
-          number: ${{ github.event.pull_request.number }}
+          number: ${{ steps.create-pr.outputs.PULL_REQUEST_NUMBER }}
           labels: automerge
       - name: Automatically merge PR
         uses: squalrus/merge-bot@v0.1.0
