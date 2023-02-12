@@ -6,33 +6,20 @@ on:
       - 'main'
 
 jobs:
-  main:
-    name: Mirror changes to 4.1 branch
+  sync-branches:
     runs-on: ubuntu-latest
+    name: Mirror changes to 4.1 branch
     steps:
       - name: git checkout
         uses: actions/checkout@v3
-#        with:
-#          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: create pull request
-        id: pr-create
-        uses: repo-sync/pull-request@v2 # https://github.com/marketplace/actions/github-pull-request-action
+      - name: Set up Node
+        uses: actions/setup-node@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          destination_branch: dev/4-1-0
-          pr_title: "[Actions] Merge ${{ github.ref_name }} into 4.1 branch"
-          pr_body: "Automated PR created through GitHub Actions"
-
-      - name: automerge
-        if: steps.pr-create.outputs.pr_number != ''
-        uses: peter-evans/enable-pull-request-automerge@v2 # https://github.com/marketplace/actions/enable-pull-request-automerge
+          node-version: 16
+      - name: Create PR
+        id: pull
+        uses: tretuna/sync-branches@1.4.0 # https://github.com/marketplace/actions/sync-branches
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ steps.pr-create.outputs.pr_number }}
-          merge-method: merge
-  dummy-test:
-    needs: main
-    runs-on: ubuntu-latest
-    steps:
-      - name: Great Success !
-        run: exit 0
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          FROM_BRANCH: 'main'
+          TO_BRANCH: 'dev/4-1-0'
