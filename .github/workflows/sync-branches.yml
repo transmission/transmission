@@ -25,6 +25,7 @@ jobs:
           TO_BRANCH: 'dev/4-1-0'
           CONTENT_COMPARISON: true
   merge:
+    needs: sync-branches
     runs-on: ubuntu-latest
     name: Automatically merge PR
     steps:
