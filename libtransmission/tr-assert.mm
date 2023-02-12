@@ -5,6 +5,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <cstdlib> // for abort()
+
 #include <fmt/format.h>
 
 #include "tr-assert.h"
@@ -18,6 +20,10 @@
 {
     auto const full_text = fmt::format(FMT_STRING("assertion failed: {:s} ({:s}:{:d})"), message, file, line);
     [NSException raise:NSInternalInconsistencyException format:@"%s", full_text.c_str()];
+
+    // We should not reach this anyway, but it helps mark the function as property noreturn
+    // (the Objective-C NSException method does not).
+    abort();
 }
 
 #endif
