@@ -9,6 +9,8 @@
 #include <QPixmap>
 #include <QTextDocument>
 
+#include <libtransmission/web-utils.h>
+
 #include "FaviconCache.h"
 #include "Formatter.h"
 #include "Torrent.h"
@@ -191,9 +193,13 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
 
     // hostname
     str += inf.st.is_backup ? QStringLiteral("<i>") : QStringLiteral("<b>");
-    auto const url = QUrl(inf.st.announce);
-    str += QStringLiteral("%1:%2").arg(url.host()).arg(url.port(80));
-
+    auto const announce_url = inf.st.announce.toStdString();
+    if (auto const parsed = tr_urlParse(announce_url); parsed)
+    {
+        str += QStringLiteral("%1:%2")
+                   .arg(QString::fromUtf8(std::data(parsed->host), std::size(parsed->host)))
+                   .arg(parsed->port);
+    }
     str += inf.st.is_backup ? QStringLiteral("</i>") : QStringLiteral("</b>");
 
     // announce & scrape info
