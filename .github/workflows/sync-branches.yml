@@ -25,6 +25,7 @@ jobs:
           TO_BRANCH: 'dev/4-1-0'
           CONTENT_COMPARISON: true
   label-pr:
+    needs: sync-branches
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
