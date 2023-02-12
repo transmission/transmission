@@ -243,6 +243,7 @@ private:
     // Used when loading piece checksums on demand.
     uint64_t pieces_offset_ = 0;
 
+    bool has_magnet_info_hash_ = false;
     bool is_private_ = false;
     bool is_v2_ = false;
 };

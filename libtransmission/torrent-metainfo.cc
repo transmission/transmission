@@ -394,6 +394,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 std::copy_n(std::data(value), sizeof(tr_sha1_digest_t), reinterpret_cast<char*>(std::data(tm_.info_hash_)));
                 tm_.info_hash_str_ = tr_sha1_to_string(tm_.info_hash_);
+                tm_.has_magnet_info_hash_ = true;
             }
         }
         else if (
@@ -510,7 +511,7 @@ private:
     bool finish(Context const& context)
     {
         // Support Transmission <= 3.0 magnets stored in torrent format.
-        if (key(1) == MagnetInfoKey)
+        if (tm_.has_magnet_info_hash_)
         {
             return true;
         }
