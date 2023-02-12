@@ -24,8 +24,23 @@ jobs:
           FROM_BRANCH: 'main'
           TO_BRANCH: 'dev/4-1-0'
           CONTENT_COMPARISON: true
-  merge:
+  label_issues:
     needs: sync-branches
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ["automerge"]
+            })
+  merge:
+    needs: label_issues
     runs-on: ubuntu-latest
     name: Automatically merge PR
     steps:
@@ -35,6 +50,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         test: false
         reviewers: false
+        labels: automerge
         blocking_labels: do not merge
         checks_enabled: false
         method: merge
