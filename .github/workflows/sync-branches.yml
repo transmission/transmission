@@ -6,7 +6,8 @@ on:
       - 'main'
 
 jobs:
-  sync-with-main:
+  mirror-main-to-dev:
+    name: Mirror main branch to dev/4.1.0
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
