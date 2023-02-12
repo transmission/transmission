@@ -1,18 +1,12 @@
-name: "build-test"
-on: [push]
+name: Dummy
+on:
+  push:
+    branches:
+      - 'main'
 
 jobs:
-  test_something:
+  test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/create-outputs@v0.0.0-fake
-      id: test
-    - uses: LouisBrunner/checks-action@v1.6.0
-      if: always()
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        name: Test XYZ
-        conclusion: ${{ job.status }}
-        output: |
-          {"summary":"${{ steps.test.outputs.summary }}"}
+      - name: Great Success !
+        run: exit 0
