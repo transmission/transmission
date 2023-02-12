@@ -29,5 +29,5 @@ jobs:
         with:
           commitTitle: 'chore: update copyright year in cmake/transmission.rc.in'
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: cmake/transmission.rc.in
+          path: cmake/Transmission.rc.in
           transform: (?<from>\d{4})?-?(\d{4})(?= Transmission Project)
