@@ -30,7 +30,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           pull-request-number: ${{ steps.pr-create.outputs.pr_number }}
           merge-method: merge
-  test:
+  dummy-test:
     needs: main
     runs-on: ubuntu-latest
     steps:
