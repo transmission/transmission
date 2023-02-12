@@ -1,0 +1,33 @@
+name: Update copyright year in license file
+
+on:
+  schedule:
+    - cron: '0 3 1 1 *' # 03:00 AM on January 1
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  update-license-year:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: FantasticFiasco/action-update-license-year@v2
+        with:
+          commitTitle: 'chore: update copyright year in COPYING'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: COPYING
+          transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})?
+      - uses: FantasticFiasco/action-update-license-year@v2
+        with:
+          commitTitle: 'chore: update copyright year in gtk/application.cc'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: gtk/application.cc
+          transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})(?=. All code is copyrighted by the respective authors.)
+      - uses: FantasticFiasco/action-update-license-year@v2
+        with:
+          commitTitle: 'chore: update copyright year in cmake/transmission.rc.in'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: cmake/transmission.rc.in
+          transform: (?<from>\d{4})?-?(\d{4})(?= Transmission Project)
