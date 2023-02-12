@@ -27,6 +27,7 @@ jobs:
       - name: Add Label
         uses: actions-ecosystem/action-add-labels@v1
         with:
+          number: ${{ github.event.pull_request.number }}
           labels: automerge
       - name: Automatically merge PR
         uses: squalrus/merge-bot@v0.1.0
