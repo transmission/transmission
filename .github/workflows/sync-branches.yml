@@ -1,0 +1,32 @@
+name: Mirror main to 4.1 branch
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  main:
+    name: Mirror changes to 4.1 branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v3
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: create pull request
+        id: pr-create
+        uses: repo-sync/pull-request@v2 # https://github.com/marketplace/actions/github-pull-request-action
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          destination_branch: dev/4-1-0
+          pr_title: "[Actions] Merge ${{ github.ref_name }} into 4.1 branch"
+          pr_body: "Automated PR created through GitHub Actions"
+
+      - name: automerge
+        if: steps.pr-create.outputs.pr_number != ''
+        uses: peter-evans/enable-pull-request-automerge@v2 # https://github.com/marketplace/actions/enable-pull-request-automerge
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.pr-create.outputs.pr_number }}
+          merge-method: merge
