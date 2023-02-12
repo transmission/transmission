@@ -24,27 +24,18 @@ jobs:
           FROM_BRANCH: 'main'
           TO_BRANCH: 'dev/4-1-0'
           CONTENT_COMPARISON: true
-  label-pr:
-    needs: sync-branches
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-ecosystem/action-add-labels@v1
+      - name: Add Label
+        uses: actions-ecosystem/action-add-labels@v1
         with:
           labels: automerge
-  merge:
-    needs: label-pr
-    runs-on: ubuntu-latest
-    name: Automatically merge PR
-    steps:
-    - name: Integration check
-      uses: squalrus/merge-bot@v0.1.0
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        test: false
-        reviewers: false
-        labels: automerge
-        blocking_labels: do not merge
-        checks_enabled: false
-        method: merge
-        delete_source_branch: false
+      - name: Automatically merge PR
+        uses: squalrus/merge-bot@v0.1.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          test: false
+          reviewers: false
+          labels: automerge
+          blocking_labels: do not merge
+          checks_enabled: false
+          method: merge
+          delete_source_branch: false
