@@ -712,7 +712,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did
 
     if (auto val = bool{}; (fields_to_load & tr_resume::Run) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &val))
     {
-        tor->isRunning = !val;
+        tor->start_when_stable = !val;
         fields_loaded |= tr_resume::Run;
     }
 
@@ -831,7 +831,7 @@ auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* cto
     {
         if (auto is_paused = bool{}; tr_ctorGetPaused(ctor, mode, &is_paused))
         {
-            tor->isRunning = !is_paused;
+            tor->start_when_stable = !is_paused;
             ret |= tr_resume::Run;
         }
     }
@@ -907,7 +907,7 @@ void save(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->peerLimit());
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tor->getPriority());
-    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
+    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->start_when_stable);
     savePeers(&top, tor);
 
     if (tor->hasMetainfo())

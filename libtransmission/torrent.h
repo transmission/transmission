@@ -904,10 +904,10 @@ public:
     bool is_queued = false;
     bool isRunning = false;
     bool isStopping = false;
-    bool startAfterVerify = false;
-    bool magnetStartAfterVerify = false;
 
-    bool magnetVerify = false;
+    // start the torrent after all the startup scaffolding is done,
+    // e.g. fetching metadata from peers and/or verifying the torrent
+    bool start_when_stable = false;
 
 private:
     [[nodiscard]] constexpr bool isPieceTransferAllowed(tr_direction direction) const noexcept

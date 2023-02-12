@@ -601,7 +601,7 @@ void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool enabled);
 /** @brief Like `tr_torrentStart()`, but resumes right away regardless of the queues. */
 void tr_torrentStartNow(tr_torrent* tor);
 
-/** @brief Like tr_torrentStart(), but sets magnetStartAfterVerify to true. */
+/** @brief DEPRECATED. Equivalent to tr_torrentStart(). Use that instead. */
 void tr_torrentStartMagnet(tr_torrent*);
 
 /** @brief Return the queued torrent's position in the queue it's in. [0...n) */

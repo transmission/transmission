@@ -756,7 +756,7 @@ bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error** err
     return tr_sys_path_remove(filename, error);
 }
 
-void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
+void removeTorrentImpl(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
 {
     auto const lock = tor->unique_lock();
 
@@ -826,9 +826,11 @@ struct torrent_start_opts
     std::optional<bool> has_local_data;
 };
 
-void torrentStart(tr_torrent* tor, torrent_start_opts opts)
+void torrentStart(tr_torrent* tor, torrent_start_opts opts = {})
 {
     using namespace start_stop_helpers;
+
+    auto const lock = tor->unique_lock();
 
     switch (tor->activity())
     {
@@ -849,7 +851,6 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     case TR_STATUS_CHECK_WAIT:
         /* verifying right now... wait until that's done so
          * we'll know what completeness to use/announce */
-        tor->startAfterVerify = true;
         return;
 
     case TR_STATUS_STOPPED:
@@ -867,9 +868,6 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     {
         return;
     }
-
-    /* otherwise, start it now... */
-    auto const lock = tor->unique_lock();
 
     /* allow finished torrents to be resumed */
     if (tr_torrentIsSeedRatioDone(tor))
@@ -889,11 +887,14 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     tor->session->runInSessionThread(torrentStartImpl, tor);
 }
 
-void torrentStop(tr_torrent* const tor)
+void torrentStopImpl(tr_torrent* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->session->amInSessionThread());
     auto const lock = tor->unique_lock();
+
+    tor->isRunning = false;
+    tor->isStopping = false;
 
     if (!tor->session->isClosing())
     {
@@ -913,13 +914,6 @@ void torrentStop(tr_torrent* const tor)
     }
 
     torrentSetQueued(tor, false);
-
-    if (tor->magnetVerify)
-    {
-        tor->magnetVerify = false;
-        tr_logAddTraceTor(tor, "Magnet Verify");
-        tr_torrentVerify(tor);
-    }
 }
 } // namespace
 
@@ -932,10 +926,9 @@ void tr_torrentStop(tr_torrent* tor)
 
     auto const lock = tor->unique_lock();
 
-    tor->isRunning = false;
-    tor->isStopping = false;
+    tor->start_when_stable = false;
     tor->setDirty();
-    tor->session->runInSessionThread(torrentStop, tor);
+    tor->session->runInSessionThread(torrentStopImpl, tor);
 }
 
 void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
@@ -946,7 +939,7 @@ void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func
 
     tor->isDeleting = true;
 
-    tor->session->runInSessionThread(removeTorrentInSessionThread, tor, delete_flag, delete_func, user_data);
+    tor->session->runInSessionThread(removeTorrentImpl, tor, delete_flag, delete_func, user_data);
 }
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor)
@@ -962,8 +955,7 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
         tr_logAddInfoTor(tor, _("Removing torrent"));
     }
 
-    tor->magnetVerify = false;
-    torrentStop(tor);
+    torrentStopImpl(tor);
 
     if (tor->isDeleting)
     {
@@ -972,7 +964,6 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
         tr_torrent_metainfo::removeFile(tor->session->resumeDir(), tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
-    tor->isRunning = false;
     freeTorrent(tor);
 }
 
@@ -1033,6 +1024,30 @@ void torrentInitFromInfoDict(tr_torrent* tor)
     tor->checked_pieces_ = tr_bitfield{ size_t(tor->pieceCount()) };
 }
 
+void on_metainfo_completed(tr_torrent* tor)
+{
+    // we can look for files now that we know what files are in the torrent
+    tor->refreshCurrentDir();
+
+    callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
+
+    if (tor->session->shouldFullyVerifyAddedTorrents() || !isNewTorrentASeed(tor))
+    {
+        tr_torrentVerify(tor);
+    }
+    else
+    {
+        tor->completion.setHasAll();
+        tor->doneDate = tor->addedDate;
+        tor->recheckCompleteness();
+
+        if (tor->start_when_stable)
+        {
+            torrentStart(tor);
+        }
+    }
+}
+
 void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
     tr_session* session = tr_ctorGetSession(ctor);
@@ -1065,8 +1080,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
-    auto const& labels = tr_ctorGetLabels(ctor);
-    tor->setLabels(labels);
+    tor->setLabels(tr_ctorGetLabels(ctor));
 
     session->addTorrent(tor);
 
@@ -1077,8 +1091,8 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->addedDate = now; // this is a default that will be overwritten by the resume file
     tor->anyDate = now;
 
-    tr_resume::fields_t loaded = {};
-    if (tor->hasMetainfo())
+    auto loaded = tr_resume::fields_t{};
+
     {
         // tr_resume::load() calls a lot of tr_torrentSetFoo() methods
         // that set things as dirty, but... these settings being loaded are
@@ -1102,9 +1116,6 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_ctorInitTorrentWanted(ctor, tor);
 
     tor->refreshCurrentDir();
-
-    bool const do_start = tor->isRunning;
-    tor->isRunning = false;
 
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
@@ -1171,37 +1182,14 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tor->torrent_announcer = session->announcer_->addTorrent(tor, &tr_torrent::onTrackerResponse);
 
-    if (is_new_torrent)
+    if (auto const has_metainfo = tor->hasMetainfo(); is_new_torrent && has_metainfo)
     {
-        if (tor->hasMetainfo())
-        {
-            callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
-        }
-
-        if (!tor->hasMetainfo() && !do_start)
-        {
-            auto opts = torrent_start_opts{};
-            opts.bypass_queue = true;
-            opts.has_local_data = has_local_data;
-            torrentStart(tor, opts);
-        }
-        else if (!session->shouldFullyVerifyAddedTorrents() && isNewTorrentASeed(tor))
-        {
-            tor->completion.setHasAll();
-            tor->doneDate = tor->addedDate;
-            tor->recheckCompleteness();
-        }
-        else
-        {
-            tor->startAfterVerify = do_start;
-            tr_torrentVerify(tor);
-        }
+        on_metainfo_completed(tor);
     }
-    else if (do_start)
+    else if (tor->start_when_stable || !has_metainfo)
     {
-        // if checked_pieces_ got populated from the loading the resume
-        // file above, then torrentStart doesn't need to check again
         auto opts = torrent_start_opts{};
+        opts.bypass_queue = !has_metainfo; // to fetch metainfo from peers
         opts.has_local_data = has_local_data;
         torrentStart(tor, opts);
     }
@@ -1224,19 +1212,9 @@ void tr_torrent::setMetainfo(tr_torrent_metainfo tm)
     tr_peerMgrOnTorrentGotMetainfo(this);
     session->onMetadataCompleted(this);
     this->setDirty();
-
-    this->isStopping = true;
-    this->magnetVerify = true;
-    if (this->session->shouldPauseAddedTorrents() && !this->magnetStartAfterVerify)
-    {
-        this->startAfterVerify = false;
-    }
     this->markEdited();
 
-    // We can look for files now that we know what files are in the torrent
-    this->refreshCurrentDir();
-
-    callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_ADDED);
+    on_metainfo_completed(this);
 }
 
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
@@ -1276,7 +1254,7 @@ namespace
 {
 namespace location_helpers
 {
-void setLocationInSessionThread(
+void setLocationImpl(
     tr_torrent* tor,
     std::string const& path,
     bool move_from_old_path,
@@ -1308,7 +1286,7 @@ void setLocationInSessionThread(
                 fmt::arg("path", path),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
-            tr_torrentStop(tor);
+            torrentStopImpl(tor);
             tr_error_clear(&error);
         }
     }
@@ -1362,13 +1340,8 @@ void tr_torrent::setLocation(
         *setme_state = TR_LOC_MOVING;
     }
 
-    this->session->runInSessionThread(
-        setLocationInSessionThread,
-        this,
-        std::string{ location },
-        move_from_old_path,
-        setme_progress,
-        setme_state);
+    this->session
+        ->runInSessionThread(setLocationImpl, this, std::string{ location }, move_from_old_path, setme_progress, setme_state);
 }
 
 void tr_torrentSetLocation(
@@ -1774,33 +1747,35 @@ void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 
 // --- Start/Stop Callback
 
+namespace
+{
+void tr_torrentStartImpl(tr_torrent* tor, bool bypass_queue)
+{
+    if (!tr_isTorrent(tor))
+    {
+        return;
+    }
+
+    tor->start_when_stable = true;
+    auto opts = torrent_start_opts{};
+    opts.bypass_queue = bypass_queue;
+    torrentStart(tor, opts);
+}
+} // namespace
+
 void tr_torrentStart(tr_torrent* tor)
 {
-    if (tr_isTorrent(tor))
-    {
-        tor->startAfterVerify = true;
-        torrentStart(tor, {});
-    }
+    tr_torrentStartImpl(tor, false);
 }
 
 void tr_torrentStartNow(tr_torrent* tor)
 {
-    if (tr_isTorrent(tor))
-    {
-        auto opts = torrent_start_opts{};
-        opts.bypass_queue = true;
-        torrentStart(tor, opts);
-    }
+    tr_torrentStartImpl(tor, true);
 }
 
 void tr_torrentStartMagnet(tr_torrent* tor)
 {
-    if (tr_isTorrent(tor))
-    {
-        tor->magnetStartAfterVerify = true;
-        tor->startAfterVerify = true;
-        torrentStart(tor, {});
-    }
+    tr_torrentStart(tor);
 }
 
 // ---
@@ -1820,17 +1795,15 @@ void onVerifyDoneThreadFunc(tr_torrent* const tor)
 
     tor->recheckCompleteness();
 
-    if (tor->startAfterVerify)
+    if (tor->start_when_stable)
     {
-        tor->startAfterVerify = false;
-
         auto opts = torrent_start_opts{};
         opts.has_local_data = !tor->checked_pieces_.hasNone();
         torrentStart(tor, opts);
     }
 }
 
-void verifyTorrent(tr_torrent* const tor)
+void torrentVerifyImpl(tr_torrent* const tor)
 {
     TR_ASSERT(tor->session->amInSessionThread());
     auto const lock = tor->unique_lock();
@@ -1840,23 +1813,16 @@ void verifyTorrent(tr_torrent* const tor)
         return;
     }
 
-    /* if the torrent's already being verified, stop it */
+    // if the torrent's already being verified, stop it
     tor->session->verifyRemove(tor);
-
-    bool const start_after = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
 
     if (tor->isRunning)
     {
-        tr_torrentStop(tor);
+        torrentStopImpl(tor);
     }
 
-    if (setLocalErrorIfFilesDisappeared(tor))
+    if (!setLocalErrorIfFilesDisappeared(tor))
     {
-        tor->startAfterVerify = false;
-    }
-    else
-    {
-        tor->startAfterVerify = start_after;
         tor->session->verifyAdd(tor);
     }
 }
@@ -1879,7 +1845,7 @@ void tr_torrentVerify(tr_torrent* tor)
 {
     using namespace verify_helpers;
 
-    tor->session->runInSessionThread(verifyTorrent, tor);
+    tor->session->runInSessionThread(torrentVerifyImpl, tor);
 }
 
 void tr_torrent::setVerifyState(tr_verify_state state)
