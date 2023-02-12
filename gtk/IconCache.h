@@ -7,10 +7,9 @@
 
 #pragma once
 
-#include <giomm/icon.h>
-#include <glibmm/refptr.h>
-
 #include <string_view>
+
+#include <gtkmm.h>
 
 extern std::string_view const DirectoryMimeType;
 extern std::string_view const UnknownMimeType;

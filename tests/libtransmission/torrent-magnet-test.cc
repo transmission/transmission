@@ -5,17 +5,19 @@
 
 #include <string>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/error.h>
-#include <libtransmission/torrent-magnet.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/torrent.h>
+#include "crypto-utils.h"
+#include "error.h"
+#include "torrent-magnet.h"
+#include "torrent-metainfo.h"
+#include "torrent.h"
 
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 using TorrentMagnetTest = SessionTest;
@@ -53,4 +55,5 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
     EXPECT_EQ(tor->pieceHash(0), torrent_metainfo.pieceHash(0));
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

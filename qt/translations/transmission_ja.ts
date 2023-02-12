@@ -64,8 +64,8 @@
     <message numerus="yes">
         <location line="+105"/>
         <source>Torrent(s) Completed</source>
-        <translation>
-            <numerusform>トレント完了</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -215,7 +215,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation>ピアに µTP を介して接続</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="+130"/>
@@ -272,7 +272,7 @@
     <message>
         <location line="+391"/>
         <source>Add URL(s)</source>
-        <translation>URL を追加</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+97"/>
@@ -501,17 +501,17 @@
         <translation>速度制限の全体設定を尊重(&amp;L)</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+7"/>
         <source>Limit &amp;download speed:</source>
         <translation>ダウンロード速度制限 (&amp;D):</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>アップロード速度制限 (&amp;U):</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+20"/>
         <source>Torrent &amp;priority:</source>
         <translation>トレントの優先度 (&amp;P):</translation>
     </message>
@@ -546,27 +546,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-257"/>
+        <location line="+255"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>通常</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>混合</translation>
     </message>
@@ -602,7 +602,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
         <translation>選択項目をチェック</translation>
     </message>
@@ -629,7 +629,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>改名...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -683,7 +683,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>検索...</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -811,7 +811,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;空き容量の計算中…&lt;/i&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
@@ -897,7 +897,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>開く(&amp;O)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -912,7 +912,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation>新規(&amp;N)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1153,17 +1153,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation>セッションの変更(&amp;C)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>場所の設定(&amp;L)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation>URL を開く(&amp;U)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1217,7 +1217,7 @@
         <translation>処理待ち順(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>ダウンロード速度制限</translation>
     </message>
@@ -1293,12 +1293,12 @@
         <translation>トレントを開く</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>速度制限</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>ネットワークエラー</translation>
     </message>
@@ -1665,7 +1665,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>曜日(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
         <translation>毎日</translation>
     </message>
@@ -1727,7 +1727,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation>TCPポートを検査中...</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+154"/>
@@ -1987,12 +1987,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation>µTP はネットワークの混雑を緩和するツールです。</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation>ピア接続に µTP を使用(&amp;T)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2082,14 +2082,14 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="-101"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation>
-            <numerusform>&lt;b&gt;更新成功!&lt;/b&gt;&lt;p&gt;ブロックリストに %Ln 個の規則があります。&lt;/p&gt;</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation>&lt;b&gt;ブロックリストの更新&lt;/b&gt;&lt;p&gt;新しいブロックリストを取得…&lt;/p&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2207,7 +2207,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>パスの改名時のエラー</translation>
     </message>
@@ -2229,15 +2229,15 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>トレントの重複</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>%n個の重複したトレントを追加できません</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -2399,7 +2399,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>マグネット転送 - メタ情報を取得中 (%1%)</translation>
@@ -2549,7 +2549,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>ピア数を要求中… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2583,7 +2583,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>ピアの増加を要求… &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+56"/>

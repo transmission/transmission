@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © 2013-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -40,11 +40,6 @@ void tr_error_free(tr_error* error);
  * @param[in]     message Error message.
  */
 void tr_error_set(tr_error** error, int code, std::string_view message);
-
-/**
- * @brief shorthand for `tr_error_set(error, errno, tr_strerror(errno))`
- */
-void tr_error_set_from_errno(tr_error** error, int errnum);
 
 /**
  * @brief Propagate existing error object upwards.

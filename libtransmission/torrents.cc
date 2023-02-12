@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -41,6 +41,22 @@ struct CompareTorrentByHash
 };
 
 } // namespace
+
+tr_torrent* tr_torrents::get(tr_torrent_id_t id)
+{
+    TR_ASSERT(static_cast<size_t>(id) < std::size(by_id_));
+    if (static_cast<size_t>(id) >= std::size(by_id_))
+    {
+        return nullptr;
+    }
+
+    auto* const tor = by_id_.at(id);
+    TR_ASSERT(tor == nullptr || tor->id() == id);
+    TR_ASSERT(
+        std::count_if(std::begin(removed_), std::end(removed_), [&id](auto const& removed) { return id == removed.first; }) ==
+        (tor == nullptr ? 1 : 0));
+    return tor;
+}
 
 tr_torrent* tr_torrents::get(std::string_view magnet_link)
 {

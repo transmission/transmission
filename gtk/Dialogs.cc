@@ -1,21 +1,20 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include "Dialogs.h"
+#include <memory>
+#include <vector>
 
-#include "GtkCompat.h"
-#include "Session.h"
-#include "Utils.h"
-
+#include <glibmm.h>
 #include <glibmm/i18n.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/messagedialog.h>
 
 #include <fmt/core.h>
 
-#include <memory>
-#include <vector>
+#include <libtransmission/transmission.h>
+
+#include "Dialogs.h"
+#include "Session.h"
+#include "Utils.h"
 
 /***
 ****

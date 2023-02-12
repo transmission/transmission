@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -211,7 +211,8 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     // replaced exbc with FUTB. The encoding for BitComet Peer IDs changed
     // to Azureus-style as of BitComet version 0.59.
     auto mod = std::string_view{};
-    if (auto const lead = std::string_view{ std::data(peer_id), std::min(std::size(peer_id), size_t{ 4 }) }; lead == "exbc")
+    auto const lead = std::string_view{ std::data(peer_id), std::min(std::size(peer_id), size_t{ 4 }) };
+    if (lead == "exbc")
     {
         mod = ""sv;
     }
@@ -667,10 +668,10 @@ void tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
         }
     };
 
-    if (auto const [eq_begin, eq_end] = std::equal_range(std::begin(Clients), std::end(Clients), key, Compare{});
-        eq_begin != std::end(Clients) && eq_begin != eq_end)
+    auto eq = std::equal_range(std::begin(Clients), std::end(Clients), key, Compare{});
+    if (eq.first != std::end(Clients) && eq.first != eq.second)
     {
-        eq_begin->formatter(buf, buflen, eq_begin->name, peer_id);
+        eq.first->formatter(buf, buflen, eq.first->name, peer_id);
         return;
     }
 

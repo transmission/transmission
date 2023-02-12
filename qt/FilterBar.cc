@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © 2012-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -286,8 +286,8 @@ void FilterBar::refreshPref(int key)
     case Prefs::FILTER_TRACKERS:
         {
             auto const display_name = prefs_.getString(key);
-
-            if (auto rows = tracker_model_->findItems(display_name); !rows.isEmpty())
+            auto rows = tracker_model_->findItems(display_name);
+            if (!rows.isEmpty())
             {
                 tracker_combo_->setCurrentIndex(rows.front()->row());
             }

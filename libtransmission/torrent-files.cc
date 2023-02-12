@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -108,11 +108,11 @@ bool isJunkFile(std::string_view filename)
 
 } // unnamed namespace
 
-// ---
+///
 
 std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     tr_file_index_t file_index,
-    std::string_view const* paths,
+    std::string_view const* search_paths,
     size_t n_paths) const
 {
     auto filename = tr_pathbuf{};
@@ -120,7 +120,7 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
 
     for (size_t path_idx = 0; path_idx < n_paths; ++path_idx)
     {
-        auto const base = paths[path_idx];
+        auto const base = search_paths[path_idx];
 
         filename.assign(base, '/', subpath);
         if (auto const info = tr_sys_path_get_info(filename); info)
@@ -138,11 +138,11 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     return {};
 }
 
-bool tr_torrent_files::hasAnyLocalData(std::string_view const* paths, size_t n_paths) const
+bool tr_torrent_files::hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const
 {
     for (tr_file_index_t i = 0, n = fileCount(); i < n; ++i)
     {
-        if (find(i, paths, n_paths))
+        if (find(i, search_paths, n_paths))
         {
             return true;
         }
@@ -151,7 +151,7 @@ bool tr_torrent_files::hasAnyLocalData(std::string_view const* paths, size_t n_p
     return false;
 }
 
-// ---
+///
 
 bool tr_torrent_files::move(
     std::string_view old_parent_in,
@@ -179,7 +179,7 @@ bool tr_torrent_files::move(
         return false;
     }
 
-    auto const paths = std::array<std::string_view, 1>{ old_parent.sv() };
+    auto const search_paths = std::array<std::string_view, 1>{ old_parent.sv() };
 
     auto const total_size = totalSize();
     auto err = bool{};
@@ -187,7 +187,7 @@ bool tr_torrent_files::move(
 
     for (tr_file_index_t i = 0, n = fileCount(); i < n; ++i)
     {
-        auto const found = find(i, std::data(paths), std::size(paths));
+        auto const found = find(i, std::data(search_paths), std::size(search_paths));
         if (!found)
         {
             continue;
@@ -233,7 +233,7 @@ bool tr_torrent_files::move(
     return !err;
 }
 
-// ---
+///
 
 /**
  * This convoluted code does something (seemingly) simple:
@@ -259,10 +259,10 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     tr_sys_dir_create_temp(std::data(tmpdir));
 
     // move the local data to the tmpdir
-    auto const paths = std::array<std::string_view, 1>{ parent.sv() };
+    auto const search_paths = std::array<std::string_view, 1>{ parent.sv() };
     for (tr_file_index_t idx = 0, n_files = fileCount(); idx < n_files; ++idx)
     {
-        if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
+        if (auto const found = find(idx, std::data(search_paths), std::size(search_paths)); found)
         {
             tr_moveFile(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
         }

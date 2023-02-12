@@ -1,10 +1,9 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © 2007-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import "GroupsController.h"
 #import "NSImageAdditions.h"
-#import "NSKeyedUnarchiverAdditions.h"
 #import "NSMutableArrayAdditions.h"
 
 static CGFloat const kIconWidth = 16.0;
@@ -14,6 +13,12 @@ static CGFloat const kIconWidthSmall = 12.0;
 @interface GroupsController ()
 
 @property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
+
+- (void)saveGroups;
+
+- (NSImage*)imageForGroup:(NSMutableDictionary*)dict;
+
+- (BOOL)torrent:(Torrent*)torrent doesMatchRulesForGroupAtIndex:(NSInteger)index;
 
 @end
 
@@ -49,7 +54,7 @@ GroupsController* fGroupsInstance = nil;
         }
         else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
         {
-            _fGroups = [NSKeyedUnarchiver deprecatedUnarchiveObjectWithData:data];
+            _fGroups = [NSUnarchiver unarchiveObjectWithData:data];
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Groups"];
             [self saveGroups];
         }
@@ -282,13 +287,36 @@ GroupsController* fGroupsInstance = nil;
 
 - (NSMenu*)groupMenuWithTarget:(id)target action:(SEL)action isSmall:(BOOL)small
 {
-    NSMenu* menu = [[NSMenu alloc] initWithTitle:@""];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"Groups"];
 
-    void (^addItemWithTitleTagIcon)(NSString*, NSInteger, NSImage*) = ^void(NSString* title, NSInteger tag, NSImage* icon) {
-        NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:title action:action keyEquivalent:@""];
+    NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"None", "Groups -> Menu") action:action
+                                           keyEquivalent:@""];
+    item.target = target;
+    item.tag = -1;
+
+    NSImage* icon = [self imageForGroupNone];
+    if (small)
+    {
+        icon = [icon copy];
+        icon.size = NSMakeSize(kIconWidthSmall, kIconWidthSmall);
+
+        item.image = icon;
+    }
+    else
+    {
+        item.image = icon;
+    }
+
+    [menu addItem:item];
+
+    for (NSMutableDictionary* dict in self.fGroups)
+    {
+        item = [[NSMenuItem alloc] initWithTitle:dict[@"Name"] action:action keyEquivalent:@""];
         item.target = target;
-        item.tag = tag;
 
+        item.tag = [dict[@"Index"] integerValue];
+
+        NSImage* icon = [self imageForGroup:dict];
         if (small)
         {
             icon = [icon copy];
@@ -302,13 +330,6 @@ GroupsController* fGroupsInstance = nil;
         }
 
         [menu addItem:item];
-    };
-
-    addItemWithTitleTagIcon(NSLocalizedString(@"None", "Groups -> Menu"), -1, [self imageForGroupNone]);
-
-    for (NSMutableDictionary* dict in self.fGroups)
-    {
-        addItemWithTitleTagIcon(dict[@"Name"], [dict[@"Index"] integerValue], [self imageForGroup:dict]);
     }
 
     return menu;
@@ -340,9 +361,7 @@ GroupsController* fGroupsInstance = nil;
         [groups addObject:tempDict];
     }
 
-    [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups requiringSecureCoding:YES
-                                                                                         error:nil]
-                                            forKey:@"GroupDicts"];
+    [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups] forKey:@"GroupDicts"];
 }
 
 - (NSImage*)imageForGroupNone

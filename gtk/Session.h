@@ -1,28 +1,21 @@
-// This file Copyright © 2021-2023 Transmission authors and contributors.
+// Copyright © Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
 #pragma once
 
-#include "GtkCompat.h"
-#include "Torrent.h"
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <giomm.h>
+#include <glibmm.h>
+#include <gtkmm.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
-
-#include <giomm/file.h>
-#include <giomm/listmodel.h>
-#include <glibmm/object.h>
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/treemodel.h>
-
-#include <cstddef>
-#include <memory>
-#include <string>
-#include <unordered_set>
-#include <vector>
 
 class Session : public Glib::Object
 {
@@ -34,8 +27,6 @@ public:
         ERR_NO_MORE_TORRENTS = 1000 /* finished adding a batch */
     };
 
-    using Model = IF_GTKMM4(Gio::ListModel, Gtk::TreeModel);
-
 public:
     ~Session() override;
 
@@ -45,8 +36,8 @@ public:
 
     tr_session* close();
 
-    Glib::RefPtr<Gio::ListModel> get_model() const;
-    Glib::RefPtr<Model> get_sorted_model() const;
+    /* Return the model used without incrementing the reference count */
+    Glib::RefPtr<Gtk::TreeModel> get_model() const;
 
     void clear();
 
@@ -66,7 +57,7 @@ public:
      * Load saved state and return number of torrents added.
      * May trigger one or more "error" signals with ERR_ADD_TORRENT
      */
-    void load(bool force_paused);
+    void load(bool forcepaused);
 
     /**
      * Add a list of torrents.
@@ -85,7 +76,7 @@ public:
     void add_ctor(tr_ctor* ctor);
 
     /** Add a torrent. */
-    void add_torrent(Glib::RefPtr<Torrent> const& torrent, bool do_notify);
+    void add_torrent(tr_torrent*, bool do_notify);
 
     /**
      * Notifies listeners that torrents have been added.
@@ -127,17 +118,16 @@ public:
 
     void blocklist_update();
 
-    void exec(tr_variant const* request);
+    void exec(tr_variant const* benc);
 
-    void open_folder(tr_torrent_id_t torrent_id) const;
+    void open_folder(tr_torrent_id_t torrent_id);
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)>& signal_add_error();
     sigc::signal<void(tr_ctor*)>& signal_add_prompt();
-    sigc::signal<void(bool)>& signal_blocklist_updated();
+    sigc::signal<void(int)>& signal_blocklist_updated();
     sigc::signal<void(bool)>& signal_busy();
     sigc::signal<void(tr_quark)>& signal_prefs_changed();
     sigc::signal<void(bool)>& signal_port_tested();
-    sigc::signal<void(std::unordered_set<tr_torrent_id_t> const&, Torrent::ChangeFlags)>& signal_torrents_changed();
 
 protected:
     explicit Session(tr_session* session);
@@ -146,3 +136,36 @@ private:
     class Impl;
     std::unique_ptr<Impl> const impl_;
 };
+
+/**
+***
+**/
+
+class TorrentModelColumns : public Gtk::TreeModelColumnRecord
+{
+public:
+    TorrentModelColumns();
+
+    Gtk::TreeModelColumn<Glib::ustring> name_collated;
+    Gtk::TreeModelColumn<gpointer> torrent;
+    Gtk::TreeModelColumn<tr_torrent_id_t> torrent_id;
+    Gtk::TreeModelColumn<double> speed_up;
+    Gtk::TreeModelColumn<double> speed_down;
+    Gtk::TreeModelColumn<int> active_peers_up;
+    Gtk::TreeModelColumn<int> active_peers_down;
+    Gtk::TreeModelColumn<double> recheck_progress;
+    Gtk::TreeModelColumn<bool> active;
+    Gtk::TreeModelColumn<tr_torrent_activity> activity;
+    Gtk::TreeModelColumn<bool> finished;
+    Gtk::TreeModelColumn<tr_priority_t> priority;
+    Gtk::TreeModelColumn<size_t> queue_position;
+    Gtk::TreeModelColumn<unsigned int> trackers;
+    /* tr_stat.error
+     * Tracked because ACTIVITY_FILTER_ERROR needs the row-changed events */
+    Gtk::TreeModelColumn<int> error;
+    /* tr_stat.{ peersSendingToUs + peersGettingFromUs + webseedsSendingToUs }
+     * Tracked because ACTIVITY_FILTER_ACTIVE needs the row-changed events */
+    Gtk::TreeModelColumn<int> active_peer_count;
+};
+
+extern TorrentModelColumns const torrent_cols;

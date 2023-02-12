@@ -1,32 +1,25 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © 2010-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "OptionsDialog.h"
+#include <memory>
+#include <utility>
 
-#include "FileList.h"
-#include "FreeSpaceLabel.h"
-#include "GtkCompat.h"
-#include "PathButton.h"
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
+#include <glibmm.h>
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/file.h> /* tr_sys_path_is_same() */
 
-#include <giomm/file.h>
-#include <glibmm/i18n.h>
-#include <gtkmm/checkbutton.h>
-#include <gtkmm/combobox.h>
-#include <gtkmm/filefilter.h>
-
-#include <memory>
-#include <utility>
-
-using namespace std::string_view_literals;
+#include "FileList.h"
+#include "FreeSpaceLabel.h"
+#include "OptionsDialog.h"
+#include "PathButton.h"
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h" /* gtr_priority_combo_get_value() */
 
 /****
 *****
@@ -35,7 +28,7 @@ using namespace std::string_view_literals;
 namespace
 {
 
-auto const ShowOptionsDialogChoice = "show_options_dialog"sv; // TODO(C++20): Use ""s
+auto const ShowOptionsDialogChoice = Glib::ustring("show_options_dialog");
 
 std::string get_source_file(tr_ctor& ctor)
 {
@@ -73,7 +66,6 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Glib::RefPtr<Session> const& core,
         std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
-    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 
@@ -118,14 +110,14 @@ void OptionsDialog::Impl::addResponseCB(int response)
     {
         if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
         {
-            tr_torrentSetPriority(tor_, gtr_combo_box_get_active_enum(*priority_combo_));
+            tr_torrentSetPriority(tor_, gtr_priority_combo_get_value(*priority_combo_));
 
             if (run_check_->get_active())
             {
                 tr_torrentStart(tor_);
             }
 
-            core_->add_torrent(Torrent::create(tor_), false);
+            core_->add_torrent(tor_, false);
 
             if (trash_check_->get_active())
             {
@@ -284,7 +276,7 @@ OptionsDialog::Impl::Impl(
     dialog.signal_response().connect(sigc::mem_fun(*this, &Impl::addResponseCB));
 
     gtr_priority_combo_init(*priority_combo_);
-    gtr_combo_box_set_active_enum(*priority_combo_, TR_PRI_NORMAL);
+    gtr_priority_combo_set_value(*priority_combo_, TR_PRI_NORMAL);
 
     auto* source_chooser = gtr_get_widget_derived<PathButton>(builder, "source_button");
     addTorrentFilters(source_chooser);
@@ -297,7 +289,7 @@ OptionsDialog::Impl::Impl(
     destination_chooser->signal_selection_changed().connect([this, destination_chooser]()
                                                             { downloadDirChanged(destination_chooser); });
 
-    bool flag = false;
+    bool flag;
     if (!tr_ctorGetPaused(ctor_.get(), TR_FORCE, &flag))
     {
         g_assert_not_reached();
@@ -338,7 +330,7 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<S
         gtr_pref_string_set(TR_KEY_open_dialog_dir, IF_GTKMM4(get_current_folder, get_current_folder_file)()->get_path());
 
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
-        bool const do_prompt = get_choice(std::string(ShowOptionsDialogChoice)) == "true";
+        bool const do_prompt = get_choice(ShowOptionsDialogChoice) == "true";
         bool const do_notify = false;
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
@@ -382,8 +374,8 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
         IF_GTKMM4(set_current_folder, set_current_folder_file)(Gio::File::create_for_path(folder));
     }
 
-    add_choice(std::string(ShowOptionsDialogChoice), _("Show options dialog"));
-    set_choice(std::string(ShowOptionsDialogChoice), gtr_pref_flag_get(TR_KEY_show_options_window) ? "true" : "false");
+    add_choice(ShowOptionsDialogChoice, _("Show options dialog"));
+    set_choice(ShowOptionsDialogChoice, gtr_pref_flag_get(TR_KEY_show_options_window) ? "true" : "false");
 }
 
 /***

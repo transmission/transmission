@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © 2008-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -15,6 +15,9 @@
 @property(nonatomic) IBOutlet NSButton* fButton;
 
 @property(nonatomic, readonly) PrefsController* fPrefsController;
+
+- (instancetype)initWithPrefsController:(PrefsController*)prefsController;
+- (void)startDownload;
 
 @end
 
@@ -103,7 +106,7 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 
     alert.informativeText = error;
 
-    [alert beginSheetModalForWindow:self.fPrefsController.window completionHandler:^(NSModalResponse /*returnCode*/) {
+    [alert beginSheetModalForWindow:self.fPrefsController.window completionHandler:^(NSModalResponse returnCode) {
         fBLViewController = nil;
     }];
 }

@@ -295,7 +295,6 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string */
 "DL" = "DL";
 
@@ -401,6 +400,9 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "From: tracker";
 
+/* File size - gigabytes */
+"GB" = "GB";
+
 /* Transfer speed (gigabytes per second) */
 "GB/s" = "GB/s";
 
@@ -475,6 +477,9 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "It appears that the file \"%1$@\" from %2$@ is not a torrent file.";
 
+/* File size - kilobytes */
+"KB" = "KB";
+
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/s";
 
@@ -511,6 +516,9 @@
 /* Inspector -> selected torrents
    Torrent -> progress string */
 "Magnetized transfer" = "Magnetized transfer";
+
+/* File size - megabytes */
+"MB" = "MB";
 
 /* Transfer speed (megabytes per second) */
 "MB/s" = "MB/s";
@@ -731,7 +739,6 @@
 
 /* Stats window -> label
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string
    Torrent table -> group row -> tooltip */
 "Ratio" = "Ratio";
@@ -910,6 +917,9 @@
 /* Donation beg -> title */
 "Support open-source indie software" = "Support open-source indie software";
 
+/* File size - terabytes */
+"TB" = "TB";
+
 /* Transfer speed (terabytes per second) */
 "TB/s" = "TB/s";
 
@@ -1029,7 +1039,8 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Total Transfer";
 
-/* Message window -> level */
+/* Message window -> level
+   Message window -> level string */
 "Trace" = "Trace";
 
 /* Filter Bar -> filter menu */
@@ -1068,7 +1079,6 @@
 
 /* inspector -> peer table -> header
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string */
 "UL" = "UL";
 

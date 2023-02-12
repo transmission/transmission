@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © 2012-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -172,7 +172,7 @@ static std::string replaceSubstr(std::string_view str, std::string_view oldval, 
     {
         auto const pos = str.find(oldval);
         ret += str.substr(0, pos);
-        if (pos == std::string_view::npos)
+        if (pos == str.npos)
         {
             break;
         }
@@ -240,7 +240,8 @@ static bool announce_list_has_url(tr_variant* announce_list, char const* url)
 
         while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
         {
-            if (auto sv = std::string_view{}; tr_variantGetStrView(node, &sv) && sv == url)
+            auto sv = std::string_view{};
+            if (tr_variantGetStrView(node, &sv) && sv == url)
             {
                 return true;
             }

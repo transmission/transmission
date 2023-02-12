@@ -501,17 +501,17 @@
         <translation>Patuhi batas g&amp;lobal</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+7"/>
         <source>Limit &amp;download speed:</source>
         <translation>Batas &amp;kecepatan unduh:</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Batas &amp;kecepatan unggah:</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+20"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;Prioritas torrent:</translation>
     </message>
@@ -546,27 +546,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>Rendah</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-257"/>
+        <location line="+255"/>
         <source>High</source>
         <translation>Tinggi</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>Normal</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>Campuran</translation>
     </message>
@@ -602,7 +602,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
         <translation>Periksa Yang Dipilih</translation>
     </message>
@@ -1217,7 +1217,7 @@
         <translation>Urutkan dengan &amp;Antrian</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>Batas Kecepatan Unduh</translation>
     </message>
@@ -1293,12 +1293,12 @@
         <translation>Buka Torrent</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Batas Kecepatan</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Galat Jaringan</translation>
     </message>
@@ -1665,7 +1665,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         <translation>&amp;Pada hari:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
         <translation>Setiap Hari</translation>
     </message>
@@ -2207,7 +2207,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Galat Mengubah Nama Path</translation>
     </message>
@@ -2399,7 +2399,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Transfer termagnetisasi - mengambil metadata (%1%)</translation>

@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -58,65 +58,65 @@ struct tr_pex
     tr_pex() = default;
 
     tr_pex(tr_address addr_in, tr_port port_in, uint8_t flags_in = {})
-        : addr{ addr_in }
+        : addr{ std::move(addr_in) }
         , port{ port_in }
         , flags{ flags_in }
     {
     }
 
     template<typename OutputIt>
-    OutputIt to_compact_ipv4(OutputIt out) const
+    OutputIt toCompact4(OutputIt out) const
     {
-        return this->addr.to_compact_ipv4(out, this->port);
+        return this->addr.toCompact4(out, this->port);
     }
 
     template<typename OutputIt>
-    OutputIt to_compact_ipv6(OutputIt out) const
+    OutputIt toCompact6(OutputIt out) const
     {
-        return this->addr.to_compact_ipv6(out, this->port);
+        return this->addr.toCompact6(out, this->port);
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, tr_pex const* pex, size_t n_pex)
+    static OutputIt toCompact4(OutputIt out, tr_pex const* pex, size_t n_pex)
     {
         for (size_t i = 0; i < n_pex; ++i)
         {
-            out = pex[i].to_compact_ipv4(out);
+            out = pex[i].toCompact4(out);
         }
         return out;
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, tr_pex const* pex, size_t n_pex)
+    static OutputIt toCompact6(OutputIt out, tr_pex const* pex, size_t n_pex)
     {
         for (size_t i = 0; i < n_pex; ++i)
         {
-            out = pex[i].to_compact_ipv6(out);
+            out = pex[i].toCompact6(out);
         }
         return out;
     }
 
-    [[nodiscard]] static std::vector<tr_pex> from_compact_ipv4(
+    [[nodiscard]] static std::vector<tr_pex> fromCompact4(
         void const* compact,
         size_t compact_len,
         uint8_t const* added_f,
         size_t added_f_len);
 
-    [[nodiscard]] static std::vector<tr_pex> from_compact_ipv6(
+    [[nodiscard]] static std::vector<tr_pex> fromCompact6(
         void const* compact,
         size_t compact_len,
         uint8_t const* added_f,
         size_t added_f_len);
 
     template<typename OutputIt>
-    [[nodiscard]] OutputIt display_name(OutputIt out) const
+    [[nodiscard]] OutputIt readable(OutputIt out) const
     {
-        return addr.display_name(out, port);
+        return addr.readable(out, port);
     }
 
-    [[nodiscard]] std::string display_name() const
+    [[nodiscard]] std::string readable() const
     {
-        return addr.display_name(port);
+        return addr.readable(port);
     }
 
     [[nodiscard]] int compare(tr_pex const& that) const noexcept // <=>
@@ -144,11 +144,6 @@ struct tr_pex
         return compare(that) < 0;
     }
 
-    [[nodiscard]] bool is_valid_for_peers() const noexcept
-    {
-        return addr.is_valid_for_peers(port);
-    }
-
     tr_address addr = {};
     tr_port port = {}; /* this field is in network byte order */
     uint8_t flags = 0;
@@ -156,7 +151,7 @@ struct tr_pex
 
 constexpr bool tr_isPex(tr_pex const* pex)
 {
-    return pex != nullptr && pex->addr.is_valid();
+    return pex && tr_address_is_valid(&pex->addr);
 }
 
 [[nodiscard]] tr_peerMgr* tr_peerMgrNew(tr_session* session);
@@ -175,7 +170,7 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
 
 [[nodiscard]] size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket);
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const& addr, tr_port port, struct tr_peer_socket const socket);
 
 size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
 
@@ -215,6 +210,11 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr);
 [[nodiscard]] struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count);
 
 [[nodiscard]] tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
+
+[[nodiscard]] tr_bytes_per_second_t tr_peerGetPieceSpeedBytesPerSecond(
+    tr_peer const* peer,
+    uint64_t now,
+    tr_direction direction);
 
 void tr_peerMgrClearInterest(tr_torrent* tor);
 

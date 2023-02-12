@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © 2010-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -55,7 +55,7 @@ public:
 
 auto log_state = tr_log_state{};
 
-// ---
+///
 
 tr_sys_file_t tr_logGetFile()
 {
@@ -87,7 +87,7 @@ tr_sys_file_t tr_logGetFile()
 
 void logAddImpl(
     [[maybe_unused]] char const* file,
-    [[maybe_unused]] long line,
+    [[maybe_unused]] int line,
     [[maybe_unused]] tr_log_level level,
     std::string_view msg,
     [[maybe_unused]] std::string_view name)
@@ -226,7 +226,9 @@ void tr_logFreeQueue(tr_log_message* freeme)
     }
 }
 
-// ---
+/**
+***
+**/
 
 char* tr_logGetTimeStr(char* buf, size_t buflen)
 {
@@ -241,7 +243,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     return buf;
 }
 
-void tr_logAddMessage(char const* file, long line, tr_log_level level, std::string_view msg, std::string_view name)
+void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view msg, std::string_view name)
 {
     TR_ASSERT(!std::empty(msg));
 
@@ -293,7 +295,7 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     errno = err;
 }
 
-// ---
+///
 
 namespace
 {
@@ -336,4 +338,9 @@ std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key_in)
     }
 
     return std::nullopt;
+}
+
+std::string_view tr_logLevelToKey(tr_log_level key)
+{
+    return LogKeys[key].first;
 }

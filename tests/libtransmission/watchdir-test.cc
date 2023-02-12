@@ -10,13 +10,13 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/file.h>
-#include <libtransmission/net.h>
-#include <libtransmission/watchdir.h>
-#include <libtransmission/watchdir-base.h>
-#include <libtransmission/timer-ev.h>
+#include "file.h"
+#include "net.h"
+#include "watchdir.h"
+#include "watchdir-base.h"
+#include "timer-ev.h"
 
 #include "test-fixtures.h"
 
@@ -36,7 +36,10 @@ static auto constexpr RetryDuration = 100ms;
 static auto constexpr ProcessEventsTimeout = 300ms;
 static_assert(ProcessEventsTimeout > GenericRescanInterval);
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 enum class WatchMode
@@ -178,7 +181,7 @@ TEST_P(WatchDirTest, watch)
     auto names = std::vector<std::string>{};
     auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
     {
-        names.emplace_back(basename);
+        names.emplace_back(std::string{ basename });
         return Watchdir::Action::Done;
     };
     auto watchdir = createWatchDir(dirname, callback);
@@ -215,7 +218,7 @@ TEST_P(WatchDirTest, watch)
     EXPECT_TRUE(std::empty(names));
 }
 
-TEST_P(WatchDirTest, DISABLED_retry)
+TEST_P(WatchDirTest, retry)
 {
     auto const path = sandboxDir();
 
@@ -226,7 +229,7 @@ TEST_P(WatchDirTest, DISABLED_retry)
     auto names = std::vector<std::string>{};
     auto callback = [&names](std::string_view /*dirname*/, std::string_view basename)
     {
-        names.emplace_back(basename);
+        names.emplace_back(std::string{ basename });
         return Watchdir::Action::Retry;
     };
     auto watchdir = createWatchDir(path, callback);
@@ -256,4 +259,6 @@ INSTANTIATE_TEST_SUITE_P( //
         WatchMode::NATIVE,
         WatchMode::GENERIC));
 
-} // namespace libtransmission::test
+} // namespace test
+
+} // namespace libtransmission

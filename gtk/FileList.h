@@ -1,19 +1,15 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © 2009-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/tr-macros.h>
-
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/scrolledwindow.h>
-
 #include <memory>
+
+#include <gtkmm.h>
+
+#include <libtransmission/tr-macros.h>
 
 class Session;
 

@@ -2,20 +2,12 @@
 
 Param(
     [Parameter(Mandatory=$true)]
-    [ValidateSet('DepsHash', 'Build', 'Test')]
+    [ValidateSet('Build', 'Test')]
     [string] $Mode,
 
     [Parameter(Mandatory=$true)]
     [ValidateSet('x86', 'x64')]
     [string] $BuildArch,
-
-    [Parameter()]
-    [ValidateSet('All', 'Deps', 'App')]
-    [string] $BuildPart = 'All',
-
-    [Parameter()]
-    [ValidateSet('None', 'All', 'Deps', 'App')]
-    [string] $CCachePart = 'None',
 
     [Parameter()]
     [string] $SourceDir,
@@ -161,10 +153,10 @@ function Import-Script([string] $Name) {
     Set-Variable -Name "$($Name -replace '\W+', '')ScriptFileHash" -Value (Get-StringHash (Get-Content -Path $ScriptFile)) -Scope Global
 }
 
-function Invoke-Build([string] $Name, [switch] $NoCache = $false, [switch] $CacheArchiveNameOnly = $false, [string[]] $MoreArguments = @()) {
+function Invoke-Build([string] $Name, [switch] $NoCache = $false, [string[]] $MoreArguments = @()) {
     Import-Script "Build-${Name}"
 
-    if (-not $NoCache -or $CacheArchiveNameOnly) {
+    if (-not $NoCache) {
         $BuildScriptFileHash = Get-Variable -Name "Build${Name}ScriptFileHash" -ValueOnly
         $BuildVersion = Get-Variable -Name "${Name}Version" -ValueOnly
         $BuildDeps = Get-Variable -Name "${Name}Deps" -ValueOnly
@@ -185,10 +177,6 @@ function Invoke-Build([string] $Name, [switch] $NoCache = $false, [switch] $Cach
     } else {
         $CacheArchiveName = $null
         $CacheArchive = $null
-    }
-
-    if ($CacheArchiveNameOnly) {
-        return $CacheArchiveName
     }
 
     while (-not $CacheArchive -or -not (Test-Path $CacheArchive)) {
@@ -248,21 +236,6 @@ if (-not $SourceDir) {
     $SourceDir = (Get-Item $ScriptDir).Parent.Parent.FullName
 }
 
-if ($Mode -eq 'DepsHash') {
-    Import-Script Toolchain
-
-    $Names = @(
-        Invoke-Build Expat -CacheArchiveNameOnly
-        Invoke-Build DBus -CacheArchiveNameOnly
-        Invoke-Build Zlib -CacheArchiveNameOnly
-        Invoke-Build OpenSsl -CacheArchiveNameOnly
-        Invoke-Build Curl -CacheArchiveNameOnly
-        Invoke-Build Qt -CacheArchiveNameOnly
-    )
-
-    Write-Output (Get-StringHash ($Names -join ':'))
-}
-
 if ($Mode -eq 'Build') {
     Import-Script Toolchain
 
@@ -270,34 +243,14 @@ if ($Mode -eq 'Build') {
     $env:CXXFLAGS = $CompilerFlags -join ' '
     $env:LDFLAGS = $LinkerFlags -join ' '
 
-    if (@('All', 'Deps') -contains $CCachePart) {
-        $Env:CMAKE_C_COMPILER_LAUNCHER = 'ccache'
-        $Env:CMAKE_CXX_COMPILER_LAUNCHER = 'ccache'
-    } else {
-        $Env:CMAKE_C_COMPILER_LAUNCHER = ''
-        $Env:CMAKE_CXX_COMPILER_LAUNCHER = ''
-    }
+    Invoke-Build Expat
+    Invoke-Build DBus
+    Invoke-Build Zlib
+    Invoke-Build OpenSsl
+    Invoke-Build Curl
+    Invoke-Build Qt
 
-    if (@('All', 'Deps') -contains $BuildPart) {
-        Invoke-Build Expat
-        Invoke-Build DBus
-        Invoke-Build Zlib
-        Invoke-Build OpenSsl
-        Invoke-Build Curl
-        Invoke-Build Qt
-    }
-
-    if (@('All', 'App') -contains $CCachePart) {
-        $Env:CMAKE_C_COMPILER_LAUNCHER = 'ccache'
-        $Env:CMAKE_CXX_COMPILER_LAUNCHER = 'ccache'
-    } else {
-        $Env:CMAKE_C_COMPILER_LAUNCHER = ''
-        $Env:CMAKE_CXX_COMPILER_LAUNCHER = ''
-    }
-
-    if (@('All', 'App') -contains $BuildPart) {
-        Invoke-Build Transmission -NoCache -MoreArguments @($SourceDir, $SourceDir, $PackDebugSyms.IsPresent)
-    }
+    Invoke-Build Transmission -NoCache -MoreArguments @($SourceDir, $SourceDir, $PackDebugSyms.IsPresent)
 }
 
 if ($Mode -eq 'Test') {

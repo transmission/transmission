@@ -1,30 +1,19 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include "GtkCompat.h"
-
-#include <libtransmission/tr-macros.h>
-
-#include <glibmm/propertyproxy.h>
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/builder.h>
-#include <gtkmm/filechooser.h>
-#include <gtkmm/filefilter.h>
-
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-#include <gtkmm/button.h>
-#else
-#include <gtkmm/filechooserbutton.h>
-#endif
-
 #include <list>
 #include <memory>
 #include <string>
+
+#include <gtkmm.h>
+
+#include <libtransmission/tr-macros.h>
+
+#include "Utils.h"
 
 class PathButton : public IF_GTKMM4(Gtk::Button, Gtk::FileChooserButton)
 {

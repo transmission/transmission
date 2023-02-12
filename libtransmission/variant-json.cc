@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -19,13 +19,13 @@
 
 #include <fmt/compile.h>
 #include <fmt/format.h>
-#include <jsonsl.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
 
 #include "error.h"
+#include "jsonsl.h"
 #include "log.h"
 #include "quark.h"
 #include "tr-assert.h"
@@ -35,14 +35,11 @@
 #include "variant.h"
 
 using namespace std::literals;
+
 using Buffer = libtransmission::Buffer;
 
-namespace
-{
-namespace parse_helpers
-{
 /* arbitrary value... this is much deeper than our code goes */
-auto constexpr MaxDepth = size_t{ 64 };
+static auto constexpr MaxDepth = size_t{ 64 };
 
 struct json_wrapper_data
 {
@@ -63,7 +60,7 @@ struct json_wrapper_data
     std::array<size_t, MaxDepth> preallocGuess;
 };
 
-tr_variant* get_node(struct jsonsl_st* jsn)
+static tr_variant* get_node(struct jsonsl_st* jsn)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -87,7 +84,7 @@ tr_variant* get_node(struct jsonsl_st* jsn)
     return node;
 }
 
-void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /*state*/, jsonsl_char_t const* buf)
+static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /*state*/, jsonsl_char_t const* buf)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -102,13 +99,17 @@ void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /*state*
             fmt::arg("error_code", error)));
 }
 
-int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t* at)
+static int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t* at)
 {
     error_handler(jsn, error, state, at);
     return 0; /* bail */
 }
 
-void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl_state_st* state, jsonsl_char_t const* /*buf*/)
+static void action_callback_PUSH(
+    jsonsl_t jsn,
+    jsonsl_action_t /*action*/,
+    struct jsonsl_state_st* state,
+    jsonsl_char_t const* /*buf*/)
 {
     auto* const data = static_cast<json_wrapper_data*>(jsn->data);
 
@@ -132,7 +133,7 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
 }
 
 /* like sscanf(in+2, "%4x", &val) but less slow */
-[[nodiscard]] constexpr bool decode_hex_string(char const* in, unsigned int* setme)
+static bool decode_hex_string(char const* in, unsigned int* setme)
 {
     TR_ASSERT(in != nullptr);
 
@@ -169,7 +170,7 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
     return true;
 }
 
-[[nodiscard]] std::string_view extract_escaped_string(char const* in, size_t in_len, std::string& buf)
+static std::string_view extract_escaped_string(char const* in, size_t in_len, std::string& buf)
 {
     char const* const in_end = in + in_len;
 
@@ -266,7 +267,7 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
     return buf;
 }
 
-[[nodiscard]] std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, std::string& buf)
+static std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, std::string& buf)
 {
     // figure out where the string is
     char const* in_begin = jsn->base + state->pos_begin;
@@ -286,7 +287,11 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
     return std::make_pair(extract_escaped_string(in_begin, in_len, buf), false);
 }
 
-void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl_state_st* state, jsonsl_char_t const* /*buf*/)
+static void action_callback_POP(
+    jsonsl_t jsn,
+    jsonsl_action_t /*action*/,
+    struct jsonsl_state_st* state,
+    jsonsl_char_t const* /*buf*/)
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
@@ -324,7 +329,8 @@ void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl
         if ((state->special_flags & JSONSL_SPECIALf_NUMNOINT) != 0)
         {
             auto sv = std::string_view{ jsn->base + state->pos_begin, jsn->pos - state->pos_begin };
-            tr_variantInitReal(get_node(jsn), tr_parseNum<double>(sv).value_or(0.0));
+            auto const val = tr_parseNum<double>(sv);
+            tr_variantInitReal(get_node(jsn), val ? *val : double{});
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {
@@ -346,13 +352,8 @@ void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl
     }
 }
 
-} // namespace parse_helpers
-} // namespace
-
 bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view json, char const** setme_end, tr_error** error)
 {
-    using namespace parse_helpers;
-
     TR_ASSERT((parse_opts & TR_VARIANT_PARSE_JSON) != 0);
 
     auto data = json_wrapper_data{};
@@ -398,12 +399,10 @@ bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view jso
     return success;
 }
 
-// ---
+/****
+*****
+****/
 
-namespace
-{
-namespace to_string_helpers
-{
 struct ParentState
 {
     int variantType;
@@ -423,7 +422,7 @@ struct JsonWalk
     bool doIndent;
 };
 
-void jsonIndent(struct JsonWalk* data)
+static void jsonIndent(struct JsonWalk* data)
 {
     static auto buf = std::array<char, 1024>{};
 
@@ -439,7 +438,7 @@ void jsonIndent(struct JsonWalk* data)
     }
 }
 
-void jsonChildFunc(struct JsonWalk* data)
+static void jsonChildFunc(struct JsonWalk* data)
 {
     if (!std::empty(data->parents))
     {
@@ -485,27 +484,27 @@ void jsonChildFunc(struct JsonWalk* data)
     }
 }
 
-void jsonPushParent(struct JsonWalk* data, tr_variant const* v)
+static void jsonPushParent(struct JsonWalk* data, tr_variant const* v)
 {
     int const n_children = tr_variantIsDict(v) ? v->val.l.count * 2 : v->val.l.count;
     data->parents.push_back({ v->type, 0, n_children });
 }
 
-void jsonPopParent(struct JsonWalk* data)
+static void jsonPopParent(struct JsonWalk* data)
 {
     data->parents.pop_back();
 }
 
-void jsonIntFunc(tr_variant const* val, void* vdata)
+static void jsonIntFunc(tr_variant const* val, void* vdata)
 {
     auto buf = std::array<char, 64>{};
-    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
+    auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
     auto* const data = static_cast<JsonWalk*>(vdata);
     data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     jsonChildFunc(data);
 }
 
-void jsonBoolFunc(tr_variant const* val, void* vdata)
+static void jsonBoolFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
 
@@ -521,27 +520,27 @@ void jsonBoolFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-void jsonRealFunc(tr_variant const* val, void* vdata)
+static void jsonRealFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
 
     if (fabs(val->val.d - (int)val->val.d) < 0.00001)
     {
         auto buf = std::array<char, 64>{};
-        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
+        auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
         data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
     else
     {
         auto buf = std::array<char, 64>{};
-        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
+        auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
         data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
 
     jsonChildFunc(data);
 }
 
-void jsonStringFunc(tr_variant const* val, void* vdata)
+static void jsonStringFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
 
@@ -616,7 +615,7 @@ void jsonStringFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-void jsonDictBeginFunc(tr_variant const* val, void* vdata)
+static void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
 
@@ -629,7 +628,7 @@ void jsonDictBeginFunc(tr_variant const* val, void* vdata)
     }
 }
 
-void jsonListBeginFunc(tr_variant const* val, void* vdata)
+static void jsonListBeginFunc(tr_variant const* val, void* vdata)
 {
     size_t const n_children = tr_variantListSize(val);
     auto* data = static_cast<struct JsonWalk*>(vdata);
@@ -643,7 +642,7 @@ void jsonListBeginFunc(tr_variant const* val, void* vdata)
     }
 }
 
-void jsonContainerEndFunc(tr_variant const* val, void* vdata)
+static void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
 
@@ -663,7 +662,7 @@ void jsonContainerEndFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-struct VariantWalkFuncs const walk_funcs = {
+static struct VariantWalkFuncs const walk_funcs = {
     jsonIntFunc, //
     jsonBoolFunc, //
     jsonRealFunc, //
@@ -673,13 +672,8 @@ struct VariantWalkFuncs const walk_funcs = {
     jsonContainerEndFunc, //
 };
 
-} // namespace to_string_helpers
-} // namespace
-
 std::string tr_variantToStrJson(tr_variant const* top, bool lean)
 {
-    using namespace to_string_helpers;
-
     auto data = JsonWalk{ !lean };
 
     tr_variantWalk(top, &walk_funcs, &data, true);
@@ -689,5 +683,5 @@ std::string tr_variantToStrJson(tr_variant const* top, bool lean)
     {
         buf.push_back('\n');
     }
-    return buf.to_string();
+    return buf.toString();
 }

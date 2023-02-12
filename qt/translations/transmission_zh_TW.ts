@@ -501,17 +501,17 @@
         <translation>依照全域限制 (&amp;B)</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+7"/>
         <source>Limit &amp;download speed:</source>
         <translation>限制下載速度  (&amp;D):</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>限制上傳速度 (&amp;U):</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+20"/>
         <source>Torrent &amp;priority:</source>
         <translation>Torrent 優先性  (&amp;P):</translation>
     </message>
@@ -546,27 +546,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-257"/>
+        <location line="+255"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>正常</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>混合</translation>
     </message>
@@ -602,7 +602,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
         <translation>選取所選項目</translation>
     </message>
@@ -1217,7 +1217,7 @@
         <translation>依佇列排序 (&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>限制下載速度</translation>
     </message>
@@ -1293,12 +1293,12 @@
         <translation>打開 Torrent</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>速度限制</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>網路錯誤</translation>
     </message>
@@ -1665,7 +1665,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>整天 (&amp;O):</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
         <translation>每天</translation>
     </message>
@@ -2207,7 +2207,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>重新命名路徑錯誤</translation>
     </message>
@@ -2399,7 +2399,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>磁力連結傳輸 - 檢索後設資料 (%1%)</translation>

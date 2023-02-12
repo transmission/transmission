@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,19 +9,17 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint>
-#include <limits>
 #include <memory>
 #include <optional>
-#include <random> // for std::uniform_int_distribution<T>
 #include <string>
 #include <string_view>
 
 #include "transmission.h" // tr_sha1_digest_t
 
 /**
- * @addtogroup utils Utilities
- * @{
- */
+*** @addtogroup utils Utilities
+*** @{
+**/
 
 class tr_sha1
 {
@@ -89,22 +87,22 @@ tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length);
 void tr_x509_cert_free(tr_x509_cert_t handle);
 
 /**
+ * @brief Returns a random number in the range of [0...upper_bound).
+ */
+[[nodiscard]] int tr_rand_int(int upper_bound);
+
+/**
+ * @brief Returns a pseudorandom number in the range of [0...upper_bound).
+ *
+ * This is faster, BUT WEAKER, than tr_rand_int() and never be used in sensitive cases.
+ * @see tr_rand_int()
+ */
+[[nodiscard]] int tr_rand_int_weak(int upper_bound);
+
+/**
  * @brief Fill a buffer with random bytes.
  */
-void tr_rand_buffer(void* buffer, size_t length);
-
-// Client code should use `tr_rand_buffer()`.
-// These helpers are only exposed here to permit open-box tests.
-bool tr_rand_buffer_crypto(void* buffer, size_t length);
-void tr_rand_buffer_std(void* buffer, size_t length);
-
-template<typename T>
-T tr_rand_obj()
-{
-    auto t = T{};
-    tr_rand_buffer(&t, sizeof(T));
-    return t;
-}
+bool tr_rand_buffer(void* buffer, size_t length);
 
 /**
  * @brief Generate a SSHA password from its plaintext source.
@@ -178,48 +176,6 @@ private:
     size_t pos = 0;
     std::array<T, N> buf;
 };
-
-// UniformRandomBitGenerator impl that uses `tr_rand_buffer()`.
-// See https://en.cppreference.com/w/cpp/named_req/UniformRandomBitGenerator
-template<typename T, size_t N = 1024U>
-class tr_urbg
-{
-public:
-    using result_type = T;
-    static_assert(!std::numeric_limits<T>::is_signed);
-
-    [[nodiscard]] static constexpr T min() noexcept
-    {
-        return std::numeric_limits<T>::min();
-    }
-
-    [[nodiscard]] static constexpr T max() noexcept
-    {
-        return std::numeric_limits<T>::max();
-    }
-
-    [[nodiscard]] T operator()() noexcept
-    {
-        return buf_();
-    }
-
-private:
-    tr_salt_shaker<T, N> buf_;
-};
-
-/**
- * @brief Returns a random number in the range of [0...upper_bound).
- */
-template<class T>
-[[nodiscard]] T tr_rand_int(T upper_bound)
-{
-    static_assert(!std::is_signed<T>());
-    using dist_type = std::uniform_int_distribution<T>;
-
-    thread_local auto rng = tr_urbg<T>{};
-    thread_local auto dist = dist_type{};
-    return dist(rng, typename dist_type::param_type(0, upper_bound - 1));
-}
 
 /** @} */
 

@@ -9,30 +9,18 @@ environment:
     secure: Bf3x1Iruxg+l3tp+an+g9oE36EHxvyWrE8GTJzZh4Ss=
 
   matrix:
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
     TR_ARCH: x86
-  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
     TR_ARCH: x64
-
-branches:
-  only:
-  - main
-  - /^\d+\.\d+.*/
 
 for:
 -
   matrix:
     only:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
 
   clone_folder: '%SystemDrive%\%TR_ARCH%-project'
-
-  cache:
-  - '%SystemDrive%\%TR_ARCH%-ccache'
-
-  init:
-  - pwsh: |
-      $Env:APPVEYOR_SAVE_CACHE_ON_ERROR = 'true'
 
   install:
   - pwsh: |
@@ -54,7 +42,6 @@ for:
       choco install nasm
       choco install jom
       choco install wixtoolset --version 3.11.2
-      choco install ccache
 
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -Recurse
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win64) -Recurse
@@ -70,16 +57,12 @@ for:
           $Env:PATH
       ) -join [System.IO.Path]::PathSeparator
 
-      $Env:CCACHE_DIR = "${Env:SystemDrive}\${Env:TR_ARCH}-ccache"
-      $Env:CCACHE_MAXSIZE = '500Mi'
-
       Set-ExecutionPolicy -Scope Process Bypass
 
       try {
           & (Join-Path $Env:APPVEYOR_BUILD_FOLDER release windows main.ps1) `
               -Mode Build `
               -BuildArch $env:TR_ARCH `
-              -CCachePart App `
               -PackDebugSyms:$($Env:APPVEYOR_REPO_BRANCH -eq "main" -or $Env:APPVEYOR_REPO_TAG -eq "true")
       } catch {
           Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue

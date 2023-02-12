@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © 2013-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -15,9 +15,7 @@
 #include "tr-macros.h"
 #include "utils.h"
 
-namespace
-{
-[[nodiscard]] char* tr_strvdup(std::string_view in)
+static char* tr_strvDup(std::string_view in)
 {
     auto const n = std::size(in);
     auto* const ret = new char[n + 1];
@@ -25,7 +23,6 @@ namespace
     ret[n] = '\0';
     return ret;
 }
-} // namespace
 
 void tr_error_free(tr_error* error)
 {
@@ -46,12 +43,7 @@ void tr_error_set(tr_error** error, int code, std::string_view message)
     }
 
     TR_ASSERT(*error == nullptr);
-    *error = new tr_error{ code, tr_strvdup(message) };
-}
-
-void tr_error_set_from_errno(tr_error** error, int errnum)
-{
-    tr_error_set(error, errnum, tr_strerror(errnum));
+    *error = new tr_error{ code, tr_strvDup(message) };
 }
 
 void tr_error_propagate(tr_error** new_error, tr_error** old_error)
@@ -94,7 +86,7 @@ void tr_error_prefix(tr_error** error, char const* prefix)
     }
 
     auto* err = *error;
-    auto* const new_message = tr_strvdup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
+    auto* const new_message = tr_strvDup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
     delete[] err->message;
     err->message = new_message;
 }

@@ -3,9 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/tr-buffer.h>
+#include "tr-buffer.h"
 
 #include "test-fixtures.h"
 
@@ -21,21 +21,21 @@ TEST_F(BufferTest, startsWithInSingleSegment)
 
     auto buf = Buffer{};
     buf.add(Hello);
-    EXPECT_TRUE(buf.starts_with(Hello));
+    EXPECT_TRUE(buf.startsWith(Hello));
 
     buf.add(World);
-    EXPECT_TRUE(buf.starts_with(Hello));
-    EXPECT_TRUE(buf.starts_with("Hello, Worl"sv));
-    EXPECT_TRUE(buf.starts_with("Hello, World"sv));
-    EXPECT_FALSE(buf.starts_with("Hello, World!"sv));
-    EXPECT_FALSE(buf.starts_with("Hello!"sv));
+    EXPECT_TRUE(buf.startsWith(Hello));
+    EXPECT_TRUE(buf.startsWith("Hello, Worl"sv));
+    EXPECT_TRUE(buf.startsWith("Hello, World"sv));
+    EXPECT_FALSE(buf.startsWith("Hello, World!"sv));
+    EXPECT_FALSE(buf.startsWith("Hello!"sv));
 
     buf.add(Bang);
-    EXPECT_FALSE(buf.starts_with("Hello!"));
-    EXPECT_TRUE(buf.starts_with(Hello));
-    EXPECT_TRUE(buf.starts_with("Hello, Worl"sv));
-    EXPECT_TRUE(buf.starts_with("Hello, World"sv));
-    EXPECT_TRUE(buf.starts_with("Hello, World!"sv));
+    EXPECT_FALSE(buf.startsWith("Hello!"));
+    EXPECT_TRUE(buf.startsWith(Hello));
+    EXPECT_TRUE(buf.startsWith("Hello, Worl"sv));
+    EXPECT_TRUE(buf.startsWith("Hello, World"sv));
+    EXPECT_TRUE(buf.startsWith("Hello, World!"sv));
 }
 TEST_F(BufferTest, startsWithInMultiSegment)
 {
@@ -45,19 +45,19 @@ TEST_F(BufferTest, startsWithInMultiSegment)
 
     auto buf = std::make_unique<Buffer>();
     buf->add(Buffer{ Hello });
-    EXPECT_TRUE(buf->starts_with(Hello));
+    EXPECT_TRUE(buf->startsWith(Hello));
 
     buf->add(Buffer{ World });
-    EXPECT_TRUE(buf->starts_with(Hello));
-    EXPECT_TRUE(buf->starts_with("Hello, Worl"sv));
-    EXPECT_TRUE(buf->starts_with("Hello, World"sv));
-    EXPECT_FALSE(buf->starts_with("Hello, World!"sv));
-    EXPECT_FALSE(buf->starts_with("Hello!"sv));
+    EXPECT_TRUE(buf->startsWith(Hello));
+    EXPECT_TRUE(buf->startsWith("Hello, Worl"sv));
+    EXPECT_TRUE(buf->startsWith("Hello, World"sv));
+    EXPECT_FALSE(buf->startsWith("Hello, World!"sv));
+    EXPECT_FALSE(buf->startsWith("Hello!"sv));
 
     buf->add(Buffer{ Bang });
-    EXPECT_FALSE(buf->starts_with("Hello!"));
-    EXPECT_TRUE(buf->starts_with(Hello));
-    EXPECT_TRUE(buf->starts_with("Hello, Worl"sv));
-    EXPECT_TRUE(buf->starts_with("Hello, World"sv));
-    EXPECT_TRUE(buf->starts_with("Hello, World!"sv));
+    EXPECT_FALSE(buf->startsWith("Hello!"));
+    EXPECT_TRUE(buf->startsWith(Hello));
+    EXPECT_TRUE(buf->startsWith("Hello, Worl"sv));
+    EXPECT_TRUE(buf->startsWith("Hello, World"sv));
+    EXPECT_TRUE(buf->startsWith("Hello, World!"sv));
 }

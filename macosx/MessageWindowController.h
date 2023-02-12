@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © 2006-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -8,10 +8,10 @@
 
 - (void)updateLog:(NSTimer*)timer;
 
-- (IBAction)changeLevel:(id)sender;
-- (IBAction)changeFilter:(id)sender;
-- (IBAction)clearLog:(id)sender;
+- (void)changeLevel:(id)sender;
+- (void)changeFilter:(id)sender;
+- (void)clearLog:(id)sender;
 
-- (IBAction)writeToFile:(id)sender;
+- (void)writeToFile:(id)sender;
 
 @end

@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -27,15 +27,21 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-namespace
-{
-void log_openssl_error(char const* file, int line)
+/***
+****
+***/
+
+static void log_openssl_error(char const* file, int line)
 {
     unsigned long const error_code = ERR_get_error();
 
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
-        if (static bool strings_loaded = false; !strings_loaded)
+#ifndef TR_LIGHTWEIGHT
+
+        static bool strings_loaded = false;
+
+        if (!strings_loaded)
         {
 #if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
             ERR_load_crypto_strings();
@@ -45,6 +51,8 @@ void log_openssl_error(char const* file, int line)
 
             strings_loaded = true;
         }
+
+#endif
 
         auto buf = std::array<char, 512>{};
         ERR_error_string_n(error_code, std::data(buf), std::size(buf));
@@ -62,7 +70,7 @@ void log_openssl_error(char const* file, int line)
 
 #define log_error() log_openssl_error(__FILE__, __LINE__)
 
-bool check_openssl_result(int result, int expected_result, bool expected_equal, char const* file, int line)
+static bool check_openssl_result(int result, int expected_result, bool expected_equal, char const* file, int line)
 {
     bool const ret = (result == expected_result) == expected_equal;
 
@@ -75,8 +83,13 @@ bool check_openssl_result(int result, int expected_result, bool expected_equal, 
 }
 
 #define check_result(result) check_openssl_result((result), 1, true, __FILE__, __LINE__)
+#define check_result_neq(result, x_result) check_openssl_result((result), (x_result), false, __FILE__, __LINE__)
 
-namespace sha_helpers
+/***
+****
+***/
+
+namespace
 {
 
 class ShaHelper
@@ -189,26 +202,55 @@ private:
     ShaHelper helper_{ EVP_sha256 };
 };
 
-} // namespace sha_helpers
 } // namespace
-
-// --- sha
 
 std::unique_ptr<tr_sha1> tr_sha1::create()
 {
-    using namespace sha_helpers;
-
     return std::make_unique<Sha1Impl>();
 }
 
 std::unique_ptr<tr_sha256> tr_sha256::create()
 {
-    using namespace sha_helpers;
-
     return std::make_unique<Sha256Impl>();
 }
 
-// --- x509
+/***
+****
+***/
+
+#if OPENSSL_VERSION_NUMBER < 0x0090802fL
+
+static EVP_CIPHER_CTX* openssl_evp_cipher_context_new()
+{
+    auto* const handle = new EVP_CIPHER_CTX{};
+
+    if (handle != nullptr)
+    {
+        EVP_CIPHER_CTX_init(handle);
+    }
+
+    return handle;
+}
+
+static void openssl_evp_cipher_context_free(EVP_CIPHER_CTX* handle)
+{
+    if (handle == nullptr)
+    {
+        return;
+    }
+
+    EVP_CIPHER_CTX_cleanup(handle);
+    delete handle;
+}
+
+#define EVP_CIPHER_CTX_new() openssl_evp_cipher_context_new()
+#define EVP_CIPHER_CTX_free(x) openssl_evp_cipher_context_free((x))
+
+#endif
+
+/***
+****
+***/
 
 tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t handle)
 {
@@ -232,7 +274,7 @@ tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
 {
     TR_ASSERT(der != nullptr);
 
-    X509* const ret = d2i_X509(nullptr, reinterpret_cast<unsigned char const**>(&der), der_length);
+    X509* const ret = d2i_X509(nullptr, (unsigned char const**)&der, der_length);
 
     if (ret == nullptr)
     {
@@ -252,9 +294,11 @@ void tr_x509_cert_free(tr_x509_cert_t handle)
     X509_free(static_cast<X509*>(handle));
 }
 
-// --- rand
+/***
+****
+***/
 
-bool tr_rand_buffer_crypto(void* buffer, size_t length)
+bool tr_rand_buffer(void* buffer, size_t length)
 {
     if (length == 0)
     {

@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © 2006-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -43,7 +43,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 - (void)startTransferIgnoringQueue:(BOOL)ignoreQueue;
 - (void)startTransferNoQueue;
 - (void)startTransfer;
-- (void)startMagnetTransferAfterMetaDownload;
 - (void)stopTransfer;
 - (void)startQueue;
 - (void)sleep;
@@ -128,10 +127,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) CGFloat availableDesired;
 
-/// True if non-paused. Running.
 @property(nonatomic, getter=isActive, readonly) BOOL active;
-/// True if downloading or uploading.
-@property(nonatomic, getter=isTransmitting, readonly) BOOL transmitting;
 @property(nonatomic, getter=isSeeding, readonly) BOOL seeding;
 @property(nonatomic, getter=isChecking, readonly) BOOL checking;
 @property(nonatomic, getter=isCheckingWaiting, readonly) BOOL checkingWaiting;
@@ -204,7 +200,6 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 @property(nonatomic, readonly) NSInteger secondsSeeding;
 
 @property(nonatomic, readonly) NSInteger stalledMinutes;
-/// True if the torrent is running, but has been idle for long enough to be considered stalled.
 @property(nonatomic, getter=isStalled, readonly) BOOL stalled;
 
 - (void)updateTimeMachineExclude;

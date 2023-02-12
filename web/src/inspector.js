@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -300,16 +300,16 @@ export class Inspector extends EventTarget {
         (sizeWhenDone ? (sizeWhenDone - leftUntilDone) / sizeWhenDone : 1);
       string = fmt.percentString(d);
 
-      if (unverified) {
-        string = `${fmt.size(verified)} of ${fmt.size(
-          sizeWhenDone
-        )} (${string}%), ${fmt.size(unverified)} Unverified`;
-      } else if (leftUntilDone) {
+      if (!unverified && !leftUntilDone) {
+        string = `${fmt.size(verified)} (100%)`;
+      } else if (!unverified) {
         string = `${fmt.size(verified)} of ${fmt.size(
           sizeWhenDone
         )} (${string}%)`;
       } else {
-        string = `${fmt.size(verified)} (100%)`;
+        string = `${fmt.size(verified)} of ${fmt.size(
+          sizeWhenDone
+        )} (${string}%), ${fmt.size(unverified)} Unverified`;
       }
     }
     setTextContent(e.info.have, string);
@@ -374,9 +374,9 @@ export class Inspector extends EventTarget {
     } else {
       const get = (t) => t.getStartDate();
       const first = get(torrents[0]);
-      string = torrents.every((t) => get(t) === first)
-        ? fmt.timeInterval(now / 1000 - first)
-        : mixed;
+      string = !torrents.every((t) => get(t) === first)
+        ? mixed
+        : fmt.timeInterval(now / 1000 - first);
     }
     setTextContent(e.info.running_time, string);
 
@@ -433,7 +433,9 @@ export class Inspector extends EventTarget {
         (accumulator, t) => accumulator + t.getTotalSize(),
         0
       );
-      if (size) {
+      if (!size) {
+        string = 'None';
+      } else {
         const get = (t) => t.getPieceSize();
         const pieceCount = torrents.reduce(
           (accumulator, t) => accumulator + t.getPieceCount(),
@@ -444,8 +446,6 @@ export class Inspector extends EventTarget {
         string = torrents.every((t) => get(t) === pieceSize)
           ? `${fmt.size(size)} (${pieceString} pieces @ ${fmt.mem(pieceSize)})`
           : `${fmt.size(size)} (${pieceString} pieces)`;
-      } else {
-        string = 'None';
       }
     }
     setTextContent(e.info.size, string);
@@ -825,11 +825,11 @@ export class Inspector extends EventTarget {
     const { indices, priority } = event_;
 
     let command = null;
-    switch (priority.toString()) {
-      case '-1':
+    switch (priority) {
+      case -1:
         command = 'priority-low';
         break;
-      case '1':
+      case 1:
         command = 'priority-high';
         break;
       default:

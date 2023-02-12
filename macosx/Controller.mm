@@ -1,11 +1,10 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 @import IOKit;
 @import IOKit.pwr_mgt;
 @import Carbon;
-@import UserNotifications;
 
 @import Sparkle;
 
@@ -42,6 +41,7 @@
 #import "ShareToolbarItem.h"
 #import "ShareTorrentFileHelper.h"
 #import "Toolbar.h"
+#import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
 #import "FilterBarController.h"
@@ -137,7 +137,7 @@ static tr_rpc_callback_status rpcCallback([[maybe_unused]] tr_session* handle, t
     return TR_RPC_NOREMOVE; //we'll do the remove manually
 }
 
-static void sleepCallback(void* controller, io_service_t /*y*/, natural_t messageType, void* messageArgument)
+static void sleepCallback(void* controller, io_service_t y, natural_t messageType, void* messageArgument)
 {
     [(__bridge Controller*)controller sleepCallback:messageType argument:messageArgument];
 }
@@ -232,7 +232,7 @@ static void removeKeRangerRansomware()
     NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
 }
 
-@interface Controller ()<UNUserNotificationCenterDelegate, NSURLSessionDataDelegate, NSURLSessionDownloadDelegate>
+@interface Controller ()
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) IBOutlet NSStackView* fStackView;
@@ -256,6 +256,8 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic) IBOutlet NSMenu* fShareMenu;
 @property(nonatomic) IBOutlet NSMenu* fShareContextMenu;
+@property(nonatomic) IBOutlet NSMenuItem* fShareMenuItem; // remove when dropping 10.6
+@property(nonatomic) IBOutlet NSMenuItem* fShareContextMenuItem; // remove when dropping 10.6
 
 @property(nonatomic, readonly) tr_session* fLib;
 
@@ -289,7 +291,7 @@ static void removeKeRangerRansomware()
 @property(nonatomic) NSMutableArray<NSString*>* fAutoImportedNames;
 @property(nonatomic) NSTimer* fAutoImportTimer;
 
-@property(nonatomic) NSURLSession* fSession;
+@property(nonatomic) NSMutableDictionary<NSURL*, id>* fPendingTorrentDownloads;
 
 @property(nonatomic) NSMutableSet<Torrent*>* fAddingTransfers;
 
@@ -337,9 +339,31 @@ static void removeKeRangerRansomware()
 
     ExpandedPathToIconTransformer* iconTransformer = [[ExpandedPathToIconTransformer alloc] init];
     [NSValueTransformer setValueTransformer:iconTransformer forName:@"ExpandedPathToIconTransformer"];
+
+    //cover our asses
+    if ([NSUserDefaults.standardUserDefaults boolForKey:@"WarningLegal"])
+    {
+        NSAlert* alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle:NSLocalizedString(@"I Accept", "Legal alert -> button")];
+        [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Legal alert -> button")];
+        alert.messageText = NSLocalizedString(@"Welcome to Transmission", "Legal alert -> title");
+        alert.informativeText = NSLocalizedString(
+            @"Transmission is a file-sharing program."
+             " When you run a torrent, its data will be made available to others by means of upload."
+             " You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.",
+            "Legal alert -> message");
+        alert.alertStyle = NSAlertStyleInformational;
+
+        if ([alert runModal] == NSAlertSecondButtonReturn)
+        {
+            exit(0);
+        }
+
+        [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningLegal"];
+    }
 }
 
-void onStartQueue(tr_session* /*session*/, tr_torrent* tor, void* vself)
+void onStartQueue(tr_session* session, tr_torrent* tor, void* vself)
 {
     auto* controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
@@ -350,7 +374,7 @@ void onStartQueue(tr_session* /*session*/, tr_torrent* tor, void* vself)
     });
 }
 
-void onIdleLimitHit(tr_session* /*session*/, tr_torrent* tor, void* vself)
+void onIdleLimitHit(tr_session* session, tr_torrent* tor, void* vself)
 {
     auto* const controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
@@ -361,7 +385,7 @@ void onIdleLimitHit(tr_session* /*session*/, tr_torrent* tor, void* vself)
     });
 }
 
-void onRatioLimitHit(tr_session* /*session*/, tr_torrent* tor, void* vself)
+void onRatioLimitHit(tr_session* session, tr_torrent* tor, void* vself)
 {
     auto* const controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
@@ -372,7 +396,7 @@ void onRatioLimitHit(tr_session* /*session*/, tr_torrent* tor, void* vself)
     });
 }
 
-void onMetadataCompleted(tr_session* /*session*/, tr_torrent* tor, void* vself)
+void onMetadataCompleted(tr_session* session, tr_torrent* tor, void* vself)
 {
     auto* const controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
@@ -566,10 +590,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         _fDisplayedTorrents = [[NSMutableArray alloc] init];
         _fTorrentHashes = [[NSMutableDictionary alloc] init];
 
-        NSURLSessionConfiguration* configuration = NSURLSessionConfiguration.defaultSessionConfiguration;
-        configuration.requestCachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
-        _fSession = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
-
         _fInfoController = [[InfoWindowController alloc] init];
 
         //needs to be done before init-ing the prefs controller
@@ -644,7 +664,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         "Main window -> 3rd bottom left button (remove all) tooltip");
 
     [self.fTableView registerForDraggedTypes:@[ kTorrentTableViewDataType ]];
-    [self.fWindow registerForDraggedTypes:@[ NSPasteboardTypeFileURL, NSPasteboardTypeURL ]];
+    [self.fWindow registerForDraggedTypes:@[ NSFilenamesPboardType, NSURLPboardType ]];
 
     //sort the sort menu items (localization is from strings file)
     NSMutableArray* sortMenuItems = [NSMutableArray arrayWithCapacity:7];
@@ -760,7 +780,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
     }
 
-    self.fBadger = [[Badger alloc] init];
+    self.fBadger = [[Badger alloc] initWithLib:self.fLib];
+
+    NSUserNotificationCenter.defaultUserNotificationCenter.delegate = self;
 
     //observe notifications
     NSNotificationCenter* nc = NSNotificationCenter.defaultCenter;
@@ -820,59 +842,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 }
 
-- (void)applicationWillFinishLaunching:(NSNotification*)notification
-{
-    // user notifications
-    if (@available(macOS 10.14, *))
-    {
-        UNUserNotificationCenter.currentNotificationCenter.delegate = self;
-        UNNotificationAction* actionShow = [UNNotificationAction actionWithIdentifier:@"actionShow"
-                                                                                title:NSLocalizedString(@"Show", "notification button")
-                                                                              options:UNNotificationActionOptionForeground];
-        UNNotificationCategory* categoryShow = [UNNotificationCategory categoryWithIdentifier:@"categoryShow" actions:@[ actionShow ]
-                                                                            intentIdentifiers:@[]
-                                                                                      options:UNNotificationCategoryOptionNone];
-        [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:[NSSet setWithObject:categoryShow]];
-        [UNUserNotificationCenter.currentNotificationCenter
-            requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge)
-                          completionHandler:^(BOOL /*granted*/, NSError* _Nullable error) {
-                              if (error.code > 0)
-                              {
-                                  NSLog(@"UserNotifications not configured: %@", error.localizedDescription);
-                              }
-                          }];
-    }
-    else
-    {
-        // Fallback on earlier versions
-        NSUserNotificationCenter.defaultUserNotificationCenter.delegate = self;
-    }
-}
-
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
 {
-    //cover our asses
-    if ([NSUserDefaults.standardUserDefaults boolForKey:@"WarningLegal"])
-    {
-        NSAlert* alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle:NSLocalizedString(@"I Accept", "Legal alert -> button")];
-        [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Legal alert -> button")];
-        alert.messageText = NSLocalizedString(@"Welcome to Transmission", "Legal alert -> title");
-        alert.informativeText = NSLocalizedString(
-            @"Transmission is a file-sharing program."
-             " When you run a torrent, its data will be made available to others by means of upload."
-             " You and you alone are fully responsible for exercising proper judgement and abiding by your local laws.",
-            "Legal alert -> message");
-        alert.alertStyle = NSAlertStyleInformational;
-
-        if ([alert runModal] == NSAlertSecondButtonReturn)
-        {
-            exit(0);
-        }
-
-        [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningLegal"];
-    }
-
     NSApp.servicesProvider = self;
 
     self.fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
@@ -998,11 +969,11 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             @"There is an active transfer that will be paused on quit."
              " The transfer will automatically resume on the next launch.",
             "Confirm Quit panel -> message") :
-        [NSString localizedStringWithFormat:NSLocalizedString(
-                                                @"There are %lu active transfers that will be paused on quit."
-                                                 " The transfers will automatically resume on the next launch.",
-                                                "Confirm Quit panel -> message"),
-                                            active];
+        [NSString stringWithFormat:NSLocalizedString(
+                                       @"There are %lu active transfers that will be paused on quit."
+                                        " The transfers will automatically resume on the next launch.",
+                                       "Confirm Quit panel -> message"),
+                                   active];
     [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Confirm Quit panel -> button")];
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
     alert.showsSuppressionButton = YES;
@@ -1050,7 +1021,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 
     //remove all torrent downloads
-    [self.fSession invalidateAndCancel];
+    if (self.fPendingTorrentDownloads)
+    {
+        for (NSDictionary* downloadDict in self.fPendingTorrentDownloads)
+        {
+            NSURLDownload* download = downloadDict[@"Download"];
+            [download cancel];
+        }
+    }
 
     //remember window states and close all windows
     [self.fDefaults setBool:self.fInfoController.window.visible forKey:@"InfoVisible"];
@@ -1106,94 +1084,84 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 }
 
-#pragma mark - NSURLSessionDelegate
-
-- (void)URLSession:(nonnull NSURLSession*)session
-              dataTask:(nonnull NSURLSessionDataTask*)dataTask
-    didReceiveResponse:(nonnull NSURLResponse*)response
-     completionHandler:(nonnull void (^)(NSURLSessionResponseDisposition))completionHandler
+- (void)download:(NSURLDownload*)download decideDestinationWithSuggestedFilename:(NSString*)suggestedName
 {
-    NSString* suggestedName = response.suggestedFilename;
-    if ([suggestedName.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
+    if ([suggestedName.pathExtension caseInsensitiveCompare:@"torrent"] != NSOrderedSame)
     {
-        completionHandler(NSURLSessionResponseBecomeDownload);
-        return;
-    }
-    completionHandler(NSURLSessionResponseCancel);
+        [download cancel];
 
-    NSString* message = [NSString
-        stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.", "Download not a torrent -> message"),
-                         suggestedName,
-                         dataTask.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding];
-    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.fPendingTorrentDownloads removeObjectForKey:download.request.URL];
+        if (self.fPendingTorrentDownloads.count == 0)
+        {
+            self.fPendingTorrentDownloads = nil;
+        }
+
+        NSString* message = [NSString
+            stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.", "Download not a torrent -> message"),
+                             suggestedName,
+                             download.request.URL.absoluteString.stringByRemovingPercentEncoding];
+
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Download not a torrent -> button")];
         alert.messageText = NSLocalizedString(@"Torrent download failed", "Download not a torrent -> title");
         alert.informativeText = message;
         [alert runModal];
-    });
-}
-
-- (void)URLSession:(nonnull NSURLSession*)session
-                 dataTask:(nonnull NSURLSessionDataTask*)dataTask
-    didBecomeDownloadTask:(nonnull NSURLSessionDownloadTask*)downloadTask
-{
-    // Required delegate method to proceed with  NSURLSessionResponseBecomeDownload.
-    // nothing to do
-}
-
-- (void)URLSession:(nonnull NSURLSession*)session
-                 downloadTask:(nonnull NSURLSessionDownloadTask*)downloadTask
-    didFinishDownloadingToURL:(nonnull NSURL*)location
-{
-    NSString* path = [NSTemporaryDirectory() stringByAppendingPathComponent:downloadTask.response.suggestedFilename.lastPathComponent];
-    NSError* error;
-    [NSFileManager.defaultManager moveItemAtPath:location.path toPath:path error:&error];
-    if (error)
-    {
-        [self URLSession:session task:downloadTask didCompleteWithError:error];
-        return;
     }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self openFiles:@[ path ] addType:ADD_URL forcePath:nil];
-
-        //delete the torrent file after opening
-        [NSFileManager.defaultManager removeItemAtPath:path error:NULL];
-    });
+    else
+    {
+        [download setDestination:[NSTemporaryDirectory() stringByAppendingPathComponent:suggestedName.lastPathComponent]
+                  allowOverwrite:NO];
+    }
 }
 
-- (void)URLSession:(nonnull NSURLSession*)session
-                    task:(nonnull NSURLSessionTask*)task
-    didCompleteWithError:(nullable NSError*)error
+- (void)download:(NSURLDownload*)download didCreateDestination:(NSString*)path
 {
-    if (!error || error.code == NSURLErrorCancelled)
-    {
-        // no errors or we already displayed an alert
-        return;
-    }
+    NSMutableDictionary* dict = self.fPendingTorrentDownloads[download.request.URL];
+    dict[@"Path"] = path;
+}
 
+- (void)download:(NSURLDownload*)download didFailWithError:(NSError*)error
+{
     NSString* message = [NSString
         stringWithFormat:NSLocalizedString(@"The torrent could not be downloaded from %@: %@.", "Torrent download failed -> message"),
-                         task.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding,
+                         download.request.URL.absoluteString.stringByRemovingPercentEncoding,
                          error.localizedDescription];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSAlert* alert = [[NSAlert alloc] init];
-        [alert addButtonWithTitle:NSLocalizedString(@"OK", "Torrent download failed -> button")];
-        alert.messageText = NSLocalizedString(@"Torrent download failed", "Torrent download error -> title");
-        alert.informativeText = message;
-        [alert runModal];
-    });
+
+    NSAlert* alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:NSLocalizedString(@"OK", "Torrent download failed -> button")];
+    alert.messageText = NSLocalizedString(@"Torrent download failed", "Torrent download error -> title");
+    alert.informativeText = message;
+    [alert runModal];
+
+    [self.fPendingTorrentDownloads removeObjectForKey:download.request.URL];
+    if (self.fPendingTorrentDownloads.count == 0)
+    {
+        self.fPendingTorrentDownloads = nil;
+    }
 }
 
-#pragma mark -
+- (void)downloadDidFinish:(NSURLDownload*)download
+{
+    NSString* path = self.fPendingTorrentDownloads[download.request.URL][@"Path"];
 
-- (void)application:(NSApplication*)app openFiles:(NSArray<NSString*>*)filenames
+    [self openFiles:@[ path ] addType:ADD_URL forcePath:nil];
+
+    //delete the torrent file after opening
+    [NSFileManager.defaultManager removeItemAtPath:path error:NULL];
+
+    [self.fPendingTorrentDownloads removeObjectForKey:download.request.URL];
+    if (self.fPendingTorrentDownloads.count == 0)
+    {
+        self.fPendingTorrentDownloads = nil;
+    }
+}
+
+- (void)application:(NSApplication*)app openFiles:(NSArray*)filenames
 {
     [self openFiles:filenames addType:ADD_MANUAL forcePath:nil];
 }
 
-- (void)openFiles:(NSArray<NSString*>*)filenames addType:(addType)type forcePath:(NSString*)path
+- (void)openFiles:(NSArray*)filenames addType:(addType)type forcePath:(NSString*)path
 {
     BOOL deleteTorrentFile, canToggleDelete = NO;
     switch (type)
@@ -1634,18 +1602,23 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             return;
         }
 
-        [self.fSession getAllTasksWithCompletionHandler:^(NSArray<__kindof NSURLSessionTask*>* _Nonnull tasks) {
-            for (NSURLSessionTask* task in tasks)
-            {
-                if ([task.originalRequest.URL isEqual:url])
-                {
-                    NSLog(@"Already downloading %@", url);
-                    return;
-                }
-            }
-            NSURLSessionDataTask* download = [self.fSession dataTaskWithURL:url];
-            [download resume];
-        }];
+        NSURLRequest* request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                             timeoutInterval:60];
+
+        if (self.fPendingTorrentDownloads[request.URL])
+        {
+            NSLog(@"Already downloading %@", request.URL);
+            return;
+        }
+
+        NSURLDownload* download = [[NSURLDownload alloc] initWithRequest:request delegate:self];
+
+        if (!self.fPendingTorrentDownloads)
+        {
+            self.fPendingTorrentDownloads = [[NSMutableDictionary alloc] init];
+        }
+        NSMutableDictionary* dict = [NSMutableDictionary dictionaryWithObject:download forKey:@"Download"];
+        self.fPendingTorrentDownloads[request.URL] = dict;
     }
 }
 
@@ -1681,7 +1654,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)resumeAllTorrents:(id)sender
 {
-    NSMutableArray<Torrent*>* torrents = [NSMutableArray arrayWithCapacity:self.fTorrents.count];
+    NSMutableArray* torrents = [NSMutableArray arrayWithCapacity:self.fTorrents.count];
 
     for (Torrent* torrent in self.fTorrents)
     {
@@ -1694,7 +1667,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self resumeTorrents:torrents];
 }
 
-- (void)resumeTorrents:(NSArray<Torrent*>*)torrents
+- (void)resumeTorrents:(NSArray*)torrents
 {
     for (Torrent* torrent in torrents)
     {
@@ -1711,7 +1684,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)resumeWaitingTorrents:(id)sender
 {
-    NSMutableArray<Torrent*>* torrents = [NSMutableArray arrayWithCapacity:self.fTorrents.count];
+    NSMutableArray* torrents = [NSMutableArray arrayWithCapacity:self.fTorrents.count];
 
     for (Torrent* torrent in self.fTorrents)
     {
@@ -1814,30 +1787,30 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             {
                 if (deleteData)
                 {
-                    title = [NSString localizedStringWithFormat:NSLocalizedString(
-                                                                    @"Are you sure you want to remove %lu transfers from the transfer list"
-                                                                     " and trash the data files?",
-                                                                    "Removal confirm panel -> title"),
-                                                                selected];
+                    title = [NSString stringWithFormat:NSLocalizedString(
+                                                           @"Are you sure you want to remove %lu transfers from the transfer list"
+                                                            " and trash the data files?",
+                                                           "Removal confirm panel -> title"),
+                                                       selected];
                 }
                 else
                 {
-                    title = [NSString localizedStringWithFormat:NSLocalizedString(
-                                                                    @"Are you sure you want to remove %lu transfers from the transfer list?",
-                                                                    "Removal confirm panel -> title"),
-                                                                selected];
+                    title = [NSString stringWithFormat:NSLocalizedString(
+                                                           @"Are you sure you want to remove %lu transfers from the transfer list?",
+                                                           "Removal confirm panel -> title"),
+                                                       selected];
                 }
 
                 if (selected == active)
                 {
-                    message = [NSString localizedStringWithFormat:NSLocalizedString(@"There are %lu active transfers.", "Removal confirm panel -> message part 1"),
-                                                                  active];
+                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %lu active transfers.", "Removal confirm panel -> message part 1"),
+                                                         active];
                 }
                 else
                 {
-                    message = [NSString localizedStringWithFormat:NSLocalizedString(@"There are %1$lu transfers (%2$lu active).", "Removal confirm panel -> message part 1"),
-                                                                  selected,
-                                                                  active];
+                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %1$lu transfers (%2$lu active).", "Removal confirm panel -> message part 1"),
+                                                         selected,
+                                                         active];
                 }
                 message = [message stringByAppendingFormat:@" %@",
                                                            NSLocalizedString(
@@ -1885,7 +1858,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     //#5106 - don't try to remove torrents that have already been removed (fix for a bug, but better safe than crash anyway)
     NSIndexSet* indexesToRemove = [torrents indexesOfObjectsWithOptions:NSEnumerationConcurrent
-                                                            passingTest:^BOOL(Torrent* torrent, NSUInteger /*idx*/, BOOL* /*stop*/) {
+                                                            passingTest:^BOOL(Torrent* torrent, NSUInteger idx, BOOL* stop) {
                                                                 return [self.fTorrents indexOfObjectIdenticalTo:torrent] != NSNotFound;
                                                             }];
     if (torrents.count != indexesToRemove.count)
@@ -1908,9 +1881,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //set up helpers to remove from the table
     __block BOOL beganUpdate = NO;
 
-    void (^doTableRemoval)(NSMutableArray*, id) = ^(NSMutableArray<Torrent*>* displayedTorrents, id parent) {
+    void (^doTableRemoval)(NSMutableArray*, id) = ^(NSMutableArray* displayedTorrents, id parent) {
         NSIndexSet* indexes = [displayedTorrents indexesOfObjectsWithOptions:NSEnumerationConcurrent
-                                                                 passingTest:^BOOL(Torrent* obj, NSUInteger /*idx*/, BOOL* /*stop*/) {
+                                                                 passingTest:^(id obj, NSUInteger idx, BOOL* stop) {
                                                                      return [torrents containsObject:obj];
                                                                  }];
 
@@ -2010,10 +1983,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
         else
         {
-            message = [NSString localizedStringWithFormat:NSLocalizedString(
-                                                              @"Are you sure you want to remove %lu completed transfers from the transfer list?",
-                                                              "Remove completed confirm panel -> title"),
-                                                          torrents.count];
+            message = [NSString stringWithFormat:NSLocalizedString(
+                                                     @"Are you sure you want to remove %lu completed transfers from the transfer list?",
+                                                     "Remove completed confirm panel -> title"),
+                                                 torrents.count];
 
             info = NSLocalizedString(
                 @"Once removed, continuing the transfers will require the torrent files or magnet links.",
@@ -2067,8 +2040,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     else
     {
         panel.message = [NSString
-            localizedStringWithFormat:NSLocalizedString(@"Select the new folder for %lu data files.", "Move torrent -> select destination folder"),
-                                      count];
+            stringWithFormat:NSLocalizedString(@"Select the new folder for %lu data files.", "Move torrent -> select destination folder"), count];
     }
 
     [panel beginSheetModalForWindow:self.fWindow completionHandler:^(NSInteger result) {
@@ -2342,7 +2314,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSUInteger totalCount = self.fTorrents.count;
     if (totalCount != 1)
     {
-        totalTorrentsString = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu transfers", "Status bar transfer count"), totalCount];
+        totalTorrentsString = [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Status bar transfer count"), totalCount];
     }
     else
     {
@@ -2358,44 +2330,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         totalTorrentsString = [NSString stringWithFormat:NSLocalizedString(@"%@ of %@", "Status bar transfer count"),
-                                                         [NSString localizedStringWithFormat:@"%lu", count],
+                                                         [NSString formattedUInteger:count],
                                                          totalTorrentsString];
     }
 
     self.fTotalTorrentsField.stringValue = totalTorrentsString;
 }
 
-#pragma mark - UNUserNotificationCenterDelegate
-
-- (void)userNotificationCenter:(UNUserNotificationCenter*)center
-       willPresentNotification:(UNNotification*)notification
-         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler API_AVAILABLE(macos(10.14))
-{
-    completionHandler(-1);
-}
-
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter*)center shouldPresentNotification:(NSUserNotification*)notification
 {
     return YES;
-}
-
-- (void)userNotificationCenter:(UNUserNotificationCenter*)center
-    didReceiveNotificationResponse:(UNNotificationResponse*)response
-             withCompletionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(10.14))
-{
-    if (!response.notification.request.content.userInfo.count)
-    {
-        return;
-    }
-
-    if ([response.actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier])
-    {
-        [self didActivateNotificationByDefaultActionWithUserInfo:response.notification.request.content.userInfo];
-    }
-    else if ([response.actionIdentifier isEqualToString:@"actionShow"])
-    {
-        [self didActivateNotificationByActionShowWithUserInfo:response.notification.request.content.userInfo];
-    }
 }
 
 - (void)userNotificationCenter:(NSUserNotificationCenter*)center didActivateNotification:(NSUserNotification*)notification
@@ -2407,72 +2351,34 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     if (notification.activationType == NSUserNotificationActivationTypeActionButtonClicked) //reveal
     {
-        [self didActivateNotificationByActionShowWithUserInfo:notification.userInfo];
+        Torrent* torrent = [self torrentForHash:notification.userInfo[@"Hash"]];
+        NSString* location = torrent.dataLocation;
+        if (!location)
+        {
+            location = notification.userInfo[@"Location"];
+        }
+        if (location)
+        {
+            [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[ [NSURL fileURLWithPath:location] ]];
+        }
     }
     else if (notification.activationType == NSUserNotificationActivationTypeContentsClicked)
     {
-        [self didActivateNotificationByDefaultActionWithUserInfo:notification.userInfo];
-    }
-}
-
-- (void)didActivateNotificationByActionShowWithUserInfo:(NSDictionary<NSString*, id>*)userInfo
-{
-    Torrent* torrent = [self torrentForHash:userInfo[@"Hash"]];
-    NSString* location = torrent.dataLocation;
-    if (!location)
-    {
-        location = userInfo[@"Location"];
-    }
-    if (location)
-    {
-        [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[ [NSURL fileURLWithPath:location] ]];
-    }
-}
-
-- (void)didActivateNotificationByDefaultActionWithUserInfo:(NSDictionary<NSString*, id>*)userInfo
-{
-    Torrent* torrent = [self torrentForHash:userInfo[@"Hash"]];
-    if (!torrent)
-    {
-        return;
-    }
-    //select in the table - first see if it's already shown
-    NSInteger row = [self.fTableView rowForItem:torrent];
-    if (row == -1)
-    {
-        //if it's not shown, see if it's in a collapsed row
-        if ([self.fDefaults boolForKey:@"SortByGroup"])
+        Torrent* torrent = [self torrentForHash:notification.userInfo[@"Hash"]];
+        if (!torrent)
         {
-            __block TorrentGroup* parent = nil;
-            [self.fDisplayedTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                      usingBlock:^(TorrentGroup* group, NSUInteger /*idx*/, BOOL* stop) {
-                                                          if ([group.torrents containsObject:torrent])
-                                                          {
-                                                              parent = group;
-                                                              *stop = YES;
-                                                          }
-                                                      }];
-            if (parent)
-            {
-                [[self.fTableView animator] expandItem:parent];
-                row = [self.fTableView rowForItem:torrent];
-            }
+            return;
         }
-
+        //select in the table - first see if it's already shown
+        NSInteger row = [self.fTableView rowForItem:torrent];
         if (row == -1)
         {
-            //not found - must be filtering
-            NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
-            [self.fFilterBar reset:YES];
-
-            row = [self.fTableView rowForItem:torrent];
-
-            //if it's not shown, it has to be in a collapsed row...again
+            //if it's not shown, see if it's in a collapsed row
             if ([self.fDefaults boolForKey:@"SortByGroup"])
             {
                 __block TorrentGroup* parent = nil;
                 [self.fDisplayedTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                          usingBlock:^(TorrentGroup* group, NSUInteger /*idx*/, BOOL* stop) {
+                                                          usingBlock:^(TorrentGroup* group, NSUInteger idx, BOOL* stop) {
                                                               if ([group.torrents containsObject:torrent])
                                                               {
                                                                   parent = group;
@@ -2485,23 +2391,49 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                     row = [self.fTableView rowForItem:torrent];
                 }
             }
+
+            if (row == -1)
+            {
+                //not found - must be filtering
+                NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
+                [self.fFilterBar reset:YES];
+
+                row = [self.fTableView rowForItem:torrent];
+
+                //if it's not shown, it has to be in a collapsed row...again
+                if ([self.fDefaults boolForKey:@"SortByGroup"])
+                {
+                    __block TorrentGroup* parent = nil;
+                    [self.fDisplayedTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                                              usingBlock:^(TorrentGroup* group, NSUInteger idx, BOOL* stop) {
+                                                                  if ([group.torrents containsObject:torrent])
+                                                                  {
+                                                                      parent = group;
+                                                                      *stop = YES;
+                                                                  }
+                                                              }];
+                    if (parent)
+                    {
+                        [[self.fTableView animator] expandItem:parent];
+                        row = [self.fTableView rowForItem:torrent];
+                    }
+                }
+            }
         }
+
+        NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
+
+        [self showMainWindow:nil];
+        [self.fTableView selectAndScrollToRow:row];
     }
-
-    NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
-
-    [self showMainWindow:nil];
-    [self.fTableView selectAndScrollToRow:row];
 }
-
-#pragma mark -
 
 - (Torrent*)torrentForHash:(NSString*)hash
 {
     NSParameterAssert(hash != nil);
 
     __block Torrent* torrent = nil;
-    [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(Torrent* obj, NSUInteger /*idx*/, BOOL* stop) {
+    [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(Torrent* obj, NSUInteger idx, BOOL* stop) {
         if ([obj.hashString isEqualToString:hash])
         {
             torrent = obj;
@@ -2528,39 +2460,24 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             }
         }
 
-        NSString* title = NSLocalizedString(@"Download Complete", "notification title");
-        NSString* body = torrent.name;
         NSString* location = torrent.dataLocation;
+
+        NSString* notificationTitle = NSLocalizedString(@"Download Complete", "notification title");
+        NSUserNotification* notification = [[NSUserNotification alloc] init];
+        notification.title = notificationTitle;
+        notification.informativeText = torrent.name;
+
+        notification.hasActionButton = YES;
+        notification.actionButtonTitle = NSLocalizedString(@"Show", "notification button");
+
         NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithObject:torrent.hashString forKey:@"Hash"];
         if (location)
         {
             userInfo[@"Location"] = location;
         }
+        notification.userInfo = userInfo;
 
-        if (@available(macOS 10.14, *))
-        {
-            NSString* identifier = [@"Download Complete " stringByAppendingString:torrent.hashString];
-            UNMutableNotificationContent* content = [UNMutableNotificationContent new];
-            content.title = title;
-            content.body = body;
-            content.categoryIdentifier = @"categoryShow";
-            content.userInfo = userInfo;
-
-            UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
-            [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
-        }
-        else
-        {
-            // Fallback on earlier versions
-            NSUserNotification* userNotification = [[NSUserNotification alloc] init];
-            userNotification.title = title;
-            userNotification.informativeText = body;
-            userNotification.hasActionButton = YES;
-            userNotification.actionButtonTitle = NSLocalizedString(@"Show", "notification button");
-            userNotification.userInfo = userInfo;
-
-            [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:userNotification];
-        }
+        [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
 
         if (!self.fWindow.mainWindow)
         {
@@ -2595,39 +2512,24 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
     }
 
-    NSString* title = NSLocalizedString(@"Seeding Complete", "notification title");
-    NSString* body = torrent.name;
     NSString* location = torrent.dataLocation;
+
+    NSString* notificationTitle = NSLocalizedString(@"Seeding Complete", "notification title");
+    NSUserNotification* userNotification = [[NSUserNotification alloc] init];
+    userNotification.title = notificationTitle;
+    userNotification.informativeText = torrent.name;
+
+    userNotification.hasActionButton = YES;
+    userNotification.actionButtonTitle = NSLocalizedString(@"Show", "notification button");
+
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithObject:torrent.hashString forKey:@"Hash"];
     if (location)
     {
         userInfo[@"Location"] = location;
     }
+    userNotification.userInfo = userInfo;
 
-    if (@available(macOS 10.14, *))
-    {
-        NSString* identifier = [@"Seeding Complete " stringByAppendingString:torrent.hashString];
-        UNMutableNotificationContent* content = [UNMutableNotificationContent new];
-        content.title = title;
-        content.body = body;
-        content.categoryIdentifier = @"categoryShow";
-        content.userInfo = userInfo;
-
-        UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
-        [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
-    }
-    else
-    {
-        // Fallback on earlier versions
-        NSUserNotification* userNotification = [[NSUserNotification alloc] init];
-        userNotification.title = title;
-        userNotification.informativeText = body;
-        userNotification.hasActionButton = YES;
-        userNotification.actionButtonTitle = NSLocalizedString(@"Show", "notification button");
-        userNotification.userInfo = userInfo;
-
-        [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:userNotification];
-    }
+    [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:userNotification];
 
     //removing from the list calls fullUpdateUI
     if (torrent.removeWhenFinishSeeding)
@@ -2778,7 +2680,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else if ([sortType isEqualToString:SortTypeSize])
     {
-        NSSortDescriptor* sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"totalSizeSelected" ascending:asc];
+        NSSortDescriptor* sizeDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"size" ascending:asc];
 
         descriptors = @[ sizeDescriptor, nameDescriptor ];
     }
@@ -2901,7 +2803,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSInteger const groupFilterValue = [self.fDefaults integerForKey:@"FilterGroup"];
     BOOL const filterGroup = groupFilterValue != kGroupFilterAllTag;
 
-    NSArray<NSString*>* searchStrings = self.fFilterBar.searchStrings;
+    NSArray* searchStrings = self.fFilterBar.searchStrings;
     if (searchStrings && searchStrings.count == 0)
     {
         searchStrings = nil;
@@ -2917,11 +2819,11 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     auto* errorRef = &error;
     //filter & get counts of each type
     NSIndexSet* indexesOfNonFilteredTorrents = [self.fTorrents
-        indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(Torrent* torrent, NSUInteger /*torrentIdx*/, BOOL* /*stopTorrentsEnumeration*/) {
+        indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(Torrent* torrent, NSUInteger idx, BOOL* stop) {
             //check status
             if (torrent.active && !torrent.checkingWaiting)
             {
-                BOOL const isActive = torrent.transmitting;
+                BOOL const isActive = !torrent.stalled;
                 if (isActive)
                 {
                     std::atomic_fetch_add_explicit(activeRef, 1, std::memory_order_relaxed);
@@ -2974,41 +2876,38 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 __block BOOL removeTextField = NO;
                 if (filterTracker)
                 {
-                    NSArray<NSString*>* trackers = torrent.allTrackersFlat;
+                    NSArray* trackers = torrent.allTrackersFlat;
 
                     //to count, we need each string in at least 1 tracker
-                    [searchStrings
-                        enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* searchString, NSUInteger /*idx*/, BOOL* stop) {
-                            __block BOOL found = NO;
-                            [trackers enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                       usingBlock:^(NSString* tracker, NSUInteger /*trackerIdx*/, BOOL* stopEnumerateTrackers) {
-                                                           if ([tracker rangeOfString:searchString
-                                                                              options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)]
-                                                                   .location != NSNotFound)
-                                                           {
-                                                               found = YES;
-                                                               *stopEnumerateTrackers = YES;
-                                                           }
-                                                       }];
-                            if (!found)
-                            {
-                                removeTextField = YES;
-                                *stop = YES;
-                            }
-                        }];
+                    [searchStrings enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id searchString, NSUInteger idx, BOOL* stop) {
+                        __block BOOL found = NO;
+                        [trackers enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                                   usingBlock:^(NSString* tracker, NSUInteger idx, BOOL* stopTracker) {
+                                                       if ([tracker rangeOfString:searchString
+                                                                          options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)]
+                                                               .location != NSNotFound)
+                                                       {
+                                                           found = YES;
+                                                           *stopTracker = YES;
+                                                       }
+                                                   }];
+                        if (!found)
+                        {
+                            removeTextField = YES;
+                            *stop = YES;
+                        }
+                    }];
                 }
                 else
                 {
-                    [searchStrings enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                    usingBlock:^(NSString* searchString, NSUInteger /*idx*/, BOOL* stop) {
-                                                        if ([torrent.name rangeOfString:searchString
-                                                                                options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)]
-                                                                .location == NSNotFound)
-                                                        {
-                                                            removeTextField = YES;
-                                                            *stop = YES;
-                                                        }
-                                                    }];
+                    [searchStrings enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id searchString, NSUInteger idx, BOOL* stop) {
+                        if ([torrent.name rangeOfString:searchString options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)]
+                                .location == NSNotFound)
+                        {
+                            removeTextField = YES;
+                            *stop = YES;
+                        }
+                    }];
                 }
 
                 if (removeTextField)
@@ -3042,7 +2941,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     if (self.fDisplayedTorrents.count > 0)
     {
         //for each torrent, removes the previous piece info if it's not in allTorrents, and keeps track of which torrents we already found in allTorrents
-        void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL*) = ^(Torrent* torrent, NSUInteger /*idx*/, BOOL* /*stop*/) {
+        void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL*) = ^(Torrent* torrent, NSUInteger idx, BOOL* stop) {
             //we used to keep track of which torrents we already found in allTorrents, but it wasn't safe fo concurrent enumeration
             if (![allTorrents containsObject:torrent])
             {
@@ -3052,11 +2951,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         if (wasGroupRows)
         {
-            [self.fDisplayedTorrents
-                enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id obj, NSUInteger /*idx*/, BOOL* /*stop*/) {
-                    [((TorrentGroup*)obj).torrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                                    usingBlock:removePreviousFinishedPieces];
-                }];
+            [self.fDisplayedTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id obj, NSUInteger idx, BOOL* stop) {
+                [((TorrentGroup*)obj).torrents enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                                                usingBlock:removePreviousFinishedPieces];
+            }];
         }
         else
         {
@@ -3081,13 +2979,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             indexSetWithIndexesInRange:NSMakeRange(0, self.fDisplayedTorrents.count)];
 
         //for each of the torrents to add, find if it already exists (and keep track of those we've already added & those we need to remove)
-        [allTorrents enumerateObjectsWithOptions:0 usingBlock:^(Torrent* obj, NSUInteger previousIndex, BOOL* /*stopEnumerate*/) {
-            NSUInteger const currentIndex = [self.fDisplayedTorrents
-                indexOfObjectAtIndexes:removePreviousIndexes
-                               options:NSEnumerationConcurrent
-                           passingTest:^BOOL(id objDisplay, NSUInteger /*idx*/, BOOL* /*stop*/) {
-                               return obj == objDisplay;
-                           }];
+        [allTorrents enumerateObjectsWithOptions:0 usingBlock:^(id objAll, NSUInteger previousIndex, BOOL* stop) {
+            NSUInteger const currentIndex = [self.fDisplayedTorrents indexOfObjectAtIndexes:removePreviousIndexes
+                                                                                    options:NSEnumerationConcurrent
+                                                                                passingTest:^(id objDisplay, NSUInteger idx, BOOL* stop) {
+                                                                                    return (BOOL)(objAll == objDisplay);
+                                                                                }];
             if (currentIndex == NSNotFound)
             {
                 [addIndexes addIndex:previousIndex];
@@ -3116,12 +3013,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 //slide new torrents in differently
                 if (self.fAddingTransfers)
                 {
-                    NSIndexSet* newAddIndexes = [allTorrents
-                        indexesOfObjectsAtIndexes:addIndexes
-                                          options:NSEnumerationConcurrent
-                                      passingTest:^BOOL(Torrent* obj, NSUInteger /*idx*/, BOOL* /*stop*/) {
-                                          return [self.fAddingTransfers containsObject:obj];
-                                      }];
+                    NSIndexSet* newAddIndexes = [allTorrents indexesOfObjectsAtIndexes:addIndexes options:NSEnumerationConcurrent
+                                                                           passingTest:^BOOL(Torrent* obj, NSUInteger idx, BOOL* stop) {
+                                                                               return [self.fAddingTransfers containsObject:obj];
+                                                                           }];
 
                     [addIndexes removeIndexes:newAddIndexes];
 
@@ -3172,8 +3067,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             {
                 Torrent* torrent = group.torrents[indexInGroup];
                 NSUInteger const allIndex = [allTorrents indexOfObjectAtIndexes:unusedAllTorrentsIndexes options:NSEnumerationConcurrent
-                                                                    passingTest:^BOOL(Torrent* obj, NSUInteger /*idx*/, BOOL* /*stop*/) {
-                                                                        return obj == torrent;
+                                                                    passingTest:^(id obj, NSUInteger idx, BOOL* stop) {
+                                                                        return (BOOL)(obj == torrent);
                                                                     }];
                 if (allIndex == NSNotFound)
                 {
@@ -3250,7 +3145,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
             [group.torrents addObject:torrent];
 
-            BOOL const newTorrent = [self.fAddingTransfers containsObject:torrent];
+            BOOL const newTorrent = self.fAddingTransfers && [self.fAddingTransfers containsObject:torrent];
             [self.fTableView insertItemsAtIndexes:[NSIndexSet indexSetWithIndex:group.torrents.count - 1] inParent:group
                                     withAnimation:newTorrent ? NSTableViewAnimationSlideLeft : NSTableViewAnimationSlideDown];
         }
@@ -3258,7 +3153,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //remove empty groups
         NSIndexSet* removeGroupIndexes = [self.fDisplayedTorrents
             indexesOfObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, originalGroupCount)]
-                              options:NSEnumerationConcurrent passingTest:^BOOL(id obj, NSUInteger /*idx*/, BOOL* /*stop*/) {
+                              options:NSEnumerationConcurrent passingTest:^BOOL(id obj, NSUInteger idx, BOOL* stop) {
                                   return ((TorrentGroup*)obj).torrents.count == 0;
                               }];
 
@@ -3410,7 +3305,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     if (menu == self.fGroupsSetMenu || menu == self.fGroupsSetContextMenu)
     {
-        [menu removeAllItems];
+        for (NSInteger i = menu.numberOfItems - 1; i >= 0; i--)
+        {
+            [menu removeItemAtIndex:i];
+        }
 
         NSMenu* groupMenu = [GroupsController.groups groupMenuWithTarget:self action:@selector(setGroup:) isSmall:NO];
 
@@ -3468,30 +3366,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     if (![dict[@"ByUser"] boolValue])
     {
-        NSString* title = isLimited ? NSLocalizedString(@"Speed Limit Auto Enabled", "notification title") :
-                                      NSLocalizedString(@"Speed Limit Auto Disabled", "notification title");
-        NSString* body = NSLocalizedString(@"Bandwidth settings changed", "notification description");
+        NSUserNotification* notification = [[NSUserNotification alloc] init];
+        notification.title = isLimited ? NSLocalizedString(@"Speed Limit Auto Enabled", "notification title") :
+                                         NSLocalizedString(@"Speed Limit Auto Disabled", "notification title");
+        notification.informativeText = NSLocalizedString(@"Bandwidth settings changed", "notification description");
+        notification.hasActionButton = NO;
 
-        if (@available(macOS 10.14, *))
-        {
-            NSString* identifier = @"Bandwidth settings changed";
-            UNMutableNotificationContent* content = [UNMutableNotificationContent new];
-            content.title = title;
-            content.body = body;
-
-            UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
-            [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
-        }
-        else
-        {
-            // Fallback on earlier versions
-            NSUserNotification* notification = [[NSUserNotification alloc] init];
-            notification.title = title;
-            notification.informativeText = body;
-            notification.hasActionButton = NO;
-
-            [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
-        }
+        [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
     }
 }
 
@@ -3589,27 +3470,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         [self openFiles:@[ fullFile ] addType:ADD_AUTO forcePath:nil];
 
         NSString* notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
+        NSUserNotification* notification = [[NSUserNotification alloc] init];
+        notification.title = notificationTitle;
+        notification.informativeText = file;
+        notification.hasActionButton = NO;
 
-        if (@available(macOS 10.14, *))
-        {
-            NSString* identifier = [@"Torrent File Auto Added " stringByAppendingString:file];
-            UNMutableNotificationContent* content = [UNMutableNotificationContent new];
-            content.title = notificationTitle;
-            content.body = file;
-
-            UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
-            [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
-        }
-        else
-        {
-            // Fallback on earlier versions
-            NSUserNotification* notification = [[NSUserNotification alloc] init];
-            notification.title = notificationTitle;
-            notification.informativeText = file;
-            notification.hasActionButton = NO;
-
-            [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
-        }
+        [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
     }
 }
 
@@ -3683,24 +3549,11 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
         else if ([ident isEqualToString:@"DL Image"])
         {
-            NSImage* image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
-            image.accessibilityDescription = NSLocalizedString(@"DL", "Torrent -> status image");
-            return image;
+            return [NSImage imageNamed:@"DownArrowGroupTemplate"];
         }
         else if ([ident isEqualToString:@"UL Image"])
         {
-            if ([self.fDefaults boolForKey:@"DisplayGroupRowRatio"])
-            {
-                NSImage* image = [NSImage imageNamed:@"YingYangGroupTemplate"];
-                image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
-                return image;
-            }
-            else
-            {
-                NSImage* image = [NSImage imageNamed:@"UpArrowGroupTemplate"];
-                image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
-                return image;
-            }
+            return [NSImage imageNamed:[self.fDefaults boolForKey:@"DisplayGroupRowRatio"] ? @"YingYangGroupTemplate" : @"UpArrowGroupTemplate"];
         }
         else
         {
@@ -3734,8 +3587,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         [pasteboard declareTypes:@[ kTorrentTableViewDataType ] owner:self];
-        [pasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:indexSet requiringSecureCoding:YES error:nil]
-                    forType:kTorrentTableViewDataType];
+        [pasteboard setData:[NSKeyedArchiver archivedDataWithRootObject:indexSet] forType:kTorrentTableViewDataType];
         return YES;
     }
     return NO;
@@ -3907,31 +3759,25 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)info
 {
     NSPasteboard* pasteboard = info.draggingPasteboard;
-    if ([pasteboard.types containsObject:NSPasteboardTypeFileURL])
+    if ([pasteboard.types containsObject:NSFilenamesPboardType])
     {
         //check if any torrent files can be added
         BOOL torrent = NO;
-        NSArray<NSURL*>* files = [pasteboard readObjectsForClasses:@[ NSURL.class ]
-                                                           options:@{ NSPasteboardURLReadingFileURLsOnlyKey : @YES }];
-        for (NSURL* fileToParse in files)
+        NSArray* files = [pasteboard propertyListForType:NSFilenamesPboardType];
+        for (NSString* file in files)
         {
-            if ([[NSWorkspace.sharedWorkspace typeOfFile:fileToParse.path error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
-                [fileToParse.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
+            if ([[NSWorkspace.sharedWorkspace typeOfFile:file error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
+                [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
             {
                 torrent = YES;
                 auto metainfo = tr_torrent_metainfo{};
-                if (metainfo.parseTorrentFile(fileToParse.path.UTF8String))
+                if (metainfo.parseTorrentFile(file.UTF8String))
                 {
                     if (!self.fOverlayWindow)
                     {
-                        self.fOverlayWindow = [[DragOverlayWindow alloc] initForWindow:self.fWindow];
+                        self.fOverlayWindow = [[DragOverlayWindow alloc] initWithLib:self.fLib forWindow:self.fWindow];
                     }
-                    NSMutableArray<NSString*>* filesToOpen = [NSMutableArray arrayWithCapacity:files.count];
-                    for (NSURL* fileToOpen in files)
-                    {
-                        [filesToOpen addObject:fileToOpen.path];
-                    }
-                    [self.fOverlayWindow setTorrents:filesToOpen];
+                    [self.fOverlayWindow setTorrents:files];
 
                     return NSDragOperationCopy;
                 }
@@ -3943,18 +3789,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             if (!self.fOverlayWindow)
             {
-                self.fOverlayWindow = [[DragOverlayWindow alloc] initForWindow:self.fWindow];
+                self.fOverlayWindow = [[DragOverlayWindow alloc] initWithLib:self.fLib forWindow:self.fWindow];
             }
             [self.fOverlayWindow setFile:[files[0] lastPathComponent]];
 
             return NSDragOperationCopy;
         }
     }
-    else if ([pasteboard.types containsObject:NSPasteboardTypeURL])
+    else if ([pasteboard.types containsObject:NSURLPboardType])
     {
         if (!self.fOverlayWindow)
         {
-            self.fOverlayWindow = [[DragOverlayWindow alloc] initForWindow:self.fWindow];
+            self.fOverlayWindow = [[DragOverlayWindow alloc] initWithLib:self.fLib forWindow:self.fWindow];
         }
         [self.fOverlayWindow setURL:[NSURL URLFromPasteboard:pasteboard].relativeString];
 
@@ -3980,24 +3826,23 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 
     NSPasteboard* pasteboard = info.draggingPasteboard;
-    if ([pasteboard.types containsObject:NSPasteboardTypeFileURL])
+    if ([pasteboard.types containsObject:NSFilenamesPboardType])
     {
         BOOL torrent = NO, accept = YES;
 
         //create an array of files that can be opened
-        NSArray<NSURL*>* files = [pasteboard readObjectsForClasses:@[ NSURL.class ]
-                                                           options:@{ NSPasteboardURLReadingFileURLsOnlyKey : @YES }];
-        NSMutableArray<NSString*>* filesToOpen = [NSMutableArray arrayWithCapacity:files.count];
-        for (NSURL* file in files)
+        NSArray* files = [pasteboard propertyListForType:NSFilenamesPboardType];
+        NSMutableArray* filesToOpen = [NSMutableArray arrayWithCapacity:files.count];
+        for (NSString* file in files)
         {
-            if ([[NSWorkspace.sharedWorkspace typeOfFile:file.path error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
+            if ([[NSWorkspace.sharedWorkspace typeOfFile:file error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
                 [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
             {
                 torrent = YES;
                 auto metainfo = tr_torrent_metainfo{};
-                if (metainfo.parseTorrentFile(file.path.UTF8String))
+                if (metainfo.parseTorrentFile(file.UTF8String))
                 {
-                    [filesToOpen addObject:file.path];
+                    [filesToOpen addObject:file];
                 }
             }
         }
@@ -4010,7 +3855,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             if (!torrent && files.count == 1)
             {
-                [CreatorWindowController createTorrentFile:self.fLib forFile:files[0]];
+                [CreatorWindowController createTorrentFile:self.fLib forFile:[NSURL fileURLWithPath:files[0]]];
             }
             else
             {
@@ -4020,7 +3865,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         return accept;
     }
-    else if ([pasteboard.types containsObject:NSPasteboardTypeURL])
+    else if ([pasteboard.types containsObject:NSURLPboardType])
     {
         NSURL* url;
         if ((url = [NSURL URLFromPasteboard:pasteboard]))
@@ -4112,7 +3957,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self.fWindow.toolbar validateVisibleItems];
 }
 
-- (NSArray<Torrent*>*)quickLookableTorrents
+- (NSArray*)quickLookableTorrents
 {
     NSArray* selectedTorrents = self.fTableView.selectedTorrents;
     NSMutableArray* qlArray = [NSMutableArray arrayWithCapacity:selectedTorrents.count];
@@ -4225,7 +4070,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     return [self toolbarButtonWithIdentifier:ident forToolbarButtonClass:[ButtonToolbarItem class]];
 }
 
-- (__kindof ButtonToolbarItem*)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)klass
+- (id)toolbarButtonWithIdentifier:(NSString*)ident forToolbarButtonClass:(Class)klass
 {
     ButtonToolbarItem* item = [[klass alloc] initWithItemIdentifier:ident];
 
@@ -4344,12 +4189,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
-        if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
-        {
-            // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
-            [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
-            [segmentedControl setWidth:64 forSegment:TOOLBAR_RESUME_TAG];
-        }
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
@@ -4400,13 +4239,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:TOOLBAR_RESUME_TAG];
-        if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
-        {
-            // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
-            [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
-            [segmentedControl setWidth:64 forSegment:TOOLBAR_RESUME_TAG];
-        }
 
+        groupItem.view = segmentedControl;
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
         groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
@@ -4523,7 +4357,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         ToolbarItemIdentifierOpenWeb,
         ToolbarItemIdentifierRemove,
         ToolbarItemIdentifierPauseResumeSelected,
-        ToolbarItemIdentifierPauseResumeAll,
+        ToolbarItemIdentifierResumeAll,
         ToolbarItemIdentifierShare,
         ToolbarItemIdentifierQuickLook,
         ToolbarItemIdentifierFilter,
@@ -4793,11 +4627,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     if (action == @selector(removeNoDelete:) || action == @selector(removeDeleteData:))
     {
         BOOL warning = NO;
-
-        if (self.fFilterBar.isFocused == YES)
-        {
-            return NO;
-        }
 
         for (Torrent* torrent in self.fTableView.selectedTorrents)
         {
@@ -5132,13 +4961,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     if (seeding > 0)
     {
-        NSString* title = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu Seeding", "Dock item - Seeding"), seeding];
+        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%lu Seeding", "Dock item - Seeding"), seeding];
         [menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 
     if (downloading > 0)
     {
-        NSString* title = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu Downloading", "Dock item - Downloading"), downloading];
+        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%lu Downloading", "Dock item - Downloading"), downloading];
         [menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 
@@ -5245,9 +5074,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
                                                                                        metrics:nil
                                                                                          views:views];
-
-            //redraw table to avoid empty cells
-            [self.fTableView reloadData];
         }
 
         //add height constraint to fStackView
@@ -5355,7 +5181,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     if ([self.fDefaults boolForKey:@"AutoSize"])
     {
-        NSUInteger groups = ![self.fDisplayedTorrents.firstObject isKindOfClass:[Torrent class]] ? self.fDisplayedTorrents.count : 0;
+        NSUInteger groups = (self.fDisplayedTorrents.count > 0 && ![self.fDisplayedTorrents[0] isKindOfClass:[Torrent class]]) ?
+            self.fDisplayedTorrents.count :
+            0;
 
         height = (kGroupSeparatorHeight + self.fTableView.intercellSpacing.height) * groups +
             (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
@@ -5474,7 +5302,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         if (torrentStruct != NULL && (type != TR_RPC_TORRENT_ADDED && type != TR_RPC_SESSION_CHANGED && type != TR_RPC_SESSION_CLOSE))
         {
             [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                             usingBlock:^(Torrent* checkTorrent, NSUInteger /*idx*/, BOOL* stop) {
+                                             usingBlock:^(Torrent* checkTorrent, NSUInteger idx, BOOL* stop) {
                                                  if (torrentStruct == checkTorrent.torrentStruct)
                                                  {
                                                      torrent = checkTorrent;
@@ -5522,7 +5350,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                 break;
 
             case TR_RPC_SESSION_CHANGED:
-                [self.prefsController rpcUpdatePrefs];
+                [_prefsController rpcUpdatePrefs];
                 break;
 
             case TR_RPC_SESSION_CLOSE:

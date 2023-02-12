@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © 2010-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -27,6 +27,11 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
 @property(nonatomic, readonly) TrackerCell* fTrackerCell;
 
 @property(nonatomic) IBOutlet NSSegmentedControl* fTrackerAddRemoveControl;
+
+- (void)setupInfo;
+
+- (void)addTrackers;
+- (void)removeTrackers;
 
 @end
 
@@ -410,8 +415,8 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
         if (removeTrackerCount > 1)
         {
             alert.messageText = [NSString
-                localizedStringWithFormat:NSLocalizedString(@"Are you sure you want to remove %lu trackers?", "Remove trackers alert -> title"),
-                                          removeTrackerCount];
+                stringWithFormat:NSLocalizedString(@"Are you sure you want to remove %lu trackers?", "Remove trackers alert -> title"),
+                                 removeTrackerCount];
             alert.informativeText = NSLocalizedString(
                 @"Once removed, Transmission will no longer attempt to contact them."
                  " This cannot be undone.",

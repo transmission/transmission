@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Transmission authors and contributors.
+// This file Copyright © 2009-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -26,6 +26,20 @@ static CGFloat const kCountWidth = 60.0;
 @property(nonatomic, readonly) NSAttributedString* attributedName;
 @property(nonatomic, readonly) NSMutableDictionary* fNameAttributes;
 @property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
+
+- (void)loadTrackerIcon:(NSString*)baseAddress;
+
+- (NSRect)imageRectForBounds:(NSRect)bounds;
+- (NSRect)rectForNameWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
+- (NSRect)rectForCountWithString:(NSAttributedString*)string withAboveRect:(NSRect)aboveRect inBounds:(NSRect)bounds;
+- (NSRect)rectForCountLabelWithString:(NSAttributedString*)string withRightRect:(NSRect)rightRect inBounds:(NSRect)bounds;
+- (NSRect)rectForStatusWithString:(NSAttributedString*)string
+                    withAboveRect:(NSRect)aboveRect
+                    withRightRect:(NSRect)rightRect
+                         inBounds:(NSRect)bounds;
+
+- (NSAttributedString*)attributedStatusWithString:(NSString*)statusString;
+- (NSAttributedString*)attributedCount:(NSInteger)count;
 
 @end
 
@@ -209,15 +223,9 @@ NSMutableSet* fTrackerIconLoading;
 
     NSURLSessionDataTask* task = [NSURLSession.sharedSession
         dataTaskWithRequest:request completionHandler:^(NSData* iconData, NSURLResponse* response, NSError* error) {
-            if (error)
-            {
-                NSLog(@"Unable to get tracker icon: task failed (%@)", error.localizedDescription);
-                return;
-            }
             BOOL ok = ((NSHTTPURLResponse*)response).statusCode == 200 ? YES : NO;
             if (!ok)
             {
-                NSLog(@"Unable to get tracker icon: status code not OK (%ld)", (long)((NSHTTPURLResponse*)response).statusCode);
                 return;
             }
 
@@ -303,8 +311,7 @@ NSMutableSet* fTrackerIconLoading;
 
 - (NSAttributedString*)attributedCount:(NSInteger)count
 {
-    NSString* countString = count != -1 ? [NSString localizedStringWithFormat:@"%ld", count] :
-                                          NSLocalizedString(@"N/A", "tracker peer stat");
+    NSString* countString = count != -1 ? [NSString stringWithFormat:@"%ld", count] : NSLocalizedString(@"N/A", "tracker peer stat");
     return [[NSAttributedString alloc] initWithString:countString attributes:self.fStatusAttributes];
 }
 

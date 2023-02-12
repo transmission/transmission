@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,8 +12,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-
-#include "tr-macros.h"
 
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
@@ -73,7 +71,7 @@ public:
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool test(size_t bit) const
+    [[nodiscard]] bool test(size_t bit) const
     {
         return hasAll() || (!hasNone() && testFlag(bit));
     }
@@ -97,29 +95,11 @@ public:
 
     [[nodiscard]] bool isValid() const;
 
-    [[nodiscard]] constexpr auto percent() const noexcept
-    {
-        if (hasAll())
-        {
-            return 1.0F;
-        }
-
-        if (hasNone() || empty())
-        {
-            return 0.0F;
-        }
-
-        return static_cast<float>(count()) / size();
-    }
-
-    tr_bitfield& operator|=(tr_bitfield const& that) noexcept;
-    tr_bitfield& operator&=(tr_bitfield const& that) noexcept;
-
 private:
     [[nodiscard]] size_t countFlags() const noexcept;
     [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
 
-    [[nodiscard]] TR_CONSTEXPR20 bool testFlag(size_t n) const
+    [[nodiscard]] bool testFlag(size_t n) const
     {
         if (n >> 3U >= std::size(flags_))
         {
@@ -132,20 +112,12 @@ private:
 
     void ensureBitsAlloced(size_t n);
     [[nodiscard]] bool ensureNthBitAlloced(size_t nth);
+    void freeArray() noexcept;
 
-    void freeArray() noexcept
-    {
-        // move-assign to ensure the reserve memory is cleared
-        flags_ = std::vector<uint8_t>{};
-    }
-
+    void setTrueCount(size_t n) noexcept;
+    void rebuildTrueCount() noexcept;
     void incrementTrueCount(size_t inc) noexcept;
     void decrementTrueCount(size_t dec) noexcept;
-    void setTrueCount(size_t n) noexcept;
-    void rebuildTrueCount() noexcept
-    {
-        setTrueCount(countFlags());
-    }
 
     std::vector<uint8_t> flags_;
 

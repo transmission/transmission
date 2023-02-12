@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,7 +11,6 @@
 
 #include <array>
 #include <cstdint> // uint8_t, uint32_t, uint64_t
-#include <string>
 
 #include "transmission.h"
 
@@ -31,7 +30,9 @@ class tr_swarm;
 struct peer_atom;
 struct tr_bandwidth;
 
-// --- Peer Publish / Subscribe
+/**
+***  Peer Publish / Subscribe
+**/
 
 class tr_peer_event
 {
@@ -186,36 +187,14 @@ public:
 
     virtual bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const = 0;
 
-    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const noexcept
-    {
-        return has().test(piece);
-    }
+    [[nodiscard]] virtual std::string readable() const = 0;
 
-    [[nodiscard]] float percentDone() const noexcept
-    {
-        return has().percent();
-    }
-
-    [[nodiscard]] bool isSeed() const noexcept
-    {
-        return has().hasAll();
-    }
-
-    [[nodiscard]] virtual std::string display_name() const = 0;
-
-    [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
+    [[nodiscard]] virtual bool hasPiece(tr_piece_index_t piece) const noexcept = 0;
 
     [[nodiscard]] virtual tr_bandwidth& bandwidth() noexcept = 0;
 
     // requests that have been made but haven't been fulfilled yet
     [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
-
-    [[nodiscard]] tr_bytes_per_second_t get_piece_speed_bytes_per_second(uint64_t now, tr_direction direction) const
-    {
-        auto bytes_per_second = tr_bytes_per_second_t{};
-        isTransferringPieces(now, direction, &bytes_per_second);
-        return bytes_per_second;
-    }
 
     virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
@@ -241,7 +220,7 @@ public:
     tr_recentHistory<uint16_t> cancels_sent_to_client;
 
     /// The following fields are only to be used in peer-mgr.cc.
-    /// TODO(ckerr): refactor them out of `tr_peer`
+    /// TODO(ckerr): refactor them out of tr_peer
 
     // hook to private peer-mgr information
     peer_atom* const atom;
@@ -262,7 +241,9 @@ public:
     tr_recentHistory<uint16_t> cancels_sent_to_peer;
 };
 
-// ---
+/***
+****
+***/
 
 struct tr_swarm_stats
 {
@@ -276,7 +257,9 @@ tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm);
 
 void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active);
 
-// ---
+/***
+****
+***/
 
 #ifdef _WIN32
 #undef EMSGSIZE

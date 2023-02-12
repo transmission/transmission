@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © 2007-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -26,6 +26,10 @@ static NSTimeInterval const kUpdateSeconds = 1.0;
 @property(nonatomic) IBOutlet NSTextField* fNumOpenedLabelField;
 @property(nonatomic) IBOutlet NSButton* fResetButton;
 @property(nonatomic) NSTimer* fTimer;
+
+- (void)updateStats;
+
+- (void)performResetStats;
 
 @end
 
@@ -75,7 +79,48 @@ tr_session* fLib = NULL;
     self.fTimeLabelField.stringValue = [NSLocalizedString(@"Running Time", "Stats window -> label") stringByAppendingString:@":"];
     self.fNumOpenedLabelField.stringValue = [NSLocalizedString(@"Program Started", "Stats window -> label") stringByAppendingString:@":"];
 
+    //size of all labels
+    CGFloat const oldWidth = self.fUploadedLabelField.frame.size.width;
+
+    NSArray* labels = @[
+        self.fUploadedLabelField,
+        self.fDownloadedLabelField,
+        self.fRatioLabelField,
+        self.fTimeLabelField,
+        self.fNumOpenedLabelField
+    ];
+
+    CGFloat maxWidth = CGFLOAT_MIN;
+    for (NSTextField* label in labels)
+    {
+        [label sizeToFit];
+
+        CGFloat const width = label.frame.size.width;
+        maxWidth = MAX(maxWidth, width);
+    }
+
+    for (NSTextField* label in labels)
+    {
+        NSRect frame = label.frame;
+        frame.size.width = maxWidth;
+        label.frame = frame;
+    }
+
+    //resize window for new label width - fields are set in nib to adjust correctly
+    NSRect windowRect = self.window.frame;
+    windowRect.size.width += maxWidth - oldWidth;
+    [self.window setFrame:windowRect display:YES];
+
+    //resize reset button
+    CGFloat const oldButtonWidth = self.fResetButton.frame.size.width;
+
     self.fResetButton.title = NSLocalizedString(@"Reset", "Stats window -> reset button");
+    [self.fResetButton sizeToFit];
+
+    NSRect buttonFrame = self.fResetButton.frame;
+    buttonFrame.size.width += 10.0;
+    buttonFrame.origin.x -= buttonFrame.size.width - oldButtonWidth;
+    self.fResetButton.frame = buttonFrame;
 }
 
 - (void)windowWillClose:(id)sender
@@ -155,7 +200,7 @@ tr_session* fLib = NULL;
 
     self.fRatioField.stringValue = [NSString stringForRatio:statsSession.ratio];
 
-    NSString* totalRatioString = static_cast<int>(statsAll.ratio) != TR_RATIO_NA ?
+    NSString* totalRatioString = statsAll.ratio != TR_RATIO_NA ?
         [NSString stringWithFormat:NSLocalizedString(@"%@ total", "stats total"), [NSString stringForRatio:statsAll.ratio]] :
         NSLocalizedString(@"Total N/A", "stats total");
     self.fRatioAllField.stringValue = totalRatioString;
@@ -181,7 +226,7 @@ tr_session* fLib = NULL;
     else
     {
         self.fNumOpenedField.stringValue = [NSString
-            localizedStringWithFormat:NSLocalizedString(@"%llu times", "stats window -> times opened"), statsAll.sessionCount];
+            stringWithFormat:NSLocalizedString(@"%llu times", "stats window -> times opened"), statsAll.sessionCount];
     }
 }
 

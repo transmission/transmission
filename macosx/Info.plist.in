@@ -34,9 +34,7 @@
 	<key>CFBundleHelpBookName</key>
 	<string>Transmission Help</string>
 	<key>CFBundleIconFile</key>
-	<string>@APPICON_NAME@</string>
-	<key>CFBundleIconName</key>
-	<string>@APPICON_NAME@</string>
+	<string>Transmission</string>
 	<key>CFBundleIdentifier</key>
 	<string>org.m0k.transmission</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -61,11 +59,11 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>14714.@TR_VERSION_MAJOR@.@TR_VERSION_MINOR@.@TR_VERSION_PATCH@</string>
+	<string>@TR_VCS_REVISION@</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>@CMAKE_OSX_DEPLOYMENT_TARGET@</string>
+	<string>10.7.0</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSAppTransportSecurity</key>

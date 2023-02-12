@@ -6,9 +6,9 @@
 #include <cstring>
 #include <string_view>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/tr-strbuf.h>
+#include "tr-strbuf.h"
 
 #include "test-fixtures.h"
 

@@ -6,18 +6,21 @@
 #include <cstring> // strlen()
 // #include <unistd.h> // sync()
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/blocklist.h>
-#include <libtransmission/file.h>
-#include <libtransmission/net.h>
-#include <libtransmission/peer-socket.h>
-#include <libtransmission/session.h> // tr_session.tr_session.addressIsBlocked()
-#include <libtransmission/tr-strbuf.h>
+#include "blocklist.h"
+#include "file.h"
+#include "net.h"
+#include "peer-socket.h"
+#include "session.h" // tr_session.tr_session.addressIsBlocked()
+#include "tr-strbuf.h"
 
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 class BlocklistTest : public SessionTest
@@ -40,9 +43,24 @@ protected:
         "IPv6 example:2001:db8::-2001:db8:ffff:ffff:ffff:ffff:ffff:ffff\n"
         "Evilcorp:216.88.88.0-216.88.88.255\n";
 
+#if 0
+    void createFileWithContents(char const* path, char const* contents)
+    {
+        auto const dir = tr_sys_path_dirname(path);
+        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700);
+
+        auto const fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
+        blockingFileWrite(fd, contents, strlen(contents));
+        tr_sys_file_close(fd);
+
+        sync();
+    }
+
+#endif
+
     bool addressIsBlocked(char const* address_str)
     {
-        auto const addr = tr_address::from_string(address_str);
+        auto const addr = tr_address::fromString(address_str);
         return !addr || session_->addressIsBlocked(*addr);
     }
 };
@@ -123,4 +141,6 @@ TEST_F(BlocklistTest, updating)
     // cleanup
 }
 
-} // namespace libtransmission::test
+} // namespace test
+
+} // namespace libtransmission

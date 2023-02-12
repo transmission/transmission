@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © 2010-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -32,6 +32,10 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
 @property(nonatomic) CGFloat fViewTopMargin;
 @property(nonatomic) IBOutlet NSLayoutConstraint* fWebSeedTableTopConstraint;
 @property(nonatomic, readonly) NSArray<NSSortDescriptor*>* peerSortDescriptors;
+
+- (void)setupInfo;
+
+- (void)setWebSeedTableHidden:(BOOL)hide animate:(BOOL)animate;
 
 @end
 
@@ -187,8 +191,7 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
         }
         else
         {
-            connectedText = [NSString
-                localizedStringWithFormat:NSLocalizedString(@"%lu Connected", "Inspector -> Peers tab -> peers"), connected];
+            connectedText = [NSString stringWithFormat:NSLocalizedString(@"%lu Connected", "Inspector -> Peers tab -> peers"), connected];
         }
 
         if (connected > 0)
@@ -197,12 +200,12 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
             if (toUs > 0)
             {
                 [upDownComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"DL from %lu", "Inspector -> Peers tab -> peers"), toUs]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"DL from %lu", "Inspector -> Peers tab -> peers"), toUs]];
             }
             if (fromUs > 0)
             {
                 [upDownComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"UL to %lu", "Inspector -> Peers tab -> peers"), fromUs]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"UL to %lu", "Inspector -> Peers tab -> peers"), fromUs]];
             }
             if (upDownComponents.count > 0)
             {
@@ -212,38 +215,38 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
             NSMutableArray* fromComponents = [NSMutableArray arrayWithCapacity:7];
             if (tracker > 0)
             {
-                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu tracker", "Inspector -> Peers tab -> peers"),
-                                                                              tracker]];
+                [fromComponents
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu tracker", "Inspector -> Peers tab -> peers"), tracker]];
             }
             if (incoming > 0)
             {
-                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu incoming", "Inspector -> Peers tab -> peers"),
-                                                                              incoming]];
+                [fromComponents
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu incoming", "Inspector -> Peers tab -> peers"), incoming]];
             }
             if (cache > 0)
             {
                 [fromComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu cache", "Inspector -> Peers tab -> peers"), cache]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu cache", "Inspector -> Peers tab -> peers"), cache]];
             }
             if (lpd > 0)
             {
-                [fromComponents addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu local discovery", "Inspector -> Peers tab -> peers"),
-                                                                              lpd]];
+                [fromComponents
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu local discovery", "Inspector -> Peers tab -> peers"), lpd]];
             }
             if (pex > 0)
             {
                 [fromComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu PEX", "Inspector -> Peers tab -> peers"), pex]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu PEX", "Inspector -> Peers tab -> peers"), pex]];
             }
             if (dht > 0)
             {
                 [fromComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu DHT", "Inspector -> Peers tab -> peers"), dht]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu DHT", "Inspector -> Peers tab -> peers"), dht]];
             }
             if (ltep > 0)
             {
                 [fromComponents
-                    addObject:[NSString localizedStringWithFormat:NSLocalizedString(@"%lu LTEP", "Inspector -> Peers tab -> peers"), ltep]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu LTEP", "Inspector -> Peers tab -> peers"), ltep]];
             }
 
             connectedText = [connectedText stringByAppendingFormat:@"\n%@", [fromComponents componentsJoinedByString:@", "]];
@@ -545,14 +548,13 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
     }
     else
     {
-        [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                         usingBlock:^(Torrent* torrent, NSUInteger /*idx*/, BOOL* stop) {
-                                             if (torrent.webSeedCount > 0)
-                                             {
-                                                 hasWebSeeds = YES;
-                                                 *stop = YES;
-                                             }
-                                         }];
+        [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(Torrent* torrent, NSUInteger idx, BOOL* stop) {
+            if (torrent.webSeedCount > 0)
+            {
+                hasWebSeeds = YES;
+                *stop = YES;
+            }
+        }];
     }
 
     if (!hasWebSeeds)

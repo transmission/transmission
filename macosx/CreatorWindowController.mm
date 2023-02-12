@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © 2007-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -53,6 +53,12 @@ typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
 @property(nonatomic) BOOL fOpenWhenCreated;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
+
++ (NSURL*)chooseFile;
+
+- (void)updateLocationField;
+- (void)createReal;
+- (void)checkProgress;
 
 @end
 
@@ -182,7 +188,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     {
         NSUInteger const count = self.fBuilder->fileCount();
         NSString* const fileString = count != 1 ?
-            [NSString localizedStringWithFormat:NSLocalizedString(@"%lu files", "Create torrent -> info"), count] :
+            [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Create torrent -> info"), count] :
             NSLocalizedString(@"1 file", "Create torrent -> info");
         status_string = [NSString stringWithFormat:@"%@, %@", fileString, status_string];
     }
@@ -360,7 +366,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (IBAction)incrementOrDecrementPieceSize:(id)sender
 {
-    uint32_t const piece_size = 1U << [(NSStepper*)sender intValue];
+    auto const piece_size = static_cast<uint32_t>(pow(2.0, [sender intValue]));
 
     if (self.fBuilder->setPieceSize(piece_size))
     {
@@ -682,7 +688,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         alert.alertStyle = NSAlertStyleWarning;
 
         alert.informativeText = [NSString stringWithFormat:@"%s (%d)", error->message, error->code];
-        [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse /*returnCode*/) {
+        [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
             [self.window close];
         }];
         tr_error_free(error);

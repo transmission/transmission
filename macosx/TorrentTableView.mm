@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -8,12 +8,10 @@
 #import "Controller.h"
 #import "FileListNode.h"
 #import "InfoOptionsViewController.h"
-#import "NSKeyedUnarchiverAdditions.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 #import "TorrentCell.h"
 #import "TorrentGroup.h"
-#import "GroupTextCell.h"
 
 CGFloat const kGroupSeparatorHeight = 18.0;
 
@@ -39,7 +37,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) IBOutlet Controller* fController;
 
 @property(nonatomic) TorrentCell* fTorrentCell;
-@property(nonatomic) GroupTextCell* fGroupTextCell;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
@@ -64,6 +61,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) BOOL fActionPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 
+- (BOOL)pointInGroupStatusRect:(NSPoint)point;
+
+- (void)setGroupStatusColumns;
+
 @end
 
 @implementation TorrentTableView
@@ -75,7 +76,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         _fDefaults = NSUserDefaults.standardUserDefaults;
 
         _fTorrentCell = [[TorrentCell alloc] init];
-        _fGroupTextCell = [[GroupTextCell alloc] init];
 
         NSData* groupData;
         if ((groupData = [_fDefaults dataForKey:@"CollapsedGroupIndexes"]))
@@ -84,7 +84,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         }
         else if ((groupData = [_fDefaults dataForKey:@"CollapsedGroups"])) //handle old groups
         {
-            _fCollapsedGroups = [[NSKeyedUnarchiver deprecatedUnarchiveObjectWithData:groupData] mutableCopy];
+            _fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData:groupData] mutableCopy];
             [_fDefaults removeObjectForKey:@"CollapsedGroups"];
             [self saveCollapsedGroups];
         }
@@ -123,9 +123,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     //set group columns to show ratio, needs to be in awakeFromNib to size columns correctly
     [self setGroupStatusColumns];
 
-    //disable highlight color and set manually in drawRow
-    [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
-
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setNeedsDisplay) name:@"RefreshTorrentTable" object:nil];
 }
 
@@ -156,15 +153,12 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)saveCollapsedGroups
 {
-    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups requiringSecureCoding:YES error:nil]
-                       forKey:@"CollapsedGroupIndexes"];
+    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups] forKey:@"CollapsedGroupIndexes"];
 }
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
 {
-    //return no and style the groupItem cell manually in willDisplayCell
-    //otherwise we get unwanted padding before each group header
-    return NO;
+    return ![item isKindOfClass:[Torrent class]];
 }
 
 - (CGFloat)outlineView:(NSOutlineView*)outlineView heightOfRowByItem:(id)item
@@ -181,16 +175,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
     else
     {
-        NSString* ident = tableColumn.identifier;
-        NSArray* imageColumns = @[ @"Color", @"DL Image", @"UL Image" ];
-        if (![imageColumns containsObject:ident])
-        {
-            return group ? self.fGroupTextCell : nil;
-        }
-        else
-        {
-            return group ? [tableColumn dataCellForRow:[self rowForItem:item]] : nil;
-        }
+        return group ? [tableColumn dataCellForRow:[self rowForItem:item]] : nil;
     }
 }
 
@@ -211,48 +196,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             torrentCell.hoverControl = (row == self.controlButtonHoverRow);
             torrentCell.hoverReveal = (row == self.revealButtonHoverRow);
             torrentCell.hoverAction = (row == self.actionButtonHoverRow);
-
-            // if cell is selected, set backgroundStyle
-            // then can provide alternate font color in TorrentCell - drawInteriorWithFrame
-            NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
-            if ([selectedRowIndexes containsIndex:row])
-            {
-                torrentCell.backgroundStyle = NSBackgroundStyleEmphasized;
-            }
         }
     }
-}
-
-//we override row highlighting because we are custom drawing the group rows
-//see isGroupItem
-- (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect
-{
-    NSColor* highlightColor = nil;
-
-    id item = [self itemAtRow:row];
-
-    //we only highlight torrent cells
-    if ([item isKindOfClass:[Torrent class]])
-    {
-        //use system highlight color when Transmission is active
-        if (self == [self.window firstResponder] && [self.window isMainWindow] && [self.window isKeyWindow])
-        {
-            highlightColor = [NSColor alternateSelectedControlColor];
-        }
-        else
-        {
-            highlightColor = [NSColor disabledControlTextColor];
-        }
-
-        NSIndexSet* selectedRowIndexes = [self selectedRowIndexes];
-        if ([selectedRowIndexes containsIndex:row])
-        {
-            [highlightColor setFill];
-            NSRectFill([self rectOfRow:row]);
-        }
-    }
-
-    [super drawRow:row clipRect:clipRect];
 }
 
 - (NSRect)frameOfCellAtColumn:(NSInteger)column row:(NSInteger)row
@@ -315,7 +260,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         }
         else
         {
-            return [NSString localizedStringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
+            return [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
         }
     }
     else
@@ -875,17 +820,17 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSMenuItem* item;
         if (menu.numberOfItems == 3)
         {
-            static NSArray<NSNumber*>* const speedLimitActionValues = @[ @50, @100, @250, @500, @1000, @2500, @5000, @10000 ];
+            NSInteger const speedLimitActionValue[] = { 50, 100, 250, 500, 1000, 2500, 5000, 10000, -1 };
 
-            for (NSNumber* i in speedLimitActionValues)
+            for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {
                 item = [[NSMenuItem alloc]
-                    initWithTitle:[NSString localizedStringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
-                                                                      i.integerValue]
+                    initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
+                                                             speedLimitActionValue[i]]
                            action:@selector(setQuickLimit:)
                     keyEquivalent:@""];
                 item.target = self;
-                item.representedObject = i;
+                item.representedObject = @(speedLimitActionValue[i]);
                 [menu addItem:item];
             }
         }
@@ -895,8 +840,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
         item = [menu itemWithTag:ActionMenuTagLimit];
         item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
-                                                         [self.fMenuTorrent speedLimit:upload]];
+        item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
+                                                [self.fMenuTorrent speedLimit:upload]];
 
         item = [menu itemWithTag:ActionMenuTagUnlimited];
         item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
@@ -906,15 +851,15 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         NSMenuItem* item;
         if (menu.numberOfItems == 4)
         {
-            static NSArray<NSNumber*>* const ratioLimitActionValue = @[ @0.25, @0.5, @0.75, @1.0, @1.5, @2.0, @3.0 ];
+            float const ratioLimitActionValue[] = { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, -1.0 };
 
-            for (NSNumber* i in ratioLimitActionValue)
+            for (NSInteger i = 0; ratioLimitActionValue[i] != -1.0; i++)
             {
-                item = [[NSMenuItem alloc] initWithTitle:[NSString localizedStringWithFormat:@"%.2f", i.floatValue]
+                item = [[NSMenuItem alloc] initWithTitle:[NSString localizedStringWithFormat:@"%.2f", ratioLimitActionValue[i]]
                                                   action:@selector(setQuickRatio:)
                                            keyEquivalent:@""];
                 item.target = self;
-                item.representedObject = i;
+                item.representedObject = @(ratioLimitActionValue[i]);
                 [menu addItem:item];
             }
         }

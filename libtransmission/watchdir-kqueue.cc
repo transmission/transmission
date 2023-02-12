@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © 2015-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -28,7 +28,6 @@
 #include "log.h"
 #include "tr-strbuf.h"
 #include "utils.h" // for _()
-#include "utils-ev.h"
 #include "watchdir-base.h"
 
 namespace libtransmission
@@ -52,7 +51,11 @@ public:
 
     ~KQueueWatchdir() override
     {
-        event_.reset();
+        if (event_ != nullptr)
+        {
+            event_del(event_);
+            event_free(event_);
+        }
 
         if (kq_ != -1)
         {
@@ -109,8 +112,8 @@ private:
         }
 
         // create libevent task for event descriptor
-        event_.reset(event_new(evbase, kq_, EV_READ | EV_ET | EV_PERSIST, &onKqueueEvent, this));
-        if (!event_)
+        event_ = event_new(evbase, kq_, EV_READ | EV_ET | EV_PERSIST, &onKqueueEvent, this);
+        if (event_ == nullptr)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -120,7 +123,7 @@ private:
             return;
         }
 
-        if (event_add(event_.get(), nullptr) == -1)
+        if (event_add(event_, nullptr) == -1)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
@@ -155,7 +158,7 @@ private:
 
     int kq_ = -1;
     int dirfd_ = -1;
-    libtransmission::evhelpers::event_unique_ptr event_;
+    struct event* event_ = nullptr;
 };
 
 } // namespace

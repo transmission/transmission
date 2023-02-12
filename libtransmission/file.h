@@ -33,6 +33,10 @@ using tr_sys_file_t = int;
 #define TR_BAD_SYS_FILE (-1)
 /** @brief Platform-specific directory descriptor type. */
 using tr_sys_dir_t = void*;
+/** @brief Platform-specific end-of-line sequence. */
+#define TR_NATIVE_EOL_STR "\n"
+/** @brief Platform-specific end-of-line sequence length. */
+#define TR_NATIVE_EOL_STR_SIZE 1
 
 #else
 
@@ -40,6 +44,8 @@ using tr_sys_file_t = HANDLE;
 #define TR_BAD_SYS_FILE INVALID_HANDLE_VALUE
 struct tr_sys_dir_win32;
 using tr_sys_dir_t = tr_sys_dir_win32*;
+#define TR_NATIVE_EOL_STR "\r\n"
+#define TR_NATIVE_EOL_STR_SIZE 2
 
 #endif
 
@@ -171,7 +177,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  */
 bool tr_sys_path_exists(char const* path, struct tr_error** error = nullptr);
 
-template<typename T, typename = decltype(&T::c_str)>
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
 bool tr_sys_path_exists(T const& path, struct tr_error** error = nullptr)
 {
     return tr_sys_path_exists(path.c_str(), error);
@@ -203,7 +209,11 @@ bool tr_sys_path_is_relative(std::string_view path);
  */
 bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error** error = nullptr);
 
-template<typename T, typename U, typename = decltype(&T::c_str), typename = decltype(&U::c_str)>
+template<
+    typename T,
+    typename U,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
 bool tr_sys_path_is_same(T const& path1, U const& path2, struct tr_error** error = nullptr)
 {
     return tr_sys_path_is_same(path1.c_str(), path2.c_str(), error);
@@ -231,7 +241,7 @@ std::string tr_sys_path_resolve(std::string_view path, struct tr_error** error =
  * @return base name (last path component; parent path removed) on success,
  *         or empty string otherwise (with `error` set accordingly).
  */
-std::string_view tr_sys_path_basename(std::string_view path, struct tr_error** error = nullptr);
+std::string tr_sys_path_basename(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `dirname()`.
@@ -257,7 +267,11 @@ std::string_view tr_sys_path_dirname(std::string_view path);
  */
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_error** error = nullptr);
 
-template<typename T, typename U, typename = decltype(&T::c_str), typename = decltype(&U::c_str)>
+template<
+    typename T,
+    typename U,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
 bool tr_sys_path_rename(T const& src_path, U const& dst_path, struct tr_error** error = nullptr)
 {
     return tr_sys_path_rename(src_path.c_str(), dst_path.c_str(), error);
@@ -276,7 +290,7 @@ bool tr_sys_path_rename(T const& src_path, U const& dst_path, struct tr_error** 
  */
 bool tr_sys_path_remove(char const* path, struct tr_error** error = nullptr);
 
-template<typename T, typename = decltype(&T::c_str)>
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
 bool tr_sys_path_remove(T const& path, struct tr_error** error = nullptr)
 {
     return tr_sys_path_remove(path.c_str(), error);
@@ -445,9 +459,6 @@ bool tr_sys_file_write_at(
  */
 bool tr_sys_file_flush(tr_sys_file_t handle, struct tr_error** error = nullptr);
 
-/* @brief Check whether `handle` may be flushed via `tr_sys_file_flush()`. */
-bool tr_sys_file_flush_possible(tr_sys_file_t handle, struct tr_error** error = nullptr);
-
 /**
  * @brief Portability wrapper for `ftruncate()`.
  *
@@ -553,7 +564,7 @@ std::string tr_sys_dir_get_current(struct tr_error** error = nullptr);
  */
 bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_error** error = nullptr);
 
-template<typename T, typename = decltype(&T::c_str)>
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
 bool tr_sys_dir_create(T const& path, int flags, int permissions, struct tr_error** error = nullptr)
 {
     return tr_sys_dir_create(path.c_str(), flags, permissions, error);

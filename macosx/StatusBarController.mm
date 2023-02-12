@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © 2011-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -166,8 +166,8 @@ typedef NS_ENUM(unsigned int, statusTag) {
     {
         if ([NSUserDefaults.standardUserDefaults boolForKey:@"CheckUpload"])
         {
-            uploadText = [NSString localizedStringWithFormat:NSLocalizedString(@"%ld KB/s", "Status Bar -> speed tooltip"),
-                                                             [NSUserDefaults.standardUserDefaults integerForKey:@"UploadLimit"]];
+            uploadText = [NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Status Bar -> speed tooltip"),
+                                                    [NSUserDefaults.standardUserDefaults integerForKey:@"UploadLimit"]];
         }
         else
         {
@@ -176,8 +176,8 @@ typedef NS_ENUM(unsigned int, statusTag) {
 
         if ([NSUserDefaults.standardUserDefaults boolForKey:@"CheckDownload"])
         {
-            downloadText = [NSString localizedStringWithFormat:NSLocalizedString(@"%ld KB/s", "Status Bar -> speed tooltip"),
-                                                               [NSUserDefaults.standardUserDefaults integerForKey:@"DownloadLimit"]];
+            downloadText = [NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Status Bar -> speed tooltip"),
+                                                      [NSUserDefaults.standardUserDefaults integerForKey:@"DownloadLimit"]];
         }
         else
         {

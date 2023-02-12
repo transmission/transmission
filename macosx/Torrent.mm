@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © 2006-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -45,8 +45,31 @@ static int const kETAIdleDisplaySec = 2 * 60;
 
 @property(nonatomic) BOOL fResumeOnWake;
 
-@property(nonatomic) dispatch_queue_t timeMachineExcludeQueue;
+@property(nonatomic) BOOL fTimeMachineExcludeInitialized;
 
+- (instancetype)initWithPath:(NSString*)path
+                        hash:(NSString*)hashString
+               torrentStruct:(tr_torrent*)torrentStruct
+               magnetAddress:(NSString*)magnetAddress
+                         lib:(tr_session*)lib
+                  groupValue:(NSNumber*)groupValue
+     removeWhenFinishSeeding:(NSNumber*)removeWhenFinishSeeding
+              downloadFolder:(NSString*)downloadFolder
+      legacyIncompleteFolder:(NSString*)incompleteFolder;
+
+- (void)createFileList;
+- (void)insertPathForComponents:(NSArray*)components
+             withComponentIndex:(NSUInteger)componentIndex
+                      forParent:(FileListNode*)parent
+                       fileSize:(uint64_t)size
+                          index:(NSInteger)index
+                       flatList:(NSMutableArray<FileListNode*>*)flatFileList;
+- (void)sortFileList:(NSMutableArray<FileListNode*>*)fileNodes;
+
+- (void)startQueue;
+- (void)ratioLimitHit;
+- (void)idleLimitHit;
+- (void)metadataRetrieved;
 - (void)renameFinished:(BOOL)success
                  nodes:(NSArray<FileListNode*>*)nodes
      completionHandler:(void (^)(BOOL))completionHandler
@@ -56,9 +79,11 @@ static int const kETAIdleDisplaySec = 2 * 60;
 @property(nonatomic, readonly) BOOL shouldShowEta;
 @property(nonatomic, readonly) NSString* etaString;
 
+- (void)setTimeMachineExclude:(BOOL)exclude;
+
 @end
 
-void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
+void renameCallback(tr_torrent* torrent, char const* oldPathCharString, char const* newNameCharString, int error, void* contextInfo)
 {
     @autoreleasepool
     {
@@ -239,18 +264,24 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 - (void)update
 {
     //get previous stalled value before update
-    BOOL const wasTransmitting = self.fStat != NULL && self.transmitting;
+    BOOL const wasStalled = self.fStat != NULL && self.stalled;
 
     self.fStat = tr_torrentStat(self.fHandle);
 
-    //make sure the "active" filter is updated when transmitting changes
-    if (wasTransmitting != self.transmitting)
+    //make sure the "active" filter is updated when stalled-ness changes
+    if (wasStalled != self.stalled)
     {
         //posting asynchronously with coalescing to prevent stack overflow on lots of torrents changing state at the same time
         [NSNotificationQueue.defaultQueue enqueueNotification:[NSNotification notificationWithName:@"UpdateQueue" object:self]
                                                  postingStyle:NSPostASAP
                                                  coalesceMask:NSNotificationCoalescingOnName
                                                      forModes:nil];
+    }
+
+    //when the torrent is first loaded, update the time machine exclusion
+    if (!self.fTimeMachineExcludeInitialized)
+    {
+        [self updateTimeMachineExclude];
     }
 }
 
@@ -274,18 +305,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 - (void)startTransfer
 {
     [self startTransferIgnoringQueue:NO];
-}
-
-- (void)startMagnetTransferAfterMetaDownload
-{
-    if ([self alertForRemainingDiskSpace])
-    {
-        tr_torrentStartMagnet(self.fHandle);
-        [self update];
-
-        //capture, specifically, stop-seeding settings changing to unlimited
-        [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
-    }
 }
 
 - (void)stopTransfer
@@ -850,12 +869,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         self.fStat->activity != TR_STATUS_SEED_WAIT;
 }
 
-- (BOOL)isTransmitting
-{
-    return self.fStat->peersGettingFromUs > 0 || self.fStat->peersSendingToUs > 0 || self.fStat->webseedsSendingToUs > 0 ||
-        self.fStat->activity == TR_STATUS_CHECK;
-}
-
 - (BOOL)isSeeding
 {
     return self.fStat->activity == TR_STATUS_SEED;
@@ -1113,11 +1126,11 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
             break;
 
         case TR_STATUS_DOWNLOAD:
-            if (NSUInteger const totalPeersCount = self.totalPeersConnected; totalPeersCount != 1)
+            if (self.totalPeersConnected != 1)
             {
-                string = [NSString localizedStringWithFormat:NSLocalizedString(@"Downloading from %lu of %lu peers", "Torrent -> status string"),
-                                                             self.peersSendingToUs,
-                                                             totalPeersCount];
+                string = [NSString stringWithFormat:NSLocalizedString(@"Downloading from %lu of %lu peers", "Torrent -> status string"),
+                                                    self.peersSendingToUs,
+                                                    self.totalPeersConnected];
             }
             else
             {
@@ -1128,14 +1141,13 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
             if (NSUInteger const webSeedCount = self.fStat->webseedsSendingToUs; webSeedCount > 0)
             {
                 NSString* webSeedString;
-                if (webSeedCount != 1)
+                if (webSeedCount == 1)
                 {
-                    webSeedString = [NSString
-                        localizedStringWithFormat:NSLocalizedString(@"%lu web seeds", "Torrent -> status string"), webSeedCount];
+                    webSeedString = NSLocalizedString(@"web seed", "Torrent -> status string");
                 }
                 else
                 {
-                    webSeedString = NSLocalizedString(@"web seed", "Torrent -> status string");
+                    webSeedString = [NSString stringWithFormat:NSLocalizedString(@"%lu web seeds", "Torrent -> status string"), webSeedCount];
                 }
 
                 string = [string stringByAppendingFormat:@" + %@", webSeedString];
@@ -1144,18 +1156,14 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
             break;
 
         case TR_STATUS_SEED:
-            if (NSUInteger const totalPeersCount = self.totalPeersConnected; totalPeersCount != 1)
+            if (self.totalPeersConnected != 1)
             {
-                string = [NSString localizedStringWithFormat:NSLocalizedString(@"Seeding to %1$lu of %2$lu peers", "Torrent -> status string"),
-                                                             self.peersGettingFromUs,
-                                                             totalPeersCount];
+                string = [NSString stringWithFormat:NSLocalizedString(@"Seeding to %1$lu of %2$lu peers", "Torrent -> status string"),
+                                                    self.peersGettingFromUs,
+                                                    self.totalPeersConnected];
             }
             else
             {
-                // TODO: "%lu of 1" vs "%u of 1" disparity
-                // - either change "Downloading from %lu of 1 peer" to "Downloading from %u of 1 peer"
-                // - or change "Seeding to %u of 1 peer" to "Seeding to %lu of 1 peer"
-                // then update Transifex accordingly
                 string = [NSString stringWithFormat:NSLocalizedString(@"Seeding to %u of 1 peer", "Torrent -> status string"),
                                                     (unsigned int)self.peersGettingFromUs];
             }
@@ -1495,7 +1503,10 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 {
     NSUInteger count = indexSet.count;
     tr_file_index_t* files = static_cast<tr_file_index_t*>(malloc(count * sizeof(tr_file_index_t)));
-    [indexSet getIndexes:files maxCount:count inIndexRange:nil];
+    for (NSUInteger index = indexSet.firstIndex, i = 0; index != NSNotFound; index = [indexSet indexGreaterThanIndex:index], i++)
+    {
+        files[i] = index;
+    }
 
     tr_torrentSetFileDLs(self.fHandle, files, count, state != NSControlStateValueOff);
     free(files);
@@ -1775,9 +1786,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
                                                name:@"GroupValueRemoved"
                                              object:nil];
 
-    _timeMachineExcludeQueue = dispatch_queue_create("updateTimeMachineExclude", DISPATCH_QUEUE_CONCURRENT);
+    _fTimeMachineExcludeInitialized = NO;
     [self update];
-    [self updateTimeMachineExclude];
 
     return self;
 }
@@ -1797,14 +1807,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         {
             auto const file = tr_torrentFile(self.fHandle, i);
 
-            NSString* fullPath = [NSString convertedStringFromCString:file.name];
+            NSString* fullPath = @(file.name);
             NSArray* pathComponents = fullPath.pathComponents;
-            while (pathComponents.count <= 1)
-            {
-                // file.name isn't a path: append an arbitrary empty component until we have two components.
-                // Invalid filenames and duplicate filenames don't need to be handled here.
-                pathComponents = [pathComponents arrayByAddingObject:@""];
-            }
 
             if (!tempNode)
             {
@@ -1851,7 +1855,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     if (isFolder)
     {
         [parent.children enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                          usingBlock:^(FileListNode* searchNode, NSUInteger /*idx*/, BOOL* stop) {
+                                          usingBlock:^(FileListNode* searchNode, NSUInteger idx, BOOL* stop) {
                                               if ([searchNode.name isEqualToString:name] && searchNode.isFolder)
                                               {
                                                   node = searchNode;
@@ -1896,11 +1900,9 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
                                                                   selector:@selector(localizedStandardCompare:)];
     [fileNodes sortUsingDescriptors:@[ descriptor ]];
 
-    [fileNodes enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(FileListNode* node, NSUInteger /*idx*/, BOOL* /*stop*/) {
+    [fileNodes enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(FileListNode* node, NSUInteger idx, BOOL* stop) {
         if (node.isFolder)
-        {
             [self sortFileList:node.children];
-        }
     }];
 }
 
@@ -2007,7 +2009,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
             if (node.isFolder)
             {
                 [node.children enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                usingBlock:^(FileListNode* childNode, NSUInteger /*idx*/, BOOL* /*stop*/) {
+                                                usingBlock:^(FileListNode* childNode, NSUInteger idx, BOOL* stop) {
                                                     weakUpdateNodeAndChildrenForRename(childNode);
                                                 }];
             }
@@ -2017,7 +2019,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         {
             nodes = self.flatFileList;
         }
-        [nodes enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(FileListNode* node, NSUInteger /*idx*/, BOOL* /*stop*/) {
+        [nodes enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(FileListNode* node, NSUInteger idx, BOOL* stop) {
             updateNodeAndChildrenForRename(node);
         }];
 
@@ -2066,16 +2068,20 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (NSString*)etaString
 {
-    time_t eta = self.fStat->eta;
-    // if there's a regular ETA, the torrent isn't idle
-    BOOL fromIdle = NO;
-    if (eta == TR_ETA_NOT_AVAIL || eta == TR_ETA_UNKNOWN)
+    NSInteger eta;
+    BOOL fromIdle;
+    //don't check for both, since if there's a regular ETA, the torrent isn't idle so it's meaningless
+    if (self.fStat->eta != TR_ETA_NOT_AVAIL && self.fStat->eta != TR_ETA_UNKNOWN)
+    {
+        eta = self.fStat->eta;
+        fromIdle = NO;
+    }
+    else if (self.fStat->etaIdle != TR_ETA_NOT_AVAIL && self.fStat->etaIdle < kETAIdleDisplaySec)
     {
         eta = self.fStat->etaIdle;
         fromIdle = YES;
     }
-    // Foundation undocumented behavior: values above INT_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451)
-    if (eta < 0 || eta > INT_MAX || (fromIdle && eta >= kETAIdleDisplaySec))
+    else
     {
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
     }
@@ -2089,8 +2095,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         formatter.collapsesLargestUnit = YES;
         formatter.includesTimeRemainingPhrase = YES;
     });
-    // the duration of months being variable, setting the reference date to now (instead of 00:00:00 UTC on 1 January 2001)
-    formatter.referenceDate = NSDate.date;
     NSString* idleString = [formatter stringFromTimeInterval:eta];
 
     if (fromIdle)
@@ -2106,10 +2110,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     NSString* path;
     if ((path = self.dataLocation))
     {
-        dispatch_async(_timeMachineExcludeQueue, ^{
-            CFURLRef url = (__bridge CFURLRef)[NSURL fileURLWithPath:path];
-            CSBackupSetItemExcluded(url, exclude, false);
-        });
+        CSBackupSetItemExcluded((__bridge CFURLRef)[NSURL fileURLWithPath:path], exclude, false);
+        self.fTimeMachineExcludeInitialized = YES;
     }
 }
 

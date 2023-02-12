@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Mnemosyne LLC.
+// This file Copyright © 2005-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -23,7 +23,7 @@ struct tr_error;
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
 public:
-    [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return std::empty(files_);
     }
@@ -32,7 +32,7 @@ public:
 
     // Helper function wrapper around parseBenc().
     // If you're looping through several files, passing in a non-nullptr
-    // `contents` can reduce the number of memory allocations needed to
+    // `buffer` can reduce the number of memory allocations needed to
     // load multiple files.
     bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error** error = nullptr);
 
@@ -42,15 +42,15 @@ public:
     {
         return files_;
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
+    [[nodiscard]] auto fileCount() const noexcept
     {
         return files().fileCount();
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const
+    [[nodiscard]] auto fileSize(tr_file_index_t i) const
     {
         return files().fileSize(i);
     }
-    [[nodiscard]] TR_CONSTEXPR20 auto const& fileSubpath(tr_file_index_t i) const
+    [[nodiscard]] auto const& fileSubpath(tr_file_index_t i) const
     {
         return files().path(i);
     }
@@ -71,15 +71,15 @@ public:
     {
         return blockInfo().blockCount();
     }
-    [[nodiscard]] constexpr auto byteLoc(uint64_t nth_byte) const noexcept
+    [[nodiscard]] constexpr auto byteLoc(uint64_t nth_byte) const
     {
         return blockInfo().byteLoc(nth_byte);
     }
-    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const noexcept
+    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const
     {
         return blockInfo().blockLoc(block);
     }
-    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
+    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
     {
         return blockInfo().pieceLoc(piece, offset, length);
     }
@@ -87,7 +87,7 @@ public:
     {
         return blockInfo().blockSize(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
     {
         return blockInfo().blockSpanForPiece(piece);
     }
@@ -128,12 +128,9 @@ public:
         return is_private_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const
-    {
-        return pieces_[piece];
-    }
+    [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
-    [[nodiscard]] TR_CONSTEXPR20 bool hasV1Metadata() const noexcept
+    [[nodiscard]] bool hasV1Metadata() const noexcept
     {
         // need 'pieces' field and 'files' or 'length'
         // TODO check for 'files' or 'length'
@@ -216,7 +213,7 @@ private:
         BasenameFormat format,
         std::string_view suffix);
 
-    [[nodiscard]] auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
         return makeFilename(dirname, name(), infoHashString(), format, suffix);
     }

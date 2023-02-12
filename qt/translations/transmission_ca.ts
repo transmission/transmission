@@ -505,17 +505,17 @@
         <translation>Respecta els &amp;límits globals</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+7"/>
         <source>Limit &amp;download speed:</source>
         <translation>Límit de la velocitat de baixa&amp;da:</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Límit de la velocitat de p&amp;ujada:</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+20"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;Prioritat del torrent:</translation>
     </message>
@@ -550,27 +550,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>Baixa</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-257"/>
+        <location line="+255"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>Normal</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>Mescla</translation>
     </message>
@@ -606,7 +606,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
         <translation>Marca els seleccionats</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>Ordena per la &amp;cua</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>Límit de la velocitat de baixada</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Obre un torrent</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Límits de velocitat</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Error de xarxa</translation>
     </message>
@@ -1678,7 +1678,7 @@ Per afegir un altre URL principal, afegiu-lo després d&apos;una línia en blanc
         <translation>&amp;Als dies:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
         <translation>Cada dia</translation>
     </message>
@@ -2224,7 +2224,7 @@ Per afegir un altre URL principal, afegiu-lo després d&apos;una línia en blanc
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Error en reanomenar el camí</translation>
     </message>
@@ -2419,7 +2419,7 @@ Per afegir un altre URL principal, afegiu-lo després d&apos;una línia en blanc
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Transferència amb magnet - s&apos;estan rebent les metadades (%1%)</translation>

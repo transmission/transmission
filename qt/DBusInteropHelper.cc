@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © 2015-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -39,13 +39,14 @@ void DBusInteropHelper::registerObject(QObject* parent)
         return;
     }
 
-    if (auto const service_name = QStringLiteral("com.transmissionbt.Transmission"); !bus.registerService(service_name))
+    auto const service_name = QStringLiteral("com.transmissionbt.Transmission");
+    if (!bus.registerService(service_name))
     {
         qWarning() << "couldn't register" << qPrintable(service_name);
     }
 
-    if (auto const object_path = QStringLiteral("/com/transmissionbt/Transmission");
-        !bus.registerObject(object_path, new InteropObject(parent), QDBusConnection::ExportAllSlots))
+    auto const object_path = QStringLiteral("/com/transmissionbt/Transmission");
+    if (!bus.registerObject(object_path, new InteropObject(parent), QDBusConnection::ExportAllSlots))
     {
         qWarning() << "couldn't register" << qPrintable(object_path);
     }

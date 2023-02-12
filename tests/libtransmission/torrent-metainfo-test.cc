@@ -6,20 +6,22 @@
 #include <array>
 #include <string_view>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/error.h>
-#include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/torrent.h>
-#include <libtransmission/tr-strbuf.h>
-#include <libtransmission/utils.h>
+#include "crypto-utils.h"
+#include "error.h"
+#include "torrent-metainfo.h"
+#include "torrent.h"
+#include "tr-strbuf.h"
+#include "utils.h"
 
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 using TorrentMetainfoTest = SessionTest;
@@ -99,9 +101,9 @@ TEST_F(TorrentMetainfoTest, parseBencFuzz)
 {
     auto buf = std::vector<char>{};
 
-    for (size_t i = 0; i < 100000U; ++i)
+    for (size_t i = 0; i < 100000; ++i)
     {
-        buf.resize(tr_rand_int(1024U));
+        buf.resize(tr_rand_int(1024));
         tr_rand_buffer(std::data(buf), std::size(buf));
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
@@ -259,4 +261,5 @@ TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
     EXPECT_FALSE(tm.parseBenc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

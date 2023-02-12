@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © 2021-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -57,7 +57,7 @@ public:
 
     [[nodiscard]] file_offset_t fileOffset(uint64_t offset) const;
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t size() const
+    [[nodiscard]] size_t size() const
     {
         return std::size(file_pieces_);
     }
@@ -145,7 +145,7 @@ public:
     void set(tr_file_index_t file, bool wanted);
     void set(tr_file_index_t const* files, size_t n, bool wanted);
 
-    [[nodiscard]] TR_CONSTEXPR20 bool fileWanted(tr_file_index_t file) const
+    [[nodiscard]] bool fileWanted(tr_file_index_t file) const
     {
         return wanted_.test(file);
     }

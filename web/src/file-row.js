@@ -1,15 +1,10 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
 import { Formatter } from './formatter.js';
-import {
-  addCheckedClass,
-  makeUUID,
-  setEnabled,
-  setTextContent,
-} from './utils.js';
+import { makeUUID, setChecked, setEnabled, setTextContent } from './utils.js';
 
 export class FileRow extends EventTarget {
   isDone() {
@@ -53,11 +48,11 @@ export class FileRow extends EventTarget {
       have += file.bytesCompleted;
       size += file.length;
       wanted |= file.wanted;
-      switch (file.priority.toString()) {
-        case '-1':
+      switch (file.priority) {
+        case -1:
           low = true;
           break;
-        case '1':
+        case 1:
           high = true;
           break;
         default:
@@ -66,9 +61,9 @@ export class FileRow extends EventTarget {
       }
     }
 
-    addCheckedClass(this.elements.priority_low_button, low);
-    addCheckedClass(this.elements.priority_normal_button, normal);
-    addCheckedClass(this.elements.priority_high_button, high);
+    setChecked(this.elements.priority_low_button, low);
+    setChecked(this.elements.priority_normal_button, normal);
+    setChecked(this.elements.priority_high_button, high);
 
     if (this.fields.have !== have || this.fields.size !== size) {
       this.fields.have = have;
@@ -137,7 +132,7 @@ export class FileRow extends EventTarget {
 
     e = document.createElement('input');
     e.type = 'radio';
-    e.value = '-1';
+    e.value = -1;
     e.className = 'low';
     e.title = 'Low Priority';
     e.addEventListener('click', priority_click_listener);
@@ -146,7 +141,7 @@ export class FileRow extends EventTarget {
 
     e = document.createElement('input');
     e.type = 'radio';
-    e.value = '0';
+    e.value = 0;
     e.className = 'normal';
     e.title = 'Normal Priority';
     e.addEventListener('click', priority_click_listener);
@@ -155,7 +150,7 @@ export class FileRow extends EventTarget {
 
     e = document.createElement('input');
     e.type = 'radio';
-    e.value = '1';
+    e.value = 1;
     e.title = 'High Priority';
     e.className = 'high';
     e.addEventListener('click', priority_click_listener);

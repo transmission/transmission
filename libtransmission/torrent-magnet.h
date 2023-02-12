@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © 2012-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -25,7 +25,7 @@ inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
 
 std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece);
 
-void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len);
+void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, int len);
 
 std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now);
 

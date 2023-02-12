@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,11 +9,20 @@
 #error only libtransmission should #include this header.
 #endif
 
+/**
+***
+**/
+
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
+#include <ctime>
 #include <deque>
 #include <memory>
-#include <utility> // std::pair
+#include <optional>
+#include <string>
+#include <utility> // std::make_pair
+
+#include <event2/buffer.h>
 
 #include "transmission.h"
 
@@ -21,15 +30,17 @@
 #include "net.h" // tr_address
 #include "peer-mse.h"
 #include "peer-socket.h"
+#include "tr-assert.h"
 #include "tr-buffer.h"
-#include "utils-ev.h"
 
+class tr_peerIo;
+struct tr_bandwidth;
 struct struct_utp_context;
 
-namespace libtransmission::test
-{
-class HandshakeTest;
-} // namespace libtransmission::test
+/**
+ * @addtogroup networked_io Networked IO
+ * @{
+ */
 
 enum ReadState
 {
@@ -38,150 +49,161 @@ enum ReadState
     READ_ERR
 };
 
+using tr_can_read_cb = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
+
+using tr_did_write_cb = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
+
+using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
+
+auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
+
+struct evbuffer_deleter
+{
+    void operator()(struct evbuffer* buf) const noexcept
+    {
+        evbuffer_free(buf);
+    }
+};
+
+using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
+
+namespace libtransmission::test
+{
+
+class HandshakeTest;
+
+} // namespace libtransmission::test
+
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 {
     using DH = tr_message_stream_encryption::DH;
     using Filter = tr_message_stream_encryption::Filter;
-    using CanRead = ReadState (*)(tr_peerIo* io, void* user_data, size_t* setme_piece_byte_count);
-    using DidWrite = void (*)(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void* userData);
-    using GotError = void (*)(tr_peerIo* io, tr_error const& error, void* userData);
 
 public:
-    tr_peerIo(
-        tr_session* session_in,
-        tr_sha1_digest_t const* info_hash,
-        bool is_incoming,
-        bool is_seed,
-        tr_bandwidth* parent_bandwidth);
-
     ~tr_peerIo();
 
-    static std::shared_ptr<tr_peerIo> new_outgoing(
+    // TODO: 8 constructor args is too many; maybe a builder object?
+    static std::shared_ptr<tr_peerIo> newOutgoing(
         tr_session* session,
         tr_bandwidth* parent,
-        tr_address const& addr,
+        struct tr_address const* addr,
         tr_port port,
-        tr_sha1_digest_t const& info_hash,
+        time_t current_time,
+        tr_sha1_digest_t const& torrent_hash,
         bool is_seed,
         bool utp);
 
-    static std::shared_ptr<tr_peerIo> new_incoming(tr_session* session, tr_bandwidth* parent, tr_peer_socket socket);
-
-    constexpr void set_callbacks(CanRead can_read, DidWrite did_write, GotError got_error, void* user_data)
-    {
-        can_read_ = can_read;
-        did_write_ = did_write;
-        got_error_ = got_error;
-        user_data_ = user_data;
-    }
-
-    void clear_callbacks()
-    {
-        set_callbacks(nullptr, nullptr, nullptr, nullptr);
-    }
-
-    void set_socket(tr_peer_socket);
-
-    [[nodiscard]] constexpr auto is_utp() const noexcept
-    {
-        return socket_.is_utp();
-    }
+    static std::shared_ptr<tr_peerIo> newIncoming(
+        tr_session* session,
+        tr_bandwidth* parent,
+        struct tr_address const* addr,
+        tr_port port,
+        time_t current_time,
+        struct tr_peer_socket const socket);
 
     void clear();
 
-    [[nodiscard]] bool reconnect();
+    void readBytes(void* bytes, size_t byte_count);
 
-    void set_enabled(tr_direction dir, bool is_enabled);
-
-    ///
-
-    [[nodiscard]] TR_CONSTEXPR20 auto read_buffer_size() const noexcept
+    void readUint8(uint8_t* setme)
     {
-        return std::size(inbuf_);
+        readBytes(setme, sizeof(uint8_t));
+    }
+
+    void readUint16(uint16_t* setme);
+    void readUint32(uint32_t* setme);
+
+    int reconnect();
+
+    void setEnabled(tr_direction dir, bool is_enabled);
+
+    [[nodiscard]] constexpr tr_address const& address() const noexcept
+    {
+        return addr_;
+    }
+
+    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
+    {
+        return std::make_pair(addr_, port_);
+    }
+
+    std::string addrStr() const;
+
+    void readBufferDrain(size_t byte_count);
+
+    [[nodiscard]] auto readBufferSize() const noexcept
+    {
+        return std::size(inbuf);
     }
 
     template<typename T>
-    [[nodiscard]] auto read_buffer_starts_with(T const& t) const noexcept
+    [[nodiscard]] auto readBufferStartsWith(T const& t) const noexcept
     {
-        return inbuf_.starts_with(t);
+        return inbuf.startsWith(t);
     }
 
-    void read_buffer_drain(size_t byte_count);
+    void readBufferAdd(void const* data, size_t n_bytes);
 
-    void read_bytes(void* bytes, size_t byte_count);
+    ssize_t flushOutgoingProtocolMsgs();
+    ssize_t flush(tr_direction dir, size_t byte_limit);
 
-    void read_uint8(uint8_t* setme)
-    {
-        read_bytes(setme, sizeof(uint8_t));
-    }
-
-    void read_uint16(uint16_t* setme);
-
-    void read_uint32(uint32_t* setme);
-
-    ///
-
-    [[nodiscard]] size_t get_write_buffer_space(uint64_t now) const noexcept;
-
-    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data);
+    void writeBytes(void const* bytes, size_t n_bytes, bool is_piece_data);
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
     void write(libtransmission::Buffer& buf, bool is_piece_data);
 
-    size_t flush_outgoing_protocol_msgs();
+    size_t getWriteBufferSpace(uint64_t now) const;
 
-    size_t flush(tr_direction dir, size_t byte_limit);
-
-    ///
-
-    [[nodiscard]] auto has_bandwidth_left(tr_direction dir) const noexcept
+    [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
         return bandwidth_.clamp(dir, 1024) > 0;
     }
 
-    [[nodiscard]] auto get_piece_speed_bytes_per_second(uint64_t now, tr_direction dir) const noexcept
+    [[nodiscard]] auto getPieceSpeedBytesPerSecond(uint64_t now, tr_direction dir) noexcept
     {
         return bandwidth_.getPieceSpeedBytesPerSecond(now, dir);
     }
 
-    ///
-
-    [[nodiscard]] constexpr auto supports_fext() const noexcept
-    {
-        return fast_extension_supported_;
-    }
-
-    constexpr void set_supports_fext(bool flag) noexcept
+    constexpr void enableFEXT(bool flag) noexcept
     {
         fast_extension_supported_ = flag;
     }
 
-    ///
-
-    [[nodiscard]] constexpr auto supports_ltep() const noexcept
+    [[nodiscard]] constexpr auto supportsFEXT() const noexcept
     {
-        return extended_protocol_supported_;
+        return fast_extension_supported_;
     }
 
-    constexpr void set_supports_ltep(bool flag) noexcept
+    constexpr void enableLTEP(bool flag) noexcept
     {
         extended_protocol_supported_ = flag;
     }
 
-    ///
-
-    [[nodiscard]] constexpr auto supports_dht() const noexcept
+    [[nodiscard]] constexpr auto supportsLTEP() const noexcept
     {
-        return dht_supported_;
+        return extended_protocol_supported_;
     }
 
-    constexpr void set_supports_dht(bool flag) noexcept
+    constexpr void enableDHT(bool flag) noexcept
     {
         dht_supported_ = flag;
     }
 
-    ///
+    [[nodiscard]] constexpr auto supportsDHT() const noexcept
+    {
+        return dht_supported_;
+    }
+
+    [[nodiscard]] constexpr auto supportsUTP() const noexcept
+    {
+        return utp_supported_;
+    }
+
+    [[nodiscard]] constexpr auto isSeed() const noexcept
+    {
+        return is_seed_;
+    }
 
     [[nodiscard]] constexpr auto const& bandwidth() const noexcept
     {
@@ -193,169 +215,147 @@ public:
         return bandwidth_;
     }
 
-    void set_bandwidth(tr_bandwidth* parent)
+    void setParent(tr_bandwidth* parent)
     {
         bandwidth_.setParent(parent);
     }
 
-    ///
-
-    [[nodiscard]] constexpr auto const& torrent_hash() const noexcept
-    {
-        return info_hash_;
-    }
-
-    void set_torrent_hash(tr_sha1_digest_t const& hash) noexcept
-    {
-        info_hash_ = hash;
-    }
-
-    ///
-
-    [[nodiscard]] constexpr auto priority() const noexcept
-    {
-        return priority_;
-    }
-
-    constexpr void set_priority(tr_priority_t priority)
-    {
-        priority_ = priority;
-    }
-
-    ///
-
-    [[nodiscard]] constexpr auto supports_utp() const noexcept
-    {
-        return utp_supported_;
-    }
-
-    [[nodiscard]] constexpr auto is_incoming() const noexcept
+    [[nodiscard]] constexpr auto isIncoming() const noexcept
     {
         return is_incoming_;
     }
 
-    [[nodiscard]] constexpr auto const& address() const noexcept
+    void setTorrentHash(tr_sha1_digest_t hash) noexcept
     {
-        return socket_.address();
+        torrent_hash_ = hash;
     }
 
-    [[nodiscard]] constexpr auto socket_address() const noexcept
+    [[nodiscard]] constexpr auto const& torrentHash() const noexcept
     {
-        return socket_.socketAddress();
+        return torrent_hash_;
     }
 
-    [[nodiscard]] auto display_name() const
+    void setCallbacks(tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* user_data);
+
+    struct tr_peer_socket socket = {};
+
+    tr_session* const session;
+
+    time_t const time_created;
+
+    tr_can_read_cb canRead = nullptr;
+    tr_did_write_cb didWrite = nullptr;
+    tr_net_error_cb gotError = nullptr;
+    void* userData = nullptr;
+
+    libtransmission::Buffer inbuf;
+    libtransmission::Buffer outbuf;
+
+    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info;
+
+    struct event* event_read = nullptr;
+    struct event* event_write = nullptr;
+
+    short int pendingEvents = 0;
+
+    tr_priority_t priority = TR_PRI_NORMAL;
+
+    bool utp_supported_ = false;
+
+    void decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        return socket_.display_name();
-    }
-
-    ///
-
-    [[nodiscard]] constexpr auto is_encrypted() const noexcept
-    {
-        return filter_.is_active();
-    }
-
-    void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
-    {
-        filter_.decryptInit(is_incoming, dh, info_hash);
-    }
-
-    void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
-    {
-        filter_.encryptInit(is_incoming, dh, info_hash);
-    }
-
-    ///
-
-    static void utp_init(struct_utp_context* ctx);
-
-private:
-    static constexpr auto RcvBuf = size_t{ 256 * 1024 };
-
-    friend class libtransmission::test::HandshakeTest;
-
-    [[nodiscard]] constexpr auto is_seed() const noexcept
-    {
-        return is_seed_;
-    }
-
-    void call_error_callback(tr_error const& error)
-    {
-        if (got_error_ != nullptr)
-        {
-            got_error_(this, error, user_data_);
-        }
+        filter().decryptInit(is_incoming, dh, info_hash);
     }
 
     void decrypt(size_t buflen, void* buf)
     {
-        filter_.decrypt(buflen, buf);
+        filter().decrypt(buflen, buf);
+    }
+
+    void encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+    {
+        filter().encryptInit(is_incoming, dh, info_hash);
     }
 
     void encrypt(size_t buflen, void* buf)
     {
-        filter_.encrypt(buflen, buf);
+        filter().encrypt(buflen, buf);
     }
 
-    void on_utp_state_change(int new_state);
-    void on_utp_error(int errcode);
+    [[nodiscard]] bool isEncrypted() const noexcept
+    {
+        return filter_.get() != nullptr;
+    }
 
-    void close();
+    static void utpInit(struct_utp_context* ctx);
 
-    static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio);
-    static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio);
-
-    void event_enable(short event);
-    void event_disable(short event);
-
-    void can_read_wrapper();
-    void did_write_wrapper(size_t bytes_transferred);
-
-    size_t try_read(size_t max);
-    size_t try_write(size_t max);
+private:
+    friend class libtransmission::test::HandshakeTest;
 
     // this is only public for testing purposes.
-    // production code should use new_outgoing() or new_incoming()
+    // production code should use newOutgoing() or newIncoming()
     static std::shared_ptr<tr_peerIo> create(
         tr_session* session,
         tr_bandwidth* parent,
-        tr_sha1_digest_t const* info_hash,
+        tr_address const* addr,
+        tr_port port,
+        time_t current_time,
+        tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
-        bool is_seed);
+        bool is_seed,
+        struct tr_peer_socket const socket);
 
-    Filter filter_;
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        tr_address const& addr,
+        tr_port port,
+        bool is_seed,
+        time_t current_time,
+        tr_bandwidth* parent_bandwidth)
+        : session{ session_in }
+        , time_created{ current_time }
+        , bandwidth_{ parent_bandwidth }
+        , addr_{ addr }
+        , port_{ port }
+        , is_seed_{ is_seed }
+        , is_incoming_{ is_incoming }
+    {
+        if (torrent_hash != nullptr)
+        {
+            torrent_hash_ = *torrent_hash;
+        }
+    }
 
-    std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
+    Filter& filter()
+    {
+        if (!filter_)
+        {
+            filter_ = std::make_unique<Filter>();
+        }
 
-    tr_peer_socket socket_ = {};
+        return *filter_;
+    }
 
     tr_bandwidth bandwidth_;
 
-    tr_sha1_digest_t info_hash_;
+    std::unique_ptr<tr_message_stream_encryption::Filter> filter_;
 
-    libtransmission::Buffer inbuf_;
-    libtransmission::Buffer outbuf_;
+    std::optional<tr_sha1_digest_t> torrent_hash_;
 
-    tr_session* const session_;
-
-    CanRead can_read_ = nullptr;
-    DidWrite did_write_ = nullptr;
-    GotError got_error_ = nullptr;
-    void* user_data_ = nullptr;
-
-    libtransmission::evhelpers::event_unique_ptr event_read_;
-    libtransmission::evhelpers::event_unique_ptr event_write_;
-
-    short int pending_events_ = 0;
-
-    tr_priority_t priority_ = TR_PRI_NORMAL;
+    tr_address const addr_;
+    tr_port const port_;
 
     bool const is_seed_;
     bool const is_incoming_;
 
-    bool utp_supported_ = false;
     bool dht_supported_ = false;
     bool extended_protocol_supported_ = false;
     bool fast_extension_supported_ = false;
 };
+
+constexpr bool tr_isPeerIo(tr_peerIo const* io)
+{
+    return io != nullptr && tr_address_is_valid(&io->address());
+}

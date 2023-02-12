@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © 2009-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -156,8 +156,9 @@ void FileTreeView::keyPressEvent(QKeyEvent* event)
 
 void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    if (auto const index = currentIndex();
-        !index.isValid() || index.column() == FileTreeModel::COL_WANTED || index.column() == FileTreeModel::COL_PRIORITY)
+    auto const index = currentIndex();
+
+    if (!index.isValid() || index.column() == FileTreeModel::COL_WANTED || index.column() == FileTreeModel::COL_PRIORITY)
     {
         return;
     }
@@ -172,7 +173,9 @@ void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 
 void FileTreeView::contextMenuEvent(QContextMenuEvent* event)
 {
-    if (auto const root_index = model_->index(0, 0); !root_index.isValid())
+    QModelIndex const root_index = model_->index(0, 0);
+
+    if (!root_index.isValid())
     {
         return;
     }

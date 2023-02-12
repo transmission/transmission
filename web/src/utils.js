@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -41,18 +41,6 @@ export const Utils = {
   },
 };
 
-function toggleClass(buttons, button, pages, page, callback) {
-  for (const element of buttons.children) {
-    element.classList.toggle('selected', element === button);
-  }
-  for (const element of pages.children) {
-    element.classList.toggle('hidden', element !== page);
-  }
-  if (callback) {
-    callback(page);
-  }
-}
-
 export function createTextualTabsContainer(id, tabs, callback) {
   const root = document.createElement('div');
   root.id = id;
@@ -79,9 +67,17 @@ export function createTextualTabsContainer(id, tabs, callback) {
     page.classList.add('hidden', 'tabs-page');
     pages.append(page);
 
-    button.addEventListener('click', () =>
-      toggleClass(buttons, button, pages, page, callback)
-    );
+    button.addEventListener('click', () => {
+      for (const element of buttons.children) {
+        element.classList.toggle('selected', element === button);
+      }
+      for (const element of pages.children) {
+        element.classList.toggle('hidden', element !== page);
+      }
+      if (callback) {
+        callback(page);
+      }
+    });
   }
 
   button_array[0].classList.add('selected');
@@ -118,9 +114,17 @@ export function createTabsContainer(id, tabs, callback) {
     page.classList.add('hidden', 'tabs-page');
     pages.append(page);
 
-    button.addEventListener('click', () =>
-      toggleClass(buttons, button, pages, page, callback)
-    );
+    button.addEventListener('click', () => {
+      for (const element of buttons.children) {
+        element.classList.toggle('selected', element === button);
+      }
+      for (const element of pages.children) {
+        element.classList.toggle('hidden', element !== page);
+      }
+      if (callback) {
+        callback(page);
+      }
+    });
   }
 
   button_array[0].classList.add('selected');
@@ -240,7 +244,7 @@ export function debounce(callback, wait = 100) {
     if (!timeout) {
       timeout = setTimeout(() => {
         timeout = null;
-        callback(...arguments_);
+        callback(arguments_);
       }, wait);
     }
   };
@@ -262,10 +266,6 @@ export function setEnabled(element, b) {
 }
 export function setChecked(element, b) {
   setOrDeleteAttribute(element, 'checked', b);
-}
-
-export function addCheckedClass(element, b) {
-  element.classList.toggle('checked', b);
 }
 
 function getBestMenuPos(r, bounds) {

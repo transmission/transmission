@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © 2007-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -30,6 +30,9 @@ typedef NS_ENUM(NSInteger, SegmentTag) {
 @property(nonatomic) IBOutlet NSWindow* groupRulesSheetWindow;
 @property(nonatomic, weak) IBOutlet NSPredicateEditor* ruleEditor;
 @property(nonatomic, weak) IBOutlet NSLayoutConstraint* ruleEditorHeightConstraint;
+
+- (void)updateSelectedGroup;
+- (void)refreshCustomLocationWithSingleGroup;
 
 @end
 
@@ -93,8 +96,7 @@ typedef NS_ENUM(NSInteger, SegmentTag) {
 - (BOOL)tableView:(NSTableView*)tableView writeRowsWithIndexes:(NSIndexSet*)rowIndexes toPasteboard:(NSPasteboard*)pboard
 {
     [pboard declareTypes:@[ kGroupTableViewDataType ] owner:self];
-    [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes requiringSecureCoding:YES error:nil]
-            forType:kGroupTableViewDataType];
+    [pboard setData:[NSKeyedArchiver archivedDataWithRootObject:rowIndexes] forType:kGroupTableViewDataType];
     return YES;
 }
 

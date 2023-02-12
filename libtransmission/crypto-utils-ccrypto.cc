@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © 2021-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -21,7 +21,9 @@
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
-// ---
+/***
+****
+***/
 
 namespace
 {
@@ -61,7 +63,7 @@ char const* ccrypto_error_to_str(CCCryptorStatus error_code)
     return "Unknown error";
 }
 
-void log_ccrypto_error(CCCryptorStatus error_code, char const* file, long line)
+void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
@@ -77,7 +79,7 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, long line)
     }
 }
 
-bool check_ccrypto_result(CCCryptorStatus result, char const* file, long line)
+bool check_ccrypto_result(CCCryptorStatus result, char const* file, int line)
 {
     bool const ret = result == kCCSuccess;
 
@@ -93,7 +95,9 @@ bool check_ccrypto_result(CCCryptorStatus result, char const* file, long line)
 
 } // namespace
 
-// ---
+/***
+****
+***/
 
 namespace
 {
@@ -115,14 +119,9 @@ public:
 
     void add(void const* data, size_t data_length) override
     {
-        static auto constexpr Max = static_cast<size_t>(std::numeric_limits<CC_LONG>::max());
-        auto const* sha_data = static_cast<uint8_t const*>(data);
-        while (data_length > 0)
+        if (data_length > 0U)
         {
-            auto const n_bytes = static_cast<CC_LONG>(std::min(data_length, Max));
-            CC_SHA1_Update(&handle_, sha_data, n_bytes);
-            data_length -= n_bytes;
-            sha_data += n_bytes;
+            CC_SHA1_Update(&handle_, data, data_length);
         }
     }
 
@@ -155,14 +154,9 @@ public:
 
     void add(void const* data, size_t data_length) override
     {
-        static auto constexpr Max = static_cast<size_t>(std::numeric_limits<CC_LONG>::max());
-        auto const* sha_data = static_cast<uint8_t const*>(data);
-        while (data_length > 0)
+        if (data_length > 0U)
         {
-            auto const n_bytes = static_cast<CC_LONG>(std::min(data_length, Max));
-            CC_SHA256_Update(&handle_, sha_data, n_bytes);
-            data_length -= n_bytes;
-            sha_data += n_bytes;
+            CC_SHA256_Update(&handle_, data, data_length);
         }
     }
 
@@ -190,9 +184,11 @@ std::unique_ptr<tr_sha256> tr_sha256::create()
     return std::make_unique<Sha256Impl>();
 }
 
-// ---
+/***
+****
+***/
 
-bool tr_rand_buffer_crypto(void* buffer, size_t length)
+bool tr_rand_buffer(void* buffer, size_t length)
 {
     if (length == 0)
     {

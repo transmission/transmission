@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -6,9 +6,10 @@
 #include <libtransmission/utils.h>
 
 #import "NSStringAdditions.h"
-#import "NSDataAdditions.h"
 
 @interface NSString (Private)
+
++ (NSString*)stringForFileSizeLion:(uint64_t)size showUnitUnless:(NSString*)notAllowedUnit unitsUsed:(NSString**)unitUsed;
 
 + (NSString*)stringForSpeed:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb;
 
@@ -26,6 +27,12 @@
     return [self stringByAppendingString:NSString.ellipsis];
 }
 
+#warning use localizedStringWithFormat: directly when 10.9-only and stringsdict translations are in place
++ (NSString*)formattedUInteger:(NSUInteger)value
+{
+    return [NSString localizedStringWithFormat:@"%lu", value];
+}
+
 // Maximum supported localization is 9.22 EB, which is the maximum supported filesystem size by macOS, 8 EiB.
 // https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/APFS_Guide/VolumeFormatComparison/VolumeFormatComparison.html
 + (NSString*)stringForFileSize:(uint64_t)size
@@ -39,7 +46,7 @@
 {
     NSByteCountFormatter* fileSizeFormatter = [[NSByteCountFormatter alloc] init];
 
-    NSString* fullSizeString = [fileSizeFormatter stringFromByteCount:fullSize];
+    NSString* fullString = [fileSizeFormatter stringFromByteCount:fullSize];
 
     //figure out the magnitude of the two, since we can't rely on comparing the units because of localization and pluralization issues (for example, "1 byte of 2 bytes")
     BOOL partialUnitsSame;
@@ -49,16 +56,16 @@
     }
     else
     {
-        auto const magnitudePartial = static_cast<unsigned int>(log(partialSize) / log(1000));
+        unsigned int const magnitudePartial = log(partialSize) / log(1000);
         // we have to catch 0 with a special case, so might as well avoid the math for all of magnitude 0
-        auto const magnitudeFull = static_cast<unsigned int>(fullSize < 1000 ? 0 : log(fullSize) / log(1000));
+        unsigned int const magnitudeFull = fullSize < 1000 ? 0 : log(fullSize) / log(1000);
         partialUnitsSame = magnitudePartial == magnitudeFull;
     }
 
     fileSizeFormatter.includesUnit = !partialUnitsSame;
-    NSString* partialSizeString = [fileSizeFormatter stringFromByteCount:partialSize];
+    NSString* partialString = [fileSizeFormatter stringFromByteCount:partialSize];
 
-    return [NSString stringWithFormat:NSLocalizedString(@"%@ of %@", "file size string"), partialSizeString, fullSizeString];
+    return [NSString stringWithFormat:NSLocalizedString(@"%@ of %@", "file size string"), partialString, fullString];
 }
 
 + (NSString*)stringForSpeed:(CGFloat)speed
@@ -77,12 +84,12 @@
 {
     //N/A is different than libtransmission's
 
-    if (static_cast<int>(ratio) == TR_RATIO_NA)
+    if ((int)ratio == TR_RATIO_NA)
     {
         return NSLocalizedString(@"N/A", "No Ratio");
     }
 
-    if (static_cast<int>(ratio) == TR_RATIO_INF)
+    if ((int)ratio == TR_RATIO_INF)
     {
         return @"\xE2\x88\x9E";
     }
@@ -135,28 +142,60 @@
     return components;
 }
 
-+ (NSString*)convertedStringFromCString:(nonnull char const*)bytes
-{
-    // UTF-8 encoding
-    NSString* fullPath = @(bytes);
-    if (fullPath)
-    {
-        return fullPath;
-    }
-    // autodetection of the encoding (#3434)
-    NSData* data = [NSData dataWithBytes:(void const*)bytes length:sizeof(unsigned char) * strlen(bytes)];
-    [NSString stringEncodingForData:data encodingOptions:nil convertedString:&fullPath usedLossyConversion:nil];
-    if (fullPath)
-    {
-        return fullPath;
-    }
-    // hexa encoding
-    return data.hexString;
-}
-
 @end
 
 @implementation NSString (Private)
+
++ (NSString*)stringForFileSizeLion:(uint64_t)size showUnitUnless:(NSString*)notAllowedUnit unitsUsed:(NSString**)unitUsed
+{
+    double convertedSize;
+    NSString* unit;
+    NSUInteger decimals;
+    if (size < pow(1000, 2))
+    {
+        convertedSize = size / 1000.0;
+        unit = NSLocalizedString(@"KB", "File size - kilobytes");
+        decimals = convertedSize >= 10.0 ? 0 : 1;
+    }
+    else if (size < pow(1000, 3))
+    {
+        convertedSize = size / powf(1000.0, 2);
+        unit = NSLocalizedString(@"MB", "File size - megabytes");
+        decimals = 1;
+    }
+    else if (size < pow(1000, 4))
+    {
+        convertedSize = size / powf(1000.0, 3);
+        unit = NSLocalizedString(@"GB", "File size - gigabytes");
+        decimals = 2;
+    }
+    else
+    {
+        convertedSize = size / powf(1000.0, 4);
+        unit = NSLocalizedString(@"TB", "File size - terabytes");
+        decimals = 2;
+    }
+
+    //match Finder's behavior
+    NSNumberFormatter* numberFormatter = [[NSNumberFormatter alloc] init];
+    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+    numberFormatter.minimumFractionDigits = 0;
+    numberFormatter.maximumFractionDigits = decimals;
+
+    NSString* fileSizeString = [numberFormatter stringFromNumber:@(convertedSize)];
+
+    if (!notAllowedUnit || ![unit isEqualToString:notAllowedUnit])
+    {
+        fileSizeString = [fileSizeString stringByAppendingFormat:@" %@", unit];
+    }
+
+    if (unitUsed)
+    {
+        *unitUsed = unit;
+    }
+
+    return fileSizeString;
+}
 
 + (NSString*)stringForSpeed:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb
 {

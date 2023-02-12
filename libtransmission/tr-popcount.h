@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,7 +11,6 @@
 #define TR_POPCNT_H
 
 #include <cstdint>
-#include <type_traits>
 
 /* Avoid defining irrelevant helpers that might interfere with other
  * preprocessor logic. */
@@ -59,7 +58,7 @@ struct tr_popcnt
 
 #if defined(TR_HAVE_STD_POPCOUNT)
     /* If we have std::popcount just use that. */
-    static constexpr inline unsigned count(T v)
+    static inline unsigned count(T v)
     {
         unsigned_T unsigned_v = static_cast<unsigned_T>(v);
         return static_cast<unsigned>(std::popcount(unsigned_v));

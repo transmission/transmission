@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Transmission authors and contributors.
+// This file Copyright © 2009-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -139,8 +139,8 @@
             }
             else
             {
-                peerString = [NSString localizedStringWithFormat:NSLocalizedString(@"got %lu peers", "Tracker last announce"),
-                                                                 (size_t)self.fStat.lastAnnouncePeerCount];
+                peerString = [NSString stringWithFormat:NSLocalizedString(@"got %lu peers", "Tracker last announce"),
+                                                        (size_t)self.fStat.lastAnnouncePeerCount];
             }
             baseString = [baseString stringByAppendingFormat:@" (%@)", peerString];
         }

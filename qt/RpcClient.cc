@@ -1,4 +1,4 @@
-// This file Copyright © 2014-2023 Mnemosyne LLC.
+// This file Copyright © 2014-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -285,7 +285,8 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
 
 int64_t RpcClient::parseResponseTag(tr_variant& response) const
 {
-    return dictFind<int>(&response, TR_KEY_tag).value_or(-1);
+    auto const tag = dictFind<int>(&response, TR_KEY_tag);
+    return tag ? *tag : -1;
 }
 
 RpcResponse RpcClient::parseResponseData(tr_variant& response) const

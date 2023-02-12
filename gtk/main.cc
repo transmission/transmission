@@ -1,36 +1,24 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include "Application.h"
-#include "GtkCompat.h"
-#include "Notify.h"
-#include "Prefs.h"
-#include "Utils.h"
+#include <cstdio>
+#include <string>
+
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+#include <gtkmm.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
-#include <giomm/file.h>
-#include <giomm/init.h>
-#include <glibmm/i18n.h>
-#include <glibmm/init.h>
-#include <glibmm/miscutils.h>
-#include <glibmm/objectbase.h>
-#include <glibmm/optioncontext.h>
-#include <glibmm/optionentry.h>
-#include <glibmm/optiongroup.h>
-#include <glibmm/ustring.h>
-#include <glibmm/wrap.h>
-#include <gtkmm.h>
-
-#include <fmt/core.h>
-
-#include <clocale>
-#include <cstdio>
-#include <string>
-#include <tuple>
+#include "Application.h"
+#include "Notify.h"
+#include "Prefs.h"
+#include "Utils.h"
 
 namespace
 {
@@ -53,7 +41,7 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 int main(int argc, char** argv)
 {
     /* init i18n */
-    std::ignore = std::setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "");
     bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);
     bind_textdomain_codeset(AppTranslationDomainName, "UTF-8");
     textdomain(AppTranslationDomainName);
@@ -67,7 +55,7 @@ int main(int argc, char** argv)
     Gio::File::create_for_path(".");
     Glib::wrap_register(
         g_type_from_name("GLocalFile"),
-        [](GObject* object) -> Glib::ObjectBase* { return new Gio::File(G_FILE(object)); });
+        [](GObject* object) -> Glib::ObjectBase* { return new Gio::File((GFile*)object); });
     g_type_ensure(Gio::File::get_type());
 
     /* default settings */
@@ -105,7 +93,7 @@ int main(int argc, char** argv)
         fmt::print(
             stderr,
             _("Run '{program} --help' to see a full list of available command line options.\n"),
-            fmt::arg("program", *argv));
+            fmt::arg("program", argv[0]));
         return 1;
     }
 

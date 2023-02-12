@@ -382,7 +382,7 @@
     <message>
         <location line="+26"/>
         <source>Downloaded:</source>
-        <translation>Mottagit:</translation>
+        <translation>Hämtat:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -505,17 +505,17 @@
         <translation>Respektera globala &amp;gränser</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+7"/>
         <source>Limit &amp;download speed:</source>
         <translation>Begränsa &amp;hämtningshastighet:</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Begränsa &amp;sändningshastighet:</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+20"/>
         <source>Torrent &amp;priority:</source>
         <translation>Torrent&amp;prioritet:</translation>
     </message>
@@ -550,27 +550,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>Låg</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-257"/>
+        <location line="+255"/>
         <source>High</source>
         <translation>Hög</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>Normal</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>Blandad</translation>
     </message>
@@ -606,7 +606,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
         <translation>Markera valda</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>Sortera efter &amp;kö</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>Begränsa hämtningshastighet</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Öppna torrent</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Hastighetsgränser</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Nätverksfel</translation>
     </message>
@@ -1678,7 +1678,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <translation>&amp;På dagar:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
         <translation>Varje dag</translation>
     </message>
@@ -2224,7 +2224,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Fel vid namnbyte av sökväg</translation>
     </message>
@@ -2247,8 +2247,8 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Torrentdubblett</numerusform>
-            <numerusform>Torrentdubbletter</numerusform>
+            <numerusform>Duplicera torrent</numerusform>
+            <numerusform>Duplicera torrenter</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2330,7 +2330,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <location line="-82"/>
         <location line="+96"/>
         <source>Downloaded:</source>
-        <translation>Mottagit:</translation>
+        <translation>Hämtat:</translation>
     </message>
     <message>
         <location line="-82"/>
@@ -2419,7 +2419,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Magnetöverföring - hämtar metadata (%1%)</translation>
@@ -2540,8 +2540,8 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>Mottog en lista med%1 %Ln jämlike%2 för %3 sedan</numerusform>
-            <numerusform>Mottog en lista med%1 %Ln jämlikar%2 för %3 sedan</numerusform>
+            <numerusform>Fick en lista på%1 %Ln jämlike%2 för %3 sedan</numerusform>
+            <numerusform>Fick en lista på%1 %Ln jämlikar%2 för %3 sedan</numerusform>
         </translation>
     </message>
     <message>

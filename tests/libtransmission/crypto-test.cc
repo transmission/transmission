@@ -13,11 +13,11 @@
 #include <string_view>
 #include <unordered_set>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/peer-mse.h>
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/utils.h>
+#include "peer-mse.h"
+#include "crypto-utils.h"
+#include "utils.h"
 
 #include "crypto-test-ref.h"
 
@@ -142,12 +142,12 @@ TEST(Crypto, ssha1)
         std::string_view ssha1;
     };
 
-    static auto constexpr Tests = std::array<LocalTest, 2>{ {
+    auto constexpr Tests = std::array<LocalTest, 2>{ {
         { "test"sv, "{15ad0621b259a84d24dcd4e75b09004e98a3627bAMbyRHJy"sv },
         { "QNY)(*#$B)!_X$B !_B#($^!)*&$%CV!#)&$C!@$(P*)"sv, "{10e2d7acbb104d970514a147cd16d51dfa40fb3c0OSwJtOL"sv },
     } };
 
-    static auto constexpr HashCount = size_t{ 4U } * 1024U;
+    auto constexpr HashCount = size_t{ 4 * 1024 };
 
     for (auto const& [plain_text, ssha1] : Tests)
     {
@@ -206,14 +206,12 @@ TEST(Crypto, sha1FromString)
     // lowercase hex
     auto const baseline = "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv;
     auto const lc = tr_sha1_from_string(baseline);
-    EXPECT_TRUE(lc.has_value());
-    assert(lc.has_value());
+    EXPECT_TRUE(lc);
     EXPECT_EQ(baseline, tr_sha1_to_string(*lc));
 
     // uppercase hex should yield the same result
     auto const uc = tr_sha1_from_string(tr_strupper(baseline));
-    EXPECT_TRUE(uc.has_value());
-    assert(uc.has_value());
+    EXPECT_TRUE(uc);
     EXPECT_EQ(*lc, *uc);
 }
 
@@ -232,14 +230,12 @@ TEST(Crypto, sha256FromString)
     // lowercase hex
     auto const baseline = "05d58dfd14ed21d33add137eb7a2c5d4ef5aaa4a945e654363d32b7c4bf5c929"sv;
     auto const lc = tr_sha256_from_string(baseline);
-    EXPECT_TRUE(lc.has_value());
-    assert(lc.has_value());
+    EXPECT_TRUE(lc);
     EXPECT_EQ(baseline, tr_sha256_to_string(*lc));
 
     // uppercase hex should yield the same result
     auto const uc = tr_sha256_from_string(tr_strupper(baseline));
-    EXPECT_TRUE(uc.has_value());
-    assert(uc.has_value());
+    EXPECT_TRUE(uc);
     EXPECT_EQ(*lc, *uc);
 }
 
@@ -248,36 +244,9 @@ TEST(Crypto, random)
     /* test that tr_rand_int() stays in-bounds */
     for (int i = 0; i < 100000; ++i)
     {
-        auto const val = tr_rand_int(100U);
-        EXPECT_LE(0U, val);
-        EXPECT_LT(val, 100U);
-    }
-}
-
-TEST(Crypto, randBuf)
-{
-    static auto constexpr Width = 32U;
-    static auto constexpr Iterations = 100000U;
-    static auto constexpr Empty = std::array<uint8_t, Width>{};
-
-    auto buf = Empty;
-
-    for (size_t i = 0; i < Iterations; ++i)
-    {
-        auto tmp = buf;
-        tr_rand_buffer(std::data(tmp), std::size(tmp));
-        EXPECT_NE(tmp, Empty);
-        EXPECT_NE(tmp, buf);
-        buf = tmp;
-    }
-
-    for (size_t i = 0; i < Iterations; ++i)
-    {
-        auto tmp = buf;
-        tr_rand_buffer_std(std::data(tmp), std::size(tmp));
-        EXPECT_NE(tmp, Empty);
-        EXPECT_NE(tmp, buf);
-        buf = tmp;
+        int const val = tr_rand_int(100);
+        EXPECT_LE(0, val);
+        EXPECT_LT(val, 100);
     }
 }
 
@@ -297,14 +266,14 @@ TEST(Crypto, base64)
         auto buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf += static_cast<char>(tr_rand_int(256U));
+            buf += char(tr_rand_int_weak(256));
         }
         EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
 
         buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf += static_cast<char>(1U + tr_rand_int(255U));
+            buf += char(1 + tr_rand_int_weak(255));
         }
         EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
     }

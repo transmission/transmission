@@ -40,10 +40,10 @@ find_cfiles() {
        ! \( $(get_find_path_args $(trim_comments .clang-format-ignore)) \) "$@"
 }
 
-# We're targeting clang-format version 15 and other versions give slightly
-# different results, so prefer `clang-format-15` if it's installed.
+# We're targeting clang-format version 12 and other versions give slightly
+# different results, so prefer `clang-format-12` if it's installed.
 clang_format_exe_names=(
-  'clang-format-15'
+  'clang-format-12'
   'clang-format'
 )
 for name in ${clang_format_exe_names[@]}; do
@@ -77,11 +77,12 @@ fi
 
 # format JS
 cd "${root}/web" || exit 1
-npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
-if ! npm ci --no-audit --no-fund --no-progress &>/dev/null; then
-  [ -n "$fix" ] || echo 'JS code could not be checked -- "npm ci" failed'
+yarn_args='--silent --no-progress --non-interactive'
+yarn_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
+if ! yarn $yarn_args install; then
+  [ -n "$fix" ] || echo 'JS code could not be checked -- "yarn install" failed'
   exitcode=1
-elif ! npm run --silent $npm_lint_args; then
+elif ! yarn $yarn_args $yarn_lint_args; then
   [ -n "$fix" ] || echo 'JS code needs formatting'
   exitcode=1
 fi

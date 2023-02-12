@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -21,15 +21,13 @@
 #include "log.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "utils.h" // tr_time(), tr_wait()
+#include "utils.h" // tr_time(), tr_wait_msec()
 #include "verify.h"
-
-using namespace std::chrono_literals;
 
 namespace
 {
 
-auto constexpr SleepPerSecondDuringVerify = 100ms;
+auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
 }
 
@@ -58,7 +56,7 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
     return 0;
 }
 
-bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& stop_flag)
+bool tr_verify_worker::verifyTorrent(tr_torrent* tor, bool const* stop_flag)
 {
     auto const begin = tr_time();
 
@@ -76,7 +74,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
 
     tr_logAddDebugTor(tor, "verifying torrent...");
 
-    while (!stop_flag && piece < tor->pieceCount())
+    while (!*stop_flag && piece < tor->pieceCount())
     {
         auto const file_length = tor->fileSize(file_index);
 
@@ -121,7 +119,9 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
         /* if we're finishing a piece... */
         if (left_in_piece == 0)
         {
-            if (auto const has_piece = sha->finish() == tor->pieceHash(piece); has_piece || had_piece)
+            auto const has_piece = sha->finish() == tor->pieceHash(piece);
+
+            if (has_piece || had_piece)
             {
                 tor->setHasPiece(piece, has_piece);
                 changed |= has_piece != had_piece;
@@ -135,7 +135,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
             if (auto const now = tr_time(); last_slept_at != now)
             {
                 last_slept_at = now;
-                tr_wait(SleepPerSecondDuringVerify);
+                tr_wait_msec(MsecToSleepPerSecondDuringVerify);
             }
 
             sha->clear();
@@ -184,12 +184,7 @@ void tr_verify_worker::verifyThreadFunc()
         {
             auto const lock = std::lock_guard(verify_mutex_);
 
-            if (stop_current_)
-            {
-                stop_current_ = false;
-                stop_current_cv_.notify_one();
-            }
-
+            stop_current_ = false;
             if (std::empty(todo_))
             {
                 current_node_.reset();
@@ -205,7 +200,7 @@ void tr_verify_worker::verifyThreadFunc()
         auto* const tor = current_node_->torrent;
         tr_logAddTraceTor(tor, "Verifying torrent");
         tor->setVerifyState(TR_VERIFY_NOW);
-        auto const changed = verifyTorrent(tor, stop_current_);
+        auto const changed = verifyTorrent(tor, &stop_current_);
         tor->setVerifyState(TR_VERIFY_NONE);
         TR_ASSERT(tr_isTorrent(tor));
 
@@ -243,12 +238,18 @@ void tr_verify_worker::remove(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto lock = std::unique_lock(verify_mutex_);
+    verify_mutex_.lock();
 
     if (current_node_ && current_node_->torrent == tor)
     {
         stop_current_ = true;
-        stop_current_cv_.wait(lock, [this]() { return !stop_current_; });
+
+        while (stop_current_)
+        {
+            verify_mutex_.unlock();
+            tr_wait_msec(100);
+            verify_mutex_.lock();
+        }
     }
     else
     {
@@ -265,6 +266,8 @@ void tr_verify_worker::remove(tr_torrent* tor)
             todo_.erase(iter);
         }
     }
+
+    verify_mutex_.unlock();
 }
 
 tr_verify_worker::~tr_verify_worker()
@@ -277,6 +280,6 @@ tr_verify_worker::~tr_verify_worker()
 
     while (verify_thread_id_.has_value())
     {
-        tr_wait(20ms);
+        tr_wait_msec(20);
     }
 }

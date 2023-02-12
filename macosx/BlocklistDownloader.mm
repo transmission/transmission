@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © 2008-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -13,6 +13,9 @@
 @property(nonatomic) NSUInteger fCurrentSize;
 @property(nonatomic) long long fExpectedSize;
 @property(nonatomic) blocklistDownloadState fState;
+
+- (void)startDownload;
+- (BOOL)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
 
 @end
 
@@ -94,7 +97,6 @@ BlocklistDownloader* fBLDownloader = nil;
         [NSUserDefaults.standardUserDefaults setObject:[NSDate date] forKey:@"BlocklistNewLastUpdate"];
         [BlocklistScheduler.scheduler updateSchedule];
 
-        [self.fSession finishTasksAndInvalidate];
         fBLDownloader = nil;
     });
 }
@@ -154,7 +156,6 @@ BlocklistDownloader* fBLDownloader = nil;
 
         [NSNotificationCenter.defaultCenter postNotificationName:@"BlocklistUpdated" object:nil];
 
-        [self.fSession finishTasksAndInvalidate];
         fBLDownloader = nil;
     });
 }
@@ -210,29 +211,6 @@ BlocklistDownloader* fBLDownloader = nil;
 
 - (BOOL)untarFrom:(NSURL*)file to:(NSURL*)destination
 {
-    // We need to check validity of archive before listing or unpacking.
-    NSTask* tarListCheck = [[NSTask alloc] init];
-
-    tarListCheck.launchPath = @"/usr/bin/tar";
-    tarListCheck.arguments = @[ @"--list", @"--file", file.path ];
-    tarListCheck.standardOutput = nil;
-    tarListCheck.standardError = nil;
-
-    @try
-    {
-        [tarListCheck launch];
-        [tarListCheck waitUntilExit];
-
-        if (tarListCheck.terminationStatus != 0)
-        {
-            return NO;
-        }
-    }
-    @catch (NSException* exception)
-    {
-        return NO;
-    }
-
     NSTask* tarList = [[NSTask alloc] init];
 
     tarList.launchPath = @"/usr/bin/tar";
@@ -335,7 +313,7 @@ BlocklistDownloader* fBLDownloader = nil;
     zipinfo.launchPath = @"/usr/bin/zipinfo";
     zipinfo.arguments = @[
         @"-1", /* just the filename */
-        file.path /* source zip file */
+        file /* source zip file */
     ];
     NSPipe* pipe = [[NSPipe alloc] init];
     zipinfo.standardOutput = pipe;

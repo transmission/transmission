@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -51,7 +51,6 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 
 #endif
 
-using namespace std::literals;
 using libtransmission::Watchdir;
 
 static char constexpr MyName[] = "transmission-daemon";
@@ -172,7 +171,6 @@ bool tr_daemon::reopen_log_file(char const* filename)
     }
 
     logfile_ = new_log_file;
-    logfile_flush_ = tr_sys_file_flush_possible(logfile_);
 
     if (old_log_file != TR_BAD_SYS_FILE)
     {
@@ -201,7 +199,7 @@ static std::string getConfigDir(int argc, char const* const* argv)
     return tr_getDefaultConfigDir(MyName);
 }
 
-static auto onFileAdded(tr_session const* session, std::string_view dirname, std::string_view basename)
+static auto onFileAdded(tr_session* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
     auto const is_torrent = tr_strvEndsWith(lowercase, ".torrent"sv);
@@ -315,7 +313,7 @@ static void printMessage(
     std::string_view name,
     std::string_view message,
     std::string_view filename,
-    long line)
+    int line)
 {
     auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
                                         fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
@@ -363,7 +361,7 @@ static void printMessage(
 #endif
 }
 
-static void pumpLogMessages(tr_sys_file_t file, bool flush)
+static void pumpLogMessages(tr_sys_file_t file)
 {
     tr_log_message* list = tr_logGetQueue();
 
@@ -372,7 +370,7 @@ static void pumpLogMessages(tr_sys_file_t file, bool flush)
         printMessage(file, l->level, l->name, l->message, l->file, l->line);
     }
 
-    if (flush && file != TR_BAD_SYS_FILE)
+    if (file != TR_BAD_SYS_FILE)
     {
         tr_sys_file_flush(file);
     }
@@ -397,7 +395,7 @@ void tr_daemon::report_status(void)
 
 void tr_daemon::periodic_update(void)
 {
-    pumpLogMessages(logfile_, logfile_flush_);
+    pumpLogMessages(logfile_);
     report_status();
 }
 
@@ -419,7 +417,7 @@ static tr_rpc_callback_status on_rpc_callback(
     return TR_RPC_OK;
 }
 
-bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code)
+bool tr_daemon::parse_args(int argc, char const** argv, bool* dump_settings, bool* foreground, int* exit_code)
 {
     int c;
     char const* optstr;
@@ -853,7 +851,7 @@ CLEANUP:
 
     tr_sessionSaveSettings(my_session_, cdir, &settings_);
     tr_sessionClose(my_session_);
-    pumpLogMessages(logfile_, logfile_flush_);
+    pumpLogMessages(logfile_);
     printf(" done.\n");
 
     /* shutdown */
@@ -878,9 +876,9 @@ CLEANUP:
     return 0;
 }
 
-bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* ret)
+bool tr_daemon::init(int argc, char* argv[], bool* foreground, int* ret)
 {
-    config_dir_ = getConfigDir(argc, argv);
+    config_dir_ = getConfigDir(argc, (char const* const*)argv);
 
     /* load settings from defaults + config file */
     tr_variantInitDict(&settings_, 0);
@@ -892,7 +890,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     *ret = 0;
 
     /* overwrite settings from the command line */
-    if (!parse_args(argc, argv, &dumpSettings, foreground, ret))
+    if (!parse_args(argc, (char const**)argv, &dumpSettings, foreground, ret))
     {
         goto EXIT_EARLY;
     }
@@ -900,7 +898,6 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     if (*foreground && logfile_ == TR_BAD_SYS_FILE)
     {
         logfile_ = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
-        logfile_flush_ = tr_sys_file_flush_possible(logfile_);
     }
 
     if (!loaded)
@@ -924,7 +921,7 @@ EXIT_EARLY:
     return false;
 }
 
-void tr_daemon::handle_error(tr_error* error) const
+void tr_daemon::handle_error(tr_error* error)
 {
     auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
     printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);

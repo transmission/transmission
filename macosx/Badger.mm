@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © 2006-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -9,17 +9,21 @@
 
 @interface Badger ()
 
+@property(nonatomic, readonly) tr_session* fLib;
+
 @property(nonatomic, readonly) NSMutableSet* fHashes;
 
 @end
 
 @implementation Badger
 
-- (instancetype)init
+- (instancetype)initWithLib:(tr_session*)lib
 {
     if ((self = [super init]))
     {
-        BadgeView* view = [[BadgeView alloc] init];
+        _fLib = lib;
+
+        BadgeView* view = [[BadgeView alloc] initWithLib:lib];
         NSApp.dockTile.contentView = view;
 
         _fHashes = [[NSMutableSet alloc] init];
@@ -45,7 +49,7 @@
     NSParameterAssert(torrent != nil);
 
     [self.fHashes addObject:torrent.hashString];
-    NSApp.dockTile.badgeLabel = [NSString localizedStringWithFormat:@"%lu", self.fHashes.count];
+    NSApp.dockTile.badgeLabel = [NSString formattedUInteger:self.fHashes.count];
 }
 
 - (void)removeTorrent:(Torrent*)torrent
@@ -55,7 +59,7 @@
         [self.fHashes removeObject:torrent.hashString];
         if (self.fHashes.count > 0)
         {
-            NSApp.dockTile.badgeLabel = [NSString localizedStringWithFormat:@"%lu", self.fHashes.count];
+            NSApp.dockTile.badgeLabel = [NSString formattedUInteger:self.fHashes.count];
         }
         else
         {

@@ -9,8 +9,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <atomic>
-#include <condition_variable>
 #include <cstdint>
 #include <functional>
 #include <list>
@@ -52,16 +50,16 @@ private:
         }
     };
 
-    void callCallback(tr_torrent* tor, bool aborted) const
+    void callCallback(tr_torrent* tor, bool aborted)
     {
-        for (auto const& callback : callbacks_)
+        for (auto& callback : callbacks_)
         {
             callback(tor, aborted);
         }
     }
 
     void verifyThreadFunc();
-    [[nodiscard]] static bool verifyTorrent(tr_torrent* tor, std::atomic<bool> const& stop_flag);
+    [[nodiscard]] static bool verifyTorrent(tr_torrent* tor, bool const* stop_flag);
 
     std::list<callback_func> callbacks_;
     std::mutex verify_mutex_;
@@ -70,7 +68,5 @@ private:
     std::optional<Node> current_node_;
 
     std::optional<std::thread::id> verify_thread_id_;
-
-    std::atomic<bool> stop_current_ = false;
-    std::condition_variable stop_current_cv_;
+    bool stop_current_ = false;
 };

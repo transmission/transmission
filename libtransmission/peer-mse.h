@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -49,10 +49,7 @@ public:
 
     // By default, a private key is randomly generated.
     // Providing a predefined one is useful for reproducible unit tests.
-    constexpr DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept
-        : private_key_{ private_key }
-    {
-    }
+    DH(private_key_bigend_t const& private_key = randomPrivateKey()) noexcept;
 
     // Returns our own public key to be shared with a peer.
     [[nodiscard]] key_bigend_t publicKey() noexcept;
@@ -70,47 +67,38 @@ public:
     [[nodiscard]] static private_key_bigend_t randomPrivateKey() noexcept;
 
 private:
-    private_key_bigend_t private_key_;
+    private_key_bigend_t const private_key_;
     key_bigend_t public_key_ = {};
     key_bigend_t secret_ = {};
 };
 
-// --- arc4 encryption for both incoming and outgoing stream
+/// arc4 encryption for both incoming and outgoing stream
 class Filter
 {
 public:
     void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
-    template<typename T>
-    constexpr void decrypt(size_t buf_len, T* buf)
+    void decrypt(size_t buf_len, void* buf)
     {
-        if (dec_active_)
+        if (dec_key_)
         {
-            dec_key_.process(buf, buf, buf_len);
+            dec_key_->process(buf, buf, buf_len);
         }
     }
 
     void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
-    template<typename T>
-    constexpr void encrypt(size_t buf_len, T* buf)
+    void encrypt(size_t buf_len, void* buf)
     {
-        if (enc_active_)
+        if (enc_key_)
         {
-            enc_key_.process(buf, buf, buf_len);
+            enc_key_->process(buf, buf, buf_len);
         }
     }
 
-    [[nodiscard]] constexpr auto is_active() const noexcept
-    {
-        return dec_active_ || enc_active_;
-    }
-
 private:
-    tr_arc4 dec_key_ = {};
-    tr_arc4 enc_key_ = {};
-    bool dec_active_ = false;
-    bool enc_active_ = false;
+    std::unique_ptr<tr_arc4> dec_key_;
+    std::unique_ptr<tr_arc4> enc_key_;
 };
 
 } // namespace tr_message_stream_encryption

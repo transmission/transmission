@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © 2007-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -9,19 +9,25 @@ static CGFloat const kBetweenPadding = 2.0;
 
 @interface BadgeView ()
 
+@property(nonatomic, readonly) tr_session* fLib;
+
 @property(nonatomic) NSMutableDictionary* fAttributes;
 
 @property(nonatomic) CGFloat fDownloadRate;
 @property(nonatomic) CGFloat fUploadRate;
 
+- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height;
+
 @end
 
 @implementation BadgeView
 
-- (instancetype)init
+- (instancetype)initWithLib:(tr_session*)lib
 {
     if ((self = [super init]))
     {
+        _fLib = lib;
+
         _fDownloadRate = 0.0;
         _fUploadRate = 0.0;
     }
@@ -48,19 +54,19 @@ static CGFloat const kBetweenPadding = 2.0;
     BOOL const upload = self.fUploadRate >= 0.1;
     BOOL const download = self.fDownloadRate >= 0.1;
     CGFloat bottom = 0.0;
-    if (download)
-    {
-        NSImage* downloadBadge = [NSImage imageNamed:@"DownloadBadge"];
-        [self badge:downloadBadge string:[NSString stringForSpeedAbbrev:self.fDownloadRate] atHeight:bottom];
-
-        if (upload)
-        {
-            bottom += downloadBadge.size.height + kBetweenPadding; //upload rate above download rate
-        }
-    }
     if (upload)
     {
-        [self badge:[NSImage imageNamed:@"UploadBadge"] string:[NSString stringForSpeedAbbrev:self.fUploadRate] atHeight:bottom];
+        NSImage* uploadBadge = [NSImage imageNamed:@"UploadBadge"];
+        [self badge:uploadBadge string:[NSString stringForSpeedAbbrev:self.fUploadRate] atHeight:bottom];
+
+        if (download)
+        {
+            bottom += uploadBadge.size.height + kBetweenPadding; //download rate above upload rate
+        }
+    }
+    if (download)
+    {
+        [self badge:[NSImage imageNamed:@"DownloadBadge"] string:[NSString stringForSpeedAbbrev:self.fDownloadRate] atHeight:bottom];
     }
 }
 

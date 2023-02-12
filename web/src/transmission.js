@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
    It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
@@ -61,7 +61,7 @@ export class Transmission extends EventTarget {
     );
 
     // listen to actions
-    // TODO: consider adding a mutator listener here to see dynamic additions
+    // TODO: consider adding a mutator listener here to pick up dynamic additions
     for (const element of document.querySelectorAll(`button[data-action]`)) {
       const { action } = element.dataset;
       setEnabled(element, this.action_manager.isEnabled(action));
@@ -179,9 +179,9 @@ export class Transmission extends EventTarget {
           break;
         case 'toggle-compact-rows':
           this.prefs.display_mode =
-            this.prefs.display_mode === Prefs.DisplayCompact
-              ? Prefs.DisplayFull
-              : Prefs.DisplayCompact;
+            this.prefs.display_mode !== Prefs.DisplayCompact
+              ? Prefs.DisplayCompact
+              : Prefs.DisplayFull;
           break;
         case 'trash-selected-torrents':
           this._removeSelectedTorrents(true);
@@ -897,9 +897,9 @@ TODO: fix this when notifications get fixed
 
     // build the new html
     let string = '';
-    string += this.filterTracker
-      ? '<option value="all">All</option>'
-      : '<option value="all" selected="selected">All</option>';
+    string += !this.filterTracker
+      ? '<option value="all" selected="selected">All</option>'
+      : '<option value="all">All</option>';
     for (const sitename of sitenames) {
       string += `<option value="${sitename}"`;
       if (sitename === this.filterTracker) {
@@ -1049,10 +1049,10 @@ TODO: fix this when notifications get fixed
         const row = dirty_rows[di++];
         const e = row.getElement();
 
-        if (ci === cmax) {
-          frag.append(e);
-        } else {
+        if (ci !== cmax) {
           list.insertBefore(e, clean_rows[ci].getElement());
+        } else {
+          frag.append(e);
         }
 
         rows.push(row);

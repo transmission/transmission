@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -29,17 +29,17 @@ struct tr_error;
 struct tr_torrent_files
 {
 public:
-    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    [[nodiscard]] bool empty() const noexcept
     {
         return std::empty(files_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t fileCount() const noexcept
+    [[nodiscard]] size_t fileCount() const noexcept
     {
         return std::size(files_);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 uint64_t fileSize(tr_file_index_t file_index) const
+    [[nodiscard]] uint64_t fileSize(tr_file_index_t file_index) const
     {
         return files_.at(file_index).size_;
     }
@@ -49,7 +49,7 @@ public:
         return total_size_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 std::string const& path(tr_file_index_t file_index) const
+    [[nodiscard]] std::string const& path(tr_file_index_t file_index) const
     {
         return files_.at(file_index).path_;
     }
@@ -80,13 +80,13 @@ public:
         files_.shrink_to_fit();
     }
 
-    TR_CONSTEXPR20 void clear() noexcept
+    void clear() noexcept
     {
         files_.clear();
         total_size_ = uint64_t{};
     }
 
-    [[nodiscard]] auto sortedByPath() const
+    auto sortedByPath() const
     {
         auto ret = std::vector<std::pair<std::string /*path*/, uint64_t /*size*/>>{};
         ret.reserve(std::size(files_));
@@ -152,8 +152,8 @@ public:
         size_t base_len_;
     };
 
-    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, std::string_view const* paths, size_t n_paths) const;
-    [[nodiscard]] bool hasAnyLocalData(std::string_view const* paths, size_t n_paths) const;
+    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t, std::string_view const* search_paths, size_t n_paths) const;
+    [[nodiscard]] bool hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const;
 
     static void makeSubpathPortable(std::string_view path, tr_pathbuf& append_me);
 

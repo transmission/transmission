@@ -14,19 +14,22 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/crypto-utils.h>
-#include <libtransmission/file.h>
-#include <libtransmission/makemeta.h>
-#include <libtransmission/session.h> // TR_NAME
-#include <libtransmission/torrent-metainfo.h>
+#include "crypto-utils.h"
+#include "file.h"
+#include "makemeta.h"
+#include "session.h" // TR_NAME
+#include "torrent-metainfo.h"
 
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 class MakemetaTest : public SandboxedTest
@@ -37,7 +40,7 @@ protected:
 
     auto makeRandomFiles(
         std::string_view top,
-        size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int(DefaultMaxFileCount))),
+        size_t n_files = std::max(size_t{ 1U }, static_cast<size_t>(tr_rand_int_weak(DefaultMaxFileCount))),
         size_t max_size = DefaultMaxFileSize)
     {
         auto files = std::vector<std::pair<std::string, std::vector<std::byte>>>{};
@@ -50,7 +53,7 @@ protected:
             // builder-to-metainfo comparisons here. tr_torrent_metainfo
             // will behave when BEP52 support is added in Transmission 5.
             static auto constexpr MinFileSize = size_t{ 1U };
-            payload.resize(std::max(MinFileSize, static_cast<size_t>(tr_rand_int(max_size))));
+            payload.resize(std::max(MinFileSize, static_cast<size_t>(tr_rand_int_weak(max_size))));
             tr_rand_buffer(std::data(payload), std::size(payload));
 
             auto filename = tr_pathbuf{ top, '/', "test.XXXXXX" };
@@ -216,24 +219,6 @@ TEST_F(MakemetaTest, singleFile)
     testBuilder(builder);
 }
 
-TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
-{
-    auto const files = makeRandomFiles(sandboxDir(), 1);
-    auto const [filename, payload] = files.front();
-    auto builder = tr_metainfo_builder{ filename };
-    auto trackers = tr_announce_list{};
-    trackers.add("udp://tracker.openbittorrent.com:80"sv, trackers.nextTier());
-    builder.setAnnounceList(std::move(trackers));
-    auto baseMetainfo = testBuilder(builder);
+} // namespace test
 
-    builder.setPrivate(true);
-    auto privateMetainfo = testBuilder(builder);
-    EXPECT_NE(baseMetainfo.infoHash(), privateMetainfo.infoHash());
-
-    builder.setSource("FOO");
-    auto privateSourceMetainfo = testBuilder(builder);
-    EXPECT_NE(baseMetainfo.infoHash(), privateSourceMetainfo.infoHash());
-    EXPECT_NE(privateMetainfo.infoHash(), privateSourceMetainfo.infoHash());
-}
-
-} // namespace libtransmission::test
+} // namespace libtransmission

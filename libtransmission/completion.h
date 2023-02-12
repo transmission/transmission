@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © 2009-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -50,7 +50,7 @@ struct tr_completion
         return hasMetainfo() && blocks_.hasAll();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool hasBlock(tr_block_index_t block) const
+    [[nodiscard]] bool hasBlock(tr_block_index_t block) const
     {
         return blocks_.test(block);
     }
@@ -118,16 +118,8 @@ struct tr_completion
 
     [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const;
 
-    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
-    {
-        auto const [begin, end] = block_info_->blockSpanForPiece(piece);
-        return (end - begin) - blocks_.count(begin, end);
-    }
-
-    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t piece) const
-    {
-        return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
-    }
+    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t) const;
+    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t) const;
 
     void amountDone(float* tab, size_t n_tabs) const;
 

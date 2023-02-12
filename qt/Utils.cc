@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © 2009-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -42,16 +42,12 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
 {
     QVariant const variant = index.data(Qt::DecorationRole);
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
-    switch (variant.typeId())
-#else
-    switch (static_cast<QMetaType::Type>(variant.type()))
-#endif
+    switch (variant.type())
     {
-    case QMetaType::QIcon:
+    case QVariant::Icon:
         return qvariant_cast<QIcon>(variant);
 
-    case QMetaType::QPixmap:
+    case QVariant::Pixmap:
         return qvariant_cast<QPixmap>(variant);
 
     default:

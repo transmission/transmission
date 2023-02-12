@@ -69,15 +69,14 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
    _Note: When **watch-dir-enabled** is true, only the transmission-daemon, transmission-gtk, and transmission-qt applications will monitor **watch-dir** for new .torrent files and automatically load them._
 
 #### Misc
- * **cache-size-mb:** Size (default = 4), in megabytes, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes.
+ * **cache-size-mb:** Size (default = 4), in megabytes, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. Default is 2 if configured with --enable-lightweight.
  * **dht-enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](https://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
  * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
  * **lazy-bitfield-enabled:** Boolean (default = true) May help get around some ISP filtering. [Vuze specification](https://wiki.vuze.com/w/Commandline_options#Network_Options).
  * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
  * **message-level:** Number (0 = None, 1 = Error, 2 = Info, 3 = Debug, default = 2) Set verbosity of transmission messages.
  * **pex-enabled:** Boolean (default =  true) Enable [https://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
- * **pidfile:** String Path to file in which daemon PID will be stored (transmission-daemon only)
- * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html).
+ * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html). This defaults to false if configured with --enable-lightweight.
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
  * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-added-filename:** String (default = "") Path to script.
@@ -85,7 +84,6 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **script-torrent-done-filename:** String (default = "") Path to script.
  * **script-torrent-done-seeding-enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-done-seeding-filename:** String (default = "") Path to script.
- * **torrent-added-verify-mode:** String ("fast", "full", default: "fast") Whether newly-added torrents' local data should be fully verified when added, or wait and verify them on-demand later. See [#2626](https://github.com/transmission/transmission/pull/2626) for more discussion.
  * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol)
 
 #### Peers
@@ -120,7 +118,6 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **rpc-host-whitelist-enabled:** Boolean (default = true. Added in v2.93)
  * **rpc-password:** String. You can enter this in as plaintext when Transmission is not running, and then Transmission will salt the value on startup and re-save the salted version as a security measure. **Note:** Transmission treats passwords starting with the character `{` as salted, so when you first create your password, the plaintext password you enter must not begin with `{`.
  * **rpc-port:** Number (default = 9091)
- * **rpc-socket-mode:** String UNIX filesystem mode for the RPC UNIX socket (default: 0750; used when `rpc-bind-address` is a UNIX socket)
  * **rpc-url:** String (default = /transmission/. Added in v2.2)
  * **rpc-username:** String
  * **rpc-whitelist:** String (Comma-delimited list of IP addresses. Wildcards allowed using '\*'. Example: "127.0.0.\*,192.168.\*.\*", Default:  "127.0.0.1")

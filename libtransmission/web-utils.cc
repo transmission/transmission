@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © 2021-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -21,20 +21,20 @@
 
 #include "transmission.h"
 
-#include "log.h"
 #include "net.h"
-#include "tr-assert.h"
 #include "tr-strbuf.h"
 #include "utils.h"
 #include "web-utils.h"
 
 using namespace std::literals;
 
-// ---
+/***
+****
+***/
 
 bool tr_addressIsIP(char const* address)
 {
-    return address != nullptr && tr_address::from_string(address).has_value();
+    return address != nullptr && tr_address::fromString(address).has_value();
 }
 
 char const* tr_webGetResponseStr(long code)
@@ -172,7 +172,7 @@ char const* tr_webGetResponseStr(long code)
     }
 }
 
-// --- URLs
+//// URLs
 
 namespace
 {
@@ -206,7 +206,7 @@ constexpr std::string_view getPortForScheme(std::string_view scheme)
     return "-1"sv;
 }
 
-TR_CONSTEXPR20 bool urlCharsAreValid(std::string_view url)
+bool urlCharsAreValid(std::string_view url)
 {
     // rfc2396
     auto constexpr ValidChars = std::string_view{
@@ -249,15 +249,8 @@ std::string_view getSiteName(std::string_view host)
     }
 
     // is it an IP?
-    if (auto const addr = tr_address::from_string(host); addr)
+    if (auto const addr = tr_address::fromString(host); addr)
     {
-        return host;
-    }
-
-    TR_ASSERT(psl_builtin() != nullptr);
-    if (psl_builtin() == nullptr)
-    {
-        tr_logAddWarn("psl_builtin is null");
         return host;
     }
 
@@ -267,7 +260,6 @@ std::string_view getSiteName(std::string_view host)
     // is it a registered name?
     if (isAsciiNonUpperCase(host))
     {
-        // www.example.co.uk -> example.co.uk
         if (char const* const top = psl_registrable_domain(psl_builtin(), std::data(szhost)); top != nullptr)
         {
             host.remove_prefix(top - std::data(szhost));
@@ -275,7 +267,7 @@ std::string_view getSiteName(std::string_view host)
     }
     else if (char* lower = nullptr; psl_str_to_utf8lower(std::data(szhost), nullptr, nullptr, &lower) == PSL_SUCCESS)
     {
-        // www.example.co.uk -> example.co.uk
+        // www.example.com -> example.com
         if (char const* const top = psl_registrable_domain(psl_builtin(), lower); top != nullptr)
         {
             host.remove_prefix(top - lower);
@@ -284,7 +276,7 @@ std::string_view getSiteName(std::string_view host)
         psl_free_string(lower);
     }
 
-    // example.co.uk -> example
+    // example.com -> example
     if (auto const dot_pos = host.find('.'); dot_pos != std::string_view::npos)
     {
         host = host.substr(0, dot_pos);
@@ -381,17 +373,6 @@ bool tr_urlIsValid(std::string_view url)
     auto constexpr Schemes = std::array<std::string_view, 5>{ "http"sv, "https"sv, "ftp"sv, "sftp"sv, "udp"sv };
     auto const parsed = tr_urlParse(url);
     return parsed && std::find(std::begin(Schemes), std::end(Schemes), parsed->scheme) != std::end(Schemes);
-}
-
-std::string tr_urlTrackerLogName(std::string_view url)
-{
-    if (auto const parsed = tr_urlParse(url); parsed)
-    {
-        return fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed->scheme, parsed->host, parsed->port);
-    }
-
-    // we have an invalid URL, we log the full string
-    return std::string{ url };
 }
 
 tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()

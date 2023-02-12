@@ -1,4 +1,4 @@
-// This file Copyright © 2016-2023 Mnemosyne LLC.
+// This file Copyright © 2016-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,8 +7,12 @@
 
 #include "RpcQueue.h"
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+RpcQueue::Tag RpcQueue::next_tag = {};
+
 RpcQueue::RpcQueue(QObject* parent)
     : QObject(parent)
+    , tag_(next_tag++)
 {
     connect(&future_watcher_, &QFutureWatcher<RpcResponse>::finished, this, &RpcQueue::stepFinished);
 }

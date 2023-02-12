@@ -5,9 +5,9 @@
 
 #include <fmt/format.h>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/benc.h>
+#include "benc.h"
 
 #include "gtest/gtest.h"
 

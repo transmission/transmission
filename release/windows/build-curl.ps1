@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:CurlVersion = '7.86.0'
+$global:CurlVersion = '7.70.0'
 
 $global:CurlDeps = @(
     'OpenSsl'
@@ -18,25 +18,20 @@ function global:Build-Curl([string] $PrefixDir, [string] $Arch, [string] $DepsPr
         '-DCMAKE_BUILD_TYPE=RelWithDebInfo'
         "-DCMAKE_INSTALL_PREFIX=${PrefixDir}"
         "-DCMAKE_PREFIX_PATH=${DepsPrefixDir}"
+        '-DCMAKE_USE_OPENSSL=ON'
+        '-DCURL_WINDOWS_SSPI=OFF'
         '-DBUILD_CURL_EXE=OFF'
         '-DBUILD_TESTING=OFF'
         '-DCURL_DISABLE_DICT=ON'
-        '-DCURL_DISABLE_FTP=ON'
         '-DCURL_DISABLE_GOPHER=ON'
         '-DCURL_DISABLE_IMAP=ON'
-        '-DCURL_DISABLE_LDAP=ON'
-        '-DCURL_DISABLE_LDAPS=ON'
-        '-DCURL_DISABLE_MQTT=ON'
+        '-DCURL_DISABLE_SMTP=ON'
         '-DCURL_DISABLE_POP3=ON'
         '-DCURL_DISABLE_RTSP=ON'
-        '-DCURL_DISABLE_SMB=ON'
-        '-DCURL_DISABLE_SMTP=ON'
-        '-DCURL_DISABLE_TELNET=ON'
         '-DCURL_DISABLE_TFTP=ON'
-        '-DCURL_USE_LIBSSH=OFF'
-        '-DCURL_USE_LIBSSH2=OFF'
-        '-DCURL_USE_OPENSSL=ON'
-        '-DCURL_WINDOWS_SSPI=OFF'
+        '-DCURL_DISABLE_TELNET=ON'
+        '-DCURL_DISABLE_LDAP=ON'
+        '-DCURL_DISABLE_LDAPS=ON'
         '-DENABLE_MANUAL=OFF'
     )
 

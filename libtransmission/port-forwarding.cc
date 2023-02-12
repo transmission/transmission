@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -44,7 +44,7 @@ public:
     tr_port_forwarding_impl& operator=(tr_port_forwarding_impl&&) = delete;
     tr_port_forwarding_impl& operator=(tr_port_forwarding_impl const&) = delete;
 
-    void localPortChanged() override
+    void portChanged() override
     {
         if (!is_enabled_)
         {
@@ -192,23 +192,23 @@ private:
 
         auto const old_state = state();
 
-        auto const result = natpmp_->pulse(mediator_.localPeerPort(), is_enabled);
+        auto const result = natpmp_->pulse(mediator_.privatePeerPort(), is_enabled);
         natpmp_state_ = result.state;
-        if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
+        if (!std::empty(result.public_port) && !std::empty(result.private_port))
         {
-            mediator_.onPortForwarded(result.advertised_port);
+            mediator_.onPortForwarded(result.public_port, result.private_port);
             tr_logAddInfo(fmt::format(
                 _("Mapped private port {private_port} to public port {public_port}"),
-                fmt::arg("private_port", result.local_port.host()),
-                fmt::arg("public_port", result.advertised_port.host())));
+                fmt::arg("public_port", result.public_port.host()),
+                fmt::arg("private_port", result.private_port.host())));
         }
 
         upnp_state_ = tr_upnpPulse(
             upnp_,
-            mediator_.localPeerPort(),
+            mediator_.privatePeerPort(),
             is_enabled,
             do_check,
-            mediator_.incomingPeerAddress().display_name());
+            mediator_.incomingPeerAddress().readable());
 
         if (auto const new_state = state(); new_state != old_state)
         {

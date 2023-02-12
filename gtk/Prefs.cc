@@ -1,20 +1,22 @@
-// This file Copyright © 2021-2023 Transmission authors and contributors.
+// This file copyright (C) Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include "Prefs.h"
+#include <errno.h>
+#include <string>
+#include <string_view>
 
-#include "GtkCompat.h"
-#include "PrefsDialog.h"
+#include <glibmm.h>
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include <glibmm/miscutils.h>
-
-#include <string>
-#include <string_view>
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Utils.h"
 
 using namespace std::literals;
 
@@ -84,7 +86,7 @@ static void tr_prefs_init_defaults(tr_variant* d)
 
 static void ensure_sound_cmd_is_a_list(tr_variant* dict)
 {
-    tr_quark const key = TR_KEY_torrent_complete_sound_command;
+    tr_quark key = TR_KEY_torrent_complete_sound_command;
     tr_variant* list = nullptr;
     if (tr_variantDictFindList(dict, key, &list))
     {
@@ -128,7 +130,7 @@ tr_variant* gtr_pref_get_all()
 
 int64_t gtr_pref_int_get(tr_quark const key)
 {
-    int64_t i = 0;
+    int64_t i;
 
     return tr_variantDictFindInt(getPrefs(), key, &i) ? i : 0;
 }
@@ -140,7 +142,7 @@ void gtr_pref_int_set(tr_quark const key, int64_t value)
 
 double gtr_pref_double_get(tr_quark const key)
 {
-    double d = 0;
+    double d;
 
     return tr_variantDictFindReal(getPrefs(), key, &d) ? d : 0.0;
 }
@@ -156,7 +158,7 @@ void gtr_pref_double_set(tr_quark const key, double value)
 
 bool gtr_pref_flag_get(tr_quark const key)
 {
-    bool boolVal = false;
+    bool boolVal;
 
     return tr_variantDictFindBool(getPrefs(), key, &boolVal) ? boolVal : false;
 }

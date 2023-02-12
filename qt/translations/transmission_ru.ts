@@ -16,7 +16,7 @@
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Быстрый и простой торрент-клиент</translation>
+        <translation>Быстрый и простой клиент BitTorrent</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
@@ -49,12 +49,12 @@
     <message>
         <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Transmission — приложение для обмена файлами.&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Transmission — программа обмена файлами.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Когда вы запускаете торрент, имеющиеся данные становятся доступны другим пользователям посредством раздачи. Вы несёте личную ответственность за всё переданное.</translation>
+        <translation>Когда вы запускаете торрент, его данные становятся доступны другим пользователям посредством раздачи. Вы несёте персональную ответственность за всю информацию, которой делитесь.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -341,7 +341,7 @@
     <message>
         <location line="+0"/>
         <source>Status</source>
-        <translation>Состояние</translation>
+        <translation>Статус</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -361,7 +361,7 @@
     <message>
         <location line="+16"/>
         <source>Information</source>
-        <translation>Информация</translation>
+        <translation>Сведения</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -446,7 +446,7 @@
     <message>
         <location line="+7"/>
         <source>Origin:</source>
-        <translation>Источник:</translation>
+        <translation>Происхождение:</translation>
     </message>
     <message>
         <location line="+78"/>
@@ -509,17 +509,17 @@
         <translation>Учитывать глобальные ограничени&amp;я</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+7"/>
         <source>Limit &amp;download speed:</source>
         <translation>Ограничить скорость &amp;загрузки:</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Ограничить скорость &amp;отдачи:</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+20"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;Приоритет торрента:</translation>
     </message>
@@ -554,27 +554,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>Низкий</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-257"/>
+        <location line="+255"/>
         <source>High</source>
         <translation>Высокий</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>Обычный</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>Смешанный</translation>
     </message>
@@ -610,7 +610,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
         <translation>Отметить выбранное</translation>
     </message>
@@ -1054,47 +1054,47 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Activity</source>
-        <translation>Упорядочивать по &amp;активности</translation>
+        <translation>Сортировать по &amp;активности</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>Упорядочивать по &amp;возрасту</translation>
+        <translation>Сортировать по &amp;возрасту</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
-        <translation>Упорядочивать по &amp;оставшемуся времени</translation>
+        <translation>Сортировать по &amp;оставшемуся времени</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Name</source>
-        <translation>Упорядочивать по &amp;названию</translation>
+        <translation>Сортировать по &amp;названию</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>Упорядочивать по степени &amp;загрузки</translation>
+        <translation>Сортировать по степени &amp;загрузки</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>Упорядочивать по ре&amp;йтингу</translation>
+        <translation>Сортировать по ре&amp;йтингу</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
-        <translation>Упорядочивать по &amp;размеру</translation>
+        <translation>Сортировать по &amp;размеру</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
-        <translation>Упорядочивать по &amp;состоянию</translation>
+        <translation>Сортировать по &amp;состоянию</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>Упорядочивать по &amp;последовательности</translation>
+        <translation>Сортировать по &amp;последовательности</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1114,12 +1114,12 @@
     <message>
         <location line="+8"/>
         <source>&amp;About</source>
-        <translation>О пр&amp;иложении</translation>
+        <translation>О програ&amp;мме</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
-        <translation>Обра&amp;тное упорядочивание</translation>
+        <translation>Обра&amp;тный порядок сортировки</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1190,7 +1190,7 @@
     <message>
         <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>С&amp;Копировать магнет-ссылку в буфер обмена</translation>
+        <translation>&amp;Копировать магнет-ссылку в буфер обмена</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1230,10 +1230,10 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>Упорядочивать по очерёдности</translation>
+        <translation>Сортировать по очерёдности</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>Ограничить скорость загрузки</translation>
     </message>
@@ -1309,12 +1309,12 @@
         <translation>Открыть торрент</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Ограничения скорости</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Ошибка сети</translation>
     </message>
@@ -1691,7 +1691,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>В указанные &amp;дни:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
         <translation>Ежедневно</translation>
     </message>
@@ -2034,7 +2034,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Трекеры для использования на всех общедоступных торрентах.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Чтобы добавить резервный адрес, добавьте его в следующую строку после основного адреса.&lt;/p&gt;&lt;p&gt;Чтобы добавить новый основной адрес, добавьте его после пустой строки.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Трекеры для использования на всех общедоступных торрентах.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt; Чтобы добавить резервный адрес, добавьте его в следующую строку после основного адреса.&lt;/p&gt;&lt;p&gt; Чтобы добавить новый основной адрес, добавьте его после пустой строки.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2241,7 +2241,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Ошибка переименования пути</translation>
     </message>
@@ -2439,7 +2439,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Магнетизированая передача — получение метаданных (%1%)</translation>

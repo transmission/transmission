@@ -18,12 +18,12 @@
 #include <windows.h>
 #endif
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
-#include <libtransmission/tr-macros.h>
-#include <libtransmission/tr-strbuf.h>
+#include "error.h"
+#include "file.h"
+#include "tr-macros.h"
+#include "tr-strbuf.h"
 
 #include "test-fixtures.h"
 
@@ -39,7 +39,10 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 class FileTest : public SessionTest
@@ -110,7 +113,7 @@ protected:
                 slash_pos = p + strlen(p) - 1;
             }
 
-            auto const path_part = std::string{ path, static_cast<size_t>(slash_pos - path + 1) };
+            auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
             auto const info = tr_sys_path_get_info(path_part, TR_SYS_PATH_NO_FOLLOW);
             if (!info || (!info->isFile() && !info->isFolder()))
             {
@@ -140,30 +143,26 @@ protected:
 
     struct XnameTestData
     {
-        std::string_view input;
-        std::string_view output;
+        char const* input;
+        char const* output;
     };
 
-    static void testPathXname(
-        XnameTestData const* data,
-        size_t data_size,
-        std::string_view (*func)(std::string_view, tr_error**))
+    static void testPathXname(XnameTestData const* data, size_t data_size, std::string (*func)(std::string_view, tr_error**))
     {
         for (size_t i = 0; i < data_size; ++i)
         {
             tr_error* err = nullptr;
-            auto const& [input, output] = data[i];
-            auto const name = func(input, &err);
+            auto const name = func(data[i].input, &err);
 
-            if (!std::empty(data[i].output))
+            if (data[i].output != nullptr)
             {
                 EXPECT_NE(""sv, name);
                 EXPECT_EQ(nullptr, err) << *err;
-                EXPECT_EQ(output, name) << " in [" << input << ']';
+                EXPECT_EQ(data[i].output, name);
             }
             else
             {
-                EXPECT_EQ(""sv, name) << " in [" << input << ']';
+                EXPECT_EQ(""sv, name);
                 EXPECT_NE(nullptr, err);
                 tr_error_clear(&err);
             }
@@ -179,14 +178,9 @@ protected:
         EXPECT_NE(TR_BAD_SYS_DIR, dd);
         EXPECT_EQ(nullptr, err) << *err;
 
-        for (;;)
+        char const* name;
+        while ((name = tr_sys_dir_read_name(dd, &err)) != nullptr)
         {
-            char const* name = tr_sys_dir_read_name(dd, &err);
-            if (name == nullptr)
-            {
-                break;
-            }
-
             EXPECT_EQ(nullptr, err) << *err;
 
             if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
@@ -225,7 +219,7 @@ TEST_F(FileTest, getInfo)
     // Can't get info of non-existent file/directory
     tr_error* err = nullptr;
     auto info = tr_sys_path_get_info(path1, 0, &err);
-    EXPECT_FALSE(info.has_value());
+    EXPECT_FALSE(info);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
@@ -234,8 +228,7 @@ TEST_F(FileTest, getInfo)
 
     // Good file info
     info = tr_sys_path_get_info(path1, 0, &err);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
     EXPECT_EQ(4U, info->size);
@@ -248,8 +241,7 @@ TEST_F(FileTest, getInfo)
     t = time(nullptr);
     tr_sys_dir_create(path1, 0, 0777);
     info = tr_sys_path_get_info(path1, 0, &err);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info->type);
     EXPECT_NE(uint64_t(-1), info->size);
@@ -261,7 +253,7 @@ TEST_F(FileTest, getInfo)
     {
         // Can't get info of non-existent file/directory
         info = tr_sys_path_get_info(path1, 0, &err);
-        ASSERT_FALSE(info.has_value());
+        EXPECT_FALSE(info);
         EXPECT_NE(nullptr, err);
         tr_error_clear(&err);
 
@@ -270,8 +262,7 @@ TEST_F(FileTest, getInfo)
 
         // Good file info
         info = tr_sys_path_get_info(path1, 0, &err);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_FILE, info->type);
         EXPECT_EQ(4, info->size);
@@ -280,8 +271,7 @@ TEST_F(FileTest, getInfo)
 
         // Symlink
         info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &err);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_OTHER, info->type);
 
@@ -293,8 +283,7 @@ TEST_F(FileTest, getInfo)
         tr_sys_dir_create(path2, 0, 0777);
         EXPECT_TRUE(createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
         info = tr_sys_path_get_info(path1, 0, &err);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info->type);
         EXPECT_NE(uint64_t(-1), info->size);
@@ -306,7 +295,7 @@ TEST_F(FileTest, getInfo)
     }
     else
     {
-        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
 }
 
@@ -339,6 +328,19 @@ TEST_F(FileTest, readFile)
     EXPECT_EQ(nullptr, err) << *err;
 
     tr_sys_file_close(fd);
+
+    // read from closed file
+    n_read = 0;
+    EXPECT_FALSE(tr_sys_file_read(fd, std::data(buf), std::size(buf), &n_read, &err)); // coverity[USE_AFTER_FREE]
+    EXPECT_EQ(0, n_read);
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
+
+    // read_at from closed file
+    EXPECT_FALSE(tr_sys_file_read_at(fd, std::data(buf), std::size(buf), offset, &n_read, &err)); // coverity[USE_AFTER_FREE]
+    EXPECT_EQ(0, n_read);
+    EXPECT_NE(nullptr, err);
+    tr_error_clear(&err);
 }
 
 TEST_F(FileTest, pathExists)
@@ -392,7 +394,7 @@ TEST_F(FileTest, pathExists)
     }
     else
     {
-        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
 }
 
@@ -589,7 +591,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
 
     path3.assign(test_dir, "/c"sv);
@@ -629,7 +631,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run hardlink tests\n", __FUNCTION__);
     }
 
     if (createSymlink(path2, path1, false) && createHardlink(path3, path1))
@@ -639,7 +641,7 @@ TEST_F(FileTest, pathIsSame)
     }
     else
     {
-        fmt::print(stderr, "WARNING: [{:s}] unable to run combined symlink and hardlink tests\n", __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run combined symlink and hardlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path3);
@@ -676,7 +678,7 @@ TEST_F(FileTest, pathResolve)
     }
     else
     {
-        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path2);
@@ -716,30 +718,30 @@ TEST_F(FileTest, pathBasename)
 #ifdef _WIN32
         { "\\", "/" },
         /* Invalid paths */
-        { "\\\\\\", "" },
-        { "123:", "" },
+        { "\\\\\\", nullptr },
+        { "123:", nullptr },
         /* Reserved characters */
-        { "<", "" },
-        { ">", "" },
-        { ":", "" },
-        { "\"", "" },
-        { "|", "" },
-        { "?", "" },
-        { "*", "" },
-        { "a\\<", "" },
-        { "a\\>", "" },
-        { "a\\:", "" },
-        { "a\\\"", "" },
-        { "a\\|", "" },
-        { "a\\?", "" },
-        { "a\\*", "" },
-        { "c:\\a\\b<c\\d", "" },
-        { "c:\\a\\b>c\\d", "" },
-        { "c:\\a\\b:c\\d", "" },
-        { "c:\\a\\b\"c\\d", "" },
-        { "c:\\a\\b|c\\d", "" },
-        { "c:\\a\\b?c\\d", "" },
-        { "c:\\a\\b*c\\d", "" },
+        { "<", nullptr },
+        { ">", nullptr },
+        { ":", nullptr },
+        { "\"", nullptr },
+        { "|", nullptr },
+        { "?", nullptr },
+        { "*", nullptr },
+        { "a\\<", nullptr },
+        { "a\\>", nullptr },
+        { "a\\:", nullptr },
+        { "a\\\"", nullptr },
+        { "a\\|", nullptr },
+        { "a\\?", nullptr },
+        { "a\\*", nullptr },
+        { "c:\\a\\b<c\\d", nullptr },
+        { "c:\\a\\b>c\\d", nullptr },
+        { "c:\\a\\b:c\\d", nullptr },
+        { "c:\\a\\b\"c\\d", nullptr },
+        { "c:\\a\\b|c\\d", nullptr },
+        { "c:\\a\\b?c\\d", nullptr },
+        { "c:\\a\\b*c\\d", nullptr },
 #else
         { "////", "/" },
 #endif
@@ -946,7 +948,7 @@ TEST_F(FileTest, pathRename)
     }
     else
     {
-        fmt::print(stderr, "WARNING: [{:s}] unable to run symlink tests\n", __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
 
     if (createHardlink(path2, path1))
@@ -967,7 +969,7 @@ TEST_F(FileTest, pathRename)
     }
     else
     {
-        fmt::print(stderr, "WARNING: [{:s}] unable to run hardlink tests\n", __FUNCTION__);
+        fprintf(stderr, "WARNING: [%s] unable to run hardlink tests\n", __FUNCTION__);
     }
 
     tr_sys_path_remove(path1);
@@ -1022,18 +1024,26 @@ TEST_F(FileTest, pathNativeSeparators)
 {
     EXPECT_EQ(nullptr, tr_sys_path_native_separators(nullptr));
 
-    static auto constexpr Tests = std::array<std::pair<std::string_view, std::string_view>, 5>{ {
-        { "", "" },
+    struct LocalTest
+    {
+        std::string input;
+        std::string expected_output;
+    };
+
+    auto const tests = std::array<LocalTest, 5>{
+        LocalTest{ "", "" },
         { "a", TR_IF_WIN32("a", "a") },
         { "/", TR_IF_WIN32("\\", "/") },
         { "/a/b/c", TR_IF_WIN32("\\a\\b\\c", "/a/b/c") },
         { "C:\\a/b\\c", TR_IF_WIN32("C:\\a\\b\\c", "C:\\a/b\\c") },
-    } };
+    };
 
-    for (auto const& [input, expected] : Tests)
+    for (auto const& test : tests)
     {
-        auto buf = tr_pathbuf{ input };
-        EXPECT_EQ(expected, tr_sys_path_native_separators(std::data(buf)));
+        auto buf = std::string(test.input);
+        char* const output = tr_sys_path_native_separators(buf.data());
+        EXPECT_EQ(test.expected_output, output);
+        EXPECT_EQ(buf.data(), output);
     }
 }
 
@@ -1126,8 +1136,7 @@ TEST_F(FileTest, fileOpen)
 
     /* Pointer is at the end of file */
     auto info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(4U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
@@ -1137,20 +1146,17 @@ TEST_F(FileTest, fileOpen)
 
     /* File gets truncated */
     info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(5U, info->size);
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_path_get_info(path1);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(0U, info->size);
     tr_sys_file_close(fd);
     info = tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(0U, info->size);
 
     /* TODO: symlink and hardlink tests */
@@ -1169,22 +1175,19 @@ TEST_F(FileTest, fileTruncate)
     EXPECT_TRUE(tr_sys_file_truncate(fd, 10, &err));
     EXPECT_EQ(nullptr, err) << *err;
     auto info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(10U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 20, &err));
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(20U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 0, &err));
     EXPECT_EQ(nullptr, err) << *err;
     info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(0U, info->size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 50, &err));
@@ -1193,8 +1196,7 @@ TEST_F(FileTest, fileTruncate)
     tr_sys_file_close(fd);
 
     info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(50U, info->size);
 
     fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
@@ -1205,8 +1207,7 @@ TEST_F(FileTest, fileTruncate)
     tr_sys_file_close(fd);
 
     info = tr_sys_path_get_info(path);
-    EXPECT_TRUE(info.has_value());
-    assert(info.has_value());
+    EXPECT_TRUE(info);
     EXPECT_EQ(25U, info->size);
 
     // try to truncate a closed file
@@ -1230,19 +1231,13 @@ TEST_F(FileTest, filePreallocate)
     {
         EXPECT_EQ(nullptr, err) << *err;
         auto info = tr_sys_path_get_info(path1);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(prealloc_size, info->size);
     }
     else
     {
         EXPECT_NE(nullptr, err);
-        fmt::print(
-            stderr,
-            "WARNING: [{:s}] unable to preallocate file (full): {:s} ({:d})\n",
-            __FUNCTION__,
-            err->message,
-            err->code);
+        fprintf(stderr, "WARNING: [%s] unable to preallocate file (full): %s (%d)\n", __FUNCTION__, err->message, err->code);
         tr_error_clear(&err);
     }
 
@@ -1252,24 +1247,18 @@ TEST_F(FileTest, filePreallocate)
 
     fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
-    prealloc_size = size_t{ 500U } * 1024U * 1024U;
+    prealloc_size = 500 * 1024 * 1024;
     if (tr_sys_file_preallocate(fd, prealloc_size, TR_SYS_FILE_PREALLOC_SPARSE, &err))
     {
         EXPECT_EQ(nullptr, err) << *err;
         auto info = tr_sys_path_get_info(path1);
-        EXPECT_TRUE(info.has_value());
-        assert(info.has_value());
+        EXPECT_TRUE(info);
         EXPECT_EQ(prealloc_size, info->size);
     }
     else
     {
         EXPECT_NE(nullptr, err) << *err;
-        fmt::print(
-            stderr,
-            "WARNING: [{:s}] unable to preallocate file (sparse): {:s} ({:d})\n",
-            __FUNCTION__,
-            err->message,
-            err->code);
+        fprintf(stderr, "WARNING: [%s] unable to preallocate file (sparse): %s (%d)\n", __FUNCTION__, err->message, err->code);
         tr_error_clear(&err);
     }
 
@@ -1352,8 +1341,8 @@ TEST_F(FileTest, dirRead)
     auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
     auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
 
-    auto have1 = bool{};
-    auto have2 = bool{};
+    bool have1;
+    bool have2;
     testDirReadImpl(test_dir, &have1, &have2);
     EXPECT_FALSE(have1);
     EXPECT_FALSE(have2);
@@ -1414,4 +1403,6 @@ TEST_F(FileTest, dirOpen)
     EXPECT_EQ(nullptr, err) << *err;
 }
 
-} // namespace libtransmission::test
+} // namespace test
+
+} // namespace libtransmission

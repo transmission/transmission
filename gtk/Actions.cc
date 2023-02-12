@@ -1,35 +1,24 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
-
-#include "Actions.h"
-
-#include "Prefs.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
-
-#include <libtransmission/transmission.h>
-
-#include <giomm/liststore.h>
-#include <giomm/menuattributeiter.h>
-#include <giomm/menulinkiter.h>
-#include <giomm/simpleaction.h>
-#include <glibmm/i18n.h>
-#include <glibmm/variant.h>
-
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-#include <gtkmm/shortcut.h>
-#include <gtkmm/shortcutaction.h>
-#include <gtkmm/shortcuttrigger.h>
-#endif
 
 #include <array>
 #include <stack>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+
+#include <libtransmission/transmission.h>
+
+#include "Actions.h"
+#include "Prefs.h"
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "Utils.h"
 
 using namespace std::string_view_literals;
 
@@ -123,7 +112,7 @@ Glib::RefPtr<Gio::SimpleActionGroup> gtr_actions_init(Glib::RefPtr<Gtk::Builder>
 {
     myBuilder = builder.get();
 
-    auto action_group = Gio::SimpleActionGroup::create();
+    auto const action_group = Gio::SimpleActionGroup::create();
 
     auto const match = gtr_pref_string_get(TR_KEY_sort_mode);
 
@@ -188,14 +177,14 @@ void gtr_action_activate(Glib::ustring const& name)
     get_action(name)->activate();
 }
 
-void gtr_action_set_sensitive(Glib::ustring const& name, bool is_sensitive)
+void gtr_action_set_sensitive(Glib::ustring const& name, bool b)
 {
-    get_action(name)->set_enabled(is_sensitive);
+    get_action(name)->set_enabled(b);
 }
 
-void gtr_action_set_toggled(Glib::ustring const& name, bool is_toggled)
+void gtr_action_set_toggled(Glib::ustring const& name, bool b)
 {
-    get_action(name)->change_state(is_toggled);
+    get_action(name)->set_state(Glib::Variant<bool>::create(b));
 }
 
 Glib::RefPtr<Glib::Object> gtr_action_get_object(Glib::ustring const& name)

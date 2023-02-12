@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Transmission authors and contributors.
+// This file Copyright © 2011-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -26,14 +26,13 @@ extern const NSInteger kGroupFilterAllTag;
 
 - (instancetype)init;
 
-- (IBAction)setFilter:(id)sender;
+- (void)setFilter:(id)sender;
 - (void)switchFilter:(BOOL)right;
-- (IBAction)setSearchText:(id)sender;
-- (IBAction)setSearchType:(id)sender;
-- (IBAction)setGroupFilter:(id)sender;
+- (void)setSearchText:(id)sender;
+- (void)setSearchType:(id)sender;
+- (void)setGroupFilter:(id)sender;
 - (void)reset:(BOOL)updateUI;
 - (void)focusSearchField;
-- (BOOL)isFocused;
 
 - (void)setCountAll:(NSUInteger)all
              active:(NSUInteger)active

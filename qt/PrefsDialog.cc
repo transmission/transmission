@@ -1,9 +1,15 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © 2009-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include "PrefsDialog.h"
+
+#ifdef _WIN32
+#include <winsock2.h> // FD_SETSIZE
+#else
+#include <sys/select.h> // FD_SETSIZE
+#endif
 
 #include <cassert>
 
@@ -452,8 +458,8 @@ void PrefsDialog::onPortTest()
 
 void PrefsDialog::initNetworkTab()
 {
-    ui_.torrentPeerLimitSpin->setRange(1, INT_MAX);
-    ui_.globalPeerLimitSpin->setRange(1, INT_MAX);
+    ui_.torrentPeerLimitSpin->setRange(1, FD_SETSIZE);
+    ui_.globalPeerLimitSpin->setRange(1, FD_SETSIZE);
 
     linkWidgetToPref(ui_.peerPortSpin, Prefs::PEER_PORT);
     linkWidgetToPref(ui_.randomPeerPortCheck, Prefs::PEER_PORT_RANDOM_ON_START);

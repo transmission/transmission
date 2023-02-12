@@ -7,7 +7,7 @@
     <property name="border-width">6</property>
     <property name="title" translatable="yes">Transmission Preferences</property>
     <property name="role">transmission-preferences-dialog</property>
-    <property name="modal">False</property>
+    <property name="modal">True</property>
     <property name="type-hint">dialog</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog_layout">
@@ -122,7 +122,6 @@
                     <child>
                       <object class="GtkSpinButton" id="upload_limit_spin">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="upload_limit_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="hexpand">True</property>
                       </object>
@@ -134,7 +133,6 @@
                     <child>
                       <object class="GtkSpinButton" id="download_limit_spin">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="download_limit_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="hexpand">True</property>
                       </object>
@@ -273,7 +271,6 @@
                     <child>
                       <object class="GtkLabel" id="alt_speed_days_label">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="alt_schedule_time_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">False</property>
                         <property name="label" translatable="yes">_On days:</property>
                         <property name="use-underline">True</property>
@@ -316,7 +313,6 @@
                         <child>
                           <object class="GtkComboBox" id="alt_speed_start_time_combo">
                             <property name="visible">True</property>
-                            <property name="sensitive" bind-source="alt_schedule_time_check" bind-property="active" bind-flags="sync-create">False</property>
                             <property name="can-focus">False</property>
                             <property name="hexpand">True</property>
                             <property name="wrap-width">4</property>
@@ -330,7 +326,6 @@
                         <child>
                           <object class="GtkLabel" id="alt_speed_to_label">
                             <property name="visible">True</property>
-                            <property name="sensitive" bind-source="alt_schedule_time_check" bind-property="active" bind-flags="sync-create">False</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes" comments="Label goes between two time selectors, e.g. &quot;limit speeds from [time] to [time]&quot;">_to</property>
                             <property name="use-underline">True</property>
@@ -345,7 +340,6 @@
                         <child>
                           <object class="GtkComboBox" id="alt_speed_end_time_combo">
                             <property name="visible">True</property>
-                            <property name="sensitive" bind-source="alt_schedule_time_check" bind-property="active" bind-flags="sync-create">False</property>
                             <property name="can-focus">False</property>
                             <property name="hexpand">True</property>
                             <property name="wrap-width">4</property>
@@ -365,7 +359,6 @@
                     <child>
                       <object class="GtkComboBox" id="alt_speed_days_combo">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="alt_schedule_time_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">False</property>
                         <property name="hexpand">True</property>
                       </object>
@@ -507,7 +500,6 @@
                     <child>
                       <object class="GtkFileChooserButton" id="watch_dir_chooser">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="watch_dir_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">False</property>
                         <property name="hexpand">True</property>
                         <property name="action">select-folder</property>
@@ -743,7 +735,6 @@
                     <child>
                       <object class="GtkFileChooserButton" id="incomplete_dir_chooser">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="incomplete_dir_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">False</property>
                         <property name="hexpand">True</property>
                         <property name="action">select-folder</property>
@@ -757,7 +748,6 @@
                     <child>
                       <object class="GtkFileChooserButton" id="download_done_script_chooser">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="download_done_script_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">False</property>
                         <property name="hexpand">True</property>
                         <property name="title" translatable="yes"/>
@@ -869,7 +859,6 @@
                     <child>
                       <object class="GtkSpinButton" id="stop_seeding_ratio_spin">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="stop_seeding_ratio_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="hexpand">True</property>
                       </object>
@@ -881,7 +870,6 @@
                     <child>
                       <object class="GtkSpinButton" id="stop_seeding_timeout_spin">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="stop_seeding_timeout_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="hexpand">True</property>
                       </object>
@@ -891,9 +879,8 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkFileChooserButton" id="seeding_done_script_chooser">
+                      <object class="GtkFileChooserButton" id="seeding_done_script_choose">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="seeding_done_script_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">False</property>
                         <property name="hexpand">True</property>
                         <property name="title" translatable="yes"/>
@@ -1044,7 +1031,6 @@
                       <object class="GtkCheckButton" id="blocklist_autoupdate_check">
                         <property name="label" translatable="yes">Enable _automatic updates</property>
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="blocklist_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="valign">center</property>
@@ -1062,7 +1048,6 @@
                       <object class="GtkEntry" id="blocklist_url_entry">
                         <property name="width-request">300</property>
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="blocklist_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="hexpand">True</property>
                       </object>
@@ -1080,7 +1065,6 @@
                         <child>
                           <object class="GtkLabel" id="blocklist_stats_label">
                             <property name="visible">True</property>
-                            <property name="sensitive" bind-source="blocklist_check" bind-property="active" bind-flags="sync-create">False</property>
                             <property name="can-focus">False</property>
                             <property name="hexpand">True</property>
                             <property name="label">...</property>
@@ -1834,7 +1818,6 @@ To add a new primary URL, add it after a blank line.</property>
                           <object class="GtkButton" id="open_web_client_button">
                             <property name="label" translatable="yes">_Open web client</property>
                             <property name="visible">True</property>
-                            <property name="sensitive" bind-source="enable_rpc_check" bind-property="active" bind-flags="sync-create">False</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">True</property>
                             <property name="use-underline">True</property>
@@ -1856,7 +1839,6 @@ To add a new primary URL, add it after a blank line.</property>
                     <child>
                       <object class="GtkLabel" id="rpc_port_label">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="enable_rpc_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">False</property>
                         <property name="label" translatable="yes">HTTP _port:</property>
                         <property name="use-underline">True</property>
@@ -1872,7 +1854,6 @@ To add a new primary URL, add it after a blank line.</property>
                       <object class="GtkCheckButton" id="enable_rpc_auth_check">
                         <property name="label" translatable="yes">Use _authentication</property>
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="enable_rpc_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="valign">center</property>
@@ -1918,7 +1899,6 @@ To add a new primary URL, add it after a blank line.</property>
                       <object class="GtkCheckButton" id="rpc_whitelist_check">
                         <property name="label" translatable="yes">Only allow these IP a_ddresses:</property>
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="enable_rpc_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
                         <property name="valign">center</property>
@@ -1964,7 +1944,6 @@ To add a new primary URL, add it after a blank line.</property>
                     <child>
                       <object class="GtkSpinButton" id="rpc_port_spin">
                         <property name="visible">True</property>
-                        <property name="sensitive" bind-source="enable_rpc_check" bind-property="active" bind-flags="sync-create">False</property>
                         <property name="can-focus">True</property>
                         <property name="hexpand">True</property>
                       </object>

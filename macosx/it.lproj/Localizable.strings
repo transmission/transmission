@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minuti";
 
 /* stats window -> times opened */
-/* "%llu times" = ""; */
+"%llu times" = "";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu cache";
@@ -295,7 +295,6 @@
 /* inspector -> peer table -> header
    inspector -> web seed table -> header
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string */
 "DL" = "Ricezione";
 
@@ -401,6 +400,9 @@
 /* Inspector -> Peers tab -> table row tooltip */
 "From: tracker" = "Da: server traccia";
 
+/* File size - gigabytes */
+"GB" = "GB";
+
 /* Transfer speed (gigabytes per second) */
 "GB/s" = "GB/s";
 
@@ -475,6 +477,9 @@
 /* Download not a torrent -> message */
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Sembra che il file \"%1$@\" da %2$@ non sia un file torrent.";
 
+/* File size - kilobytes */
+"KB" = "KB";
+
 /* Transfer speed (kilobytes per second) */
 "KB/s" = "KB/s";
 
@@ -511,6 +516,9 @@
 /* Inspector -> selected torrents
    Torrent -> progress string */
 "Magnetized transfer" = "Trasferimento magnetico";
+
+/* File size - megabytes */
+"MB" = "MB";
 
 /* Transfer speed (megabytes per second) */
 "MB/s" = "MB/s";
@@ -731,7 +739,6 @@
 
 /* Stats window -> label
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string
    Torrent table -> group row -> tooltip */
 "Ratio" = "Rapporto";
@@ -910,6 +917,9 @@
 /* Donation beg -> title */
 "Support open-source indie software" = "Supporta il software open-source indipendente";
 
+/* File size - terabytes */
+"TB" = "TB";
+
 /* Transfer speed (terabytes per second) */
 "TB/s" = "TB/s";
 
@@ -1029,8 +1039,9 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Trasferimento totale";
 
-/* Message window -> level */
-/* "Trace" = ""; */
+/* Message window -> level
+   Message window -> level string */
+"Trace" = "";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Server traccia";
@@ -1068,7 +1079,6 @@
 
 /* inspector -> peer table -> header
    status bar -> status label
-   Torrent -> status image
    Torrent -> status string */
 "UL" = "Invio";
 
@@ -1110,7 +1120,7 @@
 
 /* Message window -> level
    Message window -> level string */
-/* "Warning" = ""; */
+"Warning" = "";
 
 /* Drag overlay -> url */
 "Web Address" = "Sito web";

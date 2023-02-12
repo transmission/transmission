@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -137,13 +137,13 @@ static std::string tr_strltime(time_t seconds)
 
     auto tmpstr = std::string{};
 
-    auto const hstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, tr_ngettext("hour", "hours", hours));
-    auto const mstr = fmt::format(FMT_STRING("{:d} {:s}"), minutes, tr_ngettext("minute", "minutes", minutes));
-    auto const sstr = fmt::format(FMT_STRING("{:d} {:s}"), seconds, tr_ngettext("seconds", "seconds", seconds));
+    auto const hstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, ngettext("hour", "hours", hours));
+    auto const mstr = fmt::format(FMT_STRING("{:d} {:s}"), minutes, ngettext("minute", "minutes", minutes));
+    auto const sstr = fmt::format(FMT_STRING("{:d} {:s}"), seconds, ngettext("seconds", "seconds", seconds));
 
     if (days > 0)
     {
-        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), days, tr_ngettext("day", "days", days));
+        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, ngettext("day", "days", days));
         tmpstr = days >= 4 || hours == 0 ? dstr : fmt::format(FMT_STRING("{:s}, {:s}"), dstr, hstr);
     }
     else if (hours > 0)
@@ -159,7 +159,7 @@ static std::string tr_strltime(time_t seconds)
         tmpstr = sstr;
     }
 
-    auto const totstr = fmt::format(FMT_STRING("{:d} {:s}"), total_seconds, tr_ngettext("seconds", "seconds", total_seconds));
+    auto const totstr = fmt::format(FMT_STRING("{:d} {:s}"), total_seconds, ngettext("seconds", "seconds", total_seconds));
     return fmt::format(FMT_STRING("{:s} ({:s})"), tmpstr, totstr);
 }
 
@@ -175,7 +175,22 @@ static std::string strlratio2(double ratio)
 
 static std::string strlratio(int64_t numerator, int64_t denominator)
 {
-    return strlratio2(tr_getRatio(numerator, denominator));
+    double ratio;
+
+    if (denominator != 0)
+    {
+        ratio = numerator / (double)denominator;
+    }
+    else if (numerator != 0)
+    {
+        ratio = TR_RATIO_INF;
+    }
+    else
+    {
+        ratio = TR_RATIO_NA;
+    }
+
+    return strlratio2(ratio);
 }
 
 static std::string strlmem(int64_t bytes)
@@ -892,11 +907,11 @@ static std::string getStatusString(tr_variant* t)
     }
 }
 
-static auto constexpr bandwidth_priority_names = std::array<std::string_view, 4>{
-    "Low"sv,
-    "Normal"sv,
-    "High"sv,
-    "Invalid"sv,
+static char const* bandwidthPriorityNames[] = {
+    "Low",
+    "Normal",
+    "High",
+    "Invalid",
 };
 
 static char* format_date(char* buf, size_t buflen, time_t now)
@@ -950,11 +965,13 @@ static void printDetails(tr_variant* top)
             {
                 fmt::print("  Labels: ");
 
-                for (size_t child_idx = 0, n_children = tr_variantListSize(l); child_idx < n_children; ++child_idx)
+                size_t child_pos = 0;
+                tr_variant const* child;
+                while ((child = tr_variantListChild(l, child_pos++)))
                 {
-                    if (tr_variantGetStrView(tr_variantListChild(l, child_idx++), &sv))
+                    if (tr_variantGetStrView(child, &sv))
                     {
-                        fmt::print(child_idx == 1 ? "{:s}" : ", {:s}", sv);
+                        fmt::print(child_pos == 1 ? "{:s}" : ", {:s}", sv);
                     }
                 }
 
@@ -1224,7 +1241,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_bandwidthPriority, &i))
             {
-                fmt::print("  Bandwidth Priority: {:s}\n", bandwidth_priority_names[(i + 1) & 3]);
+                fmt::print("  Bandwidth Priority: {:s}\n", bandwidthPriorityNames[(i + 1) & 3]);
             }
 
             fmt::print("\n");
@@ -1600,7 +1617,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     break;
 
                 case TR_TRACKER_WAITING:
-                    fmt::print("  Asking for more peers in {:s}\n", tr_strltime(nextAnnounceTime - now));
+                    fmt::print("  Asking for more peers in {:s)\n", tr_strltime(nextAnnounceTime - now));
                     break;
 
                 case TR_TRACKER_QUEUED:
@@ -1734,7 +1751,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_utp_enabled, &boolVal))
         {
-            fmt::print("  µTP enabled: {:s}\n", boolVal ? "Yes" : "No");
+            fmt::print("  µTP enabled: {:d}\n", (boolVal ? "Yes" : "No"));
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_dht_enabled, &boolVal))
@@ -2037,13 +2054,18 @@ static void filterIds(tr_variant* top, Config& config)
             case 'l': // label
                 if (tr_variant * l; tr_variantDictFindList(d, TR_KEY_labels, &l))
                 {
-                    for (size_t child_idx = 0, n_children = tr_variantListSize(l); child_idx < n_children; ++child_idx)
+                    size_t child_pos = 0;
+                    tr_variant const* child;
+                    std::string_view sv;
+                    while ((child = tr_variantListChild(l, child_pos++)))
                     {
-                        if (auto sv = std::string_view{};
-                            tr_variantGetStrView(tr_variantListChild(l, child_idx), &sv) && arg == sv)
+                        if (tr_variantGetStrView(child, &sv))
                         {
-                            include = !include;
-                            break;
+                            if (arg == sv)
+                            {
+                                include = !include;
+                                break;
+                            }
                         }
                     }
                 }
@@ -2310,7 +2332,8 @@ static int flush(char const* rpcurl, tr_variant* benc, Config& config)
         fmt::print(stderr, "posting:\n--------\n{:s}\n--------\n", json);
     }
 
-    if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
+    auto const res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
     {
         tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
         status |= EXIT_FAILURE;

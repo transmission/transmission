@@ -1,4 +1,4 @@
-// This file Copyright © 2016-2023 Mnemosyne LLC.
+// This file Copyright © 2016-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -146,9 +146,8 @@ private:
         return promise.future();
     }
 
-    static inline Tag next_tag = {};
-
-    Tag const tag_ = next_tag++;
+    Tag const tag_;
+    static Tag next_tag;
     bool tolerate_errors_ = {};
     QFutureInterface<RpcResponse> promise_;
     QQueue<QPair<QueuedFunction, ErrorHandlerFunction>> queue_;

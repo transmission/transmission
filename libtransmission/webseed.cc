@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include <event2/buffer.h>
+
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -23,7 +25,7 @@
 #include "peer-mgr.h"
 #include "timer.h"
 #include "torrent.h"
-#include "utils-ev.h"
+#include "trevent.h" // tr_runInEventThread()
 #include "utils.h"
 #include "web-utils.h"
 #include "web.h"
@@ -41,7 +43,7 @@ void on_idle(tr_webseed* w);
 class tr_webseed_task
 {
 private:
-    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
+    tr_evbuffer_ptr const content_{ evbuffer_new() };
 
 public:
     tr_webseed_task(tr_torrent* tor, tr_webseed* webseed_in, tr_block_span_t blocks_in)
@@ -154,7 +156,7 @@ private:
 void task_request_next_chunk(tr_webseed_task* task);
 void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask);
 
-class tr_webseed final : public tr_peer
+class tr_webseed : public tr_peer
 {
 public:
     tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback callback_in, void* callback_data_in)
@@ -163,12 +165,10 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
-        , idle_timer_{ session->timerMaker().create([this]() { on_idle(this); }) }
-        , have_{ tor->pieceCount() }
         , bandwidth_{ &tor->bandwidth_ }
+        , idle_timer{ session->timerMaker().create([this]() { on_idle(this); }) }
     {
-        have_.setHasAll();
-        idle_timer_->startRepeating(IdleTimerInterval);
+        idle_timer->startRepeating(IdleTimerInterval);
     }
 
     tr_webseed(tr_webseed&&) = delete;
@@ -215,7 +215,7 @@ public:
         return bandwidth_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 size_t activeReqCount(tr_direction dir) const noexcept override
+    [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
     {
         if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
         {
@@ -230,7 +230,7 @@ public:
         return {};
     }
 
-    [[nodiscard]] std::string display_name() const override
+    [[nodiscard]] std::string readable() const override
     {
         if (auto const parsed = tr_urlParse(base_url); parsed)
         {
@@ -240,9 +240,9 @@ public:
         return base_url;
     }
 
-    [[nodiscard]] tr_bitfield const& has() const noexcept override
+    [[nodiscard]] bool hasPiece(tr_piece_index_t /*piece*/) const noexcept override
     {
-        return have_;
+        return true;
     }
 
     void gotPieceData(uint32_t n_bytes)
@@ -288,7 +288,7 @@ public:
             return {};
         }
 
-        if (auto const* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->isDone())
+        if (auto* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->isDone())
         {
             return {};
         }
@@ -317,21 +317,19 @@ public:
     std::set<tr_webseed_task*> tasks;
 
 private:
-    static auto constexpr IdleTimerInterval = 2s;
-
-    std::unique_ptr<libtransmission::Timer> const idle_timer_;
-
-    tr_bitfield have_;
-
     tr_bandwidth bandwidth_;
+    std::unique_ptr<libtransmission::Timer> idle_timer;
+    static auto constexpr IdleTimerInterval = 2s;
 };
 
-// ---
+/***
+****
+***/
 
 struct write_block_data
 {
 private:
-    libtransmission::evhelpers::evbuffer_unique_ptr const content_{ evbuffer_new() };
+    tr_evbuffer_ptr const content_{ evbuffer_new() };
 
 public:
     write_block_data(
@@ -350,7 +348,7 @@ public:
 
     void write_block_func()
     {
-        if (auto const* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
+        if (auto* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
         {
             session_->cache->writeBlock(tor_id_, block_, data_);
             webseed_->publish(tr_peer_event::GotBlock(tor->blockInfo(), block_));
@@ -398,7 +396,7 @@ void useFetchedBlocks(tr_webseed_task* task)
             block_buf->resize(block_size);
             evbuffer_remove(task->content(), std::data(*block_buf), std::size(*block_buf));
             auto* const data = new write_block_data{ session, tor->id(), task->loc.block, block_buf, webseed };
-            session->runInSessionThread(&write_block_data::write_block_func, data);
+            tr_runInEventThread(session, &write_block_data::write_block_func, data);
         }
 
         task->loc = tor->byteLoc(task->loc.byte + block_size);
@@ -408,7 +406,9 @@ void useFetchedBlocks(tr_webseed_task* task)
     }
 }
 
-// ---
+/***
+****
+***/
 
 void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask)
 {
@@ -448,15 +448,15 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
     bool const success = status == 206;
 
     auto* const task = static_cast<tr_webseed_task*>(vtask);
+    auto* const webseed = task->webseed;
+
+    webseed->connection_limiter.taskFinished(success);
 
     if (task->dead)
     {
         delete task;
         return;
     }
-
-    auto* const webseed = task->webseed;
-    webseed->connection_limiter.taskFinished(success);
 
     if (auto const* const tor = webseed->getTorrent(); tor == nullptr)
     {
@@ -506,7 +506,7 @@ void makeUrl(tr_webseed const* const webseed, std::string_view name, OutputIt ou
 void task_request_next_chunk(tr_webseed_task* task)
 {
     auto* const webseed = task->webseed;
-    auto const* const tor = webseed->getTorrent();
+    auto* const tor = webseed->getTorrent();
     if (tor == nullptr)
     {
         return;
@@ -533,7 +533,9 @@ void task_request_next_chunk(tr_webseed_task* task)
 
 } // namespace
 
-// ---
+/***
+****
+***/
 
 tr_peer* tr_webseedNew(tr_torrent* torrent, std::string_view url, tr_peer_callback callback, void* callback_data)
 {

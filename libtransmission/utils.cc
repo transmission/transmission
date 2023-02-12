@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © 2009-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -32,13 +32,16 @@
 #include <sys/stat.h> // mode_t
 #endif
 
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif
+
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
 #include <fmt/format.h>
 
 #include <fast_float/fast_float.h>
-#include <wildmat.h>
 
 #include "transmission.h"
 
@@ -56,9 +59,11 @@
 
 using namespace std::literals;
 
-time_t libtransmission::detail::tr_time::current_time = {};
+time_t __tr_current_time = 0;
 
-// ---
+/**
+***
+**/
 
 bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error)
 {
@@ -147,7 +152,8 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
     }
 
     // If we saved it to disk successfully, move it from '.tmp' to the correct filename
-    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, tr_pathbuf{ filename }, error))
+    auto const szfilename = tr_pathbuf{ filename };
+    if (!tr_sys_file_close(fd, error) || !ok || !tr_sys_path_rename(tmp, szfilename, error))
     {
         return false;
     }
@@ -167,7 +173,9 @@ tr_disk_space tr_dirSpace(std::string_view directory)
     return tr_device_info_get_disk_space(tr_device_info_create(directory));
 }
 
-// ---
+/****
+*****
+****/
 
 size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
 {
@@ -186,12 +194,17 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
     return len;
 }
 
+extern "C"
+{
+    int DoMatch(char const* text, char const* p);
+}
+
 /* User-level routine. returns whether or not 'text' and 'p' matched */
 bool tr_wildmat(std::string_view text, std::string_view pattern)
 {
     // TODO(ckerr): replace wildmat with base/strings/pattern.cc
     // wildmat wants these to be zero-terminated.
-    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) > 0;
+    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) != 0;
 }
 
 char const* tr_strerror(int errnum)
@@ -204,7 +217,9 @@ char const* tr_strerror(int errnum)
     return "Unknown Error";
 }
 
-// ---
+/****
+*****
+****/
 
 std::string_view tr_strvStrip(std::string_view str)
 {
@@ -222,14 +237,34 @@ std::string_view tr_strvStrip(std::string_view str)
     return str;
 }
 
-// ---
+/****
+*****
+****/
 
 uint64_t tr_time_msec()
 {
     return std::chrono::system_clock::now().time_since_epoch() / 1ms;
 }
 
-// ---
+void tr_wait_msec(long int delay_milliseconds)
+{
+#ifdef _WIN32
+
+    Sleep((DWORD)delay_milliseconds);
+
+#else
+
+    struct timespec ts = {};
+    ts.tv_sec = delay_milliseconds / 1000;
+    ts.tv_nsec = (delay_milliseconds % 1000) * 1000000;
+    nanosleep(&ts, nullptr);
+
+#endif
+}
+
+/***
+****
+***/
 
 /*
  * Copy src to string dst of size siz. At most siz-1 characters
@@ -249,7 +284,9 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
     return res.size;
 }
 
-// ---
+/***
+****
+***/
 
 double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
@@ -266,13 +303,101 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
     return TR_RATIO_NA;
 }
 
-// ---
+/***
+****
+***/
 
-std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
+namespace
+{
+namespace tr_strvUtf8Clean_impl
+{
+
+bool validateUtf8(std::string_view sv, char const** good_end)
+{
+    auto const* begin = std::data(sv);
+    auto const* const end = begin + std::size(sv);
+    auto const* walk = begin;
+    auto all_good = false;
+
+    try
+    {
+        while (walk < end)
+        {
+            utf8::next(walk, end);
+        }
+
+        all_good = true;
+    }
+    catch (utf8::exception const&)
+    {
+        all_good = false;
+    }
+
+    if (good_end != nullptr)
+    {
+        *good_end = walk;
+    }
+
+    return all_good;
+}
+
+std::string strip_non_utf8(std::string_view sv)
 {
     auto out = std::string{};
-    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
+    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), '?');
     return out;
+}
+
+std::string to_utf8(std::string_view sv)
+{
+#ifdef HAVE_ICONV
+    size_t const buflen = std::size(sv) * 4 + 10;
+    auto buf = std::vector<char>{};
+    buf.resize(buflen);
+
+    auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
+    for (auto const* test_encoding : Encodings)
+    {
+        iconv_t cd = iconv_open("UTF-8", test_encoding);
+        if (cd == (iconv_t)-1) // NOLINT(performance-no-int-to-ptr)
+        {
+            continue;
+        }
+
+#ifdef ICONV_SECOND_ARGUMENT_IS_CONST
+        auto const* inbuf = std::data(sv);
+#else
+        auto* inbuf = const_cast<char*>(std::data(sv));
+#endif
+        size_t inbytesleft = std::size(sv);
+        char* out = std::data(buf);
+        size_t outbytesleft = std::size(buf);
+        auto const rv = iconv(cd, &inbuf, &inbytesleft, &out, &outbytesleft);
+        iconv_close(cd);
+        if (rv != size_t(-1))
+        {
+            return std::string{ std::data(buf), buflen - outbytesleft };
+        }
+    }
+
+#endif
+
+    return strip_non_utf8(sv);
+}
+
+} // namespace tr_strvUtf8Clean_impl
+} // namespace
+
+std::string tr_strvUtf8Clean(std::string_view cleanme)
+{
+    using namespace tr_strvUtf8Clean_impl;
+
+    if (validateUtf8(cleanme, nullptr))
+    {
+        return std::string{ cleanme };
+    }
+
+    return to_utf8(cleanme);
 }
 
 #ifdef _WIN32
@@ -398,7 +523,9 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
 
 #endif
 
-// ---
+/***
+****
+***/
 
 namespace
 {
@@ -474,7 +601,9 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
     return { std::begin(values), std::end(values) };
 }
 
-// ---
+/***
+****
+***/
 
 double tr_truncd(double x, int decimal_places)
 {
@@ -487,7 +616,7 @@ double tr_truncd(double x, int decimal_places)
         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
-    return tr_parseNum<double>(std::data(buf)).value_or(0.0);
+    return *tr_parseNum<double>(std::data(buf));
 }
 
 std::string tr_strpercent(double x)
@@ -522,7 +651,9 @@ std::string tr_strratio(double ratio, char const* infinity)
     return tr_strpercent(ratio);
 }
 
-// ---
+/***
+****
+***/
 
 bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
 {
@@ -577,13 +708,15 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
     return true;
 }
 
-// ---
+/***
+****
+***/
 
-uint64_t tr_htonll(uint64_t hostlonglong)
+uint64_t tr_htonll(uint64_t x)
 {
 #ifdef HAVE_HTONLL
 
-    return htonll(hostlonglong);
+    return htonll(x);
 
 #else
 
@@ -593,18 +726,18 @@ uint64_t tr_htonll(uint64_t hostlonglong)
         std::array<uint32_t, 2> lx;
         uint64_t llx;
     } u = {};
-    u.lx[0] = htonl(hostlonglong >> 32);
-    u.lx[1] = htonl(hostlonglong & 0xFFFFFFFFULL);
+    u.lx[0] = htonl(x >> 32);
+    u.lx[1] = htonl(x & 0xFFFFFFFFULL);
     return u.llx;
 
 #endif
 }
 
-uint64_t tr_ntohll(uint64_t netlonglong)
+uint64_t tr_ntohll(uint64_t x)
 {
 #ifdef HAVE_NTOHLL
 
-    return ntohll(netlonglong);
+    return ntohll(x);
 
 #else
 
@@ -614,13 +747,15 @@ uint64_t tr_ntohll(uint64_t netlonglong)
         std::array<uint32_t, 2> lx;
         uint64_t llx;
     } u = {};
-    u.llx = netlonglong;
+    u.llx = x;
     return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]);
 
 #endif
 }
 
-// ---
+/***
+****
+***/
 
 namespace
 {
@@ -809,7 +944,9 @@ void tr_formatter_get_units(void* vdict)
     }
 }
 
-// --- ENVIRONMENT
+/***
+****  ENVIRONMENT
+***/
 
 bool tr_env_key_exists(char const* key)
 {
@@ -870,24 +1007,26 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
     return std::string{ default_value };
 }
 
-// ---
+/***
+****
+***/
 
 void tr_net_init()
 {
-#ifdef _WIN32
     static bool initialized = false;
 
     if (!initialized)
     {
+#ifdef _WIN32
         WSADATA wsaData;
         WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
 
         initialized = true;
     }
-#endif
 }
 
-// --- mime-type
+/// mime-type
 
 std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 {
@@ -913,7 +1052,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     return Fallback;
 }
 
-// --- parseNum()
+/// parseNum()
 
 #if defined(__GNUC__) && !__has_include(<charconv>)
 

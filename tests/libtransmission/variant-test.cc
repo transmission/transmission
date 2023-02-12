@@ -5,13 +5,13 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/benc.h>
-#include <libtransmission/crypto-utils.h> // tr_rand_buffer(), tr_rand_int()
-#include <libtransmission/error.h>
-#include <libtransmission/variant-common.h>
-#include <libtransmission/variant.h>
+#include "benc.h"
+#include "crypto-utils.h" // tr_rand_buffer(), tr_rand_int()
+#include "error.h"
+#include "variant-common.h"
+#include "variant.h"
 
 #include <algorithm>
 #include <array>
@@ -94,8 +94,7 @@ TEST_F(VariantTest, parseInt)
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    EXPECT_TRUE(value);
     EXPECT_EQ(ExpectVal, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
@@ -134,8 +133,7 @@ TEST_F(VariantTest, parseNegativeInt)
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    EXPECT_TRUE(value);
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
@@ -156,8 +154,7 @@ TEST_F(VariantTest, parseIntZero)
 
     auto benc = Benc;
     auto const value = transmission::benc::impl::ParseInt(&benc);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    EXPECT_TRUE(value);
     EXPECT_EQ(Expected, *value);
     EXPECT_EQ(std::data(Benc) + std::size(Benc), std::data(benc));
 }
@@ -185,8 +182,7 @@ TEST_F(VariantTest, str)
     // good string
     inout = benc = "4:boat";
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    EXPECT_TRUE(value);
     EXPECT_EQ("boat"sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
@@ -199,16 +195,14 @@ TEST_F(VariantTest, str)
     // empty string
     inout = benc = "0:"sv;
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    EXPECT_TRUE(value);
     EXPECT_EQ(""sv, *value);
     EXPECT_EQ(std::data(benc) + std::size(benc), std::data(inout));
 
     // short string
     inout = benc = "3:boat";
     value = ParseString(&inout);
-    EXPECT_TRUE(value.has_value());
-    assert(value.has_value());
+    EXPECT_TRUE(value);
     EXPECT_EQ("boa"sv, *value);
     EXPECT_EQ(std::data(benc) + benc.find('t'), std::data(inout));
 }
@@ -218,7 +212,7 @@ TEST_F(VariantTest, parse)
     auto benc = "i64e"sv;
     auto i = int64_t{};
     auto val = tr_variant{};
-    char const* end = nullptr;
+    char const* end;
     auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
     EXPECT_TRUE(ok);
     EXPECT_TRUE(tr_variantGetInt(&val, &i));
@@ -302,7 +296,7 @@ TEST_F(VariantTest, bencSortWhenSerializing)
     auto constexpr ExpectedOut = "lld1:ai64e1:bi32eeee"sv;
 
     tr_variant val;
-    char const* end = nullptr;
+    char const* end;
     auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
     EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(In) + std::size(In), end);
@@ -317,7 +311,7 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
     auto constexpr ExpectedOut = "le"sv;
 
     tr_variant val;
-    char const* end = nullptr;
+    char const* end;
     auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
     EXPECT_TRUE(ok);
     EXPECT_EQ(std::data(In) + std::size(ExpectedOut), end);
@@ -401,7 +395,7 @@ TEST_F(VariantTest, merge)
 
     tr_variantMergeDicts(&dest, /*const*/ &src);
 
-    auto i = int64_t{};
+    int64_t i;
     EXPECT_TRUE(tr_variantDictFindInt(&dest, i1, &i));
     EXPECT_EQ(1, i);
     EXPECT_TRUE(tr_variantDictFindInt(&dest, i2, &i));
@@ -431,7 +425,7 @@ TEST_F(VariantTest, stackSmash)
     std::string const in = std::string(Depth, 'l') + std::string(Depth, 'e');
 
     // confirm that it fails instead of crashing
-    char const* end = nullptr;
+    char const* end;
     tr_variant val;
     tr_error* error = nullptr;
     auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, in, &end, &error);
@@ -449,7 +443,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     auto const key3 = tr_quark_new("key3"sv);
     auto const key4 = tr_quark_new("key4"sv);
 
-    auto top = tr_variant{};
+    tr_variant top;
     tr_variantInitDict(&top, 10);
     tr_variantDictAddBool(&top, key1, false);
     tr_variantDictAddBool(&top, key2, 0); // NOLINT modernize-use-bool-literals
@@ -457,7 +451,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     tr_variantDictAddInt(&top, key4, 1);
 
     // confirm we can read both bools and ints as bools
-    auto b = bool{};
+    bool b;
     EXPECT_TRUE(tr_variantDictFindBool(&top, key1, &b));
     EXPECT_FALSE(b);
     EXPECT_TRUE(tr_variantDictFindBool(&top, key2, &b));
@@ -468,7 +462,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     EXPECT_TRUE(b);
 
     // confirm we can read both bools and ints as ints
-    auto i = int64_t{};
+    int64_t i;
     EXPECT_TRUE(tr_variantDictFindInt(&top, key1, &i));
     EXPECT_EQ(0, i);
     EXPECT_TRUE(tr_variantDictFindInt(&top, key2, &i));
@@ -549,7 +543,7 @@ TEST_F(VariantTest, variantFromBufFuzz)
 
     for (size_t i = 0; i < 100000; ++i)
     {
-        buf.resize(tr_rand_int(4096U));
+        buf.resize(tr_rand_int(4096));
         tr_rand_buffer(std::data(buf), std::size(buf));
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 

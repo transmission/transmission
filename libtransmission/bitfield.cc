@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -15,7 +15,9 @@
 #include "bitfield.h"
 #include "tr-assert.h"
 
-// ---
+/****
+*****
+****/
 
 namespace
 {
@@ -74,7 +76,9 @@ void setAllTrue(uint8_t* array, size_t bit_count)
 
 } // namespace
 
-// ---
+/****
+*****
+****/
 
 size_t tr_bitfield::countFlags() const noexcept
 {
@@ -172,7 +176,9 @@ size_t tr_bitfield::count(size_t begin, size_t end) const
     return countFlags(begin, end);
 }
 
-// ---
+/***
+****
+***/
 
 bool tr_bitfield::isValid() const
 {
@@ -228,6 +234,11 @@ bool tr_bitfield::ensureNthBitAlloced(size_t nth)
     return true;
 }
 
+void tr_bitfield::freeArray() noexcept
+{
+    flags_ = std::vector<uint8_t>{};
+}
+
 void tr_bitfield::setTrueCount(size_t n) noexcept
 {
     TR_ASSERT(bit_count_ == 0 || n <= bit_count_);
@@ -242,6 +253,11 @@ void tr_bitfield::setTrueCount(size_t n) noexcept
     }
 
     TR_ASSERT(isValid());
+}
+
+void tr_bitfield::rebuildTrueCount() noexcept
+{
+    setTrueCount(countFlags());
 }
 
 void tr_bitfield::incrementTrueCount(size_t inc) noexcept
@@ -260,7 +276,9 @@ void tr_bitfield::decrementTrueCount(size_t dec) noexcept
     setTrueCount(true_count_ - dec);
 }
 
-// ---
+/****
+*****
+****/
 
 tr_bitfield::tr_bitfield(size_t bit_count)
     : bit_count_{ bit_count }
@@ -437,52 +455,4 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
 
         decrementTrueCount(old_count);
     }
-}
-
-tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
-{
-    if (hasAll() || that.hasNone())
-    {
-        return *this;
-    }
-
-    if (that.hasAll() || hasNone())
-    {
-        *this = that;
-        return *this;
-    }
-
-    flags_.resize(std::max(std::size(flags_), std::size(that.flags_)));
-
-    for (size_t i = 0, n = std::size(that.flags_); i < n; ++i)
-    {
-        flags_[i] |= that.flags_[i];
-    }
-
-    rebuildTrueCount();
-    return *this;
-}
-
-tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
-{
-    if (hasNone() || that.hasAll())
-    {
-        return *this;
-    }
-
-    if (that.hasNone() || hasAll())
-    {
-        *this = that;
-        return *this;
-    }
-
-    flags_.resize(std::min(std::size(flags_), std::size(that.flags_)));
-
-    for (size_t i = 0, n = std::size(flags_); i < n; ++i)
-    {
-        flags_[i] &= that.flags_[i];
-    }
-
-    rebuildTrueCount();
-    return *this;
 }

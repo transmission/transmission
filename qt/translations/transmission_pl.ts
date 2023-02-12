@@ -509,17 +509,17 @@
         <translation>&amp;Globalne ograniczenia</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+7"/>
         <source>Limit &amp;download speed:</source>
         <translation>&amp;Ograniczenie prędkości pobierania:</translation>
     </message>
     <message>
-        <location line="-20"/>
+        <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Ograniczenie prędkości &amp;wysyłania:</translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+20"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;Priorytet torrenta:</translation>
     </message>
@@ -554,27 +554,27 @@
     <message>
         <location filename="../FileTreeItem.cc" line="+297"/>
         <location filename="../FileTreeView.cc" line="+108"/>
-        <location line="+254"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>Niski</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-254"/>
-        <location line="+252"/>
+        <location filename="../FileTreeView.cc" line="-257"/>
+        <location line="+255"/>
         <source>High</source>
         <translation>Wysoki</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
-        <location line="+253"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>Zwykły</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-252"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>Mieszane</translation>
     </message>
@@ -610,7 +610,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+244"/>
+        <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
         <translation>Zaznacz wybrane</translation>
     </message>
@@ -1139,7 +1139,7 @@
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>Udział całkowity</translation>
+        <translation>Całkowity udział</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1149,7 +1149,7 @@
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Przesłano całkowicie</translation>
+        <translation>Razem przesłano</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1174,7 +1174,7 @@
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Ustaw p&amp;ołożenie…</translation>
+        <translation>Ustaw p_ołożenie…</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1233,7 +1233,7 @@
         <translation>Według &amp;kolejki</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+468"/>
+        <location filename="../MainWindow.cc" line="+469"/>
         <source>Limit Download Speed</source>
         <translation>Ograniczenie prędkości pobierania</translation>
     </message>
@@ -1247,7 +1247,7 @@
         <location line="+733"/>
         <location line="+9"/>
         <source>Limited at %1</source>
-        <translation>Ograniczenie do %1</translation>
+        <translation>Ograniczenie na %1</translation>
     </message>
     <message>
         <location line="-687"/>
@@ -1309,12 +1309,12 @@
         <translation>Otwórz torrent</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Ograniczenia</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Błąd sieci</translation>
     </message>
@@ -1691,7 +1691,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <translation>W&#xa0;d&amp;niach:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+382"/>
+        <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
         <translation>Codziennie</translation>
     </message>
@@ -1774,7 +1774,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="-20"/>
         <source>&amp;Port for incoming connections:</source>
-        <translation>&amp;Port połączeń przychodzących:</translation>
+        <translation>&amp;Port dla połączeń przychodzących:</translation>
     </message>
     <message>
         <location line="+44"/>
@@ -2241,7 +2241,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+496"/>
         <source>Error Renaming Path</source>
         <translation>Błąd podczas zmieniania nazwy ścieżki</translation>
     </message>
@@ -2439,7 +2439,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+174"/>
+        <location filename="../TorrentDelegate.cc" line="+173"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>Przesyłanie magnet — pobieranie metadanych (%1%)</translation>

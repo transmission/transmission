@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,13 +10,13 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <event2/buffer.h>
 
 #include "error.h"
 #include "net.h" // tr_socket_t
-#include "utils-ev.h"
-#include "utils.h" // for tr_htonll(), tr_ntohll()
+#include "utils.h"
 
 namespace libtransmission
 {
@@ -24,6 +24,8 @@ namespace libtransmission
 class Buffer
 {
 public:
+    using Iovec = evbuffer_iovec;
+
     class Iterator
     {
     public:
@@ -36,101 +38,84 @@ public:
         Iterator(evbuffer* buf, size_t offset)
             : buf_{ buf }
         {
-            set_offset(offset);
+            setOffset(offset);
         }
 
-        [[nodiscard]] constexpr value_type& operator*() noexcept
+        [[nodiscard]] value_type& operator*() noexcept
         {
-            return static_cast<value_type*>(iov_.iov_base)[iov_offset_];
+            return *reinterpret_cast<value_type*>(iov_.iov_base);
         }
 
-        [[nodiscard]] constexpr value_type operator*() const noexcept
+        [[nodiscard]] value_type operator*() const noexcept
         {
-            return static_cast<value_type*>(iov_.iov_base)[iov_offset_];
+            return *reinterpret_cast<value_type*>(iov_.iov_base);
         }
 
-        [[nodiscard]] Iterator operator+(size_t n_bytes)
+        [[nodiscard]] Iterator operator+(int n_bytes)
         {
-            return Iterator{ buf_, offset() + n_bytes };
+            return Iterator(buf_, offset_ + n_bytes);
         }
 
-        [[nodiscard]] Iterator operator-(size_t n_bytes)
+        [[nodiscard]] Iterator operator-(int n_bytes)
         {
-            return Iterator{ buf_, offset() - n_bytes };
+            return Iterator(buf_, offset_ - n_bytes);
         }
 
         [[nodiscard]] constexpr auto operator-(Iterator const& that) const noexcept
         {
-            return offset() - that.offset();
+            return offset_ - that.offset_;
         }
 
         Iterator& operator++() noexcept
         {
-            *this += 1U;
-            return *this;
-        }
-
-        Iterator& operator+=(size_t n_bytes)
-        {
-            if (iov_offset_ + n_bytes < iov_.iov_len)
+            if (iov_.iov_len > 1)
             {
-                iov_offset_ += n_bytes;
+                iov_.iov_base = reinterpret_cast<value_type*>(iov_.iov_base) + 1;
+                --iov_.iov_len;
+                ++offset_;
             }
             else
             {
-                inc_offset(n_bytes);
+                setOffset(offset_ + 1);
             }
+            return *this;
+        }
 
+        Iterator& operator+=(int n_bytes)
+        {
+            setOffset(offset_ + n_bytes);
             return *this;
         }
 
         Iterator& operator--() noexcept
         {
-            if (iov_offset_ > 0)
-            {
-                --iov_offset_;
-            }
-            else
-            {
-                set_offset(offset() - 1);
-            }
+            // TODO(ckerr) inefficient; calls evbuffer_ptr_peek() every time
+            setOffset(offset_ - 1);
             return *this;
         }
 
         [[nodiscard]] constexpr bool operator==(Iterator const& that) const noexcept
         {
-            return offset() == that.offset();
+            return offset_ == that.offset_;
         }
 
         [[nodiscard]] constexpr bool operator!=(Iterator const& that) const noexcept
         {
-            return offset() != that.offset();
+            return !(*this == that);
         }
 
     private:
-        [[nodiscard]] constexpr size_t offset() const noexcept
+        void setOffset(size_t offset)
         {
-            return ptr_.pos + iov_offset_;
-        }
-
-        void inc_offset(size_t increment)
-        {
-            evbuffer_ptr_set(buf_, &ptr_, iov_offset_ + increment, EVBUFFER_PTR_ADD);
-            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
-            iov_offset_ = 0;
-        }
-
-        void set_offset(size_t offset)
-        {
-            evbuffer_ptr_set(buf_, &ptr_, offset, EVBUFFER_PTR_SET);
-            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
-            iov_offset_ = 0;
+            offset_ = offset;
+            auto ptr = evbuffer_ptr{};
+            evbuffer_ptr_set(buf_, &ptr, offset, EVBUFFER_PTR_SET);
+            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov_, 1);
         }
 
         evbuffer* buf_;
-        evbuffer_ptr ptr_ = {};
-        evbuffer_iovec iov_ = {};
-        size_t iov_offset_ = 0;
+        Iovec iov_ = {};
+        size_t offset_ = 0;
     };
 
     Buffer() = default;
@@ -155,28 +140,50 @@ public:
         return evbuffer_get_length(buf_.get()) == 0;
     }
 
+    [[nodiscard]] auto vecs(size_t n_bytes) const
+    {
+        auto chains = std::vector<Iovec>(evbuffer_peek(buf_.get(), n_bytes, nullptr, nullptr, 0));
+        evbuffer_peek(buf_.get(), n_bytes, nullptr, std::data(chains), std::size(chains));
+        return chains;
+    }
+
+    [[nodiscard]] auto vecs() const
+    {
+        return vecs(size());
+    }
+
     [[nodiscard]] auto begin() noexcept
     {
-        return Iterator{ buf_.get(), 0U };
+        return Iterator(buf_.get(), 0U);
     }
 
     [[nodiscard]] auto end() noexcept
     {
-        return Iterator{ buf_.get(), size() };
+        return Iterator(buf_.get(), size());
     }
 
     [[nodiscard]] auto begin() const noexcept
     {
-        return Iterator{ buf_.get(), 0U };
+        return Iterator(buf_.get(), 0U);
     }
 
     [[nodiscard]] auto end() const noexcept
     {
-        return Iterator{ buf_.get(), size() };
+        return Iterator(buf_.get(), size());
+    }
+
+    [[nodiscard]] auto cbegin() const noexcept
+    {
+        return Iterator(buf_.get(), 0U);
+    }
+
+    [[nodiscard]] auto cend() const noexcept
+    {
+        return Iterator(buf_.get(), size());
     }
 
     template<typename T>
-    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
+    [[nodiscard]] bool startsWith(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
         auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
@@ -184,37 +191,29 @@ public:
         return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
     }
 
-    [[nodiscard]] std::string to_string() const
-    {
-        auto str = std::string{};
-        str.resize(size());
-        evbuffer_copyout(buf_.get(), std::data(str), std::size(str));
-        return str;
-    }
-
-    auto to_buf(void* tgt, size_t n_bytes)
+    auto toBuf(void* tgt, size_t n_bytes)
     {
         return evbuffer_remove(buf_.get(), tgt, n_bytes);
     }
 
-    [[nodiscard]] uint16_t to_uint16()
+    [[nodiscard]] uint16_t toUint16()
     {
         auto tmp = uint16_t{};
-        to_buf(&tmp, sizeof(tmp));
+        toBuf(&tmp, sizeof(tmp));
         return ntohs(tmp);
     }
 
-    [[nodiscard]] uint32_t to_uint32()
+    [[nodiscard]] uint32_t toUint32()
     {
         auto tmp = uint32_t{};
-        to_buf(&tmp, sizeof(tmp));
+        toBuf(&tmp, sizeof(tmp));
         return ntohl(tmp);
     }
 
-    [[nodiscard]] uint64_t to_uint64()
+    [[nodiscard]] uint64_t toUint64()
     {
         auto tmp = uint64_t{};
-        to_buf(&tmp, sizeof(tmp));
+        toBuf(&tmp, sizeof(tmp));
         return tr_ntohll(tmp);
     }
 
@@ -228,23 +227,29 @@ public:
         drain(size());
     }
 
-    // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    // -1 on error, 0 on eof, >0 on n bytes written
+    auto toSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);
         auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
         auto const err = EVUTIL_SOCKET_ERROR();
-        if (res >= 0)
+        if (res == -1)
         {
-            return static_cast<size_t>(res);
+            tr_error_set(error, err, tr_net_strerror(err));
         }
-        tr_error_set(error, err, tr_net_strerror(err));
-        return 0;
+        return res;
     }
 
-    [[nodiscard]] std::pair<std::byte*, size_t> pullup()
+    [[nodiscard]] Iovec alloc(size_t n_bytes)
     {
-        return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
+        auto iov = Iovec{};
+        evbuffer_reserve_space(buf_.get(), static_cast<ev_ssize_t>(n_bytes), &iov, 1);
+        return iov;
+    }
+
+    void commit(Iovec iov)
+    {
+        evbuffer_commit_space(buf_.get(), &iov, 1);
     }
 
     void reserve(size_t n_bytes)
@@ -252,27 +257,17 @@ public:
         evbuffer_expand(buf_.get(), n_bytes - size());
     }
 
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    // -1 on error, 0 on eof, >0 for num bytes read
+    auto addSocket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);
         auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
         auto const err = EVUTIL_SOCKET_ERROR();
-
-        if (res > 0)
-        {
-            return static_cast<size_t>(res);
-        }
-
-        if (res == 0)
-        {
-            tr_error_set_from_errno(error, ENOTCONN);
-        }
-        else
+        if (res == -1)
         {
             tr_error_set(error, err, tr_net_strerror(err));
         }
-
-        return {};
+        return res;
     }
 
     // Move all data from one buffer into another.
@@ -307,62 +302,63 @@ public:
         add(&ch, 1);
     }
 
-    void add_port(tr_port const& port)
+    void addPort(tr_port const& port)
     {
         auto nport = port.network();
         add(&nport, sizeof(nport));
     }
 
-    void add_uint8(uint8_t uch)
+    void addUint8(uint8_t uch)
     {
         add(&uch, 1);
     }
 
-    void add_uint16(uint16_t hs)
+    void addUint16(uint16_t hs)
     {
         uint16_t const ns = htons(hs);
         add(&ns, sizeof(ns));
     }
 
-    void add_hton16(uint16_t hs)
+    void addHton16(uint16_t hs)
     {
-        add_uint16(hs);
+        addUint16(hs);
     }
 
-    void add_uint32(uint32_t hl)
+    void addUint32(uint32_t hl)
     {
         uint32_t const nl = htonl(hl);
         add(&nl, sizeof(nl));
     }
 
-    void eadd_hton32(uint32_t hl)
+    void addHton32(uint32_t hl)
     {
-        add_uint32(hl);
+        addUint32(hl);
     }
 
-    void add_uint64(uint64_t hll)
+    void addUint64(uint64_t hll)
     {
         uint64_t const nll = tr_htonll(hll);
         add(&nll, sizeof(nll));
     }
 
-    void add_hton64(uint64_t hll)
+    void addHton64(uint64_t hll)
     {
-        add_uint64(hll);
+        addUint64(hll);
+    }
+
+    [[nodiscard]] std::string toString() const
+    {
+        auto str = std::string{};
+        str.reserve(size());
+        for (auto const& by : *this)
+        {
+            str.push_back(*reinterpret_cast<char const*>(&by));
+        }
+        return str;
     }
 
 private:
-    evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
-
-    [[nodiscard]] Iterator cbegin() const noexcept
-    {
-        return Iterator{ buf_.get(), 0U };
-    }
-
-    [[nodiscard]] Iterator cend() const noexcept
-    {
-        return Iterator{ buf_.get(), size() };
-    }
+    std::unique_ptr<evbuffer, void (*)(evbuffer*)> buf_{ evbuffer_new(), evbuffer_free };
 };
 
 } // namespace libtransmission

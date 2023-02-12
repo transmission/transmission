@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -288,10 +288,10 @@ public:
 private:
     /**
      * Ensure that the buffer's string is zero-terminated, e.g. for
-     * external APIs that require `char*` strings.
+     * external APIs that require char* strings.
      *
-     * Note that the added trailing '\0' does not increment `size()`.
-     * This is to ensure that `strlen(buf.c_str()) == buf.size()`.
+     * Note that the added trailing '\0' does not increment size().
+     * This is to ensure that strlen(buf.c_str()) == buf.size().
      */
     void ensure_sz()
     {

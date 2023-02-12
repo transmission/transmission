@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © 2021-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -74,12 +74,12 @@ public:
         tr_block_index_t block = 0;
         uint32_t block_offset = 0;
 
-        [[nodiscard]] constexpr bool operator==(Location const& that) const noexcept
+        [[nodiscard]] bool operator==(Location const& that) const
         {
             return this->byte == that.byte;
         }
 
-        [[nodiscard]] constexpr bool operator<(Location const& that) const noexcept
+        [[nodiscard]] bool operator<(Location const& that) const
         {
             return this->byte < that.byte;
         }
@@ -147,7 +147,7 @@ public:
 
 private:
     // Location of the last byte in `piece`.
-    [[nodiscard]] constexpr Location pieceLastLoc(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr Location pieceLastLoc(tr_piece_index_t piece) const
     {
         return byteLoc(static_cast<uint64_t>(piece) * pieceSize() + pieceSize(piece) - 1);
     }

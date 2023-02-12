@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © 2008-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,7 +11,6 @@
 
 #include <cstdint> // int64_t
 #include <optional>
-#include <string>
 #include <string_view>
 
 #include "transmission.h"
@@ -33,9 +32,11 @@ struct VariantWalkFuncs
 
 void tr_variantWalk(tr_variant const* top, VariantWalkFuncs const* walk_funcs, void* user_data, bool sort_dicts);
 
-[[nodiscard]] std::string tr_variantToStrJson(tr_variant const* top, bool lean);
+std::string tr_variantToStrJson(tr_variant const* top, bool lean);
 
-[[nodiscard]] std::string tr_variantToStrBenc(tr_variant const* top);
+std::string tr_variantToStrBenc(tr_variant const* top);
+
+void tr_variantInit(tr_variant* v, char type);
 
 /** @brief Private function that's exposed here only for unit tests */
 [[nodiscard]] std::optional<int64_t> tr_bencParseInt(std::string_view* benc_inout);

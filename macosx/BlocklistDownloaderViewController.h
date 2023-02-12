@@ -1,8 +1,10 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © 2008-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import <Foundation/Foundation.h>
+
+#include <libtransmission/transmission.h>
 
 @class PrefsController;
 
@@ -10,7 +12,7 @@
 
 + (void)downloadWithPrefsController:(PrefsController*)prefsController;
 
-- (IBAction)cancelDownload:(id)sender;
+- (void)cancelDownload:(id)sender;
 
 - (void)setStatusStarting;
 - (void)setStatusProgressForCurrentSize:(NSUInteger)currentSize expectedSize:(long long)expectedSize;

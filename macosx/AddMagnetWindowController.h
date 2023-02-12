@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © 2010-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -13,12 +13,12 @@
 
 - (instancetype)initWithTorrent:(Torrent*)torrent destination:(NSString*)path controller:(Controller*)controller;
 
-- (IBAction)setDestination:(id)sender;
+- (void)setDestination:(id)sender;
 
-- (IBAction)add:(id)sender;
-- (IBAction)cancelAdd:(id)sender;
+- (void)add:(id)sender;
+- (void)cancelAdd:(id)sender;
 
-- (IBAction)changePriority:(id)sender;
+- (void)changePriority:(id)sender;
 
 - (void)updateGroupMenu:(NSNotification*)notification;
 

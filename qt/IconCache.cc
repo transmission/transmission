@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © 2009-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -65,7 +65,7 @@ QIcon IconCache::guessMimeIcon(QString const& filename, QIcon fallback) const
 
     if (icon.isNull())
     {
-        icon = std::move(fallback);
+        icon = fallback;
     }
 
     return icon;
@@ -224,7 +224,7 @@ QIcon IconCache::getThemeIcon(
     QString const& fallbackName,
     std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const
 {
-    auto const rtl_suffix = QApplication::layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString();
+    auto const rtl_suffix = qApp->layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString();
 
     auto icon = QIcon::fromTheme(name + rtl_suffix);
 
@@ -235,7 +235,7 @@ QIcon IconCache::getThemeIcon(
 
     if (icon.isNull() && fallbackPixmap.has_value())
     {
-        icon = QApplication::style()->standardIcon(*fallbackPixmap, nullptr);
+        icon = qApp->style()->standardIcon(*fallbackPixmap, nullptr);
     }
 
     return icon;

@@ -3,12 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
-
-#include <libtransmission/session-alt-speeds.h>
-#include <libtransmission/session-id.h>
-#include <libtransmission/session.h>
-#include <libtransmission/version.h>
+#include "transmission.h"
+#include "session.h"
+#include "session-id.h"
+#include "version.h"
 
 #include "test-fixtures.h"
 
@@ -22,7 +20,10 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 TEST_F(SessionTest, propertiesApi)
@@ -184,7 +185,7 @@ TEST_F(SessionTest, peerId)
         auto const buf = tr_peerIdInit();
 
         // confirm that it begins with peer_id_prefix
-        auto const peer_id = std::string_view{ reinterpret_cast<char const*>(buf.data()), std::size(buf) };
+        auto const peer_id = std::string_view(reinterpret_cast<char const*>(buf.data()), PEER_ID_LEN);
         EXPECT_EQ(peer_id_prefix, peer_id.substr(0, peer_id_prefix.size()));
 
         // confirm that its total is evenly divisible by 36
@@ -252,7 +253,7 @@ TEST_F(SessionTest, sessionId)
 
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
-    current_time_mock::set(7200U);
+    current_time_mock::set(3600U * 2U);
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
 
@@ -265,7 +266,7 @@ TEST_F(SessionTest, sessionId)
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
     EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
 
-    current_time_mock::set(36000U);
+    current_time_mock::set(60U * 60U * 10U);
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_3));
     EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
     EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
@@ -276,74 +277,6 @@ TEST_F(SessionTest, sessionId)
     EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
 }
 
-TEST_F(SessionTest, getDefaultSettingsIncludesSubmodules)
-{
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
+} // namespace test
 
-    // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
-    // These are all `false` by default
-    for (auto const& key : { TR_KEY_peer_port_random_on_start, TR_KEY_alt_speed_time_enabled, TR_KEY_rpc_enabled })
-    {
-        auto flag = bool{};
-        EXPECT_TRUE(tr_variantDictFindBool(&settings, key, &flag));
-        EXPECT_FALSE(flag);
-    }
-
-    tr_variantClear(&settings);
-}
-
-TEST_F(SessionTest, honorsSettings)
-{
-    // Baseline: confirm that these settings are disabled by default
-    EXPECT_FALSE(session_->isPortRandom());
-    EXPECT_FALSE(tr_sessionUsesAltSpeedTime(session_));
-    EXPECT_FALSE(tr_sessionIsRPCEnabled(session_));
-
-    // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
-    // These are all `false` by default
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
-    for (auto const& key : { TR_KEY_peer_port_random_on_start, TR_KEY_alt_speed_time_enabled, TR_KEY_rpc_enabled })
-    {
-        tr_variantDictRemove(&settings, key);
-        tr_variantDictAddBool(&settings, key, true);
-    }
-    auto* session = tr_sessionInit(sandboxDir().data(), false, &settings);
-    tr_variantClear(&settings);
-
-    // confirm that these settings were enabled
-    EXPECT_TRUE(session->isPortRandom());
-    EXPECT_TRUE(tr_sessionUsesAltSpeedTime(session));
-    EXPECT_TRUE(tr_sessionIsRPCEnabled(session));
-
-    tr_sessionClose(session);
-}
-
-TEST_F(SessionTest, savesSettings)
-{
-    // Baseline: confirm that these settings are disabled by default
-    EXPECT_FALSE(session_->isPortRandom());
-    EXPECT_FALSE(tr_sessionUsesAltSpeedTime(session_));
-    EXPECT_FALSE(tr_sessionIsRPCEnabled(session_));
-
-    tr_sessionSetPeerPortRandomOnStart(session_, true);
-    tr_sessionUseAltSpeedTime(session_, true);
-    tr_sessionSetRPCEnabled(session_, true);
-
-    // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetSettings(session_, &settings);
-    for (auto const& key : { TR_KEY_peer_port_random_on_start, TR_KEY_alt_speed_time_enabled, TR_KEY_rpc_enabled })
-    {
-        auto flag = bool{};
-        EXPECT_TRUE(tr_variantDictFindBool(&settings, key, &flag));
-        EXPECT_TRUE(flag);
-    }
-    tr_variantClear(&settings);
-}
-
-} // namespace libtransmission::test
+} // namespace libtransmission

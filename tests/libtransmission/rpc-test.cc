@@ -3,9 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/rpcimpl.h>
-#include <libtransmission/variant.h>
+#include "transmission.h"
+#include "rpcimpl.h"
+#include "variant.h"
 
 #include "test-fixtures.h"
 
@@ -17,14 +17,17 @@
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 using RpcTest = SessionTest;
 
 TEST_F(RpcTest, list)
 {
-    auto i = int64_t{};
+    int64_t i;
     auto sv = std::string_view{};
     tr_variant top;
 
@@ -86,7 +89,7 @@ TEST_F(RpcTest, sessionGet)
     tr_variantClear(&request);
 
     EXPECT_TRUE(tr_variantIsDict(&response));
-    tr_variant* args = nullptr;
+    tr_variant* args;
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
@@ -154,9 +157,9 @@ TEST_F(RpcTest, sessionGet)
 
     // what we got
     std::set<tr_quark> actual_keys;
-    auto key = tr_quark{};
-    tr_variant* val = nullptr;
-    auto n = size_t{};
+    tr_quark key;
+    tr_variant* val;
+    size_t n = 0;
     while ((tr_variantDictChild(args, n++, &key, &val)))
     {
         actual_keys.insert(key);
@@ -185,4 +188,6 @@ TEST_F(RpcTest, sessionGet)
     tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+
+} // namespace libtransmission

@@ -11,18 +11,21 @@
 
 #include <event2/buffer.h>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/cache.h> // tr_cacheWriteBlock()
-#include <libtransmission/file.h> // tr_sys_path_*()
-#include <libtransmission/tr-strbuf.h>
-#include <libtransmission/variant.h>
+#include "cache.h" // tr_cacheWriteBlock()
+#include "file.h" // tr_sys_path_*()
+#include "tr-strbuf.h"
+#include "variant.h"
 
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 auto constexpr MaxWaitMsec = 5000;
@@ -102,7 +105,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
             data.buf = std::make_unique<std::vector<uint8_t>>(tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
-            session_->runInSessionThread(test_incomplete_dir_threadfunc, &data);
+            tr_runInEventThread(session_, test_incomplete_dir_threadfunc, &data);
 
             auto const test = [&data]()
             {
@@ -187,4 +190,6 @@ TEST_F(MoveTest, setLocation)
     tr_torrentRemove(tor, true, nullptr, nullptr);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+
+} // namespace libtransmission

@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © 2015-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -153,7 +153,7 @@ private:
 
             // consume entire name into buffer
             name.resize(ev.len);
-            nread = bufferevent_read(event, name.data(), ev.len);
+            nread = bufferevent_read(event, std::data(name), ev.len);
             if (nread == static_cast<size_t>(-1))
             {
                 auto const error_code = errno;

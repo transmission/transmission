@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,29 +8,10 @@
 // We're using deprecated Gtk::StatusItem ourselves as well
 #undef GTKMM_DISABLE_DEPRECATED
 
-#include "SystemTrayIcon.h"
-
-#include "Actions.h"
-#include "Session.h"
-#include "Utils.h"
-
-#include <libtransmission/transmission.h>
-#include <libtransmission/utils.h>
-
-#include <glibmm/i18n.h>
-#include <glibmm/ustring.h>
-
-#if !GTKMM_CHECK_VERSION(4, 0, 0)
-#include <giomm/menu.h>
-#include <glibmm/miscutils.h>
-#include <gtkmm/icontheme.h>
-#include <gtkmm/menu.h>
-#if !defined(HAVE_APPINDICATOR)
-#include <gtkmm/statusicon.h>
-#endif
-#endif
-
 #include <string>
+
+#include <glibmm.h>
+#include <glibmm/i18n.h>
 
 #ifdef HAVE_APPINDICATOR
 #ifdef APPINDICATOR_IS_AYATANA
@@ -40,12 +21,24 @@
 #endif
 #endif
 
+#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
+
+#include "Actions.h"
+#include "Session.h"
+#include "SystemTrayIcon.h"
+#include "Utils.h"
+
+#define TR_SYS_TRAY_IMPL_NONE 0
+#define TR_SYS_TRAY_IMPL_APPINDICATOR 1
+#define TR_SYS_TRAY_IMPL_STATUS_ICON 2
+
 #ifdef HAVE_APPINDICATOR
-#define TR_SYS_TRAY_IMPL_APPINDICATOR
+#define TR_SYS_TRAY_IMPL TR_SYS_TRAY_IMPL_APPINDICATOR
 #elif !GTKMM_CHECK_VERSION(4, 0, 0)
-#define TR_SYS_TRAY_IMPL_STATUS_ICON
+#define TR_SYS_TRAY_IMPL TR_SYS_TRAY_IMPL_STATUS_ICON
 #else
-#define TR_SYS_TRAY_IMPL_NONE
+#define TR_SYS_TRAY_IMPL TR_SYS_TRAY_IMPL_NONE
 #endif
 
 using namespace std::literals;
@@ -53,12 +46,12 @@ using namespace std::literals;
 namespace
 {
 
-#if !defined(TR_SYS_TRAY_IMPL_NONE)
+#if TR_SYS_TRAY_IMPL != TR_SYS_TRAY_IMPL_NONE
 auto const TrayIconName = Glib::ustring("transmission-tray-icon"s);
 auto const AppIconName = Glib::ustring("transmission"s);
 #endif
 
-#if defined(TR_SYS_TRAY_IMPL_APPINDICATOR)
+#if TR_SYS_TRAY_IMPL == TR_SYS_TRAY_IMPL_APPINDICATOR
 auto const AppName = Glib::ustring("transmission-gtk"s);
 #endif
 
@@ -83,18 +76,18 @@ private:
 private:
     Glib::RefPtr<Session> const core_;
 
-#if !defined(TR_SYS_TRAY_IMPL_NONE)
+#if TR_SYS_TRAY_IMPL != TR_SYS_TRAY_IMPL_NONE
     Gtk::Menu* menu_;
 #endif
 
-#if defined(TR_SYS_TRAY_IMPL_APPINDICATOR)
+#if TR_SYS_TRAY_IMPL == TR_SYS_TRAY_IMPL_APPINDICATOR
     AppIndicator* indicator_;
-#elif defined(TR_SYS_TRAY_IMPL_STATUS_ICON)
+#elif TR_SYS_TRAY_IMPL == TR_SYS_TRAY_IMPL_STATUS_ICON
     Glib::RefPtr<Gtk::StatusIcon> icon_;
 #endif
 };
 
-#if defined(TR_SYS_TRAY_IMPL_APPINDICATOR)
+#if TR_SYS_TRAY_IMPL == TR_SYS_TRAY_IMPL_APPINDICATOR
 
 SystemTrayIcon::Impl::~Impl()
 {
@@ -105,7 +98,7 @@ void SystemTrayIcon::Impl::refresh()
 {
 }
 
-#elif defined(TR_SYS_TRAY_IMPL_STATUS_ICON)
+#elif TR_SYS_TRAY_IMPL == TR_SYS_TRAY_IMPL_STATUS_ICON
 
 SystemTrayIcon::Impl::~Impl() = default;
 
@@ -133,7 +126,7 @@ SystemTrayIcon::Impl::~Impl() = default;
 namespace
 {
 
-#if !defined(TR_SYS_TRAY_IMPL_NONE)
+#if TR_SYS_TRAY_IMPL != TR_SYS_TRAY_IMPL_NONE
 
 Glib::ustring getIconName()
 {
@@ -169,14 +162,14 @@ SystemTrayIcon::~SystemTrayIcon() = default;
 
 void SystemTrayIcon::refresh()
 {
-#if !defined(TR_SYS_TRAY_IMPL_NONE)
+#if TR_SYS_TRAY_IMPL != TR_SYS_TRAY_IMPL_NONE
     impl_->refresh();
 #endif
 }
 
 bool SystemTrayIcon::is_available()
 {
-#if !defined(TR_SYS_TRAY_IMPL_NONE)
+#if TR_SYS_TRAY_IMPL != TR_SYS_TRAY_IMPL_NONE
     return true;
 #else
     return false;
@@ -191,18 +184,18 @@ std::unique_ptr<SystemTrayIcon> SystemTrayIcon::create(Gtk::Window& main_window,
 SystemTrayIcon::Impl::Impl([[maybe_unused]] Gtk::Window& main_window, Glib::RefPtr<Session> const& core)
     : core_(core)
 {
-#if !defined(TR_SYS_TRAY_IMPL_NONE)
+#if TR_SYS_TRAY_IMPL != TR_SYS_TRAY_IMPL_NONE
     auto const icon_name = getIconName();
     menu_ = Gtk::make_managed<Gtk::Menu>(gtr_action_get_object<Gio::Menu>("icon-popup"));
     menu_->attach_to_widget(main_window);
 #endif
 
-#if defined(TR_SYS_TRAY_IMPL_APPINDICATOR)
+#if TR_SYS_TRAY_IMPL == TR_SYS_TRAY_IMPL_APPINDICATOR
     indicator_ = app_indicator_new(AppName.c_str(), icon_name.c_str(), APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
     app_indicator_set_status(indicator_, APP_INDICATOR_STATUS_ACTIVE);
     app_indicator_set_menu(indicator_, Glib::unwrap(menu_));
     app_indicator_set_title(indicator_, Glib::get_application_name().c_str());
-#elif defined(TR_SYS_TRAY_IMPL_STATUS_ICON)
+#elif TR_SYS_TRAY_IMPL == TR_SYS_TRAY_IMPL_STATUS_ICON
     icon_ = Gtk::StatusIcon::create(icon_name);
     icon_->signal_activate().connect(sigc::mem_fun(*this, &Impl::activated));
     icon_->signal_popup_menu().connect(sigc::mem_fun(*this, &Impl::popup));

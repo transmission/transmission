@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © 2006-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -31,7 +31,6 @@ static CGFloat const kHeightTitle = 16.0;
 static CGFloat const kHeightStatus = 12.0;
 
 static CGFloat const kPaddingHorizontal = 5.0;
-static CGFloat const kPaddingEdgeMax = 12.0;
 static CGFloat const kPaddingBetweenButtons = 3.0;
 static CGFloat const kPaddingBetweenImageAndTitle = kPaddingHorizontal + 1.0;
 static CGFloat const kPaddingBetweenImageAndBar = kPaddingHorizontal;
@@ -49,6 +48,24 @@ static CGFloat const kPiecesTotalPercent = 0.6;
 static NSInteger const kMaxPieces = 18 * 18;
 
 @interface TorrentCell ()
+
+- (void)drawBar:(NSRect)barRect;
+- (void)drawRegularBar:(NSRect)barRect;
+- (void)drawPiecesBar:(NSRect)barRect;
+
+- (NSRect)rectForMinimalStatusWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
+- (NSRect)rectForTitleWithString:(NSAttributedString*)string
+                  withRightBound:(CGFloat)rightBound
+                        inBounds:(NSRect)bounds
+                         minimal:(BOOL)minimal;
+- (NSRect)rectForProgressWithStringInBounds:(NSRect)bounds;
+- (NSRect)rectForStatusWithStringInBounds:(NSRect)bounds;
+- (NSRect)barRectRegForBounds:(NSRect)bounds;
+- (NSRect)barRectMinForBounds:(NSRect)bounds;
+
+- (NSRect)controlButtonRectForBounds:(NSRect)bounds;
+- (NSRect)revealButtonRectForBounds:(NSRect)bounds;
+- (NSRect)actionButtonRectForBounds:(NSRect)bounds;
 
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
@@ -89,7 +106,7 @@ static NSInteger const kMaxPieces = 18 * 18;
         _fTitleAttributes[NSParagraphStyleAttributeName] = paragraphStyle;
 
         _fStatusAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
-        _fStatusAttributes[NSFontAttributeName] = [NSFont messageFontOfSize:10.0];
+        _fStatusAttributes[NSFontAttributeName] = [NSFont messageFontOfSize:9.0];
         _fStatusAttributes[NSParagraphStyleAttributeName] = paragraphStyle;
 
         _fBluePieceColor = [NSColor colorWithCalibratedRed:0.0 green:0.4 blue:0.8 alpha:1.0];
@@ -702,7 +719,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSRect result;
     result.size = [string size];
 
-    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + NSWidth(result) + kPaddingEdgeMax);
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + NSWidth(result));
     result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
 
     return result;
@@ -727,7 +744,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     {
         result.origin.x += kGroupPaddingRegular;
         result.origin.y = NSMinY(bounds) + kPaddingAboveTitle;
-        result.size.width = rightBound - NSMinX(result) - kPaddingHorizontal - kPaddingEdgeMax;
+        result.size.width = rightBound - NSMinX(result) - kPaddingHorizontal;
     }
 
     if (((Torrent*)self.representedObject).priority != TR_PRI_NORMAL)
@@ -772,8 +789,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     result.origin.y = NSMinY(bounds) + kPaddingAboveTitle + kHeightTitle + kPaddingBetweenTitleAndProgress + kHeightStatus +
         kPaddingBetweenProgressAndBar;
 
-    result.size.width = floor(
-        NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal - 2.0 * (kPaddingBetweenButtons + kNormalButtonWidth + kPaddingEdgeMax));
+    result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal - 2.0 * (kPaddingBetweenButtons + kNormalButtonWidth));
 
     return result;
 }
@@ -784,7 +800,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kImageSizeMin + kGroupPaddingMin + kPaddingBetweenImageAndBar;
     result.origin.y = NSMinY(bounds) + kPaddingBetweenBarAndEdgeMin;
     result.size.height = NSHeight(bounds) - 2.0 * kPaddingBetweenBarAndEdgeMin;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - kPaddingBetweenBarAndEdgeMin - kPaddingEdgeMax;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - kPaddingBetweenBarAndEdgeMin;
 
     return result;
 }
@@ -794,7 +810,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSRect result;
     result.size.height = kNormalButtonWidth;
     result.size.width = kNormalButtonWidth;
-    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth + kPaddingBetweenButtons + kNormalButtonWidth + kPaddingEdgeMax);
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth + kPaddingBetweenButtons + kNormalButtonWidth);
 
     if (![self.fDefaults boolForKey:@"SmallView"])
     {
@@ -814,7 +830,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSRect result;
     result.size.height = kNormalButtonWidth;
     result.size.width = kNormalButtonWidth;
-    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth + kPaddingEdgeMax);
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth);
 
     if (![self.fDefaults boolForKey:@"SmallView"])
     {

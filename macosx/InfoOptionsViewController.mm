@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © 2010-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -48,15 +48,28 @@ static CGFloat const kStackViewSpacing = 8.0;
 @property(nonatomic) IBOutlet NSTextField* fPeersConnectLabel;
 @property(nonatomic) IBOutlet NSTextField* fPeersConnectField;
 
+//remove when we switch to auto layout
+@property(nonatomic) IBOutlet NSTextField* fTransferBandwidthSectionLabel;
+@property(nonatomic) IBOutlet NSTextField* fPrioritySectionLabel;
+@property(nonatomic) IBOutlet NSTextField* fPriorityLabel;
+@property(nonatomic) IBOutlet NSTextField* fSeedingLimitsSectionLabel;
+@property(nonatomic) IBOutlet NSTextField* fRatioLabel;
+@property(nonatomic) IBOutlet NSTextField* fInactivityLabel;
+@property(nonatomic) IBOutlet NSTextField* fAdvancedSectionLabel;
+@property(nonatomic) IBOutlet NSTextField* fMaxConnectionsLabel;
+
 @property(nonatomic, copy) NSString* fInitialString;
 
 @property(nonatomic) IBOutlet NSStackView* fOptionsStackView;
 @property(nonatomic) IBOutlet NSView* fSeedingView;
-@property(nonatomic, readonly) CGFloat fHeightChange;
-@property(nonatomic, readwrite) CGFloat fCurrentHeight;
-@property(nonatomic, readonly) CGFloat fHorizLayoutHeight;
-@property(nonatomic, readonly) CGFloat fHorizLayoutWidth;
-@property(nonatomic, readonly) CGFloat fVertLayoutHeight;
+@property(nonatomic, readonly) CGFloat currentHeight;
+@property(nonatomic, readonly) CGFloat horizLayoutHeight;
+@property(nonatomic, readonly) CGFloat horizLayoutWidth;
+@property(nonatomic, readonly) CGFloat vertLayoutHeight;
+
+- (void)setupInfo;
+- (void)setGlobalLabels;
+- (void)updateOptionsNotification:(NSNotification*)notification;
 
 @end
 
@@ -74,8 +87,6 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 - (void)awakeFromNib
 {
-    [self checkWindowSize];
-
     [self setGlobalLabels];
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setGlobalLabels) name:@"UpdateGlobalOptions" object:nil];
@@ -89,73 +100,64 @@ static CGFloat const kStackViewSpacing = 8.0;
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (CGFloat)fHorizLayoutHeight
+- (CGFloat)currentHeight
+{
+    return NSHeight(self.view.frame);
+}
+
+- (CGFloat)horizLayoutHeight
 {
     return NSHeight(self.fPriorityView.frame) + 2 * kStackViewInset;
 }
 
-- (CGFloat)fHorizLayoutWidth
+- (CGFloat)horizLayoutWidth
 {
     return NSWidth(self.fPriorityView.frame) + NSWidth(self.fSeedingView.frame) + (2 * kStackViewInset) + kStackViewSpacing;
 }
 
-- (CGFloat)fVertLayoutHeight
+- (CGFloat)vertLayoutHeight
 {
     return NSHeight(self.fPriorityView.frame) + NSHeight(self.fSeedingView.frame) + (2 * kStackViewInset) + kStackViewSpacing;
 }
 
-- (CGFloat)fHeightChange
+- (CGFloat)changeInWindowHeight
 {
-    return self.oldHeight - self.fCurrentHeight;
+    CGFloat difference = 0;
+
+    if (NSWidth(self.view.window.frame) >= self.horizLayoutWidth + 1)
+    {
+        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
+        difference = NSHeight(self.view.frame) - self.horizLayoutHeight;
+    }
+    else
+    {
+        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+        difference = NSHeight(self.view.frame) - self.vertLayoutHeight;
+    }
+
+    return difference;
 }
 
 - (NSRect)viewRect
 {
-    NSRect viewRect = self.view.frame;
+    CGFloat difference = self.changeInWindowHeight;
 
-    CGFloat difference = self.fHeightChange;
-
-    // we check for existence of self.view.window
-    // as when view is shown from TorrentTableView.mm popover we don't want to customize the view height
-    if (self.view.window)
+    NSRect windowRect = self.view.window.frame, viewRect = self.view.frame;
+    if (difference != 0)
     {
         viewRect.size.height -= difference;
+        viewRect.size.width = NSWidth(windowRect);
     }
 
     return viewRect;
 }
 
-- (void)checkLayout
-{
-    if (NSWidth(self.view.window.frame) >= self.fHorizLayoutWidth + 1)
-    {
-        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationHorizontal;
-        self.fCurrentHeight = self.fHorizLayoutHeight;
-    }
-    else
-    {
-        self.fOptionsStackView.orientation = NSUserInterfaceLayoutOrientationVertical;
-        self.fCurrentHeight = self.fVertLayoutHeight;
-    }
-}
-
-- (void)checkWindowSize
-{
-    self.oldHeight = self.fCurrentHeight;
-
-    [self updateWindowLayout];
-}
-
 - (void)updateWindowLayout
 {
-    // we check for existence of self.view.window
-    // as when view is shown from TorrentTableView.mm popover we don't want to customize the view height
-    if (self.view.window)
+    CGFloat difference = self.changeInWindowHeight;
+
+    if (difference != 0)
     {
-        [self checkLayout];
-
-        CGFloat difference = self.fHeightChange;
-
         NSRect windowRect = self.view.window.frame;
         windowRect.origin.y += difference;
         windowRect.size.height -= difference;
@@ -165,13 +167,6 @@ static CGFloat const kStackViewSpacing = 8.0;
 
         self.view.frame = [self viewRect];
         [self.view.window setFrame:windowRect display:YES animate:YES];
-    }
-    else
-    {
-        // set popover width
-        NSRect rect = self.view.frame;
-        rect.size.width = NSWidth(self.fOptionsStackView.frame) + (2 * kStackViewInset);
-        self.view.frame = rect;
     }
 }
 
@@ -205,16 +200,14 @@ static CGFloat const kStackViewSpacing = 8.0;
     Torrent* torrent = [enumerator nextObject]; //first torrent
 
     NSInteger uploadUseSpeedLimit = [torrent usesSpeedLimit:YES] ? NSControlStateValueOn : NSControlStateValueOff;
-    NSUInteger uploadSpeedLimit = [torrent speedLimit:YES];
-    BOOL multipleUploadSpeedLimits = NO;
+    NSInteger uploadSpeedLimit = [torrent speedLimit:YES];
     NSInteger downloadUseSpeedLimit = [torrent usesSpeedLimit:NO] ? NSControlStateValueOn : NSControlStateValueOff;
-    NSUInteger downloadSpeedLimit = [torrent speedLimit:NO];
-    BOOL multipleDownloadSpeedLimits = NO;
+    NSInteger downloadSpeedLimit = [torrent speedLimit:NO];
     NSInteger globalUseSpeedLimit = torrent.usesGlobalSpeedLimit ? NSControlStateValueOn : NSControlStateValueOff;
 
     while ((torrent = [enumerator nextObject]) &&
-           (uploadUseSpeedLimit != NSControlStateValueMixed || !multipleUploadSpeedLimits || downloadUseSpeedLimit != NSControlStateValueMixed ||
-            !multipleDownloadSpeedLimits || globalUseSpeedLimit != NSControlStateValueMixed))
+           (uploadUseSpeedLimit != NSControlStateValueMixed || uploadSpeedLimit != kInvalidValue || downloadUseSpeedLimit != NSControlStateValueMixed ||
+            downloadSpeedLimit != kInvalidValue || globalUseSpeedLimit != NSControlStateValueMixed))
     {
         if (uploadUseSpeedLimit != NSControlStateValueMixed &&
             uploadUseSpeedLimit != ([torrent usesSpeedLimit:YES] ? NSControlStateValueOn : NSControlStateValueOff))
@@ -222,9 +215,9 @@ static CGFloat const kStackViewSpacing = 8.0;
             uploadUseSpeedLimit = NSControlStateValueMixed;
         }
 
-        if (!multipleUploadSpeedLimits && uploadSpeedLimit != [torrent speedLimit:YES])
+        if (uploadSpeedLimit != kInvalidValue && uploadSpeedLimit != [torrent speedLimit:YES])
         {
-            multipleUploadSpeedLimits = YES;
+            uploadSpeedLimit = kInvalidValue;
         }
 
         if (downloadUseSpeedLimit != NSControlStateValueMixed &&
@@ -233,9 +226,9 @@ static CGFloat const kStackViewSpacing = 8.0;
             downloadUseSpeedLimit = NSControlStateValueMixed;
         }
 
-        if (!multipleDownloadSpeedLimits && downloadSpeedLimit != [torrent speedLimit:NO])
+        if (downloadSpeedLimit != kInvalidValue && downloadSpeedLimit != [torrent speedLimit:NO])
         {
-            multipleDownloadSpeedLimits = YES;
+            downloadSpeedLimit = kInvalidValue;
         }
 
         if (globalUseSpeedLimit != NSControlStateValueMixed &&
@@ -251,7 +244,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
     self.fUploadLimitLabel.enabled = uploadUseSpeedLimit == NSControlStateValueOn;
     self.fUploadLimitField.enabled = uploadUseSpeedLimit == NSControlStateValueOn;
-    if (!multipleUploadSpeedLimits)
+    if (uploadSpeedLimit != kInvalidValue)
     {
         self.fUploadLimitField.integerValue = uploadSpeedLimit;
     }
@@ -266,7 +259,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
     self.fDownloadLimitLabel.enabled = downloadUseSpeedLimit == NSControlStateValueOn;
     self.fDownloadLimitField.enabled = downloadUseSpeedLimit == NSControlStateValueOn;
-    if (!multipleDownloadSpeedLimits)
+    if (downloadSpeedLimit != kInvalidValue)
     {
         self.fDownloadLimitField.integerValue = downloadSpeedLimit;
     }
@@ -287,21 +280,19 @@ static CGFloat const kStackViewSpacing = 8.0;
     NSInteger checkIdle = torrent.idleSetting;
     NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff;
     CGFloat ratioLimit = torrent.ratioLimit;
-    BOOL multipleRatioLimits = NO;
     NSUInteger idleLimit = torrent.idleLimitMinutes;
-    BOOL multipleIdleLimits = NO;
 
     while ((torrent = [enumerator nextObject]) &&
-           (checkRatio != kInvalidValue || !multipleRatioLimits || checkIdle != kInvalidValue || !multipleIdleLimits))
+           (checkRatio != kInvalidValue || ratioLimit != kInvalidValue || checkIdle != kInvalidValue || idleLimit != kInvalidValue))
     {
         if (checkRatio != kInvalidValue && checkRatio != torrent.ratioSetting)
         {
             checkRatio = kInvalidValue;
         }
 
-        if (!multipleRatioLimits && ratioLimit != torrent.ratioLimit)
+        if (ratioLimit != kInvalidValue && ratioLimit != torrent.ratioLimit)
         {
-            multipleRatioLimits = YES;
+            ratioLimit = kInvalidValue;
         }
 
         if (checkIdle != kInvalidValue && checkIdle != torrent.idleSetting)
@@ -309,9 +300,9 @@ static CGFloat const kStackViewSpacing = 8.0;
             checkIdle = kInvalidValue;
         }
 
-        if (!multipleIdleLimits && idleLimit != torrent.idleLimitMinutes)
+        if (idleLimit != kInvalidValue && idleLimit != torrent.idleLimitMinutes)
         {
-            multipleIdleLimits = YES;
+            idleLimit = kInvalidValue;
         }
 
         if (removeWhenFinishSeeding != NSControlStateValueMixed &&
@@ -343,7 +334,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     self.fRatioPopUp.enabled = YES;
 
     self.fRatioLimitField.hidden = checkRatio != TR_RATIOLIMIT_SINGLE;
-    if (!multipleRatioLimits)
+    if (ratioLimit != kInvalidValue)
     {
         self.fRatioLimitField.floatValue = ratioLimit;
     }
@@ -375,7 +366,7 @@ static CGFloat const kStackViewSpacing = 8.0;
     self.fIdlePopUp.enabled = YES;
 
     self.fIdleLimitField.hidden = checkIdle != TR_IDLELIMIT_SINGLE;
-    if (!multipleIdleLimits)
+    if (idleLimit != kInvalidValue)
     {
         self.fIdleLimitField.integerValue = idleLimit;
     }

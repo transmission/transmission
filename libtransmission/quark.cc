@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © 2013-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -18,7 +18,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
+auto constexpr MyStatic = std::array<std::string_view, 399>{ ""sv,
                                                              "activeTorrentCount"sv,
                                                              "activity-date"sv,
                                                              "activityDate"sv,
@@ -284,7 +284,6 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "recheckProgress"sv,
                                                              "remote-session-enabled"sv,
                                                              "remote-session-host"sv,
-                                                             "remote-session-https"sv,
                                                              "remote-session-password"sv,
                                                              "remote-session-port"sv,
                                                              "remote-session-requres-authentication"sv,
@@ -368,7 +367,6 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "torrent-added"sv,
                                                              "torrent-added-notification-command"sv,
                                                              "torrent-added-notification-enabled"sv,
-                                                             "torrent-added-verify-mode"sv,
                                                              "torrent-complete-notification-command"sv,
                                                              "torrent-complete-notification-enabled"sv,
                                                              "torrent-complete-sound-command"sv,
@@ -418,8 +416,7 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "watch-dir"sv,
                                                              "watch-dir-enabled"sv,
                                                              "webseeds"sv,
-                                                             "webseedsSendingToUs"sv,
-                                                             "yourip"sv };
+                                                             "webseedsSendingToUs"sv };
 
 bool constexpr quarks_are_sorted()
 {
@@ -446,8 +443,8 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
     // is it in our static array?
     auto constexpr Sbegin = std::begin(MyStatic);
     auto constexpr Send = std::end(MyStatic);
-
-    if (auto const sit = std::lower_bound(Sbegin, Send, key); sit != Send && *sit == key)
+    auto const sit = std::lower_bound(Sbegin, Send, key);
+    if (sit != Send && *sit == key)
     {
         return std::distance(Sbegin, sit);
     }
@@ -455,7 +452,8 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
     /* was it added during runtime? */
     auto const rbegin = std::begin(my_runtime);
     auto const rend = std::end(my_runtime);
-    if (auto const rit = std::find(rbegin, rend, key); rit != rend)
+    auto const rit = std::find(rbegin, rend, key);
+    if (rit != rend)
     {
         return TR_N_KEYS + std::distance(rbegin, rit);
     }

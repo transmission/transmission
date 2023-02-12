@@ -1,21 +1,17 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <libtransmission/tr-macros.h>
-
-#include <giomm/actiongroup.h>
-#include <glibmm/refptr.h>
-#include <gtkmm/application.h>
-#include <gtkmm/applicationwindow.h>
-#include <gtkmm/builder.h>
-
 #include <memory>
 
+#include <glibmm.h>
+#include <gtkmm.h>
+
+#include <libtransmission/tr-macros.h>
+
 class Session;
-class Torrent;
 
 class MainWindow : public Gtk::ApplicationWindow
 {
@@ -35,16 +31,10 @@ public:
         Glib::RefPtr<Gio::ActionGroup> const& actions,
         Glib::RefPtr<Session> const& core);
 
-    void for_each_selected_torrent(std::function<void(Glib::RefPtr<Torrent> const&)> const& callback) const;
-    bool for_each_selected_torrent_until(std::function<bool(Glib::RefPtr<Torrent> const&)> const& callback) const;
-
-    void select_all();
-    void unselect_all();
+    Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
 
     void set_busy(bool isBusy);
     void refresh();
-
-    sigc::signal<void()>& signal_selection_changed();
 
 private:
     class Impl;

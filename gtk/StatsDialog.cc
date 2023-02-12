@@ -1,24 +1,19 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "StatsDialog.h"
+#include <memory>
 
-#include "GtkCompat.h"
-#include "PrefsDialog.h"
-#include "Session.h"
-#include "Utils.h"
-
+#include <glibmm.h>
 #include <glibmm/i18n.h>
-#include <glibmm/main.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/label.h>
-#include <gtkmm/messagedialog.h>
 
 #include <fmt/core.h>
 
-#include <memory>
+#include "PrefsDialog.h"
+#include "Session.h"
+#include "StatsDialog.h"
+#include "Utils.h"
 
 static auto constexpr TR_RESPONSE_RESET = int{ 1 };
 

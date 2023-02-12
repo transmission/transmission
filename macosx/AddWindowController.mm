@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © 2008-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -51,6 +51,15 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 @property(nonatomic, weak) NSTimer* fTimer;
 
 @property(nonatomic) TorrentDeterminationType fGroupValueDetermination;
+
+- (void)updateFiles;
+
+- (void)confirmAdd;
+
+- (void)setDestinationPath:(NSString*)destination determinationType:(TorrentDeterminationType)determinationType;
+
+- (void)setGroupsMenu;
+- (void)changeGroupValue:(id)sender;
 
 @end
 
@@ -320,7 +329,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
         NSUInteger count = self.torrent.fileCount;
         if (count != 1)
         {
-            fileString = [NSString localizedStringWithFormat:NSLocalizedString(@"%lu files", "Add torrent -> info"), count];
+            fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Add torrent -> info"), count];
         }
         else
         {

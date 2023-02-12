@@ -1,8 +1,10 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import <AppKit/AppKit.h>
+
+#include <libtransmission/transmission.h>
 
 @class Torrent;
 
@@ -34,14 +36,14 @@ extern const CGFloat kGroupSeparatorHeight;
 
 - (void)displayTorrentActionPopoverForEvent:(NSEvent*)event;
 
-- (IBAction)setQuickLimitMode:(id)sender;
+- (void)setQuickLimitMode:(id)sender;
 - (void)setQuickLimit:(id)sender;
-- (IBAction)setGlobalLimit:(id)sender;
+- (void)setGlobalLimit:(id)sender;
 
-- (IBAction)setQuickRatioMode:(id)sender;
+- (void)setQuickRatioMode:(id)sender;
 - (void)setQuickRatio:(id)sender;
 
-- (IBAction)setPriority:(id)sender;
+- (void)setPriority:(id)sender;
 
 - (void)togglePiecesBar;
 @property(nonatomic, readonly) CGFloat piecesBarPercent;

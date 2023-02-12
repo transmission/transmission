@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © 2010-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -19,6 +19,10 @@
 @property(nonatomic) IBOutlet NSSearchField* fFileFilterField;
 @property(nonatomic) IBOutlet NSButton* fCheckAllButton;
 @property(nonatomic) IBOutlet NSButton* fUncheckAllButton;
+
+- (void)setupInfo;
+
+- (BOOL)canQuickLookFile:(FileListNode*)item;
 
 @end
 
@@ -228,7 +232,6 @@
 - (void)setupInfo
 {
     self.fFileFilterField.stringValue = @"";
-    [self setFileFilterText:self.fFileFilterField];
 
     if (self.fTorrents.count == 1)
     {

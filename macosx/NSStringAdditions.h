@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -8,6 +8,8 @@
 
 @property(nonatomic, class, readonly) NSString* ellipsis;
 @property(nonatomic, readonly, copy) NSString* stringByAppendingEllipsis;
+
++ (NSString*)formattedUInteger:(NSUInteger)value;
 
 + (NSString*)stringForFileSize:(uint64_t)size;
 + (NSString*)stringForFilePartialSize:(uint64_t)partialSize fullSize:(uint64_t)fullSize;
@@ -24,11 +26,4 @@
 // like componentsSeparatedByCharactersInSet:, but excludes blank values
 - (NSArray<NSString*>*)nonEmptyComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators;
 
-+ (NSString*)convertedStringFromCString:(char const*)bytes;
-
 @end
-
-__attribute__((annotate("returns_localized_nsstring"))) static inline NSString* LocalizationNotNeeded(NSString* s)
-{
-    return s;
-}

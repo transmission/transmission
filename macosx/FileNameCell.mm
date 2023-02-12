@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © 2007-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -26,6 +26,9 @@ static CGFloat const kPaddingExpansionFrame = 2.0;
 @property(nonatomic, readonly) NSAttributedString* attributedStatus;
 @property(nonatomic, readonly) NSMutableDictionary* fTitleAttributes;
 @property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
+
+- (NSRect)rectForTitleWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
+- (NSRect)rectForStatusWithString:(NSAttributedString*)string withTitleRect:(NSRect)titleRect inBounds:(NSRect)bounds;
 
 @end
 

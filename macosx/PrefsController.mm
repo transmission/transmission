@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Transmission authors and contributors.
+// This file Copyright © 2015-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -102,6 +102,10 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
 
+- (void)setPrefView:(id)sender;
+
+- (void)setKeychainPassword:(char const*)password forService:(char const*)service username:(char const*)username;
+
 @end
 
 @implementation PrefsController
@@ -159,11 +163,14 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         //set encryption
         [self setEncryptionMode:nil];
 
-        //update rpc password
+        //update rpc whitelist
         [self updateRPCPassword];
 
-        //update rpc whitelist
-        _fRPCWhitelistArray = [NSMutableArray arrayWithArray:[self.fDefaults arrayForKey:@"RPCWhitelist"] ?: @[ @"127.0.0.1" ]];
+        _fRPCWhitelistArray = [[_fDefaults arrayForKey:@"RPCWhitelist"] mutableCopy];
+        if (!_fRPCWhitelistArray)
+        {
+            _fRPCWhitelistArray = [NSMutableArray arrayWithObject:@"127.0.0.1"];
+        }
         [self updateRPCWhitelist];
 
         //reset old Sparkle settings from previous versions
@@ -209,8 +216,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     self.window.toolbar = toolbar;
 
     [self setWindowSize];
-    [self.window center];
-
     [self setPrefView:nil];
 
     //set special-handling of magnet link add window checkbox
@@ -284,7 +289,10 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     self.fRPCPortField.intValue = static_cast<int>([self.fDefaults integerForKey:@"RPCPort"]);
 
     //set rpc password
-    self.fRPCPasswordField.stringValue = self.fRPCPassword ?: @"";
+    if (self.fRPCPassword)
+    {
+        self.fRPCPasswordField.stringValue = self.fRPCPassword;
+    }
 
     //set fRPCWhitelistTable column width to table width
     [self.fRPCWhitelistTable sizeToFit];
@@ -491,7 +499,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     case PORT_STATUS_CHECKING:
         break;
     default:
-        NSAssert(NO, @"Port checker returned invalid status: %d", self.fPortChecker.status);
+        NSAssert1(NO, @"Port checker returned invalid status: %d", self.fPortChecker.status);
         break;
     }
     self.fPortChecker = nil;
@@ -603,8 +611,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     if (exists)
     {
         self.fBlocklistMessageField.stringValue = [NSString
-            localizedStringWithFormat:NSLocalizedString(@"%lu IP address rules in list", "Prefs -> blocklist -> message"),
-                                      tr_blocklistGetRuleCount(self.fHandle)];
+            stringWithFormat:NSLocalizedString(@"%lu IP address rules in list", "Prefs -> blocklist -> message"),
+                             tr_blocklistGetRuleCount(self.fHandle)];
     }
     else
     {
@@ -1076,7 +1084,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [NSNotificationCenter.defaultCenter postNotificationName:@"AutoSizeSettingChange" object:self];
 }
 
-- (IBAction)setRPCEnabled:(id)sender
+- (void)setRPCEnabled:(id)sender
 {
     BOOL enable = [self.fDefaults boolForKey:@"RPC"];
     tr_sessionSetRPCEnabled(self.fHandle, enable);
@@ -1084,33 +1092,65 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self setRPCWebUIDiscovery:nil];
 }
 
-- (IBAction)linkWebUI:(id)sender
+- (void)linkWebUI:(id)sender
 {
     NSString* urlString = [NSString stringWithFormat:kWebUIURLFormat, [self.fDefaults integerForKey:@"RPCPort"]];
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:urlString]];
 }
 
-- (IBAction)setRPCAuthorize:(id)sender
+- (void)setRPCAuthorize:(id)sender
 {
     tr_sessionSetRPCPasswordEnabled(self.fHandle, [self.fDefaults boolForKey:@"RPCAuthorize"]);
 }
 
-- (IBAction)setRPCUsername:(id)sender
+- (void)setRPCUsername:(id)sender
 {
     tr_sessionSetRPCUsername(self.fHandle, [self.fDefaults stringForKey:@"RPCUsername"].UTF8String);
 }
 
-- (IBAction)setRPCPassword:(id)sender
+- (void)setRPCPassword:(id)sender
 {
     self.fRPCPassword = [sender stringValue];
 
-    char const* password = self.fRPCPassword.UTF8String;
-    [self setKeychainPassword:password];
+    char const* password = [sender stringValue].UTF8String;
+    [self setKeychainPassword:password forService:kRPCKeychainService username:kRPCKeychainName];
 
     tr_sessionSetRPCPassword(self.fHandle, password);
 }
 
-- (IBAction)setRPCPort:(id)sender
+- (void)updateRPCPassword
+{
+    UInt32 passwordLength;
+    char const* password = nil;
+    SecKeychainFindGenericPassword(
+        NULL,
+        strlen(kRPCKeychainService),
+        kRPCKeychainService,
+        strlen(kRPCKeychainName),
+        kRPCKeychainName,
+        &passwordLength,
+        (void**)&password,
+        NULL);
+
+    if (password != NULL)
+    {
+        char fullPassword[passwordLength + 1];
+        strncpy(fullPassword, password, passwordLength);
+        fullPassword[passwordLength] = '\0';
+        SecKeychainItemFreeContent(NULL, (void*)password);
+
+        tr_sessionSetRPCPassword(self.fHandle, fullPassword);
+
+        self.fRPCPassword = @(fullPassword);
+        self.fRPCPasswordField.stringValue = self.fRPCPassword;
+    }
+    else
+    {
+        self.fRPCPassword = nil;
+    }
+}
+
+- (void)setRPCPort:(id)sender
 {
     int port = [sender intValue];
     [self.fDefaults setInteger:port forKey:@"RPCPort"];
@@ -1119,12 +1159,12 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self setRPCWebUIDiscovery:nil];
 }
 
-- (IBAction)setRPCUseWhitelist:(id)sender
+- (void)setRPCUseWhitelist:(id)sender
 {
     tr_sessionSetRPCWhitelistEnabled(self.fHandle, [self.fDefaults boolForKey:@"RPCUseWhitelist"]);
 }
 
-- (IBAction)setRPCWebUIDiscovery:(id)sender
+- (void)setRPCWebUIDiscovery:(id)sender
 {
     if ([self.fDefaults boolForKey:@"RPC"] && [self.fDefaults boolForKey:@"RPCWebDiscovery"])
     {
@@ -1139,7 +1179,13 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     }
 }
 
-- (IBAction)addRemoveRPCIP:(id)sender
+- (void)updateRPCWhitelist
+{
+    NSString* string = [self.fRPCWhitelistArray componentsJoinedByString:@","];
+    tr_sessionSetRPCWhitelist(self.fHandle, string.UTF8String);
+}
+
+- (void)addRemoveRPCIP:(id)sender
 {
     //don't allow add/remove when currently adding - it leads to weird results
     if (self.fRPCWhitelistTable.editedRow != -1)
@@ -1411,7 +1457,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     BOOL const checkStalled = tr_sessionGetQueueStalledEnabled(self.fHandle);
     [self.fDefaults setBool:checkStalled forKey:@"CheckStalled"];
 
-    NSInteger const stalledMinutes = tr_sessionGetQueueStalledMinutes(self.fHandle);
+    int const stalledMinutes = tr_sessionGetQueueStalledMinutes(self.fHandle);
     [self.fDefaults setInteger:stalledMinutes forKey:@"StalledMinutes"];
 
     //done script
@@ -1575,102 +1621,46 @@ static NSString* getOSStatusDescription(OSStatus errorCode)
     return [NSError errorWithDomain:NSOSStatusErrorDomain code:errorCode userInfo:NULL].description;
 }
 
-- (void)updateRPCPassword
+- (void)setKeychainPassword:(char const*)password forService:(char const*)service username:(char const*)username
 {
-    CFTypeRef data;
-    OSStatus result = SecItemCopyMatching(
-        (CFDictionaryRef) @{
-            (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-            (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-            (NSString*)kSecAttrService : @(kRPCKeychainService),
-            (NSString*)kSecReturnData : @YES,
-        },
-        &data);
-    if (result != noErr && result != errSecItemNotFound)
-    {
-        NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
-    }
-    char const* password = (char const*)((__bridge_transfer NSData*)data).bytes;
-    if (password)
-    {
-        tr_sessionSetRPCPassword(self.fHandle, password);
-        self.fRPCPassword = @(password);
-    }
-}
+    SecKeychainItemRef item = NULL;
+    NSUInteger passwordLength = strlen(password);
 
-- (void)setKeychainPassword:(char const*)password
-{
-    CFTypeRef item;
-    OSStatus result = SecItemCopyMatching(
-        (CFDictionaryRef) @{
-            (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-            (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-            (NSString*)kSecAttrService : @(kRPCKeychainService),
-        },
-        &item);
-    if (result != noErr && result != errSecItemNotFound)
+    OSStatus result = SecKeychainFindGenericPassword(NULL, strlen(service), service, strlen(username), username, NULL, NULL, &item);
+    if (result == noErr && item)
     {
-        NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
-        return;
-    }
-
-    size_t passwordLength = strlen(password);
-    if (item)
-    {
-        if (passwordLength > 0) // found and needed, so update it
+        if (passwordLength > 0) //found, so update
         {
-            result = SecItemUpdate(
-                (CFDictionaryRef) @{
-                    (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-                    (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-                    (NSString*)kSecAttrService : @(kRPCKeychainService),
-                },
-                (CFDictionaryRef) @{
-                    (NSString*)kSecValueData : [NSData dataWithBytes:password length:passwordLength],
-                });
+            result = SecKeychainItemModifyAttributesAndData(item, NULL, passwordLength, (void const*)password);
             if (result != noErr)
             {
                 NSLog(@"Problem updating Keychain item: %@", getOSStatusDescription(result));
             }
         }
-        else // found and not needed, so remove it
+        else //remove the item
         {
-            result = SecItemDelete((CFDictionaryRef) @{
-                (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-                (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-                (NSString*)kSecAttrService : @(kRPCKeychainService),
-            });
+            result = SecKeychainItemDelete(item);
             if (result != noErr)
             {
                 NSLog(@"Problem removing Keychain item: %@", getOSStatusDescription(result));
             }
         }
-        CFRelease(item);
     }
-    else if (result == errSecItemNotFound)
+    else if (result == errSecItemNotFound) //not found, so add
     {
-        if (passwordLength > 0) // not found and needed, so add it
+        if (passwordLength > 0)
         {
-            result = SecItemAdd(
-                (CFDictionaryRef) @{
-                    (NSString*)kSecClass : (NSString*)kSecClassGenericPassword,
-                    (NSString*)kSecAttrAccount : @(kRPCKeychainName),
-                    (NSString*)kSecAttrService : @(kRPCKeychainService),
-                    (NSString*)kSecValueData : [NSData dataWithBytes:password length:passwordLength],
-                },
-                nil);
+            result = SecKeychainAddGenericPassword(NULL, strlen(service), service, strlen(username), username, passwordLength, (void const*)password, NULL);
             if (result != noErr)
             {
                 NSLog(@"Problem adding Keychain item: %@", getOSStatusDescription(result));
             }
         }
     }
-}
-
-- (void)updateRPCWhitelist
-{
-    NSString* string = [self.fRPCWhitelistArray componentsJoinedByString:@","];
-    tr_sessionSetRPCWhitelist(self.fHandle, string.UTF8String);
+    else
+    {
+        NSLog(@"Problem accessing Keychain: %@", getOSStatusDescription(result));
+    }
 }
 
 @end

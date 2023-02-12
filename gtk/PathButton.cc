@@ -1,29 +1,19 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "PathButton.h"
-
-#include "Utils.h"
-
-#include <giomm/file.h>
-#include <glibmm/error.h>
-#include <glibmm/i18n.h>
-#include <glibmm/property.h>
-#include <gtkmm/box.h>
-#include <gtkmm/filechooserdialog.h>
-#include <gtkmm/image.h>
-#include <gtkmm/label.h>
-#include <gtkmm/separator.h>
-
 #include <vector>
+
+#include <glibmm.h>
+#include <glibmm/i18n.h>
+
+#include "PathButton.h"
 
 class PathButton::Impl
 {
 public:
     explicit Impl(PathButton& widget);
-    ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
 
@@ -50,9 +40,9 @@ private:
 #endif
 
 private:
-#if GTKMM_CHECK_VERSION(4, 0, 0)
     PathButton& widget_;
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
     Glib::Property<Gtk::FileChooser::Action> action_;
     Glib::Property<Glib::ustring> title_;
 
@@ -68,9 +58,9 @@ private:
 #endif
 };
 
-PathButton::Impl::Impl([[maybe_unused]] PathButton& widget)
-#if GTKMM_CHECK_VERSION(4, 0, 0)
+PathButton::Impl::Impl(PathButton& widget)
     : widget_(widget)
+#if GTKMM_CHECK_VERSION(4, 0, 0)
     , action_(widget, "action", Gtk::FileChooser::Action::OPEN)
     , title_(widget, "title", {})
     , image_(Gtk::make_managed<Gtk::Image>())
@@ -143,7 +133,7 @@ void PathButton::Impl::show_dialog()
     auto const title = title_.get_value();
 
     auto dialog = std::make_shared<Gtk::FileChooserDialog>(!title.empty() ? title : _("Select a File"), action_.get_value());
-    dialog->set_transient_for(gtr_widget_get_window(widget_));
+    dialog->set_transient_for(*static_cast<Gtk::Window*>(widget_.get_root()));
     dialog->add_button(_("_Cancel"), Gtk::ResponseType::CANCEL);
     dialog->add_button(_("_Open"), Gtk::ResponseType::ACCEPT);
     dialog->set_modal(true);

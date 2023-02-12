@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright 2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -64,14 +64,14 @@ public:
     virtual ~TimerMaker() = default;
     [[nodiscard]] virtual std::unique_ptr<Timer> create() = 0;
 
-    [[nodiscard]] std::unique_ptr<Timer> create(std::function<void()> callback)
+    [[nodiscard]] virtual std::unique_ptr<Timer> create(std::function<void()> callback)
     {
         auto timer = create();
         timer->setCallback(std::move(callback));
         return timer;
     }
 
-    [[nodiscard]] std::unique_ptr<Timer> create(Timer::CStyleCallback callback, void* user_data)
+    [[nodiscard]] virtual std::unique_ptr<Timer> create(Timer::CStyleCallback callback, void* user_data)
     {
         auto timer = create();
         timer->setCallback(callback, user_data);

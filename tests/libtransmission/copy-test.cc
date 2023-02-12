@@ -7,13 +7,16 @@
 #include <cstring>
 #include <vector>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
+#include "transmission.h"
+#include "error.h"
+#include "file.h"
 
 #include "test-fixtures.h"
 
-namespace libtransmission::test
+namespace libtransmission
+{
+
+namespace test
 {
 
 class CopyTest : public SandboxedTest
@@ -83,4 +86,6 @@ TEST_F(CopyTest, copy)
     testImpl(filename1, filename2, random_file_length);
 }
 
-} // namespace libtransmission::test
+} // namespace test
+
+} // namespace libtransmission

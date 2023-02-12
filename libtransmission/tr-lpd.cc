@@ -1,4 +1,4 @@
-// Except where noted, this file Copyright © 2010-2023 Johannes Lieder.
+// Except where noted, this file Copyright © 2010-2022 Johannes Lieder.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -25,14 +25,13 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h" // for tr_rand_obj()
+#include "crypto-utils.h" // for tr_rand_buffer()
 #include "log.h"
 #include "net.h"
 #include "timer.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h" // for tr_net_init()
-#include "utils-ev.h" // for tr_net_init()
 
 using namespace std::literals;
 
@@ -49,7 +48,8 @@ auto makeCookie()
 {
     static auto constexpr Pool = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"sv;
 
-    auto buf = tr_rand_obj<std::array<char, 12>>();
+    auto buf = std::array<char, 12>{};
+    tr_rand_buffer(std::data(buf), std::size(buf));
     for (auto& ch : buf)
     {
         ch = Pool[static_cast<unsigned char>(ch) % std::size(Pool)];
@@ -227,7 +227,10 @@ public:
 
     ~tr_lpd_impl() override
     {
-        event_.reset();
+        if (event_ != nullptr)
+        {
+            event_free(event_);
+        }
 
         if (mcast_rcv_socket_ != TR_BAD_SOCKET)
         {
@@ -322,7 +325,7 @@ private:
             mcast_addr_.sin_port = McastPort.network();
             mcast_addr_.sin_addr.s_addr = INADDR_ANY;
 
-            if (bind(mcast_rcv_socket_, reinterpret_cast<sockaddr*>(&mcast_addr_), sizeof(mcast_addr_)) == -1)
+            if (bind(mcast_rcv_socket_, (struct sockaddr*)&mcast_addr_, sizeof(mcast_addr_)) == -1)
             {
                 return false;
             }
@@ -379,8 +382,8 @@ private:
         /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
          * any announcement received during the initial interval will be discarded. */
 
-        event_.reset(event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, this));
-        event_add(event_.get(), nullptr);
+        event_ = event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, this);
+        event_add(event_, nullptr);
 
         tr_logAddDebug("Local Peer Discovery initialised");
 
@@ -408,15 +411,15 @@ private:
 
         // process announcement from foreign peer
         struct sockaddr_in foreign_addr = {};
-        auto addr_len = socklen_t{ sizeof(foreign_addr) };
+        int addr_len = sizeof(foreign_addr);
         auto foreign_msg = std::array<char, MaxDatagramLength>{};
         auto const res = recvfrom(
             mcast_rcv_socket_,
             std::data(foreign_msg),
             MaxDatagramLength,
             0,
-            reinterpret_cast<sockaddr*>(&foreign_addr),
-            &addr_len);
+            (struct sockaddr*)&foreign_addr,
+            (socklen_t*)&addr_len);
 
         // If we couldn't read it or it was too big, discard it
         if (res < 1 || static_cast<size_t>(res) > MaxDatagramLength)
@@ -426,7 +429,8 @@ private:
 
         // If it doesn't look like a BEP14 message, discard it
         auto const msg = std::string_view{ std::data(foreign_msg), static_cast<size_t>(res) };
-        if (static auto constexpr SearchKey = "BT-SEARCH * HTTP/"sv; msg.find(SearchKey) == std::string_view::npos)
+        static auto constexpr SearchKey = "BT-SEARCH * HTTP/"sv;
+        if (msg.find(SearchKey) == std::string_view::npos)
         {
             return;
         }
@@ -520,7 +524,7 @@ private:
         }
 
         auto const next_announce_after = now + TorrentAnnounceIntervalSec;
-        for (auto const& info_hash_string : info_hash_strings)
+        for (auto& info_hash_string : info_hash_strings)
         {
             mediator_.setNextAnnounceTime(info_hash_string, next_announce_after);
         }
@@ -557,7 +561,7 @@ private:
             std::data(announce),
             std::size(announce),
             0,
-            reinterpret_cast<sockaddr const*>(&mcast_addr_),
+            (struct sockaddr const*)&mcast_addr_,
             sizeof(mcast_addr_));
         auto const sent = res == static_cast<int>(std::size(announce));
         return sent;
@@ -567,7 +571,7 @@ private:
     Mediator& mediator_;
     tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
     tr_socket_t mcast_snd_socket_ = TR_BAD_SOCKET; /**<and multicast send socket */
-    libtransmission::evhelpers::event_unique_ptr event_;
+    event* event_ = nullptr;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
     sockaddr_in mcast_addr_ = {}; /**<initialized from the above constants in init() */

@@ -9,17 +9,19 @@
 #include <string_view>
 #include <vector>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/crypto-utils.h> // tr_rand_obj()
-#include <libtransmission/session.h>
-#include <libtransmission/tr-lpd.h>
+#include "crypto-utils.h"
+#include "session.h"
+#include "tr-lpd.h"
 
 #include "test-fixtures.h"
 
 using namespace std::literals;
 
-namespace libtransmission::test
+namespace libtransmission
+{
+namespace test
 {
 
 using LpdTest = SessionTest;
@@ -34,6 +36,8 @@ public:
         : session_{ session }
     {
     }
+
+    ~MyMediator() override = default;
 
     [[nodiscard]] tr_port port() const override
     {
@@ -83,7 +87,9 @@ public:
 
 auto makeRandomHash()
 {
-    return tr_sha1::digest(tr_rand_obj<std::array<char, 256>>());
+    auto buf = std::array<char, 256>{};
+    tr_rand_buffer(std::data(buf), std::size(buf));
+    return tr_sha1::digest(buf);
 }
 
 auto makeRandomHashString()
@@ -101,7 +107,7 @@ TEST_F(LpdTest, HelloWorld)
     EXPECT_EQ(0U, std::size(mediator.found_));
 }
 
-TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
+TEST_F(LpdTest, CanAnnounceAndRead)
 {
     auto mediator_a = MyMediator{ *session_ };
     auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
@@ -123,7 +129,7 @@ TEST_F(LpdTest, DISABLED_CanAnnounceAndRead)
     EXPECT_EQ(0U, mediator_b.found_.count(info_hash_str));
 }
 
-TEST_F(LpdTest, DISABLED_canMultiAnnounce)
+TEST_F(LpdTest, canMultiAnnounce)
 {
     auto mediator_a = MyMediator{ *session_ };
     auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
@@ -159,7 +165,7 @@ TEST_F(LpdTest, DISABLED_canMultiAnnounce)
     }
 }
 
-TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
+TEST_F(LpdTest, DoesNotReannounceTooSoon)
 {
     auto mediator_a = MyMediator{ *session_ };
     auto lpd_a = tr_lpd::create(mediator_a, session_->eventBase());
@@ -202,4 +208,5 @@ TEST_F(LpdTest, DISABLED_DoesNotReannounceTooSoon)
     }
 }
 
-} // namespace libtransmission::test
+} // namespace test
+} // namespace libtransmission

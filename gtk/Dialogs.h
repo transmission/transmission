@@ -1,15 +1,12 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <libtransmission/transmission.h>
-
-#include <glibmm/refptr.h>
-#include <gtkmm/window.h>
-
 #include <vector>
+
+#include <gtkmm.h>
 
 class Session;
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © 2008-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -40,6 +40,9 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 {
     self.fFileList = [[NSMutableArray alloc] init];
 
+    self.fOutline.doubleAction = @selector(revealFile:);
+    self.fOutline.target = self;
+
     //set table header tool tips
     [self.fOutline tableColumnWithIdentifier:@"Check"].headerToolTip = NSLocalizedString(@"Download", "file table -> header tool tip");
     [self.fOutline tableColumnWithIdentifier:@"Priority"].headerToolTip = NSLocalizedString(@"Priority", "file table -> header tool tip");
@@ -58,7 +61,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 {
     _torrent = torrent;
 
-    [self.fFileList setArray:torrent.fileList ?: @[]];
+    [self.fFileList setArray:_torrent.fileList];
 
     self.filterText = nil;
 
@@ -94,7 +97,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         __block BOOL filter = NO;
         if (components)
         {
-            [components enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* obj, NSUInteger /*idx*/, BOOL* stop) {
+            [components enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* obj, NSUInteger idx, BOOL* stop) {
                 if ([item.name rangeOfString:obj options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
                 {
                     filter = YES;
@@ -600,7 +603,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
 - (NSMenu*)menu
 {
-    NSMenu* menu = [[NSMenu alloc] initWithTitle:@""];
+    NSMenu* menu = [[NSMenu alloc] initWithTitle:@"File Outline Menu"];
 
     //check and uncheck
     NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Check Selected", "File Outline -> Menu")
@@ -628,7 +631,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
     //priority
     item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Priority", "File Outline -> Menu") action:NULL keyEquivalent:@""];
-    NSMenu* priorityMenu = [[NSMenu alloc] initWithTitle:@""];
+    NSMenu* priorityMenu = [[NSMenu alloc] initWithTitle:@"File Priority Menu"];
     item.submenu = priorityMenu;
     [menu addItem:item];
 
@@ -691,10 +694,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
     using FindFileNode = void (^)(FileListNode*, NSArray<FileListNode*>*, NSIndexSet*, FileListNode*);
     __weak __block FindFileNode weakFindFileNode;
     FindFileNode findFileNode;
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wshadow"
     weakFindFileNode = findFileNode = ^(FileListNode* node, NSArray<FileListNode*>* list, NSIndexSet* indexes, FileListNode* currentParent) {
-#pragma clang diagnostic pop
         [list enumerateObjectsAtIndexes:indexes options:NSEnumerationConcurrent
                              usingBlock:^(FileListNode* checkNode, NSUInteger index, BOOL* stop) {
                                  if ([checkNode.indexes containsIndex:node.indexes.firstIndex])

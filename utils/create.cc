@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © 2012-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -223,15 +223,12 @@ int tr_main(int argc, char* argv[])
     }
 
     fmt::print(
-        tr_ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.fileCount()),
+        ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.fileCount()),
         fmt::arg("file_count", builder.fileCount()),
         fmt::arg("total_size", tr_formatter_size_B(builder.totalSize())));
 
     fmt::print(
-        tr_ngettext(
-            "{piece_count:L} piece, {piece_size}\n",
-            "{piece_count:L} pieces, {piece_size} each\n",
-            builder.pieceCount()),
+        ngettext("{piece_count:L} piece, {piece_size}\n", "{piece_count:L} pieces, {piece_size} each\n", builder.pieceCount()),
         fmt::arg("piece_count", builder.pieceCount()),
         fmt::arg("piece_size", tr_formatter_size_B(builder.pieceSize())));
 

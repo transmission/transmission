@@ -1,10 +1,8 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © 2006-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import <Foundation/Foundation.h>
-
-NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(unsigned int, port_status_t) { //
     PORT_STATUS_CHECKING,
@@ -29,5 +27,3 @@ typedef NS_ENUM(unsigned int, port_status_t) { //
 - (void)portCheckerDidFinishProbing:(PortChecker*)portChecker;
 
 @end
-
-NS_ASSUME_NONNULL_END

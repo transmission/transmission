@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mike Gelfand
+// This file Copyright © 2021-2022 Mike Gelfand
 // It may be used under the 3-clause BSD (SPDX: BSD-3-Clause).
 // License text can be found in the licenses/ folder.
 
@@ -26,14 +26,7 @@
 class tr_arc4
 {
 public:
-    constexpr tr_arc4() = default;
-
     constexpr tr_arc4(void const* key, size_t key_length)
-    {
-        init(key, key_length);
-    }
-
-    constexpr void init(void const* key, size_t key_length)
     {
         for (size_t i = 0; i < 256; ++i)
         {
@@ -51,7 +44,7 @@ public:
     {
         for (size_t i = 0; i < data_length; ++i)
         {
-            static_cast<uint8_t*>(dst_data)[i] = static_cast<uint8_t const*>(src_data)[i] ^ arc4_next();
+            ((uint8_t*)dst_data)[i] = ((uint8_t const*)src_data)[i] ^ arc4_next();
         }
     }
 
@@ -81,7 +74,7 @@ private:
         return s_[static_cast<uint8_t>(s_[i_] + s_[j_])];
     }
 
-    std::array<uint8_t, 256> s_ = {};
     uint8_t i_ = 0;
     uint8_t j_ = 0;
+    std::array<uint8_t, 256> s_ = {};
 };

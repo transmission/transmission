@@ -6,11 +6,11 @@
 #include <cstdlib>
 #include <string_view>
 
-#include <libtransmission/transmission.h>
+#include "transmission.h"
 
-#include <libtransmission/file.h>
-#include <libtransmission/platform.h>
-#include <libtransmission/tr-strbuf.h>
+#include "file.h"
+#include "platform.h"
+#include "tr-strbuf.h"
 
 #include "test-fixtures.h"
 
@@ -75,8 +75,6 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfig)
 
 TEST_F(PlatformTest, defaultConfigDirXdgConfigHome)
 {
-    unsetenv("TRANSMISSION_HOME");
-    unsetenv("XDG_CONFIG_HOME");
     auto const home = tr_pathbuf{ sandboxDir(), "/home/user" };
     setenv("HOME", home, 1);
 

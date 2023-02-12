@@ -1,20 +1,13 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include "GtkCompat.h"
-#include "Utils.h"
+#include <gtkmm.h>
 
-#include <giomm/listmodel.h>
-#include <giomm/menumodel.h>
-#include <giomm/simpleactiongroup.h>
-#include <glibmm/object.h>
-#include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
-#include <gtkmm/builder.h>
+#include "Utils.h"
 
 class Session;
 

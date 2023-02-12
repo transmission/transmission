@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © 2007-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -20,7 +20,7 @@
 #include "block-info.h"
 #include "file.h"
 #include "torrent-files.h"
-#include "utils.h" // for tr_saveFile()
+#include "utils.h" // tr_saveFile()
 
 class tr_metainfo_builder
 {
@@ -123,12 +123,12 @@ public:
         return comment_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
+    [[nodiscard]] auto fileCount() const noexcept
     {
         return files_.fileCount();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const noexcept
+    [[nodiscard]] auto fileSize(tr_file_index_t i) const noexcept
     {
         return files_.fileSize(i);
     }

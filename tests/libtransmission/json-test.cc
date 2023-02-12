@@ -9,9 +9,9 @@
 #include <string>
 #include <string_view>
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/variant.h>
-#include <libtransmission/variant-common.h>
+#include "transmission.h"
+#include "variant.h"
+#include "variant-common.h"
 
 #include "gtest/gtest.h"
 
@@ -142,7 +142,7 @@ TEST_P(JSONTest, test1)
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
 
     auto sv = std::string_view{};
-    auto i = int64_t{};
+    int64_t i;
     EXPECT_TRUE(tr_variantIsDict(&top));
     auto* headers = tr_variantDictFind(&top, tr_quark_new("headers"sv));
     EXPECT_NE(nullptr, headers);

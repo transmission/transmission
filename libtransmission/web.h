@@ -1,11 +1,10 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © 2021-2022 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <chrono>
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -23,11 +22,11 @@ public:
     // when a fetch() finishes.
     struct FetchResponse
     {
-        long status = 0; // http server response, e.g. 200
+        long status; // http server response, e.g. 200
         std::string body;
-        bool did_connect = false;
-        bool did_timeout = false;
-        void* user_data = nullptr;
+        bool did_connect;
+        bool did_timeout;
+        void* user_data;
     };
 
     // Callback to invoke when fetch() is done
@@ -43,15 +42,10 @@ public:
             V6,
         };
 
-        FetchOptions(
-            std::string_view url_in,
-            FetchDoneFunc&& done_func_in,
-            void* done_func_user_data_in,
-            std::chrono::seconds timeout_secs_in = DefaultTimeoutSecs)
+        FetchOptions(std::string_view url_in, FetchDoneFunc&& done_func_in, void* done_func_user_data_in)
             : url{ url_in }
             , done_func{ std::move(done_func_in) }
             , done_func_user_data{ done_func_user_data_in }
-            , timeout_secs{ timeout_secs_in }
         {
         }
 
@@ -79,7 +73,7 @@ public:
         std::optional<int> rcvbuf;
 
         // Maximum time to wait before timeout
-        std::chrono::seconds timeout_secs = DefaultTimeoutSecs;
+        int timeout_secs = DefaultTimeoutSecs;
 
         // If provided, this buffer will be used to hold the response body.
         // Provided for webseeds, which need to set low-level callbacks on
@@ -89,7 +83,7 @@ public:
         // IP protocol to use when making the request
         IPProtocol ip_proto = IPProtocol::ANY;
 
-        static auto inline constexpr DefaultTimeoutSecs = std::chrono::seconds{ 120 };
+        static constexpr int DefaultTimeoutSecs = 120;
     };
 
     void fetch(FetchOptions&& options);
@@ -97,7 +91,11 @@ public:
     // Notify tr_web that it's going to be destroyed soon.
     // New fetch() tasks will be rejected, but already-running tasks
     // are left alone so that they can finish.
-    void startShutdown(std::chrono::milliseconds /*deadline*/);
+    void closeSoon();
+
+    // True when tr_web is ready to be destroyed.
+    // Will never be true until after closeSoon() is called.
+    [[nodiscard]] bool isClosed() const noexcept;
 
     // If you want to give running tasks a chance to finish, call closeSoon()
     // before destroying the tr_web object. Deleting the object will cancel
@@ -105,9 +103,9 @@ public:
     ~tr_web();
 
     /**
-     * Mediates between `tr_web` and its clients.
+     * Mediates between tr_web and its clients.
      *
-     * NB: Note that `tr_web` calls all these methods from its own thread.
+     * NB: Note that tr_web calls all these methods from its own thread.
      * Overridden methods should take care to be threadsafe.
      */
     class Mediator
@@ -145,7 +143,7 @@ public:
         }
 
         // Return the number of bytes that should be allowed. See tr_bandwidth::clamp()
-        [[nodiscard]] virtual size_t clamp([[maybe_unused]] int bandwidth_tag, size_t byte_count) const
+        [[nodiscard]] virtual unsigned int clamp([[maybe_unused]] int bandwidth_tag, unsigned int byte_count) const
         {
             return byte_count;
         }
@@ -155,13 +153,11 @@ public:
         {
             func(response);
         }
-
-        [[nodiscard]] virtual time_t now() const = 0;
     };
 
     // Note that tr_web does no management of the `mediator` reference.
     // The caller must ensure `mediator` is valid for tr_web's lifespan.
-    [[nodiscard]] static std::unique_ptr<tr_web> create(Mediator& mediator);
+    static std::unique_ptr<tr_web> create(Mediator& mediator);
 
 private:
     class Impl;
