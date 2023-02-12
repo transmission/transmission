@@ -23,7 +23,7 @@ jobs:
         with:
           commitTitle: 'chore: update copyright year in gtk/application.cc'
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: gtk/application.cc
+          path: gtk/Application.cc
           transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})(?=. All code is copyrighted by the respective authors.)
       - uses: FantasticFiasco/action-update-license-year@v2
         with:
