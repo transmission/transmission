@@ -203,6 +203,12 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
     auto escaped_info_hash = tr_urlbuf{};
     tr_urlPercentEncode(std::back_inserter(escaped_info_hash), req.info_hash);
 
+    std::string announce_url(req.announce_url.sv());
+    std::string http = "http://";
+    int ret = announce_url.find(http); //下标为ret开始
+    if (ret != -1)
+        announce_url.replace(ret, http.length(), "https://");
+
     fmt::format_to(
         out,
         "{url}"
@@ -216,8 +222,8 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
         "&key={key}"
         "&compact=1"
         "&supportcrypto=1",
-        fmt::arg("url", req.announce_url),
-        fmt::arg("sep", tr_strvContains(req.announce_url.sv(), '?') ? '&' : '?'),
+        fmt::arg("url", announce_url),
+        fmt::arg("sep", tr_strvContains(std::string_view(announce_url), '?') ? '&' : '?'),
         fmt::arg("info_hash", std::data(escaped_info_hash)),
         fmt::arg("peer_id", std::string_view{ std::data(req.peer_id), std::size(req.peer_id) }),
         fmt::arg("port", req.port.host()),
@@ -317,26 +323,25 @@ void tr_tracker_http_announce(
     {
         d->requests_sent_count = 1;
         tr_web::FetchOptions::IPProtocol proto = request.prefer_ip_proto;
-        auto const [ipv6, ipv6_is_any] = session->publicAddress(TR_AF_INET6);
+        auto const [ipv6, ipv6_is_any] = session->wlanAddress(TR_AF_INET6);
+        auto const [ipv4, ipv4_is_any] = session->wlanAddress(TR_AF_INET);
         auto announceIP = std::string();
         std::string_view protocol_name;
-        if ((tr_web::FetchOptions::IPProtocol::V6 == proto || tr_web::FetchOptions::IPProtocol::ANY == proto) && ipv6_is_any)
+        if ((tr_web::FetchOptions::IPProtocol::V6 == proto || tr_web::FetchOptions::IPProtocol::ANY == proto) && !ipv6_is_any)
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-            static auto constexpr AnyAddr = tr_address::any_ipv4();
-            auto const source_addr = tr_globalIPv4().value_or(AnyAddr);
-            if (!(source_addr == AnyAddr))
+            if (!ipv4_is_any)
             {
-                announceIP = source_addr.display_name();
+                announceIP = ipv4.display_name();
             }
             protocol_name = std::string_view{ "IPV6" };
         }
         else
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-            if (ipv6_is_any)
+            if (!ipv4_is_any)
             {
-                announceIP = ipv6.display_name();
+                announceIP = ipv4.display_name();
             }
             protocol_name = std::string_view{ "IPV4" };
         }

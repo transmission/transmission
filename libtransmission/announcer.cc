@@ -970,6 +970,22 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
     }
 }
 
+[[nodiscard]] uint64_t append_upload(tr_torrent* const tor, tr_tier const* const tier, int multiple = 1)
+{
+    auto up = tier->byteCounts[TR_ANN_UP];
+    uint64_t up_append = 0;
+    if (up && up > 0)
+    {
+        up_append = up * multiple;
+        up_append = min(up_append, 512 * MB);
+        if (up_append > 0)
+        {
+            tor->session->addUploaded(up_append);
+        }
+    }
+    return up_append;
+}
+
 [[nodiscard]] tr_announce_request create_announce_request(
     tr_announcer_impl const* const announcer,
     tr_torrent* const tor,
@@ -978,7 +994,7 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
 {
     auto const* const current_tracker = tier->currentTracker();
     TR_ASSERT(current_tracker != nullptr);
-    //    append_random_upload(event, tor, tier);
+    uint64_t up_append = append_upload(tor, tier, 1);
 
     auto req = tr_announce_request{};
     req.port = announcer->session->advertisedPeerPort();
@@ -993,7 +1009,7 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
     req.peer_id = tr_torrentGetPeerId(tor);
-    req.up = tier->byteCounts[TR_ANN_UP];
+    req.up = tier->byteCounts[TR_ANN_UP] + up_append;
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
     req.leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;

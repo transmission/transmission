@@ -804,6 +804,8 @@ public:
         bool is_any_addr;
     };
 
+    [[nodiscard]] PublicAddressResult wlanAddress(tr_address_type type) const noexcept;
+
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
