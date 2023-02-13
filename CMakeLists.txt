@@ -55,7 +55,7 @@ option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
-tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" AUTO)
+tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" OFF)
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
@@ -183,6 +183,11 @@ if(WIN32)
         if(MSVC)
             # Reduce noise (at least for now)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /wd4244 /wd4267")
+            # Make caching-friendly (store debug info inside object files)
+            foreach(T IN ITEMS ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})
+                string(TOUPPER "${T}" T)
+                string(REGEX REPLACE "[-/]Z[iI]" "-Z7" CMAKE_${L}_FLAGS_${T} "${CMAKE_${L}_FLAGS_${T}}")
+            endforeach()
         endif()
 
         if(MINGW)
@@ -497,12 +502,16 @@ tr_add_external_auto_library(PSL libpsl psl
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp
         SUBPROJECT
-        TARGET libutp::libutp)
+        TARGET libutp::libutp
+        CMAKE_ARGS
+            -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
 tr_add_external_auto_library(B64 libb64 b64
     SUBPROJECT
-    TARGET libb64::libb64)
+    TARGET libb64::libb64
+    CMAKE_ARGS
+        -DLIBB64_SHARED:BOOL=OFF)
 
 if(NOT ${REBUILD_WEB} STREQUAL "OFF")
     find_program(NPM npm)

@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -644,7 +644,12 @@ public:
 
     tr_torrent* const tor;
 
+    ActiveRequests active_requests;
+
+    // depends-on: active_requests
     std::vector<std::unique_ptr<tr_peer>> webseeds;
+
+    // depends-on: active_requests
     std::vector<tr_peerMsgs*> peers;
 
     // tr_peers hold pointers to the items in this container,
@@ -655,8 +660,6 @@ public:
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
     time_t lastCancel = 0;
-
-    ActiveRequests active_requests;
 
 private:
     static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)

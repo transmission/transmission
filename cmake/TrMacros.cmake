@@ -140,6 +140,11 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
     if(USE_SYSTEM_${ID})
         unset(${ID}_UPSTREAM_TARGET)
     elseif(_TAEAL_ARG_SUBPROJECT)
+        foreach(ARG IN LISTS _TAEAL_ARG_CMAKE_ARGS)
+            if(ARG MATCHES "^-D([^=: ]+)(:[^= ]+)?=(.*)$")
+                set(${CMAKE_MATCH_1} ${CMAKE_MATCH_3} CACHE INTERNAL "")
+            endif()
+        endforeach()
         add_subdirectory("${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}" "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}")
     else()
         set(${ID}_UPSTREAM_TARGET ${LIBNAME})
@@ -168,6 +173,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
             PREFIX "${${ID}_PREFIX}"
             CMAKE_ARGS
                 -Wno-dev # We don't want to be warned over unused variables
+                --no-warn-unused-cli
                 "-DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}"
                 "-DCMAKE_USER_MAKE_RULES_OVERRIDE=${CMAKE_USER_MAKE_RULES_OVERRIDE}"
                 "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"

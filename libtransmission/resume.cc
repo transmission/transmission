@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -639,6 +639,11 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did
     }
 
     auto const filename = tor->resumeFile();
+    if (!tr_sys_path_exists(filename))
+    {
+        return fields_loaded;
+    }
+
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
