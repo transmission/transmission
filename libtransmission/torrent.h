@@ -109,7 +109,8 @@ public:
     // but more refactoring is needed before that can happen
     // because much of tr_torrent's impl is in the non-member C bindings
 
-    void setMetainfo(tr_torrent_metainfo const& tm);
+    // Used to add metainfo to a magnet torrent.
+    void setMetainfo(tr_torrent_metainfo tm);
 
     [[nodiscard]] auto unique_lock() const
     {
@@ -903,10 +904,10 @@ public:
     bool is_queued = false;
     bool isRunning = false;
     bool isStopping = false;
-    bool startAfterVerify = false;
-    bool magnetStartAfterVerify = false;
 
-    bool magnetVerify = false;
+    // start the torrent after all the startup scaffolding is done,
+    // e.g. fetching metadata from peers and/or verifying the torrent
+    bool start_when_stable = false;
 
 private:
     [[nodiscard]] constexpr bool isPieceTransferAllowed(tr_direction direction) const noexcept
