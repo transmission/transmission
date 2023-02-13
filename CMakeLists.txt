@@ -708,6 +708,11 @@ if(HAVE_LIBM)
     set(LIBM_LIBRARY m)
 endif()
 
+check_library_exists(quota quotacursor_skipidtype "" HAVE_LIBQUOTA)
+if(HAVE_LIBQUOTA)
+    set(LIBQUOTA_LIBRARY quota)
+endif()
+
 set(TR_NETWORK_LIBRARIES)
 if(WIN32)
     list(APPEND TR_NETWORK_LIBRARIES iphlpapi ws2_32)
