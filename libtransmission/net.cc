@@ -25,7 +25,9 @@
 
 #include <fmt/core.h>
 
+#ifdef WITH_UTP
 #include <libutp/utp.h>
+#endif
 
 #include "transmission.h"
 
@@ -35,7 +37,9 @@
 #include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
+#ifdef WITH_UTP
 #include "tr-utp.h"
+#endif
 #include "utils.h"
 #include "variant.h"
 

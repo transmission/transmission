@@ -55,7 +55,9 @@
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "tr-strbuf.h"
+#ifdef WITH_UTP
 #include "tr-utp.h"
+#endif
 #include "utils.h"
 #include "variant.h"
 #include "verify.h"
@@ -652,7 +654,9 @@ void tr_session::initImpl(init_data& data)
         this->lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
     }
 
+#ifdef WITH_UTP
     tr_utpInit(this);
+#endif
 
     /* cleanup */
     tr_variantClear(&settings);
@@ -1248,7 +1252,9 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     is_closing_ = true;
 
     // close the low-hanging fruit that can be closed immediately w/o consequences
+#ifdef WITH_UTP
     utp_timer.reset();
+#endif
     verifier_.reset();
     save_timer_.reset();
     now_timer_.reset();
@@ -1313,7 +1319,9 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     stats().saveIfDirty();
     peer_mgr_.reset();
     openFiles().closeAll();
+#ifdef WITH_UTP
     tr_utpClose(this);
+#endif
     this->udp_core_.reset();
 
     // tada we are done!
@@ -1490,23 +1498,29 @@ bool tr_session::allowsUTP() const noexcept
 #endif
 }
 
-bool tr_sessionIsUTPEnabled(tr_session const* session)
+bool tr_sessionIsUTPEnabled([[maybe_unused]] tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
-
+#ifdef WITH_UTP
     return session->allowsUTP();
+#else
+    return false;
+#endif
 }
 
-void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
+void tr_sessionSetUTPEnabled(tr_session* session, [[maybe_unused]] bool enabled)
 {
     TR_ASSERT(session != nullptr);
-
+#ifdef WITH_UTP
     if (enabled == session->allowsUTP())
     {
         return;
     }
 
     session->settings_.utp_enabled = enabled;
+#else
+    session->settings_.utp_enabled = false;
+#endif
 }
 
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)

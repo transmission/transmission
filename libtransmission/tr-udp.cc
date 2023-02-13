@@ -16,7 +16,9 @@
 #include "net.h"
 #include "session.h"
 #include "tr-assert.h"
+#ifdef WITH_UTP
 #include "tr-utp.h"
+#endif
 #include "utils.h"
 
 namespace
@@ -123,6 +125,7 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
             tr_logAddTrace("Couldn't parse UDP tracker packet.");
         }
     }
+#ifdef WITH_UTP
     else if (session->allowsUTP() && (session->utp_context != nullptr))
     {
         if (!tr_utpPacket(std::data(buf), rc, from_sa, fromlen, session))
@@ -130,6 +133,7 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
             tr_logAddTrace("Unexpected UDP packet");
         }
     }
+#endif
 }
 } // namespace
 

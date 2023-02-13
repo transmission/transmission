@@ -275,7 +275,7 @@ target_link_libraries(${TR_NAME}
         natpmp::natpmp
         miniupnpc::libminiupnpc
         dht::dht
-        libutp::libutp
+        $<$<BOOL:${ENABLE_UTP}>:libutp::libutp>
         libb64::libb64
         ${LIBINTL_LIBRARY}
         ${LIBM_LIBRARY}

@@ -772,6 +772,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 {
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
+#ifdef WITH_UTP
     if (io->is_utp() && !io->is_incoming() && handshake->is_state(State::AwaitingYb))
     {
         // the peer probably doesn't speak µTP.
@@ -795,6 +796,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
             return;
         }
     }
+#endif
 
     /* if the error happened while we were sending a public key, we might
      * have encountered a peer that doesn't do encryption... reconnect and

@@ -31,7 +31,9 @@
 class tr_peerIo;
 class tr_peerMsgs;
 class tr_swarm;
+#ifdef WITH_UTP
 struct UTPSocket;
+#endif
 struct peer_atom;
 struct tr_peerMgr;
 struct tr_peer_stat;

@@ -45,7 +45,9 @@
 #include "torrent.h"
 #include "torrent-magnet.h"
 #include "tr-assert.h"
+#ifdef WITH_UTP
 #include "tr-utp.h"
+#endif
 #include "utils.h"
 #include "webseed.h"
 
