@@ -2559,8 +2559,8 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 
 void torrentRenamePath(
     tr_torrent* const tor,
-    std::string oldpath, // NOLINT performance-unnecessary-value-param
-    std::string newname, // NOLINT performance-unnecessary-value-param
+    std::string const& oldpath, // NOLINT performance-unnecessary-value-param
+    std::string const& newname, // NOLINT performance-unnecessary-value-param
     tr_torrent_rename_done_func callback,
     void* const callback_user_data)
 {
