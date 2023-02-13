@@ -16,7 +16,6 @@
 #include <memory>
 
 #include "tr-macros.h" // tr_sha1_digest_t
-#include "tr-assert.h"
 #include "tr-arc4.h"
 
 class tr_arc4;
@@ -61,9 +60,8 @@ public:
     void setPeerPublicKey(key_bigend_t const& peer_public_key);
 
     // Returns the shared secret.
-    [[nodiscard]] auto secret() const noexcept
+    [[nodiscard]] constexpr auto const& secret() const noexcept
     {
-        TR_ASSERT(secret_ != key_bigend_t{});
         return secret_;
     }
 
