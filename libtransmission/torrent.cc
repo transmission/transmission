@@ -1191,7 +1191,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         on_metainfo_completed(tor);
     }
-    else if (tor->start_when_stable || !has_metainfo)
+    else if (tor->start_when_stable)
     {
         auto opts = torrent_start_opts{};
         opts.bypass_queue = !has_metainfo; // to fetch metainfo from peers
