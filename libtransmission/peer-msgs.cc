@@ -22,6 +22,7 @@
 
 #include "transmission.h"
 
+#include "bitfield.h"
 #include "cache.h"
 #include "completion.h"
 #include "crypto-utils.h"
@@ -193,12 +194,12 @@ struct tr_incoming
     {
         explicit incoming_piece_data(uint32_t block_size)
             : buf{ std::make_unique<std::vector<uint8_t>>(block_size) }
+            , have{ block_size }
         {
         }
 
-        uint32_t n_bytes_received = 0;
-
         std::unique_ptr<std::vector<uint8_t>> buf;
+        tr_bitfield have;
     };
 
     std::map<tr_block_index_t, incoming_piece_data> blocks;
@@ -1443,19 +1444,22 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
 
     auto const n_this_pass = std::min(size_t{ req->length }, inlen);
     TR_ASSERT(loc.block_offset + n_this_pass <= block_size);
+    if (n_this_pass == 0)
+    {
+        return READ_LATER;
+    }
 
     auto& incoming_block = incoming.blocks.try_emplace(block, block_size).first->second;
     msgs->io->read_bytes(std::data(*incoming_block.buf) + loc.block_offset, n_this_pass);
 
     msgs->publish(tr_peer_event::GotPieceData(n_this_pass));
     *setme_piece_bytes_read += n_this_pass;
-    incoming_block.n_bytes_received += n_this_pass;
-    TR_ASSERT(incoming_block.n_bytes_received <= block_size);
+    incoming_block.have.setSpan(loc.block_offset, loc.block_offset + n_this_pass);
     logtrace(msgs, fmt::format("got {:d} bytes for req {:d}:{:d}->{:d}", n_this_pass, req->index, req->offset, req->length));
 
     // if we haven't gotten the full response yet,
     // update what part of `req` is unfulfilled and wait for more
-    if (n_this_pass < req->length)
+    if (req->length > n_this_pass)
     {
         req->length -= n_this_pass;
         auto const new_loc = msgs->torrent->byteLoc(loc.byte + n_this_pass);
@@ -1469,7 +1473,7 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
     msgs->state = AwaitingBt::Length;
 
     // if we haven't gotten the entire block yet, wait for more
-    if (incoming_block.n_bytes_received < block_size)
+    if (!incoming_block.have.hasAll())
     {
         return READ_LATER;
     }
