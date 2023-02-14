@@ -1348,6 +1348,7 @@ tr_stat tr_torrent::stats() const
     stats.desiredAvailable = tr_peerMgrGetDesiredAvailable(this);
 
     stats.ratio = tr_getRatio(stats.uploadedEver, this->size_when_done());
+    stats.startWhenStable = this->start_when_stable_;
 
     auto seed_ratio_bytes_left = uint64_t{};
     auto seed_ratio_bytes_goal = uint64_t{};
@@ -1542,6 +1543,14 @@ void tr_torrentStartNow(tr_torrent* tor)
     {
         tor->start_when_stable_ = true;
         tor->start(true /*bypass_queue*/, {});
+    }
+}
+
+void tr_torrentStabilize(tr_torrent* tor)
+{
+    if (tr_isTorrent(tor))
+    {
+        tor->start(!tor->has_metainfo(), {});
     }
 }
 
