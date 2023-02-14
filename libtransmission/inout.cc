@@ -250,7 +250,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
             return {};
         }
 
-        auto begin = std::begin(buffer);
+        auto begin = std::data(buffer);
         auto end = begin + block_len;
 
         // handle edge case where blocks aren't on piece boundaries:
