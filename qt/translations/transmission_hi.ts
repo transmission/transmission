@@ -505,17 +505,17 @@
         <translation>वैश्विक सीमाओं का पालन करें (&amp;l)</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>डाउनलोड गति सीमित करें (&amp;d) :</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>अपलोड गति सीमित करें (&amp;u) :</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>टोरेंट प्राथमिकता (&amp;p) :</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>पंक्ति से अनुक्रमित (&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>डाउनलोड गति सीमित करें</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>टोरेंट खोलें</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>गति सीमाएँ</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>नेटवर्क त्रुटि</translation>
     </message>
@@ -2224,7 +2224,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>पथ नाम बदलने में त्रुटि</translation>
     </message>

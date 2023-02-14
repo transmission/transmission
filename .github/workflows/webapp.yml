@@ -3,9 +3,15 @@ on:
   push:
     branches:
       - 'main'
+    paths-ignore:
+      - 'docs/**'
+      - '.github/**'
   pull_request:
     branches:
       - 'main'
+    paths-ignore:
+      - 'docs/**'
+      - '.github/**'
 jobs:
   decide-what-jobs-to-run:
     runs-on: ubuntu-22.04

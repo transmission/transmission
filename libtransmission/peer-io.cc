@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -130,7 +130,15 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
 
+    // try a TCP socket
+    if (auto sock = tr_netOpenPeerSocket(session, addr, port, is_seed); sock.is_valid())
+    {
+        peer_io->set_socket(std::move(sock));
+        return peer_io;
+    }
+
 #ifdef WITH_UTP
+    // try a UTP socket
     if (utp)
     {
         auto* const sock = utp_create_socket(session->utp_context);
@@ -144,15 +152,6 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         }
     }
 #endif
-
-    if (!peer_io->socket_.is_valid())
-    {
-        if (auto sock = tr_netOpenPeerSocket(session, addr, port, is_seed); sock.is_valid())
-        {
-            peer_io->set_socket(std::move(sock));
-            return peer_io;
-        }
-    }
 
     return {};
 }

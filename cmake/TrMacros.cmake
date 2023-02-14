@@ -129,7 +129,7 @@ function(tr_process_list_conditions VAR_PREFIX)
 endfunction()
 
 macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
-    cmake_parse_arguments(_TAEAL_ARG "" "TARGET" "CMAKE_ARGS" ${ARGN})
+    cmake_parse_arguments(_TAEAL_ARG "SUBPROJECT" "TARGET" "CMAKE_ARGS" ${ARGN})
 
     if(USE_SYSTEM_${ID})
         tr_get_required_flag(USE_SYSTEM_${ID} SYSTEM_${ID}_IS_REQUIRED)
@@ -139,6 +139,13 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
 
     if(USE_SYSTEM_${ID})
         unset(${ID}_UPSTREAM_TARGET)
+    elseif(_TAEAL_ARG_SUBPROJECT)
+        foreach(ARG IN LISTS _TAEAL_ARG_CMAKE_ARGS)
+            if(ARG MATCHES "^-D([^=: ]+)(:[^= ]+)?=(.*)$")
+                set(${CMAKE_MATCH_1} ${CMAKE_MATCH_3} CACHE INTERNAL "")
+            endif()
+        endforeach()
+        add_subdirectory("${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}" "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}")
     else()
         set(${ID}_UPSTREAM_TARGET ${LIBNAME})
         set(${ID}_PREFIX "${CMAKE_BINARY_DIR}/third-party/${${ID}_UPSTREAM_TARGET}")
@@ -166,6 +173,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
             PREFIX "${${ID}_PREFIX}"
             CMAKE_ARGS
                 -Wno-dev # We don't want to be warned over unused variables
+                --no-warn-unused-cli
                 "-DCMAKE_TOOLCHAIN_FILE:PATH=${CMAKE_TOOLCHAIN_FILE}"
                 "-DCMAKE_USER_MAKE_RULES_OVERRIDE=${CMAKE_USER_MAKE_RULES_OVERRIDE}"
                 "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
@@ -185,7 +193,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         file(MAKE_DIRECTORY ${${ID}_INCLUDE_DIRS})
     endif()
 
-    if(_TAEAL_ARG_TARGET)
+    if(_TAEAL_ARG_TARGET AND (USE_SYSTEM_${ID} OR NOT _TAEAL_ARG_SUBPROJECT))
         add_library(${_TAEAL_ARG_TARGET} INTERFACE IMPORTED)
 
         target_include_directories(${_TAEAL_ARG_TARGET}
@@ -199,6 +207,10 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         if(${ID}_UPSTREAM_TARGET)
             add_dependencies(${_TAEAL_ARG_TARGET} ${${ID}_UPSTREAM_TARGET})
         endif()
+    endif()
+
+    if(_TAEAL_ARG_TARGET AND NOT TARGET ${_TAEAL_ARG_TARGET})
+        message(FATAL_ERROR "Build system is misconfigured, this shouldn't happen! Can't find target '${_TAEAL_ARG_TARGET}'")
     endif()
 endmacro()
 

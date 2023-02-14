@@ -46,7 +46,7 @@ option(ENABLE_DAEMON "Build daemon" ON)
 tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC "Build Mac client" AUTO)
-tr_auto_option(ENABLE_WEB "Build Web client" AUTO)
+tr_auto_option(REBUILD_WEB "Rebuild the web client's generated assets. Requires Node.js and network access." OFF)
 option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
@@ -55,7 +55,7 @@ option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
-tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" AUTO)
+tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" OFF)
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT "Use system dht library" AUTO)
@@ -81,7 +81,7 @@ set(TR_NAME ${PROJECT_NAME})
 set(TR_VERSION_MAJOR "4")
 set(TR_VERSION_MINOR "0")
 set(TR_VERSION_PATCH "0")
-set(TR_VERSION_BETA_NUMBER "3") # empty string for not beta
+set(TR_VERSION_BETA_NUMBER "") # empty string for not beta
 set(TR_VERSION_DEV TRUE)
 
 # derived from above: release type
@@ -183,6 +183,11 @@ if(WIN32)
         if(MSVC)
             # Reduce noise (at least for now)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /wd4244 /wd4267")
+            # Make caching-friendly (store debug info inside object files)
+            foreach(T IN ITEMS ${CMAKE_CONFIGURATION_TYPES} ${CMAKE_BUILD_TYPE})
+                string(TOUPPER "${T}" T)
+                string(REGEX REPLACE "[-/]Z[iI]" "-Z7" CMAKE_${L}_FLAGS_${T} "${CMAKE_${L}_FLAGS_${T}}")
+            endforeach()
         endif()
 
         if(MINGW)
@@ -496,20 +501,25 @@ tr_add_external_auto_library(PSL libpsl psl
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp
+        SUBPROJECT
         TARGET libutp::libutp
-        CMAKE_ARGS -DLIBUTP_BUILD_PROGRAMS=OFF)
+        CMAKE_ARGS
+            -DLIBUTP_SHARED:BOOL=OFF)
 endif()
 
 tr_add_external_auto_library(B64 libb64 b64
-    TARGET libb64::libb64)
+    SUBPROJECT
+    TARGET libb64::libb64
+    CMAKE_ARGS
+        -DLIBB64_SHARED:BOOL=OFF)
 
-if(NOT ${ENABLE_WEB} STREQUAL "OFF")
+if(NOT ${REBUILD_WEB} STREQUAL "OFF")
     find_program(NPM npm)
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
-        if ("${ENABLE_WEB}" STREQUAL "ON")
+        if ("${REBUILD_WEB}" STREQUAL "ON")
             message(FATAL_ERROR "Could NOT find NPM, minimum required is \"${NPM_MINIMUM}\"")
         else() # AUTO
-            set(ENABLE_WEB OFF)
+            set(REBUILD_WEB OFF)
         endif()
     else()
         execute_process(COMMAND "${NPM}" --version
@@ -517,13 +527,16 @@ if(NOT ${ENABLE_WEB} STREQUAL "OFF")
             OUTPUT_VARIABLE NPM_VERSION_STRING)
         if ("${NPM_VERSION_STRING}" VERSION_GREATER_EQUAL "${NPM_MINIMUM}")
             message(STATUS "Found NPM: ${NPM} (found suitable version \"${NPM_VERSION_STRING}\", minimum required is \"${NPM_MINIMUM}\")")
-            set(ENABLE_WEB ON)
-        elseif ("${ENABLE_WEB}" STREQUAL "ON")
+            set(REBUILD_WEB ON)
+        elseif ("${REBUILD_WEB}" STREQUAL "ON")
             message(FATAL_ERROR "Found NPM: ${NPM} Found unsuitable version \"${NPM_VERSION_STRING}\", but required is at least \"${NPM_MINIMUM}\"")
         else() # AUTO
             message(STATUS "Found NPM: ${NPM} Found unsuitable version \"${NPM_VERSION_STRING}\", but required is at least \"${NPM_MINIMUM}\"")
-            set(ENABLE_WEB OFF)
+            set(REBUILD_WEB OFF)
         endif()
+    endif()
+    if(REBUILD_WEB)
+      add_subdirectory(web)
     endif()
 endif()
 
@@ -695,6 +708,11 @@ if(HAVE_LIBM)
     set(LIBM_LIBRARY m)
 endif()
 
+check_library_exists(quota quotacursor_skipidtype "" HAVE_LIBQUOTA)
+if(HAVE_LIBQUOTA)
+    set(LIBQUOTA_LIBRARY quota)
+endif()
+
 set(TR_NETWORK_LIBRARIES)
 if(WIN32)
     list(APPEND TR_NETWORK_LIBRARIES iphlpapi ws2_32)
@@ -749,7 +767,7 @@ if(ENABLE_GTK AND ENABLE_NLS)
     add_subdirectory(po)
 endif()
 
-foreach(P cli daemon gtk mac qt utils web)
+foreach(P cli daemon gtk mac qt utils)
     string(TOUPPER "${P}" P_ID)
     if(ENABLE_${P_ID})
         if(DEFINED ${P_ID}_PROJECT_DIR)
@@ -759,7 +777,7 @@ foreach(P cli daemon gtk mac qt utils web)
     endif()
 endforeach()
 
-if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
+if(NOT REBUILD_WEB AND (ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT))
     tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
 endif()
 

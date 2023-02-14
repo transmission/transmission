@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -382,6 +382,21 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tm_.addWebseed(value);
         }
+        else if (pathIs(MagnetInfoKey, DisplayNameKey))
+        {
+            // compatibility with Transmission <= 3.0
+            tm_.name_ = tr_strv_replace_invalid(value);
+        }
+        else if (pathIs(MagnetInfoKey, InfoHashKey))
+        {
+            // compatibility with Transmission <= 3.0
+            if (value.length() == sizeof(tr_sha1_digest_t))
+            {
+                std::copy_n(std::data(value), sizeof(tr_sha1_digest_t), reinterpret_cast<char*>(std::data(tm_.info_hash_)));
+                tm_.info_hash_str_ = tr_sha1_to_string(tm_.info_hash_);
+                tm_.has_magnet_info_hash_ = true;
+            }
+        }
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
@@ -495,6 +510,12 @@ private:
 
     bool finish(Context const& context)
     {
+        // Support Transmission <= 3.0 magnets stored in torrent format.
+        if (tm_.has_magnet_info_hash_)
+        {
+            return true;
+        }
+
         // bittorrent 1.0 spec
         // http://bittorrent.org/beps/bep_0003.html
         //
@@ -544,6 +565,7 @@ private:
     static constexpr std::string_view CreatedByKey = "created by"sv;
     static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
     static constexpr std::string_view CreationDateKey = "creation date"sv;
+    static constexpr std::string_view DisplayNameKey = "display-name"sv;
     static constexpr std::string_view DurationKey = "duration"sv;
     static constexpr std::string_view Ed2kKey = "ed2k"sv;
     static constexpr std::string_view EncodedRateKey = "encoded rate"sv;
@@ -558,6 +580,7 @@ private:
     static constexpr std::string_view HeightKey = "height"sv;
     static constexpr std::string_view HttpSeedsKey = "httpseeds"sv;
     static constexpr std::string_view InfoKey = "info"sv;
+    static constexpr std::string_view InfoHashKey = "info_hash"sv;
     static constexpr std::string_view LengthKey = "length"sv;
     static constexpr std::string_view LibtorrentResumeKey = "libtorrent_resume"sv;
     static constexpr std::string_view LocaleKey = "locale"sv;

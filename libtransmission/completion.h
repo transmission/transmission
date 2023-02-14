@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -171,6 +171,8 @@ private:
     {
         return countHasBytesInSpan(block_info_->byteSpanForPiece(piece));
     }
+
+    void removeBlock(tr_block_index_t block);
 
     torrent_view const* tor_;
     tr_block_info const* block_info_;
