@@ -226,15 +226,11 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         if ([cell isKindOfClass:[GroupTextCell class]])
         {
             GroupTextCell* groupCell = cell;
-            groupCell.selected = NO;
 
             // if cell is selected, set selected flag so we can style the title in GroupTextCell drawInteriorWithFrame
             NSInteger const row = [self rowForItem:item];
             NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
-            if ([selectedRowIndexes containsIndex:row])
-            {
-                groupCell.selected = YES;
-            }
+            groupCell.selected = [selectedRowIndexes containsIndex:row];
         }
     }
 }

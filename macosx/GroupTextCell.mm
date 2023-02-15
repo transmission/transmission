@@ -23,14 +23,10 @@
     //set font size and color
     NSRect titleRect = [self titleRectForBounds:cellFrame];
     NSMutableAttributedString* string = [[self attributedStringValue] mutableCopy];
-    NSMutableDictionary* attributes = [NSMutableDictionary
-        dictionaryWithObjects:@[ [NSFont boldSystemFontOfSize:11.0], [NSColor secondaryLabelColor] ]
-                      forKeys:@[ NSFontAttributeName, NSForegroundColorAttributeName ]];
-
-    if (self.selected)
-    {
-        [attributes setObject:[NSColor labelColor] forKey:NSForegroundColorAttributeName];
-    }
+    NSDictionary* attributes = @{
+        NSFontAttributeName: [NSFont boldSystemFontOfSize:11.0],
+        NSForegroundColorAttributeName: self.selected ? [NSColor labelColor] : [NSColor secondaryLabelColor]
+    };
 
     [string addAttributes:attributes range:NSMakeRange(0, string.length)];
     [string drawInRect:titleRect];
