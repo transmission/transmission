@@ -1048,7 +1048,7 @@ void tr_torrent::init(tr_ctor const& ctor)
     {
         on_metainfo_completed();
     }
-    else if (start_when_stable_)
+    else if (start_when_stable_ || (is_new_torrent && !has_metainfo))
     {
         auto const bypass_queue = !has_metainfo; // to fetch metainfo from peers
         start(bypass_queue, has_any_local_data);
