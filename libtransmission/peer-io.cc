@@ -678,13 +678,28 @@ void tr_peerIo::on_utp_error(int errcode)
 {
     tr_logAddTraceIo(this, fmt::format("utp_on_error -- {}", utp_error_code_names[errcode]));
 
-    if (got_error_ != nullptr)
+    if (got_error_ == nullptr)
     {
-        tr_error* error = nullptr;
-        tr_error_set(&error, errcode, utp_error_code_names[errcode]);
-        call_error_callback(*error);
-        tr_error_clear(&error);
+        return;
     }
+
+    tr_error* error = nullptr;
+    switch (errcode)
+    {
+        case UTP_ECONNREFUSED:
+            tr_error_set_from_errno(&error, ECONNREFUSED);
+            break;
+        case UTP_ECONNRESET:
+            tr_error_set_from_errno(&error, ECONNRESET);
+            break;
+        case UTP_ETIMEDOUT:
+            tr_error_set_from_errno(&error, ETIMEDOUT);
+            break;
+        default:
+            tr_error_set(&error, errcode, utp_error_code_names[errcode]);
+    }
+    call_error_callback(*error);
+    tr_error_clear(&error);
 }
 
 #endif /* #ifdef WITH_UTP */
