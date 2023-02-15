@@ -43,6 +43,7 @@
 #include "session.h"
 #include "timer.h"
 #include "torrent.h"
+#include "torrent-magnet.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
 #include "utils.h"
@@ -2391,8 +2392,11 @@ void tr_peerMgr::bandwidthPulse()
     session->top_bandwidth_.allocate(Msec);
 
     // torrent upkeep
-    auto& torrents = session->torrents();
-    std::for_each(std::begin(torrents), std::end(torrents), [](auto* tor) { tor->do_idle_work(); });
+    for (auto* const tor : session->torrents())
+    {
+        tor->do_idle_work();
+        tr_torrentMagnetDoIdleWork(tor);
+    }
 
     /* pump the queues */
     queuePulse(session, TR_UP);

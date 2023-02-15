@@ -87,3 +87,7 @@ add_custom_target("${TR_NAME}-web"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
     SOURCES
         ${WEB_SOURCES})
+
+install(
+    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/public_html
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})

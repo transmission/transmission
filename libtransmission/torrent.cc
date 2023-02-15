@@ -18,10 +18,8 @@
 #include <vector>
 
 #ifndef _WIN32
-
 #include <sys/wait.h> /* wait() */
 #include <unistd.h> /* fork(), execvp(), _exit() */
-
 #else
 #include <windows.h> /* CreateProcess(), GetLastError() */
 #endif
@@ -590,7 +588,6 @@ struct CompareTorrentByQueuePosition
 };
 
 #ifdef TR_ENABLE_ASSERTS
-
 bool queueIsSequenced(tr_session const* session)
 {
     auto torrents = session->getAllTorrents();
@@ -609,7 +606,6 @@ bool queueIsSequenced(tr_session const* session)
 
     return is_sequenced;
 }
-
 #endif
 } // namespace queue_helpers
 } // namespace
@@ -856,8 +852,7 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     case TR_STATUS_CHECK:
     case TR_STATUS_CHECK_WAIT:
         /* verifying right now... wait until that's done so
-                 * we'll know what completeness to use/announce */
-        tor->startAfterVerify = true;
+         * we'll know what completeness to use/announce */
         return;
 
     case TR_STATUS_STOPPED:
@@ -876,9 +871,6 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
         return;
     }
 
-    /* otherwise, start it now... */
-    auto const lock = tor->unique_lock();
-
     /* allow finished torrents to be resumed */
     if (tr_torrentIsSeedRatioDone(tor))
     {
@@ -887,10 +879,10 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     }
 
     /* corresponds to the peer_id sent as a tracker request parameter.
-         * one tracker admin says: "When the same torrent is opened and
-         * closed and opened again without quitting Transmission ...
-         * change the peerid. It would help sometimes if a stopped event
-         * was missed to ensure that we didn't think someone was cheating. */
+     * one tracker admin says: "When the same torrent is opened and
+     * closed and opened again without quitting Transmission ...
+     * change the peerid. It would help sometimes if a stopped event
+     * was missed to ensure that we didn't think someone was cheating. */
     tr_torrentUnsetPeerId(tor);
     tor->isRunning = true;
     tor->setDirty();
@@ -902,6 +894,9 @@ void torrentStop(tr_torrent* const tor)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->session->amInSessionThread());
     auto const lock = tor->unique_lock();
+
+    tor->isRunning = false;
+    tor->isStopping = false;
 
     if (!tor->session->isClosing())
     {
@@ -921,16 +916,6 @@ void torrentStop(tr_torrent* const tor)
     }
 
     torrentSetQueued(tor, false);
-
-    if (tor->magnetVerify)
-    {
-        tor->magnetVerify = false;
-        tr_logAddTraceTor(tor, "Magnet Verify");
-        tor->refreshCurrentDir();
-        tr_torrentVerify(tor);
-
-        callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
-    }
 }
 } // namespace
 
@@ -943,8 +928,7 @@ void tr_torrentStop(tr_torrent* tor)
 
     auto const lock = tor->unique_lock();
 
-    tor->isRunning = false;
-    tor->isStopping = false;
+    tor->start_when_stable = false;
     tor->setDirty();
     tor->session->runInSessionThread(torrentStop, tor);
 }
@@ -973,7 +957,6 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
         tr_logAddInfoTor(tor, _("Removing torrent"));
     }
 
-    tor->magnetVerify = false;
     torrentStop(tor);
 
     if (tor->isDeleting)
@@ -983,7 +966,6 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
         tr_torrent_metainfo::removeFile(tor->session->resumeDir(), tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
-    tor->isRunning = false;
     freeTorrent(tor);
 }
 
@@ -1044,6 +1026,34 @@ void torrentInitFromInfoDict(tr_torrent* tor)
     tor->checked_pieces_ = tr_bitfield{ size_t(tor->pieceCount()) };
 }
 
+void on_metainfo_completed(tr_torrent* tor)
+{
+    // we can look for files now that we know what files are in the torrent
+    tor->refreshCurrentDir();
+
+    callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
+
+    if (tor->session->shouldFullyVerifyAddedTorrents() || !isNewTorrentASeed(tor))
+    {
+        tr_torrentVerify(tor);
+    }
+    else
+    {
+        tor->completion.setHasAll();
+        tor->doneDate = tor->addedDate;
+        tor->recheckCompleteness();
+
+        if (tor->start_when_stable)
+        {
+            torrentStart(tor, {});
+        }
+        else if (tor->isRunning)
+        {
+            tr_torrentStop(tor);
+        }
+    }
+}
+
 void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
     tr_session* session = tr_ctorGetSession(ctor);
@@ -1089,7 +1099,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->anyDate = now;
 
     tr_resume::fields_t loaded = {};
-    if (tor->hasMetainfo())
+
     {
         // tr_resume::load() calls a lot of tr_torrentSetFoo() methods
         // that set things as dirty, but... these settings being loaded are
@@ -1113,9 +1123,6 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_ctorInitTorrentWanted(ctor, tor);
 
     tor->refreshCurrentDir();
-
-    bool const do_start = tor->isRunning;
-    tor->isRunning = false;
 
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
@@ -1182,37 +1189,14 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tor->torrent_announcer = session->announcer_->addTorrent(tor, &tr_torrent::onTrackerResponse);
 
-    if (is_new_torrent)
+    if (auto const has_metainfo = tor->hasMetainfo(); is_new_torrent && has_metainfo)
     {
-        if (tor->hasMetainfo())
-        {
-            callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
-        }
-
-        if (!tor->hasMetainfo() && !do_start)
-        {
-            auto opts = torrent_start_opts{};
-            opts.bypass_queue = true;
-            opts.has_local_data = has_local_data;
-            torrentStart(tor, opts);
-        }
-        else if (!session->shouldFullyVerifyAddedTorrents() && isNewTorrentASeed(tor))
-        {
-            tor->completion.setHasAll();
-            tor->doneDate = tor->addedDate;
-            tor->recheckCompleteness();
-        }
-        else
-        {
-            tor->startAfterVerify = do_start;
-            tr_torrentVerify(tor);
-        }
+        on_metainfo_completed(tor);
     }
-    else if (do_start)
+    else if (tor->start_when_stable)
     {
-        // if checked_pieces_ got populated from the loading the resume
-        // file above, then torrentStart doesn't need to check again
         auto opts = torrent_start_opts{};
+        opts.bypass_queue = !has_metainfo; // to fetch metainfo from peers
         opts.has_local_data = has_local_data;
         torrentStart(tor, opts);
     }
@@ -1224,16 +1208,20 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 } // namespace torrent_init_helpers
 } // namespace
 
-void tr_torrent::setMetainfo(tr_torrent_metainfo const& tm)
+void tr_torrent::setMetainfo(tr_torrent_metainfo tm)
 {
     using namespace torrent_init_helpers;
 
-    metainfo_ = tm;
+    TR_ASSERT(!hasMetainfo());
+    metainfo_ = std::move(tm);
 
     torrentInitFromInfoDict(this);
     tr_peerMgrOnTorrentGotMetainfo(this);
     session->onMetadataCompleted(this);
     this->setDirty();
+    this->markEdited();
+
+    on_metainfo_completed(this);
 }
 
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
@@ -1347,7 +1335,6 @@ void setLocationInSessionThread(
         *setme_state = ok ? TR_LOC_DONE : TR_LOC_ERROR;
     }
 }
-
 size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
 {
     auto* walk = paths;
@@ -1597,9 +1584,9 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     switch (s->activity)
     {
     /* etaSpeed exists because if we use the piece speed directly,
-         * brief fluctuations cause the ETA to jump all over the place.
-         * so, etaXLSpeed is a smoothed-out version of the piece speed
-         * to dampen the effect of fluctuations */
+     * brief fluctuations cause the ETA to jump all over the place.
+     * so, etaXLSpeed is a smoothed-out version of the piece speed
+     * to dampen the effect of fluctuations */
     case TR_STATUS_DOWNLOAD:
         if (tor->etaSpeedCalculatedAt + 800 < now)
         {
@@ -1807,33 +1794,35 @@ void tr_torrentAmountFinished(tr_torrent const* tor, float* tabs, int n_tabs)
 
 // --- Start/Stop Callback
 
+namespace
+{
+void tr_torrentStartImpl(tr_torrent* tor, bool bypass_queue)
+{
+    if (!tr_isTorrent(tor))
+    {
+        return;
+    }
+
+    tor->start_when_stable = true;
+    auto opts = torrent_start_opts{};
+    opts.bypass_queue = bypass_queue;
+    torrentStart(tor, opts);
+}
+} // namespace
+
 void tr_torrentStart(tr_torrent* tor)
 {
-    if (tr_isTorrent(tor))
-    {
-        tor->startAfterVerify = true;
-        torrentStart(tor, {});
-    }
+    tr_torrentStartImpl(tor, false);
 }
 
 void tr_torrentStartNow(tr_torrent* tor)
 {
-    if (tr_isTorrent(tor))
-    {
-        auto opts = torrent_start_opts{};
-        opts.bypass_queue = true;
-        torrentStart(tor, opts);
-    }
+    tr_torrentStartImpl(tor, true);
 }
 
 void tr_torrentStartMagnet(tr_torrent* tor)
 {
-    if (tr_isTorrent(tor))
-    {
-        tor->magnetStartAfterVerify = true;
-        tor->startAfterVerify = true;
-        torrentStart(tor, {});
-    }
+    tr_torrentStart(tor);
 }
 
 // ---
@@ -1853,10 +1842,8 @@ void onVerifyDoneThreadFunc(tr_torrent* const tor)
 
     tor->recheckCompleteness();
 
-    if (tor->startAfterVerify)
+    if (tor->start_when_stable)
     {
-        tor->startAfterVerify = false;
-
         auto opts = torrent_start_opts{};
         opts.has_local_data = !tor->checked_pieces_.hasNone();
         torrentStart(tor, opts);
@@ -1876,20 +1863,18 @@ void verifyTorrent(tr_torrent* const tor)
     /* if the torrent's already being verified, stop it */
     tor->session->verifyRemove(tor);
 
-    bool const start_after = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
+    if (!tor->hasMetainfo())
+    {
+        return;
+    }
 
     if (tor->isRunning)
     {
-        tr_torrentStop(tor);
+        torrentStop(tor);
     }
 
-    if (setLocalErrorIfFilesDisappeared(tor))
+    if (!setLocalErrorIfFilesDisappeared(tor))
     {
-        tor->startAfterVerify = false;
-    }
-    else
-    {
-        tor->startAfterVerify = start_after;
         tor->session->verifyAdd(tor);
     }
 }
@@ -1954,10 +1939,10 @@ namespace completeness_helpers
     {
     case TR_PARTIAL_SEED:
         /* Translators: this is a minor point that's safe to skip over, but FYI:
-                       "Complete" and "Done" are specific, different terms in Transmission:
-                       "Complete" means we've downloaded every file in the torrent.
-                       "Done" means we're done downloading the files we wanted, but NOT all
-                       that exist */
+           "Complete" and "Done" are specific, different terms in Transmission:
+           "Complete" means we've downloaded every file in the torrent.
+           "Done" means we're done downloading the files we wanted, but NOT all
+           that exist */
         return "Done";
 
     case TR_SEED:
@@ -2381,12 +2366,12 @@ void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
     tor->session->closeTorrentFile(tor, i);
 
     /* now that the file is complete and closed, we can start watching its
-             * mtime timestamp for changes to know if we need to reverify pieces */
+     * mtime timestamp for changes to know if we need to reverify pieces */
     tor->file_mtimes_[i] = tr_time();
 
     /* if the torrent's current filename isn't the same as the one in the
-             * metadata -- for example, if it had the ".part" suffix appended to
-             * it until now -- then rename it to match the one in the metadata */
+     * metadata -- for example, if it had the ".part" suffix appended to
+     * it until now -- then rename it to match the one in the metadata */
     if (auto found = tor->findFile(i); found)
     {
         if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != found->subpath())
@@ -2457,8 +2442,17 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     tor->setDirty();
 
     tor->completion.addBlock(block);
-    if (auto const piece = tor->blockLoc(block).piece; tor->hasPiece(piece))
+
+    auto const block_loc = tor->blockLoc(block);
+    auto const first_piece = block_loc.piece;
+    auto const last_piece = tor->byteLoc(block_loc.byte + tor->blockSize(block) - 1).piece;
+    for (auto piece = first_piece; piece <= last_piece; ++piece)
     {
+        if (!tor->hasPiece(piece))
+        {
+            continue;
+        }
+
         if (tor->checkPiece(piece))
         {
             onPieceCompleted(tor, piece);

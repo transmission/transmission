@@ -279,6 +279,7 @@ target_link_libraries(${TR_NAME}
         libb64::libb64
         ${LIBINTL_LIBRARY}
         ${LIBM_LIBRARY}
+        ${LIBQUOTA_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
         jsonsl
         utf8::cpp

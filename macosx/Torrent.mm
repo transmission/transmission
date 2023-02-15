@@ -280,7 +280,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 {
     if ([self alertForRemainingDiskSpace])
     {
-        tr_torrentStartMagnet(self.fHandle);
+        tr_torrentStart(self.fHandle);
         [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited

@@ -708,6 +708,11 @@ if(HAVE_LIBM)
     set(LIBM_LIBRARY m)
 endif()
 
+check_library_exists(quota quotacursor_skipidtype "" HAVE_LIBQUOTA)
+if(HAVE_LIBQUOTA)
+    set(LIBQUOTA_LIBRARY quota)
+endif()
+
 set(TR_NETWORK_LIBRARIES)
 if(WIN32)
     list(APPEND TR_NETWORK_LIBRARIES iphlpapi ws2_32)
@@ -772,7 +777,7 @@ foreach(P cli daemon gtk mac qt utils)
     endif()
 endforeach()
 
-if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
+if(NOT REBUILD_WEB AND (ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT))
     tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
 endif()
 
