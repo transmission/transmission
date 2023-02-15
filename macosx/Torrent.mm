@@ -152,13 +152,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     //restore GroupValue
     torrent.groupValue = [history[@"GroupValue"] intValue];
 
-    //start transfer
-    NSNumber* active;
-    if (!pause && (active = history[@"Active"]) && active.boolValue)
-    {
-        [torrent startTransferNoQueue];
-    }
-
     NSNumber* ratioLimit;
     if ((ratioLimit = history[@"RatioLimit"]))
     {
