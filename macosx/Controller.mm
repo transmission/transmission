@@ -721,7 +721,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     //load previous transfers
     tr_ctor* ctor = tr_ctorNew(session);
-    tr_ctorSetPaused(ctor, TR_FORCE, true); // paused by default; unpause below after checking state history
     auto const n_torrents = tr_sessionLoadTorrents(session, ctor);
     tr_ctorFree(ctor);
 
