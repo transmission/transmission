@@ -130,15 +130,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
 
-    // try a TCP socket
-    if (auto sock = tr_netOpenPeerSocket(session, addr, port, is_seed); sock.is_valid())
-    {
-        peer_io->set_socket(std::move(sock));
-        return peer_io;
-    }
-
 #ifdef WITH_UTP
-    // try a UTP socket
     if (utp)
     {
         auto* const sock = utp_create_socket(session->utp_context);
@@ -152,6 +144,15 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         }
     }
 #endif
+
+    if (!peer_io->socket_.is_valid())
+    {
+        if (auto sock = tr_netOpenPeerSocket(session, addr, port, is_seed); sock.is_valid())
+        {
+            peer_io->set_socket(std::move(sock));
+            return peer_io;
+        }
+    }
 
     return {};
 }
