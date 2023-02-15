@@ -4,6 +4,7 @@
 
 #import "GroupTextCell.h"
 #import "TorrentGroup.h"
+#import "TorrentTableView.h"
 
 @implementation GroupTextCell
 
@@ -22,9 +23,15 @@
     //set font size and color
     NSRect titleRect = [self titleRectForBounds:cellFrame];
     NSMutableAttributedString* string = [[self attributedStringValue] mutableCopy];
-    NSDictionary* attributes = [NSDictionary
+    NSMutableDictionary* attributes = [NSMutableDictionary
         dictionaryWithObjects:@[ [NSFont boldSystemFontOfSize:11.0], [NSColor secondaryLabelColor] ]
                       forKeys:@[ NSFontAttributeName, NSForegroundColorAttributeName ]];
+
+    if (self.selected)
+    {
+        [attributes setObject:[NSColor labelColor] forKey:NSForegroundColorAttributeName];
+    }
+
     [string addAttributes:attributes range:NSMakeRange(0, string.length)];
     [string drawInRect:titleRect];
 }
