@@ -1334,6 +1334,8 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
             ++n_used;
         }
     }
+    // best estimate: we can't tell for sure if they are the same peers
+    s->stats.known_peer_from_count[from] = std::max(s->stats.known_peer_from_count[from], (uint16_t)n_used);
 
     return n_used;
 }

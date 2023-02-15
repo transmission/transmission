@@ -263,8 +263,12 @@ struct tr_swarm_stats
 {
     std::array<uint16_t, 2> active_peer_count;
     uint16_t active_webseed_count;
+    // connected peers
     uint16_t peer_count;
+    // connected peers
     std::array<uint16_t, TR_PEER_FROM__MAX> peer_from_count;
+    // known peers
+    std::array<uint16_t, TR_PEER_FROM__MAX> known_peer_from_count;
 };
 
 tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm);
