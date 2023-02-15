@@ -24,8 +24,8 @@
     NSRect titleRect = [self titleRectForBounds:cellFrame];
     NSMutableAttributedString* string = [[self attributedStringValue] mutableCopy];
     NSDictionary* attributes = @{
-        NSFontAttributeName: [NSFont boldSystemFontOfSize:11.0],
-        NSForegroundColorAttributeName: self.selected ? [NSColor labelColor] : [NSColor secondaryLabelColor]
+        NSFontAttributeName : [NSFont boldSystemFontOfSize:11.0],
+        NSForegroundColorAttributeName : self.selected ? [NSColor labelColor] : [NSColor secondaryLabelColor]
     };
 
     [string addAttributes:attributes range:NSMakeRange(0, string.length)];
