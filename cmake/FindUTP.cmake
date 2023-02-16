@@ -20,7 +20,7 @@ find_library(UTP_LIBRARY
     HINTS ${_UTP_LIBDIR})
 
 if(UTP_INCLUDE_DIR AND UTP_LIBRARY)
-    include(CheckSymbolExists)
+    include(CheckCXXSymbolExists)
 
     set(_UTP_FUNCS
         utp_check_timeouts
@@ -53,7 +53,7 @@ if(UTP_INCLUDE_DIR AND UTP_LIBRARY)
     foreach(_UTP_FUNC IN LISTS _UTP_FUNCS)
         string(MAKE_C_IDENTIFIER "HAVE_${_UTP_FUNC}" _UTP_FUNC_VAR)
         string(TOUPPER "${_UTP_FUNC_VAR}" _UTP_FUNC_VAR)
-        check_symbol_exists(${_UTP_FUNC} libutp/utp.h ${_UTP_FUNC_VAR})
+        check_cxx_symbol_exists(${_UTP_FUNC} libutp/utp.h ${_UTP_FUNC_VAR})
         if(NOT ${_UTP_FUNC_VAR})
             unset(UTP_INCLUDE_DIR CACHE)
             unset(UTP_LIBRARY CACHE)
