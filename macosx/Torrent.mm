@@ -201,12 +201,12 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     return @(tr_torrentGetCurrentDir(self.fHandle));
 }
 
-- (void)getAvailability:(int8_t*)tab size:(NSInteger)size
+- (void)getAvailability:(int8_t*)tab size:(int)size
 {
     tr_torrentAvailability(self.fHandle, tab, size);
 }
 
-- (void)getAmountFinished:(float*)tab size:(NSInteger)size
+- (void)getAmountFinished:(float*)tab size:(int)size
 {
     tr_torrentAmountFinished(self.fHandle, tab, size);
 }

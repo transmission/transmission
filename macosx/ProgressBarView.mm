@@ -150,7 +150,7 @@ static NSInteger const kMaxPieces = 18 * 18;
         return;
     }
 
-    NSInteger pieceCount = MIN(torrent.pieceCount, kMaxPieces);
+    int const pieceCount = static_cast<int>(MIN(torrent.pieceCount, kMaxPieces));
     float* piecesPercent = static_cast<float*>(malloc(pieceCount * sizeof(float)));
     [torrent getAmountFinished:piecesPercent size:pieceCount];
 

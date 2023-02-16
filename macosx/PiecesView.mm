@@ -151,7 +151,7 @@ typedef struct PieceInfo
 
     // get the current state
     BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
-    NSInteger const numCells = MIN(_torrent.pieceCount, kMaxCells);
+    int const numCells = static_cast<int>(MIN(_torrent.pieceCount, kMaxCells));
     PieceInfo info;
     [self.torrent getAvailability:info.available size:numCells];
     [self.torrent getAmountFinished:info.complete size:numCells];
