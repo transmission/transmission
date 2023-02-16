@@ -226,7 +226,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
             stats->activity == TR_STATUS_SEED && has_seed_ratio ? stats->seedRatioPercentDone : stats->percentDone,
             0.0F,
             1.0F),
-        0.01F,
+        0.0001F,
         result,
         ChangeFlag::PERCENT_DONE);
     update_cache_value(cache_.finished, stats->finished, result, ChangeFlag::FINISHED);
