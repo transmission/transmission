@@ -940,7 +940,7 @@ TODO: fix this when notifications get fixed
 
     let filter_text = null;
     let labels = null;
-    const m = /^labels:([\w,]*)(.*)$/.exec(this.filterText);
+    const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
     if (m) {
       filter_text = m[2].trim();
       labels = m[1].split(',');
