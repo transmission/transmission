@@ -71,7 +71,14 @@ set_target_properties(
         INSTALL_RPATH "@loader_path/../../../../../MacOS;@loader_path/../../../../../Frameworks"
         MACOSX_BUNDLE ON
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
-        OUTPUT_NAME ${MAC_QL_BUNDLE_NAME})
+        OUTPUT_NAME ${MAC_QL_BUNDLE_NAME}
+        XCODE_ATTRIBUTE_CLANG_ENABLE_MODULES YES
+        # Xcode recommended build settings{
+        XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_WEAK YES
+        XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING YES
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER org.m0k.transmission.${MAC_QL_BUNDLE_NAME}
+        # }Xcode recommended build settings
+)
 
 target_include_directories(${TR_NAME}-mac-ql
     PRIVATE

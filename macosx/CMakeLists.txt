@@ -426,7 +426,14 @@ set_target_properties(
         INSTALL_RPATH "@executable_path;@executable_path/../Frameworks"
         MACOSX_BUNDLE_GUI_IDENTIFIER "org.m0k.transmission"
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
-        OUTPUT_NAME ${MAC_BUNDLE_NAME})
+        OUTPUT_NAME ${MAC_BUNDLE_NAME}
+        XCODE_ATTRIBUTE_CLANG_ENABLE_MODULES YES
+        # Xcode recommended build settings{
+        XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_WEAK YES
+        XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING YES
+        XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER org.m0k.transmission
+        # }Xcode recommended build settings
+)
 
 install(
     TARGETS ${TR_NAME}-mac

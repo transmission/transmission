@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW)
 endif()
+if(POLICY CMP0114)
+    cmake_policy(SET CMP0114 NEW)
+endif()
 
 # Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
 set(MACOS_SUPPORT_MINIMUM 10.13)
