@@ -1476,7 +1476,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     using namespace stat_helpers;
 
     TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
 
     auto const now = tr_time_msec();
     auto const now_sec = tr_time();
