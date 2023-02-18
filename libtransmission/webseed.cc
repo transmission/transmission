@@ -352,7 +352,7 @@ public:
     {
         if (auto const* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
         {
-            session_->cache->writeBlock(tor_id_, block_, data_);
+            session_->cache->writeBlock(tor_id_, block_, std::move(data_));
             webseed_->publish(tr_peer_event::GotBlock(tor->blockInfo(), block_));
         }
 

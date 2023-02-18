@@ -44,6 +44,8 @@ target_sources(${TR_NAME}-gtk
         OptionsDialog.h
         PathButton.cc
         PathButton.h
+        Percents.cc
+        Percents.h
         Prefs.cc
         Prefs.h
         PrefsDialog.cc

@@ -809,7 +809,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
         else
         {
-            str = tr_format_time_relative(now, baseline);
+            str = tr_format_time(now - baseline);
         }
     }
 
