@@ -141,7 +141,7 @@ uint64 utp_callback(utp_callback_arguments* args)
     return 0;
 }
 
-void reset_timer(tr_session* session)
+void restart_timer(tr_session* session)
 {
     auto interval = std::chrono::milliseconds{};
     auto const random_percent = tr_rand_int(1000U) / 1000.0;
@@ -177,7 +177,7 @@ void timer_callback(void* vsession)
     utp_issue_deferred_acks(session->utp_context);
 
     utp_check_timeouts(session->utp_context);
-    reset_timer(session);
+    restart_timer(session);
 }
 } // namespace
 
@@ -208,16 +208,12 @@ void tr_utpInit(tr_session* session)
 #endif
 
     session->utp_context = ctx;
+    session->utp_timer = session->timerMaker().create(timer_callback, session);
+    restart_timer(session);
 }
 
 bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosing() && !ss->utp_timer)
-    {
-        ss->utp_timer = ss->timerMaker().create(timer_callback, ss);
-        reset_timer(ss);
-    }
-
     auto const ret = utp_process_udp(ss->utp_context, buf, buflen, from, fromlen);
 
     /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */

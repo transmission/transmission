@@ -792,6 +792,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
             handshake->have_sent_bittorrent_handshake_ = true;
             handshake->set_state(State::AwaitingHandshake);
             io->write_bytes(std::data(msg), std::size(msg), false);
+            return;
         }
     }
 
@@ -807,12 +808,11 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         handshake->have_sent_bittorrent_handshake_ = true;
         handshake->set_state(State::AwaitingHandshake);
         io->write_bytes(std::data(msg), std::size(msg), false);
+        return;
     }
-    else
-    {
-        tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
-        handshake->done(false);
-    }
+
+    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
+    handshake->done(false);
 }
 
 bool tr_handshake::fire_done(bool is_connected)
