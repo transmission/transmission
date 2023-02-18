@@ -729,7 +729,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
-                io->on_utp_error(args->u1.error_code);
+                io->on_utp_error(args->error_code);
             }
             return {};
         });
@@ -742,7 +742,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
                 tr_logAddTraceIo(io, fmt::format("{:d} overhead bytes via utp", args->len));
-                io->bandwidth().notifyBandwidthConsumed(args->u1.send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
+                io->bandwidth().notifyBandwidthConsumed(args->send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
             }
             return {};
         });
@@ -754,7 +754,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
-                io->on_utp_state_change(args->u1.state);
+                io->on_utp_state_change(args->state);
             }
             return {};
         });

@@ -134,7 +134,7 @@ uint64 utp_callback(utp_callback_arguments* args)
         break;
 
     case UTP_SENDTO:
-        utp_send_to(session, args->buf, args->len, args->u1.address, args->u2.address_len);
+        utp_send_to(session, args->buf, args->len, args->address, args->address_len);
         break;
     }
 
