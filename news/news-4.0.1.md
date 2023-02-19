@@ -1,12 +1,16 @@
 # Transmission 4.0.1
 
+This release has only bug fixes, build fixes, and documentation improvements. `4.0.0` generated a _lot_ of useful feedback (thank you!!) so we've been very busy squashing as many bugs as possible.
+
+RIP, Yeeshkul. TJ, your tracker is one of the first things that got me (@ckerr) interested in torrents when I started contributing to the Transmission project back in 2007. So long and thanks for all the fish.
+
 ## What's New in 4.0.1
 
 ### Highlights
 
-* Provided Qt5-based builds for older systems since [Qt6 requires Windows 10 or higher](https://doc.qt.io/qt-6/windows.html). ([#4855](https://github.com/transmission/transmission/pull/4855))
+* Provided Qt5-based Windows builds for older systems since Qt6 [requires](https://doc.qt.io/qt-6/windows.html) Windows 10 or newer. ([#4855](https://github.com/transmission/transmission/pull/4855))
 * Fixed `4.0.0` bug that caused some torrents to have poor speed and some of their checksums to be incorrectly marked as failed. ([#4879](https://github.com/transmission/transmission/pull/4879), [#4880](https://github.com/transmission/transmission/pull/4880), [#4890](https://github.com/transmission/transmission/pull/4890))
-* Fixed `4.0.0` bug that caused beachballing / [jank](https://en.wiktionary.org/wiki/jank). ([#4936](https://github.com/transmission/transmission/pull/4936))
+* Fixed `4.0.0` bug that caused [beachballing](https://en.wiktionary.org/wiki/beachball#Verb) / [jank](https://en.wiktionary.org/wiki/jank#Noun). ([#4936](https://github.com/transmission/transmission/pull/4936))
 * Fixed `4.0.0` bug that caused blocklists to use more memory than necessary. ([#4953](https://github.com/transmission/transmission/pull/4953))
 * Fixed `4.0.0` issue that failed to migrate magnet links from Transmission 3. ([#4840](https://github.com/transmission/transmission/pull/4840))
 
