@@ -145,10 +145,10 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 set(${CMAKE_MATCH_1} ${CMAKE_MATCH_3} CACHE INTERNAL "")
             endif()
         endforeach()
-        add_subdirectory("${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}" "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}")
+        add_subdirectory("${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}" "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}.bld")
     else()
         set(${ID}_UPSTREAM_TARGET ${LIBNAME})
-        set(${ID}_PREFIX "${CMAKE_BINARY_DIR}/third-party/${${ID}_UPSTREAM_TARGET}")
+        set(${ID}_PREFIX "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}.bld/pfx")
 
         set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include"
             CACHE INTERNAL "")
@@ -169,8 +169,9 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
 
         ExternalProject_Add(
             ${${ID}_UPSTREAM_TARGET}
-            URL "${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}"
-            PREFIX "${${ID}_PREFIX}"
+            PREFIX "${CMAKE_BINARY_DIR}/third-party/${DIRNAME}.bld"
+            SOURCE_DIR "${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}"
+            INSTALL_DIR "${${ID}_PREFIX}"
             CMAKE_ARGS
                 -Wno-dev # We don't want to be warned over unused variables
                 --no-warn-unused-cli
