@@ -1,7 +1,3 @@
-
-> transmission-release-notes@0.0.1 render
-> node lib/render.js --version=4.0.1
-
 # Transmission 4.0.1
 
 ## What's New in 4.0.1
