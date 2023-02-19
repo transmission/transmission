@@ -390,7 +390,7 @@ void Blocklist::ensureLoaded() const
     }
 
     auto range = address_range_t{};
-    rules_.reserve(file_info->size - std::size(BinContentsPrefix) / sizeof(address_range_t));
+    rules_.reserve((file_info->size - std::size(BinContentsPrefix)) / sizeof(address_range_t));
     while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
     {
         rules_.emplace_back(range);
