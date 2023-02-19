@@ -1,8 +1,8 @@
 # Transmission 4.0.1
 
-This release has only bug fixes, build fixes, and documentation improvements. `4.0.0` generated a _lot_ of useful feedback (thank you!!) so we've been very busy squashing as many bugs as possible.
+This release has only bug fixes, build fixes, and documentation improvements. `4.0.0` generated a _lot_ of [useful feedback](https://github.com/transmission/transmission/issues) (thank you!!) so we've been very busy squashing as many bugs as possible.
 
-RIP, Yeeshkul. TJ, your tracker is one of the first things that got me (@ckerr) interested in torrents when I started contributing to the Transmission project back in 2007. So long and thanks for all the fish.
+RIP, [Yeeshkul](http://yeeshkul.com/forum/forum.php). TJ, your tracker is one of the first things that got me (@ckerr) interested in torrents when I started contributing to the Transmission project back in 2007. So long and thanks for all the fish.
 
 ## What's New in 4.0.1
 
