@@ -4,6 +4,7 @@
 
 ### Highlights
 
+* Provided Qt5-based builds for older systems since [Qt6 requires Windows 10 or higher](https://doc.qt.io/qt-6/windows.html). ([#4855](https://github.com/transmission/transmission/pull/4855))
 * Fixed `4.0.0` bug that caused some torrents to have poor speed and some of their checksums to be incorrectly marked as failed. ([#4879](https://github.com/transmission/transmission/pull/4879), [#4880](https://github.com/transmission/transmission/pull/4880), [#4890](https://github.com/transmission/transmission/pull/4890))
 * Fixed `4.0.0` bug that caused beachballing / [jank](https://en.wiktionary.org/wiki/jank). ([#4936](https://github.com/transmission/transmission/pull/4936))
 * Fixed `4.0.0` bug that caused blocklists to use more memory than necessary. ([#4953](https://github.com/transmission/transmission/pull/4953))
@@ -11,7 +12,6 @@
 
 ### libtransmission (All Platforms)
 
-* Removed a harmless "unable to read resume file" error message to avoid confusion. ([#4799](https://github.com/transmission/transmission/pull/4799))
 * Follow [BEP 27](https://www.bittorrent.org/beps/bep_0027.html)'s placement of `private` field when creating new torrents. ([#4809](https://github.com/transmission/transmission/pull/4809))
 * Fixed `4.0.0` bug that failed to retry to connect to peers with TCP if UTP failed first. ([#4897](https://github.com/transmission/transmission/pull/4897))
 * Fixed `4.0.0` bug that could prevent port forwarding settings from being saved. ([#4842](https://github.com/transmission/transmission/pull/4842))
@@ -21,6 +21,7 @@
 * Fixed `4.0.0` build failure due to incompatible system and bundled libutp headers. ([#4877](https://github.com/transmission/transmission/pull/4877))
 * Fixed `4.0.0` build error when building bundled libb64 and libutp. ([#4762](https://github.com/transmission/transmission/pull/4762), [#4810](https://github.com/transmission/transmission/pull/4810))
 * Fixed `4.0.0` build failure on NetBSD. ([#4863](https://github.com/transmission/transmission/pull/4863))
+* Removed a harmless "unable to read resume file" error message to avoid confusion. ([#4799](https://github.com/transmission/transmission/pull/4799))
 * Fixed `4.0.0` libtransmission compiler warnings. ([#4805](https://github.com/transmission/transmission/pull/4805))
 
 ### macOS Client
@@ -34,15 +35,14 @@
 
 * Fixed incorrect display of some trackers' announce URLs. ([#4846](https://github.com/transmission/transmission/pull/4846))
 * Fixed Qt 6 deprecation warnings. ([#4710](https://github.com/transmission/transmission/pull/4710))
-* Provided Qt5-based builds for older systems since [Qt6 requires Windows 10 or higher](https://doc.qt.io/qt-6/windows.html). ([#4855](https://github.com/transmission/transmission/pull/4855))
 
 ### GTK Client
 
-* Fixed `4.0.0` blurred progress bars in main window. ([#4756](https://github.com/transmission/transmission/pull/4756))
 * Fixed `4.0.0` crash on opening torrent details dialog. ([#4859](https://github.com/transmission/transmission/pull/4859))
-* Fixed awkward grammar in the Details Dialog's running-time row. ([#4898](https://github.com/transmission/transmission/pull/4898))
-* Fixed `4.0.0` rounding error in the progressbar's percentage display. ([#4933](https://github.com/transmission/transmission/pull/4933))
 * Fixed `4.0.0` bug that froze the app after showing or hiding via system tray (GTK 3 only). ([#4939](https://github.com/transmission/transmission/pull/4939))
+* Fixed `4.0.0` rounding error in the progressbar's percentage display. ([#4933](https://github.com/transmission/transmission/pull/4933))
+* Fixed `4.0.0` blurred progress bars in main window. ([#4756](https://github.com/transmission/transmission/pull/4756))
+* Fixed awkward grammar in the Details Dialog's running-time row. ([#4898](https://github.com/transmission/transmission/pull/4898))
 
 ### Web Client
 
