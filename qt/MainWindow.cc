@@ -582,17 +582,9 @@ void MainWindow::setLocation()
 
 namespace
 {
-
-// Open Folder & select torrent's file or top folder
-
-#ifdef HAVE_OPEN_SELECT
-#undef HAVE_OPEN_SELECT
-#endif
-
+namespace open_folder_helpers
+{
 #if defined(Q_OS_WIN)
-
-#define HAVE_OPEN_SELECT
-
 void openSelect(QString const& path)
 {
     auto const explorer = QStringLiteral("explorer");
@@ -606,11 +598,7 @@ void openSelect(QString const& path)
     param += QDir::toNativeSeparators(path);
     QProcess::startDetached(explorer, QStringList(param));
 }
-
 #elif defined(Q_OS_MAC)
-
-#define HAVE_OPEN_SELECT
-
 void openSelect(QString const& path)
 {
     QStringList script_args;
@@ -621,54 +609,68 @@ void openSelect(QString const& path)
     script_args << QStringLiteral("-e") << QStringLiteral("tell application \"Finder\" to activate");
     QProcess::execute(QStringLiteral("/usr/bin/osascript"), script_args);
 }
-
+#else
+void openSelect(QString const& path)
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+}
 #endif
 
+// if all torrents in a list have the same top folder, return it
+QString getTopFolder(FileList const& files)
+{
+    if (std::empty(files))
+    {
+        return QString{};
+    }
+
+    auto const& first_filename = files.at(0).filename;
+    auto const slash_index = first_filename.indexOf(QLatin1Char{ '/' });
+    if (slash_index == -1)
+    {
+        return QString{};
+    }
+
+    auto top = first_filename.left(slash_index);
+    if (!std::all_of(std::begin(files), std::end(files), [&top](auto const& file) { return file.filename.startsWith(top); }))
+    {
+        return QString{};
+    }
+
+    return top;
+}
+} // namespace open_folder_helpers
 } // namespace
 
 void MainWindow::openFolder()
 {
-    auto const selected_torrents = getSelectedTorrents();
+    using namespace open_folder_helpers;
 
-    if (selected_torrents.size() != 1)
+    auto const selected_torrents = getSelectedTorrents();
+    if (std::size(selected_torrents) != 1U)
     {
         return;
     }
 
-    int const torrent_id(*selected_torrents.begin());
-    Torrent const* tor(model_.getTorrentFromId(torrent_id));
-
+    auto const torrent_id = *selected_torrents.begin();
+    auto const* const tor = model_.getTorrentFromId(torrent_id);
     if (tor == nullptr)
     {
         return;
     }
 
-    QString path(tor->getPath());
-    FileList const& files = tor->files();
+    auto path = tor->getPath();
 
-    if (files.empty())
+    // TODO(ckerr): this is arguably an antifeature? Seems useful to me
+    // but can cause the folder to be less predictable, i.e. sometimes
+    // using the download folder and sometimes the torrent's top-level.
+    if (auto const top = getTopFolder(tor->files()); !top.isEmpty())
     {
-        return;
+        path += QLatin1Char{ '/' };
+        path += top;
     }
 
-    QString const first_file = files.at(0).filename;
-
-    if (int const slash_index = first_file.indexOf(QLatin1Char('/')); slash_index > -1)
-    {
-        path = path + QLatin1Char('/') + first_file.left(slash_index);
-    }
-
-#ifdef HAVE_OPEN_SELECT
-
-    else
-    {
-        openSelect(path + QLatin1Char('/') + first_file);
-        return;
-    }
-
-#endif
-
-    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    openSelect(path);
 }
 
 void MainWindow::copyMagnetLinkToClipboard()
