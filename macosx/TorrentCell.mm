@@ -296,13 +296,17 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSRect const parentRect = [self iconRectForBounds:cellFrame];
     NSRect iconRect = NSMakeRect(parentRect.origin.x, parentRect.origin.y, parentRect.size.width, parentRect.size.height);
 
-    NSInteger const groupValue = torrent.groupValue;
-    if (groupValue != -1)
+    //dont show torrent group icons when SortByGroup is selected
+    if (![self.fDefaults boolForKey:@"SortByGroup"])
     {
-        NSRect groupRect = [self groupIconRectForBounds:iconRect];
-        NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
-        NSImage* icon = [NSImage discIconWithColor:groupColor insetFactor:0];
-        [icon drawInRect:groupRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0f];
+        NSInteger const groupValue = torrent.groupValue;
+        if (groupValue != -1)
+        {
+            NSRect groupRect = [self groupIconRectForBounds:iconRect];
+            NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
+            NSImage* icon = [NSImage discIconWithColor:groupColor insetFactor:0];
+            [icon drawInRect:groupRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0f];
+        }
     }
 
     BOOL const error = torrent.anyErrorOrWarning;

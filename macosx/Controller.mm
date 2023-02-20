@@ -2712,6 +2712,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self.fDefaults setBool:sortByGroup forKey:@"SortByGroup"];
 
     [self applyFilter];
+    
+    //reloaddata, otherwise the tableview may not update group icons
+    [self.fTableView reloadData];
 }
 
 - (void)setSortReverse:(id)sender
