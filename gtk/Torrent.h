@@ -1,4 +1,4 @@
-// This file Copyright © 2022 Mnemosyne LLC.
+// This file Copyright © 2022-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -20,6 +20,8 @@
 #include <initializer_list>
 #include <memory>
 #include <vector>
+
+class Percents;
 
 class Torrent : public Glib::Object
 {
@@ -80,13 +82,13 @@ public:
     tr_torrent_id_t get_id() const;
     Glib::ustring const& get_name_collated() const;
     Glib::ustring get_name() const;
-    float get_percent_complete() const;
-    float get_percent_done() const;
+    Percents get_percent_complete() const;
+    Percents get_percent_done() const;
     tr_priority_t get_priority() const;
     size_t get_queue_position() const;
     float get_ratio() const;
-    float get_recheck_progress() const;
-    float get_seed_ratio_percent_done() const;
+    Percents get_recheck_progress() const;
+    Percents get_seed_ratio_percent_done() const;
     float get_speed_down() const;
     float get_speed_up() const;
     tr_torrent& get_underlying() const;

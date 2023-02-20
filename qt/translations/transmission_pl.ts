@@ -509,17 +509,17 @@
         <translation>&amp;Globalne ograniczenia</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>&amp;Ograniczenie prędkości pobierania:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Ograniczenie prędkości &amp;wysyłania:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;Priorytet torrenta:</translation>
     </message>
@@ -1139,7 +1139,7 @@
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>Całkowity udział</translation>
+        <translation>Udział całkowity</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1149,7 +1149,7 @@
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Razem przesłano</translation>
+        <translation>Przesłano całkowicie</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1233,7 +1233,7 @@
         <translation>Według &amp;kolejki</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>Ograniczenie prędkości pobierania</translation>
     </message>
@@ -1309,12 +1309,12 @@
         <translation>Otwórz torrent</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>Ograniczenia</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>Błąd sieci</translation>
     </message>
@@ -1774,7 +1774,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="-20"/>
         <source>&amp;Port for incoming connections:</source>
-        <translation>&amp;Port dla połączeń przychodzących:</translation>
+        <translation>&amp;Port połączeń przychodzących:</translation>
     </message>
     <message>
         <location line="+44"/>
@@ -2241,7 +2241,7 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>Błąd podczas zmieniania nazwy ścieżki</translation>
     </message>

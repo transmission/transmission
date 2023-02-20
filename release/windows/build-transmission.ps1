@@ -1,6 +1,14 @@
 #!/usr/bin/env pwsh
 
-function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir, [string] $SourceDir, [string] $ArtifactsDir, [boolean] $PackDebugSyms) {
+function global:Build-Transmission(
+    [string] $PrefixDir,
+    [string] $Arch,
+    [string] $DepsPrefixDir,
+    [string] $SourceDir,
+    [string] $ArtifactsDir,
+    [string] $UseQtVersion,
+    [boolean] $PackDebugSyms
+) {
     $BuildDir = Join-Path $SourceDir .build
 
     $env:PATH = @(
@@ -37,11 +45,16 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
         Copy-Item -Path (Join-Path $DepsPrefixDir bin "${x}.pdb") -Destination $DebugSymbolsDir
     }
 
-    foreach ($x in @('Core', 'DBus', 'Gui', 'Network', 'Svg', 'Widgets')) {
+    $QtModules = @('Core', 'DBus', 'Gui', 'Network', 'Svg', 'Widgets')
+    if ($UseQtVersion -eq '5') {
+        $QtModules += @('WinExtras')
+    }
+
+    foreach ($x in $QtModules) {
         if ($DepsPrefixDir -ne $PrefixDir) {
-            Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt6${x}.dll") -Destination (Join-Path $PrefixDir bin)
+            Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt${UseQtVersion}${x}.dll") -Destination (Join-Path $PrefixDir bin)
         }
-        Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt6${x}.pdb") -Destination $DebugSymbolsDir
+        Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt${UseQtVersion}${x}.pdb") -Destination $DebugSymbolsDir
     }
 
     foreach ($x in @('gif', 'ico', 'jpeg', 'svg')) {
@@ -52,12 +65,14 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
         Copy-Item -Path (Join-Path $DepsPrefixDir plugins imageformats "q${x}.pdb") -Destination $DebugSymbolsDir
     }
 
-    foreach ($x in @('openssl')) {
-        if ($DepsPrefixDir -ne $PrefixDir) {
-            New-Item -Path (Join-Path $PrefixDir plugins tls) -ItemType Directory -ErrorAction Ignore | Out-Null
-            Copy-Item -Path (Join-Path $DepsPrefixDir plugins tls "q${x}backend.dll") -Destination (Join-Path $PrefixDir plugins tls)
+    if ($UseQtVersion -eq '6') {
+        foreach ($x in @('openssl')) {
+            if ($DepsPrefixDir -ne $PrefixDir) {
+                New-Item -Path (Join-Path $PrefixDir plugins tls) -ItemType Directory -ErrorAction Ignore | Out-Null
+                Copy-Item -Path (Join-Path $DepsPrefixDir plugins tls "q${x}backend.dll") -Destination (Join-Path $PrefixDir plugins tls)
+            }
+            Copy-Item -Path (Join-Path $DepsPrefixDir plugins tls "q${x}backend.pdb") -Destination $DebugSymbolsDir
         }
-        Copy-Item -Path (Join-Path $DepsPrefixDir plugins tls "q${x}backend.pdb") -Destination $DebugSymbolsDir
     }
 
     if ($DepsPrefixDir -ne $PrefixDir) {

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -52,21 +52,25 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
     tr_variant args;
     tr_variantInitDict(&args, 1);
 
-    switch (value.type())
+#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+    switch (value.typeId())
+#else
+    switch (static_cast<QMetaType::Type>(value.type()))
+#endif
     {
-    case QVariant::Bool:
+    case QMetaType::Bool:
         dictAdd(&args, key, value.toBool());
         break;
 
-    case QVariant::Int:
+    case QMetaType::Int:
         dictAdd(&args, key, value.toInt());
         break;
 
-    case QVariant::Double:
+    case QMetaType::Double:
         dictAdd(&args, key, value.toDouble());
         break;
 
-    case QVariant::String:
+    case QMetaType::QString:
         dictAdd(&args, key, value.toString());
         break;
 
@@ -895,7 +899,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
         switch (prefs_.type(i))
         {
-        case QVariant::Int:
+        case QMetaType::Int:
             if (auto const value = getValue<int>(b); value)
             {
                 prefs_.set(i, *value);
@@ -903,7 +907,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
             break;
 
-        case QVariant::Double:
+        case QMetaType::Double:
             if (auto const value = getValue<double>(b); value)
             {
                 prefs_.set(i, *value);
@@ -911,7 +915,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
             break;
 
-        case QVariant::Bool:
+        case QMetaType::Bool:
             if (auto const value = getValue<bool>(b); value)
             {
                 prefs_.set(i, *value);
@@ -921,7 +925,7 @@ void Session::updateInfo(tr_variant* args_dict)
 
         case CustomVariantType::FilterModeType:
         case CustomVariantType::SortModeType:
-        case QVariant::String:
+        case QMetaType::QString:
             if (auto const value = getValue<QString>(b); value)
             {
                 prefs_.set(i, *value);

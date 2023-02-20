@@ -1,9 +1,10 @@
-// This file Copyright © 2022 Transmission authors and contributors.
+// This file Copyright © 2022-2023 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
 #import "GroupTextCell.h"
 #import "TorrentGroup.h"
+#import "TorrentTableView.h"
 
 @implementation GroupTextCell
 
@@ -22,9 +23,11 @@
     //set font size and color
     NSRect titleRect = [self titleRectForBounds:cellFrame];
     NSMutableAttributedString* string = [[self attributedStringValue] mutableCopy];
-    NSDictionary* attributes = [NSDictionary
-        dictionaryWithObjects:@[ [NSFont boldSystemFontOfSize:11.0], [NSColor secondaryLabelColor] ]
-                      forKeys:@[ NSFontAttributeName, NSForegroundColorAttributeName ]];
+    NSDictionary* attributes = @{
+        NSFontAttributeName : [NSFont boldSystemFontOfSize:11.0],
+        NSForegroundColorAttributeName : self.selected ? [NSColor labelColor] : [NSColor secondaryLabelColor]
+    };
+
     [string addAttributes:attributes range:NSMakeRange(0, string.length)];
     [string drawInRect:titleRect];
 }

@@ -509,17 +509,17 @@
         <translation>Poštuj globalna &amp;ograničenja</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>Ograniči &amp;brzinu preuzimanja:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Ograniči &amp;brzinu slanja:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>Prioritet &amp;torrenta:</translation>
     </message>
@@ -1233,7 +1233,7 @@
         <translation>Razvrstaj po &amp;redu čekanja</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>Ograniči brzinu preuzimanja</translation>
     </message>
@@ -1309,12 +1309,12 @@
         <translation>Open torrent</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>Ograničenja brzine</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>Mrežna greška</translation>
     </message>
@@ -2241,7 +2241,7 @@ Kako bi dodali novi glavni URL, dodajte ga nakon praznog retka.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>Greška preimenovanja putanje</translation>
     </message>

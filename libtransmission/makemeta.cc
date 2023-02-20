@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2022 Mnemosyne LLC.
+// This file Copyright © 2010-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -340,16 +340,6 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
     tr_variantDictAddStrView(&top, TR_KEY_encoding, "UTF-8");
 
-    if (is_private_)
-    {
-        tr_variantDictAddInt(&top, TR_KEY_private, 1);
-    }
-
-    if (!std::empty(source))
-    {
-        tr_variantDictAddStr(&top, TR_KEY_source, source_);
-    }
-
     auto* const info_dict = tr_variantDictAddDict(&top, TR_KEY_info, 5);
     auto const base = tr_sys_path_basename(top_);
 
@@ -392,6 +382,17 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
     tr_variantDictAddInt(info_dict, TR_KEY_piece_length, pieceSize());
     tr_variantDictAddRaw(info_dict, TR_KEY_pieces, std::data(piece_hashes_), std::size(piece_hashes_));
+
+    if (is_private_)
+    {
+        tr_variantDictAddInt(info_dict, TR_KEY_private, 1);
+    }
+
+    if (!std::empty(source))
+    {
+        tr_variantDictAddStr(info_dict, TR_KEY_source, source_);
+    }
+
     auto ret = tr_variantToStr(&top, TR_VARIANT_FMT_BENC);
     tr_variantClear(&top);
     return ret;

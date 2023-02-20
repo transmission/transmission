@@ -1,4 +1,4 @@
-// This file Copyright © 2017-2022 Mnemosyne LLC.
+// This file Copyright © 2017-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -792,6 +792,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
             handshake->have_sent_bittorrent_handshake_ = true;
             handshake->set_state(State::AwaitingHandshake);
             io->write_bytes(std::data(msg), std::size(msg), false);
+            return;
         }
     }
 
@@ -807,12 +808,11 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         handshake->have_sent_bittorrent_handshake_ = true;
         handshake->set_state(State::AwaitingHandshake);
         io->write_bytes(std::data(msg), std::size(msg), false);
+        return;
     }
-    else
-    {
-        tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
-        handshake->done(false);
-    }
+
+    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
+    handshake->done(false);
 }
 
 bool tr_handshake::fire_done(bool is_connected)

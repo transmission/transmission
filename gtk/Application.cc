@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2022 Transmission authors and contributors.
+// This file Copyright © 2005-2023 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -1296,9 +1296,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         {
             bool const b = gtr_pref_flag_get(key);
             tr_sessionUseAltSpeed(tr, b);
-            auto const key_sv = tr_quark_get_string_view(key);
-            auto const key_ustr = Glib::ustring{ std::data(key_sv), std::size(key_sv) };
-            gtr_action_set_toggled(key_ustr, b);
+            gtr_action_set_toggled(std::string(tr_quark_get_string_view(key)), b);
             break;
         }
 
