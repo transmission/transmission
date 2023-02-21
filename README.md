@@ -53,7 +53,7 @@ If you're new to building programs from source code, this is typically easier th
     $ git submodule update --init --recursive
     $ mkdir build
     $ cd build
-    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+    $ # Use -DCMAKE_BUILD_TYPE=Release to build optimized binary.
     $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     $ make
     $ sudo make install
@@ -65,7 +65,7 @@ If you're new to building programs from source code, this is typically easier th
     $ git submodule foreach --recursive git clean -xfd
     $ git pull --rebase --prune
     $ git submodule update --recursive
-    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
+    $ # Use -DCMAKE_BUILD_TYPE=Release to build optimized binary.
     $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
     $ make
     $ sudo make install
