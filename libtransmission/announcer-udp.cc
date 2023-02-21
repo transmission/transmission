@@ -291,7 +291,7 @@ struct tau_tracker
 {
     using Mediator = tr_announcer_udp::Mediator;
 
-    tau_tracker(Mediator& mediator, tr_interned_string const& key_in, tr_interned_string const& host_in, tr_port port_in)
+    tau_tracker(Mediator& mediator, tr_interned_string key_in, tr_interned_string host_in, tr_port port_in)
         : key{ key_in }
         , host{ host_in }
         , port{ port_in }
@@ -403,7 +403,7 @@ private:
         return connection_id != tau_connection_t{} && now < connection_expiration_time;
     }
 
-    [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string const& host, tr_port port, tr_interned_string const& logname)
+    [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
     {
         auto szport = std::array<char, 16>{};
         *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
@@ -688,7 +688,7 @@ public:
 private:
     // Finds the tau_tracker struct that corresponds to this url.
     // If it doesn't exist yet, create one.
-    tau_tracker* getTrackerFromUrl(tr_interned_string const& announce_url)
+    tau_tracker* getTrackerFromUrl(tr_interned_string announce_url)
     {
         // build a lookup key for this tracker
         auto const parsed = tr_urlParseTracker(announce_url);

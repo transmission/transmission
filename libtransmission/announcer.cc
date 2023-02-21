@@ -112,7 +112,7 @@ struct tr_scrape_info
 
     tr_interned_string scrape_url;
 
-    constexpr tr_scrape_info(tr_interned_string const& scrape_url_in, int const multiscrape_max_in)
+    constexpr tr_scrape_info(tr_interned_string scrape_url_in, int const multiscrape_max_in)
         : multiscrape_max{ multiscrape_max_in }
         , scrape_url{ scrape_url_in }
     {
@@ -419,7 +419,7 @@ struct tr_tier
         return currentTracker();
     }
 
-    [[nodiscard]] std::optional<size_t> indexOf(tr_interned_string const& announce_url) const
+    [[nodiscard]] std::optional<size_t> indexOf(tr_interned_string announce_url) const
     {
         for (size_t i = 0, n = std::size(trackers); i < n; ++i)
         {
@@ -579,7 +579,7 @@ struct tr_torrent_announcer
         return nullptr;
     }
 
-    tr_tier* getTierFromScrape(tr_interned_string const& scrape_url)
+    tr_tier* getTierFromScrape(tr_interned_string scrape_url)
     {
         for (auto& tier : tiers)
         {
@@ -600,7 +600,7 @@ struct tr_torrent_announcer
     }
 
     [[nodiscard]] bool findTracker(
-        tr_interned_string const& announce_url,
+        tr_interned_string announce_url,
         tr_tier const** setme_tier,
         tr_tracker const** setme_tracker) const
     {
