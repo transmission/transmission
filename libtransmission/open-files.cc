@@ -25,7 +25,7 @@
 namespace
 {
 
-[[nodiscard]] auto constexpr isOpen(tr_sys_file_t fd) noexcept
+[[nodiscard]] auto isOpen(tr_sys_file_t fd) noexcept
 {
     return fd != TR_BAD_SYS_FILE;
 }

@@ -22,6 +22,7 @@ $white: #fff;
 $yellow-300: #ffea7f;
 $yellow-700: #dbab09;
 
+$grey-40: #666;
 $nice-grey: #f8f8f8;
 $nice-grey-darker: #f0f0f0;
 $dark-mode-black: #121212;
@@ -95,7 +96,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   --color-progressbar-seed-2: #{$green-700};
   color-scheme: light dark;
   @media (prefers-color-scheme: dark) {
-    --color-bg-hover: #{$nice-grey};
+    --color-bg-hover: #{$grey-40};
     --color-fg-primary: #fff;
     --color-bg-primary: #{$grey-800};
     --color-bg-odd: #{$grey-900};

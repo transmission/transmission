@@ -6,6 +6,7 @@
 #include "TorrentCellRenderer.h"
 
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_SMALL
+#include "Percents.h"
 #include "Torrent.h"
 
 #include <libtransmission/transmission.h>
@@ -370,7 +371,7 @@ void TorrentCellRenderer::Impl::render_compact(
     int width = 0;
 
     auto const& torrent = *property_torrent_.get_value();
-    auto const percent_done = static_cast<int>(torrent.get_percent_done() * 100);
+    auto const percent_done = torrent.get_percent_done().to_int();
     bool const sensitive = torrent.get_sensitive();
 
     if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
@@ -464,7 +465,7 @@ void TorrentCellRenderer::Impl::render_full(
     Gtk::Requisition size;
 
     auto const& torrent = *property_torrent_.get_value();
-    auto const percent_done = static_cast<int>(torrent.get_percent_done() * 100);
+    auto const percent_done = torrent.get_percent_done().to_int();
     bool const sensitive = torrent.get_sensitive();
 
     if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
