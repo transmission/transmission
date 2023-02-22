@@ -11,6 +11,7 @@ $green-200: #bef5cb;
 $green-300: #85e89d;
 $green-500: #28a745;
 $green-700: #176f2c;
+$grey-40: #666666;
 $grey-500: #828282;
 $grey-700: #373737;
 $grey-800: #292929;
@@ -22,7 +23,7 @@ $white: #fff;
 $yellow-300: #ffea7f;
 $yellow-700: #dbab09;
 
-$nice-grey: #666666;
+$nice-grey: #f8f8f8;
 $nice-grey-darker: #f0f0f0;
 $dark-mode-black: #121212;
 $default-accent-color: #fff8c5;
@@ -95,7 +96,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   --color-progressbar-seed-2: #{$green-700};
   color-scheme: light dark;
   @media (prefers-color-scheme: dark) {
-    --color-bg-hover: #{$nice-grey};
+    --color-bg-hover: #{$grey-40};
     --color-fg-primary: #fff;
     --color-bg-primary: #{$grey-800};
     --color-bg-odd: #{$grey-900};
