@@ -1,6 +1,6 @@
 # Transmission 4.0.1
 
-This release has only bug fixes, build fixes, and documentation improvements. `4.0.0` generated a _lot_ of [useful feedback](https://github.com/transmission/transmission/issues) (thank you!!) so we've been very busy squashing as many bugs as possible.
+The `4.0.0` release two weeks ago generated a lot of [useful feedback](https://github.com/transmission/transmission/issues) (thank you!!) so we've been busy fixing bugs. This release has only bug fixes, documentation improvements, and build script fixes to make packaging easier.
 
 RIP, Yeeshkul. TJ, your tracker is one of the first things that got me (@ckerr) interested in torrents when I started contributing to the Transmission project back in 2007. So long and thanks for all the fish.
 
@@ -8,7 +8,7 @@ RIP, Yeeshkul. TJ, your tracker is one of the first things that got me (@ckerr) 
 
 ### Highlights
 
-* Provided Qt5-based Windows builds for older systems since Qt6 [requires](https://doc.qt.io/qt-6/windows.html) Windows 10 or newer. ([#4855](https://github.com/transmission/transmission/pull/4855))
+* Added Qt 5 builds for older Windows system, since Qt 6 [requires](https://doc.qt.io/qt-6/windows.html) Windows 10 or newer. ([#4855](https://github.com/transmission/transmission/pull/4855))
 * Fixed `4.0.0` bug that caused some torrents to have poor speed and some of their checksums to be incorrectly marked as failed. ([#4879](https://github.com/transmission/transmission/pull/4879), [#4880](https://github.com/transmission/transmission/pull/4880), [#4890](https://github.com/transmission/transmission/pull/4890))
 * Fixed `4.0.0` bug that caused [beachballing](https://en.wiktionary.org/wiki/beachball#Verb) / [jank](https://en.wiktionary.org/wiki/jank#Noun). ([#4936](https://github.com/transmission/transmission/pull/4936))
 * Fixed `4.0.0` bug that caused blocklists to use more memory than necessary. ([#4953](https://github.com/transmission/transmission/pull/4953))
@@ -23,8 +23,10 @@ RIP, Yeeshkul. TJ, your tracker is one of the first things that got me (@ckerr) 
 * Fixed `4.0.0` regression that paused magnet links when adding them. ([#4856](https://github.com/transmission/transmission/pull/4856))
 * Fixed `4.0.0` illegal instruction exception on some x86 Windows machines. ([#4886](https://github.com/transmission/transmission/pull/4886))
 * Fixed `4.0.0` build failure due to incompatible system and bundled libutp headers. ([#4877](https://github.com/transmission/transmission/pull/4877))
-* Fixed `4.0.0` build error when building bundled libb64 and libutp. ([#4762](https://github.com/transmission/transmission/pull/4762), [#4810](https://github.com/transmission/transmission/pull/4810))
 * Fixed `4.0.0` build failure on NetBSD. ([#4863](https://github.com/transmission/transmission/pull/4863))
+* Fixed `4.0.0` build error when building bundled libb64 and libutp. ([#4762](https://github.com/transmission/transmission/pull/4762), [#4810](https://github.com/transmission/transmission/pull/4810))
+* Fixed `4.0.0` build failure when compiling with Clang on Windows. ([#4978](https://github.com/transmission/transmission/pull/4978))
+* Fixed `4.0.0` build issue that prevented distro versions of libdeflate from being used. ([#4968](https://github.com/transmission/transmission/pull/4968))
 * Removed a harmless "unable to read resume file" error message to avoid confusion. ([#4799](https://github.com/transmission/transmission/pull/4799))
 * Fixed `4.0.0` libtransmission compiler warnings. ([#4805](https://github.com/transmission/transmission/pull/4805))
 
@@ -39,6 +41,7 @@ RIP, Yeeshkul. TJ, your tracker is one of the first things that got me (@ckerr) 
 
 * Fixed incorrect display of some trackers' announce URLs. ([#4846](https://github.com/transmission/transmission/pull/4846))
 * Fixed Qt 6 deprecation warnings. ([#4710](https://github.com/transmission/transmission/pull/4710))
+* Fixed "Open Folder" feature for local sessions. ([#4963](https://github.com/transmission/transmission/pull/4963))
 
 ### GTK Client
 
@@ -52,11 +55,14 @@ RIP, Yeeshkul. TJ, your tracker is one of the first things that got me (@ckerr) 
 
 * Fixed `4.0.0` bug that failed to apply settings changes immediately. ([#4839](https://github.com/transmission/transmission/pull/4839))
 * Fixed label searches that have spaces or hyphens. ([#4932](https://github.com/transmission/transmission/pull/4932))
+* Fixed highlight color of selected context menu rows in dark mode. ([#4984](https://github.com/transmission/transmission/pull/4984))
 
 ### Everything Else
 
 * Changed default build to skip `clang-tidy` linting due to [upstream](https://github.com/llvm/llvm-project/issues/59492) bug. ([#4824](https://github.com/transmission/transmission/pull/4824))
 * Build: Use CXX symbol checking to verify system libutp. ([#4909](https://github.com/transmission/transmission/pull/4909))
+* Build: add option to disable installation of web assets. ([#4906](https://github.com/transmission/transmission/pull/4906))a
+* Build: set /utf-8 flag when using MSVC. ([#4975](https://github.com/transmission/transmission/pull/4975))
 
 ## Thank You!
 
@@ -99,9 +105,13 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 
 * [@elboletaire (Òscar Casajuana)](https://github.com/elboletaire):
   * Fixed label searches that have spaces or hyphens. ([#4932](https://github.com/transmission/transmission/pull/4932))
+* [@GaryElshaw (Gary Elshaw)](https://github.com/GaryElshaw):
+  * Fix: make context menu highlighted row readable in dark mode. ([#4984](https://github.com/transmission/transmission/pull/4984))
 
 ### Contributions to Everything Else:
 
+* [@abubaca4](https://github.com/abubaca4):
+  * Build: reduce minimum libdeflate version to 1.7. ([#4970](https://github.com/transmission/transmission/pull/4970))
 * [@Berbe](https://github.com/Berbe):
   * Updated documentation. ([#4803](https://github.com/transmission/transmission/pull/4803))
   * Fix: Prevent lengthy compilation workflows to run needlessly. ([#4804](https://github.com/transmission/transmission/pull/4804))
@@ -110,9 +120,12 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
   * Build: Use CXX symbol checking to verify system libutp. ([#4909](https://github.com/transmission/transmission/pull/4909))
 * [@fetzu (Julien)](https://github.com/fetzu):
   * Chore: normalized and updated copyright to 2023. ([#4834](https://github.com/transmission/transmission/pull/4834))
+* [@fghzxm](https://github.com/fghzxm):
+  * Build: do not test utils if not building utils. ([#4946](https://github.com/transmission/transmission/pull/4946))
+  * Build: set /utf-8 flag when using MSVC. ([#4975](https://github.com/transmission/transmission/pull/4975))
 * [@floppym (Mike Gilbert)](https://github.com/floppym):
   * Build: pass `--no-warn-unused-cli` to child CMake process. ([#4807](https://github.com/transmission/transmission/pull/4807))
 * [@t-8ch (Thomas Weißschuh)](https://github.com/t-8ch):
   * Test: expose libtransmission gtests to ctest. ([#4731](https://github.com/transmission/transmission/pull/4731))
   * Build: install rebuilt web if available. ([#4865](https://github.com/transmission/transmission/pull/4865))
-
+  * Build: add option to disable installation of web assets. ([#4906](https://github.com/transmission/transmission/pull/4906))
