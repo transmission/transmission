@@ -47,6 +47,7 @@ tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC "Build Mac client" AUTO)
 tr_auto_option(REBUILD_WEB "Rebuild the web client's generated assets. Requires Node.js and network access." OFF)
+option(INSTALL_WEB "Install the web client's generated assets." ON)
 option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
@@ -515,6 +516,7 @@ tr_add_external_auto_library(B64 libb64 b64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
+set(TR_WEB_ASSETS ${CMAKE_SOURCE_DIR}/web/public_html)
 if(NOT ${REBUILD_WEB} STREQUAL "OFF")
     find_program(NPM npm)
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
@@ -755,9 +757,11 @@ if(ENABLE_TESTS)
 endif()
 
 function(tr_install_web DST_DIR)
-    install(
-        DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html
-        DESTINATION ${DST_DIR})
+    if(INSTALL_WEB)
+        install(
+            DIRECTORY ${TR_WEB_ASSETS}
+            DESTINATION ${DST_DIR})
+    endif()
 endfunction()
 
 add_subdirectory(libtransmission)
@@ -779,7 +783,7 @@ foreach(P cli daemon gtk mac qt utils)
     endif()
 endforeach()
 
-if(NOT REBUILD_WEB AND (ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT))
+if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
     tr_install_web(${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
 endif()
 
@@ -797,7 +801,7 @@ if(INSTALL_DOC)
         DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
-if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl")
+if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl" AND INSTALL_WEB)
     add_subdirectory(dist/msi)
 endif()
 
