@@ -1282,13 +1282,6 @@ $video-image: '../img/film.svg';
   @include for-phone-only() {
     height: 80vh;
   }
-  // hide the fullscreen button unless we're on mobile
-  @include for-tablet-portrait-up {
-    #display-fullscreen-check,
-    #display-fullscreen-label {
-      display: none;
-    }
-  }
 
   fieldset {
     border: 0;
@@ -1315,6 +1308,13 @@ $video-image: '../img/film.svg';
     display: flex;
     flex-direction: row;
     padding: 3px 0;
+
+    // hide the fullscreen button unless we're on mobile
+    @include for-tablet-portrait-up {
+      &.display-fullscreen-row {
+        display: none;
+      }
+    }
   }
 
   legend {
