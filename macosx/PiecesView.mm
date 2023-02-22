@@ -157,16 +157,16 @@ typedef struct PieceInfo
     [self.torrent getAmountFinished:info.complete size:numCells];
 
     // compute bounds and color of each cell
-    NSInteger const across = (NSInteger)ceil(sqrt(numCells));
+    int const across = (int)ceil(sqrt(numCells));
     CGFloat const fullWidth = self.bounds.size.width;
     NSInteger const cellWidth = (NSInteger)((fullWidth - (across + 1) * kBetweenPadding) / across);
     NSInteger const extraBorder = (NSInteger)((fullWidth - ((cellWidth + kBetweenPadding) * across + kBetweenPadding)) / 2);
     NSMutableArray<NSValue*>* cellBounds = [NSMutableArray arrayWithCapacity:numCells];
     NSMutableArray<NSColor*>* cellColors = [NSMutableArray arrayWithCapacity:numCells];
-    for (NSInteger index = 0; index < numCells; index++)
+    for (int index = 0; index < numCells; index++)
     {
-        NSInteger const row = index / across;
-        NSInteger const col = index % across;
+        int const row = index / across;
+        int const col = index % across;
 
         cellBounds[index] = [NSValue valueWithRect:NSMakeRect(
                                                        col * (cellWidth + kBetweenPadding) + kBetweenPadding + extraBorder,
@@ -184,12 +184,12 @@ typedef struct PieceInfo
     {
         self.image = [NSImage imageWithSize:self.bounds.size flipped:NO drawingHandler:^BOOL(NSRect /*dstRect*/) {
             NSRect cFillRects[numCells];
-            for (NSInteger i = 0; i < numCells; ++i)
+            for (int i = 0; i < numCells; ++i)
             {
                 cFillRects[i] = cellBounds[i].rectValue;
             }
             NSColor* cFillColors[numCells];
-            for (NSInteger i = 0; i < numCells; ++i)
+            for (int i = 0; i < numCells; ++i)
             {
                 cFillColors[i] = cellColors[i];
             }

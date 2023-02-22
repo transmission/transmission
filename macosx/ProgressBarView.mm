@@ -166,7 +166,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSIndexSet* previousFinishedIndexes = torrent.previousFinishedPieces;
     NSMutableIndexSet* finishedIndexes = [NSMutableIndexSet indexSet];
 
-    for (NSInteger i = 0; i < pieceCount; i++)
+    for (int i = 0; i < pieceCount; i++)
     {
         NSColor* pieceColor;
         if (piecesPercent[i] == 1.0f)
