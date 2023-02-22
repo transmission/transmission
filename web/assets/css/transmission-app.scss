@@ -120,7 +120,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-default-border: #{$default-border-dark};
   }
   @media (prefers-color-scheme: light) {
-    --color-bg-hover: #{$grey-40};
+    --color-bg-hover: #{$nice-grey};
     --color-fg-primary: #404040;
     --color-bg-primary: #fff;
     --color-bg-even: #{$white};
