@@ -11,7 +11,6 @@ $green-200: #bef5cb;
 $green-300: #85e89d;
 $green-500: #28a745;
 $green-700: #176f2c;
-$grey-40: #666666;
 $grey-500: #828282;
 $grey-700: #373737;
 $grey-800: #292929;
@@ -23,6 +22,7 @@ $white: #fff;
 $yellow-300: #ffea7f;
 $yellow-700: #dbab09;
 
+$grey-40: #666666;
 $nice-grey: #f8f8f8;
 $nice-grey-darker: #f0f0f0;
 $dark-mode-black: #121212;
@@ -120,7 +120,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-default-border: #{$default-border-dark};
   }
   @media (prefers-color-scheme: light) {
-    --color-bg-hover: #{$nice-grey};
+    --color-bg-hover: #{$grey-40};
     --color-fg-primary: #404040;
     --color-bg-primary: #fff;
     --color-bg-even: #{$white};
