@@ -41,6 +41,11 @@ typedef NS_ENUM(NSInteger, SegmentTag) {
 
     [self.fSelectedColorView addObserver:self forKeyPath:@"color" options:0 context:NULL];
 
+    if (@available(macOS 13.0, *))
+    {
+        self.fSelectedColorView.colorWellStyle = NSColorWellStyleMinimal;
+    }
+
     [self updateSelectedGroup];
 }
 
