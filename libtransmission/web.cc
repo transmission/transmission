@@ -511,6 +511,10 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
+        if (mediator.proxyUrl().has_value() && !mediator.proxyUrl().value().empty())
+        {
+			(void)curl_easy_setopt(e, CURLOPT_PROXY, mediator.proxyUrl().value().data());
+        }
 
 #ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
