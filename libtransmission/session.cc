@@ -1340,7 +1340,9 @@ namespace
 {
 namespace load_torrents_helpers
 {
-[[nodiscard]] std::vector<std::string> get_matching_files(std::string const& folder, std::function<bool(std::string_view)> const& test)
+[[nodiscard]] std::vector<std::string> get_matching_files(
+    std::string const& folder,
+    std::function<bool(std::string_view)> const& test)
 {
     if (auto const info = tr_sys_path_get_info(folder); !info || !info->isFolder())
     {
