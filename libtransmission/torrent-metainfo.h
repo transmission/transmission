@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2022 Mnemosyne LLC.
+// This file Copyright © 2005-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -243,6 +243,7 @@ private:
     // Used when loading piece checksums on demand.
     uint64_t pieces_offset_ = 0;
 
+    bool has_magnet_info_hash_ = false;
     bool is_private_ = false;
     bool is_v2_ = false;
 };

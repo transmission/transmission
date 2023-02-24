@@ -1,4 +1,4 @@
-// This file Copyright © 2022 Mnemosyne LLC.
+// This file Copyright © 2022-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -27,14 +27,8 @@
 #define TR_HAVE_BUILTIN_POPCOUNT
 #endif
 #endif
-#if defined(__x86_64__) && defined(__SSE__)
+#if (defined(__x86_64__) || defined(__i386__)) && defined(__POPCNT__)
 #define TR_HAVE_ASM_POPCNT
-#endif
-#endif
-
-#if defined(_MSC_VER)
-#if defined(_M_X64) || defined(_M_IX86)
-#include <nmmintrin.h>
 #endif
 #endif
 
@@ -65,7 +59,7 @@ struct tr_popcnt
         return static_cast<unsigned>(std::popcount(unsigned_v));
     }
 
-#elif defined(TR_HAVE_BUILTIN_POPCOUNT) && defined(TR_HAVE_ASM_POPCNT)
+#elif defined(TR_HAVE_BUILTIN_POPCOUNT)
     /* Use __builtin as opposed to straight assembly to avoid any
        strain the latter puts on the optimized. */
     static inline unsigned count(T v)
@@ -93,50 +87,6 @@ struct tr_popcnt
             /* Need to avoid sign extension. */
             unsigned_T unsigned_v = static_cast<unsigned_T>(v);
             return __builtin_popcount(unsigned_v);
-        }
-    }
-
-#elif defined(_MSC_VER) && defined(_M_X64)
-    /* 64-bit x86 intrinsics. */
-    static inline unsigned count(T v)
-    {
-        if constexpr (sizeof(T) == sizeof(uint64_t))
-        {
-            return _mm_popcnt_u64(v);
-        }
-        else if constexpr (sizeof(T) == sizeof(uint32_t))
-        {
-            return _mm_popcnt_u32(v);
-        }
-        else
-        {
-            static_assert(sizeof(T) < sizeof(uint32_t));
-            /* Need to avoid sign extension. */
-            unsigned_T unsigned_v = static_cast<unsigned_T>(v);
-            return _mm_popcnt_u32(unsigned_v);
-        }
-    }
-#elif defined(_MSC_VER) && defined(_M_IX86)
-    /* 32-bit x86 intrinsics. */
-    static inline unsigned count(T v)
-    {
-        if constexpr (sizeof(T) == sizeof(uint64_t))
-        {
-            /* Avoid signed shift. */
-            unsigned_T unsigned_v = static_cast<unsigned_T>(v);
-
-            return _mm_popcnt_u32(static_cast<uint32_t>(unsigned_v)) + _mm_popcnt_u32(static_cast<uint32_t>(unsigned_v >> 32));
-        }
-        else if constexpr (sizeof(T) == sizeof(uint32_t))
-        {
-            return _mm_popcnt_u32(v);
-        }
-        else
-        {
-            static_assert(sizeof(T) < sizeof(uint32_t));
-            /* Need to avoid sign extension. */
-            unsigned_T unsigned_v = static_cast<unsigned_T>(v);
-            return _mm_popcnt_u32(unsigned_v);
         }
     }
 #elif defined(TR_HAVE_ASM_POPCNT)

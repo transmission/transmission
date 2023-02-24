@@ -75,6 +75,8 @@ TEST_F(PlatformTest, defaultConfigDirXdgConfig)
 
 TEST_F(PlatformTest, defaultConfigDirXdgConfigHome)
 {
+    unsetenv("TRANSMISSION_HOME");
+    unsetenv("XDG_CONFIG_HOME");
     auto const home = tr_pathbuf{ sandboxDir(), "/home/user" };
     setenv("HOME", home, 1);
 

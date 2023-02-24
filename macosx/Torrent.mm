@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2022 Transmission authors and contributors.
+// This file Copyright © 2006-2023 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -280,7 +280,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 {
     if ([self alertForRemainingDiskSpace])
     {
-        tr_torrentStartMagnet(self.fHandle);
+        tr_torrentStart(self.fHandle);
         [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited

@@ -156,13 +156,28 @@ void tr_completion::addPiece(tr_piece_index_t piece)
     }
 }
 
+void tr_completion::removeBlock(tr_block_index_t block)
+{
+    if (!hasBlock(block))
+    {
+        return; // already didn't have it
+    }
+
+    blocks_.unset(block);
+    size_now_ -= block_info_->blockSize(block);
+
+    size_when_done_.reset();
+    has_valid_.reset();
+}
+
 void tr_completion::removePiece(tr_piece_index_t piece)
 {
     auto const [begin, end] = block_info_->blockSpanForPiece(piece);
-    size_now_ -= countHasBytesInPiece(piece);
-    size_when_done_.reset();
-    has_valid_.reset();
-    blocks_.unsetSpan(begin, end);
+
+    for (auto block = begin; block < end; ++block)
+    {
+        removeBlock(block);
+    }
 }
 
 uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const

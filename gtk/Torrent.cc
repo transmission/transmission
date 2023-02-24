@@ -1,4 +1,4 @@
-// This file Copyright © 2022 Mnemosyne LLC.
+// This file Copyright © 2022-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,6 +6,7 @@
 #include "Torrent.h"
 
 #include "IconCache.h"
+#include "Percents.h"
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
@@ -18,6 +19,7 @@
 
 #include <array>
 #include <functional>
+#include <utility>
 
 using namespace std::string_view_literals;
 
@@ -33,6 +35,8 @@ Glib::Value<T>& column_value_cast(Glib::ValueBase& value, Gtk::TreeModelColumn<T
 template<typename T, typename U, typename = std::enable_if_t<!std::is_floating_point_v<T>>>
 void update_cache_value(T& value, U&& new_value, Torrent::ChangeFlags& changes, Torrent::ChangeFlag flag)
 {
+    using std::rel_ops::operator!=;
+
     if (value != new_value)
     {
         value = std::forward<U>(new_value);
@@ -123,19 +127,20 @@ public:
         int active_peers_up = {};
         int error_code = {};
 
+        Percents activity_percent_done = {};
+        Percents metadata_percent_complete = {};
+        Percents percent_complete = {};
+        Percents percent_done = {};
+        Percents recheck_progress = {};
+        Percents seed_ratio_percent_done = {};
+
         uint16_t peers_connected = {};
         uint16_t peers_getting_from_us = {};
         uint16_t peers_sending_to_us = {};
         uint16_t webseeds_sending_to_us = {};
 
-        float activity_percent_done = {};
-        float metadata_percent_complete = {};
-        float percent_complete = {};
-        float percent_done = {};
         float ratio = {};
-        float recheck_progress = {};
         float seed_ratio = {};
-        float seed_ratio_percent_done = {};
         float speed_down = {};
         float speed_up = {};
 
@@ -213,7 +218,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
         stats->peersSendingToUs + stats->webseedsSendingToUs,
         result,
         ChangeFlag::ACTIVE_PEERS_DOWN);
-    update_cache_value(cache_.recheck_progress, stats->recheckProgress, 0.01F, result, ChangeFlag::RECHECK_PROGRESS);
+    update_cache_value(cache_.recheck_progress, Percents(stats->recheckProgress), result, ChangeFlag::RECHECK_PROGRESS);
     update_cache_value(
         cache_.active,
         stats->peersSendingToUs > 0 || stats->peersGettingFromUs > 0 || stats->activity == TR_STATUS_CHECK,
@@ -222,11 +227,10 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
     update_cache_value(cache_.activity, stats->activity, result, ChangeFlag::ACTIVITY);
     update_cache_value(
         cache_.activity_percent_done,
-        std::clamp(
+        Percents(std::clamp(
             stats->activity == TR_STATUS_SEED && has_seed_ratio ? stats->seedRatioPercentDone : stats->percentDone,
             0.0F,
-            1.0F),
-        0.01F,
+            1.0F)),
         result,
         ChangeFlag::PERCENT_DONE);
     update_cache_value(cache_.finished, stats->finished, result, ChangeFlag::FINISHED);
@@ -247,11 +251,10 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
 
     update_cache_value(cache_.added_date, stats->addedDate, result, ChangeFlag::ADDED_DATE);
     update_cache_value(cache_.eta, stats->eta, result, ChangeFlag::ETA);
-    update_cache_value(cache_.percent_complete, stats->percentComplete, 0.01F, result, ChangeFlag::PERCENT_COMPLETE);
+    update_cache_value(cache_.percent_complete, Percents(stats->percentComplete), result, ChangeFlag::PERCENT_COMPLETE);
     update_cache_value(
         cache_.seed_ratio_percent_done,
-        stats->seedRatioPercentDone,
-        0.01F,
+        Percents(stats->seedRatioPercentDone),
         result,
         ChangeFlag::SEED_RATIO_PERCENT_DONE);
     update_cache_value(cache_.total_size, tr_torrentTotalSize(raw_torrent_), result, ChangeFlag::TOTAL_SIZE);
@@ -260,15 +263,14 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
     update_cache_value(cache_.have_unchecked, stats->haveUnchecked, result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.have_valid, stats->haveValid, result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.left_until_done, stats->leftUntilDone, result, ChangeFlag::LONG_PROGRESS);
-    update_cache_value(cache_.percent_done, stats->percentDone, 0.01F, result, ChangeFlag::LONG_PROGRESS);
+    update_cache_value(cache_.percent_done, Percents(stats->percentDone), result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.seed_ratio, static_cast<float>(seed_ratio), 0.01F, result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.size_when_done, stats->sizeWhenDone, result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.uploaded_ever, stats->uploadedEver, result, ChangeFlag::LONG_PROGRESS);
 
     update_cache_value(
         cache_.metadata_percent_complete,
-        stats->metadataPercentComplete,
-        0.01F,
+        Percents(stats->metadataPercentComplete),
         result,
         ChangeFlag::LONG_STATUS);
     update_cache_value(cache_.peers_connected, stats->peersConnected, result, ChangeFlag::LONG_STATUS);
@@ -334,7 +336,7 @@ Glib::ustring Torrent::Impl::get_short_status_text() const
         return fmt::format(
             // xgettext:no-c-format
             _("Verifying local data ({percent_done}% tested)"),
-            fmt::arg("percent_done", tr_truncd(cache_.recheck_progress * 100.0, 1)));
+            fmt::arg("percent_done", cache_.recheck_progress.to_string()));
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
@@ -363,7 +365,7 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
             _("{current_size} of {complete_size} ({percent_done}%)"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(cache_.size_when_done)),
-            fmt::arg("percent_done", tr_strpercent(cache_.percent_done * 100.0)));
+            fmt::arg("percent_done", cache_.percent_done.to_string()));
     }
     else if (!isSeed && cache_.has_seed_ratio) // partial seed, seed ratio
     {
@@ -373,7 +375,7 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
             _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
-            fmt::arg("percent_complete", tr_strpercent(cache_.percent_complete * 100.0)),
+            fmt::arg("percent_complete", cache_.percent_complete.to_string()),
             fmt::arg("uploaded_size", tr_strlsize(cache_.uploaded_ever)),
             fmt::arg("ratio", tr_strlratio(cache_.ratio)),
             fmt::arg("seed_ratio", tr_strlratio(cache_.seed_ratio)));
@@ -385,7 +387,7 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
             _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
-            fmt::arg("percent_complete", tr_strpercent(cache_.percent_complete * 100.0)),
+            fmt::arg("percent_complete", cache_.percent_complete.to_string()),
             fmt::arg("uploaded_size", tr_strlsize(cache_.uploaded_ever)),
             fmt::arg("ratio", tr_strlratio(cache_.ratio)));
     }
@@ -514,7 +516,7 @@ Glib::ustring Torrent::Impl::get_activity_text() const
                     "Downloading metadata from {active_count} connected peers ({percent_done}% done)",
                     cache_.peers_connected),
                 fmt::arg("active_count", cache_.peers_connected),
-                fmt::arg("percent_done", tr_strpercent(cache_.metadata_percent_complete * 100.0)));
+                fmt::arg("percent_done", cache_.metadata_percent_complete.to_string()));
         }
 
         if (cache_.peers_sending_to_us != 0 && cache_.webseeds_sending_to_us != 0)
@@ -608,7 +610,7 @@ int Torrent::get_active_peers_down() const
     return impl_->get_cache().active_peers_down;
 }
 
-float Torrent::get_recheck_progress() const
+Percents Torrent::get_recheck_progress() const
 {
     return impl_->get_cache().recheck_progress;
 }
@@ -678,12 +680,12 @@ time_t Torrent::get_added_date() const
     return impl_->get_cache().added_date;
 }
 
-float Torrent::get_percent_complete() const
+Percents Torrent::get_percent_complete() const
 {
     return impl_->get_cache().percent_complete;
 }
 
-float Torrent::get_seed_ratio_percent_done() const
+Percents Torrent::get_seed_ratio_percent_done() const
 {
     return impl_->get_cache().seed_ratio_percent_done;
 }
@@ -698,7 +700,7 @@ Glib::ustring Torrent::get_name() const
     return impl_->get_cache().name;
 }
 
-float Torrent::get_percent_done() const
+Percents Torrent::get_percent_done() const
 {
     return impl_->get_cache().activity_percent_done;
 }

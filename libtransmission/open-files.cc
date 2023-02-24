@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2022 Mnemosyne LLC.
+// This file Copyright © 2005-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -25,7 +25,7 @@
 namespace
 {
 
-[[nodiscard]] auto constexpr isOpen(tr_sys_file_t fd) noexcept
+[[nodiscard]] auto isOpen(tr_sys_file_t fd) noexcept
 {
     return fd != TR_BAD_SYS_FILE;
 }

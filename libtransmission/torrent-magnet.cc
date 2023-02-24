@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2022 Mnemosyne LLC.
+// This file Copyright © 2012-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -176,13 +176,6 @@ bool tr_torrentUseMetainfoFromFile(
         delete tor->incompleteMetadata;
         tor->incompleteMetadata = nullptr;
     }
-    tor->isStopping = true;
-    tor->magnetVerify = true;
-    if (tor->session->shouldPauseAddedTorrents())
-    {
-        tor->startAfterVerify = false;
-    }
-    tor->markEdited();
 
     return true;
 }
@@ -310,13 +303,6 @@ void on_have_all_metainfo(tr_torrent* tor, tr_incomplete_metadata* m)
     {
         delete tor->incompleteMetadata;
         tor->incompleteMetadata = nullptr;
-        tor->isStopping = true;
-        tor->magnetVerify = true;
-        if (tor->session->shouldPauseAddedTorrents() && !tor->magnetStartAfterVerify)
-        {
-            tor->startAfterVerify = false;
-        }
-        tor->markEdited();
     }
     else /* drat. */
     {
@@ -339,6 +325,19 @@ void on_have_all_metainfo(tr_torrent* tor, tr_incomplete_metadata* m)
 }
 } // namespace set_metadata_piece_helpers
 } // namespace
+
+void tr_torrentMagnetDoIdleWork(tr_torrent* const tor)
+{
+    using namespace set_metadata_piece_helpers;
+
+    TR_ASSERT(tr_isTorrent(tor));
+
+    if (auto* const m = tor->incompleteMetadata; m != nullptr && std::empty(m->pieces_needed))
+    {
+        tr_logAddDebugTor(tor, fmt::format("we now have all the metainfo!"));
+        on_have_all_metainfo(tor, m);
+    }
+}
 
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len)
 {
@@ -384,13 +383,6 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
 
     needed.erase(iter);
     tr_logAddDebugTor(tor, fmt::format("saving metainfo piece {}... {} remain", piece, std::size(needed)));
-
-    // are we done?
-    if (std::empty(needed))
-    {
-        tr_logAddDebugTor(tor, fmt::format("metainfo piece {} was the last one", piece));
-        on_have_all_metainfo(tor, m);
-    }
 }
 
 // ---

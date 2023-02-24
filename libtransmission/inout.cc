@@ -1,12 +1,12 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <optional>
-#include <vector>
 
 #include <fmt/core.h>
 
@@ -234,25 +234,40 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(piece < tor->pieceCount());
 
-    auto bytes_left = tor->pieceSize(piece);
-    auto loc = tor->pieceLoc(piece);
-    tr_ioPrefetch(tor, loc, bytes_left);
-
     auto sha = tr_sha1::create();
-    auto buffer = std::vector<uint8_t>(tr_block_info::BlockSize);
-    while (bytes_left != 0)
+    auto buffer = std::array<uint8_t, tr_block_info::BlockSize>{};
+
+    auto& cache = tor->session->cache;
+    auto const [begin_byte, end_byte] = tor->blockInfo().byteSpanForPiece(piece);
+    auto const [begin_block, end_block] = tor->blockSpanForPiece(piece);
+    auto n_bytes_checked = size_t{};
+    for (auto block = begin_block; block < end_block; ++block)
     {
-        auto const len = static_cast<uint32_t>(std::min(static_cast<size_t>(bytes_left), std::size(buffer)));
-        if (auto const success = tor->session->cache->readBlock(tor, loc, len, std::data(buffer)) == 0; !success)
+        auto const block_loc = tor->blockLoc(block);
+        auto const block_len = tor->blockSize(block);
+        if (auto const success = cache->readBlock(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
         {
             return {};
         }
 
-        sha->add(std::data(buffer), len);
-        loc = tor->byteLoc(loc.byte + len);
-        bytes_left -= len;
+        auto begin = std::data(buffer);
+        auto end = begin + block_len;
+
+        // handle edge case where blocks aren't on piece boundaries:
+        if (block == begin_block) // `block` may begin before `piece` does
+        {
+            begin += (begin_byte - block_loc.byte);
+        }
+        if (block + 1 == end_block) // `block` may end after `piece` does
+        {
+            end -= (block_loc.byte + block_len - end_byte);
+        }
+
+        sha->add(begin, end - begin);
+        n_bytes_checked += (end - begin);
     }
 
+    TR_ASSERT(tor->pieceSize(piece) == n_bytes_checked);
     return sha->finish();
 }
 

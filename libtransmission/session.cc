@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -1574,7 +1574,12 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    session->runInSessionThread([session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
+    session->runInSessionThread(
+        [session, enabled]()
+        {
+            session->settings_.port_forwarding_enabled = enabled;
+            session->port_forwarding_->setEnabled(enabled);
+        });
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)

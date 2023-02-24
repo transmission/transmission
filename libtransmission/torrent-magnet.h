@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2022 Mnemosyne LLC.
+// This file Copyright © 2012-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -32,6 +32,8 @@ std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t metadata_size);
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor);
+
+void tr_torrentMagnetDoIdleWork(tr_torrent* tor);
 
 bool tr_torrentUseMetainfoFromFile(
     tr_torrent* tor,

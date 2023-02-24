@@ -87,3 +87,5 @@ add_custom_target("${TR_NAME}-web"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
     SOURCES
         ${WEB_SOURCES})
+
+set(TR_WEB_ASSETS ${CMAKE_CURRENT_BINARY_DIR}/public_html PARENT_SCOPE)
