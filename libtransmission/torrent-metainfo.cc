@@ -523,10 +523,9 @@ private:
             tm_.files_.add(tm_.name_, length_);
         }
 
-        // Do a sanity check to confirm this torrent either smells right
-        // or is a transmission 3.0 magnet stored in torrent format.
-        if (!tm_.has_magnet_info_hash_)
+        if (auto const has_metainfo = tm_.infoDictSize() != 0U; has_metainfo)
         {
+            // do some sanity checks to make sure the torrent looks sane
             if (tm_.fileCount() == 0)
             {
                 if (!tr_error_is_set(context.error))
@@ -546,9 +545,12 @@ private:
             }
 
             tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
+            return true;
         }
 
-        return true;
+        // no metainfo; might be a Transmission 3.00-style magnet file
+        auto const ok = tm_.has_magnet_info_hash_;
+        return ok;
     }
 
     static constexpr std::string_view AcodecKey = "acodec"sv;
