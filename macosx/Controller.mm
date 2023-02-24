@@ -3390,7 +3390,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [popover showRelativeToRect:senderView.frame ofView:senderView preferredEdge:NSMaxYEdge];
+        [popover showRelativeToRect:senderView.bounds ofView:senderView preferredEdge:NSMaxYEdge];
     }
 }
 
