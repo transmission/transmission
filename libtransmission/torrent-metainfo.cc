@@ -510,12 +510,6 @@ private:
 
     bool finish(Context const& context)
     {
-        // Support Transmission <= 3.0 magnets stored in torrent format.
-        if (tm_.has_magnet_info_hash_)
-        {
-            return true;
-        }
-
         // bittorrent 1.0 spec
         // http://bittorrent.org/beps/bep_0003.html
         //
@@ -529,25 +523,31 @@ private:
             tm_.files_.add(tm_.name_, length_);
         }
 
-        if (tm_.fileCount() == 0)
+        // Do a sanity check to confirm this torrent either smells right
+        // or is a transmission 3.0 magnet stored in torrent format.
+        if (!tm_.has_magnet_info_hash_)
         {
-            if (!tr_error_is_set(context.error))
+            if (tm_.fileCount() == 0)
             {
-                tr_error_set(context.error, EINVAL, "no files found");
+                if (!tr_error_is_set(context.error))
+                {
+                    tr_error_set(context.error, EINVAL, "no files found");
+                }
+                return false;
             }
-            return false;
+
+            if (piece_size_ == 0)
+            {
+                if (!tr_error_is_set(context.error))
+                {
+                    tr_error_set(context.error, EINVAL, fmt::format("invalid piece size: {}", piece_size_));
+                }
+                return false;
+            }
+
+            tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
         }
 
-        if (piece_size_ == 0)
-        {
-            if (!tr_error_is_set(context.error))
-            {
-                tr_error_set(context.error, EINVAL, fmt::format("invalid piece size: {}", piece_size_));
-            }
-            return false;
-        }
-
-        tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
         return true;
     }
 
