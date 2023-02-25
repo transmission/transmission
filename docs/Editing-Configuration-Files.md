@@ -78,6 +78,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **pex-enabled:** Boolean (default =  true) Enable [https://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
  * **pidfile:** String Path to file in which daemon PID will be stored (transmission-daemon only)
  * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html).
+ * **proxy-url:** String (default = "") Proxy to use for the upcoming web-requests (for example, requests to tracker). Format `[scheme]://[host]:[port]`, where `scheme` is one of: `http`, `https`, `socks4`, `socks4h`, `socks5`, `socks5h`. If setting are not specified or equal "" then proxy will not pass to CURL. For more information see [curl proxy documentation](https://curl.se/libcurl/c/CURLOPT_PROXY.html)
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
  * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-added-filename:** String (default = "") Path to script.
