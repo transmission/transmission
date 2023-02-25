@@ -1340,39 +1340,65 @@ namespace
 {
 namespace load_torrents_helpers
 {
-void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
+[[nodiscard]] std::vector<std::string> get_matching_files(
+    std::string const& folder,
+    std::function<bool(std::string_view)> const& test)
 {
-    auto const& dirname = session->torrentDir();
-    auto const info = tr_sys_path_get_info(dirname);
-    auto const odir = info && info->isFolder() ? tr_sys_dir_open(dirname.c_str()) : TR_BAD_SYS_DIR;
-
-    auto n_torrents = size_t{};
-    if (odir != TR_BAD_SYS_DIR)
+    if (auto const info = tr_sys_path_get_info(folder); !info || !info->isFolder())
     {
-        char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+        return {};
+    }
+
+    auto const odir = tr_sys_dir_open(folder.c_str());
+    if (odir == TR_BAD_SYS_DIR)
+    {
+        return {};
+    }
+
+    auto filenames = std::vector<std::string>{};
+    for (;;)
+    {
+        char const* const name = tr_sys_dir_read_name(odir);
+
+        if (name == nullptr)
         {
-            if (!tr_strvEndsWith(name, ".torrent"sv) && !tr_strvEndsWith(name, ".magnet"sv))
-            {
-                continue;
-            }
-
-            // is a magnet link?
-            if (auto const path = tr_pathbuf{ dirname, '/', name }; !tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr))
-            {
-                if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
-                {
-                    tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr);
-                }
-            }
-
-            if (tr_torrentNew(ctor, nullptr) != nullptr)
-            {
-                ++n_torrents;
-            }
+            tr_sys_dir_close(odir);
+            return filenames;
         }
 
-        tr_sys_dir_close(odir);
+        if (test(name))
+        {
+            filenames.emplace_back(name);
+        }
+    }
+}
+
+void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
+{
+    auto n_torrents = size_t{};
+    auto const& folder = session->torrentDir();
+
+    for (auto const& name : get_matching_files(folder, [](auto const& name) { return tr_strvEndsWith(name, ".torrent"sv); }))
+    {
+        auto const path = tr_pathbuf{ folder, '/', name };
+
+        if (tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr) && tr_torrentNew(ctor, nullptr) != nullptr)
+        {
+            ++n_torrents;
+        }
+    }
+
+    auto buf = std::vector<char>{};
+    for (auto const& name : get_matching_files(folder, [](auto const& name) { return tr_strvEndsWith(name, ".magnet"sv); }))
+    {
+        auto const path = tr_pathbuf{ folder, '/', name };
+
+        if (tr_loadFile(path, buf) &&
+            tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
+            tr_torrentNew(ctor, nullptr) != nullptr)
+        {
+            ++n_torrents;
+        }
     }
 
     if (n_torrents != 0U)
