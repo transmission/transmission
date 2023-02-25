@@ -162,10 +162,6 @@ export function createDialogContainer(id) {
   buttons.classList.add('dialog-buttons');
   win.append(buttons);
 
-  const bbegin = document.createElement('span');
-  bbegin.classList.add('dialog-buttons-begin');
-  buttons.append(bbegin);
-
   const dismiss = document.createElement('button');
   dismiss.classList.add('dialog-dismiss-button');
   dismiss.textContent = 'Cancel';
@@ -174,10 +170,6 @@ export function createDialogContainer(id) {
   const confirm = document.createElement('button');
   confirm.textContent = 'OK';
   buttons.append(confirm);
-
-  const bend = document.createElement('span');
-  bend.classList.add('dialog-buttons-end');
-  buttons.append(bend);
 
   return {
     confirm,

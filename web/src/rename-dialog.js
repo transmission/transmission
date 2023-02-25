@@ -65,7 +65,7 @@ export class RenameDialog extends EventTarget {
   static _create() {
     const elements = createDialogContainer('rename-dialog');
     elements.root.setAttribute('aria-label', 'Rename Torrent');
-    elements.heading.textContent = 'Enter new name:';
+    elements.heading.textContent = 'Rename Torrent';
     elements.confirm.textContent = 'Rename';
 
     const label = document.createElement('label');

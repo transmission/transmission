@@ -66,7 +66,7 @@ const TorrentRendererHelper = {
   renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
     progressbar.className = info.classList.join(' ');
-    progressbar.style['background-size'] = `${info.percent}% 100%, 100% 100%`;
+    progressbar.style.setProperty('--progress', `${info.percent.toFixed(2)}%`);
   },
 };
 
