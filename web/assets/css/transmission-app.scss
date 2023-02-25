@@ -589,6 +589,7 @@ $video-image: '../img/film.svg';
   .torrent-peer-details {
     font-size: x-small;
     font-weight: bold;
+    
     &:not(.paused) {
       color: var(--color-fg-primary);
     }
