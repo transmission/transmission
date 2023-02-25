@@ -76,6 +76,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
  * **message-level:** Number (0 = None, 1 = Error, 2 = Info, 3 = Debug, default = 2) Set verbosity of transmission messages.
  * **pex-enabled:** Boolean (default =  true) Enable [https://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
+ * **pidfile:** String Path to file in which daemon PID will be stored (transmission-daemon only)
  * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html).
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
  * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
@@ -119,6 +120,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **rpc-host-whitelist-enabled:** Boolean (default = true. Added in v2.93)
  * **rpc-password:** String. You can enter this in as plaintext when Transmission is not running, and then Transmission will salt the value on startup and re-save the salted version as a security measure. **Note:** Transmission treats passwords starting with the character `{` as salted, so when you first create your password, the plaintext password you enter must not begin with `{`.
  * **rpc-port:** Number (default = 9091)
+ * **rpc-socket-mode:** String UNIX filesystem mode for the RPC UNIX socket (default: 0750; used when `rpc-bind-address` is a UNIX socket)
  * **rpc-url:** String (default = /transmission/. Added in v2.2)
  * **rpc-username:** String
  * **rpc-whitelist:** String (Comma-delimited list of IP addresses. Wildcards allowed using '\*'. Example: "127.0.0.\*,192.168.\*.\*", Default:  "127.0.0.1")

@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -352,7 +352,7 @@ public:
     {
         if (auto const* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
         {
-            session_->cache->writeBlock(tor_id_, block_, data_);
+            session_->cache->writeBlock(tor_id_, block_, std::move(data_));
             webseed_->publish(tr_peer_event::GotBlock(tor->blockInfo(), block_));
         }
 

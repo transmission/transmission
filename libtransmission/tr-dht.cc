@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Juliusz Chroboczek.
+// This file Copyright © 2009-2023 Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -183,7 +183,7 @@ public:
             sin.sin_family = AF_INET;
             sin.sin_addr = addr.addr.addr4;
             sin.sin_port = port.network();
-            mediator_.api().ping_node((struct sockaddr*)&sin, sizeof(sin));
+            mediator_.api().ping_node(reinterpret_cast<sockaddr*>(&sin), sizeof(sin));
         }
         else if (addr.is_ipv6())
         {
@@ -191,7 +191,7 @@ public:
             sin6.sin6_family = AF_INET6;
             sin6.sin6_addr = addr.addr.addr6;
             sin6.sin6_port = port.network();
-            mediator_.api().ping_node((struct sockaddr*)&sin6, sizeof(sin6));
+            mediator_.api().ping_node(reinterpret_cast<sockaddr*>(&sin6), sizeof(sin6));
         }
     }
 

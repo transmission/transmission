@@ -166,6 +166,7 @@ protected:
         int ping_node(struct sockaddr const* sa, int /*salen*/) override
         {
             auto addrport = tr_address::from_sockaddr(sa);
+            assert(addrport);
             auto const [addr, port] = *addrport;
             pinged_.push_back(Pinged{ addr, port, tr_time() });
             return 0;
@@ -584,9 +585,11 @@ TEST_F(DhtTest, pingsAddedNodes)
 
     EXPECT_EQ(0U, std::size(mediator.mock_dht_.pinged_));
 
-    auto const addr = *tr_address::from_string("10.10.10.1");
+    auto const addr = tr_address::from_string("10.10.10.1");
+    EXPECT_TRUE(addr.has_value());
+    assert(addr.has_value());
     auto constexpr Port = tr_port::fromHost(128);
-    dht->addNode(addr, Port);
+    dht->addNode(*addr, Port);
 
     ASSERT_EQ(1U, std::size(mediator.mock_dht_.pinged_));
     EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().address);

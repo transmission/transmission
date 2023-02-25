@@ -505,17 +505,17 @@
         <translation>Følg globale &amp;grenser</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>Begrens &amp;nedlastingshastighet:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Begrens &amp;opplastningshastighet:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>Torrent&amp;prioritet:</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>Sorter etter &amp;køstatus</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>Begrens nedlastingshastighet</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Åpne Torrent</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>Hastighetsgrenser</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>Nettverksfeil</translation>
     </message>
@@ -2224,7 +2224,7 @@ For å legge til en primær URL, legg den til etter en tom linje.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>Klarte ikke å gi sti nytt navn</translation>
     </message>

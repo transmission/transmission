@@ -35,7 +35,8 @@ TEST_F(OpenFilesTest, getOpensIfNotCached)
 
     // confirm that we can cache the file
     auto fd = session_->openFiles().get(0, 0, false, filename, TR_PREALLOCATE_FULL, std::size(Contents));
-    EXPECT_TRUE(fd);
+    EXPECT_TRUE(fd.has_value());
+    assert(fd.has_value());
     EXPECT_NE(TR_BAD_SYS_FILE, *fd);
 
     // test the file contents to confirm that fd points to the right file
@@ -66,8 +67,10 @@ TEST_F(OpenFilesTest, getCachedReturnsTheSameFd)
     EXPECT_FALSE(session_->openFiles().get(0, 0, false));
     auto const fd1 = session_->openFiles().get(0, 0, false, filename, TR_PREALLOCATE_FULL, std::size(Contents));
     auto const fd2 = session_->openFiles().get(0, 0, false);
-    EXPECT_TRUE(fd1);
-    EXPECT_TRUE(fd2);
+    EXPECT_TRUE(fd1.has_value());
+    EXPECT_TRUE(fd2.has_value());
+    assert(fd1.has_value());
+    assert(fd2.has_value());
     EXPECT_EQ(*fd1, *fd2);
 }
 
@@ -95,6 +98,8 @@ TEST_F(OpenFilesTest, opensInReadOnlyUnlessWritableIsRequested)
     // cache a file read-only mode
     tr_error* error = nullptr;
     auto fd = session_->openFiles().get(0, 0, false, filename, TR_PREALLOCATE_FULL, std::size(Contents));
+    EXPECT_TRUE(fd.has_value());
+    assert(fd.has_value());
 
     // confirm that writing to it fails
     EXPECT_FALSE(tr_sys_file_write(*fd, std::data(Contents), std::size(Contents), nullptr, &error));
@@ -113,7 +118,8 @@ TEST_F(OpenFilesTest, createsMissingFileIfWriteRequested)
     EXPECT_FALSE(tr_sys_path_exists(filename));
 
     fd = session_->openFiles().get(0, 0, true, filename, TR_PREALLOCATE_FULL, std::size(Contents));
-    EXPECT_TRUE(fd);
+    EXPECT_TRUE(fd.has_value());
+    assert(fd.has_value());
     EXPECT_NE(TR_BAD_SYS_FILE, *fd);
     EXPECT_TRUE(tr_sys_path_exists(filename));
 }

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-04 21:55+0000\n"
+"POT-Creation-Date: 2023-02-07 20:00+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: maboroshin, 2022\n"
 "Language-Team: Japanese (https://www.transifex.com/transmissionbt/teams/33778/ja/)\n"
@@ -23,75 +23,75 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../cli/cli.cc:105 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:644
+#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:512
 msgid "None"
 msgstr "なし"
 
-#: ../cli/cli.cc:110
+#: ../cli/cli.cc:112
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:233 ../gtk/Session.cc:826 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:164 ../libtransmission/utils.cc:80 ../libtransmission/utils.cc:100 ../libtransmission/utils.cc:112 ../libtransmission/watchdir.cc:119 ../libtransmission/watchdir.cc:146
+#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:162 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "読み取れません「{path}」: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:259 ../gtk/Session.cc:877 ../gtk/Utils.cc:285 ../libtransmission/watchdir.cc:97
+#: ../daemon/daemon.cc:260 ../gtk/Session.cc:863 ../gtk/Utils.cc:285 ../libtransmission/watchdir.cc:95
 msgid "Couldn't add torrent file '{path}'"
 msgstr "トレントファイルを追加できません「{path}」"
 
-#: ../daemon/daemon.cc:270
+#: ../daemon/daemon.cc:271
 msgid "Removing torrent file '{path}'"
 msgstr "トレントファイルを削除「{path}」"
 
-#: ../daemon/daemon.cc:275 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:704
+#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:570
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "以下を除去できません「{path}」: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:603
+#: ../daemon/daemon.cc:604
 msgid "Couldn't parse log level '{level}'"
 msgstr "ログの対象を解析できません「{level}」"
 
-#: ../daemon/daemon.cc:644
+#: ../daemon/daemon.cc:645
 msgid "Deferring reload until session is fully started."
 msgstr "セッションが完全に開始されるまで再読み込みを延期します。"
 
-#: ../daemon/daemon.cc:659
+#: ../daemon/daemon.cc:660
 msgid "Reloading settings from '{path}'"
 msgstr "以下から設定を再読み込み中「{path}」"
 
-#: ../daemon/daemon.cc:695
+#: ../daemon/daemon.cc:696
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr "デーモンを初期化できません: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:708
+#: ../daemon/daemon.cc:709
 msgid "Loading settings from '{path}'"
 msgstr "以下から設定を読み込み中「{path}」"
 
-#: ../daemon/daemon.cc:728
+#: ../daemon/daemon.cc:729
 msgid "Saved pidfile '{path}'"
 msgstr "PidFile を保存しました「{path}」"
 
-#: ../daemon/daemon.cc:734 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:180 ../libtransmission/rpcimpl.cc:1460 ../libtransmission/torrent.cc:757 ../libtransmission/torrent.cc:1939 ../libtransmission/variant.cc:1097
+#: ../daemon/daemon.cc:735 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1167 ../libtransmission/torrent.cc:2178 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "保存できませんでした「{path}」: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:744
+#: ../daemon/daemon.cc:745
 msgid "Requiring authentication"
 msgstr "認証を要求"
 
-#: ../daemon/daemon.cc:765
+#: ../daemon/daemon.cc:766
 msgid "Watching '{path}' for new torrent files"
 msgstr "以下の新規トレントファイルを監視中「{path}」"
 
-#: ../daemon/daemon.cc:809 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr " イベントを作成できません{error} ({error_code})"
 
-#: ../daemon/daemon.cc:819 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr "イベントを追加できません: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:833
+#: ../daemon/daemon.cc:834
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr "デーモンのイベントループを起動できません: {error} ({error_code})"
 
@@ -186,7 +186,7 @@ msgstr "取得済みのデータを検証中"
 msgid "Queued for download"
 msgstr "ダウンロード待ち行列"
 
-#: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:475
+#: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:473
 msgctxt "Verb"
 msgid "Downloading"
 msgstr "ダウンロード中"
@@ -195,16 +195,16 @@ msgstr "ダウンロード中"
 msgid "Queued for seeding"
 msgstr "シードの処理待ちに追加"
 
-#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:476
+#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:474
 msgctxt "Verb"
 msgid "Seeding"
 msgstr "シード中"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:478 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:322
 msgid "Finished"
 msgstr "完了"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:477 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:322
 msgid "Paused"
 msgstr "停止"
 
@@ -537,7 +537,7 @@ msgstr "通常"
 msgid "Low"
 msgstr "低"
 
-#: ../gtk/FileList.cc:840 ../gtk/Session.cc:330
+#: ../gtk/FileList.cc:840 ../gtk/Session.cc:329
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
 msgstr "改名できません。「{old_path}」から「{path}」へ: {error} ({error_code})"
 
@@ -564,28 +564,28 @@ msgstr "ダウンロード"
 msgid "Priority"
 msgstr "優先度"
 
-#: ../gtk/FilterBar.cc:326 ../gtk/FilterBar.cc:472
+#: ../gtk/FilterBar.cc:324 ../gtk/FilterBar.cc:470
 msgid "All"
 msgstr "すべて"
 
-#: ../gtk/FilterBar.cc:474
+#: ../gtk/FilterBar.cc:472
 msgid "Active"
 msgstr "稼働中"
 
-#: ../gtk/FilterBar.cc:479
+#: ../gtk/FilterBar.cc:477
 msgctxt "Verb"
 msgid "Verifying"
 msgstr "検証中"
 
-#: ../gtk/FilterBar.cc:480 ../gtk/FreeSpaceLabel.cc:54
+#: ../gtk/FilterBar.cc:478 ../gtk/FreeSpaceLabel.cc:54
 msgid "Error"
 msgstr "エラー"
 
-#: ../gtk/FilterBar.cc:589 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
+#: ../gtk/FilterBar.cc:586 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
 msgid "_Show:"
 msgstr "表示(_S):"
 
-#: ../gtk/FilterBar.cc:590
+#: ../gtk/FilterBar.cc:587
 msgid "_Show {count:L} of:"
 msgstr " {count:L}個の表示(_S):"
 
@@ -849,29 +849,29 @@ msgstr "移動中「{torrent_name}」"
 msgid "Couldn't move torrent"
 msgstr "トレントを移動できません"
 
-#: ../gtk/RelocateDialog.cc:143
+#: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
 msgstr "作業には数分かかる場合があります…"
 
-#: ../gtk/Session.cc:812 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
+#: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
 msgstr "読み込めません「{path}」"
 
 #. logging
-#: ../gtk/Session.cc:1071
+#: ../gtk/Session.cc:1057
 msgid "Inhibiting desktop hibernation"
 msgstr "デスクトップの休止状態を抑制中"
 
-#: ../gtk/Session.cc:1077 ../gtk/Session.cc:1102
+#: ../gtk/Session.cc:1063 ../gtk/Session.cc:1088
 msgid "Couldn't inhibit desktop hibernation: {error}"
 msgstr "デスクトップの休止状態を抑制できませんでした: {error}"
 
 #. logging
-#: ../gtk/Session.cc:1098
+#: ../gtk/Session.cc:1084
 msgid "Allowing desktop hibernation"
 msgstr "デスクトップの休止状態を許可中"
 
-#: ../gtk/Session.cc:1216
+#: ../gtk/Session.cc:1202
 msgid "Couldn't find pending RPC request for tag {tag}"
 msgstr "タグ保留中のRPCリクエストが見つかりません"
 
@@ -935,7 +935,7 @@ msgstr "{download_speed} ▼  {upload_speed} ▲"
 msgid "Stalled"
 msgstr "停滞"
 
-#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:481
+#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:2227
 msgid "Tracker warning: '{warning}'"
 msgstr "トラッカーの警告:「{warning}」"
 
@@ -1121,7 +1121,7 @@ msgstr "以下をゴミ箱へ移動できません「{path}」: {error} ({error_
 msgid "Couldn't open '{url}'"
 msgstr "開けません「{url}」"
 
-#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:198 ../libtransmission/announcer.cc:232
+#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
 msgstr "未対応のURL: {url}"
 
@@ -2048,44 +2048,44 @@ msgstr "URL からトレントを開く"
 msgid "_URL"
 msgstr "URL(_U)"
 
-#: ../libtransmission/announcer-http.cc:211
+#: ../libtransmission/announcer-http.cc:465
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "アナウンスの応答を解析できません: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:572
+#: ../libtransmission/announcer-http.cc:676
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "スクレイプの応答を解析できません: {error} ({error_code})"
 
-#: ../libtransmission/announcer-udp.cc:142 ../libtransmission/announcer-udp.cc:239
+#: ../libtransmission/announcer-udp.cc:142 ../libtransmission/announcer-udp.cc:237
 msgid "Unknown error"
 msgstr "不明のエラー"
 
-#: ../libtransmission/announcer-udp.cc:331
+#: ../libtransmission/announcer-udp.cc:327
 msgid "Connection failed"
 msgstr "接続に失敗"
 
-#: ../libtransmission/announcer-udp.cc:426 ../libtransmission/tr-dht.cc:554
+#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:554
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr "以下を検索できませんでした「{address}:{port}」: {error} ({error_code})"
 
-#: ../libtransmission/announcer.cc:1000
+#: ../libtransmission/announcer.cc:879
 msgid "Announce error: {error}"
 msgstr "アナウンスのエラー: {error}"
 
-#: ../libtransmission/announcer.cc:1010
+#: ../libtransmission/announcer.cc:889
 msgid "Announce error: {error} (Retrying in {count} second)"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] "アナウンスのエラー: {error} ({count}秒後に再試行)"
 
-#: ../libtransmission/announcer.cc:1075 ../libtransmission/announcer.cc:1373
+#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1345
 msgid "Could not connect to tracker"
 msgstr "トラッカーに接続できません"
 
-#: ../libtransmission/announcer.cc:1079 ../libtransmission/announcer.cc:1377
+#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1349
 msgid "Tracker did not respond"
 msgstr "トラッカーが応答しません"
 
-#: ../libtransmission/announcer.cc:1140
+#: ../libtransmission/announcer.cc:1079
 msgid "Success"
 msgstr "成功"
 
@@ -2103,15 +2103,15 @@ msgstr "この行を解析できません: 「{line}」"
 msgid "Rewriting old blocklist file format to new format"
 msgstr "古いブロックリストのファイル形式を新しいものへ書き換え中"
 
-#: ../libtransmission/crypto-utils-ccrypto.cc:75 ../libtransmission/crypto-utils-mbedtls.cc:43 ../libtransmission/crypto-utils-openssl.cc:58 ../libtransmission/crypto-utils-wolfssl.cc:46
+#: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:41 ../libtransmission/crypto-utils-openssl.cc:56 ../libtransmission/crypto-utils-wolfssl.cc:44
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr "{crypto_library} エラー: {error} ({error_code})"
 
-#: ../libtransmission/inout.cc:148
+#: ../libtransmission/inout.cc:146
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "取得できません「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/log.cc:292
+#: ../libtransmission/log.cc:290
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr "以下のようなメッセージがたくさん ! このセッションではこのメッセージは記録しません。"
 
@@ -2119,23 +2119,23 @@ msgstr "以下のようなメッセージがたくさん ! このセッション
 msgid "Skipping '{path}': {error} ({error_code})"
 msgstr "省略「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:153
+#: ../libtransmission/net.cc:151
 msgid "Couldn't create socket: {error} ({error_code})"
 msgstr "ソケットを作成できません: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:228
+#: ../libtransmission/net.cc:226
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
 msgstr "入力元のアドレス {address} : {socket} を設定できません: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:247
+#: ../libtransmission/net.cc:246
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
 msgstr " ソケット{socket} を {address}:{port}へ接続できません: {error} ({error_code})"
 
-#: ../libtransmission/net.cc:314
+#: ../libtransmission/net.cc:313
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
 msgstr "{address}上のポート{port}をバインドできません : {error} ({error_code}) -- 別の Transmission のコピーが既に実行されていませんか ?"
 
-#: ../libtransmission/net.cc:315
+#: ../libtransmission/net.cc:314
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
 msgstr "{port} {address}上のポート{port}をバインドできません: {error} ({error_code})"
 
@@ -2151,47 +2151,47 @@ msgstr "事前割り当てできません「{path}」: {error} ({error_code})"
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
 msgstr "切り詰めできません「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/peer-io.cc:670
+#: ../libtransmission/peer-io.cc:673
 msgid "Unknown state: {state}"
 msgstr "不明の状態: {state}"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:83
+#: ../libtransmission/port-forwarding-natpmp.cc:86
 msgid "Found public address '{address}'"
 msgstr "パブリックアドレスを発見「{address}」"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:120
+#: ../libtransmission/port-forwarding-natpmp.cc:123
 msgid "Port {port} is no longer forwarded"
 msgstr "ポート{port} は転送されなくなりました"
 
-#: ../libtransmission/port-forwarding-natpmp.cc:174
+#: ../libtransmission/port-forwarding-natpmp.cc:177
 msgid "Port {port} forwarded successfully"
 msgstr "ポート {port} は正常に転送されました"
 
-#: ../libtransmission/port-forwarding-upnp.cc:290
+#: ../libtransmission/port-forwarding-upnp.cc:281
 msgid "Found Internet Gateway Device '{url}'"
 msgstr "インターネットゲートウェイの端末が見つかりました「{url}」"
 
-#: ../libtransmission/port-forwarding-upnp.cc:291
+#: ../libtransmission/port-forwarding-upnp.cc:282
 msgid "Local Address is '{address}'"
 msgstr "内部アドレスは「{address}」"
 
-#: ../libtransmission/port-forwarding-upnp.cc:315
+#: ../libtransmission/port-forwarding-upnp.cc:306
 msgid "Port {port} is not forwarded"
 msgstr "ポート {port} は転送されていません"
 
-#: ../libtransmission/port-forwarding-upnp.cc:325
+#: ../libtransmission/port-forwarding-upnp.cc:316
 msgid "Stopping port forwarding through '{url}', service '{type}'"
 msgstr "以下によるポート転送を停止中「{url}」「サービス {type}」"
 
-#: ../libtransmission/port-forwarding-upnp.cc:357
+#: ../libtransmission/port-forwarding-upnp.cc:348
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
 msgstr "以下によるポート転送中「{url}」「サービス {type}」。(内部アドレス: {address}:{port})"
 
-#: ../libtransmission/port-forwarding-upnp.cc:365
+#: ../libtransmission/port-forwarding-upnp.cc:356
 msgid "Port {port} is forwarded"
 msgstr "ポート {port} は転送されています"
 
-#: ../libtransmission/port-forwarding-upnp.cc:371
+#: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
 msgstr "お使いのルーターがUPnPに対応するなら、有効化されているか確認してください !"
 
@@ -2219,64 +2219,64 @@ msgstr "プライベートポート {private_port} をパブリックポート {
 msgid "State changed from '{old_state}' to '{state}'"
 msgstr "状態が変化「{old_state}」から「{state}」へ"
 
-#: ../libtransmission/rpc-server.cc:584
+#: ../libtransmission/rpc-server.cc:578
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
 msgstr "Unix のソケットのパスは {count} 文字以下の必要があります ({prefix} 接頭辞含む)"
 
-#: ../libtransmission/rpc-server.cc:618
+#: ../libtransmission/rpc-server.cc:612
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
 msgstr "Unix のソケットは Windows には対応していません。設定から「{key}」を変更してください。"
 
-#: ../libtransmission/rpc-server.cc:645
+#: ../libtransmission/rpc-server.cc:639
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
 msgstr "RPC のソケットモードを {mode:#o}に設定できません。初期値は0755"
 
-#: ../libtransmission/rpc-server.cc:708
+#: ../libtransmission/rpc-server.cc:702
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] "{address} に{count}回バインドできなかったので断念します"
 
-#: ../libtransmission/rpc-server.cc:719
+#: ../libtransmission/rpc-server.cc:713
 msgid "Listening for RPC and Web requests on '{address}'"
 msgstr "以下で RPC とウェブリクエストを待ち受け中「{address}」"
 
-#: ../libtransmission/rpc-server.cc:747
+#: ../libtransmission/rpc-server.cc:741
 msgid "Stopped listening for RPC and Web requests on '{address}'"
 msgstr "以下の RPC とウェブリクエストの待ち受けを停止「{address}」"
 
-#: ../libtransmission/rpc-server.cc:769
+#: ../libtransmission/rpc-server.cc:763
 msgid "Added '{entry}' to host whitelist"
 msgstr "「{entry}」をホストのホワイトリストに追加しました"
 
-#: ../libtransmission/rpc-server.cc:899
+#: ../libtransmission/rpc-server.cc:893
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
 msgstr "「{key}」の設定は「{value}」ですが、IPv4 や IPv6 のアドレスまたは、Unix のソケットのパスにする必要があります。初期値 0.0.0.0 を使用"
 
-#: ../libtransmission/rpc-server.cc:913
+#: ../libtransmission/rpc-server.cc:907
 msgid "Serving RPC and Web requests on {address}"
 msgstr "以下のRPCとウェブリクエストを処理 {address}"
 
-#: ../libtransmission/rpc-server.cc:918
+#: ../libtransmission/rpc-server.cc:912
 msgid "Whitelist enabled"
 msgstr "ホワイトリスト有効化"
 
-#: ../libtransmission/rpc-server.cc:923
+#: ../libtransmission/rpc-server.cc:917
 msgid "Password required"
 msgstr "パスワードを要求"
 
-#: ../libtransmission/rpc-server.cc:929
+#: ../libtransmission/rpc-server.cc:923
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr "以下からのRPCとウェブリクエストを処理「{path}」"
 
-#: ../libtransmission/rpcimpl.cc:1381
+#: ../libtransmission/rpcimpl.cc:1384
 msgid "Couldn't test port: {error} ({error_code})"
 msgstr "ポートをテストできません: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1415
+#: ../libtransmission/rpcimpl.cc:1418
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr "ブロックリストを取得できません: {error} ({error_code})"
 
-#: ../libtransmission/rpcimpl.cc:1549
+#: ../libtransmission/rpcimpl.cc:1552
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr "トレントを取得できません: {error} ({error_code})"
 
@@ -2292,69 +2292,69 @@ msgstr "亀モード開始の時間"
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr "セッションのロックファイルを開けません「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/session.cc:324
+#: ../libtransmission/session.cc:405
 msgid "Listening to incoming peer connections on {hostport}"
 msgstr "以下で接続してくるピア接続を待ち受け{hostport}"
 
-#: ../libtransmission/session.cc:555
+#: ../libtransmission/session.cc:646
 msgid "Transmission version {version} starting"
 msgstr "Transmission バージョン{version} 開始"
 
-#: ../libtransmission/session.cc:1282
+#: ../libtransmission/session.cc:1328
 msgid "Transmission version {version} shutting down"
 msgstr "Transmission バージョン {version} シャットダウン"
 
-#: ../libtransmission/session.cc:1331
+#: ../libtransmission/session.cc:1381
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] "{count} トレントを読み込みました"
 
-#: ../libtransmission/torrent-magnet.cc:324
+#: ../libtransmission/torrent-magnet.cc:332
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] "マグネットのメタ情報を解析できません:「{error}」。{piece_count} ピースを再ダウンロード"
 
-#: ../libtransmission/torrent-metainfo.cc:678
+#: ../libtransmission/torrent-metainfo.cc:676
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "トレントファイルを移行「{old_path}」から「{path}」へ"
 
-#: ../libtransmission/torrent.cc:124
+#: ../libtransmission/torrent.cc:122
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "「{path}」からのメタ情報が使用できません。 「{magnet}」用のものです: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:432
-msgid "Seed ratio reached; pausing torrent"
-msgstr "シード比に達しました; トレントを停止"
-
-#: ../libtransmission/torrent.cc:439
-msgid "Seeding idle limit reached; pausing torrent"
-msgstr "シードアイドルの制限に達しました。トレントを停止"
-
-#: ../libtransmission/torrent.cc:581
+#: ../libtransmission/torrent.cc:159
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "データが見つかりません!ドライブの接続を確認するか、「場所の設定」を使用してください。もう一度ダウンロードするには、トレントを削除しそれを再び追加してください。"
 
-#: ../libtransmission/torrent.cc:1340
-msgid "Restarted manually -- disabling its seed ratio"
-msgstr "手動で再起動 -- シード比を無効化"
-
-#: ../libtransmission/torrent.cc:1460
-msgid "Pausing torrent"
-msgstr "トレントの停止"
-
-#: ../libtransmission/torrent.cc:1511
-msgid "Removing torrent"
-msgstr "トレントの削除"
-
-#: ../libtransmission/torrent.cc:1654
+#: ../libtransmission/torrent.cc:491
 msgid "Calling script '{path}'"
 msgstr "スクリプト実行「{path}」"
 
-#: ../libtransmission/torrent.cc:1663
+#: ../libtransmission/torrent.cc:500
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "スクリプトを実行できません「{path}」: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:2043 ../libtransmission/torrent.cc:2163
+#: ../libtransmission/torrent.cc:552
+msgid "Seed ratio reached; pausing torrent"
+msgstr "シード比に達しました; トレントを停止"
+
+#: ../libtransmission/torrent.cc:559
+msgid "Seeding idle limit reached; pausing torrent"
+msgstr "シードアイドルの制限に達しました。トレントを停止"
+
+#: ../libtransmission/torrent.cc:877
+msgid "Restarted manually -- disabling its seed ratio"
+msgstr "手動で再起動 -- シード比を無効化"
+
+#: ../libtransmission/torrent.cc:900
+msgid "Pausing torrent"
+msgstr "トレントの停止"
+
+#: ../libtransmission/torrent.cc:965
+msgid "Removing torrent"
+msgstr "トレントの削除"
+
+#: ../libtransmission/torrent.cc:1295 ../libtransmission/torrent.cc:2354
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "移動できません。「{old_path}」から「{path}」へ: {error} ({error_code})"
 
@@ -2366,28 +2366,28 @@ msgstr "解析負荷「{filename}」の{line}行"
 msgid "Couldn't initialize LPD: {error} ({error_code})"
 msgstr "LPDを初期化できません: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:157
+#: ../libtransmission/tr-udp.cc:159
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
 msgstr "IPv4 ソケットをバインドできません {address}: {error} ({error_code})"
 
-#: ../libtransmission/tr-udp.cc:191
+#: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/tr-utp.cc:100
+#: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
 msgstr "不明なソケットファミリー"
 
-#: ../libtransmission/utils.cc:90
+#: ../libtransmission/utils.cc:83
 msgid "Couldn't read '{path}': Not a regular file"
 msgstr "以下を読み込めません「{path}」: 通常のファイルではありません"
 
-#: ../libtransmission/variant-json.cc:95
+#: ../libtransmission/variant-json.cc:98
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
 msgstr "JSON の以下の位置と内容を解析できません {position}「{text}」: {error} ({error_code})"
 
 #. did caller give us an uninitialized val?
-#: ../libtransmission/variant.cc:868
+#: ../libtransmission/variant.cc:860
 msgid "Invalid metadata"
 msgstr "無効なメタデータ"
 
@@ -2431,17 +2431,21 @@ msgstr "ディレクトリの変更を読み取りできません"
 msgid "Couldn't wait for directory changes"
 msgstr "ディレクトリの変更を待機できません"
 
-#: ../libtransmission/web.cc:176
+#: ../libtransmission/web.cc:175
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
 msgstr "envvar CURL_CA_BUNDLE を使いトラッカーを検証: {bundle}"
 
-#: ../libtransmission/web.cc:177
+#: ../libtransmission/web.cc:176
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
 msgstr "注: nssではなく、openssl か gnutls のある libcurl に対してビルドした場合のみ動作します"
 
-#: ../libtransmission/web.cc:178
+#: ../libtransmission/web.cc:177
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr "注: 無効な証明書では、多くのほかのエラーのように「トラッカーに接続できません」となります"
+
+#: ../libtransmission/web.cc:446
+msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
+msgstr ""
 
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
@@ -2472,15 +2476,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "日"
-
-#~ msgid "Added '{entry}' to host whitelist and it has a '+' or '-'! Are you using an old ACL by mistake?"
-#~ msgstr "「{entry}」をホストのホワイトリストに追加しました。また値に + か - が含まれます！ 誤って古いACLを使っていませんか？"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "IPv4 ソケットを作成できません"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "IPv6 ソケットを再バインドできません {address}: {error} ({error_code})"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "ブロックリストの更新"

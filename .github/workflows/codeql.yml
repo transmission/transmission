@@ -3,8 +3,14 @@ name: "CodeQL"
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'docs/**'
+      - '.github/**'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'docs/**'
+      - '.github/**'
   schedule:
     - cron: '29 14 * * 1'
 
@@ -64,8 +70,8 @@ jobs:
     - name: Build Dependencies
       if: ${{ matrix.language == 'cpp' }}
       run: |
-        ninja -C _build -t targets |
-            grep -E 'third-party/.*-build:' |
+        ninja -C _build -t targets all |
+            grep -E 'third-party/.*-build:|third-party/.*/all:' |
             cut -d: -f1 |
             xargs -L1 ninja -C _build
 

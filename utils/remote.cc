@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -950,13 +950,11 @@ static void printDetails(tr_variant* top)
             {
                 fmt::print("  Labels: ");
 
-                size_t child_pos = 0;
-                tr_variant const* child;
-                while ((child = tr_variantListChild(l, child_pos++)))
+                for (size_t child_idx = 0, n_children = tr_variantListSize(l); child_idx < n_children; ++child_idx)
                 {
-                    if (tr_variantGetStrView(child, &sv))
+                    if (tr_variantGetStrView(tr_variantListChild(l, child_idx++), &sv))
                     {
-                        fmt::print(child_pos == 1 ? "{:s}" : ", {:s}", sv);
+                        fmt::print(child_idx == 1 ? "{:s}" : ", {:s}", sv);
                     }
                 }
 
@@ -2039,18 +2037,13 @@ static void filterIds(tr_variant* top, Config& config)
             case 'l': // label
                 if (tr_variant * l; tr_variantDictFindList(d, TR_KEY_labels, &l))
                 {
-                    size_t child_pos = 0;
-                    tr_variant const* child;
-                    std::string_view sv;
-                    while ((child = tr_variantListChild(l, child_pos++)))
+                    for (size_t child_idx = 0, n_children = tr_variantListSize(l); child_idx < n_children; ++child_idx)
                     {
-                        if (tr_variantGetStrView(child, &sv))
+                        if (auto sv = std::string_view{};
+                            tr_variantGetStrView(tr_variantListChild(l, child_idx), &sv) && arg == sv)
                         {
-                            if (arg == sv)
-                            {
-                                include = !include;
-                                break;
-                            }
+                            include = !include;
+                            break;
                         }
                     }
                 }

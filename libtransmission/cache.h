@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2022 Mnemosyne LLC.
+// This file Copyright © 2010-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -36,7 +36,7 @@ public:
     }
 
     // @return any error code from cacheTrim()
-    int writeBlock(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme);
+    int writeBlock(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme);
 
     int readBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len, uint8_t* setme);
     int prefetchBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len);

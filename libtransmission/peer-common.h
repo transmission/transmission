@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cstdint> // uint8_t, uint32_t, uint64_t
+#include <string>
 
 #include "transmission.h"
 
@@ -240,7 +241,7 @@ public:
     tr_recentHistory<uint16_t> cancels_sent_to_client;
 
     /// The following fields are only to be used in peer-mgr.cc.
-    /// TODO(ckerr): refactor them out of tr_peer
+    /// TODO(ckerr): refactor them out of `tr_peer`
 
     // hook to private peer-mgr information
     peer_atom* const atom;

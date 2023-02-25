@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -342,7 +342,7 @@ bool isIPAddressWithOptionalPort(char const* host)
     int address_len = sizeof(address);
 
     /* TODO: move to net.{c,h} */
-    return evutil_parse_sockaddr_port(host, (struct sockaddr*)&address, &address_len) != -1;
+    return evutil_parse_sockaddr_port(host, reinterpret_cast<sockaddr*>(&address), &address_len) != -1;
 }
 
 bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)

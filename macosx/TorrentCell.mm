@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2022 Transmission authors and contributors.
+// This file Copyright © 2006-2023 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -31,6 +31,7 @@ static CGFloat const kHeightTitle = 16.0;
 static CGFloat const kHeightStatus = 12.0;
 
 static CGFloat const kPaddingHorizontal = 5.0;
+static CGFloat const kPaddingEdgeMax = 12.0;
 static CGFloat const kPaddingBetweenButtons = 3.0;
 static CGFloat const kPaddingBetweenImageAndTitle = kPaddingHorizontal + 1.0;
 static CGFloat const kPaddingBetweenImageAndBar = kPaddingHorizontal;
@@ -701,7 +702,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSRect result;
     result.size = [string size];
 
-    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + NSWidth(result));
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + NSWidth(result) + kPaddingEdgeMax);
     result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
 
     return result;
@@ -726,7 +727,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     {
         result.origin.x += kGroupPaddingRegular;
         result.origin.y = NSMinY(bounds) + kPaddingAboveTitle;
-        result.size.width = rightBound - NSMinX(result) - kPaddingHorizontal;
+        result.size.width = rightBound - NSMinX(result) - kPaddingHorizontal - kPaddingEdgeMax;
     }
 
     if (((Torrent*)self.representedObject).priority != TR_PRI_NORMAL)
@@ -771,7 +772,8 @@ static NSInteger const kMaxPieces = 18 * 18;
     result.origin.y = NSMinY(bounds) + kPaddingAboveTitle + kHeightTitle + kPaddingBetweenTitleAndProgress + kHeightStatus +
         kPaddingBetweenProgressAndBar;
 
-    result.size.width = floor(NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal - 2.0 * (kPaddingBetweenButtons + kNormalButtonWidth));
+    result.size.width = floor(
+        NSMaxX(bounds) - NSMinX(result) - kPaddingHorizontal - 2.0 * (kPaddingBetweenButtons + kNormalButtonWidth + kPaddingEdgeMax));
 
     return result;
 }
@@ -782,7 +784,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     result.origin.x = NSMinX(bounds) + kPaddingHorizontal + kImageSizeMin + kGroupPaddingMin + kPaddingBetweenImageAndBar;
     result.origin.y = NSMinY(bounds) + kPaddingBetweenBarAndEdgeMin;
     result.size.height = NSHeight(bounds) - 2.0 * kPaddingBetweenBarAndEdgeMin;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - kPaddingBetweenBarAndEdgeMin;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - kPaddingBetweenBarAndEdgeMin - kPaddingEdgeMax;
 
     return result;
 }
@@ -792,7 +794,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSRect result;
     result.size.height = kNormalButtonWidth;
     result.size.width = kNormalButtonWidth;
-    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth + kPaddingBetweenButtons + kNormalButtonWidth);
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth + kPaddingBetweenButtons + kNormalButtonWidth + kPaddingEdgeMax);
 
     if (![self.fDefaults boolForKey:@"SmallView"])
     {
@@ -812,7 +814,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     NSRect result;
     result.size.height = kNormalButtonWidth;
     result.size.width = kNormalButtonWidth;
-    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth);
+    result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + kNormalButtonWidth + kPaddingEdgeMax);
 
     if (![self.fDefaults boolForKey:@"SmallView"])
     {

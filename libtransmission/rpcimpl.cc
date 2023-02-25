@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -2468,6 +2468,8 @@ void tr_rpc_request_exec_json(
     tr_rpc_response_func callback,
     void* callback_user_data)
 {
+    auto const lock = session->unique_lock();
+
     auto* const mutable_request = const_cast<tr_variant*>(request);
     tr_variant* args_in = tr_variantDictFind(mutable_request, TR_KEY_arguments);
     char const* result = nullptr;

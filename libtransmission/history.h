@@ -16,7 +16,7 @@
 
 /**
  * A short-term memory object that remembers how many times something
- * happened over the last Seconds seconds. tr_peer uses it to count
+ * happened over the last Seconds seconds. `tr_peer` uses it to count
  * how many bytes transferred to estimate the speed over the last
  * Seconds seconds.
  */

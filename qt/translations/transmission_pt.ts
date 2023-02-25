@@ -505,17 +505,17 @@
         <translation>Honrar &amp;limites globais</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>Velocidade limite de &amp;descarga:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>Velocidade limite de &amp;carregamento:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;Prioridade do torrent:</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>Ordenar por &amp;Fila</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>Limitar Velocidade de Transferência</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Abrir torrent</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>Limites de velocidade</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>Erro de rede</translation>
     </message>
@@ -2224,7 +2224,7 @@ Para adicionar outra hiperligação primária, adicione-a após a linha em branc
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>Erro ao Renomear Caminho</translation>
     </message>

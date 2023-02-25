@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2022 Mnemosyne LLC.
+// This file Copyright © 2012-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -287,6 +287,7 @@ enum
     TR_KEY_recheckProgress,
     TR_KEY_remote_session_enabled,
     TR_KEY_remote_session_host,
+    TR_KEY_remote_session_https,
     TR_KEY_remote_session_password,
     TR_KEY_remote_session_port,
     TR_KEY_remote_session_requres_authentication,
@@ -444,4 +445,4 @@ enum
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-[[nodiscard]] tr_quark tr_quark_new(std::string_view);
+[[nodiscard]] tr_quark tr_quark_new(std::string_view str);

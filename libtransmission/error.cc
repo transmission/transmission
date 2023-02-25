@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2022 Mnemosyne LLC.
+// This file Copyright © 2013-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -47,6 +47,11 @@ void tr_error_set(tr_error** error, int code, std::string_view message)
 
     TR_ASSERT(*error == nullptr);
     *error = new tr_error{ code, tr_strvdup(message) };
+}
+
+void tr_error_set_from_errno(tr_error** error, int errnum)
+{
+    tr_error_set(error, errnum, tr_strerror(errnum));
 }
 
 void tr_error_propagate(tr_error** new_error, tr_error** old_error)

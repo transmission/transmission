@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -177,6 +177,8 @@ template<typename T>
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr int gtr_compare_generic(T const& lhs, T const& rhs)
 {
+    using std::rel_ops::operator>;
+
     if (lhs < rhs)
     {
         return -1;

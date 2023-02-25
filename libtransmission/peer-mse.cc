@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -16,6 +16,8 @@
 
 using namespace std::literals;
 
+namespace
+{
 namespace wi
 {
 using key_t = math::wide_integer::uintwide_t<
@@ -61,6 +63,7 @@ auto WIDE_INTEGER_CONSTEXPR const prime = wi::key_t{
 // NOLINTEND(readability-identifier-naming)
 
 } // namespace wi
+} // namespace
 
 namespace tr_message_stream_encryption
 {

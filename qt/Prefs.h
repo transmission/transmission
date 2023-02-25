@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -62,10 +62,11 @@ public:
         FILTER_TEXT,
         SESSION_IS_REMOTE,
         SESSION_REMOTE_HOST,
+        SESSION_REMOTE_HTTPS,
+        SESSION_REMOTE_PASSWORD,
         SESSION_REMOTE_PORT,
         SESSION_REMOTE_AUTH,
         SESSION_REMOTE_USERNAME,
-        SESSION_REMOTE_PASSWORD,
         COMPLETE_SOUND_COMMAND,
         COMPLETE_SOUND_ENABLED,
         USER_HAS_GIVEN_INFORMED_CONSENT,

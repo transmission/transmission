@@ -22,7 +22,7 @@ jobs:
       make-source-tarball: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.any-code-changed == '1' }}
       make-tests: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.tests-changed == '1' }}
       make-utils: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.utils-changed == '1' || steps.check-diffs.outputs.tests-changed == '1' }}
-      make-web: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.web-changed == '1' }}
+      make-web: 'false' # this is handled in the webapp workflow
       test-style: ${{ steps.check-main-push.outputs.is-main-push == '1' || steps.check-diffs.outputs.our-code-changed == '1' }}
     steps:
       - name: Check Push to Main Branch
@@ -53,23 +53,25 @@ jobs:
             git diff --exit-code "$MERGE_BASE" -- "$@"
             echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
           }
-          get_changes cli      CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
-          get_changes any-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
-          get_changes our-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
-          get_changes daemon   CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
+          get_changes cli      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission cli
+          get_changes any-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
+          get_changes our-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
+          get_changes daemon   CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission daemon
           get_changes dist     dist
           get_changes docs     docs
-          get_changes gtk      CMakeLists.txt third-party libtransmission gtk
-          get_changes mac      CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
-          get_changes qt       CMakeLists.txt third-party libtransmission qt
-          get_changes tests    CMakeLists.txt third-party libtransmission utils tests
-          get_changes utils    CMakeLists.txt third-party libtransmission utils
-          get_changes web      CMakeLists.txt third-party libtransmission web
+          get_changes gtk      CMakeLists.txt cmake third-party libtransmission gtk
+          get_changes mac      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
+          get_changes qt       CMakeLists.txt cmake third-party libtransmission qt
+          get_changes tests    CMakeLists.txt cmake third-party libtransmission utils tests
+          get_changes utils    CMakeLists.txt cmake third-party libtransmission utils
+          get_changes web      CMakeLists.txt cmake third-party libtransmission web
 
   code-style:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -85,7 +87,7 @@ jobs:
           set -ex
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
-          sudo apt-get install -y clang-format-15 npm yarn
+          sudo apt-get install -y clang-format-15 npm
       - name: Check for style diffs
         id: check-for-diffs
         working-directory: .
@@ -114,6 +116,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     steps:
       - name: Show Configuration
         run: |
@@ -137,7 +141,8 @@ jobs:
             libnatpmp-dev \
             libpsl-dev \
             libssl-dev \
-            ninja-build
+            ninja-build \
+            npm
       - name: Get Source
         uses: actions/checkout@v3
         with:
@@ -167,7 +172,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
-        run: cmake -E chdir obj ctest --build-config Debug --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
 
   macos-11:
     runs-on: macos-11
@@ -180,7 +185,9 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja
+        run: |
+          brew update
+          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkg-config
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -209,7 +216,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=OFF \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -218,7 +225,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -255,6 +262,7 @@ jobs:
             linux-headers \
             miniupnpc-dev \
             ninja \
+            npm \
             pkgconfig \
             xz
       - name: Get Dependencies (GTK)
@@ -284,7 +292,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=OFF \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -293,7 +301,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -322,7 +330,8 @@ jobs:
 
           choco install `
             jom `
-            nasm
+            nasm `
+            nodejs
           choco uninstall `
             openssl.light
           (Join-Path $Env:ProgramFiles NASM) | Out-File $Env:GITHUB_PATH -Append
@@ -376,7 +385,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_TESTS=ON `
             -DENABLE_UTILS=ON `
-            -DENABLE_WEB=OFF `
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WERROR=ON `
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -385,7 +394,7 @@ jobs:
           cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure --timeout 600
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
       - name: Package
@@ -451,7 +460,9 @@ jobs:
           echo '${{ toJSON(runner) }}'
           sw_vers
       - name: Get Dependencies
-        run: brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja
+        run: |
+          brew update
+          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkg-config
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -481,7 +492,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=OFF \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -490,7 +501,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -502,6 +513,8 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
       image: debian:11-slim
     steps:
@@ -528,6 +541,7 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build \
+            npm \
             pkg-config \
             xz-utils
       - name: Get Dependencies (GTK)
@@ -557,14 +571,14 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=OFF \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -576,6 +590,8 @@ jobs:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
+    env:
+      NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
       image: fedora:36
     steps:
@@ -600,6 +616,7 @@ jobs:
             libpsl-devel \
             miniupnpc-devel \
             ninja-build \
+            npm \
             openssl-devel \
             pkgconf-pkg-config \
             xz
@@ -630,14 +647,14 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=OFF \
+            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3

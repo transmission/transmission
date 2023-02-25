@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2022 Mnemosyne LLC.
+// This file Copyright © 2013-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -318,7 +318,7 @@ extern "C"
 
     close(fd);
 #else
-    if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), (caddr_t)&dq) != 0)
+    if (quotactl(QCMD(Q_GETQUOTA, USRQUOTA), device, getuid(), reinterpret_cast<caddr_t>(&dq)) != 0)
     {
         return disk_space;
     }

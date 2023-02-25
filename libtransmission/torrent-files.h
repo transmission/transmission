@@ -1,4 +1,4 @@
-// This file Copyright © 2022 Mnemosyne LLC.
+// This file Copyright © 2022-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -86,7 +86,7 @@ public:
         total_size_ = uint64_t{};
     }
 
-    auto sortedByPath() const
+    [[nodiscard]] auto sortedByPath() const
     {
         auto ret = std::vector<std::pair<std::string /*path*/, uint64_t /*size*/>>{};
         ret.reserve(std::size(files_));
@@ -152,8 +152,8 @@ public:
         size_t base_len_;
     };
 
-    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t, std::string_view const* search_paths, size_t n_paths) const;
-    [[nodiscard]] bool hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const;
+    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, std::string_view const* paths, size_t n_paths) const;
+    [[nodiscard]] bool hasAnyLocalData(std::string_view const* paths, size_t n_paths) const;
 
     static void makeSubpathPortable(std::string_view path, tr_pathbuf& append_me);
 
