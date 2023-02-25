@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2022 Transmission authors and contributors.
+// This file Copyright © 2015-2023 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -994,11 +994,15 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         //always show the add window for magnet links when the download location is the same as the torrent file
         self.fShowMagnetAddWindowCheck.state = NSControlStateValueOn;
         self.fShowMagnetAddWindowCheck.enabled = NO;
+        self.fShowMagnetAddWindowCheck.toolTip = NSLocalizedString(
+            @"This option is not available if Default location is set to Same as torrent file.",
+            "Preferences -> Transfers -> Adding -> Magnet tooltip");
     }
     else
     {
         self.fShowMagnetAddWindowCheck.state = [self.fDefaults boolForKey:@"MagnetOpenAsk"];
         self.fShowMagnetAddWindowCheck.enabled = YES;
+        self.fShowMagnetAddWindowCheck.toolTip = nil;
     }
 }
 

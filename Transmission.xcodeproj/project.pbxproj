@@ -404,6 +404,7 @@
 		C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */; };
 		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
 		C87369652809984200573C90 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87369642809984200573C90 /* UserNotifications.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		C8748D8A29891EA100D9E979 /* suffixes_dafsa.h in Headers */ = {isa = PBXBuildFile; fileRef = C8748D8929891EA100D9E979 /* suffixes_dafsa.h */; };
 		C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C88771AE2803EE7C005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C88771AF2803EE7D005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
@@ -1208,6 +1209,7 @@
 		C841A28029197724009F18E8 /* NSKeyedUnarchiverAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSKeyedUnarchiverAdditions.mm; sourceTree = "<group>"; };
 		C86BCD9828228A9600F45599 /* SparkleProxy.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SparkleProxy.mm; sourceTree = "<group>"; };
 		C87369642809984200573C90 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		C8748D8929891EA100D9E979 /* suffixes_dafsa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = suffixes_dafsa.h; path = "third-party/suffixes_dafsa.h"; sourceTree = SOURCE_ROOT; };
 		C88771A92803EE42005C7523 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		C88771AB2803EE53005C7523 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		C887BEC02807FCE900867D3C /* create.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = create.cc; sourceTree = "<group>"; };
@@ -2139,6 +2141,7 @@
 		C3D9061627B7E12F00EF2386 /* libpsl */ = {
 			isa = PBXGroup;
 			children = (
+				C8748D8929891EA100D9E979 /* suffixes_dafsa.h */,
 				C3D9061B27B7E31100EF2386 /* libpsl.h */,
 				C3D9061727B7E1DE00EF2386 /* lookup_string_in_fixed_set.c */,
 				C3D9061827B7E1DE00EF2386 /* psl.c */,
@@ -2426,6 +2429,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */,
+				C8748D8A29891EA100D9E979 /* suffixes_dafsa.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2989,15 +2993,18 @@
 			);
 			inputPaths = (
 				"third-party/libpsl/include/libpsl.h.in",
+				"third-party/libpsl/src/psl-make-dafsa",
+				"third-party/libpsl/list/public_suffix_list.dat",
 			);
 			outputFileListPaths = (
 			);
 			outputPaths = (
 				"third-party/libpsl/include/libpsl.h",
+				"third-party/suffixes_dafsa.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sed 's|@LIBPSL_[A-Z_]*@|0|' < third-party/libpsl/include/libpsl.h.in > third-party/libpsl/include/libpsl.h\n";
+			shellScript = "sed 's|@LIBPSL_[A-Z_]*@|0|' < third-party/libpsl/include/libpsl.h.in > third-party/libpsl/include/libpsl.h\n\n# Generate files to be included\nPYTHON=$( command -v python3 ) || PYTHON=$( command -v python3.7 ) || PYTHON=$( command -v python2 )\n\"${PYTHON}\" \"third-party/libpsl/src/psl-make-dafsa\" --output-format=cxx+ \"third-party/libpsl/list/public_suffix_list.dat\" \"third-party/suffixes_dafsa.h\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -4709,6 +4716,10 @@
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFORCE_BUILTIN_LIST=1",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -4720,6 +4731,10 @@
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFORCE_BUILTIN_LIST=1",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = "Release - Debug";
@@ -4731,6 +4746,10 @@
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFORCE_BUILTIN_LIST=1",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

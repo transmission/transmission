@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2022 Mnemosyne LLC.
+// This file Copyright © 2013-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -379,7 +379,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     while (file_size > 0U)
     {
-        size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
+        size_t const chunk_size = std::min({ file_size, uint64_t{ SSIZE_MAX }, uint64_t{ INT32_MAX } });
         auto const copied = copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
 
         TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
@@ -432,7 +432,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         {
             while (file_size > 0U)
             {
-                size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
+                size_t const chunk_size = std::min({ file_size, uint64_t{ SSIZE_MAX }, uint64_t{ INT32_MAX } });
                 auto const copied = sendfile64(out, in, nullptr, chunk_size);
                 TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
@@ -1228,7 +1228,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
 
     errno = 0;
 
-    if (auto const* const entry = readdir((DIR*)handle); entry != nullptr)
+    if (auto const* const entry = readdir(static_cast<DIR*>(handle)); entry != nullptr)
     {
         ret = entry->d_name;
     }
@@ -1244,7 +1244,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
-    bool const ret = closedir((DIR*)handle) != -1;
+    bool const ret = closedir(static_cast<DIR*>(handle)) != -1;
 
     if (!ret)
     {

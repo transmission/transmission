@@ -505,17 +505,17 @@
         <translation>&amp;Bete muga orokorrak</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+27"/>
         <source>Limit &amp;download speed:</source>
         <translation>&amp;Mugatu deskargaren abiadura:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <source>Limit &amp;upload speed:</source>
         <translation>M&amp;ugatu igoeraren abiadura:</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+40"/>
         <source>Torrent &amp;priority:</source>
         <translation>&amp;Torrent lehentasuna:</translation>
     </message>
@@ -1225,7 +1225,7 @@
         <translation>Ordenatu &amp;Ilararen arabera</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+469"/>
+        <location filename="../MainWindow.cc" line="+468"/>
         <source>Limit Download Speed</source>
         <translation>Mugatu Deskargatze-Abiadura</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Ireki Torrenta</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-984"/>
         <source>Speed Limits</source>
         <translation>Abiadura Mugak</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+518"/>
         <source>Network Error</source>
         <translation>Errorea sarean</translation>
     </message>
@@ -2224,7 +2224,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+494"/>
+        <location filename="../Session.cc" line="+501"/>
         <source>Error Renaming Path</source>
         <translation>Akatsa Bidea Berrizendatzerakoan</translation>
     </message>

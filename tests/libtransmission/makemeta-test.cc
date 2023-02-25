@@ -216,4 +216,24 @@ TEST_F(MakemetaTest, singleFile)
     testBuilder(builder);
 }
 
+TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+    auto builder = tr_metainfo_builder{ filename };
+    auto trackers = tr_announce_list{};
+    trackers.add("udp://tracker.openbittorrent.com:80"sv, trackers.nextTier());
+    builder.setAnnounceList(std::move(trackers));
+    auto baseMetainfo = testBuilder(builder);
+
+    builder.setPrivate(true);
+    auto privateMetainfo = testBuilder(builder);
+    EXPECT_NE(baseMetainfo.infoHash(), privateMetainfo.infoHash());
+
+    builder.setSource("FOO");
+    auto privateSourceMetainfo = testBuilder(builder);
+    EXPECT_NE(baseMetainfo.infoHash(), privateSourceMetainfo.infoHash());
+    EXPECT_NE(privateMetainfo.infoHash(), privateSourceMetainfo.infoHash());
+}
+
 } // namespace libtransmission::test

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -155,7 +155,7 @@ template<typename T>
 template<typename T>
 [[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
 {
-    return sv.find(key) != sv.npos;
+    return sv.find(key) != std::string_view::npos;
 }
 
 [[nodiscard]] constexpr bool tr_strvStartsWith(std::string_view sv, char key) // c++20
@@ -290,10 +290,10 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 }
 
 /** @brief Portability wrapper for `htonll()` that uses the system implementation if available */
-[[nodiscard]] uint64_t tr_htonll(uint64_t);
+[[nodiscard]] uint64_t tr_htonll(uint64_t hostlonglong);
 
 /** @brief Portability wrapper for `ntohll()` that uses the system implementation if available */
-[[nodiscard]] uint64_t tr_ntohll(uint64_t);
+[[nodiscard]] uint64_t tr_ntohll(uint64_t netlonglong);
 
 // ---
 

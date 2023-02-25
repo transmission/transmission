@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -17,7 +17,7 @@ class Session;
 class FreeSpaceLabel : public Gtk::Label
 {
 public:
-    FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir = {});
+    explicit FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir = {});
     FreeSpaceLabel(
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,

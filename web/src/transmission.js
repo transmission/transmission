@@ -1,4 +1,4 @@
-/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+/* @license This file Copyright © 2020-2023 Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
    It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
@@ -940,7 +940,7 @@ TODO: fix this when notifications get fixed
 
     let filter_text = null;
     let labels = null;
-    const m = /^labels:([\w,]*)(.*)$/.exec(this.filterText);
+    const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
     if (m) {
       filter_text = m[2].trim();
       labels = m[1].split(',');

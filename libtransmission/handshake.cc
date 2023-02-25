@@ -1,4 +1,4 @@
-// This file Copyright © 2017-2022 Mnemosyne LLC.
+// This file Copyright © 2017-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -212,13 +212,13 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     peer_io->write(outbuf, false);
     peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
     outbuf.add(VC);
-    outbuf.addUint32(crypto_provide());
-    outbuf.addUint16(0);
+    outbuf.add_uint32(crypto_provide());
+    outbuf.add_uint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
     if (auto msg = std::array<uint8_t, HandshakeSize>{}; build_handshake_message(peer_io, std::data(msg)))
     {
-        outbuf.addUint16(std::size(msg));
+        outbuf.add_uint16(std::size(msg));
         outbuf.add(msg);
         have_sent_bittorrent_handshake_ = true;
     }
@@ -606,7 +606,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     if (crypto_select != 0)
     {
         tr_logAddTraceHand(this, fmt::format("selecting crypto mode '{}'", crypto_select));
-        outbuf.addUint32(crypto_select);
+        outbuf.add_uint32(crypto_select);
     }
     else
     {
@@ -619,7 +619,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     /* ENCRYPT(VC, crypto_provide, len(PadD), PadD
      * PadD is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
-    outbuf.addUint16(0);
+    outbuf.add_uint16(0);
 
     /* maybe de-encrypt our connection */
     if (crypto_select == CryptoProvidePlaintext)
@@ -792,6 +792,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
             handshake->have_sent_bittorrent_handshake_ = true;
             handshake->set_state(State::AwaitingHandshake);
             io->write_bytes(std::data(msg), std::size(msg), false);
+            return;
         }
     }
 
@@ -807,12 +808,11 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         handshake->have_sent_bittorrent_handshake_ = true;
         handshake->set_state(State::AwaitingHandshake);
         io->write_bytes(std::data(msg), std::size(msg), false);
+        return;
     }
-    else
-    {
-        tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
-        handshake->done(false);
-    }
+
+    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
+    handshake->done(false);
 }
 
 bool tr_handshake::fire_done(bool is_connected)

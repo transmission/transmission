@@ -1,4 +1,4 @@
-// This file Copyright © Transmission authors and contributors.
+// This file Copyright © 2006-2023 Transmission authors and contributors.
 // It may be used under the 3-Clause BSD (SPDX: BSD-3-Clause),
 // GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
@@ -600,6 +600,9 @@ void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool enabled);
 
 /** @brief Like `tr_torrentStart()`, but resumes right away regardless of the queues. */
 void tr_torrentStartNow(tr_torrent* tor);
+
+/** @brief DEPRECATED. Equivalent to `tr_torrentStart()`. Use that instead. */
+void tr_torrentStartMagnet(tr_torrent* tor);
 
 /** @brief Return the queued torrent's position in the queue it's in. [0...n) */
 size_t tr_torrentGetQueuePosition(tr_torrent const* tor);
@@ -1296,7 +1299,7 @@ struct tr_tracker_view
     int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
     size_t tier; // which tier this tracker is in
-    tr_torrent_id_t id; // unique transmission-generated ID for use in libtransmission API
+    tr_tracker_id_t id; // unique transmission-generated ID for use in libtransmission API
 
     tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.
     tr_tracker_state scrapeState; // whether we're scraping, waiting to scrape, etc.

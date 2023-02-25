@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -370,7 +370,12 @@ Application::Application(int& argc, char** argv)
 
 void Application::loadTranslations()
 {
-    auto const qt_qm_dirs = QStringList() << QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
+    auto const qt_qm_dirs = QStringList() <<
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QLibraryInfo::path(QLibraryInfo::TranslationsPath) <<
+#else
+        QLibraryInfo::location(QLibraryInfo::TranslationsPath) <<
+#endif
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -23,12 +23,15 @@
 
 using namespace std::literals;
 
+namespace
+{
 struct optional_args
 {
     std::optional<bool> paused;
     std::optional<uint16_t> peer_limit;
     std::string download_dir;
 };
+} // namespace
 
 /** Opaque class used when instantiating torrents.
  * @ingroup tr_ctor */

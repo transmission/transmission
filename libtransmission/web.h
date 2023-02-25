@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2022 Mnemosyne LLC.
+// This file Copyright © 2021-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -97,7 +97,7 @@ public:
     // Notify tr_web that it's going to be destroyed soon.
     // New fetch() tasks will be rejected, but already-running tasks
     // are left alone so that they can finish.
-    void startShutdown(std::chrono::milliseconds);
+    void startShutdown(std::chrono::milliseconds /*deadline*/);
 
     // If you want to give running tasks a chance to finish, call closeSoon()
     // before destroying the tr_web object. Deleting the object will cancel

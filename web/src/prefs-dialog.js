@@ -1,4 +1,4 @@
-/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -73,6 +73,7 @@ export class PrefsDialog extends EventTarget {
         return e.checked;
 
       case 'number':
+      case 'select-one':
       case 'text':
       case 'url': {
         const string = e.value;
@@ -810,7 +811,10 @@ export class PrefsDialog extends EventTarget {
               console.trace(`unhandled input: ${element.type}`);
               break;
           }
-        } else if (element.tagName === 'TEXTAREA') {
+        } else if (
+          element.tagName === 'TEXTAREA' ||
+          element.tagName === 'SELECT'
+        ) {
           element.addEventListener('change', on_change);
         }
       }

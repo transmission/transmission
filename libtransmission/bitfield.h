@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -132,12 +132,20 @@ private:
 
     void ensureBitsAlloced(size_t n);
     [[nodiscard]] bool ensureNthBitAlloced(size_t nth);
-    void freeArray() noexcept;
 
-    void setTrueCount(size_t n) noexcept;
-    void rebuildTrueCount() noexcept;
+    void freeArray() noexcept
+    {
+        // move-assign to ensure the reserve memory is cleared
+        flags_ = std::vector<uint8_t>{};
+    }
+
     void incrementTrueCount(size_t inc) noexcept;
     void decrementTrueCount(size_t dec) noexcept;
+    void setTrueCount(size_t n) noexcept;
+    void rebuildTrueCount() noexcept
+    {
+        setTrueCount(countFlags());
+    }
 
     std::vector<uint8_t> flags_;
 

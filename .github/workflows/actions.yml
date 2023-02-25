@@ -53,18 +53,18 @@ jobs:
             git diff --exit-code "$MERGE_BASE" -- "$@"
             echo "$name-changed=$?" >> "$GITHUB_OUTPUT"
           }
-          get_changes cli      CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
-          get_changes any-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
-          get_changes our-code CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
-          get_changes daemon   CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
+          get_changes cli      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission cli
+          get_changes any-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
+          get_changes our-code CMakeLists.txt cmake Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
+          get_changes daemon   CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission daemon
           get_changes dist     dist
           get_changes docs     docs
-          get_changes gtk      CMakeLists.txt third-party libtransmission gtk
-          get_changes mac      CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
-          get_changes qt       CMakeLists.txt third-party libtransmission qt
-          get_changes tests    CMakeLists.txt third-party libtransmission utils tests
-          get_changes utils    CMakeLists.txt third-party libtransmission utils
-          get_changes web      CMakeLists.txt third-party libtransmission web
+          get_changes gtk      CMakeLists.txt cmake third-party libtransmission gtk
+          get_changes mac      CMakeLists.txt cmake Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
+          get_changes qt       CMakeLists.txt cmake third-party libtransmission qt
+          get_changes tests    CMakeLists.txt cmake third-party libtransmission utils tests
+          get_changes utils    CMakeLists.txt cmake third-party libtransmission utils
+          get_changes web      CMakeLists.txt cmake third-party libtransmission web
 
   code-style:
     runs-on: ubuntu-22.04
@@ -172,7 +172,7 @@ jobs:
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
-        run: cmake -E chdir obj ctest --build-config Debug --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
 
   macos-11:
     runs-on: macos-11
@@ -187,7 +187,7 @@ jobs:
       - name: Get Dependencies
         run: |
           brew update
-          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkg-config
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -225,7 +225,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -301,7 +301,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -394,7 +394,7 @@ jobs:
           cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure --timeout 600
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure --timeout 600
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install
       - name: Package
@@ -462,7 +462,7 @@ jobs:
       - name: Get Dependencies
         run: |
           brew update
-          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node
+          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkg-config
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3 libjpeg
@@ -501,7 +501,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -578,7 +578,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -654,7 +654,7 @@ jobs:
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
-        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
