@@ -88,6 +88,4 @@ add_custom_target("${TR_NAME}-web"
     SOURCES
         ${WEB_SOURCES})
 
-install(
-    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/public_html
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${TR_NAME})
+set(TR_WEB_ASSETS ${CMAKE_CURRENT_BINARY_DIR}/public_html PARENT_SCOPE)

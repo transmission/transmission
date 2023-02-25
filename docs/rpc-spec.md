@@ -976,7 +976,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 |:---|:---
 | `/upload` | :warning: undocumented `/upload` endpoint removed
 | `session-get` | :warning: **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
-| `free-space` | new return arg `total-capacity`
+| `free-space` | new return arg `total_size`
 | `session-get` | new arg `default-trackers`
 | `session-get` | new arg `rpc-version-semver`
 | `session-get` | new arg `script-torrent-added-enabled`
