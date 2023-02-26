@@ -2435,6 +2435,25 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
     return tr_strvToBuf(tr_torrentFindFile(tor, file_num), buf, buflen);
 }
 
+void tr_torrent::setDownloadDir(std::string_view path)
+{
+    download_dir = path;
+    markEdited();
+    setDirty();
+    refreshCurrentDir();
+
+    if (session->shouldFullyVerifyAddedTorrents() || !torrent_init_helpers::isNewTorrentASeed(this))
+    {
+        tr_torrentVerify(this);
+    }
+    else
+    {
+        completion.setHasAll();
+        doneDate = addedDate;
+        recheckCompleteness();
+    }
+}
+
 // decide whether we should be looking for files in downloadDir or incompleteDir
 void tr_torrent::refreshCurrentDir()
 {
