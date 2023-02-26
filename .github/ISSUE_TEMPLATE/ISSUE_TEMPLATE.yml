@@ -6,9 +6,9 @@ body:
     attributes:
       label: What is the issue?
       description: |
-       For UI, attach a screenshot.
+       For UI, attach a screenshot that <b>does not incude</b> unlicensed content.
        For crashes, attach a crash log.
-       For specific issues, attach a torrent or provide a magnet, with public domain content only.
+       For specific issues, attach a torrent or provide a magnet, with public domain content <b>only</b>.
   - type: dropdown
     id: client
     attributes:
