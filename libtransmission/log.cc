@@ -86,7 +86,7 @@ tr_sys_file_t tr_logGetFile()
 }
 
 void logAddImpl(
-    [[maybe_unused]] char const* file,
+    [[maybe_unused]] std::string_view file,
     [[maybe_unused]] long line,
     [[maybe_unused]] tr_log_level level,
     std::string_view msg,
@@ -245,11 +245,17 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
 {
     TR_ASSERT(!std::empty(msg));
 
+    // strip source path to only include the filename
+    auto filename = tr_sys_path_basename(file);
+    if (std::empty(filename))
+    {
+        filename = "?"sv;
+    }
+
     auto name_fallback = std::string{};
     if (std::empty(name))
     {
-        auto const base = tr_sys_path_basename(file);
-        name_fallback = fmt::format(FMT_STRING("{}:{}"), !std::empty(base) ? base : "?", line);
+        name_fallback = fmt::format(FMT_STRING("{}:{}"), filename, line);
         name = name_fallback;
     }
 
@@ -271,9 +277,9 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     if (level == TR_LOG_CRITICAL || level == TR_LOG_ERROR || level == TR_LOG_WARN)
     {
         static auto constexpr MaxRepeat = size_t{ 30 };
-        static auto counts = new std::map<std::pair<char const*, int>, size_t>{};
+        static auto counts = new std::map<std::pair<std::string_view, int>, size_t>{};
 
-        auto& count = (*counts)[std::make_pair(file, line)];
+        auto& count = (*counts)[std::make_pair(filename, line)];
         ++count;
         last_one = count == MaxRepeat;
         if (count > MaxRepeat)
@@ -284,10 +290,15 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     }
 
     // log the messages
-    logAddImpl(file, line, level, msg, name);
+    logAddImpl(filename, line, level, msg, name);
     if (last_one)
     {
-        logAddImpl(file, line, level, _("Too many messages like this! I won't log this message anymore this session."), name);
+        logAddImpl(
+            filename,
+            line,
+            level,
+            _("Too many messages like this! I won't log this message anymore this session."),
+            name);
     }
 
     errno = err;
