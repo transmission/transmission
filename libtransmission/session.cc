@@ -795,6 +795,12 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     // It's a harmless call, so just call it instead of checking for settings changes
     update_bandwidth(this, TR_UP);
     update_bandwidth(this, TR_DOWN);
+
+    // web_ should initialize with parameters from settings file (for example, proxy-url)
+    if (!web_ || force)
+    {
+        web_ = tr_web::create(web_mediator_);
+    }
 }
 
 void tr_sessionSet(tr_session* session, tr_variant* settings)
