@@ -582,7 +582,7 @@ public:
         this->error_string = errmsg;
     }
 
-    void setDownloadDir(std::string_view path);
+    void setDownloadDir(std::string_view path, bool isNewTorrent = false);
 
     void refreshCurrentDir();
 
