@@ -38,11 +38,10 @@ export class ActionManager extends EventTarget {
         text: 'Resume',
       },
       'resume-selected-torrents-now': { enabled: false, text: 'Resume now' },
-      'select-all':
-      {
+      'select-all': {
         enabled: false,
         shortcut: 'Control+A',
-        text: 'Select all'
+        text: 'Select all',
       },
       'show-about-dialog': { enabled: true, text: 'About' },
       'show-inspector': {
