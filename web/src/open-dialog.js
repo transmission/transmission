@@ -8,7 +8,7 @@ import { Formatter } from './formatter.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
 export class OpenDialog extends EventTarget {
-  constructor(controller, remote, url = '', files=[]) {
+  constructor(controller, remote, url = '', files = []) {
     super();
 
     this.controller = controller;
