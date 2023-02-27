@@ -1832,8 +1832,9 @@ void rechokeDownloads(tr_swarm* s)
         }
     }
 
-    /* don't let the previous section's number tweaking go too far... */
-    max_peers = std::clamp(max_peers, MinInterestingPeers, s->tor->peerLimit());
+    // don't let the previous section's number tweaking go too far...
+    max_peers = std::max(max_peers, MinInterestingPeers);
+    max_peers = std::min(max_peers, s->tor->peerLimit());
 
     s->max_peers = max_peers;
 
