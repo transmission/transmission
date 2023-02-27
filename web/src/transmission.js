@@ -45,6 +45,27 @@ export class Transmission extends EventTarget {
       this.action_manager.update(event_)
     );
 
+    // add drag and drop to body and 'open-torrent'
+    document.body.addEventListener('dragover', (event_) => {
+      event_.preventDefault();
+      // get upload-div div and set it as dropzone (to activate on dragover)
+      const upload_div = document.querySelector('.upload-div');
+      if (upload_div) {
+        upload_div.classList.add('dropzone');
+      }
+    });
+
+    const droparea = document.querySelector('.upload-div');
+
+    droparea.addEventListener('drop', (event_) => {
+      event_.preventDefault();
+      droparea.classList.remove('dropzone');
+      const { files } = event_.dataTransfer;
+      if (files.length > 0) {
+        this.openDialog = new OpenDialog(this, this.remote, '', files);
+      }
+    });
+
     // Initialize the implementation fields
     this.filterText = '';
     this._torrents = {};

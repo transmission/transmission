@@ -1658,18 +1658,28 @@ dialog {
   font-style: italic;
 }
 
-#torrent-upload-frame {
-  border: 0;
-  display: block; /* Don't change this : safari forms won't target hidden frames (they open a new window) */
-  height: 0;
-  left: -1000px;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  top: -1000px;
-  width: 0;
-}
-
 .ui-menu {
   width: 200px;
+}
+
+.upload-div {
+  display: none;
+}
+
+.dropzone {
+  background: var(--color-bg-primary);
+  border: 2px dashed var(--color-border);
+  border-radius: 5px;
+  color: var(--color-fg-primary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2em;
+  font-weight: bold;
+  height: 100%;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 100%;
 }
