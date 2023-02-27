@@ -19,7 +19,6 @@ body:
         - GTK+ app on Linux, BSD, etc.
         - Qt app on Linux, BSD, etc.
         - Qt app on Windows
-        - Qt app on macOS
         - Web client
         - transmission-daemon
         - transmission-remote
