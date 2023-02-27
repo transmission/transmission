@@ -6,9 +6,10 @@ body:
     attributes:
       label: What is the issue?
       description: |
-       For UI, attach a screenshot that **does not incude** unlicensed content.
+       **Users who include information about pirated material will be banned**
+       For UI, attach a screenshot.
        For crashes, attach a crash log.
-       For specific issues, attach a torrent or provide a magnet, with public domain content **only**.
+       For specific issues, attach a torrent or provide a magnet, with public domain content only.
   - type: dropdown
     id: client
     attributes:
@@ -18,6 +19,7 @@ body:
         - GTK+ app on Linux, BSD, etc.
         - Qt app on Linux, BSD, etc.
         - Qt app on Windows
+        - Qt app on macOS
         - Web client
         - transmission-daemon
         - transmission-remote
