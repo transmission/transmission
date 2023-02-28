@@ -121,6 +121,27 @@ TEST_P(JSONTest, testUtf8)
     tr_variantClear(&top);
 }
 
+TEST_P(JSONTest, testUtf16Surrogates)
+{
+    constexpr auto thinking_face_emoji_utf8 = "\xf0\x9f\xa4\x94"sv;
+    tr_variant top;
+    tr_variantInitDict(&top, 1);
+    tr_quark const key = tr_quark_new("key"sv);
+    tr_variantDictAddStr(&top, key, thinking_face_emoji_utf8);
+    auto json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
+    EXPECT_EQ(
+        R"({"key":"\ud83e\udd14"})"
+        "\n"sv,
+        json);
+
+    tr_variant parsed;
+    EXPECT_TRUE(tr_variantFromBuf(&parsed, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
+    EXPECT_TRUE(tr_variantIsDict(&parsed));
+    std::string_view value;
+    EXPECT_TRUE(tr_variantDictFindStrView(&parsed, key, &value));
+    EXPECT_EQ(thinking_face_emoji_utf8, value);
+}
+
 TEST_P(JSONTest, test1)
 {
     auto const in = std::string{
