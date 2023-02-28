@@ -133,6 +133,7 @@ TEST_P(JSONTest, testUtf16Surrogates)
         R"({"key":"\ud83e\udd14"})"
         "\n"sv,
         json);
+    tr_variantClear(&top);
 
     tr_variant parsed;
     EXPECT_TRUE(tr_variantFromBuf(&parsed, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
@@ -140,6 +141,7 @@ TEST_P(JSONTest, testUtf16Surrogates)
     std::string_view value;
     EXPECT_TRUE(tr_variantDictFindStrView(&parsed, key, &value));
     EXPECT_EQ(thinking_face_emoji_utf8, value);
+    tr_variantClear(&parsed);
 }
 
 TEST_P(JSONTest, test1)
