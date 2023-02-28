@@ -373,7 +373,7 @@ void tr_peerIo::can_read_wrapper()
 
         if (overhead > 0)
         {
-            bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
+            bandwidth().notifyBandwidthConsumed(TR_DOWN, overhead, false, now);
         }
 
         switch (read_state)
