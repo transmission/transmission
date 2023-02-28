@@ -628,6 +628,12 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             tr_variantDictAddBool(&settings_, TR_KEY_utp_enabled, false);
             break;
 
+        case TR_OPT_UNK:
+            fprintf(stderr, "Unexpected argument: %s \n", optstr);
+            tr_getopt_usage(MyName, Usage, std::data(Options));
+            *exit_code = 1;
+            return false;
+
         default:
             tr_getopt_usage(MyName, Usage, std::data(Options));
             *exit_code = 0;
