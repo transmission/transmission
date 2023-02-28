@@ -72,9 +72,9 @@ static ToolbarItemIdentifier const ToolbarItemIdentifierFilter = @"Toolbar Toggl
 static ToolbarItemIdentifier const ToolbarItemIdentifierQuickLook = @"Toolbar QuickLook";
 static ToolbarItemIdentifier const ToolbarItemIdentifierShare = @"Toolbar Share";
 
-typedef NS_ENUM(unsigned int, toolbarGroupTag) { //
-    TOOLBAR_PAUSE_TAG = 0,
-    TOOLBAR_RESUME_TAG = 1
+typedef NS_ENUM(NSUInteger, ToolbarGroupTag) { //
+    ToolbarGroupTagPause = 0,
+    ToolbarGroupTagResume = 1
 };
 
 typedef NSString* SortType NS_TYPED_EXTENSIBLE_ENUM;
@@ -89,21 +89,21 @@ static SortType const SortTypeActivity = @"Activity";
 static SortType const SortTypeSize = @"Size";
 static SortType const SortTypeETA = @"ETA";
 
-typedef NS_ENUM(unsigned int, sortTag) {
-    SORT_ORDER_TAG = 0,
-    SORT_DATE_TAG = 1,
-    SORT_NAME_TAG = 2,
-    SORT_PROGRESS_TAG = 3,
-    SORT_STATE_TAG = 4,
-    SORT_TRACKER_TAG = 5,
-    SORT_ACTIVITY_TAG = 6,
-    SORT_SIZE_TAG = 7,
-    SORT_ETA_TAG = 8
+typedef NS_ENUM(NSUInteger, SortTag) {
+    SortTagOrder = 0,
+    SortTagDate = 1,
+    SortTagName = 2,
+    SortTagProgress = 3,
+    SortTagState = 4,
+    SortTagTracker = 5,
+    SortTagActivity = 6,
+    SortTagSize = 7,
+    SortTagETA = 8
 };
 
-typedef NS_ENUM(unsigned int, sortOrderTag) { //
-    SORT_ASC_TAG = 0,
-    SORT_DESC_TAG = 1
+typedef NS_ENUM(NSUInteger, SortOrderTag) { //
+    SortOrderTagAscending = 0,
+    SortOrderTagDescending = 1
 };
 
 static NSString* const kTorrentTableViewDataType = @"TorrentTableViewDataType";
@@ -655,7 +655,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     for (NSMenuItem* item in self.fSortMenu.itemArray)
     {
         //assume all sort items are together and the Queue Order item is first
-        if (item.action == @selector(setSort:) && item.tag != SORT_ORDER_TAG)
+        if (item.action == @selector(setSort:) && item.tag != SortTagOrder)
         {
             [sortMenuItems addObject:item];
             [self.fSortMenu removeItemAtIndex:sortMenuIndex];
@@ -1152,7 +1152,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self openFiles:@[ path ] addType:ADD_URL forcePath:nil];
+        [self openFiles:@[ path ] addType:AddTypeURL forcePath:nil];
 
         //delete the torrent file after opening
         [NSFileManager.defaultManager removeItemAtPath:path error:NULL];
@@ -1186,18 +1186,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)application:(NSApplication*)app openFiles:(NSArray<NSString*>*)filenames
 {
-    [self openFiles:filenames addType:ADD_MANUAL forcePath:nil];
+    [self openFiles:filenames addType:AddTypeManual forcePath:nil];
 }
 
-- (void)openFiles:(NSArray<NSString*>*)filenames addType:(addType)type forcePath:(NSString*)path
+- (void)openFiles:(NSArray<NSString*>*)filenames addType:(AddType)type forcePath:(NSString*)path
 {
     BOOL deleteTorrentFile, canToggleDelete = NO;
     switch (type)
     {
-    case ADD_CREATED:
+    case AddTypeCreated:
         deleteTorrentFile = NO;
         break;
-    case ADD_URL:
+    case AddTypeURL:
         deleteTorrentFile = YES;
         break;
     default:
@@ -1210,7 +1210,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         auto metainfo = tr_torrent_metainfo{};
         if (!metainfo.parseTorrentFile(torrentPath.UTF8String)) // invalid torrent
         {
-            if (type != ADD_AUTO)
+            if (type != AddTypeAuto)
             {
                 [self invalidOpenAlert:torrentPath.lastPathComponent];
             }
@@ -1244,7 +1244,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             location = [self.fDefaults stringForKey:@"DownloadFolder"].stringByExpandingTildeInPath;
         }
-        else if (type != ADD_URL)
+        else if (type != AddTypeURL)
         {
             location = torrentPath.stringByDeletingLastPathComponent;
         }
@@ -1255,9 +1255,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         //determine to show the options window
         auto const is_multifile = metainfo.fileCount() > 1;
-        BOOL const showWindow = type == ADD_SHOW_OPTIONS ||
+        BOOL const showWindow = type == AddTypeShowOptions ||
             ([self.fDefaults boolForKey:@"DownloadAsk"] && (is_multifile || ![self.fDefaults boolForKey:@"DownloadAskMulti"]) &&
-             (type != ADD_AUTO || ![self.fDefaults boolForKey:@"DownloadAskManual"]));
+             (type != AddTypeAuto || ![self.fDefaults boolForKey:@"DownloadAskManual"]));
 
         Torrent* torrent;
         if (!(torrent = [[Torrent alloc] initWithPath:torrentPath location:location
@@ -1275,7 +1275,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         //verify the data right away if it was newly created
-        if (type == ADD_CREATED)
+        if (type == AddTypeCreated)
         {
             [torrent resetCache];
         }
@@ -1446,18 +1446,18 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (void)openCreatedFile:(NSNotification*)notification
 {
     NSDictionary* dict = notification.userInfo;
-    [self openFiles:@[ dict[@"File"] ] addType:ADD_CREATED forcePath:dict[@"Path"]];
+    [self openFiles:@[ dict[@"File"] ] addType:AddTypeCreated forcePath:dict[@"Path"]];
 }
 
 - (void)openFilesWithDict:(NSDictionary*)dictionary
 {
-    [self openFiles:dictionary[@"Filenames"] addType:static_cast<addType>([dictionary[@"AddType"] intValue]) forcePath:nil];
+    [self openFiles:dictionary[@"Filenames"] addType:static_cast<AddType>([dictionary[@"AddType"] intValue]) forcePath:nil];
 }
 
 //called on by applescript
 - (void)open:(NSArray*)files
 {
-    NSDictionary* dict = @{ @"Filenames" : files, @"AddType" : @(ADD_MANUAL) };
+    NSDictionary* dict = @{ @"Filenames" : files, @"AddType" : @(AddTypeManual) };
     [self performSelectorOnMainThread:@selector(openFilesWithDict:) withObject:dict waitUntilDone:NO];
 }
 
@@ -1482,7 +1482,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
             NSDictionary* dictionary = @{
                 @"Filenames" : filenames,
-                @"AddType" : sender == self.fOpenIgnoreDownloadFolder ? @(ADD_SHOW_OPTIONS) : @(ADD_MANUAL)
+                @"AddType" : sender == self.fOpenIgnoreDownloadFolder ? @(AddTypeShowOptions) : @(AddTypeManual)
             };
             [self performSelectorOnMainThread:@selector(openFilesWithDict:) withObject:dictionary waitUntilDone:NO];
         }
@@ -2617,32 +2617,32 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     NSMenuItem* senderMenuItem = sender;
     switch (senderMenuItem.tag)
     {
-    case SORT_ORDER_TAG:
+    case SortTagOrder:
         sortType = SortTypeOrder;
         [self.fDefaults setBool:NO forKey:@"SortReverse"];
         break;
-    case SORT_DATE_TAG:
+    case SortTagDate:
         sortType = SortTypeDate;
         break;
-    case SORT_NAME_TAG:
+    case SortTagName:
         sortType = SortTypeName;
         break;
-    case SORT_PROGRESS_TAG:
+    case SortTagProgress:
         sortType = SortTypeProgress;
         break;
-    case SORT_STATE_TAG:
+    case SortTagState:
         sortType = SortTypeState;
         break;
-    case SORT_TRACKER_TAG:
+    case SortTagTracker:
         sortType = SortTypeTracker;
         break;
-    case SORT_ACTIVITY_TAG:
+    case SortTagActivity:
         sortType = SortTypeActivity;
         break;
-    case SORT_SIZE_TAG:
+    case SortTagSize:
         sortType = SortTypeSize;
         break;
-    case SORT_ETA_TAG:
+    case SortTagETA:
         sortType = SortTypeETA;
         break;
     default:
@@ -2665,7 +2665,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)setSortReverse:(id)sender
 {
-    BOOL const setReverse = ((NSMenuItem*)sender).tag == SORT_DESC_TAG;
+    BOOL const setReverse = ((NSMenuItem*)sender).tag == SortOrderTagDescending;
     if (setReverse != [self.fDefaults boolForKey:@"SortReverse"])
     {
         [self.fDefaults setBool:setReverse forKey:@"SortReverse"];
@@ -3541,7 +3541,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             continue;
         }
 
-        [self openFiles:@[ fullFile ] addType:ADD_AUTO forcePath:nil];
+        [self openFiles:@[ fullFile ] addType:AddTypeAuto forcePath:nil];
 
         NSString* notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
 
@@ -4280,22 +4280,22 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         segmentedControl.trackingMode = NSSegmentSwitchTrackingMomentary;
         segmentedControl.segmentCount = 2;
 
-        [segmentedControl setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
+        [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
         [segmentedControl setImage:[NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
-                        forSegment:TOOLBAR_PAUSE_TAG];
+                        forSegment:ToolbarGroupTagPause];
         [segmentedControl setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip")
-                          forSegment:TOOLBAR_PAUSE_TAG];
+                          forSegment:ToolbarGroupTagPause];
 
-        [segmentedControl setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
+        [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
         [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
-                        forSegment:TOOLBAR_RESUME_TAG];
+                        forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
-                          forSegment:TOOLBAR_RESUME_TAG];
+                          forSegment:ToolbarGroupTagResume];
         if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
         {
             // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
-            [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
-            [segmentedControl setWidth:64 forSegment:TOOLBAR_RESUME_TAG];
+            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagPause];
+            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagResume];
         }
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
@@ -4336,22 +4336,22 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         segmentedControl.trackingMode = NSSegmentSwitchTrackingMomentary;
         segmentedControl.segmentCount = 2;
 
-        [segmentedControl setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
+        [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
         [segmentedControl setImage:[NSImage systemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"]
-                        forSegment:TOOLBAR_PAUSE_TAG];
+                        forSegment:ToolbarGroupTagPause];
         [segmentedControl setToolTip:NSLocalizedString(@"Pause selected transfers", "Selected toolbar item -> tooltip")
-                          forSegment:TOOLBAR_PAUSE_TAG];
+                          forSegment:ToolbarGroupTagPause];
 
-        [segmentedControl setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
+        [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
         [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"]
-                        forSegment:TOOLBAR_RESUME_TAG];
+                        forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
-                          forSegment:TOOLBAR_RESUME_TAG];
+                          forSegment:ToolbarGroupTagResume];
         if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
         {
             // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
-            [segmentedControl setWidth:64 forSegment:TOOLBAR_PAUSE_TAG];
-            [segmentedControl setWidth:64 forSegment:TOOLBAR_RESUME_TAG];
+            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagPause];
+            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagResume];
         }
 
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
@@ -4438,10 +4438,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                                                                              ((NSControl*)sender).tag;
     switch (tagValue)
     {
-    case TOOLBAR_PAUSE_TAG:
+    case ToolbarGroupTagPause:
         [self stopAllTorrents:sender];
         break;
-    case TOOLBAR_RESUME_TAG:
+    case ToolbarGroupTagResume:
         [self resumeAllTorrents:sender];
         break;
     }
@@ -4453,10 +4453,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                                                                              ((NSControl*)sender).tag;
     switch (tagValue)
     {
-    case TOOLBAR_PAUSE_TAG:
+    case ToolbarGroupTagPause:
         [self stopSelectedTorrents:sender];
         break;
-    case TOOLBAR_RESUME_TAG:
+    case ToolbarGroupTagResume:
         [self resumeSelectedTorrents:sender];
         break;
     }
@@ -4613,31 +4613,31 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         SortType sortType;
         switch (menuItem.tag)
         {
-        case SORT_ORDER_TAG:
+        case SortTagOrder:
             sortType = SortTypeOrder;
             break;
-        case SORT_DATE_TAG:
+        case SortTagDate:
             sortType = SortTypeDate;
             break;
-        case SORT_NAME_TAG:
+        case SortTagName:
             sortType = SortTypeName;
             break;
-        case SORT_PROGRESS_TAG:
+        case SortTagProgress:
             sortType = SortTypeProgress;
             break;
-        case SORT_STATE_TAG:
+        case SortTagState:
             sortType = SortTypeState;
             break;
-        case SORT_TRACKER_TAG:
+        case SortTagTracker:
             sortType = SortTypeTracker;
             break;
-        case SORT_ACTIVITY_TAG:
+        case SortTagActivity:
             sortType = SortTypeActivity;
             break;
-        case SORT_SIZE_TAG:
+        case SortTagSize:
             sortType = SortTypeSize;
             break;
-        case SORT_ETA_TAG:
+        case SortTagETA:
             sortType = SortTypeETA;
             break;
         default:
@@ -4988,7 +4988,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     //enable reverse sort item
     if (action == @selector(setSortReverse:))
     {
-        BOOL const isReverse = menuItem.tag == SORT_DESC_TAG;
+        BOOL const isReverse = menuItem.tag == SortOrderTagDescending;
         menuItem.state = (isReverse == [self.fDefaults boolForKey:@"SortReverse"]) ? NSControlStateValueOn : NSControlStateValueOff;
         return ![[self.fDefaults stringForKey:@"Sort"] isEqualToString:SortTypeOrder];
     }
