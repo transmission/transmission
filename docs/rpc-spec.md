@@ -158,7 +158,7 @@ Request arguments:
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
 | `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
-| `trackerList`         | string   | | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
+| `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
 | `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
 | `uploadLimit`         | number   | maximum upload speed (KBps)
