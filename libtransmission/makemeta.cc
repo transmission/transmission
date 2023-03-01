@@ -291,8 +291,12 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     auto top = tr_variant{};
     tr_variantInitDict(&top, 8);
 
-    // add the announce-list trackers
+    // add the announce URLs
     if (!std::empty(announceList()))
+    {
+        tr_variantDictAddStrView(&top, TR_KEY_announce, announceList().at(0).announce.sv());
+    }
+    if (std::size(announceList()) > 1U)
     {
         auto* const announce_list = tr_variantDictAddList(&top, TR_KEY_announce_list, 0);
         tr_variant* tier_list = nullptr;
