@@ -527,7 +527,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
 | `cache-size-mb` | number | maximum size of the disk cache (MB)
 | `config-dir` | string | location of transmission's configuration directory
-| `default-trackers` | list of default trackers to use on public torrents
+| `default-trackers` | list of default trackers to use on public torrents | joined by '\n'
 | `dht-enabled` | boolean | true means allow DHT in public torrents
 | `download-dir` | string | default path to download torrents
 | `download-dir-free-space` | number |  **DEPRECATED** Use the `free-space` method instead.
