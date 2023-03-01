@@ -231,7 +231,7 @@ TEST_F(MakemetaTest, announceSingleTracker)
     // generate the torrent and parse it as a variant
     EXPECT_EQ(nullptr, builder.makeChecksums().get());
     auto top = tr_variant{};
-    auto benc = builder.benc();
+    auto const benc = builder.benc();
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
 
     // confirm there's an "announce" entry
@@ -262,7 +262,7 @@ TEST_F(MakemetaTest, announceMultiTracker)
     // generate the torrent and parse it as a variant
     EXPECT_EQ(nullptr, builder.makeChecksums().get());
     auto top = tr_variant{};
-    auto benc = builder.benc();
+    auto const benc = builder.benc();
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
 
     // confirm there's an "announce" entry
