@@ -516,14 +516,6 @@ public:
         tr_piece_index_t piece,
         uint32_t offset)
     {
-        fmt::print(
-            "{:s}:{:d} total size {:d} piece size {:d} piece {:d} piece_offset {:d}\n",
-            __FILE__,
-            __LINE__,
-            block_info.totalSize(),
-            block_info.pieceSize(),
-            piece,
-            offset);
         auto const loc = block_info.pieceLoc(piece, offset);
         auto const block_size = block_info.blockSize(loc.block);
         auto req_len = uint32_t{};
@@ -563,15 +555,7 @@ public:
                 auto const end = block_info.byteLoc(loc.byte + block_info.blockSize(block));
                 while (loc < end)
                 {
-                    fmt::print(
-                        "{:s}:{:d} requesting block {:d} @ piece {:d} piece offset {:d}\n",
-                        __FILE__,
-                        __LINE__,
-                        block,
-                        loc.piece,
-                        loc.piece_offset);
                     auto const n_this_req = calculate_request_length(block_info, loc.piece, loc.piece_offset);
-                    fmt::print("{:s}:{:d} ... and len {:d}\n", __FILE__, __LINE__, n_this_req);
                     protocolSendRequest({ loc.piece, loc.piece_offset, n_this_req });
                     loc = block_info.byteLoc(loc.byte + n_this_req);
                 }
@@ -1480,7 +1464,6 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
         auto req = peer_request{};
         io->read_uint32(&req.index);
         io->read_uint32(&req.offset);
-        fmt::print("{:s}:{:d} got block info for piece {:d} piece_offset {:d}\n", __FILE__, __LINE__, req.index, req.offset);
         req.length = tr_peerMsgsImpl::calculate_request_length(block_info, req.index, req.offset);
         logtrace(msgs, fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
 
