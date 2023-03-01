@@ -1815,14 +1815,14 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
         <translation>Izberi skripto za zaključek sejanja torrenta</translation>
     </message>
     <message numerus="yes">
-        <location line="+19"/>
-        <source> minute(s) ago</source>
+        <location filename="PrefsDialog.cc" line="582"/>
+        <source>%1 minute(s) ago</source>
         <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform>minuto nazaj</numerusform>
-            <numerusform>minutama nazaj</numerusform>
-            <numerusform>minutami nazaj</numerusform>
-            <numerusform>minutami nazaj</numerusform>
+            <numerusform>pred %1 minuto</numerusform>
+            <numerusform>pred %1 minutama</numerusform>
+            <numerusform>pred %1 minutami</numerusform>
+            <numerusform>pred %1 minutami</numerusform>
         </translation>
     </message>
     <message>
