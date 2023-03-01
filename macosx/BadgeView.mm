@@ -43,26 +43,29 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
         _fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
         _fAttributes[NSShadowAttributeName] = stringShadow;
 
-        // make sure text fits on the badge
         // DownloadBadge and UploadBadge should have the same size
         NSSize badgeSize = [NSImage imageNamed:@"DownloadBadge"].size;
-        // text is centered, so we calculate size with arbitrary symetric arrows
-        NSString* maxString = [NSString stringWithFormat:@" ▼ %@ ▼ ", [NSString stringForSpeedAbbrev:8888000]]; // "888.8 M" localized
+        // DownArrowTemplate and UpArrowTemplate should have the same size
+        CGFloat arrowWidthHeightRatio = kWhiteDownArrow.size.width / kWhiteDownArrow.size.height;
+
+        // Make sure text fits on the badge.
+        // In macOS Ventura, this will end up calculating a boldSystemFontOfSize of 21.
+        NSString* maxString = [NSString stringForSpeedAbbrev:888.8]; // "888.8 K" localized
         CGFloat fontSize = 26.0;
         NSSize stringSize;
+        CGFloat arrowHeight;
         do
         {
+            fontSize -= 1.0;
             _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:fontSize];
             stringSize = [maxString sizeWithAttributes:_fAttributes];
-            fontSize -= 1.0;
-        } while (badgeSize.width < stringSize.width);
+            // arrow height equal to font capital letter height + shadow
+            arrowHeight = [_fAttributes[NSFontAttributeName] capHeight] + 4;
+        } while (badgeSize.width < stringSize.width + 2 * arrowHeight * arrowWidthHeightRatio +
+                     arrowHeight); // text is centered + surrounded by the size of two arrows + arrow spacing (" ▼ 888.8 K ▽ ")
 
-        // DownArrowTemplate and UpArrowTemplate should have the same size
-        NSSize arrowImageSize = kWhiteDownArrow.size;
-        NSSize spaceCharacterSize = [@" " sizeWithAttributes:_fAttributes];
-        CGFloat arrowHeight = spaceCharacterSize.height - 1.5 * spaceCharacterSize.width;
-        kArrowInset = { spaceCharacterSize.width, spaceCharacterSize.width * 0.75 };
-        kArrowSize = { arrowHeight / arrowImageSize.height * arrowImageSize.width, arrowHeight };
+        kArrowInset = { badgeSize.height * 0.15, badgeSize.height * 0.1 };
+        kArrowSize = { arrowHeight * arrowWidthHeightRatio, arrowHeight };
     }
     return self;
 }
@@ -121,7 +124,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
 
     // arrow
     NSImage* arrow = arrowDirection == ArrowDirectionUp ? kWhiteUpArrow : kWhiteDownArrow;
-    NSRect arrowRect = { { kArrowInset.width, stringRect.origin.y + kArrowInset.height - (arrowDirection == ArrowDirectionUp ? 0.0 : 1.0) },
+    NSRect arrowRect = { { kArrowInset.width, stringRect.origin.y + kArrowInset.height + (arrowDirection == ArrowDirectionUp ? 0.5 : -0.5) },
                          kArrowSize };
     [arrow drawInRect:arrowRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 }
