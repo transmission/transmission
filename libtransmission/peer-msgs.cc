@@ -504,60 +504,30 @@ public:
         return tr_torrentReqIsValid(torrent, req.index, req.offset, req.length);
     }
 
-    /**
-     * Decide how much of a block to request.
-     *
-     * Most of the time we ask for the full block, but there is a catch:
-     * requests cannot cross over a piece boundary, so sometimes we have
-     * to split the block into two requests.
-     */
-    [[nodiscard]] static uint32_t calculate_request_length(
-        tr_block_info const& block_info,
-        tr_piece_index_t piece,
-        uint32_t offset)
-    {
-        auto const loc = block_info.pieceLoc(piece, offset);
-        auto const block_size = block_info.blockSize(loc.block);
-        auto req_len = uint32_t{};
-
-        // the only reason for block_offset wouldn't be zero is if it's
-        // part two of a block request that started in the previous piece
-        if (loc.block_offset != 0U)
-        {
-            TR_ASSERT(loc.piece_offset < loc.block_offset);
-            req_len = block_size - loc.block_offset;
-        }
-        else
-        {
-            // if the block's final byte is in a different piece,
-            // then the request needs to be broken into >1 part
-            auto const piece_size = block_info.pieceSize(piece);
-            req_len = std::min(block_size, piece_size - loc.piece_offset);
-        }
-
-        TR_ASSERT(req_len <= block_size);
-        return req_len;
-    }
-
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         TR_ASSERT(torrent->clientCanDownload());
         TR_ASSERT(is_client_interested());
         TR_ASSERT(!is_client_choked());
 
-        auto const& block_info = torrent->blockInfo();
-
         for (auto const *span = block_spans, *span_end = span + n_spans; span != span_end; ++span)
         {
             for (auto [block, block_end] = *span; block < block_end; ++block)
             {
-                auto loc = block_info.blockLoc(block);
-                auto const end = block_info.byteLoc(loc.byte + block_info.blockSize(block));
-                while (loc < end)
+                // Note that requests can't cross over a piece boundary.
+                // So if a piece isn't evenly divisible by the block size,
+                // we need to split our block request info per-piece chunks.
+                auto const byte_begin = torrent->blockLoc(block).byte;
+                auto const block_size = torrent->blockSize(block);
+                auto const byte_end = byte_begin + block_size;
+                for (auto offset = byte_begin; offset < byte_end;)
                 {
-                    auto const n_this_req = calculate_request_length(block_info, loc.piece, loc.piece_offset);
-                    protocolSendRequest({ loc.piece, loc.piece_offset, n_this_req });
-                    loc = block_info.byteLoc(loc.byte + n_this_req);
+                    auto const loc = torrent->byteLoc(offset);
+                    auto const left_in_block = block_size - loc.block_offset;
+                    auto const left_in_piece = torrent->pieceSize(loc.piece) - loc.piece_offset;
+                    auto const req_len = std::min(left_in_block, left_in_piece);
+                    protocolSendRequest({ loc.piece, loc.piece_offset, req_len });
+                    offset += req_len;
                 }
             }
 
@@ -1445,10 +1415,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> 
 
 ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_bytes_read)
 {
-    auto const& block_info = msgs->torrent->blockInfo();
-    auto const& io = msgs->io;
-
-    TR_ASSERT(io->read_buffer_size() >= inlen);
+    TR_ASSERT(msgs->io->read_buffer_size() >= inlen);
 
     logtrace(msgs, "In readBtPiece");
 
@@ -1456,27 +1423,26 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
     auto& incoming = msgs->incoming;
     if (!incoming.block_req)
     {
-        if (inlen < (sizeof(uint32_t) + sizeof(uint32_t)))
+        if (inlen < 8)
         {
             return READ_LATER;
         }
 
         auto req = peer_request{};
-        io->read_uint32(&req.index);
-        io->read_uint32(&req.offset);
-        req.length = tr_peerMsgsImpl::calculate_request_length(block_info, req.index, req.offset);
+        msgs->io->read_uint32(&req.index);
+        msgs->io->read_uint32(&req.offset);
+        req.length = incoming.length - 9;
         logtrace(msgs, fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
-
         incoming.block_req = req;
         return READ_NOW;
     }
 
     auto& req = incoming.block_req;
-    auto const loc = block_info.pieceLoc(req->index, req->offset);
+    auto const loc = msgs->torrent->pieceLoc(req->index, req->offset);
     auto const block = loc.block;
-    auto const block_size = block_info.blockSize(block);
+    auto const block_size = msgs->torrent->blockSize(block);
 
-    auto const n_this_pass = std::min(size_t{ req->length }, io->read_buffer_size());
+    auto const n_this_pass = std::min(size_t{ req->length }, inlen);
     TR_ASSERT(loc.block_offset + n_this_pass <= block_size);
     if (n_this_pass == 0)
     {
@@ -1484,7 +1450,7 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
     }
 
     auto& incoming_block = incoming.blocks.try_emplace(block, block_size).first->second;
-    io->read_bytes(std::data(*incoming_block.buf) + loc.block_offset, n_this_pass);
+    msgs->io->read_bytes(std::data(*incoming_block.buf) + loc.block_offset, n_this_pass);
 
     msgs->publish(tr_peer_event::GotPieceData(n_this_pass));
     *setme_piece_bytes_read += n_this_pass;
@@ -1496,7 +1462,7 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
     if (req->length > n_this_pass)
     {
         req->length -= n_this_pass;
-        auto const new_loc = block_info.byteLoc(loc.byte + n_this_pass);
+        auto const new_loc = msgs->torrent->byteLoc(loc.byte + n_this_pass);
         req->index = new_loc.piece;
         req->offset = new_loc.piece_offset;
         return READ_LATER;
