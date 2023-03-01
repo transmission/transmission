@@ -75,14 +75,11 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
   --color-progressbar-background-2: #{$grey-500};
-  --color-progressbar-verify-1: #{$pink-300};
-  --color-progressbar-magnet-1: #{$yellow-300};
-  --color-progressbar-magnet-paused-1: #{$default-accent-color};
-  --color-progressbar-leech-paused-1: #{$blue-200};
-  --color-progressbar-leech-queued-1: #{$blue-100};
-  --color-progressbar-leech-1: #{$blue-300};
-  --color-progressbar-seed-paused-1: #{$grey-200};
-  --color-progressbar-seed-queued-1: #{$green-100};
+  --color-progressbar-verify: #{$yellow-300};
+  --color-progressbar-magnet: #{$yellow-300};
+  --color-progressbar-paused: #{$grey-200};
+  --color-progressbar-leech: #{$blue-300};
+  --color-progressbar-queued: #{$blue-100};
 
   color-scheme: light dark;
 
@@ -112,6 +109,8 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-default-border: #{$default-border-dark};
     --color-progressbar-seed-1: #{$green-500};
     --color-progressbar-seed-2: #{$green-300};
+    --color-progressbar-paused: #{$grey-500};
+    --color-progressbar-seed-paused: #{$grey-500};
   }
   @media (prefers-color-scheme: light) {
     --color-bg-hover: #{$nice-grey};
@@ -139,6 +138,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-dialog-border: #{$nice-grey};
     --color-progressbar-seed-1: #{$green-300};
     --color-progressbar-seed-2: #{$green-200};
+    --color-progressbar-seed-paused: #{$grey-200};
   }
 }
 
@@ -602,35 +602,41 @@ $video-image: '../img/film.svg';
 
     &.compact {
       min-width: 50px;
-      width: 50px;
-    }
-
-    &.leech.paused {
-      background-color: var(--color-progressbar-leech-paused-1);
+      width: 10vw;
     }
 
     &.leech.queued {
-      background-color: var(--color-progressbar-leech-queued-1);
+      background: linear-gradient(
+          to right,
+          var(--color-progressbar-queued) 0,
+          var(--color-progressbar-queued) var(--progress, 30%),
+          transparent var(--progress, 30%)
+        ),
+        no-repeat;
     }
 
     &.leech {
-      background-color: var(--color-progressbar-leech-1);
-    }
-
-    &.magnet.paused {
-      background-color: var(--color-progressbar-magnet-paused-1);
+      background: linear-gradient(
+          to right,
+          var(--color-progressbar-leech) 0,
+          var(--color-progressbar-leech) var(--progress, 30%),
+          transparent var(--progress, 30%)
+        ),
+        no-repeat;
     }
 
     &.magnet {
-      background-color: var(--color-progressbar-magnet-1);
+      background: linear-gradient(
+          to right,
+          var(--color-progressbar-magnet) 0,
+          var(--color-progressbar-magnet) var(--progress, 30%),
+          transparent var(--progress, 30%)
+        ),
+        no-repeat;
     }
 
     &.seed.paused {
-      background-color: var(--color-progressbar-seed-paused-1);
-    }
-
-    &.seed.queued {
-      background-color: var(--color-progressbar-seed-queued-1);
+      background-color: var(--color-progressbar-seed-paused);
     }
 
     &.seed {
@@ -647,8 +653,28 @@ $video-image: '../img/film.svg';
         no-repeat;
     }
 
+    &.seed.queued {
+      background-color: var(--color-progressbar-seed-paused);
+    }
+
     &.verify {
-      background-color: var(--color-progressbar-verify-1);
+      background: linear-gradient(
+          to right,
+          var(--color-progressbar-verify) 0,
+          var(--color-progressbar-verify) var(--progress, 30%),
+          transparent var(--progress, 30%)
+        ),
+        no-repeat;
+    }
+
+    &.paused {
+      background: linear-gradient(
+          to right,
+          var(--color-progressbar-paused) 0,
+          var(--color-progressbar-paused) var(--progress, 30%),
+          transparent var(--progress, 30%)
+        ),
+        no-repeat;
     }
   }
 }
