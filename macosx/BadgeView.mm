@@ -64,7 +64,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
         } while (badgeSize.width < stringSize.width + 2 * arrowHeight * arrowWidthHeightRatio +
                      arrowHeight); // text is centered + surrounded by the size of two arrows + arrow spacing (" ▼ 888.8 K ▽ ")
 
-        kArrowInset = { badgeSize.height * 0.15, badgeSize.height * 0.1 };
+        kArrowInset = { badgeSize.height * 0.2, badgeSize.height * 0.1 };
         kArrowSize = { arrowHeight * arrowWidthHeightRatio, arrowHeight };
     }
     return self;
