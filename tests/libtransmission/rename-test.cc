@@ -192,7 +192,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     // (while it's renamed: confirm that the .resume file remembers the changes)
     tr_resume::save(tor);
     sync();
-    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, nullptr);
+    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor);
     EXPECT_STREQ("foobar", tr_torrentName(tor));
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Name));
 
@@ -303,7 +303,7 @@ TEST_F(RenameTest, multifileTorrent)
     tr_resume::save(tor);
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
     tor->setFileSubpath(1, "gabba gabba hey"sv);
-    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, nullptr);
+    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor);
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Filenames));
     EXPECT_EQ(ExpectedFiles[0], tr_torrentFile(tor, 0).name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", tr_torrentFile(tor, 1).name);
