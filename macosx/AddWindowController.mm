@@ -176,8 +176,6 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
     [_fTimer invalidate];
 }
 

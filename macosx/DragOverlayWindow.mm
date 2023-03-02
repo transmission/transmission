@@ -50,11 +50,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)setTorrents:(NSArray<NSString*>*)files
 {
     uint64_t size = 0;

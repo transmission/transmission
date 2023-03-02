@@ -112,11 +112,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     return self;
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)awakeFromNib
 {
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshTorrentTable) name:@"RefreshTorrentTable"
