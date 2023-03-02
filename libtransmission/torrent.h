@@ -612,13 +612,7 @@ public:
         this->error_string = errmsg;
     }
 
-    void setDownloadDir(std::string_view path)
-    {
-        download_dir = path;
-        markEdited();
-        setDirty();
-        refreshCurrentDir();
-    }
+    void setDownloadDir(std::string_view path, bool isNewTorrent = false);
 
     void refreshCurrentDir();
 
