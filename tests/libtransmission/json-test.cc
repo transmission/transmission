@@ -123,22 +123,22 @@ TEST_P(JSONTest, testUtf8)
 
 TEST_P(JSONTest, testUtf16Surrogates)
 {
-    constexpr auto thinking_face_emoji_utf8 = "\xf0\x9f\xa4\x94"sv;
-    tr_variant top;
+    static auto constexpr ThinkingFaceEmojiUtf8 = "\xf0\x9f\xa4\x94"sv;
+    auto top = tr_variant{};
     tr_variantInitDict(&top, 1);
-    tr_quark const key = tr_quark_new("key"sv);
-    tr_variantDictAddStr(&top, key, thinking_face_emoji_utf8);
-    auto json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
+    auto const key = tr_quark_new("key"sv);
+    tr_variantDictAddStr(&top, key, ThinkingFaceEmojiUtf8);
+    auto const json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
     EXPECT_NE(std::string::npos, json.find("ud83e"));
     EXPECT_NE(std::string::npos, json.find("udd14"));
     tr_variantClear(&top);
 
-    tr_variant parsed;
+    auto parsed = tr_variant{};
     EXPECT_TRUE(tr_variantFromBuf(&parsed, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
     EXPECT_TRUE(tr_variantIsDict(&parsed));
-    std::string_view value;
+    auto value = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&parsed, key, &value));
-    EXPECT_EQ(thinking_face_emoji_utf8, value);
+    EXPECT_EQ(ThinkingFaceEmojiUtf8, value);
     tr_variantClear(&parsed);
 }
 

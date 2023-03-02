@@ -172,10 +172,10 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
 template<typename Iter>
 void decode_single_uchar(char const*& in, char const* const in_end, Iter& buf16_out_it)
 {
-    constexpr unsigned escaped_uchar_length = 6;
-    if (in_end - in >= escaped_uchar_length && decode_hex_string(in, *buf16_out_it))
+    static auto constexpr EscapedUcharLength = 6U;
+    if (in_end - in >= EscapedUcharLength && decode_hex_string(in, *buf16_out_it))
     {
-        in += escaped_uchar_length;
+        in += EscapedUcharLength;
         ++buf16_out_it;
     }
 }
@@ -191,22 +191,21 @@ void decode_single_uchar(char const*& in, char const* const in_end, Iter& buf16_
         decode_single_uchar(in, in_end, buf16_out_it);
     }
 
-    if (buf16_out_it != std::begin(buf16))
-    {
-        try
-        {
-            utf8::utf16to8(std::begin(buf16), buf16_out_it, std::back_inserter(buf));
-        }
-        catch (utf8::exception const&) // invalid codepoint
-        {
-            buf.push_back('?');
-        }
-        return true;
-    }
-    else
+    if (buf16_out_it == std::begin(buf16))
     {
         return false;
     }
+
+    try
+    {
+        utf8::utf16to8(std::begin(buf16), buf16_out_it, std::back_inserter(buf));
+    }
+    catch (utf8::exception const&) // invalid codepoint
+    {
+        buf.push_back('?');
+    }
+
+    return true;
 }
 
 [[nodiscard]] std::string_view extract_escaped_string(char const* in, size_t in_len, std::string& buf)
