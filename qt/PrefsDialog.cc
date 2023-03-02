@@ -549,9 +549,23 @@ void PrefsDialog::initPrivacyTab()
 
 void PrefsDialog::onIdleLimitChanged()
 {
-    //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    QString const units_suffix = tr(" minute(s)", nullptr, ui_.idleLimitSpin->value());
+    //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
+    QString const units_format = tr("%1 minute(s)", nullptr, ui_.idleLimitSpin->value());
 
+    auto const placeholder = QStringLiteral("%1");
+    auto const placeholder_pos = units_format.indexOf(placeholder);
+    if (placeholder_pos == -1)
+    {
+        return;
+    }
+
+    auto const units_prefix = units_format.left(placeholder_pos);
+    auto const units_suffix = units_format.mid(placeholder_pos + placeholder.size());
+
+    if (ui_.idleLimitSpin->prefix() != units_prefix)
+    {
+        ui_.idleLimitSpin->setPrefix(units_prefix);
+    }
     if (ui_.idleLimitSpin->suffix() != units_suffix)
     {
         ui_.idleLimitSpin->setSuffix(units_suffix);
