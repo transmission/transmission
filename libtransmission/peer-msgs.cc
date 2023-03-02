@@ -1429,9 +1429,11 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
         }
 
         auto req = peer_request{};
+        fmt::print("{:s}:{:d} peer message length is {:d}\n", __FILE__, __LINE__, incoming.length);
         msgs->io->read_uint32(&req.index);
         msgs->io->read_uint32(&req.offset);
         req.length = incoming.length - 9;
+        fmt::print("{:s}:{:d} req piece {:d} offset {:d} len {:d}\n", __FILE__, __LINE__, req.index, req.offset, req.length);
         logtrace(msgs, fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
         incoming.block_req = req;
         return READ_NOW;
@@ -1443,6 +1445,15 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
     auto const block_size = msgs->torrent->blockSize(block);
 
     auto const n_this_pass = std::min(size_t{ req->length }, inlen);
+    auto const* const tor = msgs->torrent;
+    fmt::print("{:s}:{:d} piece size {:d} piece count {:d}\n", __FILE__, __LINE__, tor->pieceSize(), tor->pieceCount());
+    fmt::print("{:s}:{:d} block size {:d} block count {:d}\n", __FILE__, __LINE__, tr_block_info::BlockSize, tor->blockCount());
+    fmt::print("{:s}:{:d} loc piece {:d} offset {:d}\n", __FILE__, __LINE__, loc.piece, loc.piece_offset);
+    fmt::print("{:s}:{:d} loc block {:d} offset {:d}\n", __FILE__, __LINE__, loc.block, loc.block_offset);
+    fmt::print("{:s}:{:d} loc byte {:d}\n", __FILE__, __LINE__, loc.byte);
+    fmt::print("{:s}:{:d} loc byte {:d}\n", __FILE__, __LINE__, loc.byte);
+    fmt::print("{:s}:{:d} inlen {:d}\n", __FILE__, __LINE__, inlen);
+    fmt::print("{:s}:{:d} n_this_pass {:d}\n", __FILE__, __LINE__, n_this_pass);
     TR_ASSERT(loc.block_offset + n_this_pass <= block_size);
     if (n_this_pass == 0)
     {
@@ -1462,9 +1473,17 @@ ReadState readBtPiece(tr_peerMsgsImpl* msgs, size_t inlen, size_t* setme_piece_b
     if (req->length > n_this_pass)
     {
         req->length -= n_this_pass;
+        fmt::print("{:s}:{:d} remaining {:d}\n", __FILE__, __LINE__, req->length);
         auto const new_loc = msgs->torrent->byteLoc(loc.byte + n_this_pass);
         req->index = new_loc.piece;
         req->offset = new_loc.piece_offset;
+        fmt::print(
+            "{:s}:{:d} now awaiting piece {:d} offset {:d} len {:d}\n",
+            __FILE__,
+            __LINE__,
+            req->index,
+            req->offset,
+            req->length);
         return READ_LATER;
     }
 
