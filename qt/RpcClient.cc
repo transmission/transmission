@@ -5,6 +5,8 @@
 
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include "RpcClient.h"
 
 #include <QApplication>
@@ -160,6 +162,11 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
 
 void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag)
 {
+    if (verbose_)
+    {
+        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON));
+    }
+
     local_requests_.insert(tag, promise);
     tr_rpc_request_exec_json(session_, json.get(), localSessionCallback, this);
 }
