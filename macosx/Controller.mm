@@ -1028,7 +1028,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         [[BlocklistDownloader downloader] cancelDownload];
     }
 
-    //stop timers
+    //stop timers and notification checking
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+
     [self.fTimer invalidate];
 
     if (self.fAutoImportTimer)
