@@ -578,11 +578,18 @@ void PrefsDialog::initSeedingTab()
 
 void PrefsDialog::onQueueStalledMinutesChanged()
 {
-    //: Spin box format, "Download is inactive if data sharing stopped: [ 5 minutes ago ]" (includes leading space after the number, if needed)
+    //: Spin box format, "Download is inactive if data sharing stopped: [ 5 minutes ago ]"
     QString const units_format = tr("%1 minute(s) ago", nullptr, ui_.queueStalledMinutesSpin->value());
 
-    QString const units_prefix = units_format.section(QStringLiteral("%1"), -2, -2);
-    QString const units_suffix = units_format.section(QStringLiteral("%1"), -1);
+    auto const placeholder = QStringLiteral("%1");
+    auto const placeholder_pos = units_format.indexOf(placeholder);
+    if (placeholder_pos == -1)
+    {
+        return;
+    }
+
+    auto const units_prefix = units_format.left(placeholder_pos);
+    auto const units_suffix = units_format.mid(placeholder_pos + placeholder.size());
 
     if (ui_.queueStalledMinutesSpin->prefix() != units_prefix)
     {
