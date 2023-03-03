@@ -551,25 +551,8 @@ void PrefsDialog::onIdleLimitChanged()
 {
     //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
     QString const units_format = tr("%1 minute(s)", nullptr, ui_.idleLimitSpin->value());
-
     auto const placeholder = QStringLiteral("%1");
-    auto const placeholder_pos = units_format.indexOf(placeholder);
-    if (placeholder_pos == -1)
-    {
-        return;
-    }
-
-    auto const units_prefix = units_format.left(placeholder_pos);
-    auto const units_suffix = units_format.mid(placeholder_pos + placeholder.size());
-
-    if (ui_.idleLimitSpin->prefix() != units_prefix)
-    {
-        ui_.idleLimitSpin->setPrefix(units_prefix);
-    }
-    if (ui_.idleLimitSpin->suffix() != units_suffix)
-    {
-        ui_.idleLimitSpin->setSuffix(units_suffix);
-    }
+    Utils::updateSpinBoxFormat(ui_.idleLimitSpin, units_format, placeholder);
 }
 
 void PrefsDialog::initSeedingTab()
@@ -594,25 +577,8 @@ void PrefsDialog::onQueueStalledMinutesChanged()
 {
     //: Spin box format, "Download is inactive if data sharing stopped: [ 5 minutes ago ]"
     QString const units_format = tr("%1 minute(s) ago", nullptr, ui_.queueStalledMinutesSpin->value());
-
     auto const placeholder = QStringLiteral("%1");
-    auto const placeholder_pos = units_format.indexOf(placeholder);
-    if (placeholder_pos == -1)
-    {
-        return;
-    }
-
-    auto const units_prefix = units_format.left(placeholder_pos);
-    auto const units_suffix = units_format.mid(placeholder_pos + placeholder.size());
-
-    if (ui_.queueStalledMinutesSpin->prefix() != units_prefix)
-    {
-        ui_.queueStalledMinutesSpin->setPrefix(units_prefix);
-    }
-    if (ui_.queueStalledMinutesSpin->suffix() != units_suffix)
-    {
-        ui_.queueStalledMinutesSpin->setSuffix(units_suffix);
-    }
+    Utils::updateSpinBoxFormat(ui_.queueStalledMinutesSpin, units_format, placeholder);
 }
 
 void PrefsDialog::initDownloadingTab()

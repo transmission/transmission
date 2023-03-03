@@ -101,3 +101,24 @@ QColor Utils::getFadedColor(QColor const& color)
     faded_color.setAlpha(128);
     return faded_color;
 }
+
+void Utils::updateSpinBoxFormat(QSpinBox* spinBox, QString const& format, QString const& placeholder)
+{
+    auto const placeholder_pos = format.indexOf(placeholder);
+    if (placeholder_pos == -1)
+    {
+        return;
+    }
+
+    auto const units_prefix = format.left(placeholder_pos);
+    auto const units_suffix = format.mid(placeholder_pos + placeholder.size());
+
+    if (spinBox->prefix() != units_prefix)
+    {
+        spinBox->setPrefix(units_prefix);
+    }
+    if (spinBox->suffix() != units_suffix)
+    {
+        spinBox->setSuffix(units_suffix);
+    }
+}

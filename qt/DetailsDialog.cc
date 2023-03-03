@@ -1314,23 +1314,7 @@ void DetailsDialog::onIdleLimitChanged()
     QString const units_format = tr("%1 minute(s)", nullptr, ui_.idleSpin->value());
 
     auto const placeholder = QStringLiteral("%1");
-    auto const placeholder_pos = units_format.indexOf(placeholder);
-    if (placeholder_pos == -1)
-    {
-        return;
-    }
-
-    auto const units_prefix = units_format.left(placeholder_pos);
-    auto const units_suffix = units_format.mid(placeholder_pos + placeholder.size());
-
-    if (ui_.idleSpin->prefix() != units_prefix)
-    {
-        ui_.idleSpin->setPrefix(units_prefix);
-    }
-    if (ui_.idleSpin->suffix() != units_suffix)
-    {
-        ui_.idleSpin->setSuffix(units_suffix);
-    }
+    Utils::updateSpinBoxFormat(ui_.idleSpin, units_format, placeholder);
 }
 
 void DetailsDialog::onRatioModeChanged(int index)
