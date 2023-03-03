@@ -198,7 +198,7 @@ public:
         return evbuffer_remove(buf_.get(), tgt, n_bytes);
     }
 
-    [[nodiscard]] uint16_t to_uint8()
+    [[nodiscard]] auto to_uint8()
     {
         auto tmp = uint8_t{};
         to_buf(&tmp, sizeof(tmp));
