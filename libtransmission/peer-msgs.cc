@@ -270,6 +270,7 @@ void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 
 #define logdbg(msgs, text) myLogMacro(msgs, TR_LOG_DEBUG, text)
 #define logtrace(msgs, text) myLogMacro(msgs, TR_LOG_TRACE, text)
+#define logwarn(msgs, text) myLogMacro(msgs, TR_LOG_WARN, text)
 
 /**
  * Low-level communication state information about a connected peer.
@@ -1394,6 +1395,18 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, libtransmission::Buffer& paylo
     auto const loc = msgs->torrent->pieceLoc(piece, offset);
     auto const block = loc.block;
     auto const block_size = msgs->torrent->blockSize(block);
+
+    if (loc.block_offset + len > block_size)
+    {
+        logwarn(msgs, fmt::format("got unaligned piece {:d}:{:d}->{:d}", piece, offset, len));
+        return { READ_ERR, len };
+    }
+
+    if (!tr_peerMgrDidPeerRequest(msgs->torrent, msgs, block))
+    {
+        logwarn(msgs, fmt::format("got unrequested piece {:d}:{:d}->{:d}", piece, offset, len));
+        return { READ_ERR, len };
+    }
 
     auto& blocks = msgs->incoming.blocks;
     auto& incoming_block = blocks.try_emplace(block, block_size).first->second;
