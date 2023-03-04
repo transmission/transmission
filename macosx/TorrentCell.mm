@@ -79,8 +79,6 @@ static NSInteger const kMaxPieces = 18 * 18;
 {
     if ((self = [super init]))
     {
-        _fDefaults = NSUserDefaults.standardUserDefaults;
-
         NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
 
@@ -101,9 +99,19 @@ static NSInteger const kMaxPieces = 18 * 18;
 
 - (id)copyWithZone:(NSZone*)zone
 {
-    id value = [super copyWithZone:zone];
-    [value setRepresentedObject:self.representedObject];
-    return value;
+    TorrentCell* copy = [super copyWithZone:zone];
+    copy->_fTitleAttributes = [_fTitleAttributes mutableCopyWithZone:zone];
+    copy->_fStatusAttributes = [_fStatusAttributes mutableCopyWithZone:zone];
+    copy->_fBluePieceColor = _fBluePieceColor;
+    copy->_fBarBorderColor = _fBarBorderColor;
+    copy->_fBarMinimalBorderColor = _fBarMinimalBorderColor;
+    [copy setRepresentedObject:self.representedObject];
+    return copy;
+}
+
+- (NSUserDefaults*)fDefaults
+{
+    return NSUserDefaults.standardUserDefaults;
 }
 
 - (NSRect)iconRectForBounds:(NSRect)bounds
