@@ -486,7 +486,7 @@ tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
     return *this;
 }
 
-bool tr_bitfield::intersects (tr_bitfield const& that) const noexcept
+bool tr_bitfield::intersects(tr_bitfield const& that) const noexcept
 {
     if (hasNone() || that.hasNone())
     {
