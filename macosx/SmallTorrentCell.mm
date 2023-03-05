@@ -30,7 +30,7 @@
     [super drawRect:dirtyRect];
 }
 
-//otherwise progress bar in inverted
+//otherwise progress bar is inverted
 - (BOOL)isFlipped
 {
     return YES;

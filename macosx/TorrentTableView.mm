@@ -122,7 +122,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setNeedsDisplay) name:@"RefreshTorrentTable" object:nil];
 }
 
-//make sure we dont lose selection on manual reloads
+//make sure we don't lose selection on manual reloads
 - (void)reloadData
 {
     [super reloadData];
