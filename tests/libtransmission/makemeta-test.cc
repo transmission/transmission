@@ -216,6 +216,69 @@ TEST_F(MakemetaTest, singleFile)
     testBuilder(builder);
 }
 
+TEST_F(MakemetaTest, announceSingleTracker)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+    auto builder = tr_metainfo_builder{ filename };
+
+    // add a tracker
+    static auto constexpr SingleAnnounce = "udp://tracker.openbittorrent.com:80"sv;
+    auto trackers = tr_announce_list{};
+    trackers.add(SingleAnnounce, trackers.nextTier());
+    builder.setAnnounceList(std::move(trackers));
+
+    // generate the torrent and parse it as a variant
+    EXPECT_EQ(nullptr, builder.makeChecksums().get());
+    auto top = tr_variant{};
+    auto const benc = builder.benc();
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
+
+    // confirm there's an "announce" entry
+    auto single_announce = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&top, TR_KEY_announce, &single_announce));
+    EXPECT_EQ(SingleAnnounce, single_announce);
+
+    // confirm there's not an "announce-list" entry
+    EXPECT_EQ(nullptr, tr_variantDictFind(&top, TR_KEY_announce_list));
+
+    tr_variantClear(&top);
+}
+
+TEST_F(MakemetaTest, announceMultiTracker)
+{
+    auto const files = makeRandomFiles(sandboxDir(), 1);
+    auto const [filename, payload] = files.front();
+    auto builder = tr_metainfo_builder{ filename };
+
+    // add the trackers
+    auto trackers = tr_announce_list{};
+    for (auto const& url : { "udp://tracker.openbittorrent.com:80"sv, "udp://tracker.publicbt.com:80"sv })
+    {
+        trackers.add(url, trackers.nextTier());
+    }
+    builder.setAnnounceList(std::move(trackers));
+
+    // generate the torrent and parse it as a variant
+    EXPECT_EQ(nullptr, builder.makeChecksums().get());
+    auto top = tr_variant{};
+    auto const benc = builder.benc();
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
+
+    // confirm there's an "announce" entry
+    auto single_announce = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&top, TR_KEY_announce, &single_announce));
+    EXPECT_EQ(builder.announceList().at(0).announce.sv(), single_announce);
+
+    // confirm there's an "announce-list" entry
+    tr_variant* announce_list_variant = nullptr;
+    EXPECT_TRUE(tr_variantDictFindList(&top, TR_KEY_announce_list, &announce_list_variant));
+    EXPECT_NE(nullptr, announce_list_variant);
+    EXPECT_EQ(std::size(builder.announceList()), tr_variantListSize(announce_list_variant));
+
+    tr_variantClear(&top);
+}
+
 TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
 {
     auto const files = makeRandomFiles(sandboxDir(), 1);
@@ -224,16 +287,16 @@ TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
     auto trackers = tr_announce_list{};
     trackers.add("udp://tracker.openbittorrent.com:80"sv, trackers.nextTier());
     builder.setAnnounceList(std::move(trackers));
-    auto baseMetainfo = testBuilder(builder);
+    auto base_metainfo = testBuilder(builder);
 
     builder.setPrivate(true);
-    auto privateMetainfo = testBuilder(builder);
-    EXPECT_NE(baseMetainfo.infoHash(), privateMetainfo.infoHash());
+    auto private_metainfo = testBuilder(builder);
+    EXPECT_NE(base_metainfo.infoHash(), private_metainfo.infoHash());
 
     builder.setSource("FOO");
-    auto privateSourceMetainfo = testBuilder(builder);
-    EXPECT_NE(baseMetainfo.infoHash(), privateSourceMetainfo.infoHash());
-    EXPECT_NE(privateMetainfo.infoHash(), privateSourceMetainfo.infoHash());
+    auto private_source_metainfo = testBuilder(builder);
+    EXPECT_NE(base_metainfo.infoHash(), private_source_metainfo.infoHash());
+    EXPECT_NE(private_metainfo.infoHash(), private_source_metainfo.infoHash());
 }
 
 } // namespace libtransmission::test

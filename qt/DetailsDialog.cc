@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <cassert>
 #include <ctime>
+#include <map>
+#include <set>
 #include <utility>
 
 #include <QDateTime>
@@ -28,6 +30,7 @@
 #include <QTreeWidgetItem>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/announce-list.h>
 #include <libtransmission/utils.h> // tr_getRatio()
 
 #include "BaseDialog.h"
@@ -1340,42 +1343,56 @@ void DetailsDialog::onTrackerSelectionChanged()
 void DetailsDialog::onAddTrackerClicked()
 {
     bool ok = false;
-
-    QString const text = QInputDialog::getMultiLineText(
+    auto const text_qstr = QInputDialog::getMultiLineText(
         this,
         tr("Add URL(s)"),
         tr("Add tracker announce URLs, one per line:"),
         {},
         &ok);
-
-    if (ok)
+    if (!ok)
     {
-        QSet<QString> urls;
-        torrent_ids_t ids;
+        return;
+    }
 
-        for (auto const& line : text.split(QRegularExpression(QStringLiteral("[\r\n]+"))))
+    // for each URL entered by the user...
+    auto announce_list = tr_announce_list{};
+    announce_list.parse(text_qstr.toStdString());
+    auto url_to_ids = std::map<QString, std::set<tr_torrent_id_t>>{};
+    for (auto const& info : announce_list)
+    {
+        // for each selected torrent...
+        auto sv = info.announce.sv();
+        auto const announce_url = QString::fromUtf8(std::data(sv), std::size(sv));
+        for (auto const& id : ids_)
         {
-            QString const url = line.trimmed();
-            if (!line.isEmpty() && QUrl(url).isValid())
+            // make a note if the torrent doesn't already have the URL
+            if (tracker_model_->find(id, announce_url) == -1)
             {
-                for (auto const& id : ids_)
-                {
-                    if (tracker_model_->find(id, url) == -1 && !urls.contains(url))
-                    {
-                        ids.insert(id);
-                        urls.insert(url);
-                    }
-                }
+                url_to_ids[announce_url].insert(id);
             }
         }
+    }
 
-        if (urls.isEmpty())
+    // now reverse the map so that if we're adding identical trackers
+    // to more than one torrent, that can be batched into a single call
+    auto ids_to_urls = std::map<std::set<tr_torrent_id_t>, std::set<QString>>{};
+    for (auto& [announce_url, ids] : url_to_ids)
+    {
+        ids_to_urls[ids].insert(announce_url);
+    }
+
+    if (std::empty(ids_to_urls))
+    {
+        QMessageBox::warning(this, tr("Error"), tr("No new URLs found."));
+    }
+    else
+    {
+        for (auto const& [ids, urls] : ids_to_urls)
         {
-            QMessageBox::warning(this, tr("Error"), tr("No new URLs found."));
-        }
-        else
-        {
-            torrentSet(ids, TR_KEY_trackerAdd, urls.values());
+            torrentSet(
+                torrent_ids_t{ std::begin(ids), std::end(ids) },
+                TR_KEY_trackerAdd,
+                QList<QString>{ std::begin(urls), std::end(urls) });
         }
     }
 }
