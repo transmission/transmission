@@ -5,7 +5,7 @@
 #import <Cocoa/Cocoa.h>
 #import "TorrentTableView.h"
 
-@interface TorrentCell : NSTableCellView
+@interface SmallTorrentCell : NSTableCellView
 
 @property(nonatomic) IBOutlet NSButton* fActionButton;
 @property(nonatomic) IBOutlet NSButton* fControlButton;
@@ -15,7 +15,6 @@
 @property(nonatomic) IBOutlet NSImageView* fGroupIndicatorView;
 
 @property(nonatomic) IBOutlet NSTextField* fTorrentTitleField;
-@property(nonatomic) IBOutlet NSTextField* fTorrentProgressField;
 @property(nonatomic) IBOutlet NSTextField* fTorrentStatusField;
 
 @property(nonatomic) IBOutlet NSView* fTorrentProgressBarView;
