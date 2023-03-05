@@ -46,7 +46,7 @@ auto inline constexpr Group = fields_t{ 1 << 23 };
 
 auto inline constexpr All = ~fields_t{ 0 };
 
-fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, bool* did_rename_to_hash_only_name);
+fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor);
 
 void save(tr_torrent* tor);
 

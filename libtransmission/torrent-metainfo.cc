@@ -679,22 +679,20 @@ bool tr_torrent_metainfo::migrateFile(
     std::string_view suffix)
 {
     auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    auto const old_filename_exists = tr_sys_path_exists(old_filename);
-    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    auto const new_filename_exists = tr_sys_path_exists(new_filename);
+    if (!tr_sys_path_exists(old_filename))
+    {
+        return false;
+    }
 
-    if (old_filename_exists && new_filename_exists)
+    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    if (tr_sys_path_exists(new_filename))
     {
         tr_sys_path_remove(old_filename);
         return false;
     }
 
-    if (new_filename_exists)
-    {
-        return false;
-    }
-
-    if (old_filename_exists && tr_sys_path_rename(old_filename, new_filename))
+    auto const renamed = tr_sys_path_rename(old_filename, new_filename);
+    if (!renamed)
     {
         tr_logAddError(
             fmt::format(
@@ -705,7 +703,7 @@ bool tr_torrent_metainfo::migrateFile(
         return true;
     }
 
-    return false; // neither file exists
+    return renamed;
 }
 
 void tr_torrent_metainfo::removeFile(

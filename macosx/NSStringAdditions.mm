@@ -160,24 +160,24 @@
 
 + (NSString*)stringForSpeed:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb
 {
-    if (speed <= 999.95) //0.0 KB/s to 999.9 KB/s
+    if (speed < 999.95) // 0.0 KB/s to 999.9 KB/s
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, kb];
     }
 
     speed /= 1000.0;
 
-    if (speed <= 99.995) //1.00 MB/s to 99.99 MB/s
+    if (speed < 99.995) // 1.00 MB/s to 99.99 MB/s
     {
         return [NSString localizedStringWithFormat:@"%.2f %@", speed, mb];
     }
-    else if (speed <= 999.95) //100.0 MB/s to 999.9 MB/s
+    else if (speed < 999.95) // 100.0 MB/s to 999.9 MB/s
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, mb];
     }
-    else //insane speeds
+    else // insane speeds
     {
-        return [NSString localizedStringWithFormat:@"%.2f %@", (speed / 1000.0), gb];
+        return [NSString localizedStringWithFormat:@"%.2f %@", speed / 1000.0, gb];
     }
 }
 
