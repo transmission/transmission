@@ -129,20 +129,37 @@ tr_priority_t tr_file_priorities::filePriority(tr_file_index_t file) const
 
 tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
 {
-    if (std::empty(priorities_))
+    if (std::empty(*fpm_)) // not initialized yet
     {
         return TR_PRI_NORMAL;
     }
 
-    auto const [begin_idx, end_idx] = fpm_->fileSpan(piece);
-    auto const begin = std::begin(priorities_) + begin_idx;
-    auto const end = std::begin(priorities_) + end_idx;
-    auto const it = std::max_element(begin, end);
-    if (it == end)
+    // increase priority if a file begins or ends in this piece.
+    // Xref: f2daeb242dab1a9586651e6e80124792a9f05d26
+    // Xref: https://forum.transmissionbt.com/viewtopic.php?t=10473
+    if (piece == 0 || piece + 1 == fpm_->blockInfo().pieceCount()) // first, last piece
     {
-        return TR_PRI_NORMAL;
+        return TR_PRI_HIGH;
     }
-    return *it;
+    auto const [begin_idx, end_idx] = fpm_->fileSpan(piece);
+    if (begin_idx + 1 != end_idx) // at least one file ends in this piece
+    {
+        return TR_PRI_HIGH;
+    }
+
+    // check the priorities of the files that touch this piece
+    if (!std::empty(priorities_))
+    {
+        auto const begin = std::begin(priorities_) + begin_idx;
+        auto const end = std::begin(priorities_) + end_idx;
+        auto const it = std::max_element(begin, end);
+        if (it != end)
+        {
+            return *it;
+        }
+    }
+
+    return TR_PRI_NORMAL;
 }
 
 // ---

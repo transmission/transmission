@@ -16,6 +16,7 @@
 #include "transmission.h"
 
 #include "bitfield.h"
+#include "block-info.h"
 
 struct tr_block_info;
 struct tr_torrent_metainfo;
@@ -62,6 +63,11 @@ public:
         return std::size(file_pieces_);
     }
 
+    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    {
+        return std::empty(file_pieces_);
+    }
+
     // TODO(ckerr) minor wart here, two identical span types
     [[nodiscard]] tr_byte_span_t byteSpan(tr_file_index_t file) const
     {
@@ -69,7 +75,14 @@ public:
         return tr_byte_span_t{ span.begin, span.end };
     }
 
+    [[nodiscard]] constexpr auto const& blockInfo() const noexcept
+    {
+        return block_info_;
+    }
+
 private:
+    tr_block_info block_info_;
+
     using byte_span_t = index_span_t<uint64_t>;
     std::vector<byte_span_t> file_bytes_;
 
