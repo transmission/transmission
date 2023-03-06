@@ -60,11 +60,6 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
     reset({ tm.totalSize(), tm.pieceSize() }, std::data(file_sizes), std::size(file_sizes));
 }
 
-tr_file_piece_map::piece_span_t tr_file_piece_map::pieceSpan(tr_file_index_t file) const
-{
-    return file_pieces_[file];
-}
-
 tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piece) const
 {
     auto compare = CompareToSpan<tr_piece_index_t>{};
@@ -137,12 +132,10 @@ tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
     // increase priority if a file begins or ends in this piece.
     // Xref: f2daeb242dab1a9586651e6e80124792a9f05d26
     // Xref: https://forum.transmissionbt.com/viewtopic.php?t=10473
-    if (piece == 0 || piece + 1 == fpm_->blockInfo().pieceCount()) // first, last piece
-    {
-        return TR_PRI_HIGH;
-    }
-    auto const [begin_idx, end_idx] = fpm_->fileSpan(piece);
-    if (begin_idx + 1 != end_idx) // at least one file ends in this piece
+    auto const [begin_file, end_file] = fpm_->fileSpan(piece);
+    if ((begin_file + 1 != end_file) // at least one file ends in this piece
+        || (piece == fpm_->pieceSpan(begin_file).begin) // piece's first file starts in this piece
+        || (end_file > begin_file && piece + 1 == fpm_->pieceSpan(end_file - 1).end)) // piece's last file ends in this piece
     {
         return TR_PRI_HIGH;
     }
@@ -150,8 +143,8 @@ tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
     // check the priorities of the files that touch this piece
     if (!std::empty(priorities_))
     {
-        auto const begin = std::begin(priorities_) + begin_idx;
-        auto const end = std::begin(priorities_) + end_idx;
+        auto const begin = std::begin(priorities_) + begin_file;
+        auto const end = std::begin(priorities_) + end_file;
         auto const it = std::max_element(begin, end);
         if (it != end)
         {
