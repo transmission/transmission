@@ -139,14 +139,14 @@ TEST_F(FilePieceMapTest, priorities)
     {
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
-            auto const expected = static_cast<int>(expected_file_priorities[i]);
-            auto const actual = static_cast<int>(file_priorities.filePriority(i));
+            auto const expected = int{ expected_file_priorities[i] };
+            auto const actual = int{ file_priorities.filePriority(i) };
             EXPECT_EQ(expected, actual) << "idx[" << i << "] expected [" << expected << "] actual [" << actual << ']';
         }
         for (tr_piece_index_t i = 0; i < block_info_.pieceCount(); ++i)
         {
-            auto const expected = static_cast<int>(expected_piece_priorities[i]);
-            auto const actual = static_cast<int>(file_priorities.piecePriority(i));
+            auto const expected = int{ expected_piece_priorities[i] };
+            auto const actual = int{ file_priorities.piecePriority(i) };
             EXPECT_EQ(expected, actual) << "idx[" << i << "] expected [" << expected << "] actual [" << actual << ']';
         }
     };
