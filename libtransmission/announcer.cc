@@ -1099,7 +1099,11 @@ void tr_announcer_impl::onAnnounceDone(
             publishPeersPex(tier, seeders, leechers, response.pex6);
         }
 
-        publishPeerCounts(tier, seeders, leechers);
+        /* Only publish leechers if it was actually returned during the announce */
+        if (response.leechers >= 0)
+        {
+            publishPeerCounts(tier, seeders, leechers);
+        }
 
         tier->isRunning = is_running_on_success;
 
