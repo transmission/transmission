@@ -141,12 +141,11 @@ tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
     }
 
     // check the priorities of the files that touch this piece
-    if (!std::empty(priorities_))
+    if (end_file <= std::size(priorities_))
     {
         auto const begin = std::begin(priorities_) + begin_file;
         auto const end = std::begin(priorities_) + end_file;
-        auto const it = std::max_element(begin, end);
-        if (it != end)
+        if (auto const it = std::max_element(begin, end); it != end)
         {
             return *it;
         }
