@@ -129,9 +129,9 @@ tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
         return TR_PRI_NORMAL;
     }
 
-    // increase priority if a file begins or ends in this piece.
-    // Xref: f2daeb242dab1a9586651e6e80124792a9f05d26
-    // Xref: https://forum.transmissionbt.com/viewtopic.php?t=10473
+    // increase priority if a file begins or ends in this piece
+    // because that makes life easier for code/users using at incomplete files.
+    // Xrefs: f2daeb242, https://forum.transmissionbt.com/viewtopic.php?t=10473
     auto const [begin_file, end_file] = fpm_->fileSpan(piece);
     if ((begin_file + 1 != end_file) // at least one file ends in this piece
         || (piece == fpm_->pieceSpan(begin_file).begin) // piece's first file starts in this piece
