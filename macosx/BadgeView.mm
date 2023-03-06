@@ -4,8 +4,18 @@
 
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
+#import "NSImageAdditions.h"
 
 static CGFloat const kBetweenPadding = 2.0;
+static NSImage* kWhiteUpArrow = [[NSImage imageNamed:@"UpArrowTemplate"] imageWithColor:NSColor.whiteColor];
+static NSImage* kWhiteDownArrow = [[NSImage imageNamed:@"DownArrowTemplate"] imageWithColor:NSColor.whiteColor];
+static CGSize kArrowInset;
+static CGSize kArrowSize;
+
+typedef NS_ENUM(NSInteger, ArrowDirection) {
+    ArrowDirectionUp,
+    ArrowDirectionDown,
+};
 
 @interface BadgeView ()
 
@@ -24,6 +34,38 @@ static CGFloat const kBetweenPadding = 2.0;
     {
         _fDownloadRate = 0.0;
         _fUploadRate = 0.0;
+
+        NSShadow* stringShadow = [[NSShadow alloc] init];
+        stringShadow.shadowOffset = NSMakeSize(2.0, -2.0);
+        stringShadow.shadowBlurRadius = 4.0;
+
+        _fAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
+        _fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
+        _fAttributes[NSShadowAttributeName] = stringShadow;
+
+        // DownloadBadge and UploadBadge should have the same size
+        NSSize badgeSize = [NSImage imageNamed:@"DownloadBadge"].size;
+        // DownArrowTemplate and UpArrowTemplate should have the same size
+        CGFloat arrowWidthHeightRatio = kWhiteDownArrow.size.width / kWhiteDownArrow.size.height;
+
+        // Make sure text fits on the badge.
+        // In macOS Ventura, this will end up calculating a boldSystemFontOfSize of 21.
+        NSString* maxString = [NSString stringForSpeedAbbrev:888.8]; // "888.8 K" localized
+        CGFloat fontSize = 26.0;
+        NSSize stringSize;
+        CGFloat arrowHeight;
+        do
+        {
+            fontSize -= 1.0;
+            _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:fontSize];
+            stringSize = [maxString sizeWithAttributes:_fAttributes];
+            // arrow height equal to font capital letter height + shadow
+            arrowHeight = [_fAttributes[NSFontAttributeName] capHeight] + 4;
+        } while (badgeSize.width < stringSize.width + 2 * arrowHeight * arrowWidthHeightRatio +
+                     arrowHeight); // text is centered + surrounded by the size of two arrows + arrow spacing (" ▼ 888.8 K ▽ ")
+
+        kArrowInset = { badgeSize.height * 0.2, badgeSize.height * 0.1 };
+        kArrowSize = { arrowHeight * arrowWidthHeightRatio, arrowHeight };
     }
     return self;
 }
@@ -51,7 +93,7 @@ static CGFloat const kBetweenPadding = 2.0;
     if (download)
     {
         NSImage* downloadBadge = [NSImage imageNamed:@"DownloadBadge"];
-        [self badge:downloadBadge string:[NSString stringForSpeedAbbrev:self.fDownloadRate] atHeight:bottom];
+        [self badge:downloadBadge arrow:ArrowDirectionDown string:[NSString stringForSpeedAbbrev:self.fDownloadRate] atHeight:bottom];
 
         if (upload)
         {
@@ -60,47 +102,31 @@ static CGFloat const kBetweenPadding = 2.0;
     }
     if (upload)
     {
-        [self badge:[NSImage imageNamed:@"UploadBadge"] string:[NSString stringForSpeedAbbrev:self.fUploadRate] atHeight:bottom];
+        [self badge:[NSImage imageNamed:@"UploadBadge"] arrow:ArrowDirectionUp
+              string:[NSString stringForSpeedAbbrev:self.fUploadRate]
+            atHeight:bottom];
     }
 }
 
-- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height
+- (void)badge:(NSImage*)badge arrow:(ArrowDirection)arrowDirection string:(NSString*)string atHeight:(CGFloat)height
 {
-    if (!self.fAttributes)
-    {
-        NSShadow* stringShadow = [[NSShadow alloc] init];
-        stringShadow.shadowOffset = NSMakeSize(2.0, -2.0);
-        stringShadow.shadowBlurRadius = 4.0;
-
-        self.fAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
-        self.fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
-        self.fAttributes[NSShadowAttributeName] = stringShadow;
-    }
-
-    NSRect badgeRect;
-    badgeRect.size = badge.size;
-    badgeRect.origin.x = 0.0;
-    badgeRect.origin.y = height;
-
+    // background
+    NSRect badgeRect = { { 0.0, height }, badge.size };
     [badge drawInRect:badgeRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 
-    //make sure text fits on the badge
-    CGFloat fontSize = 26.0;
-    NSSize stringSize;
-    do
-    {
-        self.fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:fontSize];
-        stringSize = [string sizeWithAttributes:self.fAttributes];
-        fontSize -= 1.0;
-    } while (NSWidth(badgeRect) < stringSize.width);
-
     //string is in center of image
+    NSSize stringSize = [string sizeWithAttributes:self.fAttributes];
     NSRect stringRect;
     stringRect.origin.x = NSMidX(badgeRect) - stringSize.width * 0.5;
     stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + 1.0; //adjust for shadow
     stringRect.size = stringSize;
-
     [string drawInRect:stringRect withAttributes:self.fAttributes];
+
+    // arrow
+    NSImage* arrow = arrowDirection == ArrowDirectionUp ? kWhiteUpArrow : kWhiteDownArrow;
+    NSRect arrowRect = { { kArrowInset.width, stringRect.origin.y + kArrowInset.height + (arrowDirection == ArrowDirectionUp ? 0.5 : -0.5) },
+                         kArrowSize };
+    [arrow drawInRect:arrowRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 }
 
 @end
