@@ -299,7 +299,7 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | number | tr_file_view (0,1 as boolean)
+| `wanted` | number | tr_file_view (**Note:** For backwards compatibility, this is serialized as an array of `0` or `1` that should be treated as booleans)
 | `priority` | number | tr_file_view
 
 `peers`: an array of objects, each containing:
