@@ -299,7 +299,7 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | boolean | tr_file_view
+| `wanted` | number | tr_file_view (0,1 as boolean)
 | `priority` | number | tr_file_view
 
 `peers`: an array of objects, each containing:
@@ -1000,4 +1000,4 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `torrent-set` | :warning: **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
 | `group-set` | new method
 | `group-get` | new method
-
+| `wanted` | warning: previously documented as an array of booleans; prior to 4.0.0, it was serialized as an array of 0 or 1. only 4.0.0 and 4.0.1 serialize as bool
