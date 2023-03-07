@@ -317,7 +317,7 @@ void addFileStats(tr_torrent const* tor, tr_variant* list)
         tr_variant* d = tr_variantListAddDict(list, 3);
         tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
         tr_variantDictAddInt(d, TR_KEY_priority, file.priority);
-        tr_variantDictAddBool(d, TR_KEY_wanted, file.wanted);
+        tr_variantDictAddInt(d, TR_KEY_wanted, file.wanted);
     }
 }
 
@@ -853,7 +853,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
-                tr_variantListAddBool(initme, tr_torrentFile(tor, i).wanted);
+                tr_variantListAddInt(initme, tr_torrentFile(tor, i).wanted);
             }
         }
         break;
