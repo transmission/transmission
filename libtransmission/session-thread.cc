@@ -230,10 +230,7 @@ private:
         constexpr auto ToggleLooping = [](evutil_socket_t, short /*evtype*/, void* vself)
         {
             auto* const self = static_cast<tr_session_thread_impl*>(vself);
-            self->is_looping_mutex_.lock();
-            self->is_looping_ = !self->is_looping_;
-            self->is_looping_mutex_.unlock();
-
+            self->is_looping_ ^= 1;
             self->is_looping_cv_.notify_one();
         };
 
@@ -287,7 +284,7 @@ private:
 
     std::mutex is_looping_mutex_;
     std::condition_variable is_looping_cv_;
-    std::atomic<bool> is_looping_ = false;
+    std::atomic<int> is_looping_ = 0;
 
     std::atomic<bool> is_shutting_down_ = false;
     static constexpr std::chrono::seconds Deadline = 5s;
