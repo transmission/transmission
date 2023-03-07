@@ -292,7 +292,6 @@ std::string_view getSiteName(std::string_view host)
 
     return host;
 }
-
 } // namespace
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
@@ -335,8 +334,31 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         parsed.authority = url.substr(0, pos);
         url = pos == std::string_view::npos ? ""sv : url.substr(pos);
 
+        // A host identified by an Internet Protocol literal address, version 6
+        // [RFC3513] or later, is distinguished by enclosing the IP literal
+        // within square brackets ("[" and "]").  This is the only place where
+        // square bracket characters are allowed in the URI syntax.
         auto remain = parsed.authority;
-        parsed.host = tr_strvSep(&remain, ':');
+        if (tr_strvStartsWith(remain, '['))
+        {
+            remain.remove_prefix(1); // '['
+            parsed.host = tr_strvSep(&remain, ']');
+            if (tr_strvStartsWith(remain, ':'))
+            {
+                remain.remove_prefix(1);
+            }
+        }
+        // Not legal by RFC3986 standards, but sometimes users omit
+        // square brackets for an IPv6 address with an implicit port
+        else if (std::count(std::begin(remain), std::end(remain), ':') > 1U)
+        {
+            parsed.host = remain;
+            remain = ""sv;
+        }
+        else
+        {
+            parsed.host = tr_strvSep(&remain, ':');
+        }
         parsed.sitename = getSiteName(parsed.host);
         parsed.port = parsePort(!std::empty(remain) ? remain : getPortForScheme(parsed.scheme));
     }
