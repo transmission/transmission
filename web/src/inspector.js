@@ -312,7 +312,11 @@ export class Inspector extends EventTarget {
         string = `${fmt.size(verified)} (100%)`;
       }
     }
-    setTextContent(e.info.have, string);
+
+    setTextContent(
+      e.info.have,
+      string.includes('E2BIG') ? 'loading...' : string
+    );
 
     // availability
     if (torrents.length === 0) {
@@ -326,7 +330,7 @@ export class Inspector extends EventTarget {
       );
       string = `${fmt.percentString((100 * available) / sizeWhenDone)}%`;
     }
-    setTextContent(e.info.availability, string);
+    setTextContent(e.info.availability, string.includes('NaN') ? '0%' : string);
 
     //  downloaded
     if (torrents.length === 0) {
@@ -344,7 +348,10 @@ export class Inspector extends EventTarget {
         ? `${fmt.size(d)} (+${fmt.size(f)} discarded after failed checksum)`
         : fmt.size(d);
     }
-    setTextContent(e.info.downloaded, string);
+    setTextContent(
+      e.info.downloaded,
+      string.includes('E2BIG') ? 'loading...' : string
+    );
 
     // uploaded
     if (torrents.length === 0) {
@@ -448,7 +455,7 @@ export class Inspector extends EventTarget {
         string = 'None';
       }
     }
-    setTextContent(e.info.size, string);
+    setTextContent(e.info.size, string.includes('NaN') ? 'loading...' : string);
 
     // hash
     if (torrents.length === 0) {
