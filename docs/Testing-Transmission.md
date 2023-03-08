@@ -2,7 +2,7 @@
 
 At the bottom of a pull request, you'll find a list of checks (or expand them with "View details" if the PR was already merged).
 Follow any link to "Details", but cut the jobs part of the URL, so that it looks like: <https://github.com/transmission/transmission/actions/runs/1234567890>.
-Download the desired Artifact at the bottom of the page.
+Download the desired "from-tarball" Artifact at the bottom of the page.
 
 ## How to open a CI build on macOS ##
 
