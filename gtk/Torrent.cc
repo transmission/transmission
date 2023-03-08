@@ -447,7 +447,8 @@ Glib::ustring Torrent::Impl::get_long_status_text() const
     default:
         if (auto const buf = get_short_transfer_text(); !std::empty(buf))
         {
-            status_str += fmt::format(FMT_STRING(" - {:s}"), buf);
+            status_str += " - ";
+            status_str += buf;
         }
     }
 
