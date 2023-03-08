@@ -755,7 +755,7 @@ std::string tr_formatter_speed_KBps(double kilo_per_second)
 
     auto speed = kilo_per_second;
 
-    if (speed < 999.95) // 0.0 KB to 999.9 KB
+    if (speed < 999.95) // 0.0 KB to 999.9 KB (0.0 KiB to 999.9 KiB)
     {
         return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
     }
@@ -767,7 +767,7 @@ std::string tr_formatter_speed_KBps(double kilo_per_second)
     {
         return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
-    if (speed < 999.95) // 100.0 MB to 999.9 MB
+    if (speed < 999.95) // 100.0 MB to 999.9 MB (100.0 MiB to 999.9 MiB)
     {
         return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
@@ -778,7 +778,7 @@ std::string tr_formatter_speed_KBps(double kilo_per_second)
     {
         return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
     }
-    // 100.0 GB and above
+    // 100.0 GB and above (100.0 GiB and above)
     return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
 }
 
@@ -788,11 +788,11 @@ std::string tr_formatter_speed_compact_KBps(double kilo_per_second)
 
     auto speed = kilo_per_second;
 
-    if (speed < 99.95) // 0.0 KB to 99.9 KB
+    if (speed < 99.95) // 0.0 KB to 99.9 KB (0.0 KiB to 99.9 KiB)
     {
         return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
     }
-    if (speed < 999.5) // 100 KB to 999 KB
+    if (speed < 999.5) // 100 KB to 999 KB (100 KiB to 999 KiB)
     {
         return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
     }
@@ -804,11 +804,11 @@ std::string tr_formatter_speed_compact_KBps(double kilo_per_second)
     {
         return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
-    if (speed < 99.95) // 10.0 MB to 99.9 MB
+    if (speed < 99.95) // 10.0 MB to 99.9 MB (10.0 MiB to 99.9 MiB)
     {
         return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
-    if (speed < 999.5) // 100 MB to 999 MB
+    if (speed < 999.5) // 100 MB to 999 MB (100 MiB to 999 MiB)
     {
         return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
@@ -819,11 +819,11 @@ std::string tr_formatter_speed_compact_KBps(double kilo_per_second)
     {
         return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
     }
-    if (speed < 99.95) // 10.0 GB to 99.9 GB
+    if (speed < 99.95) // 10.0 GB to 99.9 GB (10.0 GiB to 99.9 GiB)
     {
         return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
     }
-    // 100 GB and above
+    // 100 GB and above (100 GiB and above)
     return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
 }
 
