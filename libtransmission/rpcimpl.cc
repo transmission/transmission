@@ -853,7 +853,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
-                tr_variantListAddBool(initme, tr_torrentFile(tor, i).wanted);
+                tr_variantListAddInt(initme, tr_torrentFile(tor, i).wanted);
             }
         }
         break;
