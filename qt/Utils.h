@@ -76,5 +76,5 @@ public:
         }
     }
 
-    static void updateSpinBoxFormat(QSpinBox* spinBox, QString const& format, QString const& placeholder);
+    static void updateSpinBoxFormat(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder);
 };
