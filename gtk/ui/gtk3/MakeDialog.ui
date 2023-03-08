@@ -415,8 +415,8 @@ To add a new primary URL, add it after a blank line.</property>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-7">close_button</action-widget>
-      <action-widget response="-3">new_button</action-widget>
+      <action-widget response="close">close_button</action-widget>
+      <action-widget response="accept">new_button</action-widget>
     </action-widgets>
   </object>
   <object class="GtkSizeGroup" id="labels_width_group">
