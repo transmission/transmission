@@ -117,7 +117,7 @@ char const* const LICENSE =
 class Application::Impl
 {
 public:
-    Impl(Application& app, std::string const& config_dir, bool start_paused, bool is_iconified);
+    Impl(Application& app, std::string const& config_dir, bool start_paused, bool start_iconified);
     ~Impl() = default;
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -205,8 +205,9 @@ private:
 private:
     Application& app_;
 
-    std::string config_dir_;
-    bool start_paused_ = false;
+    std::string const config_dir_;
+    bool const start_paused_;
+    bool const start_iconified_;
     bool is_iconified_ = false;
     bool is_closing_ = false;
 
@@ -669,7 +670,7 @@ void Application::Impl::on_activate()
     /* GApplication emits an 'activate' signal when bootstrapping the primary.
      * Ordinarily we handle that by presenting the main window, but if the user
      * started Transmission minimized, ignore that initial signal... */
-    if (is_iconified_ && activation_count_ == 1)
+    if (start_iconified_ && activation_count_ == 1)
     {
         return;
     }
@@ -705,19 +706,19 @@ std::string get_application_id(std::string const& config_dir)
 
 } // namespace
 
-Application::Application(std::string const& config_dir, bool start_paused, bool is_iconified)
+Application::Application(std::string const& config_dir, bool start_paused, bool start_iconified)
     : Gtk::Application(get_application_id(config_dir), TR_GIO_APPLICATION_FLAGS(HANDLES_OPEN))
-    , impl_(std::make_unique<Impl>(*this, config_dir, start_paused, is_iconified))
+    , impl_(std::make_unique<Impl>(*this, config_dir, start_paused, start_iconified))
 {
 }
 
 Application::~Application() = default;
 
-Application::Impl::Impl(Application& app, std::string const& config_dir, bool start_paused, bool is_iconified)
+Application::Impl::Impl(Application& app, std::string const& config_dir, bool start_paused, bool start_iconified)
     : app_(app)
     , config_dir_(config_dir)
     , start_paused_(start_paused)
-    , is_iconified_(is_iconified)
+    , start_iconified_(start_iconified)
 {
 }
 
@@ -728,7 +729,7 @@ void Application::Impl::on_core_busy(bool busy)
 
 void Application::Impl::app_setup()
 {
-    if (is_iconified_)
+    if (start_iconified_)
     {
         gtr_pref_flag_set(TR_KEY_show_notification_area_icon, true);
     }
@@ -758,7 +759,7 @@ void Application::Impl::app_setup()
     update_model_once();
 
     /* either show the window or iconify it */
-    if (!is_iconified_)
+    if (!start_iconified_)
     {
         wind_->show();
         gtr_action_set_toggled("toggle-main-window", true);
@@ -766,7 +767,6 @@ void Application::Impl::app_setup()
     else
     {
         gtr_window_set_skip_taskbar_hint(*wind_, icon_ != nullptr);
-        is_iconified_ = false; // ensure that the next toggle iconifies
         gtr_action_set_toggled("toggle-main-window", false);
     }
 
