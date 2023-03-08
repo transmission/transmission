@@ -42,27 +42,15 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
         _fAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
         _fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
         _fAttributes[NSShadowAttributeName] = stringShadow;
+        _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:23.0];
 
         // DownloadBadge and UploadBadge should have the same size
         NSSize badgeSize = [NSImage imageNamed:@"DownloadBadge"].size;
         // DownArrowTemplate and UpArrowTemplate should have the same size
         CGFloat arrowWidthHeightRatio = kWhiteDownArrow.size.width / kWhiteDownArrow.size.height;
 
-        // Make sure text fits on the badge.
-        // In macOS Ventura, this will end up calculating a boldSystemFontOfSize of 21.
-        NSString* maxString = [NSString stringForSpeedAbbrev:888.8]; // "888.8 K" localized
-        CGFloat fontSize = 26.0;
-        NSSize stringSize;
-        CGFloat arrowHeight;
-        do
-        {
-            fontSize -= 1.0;
-            _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:fontSize];
-            stringSize = [maxString sizeWithAttributes:_fAttributes];
-            // arrow height equal to font capital letter height + shadow
-            arrowHeight = [_fAttributes[NSFontAttributeName] capHeight] + 4;
-        } while (badgeSize.width < stringSize.width + 2 * arrowHeight * arrowWidthHeightRatio +
-                     arrowHeight); // text is centered + surrounded by the size of two arrows + arrow spacing (" ▼ 888.8 K ▽ ")
+        // arrow height equal to font capital letter height + shadow
+        CGFloat arrowHeight = [_fAttributes[NSFontAttributeName] capHeight] + 4;
 
         kArrowInset = { badgeSize.height * 0.2, badgeSize.height * 0.1 };
         kArrowSize = { arrowHeight * arrowWidthHeightRatio, arrowHeight };
