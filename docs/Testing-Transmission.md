@@ -6,10 +6,19 @@ Download the desired "from-tarball" Artifact at the bottom of the page.
 
 ## How to open a CI build on macOS ##
 
-You need to mark Transmission.app both as executable and not quarantined:
+You need to mark Transmission.app both as executable and not quarantined using the Terminal application (in Applications/Utilities):
 
 1. `chmod +x Transmission.app/Contents/MacOS/Transmission`
+
+   If you're unfamiliar with using the Terminal application, the following steps might be of help.
+
+   1. Open the Terminal application and type: chmod +x (and add a space after the x).
+   2. Right-click or Ctrl-click the Transmission application and select 'Show Package Contents'.
+   3. Navigate to the 'MacOS' directory; drag and drop 'Transmission' on to the Terminal window you had opened in step 1 and press Return. 
+
 2. `xattr -rc Transmission.app`
+
+   One of the MacOS security features is to 'quarantine' applications, and the xattr application allows the user to change the attributes of an application by setting different parameters. If xattr isn't available on your machine, you will need to install Apple's Developer Tools. Paste the following into a Terminal window to begin installation: xcode-select --install
 
 ## On Apple Silicon, you also need a working install of Rosetta ##
 
