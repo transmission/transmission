@@ -42,7 +42,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
         _fAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
         _fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
         _fAttributes[NSShadowAttributeName] = stringShadow;
-        _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:22.0];
+        _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:24.0];
 
         // DownloadBadge and UploadBadge should have the same size
         NSSize badgeSize = [NSImage imageNamed:@"DownloadBadge"].size;
@@ -105,8 +105,8 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
     //string is in center of image
     NSSize stringSize = [string sizeWithAttributes:self.fAttributes];
     NSRect stringRect;
-    stringRect.origin.x = NSMidX(badgeRect) - stringSize.width * 0.5;
-    stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + 1.0; //adjust for shadow
+    stringRect.origin.x = NSMidX(badgeRect) - stringSize.width * 0.5 + kArrowInset.width; // adjust for arrow
+    stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + 1.0; // adjust for shadow
     stringRect.size = stringSize;
     [string drawInRect:stringRect withAttributes:self.fAttributes];
 
