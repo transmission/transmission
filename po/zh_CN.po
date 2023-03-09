@@ -10,7 +10,7 @@
 # 玉堂白鹤 <yjwork@qq.com>, 2022
 # Dingzhong Chen <wsxy162@gmail.com>, 2022
 # pluwen <pluwen@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -97,7 +97,7 @@ msgstr "无法添加事件：{error}（{error_code}）"
 
 #: ../daemon/daemon.cc:840
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr "无法启动后台进程时间循环：error}（{error_code}）"
+msgstr "无法启动后台进程时间循环：{error}（{error_code}）"
 
 #: ../gtk/Application.cc:394
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
@@ -584,7 +584,7 @@ msgstr "低"
 
 #: ../gtk/FileList.cc:840 ../gtk/Session.cc:329
 msgid "Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"
-msgstr "无法将“{old_path”重命名为“{path}”：{error}（{error_code}）"
+msgstr "无法将“{old_path}”重命名为“{path}”：{error}（{error_code}）"
 
 #: ../gtk/FileList.cc:953 ../gtk/MessageLogWindow.cc:327
 msgid "Name"

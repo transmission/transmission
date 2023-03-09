@@ -8,8 +8,8 @@
 # Adolfo Jayme-Barrientos, 2021
 # GPL-advocate <adrlopgal@disroot.org>, 2022
 # picodotdev <pico.dev@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Rodrigo Lledó <rodhos92@gmail.com>, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -18,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Rodrigo Lledó <rodhos92@gmail.com>, 2023\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
 "Language-Team: Spanish (https://www.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -483,8 +483,8 @@ msgstr "Semillas web"
 #: ../gtk/DetailsDialog.cc:1823
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] "Obtuvo una lista de {markup_begin}{peer_count} par{markup_end} "
-msgstr[1] "Obtuvo una lista de {markup_begin}{peer_count} pares{markup_end} "
+msgstr[0] "Obtuvo una lista de {markup_begin}{peer_count} par{markup_end} {time_span_ago}"
+msgstr[1] "Obtuvo una lista de {markup_begin}{peer_count} pares{markup_end} {time_span_ago}"
 msgstr[2] "Se obtuvo una lista de {markup_begin}{peer_count} pares{markup_end} {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span

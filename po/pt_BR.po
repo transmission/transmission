@@ -12,7 +12,6 @@
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Eduardo Lamblet <edlamblet@netscape.net>, 2023
 # LUIS PEDRO NUNES LESSA, 2023
-# Gabriel bielperes, 2023
 # Leonardo Colman Lopes <leonardo.dev@colman.com.br>, 2023
 #
 #, fuzzy
@@ -559,23 +558,23 @@ msgstr "{torrent_name} Propriedades"
 #: ../gtk/DetailsDialog.cc:2647
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
-msgstr[0] "Propriedades"
-msgstr[1] "Propriedades"
-msgstr[2] "Propriedades"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Remover"
-msgstr[1] "Remover"
-msgstr[2] "Remover"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Apagar o arquivo baixado deste torrent?"
-msgstr[1] "Apagar o arquivo baixado deste torrent?"
-msgstr[2] "Apagar o arquivo baixado deste torrent?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."

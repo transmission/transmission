@@ -437,7 +437,7 @@ msgstr[1] "{markup_begin}{peer_count} partner{markup_end} fogadva {time_span_ago
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1835
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr "A partnerlista kérése során {markup_begin}időtúllépés történt{markup_end}; újrapróbálkozás később"
+msgstr "A partnerlista kérése során {markup_begin}időtúllépés történt {time_span_ago}{markup_end}; újrapróbálkozás később"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1844
@@ -637,7 +637,7 @@ msgstr "_Megjelenítés:"
 
 #: ../gtk/FilterBar.cc:587
 msgid "_Show {count:L} of:"
-msgstr "{count} meg_jelenítése ennyiből:"
+msgstr "{count:L} meg_jelenítése ennyiből:"
 
 #: ../gtk/FreeSpaceLabel.cc:54
 msgid "{disk_space} free"
@@ -1188,7 +1188,7 @@ msgstr "Nem sikerült megnyitni a torrentet"
 
 #: ../gtk/Utils.cc:429
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr "Nem sikerült '{old_path}' áthelyezése a kukába: {error} ({error_code})"
+msgstr "Nem sikerült '{path}' áthelyezése a kukába: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:537
 msgid "Couldn't open '{url}'"
@@ -1234,7 +1234,7 @@ msgstr "[torrent fájlok vagy webcímek]"
 
 #: ../gtk/main.cc:107
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr "A parancssori kapcsolók teljes listájáért futtassa a '%s --help' parancsot.\n"
+msgstr "A parancssori kapcsolók teljes listájáért futtassa a '{program} --help' parancsot.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"

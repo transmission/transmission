@@ -439,7 +439,7 @@ msgstr "Demande d'autres pairs {markup_begin}{time_span_ago}{markup_end}"
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1904
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr "Le traceur avait {markup_begin}{seeder_count} {seeder_or_seeders} et {leecher_count} {leecher_or_leechers}{markup_end} il y a {time_span}"
+msgstr "Le traceur avait {markup_begin}{seeder_count} {seeder_or_seeders} et {leecher_count} {leecher_or_leechers}{markup_end} il y a {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1906
 msgid "seeder"
@@ -1209,7 +1209,7 @@ msgstr "Adresse URL non prise en charge : « {url} »"
 #. modal
 #: ../gtk/Utils.cc:760
 msgid "Transmission doesn't know how to use '{url}'"
-msgstr "Transmission ne sait pas comment utiliser « %s »"
+msgstr "Transmission ne sait pas comment utiliser « {url} »"
 
 #: ../gtk/Utils.cc:765
 msgid "This magnet link appears to be intended for something other than BitTorrent."
@@ -2175,9 +2175,9 @@ msgstr "Réussi"
 #: ../libtransmission/blocklist.cc:66 ../libtransmission/blocklist.cc:400
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
-msgstr[0] "La liste de blocage contient {count:L} entrée"
-msgstr[1] "La liste de blocage contient {count:L} entrées"
-msgstr[2] "La liste de blocage contient {count:L} entrées"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:242
@@ -2242,7 +2242,7 @@ msgstr "Statut inconnu : {state}"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:86
 msgid "Found public address '{address}'"
-msgstr "Adresse publique trouvée « %s »"
+msgstr "Adresse publique trouvée « {address} »"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:123
 msgid "Port {port} is no longer forwarded"
@@ -2250,11 +2250,11 @@ msgstr "Le port {port} n’est pas redirigé"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:177
 msgid "Port {port} forwarded successfully"
-msgstr "Port %d redirigé avec succès"
+msgstr "Port {port} redirigé avec succès"
 
 #: ../libtransmission/port-forwarding-upnp.cc:281
 msgid "Found Internet Gateway Device '{url}'"
-msgstr "Périphérique de passerelle trouvé « %s »"
+msgstr "Périphérique de passerelle trouvé « {url} »"
 
 #: ../libtransmission/port-forwarding-upnp.cc:282
 msgid "Local Address is '{address}'"

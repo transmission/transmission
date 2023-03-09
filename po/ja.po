@@ -873,7 +873,7 @@ msgstr "デスクトップの休止状態を許可中"
 
 #: ../gtk/Session.cc:1202
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr "タグ保留中のRPCリクエストが見つかりません"
+msgstr ""
 
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"

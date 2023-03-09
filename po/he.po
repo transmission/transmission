@@ -6,8 +6,8 @@
 # Translators:
 # עומר א״ש <omeritzicschwartz@gmail.com>, 2022
 # Avi Markovitz <avi.markovitz@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
 "Language-Team: Hebrew (https://www.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -1009,7 +1009,7 @@ msgstr "מעוכב"
 
 #: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2213
 msgid "Tracker warning: '{warning}'"
-msgstr "אזהרת עוקב: ‚%*.*s’"
+msgstr "אזהרת עוקב: ‚{warning}’"
 
 #: ../gtk/Torrent.cc:488
 msgid "Tracker Error: '{error}'"

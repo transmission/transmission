@@ -5,8 +5,8 @@
 #
 # Translators:
 # Björn Þór Björnsson, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Sveinn í Felli <sv1@fellsnet.is>, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2023\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
 "Language-Team: Icelandic (https://www.transifex.com/transmissionbt/teams/33778/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
@@ -248,7 +248,7 @@ msgstr "Búið til af {creator}"
 
 #: ../gtk/DetailsDialog.cc:723
 msgid "Created on {date}"
-msgstr "Búið til {{ date }}"
+msgstr "Búið til {date}"
 
 #: ../gtk/DetailsDialog.cc:837
 msgid "Unknown"
@@ -502,13 +502,13 @@ msgstr[1] "Eiginleikar - {torrent_count:L} torrent-skrár"
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
 msgstr[0] "Fjarlægja torrent-skrána?"
-msgstr[1] "Fjarlægja %d torrent-skrárnar?"
+msgstr[1] "Fjarlægja {count:L} torrent-skrárnar?"
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
 msgstr[0] "Viltu eyða sóttum skrám úr þessari torrent-skrá?"
-msgstr[1] "Viltu eyða sóttum skrám úr þessum %d torrent-skrám?"
+msgstr[1] "Viltu eyða sóttum skrám úr þessum {count:L} torrent-skrám?"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
