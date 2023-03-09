@@ -986,6 +986,9 @@
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "Questa cartella non contiene alcun file.";
 
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+/* "This option is not available if Default location is set to Same as torrent file." = ""; */
+
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "Questo trasferimento è in corso. Dopo averlo rimosso, continuare il trasferimento richiederà il file torrent o il collegamento magnetico.";
 
