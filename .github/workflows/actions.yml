@@ -177,7 +177,7 @@ jobs:
   clang-tidy-libtransmission:
     runs-on: ubuntu-22.04
     needs: [ what-to-make ]
-    if: ${{ needs.what-to-make.outputs.make-style == 'true' }}
+    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
     steps:
       - name: Show Configuration
         run: |
