@@ -6,8 +6,8 @@
 # Translators:
 # Otto Koskelah <otto@nise.fi>, 2017
 # Kimmo Kujansuu <mrkujansuu@gmail.com>, 2022
-# Jiri Grönroos <jiri.gronroos@iki.fi>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2023
 #
 #, fuzzy
 msgid ""
@@ -16,7 +16,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2023\n"
 "Language-Team: Finnish (https://www.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -278,8 +278,8 @@ msgstr[1] "{total_size} on {file_count:L} tiedostoa"
 #: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:393
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] "({piece_count} BitTorrent palasta @ {piece_size})"
-msgstr[1] "({piece_count} BitTorrent palasta @ {piece_size})"
+msgstr[0] "({piece_count} BitTorrent-osa @ {piece_size})"
+msgstr[1] "({piece_count} BitTorrent-osaa @ {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:933
 msgid "{current_size} ({percent_done}%)"
@@ -516,14 +516,14 @@ msgstr[1] "Ominaisuudet - {torrent_count:L} torrentia"
 #: ../gtk/Dialogs.cc:57
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Poistetaanko torrent?"
+msgstr[1] "Poistetaanko {count:L} torrentia?"
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Poistetaanko tämän torrentin ladatut tiedostot?"
+msgstr[1] "Poistetaanko näiden {count:L} torrentin ladatut tiedostot?"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -748,31 +748,31 @@ msgstr "Aika"
 #: ../gtk/MessageLogWindow.cc:483
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Kriittinen"
 
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Virhe"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Varoitus"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Tiedot"
 
 #: ../gtk/MessageLogWindow.cc:487
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Vianjäljitys"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Ei voitu luoda välityspalvelinta väylään '{bus}': {error} ({error_code})"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -812,15 +812,15 @@ msgstr "_Avaa"
 
 #: ../gtk/OptionsDialog.cc:385
 msgid "Show options dialog"
-msgstr ""
+msgstr "Näytä valintaikkuna"
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
-msgstr ""
+msgstr "Valitse tiedosto"
 
 #: ../gtk/PathButton.cc:202
 msgid "(None)"
-msgstr ""
+msgstr "(Ei mitään)"
 
 #: ../gtk/PrefsDialog.cc:306
 msgid "Allow encryption"
@@ -1176,11 +1176,11 @@ msgstr "Ei voitu avata torrentia"
 
 #: ../gtk/Utils.cc:429
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Ei voitu siirtää '{path}' roskakoriin: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:537
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Osoitetta '{url}' ei voitu avata"
 
 #: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
@@ -1222,7 +1222,7 @@ msgstr "[torrent-tiedostot tai verkko-osoitteet]"
 
 #: ../gtk/main.cc:107
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Suorita '{program} --help' nähdäksesi kaikki komentorivivalitsimet.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1935,11 +1935,11 @@ msgstr "Enimmäismäärä _vertaisille:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1437 ../gtk/ui/gtk4/PrefsDialog.ui:994
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Käytä µ_TP:tä vertaisten yhteyksiin"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1441 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "uTP on työkalu, jonka avulla vähennetään verkon ruuhkaa."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1009
 msgid "Use PE_X to find more peers"
@@ -2164,7 +2164,7 @@ msgstr "Riviä ei voitu jäsentää: '{line}'"
 
 #: ../libtransmission/blocklist.cc:384
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Kirjoitetaan vanhan estolistan tiedostomuotoa uuteen tiedostomuotoon"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:41 ../libtransmission/crypto-utils-openssl.cc:56 ../libtransmission/crypto-utils-wolfssl.cc:44
 msgid "{crypto_library} error: {error} ({error_code})"
@@ -2377,8 +2377,8 @@ msgstr[1] "Ladattiin {count} torrentia"
 #: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-msgstr[0] "Magnet metainfoa ei voitu jäsentää: '{error}'. Ladataan {piece_count} palasta uudelleen"
-msgstr[1] "Magnet metainfoa ei voitu jäsentää: '{error}'. Ladataan {piece_count} palasta uudelleen"
+msgstr[0] "Magnet-metatietoa ei voitu jäsentää: '{error}'. Ladataan {piece_count} osa uudelleen"
+msgstr[1] "Magnet-metatietoa ei voitu jäsentää: '{error}'. Ladataan {piece_count} osaa uudelleen"
 
 #: ../libtransmission/torrent-metainfo.cc:699
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
@@ -2426,7 +2426,7 @@ msgstr "Ei voitu siirtää '{old_path}' polkuun '{path}': {error} ({error_code})
 
 #: ../libtransmission/tr-dht.cc:528
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Tiedoston '{filename}' riviä ei voitu jäsentää: '{line}'"
 
 #: ../libtransmission/tr-lpd.cc:259
 msgid "Couldn't initialize LPD: {error} ({error_code})"
@@ -2438,7 +2438,7 @@ msgstr "IPv4-porttia ei voitu sitoa uudelleen {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Ei voitu sitoa IPv6-pistoketta {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
@@ -2516,14 +2516,14 @@ msgstr ""
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} tiedosto, {total_size}\n"
+msgstr[1] "{file_count:L} tiedostoa, {total_size}\n"
 
 #: ../utils/create.cc:232
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} osa, {piece_size}\n"
+msgstr[1] "{piece_count:L} osaa, {piece_size} jokainen\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"

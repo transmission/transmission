@@ -6,11 +6,12 @@
 # Translators:
 # Валерий Дмиртиевич Степанов <valera1111@yandex.ru>, 2017
 # Stas Solovey <whats_up@tut.by>, 2022
-# hlm hlmfn, 2022
-# Виктор, 2022
 # Sergey Alyoshin <alyoshin.s@gmail.com>, 2022
+# hlm hlmfn, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Виктор, 2023
 # Andrei Stepanov, 2023
+# Артём Котлубай <artemkotlubai@yandex.ru>, 2023
 #
 #, fuzzy
 msgid ""
@@ -19,7 +20,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Andrei Stepanov, 2023\n"
+"Last-Translator: Артём Котлубай <artemkotlubai@yandex.ru>, 2023\n"
 "Language-Team: Russian (https://www.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +66,7 @@ msgstr "Повторная загрузка настроек из \"{path}\""
 
 #: ../daemon/daemon.cc:702
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr "Не удалось запустить демон: {error} ({error_code})"
+msgstr "Не удалось запустить службу: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:715
 msgid "Loading settings from '{path}'"
@@ -117,7 +118,7 @@ msgstr "_Отменить"
 
 #: ../gtk/Application.cc:784
 msgid "I _Agree"
-msgstr "Я _согласен"
+msgstr "_Принимаю"
 
 #: ../gtk/Application.cc:1013
 msgid "Closing Connections…"
@@ -162,8 +163,8 @@ msgstr "Авторское право © The Transmission Project"
 msgid "translator-credits"
 msgstr ""
 "Stas Solovey <whats_up@tut.by>, 2010-2017\n"
-"Viсtor github.com/ViktorOn, 2022\n"
-"Andrei Stepanov, 2015-2022"
+"Viсtor github.com/ViktorOn, 2022-2023\n"
+"Andrei Stepanov, 2015-2023"
 
 #: ../gtk/DetailsDialog.cc:518 ../gtk/DetailsDialog.cc:536
 msgid "Use global settings"
@@ -1234,7 +1235,7 @@ msgstr "Не удалось открыть торрент"
 
 #: ../gtk/Utils.cc:429
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr "Не удалось переместить \"{path}\" в корзину: {error} ({error_code})"
+msgstr "Не удалось убрать «{path}» в корзину: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:537
 msgid "Couldn't open '{url}'"
@@ -1401,19 +1402,19 @@ msgstr "По_ложение в очереди"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr "Переместить в начало _списка"
+msgstr "В _начало"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr "Переместить в_верх"
+msgstr "П_овысить"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr "Переместить в_низ"
+msgstr "Пониз_ить"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr "Переместить в конец _списка"
+msgstr "В _конец"
 
 #: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:55 ../gtk/ui/gtk4/MainWindow.ui:54
 msgid "_Pause"
@@ -1465,43 +1466,43 @@ msgstr "_Строка состояния"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr "Сортировать по _активности"
+msgstr "Упорядочивать по _активности"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr "Сортировать по _дате добавления"
+msgstr "Упорядочивать по _дате добавления"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr "Сортировать по _названию"
+msgstr "Упорядочивать по _названию"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr "Сортировать по _продвижению загрузки"
+msgstr "Упорядочивать по _продвижению загрузки"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr "Сортировать по о_черёдности"
+msgstr "Упорядочивать по о_черёдности"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr "Сортировать по соо_тношению"
+msgstr "Упорядочивать по соо_тношению"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
-msgstr "Сортировать по _размеру"
+msgstr "Упорядочивать по _размеру"
 
 #: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
 msgid "Sort by Stat_e"
-msgstr "Сортировать по сос_тоянию"
+msgstr "Упорядочивать по сос_тоянию"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr "Сортировать по оставшемуся _времени"
+msgstr "Упорядочивать по оставшемуся _времени"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr "О_братный порядок сортировки"
+msgstr "О_братить порядок"
 
 #: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1478
 msgid "_Help"
@@ -1529,7 +1530,7 @@ msgstr "_О программе"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr "Со_ртировать торренты по"
+msgstr "Упо_рядочивать торренты по"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1809,7 +1810,7 @@ msgstr "Н_ачать загрузку после добавления"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:478 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
 msgid "Mo_ve torrent file to the trash"
-msgstr "Пе_реместить торрент-файл в корзину"
+msgstr "Убрать торрент-файл в корз_ину"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:8 ../gtk/ui/gtk4/PrefsDialog.ui:5
 msgid "Transmission Preferences"
@@ -2017,7 +2018,7 @@ msgstr "DHT — это технология поиска участников б
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1491 ../gtk/ui/gtk4/PrefsDialog.ui:1039
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr "_Использовать локальное обнаружение участников (LDP)"
+msgstr "Исполь_зовать локальное обнаружение участников"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1495 ../gtk/ui/gtk4/PrefsDialog.ui:1041
 msgid "LPD is a tool for finding peers on your local network."

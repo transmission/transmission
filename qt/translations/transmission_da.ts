@@ -2246,9 +2246,9 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Torrentdublet</numerusform>
-            <numerusform>Torrentdubletter</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">

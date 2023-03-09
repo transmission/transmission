@@ -4,7 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Aymen J, 2023
 #
 #, fuzzy
 msgid ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Aymen J, 2023\n"
 "Language-Team: Arabic (https://www.transifex.com/transmissionbt/teams/33778/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +32,7 @@ msgstr ""
 
 #: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:162 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "لا يمكن قراءة {path}: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:260 ../gtk/Session.cc:863 ../gtk/Utils.cc:285 ../libtransmission/watchdir.cc:95
 msgid "Couldn't add torrent file '{path}'"
@@ -115,7 +116,7 @@ msgstr ""
 
 #: ../gtk/Application.cc:1013
 msgid "Closing Connections…"
-msgstr ""
+msgstr "<b>يجري غلق الاتصالات...</b>"
 
 #: ../gtk/Application.cc:1018
 msgid "Sending upload/download totals to tracker…"
@@ -543,26 +544,24 @@ msgstr[4] ""
 msgstr[5] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "أتريد أن تزيل هذا التورنت؟"
-msgstr[1] "أتريد أن تزيل هذا التورنت؟"
-msgstr[2] "أتريد أن تزيل هذين التورنتين؟"
-msgstr[3] "أتريد أن تزيل هذه التورنتات؟"
-msgstr[4] "أتريد أن تزيل هذه التورنتات؟"
-msgstr[5] "أتريد أن تزيل هذه التورنتات؟"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "أتريد أن تحذف الملفات المنزَّلة لهذا التورنت؟"
-msgstr[1] "أتريد أن تحذف الملفات المنزَّلة لهذا التورنت؟"
-msgstr[2] "أتريد أن تحذف الملفات المنزَّلة لهذين التورنتين؟"
-msgstr[3] "أتريد أن تحذف الملفات المنزَّلة لهذه التورنتات؟"
-msgstr[4] "أتريد أن تحذف الملفات المنزَّلة لهذه التورنتات؟"
-msgstr[5] "أتريد أن تحذف الملفات المنزَّلة لهذه التورنتات؟"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -1945,7 +1944,7 @@ msgstr "_في أيام:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
 msgid "_to"
-msgstr ""
+msgstr "إ_لى"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
 msgctxt "Gerund"
@@ -2733,583 +2732,3 @@ msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
 msgstr[5] ""
-
-#~ msgid " _to "
-#~ msgstr " إ_لى "
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "خصائص ملف التورنت \"%'d\""
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "أقل من يوم"
-#~ msgstr[1] "يوم واحد"
-#~ msgstr[2] "يومان"
-#~ msgstr[3] "%'d أيام"
-#~ msgstr[4] "%'d يومًا"
-#~ msgstr[5] "%'d يوم"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "أقل من ساعة"
-#~ msgstr[1] "ساعة واحدة"
-#~ msgstr[2] "ساعتان"
-#~ msgstr[3] "%'d ساعات"
-#~ msgstr[4] "%'d ساعة"
-#~ msgstr[5] "%'d ساعة"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "أقل من دقيقة"
-#~ msgstr[1] "دقيقة واحدة"
-#~ msgstr[2] "دقيقتان"
-#~ msgstr[3] "%'d دقائق"
-#~ msgstr[4] "%'d دقيقة"
-#~ msgstr[5] "%'d دقيقة"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "حالا"
-#~ msgstr[1] "ثانية واحدة"
-#~ msgstr[2] "ثانيتان"
-#~ msgstr[3] "%'d ثوان"
-#~ msgstr[4] "%'d ثانية"
-#~ msgstr[5] "%'d ثانية"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d قطعة بـ %2$s"
-#~ msgstr[1] "قطعة واحدة (%1$'d) بـ %2$s"
-#~ msgstr[2] "قطعتين (%1$'d) بـ %2$s"
-#~ msgstr[3] "%1$'d قطع بـ %2$s"
-#~ msgstr[4] "%1$'d قطعة بـ %2$s"
-#~ msgstr[5] "%1$'d قطعة بـ %2$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d قطعة بـ %3$s)"
-#~ msgstr[1] "%1$s (قطعة واحدة (%2$'d) بـ %3$s)"
-#~ msgstr[2] "%1$s (قطعتين (%2$'d) بـ %3$s)"
-#~ msgstr[3] "%1$s (%2$'d قطع بـ %3$s)"
-#~ msgstr[4] "%1$s (%2$'d قطعة بـ %3$s)"
-#~ msgstr[5] "%1$s (%2$'d قطعة بـ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d قطعة)"
-#~ msgstr[1] "%1$s (قطعة واحدة)"
-#~ msgstr[2] "%1$s (قطعتين)"
-#~ msgstr[3] "%1$s (%2$'d قطع)"
-#~ msgstr[4] "%1$s (%2$'d قطعة)"
-#~ msgstr[5] "%1$s (%2$'d قطعة)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% من %3$s%% متوفر)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (%2$s%% من %3$s%% متوفر); %4$s غير معروف"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s فاسد)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "منذ %1$s"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%1$s من %2$s (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr "%1$s من %2$s (%3$s%%)، تم رفع %4$s (النسبة: %5$s، الهدف: %6$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%1$s من %2$s (%3$s%%)، تم رفع %4$s (النسبة: %5$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-#~ msgstr "%1$s، تم رفع %2$s (النسبة: %3$s، الهدف: %4$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s، تم رفع %2$s (النسبة: %3$s)"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s؛ %2$'d ملف"
-#~ msgstr[1] "%1$s؛ ملف واحد"
-#~ msgstr[2] "%1$s؛ ملفين"
-#~ msgstr[3] "%1$s؛ %2$'d ملفات"
-#~ msgstr[4] "%1$s؛ %2$'d ملفا"
-#~ msgstr[5] "%1$s؛ %2$'d ملف"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "شغّل الأمر '%s --help' لرؤية القائمة الكاملة لخيارات الأوامر السطرية المتاحة.\n"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "تم تشغيل %s ‏%s"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (النسبة: %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - إضافة متتبع"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - تحرير المتتبع"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "خصائص %s"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "بقي %s"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "نجح %s ‏(%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>يجري غلق الاتصالات</b>"
-
-#~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>تعذّر التحديث.</b>"
-
-#~ msgid "<b>Update succeeded!</b>"
-#~ msgstr "<b>نجح التحديث!</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>لم يتم إختيار المصدر</i>"
-
-#~ msgid "<i>Testing TCP port…</i>"
-#~ msgstr "<i>اختبار منفذ بروتوكول التحكم في النقل (TCP) ...</i>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "يسأل عن المزيد من الأنداد في %s"
-
-#, c-format
-#~ msgid "Asking for more peers now… <small>%s</small>"
-#~ msgstr "يسأل عن المزيد من الأنداد... <small>%s</small>"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" contains %zu entries"
-#~ msgstr "قائمة الحظر \"%s\" تحتوي %zu مدخلات"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" updated with %zu entries"
-#~ msgstr "قائمة الحظر \"%s\" تحدثت مع %zu مدخلات"
-
-#, c-format
-#~ msgid "Blocklist contains %'d rule"
-#~ msgid_plural "Blocklist contains %'d rules"
-#~ msgstr[0] "قائمة الحظر لا تحتوي أي قاعدة"
-#~ msgstr[1] "قائمة الحظر تحتوي قاعدة واحدة"
-#~ msgstr[2] "قائمة الحظر تحتوي قاعدتين"
-#~ msgstr[3] "قائمة الحظر تحتوي %'d قواعد"
-#~ msgstr[4] "قائمة الحظر تحتوي %'d قاعدة"
-#~ msgstr[5] "قائمة الحظر تحتوي %'d قاعدة"
-
-#, c-format
-#~ msgid "Blocklist has %'d rule."
-#~ msgid_plural "Blocklist has %'d rules."
-#~ msgstr[0] "قائمة الحظر لا تحتوي أي قاعدة."
-#~ msgstr[1] "قائمة الحظر تحتوي قاعدة واحدة."
-#~ msgstr[2] "قائمة الحظر تحتوي قاعدتين."
-#~ msgstr[3] "قائمة الحظر تحتوي %'d قواعد."
-#~ msgstr[4] "قائمة الحظر تحتوي %'d قاعدة."
-#~ msgstr[5] "قائمة الحظر تحتوي %'d قاعدة."
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "استدعاء ن_ص برمجي عند اكتمال التورنت:"
-
-#~ msgid "Cancelled"
-#~ msgstr "ملغي"
-
-#~ msgid "Complete"
-#~ msgstr "مكتمل"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "جميع الحقوق محفوظة لمشروع ترانزميشن"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s"
-#~ msgstr "تعذّر ربط المنفذ %d على %s: %s"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s (%s)"
-#~ msgstr "تعذّر ربط المنفذ %d على %s:  %s (%s)"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "تعذّر إنشاء \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "تعذّر إنشاء المقبس: ‏%s"
-
-#, c-format
-#~ msgid "Couldn't inhibit desktop hibernation: %s"
-#~ msgstr "تعذّر منع سطح المكتب من الإسبات: %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "تعذّر فتح \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "تعذّرت قراءة \"%1$s\": ‏%2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "تعذّر قراءة \"%s\": %s"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "لا يمكن حفظ \"%s\""
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "تعذّر حفظ الملف ‏\"%1$s\": ‏%2$s"
-
-#, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "تعذّر حفظ الملف المؤقت \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't truncate \"%1$s\": %2$s"
-#~ msgstr "تعذّر قطع \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "أنشئ تورنت"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "نشأ \"%s\"!"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "أنشأه %1$s"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "أنشأه %1$s في %2$s"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "أنشئ في %1$s"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "يُنشئ \"%s\""
-
-#~ msgid "Debug"
-#~ msgstr "تنقيح"
-
-#, c-format
-#~ msgid "Do_wnload (%s):"
-#~ msgstr "الت_نزيل (%s):"
-
-#~ msgid "Done"
-#~ msgstr "تمّ"
-
-#, c-format
-#~ msgid "Down: %1$s, Up: %2$s"
-#~ msgstr "نزَل: %1$s، رُفِع: %2$s"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "خطأ في فتح التورنت"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "خطأ في قراءة \"%s\": %s"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "خطأ في كتابة \"%s\": %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "خطأ: %s"
-
-#, c-format
-#~ msgid "Error: invalid announce URL \"%s\""
-#~ msgstr "خطأ: رابط تبليغ غير صالح \"%s\""
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "الملف « %s » يعترض السبيل"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "تم العثور على بوابة إنترنت « %s »"
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "تم العثور على العنوان العام « %s »"
-
-#~ msgid "Friday"
-#~ msgstr "الجمعة"
-
-#~ msgid "Idle"
-#~ msgstr "خامل"
-
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "عنصر « %s » غير صالحة في البيانات الشارحة"
-
-#~ msgid "Is another copy of Transmission already running?"
-#~ msgstr "هل توجد نسخة أخرى من برنامج ترانزميشن تعمل حاليًا؟"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "حد سرعة ال_تنزيل (%s):"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "حد سرعة ال_رفع (%s):"
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "عدد التورنتت المحملة: %d"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "العنوان المحلي « %s »"
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr "_نقل ملف التورنت (torrent.) إلى المهملات"
-
-#~ msgid "Monday"
-#~ msgstr "الإثنين"
-
-#, c-format
-#~ msgid "Moving \"%s\""
-#~ msgstr "ينقل \"%s\""
-
-#~ msgid "Not a regular file"
-#~ msgstr "ليس ملفا عاديا"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "يرجى التحقق من البيانات المحلية! القطعة \"#%zu\" معطوبة."
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "نجح إعادة توجيه المنفذ رقم %d"
-
-#, c-format
-#~ msgid "Port %d isn't forwarded"
-#~ msgstr "المنفذ \"%d\" غير موجه"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "إعادة توجيه المنافذ"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "إعادة توجيه المنافذ (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "إعادة توجيه المنافذ (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "نجحت إعادة توجيه المنافذ"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "المنفذ <b>مغلق</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "المنفذ <b>مفتوح</b>"
-
-#~ msgid "Present Main Window"
-#~ msgstr "أظهر النافذة الرئيسية"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "النسبة: %s"
-
-#~ msgid "Saturday"
-#~ msgstr "السبت"
-
-#, c-format
-#~ msgid "Saved \"%s\""
-#~ msgstr "\"%s\" حُفِظ"
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "فُحِصَ %s"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "لا يجري التوزيع إلى أي ند إذ ليس هناك أنداد متصلون"
-#~ msgstr[1] "يجري التوزيع إلى الند الوحيد المتصل"
-#~ msgstr[2] "يجري التوزيع إلى الندّين المتصلين"
-#~ msgstr[3] "يجري التوزيع إلى %1$'d من أصل %2$'d أنداد متصلين"
-#~ msgstr[4] "يجري التوزيع إلى %1$'d من أصل %2$'d ندّا متصلا"
-#~ msgstr[5] "يجري التوزيع إلى %1$'d من أصل %2$'d ندّ متصل"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "عرض نافذة ال_خيارات"
-
-#, c-format
-#~ msgid "Skipping unknown torrent \"%s\""
-#~ msgstr "يتخطى التورنت المجهول \"%s\""
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "لم يبدأ أبدا"
-#~ msgstr[1] "بدأ مرة واحدة"
-#~ msgstr[2] "بدأ مرتين"
-#~ msgstr[3] "بدأ %'d مرّات"
-#~ msgstr[4] "بدأ %'d مرة"
-#~ msgstr[5] "بدأ %'d مرة"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "تغيرت الحالة من « %1$s » إلى « %2$s »"
-
-#, c-format
-#~ msgid "Stop at Ratio (%s)"
-#~ msgstr "إيقاف عن نسبة (%s)"
-
-#~ msgid "Stopped"
-#~ msgstr "متوقّف"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "جارٍ إيقاف إعادة توجيه المنافذ ب« %s » على خدمة « %s »"
-
-#~ msgid "Sunday"
-#~ msgstr "الأحد"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "ملف التورنت \"%s\" يحتوي بيانات غير صالحة."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "واجه ملف التورنت \"%s\" خطأ مجهولا."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "يبدو هذا الرابط الممغنط أنه مخصّص لشيء آخر غير بت تورنت. الروابط الممغنطة لبت تورنت يجب أن تحتوي الجزء \"%s\"."
-
-#~ msgid "Thursday"
-#~ msgstr "الخميس"
-
-#~ msgid ""
-#~ "To add a backup URL, add it on the line after the primary URL.\n"
-#~ "To add another primary URL, add it after a blank line."
-#~ msgstr ""
-#~ "لإضافة نسخة احتياطية من الرابط، أضفها في السطر بعد الرابط الأساسي.\n"
-#~ "لإضافة رابط أساسي آخر، أضفه بعد السطر الفارغ."
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "يتخطى منشئ التورنت الملف « %s »: ‏%s"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "خطأ من المتتبع: « %s »"
-
-#, c-format
-#~ msgid "Tracker gave a warning: \"%s\""
-#~ msgstr "أبلغ المتتبع عن إنذار: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave an error: \"%s\""
-#~ msgstr "أبلغ المتتبع عن خطأ: \"%s\""
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "تحذير من المتتبع: « %s »"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "سيسمح المتتبع بالطلبات بعد %s"
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "ترانزميشن\n"
-#~ "الرفع: %1$s %2$s\n"
-#~ "التنزيل: %3$s %4$s"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "لا يعرف ترانزميشن كيفية استخدام \"%s\""
-
-#~ msgid "Tuesday"
-#~ msgstr "الثلاثاء"
-
-#, c-format
-#~ msgid "U_pload (%s):"
-#~ msgstr "الر_فع (%s):"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "رابط غير معترف به"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "حدّث قائمة الحظر"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "يتحقق من البيانات المحلية (تم اختبار %.1f%%)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "يتحقق من التورنت"
-
-#~ msgid "Wednesday"
-#~ msgstr "الأربعاء"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "ال_تنزيل (%s):"
-
-#, c-format
-#~ msgid "_Upload (%s):"
-#~ msgstr "ال_رفع (%s):"
-
-#, c-format
-#~ msgid "blocklist skipped invalid address at line %d"
-#~ msgstr "قائمة الحظر تخطت عنوان غير صالح عند السطر %d"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "انتهى إعادة توجيه المنفذ رقم %d"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "نزَل: %1$s، رُفِع: %2$s"

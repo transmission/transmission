@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Northern Sami (https://www.transifex.com/transmissionbt/teams/33778/se/)\n"
 "Language: se\n"
 "MIME-Version: 1.0\n"
@@ -2562,46 +2562,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid "Cancelled"
-#~ msgstr "Gaskkalduvvon"
-
-#~ msgid "Complete"
-#~ msgstr "Olles"
-
-#~ msgid "Debug"
-#~ msgstr "Dihkeohcan"
-
-#~ msgid "Done"
-#~ msgstr "Geargan"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "Meattáhus: %s"
-
-#~ msgid "Friday"
-#~ msgstr "Bearjadat"
-
-#~ msgid "Idle"
-#~ msgstr "Ealjoheapmi"
-
-#~ msgid "Monday"
-#~ msgstr "Vuossárga"
-
-#~ msgid "Saturday"
-#~ msgstr "Lávvardat"
-
-#~ msgid "Stopped"
-#~ msgstr "Bissehuvvon"
-
-#~ msgid "Sunday"
-#~ msgstr "Sotnabeaivi"
-
-#~ msgid "Thursday"
-#~ msgstr "Duorastat"
-
-#~ msgid "Tuesday"
-#~ msgstr "Maŋŋebárga"
-
-#~ msgid "Wednesday"
-#~ msgstr "Gaskavahkku"

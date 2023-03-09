@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Filipino (https://www.transifex.com/transmissionbt/teams/33778/fil/)\n"
 "Language: fil\n"
 "MIME-Version: 1.0\n"
@@ -2517,78 +2517,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d araw"
-#~ msgstr[1] "%'d araw"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d oras"
-#~ msgstr[1] "%'d oras"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d minuto"
-#~ msgstr[1] "%'d minuto"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d segundo"
-#~ msgstr[1] "%'d segundo"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s ang nalalabi"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>Walang napiling pinagmulan</i>"
-
-#~ msgid "Complete"
-#~ msgstr "Kumpleto"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Gumawa ng torrent"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "May mali sa pagbubukas ng torrent"
-
-#~ msgid "Friday"
-#~ msgstr "Biyernes"
-
-#~ msgid "Monday"
-#~ msgstr "Lunes"
-
-#~ msgid "Saturday"
-#~ msgstr "Sabado"
-
-#~ msgid "Stopped"
-#~ msgstr "Inihinto"
-
-#~ msgid "Sunday"
-#~ msgstr "Linggo"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Ang torrent file \"%s\" ay naka"
-
-#~ msgid "Thursday"
-#~ msgstr "Huwebes"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "Hindi alam ng Transmission kung paano gamitin ang \"%s\""
-
-#~ msgid "Tuesday"
-#~ msgstr "Martes"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "Hindi kilalang URL"
-
-#~ msgid "Wednesday"
-#~ msgstr "Miyerkules"

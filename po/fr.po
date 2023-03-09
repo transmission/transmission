@@ -9,8 +9,8 @@
 # Thomas, 2022
 # AO <ao@localizationlab.org>, 2022
 # Jean de la Mouche, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Charles Monzat <c.monzat@laposte.net>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Charles Monzat <c.monzat@laposte.net>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
 "Language-Team: French (https://www.transifex.com/transmissionbt/teams/33778/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -504,20 +504,18 @@ msgstr[1] "Propriétés – {torrent_count:L} de torrents"
 msgstr[2] "Propriétés – {torrent_count:L} torrents"
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Supprimer le torrent ?"
-msgstr[1] "Supprimer les %d torrents ?"
-msgstr[2] "Supprimer les %d torrents ?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Supprimer les fichiers téléchargés de ce torrent ?"
-msgstr[1] "Supprimer les fichiers téléchargés de ces %d torrents ?"
-msgstr[2] "Supprimer les fichiers téléchargés de ces %d torrents ?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -992,9 +990,9 @@ msgstr "Erreur locale : « {error} »"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] "Téléchargement des métadonnées depuis {active_count} source connectée ({percent_done:d} % terminés)"
-msgstr[1] "Téléchargement des métadonnées depuis {active_count} sources connectées ({percent_done:d} % terminés)"
-msgstr[2] "Téléchargement des métadonnées depuis {active_count} sources connectées ({percent_done:d} % terminés)"
+msgstr[0] "Téléchargement des métadonnées depuis {active_count} source connectée ({percent_done} % terminés)"
+msgstr[1] "Téléchargement des métadonnées depuis {active_count} sources connectées ({percent_done} % terminés)"
+msgstr[2] "Téléchargement des métadonnées depuis {active_count} sources connectées ({percent_done} % terminés)"
 
 #: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
@@ -2581,39 +2579,3 @@ msgid_plural "days"
 msgstr[0] "jour"
 msgstr[1] "de jours"
 msgstr[2] "jours"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Exécutez « %s --help » pour voir une liste complète des options proposées en ligne de commande.\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "Impossible d’attribuer l’événement IPv4"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "Impossible d’attribuer l’événement IPv6"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "Impossible de créer un connecteur IPv4"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "Impossible de trouver l’adresse du traceur « {host} » : {error} ({error_code})"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "Impossible de lier le socket IPv6 {address}: {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "Impossible d'écrire à un pair"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Signal %d a été reçu ; tentative de fermeture propre. Recommencer en cas de blocage."
-
-#~ msgid "Initializing DHT"
-#~ msgstr "Initialisation de la table de hachage distribuée"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Mettre à jour la liste de blocage"

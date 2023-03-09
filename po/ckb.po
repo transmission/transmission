@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Central Kurdish (https://www.transifex.com/transmissionbt/teams/33778/ckb/)\n"
 "Language: ckb\n"
 "MIME-Version: 1.0\n"
@@ -2514,54 +2514,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s، بارکراو %2$s (ڕێژه‌: %3$s)"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s ماوه‌"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>داخستنی په‌یوه‌ندییه‌کان</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>هیچ سه‌رچاوه‌یه‌ک دیاری نه‌کراوه‌</i>"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "نه‌توانرا \"%1$s\" دروستبکرێت: %2$s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "نه‌توانرا \"%1$s\" بکرێته‌وه‌: %2$s"
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "نه‌توانرا په‌ڕگه‌ی \"%1$s\" پاشه‌که‌وتبکرێت: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "تۆرێنتێک دروست بکه‌"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "پۆڕت <b>داخراوه‌</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "پۆڕت <b>کراوه‌یه‌</b>"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "ڕێژه‌: %s"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "پێده‌به‌خشرێت به‌ %1$'d له‌ %2$'d هاوه‌ڵی په‌یوه‌ندی به‌ستراوه‌وه‌"
-#~ msgstr[1] "پێده‌به‌خشرێت به‌ %1$'d له‌ %2$'d هاوه‌ڵی په‌یوه‌ندی به‌ستراوه‌وه‌"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "ده‌ستیسپێکردووه‌ %'d جار"
-#~ msgstr[1] "ده‌ستیسپێکردووه‌ %'d جار"

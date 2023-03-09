@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # gogo <trebelnik2@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: gogo <trebelnik2@gmail.com>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Croatian (https://www.transifex.com/transmissionbt/teams/33778/hr/)\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -506,20 +506,18 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Želite li ukloniti torrent?"
-msgstr[1] "Želite li ukloniti %d torrenta?"
-msgstr[2] "Želite li ukloniti %d torrenta?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Želite li obrisati preuzete datoteke ovog torrenta?"
-msgstr[1] "Želite li obrisati ove %d preuzete datoteke torrenta?"
-msgstr[2] "Želite li obrisati ovih %d preuzetih datoteka torrenta?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -1267,43 +1265,43 @@ msgstr "Pokreni Trasmission smanjen"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Datoteka"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:22 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
-msgstr ""
+msgstr "Otvori torrent"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr ""
+msgstr "Otvori _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr ""
+msgstr "Otvori URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "_Novi…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
-msgstr ""
+msgstr "_Pokreni sve"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
-msgstr ""
+msgstr "Pokreni sve torrente"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr ""
+msgstr "_Pauziraj sve"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr ""
+msgstr "_Pauziraj sve torrente"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr ""
+msgstr "_Izlaz"
 
 #: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:680 ../gtk/ui/gtk4/DetailsDialog.ui:508
 msgid "_Edit"
@@ -1311,159 +1309,159 @@ msgstr "_Uredi"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr ""
+msgstr "Odaberi _sve"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
-msgstr ""
+msgstr "Ukl_oni odabir"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "_Osobitosti"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Torrent"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:91
 msgid "_Properties"
-msgstr ""
+msgstr "_Svojstva"
 
 #: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:92 ../gtk/ui/gtk4/MainWindow.ui:77
 msgid "Torrent properties"
-msgstr ""
+msgstr "Svojstva torrenta"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
-msgstr ""
+msgstr "Otvori _mapu"
 
 #: ../gtk/transmission.ui:97 ../gtk/transmission.ui:366 ../gtk/ui/gtk3/MainWindow.ui:40 ../gtk/ui/gtk4/MainWindow.ui:44
 msgid "_Start"
-msgstr ""
+msgstr "_Pokreni"
 
 #: ../gtk/transmission.ui:99 ../gtk/transmission.ui:368 ../gtk/ui/gtk3/MainWindow.ui:38 ../gtk/ui/gtk4/MainWindow.ui:42
 msgid "Start torrent"
-msgstr ""
+msgstr "Pokreni torrent"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
-msgstr ""
+msgstr "Pokre_ni odmah"
 
 #: ../gtk/transmission.ui:106 ../gtk/transmission.ui:375
 msgid "Start torrent now"
-msgstr ""
+msgstr "Pokreni torrent odmah"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "Pitaj pratitelja za _više točaka"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_Red čekanja"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr ""
+msgstr "Pomakni na _vrh"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr ""
+msgstr "Pomakni _gore"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr ""
+msgstr "Pomakni _dolje"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "Pomakni na  dn_o"
 
 #: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:55 ../gtk/ui/gtk4/MainWindow.ui:54
 msgid "_Pause"
-msgstr ""
+msgstr "_Pauza"
 
 #: ../gtk/transmission.ui:143 ../gtk/transmission.ui:412 ../gtk/ui/gtk3/MainWindow.ui:53 ../gtk/ui/gtk4/MainWindow.ui:52
 msgid "Pause torrent"
-msgstr ""
+msgstr "Pauziraj torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr ""
+msgstr "Postavi _lokaciju..."
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "_Provjeri lokalne podatke"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "Kopiraj _magnetnu poveznicu u međuspremnik"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:63
 msgid "Remove torrent"
-msgstr ""
+msgstr "Ukloni torrent"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "_Obriši i ukloni datoteke"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "P_ogled"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
-msgstr ""
+msgstr "_Zbijen pogled"
 
 #: ../gtk/transmission.ui:189
 msgid "_Toolbar"
-msgstr ""
+msgstr "_Alatna traka"
 
 #: ../gtk/transmission.ui:193
 msgid "_Filterbar"
-msgstr ""
+msgstr "_Filter traka"
 
 #: ../gtk/transmission.ui:197
 msgid "_Statusbar"
-msgstr ""
+msgstr "_Statusna traka"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "Razvrstaj po _aktivnosti"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "Razvrstaj po s_tarosti"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr ""
+msgstr "Razvrstaj po _nazivu"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "Razvrstaj po _napretku"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "Razvrstaj po _redu čekanja"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "Razvrstaj po omjer_u"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "Razvrstaj po veli_čini"
 
 #: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "Razvrstaj po stanj_u"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "Razvrstaj po preostalom _vremenu"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "Ob_rnuti redoslijed razvrstavanja"
 
 #: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1478
 msgid "_Help"
@@ -1471,35 +1469,35 @@ msgstr "_Pomoć"
 
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
-msgstr ""
+msgstr "_Zapisnik poruka"
 
 #: ../gtk/transmission.ui:263
 msgid "_Statistics"
-msgstr ""
+msgstr "_Statistike"
 
 #: ../gtk/transmission.ui:269
 msgid "_Donate"
-msgstr ""
+msgstr "_Doniraj"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr ""
+msgstr "_Priručnik"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "_O programu"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Razvrstaj torrente po"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
-msgstr ""
+msgstr "_Prikaži Transmission"
 
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "Omogući a_lternativna ograničenja brzine"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2006 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1412
 msgid "_Add"
@@ -1820,7 +1818,7 @@ msgstr "_Dana:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
 msgid "_to"
-msgstr ""
+msgstr "_prema"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
 msgctxt "Gerund"
@@ -2575,670 +2573,3 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#, c-format
-#~ msgid " (Limit: %s)"
-#~ msgstr " (Ograničenje: %s)"
-
-#~ msgid " _to "
-#~ msgstr " _prema "
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "%'d torrent svojstva"
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d dan"
-#~ msgstr[1] "%'d dana"
-#~ msgstr[2] "%'d dana"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d sat"
-#~ msgstr[1] "%'d sata"
-#~ msgstr[2] "%'d sati"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d minute"
-#~ msgstr[1] "%'d minute"
-#~ msgstr[2] "%'d minuta"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d sekunde"
-#~ msgstr[1] "%'d sekunde"
-#~ msgstr[2] "%'d sekundi"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d dio @ %2$s"
-#~ msgstr[1] "%1$'d dijela @ %2$s"
-#~ msgstr[2] "%1$'d dijelova @ %2$s"
-
-#, c-format
-#~ msgid "%1$s  %2$s"
-#~ msgstr "%1$s  %2$s"
-
-#, c-format
-#~ msgid "%1$s %2$s  %3$s %4$s"
-#~ msgstr "%1$s %2$s  %3$s %4$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d dio @ %3$s)"
-#~ msgstr[1] "%1$s (%2$'d dijela @ %3$s)"
-#~ msgstr[2] "%1$s (%2$'d dijelova @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d dio)"
-#~ msgstr[1] "%1$s (%2$'d dijela)"
-#~ msgstr[2] "%1$s (%2$'d dijelova)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% od %3$s%% dostupno)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (%2$s%% od %3$s%% dostupno); %4$s neprovjereno"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s discarded after failed checksum)"
-#~ msgstr "%1$s (+%2$s odbačeno nakon neuspjele provjere)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "prije %1$s"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%1$s od %2$s (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr "%1$s od %2$s (%3$s%%), poslano %4$s (Omjer: %5$s Cilj: %6$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%1$s od %2$s (%3$s%%), poslano %4$s (Omjer: %5$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-#~ msgstr "%1$s, poslano %2$s (Omjer: %3$s Cilj: %4$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s, poslano %2$s (Omjer: %3$s)"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s; %2$'d datoteka"
-#~ msgstr[1] "%1$s; %2$'d datoteke"
-#~ msgstr[2] "%1$s; %2$'d datoteka"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Pokrenite '%s --help' za popis svih mogućih naredbi naredbenog retka.\n"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s pokrenuto"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (Omjer: %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - dodavanje pratitelja"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - uređivanje pratitelja"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "%s svojstva"
-
-#, c-format
-#~ msgid "%s free"
-#~ msgstr "%s slobodno"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s preostalo"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s uspjelo (%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>Zatvaranje povezivanja</b>"
-
-#~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>Nemoguće nadopuniti.</b>"
-
-#~ msgid "<b>Update succeeded!</b>"
-#~ msgstr "<b>Nadopuna uspjela!</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>Nije odabran izvor</i>"
-
-#~ msgid "<i>Testing TCP port…</i>"
-#~ msgstr "<i>Testiranje TCP ulaza…</i>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "Traženje više točaka unutar %s"
-
-#, c-format
-#~ msgid "Asking for more peers now… <small>%s</small>"
-#~ msgstr "Slanje upita za više točaka trenutno… <small>%s</small>"
-
-#, c-format
-#~ msgid "Asking for peer counts in %s"
-#~ msgstr "Traženje broja točke u %s"
-
-#, c-format
-#~ msgid "Asking for peer counts now… <small>%s</small>"
-#~ msgstr "Slanje upita za broj točke trenutno… <small>%s</small>"
-
-#~ msgid "Automatically add .torrent files _from:"
-#~ msgstr "Automatski dodaj .torrent datoteku &iz:"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" contains %zu entries"
-#~ msgstr "Popis blokiranih \"%s\" sadrži %zu zapisa"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" updated with %zu entries"
-#~ msgstr "Popis blokiranja \"%s\" je ažuriran s %zu zapisa"
-
-#, c-format
-#~ msgid "Blocklist contains %'d rule"
-#~ msgid_plural "Blocklist contains %'d rules"
-#~ msgstr[0] "Popis blokiranja sadrži %'d pravilo"
-#~ msgstr[1] "Popis blokiranja sadrži %'d pravila"
-#~ msgstr[2] "Popis blokiranja sadrži %'d pravila"
-
-#, c-format
-#~ msgid "Blocklist has %'d rule."
-#~ msgid_plural "Blocklist has %'d rules."
-#~ msgstr[0] "Popis blokiranja ima %'d pravilo"
-#~ msgstr[1] "Popis blokiranja ima %'d pravila"
-#~ msgstr[2] "Popis blokiranja ima %'d pravila"
-
-#~ msgid "Cancelled"
-#~ msgstr "Otkazano"
-
-#, c-format
-#~ msgid ""
-#~ "Click to disable Alternative Speed Limits\n"
-#~ " (%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "Kliknite za onemogućavanje alternativnog ograničenja brzine\n"
-#~ " (%1$s preuzimanje, %2$s slanje)"
-
-#, c-format
-#~ msgid ""
-#~ "Click to enable Alternative Speed Limits\n"
-#~ " (%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "Kliknite za omogućavanje alternativnog ograničenja brzine\n"
-#~ " (%1$s preuzimanje, %2$s slanje)"
-
-#~ msgid "Complete"
-#~ msgstr "Završeno"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s"
-#~ msgstr "Nemoguće dodijeliti ulaz %d na %s: %s"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s (%s)"
-#~ msgstr "Nemoguće dodijeliti ulaz %d na %s: %s (%s)"
-
-#, c-format
-#~ msgid "Couldn't connect socket %<PRIdMAX> to %s, port %d (errno %d - %s)"
-#~ msgstr "Nemoguće povezivanje priključnice %<PRIdMAX> sa %s, ulaz %d (greška br. %d - %s)"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "Nemoguće stvoriti \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "Neuspjelo stvaranje utičnice: %s"
-
-#, c-format
-#~ msgid "Couldn't find settings key \"%s\""
-#~ msgstr "Neuspjeli pronalazak postavke ključa \"%s\""
-
-#, c-format
-#~ msgid "Couldn't get directory for \"%1$s\": %2$s"
-#~ msgstr "Nemoguće dobivanje direktorija za \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't inhibit desktop hibernation: %s"
-#~ msgstr "Spriječavanje hibernacije radne površine nije uspjelo: %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "Nemoguće otvoriti \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't preallocate file \"%1$s\" (%2$s, size: %3$<PRIu64>): %4$s"
-#~ msgstr "Nemoguće unaprijed zauzeti datoteku \"%1$s\" (%2$s, veličina: %3$<PRIu64>): %4$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "Nemoguće očitati \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "Nije moguće pročitati \"%s\": %s"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "Neuspjelo spremanje \"%s\""
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "Nemoguće spremiti datoteku \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
-#~ msgstr "Nemoguće postavljanje adrese %s na %<PRIdMAX>: %s"
-
-#, c-format
-#~ msgid "Couldn't truncate \"%1$s\": %2$s"
-#~ msgstr "Nije moguće isprazniti \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "Stvoren \"%s\"!"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "Napravio/la %1$s"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "Napravio/la %1$s datuma %2$s"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "Napravljeno %1$s"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "Stvaranje \"%s\""
-
-#~ msgid "Debug"
-#~ msgstr "Otkloni grešku"
-
-#, c-format
-#~ msgid "Do_wnload (%s):"
-#~ msgstr "Pre_uzimanje (%s):"
-
-#~ msgid "Done"
-#~ msgstr "Gotovo"
-
-#, c-format
-#~ msgid "Down: %1$s, Up: %2$s"
-#~ msgstr "Preuzimanje: %1$s, Slanje: %2$s"
-
-#, c-format
-#~ msgid "Downloading from %1$'d %2$s"
-#~ msgstr "Preuzimanje s %1$'d %2$s"
-
-#, c-format
-#~ msgid "Downloading from %1$'d of %2$'d %3$s"
-#~ msgstr "Preuzimanje s %1$'d od %2$'d %3$s"
-
-#, c-format
-#~ msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-#~ msgstr "Preuzimanje s %1$'d od %2$'d %3$s i %4$'d %5$s"
-
-#, c-format
-#~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
-#~ msgstr "Preuzimanje metapodataka s %1$'d %2$s (%3$d%% završeno)"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Omogući _uTP za povezivanje s točkama"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "Greška pri otvaranju torrenta"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "Greška pri čitanju \"%s\": %s"
-
-#, c-format
-#~ msgid "Error registering Transmission as a %s handler: %s"
-#~ msgstr "Greška registracije Transmissiona kao %s rukovatelja: %s"
-
-#, c-format
-#~ msgid "Error saving \"%*.*s\": %s (%d)"
-#~ msgstr "Greška spremanja \"%*.*s\": %s (%d)"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "Greška pri zapisivanju \"%s\": %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "Greška: %s"
-
-#, c-format
-#~ msgid "Error: invalid announce URL \"%s\""
-#~ msgstr "Greška: neispravan URL najave \"%s\""
-
-#, c-format
-#~ msgid "Failed to set piece size to %s, leaving it at %s"
-#~ msgstr "Neuspjelo postavljanje veličine djelića na %s, ostavljam na %s"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "Pronađen Internet usmjernik \"%s\""
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "Pronađena javna adresa \"%s\""
-
-#~ msgid "Friday"
-#~ msgstr "Petak"
-
-#, c-format
-#~ msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-#~ msgstr "Dobiven popis od %1$s%2$'d točaka%3$s prije %4$s"
-
-#, c-format
-#~ msgid "Got a scrape error \"%s%s%s\" %s ago"
-#~ msgstr "Dobivena greška čišćenja \"%s%s%s\" prije %s"
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "Dobivena greška %1$s\"%2$s\"%3$s prije %4$s"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Dobiven signal %d; pokušaj urednog zatvaranja. Ponovite ako se zaglavi."
-
-#~ msgid "Idle"
-#~ msgstr "Mirovanje"
-
-#~ msgid "Is another copy of Transmission already running?"
-#~ msgstr "Je li druga kopija Transmissiona već pokrenuta?"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "Ograniči brzinu _preuzimanja (%s):"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "Ograniči brzinu _slanja (%s):"
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "Učitano %d torrenata"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "Lokalna adresa je \"%s\""
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr "Pre_mjesti .torrent datoteku u smeće"
-
-#~ msgid "Monday"
-#~ msgstr "Ponedjeljak"
-
-#, c-format
-#~ msgid "Moving \"%s\""
-#~ msgstr "Premještanje \"%s\""
-
-#~ msgid "Not a regular file"
-#~ msgstr "Nije regularna datoteka"
-
-#, c-format
-#~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-#~ msgstr "Zahtjev popisa točaka %1$sistekao%2$s prije %3$s; slijedi ponovni pokušaj"
-
-#, c-format
-#~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
-#~ msgstr "Dijelić %<PRIu32>, koji je upravo preuzet, neuspio test kontrolnog zbroja"
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "Ulaz %d uspješno proslijeđen"
-
-#, c-format
-#~ msgid "Port %d isn't forwarded"
-#~ msgstr "Ulaz %d nije proslijeđen"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "Proslijeđivanje ulaza"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "Proslijeđivanje ulaza (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "Prosljeđivanje ulaza (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "Prosljeđivanje ulaza uspješno!"
-
-#, c-format
-#~ msgid "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
-#~ msgstr "Proslijeđivanje ulaza kroz \"%s\", usluga \"%s\". (lokalna adresa: %s:%d)"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "Ulaz je <b>zatvoren</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "Ulaz je <b>otvoren</b>"
-
-#, c-format
-#~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
-#~ msgstr "Unaprijed zauzeta datoteka \"%1$s\" (%2$s, veličina: %3$<PRIu64>)"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "Omjer: %s"
-
-#~ msgid "Saturday"
-#~ msgstr "Subota"
-
-#, c-format
-#~ msgid "Saved \"%s\""
-#~ msgstr "Spremljeno \"%s\""
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "Skenirano %s"
-
-#, c-format
-#~ msgid "Searching for web interface file \"%s\""
-#~ msgstr "Pretraživanje datoteke  web sučelja \"%s\""
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "Dijeljenje %1$'d od %2$'d povezane točke"
-#~ msgstr[1] "Dijeljenje %1$'d od %2$'d povezane točke"
-#~ msgstr[2] "Dijeljenje %1$'d od %2$'d povezanih točaka"
-
-#, c-format
-#~ msgid "Serving RPC and Web requests from directory '%s'"
-#~ msgstr "Posluživanje RPC i web zahtjeva iz direktorija '%s'"
-
-#, c-format
-#~ msgid "Serving RPC and Web requests on %s:%d%s"
-#~ msgstr "Posluživanje RPC i Web zahtjeva na %s:%d%s"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "Prikaži dijalog _mogućnosti"
-
-#, c-format
-#~ msgid "Skipping unknown torrent \"%s\""
-#~ msgstr "Preskakanje nepoznator torrenta \"%s\""
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "Pokrenuto %'d put"
-#~ msgstr[1] "Pokrenuto %'d puta"
-#~ msgstr[2] "Pokrenuto %'d puta"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "Status izmijenjen iz \"%1$s\" u \"%2$s\""
-
-#, c-format
-#~ msgid "Stop at Ratio (%s)"
-#~ msgstr "Zaustavi pri omjeru (%s)"
-
-#~ msgid "Stopped"
-#~ msgstr "Zaustavljeno"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "Zaustavljanje proslijeđivanja ulaza kroz \"%s\", usluga \"%s\""
-
-#~ msgid "Sunday"
-#~ msgstr "Nedjelja"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
-#~ msgstr "Torrent datoteku \"%s\" već koristi \"%s.\""
-
-#~ msgid "Thursday"
-#~ msgstr "Četvrtak"
-
-#~ msgid ""
-#~ "To add a backup URL, add it on the line after the primary URL.\n"
-#~ "To add another primary URL, add it after a blank line."
-#~ msgstr ""
-#~ "Kako bi dodali pomoćni URL, dodajte ga u redak ispod glavnog URL-a.\n"
-#~ "Kako bi dodali novi glavni URL, dodajte ga nakon praznog retka."
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "Stvaratelj torrenta preskače datoteku \"%s\": %s"
-
-#, c-format
-#~ msgid "Tracker gave a warning: \"%s\""
-#~ msgstr "Pratitelj je dao upozorenje: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave an error: \"%s\""
-#~ msgstr "Pratitelj je vratio grešku: \"%s\""
-
-#, c-format
-#~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-#~ msgstr "Pratitelj je imao %s%'d dijelitelja i %'d preuzimatelja%s prije %s"
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "Transmission\n"
-#~ "Slanje: %1$s %2$s\n"
-#~ "Preuzimanje: %3$s %4$s"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "Transmission ne zna kako koristiti \"%s\""
-
-#~ msgid "Tuesday"
-#~ msgstr "Utorak"
-
-#, c-format
-#~ msgid "U_pload (%s):"
-#~ msgstr "Sla_nje (%s):"
-
-#, c-format
-#~ msgid "Unable to rename file as \"%s\": %s"
-#~ msgstr "Neuspjelo preimenovanje datoteke kao \"%s\": %s"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "Nepoznat URL"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Nadopuni popis blokiranih"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "Provjera lokalnih podataka (%.1f%% testirano)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "Provjera torrenta"
-
-#~ msgid "Wednesday"
-#~ msgstr "Srijeda"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "_Preuzimanje (%s):"
-
-#, c-format
-#~ msgid "_Show %'d of:"
-#~ msgstr "_Prikaži %'d od:"
-
-#, c-format
-#~ msgid "_Upload (%s):"
-#~ msgstr "_Slanje (%s):"
-
-#, c-format
-#~ msgid "blocklist skipped invalid address at line %d"
-#~ msgstr "popis blokiranja preskočio neispravnu adresu u retku %d"
-
-#~ msgid "full"
-#~ msgstr "potpuno"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "više se ne proslijeđuje ulaz %d"
-
-#~ msgid "peer"
-#~ msgid_plural "peers"
-#~ msgstr[0] "točka"
-#~ msgstr[1] "točke"
-#~ msgstr[2] "točka"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "Preuzimanje: %1$s, Slanje: %2$s"
-
-#~ msgid "sparse"
-#~ msgstr "djelomično"
-
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP je alat za smanjenje zagušenja mrežnog prometa."
-
-#~ msgid "web seed"
-#~ msgid_plural "web seeds"
-#~ msgstr[0] "web djelitelj"
-#~ msgstr[1] "web djelitelja"
-#~ msgstr[2] "web djelitelja"

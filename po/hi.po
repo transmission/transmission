@@ -496,18 +496,16 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "टोरेंट हटाएँ?"
-msgstr[1] "%d टोरेंट हटाएँ?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "टोरेंट की डाउनलोड फाइलें हटाएँ?"
-msgstr[1] "%d टोरेंट की डाउनलोड फाइलें हटाएँ?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -1227,43 +1225,43 @@ msgstr "ट्रांसमिशन संक्षिप्त रूप म
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "फाइल (_F)"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:22 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
-msgstr ""
+msgstr "टोरेंट खोलें"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr ""
+msgstr "यूआरएल खोलें (_U)..."
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr ""
+msgstr "यूआरएल खोलें..."
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "नया (_N)..."
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
-msgstr ""
+msgstr "सभी आरंभ करें(_S)"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
-msgstr ""
+msgstr "सभी टोरेंट आरंभ करें"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
-msgstr ""
+msgstr "सभी रोकें (_P)"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr ""
+msgstr "सभी टोरेंट रोकें"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr ""
+msgstr "बंद करें (_Q)"
 
 #: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:680 ../gtk/ui/gtk4/DetailsDialog.ui:508
 msgid "_Edit"
@@ -1271,159 +1269,159 @@ msgstr "संपादन (_E)"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr ""
+msgstr "सभी चयनित करें (_S)"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
-msgstr ""
+msgstr "सभी अचयनित करें (_D)"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "सेटिंग्स (_P)"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "टोरेंट (_T)"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:91
 msgid "_Properties"
-msgstr ""
+msgstr "सूचना (_P)"
 
 #: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:92 ../gtk/ui/gtk4/MainWindow.ui:77
 msgid "Torrent properties"
-msgstr ""
+msgstr "टोरेंट सूचना"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
-msgstr ""
+msgstr "फोल्डर खोलें (_e)"
 
 #: ../gtk/transmission.ui:97 ../gtk/transmission.ui:366 ../gtk/ui/gtk3/MainWindow.ui:40 ../gtk/ui/gtk4/MainWindow.ui:44
 msgid "_Start"
-msgstr ""
+msgstr "आरंभ (_S)"
 
 #: ../gtk/transmission.ui:99 ../gtk/transmission.ui:368 ../gtk/ui/gtk3/MainWindow.ui:38 ../gtk/ui/gtk4/MainWindow.ui:42
 msgid "Start torrent"
-msgstr ""
+msgstr "टोरेंट आरंभ करें"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
-msgstr ""
+msgstr "अभी आरंभ करें (_N)"
 
 #: ../gtk/transmission.ui:106 ../gtk/transmission.ui:375
 msgid "Start torrent now"
-msgstr ""
+msgstr "टोरेंट अभी आरंभ करें"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr ""
+msgstr "ट्रैकर से अधिक पीयर हेतु अनुरोध (_M)"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "पंक्ति (_Q)"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
-msgstr ""
+msgstr "शीर्ष पर ले जाएँ (_T)"
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr ""
+msgstr "ऊपर ले जाएँ (_U)"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr ""
+msgstr "नीचे लाएँ (_D)"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
-msgstr ""
+msgstr "सबसे नीचे लाएँ (_B)"
 
 #: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:55 ../gtk/ui/gtk4/MainWindow.ui:54
 msgid "_Pause"
-msgstr ""
+msgstr "रोकें (_P)"
 
 #: ../gtk/transmission.ui:143 ../gtk/transmission.ui:412 ../gtk/ui/gtk3/MainWindow.ui:53 ../gtk/ui/gtk4/MainWindow.ui:52
 msgid "Pause torrent"
-msgstr ""
+msgstr "टोरेंट स्थगित करें"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr ""
+msgstr "स्थान सेट करें (_L)..."
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
-msgstr ""
+msgstr "लोकल डाटा प्रमाणीकरण (_V)"
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr ""
+msgstr "मैग्नेट लिंक क्लिपबोर्ड पर कॉपी करें (_C)"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:63
 msgid "Remove torrent"
-msgstr ""
+msgstr "टोरेंट हटाएँ"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr ""
+msgstr "फाइलें हटाएँ (_D)"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "दृश्य (_V)"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
-msgstr ""
+msgstr "संक्षिप्त दृश्य (_C)"
 
 #: ../gtk/transmission.ui:189
 msgid "_Toolbar"
-msgstr ""
+msgstr "साधन पट्टी (_T)"
 
 #: ../gtk/transmission.ui:193
 msgid "_Filterbar"
-msgstr ""
+msgstr "अनुक्रम पट्टी (_F)"
 
 #: ../gtk/transmission.ui:197
 msgid "_Statusbar"
-msgstr ""
+msgstr "स्थिति पट्टी (_S)"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr ""
+msgstr "गतिविधि से अनुक्रमित (_A)"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr ""
+msgstr "आयु से अनुक्रमित (_g)"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr ""
+msgstr "नाम से अनुक्रमित (_N)"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr ""
+msgstr "प्रगति से अनुक्रमित (_P)"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
-msgstr ""
+msgstr "पंक्ति से अनुक्रमित (_Q)"
 
 #: ../gtk/transmission.ui:228 ../gtk/transmission.ui:335
 msgid "Sort by Rati_o"
-msgstr ""
+msgstr "अनुपात से अनुक्रमित (_o)"
 
 #: ../gtk/transmission.ui:233 ../gtk/transmission.ui:340
 msgid "Sort by Si_ze"
-msgstr ""
+msgstr "आकार से अनुक्रमित (_z)"
 
 #: ../gtk/transmission.ui:238 ../gtk/transmission.ui:345
 msgid "Sort by Stat_e"
-msgstr ""
+msgstr "स्थिति से अनुक्रमित (_e)"
 
 #: ../gtk/transmission.ui:243 ../gtk/transmission.ui:350
 msgid "Sort by Time _Left"
-msgstr ""
+msgstr "शेष समय से अनुक्रमित (_L)"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr ""
+msgstr "विपरीत अनुक्रम (_v)"
 
 #: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1478
 msgid "_Help"
@@ -1431,35 +1429,35 @@ msgstr "सहायता (_H)"
 
 #: ../gtk/transmission.ui:259
 msgid "Message _Log"
-msgstr ""
+msgstr "संदेश लॉग (_L)"
 
 #: ../gtk/transmission.ui:263
 msgid "_Statistics"
-msgstr ""
+msgstr "आँकड़ें (_S)"
 
 #: ../gtk/transmission.ui:269
 msgid "_Donate"
-msgstr ""
+msgstr "दान करें (_D)"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr ""
+msgstr "सामग्री (_C)"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "बारे में (_A)"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "टोरेंट अनुक्रमण (_S)"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
-msgstr ""
+msgstr "ट्रांसमिशन दिखाएँ (_S)"
 
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
-msgstr ""
+msgstr "वैकल्पिक गति सीमाएँ सक्रिय करें"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2006 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1412
 msgid "_Add"
@@ -1780,7 +1778,7 @@ msgstr "इन दिनों पर (_O):"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
 msgid "_to"
-msgstr ""
+msgstr "हेतु (_t)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
 msgctxt "Gerund"
@@ -2528,676 +2526,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid " (Limit: %s)"
-#~ msgstr "(सीमा : %s)"
-
-#~ msgid " _to "
-#~ msgstr "हेतु (_t) "
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "%'d टोरेंट सूचना"
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d दिन"
-#~ msgstr[1] "%'d दिन"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d घंटा"
-#~ msgstr[1] "%'d घंटे"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d मिनट"
-#~ msgstr[1] "%'d मिनट"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d सेकेंड"
-#~ msgstr[1] "%'d सेकेंड"
-
-#, c-format
-#~ msgid "%*.*s is not a valid address"
-#~ msgstr "%*.*s अमान्य पता है"
-
-#, c-format
-#~ msgid "%*.*s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%*.*s आईपी4 या आईपी6 पता नहीं है। आरपीसी श्रोता साधन का आईपी4 या आईपी6 होना आवश्यक है"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d खंड @ %2$s"
-#~ msgstr[1] "%1$'d खंड @ %2$s"
-
-#, c-format
-#~ msgid "%1$s  %2$s"
-#~ msgstr "%1$s  %2$s"
-
-#, c-format
-#~ msgid "%1$s %2$s  %3$s %4$s"
-#~ msgstr "%1$s %2$s  %3$s %4$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d खंड @ %3$s)"
-#~ msgstr[1] "%1$s (%2$'d खंड @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d खंड)"
-#~ msgstr[1] "%1$s (%2$'d खंड)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%3$s%% की %2$s%% उपलब्ध)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (%3$s%% की %2$s%% उपलब्ध); %4$s अप्रमाणित"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s discarded after failed checksum)"
-#~ msgstr "%1$s (+%2$s चेकसम विफल होने के उपरांत हटाई गई)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "%1$s पूर्व"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%2$s में से %1$s (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr "%2$s में से %1$s (%3$s%%), अपलोड %4$s (अनुपात : %5$s लक्ष्य : %6$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%2$s में से %1$s (%3$s%%), अपलोड %4$s (अनुपात : %5$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-#~ msgstr "%1$s, अपलोड %2$s (अनुपात: %3$s लक्ष्य: %4$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s, अपलोड %2$s (अनुपात: %3$s)"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s; %2$'d फाइल"
-#~ msgstr[1] "%1$s; %2$'d फाइलें"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "उपलब्ध कमांड लाइन विकल्पों की पूर्ण सूची देखने हेतु '%s --help' निष्पादित करें।\n"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s आरंभ"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s(अनुपात : %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - ट्रैकर जोड़ें"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - ट्रैकर संपादन"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "%s सूचना"
-
-#, c-format
-#~ msgid "%s free"
-#~ msgstr "%s अप्रयुक्त"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s शेष"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s सफल (%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>कनेक्शन बंद करना जारी</b>"
-
-#~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>अपडेट विफल।</b>"
-
-#~ msgid "<b>Update succeeded!</b>"
-#~ msgstr "<b>अपडेट सफल।!</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>कोई स्रोत चयनित नहीं</i>"
-
-#~ msgid "<i>Testing TCP port…</i>"
-#~ msgstr "<i>टीसीपी पोर्ट जाँच जारी...</i>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "%s उपरांत अधिक पीयर हेतु अनुरोध"
-
-#, c-format
-#~ msgid "Asking for more peers now… <small>%s</small>"
-#~ msgstr "पीयर संख्या हेतु अनुरोध जारी... <small>%s</small>"
-
-#, c-format
-#~ msgid "Asking for peer counts in %s"
-#~ msgstr "%s उपरांत पीयर संख्या हेतु अनुरोध"
-
-#, c-format
-#~ msgid "Asking for peer counts now… <small>%s</small>"
-#~ msgstr "पीयर संख्या हेतु अनुरोध जारी... <small>%s</small>"
-
-#~ msgid "Automatically add .torrent files _from:"
-#~ msgstr "यहाँ से स्वतः ही .torrent फाइलें जोड़ें (_f):"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" contains %zu entries"
-#~ msgstr "अवरुद्ध सूची \"%s\" में %zu प्रविष्टियाँ हैं"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" updated with %zu entries"
-#~ msgstr "अवरुद्ध सूची \"%s\" में %zu प्रविष्टियाँ जोड़ी गई"
-
-#, c-format
-#~ msgid "Blocklist contains %'d rule"
-#~ msgid_plural "Blocklist contains %'d rules"
-#~ msgstr[0] "अवरुद्ध सूची में %'d नियम है"
-#~ msgstr[1] "अवरुद्ध सूची में %'d नियम हैं"
-
-#, c-format
-#~ msgid "Blocklist has %'d rule."
-#~ msgid_plural "Blocklist has %'d rules."
-#~ msgstr[0] "अवरुद्ध सूची में %'d नियम है।"
-#~ msgstr[1] "अवरुद्ध सूची में %'d नियम हैं।"
-
-#~ msgid "Cancelled"
-#~ msgstr "रद्द"
-
-#, c-format
-#~ msgid ""
-#~ "Click to disable Alternative Speed Limits\n"
-#~ " (%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "वैकल्पिक गति सीमाएँ निष्क्रिय करने हेतु क्लिक करें\n"
-#~ " (%1$s डाउनलोड, %2$s अपलोड)"
-
-#, c-format
-#~ msgid ""
-#~ "Click to enable Alternative Speed Limits\n"
-#~ " (%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "वैकल्पिक गति सीमाएँ सक्रिय करने हेतु क्लिक करें\n"
-#~ " (%1$s डाउनलोड, %2$s अपलोड)"
-
-#~ msgid "Complete"
-#~ msgstr "पूर्ण"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s"
-#~ msgstr "%s हेतु पोर्ट %d सेट करना विफल : %s"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s (%s)"
-#~ msgstr "%s हेतु पोर्ट %d सेट करना विफल : %s (%s)"
-
-#, c-format
-#~ msgid "Couldn't connect socket %<PRIdMAX> to %s, port %d (errno %d - %s)"
-#~ msgstr "सॉकेट %<PRIdMAX> का %s से कनेक्शन विफल, पोर्ट %d (त्रुटि संख्या %d - %s)"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\" बनाना विफल : %2$s"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "सॉकेट बनाना विफल : %s"
-
-#, c-format
-#~ msgid "Couldn't find settings key \"%s\""
-#~ msgstr "सेटिंग्स कुंजी \"%s\" खोज विफल"
-
-#, c-format
-#~ msgid "Couldn't get directory for \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\" हेतु डायरेक्टरी प्राप्ति विफल : %2$s"
-
-#, c-format
-#~ msgid "Couldn't inhibit desktop hibernation: %s"
-#~ msgstr "डेस्कटॉप सुप्त न करना विफल : %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\" खोलना विफल : %2$s"
-
-#, c-format
-#~ msgid "Couldn't preallocate file \"%1$s\" (%2$s, size: %3$<PRIu64>): %4$s"
-#~ msgstr "\"%1$s\" फाइल हेतु पूर्व आवंटन विफल (%2$s, आकार : %3$<PRIu64>):%4$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\" रीड करना विफल : %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\""
-#~ msgstr "\"%s\" रीड करना विफल"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "\"%s\" रीड करना विफल : %s"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "\"%s\" संचित करना विफल"
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\" फाइल संचय विफल : %2$s"
-
-#, c-format
-#~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
-#~ msgstr "% <PRIdMAX> हेतु स्रोत पते %s की प्राप्ति विफल : %s"
-
-#, c-format
-#~ msgid "Couldn't truncate \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\" समाप्ति विफल : %2$s"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "\"%s\" बनाया गया!"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "%1$s द्वारा बनाया गया"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "%1$s द्वारा %2$s को बनाया गया"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "%1$s को बनाया गया"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "\"%s\" बनाना जारी"
-
-#~ msgid "Debug"
-#~ msgstr "डिबग"
-
-#, c-format
-#~ msgid "Do_wnload (%s):"
-#~ msgstr "डाउनलोड (_w) (%s):"
-
-#~ msgid "Done"
-#~ msgstr "चयनित पूर्ण"
-
-#, c-format
-#~ msgid "Down: %1$s, Up: %2$s"
-#~ msgstr "डाउनलोड: %1$s, अपलोड: %2$s"
-
-#, c-format
-#~ msgid "Downloading from %1$'d %2$s"
-#~ msgstr "%1$'d %2$s से डाउनलोड जारी"
-
-#, c-format
-#~ msgid "Downloading from %1$'d of %2$'d %3$s"
-#~ msgstr "%2$'d में से %1$'d %3$s से डाउनलोड जारी"
-
-#, c-format
-#~ msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-#~ msgstr "%2$'d में से %1$'d %3$s व %4$'d %5$s से डाउनलोड जारी"
-
-#, c-format
-#~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
-#~ msgstr "%1$'d %2$s से मेटाडाटा डाउनलोड जारी (%3$d%% पूर्ण)"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "पीयर कनेक्शन हेतु uTP सक्रिय करें (_u)"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "टोरेंट खोलने में त्रुटि"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "\"%s\" रीड हेतु त्रुटि : %s"
-
-#, c-format
-#~ msgid "Error registering Transmission as a %s handler: %s"
-#~ msgstr "%s संचालक के रूप में ट्रांसमिशन पंजीकृत करते समय त्रुटि : %s"
-
-#, c-format
-#~ msgid "Error saving \"%*.*s\": %s (%d)"
-#~ msgstr "संचित करते समय त्रुटि \"%*.*s\": %s (%d)"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "\"%s\" राइट हेतु त्रुटि : %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "त्रुटि : %s"
-
-#, c-format
-#~ msgid "Error: invalid announce URL \"%s\""
-#~ msgstr "त्रुटि : अमान्य अनुरोध यूआरएल \"%s\""
-
-#, c-format
-#~ msgid "Failed to set piece size to %s, leaving it at %s"
-#~ msgstr "खंड आकार %s सेट करना विफल, %s ही उपयोग होगा"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "इंटरनेट गेटवे उपकरण \"%s\" प्राप्त"
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "सार्वजनिक पता प्राप्त \"%s\""
-
-#~ msgid "Friday"
-#~ msgstr "शुक्रवार"
-
-#, c-format
-#~ msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-#~ msgstr "%4$s पूर्व %1$s%2$'d पीयर%3$s की सूची प्राप्त"
-
-#, c-format
-#~ msgid "Got a scrape error \"%s%s%s\" %s ago"
-#~ msgstr "%s पूर्व स्क्रैप त्रुटि \"%s%s%s\" हुई"
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "%4$s पूर्व त्रुटि हुई %1$s\"%2$s\"%3$s"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "%d सिग्नल प्राप्त; उचित रूप से बंद करना जारी है। अवरुद्ध होने पर पुनः प्रयास करें।"
-
-#~ msgid "Idle"
-#~ msgstr "निष्क्रिय"
-
-#~ msgid "Is another copy of Transmission already running?"
-#~ msgstr "क्या ट्रांसमिशन की अन्य आवृत्ति कार्यरत है?"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "डाउनलोड गति सीमित करें (_d) (%s):"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "अपलोड गति सीमित करें (_u) (%s):"
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "%d टोरेंट लोड हुए"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "लोकल पता \"%s\" है"
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr ".torrent फाइल ट्रैश में भेजें (_v)"
-
-#~ msgid "Monday"
-#~ msgstr "सोमवार"
-
-#, c-format
-#~ msgid "Moving \"%s\""
-#~ msgstr "\"%s\" अंतरण जारी"
-
-#~ msgid "Not a regular file"
-#~ msgstr "यह फाइल सामान्य नहीं है"
-
-#, c-format
-#~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-#~ msgstr "पीयर सूची अनुरोध %1$s हेतु समय सीमा %2$s%3$s पूर्व समाप्त ; पुनः प्रयास किया जाएगा"
-
-#, c-format
-#~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
-#~ msgstr "अभी डाउनलोड हुए खंड %<PRIu32> हेतु चेकसम जाँच विफल"
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "पोर्ट %d सफलतापूर्वक अग्रसारित हो रहा है"
-
-#, c-format
-#~ msgid "Port %d isn't forwarded"
-#~ msgstr "पोर्ट %d अग्रसारित नहीं है"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "पोर्ट अग्रसारित करना"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "पोर्ट अग्रसारित करना (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "पोर्ट अग्रसारित करना (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "पोर्ट अग्रसारित करना सफल!"
-
-#, c-format
-#~ msgid "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
-#~ msgstr "\"%s\" द्वारा पोर्ट अग्रसारित हो रहा है, सेवा \"%s\"। (लोकल पता : %s%d)"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "पोर्ट <b>बंद</b> है"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "पोर्ट <b>चालू</b> है"
-
-#, c-format
-#~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
-#~ msgstr "पूर्व आवंटित फाइल \"%1$s\" (%2$s, आकार : %3$<PRIu64>)"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "अनुपात : %s"
-
-#~ msgid "Saturday"
-#~ msgstr "शनिवार"
-
-#, c-format
-#~ msgid "Saved \"%s\""
-#~ msgstr "\"%s\" संचित"
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "%s का स्कैन पूर्ण"
-
-#, c-format
-#~ msgid "Searching for web interface file \"%s\""
-#~ msgstr "वेब अंतरफलक फाइल \"%s\" हेतु खोज जारी"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "कनेक्ट हो रखें %2$'d पीयर में से %1$'d को सीड जारी"
-#~ msgstr[1] "कनेक्ट हो रखें %2$'d पीयर में से %1$'d को सीड जारी"
-
-#, c-format
-#~ msgid "Serving RPC and Web requests from directory '%s'"
-#~ msgstr "'%s' डायरेक्टरी से आरपीसी व वेब अनुरोध कार्यरत"
-
-#, c-format
-#~ msgid "Serving RPC and Web requests on %s:%d%s"
-#~ msgstr "%s पर आरपीसी व वेब अनुरोध कार्यरत : %d%s"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "विकल्प विंडो दिखाएँ (_o)"
-
-#, c-format
-#~ msgid "Skipping unknown torrent \"%s\""
-#~ msgstr "\"%s\" अज्ञात टोरेंट निरस्त"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "%'d बार आरंभ"
-#~ msgstr[1] "%'d बार आरंभ"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "\"%1$s\" से स्थिति \"%2$s\" की गई"
-
-#, c-format
-#~ msgid "Stop at Ratio (%s)"
-#~ msgstr "इस अनुपात पर रोकें (%s)"
-
-#~ msgid "Stopped"
-#~ msgstr "रुका हुआ"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "\"%s\" द्वारा पोर्ट अग्रसारित करना रोका गया, सेवा \"%s\""
-
-#~ msgid "Sunday"
-#~ msgstr "रविवार"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
-#~ msgstr "टोरेंट फाइल \"%s\" पहले से \"%s\"  द्वारा उपयोग में है।"
-
-#~ msgid "Thursday"
-#~ msgstr "गुरुवार"
-
-#~ msgid ""
-#~ "To add a backup URL, add it on the line after the primary URL.\n"
-#~ "To add another primary URL, add it after a blank line."
-#~ msgstr ""
-#~ "जोड़ने हेतु बैकअप यूआरएल को प्राथमिक यूआरएल से अगली पंक्ति में दर्ज करें।\n"
-#~ "दूसरा प्राथमिक यूआरएल जोड़ने हेतु, रिक्त पंक्ति के बाद दर्ज करें।"
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "टोरेंट निर्माण हेतु फाइल \"%s\" निरस्त : %s"
-
-#, c-format
-#~ msgid "Tracker gave a warning: \"%s\""
-#~ msgstr "ट्रैकर द्वारा चेतावनी : \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave an error: \"%s\""
-#~ msgstr "ट्रैकर द्वारा त्रुटि : \"%s\""
-
-#, c-format
-#~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-#~ msgstr "%sपूर्व ट्रैकर हेतु %s%'d सीड व %'d लीचर%s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%*.*s\""
-#~ msgstr "ट्रैकर चेतावनी : \"%*.*s\""
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "ट्रांसमिशन\n"
-#~ "अपलोड : %1$s %2$s\n"
-#~ "डाउनलोड : %3$s %4$s"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "ट्रांसमिशन द्वारा \"%s\" उपयोग करना संभव नहीं है"
-
-#~ msgid "Tuesday"
-#~ msgstr "मंगलवार"
-
-#, c-format
-#~ msgid "U_pload (%s):"
-#~ msgstr "अपलोड (_p) (%s):"
-
-#, c-format
-#~ msgid "Unable to add torrent file \"%s\"."
-#~ msgstr "\"%s\" टोरेंट फाइल जोड़ना विफल।"
-
-#, c-format
-#~ msgid "Unable to rename file as \"%s\": %s"
-#~ msgstr "फाइल का नाम \"%s\" करना विफल : %s"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "अज्ञात यूआरएल"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "अवरुद्ध सूची अपडेट करें"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "लोकल डाटा प्रमाणीकरण जारी (%.1f%% जाँचा गया)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "टोरेंट प्रमाणीकरण जारी"
-
-#~ msgid "Wednesday"
-#~ msgstr "बुधवार"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "डाउनलोड (_D) (%s):"
-
-#, c-format
-#~ msgid "_Show %'d of:"
-#~ msgstr "%'d दिखाएँ (_S):"
-
-#, c-format
-#~ msgid "_Upload (%s):"
-#~ msgstr "अपलोड (_U) (%s):"
-
-#, c-format
-#~ msgid "blocklist skipped invalid address at line %d"
-#~ msgstr "अवरुद्ध सूची द्वारा पंक्ति %d पर अमान्य पता अनदेखा किया गया"
-
-#~ msgid "full"
-#~ msgstr "पूर्ण"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "अब पोर्ट %d अग्रसारित नहीं हो रहा है"
-
-#~ msgid "peer"
-#~ msgid_plural "peers"
-#~ msgstr[0] "पीयर"
-#~ msgstr[1] "पीयर"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "डाउनलोड: %1$s, अपलोड: %2$s"
-
-#~ msgid "sparse"
-#~ msgstr "अल्प"
-
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP - नेटवर्क संकुलन कम करने हेतु एक साधन है"
-
-#~ msgid "web seed"
-#~ msgid_plural "web seeds"
-#~ msgstr[0] "वेब सीड"
-#~ msgstr[1] "वेब सीड"

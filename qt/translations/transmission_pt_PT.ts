@@ -2246,17 +2246,17 @@ Para adicionar outra hiperligação primária, adicione-a após a linha em branc
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Torrent duplicado</numerusform>
-            <numerusform>Torrents duplicados</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Não foi possível adicionar %n torrent duplicado</numerusform>
-            <numerusform>Não foi possível adicionar %n torrents duplicados</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

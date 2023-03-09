@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Macedonian (https://www.transifex.com/transmissionbt/teams/33778/mk/)\n"
 "Language: mk\n"
 "MIME-Version: 1.0\n"
@@ -2520,164 +2520,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d ден"
-#~ msgstr[1] "%'d дена"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d час"
-#~ msgstr[1] "%'d часа"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d минута"
-#~ msgstr[1] "%'d минути"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d секунда"
-#~ msgstr[1] "%'d секунди"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s, качени %2$s (Однос: %3$s)"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s се подигна"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s преостанато"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s успеа (%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>Затворам врски</b>"
-
-#~ msgid "Complete"
-#~ msgstr "Завршено"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "Не можам да креирам socket: %s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Креирај торент"
-
-#~ msgid "Debug"
-#~ msgstr "Дебагирање"
-
-#~ msgid "Done"
-#~ msgstr "Завршено"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Датотеката %s смета"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "Го најдов уредот за премин кон интернет %s"
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "Ја најдов јавната адреса %s"
-
-#~ msgid "Idle"
-#~ msgstr "Неактивно"
-
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Невалиден запис за мета податоци \"%s\""
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "Вчитав %d торенти"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "Локалната адреса е %s"
-
-#~ msgid "Not a regular file"
-#~ msgstr "Не е обична датотека"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "Пренасочување на порти"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "Пренасочување на порти (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "Пренасочување на порти (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "Пренасочувањето за портата е успешно!"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "Портата е <b>затворена</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "Портата е <b>отворена</b>"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "Однос: %s"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "Споделувам со %1$'d од %2$'d врзан пријател"
-#~ msgstr[1] "Споделувам со %1$'d од %2$'d врзани пријатели"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "Започнато %'d пат"
-#~ msgstr[1] "Започнато %'d пати"
-
-#~ msgid "Stopped"
-#~ msgstr "Запрено"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "Го стопирам пренасочувањето на порти преку %s, за сервисот %s"
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "Креаторот на торенти ја прескокнува датотеката %s: %s"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Грешка со тракерот: %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Предупредување од тракерот: %s"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Тракерот ќе дозволи барања во %s"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "Проверувам локални податоци (тестирани се %.1f%%)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "Го проверувам торентот"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "повеќе не ја пренасочувам портата %d"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "Надолу: %1$s, Нагоре: %2$s"

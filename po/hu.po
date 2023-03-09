@@ -8,9 +8,9 @@
 # Kristóf Korcsog <kristofkorcsog@gmail.com>, 2020
 # c2e331a438add123670fbf39846b5de3_8c31b08 <d7888a78469511cd116b0058dd23f760_811520>, 2022
 # Béla Bajza, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Balázs Meskó <meskobalazs@mailbox.org>, 2022
-# Anon, 2022
+# Anon, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Anon, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
 "Language-Team: Hungarian (https://www.transifex.com/transmissionbt/teams/33778/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -1003,8 +1003,8 @@ msgstr "Helyi hiba: '{error}'"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] "Metaadatok letöltése {active_count} kapcsolódó partnertől ({percent_done:d}% kész)"
-msgstr[1] "Metaadatok letöltése {active_count} kapcsolódó partnertől ({percent_done:d}% kész)"
+msgstr[0] "Metaadatok letöltése {active_count} kapcsolódó partnertől ({percent_done}% kész)"
+msgstr[1] "Metaadatok letöltése {active_count} kapcsolódó partnertől ({percent_done}% kész)"
 
 #: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
@@ -2450,7 +2450,7 @@ msgstr "IPv4-socket lefoglalása nem sikerült {address}: {error} ({error_code})
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "IPv6-socket lefoglalása nem sikerült {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"

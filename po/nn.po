@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Norwegian Nynorsk (https://www.transifex.com/transmissionbt/teams/33778/nn/)\n"
 "Language: nn\n"
 "MIME-Version: 1.0\n"
@@ -495,11 +495,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Fjerna torrent?"
-msgstr[1] "Fjerna %d torrentar?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
@@ -2520,240 +2519,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d dag"
-#~ msgstr[1] "%'d dagar"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d time"
-#~ msgstr[1] "%'d timar"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d minutt"
-#~ msgstr[1] "%'d minutt"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d sekund"
-#~ msgstr[1] "%'d sekund"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% av %3$s%% tilgjengeleg)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "%1$s sidan"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s, opplasta %2$s (Tilhøve: %3$s)"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s starta"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s gjenstår"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s fullførte (%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>Lukkar tilkoplingar</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>Ingen kjelde veld</i>"
-
-#~ msgid "Cancelled"
-#~ msgstr "Avbrote"
-
-#~ msgid "Complete"
-#~ msgstr "Fullført"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "Kunne ikkje lage \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "Kunne ikkje lage socket: %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "Kunne ikkje opne \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "Kunne ikkje lese \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "Kunne ikkje lagre fila \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Lag ein torrent"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "Oppretta av %1$s"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "Oppretta %2$s av %1$s"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "Oppretta %1$s"
-
-#~ msgid "Debug"
-#~ msgstr "Avlus"
-
-#~ msgid "Done"
-#~ msgstr "Ferdig"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "Feil under opning"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "Feil ved lesing av «%s»: %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Fila \"%s\" er i vegen"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "Fann internet gateway-enheten \"%s\""
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "Fann offentleg adresse \"%s\""
-
-#~ msgid "Idle"
-#~ msgstr "Ikkje aktiv"
-
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Ugyldig metadataoppføring \"%s\""
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "Avgrens ne_dlastingsfart (%s):"
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "Lasta %d torrentar"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "Lokal adresse er \"%s\""
-
-#~ msgid "Not a regular file"
-#~ msgstr "Ikkje ei vanleg fil"
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "Port %d vidaresendte med suksess"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "Portvidaresending"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "Portvidaresending (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "Portvidaresending (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "Portvidaresending fullført!"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "Porten er <b>lukka</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "Porten er <b>open</b>"
-
-#~ msgid "Present Main Window"
-#~ msgstr "Vis hovudvindauget"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "Tilhøve: %s"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "Delar til %1$'d av %2$'d tilkopla delar"
-#~ msgstr[1] "Delar til %1$'d av %2$'d tilkopla delarar"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "Starta %'d gong"
-#~ msgstr[1] "Starta %'d gongar"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "Status endra frå \"%1$s\" til \"%2$s\""
-
-#~ msgid "Stopped"
-#~ msgstr "Stoppa"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "Stoppar portvidaresending gjennom \"%s\", service \"%s\""
-
-#, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Torrentfila \"%s\" inneheld ugyldige data."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Torrentfila \"%s\" kom over ein ukjend feil."
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "Torrentlagaren hoppar over fila \"%s\": %s"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Trackerfeil: \"%s\""
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Trackeråtvaring: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Tracker vil tillate forespørslar om %s"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "Bekrefter lokale data (%.1f%% testa)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "Verifiserer torrent"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "vidaresender ikkje lenger port %d"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "Ned: %1$s, Opp: %2$s"

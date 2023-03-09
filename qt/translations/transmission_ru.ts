@@ -16,7 +16,7 @@
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Быстрый и простой торрент-клиент</translation>
+        <translation>Быстрый и простой BitTorrent-клиент</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
@@ -49,7 +49,7 @@
     <message>
         <location filename="../Application.cc" line="+332"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Transmission — приложение для обмена файлами.&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Transmission — программа для обмена файлами.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -280,7 +280,7 @@
     <message>
         <location line="+390"/>
         <source>Add URL(s)</source>
-        <translation>Добавить ссылку(-и)</translation>
+        <translation>Добавить ссылку(и)</translation>
     </message>
     <message>
         <location line="+112"/>
@@ -594,12 +594,12 @@
     <message>
         <location line="+3"/>
         <source>Progress</source>
-        <translation>Выполняется</translation>
+        <translation>Прогресс</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Download</source>
-        <translation>Загрузка</translation>
+        <translation>Загрузить</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1008,7 +1008,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Quit</source>
-        <translation>В&amp;ыйти</translation>
+        <translation>В&amp;ыход</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1119,7 +1119,7 @@
     <message>
         <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
-        <translation>Обра&amp;тное упорядочивание</translation>
+        <translation>Обра&amp;тить порядок</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1190,7 +1190,7 @@
     <message>
         <location line="+10"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>С&amp;Копировать магнет-ссылку в буфер обмена</translation>
+        <translation>Копировать магнет-&amp;ссылку в буфер</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1210,27 +1210,27 @@
     <message>
         <location line="+11"/>
         <source>Move to &amp;Top</source>
-        <translation>Переместить на самый верх</translation>
+        <translation>В &amp;начало</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Move &amp;Up</source>
-        <translation>Переместить выше</translation>
+        <translation>П&amp;овысить</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Move &amp;Down</source>
-        <translation>Переместить ниже</translation>
+        <translation>Пониз&amp;ить</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Move to &amp;Bottom</source>
-        <translation>Переместить в самый низ</translation>
+        <translation>В &amp;конец</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>Упорядочивать по очерёдности</translation>
+        <translation>Упорядочивать по очер&amp;ёдности</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+468"/>
@@ -1606,12 +1606,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+13"/>
         <source>S&amp;tart when added</source>
-        <translation>Запустить при добавлении</translation>
+        <translation>Запустить по добавлении</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation>Пере&amp;местить файл .torrent в корзину</translation>
+        <translation>Убрать торрент-файл в корз&amp;ину</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="-40"/>
@@ -1829,7 +1829,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+24"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
-        <translation>Переместить торрент-файл в корзину</translation>
+        <translation>Убрать торрент-файл в корз&amp;ину</translation>
     </message>
     <message>
         <location line="+62"/>
@@ -1883,7 +1883,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>Об&amp;щий максимум участников</translation>
+        <translation>Об&amp;щий максимум участников:</translation>
     </message>
     <message>
         <location line="-193"/>
@@ -1898,7 +1898,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../PrefsDialog.cc" line="-227"/>
         <source>Allow encryption</source>
-        <translation>Разрешить шифрование</translation>
+        <translation>Разрешать шифрование</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2049,7 +2049,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+12"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation>Отображать уведомление при добавлении торрента</translation>
+        <translation>Отображать уведомление при доба&amp;влении торрента</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2089,7 +2089,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+13"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
-        <translation>Ис&amp;пользовать локальное обнаружение участников (LDP)</translation>
+        <translation>Исполь&amp;зовать локальное обнаружение участников</translation>
     </message>
     <message>
         <location line="-3"/>
@@ -2139,7 +2139,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
-        <translation>Загрузка недоступна, если обмен данными остановлен:</translation>
+        <translation>Загрузка неак&amp;тивна, если обмен данными прекращён:</translation>
     </message>
     <message>
         <location line="-156"/>

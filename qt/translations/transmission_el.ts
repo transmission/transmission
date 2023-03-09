@@ -72,7 +72,7 @@
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Το Torrent Προστέθηκε</translation>
     </message>
 </context>
 <context>
@@ -2246,17 +2246,17 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Διπλότυπο Torrent</numerusform>
-            <numerusform>Διπλότυπα Torrent(s)</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Αδυναμία προσθήκης %n διπλότυπου torrent</numerusform>
-            <numerusform>Αδυναμία προσθήκης %n διπλότυπων torrent(s)</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

@@ -10,6 +10,9 @@
 # Olexander Movchan, 2022
 # Yevhenii Shatalov <zhenya.shot@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Petro Bilyi <whitipet@gmail.com>, 2023
+# Oleksii Lysenko, 2023
+# Gordon Freeman, 2023
 #
 #, fuzzy
 msgid ""
@@ -18,7 +21,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
+"Last-Translator: Gordon Freeman, 2023\n"
 "Language-Team: Ukrainian (https://www.transifex.com/transmissionbt/teams/33778/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -104,7 +107,7 @@ msgstr "Не вдалося зареєструвати Transmission як обр�
 
 #: ../gtk/Application.cc:551
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "Отримано сигнал завершення, спроба завершити роботу коректно. Повторіть це, якщо виникне помилка."
 
 #: ../gtk/Application.cc:777
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -485,11 +488,11 @@ msgstr[3] "завантажуючих"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:1917
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Виникла помилка запиту до трекера '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "Запит на підрахунок вузлів у {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1941
 msgid "Queued to ask for peer counts"
@@ -497,7 +500,7 @@ msgstr "У черзі на запит кількість вузлів"
 
 #: ../gtk/DetailsDialog.cc:1948
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Запитано кількість вузлів {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2231
 msgid "{torrent_name} - Edit Trackers"
@@ -532,22 +535,20 @@ msgstr[2] "Властивості — {torrent_count:L} торентів"
 msgstr[3] "Властивості — {torrent_count:L} торенти"
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Вилучити %d торент?"
-msgstr[1] "Вилучити %d торенти?"
-msgstr[2] "Вилучити %d торентів?"
-msgstr[3] "Вилучити %d торентів?"
+msgstr[0] "Вилучити торент?"
+msgstr[1] "Вилучити {count:L} торента?"
+msgstr[2] "Вилучити {count:L} торентів?"
+msgstr[3] "Вилучити {count:L} торентів?"
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Вилучити завантажені файли %d торенту?"
-msgstr[1] "Вилучити завантажені файли %d торентів?"
-msgstr[2] "Вилучити завантажені файли %d торентів?"
-msgstr[3] "Вилучити завантажені файли %d торентів?"
+msgstr[0] "Видалити цей завантажений файл торрента?"
+msgstr[1] "Видалити ці {count:L} завантажені файли торрента?"
+msgstr[2] "Видалити ці {count:L} завантажених файлів торрента?"
+msgstr[3] "Видалити ці {count:L} завантажених файлів торрента?"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -782,31 +783,31 @@ msgstr "Час"
 #: ../gtk/MessageLogWindow.cc:483
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "Критично"
 
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Помилка"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "Попередження"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "Інформація"
 
 #: ../gtk/MessageLogWindow.cc:487
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "Дебаг"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "Не вдалося створити проксі для '{bus}': {error} ({error_code})"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -846,15 +847,15 @@ msgstr "_Відкрити"
 
 #: ../gtk/OptionsDialog.cc:385
 msgid "Show options dialog"
-msgstr ""
+msgstr "Показати діалогове вікно налаштувань"
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
-msgstr ""
+msgstr "Обрати файл"
 
 #: ../gtk/PathButton.cc:202
 msgid "(None)"
-msgstr ""
+msgstr "(Нічого)"
 
 #: ../gtk/PrefsDialog.cc:306
 msgid "Allow encryption"
@@ -948,7 +949,7 @@ msgstr "Дозвіл на присипляння"
 
 #: ../gtk/Session.cc:1202
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "Не вдалось знайти запит RPC, що очікує на розгляд, для тега {tag}"
 
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"
@@ -977,7 +978,7 @@ msgstr "{upload_speed} ▲ {download_speed} ▼"
 #: ../gtk/Torrent.cc:338
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
-msgstr ""
+msgstr "Перевірка локальних даних ({percent_done}% перевірено)"
 
 #: ../gtk/Torrent.cc:365
 msgid "{current_size} of {complete_size} ({percent_done}%)"
@@ -1029,10 +1030,10 @@ msgstr "Локальна помилка: «{error}»"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Завантаження метаданих від {active_count} підʼєднаного вузла (завершено {percent_done}%)"
+msgstr[1] "Завантаження метаданих від {active_count} підʼєднаних вузлів (завершено {percent_done}%)"
+msgstr[2] "Завантаження метаданих від {active_count} підʼєднаних вузлів (завершено {percent_done}%)"
+msgstr[3] "Завантаження метаданих від {active_count} підʼєднаних вузлів (завершено {percent_done}%)"
 
 #: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
@@ -1256,11 +1257,11 @@ msgstr "Не вдалося відкрити торент"
 
 #: ../gtk/Utils.cc:429
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "Не вдалося перемістити '{path}' до смітника: {error} ({error_code})"
 
 #: ../gtk/Utils.cc:537
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "Не вдалося відкрити '{url}'"
 
 #: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
@@ -1302,7 +1303,7 @@ msgstr "[Файли торентів або посилання]"
 
 #: ../gtk/main.cc:107
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "Виконайте '{program} --help', щоб побачити повний перелік доступних  параметрів командного рядка.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1327,7 +1328,7 @@ msgstr "Запустити Transmission згорнутим"
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr ""
+msgstr "_Файл"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:22 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
@@ -1383,7 +1384,7 @@ msgstr "_Налаштування"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr ""
+msgstr "_Торент"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:91
 msgid "_Properties"
@@ -1419,7 +1420,7 @@ msgstr "Запросити у трекера _більше вузлів"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "Додати до _черги"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1467,7 +1468,7 @@ msgstr "_Вилучити файли і торент-файл"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
-msgstr ""
+msgstr "_Перегляд"
 
 #: ../gtk/transmission.ui:182
 msgid "_Compact View"
@@ -1551,7 +1552,7 @@ msgstr "_Про"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr ""
+msgstr "_Впорядкувати торенти за"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -2015,11 +2016,11 @@ msgstr "Макс. кількість вузлів _взагалі:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1437 ../gtk/ui/gtk4/PrefsDialog.ui:994
 msgid "Enable µ_TP for peer communication"
-msgstr ""
+msgstr "Увімкнути обмін даними за µ_TP"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1441 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "µTP is a tool for reducing network congestion."
-msgstr ""
+msgstr "µTP — це інструмент для зменшення перевантаження мережі."
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1009
 msgid "Use PE_X to find more peers"
@@ -2248,7 +2249,7 @@ msgstr "Не вдалося розпізнати рядок: «{line}»"
 
 #: ../libtransmission/blocklist.cc:384
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Перезапис старого формату файлу списку блокувань у новий формат"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:41 ../libtransmission/crypto-utils-openssl.cc:56 ../libtransmission/crypto-utils-wolfssl.cc:44
 msgid "{crypto_library} error: {error} ({error_code})"
@@ -2272,7 +2273,7 @@ msgstr "Не вдалося створити сокет: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:226
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
-msgstr ""
+msgstr "Не вдалося встановити адресу джерела {address} на {socket}: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:246
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
@@ -2444,7 +2445,7 @@ msgstr "Не вдалося відкрити lock-файл сесії «{path}»
 
 #: ../libtransmission/session.cc:405
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Прослуховуються вхідні з'єднання вузлів на {hostport}"
 
 #: ../libtransmission/session.cc:646
 msgid "Transmission version {version} starting"
@@ -2472,11 +2473,11 @@ msgstr[3] "Не вдалося розпізнати метадані magnet: «{
 
 #: ../libtransmission/torrent-metainfo.cc:699
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
-msgstr ""
+msgstr "Торент-файл перенесено з '{old_path}' до '{path}'"
 
 #: ../libtransmission/torrent.cc:122
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Не вдалося використати метаінформацію від  '{path}' для '{magnet}': {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:159
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
@@ -2516,11 +2517,11 @@ msgstr "Не вдалося пересунути «{old_path}» до «{path}»:
 
 #: ../libtransmission/tr-dht.cc:528
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Не вдалося розпізнати  '{filename}' рядок: '{line}'"
 
 #: ../libtransmission/tr-lpd.cc:259
 msgid "Couldn't initialize LPD: {error} ({error_code})"
-msgstr ""
+msgstr "Не вдалося ініціалізувати LPD: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:159
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
@@ -2528,7 +2529,7 @@ msgstr "Не вдалося привʼязати сокет IPv4 {address}: {err
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Не вдалося привʼязати сокет IPv6 {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
@@ -2589,15 +2590,15 @@ msgstr "Не вдалося стежити за змінами до теки"
 
 #: ../libtransmission/web.cc:175
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
-msgstr ""
+msgstr "Перевірить сертифікати трекера за допомогою змінної CURL_CA_BUNDLE: {bundle}"
 
 #: ../libtransmission/web.cc:176
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
-msgstr ""
+msgstr "Примітка: це працює, лише якщо ви зібрали на основі libcurl за допомогою openssl або gnutls, НЕ nss"
 
 #: ../libtransmission/web.cc:177
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
-msgstr ""
+msgstr "Примітка: Недійсні сертифікати відображатимуться як «Не вдалося підключитися до трекера», як і багато інших помилок"
 
 #: ../libtransmission/web.cc:448
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
@@ -2606,18 +2607,18 @@ msgstr ""
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{file_count:L} файл, {total_size}\n"
+msgstr[1] "{file_count:L} файли, {total_size}\n"
+msgstr[2] "{file_count:L} файлів, {total_size}\n"
+msgstr[3] "{file_count:L} файлів, {total_size}\n"
 
 #: ../utils/create.cc:232
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{piece_count:L} частина, {piece_size}\n"
+msgstr[1] "{piece_count:L} частини, {piece_size} кожна\n"
+msgstr[2] "{piece_count:L} частин, {piece_size} кожна\n"
+msgstr[3] "{piece_count:L} частин, {piece_size} кожна\n"
 
 #: ../utils/remote.cc:140
 msgid "hour"
@@ -2650,57 +2651,3 @@ msgstr[0] "день"
 msgstr[1] "дні"
 msgstr[2] "днів"
 msgstr[3] "дня"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Уведіть «%s --help», щоб переглянути повний перелік доступних параметрів командного рядка.\n"
-
-#~ msgid "Couldn't allocate IPv4 event"
-#~ msgstr "Не вдалося зарезервувати подію IPv4"
-
-#~ msgid "Couldn't allocate IPv6 event"
-#~ msgstr "Не вдалося зарезервувати подію IPv6"
-
-#~ msgid "Couldn't create IPv4 socket"
-#~ msgstr "Не вдалося створити сокет IPv4"
-
-#~ msgid "Couldn't find address of tracker '{host}': {error} ({error_code})"
-#~ msgstr "Не вдалося знайти адресу трекера «{host}»: {error} ({error_code})"
-
-#~ msgid "Couldn't rebind IPv6 socket {address}: {error} ({error_code})"
-#~ msgstr "Не вдалося наново привʼязати сокет IPv6 {address}: {error} ({error_code})"
-
-#~ msgid "Couldn't write to peer"
-#~ msgstr "Не вдалося записати до вузла"
-
-#~ msgid "Critical"
-#~ msgstr "Критично"
-
-#~ msgid "Debug"
-#~ msgstr "Діагностика"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Увімкнути обмін д_аними за µTP"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Отримано сигнал %d; спроба належного завершення роботи. Повторіть надсилання сигналу, якщо роботу не буде завершено."
-
-#~ msgid "Show _options dialog"
-#~ msgstr "Показати вікно п_араметрів"
-
-#~ msgid "Trace"
-#~ msgstr "Простежування"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Оновити перелік блокування"
-
-#~ msgid "Warning"
-#~ msgstr "Попередження"
-
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "µTP — інструмент для запобігання перевантаженню мережі"

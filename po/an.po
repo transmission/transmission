@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Aragonese (https://www.transifex.com/transmissionbt/teams/33778/an/)\n"
 "Language: an\n"
 "MIME-Version: 1.0\n"
@@ -2513,167 +2513,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "%'d Propiedatz d'o torrent"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d parti @ %2$s"
-#~ msgstr[1] "%1$'d partis @ %2$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d parti @ %3$s)"
-#~ msgstr[1] "%1$s (%2$'d partis @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d parti)"
-#~ msgstr[1] "%1$s (%2$'d partis)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% de %3$s%% disposable)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s corrupto)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "fa %1$s"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s; %2$'d archivo"
-#~ msgstr[1] "%1$s; %2$'d archivos"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (Tasa: %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - Anyadir Tracker"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - Editar Trackers"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "Propiedatz de %s"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>Trancando conexions</b>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "Demandando mas peers en %s"
-
-#~ msgid "Cancelled"
-#~ msgstr "Cancelau"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "No se puede creyar  \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "No s'ha puesto ubrir \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Creyar un torrent"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "Creyau \"%s\"!"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "Creyau por %1$s"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "Creyau por %1$s en %2$s"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "Creyau en %1$s"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "Creyando \"%s\""
-
-#~ msgid "Done"
-#~ msgstr "Feito"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "Error en leyer «%s»: %s"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "Error en escribir «%s»: %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "Error: %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "L'archivo \"%s\" estorba"
-
-#~ msgid "Friday"
-#~ msgstr "viernes"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "L'adreza local ye \"%s\""
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr "Mo_ver archivos .torrent a la papelera"
-
-#~ msgid "Monday"
-#~ msgstr "luns"
-
-#~ msgid "Not a regular file"
-#~ msgstr "No ye un archivo regular"
-
-#~ msgid "Saturday"
-#~ msgstr "sabado"
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "Escaneau %s"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "Amostrar o diálogo _opcions"
-
-#~ msgid "Stopped"
-#~ msgstr "Aturau"
-
-#~ msgid "Sunday"
-#~ msgstr "domingo"
-
-#~ msgid "Thursday"
-#~ msgstr "chueus"
-
-#~ msgid "Tuesday"
-#~ msgstr "martz"
-
-#~ msgid "Wednesday"
-#~ msgstr "mierques"

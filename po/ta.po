@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Tamil (https://www.transifex.com/transmissionbt/teams/33778/ta/)\n"
 "Language: ta\n"
 "MIME-Version: 1.0\n"
@@ -2514,70 +2514,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% ல் %3$s%% கிடைக்கப்பெற்றுள்ளது)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (%2$s%% ல் %3$s%% கிடைக்கப்பெற்றுள்ளது); %4$s சரிபார்க்கப்படாதது"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s பாதிப்படைந்துள்ளது)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "%1$s க்கு முன்"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (விகிதம்: %s)"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s ஐ உருவாக்க முடியவில்லை"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s ஐ திறக்க முடியவில்லை"
-
-#~ msgid "Create a torrent"
-#~ msgstr "டொராண்டை உருவாக்க"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "%1$s ஆல் உருவாக்கப்பட்டது"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "%1$s ஆல் %2$s ல் உருவாக்கப்பட்டது"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "%1$s ல் உருவாக்கப்பட்டது"
-
-#, c-format
-#~ msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-#~ msgstr "%1$s%2$'d சகாக்களின் பட்டியல் %3$s %4$s க்கு முன் பெறப்பட்டது"
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "%1$s\"%2$s\"%3$s %4$s க்கு முன் பிழை ஒன்று ஏற்பட்டுள்ளது"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "பதிவிறக்க வேகத்தினை கட்டுப்படுத்து (%s):"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "மேலேற்ற வேகத்தினை கட்டுப்படுத்து (%s):"
-
-#, c-format
-#~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-#~ msgstr "%2$s %3$s க்கு முன் சகாக்களின் பட்டியலுக்கான கேள்வி %1$s நேரம் முடிவடைந்துவிட்டது; மீண்டும் முயற்சிப்போம்"

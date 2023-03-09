@@ -193,7 +193,7 @@
 "Are you sure you want to remove %lu trackers?" = "Выделено трекеров: %lu. Вы действительно хотите удалить трекеры?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Вы действительно хотите удалить %lu раздач из списка и переместить их данные в Корзину?";
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Вы действительно хотите удалить %lu раздач из списка и убрать их данные в корзину?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list?" = "Вы действительно хотите удалить %lu раздач из списка?";

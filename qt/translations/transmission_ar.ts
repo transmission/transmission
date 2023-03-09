@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>جميع الحقوق محفوظة © The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">العميل</translation>
+        <translation>عميل</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>خادم</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -76,7 +76,7 @@
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>تم إضافة تورنت</translation>
     </message>
 </context>
 <context>
@@ -443,7 +443,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>تعديل المتتبعات</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -463,7 +463,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>مضاف:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -649,7 +649,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>أعد التسمية...</translation>
     </message>
 </context>
 <context>
@@ -927,17 +927,17 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>اعدادات</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">إحصائيات</translation>
+        <translation>الإحصائيات</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;إفتح...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2747,7 +2747,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>تعديل المتتبعات</translation>
     </message>
     <message>
         <location line="+9"/>

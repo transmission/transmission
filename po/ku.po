@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Kurdish (https://www.transifex.com/transmissionbt/teams/33778/ku/)\n"
 "Language: ku\n"
 "MIME-Version: 1.0\n"
@@ -2515,76 +2515,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s, %2$s hat barkirin  (Rêje: %3$s)"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s destpê kir"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "Taybetmendiyên %s"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s ma"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>Girêdanan Digire</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>Tu çavkanî nehat hilbijartin</i>"
-
-#~ msgid "Complete"
-#~ msgstr "Qediya"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s nayê afirandin"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s nayê vekirin"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "Nehat xwendin \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "Nehat tomarkirin \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Torrentek biafirîne"
-
-#~ msgid "Done"
-#~ msgstr "Qediya"
-
-#~ msgid "Idle"
-#~ msgstr "Betal"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "Rêje: %s"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "Rewş hat guhertin ji \"%1$s\" li \"%2$s\""
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Çewtiya Temaşeker: \"%s\""
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Hişyariya şopîner: \"%s\""
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "Daneya heremî piştrast dike (%.1f%% hat venihêrtin)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "Torrentê piştrast dike"

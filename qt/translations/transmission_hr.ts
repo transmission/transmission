@@ -2263,19 +2263,19 @@ Kako bi dodali novi glavni URL, dodajte ga nakon praznog retka.</translation>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation>
-            <numerusform>Duplikat torrenta</numerusform>
-            <numerusform>Duplikat torrenta</numerusform>
-            <numerusform>Duplikat torrenta</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation>
-            <numerusform>Nemoguće dodavanje %n duplikata torrenta</numerusform>
-            <numerusform>Nemoguće dodavanje %n duplikata torrenta</numerusform>
-            <numerusform>Nemoguće dodavanje %n duplikata torrenta</numerusform>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>

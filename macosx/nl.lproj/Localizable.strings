@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minuten";
 
 /* stats window -> times opened */
-/* "%llu times" = ""; */
+"%llu times" = "%llu keer";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu cache";
@@ -1033,7 +1033,7 @@
 "Total Transfer" = "Totale overdracht";
 
 /* Message window -> level */
-/* "Trace" = ""; */
+"Trace" = "Trace";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Tracker";
@@ -1113,7 +1113,7 @@
 
 /* Message window -> level
    Message window -> level string */
-/* "Warning" = ""; */
+"Warning" = "Waarschuwing";
 
 /* Drag overlay -> url */
 "Web Address" = "Webadres";

@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Interlingua (https://www.transifex.com/transmissionbt/teams/33778/ia/)\n"
 "Language: ia\n"
 "MIME-Version: 1.0\n"
@@ -490,18 +490,16 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Remover torrent?"
-msgstr[1] "Remover %d torrents?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Deler files discargate de iste torrent?"
-msgstr[1] "Deler files discargate de iste %d torrents?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -2516,66 +2514,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d die"
-#~ msgstr[1] "%'d dies"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d secunda"
-#~ msgstr[1] "%'d secundas"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "%1$s retro"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "Proprietates de %s"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s restante"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>Nulle fonte seligite</i>"
-
-#~ msgid "Cancelled"
-#~ msgstr "Cancellate"
-
-#~ msgid "Complete"
-#~ msgstr "Complete"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "Non pote salveguardar \"%s\""
-
-#~ msgid "Create a torrent"
-#~ msgstr "Crear un torrent"
-
-#~ msgid "Done"
-#~ msgstr "Facite"
-
-#~ msgid "Idle"
-#~ msgstr "Inactive"
-
-#~ msgid "Not a regular file"
-#~ msgstr "Non es un file regular"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "Porto es <b>aperite</b>"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "Taxa: %s"
-
-#~ msgid "Stopped"
-#~ msgstr "Stoppate"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "_Discarga (%s):"

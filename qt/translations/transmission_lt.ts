@@ -16,17 +16,17 @@
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Sparti ir paprasta „BitTorrent“ klientinė programa</translation>
+        <translation>Sparti ir paprasta „BitTorrent“ kliento programa</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Programa</translation>
+        <translation>Klientas</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveris</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -73,7 +73,7 @@
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torentas pridėtas</translation>
     </message>
 </context>
 <context>
@@ -908,7 +908,7 @@
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Statistika</translation>
+        <translation>Statistika</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1316,7 +1316,7 @@
     <message>
         <location line="+537"/>
         <source>Network Error</source>
-        <translation>Tinklo Klaida</translation>
+        <translation>Tinklo klaida</translation>
     </message>
     <message>
         <location line="+434"/>
@@ -1553,7 +1553,7 @@ Papildomą pirminį URL adresą galite įvesti, palikę prieš jį tuščią eil
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nepavyko sukurti „%1“: %2 (%3)</translation>
     </message>
 </context>
 <context>

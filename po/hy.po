@@ -4,7 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Avag Sayan <avo777772012@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Armenian (https://www.transifex.com/transmissionbt/teams/33778/hy/)\n"
 "Language: hy\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +24,7 @@ msgstr ""
 
 #: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:512
 msgid "None"
-msgstr ""
+msgstr "Ոչ մեկը"
 
 #: ../cli/cli.cc:112
 msgid "Inf"
@@ -107,7 +108,7 @@ msgstr ""
 
 #: ../gtk/Application.cc:783 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
-msgstr ""
+msgstr "_Չեղարկել"
 
 #: ../gtk/Application.cc:784
 msgid "I _Agree"
@@ -192,7 +193,7 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:473
 msgctxt "Verb"
 msgid "Downloading"
-msgstr ""
+msgstr "Ներբեռնում"
 
 #: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
 msgid "Queued for seeding"
@@ -205,7 +206,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:324
 msgid "Finished"
-msgstr ""
+msgstr "Ավարտված"
 
 #: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:324
 msgid "Paused"
@@ -1477,7 +1478,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:80 ../gtk/ui/gtk4/DetailsDialog.ui:39
 msgid "Torrent size:"
-msgstr ""
+msgstr "Տորենտի չափը՝"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:92 ../gtk/ui/gtk4/DetailsDialog.ui:49
 msgid "Have:"
@@ -1485,7 +1486,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:104 ../gtk/ui/gtk3/StatsDialog.ui:92 ../gtk/ui/gtk3/StatsDialog.ui:250 ../gtk/ui/gtk4/DetailsDialog.ui:59 ../gtk/ui/gtk4/StatsDialog.ui:33 ../gtk/ui/gtk4/StatsDialog.ui:151
 msgid "Uploaded:"
-msgstr ""
+msgstr "Վերբեռնված՝"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:116 ../gtk/ui/gtk3/StatsDialog.ui:117 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:69 ../gtk/ui/gtk4/StatsDialog.ui:54 ../gtk/ui/gtk4/StatsDialog.ui:172
 msgid "Downloaded:"
@@ -1509,7 +1510,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:176 ../gtk/ui/gtk4/DetailsDialog.ui:119
 msgid "Error:"
-msgstr ""
+msgstr "Սխալ՝"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:330 ../gtk/ui/gtk4/DetailsDialog.ui:242
 msgid "Details"
@@ -1517,7 +1518,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:354 ../gtk/ui/gtk4/DetailsDialog.ui:256
 msgid "Location:"
-msgstr ""
+msgstr "Վայրը՝"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:366 ../gtk/ui/gtk4/DetailsDialog.ui:266
 msgid "Hash:"

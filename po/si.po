@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Sinhala (https://www.transifex.com/transmissionbt/teams/33778/si/)\n"
 "Language: si\n"
 "MIME-Version: 1.0\n"
@@ -491,11 +491,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "ටොරන්ට් ඉවත්කරන්නද ?"
-msgstr[1] "ටොරන්ට් %d ඉවත්කරන්නද ?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
@@ -2516,135 +2515,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "%'d ටොරන්ට් වත්කම්"
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "දින %'d"
-#~ msgstr[1] "දින %'d"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "පැය %'d"
-#~ msgstr[1] "පැය %'d"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "මිනිත්තු %'d"
-#~ msgstr[1] "මිනිත්තු %'d"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "තත්පර %'d"
-#~ msgstr[1] "තත්පර %'d"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d කොටස @ %2$s"
-#~ msgstr[1] "%1$'d කොටස් @ %2$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d කොටස @ %3$s)"
-#~ msgstr[1] "%1$s (%2$'d කොටස් @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d කොටස)"
-#~ msgstr[1] "%1$s (%2$'d කොටස්)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%3$s%% න් %2$s%% ක් ලබාගතහැක)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s නරක් වූ)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%2$s න් %1$s (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s; %2$'d ගොනුව"
-#~ msgstr[1] "%1$s; %2$'d ගොනු"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (අනුපාතය: %s)"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s ඉතිරිව ඇත"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s සාරථකයි (%d)"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "ප්‍රකාශන හිමිකම් (c) Transmission ව්‍යාපෘතිය"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s විවෘතකල නොහැක"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s කියවිය නොහැක"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "\"%s\": %s කියවිය නොහැක"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "\"%s\" සුරැකිය නොහැක"
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s ගොනුව සුරැකිය නොහැක"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "කියවීමේ දෝෂය \"%s\": %s"
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "%1$s\"%2$s\"%3$s %4$s කට පෙර දෝශයක් ලැබුණි"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "බාගතකිරීමේ වේගය සීමා කරන්න (%s): (_d)"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "අනුපාතය: %s"
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "ට්‍රාන්ස්මිෂන්\n"
-#~ "උඩු: %1$s %2$s\n"
-#~ "බා: %3$s %4$s"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "හදුනානොගත් URL"

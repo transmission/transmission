@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Malayalam (https://www.transifex.com/transmissionbt/teams/33778/ml/)\n"
 "Language: ml\n"
 "MIME-Version: 1.0\n"
@@ -2520,36 +2520,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "%1$s മുന്പ്"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s ഉണ്ടാക്കാന്‍ സാധിക്കുന്നില്ല"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\": %2$s തുറക്കാന്‍ സാധിക്കുന്നില്ല"
-
-#~ msgid "Create a torrent"
-#~ msgstr "ഒരു ടൊറന്റ് ഉന്ണ്ടാക്കുക"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "%1$s ഉണ്ടാക്കിയത്"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "%1$s %2$s -ല്് ഉണ്ടാക്കിയത്"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "%1$s -ല്് ഉണ്ടാക്കിയത്"
-
-#~ msgid "Done"
-#~ msgstr "പൂര്‍ത്തീകരിച്ചു"
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr ".torrent രചന ചവറ്റുകുട്ടയിലേക്ക് മാറ്റുക(_V)"

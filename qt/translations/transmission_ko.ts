@@ -72,7 +72,7 @@
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent 추가됨</translation>
     </message>
 </context>
 <context>

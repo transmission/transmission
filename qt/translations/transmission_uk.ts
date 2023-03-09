@@ -64,10 +64,10 @@
     <message numerus="yes">
         <location line="+110"/>
         <source>Torrent(s) Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Торент завершено</numerusform>
+            <numerusform>Торенти завершені</numerusform>
+            <numerusform>Торенти завершені</numerusform>
         </translation>
     </message>
     <message>
@@ -221,7 +221,7 @@
     <message>
         <location line="+4"/>
         <source>Peer is connected over µTP</source>
-        <translation type="unfinished"></translation>
+        <translation>Вузол з’єднано за протоколом µTP</translation>
     </message>
     <message numerus="yes">
         <location line="+130"/>
@@ -280,7 +280,7 @@
     <message>
         <location line="+390"/>
         <source>Add URL(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Додати URL(-и) </translation>
     </message>
     <message>
         <location line="+112"/>
@@ -451,7 +451,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Додано:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -637,7 +637,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>Перейменувати...</translation>
     </message>
 </context>
 <context>
@@ -691,7 +691,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation type="unfinished"></translation>
+        <translation>Шукати...</translation>
     </message>
 </context>
 <context>
@@ -827,7 +827,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;i&gt;Обчислення вільного простору...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -913,7 +913,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Відкрити…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -928,7 +928,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Новий…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1169,17 +1169,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Змінити сеанс…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation type="unfinished"></translation>
+        <translation>Вказати &amp;місце…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation type="unfinished"></translation>
+        <translation>Відкрити &amp;адресу…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1498,7 +1498,7 @@
     <message>
         <location line="+36"/>
         <source>Piece s&amp;ize:</source>
-        <translation type="unfinished"></translation>
+        <translation>Р&amp;озмір частини: </translation>
     </message>
     <message>
         <location line="+31"/>
@@ -1553,7 +1553,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Couldn&apos;t create &quot;%1&quot;: %2 (%3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося створити  «%1»: %2 (%3)</translation>
     </message>
 </context>
 <context>
@@ -1753,7 +1753,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation type="unfinished"></translation>
+        <translation>Перевірка TCP-порту...</translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2019,12 +2019,12 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation type="unfinished"></translation>
+        <translation>µTP — це інструмент для зменшення перевантаження мережі.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Увімкнути обмін даними за µ&amp;TP</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2114,16 +2114,16 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="-101"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;Список блокувань тепер містить %Ln правило.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;Список блокувань тепер містить %Ln правила.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;2Список блокувань тепер містить %Ln правил.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Оновити список блокування&lt;/b&gt;&lt;p&gt;Отримання нового списку…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2263,19 +2263,19 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Дубльований торент</numerusform>
+            <numerusform>Дубльовані торенти</numerusform>
+            <numerusform>Дубльовані торенти</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Не вдається додати %n дубльований торент</numerusform>
+            <numerusform>Не вдається додати %n дубльованих торенти</numerusform>
+            <numerusform>Не вдається додати %n дубльований(х) торент(ів)</numerusform>
         </translation>
     </message>
 </context>
@@ -2603,7 +2603,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Надсилання запиту щодо кількості вузлів… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2641,7 +2641,7 @@ To add another primary URL, add it after a blank line.</source>
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Запит щодо додаткових вузлів… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>
