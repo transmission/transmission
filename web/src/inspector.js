@@ -315,7 +315,7 @@ export class Inspector extends EventTarget {
 
     setTextContent(
       e.info.have,
-      string.includes('E2BIG') ? 'loading...' : string
+      string.includes('E2BIG') ? '...' : string
     );
 
     // availability
@@ -350,7 +350,7 @@ export class Inspector extends EventTarget {
     }
     setTextContent(
       e.info.downloaded,
-      string.includes('E2BIG') ? 'loading...' : string
+      string.includes('E2BIG') ? '...' : string
     );
 
     // uploaded
@@ -455,7 +455,7 @@ export class Inspector extends EventTarget {
         string = 'None';
       }
     }
-    setTextContent(e.info.size, string.includes('NaN') ? 'loading...' : string);
+    setTextContent(e.info.size, string.includes('NaN') ? '...' : string);
 
     // hash
     if (torrents.length === 0) {
