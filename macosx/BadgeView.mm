@@ -42,7 +42,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
         _fAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
         _fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
         _fAttributes[NSShadowAttributeName] = stringShadow;
-        _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:23.0];
+        _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:22.0];
 
         // DownloadBadge and UploadBadge should have the same size
         NSSize badgeSize = [NSImage imageNamed:@"DownloadBadge"].size;
