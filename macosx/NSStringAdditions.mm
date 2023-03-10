@@ -11,6 +11,7 @@
 @interface NSString (Private)
 
 + (NSString*)stringForSpeed:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb;
++ (NSString*)stringForSpeedCompact:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb;
 
 @end
 
@@ -71,6 +72,11 @@
 + (NSString*)stringForSpeedAbbrev:(CGFloat)speed
 {
     return [self stringForSpeed:speed kb:@"K" mb:@"M" gb:@"G"];
+}
+
++ (NSString*)stringForSpeedAbbrevCompact:(CGFloat)speed
+{
+    return [self stringForSpeedCompact:speed kb:@"K" mb:@"M" gb:@"G"];
 }
 
 + (NSString*)stringForRatio:(CGFloat)ratio
@@ -185,6 +191,48 @@
     else // insane speeds
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, gb];
+    }
+}
+
++ (NSString*)stringForSpeedCompact:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb
+{
+    if (speed < 99.95) // 0.0 KB/s to 99.9 KB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.1f %@", speed, kb];
+    }
+    if (speed < 999.95) // 100 KB/s to 999 KB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.0f %@", speed, kb];
+    }
+
+    speed /= 1000.0;
+
+    if (speed < 9.95) // 1.00 MB/s to 9.99 MB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.2f %@", speed, mb];
+    }
+    if (speed < 99.95) // 10.0 MB/s to 99.9 MB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.1f %@", speed, mb];
+    }
+    if (speed < 999.95) // 100 MB/s to 999 MB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.0f %@", speed, mb];
+    }
+
+    speed /= 1000.0;
+
+    if (speed < 9.95) // 1.00 GB/s to 9.99 GB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.2f %@", speed, gb];
+    }
+    if (speed < 99.95) // 10.0 GB/s to 99.9 GB/s
+    {
+        return [NSString localizedStringWithFormat:@"%.1f %@", speed, gb];
+    }
+    else // insane speeds
+    {
+        return [NSString localizedStringWithFormat:@"%.0f %@", speed, gb];
     }
 }
 

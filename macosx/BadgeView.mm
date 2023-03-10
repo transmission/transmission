@@ -42,7 +42,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
         _fAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
         _fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
         _fAttributes[NSShadowAttributeName] = stringShadow;
-        _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:24.0];
+        _fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:26.0];
 
         // DownloadBadge and UploadBadge should have the same size
         NSSize badgeSize = [NSImage imageNamed:@"DownloadBadge"].size;
@@ -81,7 +81,8 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
     if (download)
     {
         NSImage* downloadBadge = [NSImage imageNamed:@"DownloadBadge"];
-        [self badge:downloadBadge arrow:ArrowDirectionDown string:[NSString stringForSpeedAbbrev:self.fDownloadRate] atHeight:bottom];
+        [self badge:downloadBadge arrow:ArrowDirectionDown string:[NSString stringForSpeedAbbrevCompact:self.fDownloadRate]
+            atHeight:bottom];
 
         if (upload)
         {
@@ -91,7 +92,7 @@ typedef NS_ENUM(NSInteger, ArrowDirection) {
     if (upload)
     {
         [self badge:[NSImage imageNamed:@"UploadBadge"] arrow:ArrowDirectionUp
-              string:[NSString stringForSpeedAbbrev:self.fUploadRate]
+              string:[NSString stringForSpeedAbbrevCompact:self.fUploadRate]
             atHeight:bottom];
     }
 }
