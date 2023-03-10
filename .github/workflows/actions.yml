@@ -65,6 +65,7 @@ jobs:
           get_changes tests    CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils    CMakeLists.txt cmake third-party libtransmission utils
           get_changes web      CMakeLists.txt cmake third-party libtransmission web
+          cat "$GITHUB_OUTPUT"
 
   code-style:
     runs-on: ubuntu-22.04
