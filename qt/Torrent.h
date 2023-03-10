@@ -300,10 +300,9 @@ public:
 
     [[nodiscard]] constexpr auto ratio() const noexcept
     {
-        auto const u = uploadedEver();
-        auto const d = downloadedEver();
-        auto const t = totalSize();
-        return double(u) / (d ? d : t);
+        auto const numerator = static_cast<double>(uploadedEver());
+        auto const denominator = sizeWhenDone();
+        return denominator > 0U ? numerator / denominator : double{};
     }
 
     [[nodiscard]] constexpr double percentComplete() const noexcept
