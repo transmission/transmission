@@ -13,7 +13,7 @@ on:
       - 'docs/**'
       - '.github/**'
 jobs:
-  decide-web-jobs-to-run:
+  decide-what-jobs-to-run:
     runs-on: ubuntu-22.04
     outputs:
       test-style: ${{ steps.check-diffs.outputs.web-changed == '1' }}
@@ -52,10 +52,10 @@ jobs:
           }
           get_changes web CMakeLists.txt web
 
-  web-code-style:
+  code-style:
     runs-on: ubuntu-latest
-    needs: [ decide-web-jobs-to-run ]
-    if: ${{ needs.decide-web-jobs-to-run.outputs.test-style == 'true' }}
+    needs: [ decide-what-jobs-to-run ]
+    if: ${{ needs.decide-what-jobs-to-run.outputs.test-style == 'true' }}
     steps:
       - name: Get source
         uses: actions/checkout@v3
@@ -71,7 +71,7 @@ jobs:
           npm --prefix web ci
           npm --prefix web run lint:fix
           set +e # do not end the script if a cmd returns an exit code
-          git diff --exit-code web > web-style.diff
+          git diff --exit-code web > style.diff
           echo "differs=$?" >> $GITHUB_OUTPUT
           echo ===
           cat style.diff
@@ -81,20 +81,20 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
         with:
-          name: web-code-style.diff
-          path: 'web-style.diff'
+          name: code-style.diff
+          path: 'style.diff'
       - name: Fail if diffs exist
         if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
         run: |
           echo "code style does not match expected."
           cat style.diff
-          echo "When CI is done, the above patch will be uploaded as 'web-code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
+          echo "When CI is done, the above patch will be uploaded as 'code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
           exit 1
 
   test-generated-files:
     runs-on: ubuntu-latest
-    needs: [ decide-web-jobs-to-run ]
-    if: ${{ needs.decide-web-jobs-to-run.outputs.test-generated-files == 'true' }}
+    needs: [ decide-what-jobs-to-run ]
+    if: ${{ needs.decide-what-jobs-to-run.outputs.test-generated-files == 'true' }}
     steps:
       - name: Get source
         uses: actions/checkout@v3
@@ -116,8 +116,8 @@ jobs:
 
   update-generated-files:
     runs-on: ubuntu-latest
-    needs: [ decide-web-jobs-to-run ]
-    if: ${{ needs.decide-web-jobs-to-run.outputs.update-generated-files == 'true' }}
+    needs: [ decide-what-jobs-to-run ]
+    if: ${{ needs.decide-what-jobs-to-run.outputs.update-generated-files == 'true' }}
     steps:
       - name: Show env
         run: |

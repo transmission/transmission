@@ -224,7 +224,8 @@ jobs:
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission.a 2>&1 | tee makelog
       - name: Test for warnings
-        run: ! grep 'warning:' makelog
+        run: |
+          if grep 'warning:' makelog; then exit 1; fi
 
   macos-11:
     runs-on: macos-11
