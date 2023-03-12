@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>جميع الحقوق محفوظة © The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">العميل</translation>
+        <translation>عميل</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>خادم</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -62,7 +62,7 @@
         <translation>أعي ذلك</translation>
     </message>
     <message numerus="yes">
-        <location line="+105"/>
+        <location line="+110"/>
         <source>Torrent(s) Completed</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -76,13 +76,13 @@
     <message>
         <location line="+29"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>تم إضافة تورنت</translation>
     </message>
 </context>
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+429"/>
+        <location filename="../DetailsDialog.cc" line="+432"/>
         <source>None</source>
         <translation>لا شيء</translation>
     </message>
@@ -246,12 +246,12 @@
         </translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+37"/>
         <source>Error</source>
         <translation>خطأ</translation>
     </message>
@@ -261,7 +261,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-834"/>
+        <location line="-843"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -290,12 +290,12 @@
         <translation>غير متوفر</translation>
     </message>
     <message>
-        <location line="+391"/>
+        <location line="+390"/>
         <source>Add URL(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+112"/>
         <source>High</source>
         <translation>مرتفعة</translation>
     </message>
@@ -443,7 +443,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>تعديل المتتبعات</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -463,7 +463,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>مضاف:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -649,7 +649,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation type="unfinished"></translation>
+        <translation>أعد التسمية...</translation>
     </message>
 </context>
 <context>
@@ -927,17 +927,17 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>اعدادات</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">إحصائيات</translation>
+        <translation>الإحصائيات</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;إفتح...</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1268,13 +1268,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+733"/>
+        <location line="+752"/>
         <location line="+9"/>
         <source>Limited at %1</source>
         <translation>محدود إلى %1</translation>
     </message>
     <message>
-        <location line="-687"/>
+        <location line="-706"/>
         <source>Limit Upload Speed</source>
         <translation>حد سرعة الرفع</translation>
     </message>
@@ -1290,7 +1290,7 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+720"/>
+        <location line="+739"/>
         <source>Stop at Ratio (%1)</source>
         <translation>إيقاف عند نسبة (%1)</translation>
     </message>
@@ -1333,12 +1333,12 @@
         <translation>فتح تورنت</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-1003"/>
         <source>Speed Limits</source>
         <translation>حدود السرعة</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+537"/>
         <source>Network Error</source>
         <translation>خطأ في الشبكة</translation>
     </message>
@@ -2246,12 +2246,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-308"/>
+        <location filename="../Application.cc" line="-313"/>
         <source>Invalid option</source>
         <translation>اختيار غير صالح</translation>
     </message>
     <message>
-        <location line="+307"/>
+        <location line="+312"/>
         <source>Start Now</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2292,7 +2292,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+505"/>
         <source>Error Renaming Path</source>
         <translation>تعذر إعادة تسمية المسار</translation>
     </message>
@@ -2640,7 +2640,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+210"/>
+        <location filename="../TrackerDelegate.cc" line="+216"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2747,7 +2747,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>تعديل المتتبعات</translation>
     </message>
     <message>
         <location line="+9"/>

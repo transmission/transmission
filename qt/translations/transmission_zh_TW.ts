@@ -62,7 +62,7 @@
         <translation>我同意 (&amp;A)</translation>
     </message>
     <message numerus="yes">
-        <location line="+105"/>
+        <location line="+110"/>
         <source>Torrent(s) Completed</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -77,7 +77,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+429"/>
+        <location filename="../DetailsDialog.cc" line="+432"/>
         <source>None</source>
         <translation>無</translation>
     </message>
@@ -226,12 +226,12 @@
         </translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+37"/>
         <source>Error</source>
         <translation>錯誤</translation>
     </message>
@@ -241,7 +241,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-834"/>
+        <location line="-843"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -270,12 +270,12 @@
         <translation>不適用</translation>
     </message>
     <message>
-        <location line="+391"/>
+        <location line="+390"/>
         <source>Add URL(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+112"/>
         <source>High</source>
         <translation>高</translation>
     </message>
@@ -1228,13 +1228,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+733"/>
+        <location line="+752"/>
         <location line="+9"/>
         <source>Limited at %1</source>
         <translation>限制於 %1</translation>
     </message>
     <message>
-        <location line="-687"/>
+        <location line="-706"/>
         <source>Limit Upload Speed</source>
         <translation>限制上傳速度</translation>
     </message>
@@ -1250,7 +1250,7 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+720"/>
+        <location line="+739"/>
         <source>Stop at Ratio (%1)</source>
         <translation>達到以下比例時停止 (%1)</translation>
     </message>
@@ -1293,12 +1293,12 @@
         <translation>打開 Torrent</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-1003"/>
         <source>Speed Limits</source>
         <translation>速度限制</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+537"/>
         <source>Network Error</source>
         <translation>網路錯誤</translation>
     </message>
@@ -2161,12 +2161,12 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-308"/>
+        <location filename="../Application.cc" line="-313"/>
         <source>Invalid option</source>
         <translation>無效的選項</translation>
     </message>
     <message>
-        <location line="+307"/>
+        <location line="+312"/>
         <source>Start Now</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2207,7 +2207,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+505"/>
         <source>Error Renaming Path</source>
         <translation>重新命名路徑錯誤</translation>
     </message>
@@ -2510,7 +2510,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+210"/>
+        <location filename="../TrackerDelegate.cc" line="+216"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
