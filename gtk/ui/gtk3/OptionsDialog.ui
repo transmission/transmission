@@ -245,8 +245,8 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-6">cancel_button</action-widget>
-      <action-widget response="-3">open_button</action-widget>
+      <action-widget response="cancel">cancel_button</action-widget>
+      <action-widget response="accept">open_button</action-widget>
     </action-widgets>
   </object>
 </interface>

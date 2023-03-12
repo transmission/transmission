@@ -258,6 +258,7 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
     switch (response)
     {
     case TR_GTK_RESPONSE_TYPE(CANCEL):
+    case TR_GTK_RESPONSE_TYPE(DELETE_EVENT):
         builder_.cancelChecksums();
         close();
         break;
@@ -316,7 +317,7 @@ std::unique_ptr<MakeProgressDialog> MakeProgressDialog::create(
 
 void MakeDialog::Impl::onResponse(int response)
 {
-    if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
+    if (response == TR_GTK_RESPONSE_TYPE(CLOSE) || response == TR_GTK_RESPONSE_TYPE(DELETE_EVENT))
     {
         dialog_.close();
         return;
