@@ -1688,21 +1688,25 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
     }
     else
     {
+        auto ok = false;
+
         if (std::empty(filename))
         {
             auto const metainfo = tr_base64_decode(metainfo_base64);
-            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
+            ok = tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
+        }
+        else if (tr_sys_path_exists(tr_pathbuf{ filename }))
+        {
+            ok = tr_ctorSetMetainfoFromFile(ctor, filename);
         }
         else
         {
-            if (tr_sys_path_exists(tr_pathbuf{ filename }))
-            {
-                tr_ctorSetMetainfoFromFile(ctor, filename);
-            }
-            else
-            {
-                tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
-            }
+            ok = tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
+        }
+
+        if (!ok)
+        {
+            return "unrecognized info";
         }
 
         addTorrentImpl(idle_data, ctor);
