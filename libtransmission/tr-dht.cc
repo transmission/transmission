@@ -379,14 +379,14 @@ private:
 
     static auto remove_bad_pex(std::vector<tr_pex>&& pex)
     {
-        static constexpr auto is_bad_pex = [](tr_pex const& pex)
+        static constexpr auto IsBadPex = [](tr_pex const& pex)
         {
             // paper over a bug in some DHT implementation that gives port 1.
             // Xref: https://github.com/transmission/transmission/issues/527
             return pex.port.host() == 1;
         };
 
-        pex.erase(std::remove_if(std::begin(pex), std::end(pex), is_bad_pex), std::end(pex));
+        pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));
         return pex;
     }
 
