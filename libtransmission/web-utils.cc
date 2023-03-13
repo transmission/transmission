@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2022 Mnemosyne LLC.
+// This file Copyright © 2021-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -21,7 +21,9 @@
 
 #include "transmission.h"
 
+#include "log.h"
 #include "net.h"
+#include "tr-assert.h"
 #include "tr-strbuf.h"
 #include "utils.h"
 #include "web-utils.h"
@@ -204,7 +206,7 @@ constexpr std::string_view getPortForScheme(std::string_view scheme)
     return "-1"sv;
 }
 
-bool urlCharsAreValid(std::string_view url)
+TR_CONSTEXPR20 bool urlCharsAreValid(std::string_view url)
 {
     // rfc2396
     auto constexpr ValidChars = std::string_view{
@@ -252,12 +254,20 @@ std::string_view getSiteName(std::string_view host)
         return host;
     }
 
+    TR_ASSERT(psl_builtin() != nullptr);
+    if (psl_builtin() == nullptr)
+    {
+        tr_logAddWarn("psl_builtin is null");
+        return host;
+    }
+
     // psl needs a zero-terminated hostname
     auto const szhost = tr_urlbuf{ host };
 
     // is it a registered name?
     if (isAsciiNonUpperCase(host))
     {
+        // www.example.co.uk -> example.co.uk
         if (char const* const top = psl_registrable_domain(psl_builtin(), std::data(szhost)); top != nullptr)
         {
             host.remove_prefix(top - std::data(szhost));
@@ -265,7 +275,7 @@ std::string_view getSiteName(std::string_view host)
     }
     else if (char* lower = nullptr; psl_str_to_utf8lower(std::data(szhost), nullptr, nullptr, &lower) == PSL_SUCCESS)
     {
-        // www.example.com -> example.com
+        // www.example.co.uk -> example.co.uk
         if (char const* const top = psl_registrable_domain(psl_builtin(), lower); top != nullptr)
         {
             host.remove_prefix(top - lower);
@@ -274,7 +284,7 @@ std::string_view getSiteName(std::string_view host)
         psl_free_string(lower);
     }
 
-    // example.com -> example
+    // example.co.uk -> example
     if (auto const dot_pos = host.find('.'); dot_pos != std::string_view::npos)
     {
         host = host.substr(0, dot_pos);
@@ -282,7 +292,6 @@ std::string_view getSiteName(std::string_view host)
 
     return host;
 }
-
 } // namespace
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
@@ -325,8 +334,31 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         parsed.authority = url.substr(0, pos);
         url = pos == std::string_view::npos ? ""sv : url.substr(pos);
 
+        // A host identified by an Internet Protocol literal address, version 6
+        // [RFC3513] or later, is distinguished by enclosing the IP literal
+        // within square brackets ("[" and "]").  This is the only place where
+        // square bracket characters are allowed in the URI syntax.
         auto remain = parsed.authority;
-        parsed.host = tr_strvSep(&remain, ':');
+        if (tr_strvStartsWith(remain, '['))
+        {
+            remain.remove_prefix(1); // '['
+            parsed.host = tr_strvSep(&remain, ']');
+            if (tr_strvStartsWith(remain, ':'))
+            {
+                remain.remove_prefix(1);
+            }
+        }
+        // Not legal by RFC3986 standards, but sometimes users omit
+        // square brackets for an IPv6 address with an implicit port
+        else if (std::count(std::begin(remain), std::end(remain), ':') > 1U)
+        {
+            parsed.host = remain;
+            remain = ""sv;
+        }
+        else
+        {
+            parsed.host = tr_strvSep(&remain, ':');
+        }
         parsed.sitename = getSiteName(parsed.host);
         parsed.port = parsePort(!std::empty(remain) ? remain : getPortForScheme(parsed.scheme));
     }

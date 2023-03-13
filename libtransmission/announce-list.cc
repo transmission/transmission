@@ -1,4 +1,4 @@
-// This file Copyright 2021-2022 Mnemosyne LLC.
+// This file Copyright © 2021-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -185,7 +185,7 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view a
 }
 
 // if two announce URLs differ only by scheme, put them in the same tier.
-// (note: this can leave gaps in the `tier' values, but since the calling
+// (note: this can leave gaps in the `tier` values, but since the calling
 // function doesn't care, there's no point in removing the gaps...)
 tr_tracker_tier_t tr_announce_list::getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const
 {

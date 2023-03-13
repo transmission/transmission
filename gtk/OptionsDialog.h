@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2022 Mnemosyne LLC.
+// This file Copyright © 2010-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -17,7 +17,8 @@
 #include <memory>
 
 class Session;
-typedef struct tr_ctor tr_ctor;
+
+struct tr_ctor;
 
 class TorrentUrlChooserDialog : public Gtk::Dialog
 {
@@ -27,6 +28,7 @@ public:
         Glib::RefPtr<Gtk::Builder> const& builder,
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core);
+    ~TorrentUrlChooserDialog() override = default;
 
     TR_DISABLE_COPY_MOVE(TorrentUrlChooserDialog)
 
@@ -39,6 +41,8 @@ private:
 class TorrentFileChooserDialog : public Gtk::FileChooserDialog
 {
 public:
+    ~TorrentFileChooserDialog() override = default;
+
     TR_DISABLE_COPY_MOVE(TorrentFileChooserDialog)
 
     static std::unique_ptr<TorrentFileChooserDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);

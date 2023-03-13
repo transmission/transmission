@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2022 Transmission authors and contributors.
+// This file Copyright © 2006-2023 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -274,6 +274,18 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 - (void)startTransfer
 {
     [self startTransferIgnoringQueue:NO];
+}
+
+- (void)startMagnetTransferAfterMetaDownload
+{
+    if ([self alertForRemainingDiskSpace])
+    {
+        tr_torrentStart(self.fHandle);
+        [self update];
+
+        //capture, specifically, stop-seeding settings changing to unlimited
+        [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
+    }
 }
 
 - (void)stopTransfer

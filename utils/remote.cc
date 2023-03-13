@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -544,9 +544,9 @@ static int getOptMode(int val)
     }
 }
 
-static std::string getEncodedMetainfo(std::string_view filename)
+static std::string getEncodedMetainfo(char const* filename)
 {
-    if (auto contents = std::vector<char>{}; tr_loadFile(filename, contents))
+    if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_loadFile(filename, contents))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
@@ -950,13 +950,11 @@ static void printDetails(tr_variant* top)
             {
                 fmt::print("  Labels: ");
 
-                size_t child_pos = 0;
-                tr_variant const* child;
-                while ((child = tr_variantListChild(l, child_pos++)))
+                for (size_t child_idx = 0, n_children = tr_variantListSize(l); child_idx < n_children; ++child_idx)
                 {
-                    if (tr_variantGetStrView(child, &sv))
+                    if (tr_variantGetStrView(tr_variantListChild(l, child_idx++), &sv))
                     {
-                        fmt::print(child_pos == 1 ? "{:s}" : ", {:s}", sv);
+                        fmt::print(child_idx == 1 ? "{:s}" : ", {:s}", sv);
                     }
                 }
 
@@ -1602,7 +1600,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     break;
 
                 case TR_TRACKER_WAITING:
-                    fmt::print("  Asking for more peers in {:s)\n", tr_strltime(nextAnnounceTime - now));
+                    fmt::print("  Asking for more peers in {:s}\n", tr_strltime(nextAnnounceTime - now));
                     break;
 
                 case TR_TRACKER_QUEUED:
@@ -1736,7 +1734,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindBool(args, TR_KEY_utp_enabled, &boolVal))
         {
-            fmt::print("  µTP enabled: {:d}\n", (boolVal ? "Yes" : "No"));
+            fmt::print("  µTP enabled: {:s}\n", boolVal ? "Yes" : "No");
         }
 
         if (tr_variantDictFindBool(args, TR_KEY_dht_enabled, &boolVal))
@@ -2039,18 +2037,13 @@ static void filterIds(tr_variant* top, Config& config)
             case 'l': // label
                 if (tr_variant * l; tr_variantDictFindList(d, TR_KEY_labels, &l))
                 {
-                    size_t child_pos = 0;
-                    tr_variant const* child;
-                    std::string_view sv;
-                    while ((child = tr_variantListChild(l, child_pos++)))
+                    for (size_t child_idx = 0, n_children = tr_variantListSize(l); child_idx < n_children; ++child_idx)
                     {
-                        if (tr_variantGetStrView(child, &sv))
+                        if (auto sv = std::string_view{};
+                            tr_variantGetStrView(tr_variantListChild(l, child_idx), &sv) && arg == sv)
                         {
-                            if (arg == sv)
-                            {
-                                include = !include;
-                                break;
-                            }
+                            include = !include;
+                            break;
                         }
                     }
                 }

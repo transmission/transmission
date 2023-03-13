@@ -1,4 +1,4 @@
-/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -66,7 +66,7 @@ const TorrentRendererHelper = {
   renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
     progressbar.className = info.classList.join(' ');
-    progressbar.style['background-size'] = `${info.percent}% 100%, 100% 100%`;
+    progressbar.style.setProperty('--progress', `${info.percent.toFixed(2)}%`);
   },
 };
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -258,6 +258,7 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
     switch (response)
     {
     case TR_GTK_RESPONSE_TYPE(CANCEL):
+    case TR_GTK_RESPONSE_TYPE(DELETE_EVENT):
         builder_.cancelChecksums();
         close();
         break;
@@ -316,7 +317,7 @@ std::unique_ptr<MakeProgressDialog> MakeProgressDialog::create(
 
 void MakeDialog::Impl::onResponse(int response)
 {
-    if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
+    if (response == TR_GTK_RESPONSE_TYPE(CLOSE) || response == TR_GTK_RESPONSE_TYPE(DELETE_EVENT))
     {
         dialog_.close();
         return;

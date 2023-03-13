@@ -71,21 +71,30 @@ std::pair<Cache::CIter, Cache::CIter> Cache::findContiguous(CIter const begin, C
 
 int Cache::writeContiguous(CIter const begin, CIter const end) const
 {
-    // join the blocks together into contiguous memory `buf`
+    // The most common case without an extra data copy.
+    auto const* towrite = begin->buf.get();
+
+    // Contiguous area to join more than one block, if any.
     auto buf = std::vector<uint8_t>{};
-    auto const buflen = std::accumulate(
-        begin,
-        end,
-        size_t{},
-        [](size_t sum, auto const& block) { return sum + std::size(*block.buf); });
-    buf.reserve(buflen);
-    for (auto iter = begin; iter != end; ++iter)
+
+    if (end - begin > 1)
     {
-        TR_ASSERT(begin->key.first == iter->key.first);
-        TR_ASSERT(begin->key.second + std::distance(begin, iter) == iter->key.second);
-        buf.insert(std::end(buf), std::begin(*iter->buf), std::end(*iter->buf));
+        // Yes, there are.
+        auto const buflen = std::accumulate(
+            begin,
+            end,
+            size_t{},
+            [](size_t sum, auto const& block) { return sum + std::size(*block.buf); });
+        buf.reserve(buflen);
+        for (auto iter = begin; iter != end; ++iter)
+        {
+            TR_ASSERT(begin->key.first == iter->key.first);
+            TR_ASSERT(begin->key.second + std::distance(begin, iter) == iter->key.second);
+            buf.insert(std::end(buf), std::begin(*iter->buf), std::end(*iter->buf));
+        }
+        TR_ASSERT(std::size(buf) == buflen);
+        towrite = &buf;
     }
-    TR_ASSERT(std::size(buf) == buflen);
 
     // save it
     auto const& [torrent_id, block] = begin->key;
@@ -97,13 +106,13 @@ int Cache::writeContiguous(CIter const begin, CIter const end) const
 
     auto const loc = tor->blockLoc(block);
 
-    if (auto const err = tr_ioWrite(tor, loc, std::size(buf), std::data(buf)); err != 0)
+    if (auto const err = tr_ioWrite(tor, loc, std::size(*towrite), std::data(*towrite)); err != 0)
     {
         return err;
     }
 
     ++disk_writes_;
-    disk_write_bytes_ += std::size(buf);
+    disk_write_bytes_ += std::size(*towrite);
     return {};
 }
 
@@ -129,11 +138,9 @@ Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
 {
 }
 
-/***
-****
-***/
+// ---
 
-int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& writeme)
+int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme)
 {
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
@@ -189,9 +196,7 @@ int Cache::prefetchBlock(tr_torrent* torrent, tr_block_info::Location loc, uint3
     return tr_ioPrefetch(torrent, loc, len);
 }
 
-/***
-****
-***/
+// ---
 
 int Cache::flushSpan(CIter const begin, CIter const end)
 {

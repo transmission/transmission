@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2022 Transmission authors and contributors.
+// This file Copyright © 2010-2023 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -50,7 +50,7 @@ std::string tr_net_strerror(int err)
 #ifdef _WIN32
 
     auto buf = std::array<char, 512>{};
-    auto const len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
+    (void)FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
     return std::string{ tr_strvStrip(std::data(buf)) };
 
 #else
@@ -60,9 +60,7 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
-/***********************************************************************
- * TCP sockets
- **********************************************************************/
+// - TCP Sockets
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
 {
@@ -241,7 +239,8 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
 #endif
         sockerrno != EINPROGRESS)
     {
-        if (auto const tmperrno = sockerrno; (tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.is_ipv4())
+        if (auto const tmperrno = sockerrno;
+            (tmperrno != ECONNREFUSED && tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr.is_ipv4())
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
@@ -303,7 +302,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
-    if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
+    if (bind(fd, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1)
     {
         int const err = sockerrno;
 
@@ -394,7 +393,7 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
     // accept the incoming connection
     auto sock = sockaddr_storage{};
     socklen_t len = sizeof(struct sockaddr_storage);
-    auto const sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
+    auto const sockfd = accept(listening_sockfd, reinterpret_cast<sockaddr*>(&sock), &len);
     if (sockfd == TR_BAD_SOCKET)
     {
         return {};
@@ -418,6 +417,8 @@ void tr_net_close_socket(tr_socket_t sockfd)
     evutil_closesocket(sockfd);
 }
 
+namespace
+{
 // code in global_ipv6_herlpers is written by Juliusz Chroboczek
 // and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
@@ -446,6 +447,7 @@ namespace global_ipv6_helpers
             {
                 if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
                 {
+                    evutil_closesocket(sock);
                     errno = save;
                     return addrport->first;
                 }
@@ -483,6 +485,7 @@ namespace global_ipv6_helpers
 }
 
 } // namespace global_ipv6_helpers
+} // namespace
 
 /* Return our global IPv6 address, with caching. */
 std::optional<tr_address> tr_globalIPv6()
@@ -504,6 +507,8 @@ std::optional<tr_address> tr_globalIPv6()
 
 // ---
 
+namespace
+{
 namespace is_valid_for_peers_helpers
 {
 
@@ -527,13 +532,13 @@ namespace is_valid_for_peers_helpers
     {
     case TR_AF_INET:
         {
-            auto const* const address = (unsigned char const*)&addr.addr.addr4;
+            auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr4);
             return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
         }
 
     case TR_AF_INET6:
         {
-            auto const* const address = (unsigned char const*)&addr.addr.addr6;
+            auto const* const address = reinterpret_cast<unsigned char const*>(&addr.addr.addr6);
             return address[0] == 0xFF ||
                 (memcmp(address, std::data(Zeroes), 15) == 0 && (address[15] == 0 || address[15] == 1));
         }
@@ -544,6 +549,7 @@ namespace is_valid_for_peers_helpers
 }
 
 } // namespace is_valid_for_peers_helpers
+} // namespace
 
 bool tr_address::is_valid_for_peers(tr_port port) const noexcept
 {
@@ -695,21 +701,16 @@ std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) con
     return { ss, sizeof(sockaddr_in6) };
 }
 
-static int tr_address_compare(tr_address const* a, tr_address const* b) noexcept // <=>
-{
-    // IPv6 addresses are always "greater than" IPv4
-    if (a->type != b->type)
-    {
-        return a->is_ipv4() ? 1 : -1;
-    }
-
-    return a->is_ipv4() ? memcmp(&a->addr.addr4, &b->addr.addr4, sizeof(a->addr.addr4)) :
-                          memcmp(&a->addr.addr6.s6_addr, &b->addr.addr6.s6_addr, sizeof(a->addr.addr6.s6_addr));
-}
-
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
-    return tr_address_compare(this, &that);
+    // IPv6 addresses are always "greater than" IPv4
+    if (this->type != that.type)
+    {
+        return this->is_ipv4() ? 1 : -1;
+    }
+
+    return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :
+                             memcmp(&this->addr.addr6.s6_addr, &that.addr.addr6.s6_addr, sizeof(this->addr.addr6.s6_addr));
 }
 
 // https://en.wikipedia.org/wiki/Reserved_IP_addresses

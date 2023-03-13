@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -363,7 +363,7 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
         if (is_uniform)
         {
             bandwidth_combo_tag_.block();
-            gtr_priority_combo_set_value(*bandwidth_combo_, baseline);
+            gtr_combo_box_set_active_enum(*bandwidth_combo_, baseline);
             bandwidth_combo_tag_.unblock();
         }
         else
@@ -510,7 +510,7 @@ void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*
 
     gtr_priority_combo_init(*bandwidth_combo_);
     bandwidth_combo_tag_ = bandwidth_combo_->signal_changed().connect(
-        [this]() { torrent_set_int(TR_KEY_bandwidthPriority, gtr_priority_combo_get_value(*bandwidth_combo_)); });
+        [this]() { torrent_set_int(TR_KEY_bandwidthPriority, gtr_combo_box_get_active_enum(*bandwidth_combo_)); });
 
     gtr_combo_box_set_enum(
         *ratio_combo_,
@@ -809,7 +809,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
         else
         {
-            str = tr_format_time_relative(now, baseline);
+            str = tr_format_time(now - baseline);
         }
     }
 
@@ -1215,8 +1215,8 @@ void initPeerRow(
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
-    (*iter)[peer_cols.key] = Glib::ustring{ std::data(key), std::size(key) };
-    (*iter)[peer_cols.torrent_name] = Glib::ustring{ std::data(torrent_name), std::size(torrent_name) };
+    (*iter)[peer_cols.key] = std::string(key);
+    (*iter)[peer_cols.torrent_name] = std::string(torrent_name);
 }
 
 void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* peer)

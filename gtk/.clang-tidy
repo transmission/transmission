@@ -1,4 +1,6 @@
 ---
+HeaderFilterRegex: .*/gtk/.*
+
 Checks: >
   -*,
   bugprone-*,
@@ -8,6 +10,7 @@ Checks: >
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -cppcoreguidelines-narrowing-conversions,
+  hicpp-*,
   misc-*,
   modernize-*,
   -modernize-use-trailing-return-type,

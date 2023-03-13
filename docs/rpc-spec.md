@@ -10,20 +10,21 @@ If `transmission-remote` is called with a `--debug` argument, its RPC traffic to
 
 If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, it too will dump the RPC requests and responses to the terminal for inspection.
 
-Lastly, using devtools in the Transmission web client is always an option.
+Lastly, using the browser's developer tools in the Transmission web client is always an option.
 
 ### 1.3 Libraries of ready-made wrappers
-In order not to waste time and effort on parsing RPC calls, we offer the following ready-made wrappers for transmission:
+Some people outside of the Transmission project have written libraries that wrap this RPC API. These aren't supported by the Transmission project, but are listed here in the hope that they may be useful:
 
-For C#:
-https://www.nuget.org/packages/Transmission.API.RPC
-
-For Python:
-https://github.com/Trim21/transmission-rpc
+| Language | Link
+|:---|:---
+| C# | https://www.nuget.org/packages/Transmission.API.RPC
+| Go | https://github.com/hekmon/transmissionrpc
+| Python | https://github.com/Trim21/transmission-rpc
+| Rust | https://crates.io/crates/transmission-rpc
 
 
 ## 2 Message format
-Messages are formatted as objects. There are two types: requests (described in 2.1) and responses (described in 2.2).
+Messages are formatted as objects. There are two types: requests (described in [section 2.1](#21-requests)) and responses (described in [section 2.2](#22-responses)).
 
 All text **must** be UTF-8 encoded.
 
@@ -73,7 +74,7 @@ since the port and path may be changed to allow mapping and/or multiple
 daemons to run on a single server.
 
 #### 2.3.1 CSRF protection
-Most Transmission RPC servers require a X-Transmission-Session-Id
+Most Transmission RPC servers require a `X-Transmission-Session-Id`
 header to be sent with requests, to prevent CSRF attacks.
 
 When your request has the wrong id -- such as when you send your first
@@ -123,6 +124,7 @@ Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
 
 `ids` should be one of the following:
+
 1. an integer referring to a torrent id
 2. a list of torrent id numbers, SHA1 hash strings, or both
 3. a string, `recently-active`, for recently-active torrents
@@ -155,10 +157,10 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
-| `trackerAdd`          | array    | add a new tracker URL in its own new tier
-| `trackerList`         | string   | rebuild the torrent's tracker list with a string of announce URLs, one per line, with a blank line between tiers
-| `trackerRemove`       | array    | remove a tracker URL
-| `trackerReplace`      | array    | modify a tracker URL
+| `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
+| `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
+| `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
+| `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
 | `uploadLimit`         | number   | maximum upload speed (KBps)
 | `uploadLimited`       | boolean  | true if `uploadLimit` is honored
 
@@ -262,7 +264,7 @@ The 'source' column here corresponds to the data structure there.
 | `secondsDownloading`| number| tr_stat
 | `secondsSeeding`| number| tr_stat
 | `seedIdleLimit`| number| tr_torrent
-| `seedIdleMode`| number| tr_inactvelimit
+| `seedIdleMode`| number| tr_inactivelimit
 | `seedRatioLimit`| double| tr_torrent
 | `seedRatioMode`| number| tr_ratiolimit
 | `sizeWhenDone`| number| tr_stat
@@ -297,7 +299,7 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | boolean | tr_file_view
+| `wanted` | number | tr_file_view (**Note:** For backwards compatibility, this is serialized as an array of `0` or `1` that should be treated as booleans)
 | `priority` | number | tr_file_view
 
 `peers`: an array of objects, each containing:
@@ -394,7 +396,7 @@ The 'source' column here corresponds to the data structure there.
 | `tier`                    | number     | tr_tracker_view
 
 
-`wanted`: An array of `tr_torrentFileCount()` booleans true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
+`wanted`: An array of `tr_torrentFileCount()` Booleans true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
 
 
 Example:
@@ -503,7 +505,7 @@ Request arguments:
 
 | Key | Value Type | Description
 |:--|:--|:--
-| `ids` | array | the torrent torrent list, as described in 3.1 (must only be 1 torrent)
+| `ids` | array | the torrent list, as described in 3.1 (must only be 1 torrent)
 | `path` | string | the path to the file or folder that will be renamed
 | `name` | string | the file or folder's new name
 
@@ -525,8 +527,9 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
 | `cache-size-mb` | number | maximum size of the disk cache (MB)
 | `config-dir` | string | location of transmission's configuration directory
-| `default-trackers` | list of default trackers to use on public torrents
-| `dht-enabled` | boolean | true means allow dht in public torrents
+| `default-trackers` | string of announce URLs, one per line, and a blank line between 
+[tiers](https://www.bittorrent.org/beps/bep_0012.html).
+| `dht-enabled` | boolean | true means allow DHT in public torrents
 | `download-dir` | string | default path to download torrents
 | `download-dir-free-space` | number |  **DEPRECATED** Use the `free-space` method instead.
 | `download-queue-enabled` | boolean | if true, limit how many torrents can be downloaded at once
@@ -541,13 +544,13 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `peer-limit-per-torrent` | number | maximum global number of peers
 | `peer-port-random-on-start` | boolean | true means pick a random peer port on launch
 | `peer-port` | number | port number
-| `pex-enabled` | boolean | true means allow pex in public torrents
+| `pex-enabled` | boolean | true means allow PEX in public torrents
 | `port-forwarding-enabled` | boolean | true means ask upstream router to forward the configured peer port to transmission using UPnP or NAT-PMP
 | `queue-stalled-enabled` | boolean | whether or not to consider idle torrents as stalled
 | `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
 | `rename-partial-files` | boolean | true means append `.part` to incomplete files
 | `rpc-version-minimum` | number | the minimum RPC API version supported
-| `rpc-version-semver` | string | the current RPC API version in a semver-compatible string
+| `rpc-version-semver` | string | the current RPC API version in a [semver](https://semver.org)-compatible string
 | `rpc-version` | number | the current RPC API version
 | `script-torrent-added-enabled` | boolean | whether or not to call the `added` script
 | `script-torrent-added-filename` | string | filename of the script to run
@@ -566,7 +569,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `start-added-torrents` | boolean | true means added torrents will be started right away
 | `trash-original-torrent-files` | boolean | true means the .torrent file of added torrents will be deleted
 | `units` | object | see below
-| `utp-enabled` | boolean | true means allow utp
+| `utp-enabled` | boolean | true means allow UTP
 | `version` | string | long version string `$version ($revision)`
 
 
@@ -655,7 +658,7 @@ Method name: `port-test`
 
 Request arguments: none
 
-Response arguments: a bool, `port-is-open`
+Response arguments: a Boolean, `port-is-open`
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
@@ -748,8 +751,9 @@ A bandwidth group description object has:
 This section lists the changes that have been made to the RPC protocol.
 
 There are two ways to check for API compatibility. Since most developers know
-semver, session-get's `rpc-version-semver` is the recommended way. That value
-is a semver-compatible string of the RPC protocol version number.
+[semver](https://semver.org/), session-get's `rpc-version-semver` is the
+recommended way. That value is a semver-compatible string of the RPC protocol
+version number.
 
 Since Transmission predates the semver 1.0 spec, the previous scheme was for
 the RPC version to be a whole number and to increment it whenever a change was
@@ -972,8 +976,8 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | Method | Description
 |:---|:---
 | `/upload` | :warning: undocumented `/upload` endpoint removed
-| `session-get` | **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
-| `free-space` | new return arg `total-capacity`
+| `session-get` | :warning: **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
+| `free-space` | new return arg `total_size`
 | `session-get` | new arg `default-trackers`
 | `session-get` | new arg `rpc-version-semver`
 | `session-get` | new arg `script-torrent-added-enabled`
@@ -991,6 +995,9 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `torrent-get` | new arg `trackerList`
 | `torrent-set` | new arg `group`
 | `torrent-set` | new arg `trackerList`
+| `torrent-set` | :warning: **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
+| `torrent-set` | :warning: **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
+| `torrent-set` | :warning: **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
 | `group-set` | new method
 | `group-get` | new method
-
+| `torrent-get` | :warning: old arg `wanted` was implemented as an array of `0` or `1` in Transmission 3.00 and older, despite being documented as an array of booleans. Transmission 4.0.0 and 4.0.1 "fixed" this by returning an array of booleans; but in practical terms, this change caused an unannounced breaking change for any 3rd party code that expected `0` or `1`. For this reason, 4.0.2 restored the 3.00 behavior and updated this spec to match the code.

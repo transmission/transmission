@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -232,7 +232,7 @@ tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
 {
     TR_ASSERT(der != nullptr);
 
-    X509* const ret = d2i_X509(nullptr, (unsigned char const**)&der, der_length);
+    X509* const ret = d2i_X509(nullptr, reinterpret_cast<unsigned char const**>(&der), der_length);
 
     if (ret == nullptr)
     {

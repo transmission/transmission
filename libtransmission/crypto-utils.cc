@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -33,10 +33,14 @@ using namespace std::literals;
 
 namespace
 {
+constexpr auto TrSha1DigestStrlen = size_t{ 40 };
+
+constexpr auto TrSha256DigestStrlen = size_t{ 64 };
+
 namespace ssha1_impl
 {
 
-auto constexpr DigestStringSize = TR_SHA1_DIGEST_STRLEN;
+auto constexpr DigestStringSize = TrSha1DigestStrlen;
 auto constexpr SaltedPrefix = "{"sv;
 
 std::string tr_salt(std::string_view plaintext, std::string_view salt)
@@ -92,9 +96,7 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
     return tr_salt(plaintext, salt) == ssha1;
 }
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -141,9 +143,7 @@ std::string tr_base64_decode(std::string_view input)
     return std::string{ std::data(buf), len };
 }
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -210,7 +210,7 @@ std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
 {
     using namespace hex_impl;
 
-    if (std::size(hex) != TR_SHA1_DIGEST_STRLEN)
+    if (std::size(hex) != TrSha1DigestStrlen)
     {
         return {};
     }
@@ -229,7 +229,7 @@ std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
 {
     using namespace hex_impl;
 
-    if (std::size(hex) != TR_SHA256_DIGEST_STRLEN)
+    if (std::size(hex) != TrSha256DigestStrlen)
     {
         return {};
     }

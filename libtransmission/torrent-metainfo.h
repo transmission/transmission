@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2022 Mnemosyne LLC.
+// This file Copyright © 2005-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -32,7 +32,7 @@ public:
 
     // Helper function wrapper around parseBenc().
     // If you're looping through several files, passing in a non-nullptr
-    // `buffer` can reduce the number of memory allocations needed to
+    // `contents` can reduce the number of memory allocations needed to
     // load multiple files.
     bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error** error = nullptr);
 
@@ -128,7 +128,10 @@ public:
         return is_private_;
     }
 
-    [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
+    [[nodiscard]] TR_CONSTEXPR20 tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const
+    {
+        return pieces_[piece];
+    }
 
     [[nodiscard]] TR_CONSTEXPR20 bool hasV1Metadata() const noexcept
     {
@@ -213,7 +216,7 @@ private:
         BasenameFormat format,
         std::string_view suffix);
 
-    auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    [[nodiscard]] auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
         return makeFilename(dirname, name(), infoHashString(), format, suffix);
     }
@@ -240,6 +243,7 @@ private:
     // Used when loading piece checksums on demand.
     uint64_t pieces_offset_ = 0;
 
+    bool has_magnet_info_hash_ = false;
     bool is_private_ = false;
     bool is_v2_ = false;
 };

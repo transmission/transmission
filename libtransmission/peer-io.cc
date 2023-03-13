@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -25,7 +25,7 @@
 #include "peer-io.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
-#include "utils.h"
+#include "utils.h" // for _()
 
 #ifdef _WIN32
 #undef EAGAIN
@@ -373,7 +373,7 @@ void tr_peerIo::can_read_wrapper()
 
         if (overhead > 0)
         {
-            bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
+            bandwidth().notifyBandwidthConsumed(TR_DOWN, overhead, false, now);
         }
 
         switch (read_state)
@@ -603,7 +603,7 @@ void tr_peerIo::read_bytes(void* bytes, size_t byte_count)
 {
     TR_ASSERT(read_buffer_size() >= byte_count);
 
-    inbuf_.toBuf(bytes, byte_count);
+    inbuf_.to_buf(bytes, byte_count);
 
     if (is_encrypted())
     {
@@ -660,7 +660,7 @@ void tr_peerIo::on_utp_state_change(int state)
     else if (state == UTP_STATE_EOF)
     {
         tr_error* error = nullptr;
-        tr_error_set(&error, ENOTCONN, tr_strerror(ENOTCONN));
+        tr_error_set_from_errno(&error, ENOTCONN);
         call_error_callback(*error);
         tr_error_clear(&error);
     }
@@ -678,13 +678,28 @@ void tr_peerIo::on_utp_error(int errcode)
 {
     tr_logAddTraceIo(this, fmt::format("utp_on_error -- {}", utp_error_code_names[errcode]));
 
-    if (got_error_ != nullptr)
+    if (got_error_ == nullptr)
     {
-        tr_error* error = nullptr;
-        tr_error_set(&error, errcode, utp_error_code_names[errcode]);
-        call_error_callback(*error);
-        tr_error_clear(&error);
+        return;
     }
+
+    tr_error* error = nullptr;
+    switch (errcode)
+    {
+    case UTP_ECONNREFUSED:
+        tr_error_set_from_errno(&error, ECONNREFUSED);
+        break;
+    case UTP_ECONNRESET:
+        tr_error_set_from_errno(&error, ECONNRESET);
+        break;
+    case UTP_ETIMEDOUT:
+        tr_error_set_from_errno(&error, ETIMEDOUT);
+        break;
+    default:
+        tr_error_set(&error, errcode, utp_error_code_names[errcode]);
+    }
+    call_error_callback(*error);
+    tr_error_clear(&error);
 }
 
 #endif /* #ifdef WITH_UTP */
@@ -718,7 +733,16 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto const* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
-                return std::size(io->inbuf_);
+                // We use this callback to enforce speed limits by telling
+                // libutp to read no more than `target_dl_bytes` bytes.
+                auto const target_dl_bytes = io->bandwidth_.clamp(TR_DOWN, RcvBuf);
+
+                // libutp's private function get_rcv_window() allows libutp
+                // to read up to (UTP_RCVBUF - READ_BUFFER_SIZE) bytes and
+                // UTP_RCVBUF is set to `RcvBuf` by tr_peerIo::utp_init().
+                // So to limit dl to `target_dl_bytes`, we need to return
+                // N where (`target_dl_bytes` == RcvBuf - N).
+                return RcvBuf - target_dl_bytes;
             }
             return {};
         });
@@ -730,7 +754,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
-                io->on_utp_error(args->u1.error_code);
+                io->on_utp_error(args->error_code);
             }
             return {};
         });
@@ -743,7 +767,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
                 tr_logAddTraceIo(io, fmt::format("{:d} overhead bytes via utp", args->len));
-                io->bandwidth().notifyBandwidthConsumed(args->u1.send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
+                io->bandwidth().notifyBandwidthConsumed(args->send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
             }
             return {};
         });
@@ -755,7 +779,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         {
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
-                io->on_utp_state_change(args->u1.state);
+                io->on_utp_state_change(args->state);
             }
             return {};
         });

@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2022 Mnemosyne LLC.
+// This file Copyright © 2010-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -165,9 +165,7 @@ std::optional<tr_sha256_digest_t> parseHash2(std::string_view sv)
 
 } // namespace
 
-/***
-****
-***/
+// ---
 
 tr_urlbuf tr_magnet_metainfo::magnet() const
 {

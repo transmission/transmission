@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2022 Mnemosyne LLC.
+// This file Copyright © 2010-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -26,9 +26,7 @@ class tr_announcer;
 class tr_announcer_udp;
 struct tr_torrent_announcer;
 
-/**
-***  Tracker Publish / Subscribe
-**/
+// --- Tracker Publish / Subscribe
 
 struct tr_pex;
 
@@ -80,9 +78,7 @@ public:
 
 std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
 
-/**
-***  For torrent customers
-**/
+// --- For torrent customers
 
 void tr_announcerChangeMyPort(tr_torrent*);
 

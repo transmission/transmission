@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -627,6 +627,12 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
         case 831:
             tr_variantDictAddBool(&settings_, TR_KEY_utp_enabled, false);
             break;
+
+        case TR_OPT_UNK:
+            fprintf(stderr, "Unexpected argument: %s \n", optstr);
+            tr_getopt_usage(MyName, Usage, std::data(Options));
+            *exit_code = 1;
+            return false;
 
         default:
             tr_getopt_usage(MyName, Usage, std::data(Options));

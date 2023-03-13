@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -99,17 +99,19 @@ bool RelocateDialog::Impl::onTimer()
             TR_GTK_BUTTONS_TYPE(CLOSE),
             true);
 
-        timer_.block();
         d->signal_response().connect(
             [this, d](int /*response*/) mutable
             {
-                timer_.unblock();
                 d.reset();
+                message_dialog_.reset();
+                dialog_.close();
             });
 
         d->show();
+        return false;
     }
-    else if (done_ == TR_LOC_DONE)
+
+    if (done_ == TR_LOC_DONE)
     {
         if (!torrent_ids_.empty())
         {
@@ -117,11 +119,13 @@ bool RelocateDialog::Impl::onTimer()
         }
         else
         {
+            message_dialog_.reset();
             dialog_.close();
+            return false;
         }
     }
 
-    return G_SOURCE_CONTINUE;
+    return true;
 }
 
 void RelocateDialog::Impl::onResponse(int response)

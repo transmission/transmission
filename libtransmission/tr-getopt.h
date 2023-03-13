@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -35,12 +35,12 @@ enum
 };
 
 /**
- * @brief similar to getopt()
- * @return TR_GETOPT_DONE, TR_GETOPT_ERR, TR_GETOPT_UNK, or the matching tr_option's `val' field
+ * @brief similar to `getopt()`
+ * @return `TR_GETOPT_DONE`, `TR_GETOPT_ERR`, `TR_GETOPT_UNK`, or the matching `tr_option`'s `val` field
  */
 int tr_getopt(char const* usage, int argc, char const* const* argv, tr_option const* opts, char const** setme_optarg);
 
-/** @brief prints the `Usage' help section to stdout */
+/** @brief prints the `Usage` help section to stdout */
 void tr_getopt_usage(char const* app_name, char const* description, tr_option const* opts);
 
 /** @} */

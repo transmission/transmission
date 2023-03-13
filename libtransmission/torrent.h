@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -40,9 +40,7 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
-/**
-***  Package-visible
-**/
+// --- Package-visible
 
 void tr_torrentFreeInSessionThread(tr_torrent* tor);
 
@@ -54,11 +52,9 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_erro
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
-bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
+bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme_incomplete_dir);
 
-/**
-***
-**/
+// ---
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
@@ -113,7 +109,8 @@ public:
     // but more refactoring is needed before that can happen
     // because much of tr_torrent's impl is in the non-member C bindings
 
-    void setMetainfo(tr_torrent_metainfo const& tm);
+    // Used to add metainfo to a magnet torrent.
+    void setMetainfo(tr_torrent_metainfo tm);
 
     [[nodiscard]] auto unique_lock() const
     {
@@ -348,9 +345,9 @@ public:
         return file_priorities_.piecePriority(piece);
     }
 
-    void setFilePriorities(tr_file_index_t const* files, tr_file_index_t fileCount, tr_priority_t priority)
+    void setFilePriorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
     {
-        file_priorities_.set(files, fileCount, priority);
+        file_priorities_.set(files, file_count, priority);
         setDirty();
     }
 
@@ -585,13 +582,7 @@ public:
         this->error_string = errmsg;
     }
 
-    void setDownloadDir(std::string_view path)
-    {
-        download_dir = path;
-        markEdited();
-        setDirty();
-        refreshCurrentDir();
-    }
+    void setDownloadDir(std::string_view path, bool is_new_torrent = false);
 
     void refreshCurrentDir();
 
@@ -788,6 +779,13 @@ public:
         return announce_key_;
     }
 
+    // should be called when done modifying the torrent's announce list.
+    void on_announce_list_changed()
+    {
+        markEdited();
+        session->announcer_->resetTorrent(this);
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -823,7 +821,7 @@ public:
      * peer_id that was registered by the peer. The peer_id from the tracker
      * and in the handshake are expected to match.
      */
-    tr_peer_id_t peer_id_;
+    tr_peer_id_t peer_id_ = {};
 
     tr_session* session = nullptr;
 
@@ -900,9 +898,10 @@ public:
     bool is_queued = false;
     bool isRunning = false;
     bool isStopping = false;
-    bool startAfterVerify = false;
 
-    bool magnetVerify = false;
+    // start the torrent after all the startup scaffolding is done,
+    // e.g. fetching metadata from peers and/or verifying the torrent
+    bool start_when_stable = false;
 
 private:
     [[nodiscard]] constexpr bool isPieceTransferAllowed(tr_direction direction) const noexcept
@@ -948,9 +947,7 @@ private:
     bool needs_completeness_check_ = true;
 };
 
-/***
-****
-***/
+// ---
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
@@ -958,9 +955,9 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
 }
 
 /**
- * Tell the tr_torrent that it's gotten a block
+ * Tell the `tr_torrent` that it's gotten a block
  */
-void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
+void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2022 Mnemosyne LLC.
+// This file Copyright © 2010-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -462,9 +462,9 @@ struct tr_tier
         scheduleNextScrape(0);
     }
 
-    void scheduleNextScrape(int interval)
+    void scheduleNextScrape(time_t interval_secs)
     {
-        this->scrapeAt = getNextScrapeTime(tor->session, this, interval);
+        this->scrapeAt = getNextScrapeTime(tor->session, this, interval_secs);
     }
 
     std::deque<tr_announce_event> announce_events;
@@ -518,7 +518,7 @@ private:
     // unless the tracker says otherwise, this is the announce min_interval
     static auto constexpr DefaultAnnounceMinIntervalSec = int{ 60 * 2 };
 
-    [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, int interval)
+    [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, time_t interval_secs)
     {
         // Maybe don't scrape paused torrents
         if (!tier->isRunning && !session->shouldScrapePausedTorrents())
@@ -529,8 +529,8 @@ private:
         /* Add the interval, and then increment to the nearest 10th second.
          * The latter step is to increase the odds of several torrents coming
          * due at the same time to improve multiscrape. */
-        auto ret = tr_time() + interval;
-        while (ret % 10 != 0)
+        auto ret = tr_time() + interval_secs;
+        while (ret % 10U != 0U)
         {
             ++ret;
         }
@@ -857,7 +857,8 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     using namespace announce_helpers;
 
     auto* current_tracker = tier->currentTracker();
-    std::string announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) : "nullptr";
+    std::string const announce_url = current_tracker != nullptr ? tr_urlTrackerLogName(current_tracker->announce_url) :
+                                                                  "nullptr";
 
     /* increment the error count */
     if (current_tracker != nullptr)
@@ -1098,7 +1099,11 @@ void tr_announcer_impl::onAnnounceDone(
             publishPeersPex(tier, seeders, leechers, response.pex6);
         }
 
-        publishPeerCounts(tier, seeders, leechers);
+        /* Only publish leechers if it was actually returned during the announce */
+        if (response.leechers >= 0)
+        {
+            publishPeerCounts(tier, seeders, leechers);
+        }
 
         tier->isRunning = is_running_on_success;
 
@@ -1400,10 +1405,21 @@ void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tier
     // batch as many info_hashes into a request as we can
     for (auto* tier : tiers)
     {
-        auto const* const scrape_info = tier->currentTracker()->scrape_info;
-        bool found = false;
+        auto const* const current_tracker = tier->currentTracker();
+        TR_ASSERT(current_tracker != nullptr);
+        if (current_tracker == nullptr)
+        {
+            continue;
+        }
 
+        auto const* const scrape_info = current_tracker->scrape_info;
         TR_ASSERT(scrape_info != nullptr);
+        if (scrape_info == nullptr)
+        {
+            continue;
+        }
+
+        bool found = false;
 
         /* if there's a request with this scrape URL and a free slot, use it */
         for (size_t j = 0; !found && j < request_count; ++j)

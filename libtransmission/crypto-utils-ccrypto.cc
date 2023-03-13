@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2022 Mnemosyne LLC.
+// This file Copyright © 2021-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -21,9 +21,7 @@
 #define TR_CRYPTO_X509_FALLBACK
 #include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -95,9 +93,7 @@ bool check_ccrypto_result(CCCryptorStatus result, char const* file, long line)
 
 } // namespace
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -194,9 +190,7 @@ std::unique_ptr<tr_sha256> tr_sha256::create()
     return std::make_unique<Sha256Impl>();
 }
 
-/***
-****
-***/
+// ---
 
 bool tr_rand_buffer_crypto(void* buffer, size_t length)
 {

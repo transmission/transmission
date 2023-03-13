@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,6 +6,7 @@
 #include "TorrentCellRenderer.h"
 
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_SMALL
+#include "Percents.h"
 #include "Torrent.h"
 
 #include <libtransmission/transmission.h>
@@ -119,12 +120,9 @@ private:
 
     static void set_icon(Gtk::CellRendererPixbuf& renderer, Glib::RefPtr<Gio::Icon> const& icon, IconSize icon_size);
     static void adjust_progress_bar_hue(
-        Cairo::RefPtr<Cairo::Surface> const& bg_surface,
         Cairo::RefPtr<Cairo::Context> const& context,
         Gdk::RGBA const& color,
-        Gdk::Rectangle const& area,
-        double bg_x,
-        double bg_y);
+        Gdk::Rectangle const& area);
 
 private:
     TorrentCellRenderer& renderer_;
@@ -278,7 +276,7 @@ Gdk::RGBA const& get_progress_bar_color(Torrent const& torrent)
 
 Cairo::RefPtr<Cairo::Surface> get_mask_surface(Cairo::RefPtr<Cairo::Surface> const& surface, Gdk::Rectangle const& area)
 {
-    auto const mask_surface = Cairo::ImageSurface::create(TR_CAIRO_SURFACE_FORMAT(A8), area.get_width(), area.get_height());
+    auto const mask_surface = Cairo::Surface::create(surface, Cairo::CONTENT_ALPHA, area.get_width(), area.get_height());
     auto const mask_context = Cairo::Context::create(mask_surface);
 
     mask_context->set_source_rgb(0, 0, 0);
@@ -301,22 +299,13 @@ void render_impl(Gtk::CellRenderer& renderer, Ts&&... args)
 } // namespace
 
 void TorrentCellRenderer::Impl::adjust_progress_bar_hue(
-    Cairo::RefPtr<Cairo::Surface> const& bg_surface,
     Cairo::RefPtr<Cairo::Context> const& context,
     Gdk::RGBA const& color,
-    Gdk::Rectangle const& area,
-    double bg_x,
-    double bg_y)
+    Gdk::Rectangle const& area)
 {
     using TrCairoContextOperator = IF_GTKMM4(Cairo::Context::Operator, Cairo::Operator);
 
     auto const mask_surface = get_mask_surface(context->get_target(), area);
-
-    // Add background under the progress bar, for better results around the transparent areas
-    context->set_source(bg_surface, bg_x, bg_y);
-    context->set_operator(TR_CAIRO_CONTEXT_OPERATOR(DEST_OVER));
-    context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
-    context->fill();
 
     // Adjust surface color
     context->set_source_rgb(color.get_red(), color.get_green(), color.get_blue());
@@ -337,8 +326,14 @@ void TorrentCellRenderer::Impl::render_progress_bar(
     Gtk::CellRendererState flags,
     Gdk::RGBA const& color)
 {
+    auto const context = IF_GTKMM4(snapshot->append_cairo(area), snapshot);
+
     auto const temp_area = Gdk::Rectangle(0, 0, area.get_width(), area.get_height());
-    auto const temp_surface = Cairo::ImageSurface::create(TR_CAIRO_SURFACE_FORMAT(ARGB32), area.get_width(), area.get_height());
+    auto const temp_surface = Cairo::Surface::create(
+        context->get_target(),
+        Cairo::CONTENT_COLOR_ALPHA,
+        area.get_width(),
+        area.get_height());
     auto const temp_context = Cairo::Context::create(temp_surface);
 
     {
@@ -357,24 +352,7 @@ void TorrentCellRenderer::Impl::render_progress_bar(
 #endif
     }
 
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    auto const context = snapshot->append_cairo(area);
-    auto const surface = context->get_target();
-#else
-    auto const context = snapshot;
-    auto const surface = Cairo::Surface::create(
-        context->get_target(),
-        area.get_x(),
-        area.get_y(),
-        area.get_width(),
-        area.get_height());
-#endif
-
-    double dx = 0;
-    double dy = 0;
-    context->device_to_user(dx, dy);
-
-    adjust_progress_bar_hue(surface, temp_context, color, temp_area, dx - area.get_x(), dy - area.get_y());
+    adjust_progress_bar_hue(temp_context, color, temp_area);
 
     context->set_source(temp_context->get_target(), area.get_x(), area.get_y());
     context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
@@ -393,7 +371,7 @@ void TorrentCellRenderer::Impl::render_compact(
     int width = 0;
 
     auto const& torrent = *property_torrent_.get_value();
-    auto const percent_done = static_cast<int>(torrent.get_percent_done() * 100);
+    auto const percent_done = torrent.get_percent_done().to_int();
     bool const sensitive = torrent.get_sensitive();
 
     if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
@@ -487,7 +465,7 @@ void TorrentCellRenderer::Impl::render_full(
     Gtk::Requisition size;
 
     auto const& torrent = *property_torrent_.get_value();
-    auto const percent_done = static_cast<int>(torrent.get_percent_done() * 100);
+    auto const percent_done = torrent.get_percent_done().to_int();
     bool const sensitive = torrent.get_sensitive();
 
     if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})

@@ -1,4 +1,4 @@
-// Copyright © Transmission authors and contributors.
+// This file Copyright © 2006-2023 Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
@@ -308,9 +308,7 @@ struct tr_address
     [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
 };
 
-/***********************************************************************
- * Sockets
- **********************************************************************/
+// --- Sockets
 
 struct tr_session;
 
@@ -329,7 +327,7 @@ bool tr_net_hasIPv6(tr_port);
 // --- TOS / DSCP
 
 /**
- * A toString() / from_string() convenience wrapper around the TOS int value
+ * A `toString()` / `from_string()` convenience wrapper around the TOS int value
  */
 class tr_tos_t
 {

@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2022 Mnemosyne LLC.
+// This file Copyright © 2010-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -72,9 +72,7 @@ void verboseLog(std::string_view description, tr_direction direction, std::strin
 auto constexpr MaxBencDepth = 8;
 } // namespace
 
-/****
-*****  ANNOUNCE
-****/
+// --- Announce
 
 namespace
 {
@@ -296,7 +294,7 @@ void tr_tracker_http_announce(
      * is expensive (disabling DNS cache), so instead we have to make do with
      * a request that we don't know if will go through IPv6 or IPv4.
      */
-    static bool const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < CURL_VERSION_BITS(7, 77, 0);
+    static auto const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < 0x074D00 /* 7.77.0 */;
     if (use_curl_workaround)
     {
         if (session->useAnnounceIP())

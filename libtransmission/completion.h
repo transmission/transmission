@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -118,8 +118,16 @@ struct tr_completion
 
     [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const;
 
-    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t) const;
-    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t) const;
+    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
+    {
+        auto const [begin, end] = block_info_->blockSpanForPiece(piece);
+        return (end - begin) - blocks_.count(begin, end);
+    }
+
+    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t piece) const
+    {
+        return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
+    }
 
     void amountDone(float* tab, size_t n_tabs) const;
 
@@ -163,6 +171,8 @@ private:
     {
         return countHasBytesInSpan(block_info_->byteSpanForPiece(piece));
     }
+
+    void removeBlock(tr_block_index_t block);
 
     torrent_view const* tor_;
     tr_block_info const* block_info_;

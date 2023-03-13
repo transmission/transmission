@@ -1,4 +1,4 @@
-// This file Copyright © 2023 Mnemosyne LLC.
+// This file Copyright © 2023-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -67,5 +67,6 @@ Glib::RefPtr<SortListModel<ItemT>> SortListModel<ItemT>::create(
     Glib::RefPtr<ModelT> const& model,
     Glib::RefPtr<SorterType> const& sorter)
 {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     return Glib::make_refptr_for_instance(new SortListModel(model, sorter));
 }

@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -78,7 +78,7 @@ enum class GtrUnicode
     Bullet
 };
 
-Glib::ustring gtr_get_unicode_string(GtrUnicode);
+Glib::ustring gtr_get_unicode_string(GtrUnicode uni);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size_in_bytes);
@@ -123,12 +123,10 @@ void gtr_window_raise(Gtk::Window& window);
 ***/
 
 void gtr_priority_combo_init(Gtk::ComboBox& combo);
-#define gtr_priority_combo_get_value(w) gtr_combo_box_get_active_enum(w)
-#define gtr_priority_combo_set_value(w, val) gtr_combo_box_set_active_enum(w, val)
 
 void gtr_combo_box_set_enum(Gtk::ComboBox& combo, std::vector<std::pair<Glib::ustring, int>> const& items);
-int gtr_combo_box_get_active_enum(Gtk::ComboBox const&);
-void gtr_combo_box_set_active_enum(Gtk::ComboBox&, int value);
+int gtr_combo_box_get_active_enum(Gtk::ComboBox const& combo);
+void gtr_combo_box_set_active_enum(Gtk::ComboBox& combo, int value);
 
 /***
 ****
@@ -179,6 +177,8 @@ template<typename T>
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr int gtr_compare_generic(T const& lhs, T const& rhs)
 {
+    using std::rel_ops::operator>;
+
     if (lhs < rhs)
     {
         return -1;

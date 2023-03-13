@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -41,10 +41,10 @@ using namespace std::literals;
 #define USE_LIBCURL_SOCKOPT
 #endif
 
-/***
-****
-***/
+// ---
 
+namespace
+{
 namespace curl_helpers
 {
 
@@ -94,6 +94,7 @@ struct EasyDeleter
 using easy_unique_ptr = std::unique_ptr<CURL, EasyDeleter>;
 
 } // namespace curl_helpers
+} // namespace
 
 #ifdef _WIN32
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
@@ -150,9 +151,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 }
 #endif
 
-/***
-****
-***/
+// ---
 
 class tr_web::Impl
 {
@@ -352,6 +351,8 @@ public:
                 return;
             }
 
+            impl.paused_easy_handles.erase(easy_);
+
             if (auto const url = tr_urlParse(options.url); url)
             {
                 curl_easy_reset(easy);
@@ -463,7 +464,7 @@ public:
             // again when the transfer is unpaused.
             if (task->impl.mediator.clamp(*tag, bytes_used) < bytes_used)
             {
-                task->impl.paused_easy_handles.emplace(tr_time_msec(), task->easy());
+                task->impl.paused_easy_handles.emplace(task->easy(), tr_time_msec());
                 return CURL_WRITEFUNC_PAUSE;
             }
 
@@ -520,8 +521,10 @@ public:
 
         if (!curl_ssl_verify)
         {
+#if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
+#endif
         }
         else if (!std::empty(curl_ca_bundle))
         {
@@ -538,12 +541,16 @@ public:
         {
             (void)curl_easy_setopt(e, CURLOPT_CAINFO, NULL);
             (void)curl_easy_setopt(e, CURLOPT_CAPATH, NULL);
+#if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
             (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
+#endif
         }
         else if (!std::empty(curl_ca_bundle))
         {
+#if LIBCURL_VERSION_NUM >= 0x073400 /* 7.52.0 */
             (void)curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, curl_ca_bundle.c_str());
+#endif
         }
 
         if (auto const& ua = user_agent; !std::empty(ua))
@@ -596,9 +603,9 @@ public:
 
         for (auto it = std::begin(paused); it != std::end(paused);)
         {
-            if (it->first + BandwidthPauseMsec < now)
+            if (it->second + BandwidthPauseMsec < now)
             {
-                curl_easy_pause(it->second, CURLPAUSE_CONT);
+                curl_easy_pause(it->first, CURLPAUSE_CONT);
                 it = paused.erase(it);
             }
             else
@@ -770,9 +777,9 @@ public:
         }
     }
 
-    static std::once_flag curl_init_flag;
+    static inline auto curl_init_flag = std::once_flag{};
 
-    std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
+    std::map<CURL*, uint64_t /*tr_time_msec()*/> paused_easy_handles;
 
     static void curlInit()
     {
@@ -784,8 +791,6 @@ public:
         }
     }
 };
-
-std::once_flag tr_web::Impl::curl_init_flag;
 
 tr_web::tr_web(Mediator& mediator)
     : impl_{ std::make_unique<Impl>(mediator) }

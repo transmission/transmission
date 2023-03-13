@@ -1,4 +1,4 @@
-// This file Copyright © 2022 Mnemosyne LLC.
+// This file Copyright © 2022-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,24 +8,29 @@
 #include <initializer_list>
 #include <type_traits>
 
+// NOLINTBEGIN(bugprone-macro-parentheses, cppcoreguidelines-macro-usage)
+
 #define DEFINE_FLAGS_OPERATORS(FlagType) \
     constexpr inline Flags<FlagType> operator|(FlagType lhs, FlagType rhs) noexcept \
     { \
         return { lhs, rhs }; \
     }
 
+// NOLINTEND(bugprone-macro-parentheses, cppcoreguidelines-macro-usage)
+
 template<typename T>
 class Flags
 {
 public:
     using FlagType = T;
-    using ValueType = std::underlying_type_t<FlagType>;
+    using ValueType = std::make_unsigned_t<std::underlying_type_t<FlagType>>;
 
     static_assert(std::is_enum_v<FlagType> && !std::is_convertible_v<FlagType, ValueType>);
 
 public:
     constexpr Flags() noexcept = default;
 
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     constexpr Flags(FlagType flag) noexcept
     {
         set(flag);
@@ -39,22 +44,22 @@ public:
         }
     }
 
-    constexpr bool none() const noexcept
+    [[nodiscard]] constexpr bool none() const noexcept
     {
         return value_ == 0;
     }
 
-    constexpr bool any() const noexcept
+    [[nodiscard]] constexpr bool any() const noexcept
     {
         return !none();
     }
 
-    constexpr bool test(FlagType flag) const noexcept
+    [[nodiscard]] constexpr bool test(FlagType flag) const noexcept
     {
         return (value_ & get_mask(flag)) != 0;
     }
 
-    constexpr bool test(Flags rhs) const noexcept
+    [[nodiscard]] constexpr bool test(Flags rhs) const noexcept
     {
         return (value_ & rhs.value_) != 0;
     }
@@ -64,7 +69,7 @@ public:
         value_ |= get_mask(flag);
     }
 
-    constexpr Flags operator|(Flags rhs) noexcept
+    [[nodiscard]] constexpr Flags operator|(Flags rhs) const noexcept
     {
         return Flags(value_ | rhs.value_);
     }
@@ -75,7 +80,7 @@ public:
         return *this;
     }
 
-    constexpr Flags operator~() const noexcept
+    [[nodiscard]] constexpr Flags operator~() const noexcept
     {
         return Flags(~value_);
     }
@@ -86,7 +91,7 @@ private:
     {
     }
 
-    static constexpr ValueType get_mask(FlagType flag) noexcept
+    [[nodiscard]] static constexpr ValueType get_mask(FlagType flag) noexcept
     {
         return ValueType{ 1 } << static_cast<ValueType>(flag);
     }

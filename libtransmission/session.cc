@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -282,9 +282,7 @@ void tr_session::LpdMediator::setNextAnnounceTime(std::string_view info_hash_str
     }
 }
 
-/***
-****
-***/
+// ---
 
 std::optional<std::string> tr_session::WebMediator::cookieFile() const
 {
@@ -356,9 +354,7 @@ void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
     session->fetch(std::move(options));
 }
 
-/***
-****
-***/
+// ---
 
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session)
 {
@@ -375,9 +371,7 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
     session->settings_.encryption_mode = mode;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
 {
@@ -812,9 +806,7 @@ void tr_sessionSet(tr_session* session, tr_variant* settings)
     done_future.wait();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 {
@@ -837,9 +829,7 @@ char const* tr_sessionGetConfigDir(tr_session const* session)
     return session->configDir().c_str();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetIncompleteFileNamingEnabled(tr_session* session, bool enabled)
 {
@@ -855,9 +845,7 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session)
     return session->isIncompleteFileNamingEnabled();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
 {
@@ -873,11 +861,11 @@ char const* tr_sessionGetIncompleteDir(tr_session const* session)
     return session->incompleteDir().c_str();
 }
 
-void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool b)
+void tr_sessionSetIncompleteDirEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->useIncompleteDir(b);
+    session->useIncompleteDir(enabled);
 }
 
 bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
@@ -887,9 +875,7 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
     return session->useIncompleteDir();
 }
 
-/***
-****  Peer Port
-***/
+// --- Peer Port
 
 void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
@@ -948,9 +934,7 @@ void tr_session::onAdvertisedPeerPortChanged()
     }
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetRatioLimited(tr_session* session, bool is_limited)
 {
@@ -980,9 +964,7 @@ double tr_sessionGetRatioLimit(tr_session const* session)
     return session->desiredRatio();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetIdleLimited(tr_session* session, bool is_limited)
 {
@@ -1012,11 +994,7 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
     return session->idleLimitMinutes();
 }
 
-/***
-****
-****  SPEED LIMITS
-****
-***/
+// --- Speed limits
 
 std::optional<tr_bytes_per_second_t> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
 {
@@ -1058,9 +1036,7 @@ void tr_session::AltSpeedMediator::isActiveChanged(bool is_active, tr_session_al
     session_.runInSessionThread(in_session_thread);
 }
 
-/***
-****  Primary session speed limits
-***/
+// --- Session primary speed limits
 
 void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
 {
@@ -1112,9 +1088,7 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
     return session->isSpeedLimited(dir);
 }
 
-/***
-****  Alternative speed limits that are used during scheduled times
-***/
+// --- Session alt speed limits
 
 void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
 {
@@ -1208,9 +1182,7 @@ void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* 
     session->alt_speed_active_changed_func_user_data_ = user_data;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetPeerLimit(tr_session* session, uint16_t max_global_peers)
 {
@@ -1368,39 +1340,65 @@ namespace
 {
 namespace load_torrents_helpers
 {
-void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
+[[nodiscard]] std::vector<std::string> get_matching_files(
+    std::string const& folder,
+    std::function<bool(std::string_view)> const& test)
 {
-    auto const& dirname = session->torrentDir();
-    auto const info = tr_sys_path_get_info(dirname);
-    auto const odir = info && info->isFolder() ? tr_sys_dir_open(dirname.c_str()) : TR_BAD_SYS_DIR;
-
-    auto n_torrents = size_t{};
-    if (odir != TR_BAD_SYS_DIR)
+    if (auto const info = tr_sys_path_get_info(folder); !info || !info->isFolder())
     {
-        char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+        return {};
+    }
+
+    auto const odir = tr_sys_dir_open(folder.c_str());
+    if (odir == TR_BAD_SYS_DIR)
+    {
+        return {};
+    }
+
+    auto filenames = std::vector<std::string>{};
+    for (;;)
+    {
+        char const* const name = tr_sys_dir_read_name(odir);
+
+        if (name == nullptr)
         {
-            if (!tr_strvEndsWith(name, ".torrent"sv) && !tr_strvEndsWith(name, ".magnet"sv))
-            {
-                continue;
-            }
-
-            // is a magnet link?
-            if (auto const path = tr_pathbuf{ dirname, '/', name }; !tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr))
-            {
-                if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
-                {
-                    tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr);
-                }
-            }
-
-            if (tr_torrentNew(ctor, nullptr) != nullptr)
-            {
-                ++n_torrents;
-            }
+            tr_sys_dir_close(odir);
+            return filenames;
         }
 
-        tr_sys_dir_close(odir);
+        if (test(name))
+        {
+            filenames.emplace_back(name);
+        }
+    }
+}
+
+void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
+{
+    auto n_torrents = size_t{};
+    auto const& folder = session->torrentDir();
+
+    for (auto const& name : get_matching_files(folder, [](auto const& name) { return tr_strvEndsWith(name, ".torrent"sv); }))
+    {
+        auto const path = tr_pathbuf{ folder, '/', name };
+
+        if (tr_ctorSetMetainfoFromFile(ctor, path.sv(), nullptr) && tr_torrentNew(ctor, nullptr) != nullptr)
+        {
+            ++n_torrents;
+        }
+    }
+
+    auto buf = std::vector<char>{};
+    for (auto const& name : get_matching_files(folder, [](auto const& name) { return tr_strvEndsWith(name, ".magnet"sv); }))
+    {
+        auto const path = tr_pathbuf{ folder, '/', name };
+
+        if (tr_loadFile(path, buf) &&
+            tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
+            tr_torrentNew(ctor, nullptr) != nullptr)
+        {
+            ++n_torrents;
+        }
     }
 
     if (n_torrents != 0U)
@@ -1442,9 +1440,7 @@ size_t tr_sessionGetAllTorrents(tr_session* session, tr_torrent** buf, size_t bu
     return n;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetPexEnabled(tr_session* session, bool enabled)
 {
@@ -1483,9 +1479,7 @@ void tr_sessionSetDHTEnabled(tr_session* session, bool enabled)
     }
 }
 
-/***
-****
-***/
+// ---
 
 bool tr_session::allowsUTP() const noexcept
 {
@@ -1538,9 +1532,7 @@ bool tr_sessionIsLPDEnabled(tr_session const* session)
     return session->allowsLPD();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb)
 {
@@ -1557,9 +1549,7 @@ size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
     return session->settings_.cache_size_mb;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_session::setDefaultTrackers(std::string_view trackers)
 {
@@ -1588,9 +1578,7 @@ void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
     session->setDefaultTrackers(trackers != nullptr ? trackers : "");
 }
 
-/***
-****
-***/
+// ---
 
 tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 {
@@ -1608,13 +1596,16 @@ tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
     return *group;
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
 {
-    session->runInSessionThread([session, enabled]() { session->port_forwarding_->setEnabled(enabled); });
+    session->runInSessionThread(
+        [session, enabled]()
+        {
+            session->settings_.port_forwarding_enabled = enabled;
+            session->port_forwarding_->setEnabled(enabled);
+        });
 }
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
@@ -1624,9 +1615,7 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
     return session->port_forwarding_->isEnabled();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_session::useBlocklist(bool enabled)
 {
@@ -1730,9 +1719,7 @@ char const* tr_blocklistGetURL(tr_session const* session)
     return session->blocklistUrl().c_str();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_session::setRpcWhitelist(std::string_view whitelist) const
 {
@@ -1858,9 +1845,7 @@ bool tr_sessionIsRPCPasswordEnabled(tr_session const* session)
     return session->rpc_server_->isPasswordEnabled();
 }
 
-/****
-*****
-****/
+// ---
 
 void tr_sessionSetScriptEnabled(tr_session* session, TrScript type, bool enabled)
 {
@@ -1894,9 +1879,7 @@ char const* tr_sessionGetScript(tr_session const* session, TrScript type)
     return session->script(type).c_str();
 }
 
-/***
-****
-***/
+// ---
 
 void tr_sessionSetQueueSize(tr_session* session, tr_direction dir, size_t max_simultaneous_torrents)
 {

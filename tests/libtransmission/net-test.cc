@@ -23,7 +23,8 @@ TEST_F(NetTest, conversionsIPv4)
     auto constexpr AddrStr = "127.0.0.1"sv;
 
     auto addr = tr_address::from_string(AddrStr);
-    EXPECT_TRUE(addr);
+    EXPECT_TRUE(addr.has_value());
+    assert(addr.has_value());
     EXPECT_EQ(AddrStr, addr->display_name());
 
     auto [ss, sslen] = addr->to_sockaddr(Port);
@@ -31,7 +32,8 @@ TEST_F(NetTest, conversionsIPv4)
     EXPECT_EQ(Port.network(), reinterpret_cast<sockaddr_in const*>(&ss)->sin_port);
 
     auto addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss));
-    EXPECT_TRUE(addrport);
+    ASSERT_TRUE(addrport.has_value());
+    assert(addrport.has_value());
     EXPECT_EQ(addr, addrport->first);
     EXPECT_EQ(Port, addrport->second);
 }
@@ -172,7 +174,8 @@ TEST_F(NetTest, isGlobalUnicastAddress)
     for (auto const& [presentation, expected] : Tests)
     {
         auto const address = tr_address::from_string(presentation);
-        EXPECT_TRUE(address);
+        EXPECT_TRUE(address.has_value());
+        assert(address.has_value());
         EXPECT_EQ(expected, address->is_global_unicast_address()) << presentation;
     }
 }

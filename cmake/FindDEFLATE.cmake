@@ -10,7 +10,7 @@ endif()
 if(UNIX)
     find_package(PkgConfig QUIET)
     # pkg-config support added in libdeflate v1.9
-    pkg_check_modules(_DEFLATE libdeflate>=${DEFLATE_MINIMUM})
+    pkg_check_modules(_DEFLATE QUIET libdeflate)
 endif()
 
 find_path(DEFLATE_INCLUDE_DIR
@@ -22,7 +22,16 @@ find_library(DEFLATE_LIBRARY
 
 set(DEFLATE_INCLUDE_DIRS ${DEFLATE_INCLUDE_DIR})
 set(DEFLATE_LIBRARIES ${DEFLATE_LIBRARY})
-set(DEFLATE_VERSION ${_DEFLATE_VERSION})
+
+if(_DEFLATE_VERSION)
+    set(DEFLATE_VERSION ${_DEFLATE_VERSION})
+elseif(DEFLATE_INCLUDE_DIR)
+    file(STRINGS "${DEFLATE_INCLUDE_DIR}/libdeflate.h" DEFLATE_VERSION_STR
+        REGEX "^#define[\t ]+LIBDEFLATE_VERSION_STRING[\t ]+\"[^\"]+\"")
+    if(DEFLATE_VERSION_STR MATCHES "\"([^\"]+)\"")
+        set(DEFLATE_VERSION "${CMAKE_MATCH_1}")
+    endif()
+endif()
 
 include(FindPackageHandleStandardArgs)
 
@@ -30,7 +39,7 @@ find_package_handle_standard_args(DEFLATE
     REQUIRED_VARS
         DEFLATE_INCLUDE_DIR
         DEFLATE_LIBRARY
-        DEFLATE_VERSION)
+    VERSION_VAR DEFLATE_VERSION)
 
 mark_as_advanced(DEFLATE_INCLUDE_DIR DEFLATE_LIBRARY)
 

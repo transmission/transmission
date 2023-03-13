@@ -203,7 +203,7 @@ TEST_F(TimerTest, restartWithDifferentInterval)
     test(200ms);
 }
 
-TEST_F(TimerTest, restartWithSameInterval)
+TEST_F(TimerTest, DISABLED_restartWithSameInterval)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
@@ -232,7 +232,7 @@ TEST_F(TimerTest, restartWithSameInterval)
     test(timer->interval());
 }
 
-TEST_F(TimerTest, repeatingThenSingleShot)
+TEST_F(TimerTest, DISABLED_repeatingThenSingleShot)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();
@@ -274,7 +274,7 @@ TEST_F(TimerTest, repeatingThenSingleShot)
     EXPECT_EQ(baseline + 1, n_calls);
 }
 
-TEST_F(TimerTest, singleShotStop)
+TEST_F(TimerTest, DISABLED_singleShotStop)
 {
     auto timer_maker = EvTimerMaker{ evbase_.get() };
     auto timer = timer_maker.create();

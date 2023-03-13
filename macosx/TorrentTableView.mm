@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2022 Transmission authors and contributors.
+// This file Copyright © 2005-2023 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -219,6 +219,18 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             {
                 torrentCell.backgroundStyle = NSBackgroundStyleEmphasized;
             }
+        }
+    }
+    else
+    {
+        if ([cell isKindOfClass:[GroupTextCell class]])
+        {
+            GroupTextCell* groupCell = cell;
+
+            // if cell is selected, set selected flag so we can style the title in GroupTextCell drawInteriorWithFrame
+            NSInteger const row = [self rowForItem:item];
+            NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
+            groupCell.selected = [selectedRowIndexes containsIndex:row];
         }
     }
 }

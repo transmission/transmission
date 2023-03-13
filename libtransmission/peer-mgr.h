@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -58,7 +58,7 @@ struct tr_pex
     tr_pex() = default;
 
     tr_pex(tr_address addr_in, tr_port port_in, uint8_t flags_in = {})
-        : addr{ std::move(addr_in) }
+        : addr{ addr_in }
         , port{ port_in }
         , flags{ flags_in }
     {

@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2022 Mnemosyne LLC.
+// This file Copyright © 2008-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -853,7 +853,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
-                tr_variantListAddBool(initme, tr_torrentFile(tor, i).wanted);
+                tr_variantListAddInt(initme, tr_torrentFile(tor, i).wanted ? 1 : 0);
             }
         }
         break;
@@ -1102,6 +1102,7 @@ char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
     }
 
     tor->announceList().save(tor->torrentFile());
+    tor->on_announce_list_changed();
 
     return nullptr;
 }
@@ -1128,6 +1129,7 @@ char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
     }
 
     tor->announceList().save(tor->torrentFile());
+    tor->on_announce_list_changed();
 
     return nullptr;
 }
@@ -1154,6 +1156,7 @@ char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     }
 
     tor->announceList().save(tor->torrentFile());
+    tor->on_announce_list_changed();
 
     return nullptr;
 }
@@ -1685,21 +1688,25 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
     }
     else
     {
+        auto ok = false;
+
         if (std::empty(filename))
         {
             auto const metainfo = tr_base64_decode(metainfo_base64);
-            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
+            ok = tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
+        }
+        else if (tr_sys_path_exists(tr_pathbuf{ filename }))
+        {
+            ok = tr_ctorSetMetainfoFromFile(ctor, filename);
         }
         else
         {
-            if (tr_sys_path_exists(tr_pathbuf{ filename }))
-            {
-                tr_ctorSetMetainfoFromFile(ctor, filename);
-            }
-            else
-            {
-                tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
-            }
+            ok = tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
+        }
+
+        if (!ok)
+        {
+            return "unrecognized info";
         }
 
         addTorrentImpl(idle_data, ctor);
@@ -2465,6 +2472,8 @@ void tr_rpc_request_exec_json(
     tr_rpc_response_func callback,
     void* callback_user_data)
 {
+    auto const lock = session->unique_lock();
+
     auto* const mutable_request = const_cast<tr_variant*>(request);
     tr_variant* args_in = tr_variantDictFind(mutable_request, TR_KEY_arguments);
     char const* result = nullptr;

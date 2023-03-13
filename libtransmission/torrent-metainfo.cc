@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2022 Mnemosyne LLC.
+// This file Copyright © 2007-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -53,12 +53,15 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
     return std::string{ url };
 }
 
-static auto constexpr MaxBencDepth = 32;
+namespace
+{
+auto constexpr MaxBencDepth = 32;
 
 bool tr_error_is_set(tr_error const* const* error)
 {
     return (error != nullptr) && (*error != nullptr);
 }
+} // namespace
 
 struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
 {
@@ -387,6 +390,21 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tm_.addWebseed(value);
         }
+        else if (pathIs(MagnetInfoKey, DisplayNameKey))
+        {
+            // compatibility with Transmission <= 3.0
+            tm_.name_ = tr_strv_replace_invalid(value);
+        }
+        else if (pathIs(MagnetInfoKey, InfoHashKey))
+        {
+            // compatibility with Transmission <= 3.0
+            if (value.length() == sizeof(tr_sha1_digest_t))
+            {
+                std::copy_n(std::data(value), sizeof(tr_sha1_digest_t), reinterpret_cast<char*>(std::data(tm_.info_hash_)));
+                tm_.info_hash_str_ = tr_sha1_to_string(tm_.info_hash_);
+                tm_.has_magnet_info_hash_ = true;
+            }
+        }
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
@@ -516,26 +534,34 @@ private:
             tm_.files_.add(tm_.name_, length_);
         }
 
-        if (tm_.fileCount() == 0)
+        if (auto const has_metainfo = tm_.infoDictSize() != 0U; has_metainfo)
         {
-            if (!tr_error_is_set(context.error))
+            // do some sanity checks to make sure the torrent looks sane
+            if (tm_.fileCount() == 0)
             {
-                tr_error_set(context.error, EINVAL, "no files found");
+                if (!tr_error_is_set(context.error))
+                {
+                    tr_error_set(context.error, EINVAL, "no files found");
+                }
+                return false;
             }
-            return false;
+
+            if (piece_size_ == 0)
+            {
+                if (!tr_error_is_set(context.error))
+                {
+                    tr_error_set(context.error, EINVAL, fmt::format("invalid piece size: {}", piece_size_));
+                }
+                return false;
+            }
+
+            tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
+            return true;
         }
 
-        if (piece_size_ == 0)
-        {
-            if (!tr_error_is_set(context.error))
-            {
-                tr_error_set(context.error, EINVAL, fmt::format("invalid piece size: {}", piece_size_));
-            }
-            return false;
-        }
-
-        tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
-        return true;
+        // no metainfo; might be a Transmission 3.00-style magnet file
+        auto const ok = tm_.has_magnet_info_hash_;
+        return ok;
     }
 
     static constexpr std::string_view AcodecKey = "acodec"sv;
@@ -552,6 +578,7 @@ private:
     static constexpr std::string_view CreatedByKey = "created by"sv;
     static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
     static constexpr std::string_view CreationDateKey = "creation date"sv;
+    static constexpr std::string_view DisplayNameKey = "display-name"sv;
     static constexpr std::string_view DurationKey = "duration"sv;
     static constexpr std::string_view Ed2kKey = "ed2k"sv;
     static constexpr std::string_view EncodedRateKey = "encoded rate"sv;
@@ -566,6 +593,7 @@ private:
     static constexpr std::string_view HeightKey = "height"sv;
     static constexpr std::string_view HttpSeedsKey = "httpseeds"sv;
     static constexpr std::string_view InfoKey = "info"sv;
+    static constexpr std::string_view InfoHashKey = "info_hash"sv;
     static constexpr std::string_view LengthKey = "length"sv;
     static constexpr std::string_view LibtorrentResumeKey = "libtorrent_resume"sv;
     static constexpr std::string_view LocaleKey = "locale"sv;
@@ -645,11 +673,6 @@ bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vecto
     return tr_loadFile(filename, *contents, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
 }
 
-tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) const
-{
-    return this->pieces_[piece];
-}
-
 tr_pathbuf tr_torrent_metainfo::makeFilename(
     std::string_view dirname,
     std::string_view name,
@@ -670,22 +693,20 @@ bool tr_torrent_metainfo::migrateFile(
     std::string_view suffix)
 {
     auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    auto const old_filename_exists = tr_sys_path_exists(old_filename);
-    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    auto const new_filename_exists = tr_sys_path_exists(new_filename);
+    if (!tr_sys_path_exists(old_filename))
+    {
+        return false;
+    }
 
-    if (old_filename_exists && new_filename_exists)
+    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    if (tr_sys_path_exists(new_filename))
     {
         tr_sys_path_remove(old_filename);
         return false;
     }
 
-    if (new_filename_exists)
-    {
-        return false;
-    }
-
-    if (old_filename_exists && tr_sys_path_rename(old_filename, new_filename))
+    auto const renamed = tr_sys_path_rename(old_filename, new_filename);
+    if (!renamed)
     {
         tr_logAddError(
             fmt::format(
@@ -696,7 +717,7 @@ bool tr_torrent_metainfo::migrateFile(
         return true;
     }
 
-    return false; // neither file exists
+    return renamed;
 }
 
 void tr_torrent_metainfo::removeFile(

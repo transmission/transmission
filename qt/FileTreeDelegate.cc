@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2022 Mnemosyne LLC.
+// This file Copyright © 2009-2023 Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -52,7 +52,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         p.rect = option.rect;
         p.rect.setSize(QSize(option.rect.width() - 4, option.rect.height() - 8));
         p.rect.moveCenter(option.rect.center());
-        p.fontMetrics = QApplication::fontMetrics();
+        p.fontMetrics = QFontMetrics{ QApplication::font() };
         p.minimum = 0;
         p.maximum = 100;
         p.textAlignment = Qt::AlignCenter;
