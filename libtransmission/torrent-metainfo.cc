@@ -171,7 +171,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             file_subpath_.clear();
             file_length_ = 0;
         }
-        if (pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
+        else if (pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
         {
             // torrent has a utf8 path, drop the other one due to probable non-utf8 encoding
             file_subpath_.clear();
