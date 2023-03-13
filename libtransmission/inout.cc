@@ -121,7 +121,13 @@ void readOrWriteBytes(
     auto filename = tr_pathbuf{};
     if (!fd && !getFilename(filename, tor, file_index, io_mode))
     {
-        tr_error_set_from_errno(error, ENOENT);
+        auto const err = ENOENT;
+        auto const msg = fmt::format(
+            _("Couldn't get '{path}': {error} ({error_code})"),
+            fmt::arg("path", tor->fileSubpath(file_index)),
+            fmt::arg("error", tr_strerror(err)),
+            fmt::arg("error_code", err));
+        tr_error_set(error, err, msg);
         return;
     }
 
