@@ -381,8 +381,8 @@ private:
     {
         static constexpr auto is_bad_pex = [](tr_pex const& pex)
         {
-            // paper over a bug in some DHT implementation
-            // that winds up with 1 for the port
+            // paper over a bug in some DHT implementation that gives port 1.
+            // Xref: https://github.com/transmission/transmission/issues/527
             return pex.port.host() == 1;
         };
 
