@@ -313,10 +313,7 @@ export class Inspector extends EventTarget {
       }
     }
 
-    setTextContent(
-      e.info.have,
-      string.includes('E2BIG') ? '...' : string
-    );
+    setTextContent(e.info.have, string.includes('E2BIG') ? '...' : string);
 
     // availability
     if (torrents.length === 0) {
