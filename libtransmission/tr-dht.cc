@@ -377,6 +377,19 @@ private:
         return std::chrono::seconds{ call_again_in_n_secs };
     }
 
+    static auto remove_bad_pex(std::vector<tr_pex>&& pex)
+    {
+        static constexpr auto is_bad_pex = [](tr_pex const& pex)
+        {
+            // paper over a bug in some DHT implementation
+            // that winds up with 1 for the port
+            return pex.port.host() == 1;
+        };
+
+        pex.erase(std::remove_if(std::begin(pex), std::end(pex), is_bad_pex), std::end(pex));
+        return pex;
+    }
+
     static void callback(void* vself, int event, unsigned char const* info_hash, void const* data, size_t data_len)
     {
         auto* const self = static_cast<tr_dht_impl*>(vself);
@@ -385,12 +398,12 @@ private:
 
         if (event == DHT_EVENT_VALUES)
         {
-            auto const pex = tr_pex::from_compact_ipv4(data, data_len, nullptr, 0);
+            auto const pex = remove_bad_pex(tr_pex::from_compact_ipv4(data, data_len, nullptr, 0));
             self->mediator_.addPex(hash, std::data(pex), std::size(pex));
         }
         else if (event == DHT_EVENT_VALUES6)
         {
-            auto const pex = tr_pex::from_compact_ipv6(data, data_len, nullptr, 0);
+            auto const pex = remove_bad_pex(tr_pex::from_compact_ipv6(data, data_len, nullptr, 0));
             self->mediator_.addPex(hash, std::data(pex), std::size(pex));
         }
     }
