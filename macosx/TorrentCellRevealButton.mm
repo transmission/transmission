@@ -19,7 +19,7 @@
     [self updateImage];
 }
 
-- (void)initTorrentTableView
+- (void)setupTorrentTableView
 {
     if (!self.torrentTableView)
     {
@@ -48,7 +48,7 @@
 - (void)mouseDown:(NSEvent*)event
 {
     //when filterbar is shown, we need to remove focus otherwise action fails
-    [[self window] makeFirstResponder:self.torrentTableView];
+    [self.window makeFirstResponder:self.torrentTableView];
 
     [super mouseDown:event];
     self.revealImageString = @"RevealOn";
@@ -57,7 +57,7 @@
 
 - (void)updateImage
 {
-    [self initTorrentTableView];
+    [self setupTorrentTableView];
 
     NSImage* revealImage = [NSImage imageNamed:self.revealImageString];
     self.image = revealImage;
@@ -67,10 +67,12 @@
 - (void)updateTrackingAreas
 {
     if (self.fTrackingArea != nil)
+    {
         [self removeTrackingArea:self.fTrackingArea];
+    }
 
-    int opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways);
-    self.fTrackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:opts owner:self userInfo:nil];
+    NSTrackingAreaOptions opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways);
+    self.fTrackingArea = [[NSTrackingArea alloc] initWithRect:self.bounds options:opts owner:self userInfo:nil];
     [self addTrackingArea:self.fTrackingArea];
 }
 

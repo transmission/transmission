@@ -8,8 +8,6 @@
 #import "Torrent.h"
 
 @implementation TorrentCell
-@synthesize fActionButton, fControlButton, fRevealButton, fIconView, fGroupIndicatorView, fTorrentTitleField,
-    fTorrentProgressField, fTorrentStatusField, fTorrentProgressBarView, fTorrentTableView;
 
 //draw progress bar
 - (void)drawRect:(NSRect)dirtyRect

@@ -4,6 +4,8 @@
 
 #import "ProgressBarView.h"
 #import "ProgressGradients.h"
+#import "TorrentTableView.h"
+#import "Torrent.h"
 
 static CGFloat const kPiecesTotalPercent = 0.6;
 static NSInteger const kMaxPieces = 18 * 18;

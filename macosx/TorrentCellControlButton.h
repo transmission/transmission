@@ -6,4 +6,6 @@
 
 @interface TorrentCellControlButton : NSButton
 
+- (void)resetImage;
+
 @end

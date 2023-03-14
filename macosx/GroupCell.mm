@@ -5,6 +5,5 @@
 #import "GroupCell.h"
 
 @implementation GroupCell
-@synthesize fGroupIndicatorView, fGroupTitleField, fGroupDownloadView, fGroupUploadAndRatioView, fGroupDownloadField, fGroupUploadAndRatioField;
 
 @end

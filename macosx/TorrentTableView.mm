@@ -176,12 +176,12 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             if (minimal)
             {
                 SmallTorrentCell* smallCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
-                [smallCell.fControlButton display];
+                [(TorrentCellControlButton*)smallCell.fControlButton resetImage];
             }
             else
             {
                 TorrentCell* torrentCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
-                [torrentCell.fControlButton display];
+                [(TorrentCellControlButton*)torrentCell.fControlButton resetImage];
             }
         }
     }];
@@ -413,11 +413,11 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         groupCell.fGroupDownloadField.stringValue = [NSString stringForSpeed:group.downloadRate];
         groupCell.fGroupDownloadView.image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
 
-        BOOL DisplayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
-        groupCell.fGroupDownloadField.hidden = DisplayGroupRowRatio;
-        groupCell.fGroupDownloadView.hidden = DisplayGroupRowRatio;
+        BOOL displayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
+        groupCell.fGroupDownloadField.hidden = displayGroupRowRatio;
+        groupCell.fGroupDownloadView.hidden = displayGroupRowRatio;
 
-        if (DisplayGroupRowRatio)
+        if (displayGroupRowRatio)
         {
             groupCell.fGroupUploadAndRatioView.image = [NSImage imageNamed:@"YingYangGroupTemplate"];
             groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
@@ -836,8 +836,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)toggleGroupRowRatio
 {
-    BOOL DisplayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
-    [self.fDefaults setBool:!DisplayGroupRowRatio forKey:@"DisplayGroupRowRatio"];
+    BOOL displayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
+    [self.fDefaults setBool:!displayGroupRowRatio forKey:@"DisplayGroupRowRatio"];
     [self reloadVisibleRows];
 }
 

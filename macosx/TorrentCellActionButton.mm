@@ -8,33 +8,28 @@
 
 @interface TorrentCellActionButton ()
 @property(nonatomic) NSTrackingArea* fTrackingArea;
-@property(nonatomic) NSImage* fImg;
-@property(nonatomic) NSImage* fAltImg;
+@property(nonatomic) NSImage* fImage;
+@property(nonatomic) NSImage* fAlternativeImage;
 @property(nonatomic) TorrentTableView* torrentTableView;
-@property(nonatomic, readonly) NSUserDefaults* fDefaults;
+@property(nonatomic) NSUserDefaults* fDefaults;
 @end
 
 @implementation TorrentCellActionButton
 
 - (void)awakeFromNib
 {
-    _fDefaults = NSUserDefaults.standardUserDefaults;
-    self.fImg = self.image;
+    self.fDefaults = NSUserDefaults.standardUserDefaults;
+    self.fImage = self.image;
 
     // hide image by default and show only on hover
-    self.fAltImg = [[NSImage alloc] init];
-    self.image = self.fAltImg;
+    self.fAlternativeImage = [[NSImage alloc] init];
+    self.image = self.fAlternativeImage;
 
     // disable button click highlighting
     [self.cell setHighlightsBy:NSNoCellMask];
 }
 
-- (void)display
-{
-    [super display];
-}
-
-- (void)initTorrentTableView
+- (void)setupTorrentTableView
 {
     if (!self.torrentTableView)
     {
@@ -46,9 +41,9 @@
 {
     [super mouseEntered:event];
 
-    self.image = self.fImg;
+    self.image = self.fImage;
 
-    [self initTorrentTableView];
+    [self setupTorrentTableView];
     [self.torrentTableView hoverEventBeganForView:self];
 }
 
@@ -56,23 +51,23 @@
 {
     [super mouseExited:event];
 
-    self.image = self.fAltImg;
+    self.image = self.fAlternativeImage;
 
-    [self initTorrentTableView];
+    [self setupTorrentTableView];
     [self.torrentTableView hoverEventEndedForView:self];
 }
 
 - (void)mouseDown:(NSEvent*)event
 {
     //when filterbar is shown, we need to remove focus otherwise action fails
-    [[self window] makeFirstResponder:self.torrentTableView];
+    [self.window makeFirstResponder:self.torrentTableView];
 
     [super mouseDown:event];
 
     BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
     if (!minimal)
     {
-        [self initTorrentTableView];
+        [self setupTorrentTableView];
         [self.torrentTableView hoverEventEndedForView:self];
     }
 }
@@ -80,10 +75,12 @@
 - (void)updateTrackingAreas
 {
     if (self.fTrackingArea != nil)
+    {
         [self removeTrackingArea:self.fTrackingArea];
+    }
 
-    int opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways);
-    self.fTrackingArea = [[NSTrackingArea alloc] initWithRect:[self bounds] options:opts owner:self userInfo:nil];
+    NSTrackingAreaOptions opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways);
+    self.fTrackingArea = [[NSTrackingArea alloc] initWithRect:self.bounds options:opts owner:self userInfo:nil];
     [self addTrackingArea:self.fTrackingArea];
 }
 

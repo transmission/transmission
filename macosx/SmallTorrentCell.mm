@@ -5,6 +5,7 @@
 #import "SmallTorrentCell.h"
 #import "ProgressBarView.h"
 #import "ProgressGradients.h"
+#import "TorrentTableView.h"
 #import "Torrent.h"
 
 @interface SmallTorrentCell ()
@@ -12,8 +13,6 @@
 @end
 
 @implementation SmallTorrentCell
-@synthesize fActionButton, fControlButton, fRevealButton, fIconView, fGroupIndicatorView, fTorrentTitleField,
-    fTorrentStatusField, fTorrentProgressBarView, fTorrentTableView;
 
 //draw progress bar
 - (void)drawRect:(NSRect)dirtyRect
@@ -42,7 +41,7 @@
     [super mouseEntered:event];
 
     NSPoint mouseLocation = [self convertPoint:[event locationInWindow] fromView:nil];
-    if (NSPointInRect(mouseLocation, [self.fTrackingArea rect]))
+    if (NSPointInRect(mouseLocation, self.fTrackingArea.rect))
     {
         [self.fTorrentTableView hoverEventBeganForView:self];
     }
@@ -53,7 +52,7 @@
     [super mouseExited:event];
 
     NSPoint mouseLocation = [self convertPoint:[event locationInWindow] fromView:nil];
-    if (!NSPointInRect(mouseLocation, [self.fTrackingArea rect]))
+    if (!NSPointInRect(mouseLocation, self.fTrackingArea.rect))
     {
         [self.fTorrentTableView hoverEventEndedForView:self];
     }
@@ -68,21 +67,23 @@
 - (void)updateTrackingAreas
 {
     if (self.fTrackingArea != nil)
+    {
         [self removeTrackingArea:self.fTrackingArea];
+    }
 
     //tracking rect should not be entire row, but start at fGroupDownloadView
     NSRect titleRect = self.fTorrentTitleField.frame;
     CGFloat maxX = NSMaxX(titleRect);
-    NSRect rect = [self bounds];
+    NSRect rect = self.bounds;
     rect.origin.x = maxX;
 
-    int opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow);
+    NSTrackingAreaOptions opts = (NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow);
     self.fTrackingArea = [[NSTrackingArea alloc] initWithRect:rect options:opts owner:self userInfo:nil];
     [self addTrackingArea:self.fTrackingArea];
 
     //check to see if mouse is already within rect
-    NSPoint mouseLocation = [[self window] mouseLocationOutsideOfEventStream];
-    mouseLocation = [[self superview] convertPoint:mouseLocation fromView:nil];
+    NSPoint mouseLocation = [self.window mouseLocationOutsideOfEventStream];
+    mouseLocation = [self.superview convertPoint:mouseLocation fromView:nil];
 
     if (NSPointInRect(mouseLocation, rect))
     {

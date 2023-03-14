@@ -5,5 +5,4 @@
 #import <Cocoa/Cocoa.h>
 
 @interface TorrentCellRevealButton : NSButton
-
 @end
