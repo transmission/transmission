@@ -632,9 +632,6 @@ public:
 
     Handshakes outgoing_handshakes;
 
-    uint16_t interested_count = 0;
-    uint16_t max_peers = 0;
-
     mutable tr_swarm_stats stats = {};
 
     uint8_t optimistic_unchoke_time_scaler = 0;
@@ -1370,7 +1367,6 @@ void tr_peerMgrStartTorrent(tr_torrent* tor)
     tr_swarm* const swarm = tor->swarm;
 
     swarm->is_running = true;
-    swarm->max_peers = tor->peerLimit();
 
     swarm->manager->rechokeSoon();
 }
@@ -1678,7 +1674,7 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
 
 namespace
 {
-namespace rechoke_downloads_helpers
+namespace update_interest_helpers
 {
 /* does this peer have any pieces that we want? */
 [[nodiscard]] bool isPeerInteresting(
@@ -1706,204 +1702,35 @@ namespace rechoke_downloads_helpers
     return false;
 }
 
-enum tr_rechoke_state
+// determine which peers to show interest in
+void updateInterest(tr_swarm* swarm)
 {
-    RECHOKE_STATE_GOOD,
-    RECHOKE_STATE_UNTESTED,
-    RECHOKE_STATE_BAD
-};
-
-struct tr_rechoke_info
-{
-    tr_rechoke_info(tr_peerMsgs* peer_in, int rechoke_state_in, uint8_t salt_in)
-        : peer{ peer_in }
-        , rechoke_state{ rechoke_state_in }
-        , salt{ salt_in }
-    {
-    }
-
-    [[nodiscard]] constexpr auto compare(tr_rechoke_info const& that) const noexcept // <=>
-    {
-        if (this->rechoke_state != that.rechoke_state)
-        {
-            return this->rechoke_state - that.rechoke_state;
-        }
-
-        if (this->salt != that.salt)
-        {
-            return this->salt < that.salt ? -1 : 1;
-        }
-
-        return 0;
-    }
-
-    [[nodiscard]] constexpr auto operator<(tr_rechoke_info const& that) const noexcept
-    {
-        return compare(that) < 0;
-    }
-
-    tr_peerMsgs* peer;
-    int rechoke_state;
-    uint8_t salt;
-};
-
-/* determines who we send "interested" messages to */
-void rechokeDownloads(tr_swarm* s)
-{
-    static auto constexpr MinInterestingPeers = uint16_t{ 5 };
-
-    auto const peer_count = s->peerCount();
-    auto const& peers = s->peers;
-    auto const now = tr_time();
-
-    uint16_t max_peers = 0;
-    auto rechoke = std::vector<tr_rechoke_info>{};
-    auto salter = tr_salt_shaker{};
-
-    /* some cases where this function isn't necessary */
-    if (s->tor->isDone() || !s->tor->clientCanDownload())
+    // sometimes this function isn't necessary
+    auto const* const tor = swarm->tor;
+    if (tor->isDone() || !tor->clientCanDownload())
     {
         return;
     }
 
-    /* decide HOW MANY peers to be interested in */
+    if (auto const peer_count = swarm->peerCount(); peer_count > 0)
     {
-        int blocks = 0;
-        int cancels = 0;
-
-        /* Count up how many blocks & cancels each peer has.
-         *
-         * There are two situations where we send out cancels --
-         *
-         * 1. We've got unresponsive peers, which is handled by deciding
-         *    -which- peers to be interested in.
-         *
-         * 2. We've hit our bandwidth cap, which is handled by deciding
-         *    -how many- peers to be interested in.
-         *
-         * We're working on 2. here, so we need to ignore unresponsive
-         * peers in our calculations lest they confuse Transmission into
-         * thinking it's hit its bandwidth cap.
-         */
-        for (auto const* const peer : peers)
-        {
-            auto const b = peer->blocks_sent_to_client.count(now, CancelHistorySec);
-
-            if (b == 0) /* ignore unresponsive peers, as described above */
-            {
-                continue;
-            }
-
-            blocks += b;
-            cancels += peer->cancels_sent_to_peer.count(now, CancelHistorySec);
-        }
-
-        if (cancels > 0)
-        {
-            /* cancel_rate: of the block requests we've recently made, the percentage we cancelled.
-             * higher values indicate more congestion. */
-            double const cancel_rate = cancels / (double)(cancels + blocks);
-            double const mult = 1 - std::min(cancel_rate, 0.5);
-            max_peers = s->interested_count * mult;
-            tr_logAddTraceSwarm(
-                s,
-                fmt::format(
-                    "cancel rate is {} -- reducing the number of peers we're interested in by {} percent",
-                    cancel_rate,
-                    mult * 100));
-            s->lastCancel = now;
-        }
-
-        time_t const time_since_cancel = now - s->lastCancel;
-
-        if (time_since_cancel != 0)
-        {
-            int const max_increase = 15;
-            time_t const max_history = 2 * CancelHistorySec;
-            double const mult = std::min(time_since_cancel, max_history) / static_cast<double>(max_history);
-            int const inc = max_increase * mult;
-            max_peers = s->max_peers + inc;
-            tr_logAddTraceSwarm(
-                s,
-                fmt::format(
-                    "time since last cancel is {} -- increasing the number of peers we're interested in by {}",
-                    time_since_cancel,
-                    inc));
-        }
-    }
-
-    /* don't let the previous section's number tweaking go too far... */
-    max_peers = std::clamp(max_peers, MinInterestingPeers, s->tor->peerLimit());
-
-    s->max_peers = max_peers;
-
-    if (peer_count > 0)
-    {
-        rechoke.reserve(peer_count);
-
-        auto const* const tor = s->tor;
         int const n = tor->pieceCount();
 
-        /* build a bitfield of interesting pieces... */
+        // build a bitfield of interesting pieces...
         auto piece_is_interesting = std::vector<bool>{};
         piece_is_interesting.resize(n);
-
         for (int i = 0; i < n; ++i)
         {
             piece_is_interesting[i] = tor->pieceIsWanted(i) && !tor->hasPiece(i);
         }
 
-        /* decide WHICH peers to be interested in (based on their cancel-to-block ratio) */
-        for (auto* const peer : peers)
+        for (auto* const peer : swarm->peers)
         {
-            if (!isPeerInteresting(s->tor, piece_is_interesting, peer))
-            {
-                peer->set_interested(false);
-            }
-            else
-            {
-                auto rechoke_state = tr_rechoke_state{};
-                auto const blocks = peer->blocks_sent_to_client.count(now, CancelHistorySec);
-                auto const cancels = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
-
-                if (blocks == 0 && cancels == 0)
-                {
-                    rechoke_state = RECHOKE_STATE_UNTESTED;
-                }
-                else if (cancels == 0)
-                {
-                    rechoke_state = RECHOKE_STATE_GOOD;
-                }
-                else if (blocks == 0)
-                {
-                    rechoke_state = RECHOKE_STATE_BAD;
-                }
-                else if (cancels * 10 < blocks)
-                {
-                    rechoke_state = RECHOKE_STATE_GOOD;
-                }
-                else
-                {
-                    rechoke_state = RECHOKE_STATE_BAD;
-                }
-
-                rechoke.emplace_back(peer, rechoke_state, salter());
-            }
+            peer->set_interested(isPeerInteresting(tor, piece_is_interesting, peer));
         }
     }
-
-    std::sort(std::begin(rechoke), std::end(rechoke));
-
-    /* now that we know which & how many peers to be interested in... update the peer interest */
-
-    s->interested_count = std::min(max_peers, static_cast<uint16_t>(std::size(rechoke)));
-
-    for (size_t i = 0, n = std::size(rechoke); i < n; ++i)
-    {
-        rechoke[i].peer->set_interested(i < s->interested_count);
-    }
 }
-} // namespace rechoke_downloads_helpers
+} // namespace update_interest_helpers
 } // namespace
 
 // ---
@@ -2099,7 +1926,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 
 void tr_peerMgr::rechokePulse() const
 {
-    using namespace rechoke_downloads_helpers;
+    using namespace update_interest_helpers;
     using namespace rechoke_uploads_helpers;
 
     auto const lock = unique_lock();
@@ -2118,7 +1945,7 @@ void tr_peerMgr::rechokePulse() const
             if (auto* const swarm = tor->swarm; swarm->stats.peer_count > 0)
             {
                 rechokeUploads(swarm, now);
-                rechokeDownloads(swarm);
+                updateInterest(swarm);
             }
         }
     }

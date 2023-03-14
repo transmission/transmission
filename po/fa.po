@@ -4,18 +4,18 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2018
 # Kurumi Tokisaki <amiryeganeh5683yeg@gmail.com>, 2020
-# Danial Behzadi <dani.behzi@ubuntu.com>, 2021
+# Danial Behzadi <dani.behzi@ubuntu.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 20:00+0000\n"
+"POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>, 2021\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Persian (https://www.transifex.com/transmissionbt/teams/33778/fa/)\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
@@ -51,55 +51,55 @@ msgstr ""
 msgid "Couldn't parse log level '{level}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:645
+#: ../daemon/daemon.cc:651
 msgid "Deferring reload until session is fully started."
 msgstr ""
 
-#: ../daemon/daemon.cc:660
+#: ../daemon/daemon.cc:666
 msgid "Reloading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:696
+#: ../daemon/daemon.cc:702
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:709
+#: ../daemon/daemon.cc:715
 msgid "Loading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:729
+#: ../daemon/daemon.cc:735
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:735 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1167 ../libtransmission/torrent.cc:2178 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1175 ../libtransmission/torrent.cc:2164 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:745
+#: ../daemon/daemon.cc:751
 msgid "Requiring authentication"
 msgstr ""
 
-#: ../daemon/daemon.cc:766
+#: ../daemon/daemon.cc:772
 msgid "Watching '{path}' for new torrent files"
 msgstr ""
 
-#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:816 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:826 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:834
+#: ../daemon/daemon.cc:840
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:393
+#: ../gtk/Application.cc:394
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:550
+#: ../gtk/Application.cc:551
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
@@ -139,18 +139,18 @@ msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "نمی‌توان تورنت‌های تکراری را افزود"
 msgstr[1] "نمی‌توان تورنت‌های تکراری را افزود"
 
-#: ../gtk/Application.cc:1415
+#: ../gtk/Application.cc:1413
 msgid "A fast and easy BitTorrent client"
 msgstr "یک کارخواه بیت‌تورنت سریع و آسان"
 
-#: ../gtk/Application.cc:1416
+#: ../gtk/Application.cc:1414
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1422
+#: ../gtk/Application.cc:1420
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -181,7 +181,7 @@ msgstr "دانه دادن بدون توجّه به فعّالیت"
 msgid "Stop seeding if idle for N minutes:"
 msgstr "پایان دانه‌دهی درصورت غیرفعّال بودن برای N دقیقه:"
 
-#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:325
+#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:327
 msgid "Queued for verification"
 msgstr "در صف وارسی"
 
@@ -189,7 +189,7 @@ msgstr "در صف وارسی"
 msgid "Verifying local data"
 msgstr "در حال وارسی داده‌های محلّی"
 
-#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:328
+#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:330
 msgid "Queued for download"
 msgstr "در صف بارگیری"
 
@@ -198,7 +198,7 @@ msgctxt "Verb"
 msgid "Downloading"
 msgstr "در حال بارگیری"
 
-#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:331
+#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
 msgid "Queued for seeding"
 msgstr "در صف دانه‌دهی"
 
@@ -207,11 +207,11 @@ msgctxt "Verb"
 msgid "Seeding"
 msgstr "در حال دانه‌دهی"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:324
 msgid "Finished"
 msgstr "پایان یافت"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:324
 msgid "Paused"
 msgstr "مکث شده"
 
@@ -496,18 +496,16 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "برداشتن %Id تورنت؟"
-msgstr[1] "برداشتن %Id تورنت؟"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "حذف پرونده‌های بارگیری شدهٔ این %Id تورنت؟"
-msgstr[1] "حذف پرونده‌های بارگیری شدهٔ این %Id تورنت؟"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -667,7 +665,7 @@ msgstr "جابه‌جایی کل"
 msgid "Session Transfer"
 msgstr "جابه‌جایی نشست"
 
-#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:344
+#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:346
 msgid "Ratio: {ratio}"
 msgstr ""
 
@@ -685,7 +683,7 @@ msgstr ""
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:467
+#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:469
 msgid "{upload_speed} ▲"
 msgstr ""
 
@@ -916,83 +914,83 @@ msgstr "این آمار تنها برای آگاهی شماست. بازنشان�
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr ""
 
-#: ../gtk/Torrent.cc:336
+#: ../gtk/Torrent.cc:338
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:363
+#: ../gtk/Torrent.cc:365
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:373
+#: ../gtk/Torrent.cc:375
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:385
+#: ../gtk/Torrent.cc:387
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:395
+#: ../gtk/Torrent.cc:397
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:404
+#: ../gtk/Torrent.cc:406
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:417
+#: ../gtk/Torrent.cc:419
 msgid "Remaining time unknown"
 msgstr "زمان مانده نامشخّص"
 
-#: ../gtk/Torrent.cc:460
+#: ../gtk/Torrent.cc:462
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/Torrent.cc:472
+#: ../gtk/Torrent.cc:474
 msgid "Stalled"
 msgstr "به گل نشسته"
 
-#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:2227
+#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2213
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:486
+#: ../gtk/Torrent.cc:488
 msgid "Tracker Error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:489
+#: ../gtk/Torrent.cc:491
 msgid "Local error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:513
+#: ../gtk/Torrent.cc:515
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:524
+#: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:535
+#: ../gtk/Torrent.cc:537
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:543
+#: ../gtk/Torrent.cc:545
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:552
+#: ../gtk/Torrent.cc:554
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
@@ -1162,16 +1160,16 @@ msgstr ""
 msgid "Couldn't open '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
+#: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:753
+#: ../gtk/Utils.cc:760
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:758
+#: ../gtk/Utils.cc:765
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
@@ -1778,7 +1776,7 @@ msgstr "در روزهای:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
 msgid "_to"
-msgstr ""
+msgstr "به"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
 msgctxt "Gerund"
@@ -2113,11 +2111,11 @@ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1345
+#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1349
 msgid "Could not connect to tracker"
 msgstr "نمی‌توان به ردیاب وصل شد"
 
-#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1349
+#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1353
 msgid "Tracker did not respond"
 msgstr "ردیاب پاسخ نداد"
 
@@ -2148,7 +2146,7 @@ msgstr ""
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/log.cc:290
+#: ../libtransmission/log.cc:300
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr ""
 
@@ -2342,19 +2340,19 @@ msgstr ""
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:1381
+#: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/torrent-magnet.cc:332
+#: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/torrent-metainfo.cc:676
+#: ../libtransmission/torrent-metainfo.cc:699
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2366,35 +2364,35 @@ msgstr ""
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:491
+#: ../libtransmission/torrent.cc:492
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:500
+#: ../libtransmission/torrent.cc:501
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:552
+#: ../libtransmission/torrent.cc:553
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:559
+#: ../libtransmission/torrent.cc:560
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:877
+#: ../libtransmission/torrent.cc:876
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:900
+#: ../libtransmission/torrent.cc:902
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:965
+#: ../libtransmission/torrent.cc:956
 msgid "Removing torrent"
 msgstr "برداشتن تورنت"
 
-#: ../libtransmission/torrent.cc:1295 ../libtransmission/torrent.cc:2354
+#: ../libtransmission/torrent.cc:1284 ../libtransmission/torrent.cc:2340
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -2483,7 +2481,7 @@ msgstr ""
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr ""
 
-#: ../libtransmission/web.cc:446
+#: ../libtransmission/web.cc:448
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 
@@ -2522,513 +2520,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#, c-format
-#~ msgid " (Limit: %s)"
-#~ msgstr "(کران: %s)"
-
-#~ msgid " _to "
-#~ msgstr " به "
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "ویژگی‌های %'Id تورنت"
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'Id روز"
-#~ msgstr[1] "%'Id روز"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'Id ساعت"
-#~ msgstr[1] "%'Id ساعت"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'Id دقیقه"
-#~ msgstr[1] "%'Id دقیقه"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'Id ثانیه"
-#~ msgstr[1] "%'Id ثانیه"
-
-#, c-format
-#~ msgid "%1$s  %2$s"
-#~ msgstr "%1$s %2$s"
-
-#, c-format
-#~ msgid "%1$s %2$s  %3$s %4$s"
-#~ msgstr "%1$s %2$s %3$s %4$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'dقطعه @ %3$s)"
-#~ msgstr[1] "%1$s (%2$'dقطعه @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d قطعه)"
-#~ msgstr[1] "%1$s (%2$'d قطعه)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% از %3$s%% موجود است)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (%2$s%% از %3$s%% موجود است); %4$s وارسی نشده"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s آسیب دیده)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "%1$s پیش"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%1$s از %2$s (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr "%1$s از %2$s (%3$s%%), بارگذاری شده %4$s (نسبت: %5$s هدف: %6$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%1$s از %2$s (%3$s%%), بارگذاری شده %4$s (نسبت: %5$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-#~ msgstr "%1$s, بارگذاری شده %2$s (نسبت: %3$s هدف: %4$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s، بارگذاری شده %2$s (نسبت: %3$s)"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "«%s --help» را برای دیدن تمام گزینه‌های خط فرمان اجرا کنید.\n"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (نسبت: %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - افزودن ردیاب"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - ویرایش ردیاب‌ها"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "ویژگی‌‌های %s"
-
-#, c-format
-#~ msgid "%s free"
-#~ msgstr "%s آزاد"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%sI مانده"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>در حال بستن اتّصال‌ها</b>"
-
-#~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>ناتوانی در به‌روز رسانی.</b>"
-
-#~ msgid "<b>Update succeeded!</b>"
-#~ msgstr "<b>به‌روز رسانی موفّق بود!</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>هیچ مبدأیی گزیده نشده</i>"
-
-#~ msgid "<i>Testing TCP port…</i>"
-#~ msgstr "<i>بررسی درگاه TCP…</i>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "درخواست برای جفت‌های بیش‌تر در %Is"
-
-#, c-format
-#~ msgid "Asking for more peers now… <small>%s</small>"
-#~ msgstr "در حال درخواست برای جفت‌های بیش‌تر… <small>%Is</small>"
-
-#, c-format
-#~ msgid "Asking for peer counts in %s"
-#~ msgstr "درخواست برای جفت‌های بیش‌تر در %Is"
-
-#, c-format
-#~ msgid "Asking for peer counts now… <small>%s</small>"
-#~ msgstr "در حال درخواست برای جفت‌شماری… <small>%Is</small>"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" contains %zu entries"
-#~ msgstr "فهرست انسداد %s دارای %zu ورودی است"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" updated with %zu entries"
-#~ msgstr "فهرست انسداد %s با %zu ورودی به‌روز شد"
-
-#, c-format
-#~ msgid "Blocklist contains %'d rule"
-#~ msgid_plural "Blocklist contains %'d rules"
-#~ msgstr[0] "فهرست انسداد دارای %'Id قانون است"
-#~ msgstr[1] "فهرست انسداد دارای %'Id قانون است"
-
-#, c-format
-#~ msgid "Blocklist has %'d rule."
-#~ msgid_plural "Blocklist has %'d rules."
-#~ msgstr[0] "فهرست انسداد %'Id قانون دارد"
-#~ msgstr[1] "فهرست انسداد %'Id قانون دارد"
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "فراخوانی کدنویسه هنگام کامل شدن تورنت:"
-
-#~ msgid "Cancelled"
-#~ msgstr "لغو شد"
-
-#~ msgid "Complete"
-#~ msgstr "کامل"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "حق رونوشت (c) پروژهٔ ترنسمیشن"
-
-#, c-format
-#~ msgid "Couldn't inhibit desktop hibernation: %s"
-#~ msgstr "نمی‌توان از خواب زمستانی میزکار جلوگیری کرد: %s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "نمی‌توان «%1$s» را خواند: %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "نمی‌توان %s را خواند: %s"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "نمی‌توان «%s» را ذخیره کرد"
-
-#, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "نمی‌توان پروندهٔ موقّتی %1$s را ذخیره کرد: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "ایجاد بک تورنت"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "«%s» ایجاد شد!"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "ایجاد شده توسّط %1$s"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "ایجاد شده توسّط %1$s در %2$s"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "ایجاد شده در %1$s"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "درحال ایجاد «%s»"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "جست‌وجوی ساناد شکست خورد: %s"
-
-#~ msgid "Debug"
-#~ msgstr "اشکال‌زدایی"
-
-#, c-format
-#~ msgid "Do_wnload (%s):"
-#~ msgstr "بارگیری (%Is):"
-
-#~ msgid "Done"
-#~ msgstr "انجام شده"
-
-#, c-format
-#~ msgid "Down: %1$s, Up: %2$s"
-#~ msgstr "پایین: %1$s, بالا: %2$s"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "فعّال کردن _uTP برای ارتباط با جفت"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "خطا در گشودن تورنت"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "خطا در خواندن «%s»: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "خطا در استخراج فهرست انسداد: %s (%d)"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "خطا در نوشتن «%s»: %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "خطا: %s"
-
-#, c-format
-#~ msgid "Error: invalid announce URL \"%s\""
-#~ msgstr "خطا: نشانی اینترنی اعلام شدهٔ نامعتبر «%s»"
-
-#~ msgid "Friday"
-#~ msgstr "آدینه"
-
-#, c-format
-#~ msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-#~ msgstr "%3$s %4$s پیش لیستی از %1$s%2$'d اتصال گرفته شد"
-
-#, c-format
-#~ msgid "Got a scrape error \"%s%s%s\" %s ago"
-#~ msgstr "خطایی گرفتیم «%s%s%s» %s پیش"
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "خطایی رخ داد %1$s\"%2$s\"%3$s %4$s پیش"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "سیگنال %Id گرفته شد: در حال تلاش برای بستن تمیز. اگر گیر کرد، دوباره انجامش دهید."
-
-#~ msgid "Idle"
-#~ msgstr "بی‌کار"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "کران سرعت بارگیری ()%s:"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "کران سرعت بارگذاری ()%s:"
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr "انتقایل پروندهٔ torrent. به زباله‌دان"
-
-#~ msgid "Monday"
-#~ msgstr "دوشنبه"
-
-#, c-format
-#~ msgid "Moving \"%s\""
-#~ msgstr "در حال جابه‌جایی «%s»"
-
-#~ msgid "Not a regular file"
-#~ msgstr "یک پروندهٔ عادی نیست"
-
-#, c-format
-#~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-#~ msgstr "مهلت درخواست فهرست جفت‌ها %1$s تمام شد %2$s %3$s پیش؛ دوباره تلاش می‌کنیم"
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "درگاه %d با موفّقیت منتقل شد"
-
-#, c-format
-#~ msgid "Port %d isn't forwarded"
-#~ msgstr "در گاه %d منتقل نشده است"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "انتقال درگاه"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "انتقال درگاه (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "انتقال درگاه (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "انتقال درگاه با موفّقیت انجام شد"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "درگاه <b>بسته</b> است"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "درگاه <b>گشوده</b> است"
-
-#~ msgid "Present Main Window"
-#~ msgstr "ارائهٔ پنجرهٔ اصلی"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "نسبت: %Is"
-
-#~ msgid "Saturday"
-#~ msgstr "شنبه"
-
-#, c-format
-#~ msgid "Saved \"%s\""
-#~ msgstr "«%s» ذخیره شد"
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "%Is پویش شد"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "در حال دانه‌دهی به %1$'Id از %2$'Id جفت وصل‌شده"
-#~ msgstr[1] "در حال دانه‌دهی به %1$'Id از %2$'Id جفت وصل‌شده"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "نمایش گفت‌وگوی انتخاب‌ها"
-
-#, c-format
-#~ msgid "Skipping unknown torrent \"%s\""
-#~ msgstr "پرش از تورنت ناشناس«%s»"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "%'Id بار آغاز شده"
-#~ msgstr[1] "%'Id بار آغاز شده"
-
-#, c-format
-#~ msgid "Stop at Ratio (%s)"
-#~ msgstr "توقّف در نسبت (%Is)"
-
-#~ msgid "Stopped"
-#~ msgstr "متوقّف"
-
-#~ msgid "Sunday"
-#~ msgstr "یک‌شنبه"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "پروندهٔ تورنت «%s» شامل داده‌های نامعتبر است"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "پروندهٔ تورنت «%s» با خطایی ناشناخته روبه‌رو شد."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "به نظر می‌رسد پیوند مغناطیسی برای چیزی غیر از بیت‌تورنت در نظر گرفته شده. پیوندهای مغناطیسی بیت‌تورنت بخشی شامل «%s» دارند."
-
-#~ msgid "Thursday"
-#~ msgstr "پنج‌شنبه"
-
-#~ msgid ""
-#~ "To add a backup URL, add it on the line after the primary URL.\n"
-#~ "To add another primary URL, add it after a blank line."
-#~ msgstr ""
-#~ "برای افزودن یک نشانی اینترنتی پشتیبان، آن را به خط پس از نشانی اینترنی اصلی بیفزایید.\n"
-#~ "برای افزودن یک نشانی اینترنی اصلی دیگر، آن را پس از یک خطّ خالی بیفزایید."
-
-#, c-format
-#~ msgid "Tracker gave a warning: \"%s\""
-#~ msgstr "ردیاب خطایی داد: «%s»"
-
-#, c-format
-#~ msgid "Tracker gave an error: \"%s\""
-#~ msgstr "ردیاب خطایی داد: «%s»"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "ردیاب‌ها اجازهٔ پرس‌وجو خواهند داد در %Is"
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "ترنسمیشن\n"
-#~ "بالا: %1$s %2$s\n"
-#~ "پایین: %3$s %4$s"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "ترنسمیشن نمی‌داند چه‌گونه از «%s» استفاده کند"
-
-#~ msgid "Tuesday"
-#~ msgstr "سه‌شنبه"
-
-#, c-format
-#~ msgid "U_pload (%s):"
-#~ msgstr "بارگذاری (%Is):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "ناتوان در تجزیهٔ محتوای پرونده"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "نشانی اینترنتی شناخته نشده"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "به‌روز رسانی فهرست انسداد"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "در حال وارسی دادهٔ محلّی (%.1f%% آزموده شده)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "صحت‌سنجی تورنت"
-
-#~ msgid "Wednesday"
-#~ msgstr "چهارشنبه"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "بارگیری (%Is):"
-
-#, c-format
-#~ msgid "_Show %'d of:"
-#~ msgstr "_نمایش %'Id از:"
-
-#, c-format
-#~ msgid "_Upload (%s):"
-#~ msgstr "بارگذاری (%Is):"
-
-#, c-format
-#~ msgid "blocklist skipped invalid address at line %d"
-#~ msgstr "فهرست انسداد از نشانی‌های نامعتبر در خط %d پرید"
-
-#~ msgid "full"
-#~ msgstr "پر"
-
-#~ msgid "peer"
-#~ msgid_plural "peers"
-#~ msgstr[0] "جفت"
-#~ msgstr[1] "جفت‌ها"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "اندازه|پایین: %1$s، بالا: %2$s"
-
-#~ msgid "sparse"
-#~ msgstr "تنک"
-
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "‫uTP ابزاری برای کاهش فزونی شبکه است."
-
-#~ msgid "web seed"
-#~ msgid_plural "web seeds"
-#~ msgstr[0] "دانهٔ وب"
-#~ msgstr[1] "دانه‌های وب"

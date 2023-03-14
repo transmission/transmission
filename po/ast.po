@@ -4,16 +4,16 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 20:00+0000\n"
+"POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Asturian (https://www.transifex.com/transmissionbt/teams/33778/ast/)\n"
 "Language: ast\n"
 "MIME-Version: 1.0\n"
@@ -49,55 +49,55 @@ msgstr ""
 msgid "Couldn't parse log level '{level}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:645
+#: ../daemon/daemon.cc:651
 msgid "Deferring reload until session is fully started."
 msgstr ""
 
-#: ../daemon/daemon.cc:660
+#: ../daemon/daemon.cc:666
 msgid "Reloading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:696
+#: ../daemon/daemon.cc:702
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:709
+#: ../daemon/daemon.cc:715
 msgid "Loading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:729
+#: ../daemon/daemon.cc:735
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:735 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1167 ../libtransmission/torrent.cc:2178 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1175 ../libtransmission/torrent.cc:2164 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:745
+#: ../daemon/daemon.cc:751
 msgid "Requiring authentication"
 msgstr ""
 
-#: ../daemon/daemon.cc:766
+#: ../daemon/daemon.cc:772
 msgid "Watching '{path}' for new torrent files"
 msgstr ""
 
-#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:816 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:826 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:834
+#: ../daemon/daemon.cc:840
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:393
+#: ../gtk/Application.cc:394
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:550
+#: ../gtk/Application.cc:551
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
@@ -137,18 +137,18 @@ msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Nun puede amestase torrent duplicáu"
 msgstr[1] "Nun pueden amestase torrents duplicaos"
 
-#: ../gtk/Application.cc:1415
+#: ../gtk/Application.cc:1413
 msgid "A fast and easy BitTorrent client"
 msgstr "Un veceru BitTorrent rápidu y cenciellu"
 
-#: ../gtk/Application.cc:1416
+#: ../gtk/Application.cc:1414
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1422
+#: ../gtk/Application.cc:1420
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -179,7 +179,7 @@ msgstr "Compartir ensin tener en cuenta l'actividá"
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Detener la compartición si ta inactivu durante N minutos:"
 
-#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:325
+#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:327
 msgid "Queued for verification"
 msgstr "En cola pa verificación"
 
@@ -187,7 +187,7 @@ msgstr "En cola pa verificación"
 msgid "Verifying local data"
 msgstr "Verificando datos llocales"
 
-#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:328
+#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:330
 msgid "Queued for download"
 msgstr "Encoláu pa descargar"
 
@@ -196,7 +196,7 @@ msgctxt "Verb"
 msgid "Downloading"
 msgstr "Baxando"
 
-#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:331
+#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
 msgid "Queued for seeding"
 msgstr "En cola pa semáu"
 
@@ -205,11 +205,11 @@ msgctxt "Verb"
 msgid "Seeding"
 msgstr "Semando"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:324
 msgid "Finished"
 msgstr "Finaos"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:324
 msgid "Paused"
 msgstr "En posa"
 
@@ -494,18 +494,16 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "¿Desaniciar torrent?"
-msgstr[1] "¿Desaniciar %d torrents?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "¿Desaniciar los ficheros descargaos d'esti torrent?"
-msgstr[1] "¿Desaniciar los ficheros descargaos d'estos %d torrents?"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -665,7 +663,7 @@ msgstr "Trasferencia Total"
 msgid "Session Transfer"
 msgstr "Trasferencia Sesión"
 
-#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:344
+#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:346
 msgid "Ratio: {ratio}"
 msgstr ""
 
@@ -683,7 +681,7 @@ msgstr ""
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:467
+#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:469
 msgid "{upload_speed} ▲"
 msgstr ""
 
@@ -914,83 +912,83 @@ msgstr "Estes estadístiques son namái pa la to información. Reaniciales nun v
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr ""
 
-#: ../gtk/Torrent.cc:336
+#: ../gtk/Torrent.cc:338
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:363
+#: ../gtk/Torrent.cc:365
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:373
+#: ../gtk/Torrent.cc:375
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:385
+#: ../gtk/Torrent.cc:387
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:395
+#: ../gtk/Torrent.cc:397
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:404
+#: ../gtk/Torrent.cc:406
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:417
+#: ../gtk/Torrent.cc:419
 msgid "Remaining time unknown"
 msgstr "Tiempu restante desconocíu"
 
-#: ../gtk/Torrent.cc:460
+#: ../gtk/Torrent.cc:462
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/Torrent.cc:472
+#: ../gtk/Torrent.cc:474
 msgid "Stalled"
 msgstr "Atascáu"
 
-#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:2227
+#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2213
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:486
+#: ../gtk/Torrent.cc:488
 msgid "Tracker Error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:489
+#: ../gtk/Torrent.cc:491
 msgid "Local error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:513
+#: ../gtk/Torrent.cc:515
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:524
+#: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:535
+#: ../gtk/Torrent.cc:537
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:543
+#: ../gtk/Torrent.cc:545
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:552
+#: ../gtk/Torrent.cc:554
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
@@ -1160,16 +1158,16 @@ msgstr ""
 msgid "Couldn't open '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
+#: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:753
+#: ../gtk/Utils.cc:760
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:758
+#: ../gtk/Utils.cc:765
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
@@ -1776,7 +1774,7 @@ msgstr "L_os díes:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
 msgid "_to"
-msgstr ""
+msgstr "_a"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
 msgctxt "Gerund"
@@ -2111,11 +2109,11 @@ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1345
+#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1349
 msgid "Could not connect to tracker"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1349
+#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1353
 msgid "Tracker did not respond"
 msgstr ""
 
@@ -2146,7 +2144,7 @@ msgstr ""
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/log.cc:290
+#: ../libtransmission/log.cc:300
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr ""
 
@@ -2340,19 +2338,19 @@ msgstr ""
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:1381
+#: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/torrent-magnet.cc:332
+#: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/torrent-metainfo.cc:676
+#: ../libtransmission/torrent-metainfo.cc:699
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2364,35 +2362,35 @@ msgstr ""
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "¡Nun s'alcontraron datos! Asegúrate de que les tos unidaes tán coneutaes o usa «Afitar llocalización». Pa volver a baxalo, desanicia'l torrent y vuelvi a amestalu."
 
-#: ../libtransmission/torrent.cc:491
+#: ../libtransmission/torrent.cc:492
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:500
+#: ../libtransmission/torrent.cc:501
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:552
+#: ../libtransmission/torrent.cc:553
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:559
+#: ../libtransmission/torrent.cc:560
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:877
+#: ../libtransmission/torrent.cc:876
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Reanicióse de mou manual -- desactivando la rellación de compartición"
 
-#: ../libtransmission/torrent.cc:900
+#: ../libtransmission/torrent.cc:902
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:965
+#: ../libtransmission/torrent.cc:956
 msgid "Removing torrent"
 msgstr "Desaniciando torrent"
 
-#: ../libtransmission/torrent.cc:1295 ../libtransmission/torrent.cc:2354
+#: ../libtransmission/torrent.cc:1284 ../libtransmission/torrent.cc:2340
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -2481,7 +2479,7 @@ msgstr ""
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr ""
 
-#: ../libtransmission/web.cc:446
+#: ../libtransmission/web.cc:448
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 
@@ -2520,574 +2518,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
-
-#~ msgid " _to "
-#~ msgstr " _a "
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "Propiedáes del torrent %'d"
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d día"
-#~ msgstr[1] "%'d díes"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d hora"
-#~ msgstr[1] "%'d hores"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d minutu"
-#~ msgstr[1] "%'d minutos"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d segundu"
-#~ msgstr[1] "%'d segundos"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d parte @ %2$s"
-#~ msgstr[1] "%1$'d partes @ %2$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d parte @ %3$s)"
-#~ msgstr[1] "%1$s (%2$'d partes @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d parte)"
-#~ msgstr[1] "%1$s (%2$'d partes)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% de %3$s%% disponible)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (%2$s%% de %3$s%% disponible); %4$s ensin verificar"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s corruptu)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "fai %1$s"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%1$s de %2$s (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr "%1$s de %2$s (%3$s%%), xubíu %4$s (Proporción: %5$s Oxetivu: %6$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%1$s de %2$s (%3$s%%), xubíu %4$s (Proporción: %5$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-#~ msgstr "%1$s, xubío %2$s (Rellación: %3$s Oxetivu: %4$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s, xubío %2$s (Ratio: %3$s)"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s; %2$'d ficheru"
-#~ msgstr[1] "%1$s; %2$'d ficheros"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Executar '%s --help' pa ver una llista completa de les opciones de comandu disponibles.\n"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s Entamáu"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (Proporción: %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - Amestar rastrexador"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - Editar los rastrexadores"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "%s Propiedaes"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s restantes"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s fechos (%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>Zarrando Conexones</b>"
-
-#~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>Nun pudo anovase.</b>"
-
-#~ msgid "<b>Update succeeded!</b>"
-#~ msgstr "<b>¡Anovose con ésitu!</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>Non seleicionao fonte</i>"
-
-#~ msgid "<i>Testing TCP port…</i>"
-#~ msgstr "<i>Probando el puertu TCP…</i>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "Pidiendo más pares en %s"
-
-#, c-format
-#~ msgid "Asking for more peers now… <small>%s</small>"
-#~ msgstr "Pidiendo más pares agora… <small>%s</small>"
-
-#, c-format
-#~ msgid "Asking for peer counts in %s"
-#~ msgstr "Entrugando por contéu de pares en %s"
-
-#, c-format
-#~ msgid "Asking for peer counts now… <small>%s</small>"
-#~ msgstr "Pidiendo recuentu de pares agora… <small>%s</small>"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" contains %zu entries"
-#~ msgstr "La llista de bloquéu «%s» contién %zu entraes"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" updated with %zu entries"
-#~ msgstr "Llista prieta «%s» anovada con %zu entraes"
-
-#, c-format
-#~ msgid "Blocklist contains %'d rule"
-#~ msgid_plural "Blocklist contains %'d rules"
-#~ msgstr[0] "La llista de bloquéu contién %'d regla"
-#~ msgstr[1] "La llista de bloquéu contién %'d regles"
-
-#, c-format
-#~ msgid "Blocklist has %'d rule."
-#~ msgid_plural "Blocklist has %'d rules."
-#~ msgstr[0] "La llista de bloquéu tien %'d regla"
-#~ msgstr[1] "La llista de bloquéu tien %'d regles"
-
-#~ msgid "Cancelled"
-#~ msgstr "Encaboxáu"
-
-#~ msgid "Complete"
-#~ msgstr "Completáu"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s"
-#~ msgstr "Nun puede coneutase col puertu %d en %s: %s"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s (%s)"
-#~ msgstr "Nun pudo vinculase al puertu %d en %s: %s (%s)"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "Nun puede crease \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "Nun pudó crease socket: %s"
-
-#, c-format
-#~ msgid "Couldn't inhibit desktop hibernation: %s"
-#~ msgstr "Nun pue inhibise la hibernación del escritoriu: %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "Nun puede abrise \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "Nun puede lleese \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "Nun pue lleese «%s»: %s"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "Nun puede guardase «%s»"
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "Nun puede guardase ficheru \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Nun pudo guardase'l ficheru temporal «%1$s»: %2$s"
-
-#, c-format
-#~ msgid "Couldn't truncate \"%1$s\": %2$s"
-#~ msgstr "Nun pudo interrumpise «%1$s»: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Crear un torrent"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "¡«%s» creáu!"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "Creáu por %1$s"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "Creáu por %1$s en %2$s"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "Creáu en %1$s"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "Creando \"%s\""
-
-#~ msgid "Debug"
-#~ msgstr "Depurar"
-
-#, c-format
-#~ msgid "Do_wnload (%s):"
-#~ msgstr "Des_cargar (%s):"
-
-#~ msgid "Done"
-#~ msgstr "Fecho"
-
-#, c-format
-#~ msgid "Down: %1$s, Up: %2$s"
-#~ msgstr "Baxada: %1$s, Xuba: %2$s"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Activar _uTP pa la comunicación colos pares"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "Error abriendo torrent"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "Fallu al lleer «%s»: %s"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "Fallu al escribir «%s»: %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "Fallu: %s"
-
-#, c-format
-#~ msgid "Error: invalid announce URL \"%s\""
-#~ msgstr "Fallu: URL d'anunciu incorreuta «%s»"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Ficheru \"%s\" ta nel camín"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "Atopáu Preseu Gateway Internet \"%s\""
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "Atopada direición pública \"%s\""
-
-#~ msgid "Friday"
-#~ msgstr "Vienres"
-
-#, c-format
-#~ msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-#~ msgstr "Obtúvose una llista de %1$s%2$'d pares fai %3$s %4$s"
-
-#, c-format
-#~ msgid "Got a scrape error \"%s%s%s\" %s ago"
-#~ msgstr "Obtúvose un fallu de raspiáu \"%s%s%s\" fai %s"
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "Obtuvo un fallu fai %1$s\"%2$s\"%3$s %4$s"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Obtúvose la señal %d; y ta intentándose detenela llimpiamente. Vuelvi a facelo si se bloquia."
-
-#~ msgid "Idle"
-#~ msgstr "N'espera"
-
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Entrada de metadatos \"%s\" nun válida"
-
-#~ msgid "Is another copy of Transmission already running?"
-#~ msgstr "¿Hai otra copia de Transmission executándose yá?"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "Llimitar la velocidá de _descarga (%s):"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "Llímitar la velocidá de x_uba (%s):"
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "Cargaos %d torrents"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "Direición Llocal ye \"%s\""
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr "Mo_ver ficheru .torrent a la papelera"
-
-#~ msgid "Monday"
-#~ msgstr "Llunes"
-
-#, c-format
-#~ msgid "Moving \"%s\""
-#~ msgstr "Moviendo \"%s\""
-
-#~ msgid "Not a regular file"
-#~ msgstr "Nun ye un ficheru normal"
-
-#, c-format
-#~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-#~ msgstr "La petición de llista de pares %1$sescosó'l tiempu d'espera fai%2$s %3$s; reintentando"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "¡Verifica los tos datos llocales! La pieza #%zu ta frañada."
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "Puertu %d reunviáu exitosamente"
-
-#, c-format
-#~ msgid "Port %d isn't forwarded"
-#~ msgstr "El puertu %d nun ta redirixíu"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "Reunvíu de puertos"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "Reunvíu de puertos (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "Reunvíu de puertos (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "¡Reunvíu de puertos exitosu!"
-
-#, c-format
-#~ msgid "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
-#~ msgstr "Reunvíu de puertos a traviés de «%s», serviciu «%s». (direición llocal: %s:%d)"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "El puertu ta <b>zarráu</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "El puertu ta <b>abiertu</b>"
-
-#~ msgid "Present Main Window"
-#~ msgstr "Ventana principal presente"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "Ratiu: %s"
-
-#~ msgid "Saturday"
-#~ msgstr "Sábadu"
-
-#, c-format
-#~ msgid "Saved \"%s\""
-#~ msgstr "«%s» guardáu"
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "Escaneáu %s"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "Semando en %1$'d de %2$'d par coneutáu"
-#~ msgstr[1] "Semando en %1$'d de %2$'d pares coneutaos"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "Amosar el diálogu _opciones"
-
-#, c-format
-#~ msgid "Skipping unknown torrent \"%s\""
-#~ msgstr "Omitiendo torrent «%s» desconocíu"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "Entamao %'d vegada"
-#~ msgstr[1] "Entamaos %'d vegaes"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "Camudáu estáu dende \"%1$s\" a \"%2$s\""
-
-#, c-format
-#~ msgid "Stop at Ratio (%s)"
-#~ msgstr "Parar na rellación (%s)"
-
-#~ msgid "Stopped"
-#~ msgstr "Paráu"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "Parando reunvíu de puertos a traviés de \"%s\", serviciu \"%s\""
-
-#~ msgid "Sunday"
-#~ msgstr "Domingu"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "El ficheru torrent \"%s\" nun tien datos válidos"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "El ficheru torrent \"%s\" tien un fallu desconocíu."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Esti enllaz magnet paez tar destináu pa daqué más que BitTorrent. Los enllaces magnet de BitTorrent tienen una seición que contién «%s»."
-
-#~ msgid "Thursday"
-#~ msgstr "Xueves"
-
-#~ msgid ""
-#~ "To add a backup URL, add it on the line after the primary URL.\n"
-#~ "To add another primary URL, add it after a blank line."
-#~ msgstr ""
-#~ "P'amestar una direición URL de respaldu, amiéstala na llinia dempués de la direición URL principal.\n"
-#~ "P'amestar otra dirección URL principal, amiéstala dempués d'una llinia en blanco."
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "Creador Torrent saltóse ficheru \"%s\": %s"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Fallu tracker: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave a warning: \"%s\""
-#~ msgstr "El rastreador dio un avisu: «%s»"
-
-#, c-format
-#~ msgid "Tracker gave an error: \"%s\""
-#~ msgstr "El rastreador dio un fallu: «%s»"
-
-#, c-format
-#~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-#~ msgstr "El rastreador tenía %s%'d semadores y %'d sanixueles%s fai %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Avisu de tracker: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Tracker permitirá peticiones en %s"
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "Transmission\n"
-#~ "Xuba: %1$s %2$s\n"
-#~ "Descarga: %3$s %4$s"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "Tranmission nun sabe cómo usar «%s»"
-
-#~ msgid "Tuesday"
-#~ msgstr "Martes"
-
-#, c-format
-#~ msgid "U_pload (%s):"
-#~ msgstr "X_ubir (%s):"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "URL non reconocida"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Anovar llista prieta"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "Verificando datos llocales (%.1f%% testeao)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "Verificando torrent"
-
-#~ msgid "Wednesday"
-#~ msgstr "Miércoles"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "_Descargar (%s):"
-
-#, c-format
-#~ msgid "_Upload (%s):"
-#~ msgstr "_Xubir (%s):"
-
-#, c-format
-#~ msgid "blocklist skipped invalid address at line %d"
-#~ msgstr "la llista de bloquéu saltó una direición inválida na llinia %d"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "yá nun se reunvía'l el puertu %d"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "tamañu|Baxada: %1$s, Xuba: %2$s"
-
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP ye una ferramienta p'amenorgar la conxestión de rede"

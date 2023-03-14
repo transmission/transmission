@@ -4,19 +4,19 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2018
 # ati3, 2020
-# Dušan Kazik <prescott66@gmail.com>, 2020
 # Julius Dielik, 2021
+# Dušan Kazik <prescott66@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 20:00+0000\n"
+"POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Julius Dielik, 2021\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Slovak (https://www.transifex.com/transmissionbt/teams/33778/sk/)\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -52,55 +52,55 @@ msgstr ""
 msgid "Couldn't parse log level '{level}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:645
+#: ../daemon/daemon.cc:651
 msgid "Deferring reload until session is fully started."
 msgstr ""
 
-#: ../daemon/daemon.cc:660
+#: ../daemon/daemon.cc:666
 msgid "Reloading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:696
+#: ../daemon/daemon.cc:702
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:709
+#: ../daemon/daemon.cc:715
 msgid "Loading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:729
+#: ../daemon/daemon.cc:735
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:735 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1167 ../libtransmission/torrent.cc:2178 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1175 ../libtransmission/torrent.cc:2164 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:745
+#: ../daemon/daemon.cc:751
 msgid "Requiring authentication"
 msgstr ""
 
-#: ../daemon/daemon.cc:766
+#: ../daemon/daemon.cc:772
 msgid "Watching '{path}' for new torrent files"
 msgstr ""
 
-#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:816 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:826 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:834
+#: ../daemon/daemon.cc:840
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:393
+#: ../gtk/Application.cc:394
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:550
+#: ../gtk/Application.cc:551
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
@@ -144,18 +144,18 @@ msgstr[1] "Nepodarilo sa pridať rovnaký torrent"
 msgstr[2] "Nepodarilo sa pridať rovnaké torrenty"
 msgstr[3] "Nepodarilo sa pridať rovnaké torrenty"
 
-#: ../gtk/Application.cc:1415
+#: ../gtk/Application.cc:1413
 msgid "A fast and easy BitTorrent client"
 msgstr "Rýchly a jednoduchý BitTorrent klient"
 
-#: ../gtk/Application.cc:1416
+#: ../gtk/Application.cc:1414
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1422
+#: ../gtk/Application.cc:1420
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -193,7 +193,7 @@ msgstr "Zdielať bez ohľadu na činnosť"
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Ukončiť zdieľanie po N minútach nečinnosti:"
 
-#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:325
+#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:327
 msgid "Queued for verification"
 msgstr "Zaradený do radu na overenie"
 
@@ -201,7 +201,7 @@ msgstr "Zaradený do radu na overenie"
 msgid "Verifying local data"
 msgstr "Overujú sa lokálne dáta"
 
-#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:328
+#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:330
 msgid "Queued for download"
 msgstr "Zaradené na sťahovanie"
 
@@ -210,7 +210,7 @@ msgctxt "Verb"
 msgid "Downloading"
 msgstr "Sťahuje sa"
 
-#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:331
+#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
 msgid "Queued for seeding"
 msgstr "Zaradené na zdieľanie"
 
@@ -219,11 +219,11 @@ msgctxt "Verb"
 msgid "Seeding"
 msgstr "Zdieľa sa"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:324
 msgid "Finished"
 msgstr "Dokončené"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:324
 msgid "Paused"
 msgstr "Pozastavené"
 
@@ -520,22 +520,20 @@ msgstr[2] ""
 msgstr[3] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Odstrániť %d torrentov?"
-msgstr[1] "Odstrániť torrent?"
-msgstr[2] "Odstrániť %d torrenty?"
-msgstr[3] "Odstrániť %d torrenty?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Odstrániť súbory stiahnuté týmito %d torrentami?"
-msgstr[1] "Odstrániť súbory stiahnuté týmto torentom?"
-msgstr[2] "Odstrániť súbory stiahnuté týmito %d torrentami?"
-msgstr[3] "Odstrániť súbory stiahnuté týmito %d torrentami?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -705,7 +703,7 @@ msgstr "Celkový prenos"
 msgid "Session Transfer"
 msgstr "Prenos relácie"
 
-#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:344
+#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:346
 msgid "Ratio: {ratio}"
 msgstr ""
 
@@ -723,7 +721,7 @@ msgstr ""
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:467
+#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:469
 msgid "{upload_speed} ▲"
 msgstr ""
 
@@ -958,58 +956,58 @@ msgstr "Tieto štatistiky sú len pre vašu informáciu. Ich znulovanie nemá vp
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr ""
 
-#: ../gtk/Torrent.cc:336
+#: ../gtk/Torrent.cc:338
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:363
+#: ../gtk/Torrent.cc:365
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:373
+#: ../gtk/Torrent.cc:375
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:385
+#: ../gtk/Torrent.cc:387
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:395
+#: ../gtk/Torrent.cc:397
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:404
+#: ../gtk/Torrent.cc:406
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:417
+#: ../gtk/Torrent.cc:419
 msgid "Remaining time unknown"
 msgstr "Zostávajúci čas je neznámy"
 
-#: ../gtk/Torrent.cc:460
+#: ../gtk/Torrent.cc:462
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/Torrent.cc:472
+#: ../gtk/Torrent.cc:474
 msgid "Stalled"
 msgstr "Preťažený"
 
-#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:2227
+#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2213
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:486
+#: ../gtk/Torrent.cc:488
 msgid "Tracker Error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:489
+#: ../gtk/Torrent.cc:491
 msgid "Local error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:513
+#: ../gtk/Torrent.cc:515
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
@@ -1018,7 +1016,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../gtk/Torrent.cc:524
+#: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
@@ -1026,7 +1024,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../gtk/Torrent.cc:535
+#: ../gtk/Torrent.cc:537
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
@@ -1034,7 +1032,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../gtk/Torrent.cc:543
+#: ../gtk/Torrent.cc:545
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
@@ -1042,7 +1040,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../gtk/Torrent.cc:552
+#: ../gtk/Torrent.cc:554
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
@@ -1246,16 +1244,16 @@ msgstr ""
 msgid "Couldn't open '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
+#: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:753
+#: ../gtk/Utils.cc:760
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:758
+#: ../gtk/Utils.cc:765
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
@@ -1862,7 +1860,7 @@ msgstr "_V dňoch:"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
 msgid "_to"
-msgstr ""
+msgstr "_do"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
 msgctxt "Gerund"
@@ -2199,11 +2197,11 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1345
+#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1349
 msgid "Could not connect to tracker"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1349
+#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1353
 msgid "Tracker did not respond"
 msgstr ""
 
@@ -2236,7 +2234,7 @@ msgstr ""
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/log.cc:290
+#: ../libtransmission/log.cc:300
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr ""
 
@@ -2432,7 +2430,7 @@ msgstr ""
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:1381
+#: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
@@ -2440,7 +2438,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../libtransmission/torrent-magnet.cc:332
+#: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
@@ -2448,7 +2446,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../libtransmission/torrent-metainfo.cc:676
+#: ../libtransmission/torrent-metainfo.cc:699
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2460,35 +2458,35 @@ msgstr ""
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "Neboli nájdené žiadne dáta! Uistite sa, či sú všetky vaše disky pripojené alebo použite \"Nastaviť umiestnenie\". Ak chcete dáta znova stiahnuť, odstráňte torrent a pridajte ho znova."
 
-#: ../libtransmission/torrent.cc:491
+#: ../libtransmission/torrent.cc:492
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:500
+#: ../libtransmission/torrent.cc:501
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:552
+#: ../libtransmission/torrent.cc:553
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:559
+#: ../libtransmission/torrent.cc:560
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:877
+#: ../libtransmission/torrent.cc:876
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Ručne reštartovaný - vypnutiie jeho pomeru zdieľania"
 
-#: ../libtransmission/torrent.cc:900
+#: ../libtransmission/torrent.cc:902
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:965
+#: ../libtransmission/torrent.cc:956
 msgid "Removing torrent"
 msgstr "Odstraňuje sa torrent"
 
-#: ../libtransmission/torrent.cc:1295 ../libtransmission/torrent.cc:2354
+#: ../libtransmission/torrent.cc:1284 ../libtransmission/torrent.cc:2340
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -2577,7 +2575,7 @@ msgstr ""
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr ""
 
-#: ../libtransmission/web.cc:446
+#: ../libtransmission/web.cc:448
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 
@@ -2628,604 +2626,3 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
-
-#~ msgid " _to "
-#~ msgstr " _do "
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "Vlastnosti torrentu %'d"
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d deň"
-#~ msgstr[1] "%'d dni"
-#~ msgstr[2] "%'d dní"
-#~ msgstr[3] "%'d dní"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d hodina"
-#~ msgstr[1] "%'d hodiny"
-#~ msgstr[2] "%'d hodín"
-#~ msgstr[3] "%'d hodín"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d minúta"
-#~ msgstr[1] "%'d minúty"
-#~ msgstr[2] "%'d minút"
-#~ msgstr[3] "%'d minút"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d sekunda"
-#~ msgstr[1] "%'d sekundy"
-#~ msgstr[2] "%'d sekúnd"
-#~ msgstr[3] "%'d sekúnd"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d častí @ %2$s"
-#~ msgstr[1] "%1$'d časť @ %2$s"
-#~ msgstr[2] "%1$'d časti @ %2$s"
-#~ msgstr[3] "%1$'d časti @ %2$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d častí @ %3$s)"
-#~ msgstr[1] "%1$s (%2$'d časť @ %3$s)"
-#~ msgstr[2] "%1$s (%2$'d časti @ %3$s)"
-#~ msgstr[3] "%1$s (%2$'d časti @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d častí)"
-#~ msgstr[1] "%1$s (%2$'d časť)"
-#~ msgstr[2] "%1$s (%2$'d časti)"
-#~ msgstr[3] "%1$s (%2$'d časti)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% z %3$s%% dostupných)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (%2$s%% z %3$s%% dostupných); %4$s neoverených"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s poškodené)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "pred %1$s"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%1$s z %2$s (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr "%1$s z %2$s (%3$s%%), odoslaných %4$s (Pomer: %5$s Cieľ: %6$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%1$s z %2$s (%3$s%%), odoslaných %4$s (Pomer: %5$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-#~ msgstr "%1$s, odoslaných %2$s (Pomer: %3$s Limit: %4$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s, odoslaných %2$s (Pomer: %3$s)"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s; %2$'d súborov"
-#~ msgstr[1] "%1$s; %2$'d súbor"
-#~ msgstr[2] "%1$s; %2$'d súbory"
-#~ msgstr[3] "%1$s; %2$'d súbory"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Úplný zoznam dostupných volieb príkazového riadka zobrazíte spustením „%s --help“.\n"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s spustený"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (Pomer: %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - Pridať tracker"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - Upraviť trackery"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "Vlastnosti %s"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "Zostáva %s"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s bol úspešný (%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>Ukončovanie spojení</b>"
-
-#~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>Nemožno aktualizovať .</b>"
-
-#~ msgid "<b>Update succeeded!</b>"
-#~ msgstr "<b>Aktualizácia úspešná!</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>Nebol zvolený žiadny zdroj</i>"
-
-#~ msgid "<i>Testing TCP port…</i>"
-#~ msgstr "<i>Testovanie TCP portu…</i>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "Požiadanie o viac partnerov za čas: %s"
-
-#, c-format
-#~ msgid "Asking for more peers now… <small>%s</small>"
-#~ msgstr "Prebieha žiadanie o viac partnerov… <small>%s</small>"
-
-#, c-format
-#~ msgid "Asking for peer counts in %s"
-#~ msgstr "Zistenie počtu partnerov za čas: %s"
-
-#, c-format
-#~ msgid "Asking for peer counts now… <small>%s</small>"
-#~ msgstr "Prebieha zisťovanie počtu partnerov… <small>%s</small>"
-
-#~ msgid "Automatically add .torrent files _from:"
-#~ msgstr "Automaticky pridať .torrent súbory z:"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" contains %zu entries"
-#~ msgstr "Zoznam \"%s\" obsahuje %zu položiek"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" updated with %zu entries"
-#~ msgstr "Zoznam blokovaní \"%s\" bol aktualizovaný %zu položkami"
-
-#, c-format
-#~ msgid "Blocklist contains %'d rule"
-#~ msgid_plural "Blocklist contains %'d rules"
-#~ msgstr[0] "Zoznam blokovaní obsahuje %'d pravidiel"
-#~ msgstr[1] "Zoznam blokovaní obsahuje %'d pravidlo"
-#~ msgstr[2] "Zoznam blokovaní obsahuje %'d pravidlá"
-#~ msgstr[3] "Zoznam blokovaní obsahuje %'d pravidlá"
-
-#, c-format
-#~ msgid "Blocklist has %'d rule."
-#~ msgid_plural "Blocklist has %'d rules."
-#~ msgstr[0] "Zoznam blokovaní obsahuje %'d pravidlo"
-#~ msgstr[1] "Zoznam blokovaní obsahuje %'d pravidlá"
-#~ msgstr[2] "Zoznam blokovaní obsahuje %'d pravidla"
-#~ msgstr[3] "Zoznam blokovaní obsahuje %'d pravidiel"
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Zavolať s_kript po dokončení torrentu:"
-
-#~ msgid "Cancelled"
-#~ msgstr "Zrušené"
-
-#~ msgid "Complete"
-#~ msgstr "Úplný"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s"
-#~ msgstr "Nepodarilo sa naviazať port %d na %s: %s"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s (%s)"
-#~ msgstr "Nepodarilo sa naviazať port %d na %s: %s (%s)"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "Nepodarilo sa vytvoriť \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "Nepodarilo sa vytvoriť soket: %s"
-
-#, c-format
-#~ msgid "Couldn't inhibit desktop hibernation: %s"
-#~ msgstr "Nepodarilo sa potlačiť hibernáciu pracovného prostredia: %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "Nepodarilo sa otvoriť \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "Nepodarilo sa prečítať \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "Nepodarilo sa načítať „%s“:%s"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "Nepodarilo sa uložiť \"%s\""
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "Nepodarilo sa uložiť súbor \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Nepodarilo sa uložiť dočasný súbor \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't truncate \"%1$s\": %2$s"
-#~ msgstr "Nepodarilo sa skrátiť \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Vytvoriť torrent"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "\"%s\" vytvorený!"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "Vytvoril %1$s"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "Vytvoril %1$s dňa %2$s"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "Vytvorené %1$s"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "Vytvára sa \"%s\""
-
-#~ msgid "Debug"
-#~ msgstr "Ladenie"
-
-#, c-format
-#~ msgid "Do_wnload (%s):"
-#~ msgstr "St_iahnuté (%s):"
-
-#~ msgid "Done"
-#~ msgstr "Dokončený"
-
-#, c-format
-#~ msgid "Down: %1$s, Up: %2$s"
-#~ msgstr "Stiahnuté: %1$s, Odoslané: %2$s"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Povoliť _uTP pro komunikáciu s partnermi"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "Chyba pri otváraní torrentu"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "Chyba čítania \"%s\": %s"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "Chyba zápisu \"%s\": %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "Chyba: %s"
-
-#, c-format
-#~ msgid "Error: invalid announce URL \"%s\""
-#~ msgstr "Chyba: neplatná oznamovacia URL \"%s\""
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Súbor \"%s\" je na ceste"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "Bolo nájdené zariadenie brány do internetu \"%s\""
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "Nájdená verejná adresa \"%s\""
-
-#~ msgid "Friday"
-#~ msgstr "Piatok"
-
-#, c-format
-#~ msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-#~ msgstr "Od posledného získania zoznamu %1$s%2$'d partnerov prešiel čas: %3$s %4$s"
-
-#, c-format
-#~ msgid "Got a scrape error \"%s%s%s\" %s ago"
-#~ msgstr "Dotaz na tracker viedlo k chybe \"%s%s%s\" pred časom: %s."
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "Získali sme chybu %1$s\"%2$s\"%3$s pred %4$s"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "Program dostal signál %d; snaží sa o korektné vypnutie. Ak to uviazne, urobte to znova."
-
-#~ msgid "Idle"
-#~ msgstr "Nečinný"
-
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Neplatné metadáta položky \"%s\""
-
-#~ msgid "Is another copy of Transmission already running?"
-#~ msgstr "Je už spustená aj iná kópia programu Transmission?"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "Obmedziť rýchlosť _sťahovania (%s):"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "Obmedziť rýchlosť _odosielania (%s):"
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "Počet načítaných torrentov je %d"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "Lokálna adresa je \"%s\""
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr "_Presunúť súbor .torrent do Koša"
-
-#~ msgid "Monday"
-#~ msgstr "Pondelok"
-
-#, c-format
-#~ msgid "Moving \"%s\""
-#~ msgstr "Presúva sa torrent „%s“"
-
-#~ msgid "Not a regular file"
-#~ msgstr "Nie je platný súbor"
-
-#, c-format
-#~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-#~ msgstr "Požiadavka na zoznam partnerov %1$s vypršala %2$s pred časom %3$s; obnoví sa"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Prosím, overte miestne dáta! Časť #%zu je poškodená."
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "Port %d bol úspešne presmerovaný"
-
-#, c-format
-#~ msgid "Port %d isn't forwarded"
-#~ msgstr "Port %d nie je presmerovaný"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "Presmerovanie portu"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "Presmerovanie portu (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "Presmerovanie portu (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "Presmerovanie portu úspešné!"
-
-#, c-format
-#~ msgid "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
-#~ msgstr "Port presmerovaný  cez \"%s\", služba \"%s\". (lokálna addresa: %s:%d)"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "Port je <b>zatvorený</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "Port je <b>otvorený</b>"
-
-#~ msgid "Present Main Window"
-#~ msgstr "Súčasné hlavné okno"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "Pomer: %s"
-
-#~ msgid "Saturday"
-#~ msgstr "Sobota"
-
-#, c-format
-#~ msgid "Saved \"%s\""
-#~ msgstr "Uložený \"%s\""
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "Prezretých %s"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "Zdieľa sa %1$'d s %2$'d pripojenými partnermi"
-#~ msgstr[1] "Zdieľa sa %1$'d s %2$'d pripojeným partnerom"
-#~ msgstr[2] "Zdieľa sa %1$'d s %2$'d pripojenými partnermi"
-#~ msgstr[3] "Zdieľa sa %1$'d s %2$'d pripojenými partnermi"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "Zobraziť okno s _voľbami"
-
-#, c-format
-#~ msgid "Skipping unknown torrent \"%s\""
-#~ msgstr "Preskakuje sa neznámy torrent „%s“"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "Spustený %'dkrát"
-#~ msgstr[1] "Spustený %'dkrát"
-#~ msgstr[2] "Spustený %'dkrát"
-#~ msgstr[3] "Spustený %'dkrát"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "Stav sa zmenil zo stavu \"%1$s\" na \"%2$s\""
-
-#, c-format
-#~ msgid "Stop at Ratio (%s)"
-#~ msgstr "Zastaviť pri pomere (%s)"
-
-#~ msgid "Stopped"
-#~ msgstr "Zastavený"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "Zastavuje sa presmerovanie portu cez \"%s\", služba \"%s\""
-
-#~ msgid "Sunday"
-#~ msgstr "Nedeľa"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Súbor s torrentom \"%s\" obsahuje neplatné dáta."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "V súbore s torrentom \"%s\" došlo k neznámej chybe."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Tento magnetický odkaz sa zdá byť určený pre niečo iné, než je BitTorrent. Magnetické odkazy pre BitTorrent majú časť obsahujúcu \"% s\"."
-
-#~ msgid "Thursday"
-#~ msgstr "Štvrtok"
-
-#~ msgid ""
-#~ "To add a backup URL, add it on the line after the primary URL.\n"
-#~ "To add another primary URL, add it after a blank line."
-#~ msgstr ""
-#~ "Záložnú URL adresu pridajte do riadka za hlavnú URL adresu.\n"
-#~ "Pred ďalšou hlavnou URL adresou vložte prázdny riadok."
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "Pri vytváraní torrentu bol preskočený súbor \"%s\": %s"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Chyba trackera: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave a warning: \"%s\""
-#~ msgstr "Tracker vydal varovanie: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave an error: \"%s\""
-#~ msgstr "Tracker oznámil chybu: \"%s\""
-
-#, c-format
-#~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-#~ msgstr "Od doby, kedy mal tracker %s%'d zdieľajúcich a %'d sťahujúcich ubehol čas: %s %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Varovanie trackera: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Tracker dovolí požiadavky za %s"
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "Transmission\n"
-#~ "Odosielanie: %1$s %2$s\n"
-#~ "Sťahovanie: %3$s %4$s"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "Transmission nevie, ako má použiť \"%s\""
-
-#~ msgid "Tuesday"
-#~ msgstr "Utorok"
-
-#, c-format
-#~ msgid "U_pload (%s):"
-#~ msgstr "O_dosielané (%s):"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "Nerozpoznaná URL adresa"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Aktualizovať zoznam blokovaní"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "Overujú sa lokálne dáta (%.1f%% skontrolovaných)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "Overuje sa torrent"
-
-#~ msgid "Wednesday"
-#~ msgstr "Streda"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "_Stiahnuté (%s):"
-
-#, c-format
-#~ msgid "_Upload (%s):"
-#~ msgstr "_Odoslané (%s):"
-
-#, c-format
-#~ msgid "blocklist skipped invalid address at line %d"
-#~ msgstr "zoznam blokovaní preskočil neplatnú adresu na riadku %d"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "port %d sa už viac nepresmerúva"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "Prevzaté: %1$s, Odovzdané: %2$s"
-
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP je nástroj znižujúci zahltenie siete."

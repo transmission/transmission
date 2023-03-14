@@ -2095,8 +2095,8 @@ To add a new primary URL, add it after a blank line.</property>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-11">help_button</action-widget>
-      <action-widget response="-7">close_button</action-widget>
+      <action-widget response="help">help_button</action-widget>
+      <action-widget response="close">close_button</action-widget>
     </action-widgets>
   </object>
   <object class="GtkSizeGroup" id="downloading_page_labels_width_group">

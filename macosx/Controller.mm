@@ -3580,10 +3580,19 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             continue;
         }
 
+        NSDictionary<NSFileAttributeKey, id>* fileAttributes = [NSFileManager.defaultManager attributesOfItemAtPath:fullFile
+                                                                                                              error:nil];
+        if (fileAttributes.fileSize == 0)
+        {
+            // Workaround for Firefox downloads happening in two steps: first time being an empty file
+            [self.fAutoImportedNames removeObject:file];
+            continue;
+        }
+
         auto metainfo = tr_torrent_metainfo{};
         if (!metainfo.parseTorrentFile(fullFile.UTF8String))
         {
-            break;
+            continue;
         }
 
         [self openFiles:@[ fullFile ] addType:ADD_AUTO forcePath:nil];
