@@ -2429,14 +2429,14 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
     return tr_strvToBuf(tr_torrentFindFile(tor, file_num), buf, buflen);
 }
 
-void tr_torrent::setDownloadDir(std::string_view path, bool isNewTorrent)
+void tr_torrent::setDownloadDir(std::string_view path, bool is_new_torrent)
 {
     download_dir = path;
     markEdited();
     setDirty();
     refreshCurrentDir();
 
-    if (isNewTorrent)
+    if (is_new_torrent)
     {
         if (session->shouldFullyVerifyAddedTorrents() || !torrent_init_helpers::isNewTorrentASeed(this))
         {

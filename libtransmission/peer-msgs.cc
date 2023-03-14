@@ -619,7 +619,11 @@ private:
         size_t constexpr Seconds = RequestBufSecs;
         size_t const estimated_blocks_in_period = (rate_bytes_per_second * Seconds) / tr_block_info::BlockSize;
         size_t const ceil = reqq ? *reqq : 250;
-        return std::clamp(estimated_blocks_in_period, Floor, ceil);
+
+        auto max_reqs = estimated_blocks_in_period;
+        max_reqs = std::min(max_reqs, ceil);
+        max_reqs = std::max(max_reqs, Floor);
+        return max_reqs;
     }
 
     void protocolSendRequest(struct peer_request const& req)
@@ -1792,15 +1796,15 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     }
 
     // read <payload>
-    auto& payload = msgs->incoming.payload;
+    auto& current_payload = msgs->incoming.payload;
     auto const full_payload_len = *current_message_len - sizeof(uint8_t /*message_type*/);
-    auto n_left = full_payload_len - std::size(payload);
+    auto n_left = full_payload_len - std::size(current_payload);
     while (n_left > 0U && io->read_buffer_size() > 0U)
     {
         auto buf = std::array<char, tr_block_info::BlockSize>{};
         auto const n_this_pass = std::min({ n_left, io->read_buffer_size(), std::size(buf) });
         io->read_bytes(std::data(buf), n_this_pass);
-        payload.add(std::data(buf), n_this_pass);
+        current_payload.add(std::data(buf), n_this_pass);
         n_left -= n_this_pass;
         logtrace(msgs, fmt::format("read {:d} payload bytes; {:d} left to go", n_this_pass, n_left));
     }
@@ -1810,10 +1814,17 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
         return READ_LATER;
     }
 
-    auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, *current_message_type, payload);
-    current_message_type.reset();
+    // The incoming message is now complete. Reset the peerMsgs' incoming
+    // field so it's ready to receive the next message, then process the
+    // current one with `process_peer_message()`.
+
     current_message_len.reset();
-    payload.clear();
+    auto const message_type = *current_message_type;
+    current_message_type.reset();
+    auto payload = libtransmission::Buffer{};
+    std::swap(payload, current_payload);
+
+    auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, message_type, payload);
     *piece = n_piece_bytes_read;
     return read_state;
 }

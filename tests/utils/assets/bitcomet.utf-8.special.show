@@ -1,0 +1,26 @@
+Name: modified test-utf8
+File: assets/bitcomet.utf-8.special.torrent
+
+GENERAL
+
+  Name: modified test-utf8
+  Hash v1: 52bb66ab192b38cad7ce20fb8ee2dfe1d870bea8
+  Created by: Hand with love
+  Created on: Sat Jul 16 21:13:04 2022
+
+  Source: 私たちの世界
+  Piece Count: 1
+  Piece Size: 1.00 MiB
+  Total Size: 0.01 kB
+  Privacy: Public torrent
+
+TRACKERS
+
+  Tier #1
+  http://fake.example.com:7070/announce
+
+FILES
+
+  modified test-utf8/別の世界f1.txt (0.01 kB)
+  modified test-utf8/別の世界f2.txt (0.01 kB)
+

@@ -65,6 +65,7 @@ jobs:
           get_changes tests    CMakeLists.txt cmake third-party libtransmission utils tests
           get_changes utils    CMakeLists.txt cmake third-party libtransmission utils
           get_changes web      CMakeLists.txt cmake third-party libtransmission web
+          cat "$GITHUB_OUTPUT"
 
   code-style:
     runs-on: ubuntu-22.04
@@ -173,6 +174,58 @@ jobs:
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
       - name: Test with sanitizers
         run: cmake -E chdir obj ctest -j $(nproc) --build-config Debug --output-on-failure
+
+  clang-tidy-libtransmission:
+    runs-on: ubuntu-22.04
+    needs: [ what-to-make ]
+    if: ${{ needs.what-to-make.outputs.test-style == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            clang \
+            clang-tidy \
+            cmake \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            npm
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          path: src
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DRUN_CLANG_TIDY=ON
+      - name: Make
+        run: cmake --build obj --config Debug --target libtransmission.a 2>&1 | tee makelog
+      - name: Test for warnings
+        run: |
+          if grep 'warning:' makelog; then exit 1; fi
 
   macos-11:
     runs-on: macos-11

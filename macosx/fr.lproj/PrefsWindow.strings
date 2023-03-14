@@ -222,13 +222,13 @@
 "1451.title" = "Connexions :";
 
 /* Class = "NSButtonCell"; title = "Prefer encrypted peers"; ObjectID = "1452"; */
-"1452.title" = "Préférer les pairs encryptés";
+"1452.title" = "Préférer les pairs chiffrés";
 
 /* Class = "NSTextFieldCell"; title = "Encryption:"; ObjectID = "1453"; */
-"1453.title" = "Cryptage :";
+"1453.title" = "Chiffrement :";
 
 /* Class = "NSButtonCell"; title = "Ignore unencrypted peers"; ObjectID = "1454"; */
-"1454.title" = "Ignorer les pairs non cryptés";
+"1454.title" = "Ignorer les pairs non chiffrés";
 
 /* Class = "NSButtonCell"; title = "Only when adding manually"; ObjectID = "1477"; */
 "1477.title" = "À l'ajout manuel uniquement";

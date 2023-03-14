@@ -4,16 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2018
+# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Temuri Doghonadze <temuri.doghonadze@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 20:00+0000\n"
+"POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2018\n"
+"Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>, 2023\n"
 "Language-Team: Georgian (https://www.transifex.com/transmissionbt/teams/33778/ka/)\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
@@ -49,55 +50,55 @@ msgstr ""
 msgid "Couldn't parse log level '{level}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:645
+#: ../daemon/daemon.cc:651
 msgid "Deferring reload until session is fully started."
 msgstr ""
 
-#: ../daemon/daemon.cc:660
+#: ../daemon/daemon.cc:666
 msgid "Reloading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:696
+#: ../daemon/daemon.cc:702
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:709
+#: ../daemon/daemon.cc:715
 msgid "Loading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:729
+#: ../daemon/daemon.cc:735
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:735 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1167 ../libtransmission/torrent.cc:2178 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1175 ../libtransmission/torrent.cc:2164 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:745
+#: ../daemon/daemon.cc:751
 msgid "Requiring authentication"
 msgstr ""
 
-#: ../daemon/daemon.cc:766
+#: ../daemon/daemon.cc:772
 msgid "Watching '{path}' for new torrent files"
 msgstr ""
 
-#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:816 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:826 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:834
+#: ../daemon/daemon.cc:840
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:393
+#: ../gtk/Application.cc:394
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:550
+#: ../gtk/Application.cc:551
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
@@ -107,7 +108,7 @@ msgstr ""
 
 #: ../gtk/Application.cc:783 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
-msgstr ""
+msgstr "_შეწყვეტა"
 
 #: ../gtk/Application.cc:784
 msgid "I _Agree"
@@ -137,21 +138,21 @@ msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "ვერ ვამატებ ტორენტის დუბლიკატს"
 msgstr[1] "ვერ ვამატებ ტორენტის დუბლიკატს"
 
-#: ../gtk/Application.cc:1415
+#: ../gtk/Application.cc:1413
 msgid "A fast and easy BitTorrent client"
 msgstr "სწრაფი და მარტივი ბიტტორენტ კლიენტი"
 
-#: ../gtk/Application.cc:1416
+#: ../gtk/Application.cc:1414
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1422
+#: ../gtk/Application.cc:1420
 msgid "translator-credits"
 msgstr ""
-"Launchpad Contributions:\n"
+"launchpad Contributions:\n"
 "  Aleksandre Apkhaidze https://launchpad.net/~a1eksandre\n"
 "  Beqa Arabuli https://launchpad.net/~arabulibeqa\n"
 "  David Machakhelidze https://launchpad.net/~david-mac\n"
@@ -159,7 +160,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:518 ../gtk/DetailsDialog.cc:536
 msgid "Use global settings"
-msgstr ""
+msgstr "გლობალური პარამეტრების გამოყენება"
 
 #: ../gtk/DetailsDialog.cc:519
 msgid "Seed regardless of ratio"
@@ -177,7 +178,7 @@ msgstr ""
 msgid "Stop seeding if idle for N minutes:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:325
+#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:327
 msgid "Queued for verification"
 msgstr ""
 
@@ -185,35 +186,35 @@ msgstr ""
 msgid "Verifying local data"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:328
+#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:330
 msgid "Queued for download"
 msgstr ""
 
 #: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:473
 msgctxt "Verb"
 msgid "Downloading"
-msgstr ""
+msgstr "გადმოწერა"
 
-#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:331
+#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
 msgid "Queued for seeding"
-msgstr ""
+msgstr "რიგშია Seeding-სთვის"
 
 #: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:474
 msgctxt "Verb"
 msgid "Seeding"
-msgstr ""
+msgstr "Seeding"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:324
 msgid "Finished"
-msgstr ""
+msgstr "დასრულებულია"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:324
 msgid "Paused"
-msgstr ""
+msgstr "შეჩერება"
 
 #: ../gtk/DetailsDialog.cc:608 ../gtk/DetailsDialog.cc:613 ../gtk/DetailsDialog.cc:727
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: ../gtk/DetailsDialog.cc:622 ../gtk/FileList.cc:654
 msgid "Mixed"
@@ -283,7 +284,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:1054
 msgid "No errors"
-msgstr ""
+msgstr "შეცდომების გარეშე"
 
 #: ../gtk/DetailsDialog.cc:1074
 msgid "Never"
@@ -299,23 +300,23 @@ msgstr "ოპტიმისტური ანჩოკი"
 
 #: ../gtk/DetailsDialog.cc:1493
 msgid "Downloading from this peer"
-msgstr "ჩამოტვირთვა ამ პირისგან"
+msgstr "ამ პარტნიორისგან გადმოწერა"
 
 #: ../gtk/DetailsDialog.cc:1497
 msgid "We would download from this peer if they would let us"
-msgstr "უნდა ჩამოვტვირთოთ ამ პირისგან თუ მივიღეთ ნებართვა"
+msgstr "პარტნიორისგან უფლების მიღების შემთხვევაში ამასმისგან გადმოვწერ"
 
 #: ../gtk/DetailsDialog.cc:1501
 msgid "Uploading to peer"
-msgstr "ატვირთვა პირისთვის"
+msgstr "პარტნიორზე ატვირთვა"
 
 #: ../gtk/DetailsDialog.cc:1505
 msgid "We would upload to this peer if they asked"
-msgstr "ჩვენ ავტვირთავთ პირისკენ თუ გვთხოვეს"
+msgstr "ჩვენ გვინდა პარტნიორებთან ატვირთვა, თუ გვთხოვენ"
 
 #: ../gtk/DetailsDialog.cc:1509
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "პირმა გაგვიკეთა ანჩოკი, მაგრამ ჩვენ დაინტერესებულნი არა ვართ"
+msgstr "პარტნიორმა გაგვიკეთა ანჩოკი, მაგრამ ჩვენ დაინტერესებულნი არა ვართ"
 
 #: ../gtk/DetailsDialog.cc:1513
 msgid "We unchoked this peer, but they're not interested"
@@ -335,7 +336,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:1529
 msgid "Peer is an incoming connection"
-msgstr "პირი არის შემომავალი შეერთება"
+msgstr "პარტნიორი არის შემომავალი შეერთება"
 
 #: ../gtk/DetailsDialog.cc:1533
 msgid "Peer is connected over µTP"
@@ -388,7 +389,7 @@ msgstr "კლიენტი"
 
 #: ../gtk/DetailsDialog.cc:1707
 msgid "Flags"
-msgstr ""
+msgstr "ალმები"
 
 #: ../gtk/DetailsDialog.cc:1755
 msgid "Web Seeds"
@@ -479,7 +480,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:2463 ../gtk/ui/gtk3/DetailsDialog.ui:761 ../gtk/ui/gtk4/DetailsDialog.ui:546
 msgid "Trackers"
-msgstr "მეთვალყურეები:"
+msgstr "ტრეკერები"
 
 #: ../gtk/DetailsDialog.cc:2642
 msgid "{torrent_name} Properties"
@@ -535,11 +536,11 @@ msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:118
 msgid "_Delete"
-msgstr ""
+msgstr "_წაშლა"
 
 #: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2021 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1420
 msgid "_Remove"
-msgstr ""
+msgstr "_მოცილება"
 
 #: ../gtk/FileList.cc:642 ../gtk/Utils.cc:626
 msgid "High"
@@ -547,7 +548,7 @@ msgstr "მაღალი"
 
 #: ../gtk/FileList.cc:646 ../gtk/Utils.cc:627
 msgid "Normal"
-msgstr "ჩვეულებრივი"
+msgstr "ნორმალური"
 
 #: ../gtk/FileList.cc:650 ../gtk/Utils.cc:628
 msgid "Low"
@@ -559,21 +560,21 @@ msgstr ""
 
 #: ../gtk/FileList.cc:953 ../gtk/MessageLogWindow.cc:327
 msgid "Name"
-msgstr ""
+msgstr "სახელი"
 
 #: ../gtk/FileList.cc:983
 msgid "Size"
-msgstr ""
+msgstr "ზომა"
 
 #. add "progress" column
 #: ../gtk/FileList.cc:992
 msgid "Have"
-msgstr ""
+msgstr "მაქვს:"
 
 #. add "enabled" column
 #: ../gtk/FileList.cc:1009
 msgid "Download"
-msgstr ""
+msgstr "ჩამოტვირთვა"
 
 #. add priority column
 #: ../gtk/FileList.cc:1025
@@ -582,24 +583,24 @@ msgstr "პრიორიტეტი"
 
 #: ../gtk/FilterBar.cc:324 ../gtk/FilterBar.cc:470
 msgid "All"
-msgstr ""
+msgstr "ყველა"
 
 #: ../gtk/FilterBar.cc:472
 msgid "Active"
-msgstr ""
+msgstr "აქტიური"
 
 #: ../gtk/FilterBar.cc:477
 msgctxt "Verb"
 msgid "Verifying"
-msgstr ""
+msgstr "შემოწმება"
 
 #: ../gtk/FilterBar.cc:478 ../gtk/FreeSpaceLabel.cc:54
 msgid "Error"
-msgstr ""
+msgstr "შეცდომა"
 
 #: ../gtk/FilterBar.cc:586 ../gtk/ui/gtk3/FilterBar.ui:14 ../gtk/ui/gtk4/FilterBar.ui:8
 msgid "_Show:"
-msgstr ""
+msgstr "[ჩვენება]"
 
 #: ../gtk/FilterBar.cc:587
 msgid "_Show {count:L} of:"
@@ -623,7 +624,7 @@ msgstr ""
 
 #: ../gtk/MainWindow.cc:357
 msgid "Unlimited"
-msgstr ""
+msgstr "შეუზღუდავი"
 
 #: ../gtk/MainWindow.cc:420
 msgid "Seed Forever"
@@ -661,7 +662,7 @@ msgstr ""
 msgid "Session Transfer"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:344
+#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:346
 msgid "Ratio: {ratio}"
 msgstr ""
 
@@ -679,7 +680,7 @@ msgstr ""
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:467
+#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:469
 msgid "{upload_speed} ▲"
 msgstr ""
 
@@ -701,48 +702,48 @@ msgstr ""
 
 #: ../gtk/MakeDialog.cc:381 ../gtk/MakeDialog.cc:544 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
 msgid "No source selected"
-msgstr ""
+msgstr "წყარო არჩეული არაა"
 
 #: ../gtk/MessageLogWindow.cc:253
 msgid "Save Log"
-msgstr ""
+msgstr "ჟურნალის შენახვა"
 
 #: ../gtk/MessageLogWindow.cc:255 ../gtk/ui/gtk3/EditTrackersDialog.ui:35 ../gtk/ui/gtk4/EditTrackersDialog.ui:92
 msgid "_Save"
-msgstr ""
+msgstr "_შენახვა"
 
 #: ../gtk/MessageLogWindow.cc:336
 msgid "Message"
-msgstr ""
+msgstr "შეტყობინება"
 
 #: ../gtk/MessageLogWindow.cc:345
 msgid "Time"
-msgstr ""
+msgstr "დრო"
 
 #: ../gtk/MessageLogWindow.cc:483
 msgctxt "Logging level"
 msgid "Critical"
-msgstr ""
+msgstr "კრიტიკული"
 
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "შეცდომა"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
 msgid "Warning"
-msgstr ""
+msgstr "გაფრთხილება"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgctxt "Logging level"
 msgid "Information"
-msgstr ""
+msgstr "ინფორმაცია"
 
 #: ../gtk/MessageLogWindow.cc:487
 msgctxt "Logging level"
 msgid "Debug"
-msgstr ""
+msgstr "გამართვა"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
@@ -750,11 +751,11 @@ msgstr ""
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
-msgstr ""
+msgstr "ფაილის გახსნა"
 
 #: ../gtk/Notify.cc:238
 msgid "Open Folder"
-msgstr ""
+msgstr "გახსენი საქაღალდე"
 
 #: ../gtk/Notify.cc:252
 msgid "Torrent Complete"
@@ -762,7 +763,7 @@ msgstr ""
 
 #: ../gtk/Notify.cc:274
 msgid "Start Now"
-msgstr ""
+msgstr "ახლა დაწყება"
 
 #: ../gtk/Notify.cc:286
 msgid "Torrent Added"
@@ -778,11 +779,11 @@ msgstr "ყველა ფაილი"
 
 #: ../gtk/OptionsDialog.cc:369
 msgid "Open a Torrent"
-msgstr ""
+msgstr "ტორენტის გახსნა"
 
 #: ../gtk/OptionsDialog.cc:374 ../gtk/PathButton.cc:148 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:25 ../gtk/ui/gtk3/OptionsDialog.ui:36 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:35 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:72
 msgid "_Open"
-msgstr ""
+msgstr "_გახსნა"
 
 #: ../gtk/OptionsDialog.cc:385
 msgid "Show options dialog"
@@ -790,7 +791,7 @@ msgstr ""
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
-msgstr ""
+msgstr "ფაილის არჩევა"
 
 #: ../gtk/PathButton.cc:202
 msgid "(None)"
@@ -802,7 +803,7 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:307
 msgid "Prefer encryption"
-msgstr ""
+msgstr "მირჩევნია დავშიფრო"
 
 #: ../gtk/PrefsDialog.cc:308
 msgid "Require encryption"
@@ -810,15 +811,15 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:374
 msgid "Every Day"
-msgstr ""
+msgstr "ყოველდღე"
 
 #: ../gtk/PrefsDialog.cc:375
 msgid "Weekdays"
-msgstr ""
+msgstr "სამუსაო დღეებში"
 
 #: ../gtk/PrefsDialog.cc:376
 msgid "Weekends"
-msgstr ""
+msgstr "კვირის ბოლოს"
 
 #: ../gtk/PrefsDialog.cc:551
 msgid "Blocklist has {count:L} entry"
@@ -840,7 +841,7 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1266 ../gtk/ui/gtk4/PrefsDialog.ui:885
 msgid "Status unknown"
-msgstr ""
+msgstr "სტატუსი უცნობია"
 
 #: ../gtk/PrefsDialog.cc:912
 msgid "Port is {markup_begin}closed{markup_end}"
@@ -900,7 +901,7 @@ msgstr ""
 
 #: ../gtk/StatsDialog.cc:111 ../gtk/ui/gtk3/StatsDialog.ui:22 ../gtk/ui/gtk4/StatsDialog.ui:245
 msgid "_Reset"
-msgstr ""
+msgstr "_განულება"
 
 #: ../gtk/StatsDialog.cc:113
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
@@ -910,83 +911,83 @@ msgstr ""
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr ""
 
-#: ../gtk/Torrent.cc:336
+#: ../gtk/Torrent.cc:338
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:363
+#: ../gtk/Torrent.cc:365
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:373
+#: ../gtk/Torrent.cc:375
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:385
+#: ../gtk/Torrent.cc:387
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:395
+#: ../gtk/Torrent.cc:397
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:404
+#: ../gtk/Torrent.cc:406
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:417
+#: ../gtk/Torrent.cc:419
 msgid "Remaining time unknown"
 msgstr ""
 
-#: ../gtk/Torrent.cc:460
+#: ../gtk/Torrent.cc:462
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/Torrent.cc:472
+#: ../gtk/Torrent.cc:474
 msgid "Stalled"
-msgstr ""
+msgstr "გაჭედილი"
 
-#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:2227
+#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2213
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:486
+#: ../gtk/Torrent.cc:488
 msgid "Tracker Error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:489
+#: ../gtk/Torrent.cc:491
 msgid "Local error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:513
+#: ../gtk/Torrent.cc:515
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:524
+#: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:535
+#: ../gtk/Torrent.cc:537
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:543
+#: ../gtk/Torrent.cc:545
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Torrent.cc:552
+#: ../gtk/Torrent.cc:554
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
@@ -994,47 +995,47 @@ msgstr[1] ""
 
 #: ../gtk/Utils.cc:66
 msgid "KiB"
-msgstr ""
+msgstr "კიბ"
 
 #: ../gtk/Utils.cc:67
 msgid "MiB"
-msgstr ""
+msgstr "მიბ"
 
 #: ../gtk/Utils.cc:68
 msgid "GiB"
-msgstr ""
+msgstr "გიბ"
 
 #: ../gtk/Utils.cc:69
 msgid "TiB"
-msgstr ""
+msgstr "ტიბ"
 
 #: ../gtk/Utils.cc:72
 msgid "kB"
-msgstr ""
+msgstr "კბ"
 
 #: ../gtk/Utils.cc:73
 msgid "MB"
-msgstr ""
+msgstr "მბ"
 
 #: ../gtk/Utils.cc:74
 msgid "GB"
-msgstr ""
+msgstr "გბ"
 
 #: ../gtk/Utils.cc:75
 msgid "TB"
-msgstr ""
+msgstr "ტბ"
 
 #: ../gtk/Utils.cc:78
 msgid "kB/s"
-msgstr ""
+msgstr "კბ/წმ"
 
 #: ../gtk/Utils.cc:79
 msgid "MB/s"
-msgstr ""
+msgstr "მბ/წმ"
 
 #: ../gtk/Utils.cc:80
 msgid "GB/s"
-msgstr ""
+msgstr "გბ/წმ"
 
 #: ../gtk/Utils.cc:81
 msgid "TB/s"
@@ -1066,7 +1067,7 @@ msgstr[1] ""
 
 #: ../gtk/Utils.cc:173 ../gtk/Utils.cc:204 ../gtk/Utils.cc:231 ../gtk/Utils.cc:264
 msgid "now"
-msgstr ""
+msgstr "ახლა"
 
 #: ../gtk/Utils.cc:180
 msgid "{days_ago:L} day ago"
@@ -1156,22 +1157,22 @@ msgstr ""
 msgid "Couldn't open '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
+#: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:753
+#: ../gtk/Utils.cc:760
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:758
+#: ../gtk/Utils.cc:765
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
 #: ../gtk/main.cc:64 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
-msgstr ""
+msgstr "Transmission"
 
 #. parse the command line
 #: ../gtk/main.cc:80
@@ -1188,7 +1189,7 @@ msgstr ""
 
 #: ../gtk/main.cc:83
 msgid "Show version number and exit"
-msgstr ""
+msgstr "ვერსიის ჩვენება და გასვლა"
 
 #: ../gtk/main.cc:91
 msgid "[torrent files or urls]"
@@ -1200,7 +1201,7 @@ msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
-msgstr ""
+msgstr "BitTorrent -ის კლიენტი"
 
 #: ../gtk/transmission-gtk.desktop.in:5
 msgid "Download and share files over BitTorrent"
@@ -1221,11 +1222,11 @@ msgstr ""
 
 #: ../gtk/transmission.ui:7
 msgid "_File"
-msgstr "ფაილი"
+msgstr "_ფაილი"
 
 #: ../gtk/transmission.ui:14 ../gtk/transmission.ui:459 ../gtk/ui/gtk3/MainWindow.ui:22 ../gtk/ui/gtk4/MainWindow.ui:16
 msgid "Open a torrent"
-msgstr ""
+msgstr "ტორენტის გახსნა"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
@@ -1237,11 +1238,11 @@ msgstr ""
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr ""
+msgstr "_ახალი…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
-msgstr ""
+msgstr "_ყველას დაწყება"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
@@ -1257,15 +1258,15 @@ msgstr ""
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
-msgstr "გასვლა"
+msgstr "_გამოსვლა"
 
 #: ../gtk/transmission.ui:54 ../gtk/ui/gtk3/DetailsDialog.ui:680 ../gtk/ui/gtk4/DetailsDialog.ui:508
 msgid "_Edit"
-msgstr "_რედაქტირება"
+msgstr "_ჩასწორება"
 
 #: ../gtk/transmission.ui:59
 msgid "Select _All"
-msgstr "ყ_ველას მონიშვნა"
+msgstr "ყველაფრის _მონიშვნა"
 
 #: ../gtk/transmission.ui:64
 msgid "Dese_lect All"
@@ -1273,19 +1274,19 @@ msgstr "ყველა _მონიშვნის მოხსნა"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "გამართვა"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
-msgstr "ტორენტი"
+msgstr "_ტორენტი"
 
 #: ../gtk/transmission.ui:82 ../gtk/transmission.ui:293 ../gtk/ui/gtk3/MainWindow.ui:95 ../gtk/ui/gtk4/MainWindow.ui:91
 msgid "_Properties"
-msgstr ""
+msgstr "_თვისებები"
 
 #: ../gtk/transmission.ui:84 ../gtk/transmission.ui:295 ../gtk/ui/gtk3/MainWindow.ui:92 ../gtk/ui/gtk4/MainWindow.ui:77
 msgid "Torrent properties"
-msgstr ""
+msgstr "ტორენტის თვისებები"
 
 #: ../gtk/transmission.ui:89 ../gtk/transmission.ui:300
 msgid "Open Fold_er"
@@ -1297,7 +1298,7 @@ msgstr "_დაწყება"
 
 #: ../gtk/transmission.ui:99 ../gtk/transmission.ui:368 ../gtk/ui/gtk3/MainWindow.ui:38 ../gtk/ui/gtk4/MainWindow.ui:42
 msgid "Start torrent"
-msgstr "ტორენტის დაწყება"
+msgstr "ტორენტის გააშვება"
 
 #: ../gtk/transmission.ui:104 ../gtk/transmission.ui:373
 msgid "Start _Now"
@@ -1313,7 +1314,7 @@ msgstr "გამოითხოვე მეთვალყურისგა�
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
-msgstr ""
+msgstr "_რიგი"
 
 #: ../gtk/transmission.ui:119 ../gtk/transmission.ui:388
 msgid "Move to _Top"
@@ -1321,11 +1322,11 @@ msgstr ""
 
 #: ../gtk/transmission.ui:124 ../gtk/transmission.ui:393
 msgid "Move _Up"
-msgstr ""
+msgstr "ზ_ემოთ აწევა"
 
 #: ../gtk/transmission.ui:129 ../gtk/transmission.ui:398
 msgid "Move _Down"
-msgstr ""
+msgstr "_ჩამოწევა"
 
 #: ../gtk/transmission.ui:134 ../gtk/transmission.ui:403
 msgid "Move to _Bottom"
@@ -1333,11 +1334,11 @@ msgstr ""
 
 #: ../gtk/transmission.ui:141 ../gtk/transmission.ui:410 ../gtk/ui/gtk3/MainWindow.ui:55 ../gtk/ui/gtk4/MainWindow.ui:54
 msgid "_Pause"
-msgstr "_პაუზა"
+msgstr "_შეჩერება"
 
 #: ../gtk/transmission.ui:143 ../gtk/transmission.ui:412 ../gtk/ui/gtk3/MainWindow.ui:53 ../gtk/ui/gtk4/MainWindow.ui:52
 msgid "Pause torrent"
-msgstr "ტორენტის პაუზა"
+msgstr "ტორენტის შეჩერება"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
@@ -1349,15 +1350,15 @@ msgstr "_ლოკალური ინფორმაციის შემო
 
 #: ../gtk/transmission.ui:159 ../gtk/transmission.ui:428
 msgid "Copy _Magnet Link to Clipboard"
-msgstr "მაგნიტის კოპირება"
+msgstr "_მაგნიტური ბმულის ბუფერში კოპირება"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:63
 msgid "Remove torrent"
-msgstr "ტორენტის ამოგდება"
+msgstr "ტორენტის წაშლა"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
-msgstr "_ფაილების წაშლა და ამოგდება"
+msgstr "_ფაილების წაშლა და სიიდან ამოღება"
 
 #: ../gtk/transmission.ui:178
 msgid "_View"
@@ -1381,19 +1382,19 @@ msgstr "_სტატუსის ზოლი"
 
 #: ../gtk/transmission.ui:203 ../gtk/transmission.ui:310
 msgid "Sort by _Activity"
-msgstr "დალაგება აქტივობის მიხედვით"
+msgstr "_დალაგება აქტივობის მიხედვით"
 
 #: ../gtk/transmission.ui:208 ../gtk/transmission.ui:315
 msgid "Sort by A_ge"
-msgstr "დალაგება ასაკის მიხედვით"
+msgstr "დალაგება ასაკის _მიხედვით"
 
 #: ../gtk/transmission.ui:213 ../gtk/transmission.ui:320
 msgid "Sort by _Name"
-msgstr "დალაგება სახელის მიხედვით"
+msgstr "დალაგება _სახელის მიხედვით"
 
 #: ../gtk/transmission.ui:218 ../gtk/transmission.ui:325
 msgid "Sort by _Progress"
-msgstr "დალაგება პროგრესის მიხედვით"
+msgstr "_დალაგება პროგრესის მიხედვით"
 
 #: ../gtk/transmission.ui:223 ../gtk/transmission.ui:330
 msgid "Sort by _Queue"
@@ -1417,7 +1418,7 @@ msgstr "დარჩენილი დროის მიხედვით"
 
 #: ../gtk/transmission.ui:250 ../gtk/transmission.ui:357
 msgid "Re_verse Sort Order"
-msgstr "დალაგების შებრუნბა"
+msgstr "დალაგების შებრუნე_ბა"
 
 #: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1478
 msgid "_Help"
@@ -1433,19 +1434,19 @@ msgstr "_სტატისტიკა"
 
 #: ../gtk/transmission.ui:269
 msgid "_Donate"
-msgstr ""
+msgstr "_შეწირვა"
 
 #: ../gtk/transmission.ui:276
 msgid "_Contents"
-msgstr "შინაარსი"
+msgstr "_შემცველობა"
 
 #: ../gtk/transmission.ui:282
 msgid "_About"
-msgstr ""
+msgstr "_შესახებ"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr "ტორენტების სორტირება"
+msgstr "ტორენტების _დალაგება"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -1453,15 +1454,15 @@ msgstr ""
 
 #: ../gtk/transmission.ui:486
 msgid "Enable Alternative Speed _Limits"
-msgstr "ალტერნატიული სიჩქარის გააქტიურება"
+msgstr "ალტერნატიული სიჩქარის _ლიმიტების გააქტიურება"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2006 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1412
 msgid "_Add"
-msgstr ""
+msgstr "_დამატება"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/AddTrackerDialog.ui:18
 msgid "Tracker"
-msgstr "მეთვალყურე"
+msgstr "ტრეკერი"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:88 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
 msgid "_Announce URL:"
@@ -1469,7 +1470,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1491 ../gtk/ui/gtk4/StatsDialog.ui:253
 msgid "_Close"
-msgstr ""
+msgstr "_დახურვა"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:56 ../gtk/ui/gtk4/DetailsDialog.ui:25
 msgid "Activity"
@@ -1481,19 +1482,19 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:92 ../gtk/ui/gtk4/DetailsDialog.ui:49
 msgid "Have:"
-msgstr "გვაქვს:"
+msgstr "მაქვს:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:104 ../gtk/ui/gtk3/StatsDialog.ui:92 ../gtk/ui/gtk3/StatsDialog.ui:250 ../gtk/ui/gtk4/DetailsDialog.ui:59 ../gtk/ui/gtk4/StatsDialog.ui:33 ../gtk/ui/gtk4/StatsDialog.ui:151
 msgid "Uploaded:"
-msgstr "ატვირთულია"
+msgstr "ატვირთულია:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:116 ../gtk/ui/gtk3/StatsDialog.ui:117 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:69 ../gtk/ui/gtk4/StatsDialog.ui:54 ../gtk/ui/gtk4/StatsDialog.ui:172
 msgid "Downloaded:"
-msgstr "იქაჩება:"
+msgstr "გადმოწერილია:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:128 ../gtk/ui/gtk4/DetailsDialog.ui:79
 msgid "State:"
-msgstr "შტატი:"
+msgstr "მდგომარეობა:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:140 ../gtk/ui/gtk4/DetailsDialog.ui:89
 msgid "Running time:"
@@ -1501,7 +1502,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:152 ../gtk/ui/gtk4/DetailsDialog.ui:99
 msgid "Remaining time:"
-msgstr ""
+msgstr "დარჩენილი დრო:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:164 ../gtk/ui/gtk4/DetailsDialog.ui:109
 msgid "Last activity:"
@@ -1517,7 +1518,7 @@ msgstr "დაწვრილებით"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:354 ../gtk/ui/gtk4/DetailsDialog.ui:256
 msgid "Location:"
-msgstr ""
+msgstr "მდებარეობა:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:366 ../gtk/ui/gtk4/DetailsDialog.ui:266
 msgid "Hash:"
@@ -1525,15 +1526,15 @@ msgstr "ჰეში:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:378 ../gtk/ui/gtk4/DetailsDialog.ui:276
 msgid "Privacy:"
-msgstr "პრივატულობა:"
+msgstr "პირადი ინფორმაცია:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:390 ../gtk/ui/gtk4/DetailsDialog.ui:286
 msgid "Origin:"
-msgstr ""
+msgstr "საწყისი:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:402 ../gtk/ui/gtk4/DetailsDialog.ui:296
 msgid "Added:"
-msgstr ""
+msgstr "დამატებულია:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
@@ -1549,7 +1550,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:617 ../gtk/ui/gtk4/DetailsDialog.ui:461
 msgid "Peers"
-msgstr "პირები"
+msgstr "პარტნიორები"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:738 ../gtk/ui/gtk4/DetailsDialog.ui:536
 msgid "Show _backup trackers"
@@ -1565,7 +1566,7 @@ msgstr "ფაილები"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:390 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:245
 msgid "Speed"
-msgstr ""
+msgstr "სიჩქარე"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:857 ../gtk/ui/gtk4/DetailsDialog.ui:613
 msgid "Honor global _limits"
@@ -1597,15 +1598,15 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1117 ../gtk/ui/gtk4/DetailsDialog.ui:787
 msgid "Peer Connections"
-msgstr "პირთა შეერთებები"
+msgstr "პარტნორთან მიერთებები"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1141 ../gtk/ui/gtk4/DetailsDialog.ui:801
 msgid "_Maximum peers:"
-msgstr "მაქსიმუმი პირები:"
+msgstr "მაქსიმუმი პარტნიორები:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1415 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:980
 msgid "Options"
-msgstr "პარამეტრები"
+msgstr "გამართვა"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:18
 msgid "Tracker Announce URLs"
@@ -1623,19 +1624,19 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/MainWindow.ui:143 ../gtk/ui/gtk4/MainWindow.ui:130
 msgid "Torrent"
-msgstr ""
+msgstr "Torrent"
 
 #: ../gtk/ui/gtk3/MainWindow.ui:251 ../gtk/ui/gtk3/StatsDialog.ui:8 ../gtk/ui/gtk4/MainWindow.ui:202 ../gtk/ui/gtk4/StatsDialog.ui:5
 msgid "Statistics"
-msgstr ""
+msgstr "სტატისტიკა"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:8 ../gtk/ui/gtk3/MakeProgressDialog.ui:8 ../gtk/ui/gtk4/MakeDialog.ui:5 ../gtk/ui/gtk4/MakeProgressDialog.ui:5
 msgid "New Torrent"
-msgstr ""
+msgstr "ახალი ტორენტი"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:36 ../gtk/ui/gtk4/MakeDialog.ui:289
 msgid "_New"
-msgstr ""
+msgstr "_ახალი"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:91 ../gtk/ui/gtk4/MakeDialog.ui:33
 msgid "Sa_ve to:"
@@ -1663,11 +1664,11 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:333 ../gtk/ui/gtk4/MakeDialog.ui:212
 msgid "Co_mment:"
-msgstr ""
+msgstr "კომე_ნტარი:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:360 ../gtk/ui/gtk4/MakeDialog.ui:235
 msgid "_Source:"
-msgstr ""
+msgstr "_წყარო:"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:387 ../gtk/ui/gtk4/MakeDialog.ui:258
 msgid "_Private torrent"
@@ -1679,43 +1680,43 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"
-msgstr ""
+msgstr "შეტყობინებების ჟურნალი"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:27 ../gtk/ui/gtk4/MessageLogWindow.ui:31
 msgid "Save _As"
-msgstr ""
+msgstr "_შენახვა, როგორც"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:42 ../gtk/ui/gtk4/MessageLogWindow.ui:55
 msgid "Clear"
-msgstr ""
+msgstr "გაწმენდა"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:67 ../gtk/ui/gtk4/MessageLogWindow.ui:84
 msgid "P_ause"
-msgstr ""
+msgstr "_პაუზა"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:97 ../gtk/ui/gtk4/MessageLogWindow.ui:100
 msgid "Level"
-msgstr ""
+msgstr "დონე"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:8 ../gtk/ui/gtk4/OptionsDialog.ui:5
 msgid "Torrent Options"
-msgstr "ტორენტის პარამეტრები"
+msgstr "ტორენტის მორგება"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:67 ../gtk/ui/gtk4/OptionsDialog.ui:19
 msgid "_Torrent file:"
-msgstr "ტორენტ ფაილი"
+msgstr "ტორენტის _ფაილი:"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:82 ../gtk/ui/gtk4/OptionsDialog.ui:32
 msgid "Select Source File"
-msgstr "შეარჩიე წყარო ფაილი"
+msgstr "აირჩიეთ საწყისი ფაილი"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:93 ../gtk/ui/gtk4/OptionsDialog.ui:41
 msgid "_Destination folder:"
-msgstr "_საბოლოო საქაღალდე"
+msgstr "_დანიშნულების საქაღალდე:"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:109 ../gtk/ui/gtk4/OptionsDialog.ui:55
 msgid "Select Destination Folder"
-msgstr "საბოლოო საქაღალდის არჩევა"
+msgstr "აირჩიეთ სამიზნე საქაღალდე"
 
 #: ../gtk/ui/gtk3/OptionsDialog.ui:168 ../gtk/ui/gtk4/OptionsDialog.ui:108
 msgid "_Start when added"
@@ -1731,7 +1732,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:72 ../gtk/ui/gtk4/PrefsDialog.ui:26
 msgid "Speed Limits"
-msgstr ""
+msgstr "სიჩქარის ლიმიტები"
 
 #. Checkbox to limit upload speed
 #: ../gtk/ui/gtk3/PrefsDialog.ui:94 ../gtk/ui/gtk4/PrefsDialog.ui:40
@@ -1777,7 +1778,7 @@ msgstr ""
 #: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
 msgctxt "Gerund"
 msgid "Adding"
-msgstr ""
+msgstr "დამატება"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:429 ../gtk/ui/gtk4/PrefsDialog.ui:274
 msgid "Automatically add torrent files _from:"
@@ -1809,7 +1810,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:676 ../gtk/ui/gtk4/PrefsDialog.ui:457
 msgid "Incomplete"
-msgstr ""
+msgstr "არასრული"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:698 ../gtk/ui/gtk4/PrefsDialog.ui:471
 msgid "Append \"._part\" to incomplete files' names"
@@ -1826,11 +1827,11 @@ msgstr ""
 #: ../gtk/ui/gtk3/PrefsDialog.ui:786 ../gtk/ui/gtk4/PrefsDialog.ui:536
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr ""
+msgstr "გადმოწერა"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:804 ../gtk/ui/gtk4/PrefsDialog.ui:551
 msgid "Limits"
-msgstr ""
+msgstr "ლიმიტები"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:826 ../gtk/ui/gtk4/PrefsDialog.ui:565
 msgid "Stop seeding at _ratio:"
@@ -1847,11 +1848,11 @@ msgstr ""
 #: ../gtk/ui/gtk3/PrefsDialog.ui:922 ../gtk/ui/gtk4/PrefsDialog.ui:638
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr ""
+msgstr "Seeding"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:940 ../gtk/ui/gtk3/PrefsDialog.ui:1147 ../gtk/ui/gtk4/PrefsDialog.ui:653 ../gtk/ui/gtk4/PrefsDialog.ui:791
 msgid "Privacy"
-msgstr ""
+msgstr "პირადი ინფორმაცია"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:964 ../gtk/ui/gtk4/PrefsDialog.ui:667
 msgid "_Encryption mode:"
@@ -1871,7 +1872,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1100 ../gtk/ui/gtk4/PrefsDialog.ui:763
 msgid "_Update"
-msgstr ""
+msgstr "განახლება"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1165 ../gtk/ui/gtk4/PrefsDialog.ui:806
 msgid "Listening Port"
@@ -1951,11 +1952,11 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1591 ../gtk/ui/gtk4/PrefsDialog.ui:1103
 msgid "Network"
-msgstr ""
+msgstr "ქსელი"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1609 ../gtk/ui/gtk3/PrefsDialog.ui:1773 ../gtk/ui/gtk4/PrefsDialog.ui:1118 ../gtk/ui/gtk4/PrefsDialog.ui:1227
 msgid "Desktop"
-msgstr ""
+msgstr "სამუშაო მაგიდა"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1631 ../gtk/ui/gtk4/PrefsDialog.ui:1132
 msgid "_Inhibit hibernation when torrents are active"
@@ -1967,7 +1968,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1686 ../gtk/ui/gtk4/PrefsDialog.ui:1167
 msgid "Notification"
-msgstr ""
+msgstr "შეტყობინება"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1708 ../gtk/ui/gtk4/PrefsDialog.ui:1181
 msgid "Show a notification when torrents are a_dded"
@@ -1983,7 +1984,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1791 ../gtk/ui/gtk4/PrefsDialog.ui:1242
 msgid "Remote Control"
-msgstr ""
+msgstr "დაშორებული მართვა"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1819 ../gtk/ui/gtk4/PrefsDialog.ui:1261
 msgid "Allow _remote access"
@@ -2003,11 +2004,11 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1893 ../gtk/ui/gtk4/PrefsDialog.ui:1313
 msgid "_Username:"
-msgstr ""
+msgstr "_მომხმარებელი:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1907 ../gtk/ui/gtk4/PrefsDialog.ui:1325
 msgid "Pass_word:"
-msgstr ""
+msgstr "პა_როლი:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1919 ../gtk/ui/gtk4/PrefsDialog.ui:1338
 msgid "Only allow these IP a_ddresses:"
@@ -2015,7 +2016,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1941 ../gtk/ui/gtk4/PrefsDialog.ui:1354
 msgid "Addresses:"
-msgstr ""
+msgstr "მისამართები:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:2052 ../gtk/ui/gtk4/PrefsDialog.ui:1442
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -2023,7 +2024,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:2081 ../gtk/ui/gtk4/PrefsDialog.ui:1461
 msgid "Remote"
-msgstr ""
+msgstr "დაშორებული"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:8 ../gtk/ui/gtk4/RelocateDialog.ui:5
 msgid "Set Torrent Location"
@@ -2031,11 +2032,11 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:36 ../gtk/ui/gtk4/RelocateDialog.ui:101
 msgid "_Apply"
-msgstr ""
+msgstr "_დაგატარება"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:67 ../gtk/ui/gtk4/RelocateDialog.ui:19
 msgid "Location"
-msgstr "მისამართი"
+msgstr "მდებარეობა"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:92 ../gtk/ui/gtk4/RelocateDialog.ui:34
 msgid "Torrent _location:"
@@ -2051,7 +2052,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/StatsDialog.ui:68 ../gtk/ui/gtk4/StatsDialog.ui:19
 msgid "Current Session"
-msgstr ""
+msgstr "მიმდინარე სესია"
 
 #: ../gtk/ui/gtk3/StatsDialog.ui:142 ../gtk/ui/gtk3/StatsDialog.ui:300 ../gtk/ui/gtk4/StatsDialog.ui:75 ../gtk/ui/gtk4/StatsDialog.ui:193
 msgid "Ratio:"
@@ -2059,15 +2060,15 @@ msgstr "შეფარდება:"
 
 #: ../gtk/ui/gtk3/StatsDialog.ui:167 ../gtk/ui/gtk3/StatsDialog.ui:325 ../gtk/ui/gtk4/StatsDialog.ui:96 ../gtk/ui/gtk4/StatsDialog.ui:214
 msgid "Duration:"
-msgstr ""
+msgstr "ხანგრძლივობა:"
 
 #: ../gtk/ui/gtk3/StatsDialog.ui:212 ../gtk/ui/gtk4/StatsDialog.ui:125
 msgid "Total"
-msgstr ""
+msgstr "ჯამში"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:8 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:5
 msgid "Open URL"
-msgstr ""
+msgstr "URL-ის გახსნა"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:64 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:18
 msgid "Open torrent from URL"
@@ -2075,7 +2076,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:88 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:32
 msgid "_URL"
-msgstr ""
+msgstr "_URL"
 
 #: ../libtransmission/announcer-http.cc:465
 msgid "Couldn't parse announce response: {error} ({error_code})"
@@ -2087,11 +2088,11 @@ msgstr ""
 
 #: ../libtransmission/announcer-udp.cc:142 ../libtransmission/announcer-udp.cc:237
 msgid "Unknown error"
-msgstr ""
+msgstr "უცნობი შეცდომა"
 
 #: ../libtransmission/announcer-udp.cc:327
 msgid "Connection failed"
-msgstr ""
+msgstr "შეერთების შეცდომა"
 
 #: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:554
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
@@ -2107,17 +2108,17 @@ msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1345
+#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1349
 msgid "Could not connect to tracker"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1349
+#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1353
 msgid "Tracker did not respond"
 msgstr ""
 
 #: ../libtransmission/announcer.cc:1079
 msgid "Success"
-msgstr ""
+msgstr "წარმატება"
 
 #: ../libtransmission/blocklist.cc:66 ../libtransmission/blocklist.cc:400
 msgid "Blocklist '{path}' has {count} entry"
@@ -2142,7 +2143,7 @@ msgstr ""
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/log.cc:290
+#: ../libtransmission/log.cc:300
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr ""
 
@@ -2228,15 +2229,15 @@ msgstr ""
 
 #: ../libtransmission/port-forwarding.cc:163
 msgid "Starting"
-msgstr ""
+msgstr "გაშვება"
 
 #: ../libtransmission/port-forwarding.cc:166
 msgid "Forwarded"
-msgstr ""
+msgstr "გადაგზავნილი"
 
 #: ../libtransmission/port-forwarding.cc:169
 msgid "Stopping"
-msgstr ""
+msgstr "შეჩერება"
 
 #: ../libtransmission/port-forwarding.cc:172
 msgid "Not forwarded"
@@ -2294,7 +2295,7 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.cc:917
 msgid "Password required"
-msgstr ""
+msgstr "პაროლი აუცილებელია"
 
 #: ../libtransmission/rpc-server.cc:923
 msgid "Serving RPC and Web requests from '{path}'"
@@ -2336,19 +2337,19 @@ msgstr ""
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:1381
+#: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/torrent-magnet.cc:332
+#: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../libtransmission/torrent-metainfo.cc:676
+#: ../libtransmission/torrent-metainfo.cc:699
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2360,35 +2361,35 @@ msgstr ""
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:491
+#: ../libtransmission/torrent.cc:492
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:500
+#: ../libtransmission/torrent.cc:501
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:552
+#: ../libtransmission/torrent.cc:553
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:559
+#: ../libtransmission/torrent.cc:560
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:877
+#: ../libtransmission/torrent.cc:876
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:900
+#: ../libtransmission/torrent.cc:902
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:965
+#: ../libtransmission/torrent.cc:956
 msgid "Removing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1295 ../libtransmission/torrent.cc:2354
+#: ../libtransmission/torrent.cc:1284 ../libtransmission/torrent.cc:2340
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -2477,7 +2478,7 @@ msgstr ""
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr ""
 
-#: ../libtransmission/web.cc:446
+#: ../libtransmission/web.cc:448
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 
@@ -2496,37 +2497,23 @@ msgstr[1] ""
 #: ../utils/remote.cc:140
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "საათი"
+msgstr[1] "საათი"
 
 #: ../utils/remote.cc:141
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "წუთი"
+msgstr[1] "წუთი"
 
 #: ../utils/remote.cc:142 ../utils/remote.cc:162
 msgid "seconds"
 msgid_plural "seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "წამი"
+msgstr[1] "წამი"
 
 #: ../utils/remote.cc:146
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>კავშირების გაწყვეტა</b>"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "ვერ შევქმენი \"%1$s\": %2$s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "ვერ გავხსენი \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "ტორენტის შქმნა"
+msgstr[0] "დღე"
+msgstr[1] "დღე"
