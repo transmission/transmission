@@ -93,15 +93,15 @@ bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_
     return true;
 }
 
-/* returns 0 on success, or an errno on failure */
-int readOrWriteBytes(
+void readOrWriteBytes(
     tr_session* session,
     tr_torrent* tor,
     IoMode io_mode,
     tr_file_index_t file_index,
     uint64_t file_offset,
     uint8_t* buf,
-    size_t buflen)
+    size_t buflen,
+    tr_error** error)
 {
     TR_ASSERT(file_index < tor->fileCount());
 
@@ -112,7 +112,7 @@ int readOrWriteBytes(
 
     if (file_size == 0)
     {
-        return 0;
+        return;
     }
 
     // --- Find the fd
@@ -121,7 +121,14 @@ int readOrWriteBytes(
     auto filename = tr_pathbuf{};
     if (!fd && !getFilename(filename, tor, file_index, io_mode))
     {
-        return ENOENT;
+        auto const err = ENOENT;
+        auto const msg = fmt::format(
+            _("Couldn't get '{path}': {error} ({error_code})"),
+            fmt::arg("path", tor->fileSubpath(file_index)),
+            fmt::arg("error", tr_strerror(err)),
+            fmt::arg("error_code", err));
+        tr_error_set(error, err, msg);
+        return;
     }
 
     if (!fd) // not in the cache, so open or create it now
@@ -139,48 +146,46 @@ int readOrWriteBytes(
 
     if (!fd) // couldn't create/open it either
     {
-        int const err = errno;
-        tr_logAddErrorTor(
-            tor,
-            fmt::format(
-                _("Couldn't get '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename),
-                fmt::arg("error", tr_strerror(err)),
-                fmt::arg("error_code", err)));
-        return err;
+        auto const err = errno;
+        auto const msg = fmt::format(
+            _("Couldn't get '{path}': {error} ({error_code})"),
+            fmt::arg("path", filename),
+            fmt::arg("error", tr_strerror(err)),
+            fmt::arg("error_code", err));
+        tr_error_set(error, err, msg);
+        tr_logAddErrorTor(tor, msg);
+        return;
     }
 
     switch (io_mode)
     {
     case IoMode::Read:
-        if (tr_error* error = nullptr; !readEntireBuf(*fd, file_offset, buf, buflen, &error) && error != nullptr)
+        if (tr_error* my_error = nullptr; !readEntireBuf(*fd, file_offset, buf, buflen, &my_error) && my_error != nullptr)
         {
-            auto const err = error->code;
             tr_logAddErrorTor(
                 tor,
                 fmt::format(
                     _("Couldn't read '{path}': {error} ({error_code})"),
                     fmt::arg("path", tor->fileSubpath(file_index)),
-                    fmt::arg("error", error->message),
-                    fmt::arg("error_code", error->code)));
-            tr_error_free(error);
-            return err;
+                    fmt::arg("error", my_error->message),
+                    fmt::arg("error_code", my_error->code)));
+            tr_error_propagate(error, &my_error);
+            return;
         }
         break;
 
     case IoMode::Write:
-        if (tr_error* error = nullptr; !writeEntireBuf(*fd, file_offset, buf, buflen, &error) && error != nullptr)
+        if (tr_error* my_error = nullptr; !writeEntireBuf(*fd, file_offset, buf, buflen, &my_error) && my_error != nullptr)
         {
-            auto const err = error->code;
             tr_logAddErrorTor(
                 tor,
                 fmt::format(
                     _("Couldn't save '{path}': {error} ({error_code})"),
                     fmt::arg("path", tor->fileSubpath(file_index)),
-                    fmt::arg("error", error->message),
-                    fmt::arg("error_code", error->code)));
-            tr_error_free(error);
-            return err;
+                    fmt::arg("error", my_error->message),
+                    fmt::arg("error_code", my_error->code)));
+            tr_error_propagate(error, &my_error);
+            return;
         }
         break;
 
@@ -188,15 +193,11 @@ int readOrWriteBytes(
         tr_sys_file_advise(*fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED);
         break;
     }
-
-    return 0;
 }
 
 /* returns 0 on success, or an errno on failure */
 int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location loc, uint8_t* buf, size_t buflen)
 {
-    int err = 0;
-
     if (loc.piece >= tor->pieceCount())
     {
         return EINVAL;
@@ -204,29 +205,37 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
 
     auto [file_index, file_offset] = tor->fileOffset(loc);
 
-    while (buflen != 0 && err == 0)
+    while (buflen != 0)
     {
         uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->fileSize(file_index) - file_offset });
 
-        err = readOrWriteBytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass);
+        tr_error* error = nullptr;
+        readOrWriteBytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, &error);
+
+        if (error != nullptr)
+        {
+            if (io_mode == IoMode::Write && tor->error != TR_STAT_LOCAL_ERROR)
+            {
+                tor->setLocalError(error->message);
+                tr_torrentStop(tor);
+            }
+
+            auto const error_code = error->code;
+            tr_error_clear(&error);
+            return error_code;
+        }
+
         if (buf != nullptr)
         {
             buf += bytes_this_pass;
         }
         buflen -= bytes_this_pass;
 
-        if (err != 0 && io_mode == IoMode::Write && tor->error != TR_STAT_LOCAL_ERROR)
-        {
-            auto const path = tr_pathbuf{ tor->downloadDir(), '/', tor->fileSubpath(file_index) };
-            tor->setLocalError(fmt::format(FMT_STRING("{:s} ({:s})"), tr_strerror(err), path));
-            tr_torrentStop(tor);
-        }
-
         ++file_index;
         file_offset = 0;
     }
 
-    return err;
+    return 0;
 }
 
 std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_t piece)

@@ -188,10 +188,8 @@
     {
         return [NSString localizedStringWithFormat:@"%.2f %@", speed, gb];
     }
-    else // insane speeds
-    {
-        return [NSString localizedStringWithFormat:@"%.1f %@", speed, gb];
-    }
+    // 100.0 GB/s and above
+    return [NSString localizedStringWithFormat:@"%.1f %@", speed, gb];
 }
 
 + (NSString*)stringForSpeedCompact:(CGFloat)speed kb:(NSString*)kb mb:(NSString*)mb gb:(NSString*)gb
@@ -200,14 +198,14 @@
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, kb];
     }
-    if (speed < 999.95) // 100 KB/s to 999 KB/s
+    if (speed < 999.5) // 100 KB/s to 999 KB/s
     {
         return [NSString localizedStringWithFormat:@"%.0f %@", speed, kb];
     }
 
     speed /= 1000.0;
 
-    if (speed < 9.95) // 1.00 MB/s to 9.99 MB/s
+    if (speed < 9.995) // 1.00 MB/s to 9.99 MB/s
     {
         return [NSString localizedStringWithFormat:@"%.2f %@", speed, mb];
     }
@@ -215,14 +213,14 @@
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, mb];
     }
-    if (speed < 999.95) // 100 MB/s to 999 MB/s
+    if (speed < 999.5) // 100 MB/s to 999 MB/s
     {
         return [NSString localizedStringWithFormat:@"%.0f %@", speed, mb];
     }
 
     speed /= 1000.0;
 
-    if (speed < 9.95) // 1.00 GB/s to 9.99 GB/s
+    if (speed < 9.995) // 1.00 GB/s to 9.99 GB/s
     {
         return [NSString localizedStringWithFormat:@"%.2f %@", speed, gb];
     }
@@ -230,10 +228,8 @@
     {
         return [NSString localizedStringWithFormat:@"%.1f %@", speed, gb];
     }
-    else // insane speeds
-    {
-        return [NSString localizedStringWithFormat:@"%.0f %@", speed, gb];
-    }
+    // 100 GB/s and above
+    return [NSString localizedStringWithFormat:@"%.0f %@", speed, gb];
 }
 
 @end
