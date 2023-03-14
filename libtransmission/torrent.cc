@@ -24,8 +24,6 @@
 #include <windows.h> /* CreateProcess(), GetLastError() */
 #endif
 
-#include <event2/util.h> /* evutil_vsnprintf() */
-
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 
