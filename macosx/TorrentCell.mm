@@ -692,7 +692,7 @@ static NSInteger const kMaxPieces = 18 * 18;
         }
 
         //it's faster to just set color instead of checking previous color
-        // faster an non-broken alternative to `[bitmap setColor:pieceColor atX:i y:0]`
+        // faster and non-broken alternative to `[bitmap setColor:pieceColor atX:i y:0]`
         unsigned char* data = bitmap.bitmapData + (i << 2);
         data[0] = pieceColor.redComponent * 255;
         data[1] = pieceColor.greenComponent * 255;
