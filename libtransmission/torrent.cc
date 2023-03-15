@@ -167,18 +167,6 @@ void tr_torrentClearError(tr_torrent* tor)
     tor->error_string.clear();
 }
 
-constexpr void tr_torrentUnsetPeerId(tr_torrent* tor)
-{
-    // triggers a rebuild next time tr_torrentGetPeerId() is called
-    tor->peer_id_ = {};
-}
-
-int peerIdTTL(tr_torrent const* tor)
-{
-    auto const ctime = tor->peer_id_creation_time_;
-    return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peerIdTTLHours() * 3600, tr_time());
-}
-
 /* returns true if the seed ratio applies --
  * it applies if the torrent's a seed AND it has a seed ratio set */
 bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_left, uint64_t* setme_goal)
@@ -215,20 +203,6 @@ bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
     return tr_torrentGetSeedRatioBytes(tor, &bytes_left, nullptr) && bytes_left == 0;
 }
 } // namespace
-
-tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
-{
-    bool const needs_new_peer_id = tor->peer_id_[0] == '\0' || // doesn't have one
-        (tor->isPublic() && (peerIdTTL(tor) <= 0)); // has one but it's expired
-
-    if (needs_new_peer_id)
-    {
-        tor->peer_id_ = tr_peerIdInit();
-        tor->peer_id_creation_time_ = tr_time();
-    }
-
-    return tor->peer_id_;
-}
 
 // --- PER-TORRENT UL / DL SPEEDS
 
@@ -875,12 +849,6 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
         tor->setRatioMode(TR_RATIOLIMIT_UNLIMITED);
     }
 
-    /* corresponds to the peer_id sent as a tracker request parameter.
-     * one tracker admin says: "When the same torrent is opened and
-     * closed and opened again without quitting Transmission ...
-     * change the peerid. It would help sometimes if a stopped event
-     * was missed to ensure that we didn't think someone was cheating. */
-    tr_torrentUnsetPeerId(tor);
     tor->isRunning = true;
     tor->setDirty();
     tor->session->runInSessionThread(torrentStartImpl, tor);

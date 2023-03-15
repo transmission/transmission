@@ -910,7 +910,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     req.announce_url = current_tracker->announce_url;
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
-    req.peer_id = tr_torrentGetPeerId(tor);
+    req.peer_id = tor->peer_id();
     req.up = tier->byteCounts[TR_ANN_UP];
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
