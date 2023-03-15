@@ -20,13 +20,13 @@ static CGFloat const kPaddingBelowStatusFile = 2.0;
 static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 static CGFloat const kPaddingExpansionFrame = 2.0;
 
-static NSParagraphStyle* kParagraphStyle()
+static NSMutableParagraphStyle* sParagraphStyle()
 {
     NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
     paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
     return paragraphStyle;
 }
-static NSParagraphStyle* kStatusParagraphStyle()
+static NSMutableParagraphStyle* sStatusParagraphStyle()
 {
     NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
     paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
@@ -35,32 +35,32 @@ static NSParagraphStyle* kStatusParagraphStyle()
 
 static NSDictionary<NSAttributedStringKey, id>* const kTitleAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:12.0],
-    NSParagraphStyleAttributeName : kParagraphStyle(),
+    NSParagraphStyleAttributeName : sParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.controlTextColor
 };
 static NSDictionary<NSAttributedStringKey, id>* const kStatusAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:9.0],
-    NSParagraphStyleAttributeName : kStatusParagraphStyle(),
+    NSParagraphStyleAttributeName : sStatusParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.secondaryLabelColor
 };
 static NSDictionary<NSAttributedStringKey, id>* const kTitleEmphasizedAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:12.0],
-    NSParagraphStyleAttributeName : kParagraphStyle(),
+    NSParagraphStyleAttributeName : sParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.whiteColor
 };
 static NSDictionary<NSAttributedStringKey, id>* const kStatusEmphasizedAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:9.0],
-    NSParagraphStyleAttributeName : kStatusParagraphStyle(),
+    NSParagraphStyleAttributeName : sStatusParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.whiteColor
 };
 static NSDictionary<NSAttributedStringKey, id>* const kTitleDisabledAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:12.0],
-    NSParagraphStyleAttributeName : kParagraphStyle(),
+    NSParagraphStyleAttributeName : sParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.disabledControlTextColor
 };
 static NSDictionary<NSAttributedStringKey, id>* const kStatusDisabledAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:9.0],
-    NSParagraphStyleAttributeName : kStatusParagraphStyle(),
+    NSParagraphStyleAttributeName : sStatusParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.disabledControlTextColor
 };
 

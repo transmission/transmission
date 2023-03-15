@@ -49,7 +49,7 @@ static CGFloat const kPiecesTotalPercent = 0.6;
 
 static NSInteger const kMaxPieces = 18 * 18;
 
-static NSParagraphStyle* kParagraphStyle()
+static NSMutableParagraphStyle* sParagraphStyle()
 {
     NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
     paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
@@ -57,22 +57,22 @@ static NSParagraphStyle* kParagraphStyle()
 }
 static NSDictionary<NSAttributedStringKey, id>* const kTitleAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:12.0],
-    NSParagraphStyleAttributeName : kParagraphStyle(),
+    NSParagraphStyleAttributeName : sParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.labelColor
 };
 static NSDictionary<NSAttributedStringKey, id>* const kStatusAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:10.0],
-    NSParagraphStyleAttributeName : kParagraphStyle(),
+    NSParagraphStyleAttributeName : sParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.secondaryLabelColor
 };
 static NSDictionary<NSAttributedStringKey, id>* const kTitleEmphasizedAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:12.0],
-    NSParagraphStyleAttributeName : kParagraphStyle(),
+    NSParagraphStyleAttributeName : sParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.whiteColor
 };
 static NSDictionary<NSAttributedStringKey, id>* const kStatusEmphasizedAttributes = @{
     NSFontAttributeName : [NSFont messageFontOfSize:10.0],
-    NSParagraphStyleAttributeName : kParagraphStyle(),
+    NSParagraphStyleAttributeName : sParagraphStyle(),
     NSForegroundColorAttributeName : NSColor.whiteColor
 };
 
