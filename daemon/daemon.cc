@@ -695,7 +695,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     /* setup event state */
     ev_base_ = event_base_new();
 
-    if (ev_base_ == nullptr || setup_signals() == false)
+    if (ev_base_ == nullptr || !setup_signals())
     {
         auto const error_code = errno;
         auto const errmsg = fmt::format(
