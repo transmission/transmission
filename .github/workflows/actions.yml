@@ -587,8 +587,8 @@ jobs:
       - name: Get Dependencies
         run: |
           set -ex
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          apt-get update
+          apt-get install -y --no-install-recommends \
             ca-certificates \
             cmake \
             g++ \
@@ -607,10 +607,10 @@ jobs:
             xz-utils
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
+        run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: sudo apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
+        run: apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v3
         with:
@@ -754,10 +754,10 @@ jobs:
             npm
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
-        run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
+        run: sudo apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
       - name: Get Dependencies (Qt)
         if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
-        run: apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
+        run: sudo apt-get install -y --no-install-recommends qtbase5-dev libqt5svg5-dev qttools5-dev
       - name: Get Source
         uses: actions/download-artifact@v3
         with:
