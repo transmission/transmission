@@ -736,23 +736,22 @@ jobs:
       - name: Get Dependencies
         run: |
           set -ex
-          apk update
-          apk add \
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
             ca-certificates \
+            clang \
             cmake \
-            curl-dev \
-            fmt-dev \
-            g++ \
-            gettext-dev \
-            git \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
             libevent-dev \
-            libpsl \
-            linux-headers \
-            miniupnpc-dev \
-            ninja \
-            npm \
-            pkgconfig \
-            xz
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            npm
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: apt-get install -y --no-install-recommends libglibmm-2.4-dev libgtkmm-3.0-dev
