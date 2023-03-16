@@ -75,7 +75,7 @@ private:
 
         auto info = TorrentInfo{};
         info.info_hash = tor->infoHash();
-        info.client_peer_id = tr_torrentGetPeerId(tor);
+        info.client_peer_id = tor->peer_id();
         info.id = tor->id();
         info.is_done = tor->isDone();
         return info;
