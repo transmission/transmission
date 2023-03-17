@@ -268,12 +268,17 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 
 // ---
 
+#ifndef __APPLE__
+
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
     auto out = std::string{};
+    out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
 }
+
+#endif
 
 #ifdef _WIN32
 

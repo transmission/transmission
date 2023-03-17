@@ -360,7 +360,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(InfoKey, NameKey) || pathIs(InfoKey, NameUtf8Key))
         {
-            tm_.name_ = tr_strv_replace_invalid(value);
+            tm_.setName(value);
         }
         else if (pathIs(InfoKey, PiecesKey))
         {
@@ -393,7 +393,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (pathIs(MagnetInfoKey, DisplayNameKey))
         {
             // compatibility with Transmission <= 3.0
-            tm_.name_ = tr_strv_replace_invalid(value);
+            tm_.setName(value);
         }
         else if (pathIs(MagnetInfoKey, InfoHashKey))
         {

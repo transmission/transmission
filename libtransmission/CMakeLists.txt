@@ -198,6 +198,7 @@ tr_allow_compile_if(
         watchdir-kqueue.cc
     [=[[APPLE]]=]
         tr-assert.mm
+        utils.mm
     [=[[NOT APPLE]]=]
         tr-assert.cc
     [=[[WIN32]]=]
