@@ -133,8 +133,8 @@ size_t ActiveRequests::count(tr_peer const* peer) const noexcept
 size_t ActiveRequests::size() const noexcept
 {
     return std::accumulate(
-            std::begin(impl_->peer_to_blocks_),
-            std::end(impl_->peer_to_blocks_),
-            size_t{},
-            [](auto sum, auto iter){ return sum + std::size(iter.second); });
+        std::begin(impl_->peer_to_blocks_),
+        std::end(impl_->peer_to_blocks_),
+        size_t{},
+        [](auto sum, auto iter) { return sum + std::size(iter.second); });
 }

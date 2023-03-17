@@ -192,6 +192,11 @@ struct peer_atom
         return value;
     }
 
+    [[nodiscard]] constexpr auto piece_data_time() const noexcept
+    {
+        return std::max(client_sent_piece_data_at_, client_got_piece_data_at_);
+    }
+
     [[nodiscard]] constexpr int getReconnectIntervalSecs(time_t const now) const noexcept
     {
         auto sec = int{};
@@ -200,7 +205,7 @@ struct peer_atom
         /* if we were recently connected to this peer and transferring piece
          * data, try to reconnect to them sooner rather that later -- we don't
          * want network troubles to get in the way of a good peer. */
-        if (!unreachable && now - this->piece_data_time <= MinimumReconnectIntervalSecs * 2)
+        if (!unreachable && now - piece_data_time() <= MinimumReconnectIntervalSecs * 2)
         {
             sec = MinimumReconnectIntervalSecs;
         }
@@ -278,7 +283,9 @@ struct peer_atom
     uint16_t num_fails = {};
 
     time_t time = {}; /* when the peer's connection status last changed */
-    time_t piece_data_time = {};
+    time_t client_got_piece_data_at_ = {};
+    time_t client_requested_piece_data_at_ = {};
+    time_t client_sent_piece_data_at_ = {};
 
     time_t lastConnectionAttemptAt = {};
     time_t lastConnectionAt = {};
@@ -546,7 +553,7 @@ public:
 
                 if (peer->atom != nullptr)
                 {
-                    peer->atom->piece_data_time = now;
+                    peer->atom->client_sent_piece_data_at_ = now;
                 }
 
                 break;
@@ -564,7 +571,7 @@ public:
 
                 if (peer->atom != nullptr)
                 {
-                    peer->atom->piece_data_time = now;
+                    peer->atom->client_got_piece_data_at_ = now;
                 }
 
                 break;
@@ -672,19 +679,21 @@ private:
     [[nodiscard]] std::vector<tr_peer*> get_overdue_peers() const
     {
         static auto constexpr RequestTtlSecs = time_t{ 180 };
-        auto const deadline = tr_time() - RequestTtlSecs;
+        auto const now = tr_time();
 
-        auto overdue_peers = std::vector<tr_peer*>{};
-        overdue_peers.reserve(std::size(peers));
-        for (auto* const peer : peers)
-        {
-            if (auto const when = peer->atom->piece_data_time; when != time_t{} && when < deadline)
+        auto overdue = std::vector<tr_peer*>{};
+        overdue.reserve(std::size(peers));
+        std::copy_if(
+            std::begin(peers),
+            std::end(peers),
+            std::back_inserter(overdue),
+            [now](auto const* const peer)
             {
-                overdue_peers.emplace_back(peer);
-            }
-        }
-
-        return overdue_peers;
+                auto const* const atom = peer->atom;
+                auto const timer_begin = std::max(atom->client_requested_piece_data_at_, atom->client_got_piece_data_at_);
+                return timer_begin && timer_begin + RequestTtlSecs < now;
+            });
+        return overdue;
     }
 
     // number of bad pieces a peer is allowed to send before we ban them
@@ -1060,7 +1069,6 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         struct peer_atom* atom = s->ensure_atom_exists(addr, port, 0, TR_PEER_FROM_INCOMING);
 
         atom->time = tr_time();
-        atom->piece_data_time = 0;
         atom->lastConnectionAt = tr_time();
 
         if (!result.io->is_incoming())
@@ -1256,9 +1264,11 @@ struct CompareAtomsByUsefulness
 {
     [[nodiscard]] constexpr static int compare(peer_atom const& a, peer_atom const& b) noexcept // <=>
     {
-        if (a.piece_data_time != b.piece_data_time)
+        auto const a_piece_time = a.piece_data_time();
+        auto const b_piece_time = b.piece_data_time();
+        if (a_piece_time != b_piece_time)
         {
-            return a.piece_data_time > b.piece_data_time ? -1 : 1;
+            return a_piece_time > b_piece_time ? -1 : 1;
         }
 
         if (a.fromBest != b.fromBest)
@@ -1992,7 +2002,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
         auto const lo = MinUploadIdleSecs;
         auto const hi = MaxUploadIdleSecs;
         time_t const limit = hi - (hi - lo) * strictness;
-        time_t const idle_time = now - std::max(atom->time, atom->piece_data_time);
+        time_t const idle_time = now - std::max(atom->time, atom->piece_data_time());
 
         if (idle_time > limit)
         {
@@ -2017,7 +2027,7 @@ void closePeer(tr_peer* peer)
     /* if we transferred piece data, then they might be good peers,
        so reset their `num_fails' weight to zero. otherwise we connected
        to them fruitlessly, so mark it as another fail */
-    if (auto* const atom = peer->atom; atom->piece_data_time != 0)
+    if (auto* const atom = peer->atom; atom->piece_data_time() != 0)
     {
         tr_logAddTraceSwarm(s, fmt::format("resetting atom {} num_fails to 0", peer->display_name()));
         atom->num_fails = 0;
@@ -2041,13 +2051,15 @@ struct ComparePeerByActivity
             return a->do_purge ? 1 : -1;
         }
 
-        /* the one to give us data more recently goes first */
-        if (a->atom->piece_data_time != b->atom->piece_data_time)
+        // primary key: most recent piece activity
+        auto const a_piece_time = a->atom->piece_data_time();
+        auto const b_piece_time = b->atom->piece_data_time();
+        if (a_piece_time != b_piece_time)
         {
-            return a->atom->piece_data_time > b->atom->piece_data_time ? -1 : 1;
+            return a_piece_time > b_piece_time ? -1 : 1;
         }
 
-        /* the one we connected to most recently goes first */
+        // secondary key: most recent connection
         if (a->atom->time != b->atom->time)
         {
             return a->atom->time > b->atom->time ? -1 : 1;
