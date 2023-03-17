@@ -338,13 +338,12 @@ public:
 
     void cancelOldRequests()
     {
-        auto const now = tr_time();
-        auto const oldest = now - RequestTtlSecs;
-
-        for (auto const& [block, peer] : active_requests.sentBefore(oldest))
+        for (auto* const peer : get_overdue_peers())
         {
-            maybeSendCancelRequest(peer, block, nullptr);
-            active_requests.remove(block, peer);
+            for (auto const block : active_requests.remove(peer))
+            {
+                maybeSendCancelRequest(peer, block);
+            }
         }
     }
 
@@ -660,7 +659,7 @@ public:
     time_t lastCancel = 0;
 
 private:
-    static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)
+    static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_peer const* muted = nullptr)
     {
         auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
         if (msgs != nullptr && msgs != muted)
@@ -670,11 +669,26 @@ private:
         }
     }
 
+    [[nodiscard]] std::vector<tr_peer*> get_overdue_peers() const
+    {
+        static auto constexpr RequestTtlSecs = time_t{ 180 };
+        auto const deadline = tr_time() - RequestTtlSecs;
+
+        auto overdue_peers = std::vector<tr_peer*>{};
+        overdue_peers.reserve(std::size(peers));
+        for (auto* const peer : peers)
+        {
+            if (auto const when = peer->atom->piece_data_time; when != time_t{} && when < deadline)
+            {
+                overdue_peers.emplace_back(peer);
+            }
+        }
+
+        return overdue_peers;
+    }
+
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
-
-    // how long we'll let requests we've made linger before we cancel them
-    static auto constexpr RequestTtlSecs = int{ 90 };
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -844,11 +858,9 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed
 // TODO: if we keep this, add equivalent API to ActiveRequest
 void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span)
 {
-    auto const now = tr_time();
-
     for (tr_block_index_t block = span.begin; block < span.end; ++block)
     {
-        torrent->swarm->active_requests.add(block, peer, now);
+        torrent->swarm->active_requests.add(block, peer);
     }
 }
 

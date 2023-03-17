@@ -4,12 +4,10 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <ctime>
 #include <memory>
-#include <utility>
+#include <numeric> // std::accumulate()
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
 #define LIBTRANSMISSION_PEER_MODULE
 
@@ -18,89 +16,11 @@
 #include "libtransmission/peer-mgr-active-requests.h"
 #include "libtransmission/tr-assert.h"
 
-namespace
-{
-
-struct peer_at
-{
-    tr_peer* peer;
-    time_t when;
-
-    peer_at(tr_peer* p, time_t w)
-        : peer{ p }
-        , when{ w }
-    {
-    }
-
-    [[nodiscard]] int compare(peer_at const& that) const // <=>
-    {
-        if (peer != that.peer)
-        {
-            return peer < that.peer ? -1 : 1;
-        }
-
-        return 0;
-    }
-
-    bool operator==(peer_at const& that) const
-    {
-        return compare(that) == 0;
-    }
-};
-
-struct PeerAtHash
-{
-    std::size_t operator()(peer_at const& pa) const noexcept
-    {
-        return std::hash<tr_peer*>{}(pa.peer);
-    }
-};
-
-} // namespace
-
 class ActiveRequests::Impl
 {
 public:
-    size_t size() const
-    {
-        return size_;
-    }
-
-    size_t count(tr_peer const* peer) const
-    {
-        auto const it = count_.find(peer);
-        return it != std::end(count_) ? it->second : size_t{};
-    }
-
-    void incCount(tr_peer const* peer)
-    {
-        ++count_[peer];
-        ++size_;
-    }
-
-    void decCount(tr_peer const* peer)
-    {
-        auto it = count_.find(peer);
-        TR_ASSERT(it != std::end(count_));
-        TR_ASSERT(it->second > 0);
-        TR_ASSERT(size_ > 0);
-
-        if (it != std::end(count_))
-        {
-            if (--it->second == 0)
-            {
-                count_.erase(it);
-            }
-            --size_;
-        }
-    }
-
-    std::unordered_map<tr_peer const*, size_t> count_;
-
-    std::unordered_map<tr_block_index_t, std::unordered_set<peer_at, PeerAtHash>> blocks_;
-
-private:
-    size_t size_ = 0;
+    std::unordered_map<tr_block_index_t, std::unordered_set<tr_peer*>> block_to_peers_;
+    std::unordered_map<tr_peer*, std::unordered_set<tr_block_index_t>> peer_to_blocks_;
 };
 
 ActiveRequests::ActiveRequests()
@@ -110,127 +30,111 @@ ActiveRequests::ActiveRequests()
 
 ActiveRequests::~ActiveRequests() = default;
 
-bool ActiveRequests::add(tr_block_index_t block, tr_peer* peer, time_t when)
+bool ActiveRequests::add(tr_block_index_t block, tr_peer* peer)
 {
-    bool const added = impl_->blocks_[block].emplace(peer, when).second;
-
-    if (added)
-    {
-        impl_->incCount(peer);
-    }
-
+    auto const added = impl_->block_to_peers_[block].emplace(peer).second;
+    auto const also_added = added && impl_->peer_to_blocks_[peer].emplace(block).second;
+    TR_ASSERT(added == also_added);
     return added;
 }
 
 // remove a request to `peer` for `block`
 bool ActiveRequests::remove(tr_block_index_t block, tr_peer const* peer)
 {
-    auto const it = impl_->blocks_.find(block);
-    auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-    auto const removed = it != std::end(impl_->blocks_) && it->second.erase(key) != 0;
-
-    if (removed)
-    {
-        impl_->decCount(peer);
-
-        if (std::empty(it->second))
-        {
-            impl_->blocks_.erase(it);
-        }
-    }
-
+    auto* const peer_key = const_cast<tr_peer*>(peer);
+    auto const removed = impl_->block_to_peers_[block].erase(peer_key) != 0U;
+    auto const also_removed = removed && impl_->peer_to_blocks_[peer_key].erase(block) != 0U;
+    TR_ASSERT(removed == also_removed);
     return removed;
 }
 
 // remove requests to `peer` and return the associated blocks
 std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
 {
-    auto removed = std::vector<tr_block_index_t>{};
-    removed.reserve(impl_->blocks_.size());
+    auto* const peer_key = const_cast<tr_peer*>(peer);
 
-    auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-    for (auto const& [block, peers_at] : impl_->blocks_)
+    if (auto nh = impl_->peer_to_blocks_.extract(peer_key); nh)
     {
-        if (peers_at.count(key) != 0U)
+        auto const& blocks = nh.mapped();
+
+        for (auto const block : blocks)
         {
-            removed.push_back(block);
+            [[maybe_unused]] auto const removed = impl_->block_to_peers_[block].erase(peer_key) != 0U;
+            TR_ASSERT(removed);
         }
+
+        return { std::begin(blocks), std::end(blocks) };
     }
 
-    for (auto block : removed)
-    {
-        remove(block, peer);
-    }
-
-    return removed;
+    return {};
 }
 
 // remove requests for `block` and return the associated peers
 std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
 {
-    auto removed = std::vector<tr_peer*>{};
-
-    if (auto it = impl_->blocks_.find(block); it != std::end(impl_->blocks_))
+    if (auto nh = impl_->block_to_peers_.extract(block); nh)
     {
-        auto const n = std::size(it->second);
-        removed.resize(n);
-        std::transform(
-            std::begin(it->second),
-            std::end(it->second),
-            std::begin(removed),
-            [](auto const& sent) { return sent.peer; });
-        impl_->blocks_.erase(block);
+        auto const& peers = nh.mapped();
+
+        for (auto* const peer : peers)
+        {
+            [[maybe_unused]] auto const removed = impl_->peer_to_blocks_[peer].erase(block) != 0U;
+            TR_ASSERT(removed);
+        }
+
+        return { std::begin(peers), std::end(peers) };
     }
 
-    for (auto const* const peer : removed)
-    {
-        impl_->decCount(peer);
-    }
-
-    return removed;
+    return {};
 }
 
 // return true if there's an active request to `peer` for `block`
-bool ActiveRequests::has(tr_block_index_t block, tr_peer const* peer) const
+bool ActiveRequests::has(tr_block_index_t block, tr_peer const* peer) const noexcept
 {
-    auto const it = impl_->blocks_.find(block);
-    return it != std::end(impl_->blocks_) && (it->second.count(peer_at{ const_cast<tr_peer*>(peer), 0 }) != 0U);
+    auto const& btop = impl_->block_to_peers_;
+
+    if (auto const iter = btop.find(block); iter != std::end(btop))
+    {
+        auto* const peer_key = const_cast<tr_peer*>(peer);
+        return iter->second.count(peer_key) != 0U;
+    }
+
+    return false;
 }
 
 // count how many peers we're asking for `block`
-size_t ActiveRequests::count(tr_block_index_t block) const
+size_t ActiveRequests::count(tr_block_index_t block) const noexcept
 {
-    return std::size(impl_->blocks_[block]);
+    auto const& btop = impl_->block_to_peers_;
+
+    if (auto const iter = btop.find(block); iter != std::end(btop))
+    {
+        return std::size(iter->second);
+    }
+
+    return {};
 }
 
 // count how many active block requests we have to `peer`
-size_t ActiveRequests::count(tr_peer const* peer) const
+size_t ActiveRequests::count(tr_peer const* peer) const noexcept
 {
-    return impl_->count(peer);
+    auto const& ptob = impl_->peer_to_blocks_;
+    auto* const peer_key = const_cast<tr_peer*>(peer);
+
+    if (auto const iter = ptob.find(peer_key); iter != std::end(ptob))
+    {
+        return std::size(iter->second);
+    }
+
+    return {};
 }
 
 // return the total number of active requests
-size_t ActiveRequests::size() const
+size_t ActiveRequests::size() const noexcept
 {
-    return impl_->size();
-}
-
-// returns the active requests sent before `when`
-std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(time_t when) const
-{
-    auto sent_before = std::vector<std::pair<tr_block_index_t, tr_peer*>>{};
-    sent_before.reserve(std::size(impl_->blocks_));
-
-    for (auto const& [block, peers_at] : impl_->blocks_)
-    {
-        for (auto const& sent : peers_at)
-        {
-            if (sent.when < when)
-            {
-                sent_before.emplace_back(block, sent.peer);
-            }
-        }
-    }
-
-    return sent_before;
+    return std::accumulate(
+            std::begin(impl_->peer_to_blocks_),
+            std::end(impl_->peer_to_blocks_),
+            size_t{},
+            [](auto sum, auto iter){ return sum + std::size(iter.second); });
 }
