@@ -779,6 +779,11 @@ public:
         return announce_key_;
     }
 
+    [[nodiscard]] constexpr tr_peer_id_t const& peer_id() const noexcept
+    {
+        return peer_id_;
+    }
+
     // should be called when done modifying the torrent's announce list.
     void on_announce_list_changed()
     {
@@ -814,15 +819,6 @@ public:
 
     tr_sha1_digest_t obfuscated_hash = {};
 
-    /* If the initiator of the connection receives a handshake in which the
-     * peer_id does not match the expected peerid, then the initiator is
-     * expected to drop the connection. Note that the initiator presumably
-     * received the peer information from the tracker, which includes the
-     * peer_id that was registered by the peer. The peer_id from the tracker
-     * and in the handshake are expected to match.
-     */
-    tr_peer_id_t peer_id_ = {};
-
     tr_session* session = nullptr;
 
     tr_torrent_announcer* torrent_announcer = nullptr;
@@ -833,8 +829,6 @@ public:
      * and we're in the process of downloading the metainfo from
      * other peers */
     struct tr_incomplete_metadata* incompleteMetadata = nullptr;
-
-    time_t peer_id_creation_time_ = 0;
 
     time_t lpdAnnounceAt = 0;
 
@@ -936,6 +930,15 @@ private:
         }
     }
 
+    /* If the initiator of the connection receives a handshake in which the
+     * peer_id does not match the expected peerid, then the initiator is
+     * expected to drop the connection. Note that the initiator presumably
+     * received the peer information from the tracker, which includes the
+     * peer_id that was registered by the peer. The peer_id from the tracker
+     * and in the handshake are expected to match.
+     */
+    tr_peer_id_t peer_id_ = tr_peerIdInit();
+
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
 
     float verify_progress_ = -1;
@@ -958,8 +961,6 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
  * Tell the `tr_torrent` that it's gotten a block
  */
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
-
-tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
