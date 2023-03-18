@@ -450,7 +450,7 @@ export class Inspector extends EventTarget {
         string = 'None';
       }
     }
-    setTextContent(e.info.size, string.includes('NaN') ? '...' : string);
+    setTextContent(e.info.size, fmt.stringSanitizer(string));
 
     // hash
     if (torrents.length === 0) {
