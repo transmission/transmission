@@ -19,7 +19,6 @@
 #include <curl/curl.h>
 
 #include <event2/buffer.h>
-#include <event2/util.h>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>

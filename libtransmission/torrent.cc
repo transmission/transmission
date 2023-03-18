@@ -24,8 +24,6 @@
 #include <windows.h> /* CreateProcess(), GetLastError() */
 #endif
 
-#include <event2/util.h> /* evutil_vsnprintf() */
-
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 
@@ -781,7 +779,7 @@ void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc
         {
             delete_func(filename, user_data, nullptr);
         };
-        tor->removeFiles(delete_func_wrapper);
+        tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func_wrapper);
     }
 
     tr_torrentFreeInSessionThread(tor);
@@ -835,6 +833,8 @@ struct torrent_start_opts
 void torrentStart(tr_torrent* tor, torrent_start_opts opts)
 {
     using namespace start_stop_helpers;
+
+    auto const lock = tor->unique_lock();
 
     switch (tor->activity())
     {
@@ -1238,25 +1238,12 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
     // is it a duplicate?
     if (auto* const duplicate_of = session->torrents().get(metainfo.infoHash()); duplicate_of != nullptr)
     {
-        if (duplicate_of->isVirtual())
+        if (setme_duplicate_of != nullptr)
         {
-            char const* dir = nullptr;
-            if (tr_ctorGetDownloadDir(ctor, TR_FORCE, &dir) || tr_ctorGetDownloadDir(ctor, TR_FALLBACK, &dir))
-            {
-                if (isVirtualDir(dir))
-                {
-                    if (setme_duplicate_of != nullptr)
-                    {
-                        *setme_duplicate_of = duplicate_of;
-                    }
-                    return nullptr;
-                }
-                else
-                {
-                    tr_torrentRemove(duplicate_of, true, nullptr, nullptr);
-                }
-            }
+            *setme_duplicate_of = duplicate_of;
         }
+
+        return nullptr;
     }
 
     auto* const tor = new tr_torrent{ std::move(metainfo) };
@@ -1293,24 +1280,17 @@ void setLocationInSessionThread(
         tor->session->verifyRemove(tor);
 
         tr_error* error = nullptr;
-        if (isVirtualDir(path.c_str()) || tor->isVirtual())
+        ok = tor->metainfo_.files().move(tor->currentDir(), path, setme_progress, tor->name(), &error);
+        if (error != nullptr)
         {
-            ok = true;
-        }
-        else
-        {
-            ok = tor->metainfo_.files().move(tor->currentDir(), path, setme_progress, tor->name(), &error);
-            if (error != nullptr)
-            {
-                tor->setLocalError(fmt::format(
-                    _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
-                    fmt::arg("old_path", tor->currentDir()),
-                    fmt::arg("path", path),
-                    fmt::arg("error", error->message),
-                    fmt::arg("error_code", error->code)));
-                tr_torrentStop(tor);
-                tr_error_clear(&error);
-            }
+            tor->setLocalError(fmt::format(
+                _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", tor->currentDir()),
+                fmt::arg("path", path),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_torrentStop(tor);
+            tr_error_clear(&error);
         }
     }
 

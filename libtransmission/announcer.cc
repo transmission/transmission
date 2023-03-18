@@ -1016,7 +1016,7 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
     req.torrent_name = tor->metainfo_.name();
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
-    req.peer_id = tr_torrentGetPeerId(tor);
+    req.peer_id = tor->peer_id();
     req.up = tier->byteCounts[TR_ANN_UP];
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];

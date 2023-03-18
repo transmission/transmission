@@ -16,8 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include <event2/bufferevent.h>
-
 #include <fmt/format.h>
 
 #include "transmission.h"
