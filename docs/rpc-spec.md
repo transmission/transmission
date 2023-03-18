@@ -271,7 +271,7 @@ The 'source' column here corresponds to the data structure there.
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
 | `trackers`| array (see below)| n/a
-' `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
+| `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
 | `trackerStats`| array (see below)| n/a
 | `totalSize`| number| tr_torrent_view
 | `torrentFile`| string| tr_info
@@ -527,8 +527,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
 | `cache-size-mb` | number | maximum size of the disk cache (MB)
 | `config-dir` | string | location of transmission's configuration directory
-| `default-trackers` | string of announce URLs, one per line, and a blank line between 
-[tiers](https://www.bittorrent.org/beps/bep_0012.html).
+| `default-trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `dht-enabled` | boolean | true means allow DHT in public torrents
 | `download-dir` | string | default path to download torrents
 | `download-dir-free-space` | number |  **DEPRECATED** Use the `free-space` method instead.

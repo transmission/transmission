@@ -4,19 +4,20 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Woosuk Park, 2017
-# Lock Ring <reject5514@naver.com>, 2019
-# Apparatus_Zero <aLOVEforMEDnCSnSYD@protonmail.com>, 2020
-# Mike Gelfand <mikedld@mikedld.com>, 2020
+# 박우석, 2017
+# Lock Ring <reject5514@naver.com>, 2017
+# Hugo Blackwood, 2022
+# Apparatus_Zero <aLOVEforMEDnCSnSYD@protonmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 20:00+0000\n"
+"POT-Creation-Date: 2023-03-09 00:31+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2020\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Korean (https://www.transifex.com/transmissionbt/teams/33778/ko/)\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -34,73 +35,73 @@ msgstr ""
 
 #: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:162 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "'{path}' 경로를 읽을 수 없음: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:260 ../gtk/Session.cc:863 ../gtk/Utils.cc:285 ../libtransmission/watchdir.cc:95
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "'{path}' 토렌트 파일 추가할 수 없음"
 
 #: ../daemon/daemon.cc:271
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "'{path}' 토렌트 파일 지우는 중"
 
 #: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:570
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "'{path}' 경로를 지울 수 없음: {error} ({error_code})"
 
 #: ../daemon/daemon.cc:604
 msgid "Couldn't parse log level '{level}'"
-msgstr ""
+msgstr "'{level}' 로그 레벨을 분석할 수 없음"
 
-#: ../daemon/daemon.cc:645
+#: ../daemon/daemon.cc:651
 msgid "Deferring reload until session is fully started."
-msgstr ""
+msgstr "세션이 완전히 시작되기 전 다시 불러오기를 연기하는 중"
 
-#: ../daemon/daemon.cc:660
+#: ../daemon/daemon.cc:666
 msgid "Reloading settings from '{path}'"
-msgstr ""
+msgstr "'{path}' 경로에서 설정 다시 불러오는 중"
 
-#: ../daemon/daemon.cc:696
+#: ../daemon/daemon.cc:702
 msgid "Couldn't initialize daemon: {error} ({error_code})"
-msgstr ""
+msgstr "데몬을 초기화할 수 없습니다. {error} ({error_code})"
 
-#: ../daemon/daemon.cc:709
+#: ../daemon/daemon.cc:715
 msgid "Loading settings from '{path}'"
-msgstr ""
+msgstr "'{path}' 경로에서 설정 불러오는 중"
 
-#: ../daemon/daemon.cc:729
+#: ../daemon/daemon.cc:735
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:735 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1167 ../libtransmission/torrent.cc:2178 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1175 ../libtransmission/torrent.cc:2164 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "'{path}' 경로에 저장할 수 없음: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:745
+#: ../daemon/daemon.cc:751
 msgid "Requiring authentication"
-msgstr ""
+msgstr "인증 필요"
 
-#: ../daemon/daemon.cc:766
+#: ../daemon/daemon.cc:772
 msgid "Watching '{path}' for new torrent files"
-msgstr ""
+msgstr "'{path}' 경로에 새 토렌트 파일이 추가되는지 감시 중"
 
-#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:816 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
-msgstr ""
+msgstr "이벤트를 만들 수 없음: {error}({error_code})"
 
-#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:826 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
-msgstr ""
+msgstr "이벤트를 추가할 수 없음: {error} ({error_code})"
 
-#: ../daemon/daemon.cc:834
+#: ../daemon/daemon.cc:840
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
-msgstr ""
+msgstr "데몬 이벤트 반복을 실행할 수 없음: {error} ({error_code})"
 
-#: ../gtk/Application.cc:393
+#: ../gtk/Application.cc:394
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
-msgstr ""
+msgstr "트랜스미션을 {content_type} 연결 프로그램에 등록할 수 없음: {error} ({error_code})"
 
-#: ../gtk/Application.cc:550
+#: ../gtk/Application.cc:551
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
@@ -110,7 +111,7 @@ msgstr "트랜스미션은 파일 공유 프로그램입니다. 토렌트를 실
 
 #: ../gtk/Application.cc:783 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
-msgstr ""
+msgstr "취소"
 
 #: ../gtk/Application.cc:784
 msgid "I _Agree"
@@ -118,7 +119,7 @@ msgstr "이에 _동의합니다"
 
 #: ../gtk/Application.cc:1013
 msgid "Closing Connections…"
-msgstr ""
+msgstr "연결 닫는 중…"
 
 #: ../gtk/Application.cc:1018
 msgid "Sending upload/download totals to tracker…"
@@ -138,18 +139,18 @@ msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "중복된 토렌트는 추가할 수 없습니다"
 
-#: ../gtk/Application.cc:1415
+#: ../gtk/Application.cc:1413
 msgid "A fast and easy BitTorrent client"
 msgstr "빠르고 간편한 비트토렌트 클라이언트"
 
-#: ../gtk/Application.cc:1416
+#: ../gtk/Application.cc:1414
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Copyright © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1422
+#: ../gtk/Application.cc:1420
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -192,7 +193,7 @@ msgstr "상태와 상관없이 배포"
 msgid "Stop seeding if idle for N minutes:"
 msgstr "N 분 대기 상태에 있으면 배포를 중지:"
 
-#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:325
+#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:327
 msgid "Queued for verification"
 msgstr "검사를 위해 대기"
 
@@ -200,7 +201,7 @@ msgstr "검사를 위해 대기"
 msgid "Verifying local data"
 msgstr "로컬 데이터 확인 중"
 
-#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:328
+#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:330
 msgid "Queued for download"
 msgstr "다운로드 대기"
 
@@ -209,7 +210,7 @@ msgctxt "Verb"
 msgid "Downloading"
 msgstr "다운로드 중"
 
-#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:331
+#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
 msgid "Queued for seeding"
 msgstr "배포 대기"
 
@@ -218,11 +219,11 @@ msgctxt "Verb"
 msgid "Seeding"
 msgstr "배포 중"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:324
 msgid "Finished"
 msgstr "완료함"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:324
 msgid "Paused"
 msgstr "일시 정지"
 
@@ -248,15 +249,15 @@ msgstr "공개 토렌트"
 
 #: ../gtk/DetailsDialog.cc:715
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "{creator}이(가) {date}에 만듦"
 
 #: ../gtk/DetailsDialog.cc:719
 msgid "Created by {creator}"
-msgstr ""
+msgstr "{creator}이(가) 만듦"
 
 #: ../gtk/DetailsDialog.cc:723
 msgid "Created on {date}"
-msgstr ""
+msgstr "{date}에 만듦"
 
 #: ../gtk/DetailsDialog.cc:837
 msgid "Unknown"
@@ -265,26 +266,26 @@ msgstr "알려지지 않음"
 #: ../gtk/DetailsDialog.cc:874 ../gtk/MakeDialog.cc:387
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
-msgstr[0] ""
+msgstr[0] "{total_size} 용량의 총 {file_count:L}개 파일"
 
 #: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:393
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] ""
+msgstr[0] "(비트토렌트 조각 {piece_count}개 @ {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:933
 msgid "{current_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} ({percent_done}%)"
 
 #: ../gtk/DetailsDialog.cc:941
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
-msgstr ""
+msgstr "{current_size} (이용 가능한 {percent_available}% 중 {percent_done}%)"
 
 #: ../gtk/DetailsDialog.cc:950
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
-msgstr ""
+msgstr "{current_size} (이용 가능한 {percent_available}% 중 {percent_done}%; {unverified_size} 검증되지 않음)"
 
 #: ../gtk/DetailsDialog.cc:983
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
@@ -501,16 +502,14 @@ msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "토렌트 %d개를 제거하시겠습니까?"
+msgstr[0] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "토렌트로 다운로드한 파일 %d개를 삭제하시겠습니까?"
+msgstr[0] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -665,7 +664,7 @@ msgstr "총 전송 량"
 msgid "Session Transfer"
 msgstr "세션 전송 량"
 
-#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:344
+#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:346
 msgid "Ratio: {ratio}"
 msgstr ""
 
@@ -683,7 +682,7 @@ msgstr ""
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:467
+#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:469
 msgid "{upload_speed} ▲"
 msgstr ""
 
@@ -912,79 +911,79 @@ msgstr "이 통계는 사용자 정보 만을 담고 있습니다. 초기화를 
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr ""
 
-#: ../gtk/Torrent.cc:336
+#: ../gtk/Torrent.cc:338
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:363
+#: ../gtk/Torrent.cc:365
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:373
+#: ../gtk/Torrent.cc:375
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:385
+#: ../gtk/Torrent.cc:387
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:395
+#: ../gtk/Torrent.cc:397
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:404
+#: ../gtk/Torrent.cc:406
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:417
+#: ../gtk/Torrent.cc:419
 msgid "Remaining time unknown"
 msgstr "남은 시간을 알 수 없습니다"
 
-#: ../gtk/Torrent.cc:460
+#: ../gtk/Torrent.cc:462
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/Torrent.cc:472
+#: ../gtk/Torrent.cc:474
 msgid "Stalled"
 msgstr "지연됨"
 
-#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:2227
+#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2213
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:486
+#: ../gtk/Torrent.cc:488
 msgid "Tracker Error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:489
+#: ../gtk/Torrent.cc:491
 msgid "Local error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:513
+#: ../gtk/Torrent.cc:515
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
 msgstr[0] ""
 
-#: ../gtk/Torrent.cc:524
+#: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
 
-#: ../gtk/Torrent.cc:535
+#: ../gtk/Torrent.cc:537
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
 
-#: ../gtk/Torrent.cc:543
+#: ../gtk/Torrent.cc:545
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 
-#: ../gtk/Torrent.cc:552
+#: ../gtk/Torrent.cc:554
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
@@ -1137,16 +1136,16 @@ msgstr ""
 msgid "Couldn't open '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
+#: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:753
+#: ../gtk/Utils.cc:760
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:758
+#: ../gtk/Utils.cc:765
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
@@ -1514,7 +1513,7 @@ msgstr "만든 날짜:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:402 ../gtk/ui/gtk4/DetailsDialog.ui:296
 msgid "Added:"
-msgstr ""
+msgstr "추가됨:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
@@ -1554,11 +1553,11 @@ msgstr "전체 제한 존중(_L)"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:873 ../gtk/ui/gtk4/DetailsDialog.ui:626
 msgid "Limit _download speed ({speed_units}):"
-msgstr ""
+msgstr "다운로드 속도 제한 ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:888 ../gtk/ui/gtk4/DetailsDialog.ui:638
 msgid "Limit _upload speed ({speed_units}):"
-msgstr ""
+msgstr "업로드 속도 제한 ({speed_units}):"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:905 ../gtk/ui/gtk3/OptionsDialog.ui:145 ../gtk/ui/gtk4/DetailsDialog.ui:650 ../gtk/ui/gtk4/OptionsDialog.ui:87
 msgid "Torrent _priority:"
@@ -1753,7 +1752,7 @@ msgstr "적용할 날(_O):"
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
 #: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
 msgid "_to"
-msgstr ""
+msgstr "부터(_T)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
 msgctxt "Gerund"
@@ -2087,11 +2086,11 @@ msgid "Announce error: {error} (Retrying in {count} second)"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] ""
 
-#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1345
+#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1349
 msgid "Could not connect to tracker"
 msgstr "트래커에 연결할 수 없음"
 
-#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1349
+#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1353
 msgid "Tracker did not respond"
 msgstr "트래커가 응답하지 않음"
 
@@ -2121,7 +2120,7 @@ msgstr ""
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/log.cc:290
+#: ../libtransmission/log.cc:300
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr ""
 
@@ -2314,17 +2313,17 @@ msgstr ""
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:1381
+#: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 
-#: ../libtransmission/torrent-magnet.cc:332
+#: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
 
-#: ../libtransmission/torrent-metainfo.cc:676
+#: ../libtransmission/torrent-metainfo.cc:699
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
@@ -2336,35 +2335,35 @@ msgstr ""
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "데이터를 찾을 수 없습니다. 드라이브가 연결 되었는지 확인하시거나 \"위치 설정\"을 사용하십시오. 다시 다운로드하려면  토렌트를 제거한 후 다시 추가하십시오."
 
-#: ../libtransmission/torrent.cc:491
+#: ../libtransmission/torrent.cc:492
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:500
+#: ../libtransmission/torrent.cc:501
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:552
+#: ../libtransmission/torrent.cc:553
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:559
+#: ../libtransmission/torrent.cc:560
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:877
+#: ../libtransmission/torrent.cc:876
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "사용자가 다시 시작함 -- 시드 비율을 사용하지 않음"
 
-#: ../libtransmission/torrent.cc:900
+#: ../libtransmission/torrent.cc:902
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:965
+#: ../libtransmission/torrent.cc:956
 msgid "Removing torrent"
 msgstr "토렌트 제거"
 
-#: ../libtransmission/torrent.cc:1295 ../libtransmission/torrent.cc:2354
+#: ../libtransmission/torrent.cc:1284 ../libtransmission/torrent.cc:2340
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -2453,7 +2452,7 @@ msgstr ""
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr ""
 
-#: ../libtransmission/web.cc:446
+#: ../libtransmission/web.cc:448
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 
@@ -2486,674 +2485,3 @@ msgstr[0] ""
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
-
-#, c-format
-#~ msgid " (Limit: %s)"
-#~ msgstr "(제한: %s)"
-
-#~ msgid " _to "
-#~ msgstr " 부터(_T) "
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "%'d 토렌트 속성"
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d 일"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d 시간"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d 분"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d 초"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d 조각 @ %2$s"
-
-#, c-format
-#~ msgid "%1$s  %2$s"
-#~ msgstr "%1$s  %2$s"
-
-#, c-format
-#~ msgid "%1$s %2$s  %3$s %4$s"
-#~ msgstr "%1$s %2$s  %3$s %4$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d 조각 @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d 조각)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% of %3$s%% 사용 가능)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (전체 %3$s%% 중 %2$s%% 사용 가능); %4$s 확인되지 않음"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s 손상)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "%1$s 전"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%2$s 중 %1$s  (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr "%2$s 중 %1$s (%3$s%%), 업로드 함 %4$s (비율: %5$s 목표: %6$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%2$s 중 %1$s (%3$s%%), 업로드함 %4$s (비율: %5$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-#~ msgstr "전제 %1$s 중, %2$s 업로드함(비율: %3$s 목표: %4$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "전체 %1$s 중, %2$s 업로드함(비율: %3$s)"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s; %2$'d 파일"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "사용할 수 있는 명령행 옵션을 모두 보려면 '%s --help' 명령을 실행하십시오.\n"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s 시작함"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (비율: %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - 트래커 추가"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - 트래커 편집"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "%s 속성"
-
-#, c-format
-#~ msgid "%s free"
-#~ msgstr "%s 남음"
-
-#, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s 은(는) 올바른 주소가 아닙니다"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s(은)는 IPv4나 IPv6 주소가 아닙니다. RPC 리스너는 IPv4 이거나 IPv6이어야 합니다."
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s 남음"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s 성공 (%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>접속을 닫는 중</b>"
-
-#~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>업데이트할 수 없습니다.</b>"
-
-#~ msgid "<b>Update succeeded!</b>"
-#~ msgstr "<b>업데이트 성공!</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>공유할 대상을 선택하지 않음</i>"
-
-#~ msgid "<i>Testing TCP port…</i>"
-#~ msgstr "<i>TCP 포트를 검사하는 중...</i>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "%s 뒤에 더 많은 피어 요청"
-
-#, c-format
-#~ msgid "Asking for more peers now… <small>%s</small>"
-#~ msgstr "더 많은 피어를 요청하고 있습니다... <small>%s</small>"
-
-#, c-format
-#~ msgid "Asking for peer counts in %s"
-#~ msgstr "%s 뒤에 피어 총 계 요청"
-
-#, c-format
-#~ msgid "Asking for peer counts now… <small>%s</small>"
-#~ msgstr "피어 수를 요청하고 있습니다... <small>%s</small>"
-
-#~ msgid "Automatically add .torrent files _from:"
-#~ msgstr "자동으로 _여기 에 있는 .torrent 파일을 추가:"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" contains %zu entries"
-#~ msgstr "차단 목록 \"%s\"이(가) %'zu 항목 가짐"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" updated with %zu entries"
-#~ msgstr "차단 목록 \\\"%s\\\"에 %zu 항목이 업데이트 되었습니다"
-
-#, c-format
-#~ msgid "Blocklist contains %'d rule"
-#~ msgid_plural "Blocklist contains %'d rules"
-#~ msgstr[0] "차단 목록에 규칙 %'d개가 있습니다."
-
-#, c-format
-#~ msgid "Blocklist has %'d rule."
-#~ msgid_plural "Blocklist has %'d rules."
-#~ msgstr[0] "차단 목록에 규칙 %'d개가 있습니다."
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "토렌트가 완료되면 스크립트 불러오기(_T):"
-
-#~ msgid "Cancelled"
-#~ msgstr "취소함"
-
-#, c-format
-#~ msgid ""
-#~ "Click to disable Alternative Speed Limits\n"
-#~ " (%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "대체 속도 제한을 끄려면 누르세요\n"
-#~ "(다운로드 %1$s, 업로드 %2$s)"
-
-#, c-format
-#~ msgid ""
-#~ "Click to enable Alternative Speed Limits\n"
-#~ " (%1$s down, %2$s up)"
-#~ msgstr ""
-#~ "대체 속도 제한을 켜려면 누르세요\n"
-#~ "(다운로드 %1$s, 업로드%2$s)"
-
-#~ msgid "Complete"
-#~ msgstr "완료"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s"
-#~ msgstr "포트 %d을(를) %s에 할당할 수 없음: %s"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s (%s)"
-#~ msgstr "포트 %d(을)를 %s에 할당할 수 없음:  %s (%s)"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\"을(를) 만들 수 없음: %2$s"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "소켓을 만들 수 없음: %s"
-
-#, c-format
-#~ msgid "Couldn't find settings key \"%s\""
-#~ msgstr "설정 키 \"%s\" 을(를) 찾지 못했습니다"
-
-#, c-format
-#~ msgid "Couldn't get directory for \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\" 디렉토리를 열 수 없음: %2$s"
-
-#, c-format
-#~ msgid "Couldn't inhibit desktop hibernation: %s"
-#~ msgstr "데스크톱 최대 절전을 사용하지 않도록 설정할 수 없습니다: %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\"을(를) 열 수 없음: %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\"(을)를 읽을 수 없습니다: %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "\"%s\"을(를) 읽을 수 없습니다: %s"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "\"%s\"을(를) 저장할 수 없습니다"
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "파일 \"%1$s\"을(를) 저장할 수 없음: %2$s"
-
-#, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "임시 파일 \"%1$s\"(을)를 저장할 수 없습니다: %2$s"
-
-#, c-format
-#~ msgid "Couldn't truncate \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\"을(를) 끝낼 수 없음: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "토렌트 만들기"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "\"%s\" 만듦!"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "%1$s이(가) 만듦"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "%2$s에 %1$s이(가) 만듦"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "%1$s에 만듦"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "\"%s\" 만드는 중"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "DNS 조회 실패: %s"
-
-#~ msgid "Debug"
-#~ msgstr "디버그"
-
-#, c-format
-#~ msgid "Do_wnload (%s):"
-#~ msgstr "다운로드 (%s)(_W):"
-
-#~ msgid "Done"
-#~ msgstr "마침"
-
-#, c-format
-#~ msgid "Down: %1$s, Up: %2$s"
-#~ msgstr "다운로드: %1$s, 업로드: %2$s"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "피어와 통신하는데 uTP를 사용(_U)"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "토렌트를 여는 중 오류"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "\"%s\"읽기 오류: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "블록리스트 압축 해제 오류: %s (%d)"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "\"%s\"쓰기 오류: %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "오류: \"%s\""
-
-#, c-format
-#~ msgid "Error: invalid announce URL \"%s\""
-#~ msgstr "오류: 잘못된 알림 주소 \"%s\""
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "파일 \"%s\" 정상"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "인터넷 게이트웨이 장치 \"%s\"을(를) 발견"
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "공개 주소 발견 \"%s\""
-
-#~ msgid "Friday"
-#~ msgstr "금요일"
-
-#, c-format
-#~ msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-#~ msgstr "%3$s %4$s 전에 피어 %1$s%2$'d명의 목록을 받음"
-
-#, c-format
-#~ msgid "Got a scrape error \"%s%s%s\" %s ago"
-#~ msgstr "스크레이프 오류 발생 \"%s%s%s\" %s 지남"
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "오류 %1$s\"%2$s\"을(를) %3$s %4$s 전에 받음"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "신호 %d개를 받음; 완전하게 끝내려 하고 있습니다. 진행이 되지 않을 경우에는 다시 하십시오."
-
-#~ msgid "Idle"
-#~ msgstr "대기 중"
-
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "잘못된 메타 정보 항목 \"%s\""
-
-#~ msgid "Is another copy of Transmission already running?"
-#~ msgstr "이미 실행 중인 트랜스미션이 있는 것은 아닙니까?"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "다운로드 속도 제한(_D) (%s):"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "업로드 속도 제한(_U) (%s):"
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "토렌트 %d개를 불러옴"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "로컬 주소 \"%s\""
-
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "마그넷 토렌트의 메타 정보를 사용할 수 없습니다"
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr ".torrent 파일을 휴지통에 버림(_V)"
-
-#~ msgid "Monday"
-#~ msgstr "월요일"
-
-#, c-format
-#~ msgid "Moving \"%s\""
-#~ msgstr "\"%s\"을(를) 옮기는 중"
-
-#~ msgid "Not a regular file"
-#~ msgstr "정규 파일 아님"
-
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "트랜스미션의 주목할만한 기능에는 로컬 피어 검색, 암호화, DHT, μTP, PEX 및 마그넷 링크에 대한 지원이 포함되어 있습니다."
-
-#, c-format
-#~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-#~ msgstr "%2$s %3$s전에 요청한 피어 목록 %1$s의 시간이 초과 되었습니다; 다시 시도합니다"
-
-#, c-format
-#~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
-#~ msgstr "조각 %<PRIu32>이 방금 다운로드 되었으나, 체크섬 테스트를 실패함"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "로컬 데이터를 확인해주십시오. #%zu 조각에 오류가 있습니다."
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "포트 %d 성공적으로 포워드 함"
-
-#, c-format
-#~ msgid "Port %d isn't forwarded"
-#~ msgstr "포트 %d 포워드 되지 않음"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "포트 포워딩"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "포트 포워딩(NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "포트 포워딩(UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "포트 포워딩 성공!"
-
-#, c-format
-#~ msgid "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
-#~ msgstr "\"%s\", 서비스 \"%s\"을(를)통하여 포트 포워딩을 합니다. (로컬 주소: %s:%d)"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "포트 <b>닫힘</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "포트 <b>열림</b>"
-
-#~ msgid "Present Main Window"
-#~ msgstr "프로그램 창 표시"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "비율: %s"
-
-#~ msgid "Saturday"
-#~ msgstr "토요일"
-
-#, c-format
-#~ msgid "Saved \"%s\""
-#~ msgstr "\"%s\" 저장함"
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "%s 조사함"
-
-#, c-format
-#~ msgid "Searching for web interface file \"%s\""
-#~ msgstr "웹 인터페이스 파일 \"%s\" 찿는 중"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "%2$'d명 중 연결된 파어 %1$'d명에게 배포 중"
-
-#, c-format
-#~ msgid "Serving RPC and Web requests on %s:%d%s"
-#~ msgstr "%s:%d%s에서 RPC와 웹 요청 제공 중"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "옵션 대화 상자 표시(_O)"
-
-#, c-format
-#~ msgid "Skipping unknown torrent \"%s\""
-#~ msgstr "알 수 없는 토렌트 \"%s\"을(를) 건너뛰는 중"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "%d회 시작함"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "상태가 \"%1$s\"에서 \"%2$s\"(으)로 바뀜"
-
-#, c-format
-#~ msgid "Stop at Ratio (%s)"
-#~ msgstr "비율 (%s)에서 중지"
-
-#~ msgid "Stopped"
-#~ msgstr "정지함"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "\"%s\", 서비스 \"%s\"을(를)통한 포트 포워딩 중지"
-
-#~ msgid "Sunday"
-#~ msgstr "일요일"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "\"%s\" 토렌트 파일이 잘못된 데이터를 포함하고 있습니다."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "\"%s\" 토렌트 파일에서 알 수 없는 오류가 발생했습니다."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
-#~ msgstr "\"%s\" 토렌트 파일이 이미 \"%s\"에서 사용 중입니다."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "이 마그넷 주소는 비트 토렌트에서 사용할 수 없는 것으로 보입니다. 비트 토렌트에서 사용 가능한 마그넷 주소는 \"%s\"(이)라는 부분을 포함하고 있습니다."
-
-#~ msgid "Thursday"
-#~ msgstr "목요일"
-
-#~ msgid ""
-#~ "To add a backup URL, add it on the line after the primary URL.\n"
-#~ "To add another primary URL, add it after a blank line."
-#~ msgstr ""
-#~ "백업 주소를 추가하려면 주 주소의 다음 줄에 추가하십시오.\n"
-#~ "다른 기본 주소를 추가하려면 공백 줄 다음에 추가하십시오."
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "토렌트 만들기 도구가 파일 \"%s\"을(를) 건너뜀: %s"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "트래커 오류: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "트래커가 HTTP 응답 코드 %1$ld 를 반환함(%2$s)"
-
-#, c-format
-#~ msgid "Tracker gave a warning: \"%s\""
-#~ msgstr "트래커 경고: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave an error: \"%s\""
-#~ msgstr "트래커 오류: \"%s\""
-
-#, c-format
-#~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-#~ msgstr "트래커에 배포자 %s%'d명과 다운 받는 사람 %'d명이 있음%s %s 지남"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "트래커 경고: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "트래커가 %s 안에 요청을 수락할 것입니다"
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "트랜스미션\n"
-#~ "업로드: %1$s %2$s\n"
-#~ "다운로드: %3$s %4$s"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "트랜스미션이 \"%s\"의 사용 방법을 알지 못합니다"
-
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "트랜스미션은 크로스 플랫폼 백엔드 위에서 동작하는 쉽게 사용가능한 프론트엔드인 비트토렌트 클라이언트입니다. 네이티브 프론트엔드는 OS X와 Windows, 커멘드라인 및 웹 프론트엔드가 존재합니다."
-
-#~ msgid "Tuesday"
-#~ msgstr "화요일"
-
-#, c-format
-#~ msgid "U_pload (%s):"
-#~ msgstr "업로드 (%s)(_P):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "파일 내용을 해석할 수 없습니다"
-
-#, c-format
-#~ msgid "Unable to rename file as \"%s\": %s"
-#~ msgstr "\"%s\" 파일의 이름을 변경할수 없습니다: %s"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "인식할 수 없는 주소"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "차단 목록 업데이트"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "다운로드 한 데이터 검사 중 (%.1f%% 확인)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "토렌트 확인 중"
-
-#~ msgid "Wednesday"
-#~ msgstr "수요일"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "다운로드 (%s)(_D):"
-
-#, c-format
-#~ msgid "_Upload (%s):"
-#~ msgstr "업로드 (%s)(_U):"
-
-#, c-format
-#~ msgid "blocklist skipped invalid address at line %d"
-#~ msgstr "차단 목록 중 %d번째 줄의 잘못된 주소를 넘어감"
-
-#~ msgid "full"
-#~ msgstr "전체"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "포트 %d을(를) 더 이상 포워딩하지 않음"
-
-#~ msgid "peer"
-#~ msgid_plural "peers"
-#~ msgstr[0] "피어"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "크기|다운로드: %1$s, 업로드: %2$s"
-
-#~ msgid "sparse"
-#~ msgstr "부족"
-
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP는 네트워크 혼잡을 줄여주는 도구입니다."
-
-#~ msgid "web seed"
-#~ msgid_plural "web seeds"
-#~ msgstr[0] "웹 배포"

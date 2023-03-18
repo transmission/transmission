@@ -16,8 +16,6 @@
 #include <utility>
 #include <vector>
 
-#include <event2/bufferevent.h>
-
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -619,7 +617,11 @@ private:
         size_t constexpr Seconds = RequestBufSecs;
         size_t const estimated_blocks_in_period = (rate_bytes_per_second * Seconds) / tr_block_info::BlockSize;
         size_t const ceil = reqq ? *reqq : 250;
-        return std::clamp(estimated_blocks_in_period, Floor, ceil);
+
+        auto max_reqs = estimated_blocks_in_period;
+        max_reqs = std::min(max_reqs, ceil);
+        max_reqs = std::max(max_reqs, Floor);
+        return max_reqs;
     }
 
     void protocolSendRequest(struct peer_request const& req)
