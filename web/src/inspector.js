@@ -327,7 +327,10 @@ export class Inspector extends EventTarget {
       );
       string = `${fmt.percentString((100 * available) / sizeWhenDone)}%`;
     }
-    setTextContent(e.info.availability, string.includes('NaN') ? '0%' : string);
+    setTextContent(
+      e.info.availability,
+      string.includes('NaN') ? '...' : string
+    );
 
     //  downloaded
     if (torrents.length === 0) {
