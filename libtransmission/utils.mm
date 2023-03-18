@@ -8,32 +8,42 @@
 #include <string>
 #include <string_view>
 
-#include <utf8.h>
+#include "utils.h"
 
-// macOS implementation of tr_strv_replace_invalid() that autodetects the encoding.
-// This replaces the generic implementation of the function in utils.cc
+// macOS implementation of tr_strv_convert_utf8() that autodetects the encoding.
+// This replaces the generic implementation of the function in utils.cc.
 
-std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
+std::string tr_strv_convert_utf8(std::string_view sv)
 {
     // UTF-8 encoding
-    NSString* validUTF8 = [[NSString alloc] initWithBytes:std::data(sv) length:std::size(sv) encoding:NSUTF8StringEncoding];
+    char const* validUTF8 = [[NSString alloc] initWithBytes:std::data(sv) length:std::size(sv) encoding:NSUTF8StringEncoding].UTF8String;
     if (validUTF8)
     {
-        return std::string(validUTF8.UTF8String);
+        return std::string(validUTF8);
     }
 
     // autodetection of the encoding (#3434)
     NSString* convertedString;
-    NSData* data = [NSData dataWithBytes:std::data(sv) length:std::size(sv)];
-    [NSString stringEncodingForData:data encodingOptions:nil convertedString:&convertedString usedLossyConversion:nil];
-    if (convertedString)
+    NSStringEncoding stringEncoding = [NSString
+        stringEncodingForData:[NSData dataWithBytes:std::data(sv) length:std::size(sv)]
+              encodingOptions:@{
+                  // We disallow lossy conversion, and will leave it to `utf8::unchecked::replace_invalid`.
+                  NSStringEncodingDetectionAllowLossyKey : @NO,
+                  // We only set the likely language.
+                  // If we were to set suggested encodings, then whatever is listed first would take precedence on all others, making for instance kCFStringEncodingDOSJapanese (cp932) and kCFStringEncodingDOSRussian (cp866) taking priority on each other.
+                  NSStringEncodingDetectionLikelyLanguageKey : NSLocale.currentLocale.languageCode
+              }
+              convertedString:&convertedString
+          usedLossyConversion:nil];
+    if (stringEncoding)
     {
-        return std::string(convertedString.UTF8String);
+        validUTF8 = convertedString.UTF8String;
+        if (validUTF8)
+        {
+            return std::string(validUTF8);
+        }
     }
 
     // invalid encoding
-    auto out = std::string{};
-    out.reserve(std::size(sv));
-    utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
-    return out;
+    return tr_strv_replace_invalid(sv);
 }

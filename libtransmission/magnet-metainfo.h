@@ -14,7 +14,7 @@
 
 #include "announce-list.h"
 #include "tr-strbuf.h" // tr_urlbuf
-#include "utils.h" // tr_strv_replace_invalid()
+#include "utils.h" // tr_strv_convert_utf8()
 
 struct tr_error;
 struct tr_variant;
@@ -70,7 +70,7 @@ public:
 
     void setName(std::string_view name)
     {
-        name_ = tr_strv_replace_invalid(name);
+        name_ = tr_strv_convert_utf8(name);
     }
 
     void addWebseed(std::string_view webseed);
