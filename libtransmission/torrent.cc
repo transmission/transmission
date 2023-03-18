@@ -230,6 +230,7 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
     if (needs_new_peer_id)
     {
         tor->peer_id_ = tr_peerIdInit(tor->infoHashString());
+//        tor->peer_id_ = tr_peerIdInit();
         tor->peer_id_creation_time_ = tr_time();
     }
 

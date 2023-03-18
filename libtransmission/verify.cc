@@ -85,6 +85,8 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
             {
                 fast_verify_pass = false;
                 break;
+            }else{
+                fast_verify_pass = true;
             }
         }
     }

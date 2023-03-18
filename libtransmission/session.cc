@@ -175,7 +175,7 @@ tr_peer_id_t tr_peerIdInit(std::string hash_string)
     auto* it = std::data(peer_id);
 
     // starts with -TRXXXX-
-    auto constexpr Prefix = std::string_view{ "-TR3000-" };
+    auto constexpr Prefix = std::string_view{ PEERID_PREFIX };
     auto const* const end = it + std::size(peer_id);
     it = std::copy_n(std::data(Prefix), std::size(Prefix), it);
 

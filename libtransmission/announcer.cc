@@ -501,7 +501,7 @@ struct tr_tier
 
     /* number of up/down/corrupt bytes since the last time we sent an
      * "event=stopped" message that was acknowledged by the tracker */
-    std::array<uint64_t, 3> byteCounts = {};
+    std::array<uint64_t, 4> byteCounts = {};
 
     std::vector<tr_tracker> trackers;
 
@@ -970,19 +970,24 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
     }
 }
 
-[[nodiscard]] uint64_t append_upload(tr_torrent* const tor, tr_tier const* const tier, int multiple = 1)
+[[nodiscard]] uint64_t append_upload(tr_torrent* const tor, tr_tier const* const tier)
 {
     auto up = tier->byteCounts[TR_ANN_UP];
+    auto pre_up = tier->byteCounts[TR_ANN_PRE_UP];
+    auto const *const current_tracker = tier->currentTracker();
+    auto increase = up - pre_up;
     uint64_t up_append = 0;
-    if (up && up > 0)
-    {
-        up_append = up * multiple;
+    if (increase && increase > 0) {
+        up_append = increase * ((current_tracker->leecher_count + 9) % 10);
         up_append = min(up_append, 512 * MB);
-        if (up_append > 0)
-        {
+        if (up_append > 0) {
+            tr_announcerAddBytes(tor, TR_ANN_UP, up_append);
+            tor->setDateActive(tr_time());
+            tor->setDirty();
             tor->session->addUploaded(up_append);
         }
     }
+    tr_announcerAddBytes(tor, TR_ANN_PRE_UP, tier->byteCounts[TR_ANN_UP] - tier->byteCounts[TR_ANN_PRE_UP]);
     return up_append;
 }
 
@@ -994,8 +999,10 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
 {
     auto const* const current_tracker = tier->currentTracker();
     TR_ASSERT(current_tracker != nullptr);
-    uint64_t up_append = append_upload(tor, tier, 1);
-
+    uint64_t up_append = append_upload(tor, tier);
+    if (up_append > 0) {
+        tr_logAddInfo(fmt::format(_("Append upload size {size} for torrent {name} {tracker}"), fmt::arg("size", up_append), fmt::arg("name", tor->metainfo_.name()), fmt::arg("tracker", current_tracker->announce_url)));
+    }
     auto req = tr_announce_request{};
     req.port = announcer->session->advertisedPeerPort();
     if (tor->isPrivate())
@@ -1006,10 +1013,11 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
     {
         req.announce_url = current_tracker->announce_url;
     }
+    req.torrent_name = tor->metainfo_.name();
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
     req.peer_id = tr_torrentGetPeerId(tor);
-    req.up = tier->byteCounts[TR_ANN_UP] + up_append;
+    req.up = tier->byteCounts[TR_ANN_UP];
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
     req.leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
@@ -1238,6 +1246,7 @@ void tr_announcer_impl::onAnnounceDone(
             tier->byteCounts[TR_ANN_UP] = 0;
             tier->byteCounts[TR_ANN_DOWN] = 0;
             tier->byteCounts[TR_ANN_CORRUPT] = 0;
+            tier->byteCounts[TR_ANN_PRE_UP] = 0;
         }
 
         if (!is_stopped && std::empty(tier->announce_events))

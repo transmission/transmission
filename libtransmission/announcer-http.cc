@@ -252,6 +252,10 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
     {
         fmt::format_to(out, "&trackerid={}", req.tracker_id);
     }
+
+    if (req.up > 0) {
+        tr_logAddInfo(fmt::format(_("announce for torrent {name} {url}"), fmt::arg("name", req.torrent_name), fmt::arg("url", url.sv())));
+    }
 }
 
 [[nodiscard]] std::string format_ip_arg(std::string_view ip)

@@ -89,6 +89,8 @@ struct tr_announce_request
      * see tr_announce_response.tracker_id_str */
     std::string tracker_id;
 
+    std::string torrent_name;
+
     /* the torrent's peer id.
      * this changes when a torrent is stopped -> restarted. */
     tr_peer_id_t peer_id;

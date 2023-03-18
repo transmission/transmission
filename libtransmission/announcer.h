@@ -92,7 +92,8 @@ enum
 {
     TR_ANN_UP,
     TR_ANN_DOWN,
-    TR_ANN_CORRUPT
+    TR_ANN_CORRUPT,
+    TR_ANN_PRE_UP,
 };
 
 void tr_announcerAddBytes(tr_torrent*, int type, uint32_t n_bytes);
