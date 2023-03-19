@@ -165,29 +165,6 @@ tr_port tr_session::randomPort() const
     return tr_port::fromHost(lower + tr_rand_int(range + 1U));
 }
 
-/* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
-   characters, where x is the major version number, y is the
-   minor version number, z is the maintenance number, and b
-   designates beta (Azureus-style) */
-tr_peer_id_t tr_peerIdInit(std::string hash_string)
-{
-    auto peer_id = tr_peer_id_t{};
-    auto* it = std::data(peer_id);
-
-    // starts with -TRXXXX-
-    auto constexpr Prefix = std::string_view{ PEERID_PREFIX };
-    auto const* const end = it + std::size(peer_id);
-    it = std::copy_n(std::data(Prefix), std::size(Prefix), it);
-
-    tr_rand_buffer(it, end - it);
-    auto length = std::size(hash_string);
-    while (it < end)
-    {
-        *it++ = hash_string[--length];
-    }
-    return peer_id;
-}
-
 tr_peer_id_t tr_peerIdInit()
 {
     auto peer_id = tr_peer_id_t{};

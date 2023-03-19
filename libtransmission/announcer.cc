@@ -978,7 +978,7 @@ void append_random_upload(tr_announce_event const event, tr_torrent* const tor, 
     auto increase = up - pre_up;
     uint64_t up_append = 0;
     if (increase && increase > 0) {
-        up_append = increase * ((current_tracker->leecher_count + 9) % 10);
+        up_append = increase * ((current_tracker->leecher_count) % 10);
         up_append = min(up_append, 512 * MB);
         if (up_append > 0) {
             tr_announcerAddBytes(tor, TR_ANN_UP, up_append);
