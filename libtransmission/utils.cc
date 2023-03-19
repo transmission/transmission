@@ -282,7 +282,7 @@ std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
     // stripping characters after first \0
     if (auto first_null = sv.find('\0'); first_null != std::string::npos)
     {
-        sv = { sv.begin(), first_null };
+        sv = { std::data(sv), first_null };
     }
     auto out = std::string{};
     out.reserve(std::size(sv));
