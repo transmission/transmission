@@ -173,8 +173,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
             //[[SUUpdater sharedUpdater] setAutomaticallyChecksForUpdates:[fDefaults boolForKey:@"CheckForUpdates"]];
             [_fDefaults removeObjectForKey:@"CheckForUpdates"];
         }
-
-        [self setAutoUpdateToBeta:nil];
     }
 
     return self;
@@ -400,17 +398,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     }
     windowRect.size.width = [sizeString floatValue];
     [self.window setFrame:windowRect display:YES animate:NO];
-}
-
-//for a beta release, always use the beta appcast
-#if defined(TR_BETA_RELEASE)
-#define SPARKLE_TAG YES
-#else
-#define SPARKLE_TAG [fDefaults boolForKey:@"AutoUpdateBeta"]
-#endif
-- (void)setAutoUpdateToBeta:(id)sender
-{
-    // TODO: Support beta releases (if/when necessary)
 }
 
 - (void)setPort:(id)sender
