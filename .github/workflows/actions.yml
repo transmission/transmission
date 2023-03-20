@@ -738,11 +738,11 @@ jobs:
           set -ex
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            apptream \
             ca-certificates \
             clang \
             cmake \
             gettext \
+            intltool \
             libcurl4-openssl-dev \
             libdeflate-dev \
             libevent-dev \
