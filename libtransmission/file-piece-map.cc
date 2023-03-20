@@ -65,7 +65,7 @@ tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piec
     constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
     auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, Compare);
-    return { tr_piece_index_t(std::distance(begin, equal_begin)), tr_piece_index_t(std::distance(begin, equal_end)) };
+    return { tr_piece_index_t(equal_begin - begin), tr_piece_index_t(equal_end - begin) };
 }
 
 tr_file_piece_map::file_offset_t tr_file_piece_map::fileOffset(uint64_t offset) const
@@ -124,11 +124,6 @@ tr_priority_t tr_file_priorities::filePriority(tr_file_index_t file) const
 
 tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
 {
-    if (std::empty(*fpm_)) // not initialized yet
-    {
-        return TR_PRI_NORMAL;
-    }
-
     // increase priority if a file begins or ends in this piece
     // because that makes life easier for code/users using at incomplete files.
     // Xrefs: f2daeb242, https://forum.transmissionbt.com/viewtopic.php?t=10473
