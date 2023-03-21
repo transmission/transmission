@@ -35,6 +35,11 @@ public:
         virtual ~Mediator() = default;
     };
 
-    // get a list of the next blocks that we should request from a peer
-    static std::vector<tr_block_span_t> next(Mediator const& mediator, size_t n_wanted_blocks);
+    Wishlist(Mediator const& mediator);
+
+    // the next blocks that we should request from a peer
+    [[nodiscard]] std::vector<tr_block_span_t> next(size_t n_wanted_blocks);
+
+private:
+    Mediator const& mediator_;
 };
