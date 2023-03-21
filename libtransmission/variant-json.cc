@@ -132,7 +132,7 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
 }
 
 /* like sscanf(in+2, "%4x", &val) but less slow */
-[[nodiscard]] constexpr bool decode_hex_string(char const* in, unsigned int* setme)
+[[nodiscard]] constexpr bool decode_hex_string(char const* in, std::uint16_t& setme)
 {
     TR_ASSERT(in != nullptr);
 
@@ -165,7 +165,46 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
         }
     } while (++in != end);
 
-    *setme = val;
+    setme = val;
+    return true;
+}
+
+template<typename Iter>
+void decode_single_uchar(char const*& in, char const* const in_end, Iter& buf16_out_it)
+{
+    static auto constexpr EscapedUcharLength = 6U;
+    if (in_end - in >= EscapedUcharLength && decode_hex_string(in, *buf16_out_it))
+    {
+        in += EscapedUcharLength;
+        ++buf16_out_it;
+    }
+}
+
+[[nodiscard]] bool decode_escaped_uchar_sequence(char const*& in, char const* const in_end, std::string& buf)
+{
+    auto buf16 = std::array<std::uint16_t, 2>{};
+    auto buf16_out_it = std::begin(buf16);
+
+    decode_single_uchar(in, in_end, buf16_out_it);
+    if (in[0] == '\\' && in[1] == 'u')
+    {
+        decode_single_uchar(in, in_end, buf16_out_it);
+    }
+
+    if (buf16_out_it == std::begin(buf16))
+    {
+        return false;
+    }
+
+    try
+    {
+        utf8::utf16to8(std::begin(buf16), buf16_out_it, std::back_inserter(buf));
+    }
+    catch (utf8::exception const&) // invalid codepoint
+    {
+        buf.push_back('?');
+    }
+
     return true;
 }
 
@@ -232,26 +271,10 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
                 break;
 
             case 'u':
-                if (in_end - in >= 6)
+                if (decode_escaped_uchar_sequence(in, in_end, buf))
                 {
-                    unsigned int val = 0;
-
-                    if (decode_hex_string(in, &val))
-                    {
-                        try
-                        {
-                            auto buf8 = std::array<char, 8>{};
-                            auto const it = utf8::append(val, std::data(buf8));
-                            buf.append(std::data(buf8), it - std::data(buf8));
-                        }
-                        catch (utf8::exception const&) // invalid codepoint
-                        {
-                            buf.push_back('?');
-                        }
-                        unescaped = true;
-                        in += 6;
-                        break;
-                    }
+                    unescaped = true;
+                    break;
                 }
             }
         }
@@ -541,6 +564,26 @@ void jsonRealFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
+void write_escaped_char(Buffer& out, std::string_view& sv)
+{
+    auto u16buf = std::array<std::uint16_t, 2>{};
+
+    auto const* const begin8 = std::data(sv);
+    auto const* const end8 = begin8 + std::size(sv);
+    auto const* walk8 = begin8;
+    utf8::next(walk8, end8);
+    auto const end16 = utf8::utf8to16(begin8, walk8, std::begin(u16buf));
+
+    for (auto it = std::cbegin(u16buf); it != end16; ++it)
+    {
+        auto arr = std::array<char, 16>{};
+        auto const result = fmt::format_to_n(std::data(arr), std::size(arr), FMT_COMPILE("\\u{:04x}"), *it);
+        out.add(std::data(arr), result.size);
+    }
+
+    sv.remove_prefix(walk8 - begin8 - 1);
+}
+
 void jsonStringFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
@@ -593,14 +636,7 @@ void jsonStringFunc(tr_variant const* val, void* vdata)
             {
                 try
                 {
-                    auto arr = std::array<char, 16>{};
-                    auto const* const begin8 = std::data(sv);
-                    auto const* const end8 = begin8 + std::size(sv);
-                    auto const* walk8 = begin8;
-                    auto const uch32 = utf8::next(walk8, end8);
-                    auto const result = fmt::format_to_n(std::data(arr), std::size(arr), FMT_COMPILE("\\u{:04x}"), uch32);
-                    out.add(std::data(arr), result.size);
-                    sv.remove_prefix(walk8 - begin8 - 1);
+                    write_escaped_char(out, sv);
                 }
                 catch (utf8::exception const&)
                 {

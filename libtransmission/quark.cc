@@ -18,7 +18,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
+auto constexpr MyStatic = std::array<std::string_view, 401>{ ""sv,
                                                              "activeTorrentCount"sv,
                                                              "activity-date"sv,
                                                              "activityDate"sv,
@@ -217,7 +217,6 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "paused"sv,
                                                              "pausedTorrentCount"sv,
                                                              "peer-congestion-algorithm"sv,
-                                                             "peer-id-ttl-hours"sv,
                                                              "peer-limit"sv,
                                                              "peer-limit-global"sv,
                                                              "peer-limit-per-torrent"sv,

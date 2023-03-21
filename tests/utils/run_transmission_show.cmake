@@ -14,9 +14,13 @@ else()
     message(STATUS "      output_file ${output_file}")
     message(STATUS "   reference_file ${reference_file}")
 
+    # We want UTF-8
+    set(ENV{LC_ALL} "en_US.UTF-8")
+
     # The app's output includes timestamps, so fake our TZ to ensure
     # the test doesn't depend on the physical TZ of the test machine
     set(ENV{TZ} "UTC")
+
     execute_process(
         COMMAND ${transmission_show} ${torrent_file}
         OUTPUT_FILE ${output_file})

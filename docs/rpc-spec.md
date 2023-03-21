@@ -158,7 +158,7 @@ Request arguments:
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
 | `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
-| `trackerList`         | string   | string of announce URLs, one per line, with a blank line between tiers
+| `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
 | `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
 | `uploadLimit`         | number   | maximum upload speed (KBps)
@@ -271,7 +271,7 @@ The 'source' column here corresponds to the data structure there.
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
 | `trackers`| array (see below)| n/a
-' `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
+| `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
 | `trackerStats`| array (see below)| n/a
 | `totalSize`| number| tr_torrent_view
 | `torrentFile`| string| tr_info
@@ -299,7 +299,7 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | boolean | tr_file_view
+| `wanted` | number | tr_file_view (**Note:** For backwards compatibility, this is serialized as an array of `0` or `1` that should be treated as booleans)
 | `priority` | number | tr_file_view
 
 `peers`: an array of objects, each containing:
@@ -527,7 +527,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
 | `cache-size-mb` | number | maximum size of the disk cache (MB)
 | `config-dir` | string | location of transmission's configuration directory
-| `default-trackers` | list of default trackers to use on public torrents
+| `default-trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `dht-enabled` | boolean | true means allow DHT in public torrents
 | `download-dir` | string | default path to download torrents
 | `download-dir-free-space` | number |  **DEPRECATED** Use the `free-space` method instead.
@@ -999,4 +999,4 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `torrent-set` | :warning: **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
 | `group-set` | new method
 | `group-get` | new method
-
+| `torrent-get` | :warning: old arg `wanted` was implemented as an array of `0` or `1` in Transmission 3.00 and older, despite being documented as an array of booleans. Transmission 4.0.0 and 4.0.1 "fixed" this by returning an array of booleans; but in practical terms, this change caused an unannounced breaking change for any 3rd party code that expected `0` or `1`. For this reason, 4.0.2 restored the 3.00 behavior and updated this spec to match the code.

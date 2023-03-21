@@ -37,9 +37,9 @@ static CGFloat const kImageOverlap = 1.0;
 
 - (id)copyWithZone:(NSZone*)zone
 {
-    id value = [super copyWithZone:zone];
-    [value setRepresentedObject:self.representedObject];
-    return value;
+    FilePriorityCell* copy = [super copyWithZone:zone];
+    [copy setRepresentedObject:self.representedObject];
+    return copy;
 }
 
 - (void)setSelected:(BOOL)flag forSegment:(NSInteger)segment

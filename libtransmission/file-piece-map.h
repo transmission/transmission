@@ -52,7 +52,11 @@ public:
     void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
     void reset(tr_torrent_metainfo const& tm);
 
-    [[nodiscard]] piece_span_t pieceSpan(tr_file_index_t file) const;
+    [[nodiscard]] TR_CONSTEXPR20 piece_span_t pieceSpan(tr_file_index_t file) const noexcept
+    {
+        return file_pieces_[file];
+    }
+
     [[nodiscard]] file_span_t fileSpan(tr_piece_index_t piece) const;
 
     [[nodiscard]] file_offset_t fileOffset(uint64_t offset) const;
@@ -60,6 +64,11 @@ public:
     [[nodiscard]] TR_CONSTEXPR20 size_t size() const
     {
         return std::size(file_pieces_);
+    }
+
+    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    {
+        return std::empty(file_pieces_);
     }
 
     // TODO(ckerr) minor wart here, two identical span types
@@ -80,7 +89,7 @@ private:
     {
         using span_t = index_span_t<T>;
 
-        int compare(T item, span_t span) const // <=>
+        [[nodiscard]] constexpr int compare(T item, span_t span) const // <=>
         {
             if (item < span.begin)
             {
@@ -95,17 +104,17 @@ private:
             return 0;
         }
 
-        bool operator()(T item, span_t span) const // <
+        [[nodiscard]] constexpr bool operator()(T item, span_t span) const // <
         {
             return compare(item, span) < 0;
         }
 
-        int compare(span_t span, T item) const // <=>
+        [[nodiscard]] constexpr int compare(span_t span, T item) const // <=>
         {
             return -compare(item, span);
         }
 
-        bool operator()(span_t span, T item) const // <
+        [[nodiscard]] constexpr bool operator()(span_t span, T item) const // <
         {
             return compare(span, item) < 0;
         }

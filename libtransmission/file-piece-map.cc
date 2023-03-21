@@ -60,24 +60,19 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
     reset({ tm.totalSize(), tm.pieceSize() }, std::data(file_sizes), std::size(file_sizes));
 }
 
-tr_file_piece_map::piece_span_t tr_file_piece_map::pieceSpan(tr_file_index_t file) const
-{
-    return file_pieces_[file];
-}
-
 tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piece) const
 {
-    auto compare = CompareToSpan<tr_piece_index_t>{};
+    constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
-    auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, compare);
-    return { tr_piece_index_t(std::distance(begin, equal_begin)), tr_piece_index_t(std::distance(begin, equal_end)) };
+    auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, Compare);
+    return { tr_piece_index_t(equal_begin - begin), tr_piece_index_t(equal_end - begin) };
 }
 
 tr_file_piece_map::file_offset_t tr_file_piece_map::fileOffset(uint64_t offset) const
 {
-    auto compare = CompareToSpan<uint64_t>{};
+    constexpr auto Compare = CompareToSpan<uint64_t>{};
     auto const begin = std::begin(file_bytes_);
-    auto const it = std::lower_bound(begin, std::end(file_bytes_), offset, compare);
+    auto const it = std::lower_bound(begin, std::end(file_bytes_), offset, Compare);
     tr_file_index_t const file_index = std::distance(begin, it);
     auto const file_offset = offset - it->begin;
     return file_offset_t{ file_index, file_offset };
@@ -129,20 +124,29 @@ tr_priority_t tr_file_priorities::filePriority(tr_file_index_t file) const
 
 tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
 {
-    if (std::empty(priorities_))
+    // increase priority if a file begins or ends in this piece
+    // because that makes life easier for code/users using at incomplete files.
+    // Xrefs: f2daeb242, https://forum.transmissionbt.com/viewtopic.php?t=10473
+    auto const [begin_file, end_file] = fpm_->fileSpan(piece);
+    if ((begin_file + 1 != end_file) // at least one file ends in this piece
+        || (piece == fpm_->pieceSpan(begin_file).begin) // piece's first file starts in this piece
+        || (end_file > begin_file && piece + 1 == fpm_->pieceSpan(end_file - 1).end)) // piece's last file ends in this piece
     {
-        return TR_PRI_NORMAL;
+        return TR_PRI_HIGH;
     }
 
-    auto const [begin_idx, end_idx] = fpm_->fileSpan(piece);
-    auto const begin = std::begin(priorities_) + begin_idx;
-    auto const end = std::begin(priorities_) + end_idx;
-    auto const it = std::max_element(begin, end);
-    if (it == end)
+    // check the priorities of the files that touch this piece
+    if (end_file <= std::size(priorities_))
     {
-        return TR_PRI_NORMAL;
+        auto const begin = std::begin(priorities_) + begin_file;
+        auto const end = std::begin(priorities_) + end_file;
+        if (auto const it = std::max_element(begin, end); it != end)
+        {
+            return *it;
+        }
     }
-    return *it;
+
+    return TR_PRI_NORMAL;
 }
 
 // ---

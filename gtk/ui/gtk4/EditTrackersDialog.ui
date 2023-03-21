@@ -98,8 +98,8 @@ To add a new primary URL, add it after a blank line.</property>
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-6">cancel_button</action-widget>
-      <action-widget response="-3">save_button</action-widget>
+      <action-widget response="cancel">cancel_button</action-widget>
+      <action-widget response="accept">save_button</action-widget>
     </action-widgets>
   </object>
 </interface>
