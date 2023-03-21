@@ -204,6 +204,8 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
 
 [[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
 
+[[nodiscard]] std::string tr_strv_convert_utf8(std::string_view sv);
+
 [[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 
 /**

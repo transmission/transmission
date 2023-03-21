@@ -1019,7 +1019,7 @@ static void printDetails(tr_variant* top)
                 }
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_downloaded, &i))
+            if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i))
             {
                 if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
                 {

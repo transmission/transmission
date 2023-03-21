@@ -89,7 +89,7 @@ private:
     {
         using span_t = index_span_t<T>;
 
-        int compare(T item, span_t span) const // <=>
+        [[nodiscard]] constexpr int compare(T item, span_t span) const // <=>
         {
             if (item < span.begin)
             {
@@ -104,17 +104,17 @@ private:
             return 0;
         }
 
-        bool operator()(T item, span_t span) const // <
+        [[nodiscard]] constexpr bool operator()(T item, span_t span) const // <
         {
             return compare(item, span) < 0;
         }
 
-        int compare(span_t span, T item) const // <=>
+        [[nodiscard]] constexpr int compare(span_t span, T item) const // <=>
         {
             return -compare(item, span);
         }
 
-        bool operator()(span_t span, T item) const // <
+        [[nodiscard]] constexpr bool operator()(span_t span, T item) const // <
         {
             return compare(span, item) < 0;
         }
