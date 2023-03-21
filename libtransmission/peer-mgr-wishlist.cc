@@ -127,11 +127,6 @@ std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, si
 
 } // namespace
 
-Wishlist::Wishlist(Wishlist::Mediator const& mediator)
-    : mediator_{ mediator }
-{
-}
-
 std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
 {
     if (n_wanted_blocks == 0)
