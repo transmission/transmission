@@ -45,11 +45,12 @@ public:
     {
         reset(tm);
     }
+
     tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
     {
         reset(block_info, file_sizes, n_files);
     }
-    void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
+
     void reset(tr_torrent_metainfo const& tm);
 
     [[nodiscard]] TR_CONSTEXPR20 piece_span_t pieceSpan(tr_file_index_t file) const noexcept
@@ -79,6 +80,8 @@ public:
     }
 
 private:
+    void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
+
     using byte_span_t = index_span_t<uint64_t>;
     std::vector<byte_span_t> file_bytes_;
 
