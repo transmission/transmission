@@ -237,14 +237,33 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
 
     if (accepts)
     {
-        auto const m = prefs_.get<FilterMode>(Prefs::FILTER_MODE);
-        accepts = m.test(tor);
+        bool included_in_activities = false;
+        auto const modes = prefs_.get<QList<FilterMode>>(Prefs::FILTER_MODE);
+
+        for (const FilterMode& mode : modes) {
+            included_in_activities = included_in_activities || mode.test(tor);
+        }
+
+        if (modes.isEmpty()) {
+            included_in_activities = true;
+        }
+
+        accepts = included_in_activities;
     }
 
     if (accepts)
     {
-        auto const display_name = prefs_.getString(Prefs::FILTER_TRACKERS);
-        accepts = display_name.isEmpty() || tor.includesTracker(display_name.toLower());
+        bool included_in_trackers = false;
+        auto const display_names = prefs_.get<QStringList>(Prefs::FILTER_TRACKERS);
+        for (const QString& display_name : display_names) {
+            included_in_trackers = included_in_trackers || tor.includesTracker(display_name.toLower());
+        }
+
+        if (display_names.isEmpty()) {
+            included_in_trackers = true;
+        }
+
+        accepts = included_in_trackers;
     }
 
     if (accepts)

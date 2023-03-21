@@ -10,6 +10,7 @@
 #include "FilterBarComboBox.h"
 #include "StyleHelper.h"
 #include "Utils.h"
+#include "FilterUI.h"
 
 namespace
 {
@@ -31,7 +32,7 @@ QSize FilterBarComboBox::minimumSizeHint() const
 {
     QFontMetrics const fm(fontMetrics());
     QSize const text_size = fm.size(0, itemText(0));
-    QSize const count_size = fm.size(0, itemData(0, CountStringRole).toString());
+    QSize const count_size = fm.size(0, itemData(0, FilterUI::CountStringRole).toString());
     return calculateSize(text_size, count_size);
 }
 
@@ -47,7 +48,7 @@ QSize FilterBarComboBox::sizeHint() const
         max_text_size.setHeight(qMax(max_text_size.height(), text_size.height()));
         max_text_size.setWidth(qMax(max_text_size.width(), text_size.width()));
 
-        QSize const count_size = fm.size(0, itemData(i, CountStringRole).toString());
+        QSize const count_size = fm.size(0, itemData(i, FilterUI::CountStringRole).toString());
         max_count_size.setHeight(qMax(max_count_size.height(), count_size.height()));
         max_count_size.setWidth(qMax(max_count_size.width(), count_size.width()));
     }
@@ -102,7 +103,7 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
         }
 
         // draw the count
-        QString text = model_index.data(CountStringRole).toString();
+        QString text = model_index.data(FilterUI::CountStringRole).toString();
 
         if (!text.isEmpty())
         {

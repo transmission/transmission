@@ -42,6 +42,7 @@
 #include "TorrentDelegateMin.h"
 #include "TorrentFilter.h"
 #include "TorrentModel.h"
+#include "FilterView.h"
 #include "Utils.h"
 
 namespace
@@ -243,6 +244,12 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setModel(&filter_model_);
     connect(ui_.listView->selectionModel(), &QItemSelectionModel::selectionChanged, refresh_action_sensitivity_soon);
 
+    // filter view
+
+    auto* filter_view = new FilterView(prefs_, model_, filter_model_);
+    ui_.splitter->insertWidget(0, filter_view);
+    filter_view_ = filter_view;
+
     std::array<std::pair<QAction*, int>, 9> const sort_modes = { {
         { ui_.action_SortByActivity, SortMode::SORT_BY_ACTIVITY },
         { ui_.action_SortByAge, SortMode::SORT_BY_AGE },
@@ -308,13 +315,15 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&filter_model_, &TorrentFilter::rowsInserted, this, refresh_header_soon);
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
     connect(ui_.listView, &TorrentView::headerDoubleClicked, filter_bar, &FilterBar::clear);
+    connect(ui_.listView, &TorrentView::headerDoubleClicked, filter_view, &FilterView::clear);
 
-    static std::array<int, 17> constexpr InitKeys = {
+    static std::array<int, 18> constexpr InitKeys = {
         Prefs::ALT_SPEED_LIMIT_ENABLED, //
         Prefs::COMPACT_VIEW, //
         Prefs::DSPEED, //
         Prefs::DSPEED_ENABLED, //
         Prefs::FILTERBAR, //
+        Prefs::FILTERBAR_ALT_VIEW, //
         Prefs::MAIN_WINDOW_X, //
         Prefs::RATIO, //
         Prefs::RATIO_ENABLED, //
@@ -1190,8 +1199,22 @@ void MainWindow::refreshPref(int key)
 
     case Prefs::FILTERBAR:
         b = prefs_.getBool(key);
-        filter_bar_->setVisible(b);
+
+        if (b) {
+            filter_bar_->setVisible(!prefs_.getBool(Prefs::FILTERBAR_ALT_VIEW));
+            filter_view_->setVisible(prefs_.getBool(Prefs::FILTERBAR_ALT_VIEW));
+        } else {
+            filter_bar_->setVisible(b);
+            filter_view_->setVisible(b);
+        }
+
         ui_.action_Filterbar->setChecked(b);
+        break;
+
+    case Prefs::FILTERBAR_ALT_VIEW:
+        b = prefs_.getBool(key);
+        filter_bar_->setVisible(!b);
+        filter_view_->setVisible(b);
         break;
 
     case Prefs::STATUSBAR:

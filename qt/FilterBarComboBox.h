@@ -15,13 +15,6 @@ class FilterBarComboBox : public QComboBox
     TR_DISABLE_COPY_MOVE(FilterBarComboBox)
 
 public:
-    enum
-    {
-        CountRole = Qt::UserRole + 1,
-        CountStringRole,
-        UserRole
-    };
-
     explicit FilterBarComboBox(QWidget* parent = nullptr);
 
     // QWidget
