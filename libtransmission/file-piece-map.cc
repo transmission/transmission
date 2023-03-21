@@ -62,17 +62,17 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
 
 tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piece) const
 {
-    auto compare = CompareToSpan<tr_piece_index_t>{};
+    constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
-    auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, compare);
-    return { tr_piece_index_t(std::distance(begin, equal_begin)), tr_piece_index_t(std::distance(begin, equal_end)) };
+    auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, Compare);
+    return { tr_piece_index_t(equal_begin - begin), tr_piece_index_t(equal_end - begin) };
 }
 
 tr_file_piece_map::file_offset_t tr_file_piece_map::fileOffset(uint64_t offset) const
 {
-    auto compare = CompareToSpan<uint64_t>{};
+    constexpr auto Compare = CompareToSpan<uint64_t>{};
     auto const begin = std::begin(file_bytes_);
-    auto const it = std::lower_bound(begin, std::end(file_bytes_), offset, compare);
+    auto const it = std::lower_bound(begin, std::end(file_bytes_), offset, Compare);
     tr_file_index_t const file_index = std::distance(begin, it);
     auto const file_offset = offset - it->begin;
     return file_offset_t{ file_index, file_offset };
@@ -124,11 +124,6 @@ tr_priority_t tr_file_priorities::filePriority(tr_file_index_t file) const
 
 tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
 {
-    if (std::empty(*fpm_)) // not initialized yet
-    {
-        return TR_PRI_NORMAL;
-    }
-
     // increase priority if a file begins or ends in this piece
     // because that makes life easier for code/users using at incomplete files.
     // Xrefs: f2daeb242, https://forum.transmissionbt.com/viewtopic.php?t=10473
