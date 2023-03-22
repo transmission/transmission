@@ -1449,31 +1449,23 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     }
 }
 
-tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm)
+tr_swarm_stats tr_swarmGetStats(tr_swarm const* const swarm)
 {
     TR_ASSERT(swarm != nullptr);
+
+    auto count_active_peers = [&swarm](tr_direction dir)
+    {
+        return std::count_if(
+            std::begin(swarm->peers),
+            std::end(swarm->peers),
+            [dir](auto const& peer) { return peer->is_active(dir); });
+    };
+
     auto& stats = swarm->stats;
+    stats.active_peer_count[TR_UP] = count_active_peers(TR_UP);
+    stats.active_peer_count[TR_DOWN] = count_active_peers(TR_DOWN);
     stats.active_webseed_count = swarm->countActiveWebseeds(tr_time_msec());
     return stats;
-}
-
-void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active)
-{
-    int n = swarm->stats.active_peer_count[direction];
-
-    if (is_active)
-    {
-        ++n;
-    }
-    else
-    {
-        --n;
-    }
-
-    TR_ASSERT(n >= 0);
-    TR_ASSERT(n <= swarm->stats.peer_count);
-
-    swarm->stats.active_peer_count[direction] = n;
 }
 
 /* count how many bytes we want that connected peers have */

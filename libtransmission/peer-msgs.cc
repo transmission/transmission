@@ -401,14 +401,6 @@ public:
         return io->bandwidth();
     }
 
-    [[nodiscard]] bool is_active(tr_direction direction) const override
-    {
-        TR_ASSERT(tr_isDirection(direction));
-        auto const active = is_active_[direction];
-        TR_ASSERT(active == calculate_active(direction));
-        return active;
-    }
-
     [[nodiscard]] std::pair<tr_address, tr_port> socketAddress() const override
     {
         return io->socket_address();
@@ -624,18 +616,6 @@ private:
         return active;
     }
 
-    void set_active(tr_direction direction, bool active)
-    {
-        // TODO logtrace(msgs, "direction [%d] is_active [%d]", int(direction), int(is_active));
-        auto& val = is_active_[direction];
-        if (val != active)
-        {
-            val = active;
-
-            tr_swarmIncrementActivePeers(torrent->swarm, direction, active);
-        }
-    }
-
     void update_active()
     {
         update_active(TR_UP);
@@ -713,8 +693,6 @@ public:
 
 private:
     friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmission::Buffer& payload);
-
-    std::array<bool, 2> is_active_ = { false, false };
 
     tr_peer_callback const callback_;
     void* const callback_data_;

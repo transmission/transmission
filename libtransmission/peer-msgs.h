@@ -92,7 +92,10 @@ public:
         return client_;
     }
 
-    [[nodiscard]] virtual bool is_active(tr_direction direction) const = 0;
+    [[nodiscard]] constexpr auto is_active(tr_direction direction) const noexcept
+    {
+        return is_active_[direction];
+    }
 
     [[nodiscard]] virtual std::pair<tr_address, tr_port> socketAddress() const = 0;
 
@@ -128,6 +131,11 @@ protected:
         peer_is_interested_ = val;
     }
 
+    constexpr void set_active(tr_direction direction, bool active) noexcept
+    {
+        is_active_[direction] = active;
+    }
+
 private:
     static inline auto n_peers = std::atomic<size_t>{};
 
@@ -137,6 +145,8 @@ private:
     bool const connection_is_encrypted_;
     bool const connection_is_incoming_;
     bool const connection_is_utp_;
+
+    std::array<bool, 2> is_active_ = {};
 
     // whether or not the peer is choking us.
     bool client_is_choked_ = true;
