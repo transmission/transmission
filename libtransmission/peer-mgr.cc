@@ -369,7 +369,7 @@ public:
             [&now](auto const& webseed) { return webseed->isTransferringPieces(now, TR_DOWN, nullptr); });
     }
 
-    [[nodiscard]] auto peerCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto peerCount() const noexcept
     {
         return std::size(peers);
     }
@@ -1318,10 +1318,11 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     auto atoms = std::vector<peer_atom const*>{};
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
-        atoms.reserve(s->peerCount());
+        auto const& peers = s->peers;
+        atoms.reserve(std::size(peers));
         std::transform(
-            std::begin(s->peers),
-            std::end(s->peers),
+            std::begin(peers),
+            std::end(peers),
             std::back_inserter(atoms),
             [](auto const* peer) { return peer->atom; });
     }
@@ -1481,7 +1482,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     }
 
     tr_swarm const* const swarm = tor->swarm;
-    if (swarm == nullptr || swarm->peerCount() == 0U)
+    if (swarm == nullptr || std::empty(swarm->peers))
     {
         return 0;
     }
@@ -1698,7 +1699,7 @@ void updateInterest(tr_swarm* swarm)
         return;
     }
 
-    if (auto const peer_count = swarm->peerCount(); peer_count > 0)
+    if (auto const& peers = swarm->peers; !std::empty(peers))
     {
         int const n = tor->pieceCount();
 
@@ -1710,7 +1711,7 @@ void updateInterest(tr_swarm* swarm)
             piece_is_interesting[i] = tor->pieceIsWanted(i) && !tor->hasPiece(i);
         }
 
-        for (auto* const peer : swarm->peers)
+        for (auto* const peer : peers)
         {
             peer->set_interested(isPeerInteresting(tor, piece_is_interesting, peer));
         }
@@ -1798,8 +1799,8 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 {
     auto const lock = s->unique_lock();
 
-    auto const peer_count = s->peerCount();
     auto& peers = s->peers;
+    auto const peer_count = std::size(peers);
     auto choked = std::vector<ChokeData>{};
     choked.reserve(peer_count);
     auto const* const session = s->manager->session;
@@ -2051,9 +2052,11 @@ struct ComparePeerByActivity
 
 [[nodiscard]] auto getPeersToClose(tr_swarm const* const swarm, time_t const now_sec)
 {
-    auto peers_to_close = std::vector<tr_peer*>{};
+    auto const& peers = swarm->peers;
+    auto const peer_count = std::size(peers);
 
-    auto const peer_count = swarm->peerCount();
+    auto peers_to_close = std::vector<tr_peer*>{};
+    peers_to_close.reserve(peer_count);
     for (auto* peer : swarm->peers)
     {
         if (shouldPeerBeClosed(swarm, peer, peer_count, now_sec))
