@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <set>
 #include <vector>
 
 #include "transmission.h"
@@ -21,6 +22,8 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
     file_pieces_.resize(n_files);
     file_pieces_.shrink_to_fit();
 
+    auto edge_pieces = std::set<tr_piece_index_t>{};
+
     uint64_t offset = 0;
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
@@ -30,12 +33,16 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
         auto end_byte = tr_byte_index_t{};
         auto end_piece = tr_piece_index_t{};
 
+        edge_pieces.insert(begin_piece);
+
         if (file_size != 0)
         {
             end_byte = offset + file_size;
             auto const final_byte = end_byte - 1;
             auto const final_piece = block_info.byteLoc(final_byte).piece;
             end_piece = final_piece + 1;
+
+            edge_pieces.insert(final_piece);
         }
         else
         {
@@ -47,6 +54,8 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
         file_bytes_[i] = byte_span_t{ begin_byte, end_byte };
         offset += file_size;
     }
+
+    edge_pieces_.assign(std::begin(edge_pieces), std::end(edge_pieces));
 }
 
 void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
@@ -127,16 +136,13 @@ tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
     // increase priority if a file begins or ends in this piece
     // because that makes life easier for code/users using at incomplete files.
     // Xrefs: f2daeb242, https://forum.transmissionbt.com/viewtopic.php?t=10473
-    auto const [begin_file, end_file] = fpm_->fileSpan(piece);
-    if ((begin_file + 1 != end_file) // at least one file ends in this piece
-        || (piece == fpm_->pieceSpan(begin_file).begin) // piece's first file starts in this piece
-        || (end_file > begin_file && piece + 1 == fpm_->pieceSpan(end_file - 1).end)) // piece's last file ends in this piece
+    if (fpm_->is_edge_piece(piece))
     {
         return TR_PRI_HIGH;
     }
 
     // check the priorities of the files that touch this piece
-    if (end_file <= std::size(priorities_))
+    if (auto const [begin_file, end_file] = fpm_->fileSpan(piece); end_file <= std::size(priorities_))
     {
         auto const begin = std::begin(priorities_) + begin_file;
         auto const end = std::begin(priorities_) + end_file;
