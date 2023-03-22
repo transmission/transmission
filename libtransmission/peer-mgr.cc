@@ -977,7 +977,7 @@ namespace
 {
 namespace handshake_helpers
 {
-void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, struct peer_atom* atom, tr_quark client)
+void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, struct peer_atom* atom, tr_interned_string client)
 {
     TR_ASSERT(atom != nullptr);
     TR_ASSERT(tr_isTorrent(tor));
@@ -985,8 +985,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
     tr_swarm* swarm = tor->swarm;
 
-    auto* peer = tr_peerMsgsNew(tor, atom, std::move(io), &tr_swarm::peerCallbackFunc, swarm);
-    peer->client = client;
+    auto* peer = tr_peerMsgsNew(tor, atom, std::move(io), client, &tr_swarm::peerCallbackFunc, swarm);
     atom->is_connected = true;
 
     swarm->peers.push_back(peer);
@@ -1084,12 +1083,12 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         }
         else
         {
-            auto client = tr_quark{ TR_KEY_NONE };
+            auto client = tr_interned_string{};
             if (result.peer_id)
             {
                 auto buf = std::array<char, 128>{};
                 tr_clientForId(std::data(buf), sizeof(buf), *result.peer_id);
-                client = tr_quark_new(std::data(buf));
+                client = tr_interned_string{ tr_quark_new(std::data(buf)) };
             }
 
             result.io->set_bandwidth(&s->tor->bandwidth_);
@@ -1555,7 +1554,7 @@ namespace peer_stat_helpers
     auto const [addr, port] = peer->socketAddress();
 
     addr.display_name(stats.addr, sizeof(stats.addr));
-    stats.client = peer->client.c_str();
+    stats.client = peer->client().c_str();
     stats.port = port.host();
     stats.from = atom->fromFirst;
     stats.progress = peer->percentDone();

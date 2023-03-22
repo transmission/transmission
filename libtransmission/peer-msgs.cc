@@ -261,7 +261,7 @@ void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
                 __FILE__, \
                 __LINE__, \
                 (level), \
-                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->display_name(), (msgs)->client, text), \
+                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->display_name(), (msgs)->client().sv(), text), \
                 (msgs)->torrent->name()); \
         } \
     } while (0)
@@ -293,9 +293,10 @@ public:
         tr_torrent* torrent_in,
         peer_atom* atom_in,
         std::shared_ptr<tr_peerIo> io_in,
+        tr_interned_string client,
         tr_peer_callback callback,
         void* callback_data)
-        : tr_peerMsgs{ torrent_in, atom_in, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
+        : tr_peerMsgs{ torrent_in, atom_in, client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
         , outMessagesBatchPeriod{ LowPriorityIntervalSecs }
         , torrent{ torrent_in }
         , io{ std::move(io_in) }
@@ -2227,8 +2228,9 @@ tr_peerMsgs* tr_peerMsgsNew(
     tr_torrent* torrent,
     peer_atom* atom,
     std::shared_ptr<tr_peerIo> io,
+    tr_interned_string client,
     tr_peer_callback callback,
     void* callback_data)
 {
-    return new tr_peerMsgsImpl(torrent, atom, std::move(io), callback, callback_data);
+    return new tr_peerMsgsImpl(torrent, atom, std::move(io), client, callback, callback_data);
 }

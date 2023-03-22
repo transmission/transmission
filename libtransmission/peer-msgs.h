@@ -34,10 +34,12 @@ public:
     tr_peerMsgs(
         tr_torrent const* tor,
         peer_atom* atom_in,
+        tr_interned_string client,
         bool connection_is_encrypted,
         bool connection_is_incoming,
         bool connection_is_utp)
         : tr_peer{ tor, atom_in }
+        , client_{ client }
         , connection_is_encrypted_{ connection_is_encrypted }
         , connection_is_incoming_{ connection_is_incoming }
         , connection_is_utp_{ connection_is_utp }
@@ -87,6 +89,11 @@ public:
         return connection_is_utp_;
     }
 
+    [[nodiscard]] constexpr auto const& client() const noexcept
+    {
+        return client_;
+    }
+
     [[nodiscard]] virtual bool is_active(tr_direction direction) const = 0;
     virtual void update_active(tr_direction direction) = 0;
 
@@ -102,9 +109,6 @@ public:
     virtual void onTorrentGotMetainfo() = 0;
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
-
-    /// The client name. This is the app name derived from the `v` string in LTEP's handshake dictionary
-    tr_interned_string client;
 
 protected:
     constexpr void set_client_choked(bool val) noexcept
@@ -130,6 +134,13 @@ protected:
 private:
     static inline auto n_peers = std::atomic<size_t>{};
 
+    /// The client name. This is the app name derived from the `v` string in LTEP's handshake dictionary
+    tr_interned_string const client_;
+
+    bool const connection_is_encrypted_;
+    bool const connection_is_incoming_;
+    bool const connection_is_utp_;
+
     // whether or not the peer is choking us.
     bool client_is_choked_ = true;
 
@@ -141,16 +152,13 @@ private:
 
     // whether or not the peer has indicated it will download from us
     bool peer_is_interested_ = false;
-
-    bool const connection_is_encrypted_;
-    bool const connection_is_incoming_;
-    bool const connection_is_utp_;
 };
 
 tr_peerMsgs* tr_peerMsgsNew(
     tr_torrent* torrent,
     peer_atom* atom,
     std::shared_ptr<tr_peerIo> io,
+    tr_interned_string client,
     tr_peer_callback callback,
     void* callback_data);
 
