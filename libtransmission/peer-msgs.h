@@ -16,7 +16,6 @@
 #include <memory>
 #include <utility>
 
-#include "bitfield.h"
 #include "peer-common.h"
 #include "torrent.h"
 
@@ -39,7 +38,6 @@ public:
         bool connection_is_incoming,
         bool connection_is_utp)
         : tr_peer{ tor, atom_in }
-        , have_{ tor->pieceCount() }
         , connection_is_encrypted_{ connection_is_encrypted }
         , connection_is_incoming_{ connection_is_incoming }
         , connection_is_utp_{ connection_is_utp }
@@ -128,8 +126,6 @@ protected:
     {
         peer_is_interested_ = val;
     }
-
-    tr_bitfield have_;
 
 private:
     static inline auto n_peers = std::atomic<size_t>{};
