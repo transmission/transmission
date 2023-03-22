@@ -10,18 +10,16 @@
 #endif
 
 #include <atomic>
-#include <cstdint> // int8_t
-#include <cstddef> // size_t
-#include <ctime> // time_t
+#include <cstddef> // for size_t
 #include <memory>
-#include <utility>
+#include <utility> // for std::pair<>
 
-#include "peer-common.h"
-#include "torrent.h"
+#include "peer-common.h" // for tr_peer
 
 class tr_peer;
 class tr_peerIo;
 struct tr_address;
+struct tr_torrent;
 
 /**
  * @addtogroup peers Peers
@@ -49,7 +47,7 @@ public:
 
     virtual ~tr_peerMsgs() override;
 
-    [[nodiscard]] static size_t size() noexcept
+    [[nodiscard]] static auto size() noexcept
     {
         return n_peers.load();
     }
