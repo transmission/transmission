@@ -334,6 +334,8 @@ public:
 
         io->set_callbacks(canRead, didWrite, gotError, this);
         updateDesiredRequestCount(this);
+
+        update_active();
     }
 
     tr_peerMsgsImpl(tr_peerMsgsImpl&&) = delete;
@@ -407,13 +409,6 @@ public:
         return active;
     }
 
-    void update_active(tr_direction direction) override
-    {
-        TR_ASSERT(tr_isDirection(direction));
-
-        set_active(direction, calculate_active(direction));
-    }
-
     [[nodiscard]] std::pair<tr_address, tr_port> socketAddress() const override
     {
         return io->socket_address();
@@ -433,6 +428,8 @@ public:
     void onTorrentGotMetainfo() noexcept override
     {
         invalidatePercentDone();
+
+        update_active();
     }
 
     void invalidatePercentDone()
@@ -637,6 +634,19 @@ private:
 
             tr_swarmIncrementActivePeers(torrent->swarm, direction, active);
         }
+    }
+
+    void update_active()
+    {
+        update_active(TR_UP);
+        update_active(TR_DOWN);
+    }
+
+    void update_active(tr_direction direction)
+    {
+        TR_ASSERT(tr_isDirection(direction));
+
+        set_active(direction, calculate_active(direction));
     }
 
 public:

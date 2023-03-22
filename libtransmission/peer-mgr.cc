@@ -995,11 +995,6 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
     TR_ASSERT(swarm->stats.peer_count == swarm->peerCount());
     TR_ASSERT(swarm->stats.peer_from_count[atom->fromFirst] <= swarm->stats.peer_count);
-
-    // TODO is this needed?
-    // isn't it already initialized in tr_peerMsgsImpl's ctor?
-    peer->update_active(TR_UP);
-    peer->update_active(TR_DOWN);
 }
 
 /* FIXME: this is kind of a mess. */
@@ -1419,13 +1414,6 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
         {
             swarm->mark_atom_as_seed(*peer->atom);
         }
-    }
-
-    /* update the bittorrent peers' willingness... */
-    for (auto* peer : swarm->peers)
-    {
-        peer->update_active(TR_UP);
-        peer->update_active(TR_DOWN);
     }
 }
 
