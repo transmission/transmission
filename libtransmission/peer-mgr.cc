@@ -1563,10 +1563,10 @@ namespace peer_stat_helpers
     stats.isEncrypted = peer->is_encrypted();
     stats.rateToPeer_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_CLIENT_TO_PEER));
     stats.rateToClient_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_PEER_TO_CLIENT));
-    stats.peerIsChoked = peer->is_peer_choked();
-    stats.peerIsInterested = peer->is_peer_interested();
-    stats.clientIsChoked = peer->is_client_choked();
-    stats.clientIsInterested = peer->is_client_interested();
+    stats.peerIsChoked = peer->peer_is_choked();
+    stats.peerIsInterested = peer->peer_is_interested();
+    stats.clientIsChoked = peer->client_is_choked();
+    stats.clientIsInterested = peer->client_is_interested();
     stats.isIncoming = peer->is_incoming_connection();
     stats.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
     stats.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
@@ -1857,8 +1857,8 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
                 peer,
                 getRateBps(s->tor, peer, now),
                 salter(),
-                peer->is_peer_interested(),
-                peer->is_peer_choked(),
+                peer->peer_is_interested(),
+                peer->peer_is_choked(),
                 true);
         }
     }
