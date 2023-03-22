@@ -1526,7 +1526,7 @@ namespace
 namespace peer_stat_helpers
 {
 
-[[nodiscard]] auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
+[[nodiscard]] auto get_peer_stats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
 {
     auto stats = tr_peer_stat{};
     auto const* const atom = peer->atom;
@@ -1633,16 +1633,17 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
-    auto const n = tor->swarm->peerCount();
+    auto const peers = tor->swarm->peers;
+    auto const n = std::size(peers);
     auto* const ret = new tr_peer_stat[n];
 
     auto const now = tr_time();
     auto const now_msec = tr_time_msec();
     std::transform(
-        std::begin(tor->swarm->peers),
-        std::end(tor->swarm->peers),
+        std::begin(peers),
+        std::end(peers),
         ret,
-        [&now, &now_msec](auto const* peer) { return getPeerStats(peer, now, now_msec); });
+        [&now, &now_msec](auto const* peer) { return get_peer_stats(peer, now, now_msec); });
 
     *setme_count = n;
     return ret;
