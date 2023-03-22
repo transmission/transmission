@@ -261,7 +261,7 @@ void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
                 __FILE__, \
                 __LINE__, \
                 (level), \
-                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->display_name(), (msgs)->client().sv(), text), \
+                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->display_name(), (msgs)->user_agent().sv(), text), \
                 (msgs)->torrent->name()); \
         } \
     } while (0)
@@ -693,6 +693,7 @@ public:
 
 private:
     friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmission::Buffer& payload);
+    friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload);
 
     tr_peer_callback const callback_;
     void* const callback_data_;
@@ -1030,6 +1031,15 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
     if (tr_variantDictFindInt(&val, TR_KEY_upload_only, &i))
     {
         pex.flags |= ADDED_F_SEED_FLAG;
+    }
+
+    // http://bittorrent.org/beps/bep_0010.html
+    // Client name and version (as a utf-8 string). This is a much more
+    // reliable way of identifying the client than relying on the
+    // peer id encoding.
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&val, TR_KEY_v, &sv))
+    {
+        msgs->set_user_agent(tr_interned_string{ sv });
     }
 
     /* get peer's listening port */
@@ -2216,9 +2226,9 @@ tr_peerMsgs* tr_peerMsgsNew(
     tr_torrent* torrent,
     peer_atom* atom,
     std::shared_ptr<tr_peerIo> io,
-    tr_interned_string client,
+    tr_interned_string user_agent,
     tr_peer_callback callback,
     void* callback_data)
 {
-    return new tr_peerMsgsImpl(torrent, atom, std::move(io), client, callback, callback_data);
+    return new tr_peerMsgsImpl(torrent, atom, std::move(io), user_agent, callback, callback_data);
 }

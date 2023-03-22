@@ -32,12 +32,12 @@ public:
     tr_peerMsgs(
         tr_torrent const* tor,
         peer_atom* atom_in,
-        tr_interned_string client,
+        tr_interned_string user_agent,
         bool connection_is_encrypted,
         bool connection_is_incoming,
         bool connection_is_utp)
         : tr_peer{ tor, atom_in }
-        , client_{ client }
+        , user_agent_{ user_agent }
         , connection_is_encrypted_{ connection_is_encrypted }
         , connection_is_incoming_{ connection_is_incoming }
         , connection_is_utp_{ connection_is_utp }
@@ -87,9 +87,9 @@ public:
         return connection_is_utp_;
     }
 
-    [[nodiscard]] constexpr auto const& client() const noexcept
+    [[nodiscard]] constexpr auto const& user_agent() const noexcept
     {
-        return client_;
+        return user_agent_;
     }
 
     [[nodiscard]] constexpr auto is_active(tr_direction direction) const noexcept
@@ -136,11 +136,17 @@ protected:
         is_active_[direction] = active;
     }
 
+    constexpr void set_user_agent(tr_interned_string val) noexcept
+    {
+        user_agent_ = val;
+    }
+
 private:
     static inline auto n_peers = std::atomic<size_t>{};
 
-    /// The client name. This is the app name derived from the `v` string in LTEP's handshake dictionary
-    tr_interned_string const client_;
+    // What software the peer is running.
+    // Derived from the `v` string in LTEP's handshake dictionary, when available.
+    tr_interned_string user_agent_;
 
     bool const connection_is_encrypted_;
     bool const connection_is_incoming_;
@@ -165,7 +171,7 @@ tr_peerMsgs* tr_peerMsgsNew(
     tr_torrent* torrent,
     peer_atom* atom,
     std::shared_ptr<tr_peerIo> io,
-    tr_interned_string client,
+    tr_interned_string user_agent,
     tr_peer_callback callback,
     void* callback_data);
 

@@ -1534,7 +1534,7 @@ namespace peer_stat_helpers
     auto const [addr, port] = peer->socketAddress();
 
     addr.display_name(stats.addr, sizeof(stats.addr));
-    stats.client = peer->client().c_str();
+    stats.client = peer->user_agent().c_str();
     stats.port = port.host();
     stats.from = atom->fromFirst;
     stats.progress = peer->percentDone();
