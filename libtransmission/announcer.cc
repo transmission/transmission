@@ -910,7 +910,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     req.announce_url = current_tracker->announce_url;
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
-    req.peer_id = tr_torrentGetPeerId(tor);
+    req.peer_id = tor->peer_id();
     req.up = tier->byteCounts[TR_ANN_UP];
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
@@ -1733,18 +1733,21 @@ tr_tracker_view tr_announcerTracker(tr_torrent const* tor, size_t nth)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->torrent_announcer != nullptr);
 
-    auto i = size_t{ 0 };
+    auto tier_index = size_t{ 0 };
+    auto tracker_index = size_t{ 0 };
     for (auto const& tier : tor->torrent_announcer->tiers)
     {
         for (auto const& tracker : tier.trackers)
         {
-            if (i == nth)
+            if (tracker_index == nth)
             {
-                return trackerView(*tor, i, tier, tracker);
+                return trackerView(*tor, tier_index, tier, tracker);
             }
 
-            ++i;
+            ++tracker_index;
         }
+
+        ++tier_index;
     }
 
     TR_ASSERT(false);

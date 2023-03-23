@@ -268,9 +268,24 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 
 // ---
 
+#ifndef __APPLE__
+
+std::string tr_strv_convert_utf8(std::string_view sv)
+{
+    return tr_strv_replace_invalid(sv);
+}
+
+#endif
+
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
+    // stripping characters after first \0
+    if (auto first_null = sv.find('\0'); first_null != std::string::npos)
+    {
+        sv = { std::data(sv), first_null };
+    }
     auto out = std::string{};
+    out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
 }
