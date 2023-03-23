@@ -255,7 +255,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
     if (denominator > 0)
     {
-        return numerator / (double)denominator;
+        return numerator / static_cast<double>(denominator);
     }
 
     if (numerator > 0)
@@ -683,7 +683,7 @@ char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes
         unit = &u[3];
     }
 
-    double const value = double(bytes) / unit->value;
+    double const value = static_cast<double>(bytes) / unit->value;
     auto const* const units = std::data(unit->name);
 
     auto precision = int{};
