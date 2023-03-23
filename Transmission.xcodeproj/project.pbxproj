@@ -3717,7 +3717,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/dht",
@@ -3961,7 +3960,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/dht",
@@ -4277,7 +4275,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"third-party/dht",
