@@ -6,11 +6,6 @@ Maintainers
   Mike Gelfand (@mikedld) (GTK client, scripts & tooling)
   Mitchell Livingston (@livings124) (macOS client)
 
-Previous Maintainers
-  Eric Petit (@titer) (Project originator)
-  Josh Elsasser (Daemon, Backend, GTK client)
-  Bryan Varner (BeOS client)
-
 Contributor Team
   Derek Reiff (@dareiff) (Web client)
   Dmitry Serov (@DevilDimon) (macOS client)
@@ -18,6 +13,11 @@ Contributor Team
   FX Coudert (@fxcoudert) (macOS client)
   John Clay (@JohnClay)
   SweetP Pro (@sweetppro) (macOS client)
+
+Hall of Fame
+  Eric Petit (@titer) (Project originator)
+  Josh Elsasser (Daemon, Backend, GTK client)
+  Bryan Varner (BeOS client)
 
 Starting with Transmission 4.0.0, contributors are credited in each
 release's notes so that repeat contributions receive repeat shout-outs.
