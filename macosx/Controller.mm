@@ -825,30 +825,22 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (void)applicationWillFinishLaunching:(NSNotification*)notification
 {
     // user notifications
-    if (@available(macOS 10.14, *))
-    {
-        UNUserNotificationCenter.currentNotificationCenter.delegate = self;
-        UNNotificationAction* actionShow = [UNNotificationAction actionWithIdentifier:@"actionShow"
-                                                                                title:NSLocalizedString(@"Show", "notification button")
-                                                                              options:UNNotificationActionOptionForeground];
-        UNNotificationCategory* categoryShow = [UNNotificationCategory categoryWithIdentifier:@"categoryShow" actions:@[ actionShow ]
-                                                                            intentIdentifiers:@[]
-                                                                                      options:UNNotificationCategoryOptionNone];
-        [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:[NSSet setWithObject:categoryShow]];
-        [UNUserNotificationCenter.currentNotificationCenter
-            requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge)
-                          completionHandler:^(BOOL /*granted*/, NSError* _Nullable error) {
-                              if (error.code > 0)
-                              {
-                                  NSLog(@"UserNotifications not configured: %@", error.localizedDescription);
-                              }
-                          }];
-    }
-    else
-    {
-        // Fallback on earlier versions
-        NSUserNotificationCenter.defaultUserNotificationCenter.delegate = self;
-    }
+    UNUserNotificationCenter.currentNotificationCenter.delegate = self;
+    UNNotificationAction* actionShow = [UNNotificationAction actionWithIdentifier:@"actionShow"
+                                                                            title:NSLocalizedString(@"Show", "notification button")
+                                                                          options:UNNotificationActionOptionForeground];
+    UNNotificationCategory* categoryShow = [UNNotificationCategory categoryWithIdentifier:@"categoryShow" actions:@[ actionShow ]
+                                                                        intentIdentifiers:@[]
+                                                                                  options:UNNotificationCategoryOptionNone];
+    [UNUserNotificationCenter.currentNotificationCenter setNotificationCategories:[NSSet setWithObject:categoryShow]];
+    [UNUserNotificationCenter.currentNotificationCenter
+        requestAuthorizationWithOptions:(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge)
+                      completionHandler:^(BOOL /*granted*/, NSError* _Nullable error) {
+                          if (error.code > 0)
+                          {
+                              NSLog(@"UserNotifications not configured: %@", error.localizedDescription);
+                          }
+                      }];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
@@ -886,24 +878,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                                                         andEventID:kAEOpenContents];
 
     //if we were opened from a user notification, do the corresponding action
-    if (@available(macOS 10.14, *))
+    UNNotificationResponse* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
+    if (launchNotification)
     {
-        UNNotificationResponse* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
-        if (launchNotification)
-        {
-            [self userNotificationCenter:UNUserNotificationCenter.currentNotificationCenter
-                didReceiveNotificationResponse:launchNotification withCompletionHandler:^{
-                }];
-        }
-    }
-    else
-    {
-        NSUserNotification* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
-        if (launchNotification)
-        {
-            [self userNotificationCenter:NSUserNotificationCenter.defaultUserNotificationCenter
-                 didActivateNotification:launchNotification];
-        }
+        [self userNotificationCenter:UNUserNotificationCenter.currentNotificationCenter didReceiveNotificationResponse:launchNotification
+                     withCompletionHandler:^{
+                     }];
     }
 
     //auto importing
@@ -2385,19 +2365,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
 - (void)userNotificationCenter:(UNUserNotificationCenter*)center
        willPresentNotification:(UNNotification*)notification
-         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler API_AVAILABLE(macos(10.14))
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler
 {
     completionHandler(-1);
 }
 
-- (BOOL)userNotificationCenter:(NSUserNotificationCenter*)center shouldPresentNotification:(NSUserNotification*)notification
-{
-    return YES;
-}
-
 - (void)userNotificationCenter:(UNUserNotificationCenter*)center
     didReceiveNotificationResponse:(UNNotificationResponse*)response
-             withCompletionHandler:(void (^)(void))completionHandler API_AVAILABLE(macos(10.14))
+             withCompletionHandler:(void (^)(void))completionHandler
 {
     if (!response.notification.request.content.userInfo.count)
     {
@@ -2414,23 +2389,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         [self didActivateNotificationByActionShowWithUserInfo:response.notification.request.content.userInfo];
     }
     completionHandler();
-}
-
-- (void)userNotificationCenter:(NSUserNotificationCenter*)center didActivateNotification:(NSUserNotification*)notification
-{
-    if (!notification.userInfo)
-    {
-        return;
-    }
-
-    if (notification.activationType == NSUserNotificationActivationTypeActionButtonClicked) //reveal
-    {
-        [self didActivateNotificationByActionShowWithUserInfo:notification.userInfo];
-    }
-    else if (notification.activationType == NSUserNotificationActivationTypeContentsClicked)
-    {
-        [self didActivateNotificationByDefaultActionWithUserInfo:notification.userInfo];
-    }
 }
 
 - (void)didActivateNotificationByActionShowWithUserInfo:(NSDictionary<NSString*, id>*)userInfo
@@ -2555,30 +2513,15 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             userInfo[@"Location"] = location;
         }
 
-        if (@available(macOS 10.14, *))
-        {
-            NSString* identifier = [@"Download Complete " stringByAppendingString:torrent.hashString];
-            UNMutableNotificationContent* content = [UNMutableNotificationContent new];
-            content.title = title;
-            content.body = body;
-            content.categoryIdentifier = @"categoryShow";
-            content.userInfo = userInfo;
+        NSString* identifier = [@"Download Complete " stringByAppendingString:torrent.hashString];
+        UNMutableNotificationContent* content = [UNMutableNotificationContent new];
+        content.title = title;
+        content.body = body;
+        content.categoryIdentifier = @"categoryShow";
+        content.userInfo = userInfo;
 
-            UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
-            [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
-        }
-        else
-        {
-            // Fallback on earlier versions
-            NSUserNotification* userNotification = [[NSUserNotification alloc] init];
-            userNotification.title = title;
-            userNotification.informativeText = body;
-            userNotification.hasActionButton = YES;
-            userNotification.actionButtonTitle = NSLocalizedString(@"Show", "notification button");
-            userNotification.userInfo = userInfo;
-
-            [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:userNotification];
-        }
+        UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
+        [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
 
         if (!self.fWindow.mainWindow)
         {
@@ -2622,30 +2565,15 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         userInfo[@"Location"] = location;
     }
 
-    if (@available(macOS 10.14, *))
-    {
-        NSString* identifier = [@"Seeding Complete " stringByAppendingString:torrent.hashString];
-        UNMutableNotificationContent* content = [UNMutableNotificationContent new];
-        content.title = title;
-        content.body = body;
-        content.categoryIdentifier = @"categoryShow";
-        content.userInfo = userInfo;
+    NSString* identifier = [@"Seeding Complete " stringByAppendingString:torrent.hashString];
+    UNMutableNotificationContent* content = [UNMutableNotificationContent new];
+    content.title = title;
+    content.body = body;
+    content.categoryIdentifier = @"categoryShow";
+    content.userInfo = userInfo;
 
-        UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
-        [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
-    }
-    else
-    {
-        // Fallback on earlier versions
-        NSUserNotification* userNotification = [[NSUserNotification alloc] init];
-        userNotification.title = title;
-        userNotification.informativeText = body;
-        userNotification.hasActionButton = YES;
-        userNotification.actionButtonTitle = NSLocalizedString(@"Show", "notification button");
-        userNotification.userInfo = userInfo;
-
-        [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:userNotification];
-    }
+    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
+    [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
 
     //removing from the list calls fullUpdateUI
     if (torrent.removeWhenFinishSeeding)
@@ -3503,26 +3431,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                                       NSLocalizedString(@"Speed Limit Auto Disabled", "notification title");
         NSString* body = NSLocalizedString(@"Bandwidth settings changed", "notification description");
 
-        if (@available(macOS 10.14, *))
-        {
-            NSString* identifier = @"Bandwidth settings changed";
-            UNMutableNotificationContent* content = [UNMutableNotificationContent new];
-            content.title = title;
-            content.body = body;
+        NSString* identifier = @"Bandwidth settings changed";
+        UNMutableNotificationContent* content = [UNMutableNotificationContent new];
+        content.title = title;
+        content.body = body;
 
-            UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
-            [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
-        }
-        else
-        {
-            // Fallback on earlier versions
-            NSUserNotification* notification = [[NSUserNotification alloc] init];
-            notification.title = title;
-            notification.informativeText = body;
-            notification.hasActionButton = NO;
-
-            [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
-        }
+        UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
+        [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
     }
 }
 
@@ -3630,26 +3545,13 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         NSString* notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
 
-        if (@available(macOS 10.14, *))
-        {
-            NSString* identifier = [@"Torrent File Auto Added " stringByAppendingString:file];
-            UNMutableNotificationContent* content = [UNMutableNotificationContent new];
-            content.title = notificationTitle;
-            content.body = file;
+        NSString* identifier = [@"Torrent File Auto Added " stringByAppendingString:file];
+        UNMutableNotificationContent* content = [UNMutableNotificationContent new];
+        content.title = notificationTitle;
+        content.body = file;
 
-            UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
-            [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
-        }
-        else
-        {
-            // Fallback on earlier versions
-            NSUserNotification* notification = [[NSUserNotification alloc] init];
-            notification.title = notificationTitle;
-            notification.informativeText = file;
-            notification.hasActionButton = NO;
-
-            [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
-        }
+        UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identifier content:content trigger:nil];
+        [UNUserNotificationCenter.currentNotificationCenter addNotificationRequest:request withCompletionHandler:nil];
     }
 }
 

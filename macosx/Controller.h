@@ -26,7 +26,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 };
 
 @interface Controller
-    : NSObject<NSApplicationDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
+    : NSObject<NSApplicationDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
 
 - (void)openFiles:(NSArray<NSString*>*)filenames addType:(addType)type forcePath:(NSString*)path;
 
