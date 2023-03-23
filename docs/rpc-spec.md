@@ -603,6 +603,7 @@ except:
 * `rpc-version-semver`
 * `rpc-version`
 * `session-id`
+* `units`
 * `version`
 
 Response arguments: none
