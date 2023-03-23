@@ -2,7 +2,7 @@ The Transmission Project
 https://transmissionbt.com/
 
 Maintainers
-  Charles Kerr (@ckerr) (libtransmission, Qt client)
+  Charles Kerr (@ckerr) (libtransmission, Qt client, utils)
   Mike Gelfand (@mikedld) (GTK client, scripts & tooling)
   Mitchell Livingston (@livings124) (macOS client)
 
@@ -17,7 +17,11 @@ Contributor Team
 Hall of Fame
   Eric Petit (@titer) (Project originator)
   Josh Elsasser (Daemon, Backend, GTK client)
+  Juliusz Chroboczek (DHT, network code)
   Bryan Varner (BeOS client)
+  Malcolm Jarvis (Web client)
+  Kendall Hopkins <SoftwareElves@gmail.com> (Web client)
+  Kevin Glowacz <kjg@transmissionbt.com> (Web client)
 
 Starting with Transmission 4.0.0, contributors are credited in each
 release's notes so that repeat contributions receive repeat shout-outs.
@@ -38,23 +42,23 @@ These people contributed to the project before Transmission 4:
   Greg Hazel, Guido Cella, Guido Vranken, Hakjoon Sim, Han Shen,
   Herman Semenov, Hugo van Heuven, Ilkka Kallioniemi, Ilya Chirkov,
   Isabella Skořepová, Jakub Steiner, James "Kibo" Parry, Jan Weiß,
-  Jelle van der Waa, John Clay, Jonas Malaco, Jonas Rask, Jordan Lee,
-  Josh Elsasser, Juliusz Chroboczek, Kendall Hopkins, Kevin Glowacz,
-  Kevin Stubbings, Kirill Ovchinnikov, Lucas Clemente Vella, Luukas Pörtfors,
+  Jelle van der Waa, John Clay, Jonas Malaco, Jonas Rask, Josh Elsasser,
+  Juliusz Chroboczek, Kendall Hopkins, Kevin Glowacz, Kevin Stubbings,
+  Kirill Ovchinnikov, Lucas Clemente Vella, Luukas Pörtfors,
   Maarten Van Coile, Maciej Wolny, Malcolm Jarvis, Mark Deepwell,
   Markus Amalthea Magnuson, Matan Ziv-Av, Matt Joiner, Max Zettlmeißl,
   Michael Lopez, Michael Skree, Michal Kubiak, Mike Gelfand, Mike Gilbert,
-  Mingye Wang, Mitchell Livingston, Mitch Livingston, Mukund Sivaraman,
-  Nathan Benichou, Nicholas Guriev, Niklas Haas, Norbert Papke, Oleg Chashko,
-  Pavel Borzenkov, Pavel Shlyak, Pedro Scarapicchia Junior, Peter Bailey,
-  Peter Dave Hello, Pierre Carru, Piotr Drąg, Rahim Nathwani, Rashid Eissing,
-  Reed Morrison, Rick Patrick, Robert Palmer, Robert Vehse, Robin Seth Ekman,
-  Rodger Werner, Rosen Penev, Sam Marcus, Sam Thursfield, Sander van Kasteel,
+  Mingye Wang, Mitch Livingston, Mukund Sivaraman, Nathan Benichou,
+  Nicholas Guriev, Niklas Haas, Norbert Papke, Oleg Chashko, Pavel Borzenkov,
+  Pavel Shlyak, Pedro Scarapicchia Junior, Peter Bailey, Peter Dave Hello,
+  Pierre Carru, Piotr Drąg, Rahim Nathwani, Rashid Eissing, Reed Morrison,
+  Rick Patrick, Robert Palmer, Robert Vehse, Robin Seth Ekman, Rodger Werner,
+  Rosen Penev, Sam Marcus, Sam Thursfield, Sander van Kasteel,
   Sebastiaan Lokhorst, Sebastian Andrzej Siewior, Sebastian Jensen,
   Sergey Fedoseev, Simon Wells, Stefan Talpalaru, Ștefan Talpalaru,
   Sven Depondt, Szepesi Tibor, Tavis Ormandy, Thomas Hines, Tomas Carnecky,
-  Tomáš Kelemen, Tom Forbes, Tom Richards, Viacheslav Chimishuk, Vincent Vinel,
-  Vitaly Potyarkin, Waldemar Brodkorb, Will Thompson, Yaron Shahrabani,
-  Yuze Jiang, and Zachary J. Slater.
+  Tomáš Kelemen, Tom Forbes, Tom Richards, Viacheslav Chimishuk,
+  Vincent Vinel, Vitaly Potyarkin, Waldemar Brodkorb, Will Thompson,
+  Yaron Shahrabani, Yuze Jiang, and Zachary J. Slater.
 
 If anyone is missing from this list, please let us know!
