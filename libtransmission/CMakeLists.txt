@@ -12,10 +12,7 @@ check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
 
 add_compile_options(
     # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
-    $<$<AND:$<BOOL:${APPLE}>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-arc>
-
-    # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_WEAK YES for this directory
-    $<$<AND:$<BOOL:${APPLE}>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-weak>)
+    $<$<AND:$<BOOL:${APPLE}>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-arc>)
 
 add_library(${TR_NAME} STATIC)
 
