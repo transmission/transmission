@@ -523,32 +523,28 @@ export class PrefsDialog extends EventTarget {
     label.classList.add('section-label');
     root.append(label);
 
-    let cal = PrefsDialog._createCheckAndLabel(
-      'max-peers-per-torrent-div',
-      'Max peers per torrent:'
-    );
-    root.append(cal.root);
-    const max_peers_per_torrent_check = cal.check;
+    label = document.createElement('label');
+    label.textContent = 'Max peers per torrent:';
+    root.append(label);
 
     let input = document.createElement('input');
     input.type = 'number';
     input.dataset.key = 'peer-limit-per-torrent';
+    input.id = makeUUID();
+    label.setAttribute('for', input.id);
     root.append(input);
-    PrefsDialog._enableIfChecked(input, cal.check);
     const max_peers_per_torrent_input = input;
 
-    cal = PrefsDialog._createCheckAndLabel(
-      'max-peers-overall-div',
-      'Max peers overall:'
-    );
-    root.append(cal.root);
-    const max_peers_overall_check = cal.check;
+    label = document.createElement('label');
+    label.textContent = 'Max peers overall:';
+    root.append(label);
 
     input = document.createElement('input');
     input.type = 'number';
     input.dataset.key = 'peer-limit-global';
+    input.id = makeUUID();
+    label.setAttribute('for', input.id);
     root.append(input);
-    PrefsDialog._enableIfChecked(input, cal.check);
     const max_peers_overall_input = input;
 
     label = document.createElement('div');
@@ -569,7 +565,7 @@ export class PrefsDialog extends EventTarget {
     root.append(select);
     const encryption_select = select;
 
-    cal = PrefsDialog._createCheckAndLabel(
+    let cal = PrefsDialog._createCheckAndLabel(
       'use-pex-div',
       'Use PEX to find more peers'
     );
@@ -642,9 +638,7 @@ export class PrefsDialog extends EventTarget {
       dht_check,
       encryption_select,
       lpd_check,
-      max_peers_overall_check,
       max_peers_overall_input,
-      max_peers_per_torrent_check,
       max_peers_per_torrent_input,
       pex_check,
       root,

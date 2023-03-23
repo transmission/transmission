@@ -95,7 +95,6 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections.
  * **bind-address-ipv6:** String (default = "::") Where to listen for peer connections.
  * **peer-congestion-algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
- * **peer-id-ttl-hours:** Number (default = 6) Recycle the peer id used for public torrents after N hours of use.
  * **peer-limit-global:** Number (default = 240)
  * **peer-limit-per-torrent:** Number (default =  60)
  * **peer-socket-tos:** String (default = "default") Set the [Type-Of-Service (TOS)](https://en.wikipedia.org/wiki/Type_of_Service) parameter for outgoing TCP packets. Possible values are "default", "lowcost", "throughput", "lowdelay" and "reliability". The value "lowcost" is recommended if you're using a smart router, and shouldn't harm in any case.

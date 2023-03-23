@@ -312,7 +312,8 @@ export class Inspector extends EventTarget {
         string = `${fmt.size(verified)} (100%)`;
       }
     }
-    setTextContent(e.info.have, string);
+
+    setTextContent(e.info.have, fmt.stringSanitizer(string));
 
     // availability
     if (torrents.length === 0) {
@@ -326,7 +327,7 @@ export class Inspector extends EventTarget {
       );
       string = `${fmt.percentString((100 * available) / sizeWhenDone)}%`;
     }
-    setTextContent(e.info.availability, string);
+    setTextContent(e.info.availability, fmt.stringSanitizer(string));
 
     //  downloaded
     if (torrents.length === 0) {
@@ -344,7 +345,8 @@ export class Inspector extends EventTarget {
         ? `${fmt.size(d)} (+${fmt.size(f)} discarded after failed checksum)`
         : fmt.size(d);
     }
-    setTextContent(e.info.downloaded, string);
+
+    setTextContent(e.info.downloaded, fmt.stringSanitizer(string));
 
     // uploaded
     if (torrents.length === 0) {
@@ -448,7 +450,7 @@ export class Inspector extends EventTarget {
         string = 'None';
       }
     }
-    setTextContent(e.info.size, string);
+    setTextContent(e.info.size, fmt.stringSanitizer(string));
 
     // hash
     if (torrents.length === 0) {
