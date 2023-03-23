@@ -217,7 +217,11 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     // set source address
-    auto const [source_addr, is_any] = session->publicAddress(addr.type);
+    auto const [source_addr, is_enabled] = session->publicAddress(addr.type);
+    if (!is_enabled)
+    {
+        return {};
+    }
     auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
@@ -461,6 +465,7 @@ namespace global_ipv6_helpers
     return {};
 }
 
+// TODO: Still needed?
 [[nodiscard]] std::optional<tr_address> global_address(int af)
 {
     // Pick some destination address to pretend to send a packet to

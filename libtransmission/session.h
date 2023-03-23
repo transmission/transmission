@@ -193,6 +193,7 @@ private:
 
         [[nodiscard]] tr_address incomingPeerAddress() const override
         {
+            // TODO (tearfur): Study UPnP then modify for publicAddress
             return session_.publicAddress(TR_AF_INET).address;
         }
 
@@ -780,7 +781,7 @@ public:
     struct PublicAddressResult
     {
         tr_address address;
-        bool is_any_addr;
+        bool is_enabled;
     };
 
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;

@@ -180,6 +180,7 @@ TEST_F(NetTest, isGlobalUnicastAddress)
     }
 }
 
+// TODO: Maybe be no longer relevant?
 TEST_F(NetTest, globalIPv6)
 {
     auto const addr = tr_globalIPv6();
