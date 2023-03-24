@@ -581,13 +581,15 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 
     auto addr = tr_address{};
 
-    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr) == 1)
+    addr.addr.addr4 = {};
+    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr.addr4) == 1)
     {
         addr.type = TR_AF_INET;
         return addr;
     }
 
-    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr) == 1)
+    addr.addr.addr6 = {};
+    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr.addr6) == 1)
     {
         addr.type = TR_AF_INET6;
         return addr;

@@ -267,11 +267,8 @@ void tr_tracker_http_announce(
        public address they want to use.
 
        We should ensure that we send the announce both via IPv6 and IPv4,
-       and to be safe we also add the "ipv6=" and "ipv4=" parameters, if
-       we already have them. Our global IPv6 address is computed for the
-       LTEP handshake, so this comes for free. Our public IPv4 address
-       may have been returned from a previous announce and stored in the
-       session.
+       but no longer use the "ipv4=" and "ipv6=" parameters. So, we no
+       longer need to compute the global IPv4 and IPv6 addresses.
      */
     auto url = tr_urlbuf{};
     announce_url_new(url, session, request);
@@ -286,8 +283,6 @@ void tr_tracker_http_announce(
         session->fetch(std::move(opt));
     };
 
-    auto const [ipv6, ipv6_is_any] = session->publicAddress(TR_AF_INET6);
-
     /*
      * Before Curl 7.77.0, if we explicitly choose the IP version we want
      * to use, it is still possible that the wrong one is used. The workaround
@@ -295,7 +290,7 @@ void tr_tracker_http_announce(
      * a request that we don't know if will go through IPv6 or IPv4.
      */
     static auto const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < 0x074D00 /* 7.77.0 */;
-    if (use_curl_workaround)
+    if (use_curl_workaround || session->useAnnounceIP())
     {
         if (session->useAnnounceIP())
         {
@@ -307,28 +302,16 @@ void tr_tracker_http_announce(
     }
     else
     {
-        if (session->useAnnounceIP() || ipv6_is_any)
-        {
-            if (session->useAnnounceIP())
-            {
-                options.url += format_ip_arg(session->announceIP());
-            }
-            d->requests_sent_count = 1;
-            do_make_request(""sv, std::move(options));
-        }
-        else
-        {
-            d->requests_sent_count = 2;
+        d->requests_sent_count = 2;
 
-            // First try to send the announce via IPv4:
-            auto ipv4_options = options;
-            ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-            do_make_request("IPv4"sv, std::move(ipv4_options));
+        // First try to send the announce via IPv4:
+        auto ipv4_options = options;
+        ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+        do_make_request("IPv4"sv, std::move(ipv4_options));
 
-            // Then try to send via IPv6:
-            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-            do_make_request("IPv6"sv, std::move(options));
-        }
+        // Then try to send via IPv6:
+        options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+        do_make_request("IPv6"sv, std::move(options));
     }
 }
 
