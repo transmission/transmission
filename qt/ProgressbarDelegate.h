@@ -9,13 +9,13 @@
 
 #include "TorrentDelegate.h"
 
-class TorrentDelegateMin : public TorrentDelegate
+class ProgressbarDelegate : public TorrentDelegate
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(TorrentDelegateMin)
+    TR_DISABLE_COPY_MOVE(ProgressbarDelegate)
 
 public:
-    explicit TorrentDelegateMin(QObject* parent = nullptr)
+    explicit ProgressbarDelegate(QObject* parent = nullptr)
         : TorrentDelegate(parent)
     {
     }

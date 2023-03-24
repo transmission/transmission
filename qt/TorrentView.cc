@@ -6,8 +6,12 @@
 #include <QApplication>
 #include <QStyleOptionHeader>
 #include <QStylePainter>
+#include <QHeaderView>
 
+#include "TorrentModel.h"
 #include "TorrentView.h"
+#include "TorrentDelegate.h"
+#include "ProgressbarDelegate.h"
 
 class TorrentView::HeaderWidget : public QWidget
 {
@@ -61,9 +65,18 @@ private:
 };
 
 TorrentView::TorrentView(QWidget* parent)
-    : QListView(parent)
+    : QTableView(parent)
     , header_widget_(new HeaderWidget(this))
 {
+    setShowGrid(false);
+    verticalHeader()->hide();
+    horizontalHeader()->hide();
+    setSortingEnabled(true);
+    setWordWrap(false);
+    setTextElideMode(Qt::ElideMiddle);
+    setSelectionBehavior(SelectionBehavior::SelectRows);
+    horizontalHeader()->setSectionsMovable(true);
+    horizontalHeader()->setStretchLastSection(true);
 }
 
 void TorrentView::setHeaderText(QString const& text)
@@ -83,12 +96,14 @@ void TorrentView::setHeaderText(QString const& text)
 
 void TorrentView::resizeEvent(QResizeEvent* event)
 {
-    QListView::resizeEvent(event);
+    QTableView::resizeEvent(event);
 
     if (header_widget_->isVisible())
     {
         adjustHeaderPosition();
     }
+
+    this->resizeRowsToContents();
 }
 
 void TorrentView::adjustHeaderPosition()
@@ -97,4 +112,45 @@ void TorrentView::adjustHeaderPosition()
     header_widget_rect.setWidth(viewport()->width());
     header_widget_rect.setHeight(header_widget_->sizeHint().height());
     header_widget_->setGeometry(header_widget_rect);
+}
+
+void TorrentView::setCompactView(bool active)
+{
+    if (active)
+    {
+        this->horizontalHeader()->show();
+        this->setColumnWidth(0, (this->width() - style()->pixelMetric(QStyle::PM_DefaultFrameWidth)) / 2);
+    }
+    else
+    {
+        this->horizontalHeader()->hide();
+        this->setColumnWidth(0, this->width() - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+    }
+
+    this->horizontalHeader()->setStretchLastSection(true);
+}
+
+void TorrentView::setColumns(QString const& columns)
+{
+    if (auto* delegate = dynamic_cast<TorrentDelegate*>(this->itemDelegate())) // not using compact view
+    {
+        for (int i = 1; i < model()->columnCount(); i++)
+        {
+            hideColumn(i);
+        }
+
+        setColumnWidth(0, this->width() - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+    }
+    else
+    {
+        this->setItemDelegateForColumn(TorrentModel::Columns::COL_PROGRESS, new ProgressbarDelegate);
+
+        for (int i = 0; i < model()->columnCount(); i++)
+        {
+            columns[i] == QStringLiteral("1") ? showColumn(i) : hideColumn(i);
+        }
+    }
+
+    horizontalHeader()->setStretchLastSection(true);
+    resizeColumnsToContents();
 }

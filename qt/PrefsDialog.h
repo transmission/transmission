@@ -31,6 +31,7 @@ public:
 private slots:
     void focusChanged(QWidget* old, QWidget* cur);
     void checkBoxToggled(bool checked);
+    void columnCheckBoxToggled(bool checked, int column);
     void spinBoxEditingFinished();
     void timeEditingFinished();
     void lineEditingFinished();
@@ -54,6 +55,7 @@ private:
 
     bool updateWidgetValue(QWidget* widget, int pref_key) const;
     void linkWidgetToPref(QWidget* widget, int pref_key);
+    void linkColumnCheckboxToPref(QWidget* widget, int column);
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
     void updateSeedingWidgetsLocality();

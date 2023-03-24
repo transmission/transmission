@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <QListView>
+#include <QTableView>
 
 #include <libtransmission/tr-macros.h>
 
-class TorrentView : public QListView
+class TorrentView : public QTableView
 {
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(TorrentView)
@@ -19,6 +19,8 @@ public:
 
 public slots:
     void setHeaderText(QString const& text);
+    void setCompactView(bool active);
+    void setColumns(QString const& columns);
 
 signals:
     void headerDoubleClicked();

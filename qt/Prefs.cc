@@ -101,6 +101,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QMetaType::Bool },
     { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QMetaType::Bool },
     { READ_CLIPBOARD, TR_KEY_read_clipboard, QMetaType::Bool },
+    { COMPACT_COLUMNS, TR_KEY_compact_columns, QMetaType::QString },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_KEY_alt_speed_up, QMetaType::Int },
@@ -435,8 +436,11 @@ void Prefs::initDefaults(tr_variant* d) const
 
     auto const download_dir = tr_getDefaultDownloadDir();
 
-    tr_variantDictReserve(d, 38);
+    auto const compact_columns = std::string_view{ "100000000000000000000" };
+
+    tr_variantDictReserve(d, 39);
     dictAdd(d, TR_KEY_blocklist_updates_enabled, true);
+    dictAdd(d, TR_KEY_compact_columns, compact_columns);
     dictAdd(d, TR_KEY_compact_view, false);
     dictAdd(d, TR_KEY_inhibit_desktop_hibernation, false);
     dictAdd(d, TR_KEY_prompt_before_exit, true);

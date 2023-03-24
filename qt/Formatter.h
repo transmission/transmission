@@ -83,6 +83,11 @@ public:
         return QString::fromStdString(tr_strratio(ratio, InfinitySymbol));
     }
 
+    [[nodiscard]] auto boolToString(bool value) const
+    {
+        return value ? tr("Yes") : tr("No");
+    }
+
 protected:
     Formatter();
 
