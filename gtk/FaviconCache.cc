@@ -44,7 +44,7 @@ struct favicon_data
     long code = 0;
 };
 
-Glib::ustring get_url(std::string const& host, size_t image_type)
+[[nodiscard]] auto get_url(std::string const& host, size_t image_type)
 {
     return fmt::format("http://{}/favicon.{}", host, ImageTypes.at(image_type));
 }
@@ -109,7 +109,7 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
         fav->contents.clear();
         auto* const session = fav->session;
         auto const next_url = get_url(fav->host, fav->type);
-        tr_sessionFetch(session, { next_url.raw(), favicon_web_done_cb, fav.release(), TimeoutSecs });
+        tr_sessionFetch(session, { next_url, favicon_web_done_cb, fav.release(), TimeoutSecs });
         return false;
     }
 
@@ -145,7 +145,7 @@ void gtr_get_favicon(
         data->session = session;
         data->func = pixbuf_ready_func;
         data->host = host;
-        tr_sessionFetch(session, { get_url(host, 0).raw(), favicon_web_done_cb, data.release(), TimeoutSecs });
+        tr_sessionFetch(session, { get_url(host, 0), favicon_web_done_cb, data.release(), TimeoutSecs });
     }
 }
 
