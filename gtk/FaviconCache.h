@@ -20,9 +20,10 @@
 class FaviconCache
 {
 public:
-    FaviconCache(tr_session* session);
+    using Icon = Glib::RefPtr<Gdk::Pixbuf>;
+    using IconFunc = std::function<void(Icon const&)>;
 
-    using IconFunc = std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)>;
+    FaviconCache(tr_session* session);
 
     void lookup(std::string_view url, IconFunc callback);
 
@@ -32,8 +33,12 @@ private:
     void scan_file_cache();
     void mark_site_as_scraped(std::string_view sitename);
 
-    void on_fetch_idle(std::shared_ptr<FaviconCache::InFlightData> fav);
-    void on_fetch_done(std::shared_ptr<FaviconCache::InFlightData> fav, tr_web::FetchResponse const& response);
+    void check_responses(std::shared_ptr<FaviconCache::InFlightData> in_flight);
+    void add_to_ui_thread(std::function<void()> idlefunc);
+
+    [[nodiscard]] Icon create_from_file(std::string_view filename) const;
+    [[nodiscard]] Icon create_from_data(void const* data, size_t datalen) const;
+    [[nodiscard]] std::string app_cache_dir() const;
 
     static inline constexpr auto Width = 16;
     static inline constexpr auto Height = 16;
@@ -44,5 +49,5 @@ private:
     std::string const icons_dir_;
     std::string const scraped_sitenames_filename_;
 
-    std::map<std::string /*sitename*/, Glib::RefPtr<Gdk::Pixbuf>, std::less<>> icons_;
+    std::map<std::string /*sitename*/, Icon, std::less<>> icons_;
 };

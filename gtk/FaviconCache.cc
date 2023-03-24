@@ -5,16 +5,14 @@
 
 #include "FaviconCache.h"
 
-#include "Utils.h" /* gtr_get_host_from_url() */
-
 #include <libtransmission/transmission.h>
 #include <libtransmission/file.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/web-utils.h>
+#include <libtransmission/web-utils.h> // tr_urlParse()
 #include <libtransmission/web.h> // tr_sessionFetch()
 
-#include <giomm/memoryinputstream.h>
 #include <gdkmm/pixbuf.h>
+#include <giomm/memoryinputstream.h>
 #include <glibmm/error.h>
 #include <glibmm/fileutils.h>
 #include <glibmm/main.h>
@@ -26,37 +24,71 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <map>
-#include <memory>
 #include <mutex>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <glib/gstdio.h> /* g_remove() */
-
 using namespace std::literals;
+
+FaviconCache::Icon FaviconCache::create_from_file(std::string_view filename) const
+{
+    try
+    {
+        return Gdk::Pixbuf::create_from_file(std::string{ filename }, Width, Height, false);
+    }
+    catch (Glib::Error const&)
+    {
+        return {};
+    }
+}
+
+FaviconCache::Icon FaviconCache::create_from_data(void const* data, size_t datalen) const
+{
+    try
+    {
+        auto memory_stream = Gio::MemoryInputStream::create();
+        memory_stream->add_data(data, datalen, nullptr);
+        return Gdk::Pixbuf::create_from_stream_at_scale(memory_stream, Width, Height, false);
+    }
+    catch (Glib::Error const&)
+    {
+        return {};
+    }
+}
+
+std::string FaviconCache::app_cache_dir() const
+{
+    return fmt::format("{:s}/{:s}", Glib::get_user_cache_dir(), "transmission");
+}
+
+void FaviconCache::add_to_ui_thread(std::function<void()> idlefunc)
+{
+    Glib::signal_idle().connect_once([idlefunc = std::move(idlefunc)]() { idlefunc(); });
+}
+
+// ---
 
 class FaviconCache::InFlightData
 {
 public:
     InFlightData(IconFunc callback, std::string_view sitename)
-      : callback_{ std::move(callback) }
-      , sitename_{ sitename }
+        : callback_{ std::move(callback) }
+        , sitename_{ sitename }
     {
     }
 
     [[nodiscard]] constexpr auto const& sitename() const noexcept
     {
-      return sitename_;
+        return sitename_;
     }
 
     ~InFlightData()
     {
-      invoke_callback({}); // ensure it's called once, even if no pixbuf
+        invoke_callback({}); // ensure it's called once, even if no pixbuf
     }
 
-    void invoke_callback(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf)
+    void invoke_callback(Icon const& pixbuf)
     {
         if (callback_)
         {
@@ -87,12 +119,13 @@ private:
     std::vector<std::pair<std::string, long>> responses_;
 };
 
+// ---
 
 FaviconCache::FaviconCache(tr_session* const session)
     : session_{ session }
-    , cache_dir_{ Glib::build_filename(Glib::get_user_cache_dir(), "transmission") }
-    , icons_dir_{ Glib::build_filename(cache_dir_, "favicons") }
-    , scraped_sitenames_filename_{ Glib::build_filename(cache_dir_, "favicons-scraped.txt") }
+    , cache_dir_{ app_cache_dir() }
+    , icons_dir_{ fmt::format("{:s}/{:s}", cache_dir_, "favicons") }
+    , scraped_sitenames_filename_{ fmt::format("{:s}/favicons-scraped.txt", cache_dir_) }
 {
 }
 
@@ -104,45 +137,35 @@ void FaviconCache::mark_site_as_scraped(std::string_view sitename)
     }
 }
 
-void FaviconCache::on_fetch_idle(std::shared_ptr<FaviconCache::InFlightData> fav)
+void FaviconCache::check_responses(std::shared_ptr<FaviconCache::InFlightData> in_flight)
 {
-    for (auto const& [contents, code] : fav->get_responses())
+    for (auto const& [contents, code] : in_flight->get_responses())
     {
         if (std::empty(contents) || code < 200 || code >= 300)
         {
             continue;
         }
 
-        try
+        if (auto const icon = create_from_data(std::data(contents), std::size(contents)); icon)
         {
-            auto memory_stream = Gio::MemoryInputStream::create();
-            memory_stream->add_data(std::data(contents), std::size(contents), nullptr);
-            if (auto icon = Gdk::Pixbuf::create_from_stream_at_scale(memory_stream, Width, Height, false); icon)
-            {
-                icons_[fav->sitename()] = icon;
-                Glib::file_set_contents(Glib::build_filename(icons_dir_, fav->sitename()), contents);
-                fav->invoke_callback(icon);
-                return;
-            }
-        }
-        catch (Glib::Error const&)
-        {
+            // cache it in memory
+            icons_[in_flight->sitename()] = icon;
+
+            // cache it on disk
+            tr_saveFile(fmt::format("{:s}/{:s}", icons_dir_, in_flight->sitename()), contents);
+
+            // notify the user that we got it
+            in_flight->invoke_callback(icon);
+            return;
         }
     }
-}
-
-void FaviconCache::on_fetch_done(std::shared_ptr<FaviconCache::InFlightData> fav, tr_web::FetchResponse const& response)
-{
-    // delegate the work to the glib thread
-    fav->add_response(response.body, response.status);
-    Glib::signal_idle().connect_once([this, fav]() { on_fetch_idle(fav); });
 }
 
 void FaviconCache::scan_file_cache()
 {
     // ensure the folders exist
-    (void)g_mkdir_with_parents(cache_dir_.c_str(), 0777);
-    (void)g_mkdir_with_parents(icons_dir_.c_str(), 0777);
+    tr_sys_dir_create(cache_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(icons_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
 
     // remember which hosts we've asked for a favicon so that we
     // don't re-ask them every time we start a new session
@@ -161,15 +184,15 @@ void FaviconCache::scan_file_cache()
     // load the cached favicons
     for (auto const& sitename : tr_sys_dir_get_files(icons_dir_))
     {
-        auto const filename = Glib::build_filename(icons_dir_, sitename);
+        auto const filename = fmt::format("{:s}/{:s}", icons_dir_, sitename);
 
-        try
+        if (auto icon = create_from_file(filename); icon)
         {
-            icons_[sitename] = Gdk::Pixbuf::create_from_file(filename, Width, Height, false);
+            icons_[sitename] = icon;
         }
-        catch (Glib::Error const&)
+        else
         {
-            (void)g_remove(filename.c_str());
+            tr_sys_path_remove(filename);
         }
     }
 }
@@ -204,16 +227,22 @@ void FaviconCache::lookup(std::string_view url_in, IconFunc callback)
         ports[n_ports++] = url->port;
     }
 
-    static constexpr auto TimeoutSecs = 15s;
-    auto data = std::make_shared<InFlightData>(callback, url->sitename);
+    auto in_flight = std::make_shared<InFlightData>(callback, url->sitename);
     for (auto i = 0; i < n_ports; ++i)
     {
         for (auto const scheme : { "http"sv, "https"sv })
         {
             for (auto const suffix : { "ico"sv, "png"sv, "gif"sv, "jpg"sv })
             {
+                auto on_fetch_response = [this, in_flight](auto const& response)
+                {
+                    in_flight->add_response(response.body, response.status);
+                    add_to_ui_thread([this, in_flight]() { check_responses(in_flight); });
+                };
+
+                static constexpr auto TimeoutSecs = 15s;
                 auto const favicon_url = fmt::format("{:s}://{:s}:{:d}/favicon.{:s}", scheme, url->host, ports[i], suffix);
-                tr_sessionFetch(session_, { favicon_url, [this, data](auto const& response){ on_fetch_done(data, response); }, nullptr, TimeoutSecs });
+                tr_sessionFetch(session_, { favicon_url, std::move(on_fetch_response), nullptr, TimeoutSecs });
             }
         }
     }
