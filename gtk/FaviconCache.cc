@@ -49,11 +49,11 @@ struct favicon_data
     return fmt::format("http://{}/favicon.{}", host, ImageTypes.at(image_type));
 }
 
-std::string favicon_get_cache_dir()
+[[nodiscard]] auto const& favicon_get_cache_dir()
 {
-    static std::string dir;
+    static auto dir = std::string{};
 
-    if (dir.empty())
+    if (std::empty(dir))
     {
         dir = Glib::build_filename(Glib::get_user_cache_dir(), "transmission", "favicons");
         (void)g_mkdir_with_parents(dir.c_str(), 0777);
