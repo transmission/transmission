@@ -62,7 +62,7 @@ struct favicon_data
     return dir;
 }
 
-std::string favicon_get_cache_filename(std::string const& host)
+[[nodiscard]] auto favicon_get_cache_filename(std::string const& host)
 {
     return Glib::build_filename(favicon_get_cache_dir(), host);
 }
