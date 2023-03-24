@@ -147,6 +147,11 @@ public:
         return signal_torrents_changed_;
     }
 
+    [[nodiscard]] constexpr auto& favicon_cache()
+    {
+        return favicon_cache_;
+    }
+
 private:
     Glib::RefPtr<Session> get_core_ptr() const;
 
@@ -209,6 +214,7 @@ private:
     Glib::RefPtr<SortListModel<Torrent>> sorted_model_;
     Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
+    FaviconCache favicon_cache_;
 };
 
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
@@ -533,6 +539,7 @@ Session::~Session() = default;
 Session::Impl::Impl(Session& core, tr_session* session)
     : core_(core)
     , session_(session)
+    , favicon_cache_(session_)
 {
     raw_model_ = Gio::ListStore<Torrent>::create();
     signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_.get(), &TorrentSorter::update)));
@@ -1357,6 +1364,11 @@ tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
     }
 
     return tor;
+}
+
+FaviconCache& Session::favicon_cache() const
+{
+    return impl_->favicon_cache();
 }
 
 void Session::open_folder(tr_torrent_id_t torrent_id) const

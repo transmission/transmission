@@ -301,10 +301,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
             add->set_value(tracker_filter_cols.count, site.count);
             add->set_value(tracker_filter_cols.type, static_cast<int>(TrackerType::HOST));
             auto path = tracker_model_->get_path(add);
-            gtr_get_favicon_from_url(
-                core_->get_session(),
-                site.announce_url,
-                [this, path](auto const& pixbuf) { favicon_ready_cb(pixbuf, path); });
+            core_->favicon_cache().lookup(site.announce_url, [this, path](auto const& pixbuf) { favicon_ready_cb(pixbuf, path); });
             ++i;
         }
         else // update row

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "FaviconCache.h"
 #include "GtkCompat.h"
 #include "Torrent.h"
 
@@ -57,6 +58,8 @@ public:
     size_t get_torrent_count() const;
 
     tr_torrent* find_torrent(tr_torrent_id_t id) const;
+
+    FaviconCache& favicon_cache() const;
 
     /******
     *******

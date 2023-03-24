@@ -2067,7 +2067,6 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     std::ostringstream gstr;
     auto& hash = tracker_hash_;
     auto const& store = tracker_store_;
-    auto* session = core_->get_session();
     bool const showScrape = scrape_check_->get_active();
 
     /* step 1: get all the trackers */
@@ -2104,8 +2103,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
 
             auto const p = store->get_path(iter);
             hash.try_emplace(gstr.str(), Gtk::TreeRowReference(store, p));
-            gtr_get_favicon_from_url(
-                session,
+            core_->favicon_cache().lookup(
                 tracker.announce,
                 [ref = Gtk::TreeRowReference(store, p)](auto const& pixbuf) mutable { favicon_ready_cb(pixbuf, ref); });
         }

@@ -6,15 +6,43 @@
 #pragma once
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/web.h>
 
 #include <gdkmm/pixbuf.h>
 #include <glibmm/refptr.h>
-#include <glibmm/ustring.h>
 
 #include <functional>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <string_view>
 
-void gtr_get_favicon_from_url(
-    tr_session* session,
-    Glib::ustring const& url,
-    std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> const& pixbuf_ready_func);
+class FaviconCache
+{
+public:
+    FaviconCache(tr_session* session);
+
+    using IconFunc = std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)>;
+
+    void lookup(std::string_view url, IconFunc callback);
+
+private:
+    class InFlightData;
+
+    void scan_file_cache();
+    void mark_site_as_scraped(std::string_view sitename);
+
+    void on_fetch_idle(std::shared_ptr<FaviconCache::InFlightData> fav);
+    void on_fetch_done(std::shared_ptr<FaviconCache::InFlightData> fav, tr_web::FetchResponse const& response);
+
+    static inline constexpr auto Width = 16;
+    static inline constexpr auto Height = 16;
+
+    tr_session* const session_;
+    std::once_flag scan_once_flag_;
+    std::string const cache_dir_;
+    std::string const icons_dir_;
+    std::string const scraped_sitenames_filename_;
+
+    std::map<std::string /*sitename*/, Glib::RefPtr<Gdk::Pixbuf>, std::less<>> icons_;
+};
