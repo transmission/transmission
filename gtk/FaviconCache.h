@@ -14,11 +14,6 @@
 #include <functional>
 #include <string>
 
-void gtr_get_favicon(
-    tr_session* session,
-    std::string const& host,
-    std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> const& pixbuf_ready_func);
-
 void gtr_get_favicon_from_url(
     tr_session* session,
     Glib::ustring const& url,

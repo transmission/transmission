@@ -190,6 +190,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
         int count = 0;
         std::string host;
         std::string sitename;
+        std::string announce_url;
 
         bool operator<(site_info const& that) const
         {
@@ -214,18 +215,19 @@ bool FilterBar::Impl::tracker_filter_model_update()
 
         auto const& raw_torrent = torrent->get_underlying();
 
-        auto torrent_sites_and_hosts = std::map<std::string, std::string>{};
+        auto site_to_host_and_announce = std::map<std::string, std::pair<std::string, std::string>>{};
         for (size_t j = 0, n = tr_torrentTrackerCount(&raw_torrent); j < n; ++j)
         {
             auto const view = tr_torrentTracker(&raw_torrent, j);
-            torrent_sites_and_hosts.try_emplace(std::data(view.sitename), view.host);
+            site_to_host_and_announce.try_emplace(std::data(view.sitename), view.host, view.announce);
         }
 
-        for (auto const& [sitename, host] : torrent_sites_and_hosts)
+        for (auto const& [sitename, host_and_announce] : site_to_host_and_announce)
         {
             auto& info = site_infos[sitename];
+            info.host = host_and_announce.first;
+            info.announce_url = host_and_announce.second;
             info.sitename = sitename;
-            info.host = host;
             ++info.count;
         }
 
@@ -299,9 +301,9 @@ bool FilterBar::Impl::tracker_filter_model_update()
             add->set_value(tracker_filter_cols.count, site.count);
             add->set_value(tracker_filter_cols.type, static_cast<int>(TrackerType::HOST));
             auto path = tracker_model_->get_path(add);
-            gtr_get_favicon(
+            gtr_get_favicon_from_url(
                 core_->get_session(),
-                site.host,
+                site.announce_url,
                 [this, path](auto const& pixbuf) { favicon_ready_cb(pixbuf, path); });
             ++i;
         }
