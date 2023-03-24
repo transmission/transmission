@@ -8,8 +8,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/file.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/web-utils.h> // tr_urlParse()
-#include <libtransmission/web.h> // tr_sessionFetch()
+#include <libtransmission/web-utils.h>
+#include <libtransmission/web.h>
 
 #include <gdkmm/pixbuf.h>
 #include <giomm/memoryinputstream.h>
