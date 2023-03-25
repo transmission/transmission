@@ -884,10 +884,24 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                                                         andEventID:kAEOpenContents];
 
     //if we were opened from a user notification, do the corresponding action
-    NSUserNotification* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
-    if (launchNotification)
+    if (@available(macOS 10.14, *))
     {
-        [self userNotificationCenter:NSUserNotificationCenter.defaultUserNotificationCenter didActivateNotification:launchNotification];
+        UNNotificationResponse* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
+        if (launchNotification)
+        {
+            [self userNotificationCenter:UNUserNotificationCenter.currentNotificationCenter
+                didReceiveNotificationResponse:launchNotification withCompletionHandler:^{
+                }];
+        }
+    }
+    else
+    {
+        NSUserNotification* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
+        if (launchNotification)
+        {
+            [self userNotificationCenter:NSUserNotificationCenter.defaultUserNotificationCenter
+                 didActivateNotification:launchNotification];
+        }
     }
 
     //auto importing
@@ -2385,6 +2399,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     if (!response.notification.request.content.userInfo.count)
     {
+        completionHandler();
         return;
     }
 
@@ -2396,6 +2411,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         [self didActivateNotificationByActionShowWithUserInfo:response.notification.request.content.userInfo];
     }
+    completionHandler();
 }
 
 - (void)userNotificationCenter:(NSUserNotificationCenter*)center didActivateNotification:(NSUserNotification*)notification

@@ -75,7 +75,7 @@ private:
 
         auto info = TorrentInfo{};
         info.info_hash = tor->infoHash();
-        info.client_peer_id = tr_torrentGetPeerId(tor);
+        info.client_peer_id = tor->peer_id();
         info.id = tor->id();
         info.is_done = tor->isDone();
         return info;
@@ -918,7 +918,8 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
     };
 
     torrent->swarm->updateEndgame();
-    return Wishlist::next(MediatorImpl(torrent, peer), numwant);
+    auto const mediator = MediatorImpl{ torrent, peer };
+    return Wishlist{ mediator }.next(numwant);
 }
 
 // --- Piece List Manipulation / Accessors
