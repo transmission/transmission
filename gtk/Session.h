@@ -12,6 +12,7 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
 
+#include <gdkmm/pixbuf.h>
 #include <giomm/file.h>
 #include <giomm/listmodel.h>
 #include <glibmm/object.h>
@@ -59,7 +60,7 @@ public:
 
     tr_torrent* find_torrent(tr_torrent_id_t id) const;
 
-    FaviconCache& favicon_cache() const;
+    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& favicon_cache() const;
 
     /******
     *******

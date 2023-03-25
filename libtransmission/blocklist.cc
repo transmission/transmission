@@ -294,11 +294,11 @@ auto parseFile(std::string_view filename)
 
 auto getFilenamesInDir(std::string_view folder)
 {
-    constexpr auto test = [](auto const& base)
+    constexpr auto Test = [](auto const& base)
     {
         return base != "/"sv;
     };
-    return tr_sys_dir_get_files(folder, test);
+    return tr_sys_dir_get_files(folder, Test);
 }
 
 } // namespace
@@ -398,7 +398,7 @@ std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklis
         }
 
         // ensure this src_file has an up-to-date corresponding bin_file
-        auto const src_file = fmt::print("{:s}/{:s}", blocklist_dir, base);
+        auto const src_file = fmt::format("{:s}/{:s}", blocklist_dir, base);
         auto const src_info = tr_sys_path_get_info(src_file);
         auto const bin_file = tr_pathbuf{ src_file, BinFileSuffix };
         auto const bin_info = tr_sys_path_get_info(bin_file);

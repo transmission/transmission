@@ -214,7 +214,7 @@ private:
     Glib::RefPtr<SortListModel<Torrent>> sorted_model_;
     Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
-    FaviconCache favicon_cache_;
+    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>> favicon_cache_;
 };
 
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
@@ -1366,7 +1366,7 @@ tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
     return tor;
 }
 
-FaviconCache& Session::favicon_cache() const
+FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& Session::favicon_cache() const
 {
     return impl_->favicon_cache();
 }
