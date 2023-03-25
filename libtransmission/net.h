@@ -300,21 +300,6 @@ struct tr_address
         return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
     }
 
-    [[nodiscard]] auto is_any4() const noexcept
-    {
-        return *this == any_ipv4();
-    }
-
-    [[nodiscard]] auto is_any6() const noexcept
-    {
-        return *this == any_ipv6();
-    }
-
-    [[nodiscard]] auto is_any() const noexcept
-    {
-        return is_any4() || is_any6();
-    }
-
     [[nodiscard]] constexpr auto is_valid() const noexcept
     {
         return type == TR_AF_INET || type == TR_AF_INET6;
