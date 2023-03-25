@@ -92,8 +92,8 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol)
 
 #### Peers
- * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections.
- * **bind-address-ipv6:** String (default = "::") Where to listen for peer connections.
+ * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections. Invalid IP addresses will be treated as "0.0.0.0".
+ * **bind-address-ipv6:** String (default = "::") Where to listen for peer connections. Invalid IP addresses will be treated as "::".
  * **peer-congestion-algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
  * **peer-limit-global:** Number (default = 240)
  * **peer-limit-per-torrent:** Number (default =  60)
