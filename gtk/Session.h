@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "FaviconCache.h"
 #include "GtkCompat.h"
 #include "Torrent.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/favicon-cache.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
 

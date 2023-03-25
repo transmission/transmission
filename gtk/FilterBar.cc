@@ -5,7 +5,6 @@
 
 #include "FilterBar.h"
 
-#include "FaviconCache.h" // gtr_get_favicon()
 #include "FilterListModel.hh"
 #include "HigWorkarea.h" // GUI_PAD
 #include "ListModelAdapter.h"

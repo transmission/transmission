@@ -6,7 +6,6 @@
 #include "DetailsDialog.h"
 
 #include "Actions.h"
-#include "FaviconCache.h" // gtr_get_favicon()
 #include "FileList.h"
 #include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
