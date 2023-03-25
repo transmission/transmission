@@ -5,13 +5,11 @@
 
 #include "FaviconCache.h"
 
+#include <gdkmm/pixbuf.h>
+#include <giomm/memoryinputstream.h>
 #include <glibmm/error.h>
 #include <glibmm/main.h>
 #include <glibmm/miscutils.h>
-
-#include <giomm/memoryinputstream.h>
-
-#include <gdkmm/pixbuf.h>
 
 using Icon = Glib::RefPtr<Gdk::Pixbuf>;
 

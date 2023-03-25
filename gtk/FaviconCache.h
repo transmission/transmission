@@ -6,7 +6,6 @@
 #pragma once
 
 #include <libtransmission/transmission.h>
-
 #include <libtransmission/file.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h>
