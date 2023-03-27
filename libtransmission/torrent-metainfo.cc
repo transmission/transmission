@@ -13,20 +13,20 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "benc.h"
-#include "crypto-utils.h"
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "quark.h"
-#include "torrent-metainfo.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/benc.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 

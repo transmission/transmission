@@ -14,14 +14,15 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
-#include "cache.h"
-#include "inout.h"
-#include "log.h"
-#include "torrent.h"
-#include "torrents.h"
-#include "tr-assert.h"
-#include "utils.h" // tr_time(), tr_formatter
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/cache.h"
+#include "libtransmission/inout.h"
+#include "libtransmission/log.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/torrents.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // tr_time(), tr_formatter
 
 Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {

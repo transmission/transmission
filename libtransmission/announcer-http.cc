@@ -23,21 +23,21 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer-common.h"
-#include "benc.h"
-#include "crypto-utils.h"
-#include "error.h"
-#include "log.h"
-#include "net.h"
-#include "peer-mgr.h" /* pex */
-#include "quark.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "web-utils.h"
-#include "web.h"
+#include "libtransmission/announcer-common.h"
+#include "libtransmission/benc.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-mgr.h" /* pex */
+#include "libtransmission/quark.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
+#include "libtransmission/web.h"
 
 using namespace std::literals;
 

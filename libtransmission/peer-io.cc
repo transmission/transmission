@@ -17,15 +17,16 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
-#include "session.h"
-#include "bandwidth.h"
-#include "log.h"
-#include "net.h"
-#include "peer-io.h"
-#include "tr-assert.h"
-#include "tr-utp.h"
-#include "utils.h" // for _()
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/session.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h" // for _()
 
 #ifdef _WIN32
 #undef EAGAIN

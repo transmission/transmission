@@ -13,18 +13,17 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "session-id.h"
-
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "platform.h"
-#include "tr-strbuf.h" // for tr_pathbuf
-#include "utils.h" // for _()
+#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/platform.h"
+#include "libtransmission/session-id.h"
+#include "libtransmission/tr-strbuf.h" // for tr_pathbuf
+#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 

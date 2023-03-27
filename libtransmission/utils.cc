@@ -40,19 +40,19 @@
 #include <fast_float/fast_float.h>
 #include <wildmat.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "mime-types.h"
-#include "net.h" // ntohl()
-#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/mime-types.h"
+#include "libtransmission/net.h" // ntohl()
+#include "libtransmission/platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 

@@ -5,12 +5,12 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h" // for tr_log_level
-#include "net.h" // for tr_port
-#include "utils.h" // for tr_strvStrip(), tr_strlower()
-#include "variant.h"
+#include "libtransmission/log.h" // for tr_log_level
+#include "libtransmission/net.h" // for tr_port
+#include "libtransmission/utils.h" // for tr_strvStrip(), tr_strlower()
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 

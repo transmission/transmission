@@ -15,18 +15,18 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "makemeta.h"
-#include "session.h" // TR_NAME
-#include "tr-assert.h"
-#include "utils.h" // for _()
-#include "variant.h"
-#include "version.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/makemeta.h"
+#include "libtransmission/session.h" // TR_NAME
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // for _()
+#include "libtransmission/variant.h"
+#include "libtransmission/version.h"
 
 using namespace std::literals;
 

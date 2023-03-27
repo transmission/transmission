@@ -19,14 +19,14 @@
 #define PSL_STATIC
 #include <libpsl.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "net.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
