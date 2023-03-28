@@ -419,11 +419,11 @@ void tr_net_close_socket(tr_socket_t sockfd)
 
 namespace
 {
-// code in global_ipv6_herlpers is written by Juliusz Chroboczek
+// code in global_ip_herlpers is written by Juliusz Chroboczek
 // and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
 // unbreaking the double-stack Internet.
-namespace global_ipv6_helpers
+namespace global_ip_helpers
 {
 
 // Get the source address used for a given destination address.
@@ -484,13 +484,31 @@ namespace global_ipv6_helpers
     return {};
 }
 
-} // namespace global_ipv6_helpers
+} // namespace global_ip_helpers
 } // namespace
+
+/* Return our global IPv4 address, with caching. */
+std::optional<tr_address> tr_globalIPv4()
+{
+    using namespace global_ip_helpers;
+
+    // recheck our cached value every half hour
+    static auto constexpr CacheSecs = 1800;
+    static auto cache_val = std::optional<tr_address>{};
+    static auto cache_expires_at = time_t{};
+    if (auto const now = tr_time(); cache_expires_at <= now)
+    {
+        cache_expires_at = now + CacheSecs;
+        cache_val = global_address(AF_INET);
+    }
+
+    return cache_val;
+}
 
 /* Return our global IPv6 address, with caching. */
 std::optional<tr_address> tr_globalIPv6()
 {
-    using namespace global_ipv6_helpers;
+    using namespace global_ip_helpers;
 
     // recheck our cached value every half hour
     static auto constexpr CacheSecs = 1800;

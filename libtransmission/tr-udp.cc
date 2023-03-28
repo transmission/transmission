@@ -237,6 +237,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
+    auto const addrport = tr_address::from_sockaddr(to);
     if (to->sa_family != AF_INET && to->sa_family != AF_INET6)
     {
         errno = EAFNOSUPPORT;
@@ -246,13 +247,23 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         // don't warn on bad sockets; the system may not support IPv6
         return;
     }
+    else if (to->sa_family == AF_INET && !tr_globalIPv4() && addrport && addrport->first.is_global_unicast_address())
+    {
+        // don't try to connect to a IPv4 global address if we don't have a IPv4 global address
+        return;
+    }
+    else if (to->sa_family == AF_INET6 && !tr_globalIPv6() && addrport && addrport->first.is_global_unicast_address())
+    {
+        // don't try to connect to a IPv6 global address if we don't have a IPv6 global address
+        return;
+    }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
     {
         return;
     }
 
     auto display_name = std::string{};
-    if (auto const addrport = tr_address::from_sockaddr(to); addrport)
+    if (addrport)
     {
         auto const& [addr, port] = *addrport;
         display_name = addr.display_name(port);

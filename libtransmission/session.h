@@ -464,11 +464,6 @@ public:
 
     [[nodiscard]] bool useRpcWhitelist() const;
 
-    void setExternalIP(tr_address external_ip)
-    {
-        external_ip_ = external_ip;
-    }
-
     // peer networking
 
     [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
@@ -1008,7 +1003,6 @@ private:
     /// trivial type fields
 
     tr_session_settings settings_;
-    std::optional<tr_address> external_ip_;
 
     queue_start_callback_t queue_start_callback_ = nullptr;
     void* queue_start_user_data_ = nullptr;
