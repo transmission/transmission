@@ -484,7 +484,7 @@ msgstr "Sem atualizações agendadas"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Asking for more peers {time_span_from_now}"
-msgstr "Solicitando mais peers {time_span_from_now}"
+msgstr "Solicitando mais pares {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1871
 msgid "Queued to ask for more peers"
@@ -493,7 +493,7 @@ msgstr "Esperando para pedir mais pares"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1879
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr "Solicitado mais peers {markup_begin}{time_span_ago}{markup_end}"
+msgstr "Solicitado mais pares {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1904
@@ -521,7 +521,7 @@ msgstr "Obtido um erro crítico '{markup_begin}{error}{markup_end}'{time_span_ag
 
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr "Solicitando contagem de peers em {time_span_from_now}"
+msgstr "Solicitando contagem de pares em {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1941
 msgid "Queued to ask for peer counts"
@@ -529,7 +529,7 @@ msgstr "Esperando para pedir a contagem de pares"
 
 #: ../gtk/DetailsDialog.cc:1948
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr "Solicitado contagem de peers {markup_begin}{time_span_ago}{markup_end}"
+msgstr "Solicitado contagem de pares {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2231
 msgid "{torrent_name} - Edit Trackers"
@@ -681,7 +681,7 @@ msgstr "Mo_strar:"
 
 #: ../gtk/FilterBar.cc:587
 msgid "_Show {count:L} of:"
-msgstr "_Mostrar {count:L}de:"
+msgstr "_Mostrar {count:L} de:"
 
 #: ../gtk/FreeSpaceLabel.cc:54
 msgid "{disk_space} free"
@@ -693,7 +693,7 @@ msgid ""
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 "Clique para desabilitar Limites Alternativos de Velocidade \n"
-"({download_speed}down, {upload_speed}up)"
+"({download_speed} down, {upload_speed} up)"
 
 #: ../gtk/MainWindow.cc:305
 msgid ""
@@ -701,7 +701,7 @@ msgid ""
 " ({download_speed} down, {upload_speed} up)"
 msgstr ""
 "Clique para habilitar Limites Alternativos de Velocidade\n"
-"({download_speed}, {upload_speed}up)"
+"({download_speed} down, {upload_speed} up)"
 
 #: ../gtk/MainWindow.cc:357
 msgid "Unlimited"
@@ -1001,7 +1001,7 @@ msgstr "Verificando dados locais ({percent_done}% testados)"
 
 #: ../gtk/Torrent.cc:365
 msgid "{current_size} of {complete_size} ({percent_done}%)"
-msgstr "{current_size}de {complete_size} ({percent_done}%)"
+msgstr "{current_size} de {complete_size} ({percent_done}%)"
 
 #: ../gtk/Torrent.cc:375
 #, no-c-format
@@ -1056,30 +1056,30 @@ msgstr[2] ""
 #: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
-msgstr[0] "Baixando de {active_count}de {connected_count}peers e webseeds conectados"
-msgstr[1] "Baixando de {active_count}de {connected_count} peers e webseeds conectados"
-msgstr[2] "Baixando {active_count}de {connected_count}peers e webseeds conectados"
+msgstr[0] "Baixando de {active_count} de {connected_count} pares e webseeds conectados"
+msgstr[1] "Baixando de {active_count} de {connected_count} pares e webseeds conectados"
+msgstr[2] "Baixando {active_count} de {connected_count} pares e webseeds conectados"
 
 #: ../gtk/Torrent.cc:537
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
-msgstr[0] "Baixando de {active_count}webseed"
-msgstr[1] "Baixando de {active_count}webseeds"
-msgstr[2] "Baixando de {active_count}webseed"
+msgstr[0] "Baixando de {active_count} webseed"
+msgstr[1] "Baixando de {active_count} webseeds"
+msgstr[2] "Baixando de {active_count} webseed"
 
 #: ../gtk/Torrent.cc:545
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
-msgstr[0] "Baixando de {active_count}de {connected_count}peers conectados"
-msgstr[1] "Baixando de {active_count}de {connected_count}peers conectados"
-msgstr[2] "Baixando de {active_count}de {connected_count}peers conectados"
+msgstr[0] "Baixando de {active_count} de {connected_count} pares conectados"
+msgstr[1] "Baixando de {active_count} de {connected_count} pares conectados"
+msgstr[2] "Baixando de {active_count} de {connected_count} pares conectados"
 
 #: ../gtk/Torrent.cc:554
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
-msgstr[0] "Enviando para {active_count}de {connected_count}peers conectados"
-msgstr[1] "Enviando para {active_count}de {connected_count}peers conectados "
-msgstr[2] "Enviando para {active_count}de {connected_count}peers conectados"
+msgstr[0] "Enviando para {active_count} de {connected_count} pares conectados"
+msgstr[1] "Enviando para {active_count} de {connected_count} pares conectados "
+msgstr[2] "Enviando para {active_count} de {connected_count} pares conectados"
 
 #: ../gtk/Utils.cc:66
 msgid "KiB"
