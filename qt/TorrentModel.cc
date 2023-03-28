@@ -132,7 +132,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
                 return Formatter::get().timeToString(static_cast<int>(std::difftime(std::time(nullptr), t->lastStarted())));
 
             case COL_SEEDS:
-                for (const auto& ts : t->trackerStats())
+                for (auto const& ts : t->trackerStats())
                 {
                     seeds_total += ts.seeder_count;
                 }
@@ -140,7 +140,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
                 return tr("%1 / %2").arg(t->peersWeAreDownloadingFrom()).arg(seeds_total);
 
             case COL_PEERS:
-                for (const auto& ts : t->trackerStats())
+                for (auto const& ts : t->trackerStats())
                 {
                     leechers_total += ts.leecher_count;
                 }
@@ -246,14 +246,13 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
             return QVariant::fromValue(t);
 
         case Qt::TextAlignmentRole:
-            if (index.column() == COL_NAME ||
-                index.column() == COL_PATH)
+            if (index.column() == COL_NAME || index.column() == COL_PATH)
             {
-                return {Qt::AlignLeading | Qt::AlignVCenter};
+                return { Qt::AlignLeading | Qt::AlignVCenter };
             }
             else
             {
-                return {Qt::AlignTrailing | Qt::AlignVCenter};
+                return { Qt::AlignTrailing | Qt::AlignVCenter };
             }
 
         default:
