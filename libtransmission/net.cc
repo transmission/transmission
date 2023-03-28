@@ -368,7 +368,7 @@ bool tr_net_hasIPv6(tr_port port)
     if (!already_done)
     {
         int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv4(), port, true, &err);
+        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv6(), port, true, &err);
 
         if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
         {
