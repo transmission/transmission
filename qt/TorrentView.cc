@@ -77,6 +77,9 @@ TorrentView::TorrentView(QWidget* parent)
     setSelectionBehavior(SelectionBehavior::SelectRows);
     horizontalHeader()->setSectionsMovable(true);
     horizontalHeader()->setStretchLastSection(true);
+
+    horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    horizontalHeader()->setCascadingSectionResizes(true);
 }
 
 void TorrentView::setHeaderText(QString const& text)
@@ -103,6 +106,11 @@ void TorrentView::resizeEvent(QResizeEvent* event)
         adjustHeaderPosition();
     }
 
+    if (auto* delegate = dynamic_cast<TorrentDelegate*>(this->itemDelegate()))
+    {
+        setColumnWidth(0, this->width() - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+    }
+
     this->resizeRowsToContents();
 }
 
@@ -118,16 +126,19 @@ void TorrentView::setCompactView(bool active)
 {
     if (active)
     {
-        this->horizontalHeader()->show();
-        this->setColumnWidth(0, (this->width() - style()->pixelMetric(QStyle::PM_DefaultFrameWidth)) / 2);
+        horizontalHeader()->show();
     }
     else
     {
-        this->horizontalHeader()->hide();
-        this->setColumnWidth(0, this->width() - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
-    }
+        horizontalHeader()->hide();
 
-    this->horizontalHeader()->setStretchLastSection(true);
+        for (int i = 1; i < model()->columnCount(); i++)
+        {
+            hideColumn(i);
+        }
+
+        setColumnWidth(0, this->width() - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+    }
 }
 
 void TorrentView::setColumns(QString const& columns)
@@ -151,6 +162,5 @@ void TorrentView::setColumns(QString const& columns)
         }
     }
 
-    horizontalHeader()->setStretchLastSection(true);
     resizeColumnsToContents();
 }
