@@ -73,6 +73,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { ASKQUIT, TR_KEY_prompt_before_exit, QMetaType::Bool },
     { SORT_MODE, TR_KEY_sort_mode, CustomVariantType::SortModeType },
     { SORT_REVERSED, TR_KEY_sort_reversed, QMetaType::Bool },
+    { COMPACT_COLUMNS, TR_KEY_compact_columns, QMetaType::QString },
     { COMPACT_VIEW, TR_KEY_compact_view, QMetaType::Bool },
     { FILTERBAR, TR_KEY_show_filterbar, QMetaType::Bool },
     { STATUSBAR, TR_KEY_show_statusbar, QMetaType::Bool },
@@ -101,7 +102,6 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QMetaType::Bool },
     { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QMetaType::Bool },
     { READ_CLIPBOARD, TR_KEY_read_clipboard, QMetaType::Bool },
-    { COMPACT_COLUMNS, TR_KEY_compact_columns, QMetaType::QString },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_KEY_alt_speed_up, QMetaType::Int },
