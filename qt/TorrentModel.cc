@@ -132,7 +132,9 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
                 return tr("%1 / %2").arg(t->peersWeAreUploadingTo()).arg(t->connectedPeers());
 
             case COL_PEERS:
-                return tr("%1 / %2").arg(t->peersWeAreDownloadingFrom() + t->webseedsWeAreDownloadingFrom()).arg(t->connectedPeersAndWebseeds());
+                return tr("%1 / %2")
+                    .arg(t->peersWeAreDownloadingFrom() + t->webseedsWeAreDownloadingFrom())
+                    .arg(t->connectedPeersAndWebseeds());
 
             case COL_DOWN_SPEED:
                 return Formatter::get().downloadSpeedToString(t->downloadSpeed());

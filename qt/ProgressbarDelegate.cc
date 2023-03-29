@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-
 #include <QApplication>
 #include <QFont>
 #include <QFontMetrics>
@@ -27,7 +26,6 @@ enum
     BAR_HEIGHT = 16
 };
 
-
 namespace
 {
 
@@ -36,10 +34,7 @@ class ItemLayout
 public:
     QRect bar_rect;
 
-    ItemLayout(
-        Qt::LayoutDirection direction,
-        QPoint const& top_left,
-        int width);
+    ItemLayout(Qt::LayoutDirection direction, QPoint const& top_left, int width);
 
     [[nodiscard]] QSize size() const
     {
@@ -47,17 +42,13 @@ public:
     }
 
 private:
-
     [[nodiscard]] QString elidedText(QFont const& font, QString const& text, int width) const
     {
         return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
     }
 };
 
-ItemLayout::ItemLayout(
-    Qt::LayoutDirection direction,
-    QPoint const& top_left,
-    int width)
+ItemLayout::ItemLayout(Qt::LayoutDirection direction, QPoint const& top_left, int width)
 {
     auto const* style = QApplication::style();
 
@@ -70,9 +61,7 @@ ItemLayout::ItemLayout(
         bar_style.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
         bar_style.rect.height());
 
-    QRect base_rect(
-        top_left,
-        QSize(width,bar_size.height()));
+    QRect base_rect(top_left, QSize(width, bar_size.height()));
 
     bar_rect = QStyle::alignedRect(direction, Qt::AlignTrailing | Qt::AlignVCenter, bar_size, base_rect);
     Utils::narrowRect(base_rect, GUI_PAD, bar_rect.width() + GUI_PAD, direction);
@@ -84,10 +73,7 @@ ItemLayout::ItemLayout(
 QSize ProgressbarDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
     auto const m = margin(*QApplication::style());
-    auto const layout = ItemLayout(
-        option.direction,
-        QPoint(0, 0),
-        option.rect.width() - m.width() * 2);
+    auto const layout = ItemLayout(option.direction, QPoint(0, 0), option.rect.width() - m.width() * 2);
     return layout.size() + m * 2;
 }
 
@@ -141,10 +127,7 @@ void ProgressbarDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem co
     // layout
     QSize const m(margin(*style));
     QRect const content_rect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
-    ItemLayout const layout(
-        option.direction,
-        content_rect.topLeft(),
-        content_rect.width());
+    ItemLayout const layout(option.direction, content_rect.topLeft(), content_rect.width());
 
     // render
     if (tor.hasError() && !is_item_selected)
