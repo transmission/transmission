@@ -1173,108 +1173,10 @@
        </item>
        <item>
         <layout class="QGridLayout" name="columnsSectionLayout">
-         <item row="6" column="1">
-          <widget class="QCheckBox" name="sizeLeftCheckBox">
-           <property name="text">
-            <string>Size left</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="upSpeedCheckBox">
-           <property name="text">
-            <string>Upload Speed</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="statusCheckBox">
-           <property name="text">
-            <string>Status</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="nameCheckBox">
-           <property name="text">
-            <string>Name</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="uploadedCheckBox">
-           <property name="text">
-            <string>Uploaded</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="1">
           <widget class="QCheckBox" name="downloadedCheckBox">
            <property name="text">
             <string>Downloaded</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QCheckBox" name="progressCheckBox">
-           <property name="text">
-            <string>Progress</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QCheckBox" name="downSpeedCheckBox">
-           <property name="text">
-            <string>Download Speed</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QCheckBox" name="sizeCheckBox">
-           <property name="text">
-            <string>Size</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QCheckBox" name="peersCheckBox">
-           <property name="text">
-            <string>Peers</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QCheckBox" name="seedingTimeCheckBox">
-           <property name="text">
-            <string>Seeding Time</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QCheckBox" name="etaCheckBox">
-           <property name="text">
-            <string>ETA</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QCheckBox" name="ratioCheckBox">
-           <property name="text">
-            <string>Ratio</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QCheckBox" name="seedsCheckBox">
-           <property name="text">
-            <string>Seeds</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QCheckBox" name="lastActiveCheckBox">
-           <property name="text">
-            <string>Last active</string>
            </property>
           </widget>
          </item>
@@ -1285,6 +1187,20 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="etaCheckBox">
+           <property name="text">
+            <string>ETA</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QCheckBox" name="progressCheckBox">
+           <property name="text">
+            <string>Progress</string>
+           </property>
+          </widget>
+         </item>
          <item row="17" column="0">
           <widget class="QCheckBox" name="privateCheckBox">
            <property name="text">
@@ -1292,17 +1208,66 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="4" column="0">
           <widget class="QCheckBox" name="addedOnCheckBox">
            <property name="text">
             <string>Added on</string>
            </property>
           </widget>
          </item>
-         <item row="9" column="0">
-          <widget class="QCheckBox" name="queuePositionCheckBox">
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="seedsCheckBox">
            <property name="text">
-            <string>Queue Position</string>
+            <string>Seeds</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QCheckBox" name="activityCheckBox">
+           <property name="text">
+            <string>Activity</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="nameCheckBox">
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QCheckBox" name="lastActiveCheckBox">
+           <property name="text">
+            <string>Last active</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="statusCheckBox">
+           <property name="text">
+            <string>Status</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QCheckBox" name="sizeCheckBox">
+           <property name="text">
+            <string>Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="seedingTimeCheckBox">
+           <property name="text">
+            <string>Seeding Time</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="peersCheckBox">
+           <property name="text">
+            <string>Peers</string>
            </property>
           </widget>
          </item>
@@ -1313,6 +1278,13 @@
            </property>
           </widget>
          </item>
+         <item row="5" column="1">
+          <widget class="QCheckBox" name="sizeLeftCheckBox">
+           <property name="text">
+            <string>Size left</string>
+           </property>
+          </widget>
+         </item>
          <item row="10" column="0">
           <widget class="QCheckBox" name="priorityCheckBox">
            <property name="text">
@@ -1320,10 +1292,31 @@
            </property>
           </widget>
          </item>
+         <item row="9" column="0">
+          <widget class="QCheckBox" name="queuePositionCheckBox">
+           <property name="text">
+            <string>Queue Position</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="uploadedCheckBox">
+           <property name="text">
+            <string>Uploaded</string>
+           </property>
+          </widget>
+         </item>
          <item row="17" column="1">
           <widget class="QCheckBox" name="idCheckBox">
            <property name="text">
             <string>Id</string>
+           </property>
+          </widget>
+         </item>
+         <item row="18" column="0">
+          <widget class="QCheckBox" name="ratioCheckBox">
+           <property name="text">
+            <string>Ratio</string>
            </property>
           </widget>
          </item>

@@ -485,8 +485,7 @@ void PrefsDialog::initDesktopTab()
     linkColumnCheckboxToPref(ui_.seedingTimeCheckBox, TorrentModel::COL_SEEDING_TIME);
     linkColumnCheckboxToPref(ui_.seedsCheckBox, TorrentModel::COL_SEEDS);
     linkColumnCheckboxToPref(ui_.peersCheckBox, TorrentModel::COL_PEERS);
-    linkColumnCheckboxToPref(ui_.downSpeedCheckBox, TorrentModel::COL_DOWN_SPEED);
-    linkColumnCheckboxToPref(ui_.upSpeedCheckBox, TorrentModel::COL_UP_SPEED);
+    linkColumnCheckboxToPref(ui_.activityCheckBox, TorrentModel::COL_ACTIVITY);
     linkColumnCheckboxToPref(ui_.etaCheckBox, TorrentModel::COL_ETA);
     linkColumnCheckboxToPref(ui_.ratioCheckBox, TorrentModel::COL_RATIO);
     linkColumnCheckboxToPref(ui_.downloadedCheckBox, TorrentModel::COL_DOWNLOADED);

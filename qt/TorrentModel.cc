@@ -136,11 +136,10 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
                     .arg(t->peersWeAreDownloadingFrom() + t->webseedsWeAreDownloadingFrom())
                     .arg(t->connectedPeersAndWebseeds());
 
-            case COL_DOWN_SPEED:
-                return Formatter::get().downloadSpeedToString(t->downloadSpeed());
-
-            case COL_UP_SPEED:
-                return Formatter::get().uploadSpeedToString(t->uploadSpeed());
+            case COL_ACTIVITY:
+                return tr("%1 / %2")
+                    .arg(Formatter::get().downloadSpeedToString(t->downloadSpeed()))
+                    .arg(Formatter::get().uploadSpeedToString(t->uploadSpeed()));
 
             case COL_ETA:
                 return Formatter::get().timeToString(t->getETA());
@@ -279,11 +278,8 @@ QVariant TorrentModel::headerData(int section, Qt::Orientation orientation, int 
         case COL_PEERS:
             return tr("Peers");
 
-        case COL_DOWN_SPEED:
-            return tr("Download Speed");
-
-        case COL_UP_SPEED:
-            return tr("Upload Speed");
+        case COL_ACTIVITY:
+            return tr("Speeds");
 
         case COL_ETA:
             return tr("ETA");
