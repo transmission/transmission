@@ -4,9 +4,10 @@
 // License text can be found in the licenses/ folder.
 
 #include <QApplication>
+#include <QHeaderView>
+#include <QScrollBar>
 #include <QStyleOptionHeader>
 #include <QStylePainter>
-#include <QHeaderView>
 
 #include "TorrentModel.h"
 #include "TorrentView.h"
@@ -108,7 +109,11 @@ void TorrentView::resizeEvent(QResizeEvent* event)
 
     if (auto* delegate = dynamic_cast<TorrentDelegate*>(this->itemDelegate()))
     {
-        setColumnWidth(0, this->width() - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+        int const actual_width = verticalScrollBar()->isVisible() ?
+            this->width() - style()->pixelMetric(QStyle::PM_ScrollBarExtent) :
+            this->width();
+
+        setColumnWidth(0, actual_width - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
     }
 
     this->resizeRowsToContents();
