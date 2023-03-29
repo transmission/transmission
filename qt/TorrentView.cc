@@ -9,10 +9,12 @@
 #include <QStyleOptionHeader>
 #include <QStylePainter>
 
+#include "Prefs.h"
+#include "ProgressbarDelegate.h"
 #include "TorrentModel.h"
 #include "TorrentView.h"
 #include "TorrentDelegate.h"
-#include "ProgressbarDelegate.h"
+#include "Filters.h"
 
 class TorrentView::HeaderWidget : public QWidget
 {
@@ -81,6 +83,14 @@ TorrentView::TorrentView(QWidget* parent)
 
     horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     horizontalHeader()->setCascadingSectionResizes(true);
+
+    connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &TorrentView::sortChanged);
+}
+
+void TorrentView::linkPrefs(Prefs* prefs)
+{
+    prefs_ = prefs;
+    connect(prefs, &Prefs::changed, this, &TorrentView::onPrefChanged);
 }
 
 void TorrentView::setHeaderText(QString const& text)
@@ -168,4 +178,119 @@ void TorrentView::setColumns(QString const& columns)
     }
 
     resizeColumnsToContents();
+}
+
+// applying a change made via clicking on the little arrow in a column header to the state in View > Sort by X
+void TorrentView::sortChanged(int logicalIndex, Qt::SortOrder order)
+{
+    bool const reversed = order == Qt::DescendingOrder;
+
+    switch (logicalIndex)
+    {
+    case TorrentModel::COL_QUEUE_POSITION:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_QUEUE));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_SIZE:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_SIZE));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_ADDED_ON:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_AGE));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_ID:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_ID));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_ACTIVITY:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_ACTIVITY));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_STATUS:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_STATE));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_PROGRESS:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_PROGRESS));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_RATIO:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_RATIO));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_ETA:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_ETA));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    case TorrentModel::COL_NAME:
+        prefs_->set(Prefs::SORT_MODE, SortMode(SortMode::SORT_BY_NAME));
+        prefs_->set(Prefs::SORT_REVERSED, reversed);
+        break;
+
+    default:
+        break;
+    }
+}
+
+// applying a change made via clicking View > Sort by X to the state of the little arrow in the column header
+void TorrentView::onPrefChanged(int key)
+{
+    if (key == Prefs::SORT_MODE || key == Prefs::SORT_REVERSED)
+    {
+        auto reversed = prefs_->getBool(Prefs::SORT_REVERSED) ? Qt::DescendingOrder : Qt::AscendingOrder;
+
+        switch (prefs_->get<SortMode>(Prefs::SORT_MODE).mode())
+        {
+        case SortMode::SORT_BY_QUEUE:
+            sortByColumn(TorrentModel::COL_QUEUE_POSITION, reversed);
+            break;
+
+        case SortMode::SORT_BY_SIZE:
+            sortByColumn(TorrentModel::COL_SIZE, reversed);
+            break;
+
+        case SortMode::SORT_BY_AGE:
+            sortByColumn(TorrentModel::COL_ADDED_ON, reversed);
+            break;
+
+        case SortMode::SORT_BY_ID:
+            sortByColumn(TorrentModel::COL_ID, reversed);
+            break;
+
+        case SortMode::SORT_BY_ACTIVITY:
+            sortByColumn(TorrentModel::COL_STATUS, reversed);
+
+        case SortMode::SORT_BY_STATE:
+            sortByColumn(TorrentModel::COL_STATUS, reversed);
+            break;
+
+        case SortMode::SORT_BY_PROGRESS:
+            sortByColumn(TorrentModel::COL_PROGRESS, reversed);
+            break;
+
+        case SortMode::SORT_BY_RATIO:
+            sortByColumn(TorrentModel::COL_RATIO, reversed);
+            break;
+
+        case SortMode::SORT_BY_ETA:
+            sortByColumn(TorrentModel::COL_ETA, reversed);
+            break;
+
+        case SortMode::SORT_BY_NAME:
+            sortByColumn(TorrentModel::COL_NAME, reversed);
+
+        default:
+            break;
+        }
+    }
 }

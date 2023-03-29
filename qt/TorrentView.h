@@ -16,11 +16,13 @@ class TorrentView : public QTableView
 
 public:
     explicit TorrentView(QWidget* parent = nullptr);
+    void linkPrefs(Prefs* prefs);
 
 public slots:
     void setHeaderText(QString const& text);
     void setCompactView(bool active);
     void setColumns(QString const& columns);
+    void sortChanged(int logicalIndex, Qt::SortOrder order);
 
 signals:
     void headerDoubleClicked();
@@ -28,10 +30,14 @@ signals:
 protected:
     void resizeEvent(QResizeEvent* event) override;
 
+private slots:
+    void onPrefChanged(int key);
+
 private:
     class HeaderWidget;
 
     void adjustHeaderPosition();
 
+    Prefs* prefs_;
     HeaderWidget* const header_widget_ = {};
 };

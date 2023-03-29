@@ -140,6 +140,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
 
     ui_.setupUi(this);
 
+    ui_.tableView->linkPrefs(&prefs);
     ui_.tableView->setStyle(lvp_style_.get());
     ui_.tableView->setAttribute(Qt::WA_MacShowFocusRect, false);
 

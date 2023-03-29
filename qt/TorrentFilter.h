@@ -39,7 +39,6 @@ public:
 protected:
     // QSortFilterProxyModel
     bool filterAcceptsRow(int, QModelIndex const&) const override;
-    bool lessThan(QModelIndex const&, QModelIndex const&) const override;
 
 private slots:
     void onPrefChanged(int key);
