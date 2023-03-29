@@ -108,9 +108,6 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
 
     if (t != nullptr)
     {
-        auto seeds_total = 0;
-        auto leechers_total = 0;
-
         switch (role)
         {
         case Qt::DisplayRole:
@@ -132,20 +129,10 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
                 return Formatter::get().timeToString(static_cast<int>(std::difftime(std::time(nullptr), t->lastStarted())));
 
             case COL_SEEDS:
-                for (auto const& ts : t->trackerStats())
-                {
-                    seeds_total += ts.seeder_count;
-                }
-
-                return tr("%1 / %2").arg(t->peersWeAreDownloadingFrom()).arg(seeds_total);
+                return tr("%1 / %2").arg(t->peersWeAreUploadingTo()).arg(t->connectedPeers());
 
             case COL_PEERS:
-                for (auto const& ts : t->trackerStats())
-                {
-                    leechers_total += ts.leecher_count;
-                }
-
-                return tr("%1 / %2").arg(t->peersWeAreUploadingTo()).arg(leechers_total);
+                return tr("%1 / %2").arg(t->peersWeAreDownloadingFrom() + t->webseedsWeAreDownloadingFrom()).arg(t->connectedPeersAndWebseeds());
 
             case COL_DOWN_SPEED:
                 return Formatter::get().downloadSpeedToString(t->downloadSpeed());
