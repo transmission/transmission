@@ -244,16 +244,9 @@ void PrefsDialog::linkColumnCheckboxToPref(QWidget* widget, int column)
     pref_widget.setPrefKey(Prefs::COMPACT_COLUMNS);
 
     // update widget value
-    auto const ch = prefs_.getString(Prefs::COMPACT_COLUMNS)[column];
+    bool const checked = prefs_.getString(Prefs::COMPACT_COLUMNS)[column] == QStringLiteral("1");
 
-    if (ch == QStringLiteral("1"))
-    {
-        pref_widget.as<QCheckBox>()->setChecked(true);
-    }
-    else
-    {
-        pref_widget.as<QCheckBox>()->setChecked(false);
-    }
+    pref_widget.as<QCheckBox>()->setChecked(checked);
 
     widgets_.insert(Prefs::COMPACT_COLUMNS, widget);
 
