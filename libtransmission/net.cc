@@ -423,7 +423,7 @@ namespace
 // and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
 // unbreaking the double-stack Internet.
-namespace global_ip_helpers
+namespace global_ipv6_helpers
 {
 
 // Get the source address used for a given destination address.
@@ -484,7 +484,7 @@ namespace global_ip_helpers
     return {};
 }
 
-} // namespace global_ip_helpers
+} // namespace global_ipv6_helpers
 } // namespace
 
 /* Return our global IPv4 address, with caching. */
@@ -508,7 +508,7 @@ std::optional<tr_address> tr_globalIPv4()
 /* Return our global IPv6 address, with caching. */
 std::optional<tr_address> tr_globalIPv6()
 {
-    using namespace global_ip_helpers;
+    using namespace global_ipv6_helpers;
 
     // recheck our cached value every half hour
     static auto constexpr CacheSecs = 1800;

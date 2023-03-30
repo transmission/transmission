@@ -247,14 +247,11 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         // don't warn on bad sockets; the system may not support IPv6
         return;
     }
-    else if (to->sa_family == AF_INET && !tr_globalIPv4() && addrport && addrport->first.is_global_unicast_address())
+    else if (
+        addrport && addrport->first.is_global_unicast_address() &&
+        ((to->sa_family == AF_INET && !tr_globalIPv4()) || (to->sa_family == AF_INET6 && !tr_globalIPv6())))
     {
-        // don't try to connect to a IPv4 global address if we don't have a IPv4 global address
-        return;
-    }
-    else if (to->sa_family == AF_INET6 && !tr_globalIPv6() && addrport && addrport->first.is_global_unicast_address())
-    {
-        // don't try to connect to a IPv6 global address if we don't have a IPv6 global address
+        // don't try to connect to a global address if we don't have a global address
         return;
     }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
