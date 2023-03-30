@@ -21,6 +21,8 @@
 #include <netinet/tcp.h> /* TCP_CONGESTION */
 #endif
 
+#include <curl/curl.h>
+
 #include <event2/util.h>
 
 #include <fmt/core.h>
@@ -419,6 +421,64 @@ void tr_net_close_socket(tr_socket_t sockfd)
 
 namespace
 {
+namespace global_ipv4_helpers
+{
+
+size_t write_callback(char* ptr, size_t /* size */, size_t nmemb, void* userdata)
+{
+    // size is always 1 as per https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html
+    reinterpret_cast<std::string*>(userdata)->append(ptr, nmemb);
+    return nmemb;
+}
+
+[[nodiscard]] std::optional<tr_address> global_address()
+{
+    static constexpr auto Dests = std::array<std::string_view, 1>{ "https://icanhazip.com"sv };
+
+    CURL* hnd = curl_easy_init();
+    std::string response;
+    (void)curl_easy_setopt(hnd, CURLOPT_BUFFERSIZE, 102400L);
+    (void)curl_easy_setopt(hnd, CURLOPT_NOPROGRESS, 1L);
+    (void)curl_easy_setopt(hnd, CURLOPT_MAXREDIRS, -1L);
+    (void)curl_easy_setopt(hnd, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
+    (void)curl_easy_setopt(hnd, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    (void)curl_easy_setopt(hnd, CURLOPT_FTP_SKIP_PASV_IP, 1L);
+    (void)curl_easy_setopt(hnd, CURLOPT_TCP_KEEPALIVE, 1L);
+    (void)curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, write_callback);
+    (void)curl_easy_setopt(hnd, CURLOPT_WRITEDATA, &response);
+
+    for (auto const& dest : Dests)
+    {
+        (void)curl_easy_setopt(hnd, CURLOPT_URL, tr_urlbuf{ dest }.c_str());
+
+        if (auto const ret = curl_easy_perform(hnd); ret == CURLE_OK)
+        {
+            // Trim
+            auto constexpr Ws = [](unsigned char c)
+            {
+                return std::isspace(c);
+            };
+            response.erase(response.begin(), std::find_if_not(response.begin(), response.end(), Ws));
+            response.erase(std::find_if_not(response.rbegin(), response.rend(), Ws).base(), response.end());
+
+            // Check global address
+            if (auto const addr = tr_address::from_string(response); addr && addr->is_global_unicast_address())
+            {
+                curl_easy_cleanup(hnd);
+                return addr;
+            }
+        }
+    }
+
+    curl_easy_cleanup(hnd);
+    return {};
+}
+
+} // namespace global_ipv4_helpers
+} // namespace
+
+namespace
+{
 // code in global_ip_herlpers is written by Juliusz Chroboczek
 // and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
@@ -490,7 +550,7 @@ namespace global_ipv6_helpers
 /* Return our global IPv4 address, with caching. */
 std::optional<tr_address> tr_globalIPv4()
 {
-    using namespace global_ip_helpers;
+    using namespace global_ipv4_helpers;
 
     // recheck our cached value every half hour
     static auto constexpr CacheSecs = 1800;
@@ -499,7 +559,7 @@ std::optional<tr_address> tr_globalIPv4()
     if (auto const now = tr_time(); cache_expires_at <= now)
     {
         cache_expires_at = now + CacheSecs;
-        cache_val = global_address(AF_INET);
+        cache_val = global_address();
     }
 
     return cache_val;
