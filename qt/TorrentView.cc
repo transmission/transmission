@@ -80,9 +80,11 @@ TorrentView::TorrentView(QWidget* parent)
     setSelectionBehavior(SelectionBehavior::SelectRows);
     horizontalHeader()->setSectionsMovable(true);
     horizontalHeader()->setStretchLastSection(true);
-
     horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     horizontalHeader()->setCascadingSectionResizes(true);
+
+    // only look at the currently visible items so columns do not become too wide when there are long out-of-view items
+    horizontalHeader()->setResizeContentsPrecision(0);
 
     connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &TorrentView::sortChanged);
 }
@@ -125,8 +127,17 @@ void TorrentView::resizeEvent(QResizeEvent* event)
 
         setColumnWidth(0, actual_width - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
     }
+    else
+    {
+        resizeColumnsToContents();
 
-    this->resizeRowsToContents();
+        // if the main window is wider than the sum of column widths after calling resizeColumnsToContents() then there will
+        // unused whitespace at the end...this somehow fixes that...
+        horizontalHeader()->setStretchLastSection(false);
+        horizontalHeader()->setStretchLastSection(true);
+    }
+
+    resizeRowsToContents();
 }
 
 void TorrentView::adjustHeaderPosition()
