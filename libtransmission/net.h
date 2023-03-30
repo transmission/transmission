@@ -10,6 +10,7 @@
 
 #include <algorithm> // for std::copy_n
 #include <array>
+#include <chrono>
 #include <cstddef> // size_t
 #include <optional>
 #include <string>
@@ -57,6 +58,11 @@ using tr_socket_t = int;
 
 #define sockerrno errno
 #endif
+
+#include "timer.h"
+#include "web.h"
+
+using namespace std::literals::chrono_literals;
 
 /**
  * Literally just a port number.
@@ -322,7 +328,7 @@ void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
 void tr_net_close_socket(tr_socket_t fd);
 
-bool tr_net_hasIPv6(tr_port);
+[[nodiscard]] bool tr_net_hasIPv6(tr_port);
 
 // --- TOS / DSCP
 
@@ -398,6 +404,37 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
 
-[[nodiscard]] std::optional<tr_address> tr_globalIPv4();
-
 [[nodiscard]] std::optional<tr_address> tr_globalIPv6();
+
+class tr_global_ip_cache
+{
+public:
+    explicit tr_global_ip_cache(tr_session* session_in);
+
+    [[nodiscard]] const std::optional<tr_address>& globalIPv4() const noexcept
+    {
+        return ipv4_addr_;
+    }
+
+    [[nodiscard]] const std::optional<tr_address>& globalIPv6() const noexcept
+    {
+        return ipv6_addr_;
+    }
+
+private:
+    // Only to be called by timer
+    void update_ipv4_addr(std::size_t* d = new std::size_t{ 0 }) noexcept;
+    void update_ipv6_addr() noexcept;
+
+    // Auxiliary functions for update_ipv*_addr()
+    void onIPv4Response(tr_web::FetchResponse const& response);
+    [[nodiscard]] static std::optional<tr_address> ipv6_global_address();
+    [[nodiscard]] static std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port);
+
+    tr_session* const session_;
+    std::optional<tr_address> ipv4_addr_, ipv6_addr_;
+    std::unique_ptr<libtransmission::Timer> ipv4_upkeep_timer_, ipv6_upkeep_timer_;
+    static auto constexpr UpkeepInterval = 30min;
+    static auto constexpr RetryUpkeepInterval = 30s;
+    static auto constexpr IpQueryServices = std::array<char const*, 1>{ "https://icanhazip.com" };
+};

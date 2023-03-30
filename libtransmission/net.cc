@@ -35,6 +35,7 @@
 #include "net.h"
 #include "peer-socket.h"
 #include "session.h"
+#include "timer.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "tr-utp.h"
@@ -421,64 +422,6 @@ void tr_net_close_socket(tr_socket_t sockfd)
 
 namespace
 {
-namespace global_ipv4_helpers
-{
-
-size_t write_callback(char* ptr, size_t /* size */, size_t nmemb, void* userdata)
-{
-    // size is always 1 as per https://curl.se/libcurl/c/CURLOPT_WRITEFUNCTION.html
-    reinterpret_cast<std::string*>(userdata)->append(ptr, nmemb);
-    return nmemb;
-}
-
-[[nodiscard]] std::optional<tr_address> global_address()
-{
-    static constexpr auto Dests = std::array<std::string_view, 1>{ "https://icanhazip.com"sv };
-
-    CURL* hnd = curl_easy_init();
-    std::string response;
-    (void)curl_easy_setopt(hnd, CURLOPT_BUFFERSIZE, 102400L);
-    (void)curl_easy_setopt(hnd, CURLOPT_NOPROGRESS, 1L);
-    (void)curl_easy_setopt(hnd, CURLOPT_MAXREDIRS, -1L);
-    (void)curl_easy_setopt(hnd, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
-    (void)curl_easy_setopt(hnd, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    (void)curl_easy_setopt(hnd, CURLOPT_FTP_SKIP_PASV_IP, 1L);
-    (void)curl_easy_setopt(hnd, CURLOPT_TCP_KEEPALIVE, 1L);
-    (void)curl_easy_setopt(hnd, CURLOPT_WRITEFUNCTION, write_callback);
-    (void)curl_easy_setopt(hnd, CURLOPT_WRITEDATA, &response);
-
-    for (auto const& dest : Dests)
-    {
-        (void)curl_easy_setopt(hnd, CURLOPT_URL, tr_urlbuf{ dest }.c_str());
-
-        if (auto const ret = curl_easy_perform(hnd); ret == CURLE_OK)
-        {
-            // Trim
-            auto constexpr Ws = [](unsigned char c)
-            {
-                return std::isspace(c);
-            };
-            response.erase(response.begin(), std::find_if_not(response.begin(), response.end(), Ws));
-            response.erase(std::find_if_not(response.rbegin(), response.rend(), Ws).base(), response.end());
-
-            // Check global address
-            if (auto const addr = tr_address::from_string(response); addr && addr->is_global_unicast_address())
-            {
-                curl_easy_cleanup(hnd);
-                return addr;
-            }
-        }
-    }
-
-    curl_easy_cleanup(hnd);
-    return {};
-}
-
-} // namespace global_ipv4_helpers
-} // namespace
-
-namespace
-{
 // code in global_ip_herlpers is written by Juliusz Chroboczek
 // and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
@@ -547,24 +490,6 @@ namespace global_ipv6_helpers
 } // namespace global_ipv6_helpers
 } // namespace
 
-/* Return our global IPv4 address, with caching. */
-std::optional<tr_address> tr_globalIPv4()
-{
-    using namespace global_ipv4_helpers;
-
-    // recheck our cached value every half hour
-    static auto constexpr CacheSecs = 1800;
-    static auto cache_val = std::optional<tr_address>{};
-    static auto cache_expires_at = time_t{};
-    if (auto const now = tr_time(); cache_expires_at <= now)
-    {
-        cache_expires_at = now + CacheSecs;
-        cache_val = global_address();
-    }
-
-    return cache_val;
-}
-
 /* Return our global IPv6 address, with caching. */
 std::optional<tr_address> tr_globalIPv6()
 {
@@ -581,6 +506,156 @@ std::optional<tr_address> tr_globalIPv6()
     }
 
     return cache_val;
+}
+
+tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
+    : session_{ session_in }
+    , ipv4_upkeep_timer_{ session_in->timerMaker().create() }
+    , ipv6_upkeep_timer_{ session_in->timerMaker().create() }
+{
+    ipv4_upkeep_timer_->setCallback([this]() { this->update_ipv4_addr(); });
+    ipv4_upkeep_timer_->startRepeating(UpkeepInterval);
+    ipv6_upkeep_timer_->setCallback([this]() { this->update_ipv6_addr(); });
+    ipv6_upkeep_timer_->startRepeating(UpkeepInterval);
+}
+
+void tr_global_ip_cache::update_ipv4_addr(std::size_t* d) noexcept
+{
+    auto options = tr_web::FetchOptions{ IpQueryServices[*d],
+                                         [this](tr_web::FetchResponse const& response) { this->onIPv4Response(response); },
+                                         d };
+    options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+    options.sndbuf = 4096;
+    options.rcvbuf = 4096;
+    session_->fetch(std::move(options));
+}
+
+void tr_global_ip_cache::update_ipv6_addr() noexcept
+{
+    ipv6_addr_ = ipv6_global_address();
+    if (ipv6_addr_)
+    {
+        ipv6_upkeep_timer_->setInterval(UpkeepInterval);
+        tr_logAddInfo(_("Successfully updated global IPv6 address"));
+    }
+    else
+    {
+        ipv6_upkeep_timer_->setInterval(RetryUpkeepInterval);
+        tr_logAddWarn(_("Couldn't update global IPv6 address"));
+    }
+}
+
+void tr_global_ip_cache::onIPv4Response(tr_web::FetchResponse const& response)
+{
+    auto d = reinterpret_cast<std::size_t*>(response.user_data);
+    auto success = bool{ false };
+
+    if (response.status == 200 /* HTTP_OK */)
+    {
+        std::string ip{ response.body };
+
+        // Trim IP string
+        auto constexpr Ws = [](unsigned char c)
+        {
+            return std::isspace(c);
+        };
+        ip.erase(ip.begin(), std::find_if_not(ip.begin(), ip.end(), Ws));
+        ip.erase(std::find_if_not(ip.rbegin(), ip.rend(), Ws).base(), ip.end());
+
+        // Update member
+        if (auto addr = tr_address::from_string(ip); addr && addr->is_global_unicast_address() && addr->is_ipv4())
+        {
+            ipv4_addr_ = addr;
+            success = true;
+            ipv4_upkeep_timer_->setInterval(UpkeepInterval);
+            tr_logAddInfo(fmt::format(
+                _("Successfully updated global IPv4 address: {url} (HTTP {status})"),
+                fmt::arg("url", IpQueryServices[*d]),
+                fmt::arg("status", response.status)));
+        }
+    }
+
+    // Try next IP query URL
+    if (!success && ++(*d) < std::size(IpQueryServices))
+    {
+        update_ipv4_addr(d);
+        return;
+    }
+
+    if (!success)
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't update global IPv4 address: {url} (HTTP {status})"),
+            fmt::arg("url", IpQueryServices[*d]),
+            fmt::arg("status", response.status)));
+        ipv4_addr_.reset();
+        ipv4_upkeep_timer_->setInterval(RetryUpkeepInterval);
+    }
+
+    delete d;
+}
+
+// tr_global_ip_cache::ipv6_global_address() and tr_global_ip_cache::get_source_address
+// is written by Juliusz Chroboczek and is covered under the same license as dht.cc.
+// Please feel free to copy them into your software if it can help
+// unbreaking the double-stack Internet.
+std::optional<tr_address> tr_global_ip_cache::ipv6_global_address()
+{
+    // Pick some destination address to pretend to send a packet to
+    /* static auto constexpr DstIPv4 = "91.121.74.28"sv; */
+    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
+    /*auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6); */
+    auto const dst_addr = tr_address::from_string(DstIPv6);
+    auto const dst_port = tr_port::fromHost(6969);
+
+    // In order for address selection to work right,
+    // this should be a native IPv6 address, not Teredo or 6to4
+    TR_ASSERT(dst_addr.has_value() && dst_addr->is_global_unicast_address());
+
+    if (dst_addr)
+    {
+        if (auto addr = get_source_address(*dst_addr, dst_port); addr && addr->is_global_unicast_address())
+        {
+            return addr;
+        }
+    }
+
+    return {};
+}
+
+// Get the source address used for a given destination address.
+// Since there is no official interface to get this information,
+// we create a connected UDP socket (connected UDP... hmm...)
+// and check its source address.
+//
+// Since it's a UDP socket, this doesn't actually send any packets
+std::optional<tr_address> tr_global_ip_cache::get_source_address(tr_address const& dst_addr, tr_port dst_port)
+{
+    auto const save = errno;
+
+    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
+    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    {
+        if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
+        {
+            auto src_ss = sockaddr_storage{};
+            auto src_sslen = socklen_t{ sizeof(src_ss) };
+            if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
+            {
+                if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
+                {
+                    evutil_closesocket(sock);
+                    errno = save;
+                    return addrport->first;
+                }
+            }
+        }
+
+        evutil_closesocket(sock);
+    }
+
+    errno = save;
+    return {};
 }
 
 // ---
