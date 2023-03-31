@@ -60,7 +60,7 @@ export const Formatter = {
   },
 
   countString(msgid, msgid_plural, n) {
-    return `${this.number(n)} ${this.ngettext(msgid, msgid_plural, n)}`;
+    return `${this.number(n)}\u00A0${this.ngettext(msgid, msgid_plural, n)}`;
   },
 
   // Formats a memory size into a human-readable string
@@ -77,7 +77,7 @@ export const Formatter = {
     let size = bytes;
     for (const nf of mem_formatters) {
       if (size < kilo) {
-        return nf.format(size);
+        return nf.format(size).replaceAll('', '\u00A0');
       }
       size /= kilo;
     }
@@ -126,7 +126,7 @@ export const Formatter = {
   },
 
   speedBps(Bps) {
-    return this.speed(this.toKBps(Bps));
+    return this.speed(this.toKBps(Bps)).replaceAll(' ', '\u00A0');
   },
 
   stringSanitizer(str) {
