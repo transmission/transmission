@@ -1136,6 +1136,7 @@ void MainWindow::refreshPref(int key)
     auto b = bool{};
     auto i = int{};
     auto str = QString{};
+    auto ba = QByteArray{};
 
     switch (key)
     {
@@ -1219,6 +1220,13 @@ void MainWindow::refreshPref(int key)
     case Prefs::COMPACT_COLUMNS:
         str = prefs_.getString(Prefs::COMPACT_COLUMNS);
         ui_.tableView->setColumns(str);
+        break;
+
+    case Prefs::COMPACT_COLUMNS_STATE:
+        str = prefs_.getString(Prefs::COMPACT_COLUMNS_STATE);
+        ba = QByteArray::fromBase64(prefs_.getString(Prefs::COMPACT_COLUMNS_STATE).toUtf8());
+        ui_.tableView->setColumns(str);
+        ui_.tableView->setColumnsState(ba);
         break;
 
     case Prefs::COMPACT_VIEW:

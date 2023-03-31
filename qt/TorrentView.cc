@@ -127,15 +127,6 @@ void TorrentView::resizeEvent(QResizeEvent* event)
 
         setColumnWidth(0, actual_width - style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
     }
-    else
-    {
-        resizeColumnsToContents();
-
-        // if the main window is wider than the sum of column widths after calling resizeColumnsToContents() then there will
-        // unused whitespace at the end...this somehow fixes that...
-        horizontalHeader()->setStretchLastSection(false);
-        horizontalHeader()->setStretchLastSection(true);
-    }
 
     resizeRowsToContents();
 }
@@ -153,9 +144,12 @@ void TorrentView::setCompactView(bool active)
     if (active)
     {
         horizontalHeader()->show();
+        horizontalHeader()->restoreState(column_state_);
     }
     else
     {
+        column_state_ = horizontalHeader()->saveState();
+
         horizontalHeader()->hide();
 
         for (int i = 1; i < model()->columnCount(); i++)
@@ -186,9 +180,16 @@ void TorrentView::setColumns(QString const& columns)
         {
             columns[i] == QStringLiteral("1") ? showColumn(i) : hideColumn(i);
         }
-    }
 
-    resizeColumnsToContents();
+        column_state_ = horizontalHeader()->saveState();
+        prefs_->set(Prefs::COMPACT_COLUMNS_STATE, column_state_.toBase64());
+    }
+}
+
+void TorrentView::setColumnsState(QByteArray const& columns_state)
+{
+    column_state_ = columns_state;
+    horizontalHeader()->restoreState(columns_state);
 }
 
 // applying a change made via clicking on the little arrow in a column header to the state in View > Sort by X

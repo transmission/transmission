@@ -74,6 +74,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { SORT_MODE, TR_KEY_sort_mode, CustomVariantType::SortModeType },
     { SORT_REVERSED, TR_KEY_sort_reversed, QMetaType::Bool },
     { COMPACT_COLUMNS, TR_KEY_compact_columns, QMetaType::QString },
+    { COMPACT_COLUMNS_STATE, TR_KEY_compact_columns_state, QMetaType::QString },
     { COMPACT_VIEW, TR_KEY_compact_view, QMetaType::Bool },
     { FILTERBAR, TR_KEY_show_filterbar, QMetaType::Bool },
     { STATUSBAR, TR_KEY_show_statusbar, QMetaType::Bool },
@@ -441,6 +442,7 @@ void Prefs::initDefaults(tr_variant* d) const
     tr_variantDictReserve(d, 39);
     dictAdd(d, TR_KEY_blocklist_updates_enabled, true);
     dictAdd(d, TR_KEY_compact_columns, compact_columns);
+    dictAdd(d, TR_KEY_compact_columns_state, std::string_view{});
     dictAdd(d, TR_KEY_compact_view, false);
     dictAdd(d, TR_KEY_inhibit_desktop_hibernation, false);
     dictAdd(d, TR_KEY_prompt_before_exit, true);
