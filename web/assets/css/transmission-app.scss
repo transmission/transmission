@@ -1022,6 +1022,23 @@ $video-image: '../img/film.svg';
   }
 }
 
+.tabs-button {
+  background-color: var(--color-bg-even);
+  border: 0.5rem solid transparent;
+  font-size: 1rem;
+  height: 2rem;
+  margin: 0;
+  min-width: 5rem;
+  padding: 0.1875rem 0.5rem;
+
+  &:active,
+  &:checked,
+  &.selected {
+    background-color: var(--color-bg-tabs);
+    font-weight: 500;
+  }
+}
+
 .tabs-pages {
   border-top: 0.0625rem solid var(--color-default-border);
   box-sizing: border-box;
