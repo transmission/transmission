@@ -520,7 +520,7 @@ std::optional<tr_address> tr_global_ip_cache::ipv6_global_address()
     // Pick some destination address to pretend to send a packet to
     /* static auto constexpr DstIPv4 = "91.121.74.28"sv; */
     static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    /*auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6); */
+    /* auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6); */
     auto const dst_addr = tr_address::from_string(DstIPv6);
     auto const dst_port = tr_port::fromHost(6969);
 
