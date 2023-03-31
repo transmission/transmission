@@ -221,12 +221,37 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
             }
 
         case Qt::DecorationRole:
-            if (index.column() == COL_NAME)
+            switch (index.column())
             {
+            case COL_NAME:
                 return t->getMimeTypeIcon();
-            }
-            else
-            {
+
+            case COL_STATUS:
+                if (t->isDownloading() || t->isWaitingToDownload())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("go-down"));
+                }
+                else if (t->isSeeding() || t->isWaitingToSeed())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("go-up"));
+                }
+                else if (t->isPaused())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("media-playback-pause"));
+                }
+                else if (t->isFinished())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("dialog-ok"));
+                }
+                else if (t->isVerifying() || t->isWaitingToVerify())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("view-refresh"));
+                }
+                else if (t->hasError())
+                {
+                    return IconCache::get().getThemeIcon(QStringLiteral("process-stop"));
+                }
+
                 return QIcon();
             }
 
@@ -234,7 +259,7 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
             return QVariant::fromValue(t);
 
         case Qt::TextAlignmentRole:
-            if (index.column() == COL_NAME || index.column() == COL_PATH)
+            if (index.column() == COL_NAME || index.column() == COL_STATUS || index.column() == COL_PATH)
             {
                 return { Qt::AlignLeading | Qt::AlignVCenter };
             }
