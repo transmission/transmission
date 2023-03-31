@@ -431,10 +431,10 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
     if (type == TR_AF_INET6)
     {
         // if user provided an address, use it.
-        // otherwise, if we can determine which one to use via tr_globalIPv6 magic, use it.
+        // otherwise, if we can determine which one to use via globalIPv6 magic, use it.
         // otherwise, use any_ipv6 (::).
         static auto constexpr AnyAddr = tr_address::any_ipv6();
-        auto const default_addr = tr_globalIPv6().value_or(AnyAddr);
+        auto const default_addr = global_ip_cache_->globalIPv6().value_or(AnyAddr);
         auto addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
         return { addr, addr == AnyAddr };
     }
@@ -1315,6 +1315,9 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     openFiles().closeAll();
     tr_utpClose(this);
     this->udp_core_.reset();
+
+    // Global IP cache needs to wait until all UDP announces are sent
+    global_ip_cache_.reset();
 
     // tada we are done!
     closed_promise->set_value();

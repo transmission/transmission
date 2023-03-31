@@ -1119,6 +1119,9 @@ private:
     DhtMediator dht_mediator_{ *this };
 
 public:
+    // depends-on: timer_maker_
+    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
+
     // depends-on: announcer_udp_mediator_
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 

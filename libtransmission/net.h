@@ -423,7 +423,7 @@ public:
 
 private:
     // Only to be called by timer
-    void update_ipv4_addr(std::size_t* d = new std::size_t{ 0 }) noexcept;
+    void update_ipv4_addr(std::size_t* d = nullptr) noexcept;
     void update_ipv6_addr() noexcept;
 
     // Auxiliary functions for update_ipv*_addr()
