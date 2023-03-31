@@ -40,12 +40,6 @@ public:
     {
         return bar_rect.size();
     }
-
-private:
-    [[nodiscard]] QString elidedText(QFont const& font, QString const& text, int width) const
-    {
-        return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
-    }
 };
 
 ItemLayout::ItemLayout(Qt::LayoutDirection direction, QPoint const& top_left, int width)
@@ -57,20 +51,18 @@ ItemLayout::ItemLayout(Qt::LayoutDirection direction, QPoint const& top_left, in
     bar_style.maximum = 100;
     bar_style.progress = 100;
     bar_style.textVisible = true;
-    QSize const bar_size(
-        bar_style.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
-        bar_style.rect.height());
+    QSize const bar_size(bar_style.rect.width(), bar_style.rect.height());
 
     QRect base_rect(top_left, QSize(width, bar_size.height()));
 
-    bar_rect = QStyle::alignedRect(direction, Qt::AlignTrailing | Qt::AlignVCenter, bar_size, base_rect);
+    bar_rect = QStyle::alignedRect(direction, Qt::AlignCenter, bar_size, base_rect);
     Utils::narrowRect(base_rect, GUI_PAD, bar_rect.width() + GUI_PAD, direction);
     Utils::narrowRect(base_rect, 0, GUI_PAD, direction);
 }
 
 } // namespace
 
-QSize ProgressbarDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
+QSize ProgressbarDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& /*tor*/) const
 {
     auto const m = margin(*QApplication::style());
     auto const layout = ItemLayout(option.direction, QPoint(0, 0), option.rect.width() - m.width() * 2);
