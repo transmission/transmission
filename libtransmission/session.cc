@@ -1320,9 +1320,6 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     tr_utpClose(this);
     this->udp_core_.reset();
 
-    // Now that udp_core_ is gone, we can safely destroy global_ip_cache_
-    global_ip_cache_.reset();
-
     // tada we are done!
     closed_promise->set_value();
 }

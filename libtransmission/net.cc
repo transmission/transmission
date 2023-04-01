@@ -434,14 +434,14 @@ tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
 
 tr_global_ip_cache::~tr_global_ip_cache()
 {
+    // Wait until all updates are done
+    std::unique_lock lock{ is_updating_mutex_ };
+    is_updating_cv_.wait(lock, [this]() { return is_updating_ == 0U; });
+
     // Destroying std::shared_mutex while someone owns it is undefined behaviour
-    std::lock(ipv4_mutex_, ipv6_mutex_, is_updating_mutex_);
+    std::lock(ipv4_mutex_, ipv6_mutex_);
     std::lock_guard const ipv4_lock{ ipv4_mutex_, std::adopt_lock };
     std::lock_guard const ipv6_lock{ ipv6_mutex_, std::adopt_lock };
-    std::unique_lock lock{ is_updating_mutex_, std::adopt_lock };
-
-    // Wait until all updates are done
-    is_updating_cv_.wait(lock, [this]() { return is_updating_ == 0U; });
 }
 
 std::optional<tr_address> const& tr_global_ip_cache::globalIPv4() noexcept
@@ -464,15 +464,16 @@ void tr_global_ip_cache::stop_update()
 
 void tr_global_ip_cache::update_ipv4_addr(std::size_t* d) noexcept
 {
-    std::unique_lock lock{ is_updating_mutex_ };
-    ++is_updating_;
-    lock.unlock();
-    is_updating_cv_.notify_one();
-
     if (d == nullptr)
     {
+        std::unique_lock lock{ is_updating_mutex_ };
+        ++is_updating_;
+        lock.unlock();
+        is_updating_cv_.notify_one();
+
         d = new std::size_t{ 0 };
     }
+
     auto options = tr_web::FetchOptions{ IPv4QueryServices[*d],
                                          [this](tr_web::FetchResponse const& response) { this->onIPv4Response(response); },
                                          d };
