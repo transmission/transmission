@@ -408,9 +408,11 @@ class tr_global_ip_cache
 {
 public:
     explicit tr_global_ip_cache(tr_session* session_in);
-
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache(tr_global_ip_cache&&) = delete;
+    tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
+    tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
+    ~tr_global_ip_cache() = default;
 
     [[nodiscard]] const std::optional<tr_address>& globalIPv4() const noexcept
     {
@@ -434,8 +436,12 @@ private:
 
     tr_session* const session_;
     std::optional<tr_address> ipv4_addr_, ipv6_addr_;
+    // Keep timers at the bottom of the class definition so that they will be destructed first
     std::unique_ptr<libtransmission::Timer> ipv4_upkeep_timer_, ipv6_upkeep_timer_;
     static auto constexpr UpkeepInterval = 30min;
     static auto constexpr RetryUpkeepInterval = 30s;
-    static auto constexpr IpQueryServices = std::array<char const*, 1>{ "https://icanhazip.com" };
+    static auto constexpr IPv4QueryServices = std::array<char const*, 4>{ "https://icanhazip.com",
+                                                                          "https://ifconfig.me/ip",
+                                                                          "https://api.ipify.org",
+                                                                          "https://ipecho.net/plain" };
 };

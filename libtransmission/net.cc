@@ -437,7 +437,7 @@ void tr_global_ip_cache::update_ipv4_addr(std::size_t* d) noexcept
     {
         d = new std::size_t{ 0 };
     }
-    auto options = tr_web::FetchOptions{ IpQueryServices[*d],
+    auto options = tr_web::FetchOptions{ IPv4QueryServices[*d],
                                          [this](tr_web::FetchResponse const& response) { this->onIPv4Response(response); },
                                          d };
     options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
@@ -486,13 +486,13 @@ void tr_global_ip_cache::onIPv4Response(tr_web::FetchResponse const& response)
             ipv4_upkeep_timer_->setInterval(UpkeepInterval);
             tr_logAddInfo(fmt::format(
                 _("Successfully updated global IPv4 address: {url} (HTTP {status})"),
-                fmt::arg("url", IpQueryServices[*d]),
+                fmt::arg("url", IPv4QueryServices[*d]),
                 fmt::arg("status", response.status)));
         }
     }
 
     // Try next IP query URL
-    if (!success && ++(*d) < std::size(IpQueryServices))
+    if (!success && ++(*d) < std::size(IPv4QueryServices))
     {
         update_ipv4_addr(d);
         return;
@@ -502,7 +502,7 @@ void tr_global_ip_cache::onIPv4Response(tr_web::FetchResponse const& response)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't update global IPv4 address: {url} (HTTP {status})"),
-            fmt::arg("url", IpQueryServices[*d]),
+            fmt::arg("url", IPv4QueryServices[*d]),
             fmt::arg("status", response.status)));
         ipv4_addr_.reset();
         ipv4_upkeep_timer_->setInterval(RetryUpkeepInterval);
