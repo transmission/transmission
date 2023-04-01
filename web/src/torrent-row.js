@@ -219,7 +219,7 @@ export class TorrentRendererFull {
     // name
     let e = root._name_container;
     setTextContent(e, t.getName());
-    e.classList.toggle('paused', is_stopped);
+    root.classList.toggle('paused', is_stopped);
 
     // labels
     e = root._labels_container;
