@@ -405,6 +405,7 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
 
+/// Cache global IP addresses
 class tr_global_ip_cache
 {
 public:
@@ -413,11 +414,13 @@ public:
     tr_global_ip_cache(tr_global_ip_cache&&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
-    ~tr_global_ip_cache() = default;
+    ~tr_global_ip_cache();
 
     [[nodiscard]] std::optional<tr_address> const& globalIPv4() noexcept;
 
     [[nodiscard]] std::optional<tr_address> const& globalIPv6() noexcept;
+
+    void stop_update();
 
 private:
     // Only to be called by timer
@@ -430,8 +433,8 @@ private:
     [[nodiscard]] static std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port);
 
     tr_session* const session_;
-    std::optional<tr_address> ipv4_addr_, ipv6_addr_;
     std::shared_mutex ipv4_mutex_, ipv6_mutex_;
+    std::optional<tr_address> ipv4_addr_, ipv6_addr_;
     // Keep timers at the bottom of the class definition so that they will be destructed first
     std::unique_ptr<libtransmission::Timer> ipv4_upkeep_timer_, ipv6_upkeep_timer_;
     static auto constexpr UpkeepInterval = 30min;

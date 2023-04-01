@@ -1108,7 +1108,7 @@ private:
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
-    // depends-on: timer_maker_, tr_web
+    // depends-on: timer_maker_, web_
     std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
 
 public:

@@ -187,7 +187,7 @@ using GlobalIPTest = SessionTest;
 
 TEST_F(GlobalIPTest, globalIPv4)
 {
-    auto const cache = tr_global_ip_cache{ session_ };
+    auto cache = tr_global_ip_cache{ session_ };
     std::optional<tr_address> addr;
     auto const test = [&cache, &addr]() -> bool
     {
@@ -207,7 +207,7 @@ TEST_F(GlobalIPTest, globalIPv4)
 
 TEST_F(GlobalIPTest, globalIPv6)
 {
-    auto const cache = tr_global_ip_cache{ session_ };
+    auto cache = tr_global_ip_cache{ session_ };
     std::optional<tr_address> addr;
     auto const test = [&cache, &addr]() -> bool
     {

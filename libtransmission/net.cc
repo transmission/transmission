@@ -431,6 +431,14 @@ tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
     ipv6_upkeep_timer_->startRepeating(UpkeepInterval);
 }
 
+tr_global_ip_cache::~tr_global_ip_cache()
+{
+    // Destroying std::shared_mutex while someone owns it is undefined behaviour
+    std::lock(ipv4_mutex_, ipv6_mutex_);
+    std::lock_guard const lock1{ ipv4_mutex_, std::adopt_lock };
+    std::lock_guard const lock2{ ipv6_mutex_, std::adopt_lock };
+}
+
 std::optional<tr_address> const& tr_global_ip_cache::globalIPv4() noexcept
 {
     std::shared_lock const lock{ ipv4_mutex_ };
@@ -441,6 +449,12 @@ std::optional<tr_address> const& tr_global_ip_cache::globalIPv6() noexcept
 {
     std::shared_lock const lock{ ipv6_mutex_ };
     return ipv6_addr_;
+}
+
+void tr_global_ip_cache::stop_update()
+{
+    ipv4_upkeep_timer_->stop();
+    ipv6_upkeep_timer_->start();
 }
 
 void tr_global_ip_cache::update_ipv4_addr(std::size_t* d) noexcept
