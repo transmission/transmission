@@ -47,17 +47,13 @@ public:
             return std::find(items, items + item_count, item) != items + item_count;
         };
 
-        for (auto const& [lpos, litem] : items_) std::cerr << "[pos " << lpos << " item " << litem << ']'; std::cerr << std::endl;
         for (size_t i = 0, end = std::size(items_); i != end; ++i)
         {
             if (auto const& [pos, item] = items_[i]; do_move(item) && pos > 0U)
             {
-                std::cerr << "due to " << item << " swapping " << items_[i-1U].second << " and " << items_[i].second << std::endl;
                 std::swap(items_[i-1U].second, items_[i].second);
-                for (auto const& [lpos, litem] : items_) std::cerr << "[pos " << lpos << " item " << litem << ']'; std::cerr << std::endl;
             }
         }
-        for (auto const& [lpos, litem] : items_) std::cerr << "[pos " << lpos << " item " << litem << ']'; std::cerr << std::endl;
     }
 
     void move_down(Item const* items, size_t item_count);
