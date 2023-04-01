@@ -13,6 +13,7 @@
 #include <chrono>
 #include <cstddef> // size_t
 #include <optional>
+#include <shared_mutex>
 #include <string>
 #include <string_view>
 #include <utility> // std::pair
@@ -414,15 +415,9 @@ public:
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
     ~tr_global_ip_cache() = default;
 
-    [[nodiscard]] const std::optional<tr_address>& globalIPv4() const noexcept
-    {
-        return ipv4_addr_;
-    }
+    [[nodiscard]] std::optional<tr_address> const& globalIPv4() noexcept;
 
-    [[nodiscard]] const std::optional<tr_address>& globalIPv6() const noexcept
-    {
-        return ipv6_addr_;
-    }
+    [[nodiscard]] std::optional<tr_address> const& globalIPv6() noexcept;
 
 private:
     // Only to be called by timer
@@ -436,6 +431,7 @@ private:
 
     tr_session* const session_;
     std::optional<tr_address> ipv4_addr_, ipv6_addr_;
+    std::shared_mutex ipv4_mutex_, ipv6_mutex_;
     // Keep timers at the bottom of the class definition so that they will be destructed first
     std::unique_ptr<libtransmission::Timer> ipv4_upkeep_timer_, ipv6_upkeep_timer_;
     static auto constexpr UpkeepInterval = 30min;

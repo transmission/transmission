@@ -431,6 +431,18 @@ tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
     ipv6_upkeep_timer_->startRepeating(UpkeepInterval);
 }
 
+std::optional<tr_address> const& tr_global_ip_cache::globalIPv4() noexcept
+{
+    std::shared_lock const lock{ ipv4_mutex_ };
+    return ipv4_addr_;
+}
+
+std::optional<tr_address> const& tr_global_ip_cache::globalIPv6() noexcept
+{
+    std::shared_lock const lock{ ipv6_mutex_ };
+    return ipv6_addr_;
+}
+
 void tr_global_ip_cache::update_ipv4_addr(std::size_t* d) noexcept
 {
     if (d == nullptr)
@@ -448,7 +460,9 @@ void tr_global_ip_cache::update_ipv4_addr(std::size_t* d) noexcept
 
 void tr_global_ip_cache::update_ipv6_addr() noexcept
 {
+    std::unique_lock lock{ ipv6_mutex_ };
     ipv6_addr_ = ipv6_global_address();
+    lock.unlock();
     if (ipv6_addr_)
     {
         ipv6_upkeep_timer_->setInterval(UpkeepInterval);
@@ -481,7 +495,9 @@ void tr_global_ip_cache::onIPv4Response(tr_web::FetchResponse const& response)
         // Update member
         if (auto addr = tr_address::from_string(ip); addr && addr->is_global_unicast_address() && addr->is_ipv4())
         {
+            std::unique_lock lock{ ipv4_mutex_ };
             ipv4_addr_ = addr;
+            lock.unlock();
             success = true;
             ipv4_upkeep_timer_->setInterval(UpkeepInterval);
             tr_logAddInfo(fmt::format(
@@ -504,7 +520,9 @@ void tr_global_ip_cache::onIPv4Response(tr_web::FetchResponse const& response)
             _("Couldn't update global IPv4 address: {url} (HTTP {status})"),
             fmt::arg("url", IPv4QueryServices[*d]),
             fmt::arg("status", response.status)));
+        std::unique_lock lock{ ipv4_mutex_ };
         ipv4_addr_.reset();
+        lock.unlock();
         ipv4_upkeep_timer_->setInterval(RetryUpkeepInterval);
     }
 
