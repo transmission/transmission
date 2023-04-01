@@ -253,6 +253,9 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
                 }
 
                 return QIcon();
+
+            default:
+                return QIcon();
             }
 
         case TorrentRole:
