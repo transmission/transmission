@@ -62,7 +62,7 @@ using tr_socket_t = int;
 #include "timer.h"
 #include "web.h"
 
-using namespace std::literals::chrono_literals;
+using namespace std::literals;
 
 /**
  * Literally just a port number.
@@ -440,8 +440,8 @@ private:
     std::unique_ptr<libtransmission::Timer> ipv4_upkeep_timer_, ipv6_upkeep_timer_;
     static auto constexpr UpkeepInterval = 30min;
     static auto constexpr RetryUpkeepInterval = 30s;
-    static auto constexpr IPv4QueryServices = std::array<char const*, 4>{ "https://icanhazip.com",
-                                                                          "https://ifconfig.me/ip",
-                                                                          "https://api.ipify.org",
-                                                                          "https://ipecho.net/plain" };
+    static auto constexpr IPv4QueryServices = std::array<std::string_view, 4>{ "https://icanhazip.com"sv,
+                                                                               "https://ifconfig.me/ip"sv,
+                                                                               "https://api.ipify.org"sv,
+                                                                               "https://ipecho.net/plain"sv };
 };
