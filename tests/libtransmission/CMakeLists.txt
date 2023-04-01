@@ -24,6 +24,7 @@ target_sources(libtransmission-test
         getopt-test.cc
         handshake-test.cc
         history-test.cc
+        item-queue-test.cc
         json-test.cc
         lpd-test.cc
         magnet-metainfo-test.cc

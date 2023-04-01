@@ -57,6 +57,8 @@ target_sources(${TR_NAME}
         history.h
         inout.cc
         inout.h
+        item-queue.cc
+        item-queue.h
         log.cc
         log.h
         lru-cache.h
