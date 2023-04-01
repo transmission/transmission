@@ -17,6 +17,20 @@
 using ItemQueueTest = ::testing::Test;
 using libtransmission::ItemQueue;
 
+namespace
+{
+template<typename Type>
+[[nodiscard]] auto toString(std::vector<Type> const& items)
+{
+    auto out = std::ostringstream{};
+    for (auto const& item : items)
+    {
+        out << '[' << item << ']';
+    }
+    return out.str();
+}
+} // namespace
+
 TEST_F(ItemQueueTest, construct)
 {
     auto items = ItemQueue<size_t>{};
@@ -151,23 +165,6 @@ TEST_F(ItemQueueTest, pop)
     popped = items.pop();
     EXPECT_FALSE(popped.has_value());
 }
-
-namespace
-{
-
-template<typename Type>
-[[nodiscard]] auto toString(std::vector<Type> const& items)
-{
-    auto out = std::ostringstream{};
-    for (auto const& item : items)
-    {
-        out << '[' << item << ']';
-    }
-    return out.str();
-}
-
-} // namespace
-
 
 TEST_F(ItemQueueTest, moveUp)
 {
