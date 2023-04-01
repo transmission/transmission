@@ -249,8 +249,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     }
     else if (
         addrport && addrport->first.is_global_unicast_address() &&
-        ((to->sa_family == AF_INET && !session_.global_ip_cache_->globalIPv4()) ||
-         (to->sa_family == AF_INET6 && !session_.global_ip_cache_->globalIPv6())))
+        ((to->sa_family == AF_INET && !session_.globalIPv4()) || (to->sa_family == AF_INET6 && !session_.globalIPv6())))
     {
         // don't try to connect to a global address if we don't have a global address
         return;

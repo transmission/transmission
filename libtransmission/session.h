@@ -778,6 +778,16 @@ public:
         bool is_any_addr;
     };
 
+    [[nodiscard]] auto globalIPv4() const noexcept
+    {
+        return global_ip_cache_->globalIPv4();
+    }
+
+    [[nodiscard]] auto globalIPv6() const noexcept
+    {
+        return global_ip_cache_->globalIPv6();
+    }
+
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
@@ -1066,6 +1076,9 @@ private:
     // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_
     std::optional<BoundSocket> bound_ipv6_;
 
+    // depends-on: timer_maker_
+    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
+
 public:
     // depends-on: settings_, announcer_udp_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
@@ -1119,9 +1132,6 @@ private:
     DhtMediator dht_mediator_{ *this };
 
 public:
-    // depends-on: timer_maker_
-    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
-
     // depends-on: announcer_udp_mediator_
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
