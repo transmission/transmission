@@ -1076,7 +1076,7 @@ private:
     // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_
     std::optional<BoundSocket> bound_ipv6_;
 
-    // depends-on: timer_maker_
+    // depends-on: timer_maker_, tr_web
     std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
 
 public:
