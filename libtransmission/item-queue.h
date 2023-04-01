@@ -44,11 +44,7 @@ public:
 
         auto const do_move = [items, item_count](auto const& item)
         {
-            auto const begin = items;
-            auto const end = items + item_count;
-            auto const found = std::find(begin, end, item) != end;
-            std::cerr << "item [" << item << "] found " << found << std::endl;
-            return found;
+            return std::find(items, items + item_count, item) != items + item_count;
         };
 
         for (auto const& [lpos, litem] : items_) std::cerr << "[pos " << lpos << " item " << litem << ']'; std::cerr << std::endl;
