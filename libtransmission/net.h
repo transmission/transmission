@@ -10,6 +10,8 @@
 
 #include <algorithm> // for std::copy_n
 #include <array>
+#include <atomic>
+#include <condition_variable>
 #include <chrono>
 #include <cstddef> // size_t
 #include <optional>
@@ -433,10 +435,17 @@ private:
     [[nodiscard]] static std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port);
 
     tr_session* const session_;
+
+    std::atomic_uint_least8_t is_updating_;
+    std::mutex is_updating_mutex_;
+    std::condition_variable is_updating_cv_;
+
     std::shared_mutex ipv4_mutex_, ipv6_mutex_;
     std::optional<tr_address> ipv4_addr_, ipv6_addr_;
+
     // Keep timers at the bottom of the class definition so that they will be destructed first
     std::unique_ptr<libtransmission::Timer> ipv4_upkeep_timer_, ipv6_upkeep_timer_;
+
     static auto constexpr UpkeepInterval = 30min;
     static auto constexpr RetryUpkeepInterval = 30s;
     static auto constexpr IPv4QueryServices = std::array<std::string_view, 4>{ "https://icanhazip.com"sv,
