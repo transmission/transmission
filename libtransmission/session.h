@@ -1076,11 +1076,8 @@ private:
     // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_
     std::optional<BoundSocket> bound_ipv6_;
 
-    // depends-on: timer_maker_, tr_web
-    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
-
 public:
-    // depends-on: settings_, announcer_udp_
+    // depends-on: settings_, announcer_udp_, global_ip_cache_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
     std::unique_ptr<tr_udp_core> udp_core_;
 
@@ -1110,6 +1107,9 @@ private:
     // depends-on: settings_, session_thread_, torrents_
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
+
+    // depends-on: timer_maker_, tr_web
+    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
 
 public:
     // depends-on: settings_, open_files_, torrents_
