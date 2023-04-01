@@ -187,11 +187,10 @@ using GlobalIPTest = SessionTest;
 
 TEST_F(GlobalIPTest, globalIPv4)
 {
-    auto cache = tr_global_ip_cache{ session_ };
     std::optional<tr_address> addr;
-    auto const test = [&cache, &addr]() -> bool
+    auto const test = [this, &addr]() -> bool
     {
-        addr = cache.globalIPv4();
+        addr = session_->globalIPv4();
         return addr && addr->is_ipv4() && addr->is_global_unicast_address();
     };
     (void)waitFor(test, 5000);
@@ -207,11 +206,10 @@ TEST_F(GlobalIPTest, globalIPv4)
 
 TEST_F(GlobalIPTest, globalIPv6)
 {
-    auto cache = tr_global_ip_cache{ session_ };
     std::optional<tr_address> addr;
-    auto const test = [&cache, &addr]() -> bool
+    auto const test = [this, &addr]() -> bool
     {
-        addr = cache.globalIPv6();
+        addr = session_->globalIPv6();
         return addr && addr->is_ipv6() && addr->is_global_unicast_address();
     };
     // Timeout shorter than IPv4 because there is no need to query external endpoints

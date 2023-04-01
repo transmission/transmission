@@ -407,49 +407,85 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
 
-/// Cache global IP addresses
+/* Cache global IP addresses */
 class tr_global_ip_cache
 {
-public:
+protected:
     explicit tr_global_ip_cache(tr_session* session_in);
+    ~tr_global_ip_cache();
+
+public:
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache(tr_global_ip_cache&&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
-    ~tr_global_ip_cache();
 
-    [[nodiscard]] std::optional<tr_address> const& globalIPv4() noexcept;
+    [[nodiscard]] std::optional<tr_address> const& global_addr() noexcept;
 
-    [[nodiscard]] std::optional<tr_address> const& globalIPv6() noexcept;
+    void start_timer() noexcept;
+    void stop_timer() noexcept;
 
-    void stop_update();
+protected:
+    void update_start() noexcept;
+    void update_end() noexcept;
+
+    void set_addr(std::optional<tr_address> const& addr) noexcept;
+    void unset_addr() noexcept;
+
+    tr_session* const session_;
+
+    std::atomic_bool is_updating_;
+    std::mutex is_updating_mutex_;
+    std::condition_variable is_updating_cv_;
+
+    std::shared_mutex addr_mutex_;
+    std::optional<tr_address> addr_;
+
+    // Keep timers at the bottom of the class definition so that they will be destructed first
+    std::unique_ptr<libtransmission::Timer> upkeep_timer_;
+
+    static auto constexpr UpkeepInterval = 30min;
+    static auto constexpr RetryUpkeepInterval = 30s;
+};
+
+class tr_global_ipv4_cache : public tr_global_ip_cache
+{
+public:
+    explicit tr_global_ipv4_cache(tr_session* session_in);
+    tr_global_ipv4_cache(tr_global_ipv4_cache const&) = delete;
+    tr_global_ipv4_cache(tr_global_ipv4_cache&&) = delete;
+    tr_global_ipv4_cache& operator=(tr_global_ipv4_cache const&) = delete;
+    tr_global_ipv4_cache& operator=(tr_global_ipv4_cache&&) = delete;
+    ~tr_global_ipv4_cache() = default;
 
 private:
     // Only to be called by timer
     void update_ipv4_addr(std::size_t* d = nullptr) noexcept;
-    void update_ipv6_addr() noexcept;
 
-    // Auxiliary functions for update_ipv*_addr()
+    // Auxiliary functions for update_ipv4_addr()
     void onIPv4Response(tr_web::FetchResponse const& response);
-    [[nodiscard]] static std::optional<tr_address> ipv6_global_address();
-    [[nodiscard]] static std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port);
 
-    tr_session* const session_;
-
-    std::atomic_uint_least8_t is_updating_;
-    std::mutex is_updating_mutex_;
-    std::condition_variable is_updating_cv_;
-
-    std::shared_mutex ipv4_mutex_, ipv6_mutex_;
-    std::optional<tr_address> ipv4_addr_, ipv6_addr_;
-
-    // Keep timers at the bottom of the class definition so that they will be destructed first
-    std::unique_ptr<libtransmission::Timer> ipv4_upkeep_timer_, ipv6_upkeep_timer_;
-
-    static auto constexpr UpkeepInterval = 30min;
-    static auto constexpr RetryUpkeepInterval = 30s;
     static auto constexpr IPv4QueryServices = std::array<std::string_view, 4>{ "https://icanhazip.com"sv,
                                                                                "https://ifconfig.me/ip"sv,
                                                                                "https://api.ipify.org"sv,
                                                                                "https://ipecho.net/plain"sv };
+};
+
+class tr_global_ipv6_cache : public tr_global_ip_cache
+{
+public:
+    explicit tr_global_ipv6_cache(tr_session* session_in);
+    tr_global_ipv6_cache(tr_global_ipv6_cache const&) = delete;
+    tr_global_ipv6_cache(tr_global_ipv6_cache&&) = delete;
+    tr_global_ipv6_cache& operator=(tr_global_ipv6_cache const&) = delete;
+    tr_global_ipv6_cache& operator=(tr_global_ipv6_cache&&) = delete;
+    ~tr_global_ipv6_cache() = default;
+
+private:
+    // Only to be called by timer
+    void update_ipv6_addr() noexcept;
+
+    // Auxiliary functions for update_ipv6_addr()
+    [[nodiscard]] static std::optional<tr_address> ipv6_global_address();
+    [[nodiscard]] static std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port);
 };

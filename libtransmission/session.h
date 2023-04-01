@@ -780,12 +780,12 @@ public:
 
     [[nodiscard]] auto globalIPv4() const noexcept
     {
-        return global_ip_cache_->globalIPv4();
+        return global_ipv4_cache_->global_addr();
     }
 
     [[nodiscard]] auto globalIPv6() const noexcept
     {
-        return global_ip_cache_->globalIPv6();
+        return global_ipv6_cache_->global_addr();
     }
 
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
@@ -1077,7 +1077,7 @@ private:
     std::optional<BoundSocket> bound_ipv6_;
 
 public:
-    // depends-on: settings_, announcer_udp_, global_ip_cache_
+    // depends-on: settings_, announcer_udp_, global_ipv6_cache_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
     std::unique_ptr<tr_udp_core> udp_core_;
 
@@ -1104,12 +1104,15 @@ private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
-    // depends-on: settings_, session_thread_, torrents_
+    // depends-on: timer_maker_
+    std::unique_ptr<tr_global_ipv6_cache> global_ipv6_cache_ = std::make_unique<tr_global_ipv6_cache>(this);
+
+    // depends-on: settings_, session_thread_, torrents_, global_ipv6_cache_
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
     // depends-on: timer_maker_, web_
-    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
+    std::unique_ptr<tr_global_ipv4_cache> global_ipv4_cache_ = std::make_unique<tr_global_ipv4_cache>(this);
 
 public:
     // depends-on: settings_, open_files_, torrents_

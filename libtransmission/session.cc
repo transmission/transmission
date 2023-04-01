@@ -1283,10 +1283,10 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // Tell the announcer to start shutdown, which sends out the stop
     // events and stops scraping.
     this->announcer_->startShutdown();
-    // ...since global_ip_cache_ relies on web_ to update IPv4, we tell
+    // ...since global_ipv4_cache_ relies on web_ to update IPv4, we tell
     // it to stop updating before web_ starts to refuse new requests.
     // But we keep it intact for now, so that udp_core_ can continue.
-    this->global_ip_cache_->stop_update();
+    this->global_ipv4_cache_->stop_timer();
     // ...and now that those are done, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
