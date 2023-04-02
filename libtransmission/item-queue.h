@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <cstddef> // for size_t
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <map>
@@ -39,21 +40,26 @@ public:
 
     void move_top(Item const* top_items, size_t n_top_items)
     {
-        auto const n_all_items = std::size(items_);
+        return move_top([&top_items, &n_top_items](auto const& test){ return contains(top_items, n_top_items, test); });
+    }
+
+    void move_top(std::function<bool(Item const&)>&& test)
+    {
+        auto const n_items = std::size(items_);
         auto moved = decltype(items_){};
-        moved.resize(n_all_items);
-        for (size_t i = 0, end = n_all_items; i != end; ++i)
+        moved.resize(n_items);
+        for (size_t i = 0, end = n_items; i != end; ++i)
         {
             moved[i].first = items_[i].first;
         }
 
-        auto const hits = std::count_if(std::begin(items_), std::end(items_), [&top_items, &n_top_items](auto const& item){ return contains(top_items, n_top_items, item.second); });
+        auto const hits = std::count_if(std::begin(items_), std::end(items_), [&test](auto const& pair){ return test(pair.second); });
 
         auto hit_count = size_t{};
         auto miss_count = size_t{};
-        for (size_t i = 0, end = n_all_items; i != end; ++i)
+        for (size_t i = 0, end = n_items; i != end; ++i)
         {
-            if (contains(top_items, n_top_items, items_[i].second))
+            if (test(items_[i].second))
             {
                 moved[hit_count++].second = std::move(items_[i].second);
             }
@@ -65,6 +71,7 @@ public:
 
         std::swap(items_, moved);
     }
+
 
     void move_up(Item const* items, size_t n_items)
     {
