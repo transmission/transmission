@@ -460,7 +460,7 @@ public:
     ~tr_global_ipv4_cache() = default;
 
 private:
-    // Only to be called by timer
+    // Only to be called by timer or the constructor
     void update_ipv4_addr() noexcept;
 
     // Auxiliary functions for update_ipv4_addr()
@@ -485,7 +485,7 @@ public:
     ~tr_global_ipv6_cache() = default;
 
 private:
-    // Only to be called by timer
+    // Only to be called by timer or the constructor
     void update_ipv6_addr() noexcept;
 
     // Auxiliary functions for update_ipv6_addr()
