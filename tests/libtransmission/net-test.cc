@@ -233,4 +233,46 @@ TEST_F(GlobalIPTest, globalIPv6)
         << "globalIPv6 returned a non-global IPv6 address (" << addr->display_name() << ')';
 }
 
+TEST_F(GlobalIPTest, globalSourceIPv4)
+{
+    std::optional<tr_address> addr;
+    auto const test = [this, &addr]() -> bool
+    {
+        addr = session_->globalSourceIPv4();
+        return addr && addr->is_ipv4();
+    };
+    (void)waitFor(test, 1000);
+    if (!addr)
+    {
+        std::cerr << "globalSourceIPv4 did not return an address, either:" << std::endl
+                  << "1. globalSourceIPv4 is broken" << std::endl
+                  << "2. Your system does not support IPv4" << std::endl
+                  << "3. You don't have IPv4 connectivity to public internet" << std::endl;
+        SUCCEED();
+        return;
+    }
+    ASSERT_TRUE(addr->is_ipv4()) << "globalSourceIPv4 returned a non-IPv4 address (" << addr->display_name() << ')';
+}
+
+TEST_F(GlobalIPTest, globalSourceIPv6)
+{
+    std::optional<tr_address> addr;
+    auto const test = [this, &addr]() -> bool
+    {
+        addr = session_->globalSourceIPv6();
+        return addr && addr->is_ipv6();
+    };
+    (void)waitFor(test, 1000);
+    if (!addr)
+    {
+        std::cerr << "globalSourceIPv6 did not return an address, either:" << std::endl
+                  << "1. globalSourceIPv6 is broken" << std::endl
+                  << "2. Your system does not support IPv6" << std::endl
+                  << "3. You don't have IPv6 connectivity to public internet" << std::endl;
+        SUCCEED();
+        return;
+    }
+    ASSERT_TRUE(addr->is_ipv6()) << "globalSourceIPv6 returned a non-IPv6 address (" << addr->display_name() << ')';
+}
+
 } // namespace libtransmission::test

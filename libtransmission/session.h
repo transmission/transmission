@@ -788,6 +788,16 @@ public:
         return global_ipv6_cache_->global_addr();
     }
 
+    [[nodiscard]] auto globalSourceIPv4() const noexcept
+    {
+        return global_ipv4_cache_->global_source_addr();
+    }
+
+    [[nodiscard]] auto globalSourceIPv6() const noexcept
+    {
+        return global_ipv6_cache_->global_source_addr();
+    }
+
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept

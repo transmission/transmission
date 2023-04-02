@@ -408,7 +408,20 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
 
-/* Cache global IP addresses */
+/**
+ * Cache global IP addresses.
+ *
+ * This class caches 2 IP addresses:
+ * 1. Source address used for global connections
+ * 2. Global address
+ *
+ * The idea is, if this class successfully cached a source address, that means
+ * you have connectivity to the public internet. And if the global address is
+ * the same with the source address, then you are not behind an NAT.
+ *
+ * Note: The IPv4 cache can find your global address even if you are behind an
+ * NAT, whilst the IPv6 cache cannot.
+ */
 class tr_global_ip_cache
 {
 protected:
@@ -422,16 +435,22 @@ public:
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
 
     [[nodiscard]] std::optional<tr_address> const& global_addr() noexcept;
+    [[nodiscard]] std::optional<tr_address> const& global_source_addr() noexcept;
 
     void start_timer(std::chrono::milliseconds msec) noexcept;
     void stop_timer() noexcept;
 
 protected:
-    void update_start() noexcept;
-    void update_end() noexcept;
+    void set_is_updating() noexcept;
+    void unset_is_updating() noexcept;
 
-    void set_addr(std::optional<tr_address> const& addr) noexcept;
-    void unset_addr() noexcept;
+    void set_global_addr(std::optional<tr_address> const& addr) noexcept;
+    void unset_global_addr() noexcept;
+    void set_source_addr(std::optional<tr_address> const& addr) noexcept;
+    void unset_source_addr() noexcept;
+
+    [[nodiscard]] static std::optional<tr_address> get_global_source_address(int af);
+    [[nodiscard]] static std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port);
 
     tr_session* const session_;
 
@@ -439,8 +458,8 @@ protected:
     std::mutex is_updating_mutex_;
     std::condition_variable is_updating_cv_;
 
-    std::shared_mutex addr_mutex_;
-    std::optional<tr_address> addr_;
+    std::shared_mutex global_addr_mutex_, source_addr_mutex_;
+    std::optional<tr_address> global_addr_, source_addr_;
 
     // Keep timers at the bottom of the class definition so that they will be destructed first
     std::unique_ptr<libtransmission::Timer> upkeep_timer_;
@@ -464,7 +483,7 @@ private:
     // Only to be called by timer or the constructor
     void update_ipv4_addr() noexcept;
 
-    // Auxiliary functions for update_ipv4_addr()
+    // Callback for querying IP
     void onIPv4Response(tr_web::FetchResponse const& response);
 
     std::atomic_size_t ix_service_;
@@ -488,8 +507,4 @@ public:
 private:
     // Only to be called by timer or the constructor
     void update_ipv6_addr() noexcept;
-
-    // Auxiliary functions for update_ipv6_addr()
-    [[nodiscard]] static std::optional<tr_address> ipv6_global_address();
-    [[nodiscard]] static std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port);
 };
