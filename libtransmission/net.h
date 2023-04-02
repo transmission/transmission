@@ -16,6 +16,7 @@
 #include <cstddef> // size_t
 #include <optional>
 #include <shared_mutex>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <utility> // std::pair
@@ -422,7 +423,7 @@ public:
 
     [[nodiscard]] std::optional<tr_address> const& global_addr() noexcept;
 
-    void start_timer() noexcept;
+    void start_timer(std::chrono::milliseconds msec) noexcept;
     void stop_timer() noexcept;
 
 protected:
@@ -460,10 +461,12 @@ public:
 
 private:
     // Only to be called by timer
-    void update_ipv4_addr(std::size_t* d = nullptr) noexcept;
+    void update_ipv4_addr() noexcept;
 
     // Auxiliary functions for update_ipv4_addr()
     void onIPv4Response(tr_web::FetchResponse const& response);
+
+    std::atomic_size_t ix_service_;
 
     static auto constexpr IPv4QueryServices = std::array<std::string_view, 4>{ "https://icanhazip.com"sv,
                                                                                "https://ifconfig.me/ip"sv,

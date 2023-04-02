@@ -813,9 +813,9 @@ std::optional<tr_address> const& tr_global_ip_cache::global_addr() noexcept
     return addr_;
 }
 
-void tr_global_ip_cache::start_timer() noexcept
+void tr_global_ip_cache::start_timer(std::chrono::milliseconds msec) noexcept
 {
-    upkeep_timer_->start();
+    upkeep_timer_->startRepeating(msec);
 }
 
 void tr_global_ip_cache::stop_timer() noexcept
@@ -825,24 +825,27 @@ void tr_global_ip_cache::stop_timer() noexcept
 
 tr_global_ipv4_cache::tr_global_ipv4_cache(tr_session* const session_in)
     : tr_global_ip_cache{ session_in }
+    , ix_service_{ 0 }
 {
     upkeep_timer_->setCallback([this]() { this->update_ipv4_addr(); });
-    start_timer();
+    start_timer(UpkeepInterval);
     update_ipv4_addr();
 }
 
-void tr_global_ipv4_cache::update_ipv4_addr(std::size_t* d) noexcept
+void tr_global_ipv4_cache::update_ipv4_addr() noexcept
 {
-    if (d == nullptr)
+    if (ix_service_ == 0U)
     {
+        if (is_updating_)
+        {
+            return;
+        }
         update_start();
-
-        d = new std::size_t{ 0 };
     }
 
-    auto options = tr_web::FetchOptions{ IPv4QueryServices[*d],
+    auto options = tr_web::FetchOptions{ IPv4QueryServices[ix_service_],
                                          [this](tr_web::FetchResponse const& response) { this->onIPv4Response(response); },
-                                         d };
+                                         nullptr };
     options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
@@ -851,7 +854,6 @@ void tr_global_ipv4_cache::update_ipv4_addr(std::size_t* d) noexcept
 
 void tr_global_ipv4_cache::onIPv4Response(tr_web::FetchResponse const& response)
 {
-    auto const d = reinterpret_cast<std::size_t*>(response.user_data);
     auto success = bool{ false };
 
     if (response.status == 200 /* HTTP_OK */)
@@ -876,15 +878,15 @@ void tr_global_ipv4_cache::onIPv4Response(tr_web::FetchResponse const& response)
 
             tr_logAddInfo(fmt::format(
                 _("Successfully updated global IPv4 address: {url} (HTTP {status})"),
-                fmt::arg("url", IPv4QueryServices[*d]),
+                fmt::arg("url", IPv4QueryServices[ix_service_]),
                 fmt::arg("status", response.status)));
         }
     }
 
     // Try next IP query URL
-    if (!success && ++(*d) < std::size(IPv4QueryServices))
+    if (!success && ++ix_service_ < std::size(IPv4QueryServices))
     {
-        update_ipv4_addr(d);
+        update_ipv4_addr();
         return;
     }
 
@@ -892,7 +894,7 @@ void tr_global_ipv4_cache::onIPv4Response(tr_web::FetchResponse const& response)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't update global IPv4 address: {url} (HTTP {status})"),
-            fmt::arg("url", IPv4QueryServices[*d]),
+            fmt::arg("url", IPv4QueryServices[ix_service_]),
             fmt::arg("status", response.status)));
 
         unset_addr();
@@ -900,7 +902,7 @@ void tr_global_ipv4_cache::onIPv4Response(tr_web::FetchResponse const& response)
         upkeep_timer_->setInterval(RetryUpkeepInterval);
     }
 
-    delete d;
+    ix_service_ = 0;
     update_end();
 }
 
@@ -908,10 +910,16 @@ tr_global_ipv6_cache::tr_global_ipv6_cache(tr_session* const session_in)
     : tr_global_ip_cache{ session_in }
 {
     upkeep_timer_->setCallback([this]() { this->update_ipv6_addr(); });
+    start_timer(UpkeepInterval);
+    update_ipv6_addr();
 }
 
 void tr_global_ipv6_cache::update_ipv6_addr() noexcept
 {
+    if (is_updating_)
+    {
+        return;
+    }
     update_start();
 
     set_addr(ipv6_global_address());
