@@ -280,7 +280,8 @@ void TorrentView::onPrefChanged(int key)
             break;
 
         case SortMode::SORT_BY_ACTIVITY:
-            sortByColumn(TorrentModel::COL_STATUS, reversed);
+            sortByColumn(TorrentModel::COL_ACTIVITY, reversed);
+            break;
 
         case SortMode::SORT_BY_STATE:
             sortByColumn(TorrentModel::COL_STATUS, reversed);
