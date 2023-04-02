@@ -773,7 +773,7 @@ tr_global_ip_cache::~tr_global_ip_cache()
 {
     // Wait until all updates are done
     std::unique_lock lock{ is_updating_mutex_ };
-    is_updating_cv_.wait(lock, [this]() { return !is_updating_; });
+    is_updating_cv_.wait_for(lock, 5s, [this]() { return !is_updating_; });
 
     // Destroying std::shared_mutex while someone owns it is undefined behaviour
     std::lock_guard const ip_lock{ addr_mutex_ };
