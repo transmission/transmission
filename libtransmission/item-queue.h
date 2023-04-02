@@ -139,16 +139,10 @@ private:
 
         auto hit_count = size_t{};
         auto miss_count = size_t{};
-        for (size_t i = 0, end = n_items; i != end; ++i)
+        for (auto& [pos, item] : items_)
         {
-            if (test(items_[i].second))
-            {
-                moved[hit_count++].second = std::move(items_[i].second);
-            }
-            else
-            {
-                moved[hits + miss_count++].second = std::move(items_[i].second);
-            }
+            auto const idx = test(item) ? hit_count++ : hits + miss_count++;
+            moved[idx].second = std::move(item);
         }
 
         std::swap(items_, moved);
