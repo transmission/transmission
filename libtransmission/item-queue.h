@@ -13,11 +13,9 @@
 #include <cstddef> // for size_t
 #include <functional>
 #include <iostream>
-#include <iterator>
-#include <map>
 #include <optional>
-#include <set>
 #include <sstream>
+#include <utility> // for std::pair<>
 #include <vector>
 
 #include "tr-macros.h" // for TR_CONSTEXPR20
