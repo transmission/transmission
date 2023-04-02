@@ -12,9 +12,7 @@
 #include <algorithm>
 #include <cstddef> // for size_t
 #include <functional>
-#include <iostream>
 #include <optional>
-#include <sstream>
 #include <utility> // for std::pair<>
 #include <vector>
 
@@ -59,9 +57,9 @@ public:
 
     void move_down(Item const* items, size_t n_items)
     {
-        for (size_t i = std::size(items_), end = 0U; i != end; --i)
+        for (size_t begin = std::size(items_), i = begin, end = 0U; i != end; --i)
         {
-            if (auto const& [pos, item] = items_[i-1U]; contains(items, n_items, item) && i + 1 < std::size(items_))
+            if (auto const& [pos, item] = items_[i-1U]; contains(items, n_items, item) && i + 1 < begin)
             {
                 std::swap(items_[i-1U].second, items_[i].second);
             }
