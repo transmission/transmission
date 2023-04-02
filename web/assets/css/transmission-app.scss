@@ -548,7 +548,7 @@ $video-image: '../img/film.svg';
 
       &.compact {
         flex: 1;
-        font-size: x-small;
+        font-size: small;
       }
     }
 
@@ -697,7 +697,7 @@ $video-image: '../img/film.svg';
     }
 
     &.compact {
-      min-width: 50px;
+      min-width: 250px;
       width: 10vw;
     }
 
