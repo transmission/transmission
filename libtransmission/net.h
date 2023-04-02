@@ -445,6 +445,7 @@ protected:
     // Keep timers at the bottom of the class definition so that they will be destructed first
     std::unique_ptr<libtransmission::Timer> upkeep_timer_;
 
+public:
     static auto constexpr UpkeepInterval = 30min;
     static auto constexpr RetryUpkeepInterval = 30s;
 };
