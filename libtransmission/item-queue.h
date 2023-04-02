@@ -43,6 +43,11 @@ public:
         return move_top([&top_items, &n_top_items](auto const& test){ return contains(top_items, n_top_items, test); });
     }
 
+    void move_bottom(Item const* top_items, size_t n_top_items)
+    {
+        return move_top([&top_items, &n_top_items](auto const& test){ return !contains(top_items, n_top_items, test); });
+    }
+
     void move_top(std::function<bool(Item const&)>&& test)
     {
         auto const n_items = std::size(items_);
@@ -94,8 +99,6 @@ public:
             }
         }
     }
-
-    void move_bottom(Item const* items, size_t item_count);
 
     void erase(Item const& item)
     {
