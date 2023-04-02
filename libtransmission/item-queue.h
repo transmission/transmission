@@ -37,7 +37,30 @@ public:
         return std::empty(items_);
     }
 
-    void move_top(Item const* items, size_t item_count);
+    void move_top(Item const* items, size_t n_items)
+    {
+        auto moved = decltype(items_){};
+        moved.reserve(std::size(items_));
+
+        for (size_t i = 0, end = std::size(items_); i != end; ++i)
+        {
+            if (contains(items, n_items, items_[i].second))
+            {
+                moved.emplace_back(items_[std::size(moved)].first, std::move(items_[i].second));
+                items_[i].second = {};
+            }
+        }
+
+        for (size_t i = 0, end = std::size(items_); i != end; ++i)
+        {
+            if (items_[i].second != Item{})
+            {
+                moved.emplace_back(items_[std::size(moved)].first, std::move(items_[i].second));
+            }
+        }
+
+        std::swap(items_, moved);
+    }
 
     void move_up(Item const* items, size_t n_items)
     {
