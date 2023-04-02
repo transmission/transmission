@@ -458,10 +458,14 @@ protected:
     std::mutex is_updating_mutex_;
     std::condition_variable is_updating_cv_;
 
+    // Never directly read/write IP addresses for the sake of being thread safe
+    // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
     std::shared_mutex global_addr_mutex_, source_addr_mutex_;
     std::optional<tr_address> global_addr_, source_addr_;
 
-    // Keep timers at the bottom of the class definition so that they will be destructed first
+    // Keep the timer at the bottom of the class definition so that it will be destructed first
+    // We don't want it to trigger after the IP addresses have been destroyed
+    // (The destructor will acquire the IP address locks before proceeding, but still)
     std::unique_ptr<libtransmission::Timer> upkeep_timer_;
 
 public:
