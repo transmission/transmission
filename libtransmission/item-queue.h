@@ -39,24 +39,27 @@ public:
 
     void move_top(Item const* items, size_t item_count);
 
-    void move_up(Item const* items, size_t item_count)
+    void move_up(Item const* items, size_t n_items)
     {
-
-        auto const do_move = [items, item_count](auto const& item)
-        {
-            return std::find(items, items + item_count, item) != items + item_count;
-        };
-
         for (size_t i = 0, end = std::size(items_); i != end; ++i)
         {
-            if (auto const& [pos, item] = items_[i]; do_move(item) && pos > 0U)
+            if (auto const& [pos, item] = items_[i]; contains(items, n_items, item) && i > 0U)
             {
                 std::swap(items_[i-1U].second, items_[i].second);
             }
         }
     }
 
-    void move_down(Item const* items, size_t item_count);
+    void move_down(Item const* items, size_t n_items)
+    {
+        for (size_t i = std::size(items_), end = 0U; i != end; --i)
+        {
+            if (auto const& [pos, item] = items_[i-1U]; contains(items, n_items, item) && i + 1 < std::size(items_))
+            {
+                std::swap(items_[i-1U].second, items_[i].second);
+            }
+        }
+    }
 
     void move_bottom(Item const* items, size_t item_count);
 
@@ -135,6 +138,11 @@ private:
             return a.first < b.first;
         }
     };
+
+    [[nodiscard]] bool contains(Item const* items, size_t n_items, Item const& needle)
+    {
+        return std::find(items, items + n_items, needle) != items + n_items;
+    }
 };
 
 } // namespace libtransmission
