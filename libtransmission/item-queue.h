@@ -48,7 +48,13 @@ public:
 
     void move_up(Item const* items, size_t n_items)
     {
-        return move_up([&items, &n_items](auto const& item){ return contains(items, n_items, item); });
+        for (size_t i = 0, end = std::size(items_); i != end; ++i)
+        {
+            if (auto const& [pos, item] = items_[i]; contains(items, n_items, item) && i > 0U)
+            {
+                std::swap(items_[i-1U].second, items_[i].second);
+            }
+        }
     }
 
     void move_down(Item const* items, size_t n_items)
@@ -113,17 +119,6 @@ public:
 private:
     using PairType = std::pair<size_t /*pos*/, Item>;
     std::vector<PairType> items_;
-
-    void move_up(std::function<bool(Item const&)>&& test)
-    {
-        for (size_t i = 0, end = std::size(items_); i != end; ++i)
-        {
-            if (auto const& [pos, item] = items_[i]; test(item) && i > 0U)
-            {
-                std::swap(items_[i-1U].second, items_[i].second);
-            }
-        }
-    }
 
     void move_top(std::function<bool(Item const&)>&& test)
     {
