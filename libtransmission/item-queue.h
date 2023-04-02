@@ -37,25 +37,29 @@ public:
         return std::empty(items_);
     }
 
-    void move_top(Item const* items, size_t n_items)
+    void move_top(Item const* top_items, size_t n_top_items)
     {
+        auto const n_all_items = std::size(items_);
         auto moved = decltype(items_){};
-        moved.reserve(std::size(items_));
-
-        for (size_t i = 0, end = std::size(items_); i != end; ++i)
+        moved.resize(n_all_items);
+        for (size_t i = 0, end = n_all_items; i != end; ++i)
         {
-            if (contains(items, n_items, items_[i].second))
-            {
-                moved.emplace_back(items_[std::size(moved)].first, std::move(items_[i].second));
-                items_[i].second = {};
-            }
+            moved[i].first = items_[i].first;
         }
 
-        for (size_t i = 0, end = std::size(items_); i != end; ++i)
+        auto const hits = std::count_if(std::begin(items_), std::end(items_), [&top_items, &n_top_items](auto const& item){ return contains(top_items, n_top_items, item.second); });
+
+        auto hit_count = size_t{};
+        auto miss_count = size_t{};
+        for (size_t i = 0, end = n_all_items; i != end; ++i)
         {
-            if (items_[i].second != Item{})
+            if (contains(top_items, n_top_items, items_[i].second))
             {
-                moved.emplace_back(items_[std::size(moved)].first, std::move(items_[i].second));
+                moved[hit_count++].second = std::move(items_[i].second);
+            }
+            else
+            {
+                moved[hits + miss_count++].second = std::move(items_[i].second);
             }
         }
 
@@ -162,7 +166,7 @@ private:
         }
     };
 
-    [[nodiscard]] bool contains(Item const* items, size_t n_items, Item const& needle)
+    [[nodiscard]] static bool contains(Item const* items, size_t n_items, Item const& needle)
     {
         return std::find(items, items + n_items, needle) != items + n_items;
     }
