@@ -540,6 +540,21 @@ public:
 
     ///
 
+    [[nodiscard]] auto is_queued() const noexcept
+    {
+        return session->torrent_queue().position(this).has_value();
+    }
+
+    [[nodiscard]] auto queue_position() const noexcept
+    {
+        return session->torrent_queue().position(this).value_or(0);
+    }
+
+    void set_queue_position(size_t pos)
+    {
+        session->torrent_queue().set_position(this, pos);
+    }
+
     [[nodiscard]] constexpr auto queueDirection() const noexcept
     {
         return this->isDone() ? TR_UP : TR_DOWN;
@@ -637,7 +652,7 @@ public:
             return is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
         }
 
-        if (this->session->torrent_queue().position(this).has_value())
+        if (this->is_queued())
         {
             if (is_seed && this->session->queueEnabled(TR_UP))
             {
@@ -784,26 +799,6 @@ public:
     {
         markEdited();
         session->announcer_->resetTorrent(this);
-    }
-
-    [[nodiscard]] size_t queue_position() const
-    {
-        if (auto const pos = session->torrent_queue().position(this); pos)
-        {
-            return *pos;
-        }
-
-        return {};
-    }
-
-    void set_queue_position(size_t pos)
-    {
-        session->torrent_queue().set_position(this, pos);
-    }
-
-    [[nodiscard]] auto is_queued() const noexcept
-    {
-        return session->torrent_queue().position(this).has_value();
     }
 
     tr_torrent_metainfo metainfo_;
