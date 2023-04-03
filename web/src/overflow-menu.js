@@ -282,27 +282,27 @@ export class OverflowMenu extends EventTarget {
     div.append(label);
     div.append(check);
 
-    section = make_section('speed', 'Speed Limit');
+    section = make_section('speed-limit', 'Speed Limit');
     root.append(section);
 
     options = document.createElement('div');
-    options.id = 'speed-options';
+    options.id = 'speed-limit-options';
     section.append(options);
 
     // speed up
 
     div = document.createElement('div');
-    div.classList.add('speed-up');
+    div.classList.add('speed-limit-up');
     options.append(div);
 
     label = document.createElement('label');
-    label.id = 'speed-up-label';
+    label.id = 'speed-limit-up-label';
     label.textContent = 'Upload:';
     div.append(label);
 
     const unlimited = 'Unlimited';
     select = document.createElement('select');
-    select.id = 'speed-up-select';
+    select.id = 'speed-limit-up-select';
     div.append(select);
 
     const speeds = [
@@ -348,16 +348,16 @@ export class OverflowMenu extends EventTarget {
     // speed down
 
     div = document.createElement('div');
-    div.classList.add('speed-down');
+    div.classList.add('speed-limit-down');
     options.append(div);
 
     label = document.createElement('label');
-    label.id = 'speed-down-label';
+    label.id = 'speed-limit-down-label';
     label.textContent = 'Download:';
     div.append(label);
 
     select = document.createElement('select');
-    select.id = 'speed-down-select';
+    select.id = 'speed-limit-down-select';
     div.append(select);
 
     for (const speed of [
@@ -392,11 +392,11 @@ export class OverflowMenu extends EventTarget {
     // alt speed
 
     div = document.createElement('div');
-    div.classList.add('alt-speed');
+    div.classList.add('alt-speed-limit');
     options.append(div);
 
     check = document.createElement('input');
-    check.id = 'alt-speed-check';
+    check.id = 'alt-speed-limit-check';
     check.type = 'checkbox';
     check.classList.add('switch');
     check.checked = session_properties[RPC._TurtleState];
@@ -407,7 +407,7 @@ export class OverflowMenu extends EventTarget {
     });
 
     label = document.createElement('label');
-    label.id = 'alt-speed-label';
+    label.id = 'alt-speed-limit-label';
     label.setAttribute('for', check.id);
     const up = Formatter.speed(session_properties[RPC._TurtleUpSpeedLimit]);
     const dn = Formatter.speed(session_properties[RPC._TurtleDownSpeedLimit]);
