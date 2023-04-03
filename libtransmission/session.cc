@@ -1985,34 +1985,26 @@ bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
     return session->rpc_server_->isAntiBruteForceEnabled();
 }
 
-std::vector<tr_torrent*> tr_session::getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const
+std::vector<tr_torrent*> tr_session::getNextQueuedTorrents(tr_direction const dir, size_t const num_wanted) const
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    // build an array of the candidates
-    auto candidates = std::vector<tr_torrent*>{};
-    candidates.reserve(std::size(torrents()));
-    for (auto* const tor : torrents())
+    auto torrents = std::vector<tr_torrent*>{};
+    torrents.reserve(std::max(num_wanted, std::size(torrent_queue_)));
+    for (auto* const tor : torrent_queue_.queue())
     {
-        if (tor->isQueued() && (dir == tor->queueDirection()))
+        if (dir == tor->queueDirection())
         {
-            candidates.push_back(tor);
+            torrents.emplace_back(const_cast<tr_torrent*>(tor));
+
+            if (std::size(torrents) >= num_wanted)
+            {
+                break;
+            }
         }
     }
 
-    // find the best n candidates
-    num_wanted = std::min(num_wanted, std::size(candidates));
-    if (num_wanted < candidates.size())
-    {
-        std::partial_sort(
-            std::begin(candidates),
-            std::begin(candidates) + num_wanted,
-            std::end(candidates),
-            [](auto const* a, auto const* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
-        candidates.resize(num_wanted);
-    }
-
-    return candidates;
+    return torrents;
 }
 
 size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept

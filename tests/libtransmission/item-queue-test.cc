@@ -36,7 +36,7 @@ template<typename Type>
     auto item_queue = ItemQueue<Type>{};
     for (size_t pos = {}, size = std::size(args); pos != size; ++pos)
     {
-        item_queue.set(args[pos], pos);
+        item_queue.set_position(args[pos], pos);
     }
     EXPECT_EQ(std::size(args), std::size(item_queue));
     EXPECT_EQ(std::empty(args), std::empty(item_queue));
@@ -117,7 +117,7 @@ TEST_F(ItemQueueTest, getPosition)
 
     for (size_t idx = {}, size = std::size(Keys); idx != size; ++idx)
     {
-        auto const pos = items.get_position(Keys[idx]);
+        auto const pos = items.position(Keys[idx]);
         EXPECT_TRUE(pos.has_value());
         EXPECT_EQ(idx, *pos);
     }
@@ -162,8 +162,8 @@ TEST_F(ItemQueueTest, setInReverseOrder)
     static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
 
     auto items = ItemQueue<Type>{};
-    items.set(Keys[0], 1U);
-    items.set(Keys[1], 0U);
+    items.set_position(Keys[0], 1U);
+    items.set_position(Keys[1], 0U);
     EXPECT_EQ(2U, std::size(items));
     EXPECT_FALSE(std::empty(items));
 
@@ -177,7 +177,7 @@ TEST_F(ItemQueueTest, setReplacesPreviousPosition)
     static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
     auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
 
-    items.set(Keys[0], 2U);
+    items.set_position(Keys[0], 2U);
     EXPECT_EQ(2U, std::size(items));
 
     auto const expected = std::vector<Type>{ std::crbegin(Keys), std::crend(Keys) };
@@ -193,19 +193,19 @@ TEST_F(ItemQueueTest, setDuplicatePosition)
     // setup: get the info about the pos we're going to duplicate
     static auto constexpr NewKey = "gronk"sv;
     static auto constexpr KeysIndex = 1U;
-    auto const initial_pos = items.get_position(initial_keys[KeysIndex]);
+    auto const initial_pos = items.position(initial_keys[KeysIndex]);
     EXPECT_TRUE(initial_pos.has_value());
 
     // set a new item at a duplicate position
-    items.set(NewKey, *initial_pos);
-    auto const new_key_pos = items.get_position(NewKey);
+    items.set_position(NewKey, *initial_pos);
+    auto const new_key_pos = items.position(NewKey);
 
     // confirm new item has correct position
     EXPECT_TRUE(new_key_pos.has_value());
     EXPECT_EQ(*initial_pos, *new_key_pos);
 
     // confirm old item got bumped down
-    auto const old_key_pos = items.get_position(initial_keys[KeysIndex]);
+    auto const old_key_pos = items.position(initial_keys[KeysIndex]);
     EXPECT_TRUE(old_key_pos.has_value());
     EXPECT_EQ(*initial_pos + 1, *old_key_pos);
 

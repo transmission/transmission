@@ -34,6 +34,7 @@
 #include "bitfield.h"
 #include "cache.h"
 #include "interned-string.h"
+#include "item-queue.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
 #include "port-forwarding.h"
@@ -863,6 +864,16 @@ public:
         }
     }
 
+    [[nodiscard]] constexpr auto const& torrent_queue() const noexcept
+    {
+        return torrent_queue_;
+    }
+
+    [[nodiscard]] constexpr auto& torrent_queue() noexcept
+    {
+        return torrent_queue_;
+    }
+
 private:
     constexpr bool& scriptEnabledFlag(TrScript i)
     {
@@ -1099,6 +1110,8 @@ public:
 private:
     // depends-on: open_files_
     tr_torrents torrents_;
+
+    libtransmission::ItemQueue<tr_torrent const*> torrent_queue_;
 
     // depends-on: settings_, session_thread_, torrents_
     WebMediator web_mediator_{ this };

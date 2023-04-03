@@ -199,9 +199,9 @@ char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_variant
 
 struct CompareTorrentByQueuePosition
 {
-    constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const
+    bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
-        return a->queuePosition < b->queuePosition;
+        return a->queue_position() < b->queue_position();
     }
 };
 
@@ -241,7 +241,7 @@ char const* torrentStop(tr_session* session, tr_variant* args_in, tr_variant* /*
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (tor->isRunning || tor->isQueued() || tor->verifyState() != TR_VERIFY_NONE)
+        if (tor->isRunning || tor->is_queued() || tor->verifyState() != TR_VERIFY_NONE)
         {
             tor->isStopping = true;
             session->rpcNotify(TR_RPC_TORRENT_STOPPED, tor);
@@ -1268,7 +1268,7 @@ char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))
         {
-            tr_torrentSetQueuePosition(tor, static_cast<size_t>(tmp));
+            tor->set_queue_position(static_cast<size_t>(tmp));
         }
 
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_trackerAdd, &tmp_variant))

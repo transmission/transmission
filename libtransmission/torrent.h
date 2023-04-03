@@ -540,11 +540,6 @@ public:
 
     ///
 
-    [[nodiscard]] constexpr auto isQueued() const noexcept
-    {
-        return this->is_queued;
-    }
-
     [[nodiscard]] constexpr auto queueDirection() const noexcept
     {
         return this->isDone() ? TR_UP : TR_DOWN;
@@ -623,7 +618,7 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto activity() const noexcept
+    [[nodiscard]] auto activity() const noexcept
     {
         bool const is_seed = this->isDone();
 
@@ -642,7 +637,7 @@ public:
             return is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
         }
 
-        if (this->isQueued())
+        if (this->session->torrent_queue().position(this).has_value())
         {
             if (is_seed && this->session->queueEnabled(TR_UP))
             {
@@ -791,6 +786,26 @@ public:
         session->announcer_->resetTorrent(this);
     }
 
+    [[nodiscard]] size_t queue_position() const
+    {
+        if (auto const pos = session->torrent_queue().position(this); pos)
+        {
+            return *pos;
+        }
+
+        return {};
+    }
+
+    void set_queue_position(size_t pos)
+    {
+        session->torrent_queue().set_position(this, pos);
+    }
+
+    [[nodiscard]] auto is_queued() const noexcept
+    {
+        return session->torrent_queue().position(this).has_value();
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -870,8 +885,6 @@ public:
 
     tr_bytes_per_second_t etaSpeed_Bps = 0;
 
-    size_t queuePosition = 0;
-
     tr_torrent_id_t unique_id_ = 0;
 
     tr_completeness completeness = TR_LEECH;
@@ -889,7 +902,6 @@ public:
 
     bool isDeleting = false;
     bool isDirty = false;
-    bool is_queued = false;
     bool isRunning = false;
     bool isStopping = false;
 

@@ -46,16 +46,6 @@ public:
         return ret;
     }
 
-    [[nodiscard]] std::optional<size_t> get_position(Item const& item) const
-    {
-        if (auto iter = find(item); iter != std::cend(items_))
-        {
-            return iter - std::begin(items_);
-        }
-
-        return {};
-    }
-
     [[nodiscard]] std::optional<Item> pop()
     {
         if (std::empty(items_))
@@ -68,7 +58,17 @@ public:
         return item;
     }
 
-    void set(Item item, size_t pos)
+    [[nodiscard]] std::optional<size_t> position(Item const& item) const
+    {
+        if (auto iter = find(item); iter != std::cend(items_))
+        {
+            return iter - std::begin(items_);
+        }
+
+        return {};
+    }
+
+    void set_position(Item item, size_t pos)
     {
         erase(item);
 
@@ -91,12 +91,23 @@ public:
         }
     }
 
-    void erase(Item const& item)
+    void append(Item item)
+    {
+        erase(item);
+
+        auto const pos = std::empty(items_) ? size_t{} : items_.back().first + 1U;
+        items_.emplace_back(pos, std::move(item));
+    }
+
+    size_t erase(Item const& item)
     {
         if (auto old_iter = find(item); old_iter != std::cend(items_))
         {
             items_.erase(old_iter);
+            return 1U;
         }
+
+        return {};
     }
 
     void move_top(Item const* items, size_t n_items)
