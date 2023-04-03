@@ -35,6 +35,70 @@ public:
         return std::empty(items_);
     }
 
+    [[nodiscard]] std::vector<Item> queue() const
+    {
+        auto ret = std::vector<Item>{};
+        ret.reserve(size());
+        for (auto const& [pos, item] : items_)
+        {
+            ret.emplace_back(item);
+        }
+        return ret;
+    }
+
+    [[nodiscard]] std::optional<size_t> get_position(Item const& item) const
+    {
+        if (auto iter = find(item); iter != std::cend(items_))
+        {
+            return iter - std::begin(items_);
+        }
+
+        return {};
+    }
+
+    [[nodiscard]] std::optional<Item> pop()
+    {
+        if (std::empty(items_))
+        {
+            return {};
+        }
+
+        auto item = std::move(items_.at(0).second);
+        items_.erase(std::begin(items_));
+        return item;
+    }
+
+    void set(Item item, size_t pos)
+    {
+        erase(item);
+
+        auto iter = items_.emplace(
+            std::lower_bound(std::cbegin(items_), std::cend(items_), pos, CompareByPos{}),
+            pos,
+            std::move(item));
+
+        for (auto const end = std::cend(items_);;) // fix any pos collisions
+        {
+            auto const next = std::next(iter);
+
+            if (next == end || iter->first != next->first)
+            {
+                break;
+            }
+
+            ++next->first;
+            iter = next;
+        }
+    }
+
+    void erase(Item const& item)
+    {
+        if (auto old_iter = find(item); old_iter != std::cend(items_))
+        {
+            items_.erase(old_iter);
+        }
+    }
+
     void move_top(Item const* items, size_t n_items)
     {
         return move_top([&items, &n_items](auto const& test) { return contains(items, n_items, test); });
@@ -65,70 +129,6 @@ public:
                 std::swap(items_[i - 1U].second, items_[i].second);
             }
         }
-    }
-
-    void erase(Item const& item)
-    {
-        if (auto old_iter = find(item); old_iter != std::cend(items_))
-        {
-            items_.erase(old_iter);
-        }
-    }
-
-    void set(Item item, size_t pos)
-    {
-        erase(item);
-
-        auto iter = items_.emplace(
-            std::lower_bound(std::cbegin(items_), std::cend(items_), pos, CompareByPos{}),
-            pos,
-            std::move(item));
-
-        for (auto const end = std::cend(items_);;) // fix any pos collisions
-        {
-            auto const next = std::next(iter);
-
-            if (next == end || iter->first != next->first)
-            {
-                break;
-            }
-
-            ++next->first;
-            iter = next;
-        }
-    }
-
-    [[nodiscard]] std::optional<size_t> get_position(Item const& item) const
-    {
-        if (auto iter = find(item); iter != std::cend(items_))
-        {
-            return iter - std::begin(items_);
-        }
-
-        return {};
-    }
-
-    [[nodiscard]] std::optional<Item> pop()
-    {
-        if (std::empty(items_))
-        {
-            return {};
-        }
-
-        auto item = std::move(items_.at(0).second);
-        items_.erase(std::begin(items_));
-        return item;
-    }
-
-    [[nodiscard]] std::vector<Item> queue() const
-    {
-        auto ret = std::vector<Item>{};
-        ret.reserve(size());
-        for (auto const& [pos, item] : items_)
-        {
-            ret.emplace_back(item);
-        }
-        return ret;
     }
 
 private:
