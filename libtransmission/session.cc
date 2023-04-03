@@ -434,7 +434,7 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
         // otherwise, if we can determine which one to use via globalIPv6 magic, use it.
         // otherwise, use any_ipv6 (::).
         static auto constexpr AnyAddr = tr_address::any_ipv6();
-        auto const default_addr = globalIPv6().value_or(AnyAddr);
+        auto const default_addr = globalIP(type).value_or(AnyAddr);
         auto addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
         return { addr, addr == AnyAddr };
     }

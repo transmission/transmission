@@ -762,9 +762,10 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
     return false;
 }
 
-tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
+tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in, tr_address_type type_in)
     : session_{ session_in }
     , is_updating_{ false }
+    , type{ type_in }
     , upkeep_timer_{ session_in->timerMaker().create() }
 {
 }
@@ -822,26 +823,45 @@ void tr_global_ip_cache::unset_is_updating() noexcept
 
 void tr_global_ip_cache::set_global_addr(std::optional<tr_address> const& addr) noexcept
 {
+    TR_ASSERT(!addr || addr->type == type);
     std::lock_guard const lock{ global_addr_mutex_ };
-    global_addr_ = addr;
+    if (addr)
+    {
+        tr_logAddTrace(fmt::format("Cached global address {}", addr->display_name()));
+    }
+    else
+    {
+        tr_logAddTrace(fmt::format("Unset {} global address cache", type == TR_AF_INET ? "IPv4" : "IPv6"));
+    }
 }
 
 void tr_global_ip_cache::unset_global_addr() noexcept
 {
     std::lock_guard const lock{ global_addr_mutex_ };
     global_addr_.reset();
+    tr_logAddTrace(fmt::format("Unset {} global address cache", type == TR_AF_INET ? "IPv4" : "IPv6"));
 }
 
 void tr_global_ip_cache::set_source_addr(std::optional<tr_address> const& addr) noexcept
 {
+    TR_ASSERT(!addr || addr->type == type);
     std::lock_guard const lock{ source_addr_mutex_ };
     source_addr_ = addr;
+    if (addr)
+    {
+        tr_logAddTrace(fmt::format("Cached source address {}", addr->display_name()));
+    }
+    else
+    {
+        tr_logAddTrace(fmt::format("Unset {} source address cache", type == TR_AF_INET ? "IPv4" : "IPv6"));
+    }
 }
 
 void tr_global_ip_cache::unset_source_addr() noexcept
 {
     std::lock_guard const lock{ source_addr_mutex_ };
     source_addr_.reset();
+    tr_logAddTrace(fmt::format("Unset {} source address cache", type == TR_AF_INET ? "IPv4" : "IPv6"));
 }
 
 // tr_global_ip_cache::get_global_source_address() and tr_global_ipv6_cache::get_source_address
@@ -898,7 +918,7 @@ std::optional<tr_address> tr_global_ip_cache::get_source_address(tr_address cons
             }
         }
 
-        evutil_closesocket(sock);
+        tr_net_close_socket(sock);
     }
 
     errno = save;
@@ -906,7 +926,7 @@ std::optional<tr_address> tr_global_ip_cache::get_source_address(tr_address cons
 }
 
 tr_global_ipv4_cache::tr_global_ipv4_cache(tr_session* const session_in)
-    : tr_global_ip_cache{ session_in }
+    : tr_global_ip_cache{ session_in, TR_AF_INET }
     , ix_service_{ 0 }
 {
     auto const cb = [this]()
@@ -986,7 +1006,7 @@ void tr_global_ipv4_cache::onIPv4Response(tr_web::FetchResponse const& response)
 
     if (!success)
     {
-        tr_logAddDebug(_("Couldn't update global IPv4 address"));
+        tr_logAddDebug("Couldn't obtain global IPv4 address");
         unset_global_addr();
         upkeep_timer_->setInterval(RetryUpkeepInterval);
     }
@@ -996,7 +1016,7 @@ void tr_global_ipv4_cache::onIPv4Response(tr_web::FetchResponse const& response)
 }
 
 tr_global_ipv6_cache::tr_global_ipv6_cache(tr_session* const session_in)
-    : tr_global_ip_cache{ session_in }
+    : tr_global_ip_cache{ session_in, TR_AF_INET6 }
 {
     auto const cb = [this]()
     {
@@ -1030,15 +1050,24 @@ void tr_global_ipv6_cache::update_ipv6_addr() noexcept
         unset_global_addr();
     }
 
-    if (global_addr_)
+    if (source_addr)
     {
         upkeep_timer_->setInterval(UpkeepInterval);
-        tr_logAddInfo(_("Successfully updated global IPv6 address"));
+        tr_logAddInfo(_("Successfully updated source IPv6 address"));
     }
     else
     {
         upkeep_timer_->setInterval(RetryUpkeepInterval);
-        tr_logAddDebug(_("Couldn't update global IPv6 address"));
+        tr_logAddDebug("Couldn't obtain source IPv6 address");
+    }
+
+    if (global_addr_)
+    {
+        tr_logAddInfo(_("Successfully updated global IPv6 address"));
+    }
+    else
+    {
+        tr_logAddDebug("Couldn't obtain global IPv6 address");
     }
 
     unset_is_updating();

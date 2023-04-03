@@ -1004,6 +1004,11 @@ void tr_announcer_impl::onAnnounceDone(
     tier->isAnnouncing = false;
     tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
 
+    if (response.external_ip)
+    {
+        session->globalIP(*response.external_ip);
+    }
+
     if (!response.did_connect)
     {
         on_announce_error(tier, _("Could not connect to tracker"), event);

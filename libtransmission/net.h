@@ -421,11 +421,13 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  *
  * Note: The IPv4 cache can find your global address even if you are behind an
  * NAT, whilst the IPv6 cache cannot.
+ *
+ * Note: This class is an extension of tr_session, so it has no public methods.
  */
 class tr_global_ip_cache
 {
 protected:
-    explicit tr_global_ip_cache(tr_session* session_in);
+    explicit tr_global_ip_cache(tr_session* session_in, tr_address_type type_in);
     ~tr_global_ip_cache();
 
 public:
@@ -434,20 +436,19 @@ public:
     tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
 
+protected:
     [[nodiscard]] std::optional<tr_address> const& global_addr() noexcept;
     [[nodiscard]] std::optional<tr_address> const& global_source_addr() noexcept;
-
-    void start_timer(std::chrono::milliseconds msec) noexcept;
-    void stop_timer() noexcept;
-
-protected:
-    void set_is_updating() noexcept;
-    void unset_is_updating() noexcept;
 
     void set_global_addr(std::optional<tr_address> const& addr) noexcept;
     void unset_global_addr() noexcept;
     void set_source_addr(std::optional<tr_address> const& addr) noexcept;
     void unset_source_addr() noexcept;
+
+    void start_timer(std::chrono::milliseconds msec) noexcept;
+    void stop_timer() noexcept;
+    void set_is_updating() noexcept;
+    void unset_is_updating() noexcept;
 
     [[nodiscard]] static std::optional<tr_address> get_global_source_address(int af);
     [[nodiscard]] static std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port);
@@ -458,6 +459,8 @@ protected:
     std::mutex is_updating_mutex_;
     std::condition_variable is_updating_cv_;
 
+    tr_address_type const type;
+
     // Never directly read/write IP addresses for the sake of being thread safe
     // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
     std::shared_mutex global_addr_mutex_, source_addr_mutex_;
@@ -467,6 +470,8 @@ protected:
     // We don't want it to trigger after the IP addresses have been destroyed
     // (The destructor will acquire the IP address locks before proceeding, but still)
     std::unique_ptr<libtransmission::Timer> upkeep_timer_;
+
+    friend class tr_announcer_impl;
 
 public:
     static auto constexpr UpkeepInterval = 30min;
@@ -496,6 +501,8 @@ private:
                                                                                "https://ifconfig.me/ip"sv,
                                                                                "https://api.ipify.org"sv,
                                                                                "https://ipecho.net/plain"sv };
+
+    friend class tr_session;
 };
 
 class tr_global_ipv6_cache : public tr_global_ip_cache
@@ -511,4 +518,6 @@ public:
 private:
     // Only to be called by timer or the constructor
     void update_ipv6_addr() noexcept;
+
+    friend class tr_session;
 };

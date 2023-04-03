@@ -778,27 +778,67 @@ public:
         bool is_any_addr;
     };
 
-    [[nodiscard]] auto globalIPv4() const noexcept
-    {
-        return global_ipv4_cache_->global_addr();
-    }
-
-    [[nodiscard]] auto globalIPv6() const noexcept
-    {
-        return global_ipv6_cache_->global_addr();
-    }
-
-    [[nodiscard]] auto globalSourceIPv4() const noexcept
-    {
-        return global_ipv4_cache_->global_source_addr();
-    }
-
-    [[nodiscard]] auto globalSourceIPv6() const noexcept
-    {
-        return global_ipv6_cache_->global_source_addr();
-    }
-
     [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
+
+    [[nodiscard]] std::optional<tr_address> globalIP(tr_address_type type) const noexcept
+    {
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        switch (type)
+        {
+        case TR_AF_INET:
+            return global_ipv4_cache_->global_addr();
+        case TR_AF_INET6:
+            return global_ipv6_cache_->global_addr();
+        default:
+            return {};
+        }
+    }
+
+    bool globalIP(tr_address const& addr) const noexcept
+    {
+        TR_ASSERT((addr.is_ipv4() || addr.is_ipv6()) && addr.is_global_unicast_address());
+        switch (addr.type)
+        {
+        case TR_AF_INET:
+            global_ipv4_cache_->set_global_addr(addr);
+            return true;
+        case TR_AF_INET6:
+            global_ipv6_cache_->set_global_addr(addr);
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    [[nodiscard]] std::optional<tr_address> globalSourceIP(tr_address_type type) const noexcept
+    {
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        switch (type)
+        {
+        case TR_AF_INET:
+            return global_ipv4_cache_->global_source_addr();
+        case TR_AF_INET6:
+            return global_ipv6_cache_->global_source_addr();
+        default:
+            return {};
+        }
+    }
+
+    bool globalSourceIP(tr_address const& addr) const noexcept
+    {
+        TR_ASSERT(addr.is_ipv4() || addr.is_ipv6());
+        switch (addr.type)
+        {
+        case TR_AF_INET:
+            global_ipv4_cache_->set_source_addr(addr);
+            return true;
+        case TR_AF_INET6:
+            global_ipv6_cache_->set_source_addr(addr);
+            return true;
+        default:
+            return false;
+        }
+    }
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
     {
@@ -926,7 +966,8 @@ private:
     static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
 
     friend class libtransmission::test::SessionTest;
-    friend struct tr_bindinfo;
+    friend class tr_global_ipv4_cache;
+    friend class tr_global_ipv6_cache;
 
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
