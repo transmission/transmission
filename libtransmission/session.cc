@@ -577,15 +577,15 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 
     tr_timeUpdate(time(nullptr));
 
-    /* initialize the bare skeleton of the session object */
-    auto* const session = new tr_session{ config_dir };
-    bandwidthGroupRead(session, config_dir);
-
     // nice to start logging at the very beginning
     if (auto val = int64_t{}; tr_variantDictFindInt(client_settings, TR_KEY_message_level, &val))
     {
         tr_logSetLevel(static_cast<tr_log_level>(val));
     }
+
+    /* initialize the bare skeleton of the session object */
+    auto* const session = new tr_session{ config_dir };
+    bandwidthGroupRead(session, config_dir);
 
     auto data = tr_session::init_data{};
     data.config_dir = config_dir;
