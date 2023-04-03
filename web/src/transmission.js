@@ -859,9 +859,9 @@ TODO: fix this when notifications get fixed
       checksum,
       version,
     };
-
-    const element = document.querySelector('#toolbar-overflow');
-    element.classList.toggle('alt-speed-enabled', o[RPC._TurtleState]);
+    for (const element of document.querySelectorAll('.speed-labels')) {
+      element.classList.toggle('alt-speed-enabled', o[RPC._TurtleState]);
+    }
   }
 
   _updateStatusbar() {

@@ -349,17 +349,12 @@ input[type='checkbox'] {
       opacity: 0.25;
     }
   }
+}
 
-  > .toolbar-separator {
-    border-left: 0.06251px solid var(--color-default-border);
-    height: 2rem;
-    margin: 0 0.5rem;
-  }
-
-  :nth-last-child(2) {
-    border: 0;
-    flex-grow: 1;
-  }
+.toolbar-separator {
+  border-left: 0.06251px solid var(--color-default-border);
+  height: 2rem;
+  margin: 0 0.5rem;
 }
 
 .toolbar-icon {
@@ -373,18 +368,13 @@ input[type='checkbox'] {
 }
 
 #toolbar-overflow {
-  margin-right: 4px;
+  margin-left: auto;
+  margin-right: 0.25rem;
 
   svg {
     fill: var(--color-fg-primary);
     height: 36px;
     width: 36px;
-  }
-
-  &.alt-speed-enabled {
-    background-image: url($image-alt-speed-enabled);
-    background-position: bottom left;
-    background-size: 20px;
   }
 }
 
@@ -396,36 +386,63 @@ input[type='checkbox'] {
   border-bottom: 0.0625rem solid var(--color-default-border);
   display: flex;
   flex-direction: row;
-  height: 3rem;
+  flex-wrap: wrap;
+  min-height: 3rem;
   width: 100%;
 
+  > * {
+    height: 3rem;
+    margin: 0 0.8rem;
+  }
+}
+
+.filterbar-group {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+
   @include for-phone-only {
-    :not(select):not(input):not(option) {
+    label {
       display: none;
     }
   }
+}
 
-  > * {
-    margin: 0 0.4rem;
+.speed-labels {
+  margin-left: auto;
 
-    &:first-child {
-      margin-left: 0.8rem;
-    }
+  @include for-phone-only {
+    font-size: small;
+  }
 
-    &:last-child {
-      margin-right: 0.8rem;
-    }
+  &.alt-speed-enabled::before {
+    background-image: url($image-alt-speed-enabled);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    content: '';
+    height: 1.2rem;
+    margin-inline: 0.3rem;
+    width: 1.2rem;
   }
 }
 
-#speed-dn-label::before {
-  content: '\25BC';
-  margin-inline: 0.3rem;
+#speed-dn-label {
+  margin-inline: 0.2rem;
+
+  &::before {
+    content: '\25BC';
+    margin-inline: 0.1rem;
+  }
 }
 
-#speed-up-label::before {
-  content: '\25B2';
-  margin-inline: 0.3rem;
+#speed-up-label {
+  margin-inline: 0.2rem;
+
+  &::before {
+    content: '\25B2';
+    margin-inline: 0.1rem;
+  }
 }
 
 /// TORRENT CONTAINER
