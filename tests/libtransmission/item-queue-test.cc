@@ -31,16 +31,24 @@ template<typename Type>
 }
 
 template<typename Type>
+[[nodiscard]] ItemQueue<Type> initialQueue(std::vector<Type> const& args)
+{
+    auto item_queue = ItemQueue<Type>{};
+    for (auto size = std::size(args), pos = 0UL; pos != size; ++pos)
+    {
+        item_queue.set(args[pos], pos);
+    }
+    EXPECT_EQ(std::size(args), std::size(item_queue));
+    EXPECT_EQ(std::empty(args), std::empty(item_queue));
+    return item_queue;
+}
+
+template<typename Type>
 struct MoveTest
 {
-    [[nodiscard]] auto initialQueue() const
+    [[nodiscard]] ItemQueue<Type> initialQueue() const
     {
-        auto items = ItemQueue<Type>{};
-        for (size_t i = 0; i < std::size(initial); ++i)
-        {
-            items.set(initial[i], i);
-        }
-        return items;
+        return ::initialQueue(initial);
     }
 
     std::vector<Type> initial;
@@ -69,13 +77,7 @@ TEST_F(ItemQueueTest, setInOrder)
     using Type = std::string_view;
     static auto constexpr Key1 = "hello"sv;
     static auto constexpr Key2 = "world"sv;
-
-    auto items = ItemQueue<Type>{};
-    items.set(Key1, 0U);
-    items.set(Key2, 1U);
-
-    EXPECT_EQ(2U, std::size(items));
-    EXPECT_FALSE(std::empty(items));
+    auto items = initialQueue<Type>({ Key1, Key2 });
 
     auto const expected_queue = std::vector<Type>{ Key1, Key2 };
     auto const actual_queue = items.queue();
@@ -88,11 +90,8 @@ TEST_F(ItemQueueTest, eraseFront)
     static auto constexpr Key1 = "a"sv;
     static auto constexpr Key2 = "b"sv;
     static auto constexpr Key3 = "c"sv;
+    auto items = initialQueue<Type>({ Key1, Key2, Key3 });
 
-    auto items = ItemQueue<Type>{};
-    items.set(Key1, 0U);
-    items.set(Key2, 1U);
-    items.set(Key3, 2U);
     items.erase(Key1);
     auto expected_queue = std::vector<Type>{ Key2, Key3 };
     auto actual_queue = items.queue();
@@ -105,11 +104,8 @@ TEST_F(ItemQueueTest, eraseMiddle)
     static auto constexpr Key1 = "a"sv;
     static auto constexpr Key2 = "b"sv;
     static auto constexpr Key3 = "c"sv;
+    auto items = initialQueue<Type>({ Key1, Key2, Key3 });
 
-    auto items = ItemQueue<Type>{};
-    items.set(Key1, 0U);
-    items.set(Key2, 1U);
-    items.set(Key3, 2U);
     items.erase(Key2);
     auto expected_queue = std::vector<Type>{ Key1, Key3 };
     auto actual_queue = items.queue();
@@ -122,11 +118,8 @@ TEST_F(ItemQueueTest, eraseBack)
     static auto constexpr Key1 = "a"sv;
     static auto constexpr Key2 = "b"sv;
     static auto constexpr Key3 = "c"sv;
+    auto items = initialQueue<Type>({ Key1, Key2, Key3 });
 
-    auto items = ItemQueue<Type>{};
-    items.set(Key1, 0U);
-    items.set(Key2, 1U);
-    items.set(Key3, 2U);
     items.erase(Key3);
     auto expected_queue = std::vector<Type>{ Key1, Key2 };
     auto actual_queue = items.queue();
@@ -168,15 +161,24 @@ TEST_F(ItemQueueTest, setReplacesPreviousPosition)
     EXPECT_EQ(expected_queue, actual_queue);
 }
 
+TEST_F(ItemQueueTest, setDuplicatePosition)
+{
+    using Type = std::string_view;
+    static auto constexpr Keys = std::array<Type, 3>{ "hello"sv, "there"sv, "world"sv };
+    auto items = initialQueue<Type>({ std::begin(Keys), std::end(Keys) });
+
+    EXPECT_FALSE(std::empty(items));
+    auto expected_queue = std::vector<Type>{ std::begin(Keys), std::end(Keys) };
+    auto actual_queue = items.queue();
+    EXPECT_EQ(expected_queue, actual_queue);
+}
+
 TEST_F(ItemQueueTest, pop)
 {
     using Type = std::string_view;
     static auto constexpr Key1 = "hello"sv;
     static auto constexpr Key2 = "world"sv;
-
-    auto items = ItemQueue<Type>{};
-    items.set(Key1, 0U);
-    items.set(Key2, 1U);
+    auto items = initialQueue<Type>({ Key1, Key2 });
 
     auto popped = items.pop();
     EXPECT_TRUE(popped.has_value());
