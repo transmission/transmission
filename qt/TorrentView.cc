@@ -87,12 +87,16 @@ TorrentView::TorrentView(QWidget* parent)
     horizontalHeader()->setResizeContentsPrecision(0);
 
     connect(horizontalHeader(), &QHeaderView::sortIndicatorChanged, this, &TorrentView::sortChanged);
+
+    window()->installEventFilter(this);
 }
 
 void TorrentView::linkPrefs(Prefs* prefs)
 {
     prefs_ = prefs;
     connect(prefs, &Prefs::changed, this, &TorrentView::onPrefChanged);
+
+    setColumnsState(QByteArray::fromBase64(prefs_->getString(Prefs::COMPACT_COLUMNS_STATE).toUtf8()));
 }
 
 void TorrentView::setHeaderText(QString const& text)
@@ -180,9 +184,6 @@ void TorrentView::setColumns(QString const& columns)
         {
             columns[i] == QStringLiteral("1") ? showColumn(i) : hideColumn(i);
         }
-
-        column_state_ = horizontalHeader()->saveState();
-        prefs_->set(Prefs::COMPACT_COLUMNS_STATE, column_state_.toBase64());
     }
 }
 
@@ -306,4 +307,14 @@ void TorrentView::onPrefChanged(int key)
             break;
         }
     }
+}
+
+bool TorrentView::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == this->window() && event->type() == QEvent::Close)
+    {
+        prefs_->set(Prefs::COMPACT_COLUMNS_STATE, horizontalHeader()->saveState().toBase64());
+    }
+
+    return QAbstractItemView::eventFilter(watched, event);
 }

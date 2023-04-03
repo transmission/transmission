@@ -1224,7 +1224,7 @@ void MainWindow::refreshPref(int key)
 
     case Prefs::COMPACT_COLUMNS_STATE:
         str = prefs_.getString(Prefs::COMPACT_COLUMNS_STATE);
-        ba = QByteArray::fromBase64(prefs_.getString(Prefs::COMPACT_COLUMNS_STATE).toUtf8());
+        ba = QByteArray::fromBase64(str.toUtf8());
         ui_.tableView->setColumns(str);
         ui_.tableView->setColumnsState(ba);
         break;
