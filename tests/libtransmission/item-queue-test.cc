@@ -34,7 +34,7 @@ template<typename Type>
 [[nodiscard]] ItemQueue<Type> initialQueue(std::vector<Type> const& args)
 {
     auto item_queue = ItemQueue<Type>{};
-    for (auto size = std::size(args), pos = 0UL; pos != size; ++pos)
+    for (size_t pos = {}, size = std::size(args); pos != size; ++pos)
     {
         item_queue.set(args[pos], pos);
     }
@@ -107,6 +107,20 @@ TEST_F(ItemQueueTest, setInOrder)
 
     auto const expected = std::vector<Type>{ std::cbegin(Keys), std::cend(Keys) };
     EXPECT_EQ(expected, items.queue());
+}
+
+TEST_F(ItemQueueTest, getPosition)
+{
+    using Type = std::string_view;
+    static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
+    auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
+
+    for (size_t idx = {}, size = std::size(Keys); idx != size; ++idx)
+    {
+        auto const pos = items.get_position(Keys[idx]);
+        EXPECT_TRUE(pos.has_value());
+        EXPECT_EQ(idx, *pos);
+    }
 }
 
 TEST_F(ItemQueueTest, eraseFront)
