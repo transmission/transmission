@@ -20,7 +20,7 @@ using libtransmission::ItemQueue;
 namespace
 {
 template<typename Type>
-[[nodiscard]] auto toString(std::vector<Type> const& items)
+[[nodiscard]] std::string toString(std::vector<Type> const& items)
 {
     auto out = std::ostringstream{};
     for (auto const& item : items)
@@ -29,6 +29,32 @@ template<typename Type>
     }
     return out.str();
 }
+
+template<typename Type>
+struct MoveTest
+{
+    [[nodiscard]] auto initialQueue() const
+    {
+        auto items = ItemQueue<Type>{};
+        for (size_t i = 0; i < std::size(initial); ++i)
+        {
+            items.set(initial[i], i);
+        }
+        return items;
+    }
+
+    std::vector<Type> initial;
+    std::vector<Type> moved;
+    std::vector<Type> expected;
+};
+
+template<typename Type>
+std::ostream& operator<<(std::ostream& out, MoveTest<Type> const& test)
+{
+    out << "initial: " << toString(test.initial) << " move " << toString(test.moved) << " expected " << toString(test.expected);
+    return out;
+}
+
 } // namespace
 
 TEST_F(ItemQueueTest, construct)
@@ -170,14 +196,8 @@ TEST_F(ItemQueueTest, moveUp)
 {
     using Type = std::string_view;
 
-    struct Test
-    {
-        std::vector<Type> initial;
-        std::vector<Type> moved;
-        std::vector<Type> expected;
-    };
-
-    auto const tests = std::array<Test, 7>{{
+    // clang-format off
+    auto const tests = std::array<MoveTest<Type>, 7>{{
         { { "a", "b", "c", "d", "e", "f" }, { "a" },      { "a", "b", "c", "d", "e", "f" } },
         { { "a", "b", "c", "d", "e", "f" }, { "a", "b" }, { "b", "a", "c", "d", "e", "f" } },
         { { "a", "b", "c", "d", "e", "f" }, { "b", "d" }, { "b", "a", "d", "c", "e", "f" } },
@@ -186,20 +206,14 @@ TEST_F(ItemQueueTest, moveUp)
         { { "a", "b", "c", "d", "e", "f" }, { "f", "f" }, { "a", "b", "c", "d", "f", "e" } },
         { { "a", "b", "c", "d", "e", "f" }, { "z", "q" }, { "a", "b", "c", "d", "e", "f" } },
     }};
+    // clang-format on
 
-    for (auto const& [initial, moved, expected] : tests)
+    for (auto const& test : tests)
     {
-        // set up the test queue
-        auto items = ItemQueue<Type>{};
-        for (size_t i = 0; i < std::size(initial); ++i)
-        {
-            items.set(initial[i], i);
-        }
-
-        items.move_up(std::data(moved), std::size(moved));
-
+        auto items = test.initialQueue();
+        items.move_up(std::data(test.moved), std::size(test.moved));
         auto const actual = items.queue();
-        EXPECT_EQ(expected, actual) << "initial: " << toString(initial) << " move " << toString(moved) << " expected " << toString(expected) << " actual " << toString(actual) << std::endl;
+        EXPECT_EQ(test.expected, actual) << test << " actual " << toString(actual);
     }
 }
 
@@ -207,14 +221,8 @@ TEST_F(ItemQueueTest, moveDown)
 {
     using Type = std::string_view;
 
-    struct Test
-    {
-        std::vector<Type> initial;
-        std::vector<Type> moved;
-        std::vector<Type> expected;
-    };
-
-    auto const tests = std::array<Test, 7>{{
+    // clang-format off
+    auto const tests = std::array<MoveTest<Type>, 7>{{
         { { "a", "b", "c", "d", "e", "f" }, { "a" },      { "b", "a", "c", "d", "e", "f" } },
         { { "a", "b", "c", "d", "e", "f" }, { "a", "b" }, { "c", "a", "b", "d", "e", "f" } },
         { { "a", "b", "c", "d", "e", "f" }, { "b", "d" }, { "a", "c", "b", "e", "d", "f" } },
@@ -223,20 +231,14 @@ TEST_F(ItemQueueTest, moveDown)
         { { "a", "b", "c", "d", "e", "f" }, { "f", "f" }, { "a", "b", "c", "d", "e", "f" } },
         { { "a", "b", "c", "d", "e", "f" }, { "z", "q" }, { "a", "b", "c", "d", "e", "f" } },
     }};
+    // clang-format on
 
-    for (auto const& [initial, moved, expected] : tests)
+    for (auto const& test : tests)
     {
-        // set up the test queue
-        auto items = ItemQueue<Type>{};
-        for (size_t i = 0; i < std::size(initial); ++i)
-        {
-            items.set(initial[i], i);
-        }
-
-        items.move_down(std::data(moved), std::size(moved));
-
+        auto items = test.initialQueue();
+        items.move_down(std::data(test.moved), std::size(test.moved));
         auto const actual = items.queue();
-        EXPECT_EQ(expected, actual) << "initial: " << toString(initial) << " move " << toString(moved) << " expected " << toString(expected) << " actual " << toString(actual) << std::endl;
+        EXPECT_EQ(test.expected, actual) << test << " actual " << toString(actual);
     }
 }
 
@@ -244,14 +246,8 @@ TEST_F(ItemQueueTest, moveTop)
 {
     using Type = std::string_view;
 
-    struct Test
-    {
-        std::vector<Type> initial;
-        std::vector<Type> moved;
-        std::vector<Type> expected;
-    };
-
-    auto const tests = std::array<Test, 7>{{
+    // clang-format off
+    auto const tests = std::array<MoveTest<Type>, 7>{{
         { { "a", "b", "c", "d", "e", "f" }, { "a" },      { "a", "b", "c", "d", "e", "f" } },
         { { "a", "b", "c", "d", "e", "f" }, { "a", "b" }, { "a", "b", "c", "d", "e", "f" } },
         { { "a", "b", "c", "d", "e", "f" }, { "b", "d" }, { "b", "d", "a", "c", "e", "f" } },
@@ -260,20 +256,14 @@ TEST_F(ItemQueueTest, moveTop)
         { { "a", "b", "c", "d", "e", "f" }, { "f", "f" }, { "f", "a", "b", "c", "d", "e" } },
         { { "a", "b", "c", "d", "e", "f" }, { "z", "q" }, { "a", "b", "c", "d", "e", "f" } },
     }};
+    // clang-format on
 
-    for (auto const& [initial, moved, expected] : tests)
+    for (auto const& test : tests)
     {
-        // set up the test queue
-        auto items = ItemQueue<Type>{};
-        for (size_t i = 0; i < std::size(initial); ++i)
-        {
-            items.set(initial[i], i);
-        }
-
-        items.move_top(std::data(moved), std::size(moved));
-
+        auto items = test.initialQueue();
+        items.move_top(std::data(test.moved), std::size(test.moved));
         auto const actual = items.queue();
-        EXPECT_EQ(expected, actual) << "initial: " << toString(initial) << " move " << toString(moved) << " expected " << toString(expected) << " actual " << toString(actual) << std::endl;
+        EXPECT_EQ(test.expected, actual) << test << " actual " << toString(actual) << std::endl;
     }
 }
 
@@ -281,14 +271,8 @@ TEST_F(ItemQueueTest, moveBottom)
 {
     using Type = std::string_view;
 
-    struct Test
-    {
-        std::vector<Type> initial;
-        std::vector<Type> moved;
-        std::vector<Type> expected;
-    };
-
-    auto const tests = std::array<Test, 7>{{
+    // clang-format off
+    auto const tests = std::array<MoveTest<Type>, 7>{{
         { { "a", "b", "c", "d", "e", "f" }, { "a" },      { "b", "c", "d", "e", "f", "a" } },
         { { "a", "b", "c", "d", "e", "f" }, { "a", "b" }, { "c", "d", "e", "f", "a", "b" } },
         { { "a", "b", "c", "d", "e", "f" }, { "b", "d" }, { "a", "c", "e", "f", "b", "d" } },
@@ -297,19 +281,13 @@ TEST_F(ItemQueueTest, moveBottom)
         { { "a", "b", "c", "d", "e", "f" }, { "f", "f" }, { "a", "b", "c", "d", "e", "f" } },
         { { "a", "b", "c", "d", "e", "f" }, { "z", "q" }, { "a", "b", "c", "d", "e", "f" } },
     }};
+    // clang-format on
 
-    for (auto const& [initial, moved, expected] : tests)
+    for (auto const& test : tests)
     {
-        // set up the test queue
-        auto items = ItemQueue<Type>{};
-        for (size_t i = 0; i < std::size(initial); ++i)
-        {
-            items.set(initial[i], i);
-        }
-
-        items.move_bottom(std::data(moved), std::size(moved));
-
+        auto items = test.initialQueue();
+        items.move_bottom(std::data(test.moved), std::size(test.moved));
         auto const actual = items.queue();
-        EXPECT_EQ(expected, actual) << "initial: " << toString(initial) << " move " << toString(moved) << " expected " << toString(expected) << " actual " << toString(actual) << std::endl;
+        EXPECT_EQ(test.expected, actual) << test << " actual " << toString(actual) << std::endl;
     }
 }

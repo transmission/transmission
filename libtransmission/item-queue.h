@@ -36,12 +36,12 @@ public:
 
     void move_top(Item const* items, size_t n_items)
     {
-        return move_top([&items, &n_items](auto const& test){ return contains(items, n_items, test); });
+        return move_top([&items, &n_items](auto const& test) { return contains(items, n_items, test); });
     }
 
     void move_bottom(Item const* items, size_t n_items)
     {
-        return move_top([&items, &n_items](auto const& test){ return !contains(items, n_items, test); });
+        return move_top([&items, &n_items](auto const& test) { return !contains(items, n_items, test); });
     }
 
     void move_up(Item const* items, size_t n_items)
@@ -50,7 +50,7 @@ public:
         {
             if (auto const& [pos, item] = items_[i]; contains(items, n_items, item) && i > 0U)
             {
-                std::swap(items_[i-1U].second, items_[i].second);
+                std::swap(items_[i - 1U].second, items_[i].second);
             }
         }
     }
@@ -59,9 +59,9 @@ public:
     {
         for (size_t begin = std::size(items_), i = begin, end = 0U; i != end; --i)
         {
-            if (auto const& [pos, item] = items_[i-1U]; contains(items, n_items, item) && i + 1 < begin)
+            if (auto const& [pos, item] = items_[i - 1U]; contains(items, n_items, item) && i + 1 < begin)
             {
-                std::swap(items_[i-1U].second, items_[i].second);
+                std::swap(items_[i - 1U].second, items_[i].second);
             }
         }
     }
@@ -128,7 +128,10 @@ private:
             moved[i].first = items_[i].first;
         }
 
-        auto const hits = std::count_if(std::begin(items_), std::end(items_), [&test](auto const& pair){ return test(pair.second); });
+        auto const hits = std::count_if(
+            std::begin(items_),
+            std::end(items_),
+            [&test](auto const& pair) { return test(pair.second); });
 
         auto hit_count = size_t{};
         auto miss_count = size_t{};
