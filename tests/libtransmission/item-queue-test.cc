@@ -72,126 +72,156 @@ TEST_F(ItemQueueTest, construct)
     EXPECT_EQ(0U, std::size(items));
 }
 
+TEST_F(ItemQueueTest, size)
+{
+    using Type = std::string_view;
+    static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
+    auto const items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
+
+    EXPECT_EQ(std::size(Keys), std::size(items));
+}
+
+TEST_F(ItemQueueTest, emptyTrue)
+{
+    using Type = std::string_view;
+    static auto constexpr Keys = std::array<std::string_view, 0>{};
+    auto const items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
+
+    EXPECT_EQ(std::empty(Keys), std::empty(items));
+}
+
+TEST_F(ItemQueueTest, emptyFalse)
+{
+    using Type = std::string_view;
+    static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
+    auto const items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
+
+    EXPECT_EQ(std::empty(Keys), std::empty(items));
+}
+
 TEST_F(ItemQueueTest, setInOrder)
 {
     using Type = std::string_view;
-    static auto constexpr Key1 = "hello"sv;
-    static auto constexpr Key2 = "world"sv;
-    auto items = initialQueue<Type>({ Key1, Key2 });
+    static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
+    auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
 
-    auto const expected_queue = std::vector<Type>{ Key1, Key2 };
-    auto const actual_queue = items.queue();
-    EXPECT_EQ(expected_queue, actual_queue);
+    auto const expected = std::vector<Type>{ std::cbegin(Keys), std::cend(Keys) };
+    EXPECT_EQ(expected, items.queue());
 }
 
 TEST_F(ItemQueueTest, eraseFront)
 {
     using Type = std::string_view;
-    static auto constexpr Key1 = "a"sv;
-    static auto constexpr Key2 = "b"sv;
-    static auto constexpr Key3 = "c"sv;
-    auto items = initialQueue<Type>({ Key1, Key2, Key3 });
+    static auto constexpr Keys = std::array<std::string_view, 3>{ "a"sv, "b"sv, "c"sv };
+    auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
 
-    items.erase(Key1);
-    auto expected_queue = std::vector<Type>{ Key2, Key3 };
-    auto actual_queue = items.queue();
-    EXPECT_EQ(expected_queue, actual_queue);
+    items.erase(Keys.front());
+    auto expected = std::vector<Type>{ std::cbegin(Keys) + 1, std::cend(Keys) };
+    EXPECT_EQ(expected, items.queue());
 }
 
 TEST_F(ItemQueueTest, eraseMiddle)
 {
     using Type = std::string_view;
-    static auto constexpr Key1 = "a"sv;
-    static auto constexpr Key2 = "b"sv;
-    static auto constexpr Key3 = "c"sv;
-    auto items = initialQueue<Type>({ Key1, Key2, Key3 });
+    static auto constexpr Keys = std::array<std::string_view, 3>{ "a"sv, "b"sv, "c"sv };
+    auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
 
-    items.erase(Key2);
-    auto expected_queue = std::vector<Type>{ Key1, Key3 };
-    auto actual_queue = items.queue();
-    EXPECT_EQ(expected_queue, actual_queue);
+    items.erase(Keys[1]);
+    auto expected = std::vector<Type>{ Keys[0], Keys[2] };
+    EXPECT_EQ(expected, items.queue());
 }
 
 TEST_F(ItemQueueTest, eraseBack)
 {
     using Type = std::string_view;
-    static auto constexpr Key1 = "a"sv;
-    static auto constexpr Key2 = "b"sv;
-    static auto constexpr Key3 = "c"sv;
-    auto items = initialQueue<Type>({ Key1, Key2, Key3 });
+    static auto constexpr Keys = std::array<std::string_view, 3>{ "a"sv, "b"sv, "c"sv };
+    auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
 
-    items.erase(Key3);
-    auto expected_queue = std::vector<Type>{ Key1, Key2 };
-    auto actual_queue = items.queue();
-    EXPECT_EQ(expected_queue, actual_queue);
+    items.erase(Keys.back());
+    auto const expected = std::vector<Type>{ std::cbegin(Keys), std::cend(Keys) - 1 };
+    EXPECT_EQ(expected, items.queue());
 }
 
 TEST_F(ItemQueueTest, setInReverseOrder)
 {
     using Type = std::string_view;
-    static auto constexpr Key1 = "hello"sv;
-    static auto constexpr Key2 = "world"sv;
+    static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
 
     auto items = ItemQueue<Type>{};
-    items.set(Key1, 1U);
-    items.set(Key2, 0U);
+    items.set(Keys[0], 1U);
+    items.set(Keys[1], 0U);
     EXPECT_EQ(2U, std::size(items));
     EXPECT_FALSE(std::empty(items));
 
-    auto const expected_queue = std::vector<Type>{ Key2, Key1 };
-    auto const actual_queue = items.queue();
-    EXPECT_EQ(expected_queue, actual_queue);
+    auto const expected = std::vector<Type>{ Keys[1], Keys[0] };
+    EXPECT_EQ(expected, items.queue());
 }
 
 TEST_F(ItemQueueTest, setReplacesPreviousPosition)
 {
     using Type = std::string_view;
-    static auto constexpr Key1 = "hello"sv;
-    static auto constexpr Key2 = "world"sv;
+    static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
+    auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
 
-    auto items = ItemQueue<Type>{};
-    items.set(Key1, 0U);
-    items.set(Key2, 1U);
-    items.set(Key1, 2U);
+    items.set(Keys[0], 2U);
     EXPECT_EQ(2U, std::size(items));
-    EXPECT_FALSE(std::empty(items));
 
-    auto const expected_queue = std::vector<Type>{ Key2, Key1 };
-    auto const actual_queue = items.queue();
-    EXPECT_EQ(expected_queue, actual_queue);
+    auto const expected = std::vector<Type>{ std::crbegin(Keys), std::crend(Keys) };
+    EXPECT_EQ(expected, items.queue());
 }
 
 TEST_F(ItemQueueTest, setDuplicatePosition)
 {
     using Type = std::string_view;
-    static auto constexpr Keys = std::array<Type, 3>{ "hello"sv, "there"sv, "world"sv };
-    auto items = initialQueue<Type>({ std::begin(Keys), std::end(Keys) });
+    auto const initial_keys = std::vector<Type>{ "hello"sv, "there"sv, "world"sv };
+    auto items = initialQueue<Type>(initial_keys);
 
-    EXPECT_FALSE(std::empty(items));
-    auto expected_queue = std::vector<Type>{ std::begin(Keys), std::end(Keys) };
-    auto actual_queue = items.queue();
-    EXPECT_EQ(expected_queue, actual_queue);
+    // setup: get the info about the pos we're going to duplicate
+    static auto constexpr NewKey = "gronk"sv;
+    static auto constexpr KeysIndex = 1U;
+    auto const initial_pos = items.get_position(initial_keys[KeysIndex]);
+    EXPECT_TRUE(initial_pos.has_value());
+
+    // set a new item at a duplicate position
+    items.set(NewKey, *initial_pos);
+    auto const new_key_pos = items.get_position(NewKey);
+
+    // confirm new item has correct position
+    EXPECT_TRUE(new_key_pos.has_value());
+    EXPECT_EQ(*initial_pos, *new_key_pos);
+
+    // confirm old item got bumped down
+    auto const old_key_pos = items.get_position(initial_keys[KeysIndex]);
+    EXPECT_TRUE(old_key_pos.has_value());
+    EXPECT_EQ(*initial_pos + 1, *old_key_pos);
+
+    // confirm full queue is correct
+    auto expected = initial_keys;
+    expected.insert(std::cbegin(expected) + KeysIndex, NewKey);
+    EXPECT_EQ(expected, items.queue());
 }
 
 TEST_F(ItemQueueTest, pop)
 {
     using Type = std::string_view;
-    static auto constexpr Key1 = "hello"sv;
-    static auto constexpr Key2 = "world"sv;
-    auto items = initialQueue<Type>({ Key1, Key2 });
+    static auto constexpr Keys = std::array<std::string_view, 2>{ "hello"sv, "world"sv };
+    auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
 
     auto popped = items.pop();
     EXPECT_TRUE(popped.has_value());
-    EXPECT_EQ(Key1, *popped);
-    EXPECT_EQ(1U, std::size(items));
+    EXPECT_EQ(Keys.front(), *popped);
+    EXPECT_EQ(std::size(Keys) - 1, std::size(items));
+}
 
-    popped = items.pop();
-    EXPECT_TRUE(popped.has_value());
-    EXPECT_EQ(Key2, *popped);
-    EXPECT_TRUE(std::empty(items));
+TEST_F(ItemQueueTest, popEmpty)
+{
+    using Type = std::string_view;
+    static auto constexpr Keys = std::array<std::string_view, 0>{};
+    auto items = initialQueue<Type>({ std::cbegin(Keys), std::cend(Keys) });
 
-    popped = items.pop();
+    auto popped = items.pop();
     EXPECT_FALSE(popped.has_value());
+    EXPECT_EQ(std::size(Keys), std::size(items));
 }
 
 TEST_F(ItemQueueTest, moveUp)
@@ -214,8 +244,7 @@ TEST_F(ItemQueueTest, moveUp)
     {
         auto items = test.initialQueue();
         items.move_up(std::data(test.moved), std::size(test.moved));
-        auto const actual = items.queue();
-        EXPECT_EQ(test.expected, actual) << test << " actual " << toString(actual);
+        EXPECT_EQ(test.expected, items.queue()) << test;
     }
 }
 
@@ -239,8 +268,7 @@ TEST_F(ItemQueueTest, moveDown)
     {
         auto items = test.initialQueue();
         items.move_down(std::data(test.moved), std::size(test.moved));
-        auto const actual = items.queue();
-        EXPECT_EQ(test.expected, actual) << test << " actual " << toString(actual);
+        EXPECT_EQ(test.expected, items.queue()) << test;
     }
 }
 
@@ -264,8 +292,7 @@ TEST_F(ItemQueueTest, moveTop)
     {
         auto items = test.initialQueue();
         items.move_top(std::data(test.moved), std::size(test.moved));
-        auto const actual = items.queue();
-        EXPECT_EQ(test.expected, actual) << test << " actual " << toString(actual) << std::endl;
+        EXPECT_EQ(test.expected, items.queue()) << test;
     }
 }
 
@@ -289,7 +316,6 @@ TEST_F(ItemQueueTest, moveBottom)
     {
         auto items = test.initialQueue();
         items.move_bottom(std::data(test.moved), std::size(test.moved));
-        auto const actual = items.queue();
-        EXPECT_EQ(test.expected, actual) << test << " actual " << toString(actual) << std::endl;
+        EXPECT_EQ(test.expected, items.queue()) << test;
     }
 }

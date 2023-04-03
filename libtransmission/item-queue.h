@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstddef> // for size_t
 #include <functional>
+#include <iterator> // for std::next()
 #include <optional>
 #include <utility> // for std::pair<>
 #include <vector>
@@ -68,7 +69,7 @@ public:
 
     void erase(Item const& item)
     {
-        if (auto old_iter = find(item); old_iter != std::end(items_))
+        if (auto old_iter = find(item); old_iter != std::cend(items_))
         {
             items_.erase(old_iter);
         }
@@ -77,13 +78,29 @@ public:
     void set(Item item, size_t pos)
     {
         erase(item);
-        auto const iter = std::lower_bound(std::begin(items_), std::end(items_), pos, CompareByPos{});
-        items_.emplace(iter, pos, std::move(item));
+
+        auto iter = items_.emplace(
+            std::lower_bound(std::cbegin(items_), std::cend(items_), pos, CompareByPos{}),
+            pos,
+            std::move(item));
+
+        for (auto const end = std::cend(items_);;) // fix any pos collisions
+        {
+            auto const next = std::next(iter);
+
+            if (next == end || iter->first != next->first)
+            {
+                break;
+            }
+
+            ++next->first;
+            iter = next;
+        }
     }
 
     [[nodiscard]] std::optional<size_t> get_position(Item const& item) const
     {
-        if (auto iter = find(item); item != std::end(items_))
+        if (auto iter = find(item); iter != std::cend(items_))
         {
             return iter - std::begin(items_);
         }
@@ -129,8 +146,8 @@ private:
         }
 
         auto const hits = std::count_if(
-            std::begin(items_),
-            std::end(items_),
+            std::cbegin(items_),
+            std::cend(items_),
             [&test](auto const& pair) { return test(pair.second); });
 
         auto hit_count = size_t{};
@@ -151,7 +168,7 @@ private:
             return item == pair.second;
         };
 
-        return std::find_if(std::begin(items_), std::end(items_), pred);
+        return std::find_if(std::cbegin(items_), std::cend(items_), pred);
     }
 
     struct CompareByPos
