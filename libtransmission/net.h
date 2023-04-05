@@ -485,8 +485,7 @@ private:
     std::array<std::unique_ptr<libtransmission::Timer>, NUM_TR_AF_INET_TYPES> upkeep_timer_;
 
     std::array<std::atomic_size_t, NUM_TR_AF_INET_TYPES> ix_service_ = { 0U };
-    static auto constexpr IPQueryServices = std::array<std::string_view, 4>{ "https://icanhazip.com"sv,
-                                                                             "https://api64.ipify.org"sv };
+    static auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
 
     friend struct tr_session;
 
