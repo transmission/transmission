@@ -771,6 +771,8 @@ tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in, tr_address_
 
 tr_global_ip_cache::~tr_global_ip_cache()
 {
+    TR_ASSERT(!session_->amInSessionThread());
+
     // Wait until all updates are done
     std::unique_lock lock{ is_updating_mutex_ };
     is_updating_cv_.wait_for(lock, 5s, [this]() { return !is_updating_; });
@@ -844,7 +846,7 @@ void tr_global_ip_cache::unset_is_updating() noexcept
 
 void tr_global_ip_cache::set_global_addr(std::optional<tr_address> const& addr) noexcept
 {
-    TR_ASSERT(!addr || addr->type == type);
+    TR_ASSERT(!addr || (addr->type == type && addr->is_global_unicast_address()));
     if (addr)
     {
         std::lock_guard const lock{ global_addr_mutex_ };
@@ -980,11 +982,11 @@ void tr_global_ipv4_cache::update_ipv4_addr() noexcept
 
         // Update the source address for global connections
         set_source_addr(get_global_source_address(AF_INET, bind_addr()));
-        if (errno == EAFNOSUPPORT)
+        if (!global_source_addr() && errno == EAFNOSUPPORT)
         {
-            // Your machine does not support this IP protocol
             stop_timer();
             has_ip_protocol_ = false;
+            unset_global_addr();
             unset_is_updating();
             tr_logAddInfo(_("Your machine does not support IPv4"));
             return;
@@ -1075,15 +1077,6 @@ void tr_global_ipv6_cache::update_ipv6_addr() noexcept
 
     // Get the IPv6 source address used for global connections
     auto const& source_addr = get_global_source_address(AF_INET6, bind_addr());
-    if (errno == EAFNOSUPPORT)
-    {
-        // Your machine does not support this IP protocol
-        stop_timer();
-        has_ip_protocol_ = false;
-        unset_is_updating();
-        tr_logAddInfo(_("Your machine does not support IPv6"));
-        return;
-    }
 
     // Update the source address for global connections
     set_source_addr(source_addr);
@@ -1096,6 +1089,15 @@ void tr_global_ipv6_cache::update_ipv6_addr() noexcept
     else
     {
         unset_global_addr();
+    }
+
+    if (!global_source_addr() && errno == EAFNOSUPPORT)
+    {
+        stop_timer();
+        has_ip_protocol_ = false;
+        unset_is_updating();
+        tr_logAddInfo(_("Your machine does not support IPv6"));
+        return;
     }
 
     if (source_addr)
