@@ -774,16 +774,8 @@ public:
 
     [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
     {
-        switch (type)
-        {
-        case TR_AF_INET:
-            return global_ipv4_cache_->has_ip_protocol_;
-        case TR_AF_INET6:
-            return global_ipv6_cache_->has_ip_protocol_;
-        default:
-            TR_ASSERT_MSG(false, "invalid type");
-            return false;
-        }
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        return global_ip_cache_->has_ip_protocol_[type];
     }
 
     struct PublicAddressResult
@@ -797,29 +789,13 @@ public:
     [[nodiscard]] std::optional<tr_address> globalIP(tr_address_type type) const noexcept
     {
         TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
-        switch (type)
-        {
-        case TR_AF_INET:
-            return global_ipv4_cache_->global_addr();
-        case TR_AF_INET6:
-            return global_ipv6_cache_->global_addr();
-        default:
-            return {};
-        }
+        return global_ip_cache_->global_addr(type);
     }
 
     [[nodiscard]] std::optional<tr_address> globalSourceIP(tr_address_type type) const noexcept
     {
         TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
-        switch (type)
-        {
-        case TR_AF_INET:
-            return global_ipv4_cache_->global_source_addr();
-        case TR_AF_INET6:
-            return global_ipv6_cache_->global_source_addr();
-        default:
-            return {};
-        }
+        return global_ip_cache_->global_source_addr(type);
     }
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
@@ -1136,15 +1112,12 @@ private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
-    // depends-on: timer_maker_
-    std::unique_ptr<tr_global_ipv6_cache> global_ipv6_cache_ = std::make_unique<tr_global_ipv6_cache>(this);
-
-    // depends-on: settings_, session_thread_, torrents_, global_ipv6_cache_
+    // depends-on: settings_, session_thread_, torrents_, global_ip_cache_
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 
     // depends-on: timer_maker_, web_
-    std::unique_ptr<tr_global_ipv4_cache> global_ipv4_cache_ = std::make_unique<tr_global_ipv4_cache>(this);
+    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
 
 public:
     // depends-on: settings_, open_files_, torrents_

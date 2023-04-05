@@ -409,8 +409,7 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
 [[nodiscard]] std::string tr_net_strerror(int err);
 
 /**
- * Cache global IP addresses. IPv4 and IPv6 are separated into
- * `tr_global_ipv4_cache` and `tr_global_ipv6_cache` respectively.
+ * Cache global IP addresses.
  *
  * This class caches 3 useful info:
  * 1. Whether your machine supports the IP protocol
@@ -421,41 +420,44 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * you have connectivity to the public internet. And if the global address is
  * the same with the source address, then you are not behind an NAT.
  *
- * Note: By itself, the IPv4 cache can find your global address even if you are behind an
- * NAT, whilst the IPv6 cache cannot.
- * (Not yet implemented) However, the IPv6 cache can obtain your IPv6 global
- * address if a tracker response returned it, even if you are behind a NAT.
+ * Note: `tr_session.web_` depends on the source address cache, and the global address cache
+ * depends on `tr_session.web_`. So we do the initial update of the source address in the
+ * constructor, and do the initial update of the global address in `tr_session.initImpl()`.
  *
  * Note: This class isn't meant to be accessed by anyone other than tr_session,
  * so it has no public methods.
  */
 class tr_global_ip_cache
 {
-protected:
-    explicit tr_global_ip_cache(tr_session* session_in, tr_address_type type_in);
-    ~tr_global_ip_cache();
-
 public:
+    explicit tr_global_ip_cache(tr_session* session_in);
+    ~tr_global_ip_cache();
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache(tr_global_ip_cache&&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
 
-protected:
-    [[nodiscard]] std::optional<tr_address> const& global_addr() noexcept;
-    [[nodiscard]] std::optional<tr_address> const& global_source_addr() noexcept;
+private:
+    [[nodiscard]] std::optional<tr_address> const& global_addr(tr_address_type type) noexcept;
+    [[nodiscard]] std::optional<tr_address> const& global_source_addr(tr_address_type type) noexcept;
 
-    [[nodiscard]] tr_address bind_addr() noexcept;
+    [[nodiscard]] tr_address bind_addr(tr_address_type type) noexcept;
 
-    void set_global_addr(std::optional<tr_address> const& addr) noexcept;
-    void unset_global_addr() noexcept;
-    void set_source_addr(std::optional<tr_address> const& addr) noexcept;
-    void unset_source_addr() noexcept;
+    void set_global_addr(tr_address const& addr) noexcept;
+    void unset_global_addr(tr_address_type type) noexcept;
+    void set_source_addr(tr_address const& addr) noexcept;
+    void unset_addr(tr_address_type type) noexcept;
 
-    void start_timer(std::chrono::milliseconds msec) noexcept;
-    void stop_timer() noexcept;
-    void set_is_updating() noexcept;
-    void unset_is_updating() noexcept;
+    void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept;
+    void stop_timer(tr_address_type type) noexcept;
+    void set_is_updating(tr_address_type type) noexcept;
+    void unset_is_updating(tr_address_type type) noexcept;
+
+    void update_global_addr(tr_address_type type) noexcept;
+    void update_source_addr(tr_address_type type) noexcept;
+
+    // Only use as a callback for web_->fetch()
+    void on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept;
 
     [[nodiscard]] static std::optional<tr_address> get_global_source_address(int af, tr_address const& bind_addr);
     [[nodiscard]] static std::optional<tr_address> get_source_address(
@@ -465,70 +467,30 @@ protected:
 
     tr_session* const session_;
 
-    std::atomic_bool is_updating_ = false;
-    std::mutex is_updating_mutex_;
-    std::condition_variable is_updating_cv_;
-
-    tr_address_type const type;
+    std::array<std::atomic_bool, NUM_TR_AF_INET_TYPES> is_updating_ = { false };
+    std::array<std::mutex, NUM_TR_AF_INET_TYPES> is_updating_mutex_;
+    std::array<std::condition_variable, NUM_TR_AF_INET_TYPES> is_updating_cv_;
 
     // Whether this machine supports this IP protocol
-    std::atomic_bool has_ip_protocol_ = true;
+    std::array<std::atomic_bool, NUM_TR_AF_INET_TYPES> has_ip_protocol_ = { true, true };
 
     // Never directly read/write IP addresses for the sake of being thread safe
     // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
-    std::shared_mutex global_addr_mutex_, source_addr_mutex_;
-    std::optional<tr_address> global_addr_, source_addr_;
+    std::array<std::shared_mutex, NUM_TR_AF_INET_TYPES> global_addr_mutex_, source_addr_mutex_;
+    std::array<std::optional<tr_address>, NUM_TR_AF_INET_TYPES> global_addr_, source_addr_;
 
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed
     // (The destructor will acquire the IP address locks before proceeding, but still)
-    std::unique_ptr<libtransmission::Timer> upkeep_timer_;
+    std::array<std::unique_ptr<libtransmission::Timer>, NUM_TR_AF_INET_TYPES> upkeep_timer_;
+
+    std::array<std::atomic_size_t, NUM_TR_AF_INET_TYPES> ix_service_ = { 0U };
+    static auto constexpr IPQueryServices = std::array<std::string_view, 4>{ "https://icanhazip.com"sv,
+                                                                             "https://api64.ipify.org"sv };
+
+    friend struct tr_session;
 
 public:
     static auto constexpr UpkeepInterval = 30min;
     static auto constexpr RetryUpkeepInterval = 30s;
-};
-
-class tr_global_ipv4_cache : public tr_global_ip_cache
-{
-public:
-    explicit tr_global_ipv4_cache(tr_session* session_in);
-    tr_global_ipv4_cache(tr_global_ipv4_cache const&) = delete;
-    tr_global_ipv4_cache(tr_global_ipv4_cache&&) = delete;
-    tr_global_ipv4_cache& operator=(tr_global_ipv4_cache const&) = delete;
-    tr_global_ipv4_cache& operator=(tr_global_ipv4_cache&&) = delete;
-    ~tr_global_ipv4_cache() = default;
-
-private:
-    // Only to be called by timer or the constructor
-    void update_ipv4_addr() noexcept;
-
-    // Callback for querying IP
-    void onIPv4Response(tr_web::FetchResponse const& response);
-
-    std::atomic_size_t ix_service_;
-
-    static auto constexpr IPv4QueryServices = std::array<std::string_view, 4>{ "https://icanhazip.com"sv,
-                                                                               "https://ifconfig.me/ip"sv,
-                                                                               "https://api.ipify.org"sv,
-                                                                               "https://ipecho.net/plain"sv };
-
-    friend struct tr_session;
-};
-
-class tr_global_ipv6_cache : public tr_global_ip_cache
-{
-public:
-    explicit tr_global_ipv6_cache(tr_session* session_in);
-    tr_global_ipv6_cache(tr_global_ipv6_cache const&) = delete;
-    tr_global_ipv6_cache(tr_global_ipv6_cache&&) = delete;
-    tr_global_ipv6_cache& operator=(tr_global_ipv6_cache const&) = delete;
-    tr_global_ipv6_cache& operator=(tr_global_ipv6_cache&&) = delete;
-    ~tr_global_ipv6_cache() = default;
-
-private:
-    // Only to be called by timer or the constructor
-    void update_ipv6_addr() noexcept;
-
-    friend struct tr_session;
 };

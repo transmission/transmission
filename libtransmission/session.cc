@@ -424,7 +424,7 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
         static auto constexpr DefaultAddr = tr_address::any_ipv4();
-        auto addr = global_ipv4_cache_->bind_addr();
+        auto addr = global_ip_cache_->bind_addr(type);
         return { addr, addr == DefaultAddr };
     }
 
@@ -646,6 +646,15 @@ void tr_session::initImpl(init_data& data)
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
     setSettings(client_settings, true);
+
+    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        auto const type = static_cast<tr_address_type>(i);
+        if (global_ip_cache_->global_source_addr(type))
+        {
+            global_ip_cache_->update_global_addr(type);
+        }
+    }
 
     if (this->allowsLPD())
     {
@@ -1283,10 +1292,11 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // Tell the announcer to start shutdown, which sends out the stop
     // events and stops scraping.
     this->announcer_->startShutdown();
-    // ...since global_ipv4_cache_ relies on web_ to update IPv4, we tell
-    // it to stop updating before web_ starts to refuse new requests.
+    // ...since global_ip_cache_ relies on web_ to update global addresses,
+    // we tell it to stop updating before web_ starts to refuse new requests.
     // But we keep it intact for now, so that udp_core_ can continue.
-    this->global_ipv4_cache_->stop_timer();
+    this->global_ip_cache_->stop_timer(TR_AF_INET);
+    this->global_ip_cache_->stop_timer(TR_AF_INET6);
     // ...and now that those are done, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
