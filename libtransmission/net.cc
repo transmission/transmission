@@ -934,23 +934,26 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 
     set_is_updating(type);
 
-    auto constexpr map = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
+    auto constexpr Map = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
+    auto const protocol = type == TR_AF_INET ? "IPv4" : "IPv6";
 
-    auto const& source_addr = get_global_source_address(map[type], bind_addr(type));
+    auto const& source_addr = get_global_source_address(Map[type], bind_addr(type));
     if (source_addr)
     {
         set_source_addr(*source_addr);
+        tr_logAddInfo(fmt::format(_("Successfully updated source {} address to {}"), protocol, source_addr->display_name()));
     }
     else
     {
         // Stop the update process since we have no public internet connectivity
         unset_addr(type);
         upkeep_timer_[type]->setInterval(RetryUpkeepInterval);
+        tr_logAddDebug(fmt::format(_("Couldn't obtain source {} address"), protocol));
         if (errno == EAFNOSUPPORT)
         {
             stop_timer(type); // No point in retrying
             has_ip_protocol_[type] = false;
-            tr_logAddInfo(fmt::format(_("Your machine does not support {}"), type == TR_AF_INET ? "IPv4" : "IPv6"));
+            tr_logAddWarn(fmt::format(_("Your machine does not support {}"), protocol));
         }
     }
 
@@ -963,6 +966,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     TR_ASSERT(is_updating_[type]);
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices));
 
+    auto const protocol = type == TR_AF_INET ? "IPv4" : "IPv6";
     auto success = bool{ false };
 
     if (response.status == 200 /* HTTP_OK */)
@@ -986,8 +990,9 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
             upkeep_timer_[type]->setInterval(UpkeepInterval);
 
             tr_logAddInfo(fmt::format(
-                _("Successfully updated global {type} address from {url}"),
-                fmt::arg("type", type == TR_AF_INET ? "IPv4" : "IPv6"),
+                _("Successfully updated global {type} address to {ip} using {url}"),
+                fmt::arg("type", protocol),
+                fmt::arg("ip", addr->display_name()),
                 fmt::arg("url", IPQueryServices[ix_service_[type]])));
         }
     }
@@ -1001,7 +1006,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
 
     if (!success)
     {
-        tr_logAddDebug(fmt::format("Couldn't obtain global {} address", type == TR_AF_INET ? "IPv4" : "IPv6"));
+        tr_logAddDebug(fmt::format("Couldn't obtain global {} address", protocol));
         unset_global_addr(type);
         upkeep_timer_[type]->setInterval(RetryUpkeepInterval);
     }
