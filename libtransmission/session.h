@@ -772,6 +772,20 @@ public:
 
     [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
 
+    [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
+    {
+        switch (type)
+        {
+        case TR_AF_INET:
+            return global_ipv4_cache_->has_ip_protocol_;
+        case TR_AF_INET6:
+            return global_ipv6_cache_->has_ip_protocol_;
+        default:
+            TR_ASSERT_MSG(false, "invalid type");
+            return false;
+        }
+    }
+
     struct PublicAddressResult
     {
         tr_address address;
@@ -794,22 +808,6 @@ public:
         }
     }
 
-    bool globalIP(tr_address const& addr) const noexcept
-    {
-        TR_ASSERT((addr.is_ipv4() || addr.is_ipv6()) && addr.is_global_unicast_address());
-        switch (addr.type)
-        {
-        case TR_AF_INET:
-            global_ipv4_cache_->set_global_addr(addr);
-            return true;
-        case TR_AF_INET6:
-            global_ipv6_cache_->set_global_addr(addr);
-            return true;
-        default:
-            return false;
-        }
-    }
-
     [[nodiscard]] std::optional<tr_address> globalSourceIP(tr_address_type type) const noexcept
     {
         TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
@@ -821,22 +819,6 @@ public:
             return global_ipv6_cache_->global_source_addr();
         default:
             return {};
-        }
-    }
-
-    bool globalSourceIP(tr_address const& addr) const noexcept
-    {
-        TR_ASSERT(addr.is_ipv4() || addr.is_ipv6());
-        switch (addr.type)
-        {
-        case TR_AF_INET:
-            global_ipv4_cache_->set_source_addr(addr);
-            return true;
-        case TR_AF_INET6:
-            global_ipv6_cache_->set_source_addr(addr);
-            return true;
-        default:
-            return false;
         }
     }
 
@@ -966,8 +948,7 @@ private:
     static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
 
     friend class libtransmission::test::SessionTest;
-    friend class tr_global_ipv4_cache;
-    friend class tr_global_ipv6_cache;
+    friend class tr_global_ip_cache;
 
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);

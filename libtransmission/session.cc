@@ -424,19 +424,19 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
         static auto constexpr DefaultAddr = tr_address::any_ipv4();
-        auto addr = tr_address::from_string(settings_.bind_address_ipv4).value_or(DefaultAddr);
+        auto addr = global_ipv4_cache_->bind_addr();
         return { addr, addr == DefaultAddr };
     }
 
     if (type == TR_AF_INET6)
     {
         // if user provided an address, use it.
-        // otherwise, if we can determine which one to use via globalIPv6 magic, use it.
+        // otherwise, if we can determine which one to use via globalSourceIPv6 magic, use it.
         // otherwise, use any_ipv6 (::).
-        static auto constexpr AnyAddr = tr_address::any_ipv6();
-        auto const default_addr = globalIP(type).value_or(AnyAddr);
-        auto addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
-        return { addr, addr == AnyAddr };
+        static auto constexpr DefaultAddr = tr_address::any_ipv6();
+        auto const source_addr = globalSourceIP(type);
+        auto addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr : DefaultAddr;
+        return { addr, addr == DefaultAddr };
     }
 
     TR_ASSERT_MSG(false, "invalid type");
