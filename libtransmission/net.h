@@ -420,10 +420,6 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * you have connectivity to the public internet. And if the global address is
  * the same with the source address, then you are not behind an NAT.
  *
- * Note: `tr_session.web_` depends on the source address cache, and the global address cache
- * depends on `tr_session.web_`. So we do the initial update of the source address in the
- * constructor, and do the initial update of the global address in `tr_session.initImpl()`.
- *
  * Note: This class isn't meant to be accessed by anyone other than tr_session,
  * so it has no public methods.
  */
@@ -453,6 +449,7 @@ private:
     void set_is_updating(tr_address_type type) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
 
+    void update_addr(tr_address_type type) noexcept;
     void update_global_addr(tr_address_type type) noexcept;
     void update_source_addr(tr_address_type type) noexcept;
 

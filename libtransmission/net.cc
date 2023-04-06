@@ -771,11 +771,7 @@ tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
         auto const type = static_cast<tr_address_type>(i);
         auto const cb = [this, type]()
         {
-            update_source_addr(type);
-            if (global_source_addr(type))
-            {
-                update_global_addr(type);
-            }
+            update_addr(type);
         };
         upkeep_timer_[i]->setCallback(cb);
         start_timer(type, UpkeepInterval);
@@ -902,6 +898,15 @@ void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
     is_updating_[type] = false;
     lock.unlock();
     is_updating_cv_[type].notify_one();
+}
+
+void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
+{
+    update_source_addr(type);
+    if (global_source_addr(type))
+    {
+        update_global_addr(type);
+    }
 }
 
 void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept

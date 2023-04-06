@@ -1085,7 +1085,7 @@ private:
     std::optional<BoundSocket> bound_ipv6_;
 
 public:
-    // depends-on: settings_, announcer_udp_, global_ipv4_cache_, global_ipv6_cache_
+    // depends-on: settings_, announcer_udp_, global_ip_cache_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
     std::unique_ptr<tr_udp_core> udp_core_;
 

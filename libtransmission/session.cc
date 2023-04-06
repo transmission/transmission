@@ -647,15 +647,6 @@ void tr_session::initImpl(init_data& data)
 
     setSettings(client_settings, true);
 
-    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
-    {
-        auto const type = static_cast<tr_address_type>(i);
-        if (global_ip_cache_->global_source_addr(type))
-        {
-            global_ip_cache_->update_global_addr(type);
-        }
-    }
-
     if (this->allowsLPD())
     {
         this->lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
@@ -708,6 +699,15 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     if (auto const& val = new_settings.cache_size_mb; force || val != old_settings.cache_size_mb)
     {
         tr_sessionSetCacheLimit_MB(this, val);
+    }
+
+    if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
+    {
+        global_ip_cache_->update_addr(TR_AF_INET);
+    }
+    if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
+    {
+        global_ip_cache_->update_addr(TR_AF_INET6);
     }
 
     if (auto const& val = new_settings.default_trackers_str; force || val != old_settings.default_trackers_str)
