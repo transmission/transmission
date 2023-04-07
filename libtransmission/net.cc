@@ -775,7 +775,6 @@ tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
         };
         upkeep_timer_[i]->setCallback(cb);
         start_timer(type, UpkeepInterval);
-        update_source_addr(type);
     }
 }
 
@@ -789,8 +788,9 @@ tr_global_ip_cache::~tr_global_ip_cache()
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
         locks[i].lock();
-        is_updating_cv_[i].wait_for(locks[i], 5s, [this, i]() { return !is_updating_[i]; });
-        TR_ASSERT(!is_updating_[i]);
+        is_updating_cv_[i].wait_for(locks[i], 5s, [this, i]() { return is_updating_[i] == 0; });
+        TR_ASSERT(is_updating_[i] == 0);
+        is_updating_[i] = -1; // Disable updates
     }
 
     // Destroying std::shared_mutex while someone owns it is undefined behaviour
@@ -881,21 +881,25 @@ void tr_global_ip_cache::stop_timer(tr_address_type type) noexcept
     upkeep_timer_[type]->stop();
 }
 
-void tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
+bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
 {
     std::unique_lock lock{ is_updating_mutex_[type] };
-    is_updating_cv_[type].wait_for(lock, 5s, [this, type]() { return !is_updating_[type]; });
-    TR_ASSERT(!is_updating_[type]);
-    is_updating_[type] = true;
+    is_updating_cv_[type].wait(lock, [this, type]() { return is_updating_[type] == 0 || is_updating_[type] == -1; });
+    if (is_updating_[type] != 0)
+    {
+        return false;
+    }
+    is_updating_[type] = 1;
     lock.unlock();
     is_updating_cv_[type].notify_one();
+    return true;
 }
 
 void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
 {
-    TR_ASSERT(is_updating_[type]);
+    TR_ASSERT(is_updating_[type] == 1);
     std::unique_lock lock{ is_updating_mutex_[type] };
-    is_updating_[type] = false;
+    is_updating_[type] = 0;
     lock.unlock();
     is_updating_cv_[type].notify_one();
 }
@@ -913,14 +917,13 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
 {
     TR_ASSERT(has_ip_protocol_[type]);
     TR_ASSERT(global_source_addr(type));
-    TR_ASSERT(session_->amInSessionThread());
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices));
 
-    if (ix_service_[type] == 0U)
+    if (ix_service_[type] == 0U && !set_is_updating(type))
     {
-        TR_ASSERT(!is_updating_[type]);
-        set_is_updating(type);
+        return;
     }
+    TR_ASSERT(is_updating_[type] == 1);
 
     // Update global address
     auto options = tr_web::FetchOptions{ IPQueryServices[ix_service_[type]],
@@ -937,7 +940,11 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 {
     TR_ASSERT(has_ip_protocol_[type]);
 
-    set_is_updating(type);
+    if (!set_is_updating(type))
+    {
+        return;
+    }
+    TR_ASSERT(is_updating_[type] == 1);
 
     auto constexpr Map = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
     auto const protocol = type == TR_AF_INET ? "IPv4" : "IPv6";
@@ -968,7 +975,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
 {
     TR_ASSERT(session_->amInSessionThread());
-    TR_ASSERT(is_updating_[type]);
+    TR_ASSERT(is_updating_[type] == 1);
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices));
 
     auto const protocol = type == TR_AF_INET ? "IPv4" : "IPv6";

@@ -446,7 +446,7 @@ private:
 
     void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept;
     void stop_timer(tr_address_type type) noexcept;
-    void set_is_updating(tr_address_type type) noexcept;
+    bool set_is_updating(tr_address_type type) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
 
     void update_addr(tr_address_type type) noexcept;
@@ -464,7 +464,7 @@ private:
 
     tr_session* const session_;
 
-    std::array<std::atomic_bool, NUM_TR_AF_INET_TYPES> is_updating_ = { false };
+    std::array<std::atomic_int8_t, NUM_TR_AF_INET_TYPES> is_updating_ = { 0 };
     std::array<std::mutex, NUM_TR_AF_INET_TYPES> is_updating_mutex_;
     std::array<std::condition_variable, NUM_TR_AF_INET_TYPES> is_updating_cv_;
 
