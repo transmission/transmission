@@ -764,7 +764,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
 tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
     : session_{ session_in }
-    , upkeep_timer_{ session_in->timerMaker().create(), session_in->timerMaker().create() }
+    , upkeep_timers_{ session_in->timerMaker().create(), session_in->timerMaker().create() }
 {
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
@@ -773,7 +773,7 @@ tr_global_ip_cache::tr_global_ip_cache(tr_session* const session_in)
         {
             update_addr(type);
         };
-        upkeep_timer_[i]->setCallback(cb);
+        upkeep_timers_[i]->setCallback(cb);
         start_timer(type, UpkeepInterval);
     }
 }
@@ -782,27 +782,32 @@ tr_global_ip_cache::~tr_global_ip_cache()
 {
     TR_ASSERT(!session_->amInSessionThread());
 
-    // Wait until all updates are done
-    std::array locks{ std::unique_lock{ is_updating_mutex_[TR_AF_INET], std::defer_lock },
-                      std::unique_lock{ is_updating_mutex_[TR_AF_INET6], std::defer_lock } };
-    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
+    // Destroying mutex while someone owns it is undefined behaviour, so we acquire it first
+    std::scoped_lock const locks{ is_updating_mutex_[TR_AF_INET], is_updating_mutex_[TR_AF_INET6],
+                                  global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
+                                  source_addr_mutex_[TR_AF_INET], source_addr_mutex_[TR_AF_INET6] };
+
+    TR_ASSERT(
+        std::all_of(std::begin(is_updating_), std::end(is_updating_), [](std::atomic_int8_t const& v) { return v == -1; }));
+}
+
+bool tr_global_ip_cache::try_shutdown() noexcept
+{
+    for (auto& timer : upkeep_timers_)
     {
-        locks[i].lock();
-        is_updating_cv_[i].wait_for(locks[i], 5s, [this, i]() { return is_updating_[i] == 0; });
-        TR_ASSERT(is_updating_[i] == 0);
-        is_updating_[i] = -1; // Disable updates
+        timer->stop();
     }
 
-    // Destroying std::shared_mutex while someone owns it is undefined behaviour
-    std::lock(
-        global_addr_mutex_[TR_AF_INET],
-        global_addr_mutex_[TR_AF_INET6],
-        source_addr_mutex_[TR_AF_INET],
-        source_addr_mutex_[TR_AF_INET6]);
-    std::unique_lock const ip_lock1{ global_addr_mutex_[TR_AF_INET], std::adopt_lock };
-    std::unique_lock const ip_lock2{ global_addr_mutex_[TR_AF_INET6], std::adopt_lock };
-    std::unique_lock const ip_lock3{ source_addr_mutex_[TR_AF_INET], std::adopt_lock };
-    std::unique_lock const ip_lock4{ source_addr_mutex_[TR_AF_INET6], std::adopt_lock };
+    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        std::unique_lock const lock{ is_updating_mutex_[i], std::try_to_lock };
+        if (!lock.owns_lock() || is_updating_[i] == 1)
+        {
+            return false;
+        }
+        is_updating_[i] = -1; // Abort any future updates
+    }
+    return true;
 }
 
 std::optional<tr_address> const& tr_global_ip_cache::global_addr(tr_address_type type) noexcept
@@ -873,12 +878,12 @@ void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 
 void tr_global_ip_cache::start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept
 {
-    upkeep_timer_[type]->startRepeating(msec);
+    upkeep_timers_[type]->startRepeating(msec);
 }
 
 void tr_global_ip_cache::stop_timer(tr_address_type type) noexcept
 {
-    upkeep_timer_[type]->stop();
+    upkeep_timers_[type]->stop();
 }
 
 bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
@@ -959,7 +964,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
     {
         // Stop the update process since we have no public internet connectivity
         unset_addr(type);
-        upkeep_timer_[type]->setInterval(RetryUpkeepInterval);
+        upkeep_timers_[type]->setInterval(RetryUpkeepInterval);
         tr_logAddDebug(fmt::format(_("Couldn't obtain source {} address"), protocol));
         if (errno == EAFNOSUPPORT)
         {
@@ -990,8 +995,8 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
         {
             return std::isspace(c);
         };
-        ip.erase(ip.begin(), std::find_if_not(ip.begin(), ip.end(), Ws));
-        ip.erase(std::find_if_not(ip.rbegin(), ip.rend(), Ws).base(), ip.end());
+        ip.erase(std::begin(ip), std::find_if_not(std::begin(ip), std::end(ip), Ws));
+        ip.erase(std::find_if_not(std::rbegin(ip), std::rend(ip), Ws).base(), std::end(ip));
 
         // Update member
         if (auto addr = tr_address::from_string(ip); addr && addr->is_global_unicast_address() && addr->type == type)
@@ -999,7 +1004,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
             set_global_addr(*addr);
 
             success = true;
-            upkeep_timer_[type]->setInterval(UpkeepInterval);
+            upkeep_timers_[type]->setInterval(UpkeepInterval);
 
             tr_logAddInfo(fmt::format(
                 _("Successfully updated global {type} address to {ip} using {url}"),
@@ -1020,7 +1025,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     {
         tr_logAddDebug(fmt::format("Couldn't obtain global {} address", protocol));
         unset_global_addr(type);
-        upkeep_timer_[type]->setInterval(RetryUpkeepInterval);
+        upkeep_timers_[type]->setInterval(RetryUpkeepInterval);
     }
 
     ix_service_[type] = 0U;

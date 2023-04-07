@@ -434,6 +434,8 @@ public:
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
 
 private:
+    bool try_shutdown() noexcept;
+
     [[nodiscard]] std::optional<tr_address> const& global_addr(tr_address_type type) noexcept;
     [[nodiscard]] std::optional<tr_address> const& global_source_addr(tr_address_type type) noexcept;
 
@@ -479,7 +481,7 @@ private:
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed
     // (The destructor will acquire the IP address locks before proceeding, but still)
-    std::array<std::unique_ptr<libtransmission::Timer>, NUM_TR_AF_INET_TYPES> upkeep_timer_;
+    std::array<std::unique_ptr<libtransmission::Timer>, NUM_TR_AF_INET_TYPES> upkeep_timers_;
 
     std::array<std::atomic_size_t, NUM_TR_AF_INET_TYPES> ix_service_ = { 0U };
     static auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };

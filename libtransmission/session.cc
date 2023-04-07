@@ -1295,8 +1295,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // ...since global_ip_cache_ relies on web_ to update global addresses,
     // we tell it to stop updating before web_ starts to refuse new requests.
     // But we keep it intact for now, so that udp_core_ can continue.
-    this->global_ip_cache_->stop_timer(TR_AF_INET);
-    this->global_ip_cache_->stop_timer(TR_AF_INET6);
+    this->global_ip_cache_->try_shutdown();
     // ...and now that those are done, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
@@ -1312,8 +1311,10 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
 void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
 {
     // try to keep the UDP announcer alive long enough to send out
-    // all the &event=stopped tracker announces
-    if (n_pending_stops_ != 0U && std::chrono::steady_clock::now() < deadline)
+    // all the &event=stopped tracker announces.
+    // also wait for all ip cache updates to finish so that web_ can
+    // safely destruct.
+    if ((n_pending_stops_ != 0U || !global_ip_cache_->try_shutdown()) && std::chrono::steady_clock::now() < deadline)
     {
         announcer_udp_->upkeep();
         return;
