@@ -435,7 +435,7 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
         // otherwise, use any_ipv6 (::).
         static auto constexpr DefaultAddr = tr_address::any_ipv6();
         auto const source_addr = globalSourceIP(type);
-        auto addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr : DefaultAddr;
+        auto addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr : global_ip_cache_->bind_addr(type);
         return { addr, addr == DefaultAddr };
     }
 
