@@ -10,13 +10,8 @@
 
 #include <algorithm> // for std::copy_n
 #include <array>
-#include <atomic>
-#include <condition_variable>
-#include <chrono>
 #include <cstddef> // size_t
 #include <optional>
-#include <shared_mutex>
-#include <mutex>
 #include <string>
 #include <string_view>
 #include <utility> // std::pair
@@ -62,11 +57,6 @@ using tr_socket_t = int;
 
 #define sockerrno errno
 #endif
-
-#include "timer.h"
-#include "web.h"
-
-using namespace std::literals;
 
 /**
  * Literally just a port number.
@@ -407,88 +397,3 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * @param err an errno on Unix/Linux and an WSAError on win32)
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
-
-/**
- * Cache global IP addresses.
- *
- * This class caches 3 useful info:
- * 1. Whether your machine supports the IP protocol
- * 2. Source address used for global connections
- * 3. Global address
- *
- * The idea is, if this class successfully cached a source address, that means
- * you have connectivity to the public internet. And if the global address is
- * the same with the source address, then you are not behind an NAT.
- *
- * Note: This class isn't meant to be accessed by anyone other than tr_session,
- * so it has no public methods.
- */
-class tr_global_ip_cache
-{
-public:
-    explicit tr_global_ip_cache(tr_session* session_in);
-    ~tr_global_ip_cache();
-    tr_global_ip_cache(tr_global_ip_cache const&) = delete;
-    tr_global_ip_cache(tr_global_ip_cache&&) = delete;
-    tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
-    tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
-
-private:
-    bool try_shutdown() noexcept;
-
-    [[nodiscard]] std::optional<tr_address> const& global_addr(tr_address_type type) noexcept;
-    [[nodiscard]] std::optional<tr_address> const& global_source_addr(tr_address_type type) noexcept;
-
-    [[nodiscard]] tr_address bind_addr(tr_address_type type) noexcept;
-
-    void set_global_addr(tr_address const& addr) noexcept;
-    void unset_global_addr(tr_address_type type) noexcept;
-    void set_source_addr(tr_address const& addr) noexcept;
-    void unset_addr(tr_address_type type) noexcept;
-
-    void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept;
-    void stop_timer(tr_address_type type) noexcept;
-    bool set_is_updating(tr_address_type type) noexcept;
-    void unset_is_updating(tr_address_type type) noexcept;
-
-    void update_addr(tr_address_type type) noexcept;
-    void update_global_addr(tr_address_type type) noexcept;
-    void update_source_addr(tr_address_type type) noexcept;
-
-    // Only use as a callback for web_->fetch()
-    void on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept;
-
-    [[nodiscard]] static std::optional<tr_address> get_global_source_address(int af, tr_address const& bind_addr);
-    [[nodiscard]] static std::optional<tr_address> get_source_address(
-        tr_address const& dst_addr,
-        tr_port dst_port,
-        tr_address const& bind_addr);
-
-    tr_session* const session_;
-
-    std::array<std::atomic_int8_t, NUM_TR_AF_INET_TYPES> is_updating_ = { 0 };
-    std::array<std::mutex, NUM_TR_AF_INET_TYPES> is_updating_mutex_;
-    std::array<std::condition_variable, NUM_TR_AF_INET_TYPES> is_updating_cv_;
-
-    // Whether this machine supports this IP protocol
-    std::array<std::atomic_bool, NUM_TR_AF_INET_TYPES> has_ip_protocol_ = { true, true };
-
-    // Never directly read/write IP addresses for the sake of being thread safe
-    // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
-    std::array<std::shared_mutex, NUM_TR_AF_INET_TYPES> global_addr_mutex_, source_addr_mutex_;
-    std::array<std::optional<tr_address>, NUM_TR_AF_INET_TYPES> global_addr_, source_addr_;
-
-    // Keep the timer at the bottom of the class definition so that it will be destructed first
-    // We don't want it to trigger after the IP addresses have been destroyed
-    // (The destructor will acquire the IP address locks before proceeding, but still)
-    std::array<std::unique_ptr<libtransmission::Timer>, NUM_TR_AF_INET_TYPES> upkeep_timers_;
-
-    std::array<std::atomic_size_t, NUM_TR_AF_INET_TYPES> ix_service_ = { 0U };
-    static auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
-
-    friend struct tr_session;
-
-public:
-    static auto constexpr UpkeepInterval = 30min;
-    static auto constexpr RetryUpkeepInterval = 30s;
-};

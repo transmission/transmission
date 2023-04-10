@@ -33,6 +33,7 @@
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "cache.h"
+#include "global-ip-cache.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
@@ -44,6 +45,7 @@
 #include "session-thread.h"
 #include "stats.h"
 #include "torrents.h"
+#include "tr-assert.h"
 #include "tr-dht.h"
 #include "tr-lpd.h"
 #include "utils-ev.h"
@@ -775,7 +777,7 @@ public:
     [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
     {
         TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
-        return global_ip_cache_->has_ip_protocol_[type];
+        return global_ip_cache_.has_ip_protocol_[type];
     }
 
     struct PublicAddressResult
@@ -789,13 +791,13 @@ public:
     [[nodiscard]] std::optional<tr_address> globalIP(tr_address_type type) const noexcept
     {
         TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
-        return global_ip_cache_->global_addr(type);
+        return global_ip_cache_.global_addr(type);
     }
 
     [[nodiscard]] std::optional<tr_address> globalSourceIP(tr_address_type type) const noexcept
     {
         TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
-        return global_ip_cache_->global_source_addr(type);
+        return global_ip_cache_.global_source_addr(type);
     }
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
@@ -1113,7 +1115,7 @@ private:
     tr_torrents torrents_;
 
     // depends-on: settings_, session_thread_, timer_maker_, web_
-    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = std::make_unique<tr_global_ip_cache>(this);
+    tr_global_ip_cache global_ip_cache_{ *this };
 
     // depends-on: settings_, session_thread_, torrents_, global_ip_cache_
     WebMediator web_mediator_{ this };

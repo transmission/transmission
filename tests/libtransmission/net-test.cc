@@ -196,13 +196,11 @@ TEST_F(GlobalIPTest, globalIPv4)
     (void)waitFor(test, 5000);
     if (!addr)
     {
-        std::cerr << "globalIPv4 did not return an address, either:" << std::endl
-                  << "1. globalIPv4 is broken" << std::endl
-                  << "2. Your system does not support IPv4" << std::endl
-                  << "3. You don't have a global IPv4 address" << std::endl
-                  << "4. None of the IP query services we use is up" << std::endl;
-        SUCCEED();
-        return;
+        GTEST_SKIP() << "globalIPv4 did not return an address, either:\n"
+                     << "1. globalIPv4 is broken\n"
+                     << "2. Your system does not support IPv4\n"
+                     << "3. You don't have a global IPv4 address\n"
+                     << "4. None of the IP query services we use is up";
     }
     ASSERT_TRUE(addr->is_ipv4()) << "globalIPv4 returned a non-IPv4 address (" << addr->display_name() << ')';
     ASSERT_TRUE(addr->is_global_unicast_address())
@@ -221,12 +219,11 @@ TEST_F(GlobalIPTest, globalIPv6)
     (void)waitFor(test, 1000);
     if (!addr)
     {
-        std::cerr << "globalIPv6 did not return an address, either:" << std::endl
-                  << "1. globalIPv6 is broken" << std::endl
-                  << "2. Your system does not support IPv6" << std::endl
-                  << "3. You don't have a global IPv6 address" << std::endl;
-        SUCCEED();
-        return;
+        GTEST_SKIP() << "globalIPv6 did not return an address, either:\n"
+                     << "1. globalIPv6 is broken\n"
+                     << "2. Your system does not support IPv6\n"
+                     << "3. You don't have a global IPv6 address\n"
+                     << "4. None of the IP query services we use is up";
     }
     ASSERT_TRUE(addr->is_ipv6()) << "globalIPv6 returned a non-IPv6 address (" << addr->display_name() << ')';
     ASSERT_TRUE(addr->is_global_unicast_address())
@@ -244,12 +241,10 @@ TEST_F(GlobalIPTest, globalSourceIPv4)
     (void)waitFor(test, 1000);
     if (!addr)
     {
-        std::cerr << "globalSourceIPv4 did not return an address, either:" << std::endl
-                  << "1. globalSourceIPv4 is broken" << std::endl
-                  << "2. Your system does not support IPv4" << std::endl
-                  << "3. You don't have IPv4 connectivity to public internet" << std::endl;
-        SUCCEED();
-        return;
+        GTEST_SKIP() << "globalSourceIPv4 did not return an address, either:\n"
+                     << "1. globalSourceIPv4 is broken\n"
+                     << "2. Your system does not support IPv4\n"
+                     << "3. You don't have IPv4 connectivity to public internet";
     }
     ASSERT_TRUE(addr->is_ipv4()) << "globalSourceIPv4 returned a non-IPv4 address (" << addr->display_name() << ')';
 }
@@ -265,12 +260,10 @@ TEST_F(GlobalIPTest, globalSourceIPv6)
     (void)waitFor(test, 1000);
     if (!addr)
     {
-        std::cerr << "globalSourceIPv6 did not return an address, either:" << std::endl
-                  << "1. globalSourceIPv6 is broken" << std::endl
-                  << "2. Your system does not support IPv6" << std::endl
-                  << "3. You don't have IPv6 connectivity to public internet" << std::endl;
-        SUCCEED();
-        return;
+        GTEST_SKIP() << "globalSourceIPv6 did not return an address, either:\n"
+                     << "1. globalSourceIPv6 is broken\n"
+                     << "2. Your system does not support IPv6\n"
+                     << "3. You don't have IPv6 connectivity to public internet";
     }
     ASSERT_TRUE(addr->is_ipv6()) << "globalSourceIPv6 returned a non-IPv6 address (" << addr->display_name() << ')';
 }

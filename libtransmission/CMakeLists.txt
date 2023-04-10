@@ -52,6 +52,8 @@ target_sources(${TR_NAME}
         file-win32.cc
         file.cc
         file.h
+        global-ip-cache.cc
+        global-ip-cache.h
         handshake.cc
         handshake.h
         history.h
