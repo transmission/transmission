@@ -2,8 +2,6 @@
 #include "tr-assert.h"
 #include "session.h"
 
-#include <iostream>
-
 tr_global_ip_cache::tr_global_ip_cache(tr_session& session_in)
     : session_{ session_in }
     , upkeep_timers_{ session_in.timerMaker().create(), session_in.timerMaker().create() }
