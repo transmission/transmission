@@ -1,6 +1,20 @@
+#include <algorithm> // std::all_of
+#include <cstddef>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <cerrno>
+#include <sys/socket.h>
+#endif
+
+#include <fmt/core.h>
+
+#include "log.h"
 #include "global-ip-cache.h"
-#include "tr-assert.h"
 #include "session.h"
+#include "tr-assert.h"
+#include "utils.h"
 
 tr_global_ip_cache::tr_global_ip_cache(tr_session& session_in)
     : session_{ session_in }
@@ -291,7 +305,12 @@ std::optional<tr_address> tr_global_ip_cache::get_global_source_address(tr_addre
     // this should be a global unicast address, not Teredo or 6to4
     TR_ASSERT(dst_addr && dst_addr->is_global_unicast_address());
 
-    return get_source_address(*dst_addr, dst_port, bind_addr, err_out);
+    if (dst_addr)
+    {
+        return get_source_address(*dst_addr, dst_port, bind_addr, err_out);
+    }
+
+    return {};
 }
 
 // Get the source address used for a given destination address.

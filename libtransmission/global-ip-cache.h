@@ -1,10 +1,12 @@
 #include <array>
 #include <atomic>
 #include <condition_variable>
-#include <chrono>
+#include <chrono> // operator ""min, operator ""s, std::chrono::milliseconds
+#include <memory> // std::unique_ptr
 #include <mutex>
 #include <optional>
 #include <shared_mutex>
+#include <string_view> // operator ""sv
 
 #include "net.h"
 #include "timer.h"
@@ -17,6 +19,8 @@
 #endif
 
 using namespace std::literals;
+
+struct tr_session;
 
 /**
  * Cache global IP addresses.
