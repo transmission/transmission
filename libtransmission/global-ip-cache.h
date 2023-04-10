@@ -62,7 +62,7 @@ private:
 
     void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept;
     void stop_timer(tr_address_type type) noexcept;
-    bool set_is_updating(tr_address_type type) noexcept;
+    [[nodiscard]] bool set_is_updating(tr_address_type type) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
 
     void update_addr(tr_address_type type) noexcept;
