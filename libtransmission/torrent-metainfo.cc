@@ -390,7 +390,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tm_.addWebseed(value);
         }
-        else if (pathIs(MagnetInfoKey, DisplayNameKey))
+        else if (pathIs(MagnetInfoKey, DisplayNameKey) && std::empty(tm_.name()))
         {
             // compatibility with Transmission <= 3.0
             tm_.setName(value);
