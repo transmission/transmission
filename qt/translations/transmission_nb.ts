@@ -123,7 +123,7 @@
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
             <numerusform>%1 (%Ln del @ %2)</numerusform>
-            <numerusform>%1 (%Ln feler @ %2)</numerusform>
+            <numerusform>%1 (%Ln deler @ %2)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
