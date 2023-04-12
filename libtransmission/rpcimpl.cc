@@ -1508,7 +1508,7 @@ void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
             tr_variantDictAdd(data->args_out, TR_KEY_torrent_duplicate),
             std::data(Fields),
             std::size(Fields));
-        tr_idle_function_done(data, "duplicate torrent"sv);
+        tr_idle_function_done(data, SuccessResult);
         return;
     }
 
