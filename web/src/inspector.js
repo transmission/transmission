@@ -739,13 +739,14 @@ export class Inspector extends EventTarget {
         tier_div.classList.add('tier-list-row', index % 2 ? 'odd' : 'even');
 
         let element = document.createElement('div');
+        let site = '';
+        try {
+          site = new URL(tracker.announce).origin;
+        } catch {
+          site = [tracker.sitename || tracker.host || tracker.announce];
+        }
         element.classList.add('tier-list-tracker');
-        setTextContent(
-          element,
-          `${tracker.sitename || tracker.host || tracker.announce} - tier ${
-            tracker.tier + 1
-          }`
-        );
+        setTextContent(element, `${site} - tier ${tracker.tier + 1}`);
         element.setAttribute('title', tracker.announce);
         tier_div.append(element);
 
