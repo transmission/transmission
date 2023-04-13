@@ -10,6 +10,7 @@
 
 #include "net.h"
 #include "timer.h"
+#include "tr-assert.h"
 #include "web.h"
 
 #pragma once
@@ -46,15 +47,22 @@ public:
     tr_global_ip_cache(tr_global_ip_cache&&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
-
-private:
     bool try_shutdown() noexcept;
+
+    [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
+    {
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        return has_ip_protocol_[type];
+    }
 
     [[nodiscard]] std::optional<tr_address> global_addr(tr_address_type type) const noexcept;
     [[nodiscard]] std::optional<tr_address> global_source_addr(tr_address_type type) const noexcept;
 
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
+    void update_addr(tr_address_type type) noexcept;
+
+private:
     void set_global_addr(tr_address const& addr) noexcept;
     void unset_global_addr(tr_address_type type) noexcept;
     void set_source_addr(tr_address const& addr) noexcept;
@@ -65,7 +73,6 @@ private:
     [[nodiscard]] bool set_is_updating(tr_address_type type) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
 
-    void update_addr(tr_address_type type) noexcept;
     void update_global_addr(tr_address_type type) noexcept;
     void update_source_addr(tr_address_type type) noexcept;
 
@@ -79,6 +86,9 @@ private:
         tr_address const& bind_addr,
         int& err_out);
 
+    template<typename T>
+    using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
+
     tr_session const& session_;
 
     enum class is_updating_t
@@ -87,29 +97,27 @@ private:
         YES,
         ABORT
     };
-    std::array<is_updating_t, NUM_TR_AF_INET_TYPES> is_updating_ = {};
-    std::array<std::mutex, NUM_TR_AF_INET_TYPES> is_updating_mutex_;
-    std::array<std::condition_variable, NUM_TR_AF_INET_TYPES> is_updating_cv_;
+    array_ip_t<is_updating_t> is_updating_ = {};
+    array_ip_t<std::mutex> is_updating_mutex_;
+    array_ip_t<std::condition_variable> is_updating_cv_;
 
     // Whether this machine supports this IP protocol
-    std::array<std::atomic_bool, NUM_TR_AF_INET_TYPES> has_ip_protocol_ = { true, true };
+    array_ip_t<std::atomic_bool> has_ip_protocol_ = { true, true };
 
     // Never directly read/write IP addresses for the sake of being thread safe
     // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
-    mutable std::array<std::shared_mutex, NUM_TR_AF_INET_TYPES> global_addr_mutex_;
-    std::array<std::optional<tr_address>, NUM_TR_AF_INET_TYPES> global_addr_;
-    mutable std::array<std::shared_mutex, NUM_TR_AF_INET_TYPES> source_addr_mutex_;
-    std::array<std::optional<tr_address>, NUM_TR_AF_INET_TYPES> source_addr_;
+    mutable array_ip_t<std::shared_mutex> global_addr_mutex_;
+    array_ip_t<std::optional<tr_address>> global_addr_;
+    mutable array_ip_t<std::shared_mutex> source_addr_mutex_;
+    array_ip_t<std::optional<tr_address>> source_addr_;
 
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed
     // (The destructor will acquire the IP address locks before proceeding, but still)
-    std::array<std::unique_ptr<libtransmission::Timer>, NUM_TR_AF_INET_TYPES> upkeep_timers_;
+    array_ip_t<std::unique_ptr<libtransmission::Timer>> upkeep_timers_;
 
-    std::array<std::atomic_size_t, NUM_TR_AF_INET_TYPES> ix_service_ = {};
+    array_ip_t<std::atomic_size_t> ix_service_ = {};
     static auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
     static auto constexpr UpkeepInterval = 30min;
     static auto constexpr RetryUpkeepInterval = 30s;
-
-    friend struct tr_session;
 };

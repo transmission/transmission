@@ -89,7 +89,7 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
         static auto constexpr DefaultAddr = tr_address::any_ipv4();
-        return tr_address::from_string(session_.settings_.bind_address_ipv4).value_or(DefaultAddr);
+        return tr_address::from_string(session_.bindAddress(type)).value_or(DefaultAddr);
     }
 
     if (type == TR_AF_INET6)
@@ -97,11 +97,20 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, use any_ipv6 (::).
         static auto constexpr DefaultAddr = tr_address::any_ipv6();
-        return tr_address::from_string(session_.settings_.bind_address_ipv6).value_or(DefaultAddr);
+        return tr_address::from_string(session_.bindAddress(type)).value_or(DefaultAddr);
     }
 
     TR_ASSERT_MSG(false, "invalid type");
     return {};
+}
+
+void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
+{
+    update_source_addr(type);
+    if (global_source_addr(type))
+    {
+        update_global_addr(type);
+    }
 }
 
 void tr_global_ip_cache::set_global_addr(tr_address const& addr) noexcept
@@ -169,15 +178,6 @@ void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
     is_updating_[type] = is_updating_t::NO;
     lock.unlock();
     is_updating_cv_[type].notify_one();
-}
-
-void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
-{
-    update_source_addr(type);
-    if (global_source_addr(type))
-    {
-        update_global_addr(type);
-    }
 }
 
 void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept

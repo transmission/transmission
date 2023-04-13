@@ -45,7 +45,6 @@
 #include "session-thread.h"
 #include "stats.h"
 #include "torrents.h"
-#include "tr-assert.h"
 #include "tr-dht.h"
 #include "tr-lpd.h"
 #include "utils-ev.h"
@@ -507,6 +506,10 @@ public:
     void closeTorrentFiles(tr_torrent* tor) noexcept;
     void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
 
+    // bind address
+
+    [[nodiscard]] std::string bindAddress(tr_address_type type) const noexcept;
+
     // announce ip
 
     [[nodiscard]] constexpr std::string const& announceIP() const noexcept
@@ -776,8 +779,7 @@ public:
 
     [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
     {
-        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
-        return global_ip_cache_.has_ip_protocol_[type];
+        return global_ip_cache_.has_ip_protocol(type);
     }
 
     struct PublicAddressResult
@@ -926,7 +928,6 @@ private:
     static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
 
     friend class libtransmission::test::SessionTest;
-    friend class tr_global_ip_cache;
 
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);

@@ -2087,6 +2087,22 @@ void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noe
 
 // ---
 
+std::string tr_session::bindAddress(tr_address_type type) const noexcept
+{
+    switch (type)
+    {
+    case TR_AF_INET:
+        return settings_.bind_address_ipv4;
+    case TR_AF_INET6:
+        return settings_.bind_address_ipv6;
+    default:
+        TR_ASSERT_MSG(false, "invalid type");
+        return {};
+    }
+}
+
+// ---
+
 void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data)
 {
     session->setQueueStartCallback(callback, user_data);
