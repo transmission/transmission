@@ -582,17 +582,9 @@ void MainWindow::setLocation()
 
 namespace
 {
-
-// Open Folder & select torrent's file or top folder
-
-#ifdef HAVE_OPEN_SELECT
-#undef HAVE_OPEN_SELECT
-#endif
-
+namespace open_folder_helpers
+{
 #if defined(Q_OS_WIN)
-
-#define HAVE_OPEN_SELECT
-
 void openSelect(QString const& path)
 {
     auto const explorer = QStringLiteral("explorer");
@@ -606,11 +598,7 @@ void openSelect(QString const& path)
     param += QDir::toNativeSeparators(path);
     QProcess::startDetached(explorer, QStringList(param));
 }
-
 #elif defined(Q_OS_MAC)
-
-#define HAVE_OPEN_SELECT
-
 void openSelect(QString const& path)
 {
     QStringList script_args;
@@ -621,54 +609,85 @@ void openSelect(QString const& path)
     script_args << QStringLiteral("-e") << QStringLiteral("tell application \"Finder\" to activate");
     QProcess::execute(QStringLiteral("/usr/bin/osascript"), script_args);
 }
-
+#else
+void openSelect(QString const& path)
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+}
 #endif
 
+// if all torrents in a list have the same top folder, return it
+[[nodiscard]] QString getTopFolder(FileList const& files)
+{
+    if (std::empty(files))
+    {
+        return {};
+    }
+
+    auto const& first_filename = files.at(0).filename;
+    auto const slash_index = first_filename.indexOf(QLatin1Char{ '/' });
+    if (slash_index == -1)
+    {
+        return {};
+    }
+
+    auto top = first_filename.left(slash_index);
+    if (!std::all_of(std::begin(files), std::end(files), [&top](auto const& file) { return file.filename.startsWith(top); }))
+    {
+        return {};
+    }
+
+    return top;
+}
+
+[[nodiscard]] bool isTopFolder(QDir const& parent, QString const& child)
+{
+    if (child.isEmpty())
+    {
+        return false;
+    }
+
+    auto const info = QFileInfo{ parent, child };
+    return info.exists() && info.isDir();
+}
+
+[[nodiscard]] QString getTopFolder(QDir const& parent, Torrent const* const tor)
+{
+    if (auto top = getTopFolder(tor->files()); isTopFolder(parent, top))
+    {
+        return top;
+    }
+
+    if (auto const& top = tor->name(); isTopFolder(parent, top))
+    {
+        return top;
+    }
+
+    return {};
+}
+} // namespace open_folder_helpers
 } // namespace
 
 void MainWindow::openFolder()
 {
-    auto const selected_torrents = getSelectedTorrents();
+    using namespace open_folder_helpers;
 
-    if (selected_torrents.size() != 1)
+    auto const selected_torrents = getSelectedTorrents();
+    if (std::size(selected_torrents) != 1U)
     {
         return;
     }
 
-    int const torrent_id(*selected_torrents.begin());
-    Torrent const* tor(model_.getTorrentFromId(torrent_id));
-
+    auto const torrent_id = *selected_torrents.begin();
+    auto const* const tor = model_.getTorrentFromId(torrent_id);
     if (tor == nullptr)
     {
         return;
     }
 
-    QString path(tor->getPath());
-    FileList const& files = tor->files();
-
-    if (files.empty())
-    {
-        return;
-    }
-
-    QString const first_file = files.at(0).filename;
-
-    if (int const slash_index = first_file.indexOf(QLatin1Char('/')); slash_index > -1)
-    {
-        path = path + QLatin1Char('/') + first_file.left(slash_index);
-    }
-
-#ifdef HAVE_OPEN_SELECT
-
-    else
-    {
-        openSelect(path + QLatin1Char('/') + first_file);
-        return;
-    }
-
-#endif
-
-    QDesktopServices::openUrl(QUrl::fromLocalFile(path));
+    auto const parent = QDir{ tor->getPath() };
+    auto const child = getTopFolder(parent, tor);
+    openSelect(parent.filePath(child));
 }
 
 void MainWindow::copyMagnetLinkToClipboard()

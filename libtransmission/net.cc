@@ -368,7 +368,7 @@ bool tr_net_hasIPv6(tr_port port)
     if (!already_done)
     {
         int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv4(), port, true, &err);
+        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv6(), port, true, &err);
 
         if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
         {
@@ -581,13 +581,15 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 
     auto addr = tr_address{};
 
-    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr) == 1)
+    addr.addr.addr4 = {};
+    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr.addr4) == 1)
     {
         addr.type = TR_AF_INET;
         return addr;
     }
 
-    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr) == 1)
+    addr.addr.addr6 = {};
+    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr.addr6) == 1)
     {
         addr.type = TR_AF_INET6;
         return addr;

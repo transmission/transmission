@@ -312,7 +312,8 @@ export class Inspector extends EventTarget {
         string = `${fmt.size(verified)} (100%)`;
       }
     }
-    setTextContent(e.info.have, string);
+
+    setTextContent(e.info.have, fmt.stringSanitizer(string));
 
     // availability
     if (torrents.length === 0) {
@@ -326,7 +327,7 @@ export class Inspector extends EventTarget {
       );
       string = `${fmt.percentString((100 * available) / sizeWhenDone)}%`;
     }
-    setTextContent(e.info.availability, string);
+    setTextContent(e.info.availability, fmt.stringSanitizer(string));
 
     //  downloaded
     if (torrents.length === 0) {
@@ -344,7 +345,8 @@ export class Inspector extends EventTarget {
         ? `${fmt.size(d)} (+${fmt.size(f)} discarded after failed checksum)`
         : fmt.size(d);
     }
-    setTextContent(e.info.downloaded, string);
+
+    setTextContent(e.info.downloaded, fmt.stringSanitizer(string));
 
     // uploaded
     if (torrents.length === 0) {
@@ -448,7 +450,7 @@ export class Inspector extends EventTarget {
         string = 'None';
       }
     }
-    setTextContent(e.info.size, string);
+    setTextContent(e.info.size, fmt.stringSanitizer(string));
 
     // hash
     if (torrents.length === 0) {
@@ -737,13 +739,14 @@ export class Inspector extends EventTarget {
         tier_div.classList.add('tier-list-row', index % 2 ? 'odd' : 'even');
 
         let element = document.createElement('div');
+        let site = '';
+        try {
+          site = new URL(tracker.announce).origin;
+        } catch {
+          site = [tracker.sitename || tracker.host || tracker.announce];
+        }
         element.classList.add('tier-list-tracker');
-        setTextContent(
-          element,
-          `${tracker.sitename || tracker.host || tracker.announce} - tier ${
-            tracker.tier + 1
-          }`
-        );
+        setTextContent(element, `${site} - tier ${tracker.tier + 1}`);
         element.setAttribute('title', tracker.announce);
         tier_div.append(element);
 

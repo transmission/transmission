@@ -884,10 +884,24 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                                                         andEventID:kAEOpenContents];
 
     //if we were opened from a user notification, do the corresponding action
-    NSUserNotification* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
-    if (launchNotification)
+    if (@available(macOS 10.14, *))
     {
-        [self userNotificationCenter:NSUserNotificationCenter.defaultUserNotificationCenter didActivateNotification:launchNotification];
+        UNNotificationResponse* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
+        if (launchNotification)
+        {
+            [self userNotificationCenter:UNUserNotificationCenter.currentNotificationCenter
+                didReceiveNotificationResponse:launchNotification withCompletionHandler:^{
+                }];
+        }
+    }
+    else
+    {
+        NSUserNotification* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
+        if (launchNotification)
+        {
+            [self userNotificationCenter:NSUserNotificationCenter.defaultUserNotificationCenter
+                 didActivateNotification:launchNotification];
+        }
     }
 
     //auto importing
@@ -2385,6 +2399,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 {
     if (!response.notification.request.content.userInfo.count)
     {
+        completionHandler();
         return;
     }
 
@@ -2396,6 +2411,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         [self didActivateNotificationByActionShowWithUserInfo:response.notification.request.content.userInfo];
     }
+    completionHandler();
 }
 
 - (void)userNotificationCenter:(NSUserNotificationCenter*)center didActivateNotification:(NSUserNotification*)notification
@@ -3390,7 +3406,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     }
     else
     {
-        [popover showRelativeToRect:senderView.frame ofView:senderView preferredEdge:NSMaxYEdge];
+        [popover showRelativeToRect:senderView.bounds ofView:senderView preferredEdge:NSMaxYEdge];
     }
 }
 
@@ -3580,10 +3596,19 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             continue;
         }
 
+        NSDictionary<NSFileAttributeKey, id>* fileAttributes = [NSFileManager.defaultManager attributesOfItemAtPath:fullFile
+                                                                                                              error:nil];
+        if (fileAttributes.fileSize == 0)
+        {
+            // Workaround for Firefox downloads happening in two steps: first time being an empty file
+            [self.fAutoImportedNames removeObject:file];
+            continue;
+        }
+
         auto metainfo = tr_torrent_metainfo{};
         if (!metainfo.parseTorrentFile(fullFile.UTF8String))
         {
-            break;
+            continue;
         }
 
         [self openFiles:@[ fullFile ] addType:ADD_AUTO forcePath:nil];

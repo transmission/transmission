@@ -9,6 +9,7 @@ body:
        For UI, attach a screenshot.
        For crashes, attach a crash log.
        For specific issues, attach a torrent or provide a magnet, with public domain content only.
+       **YOU WILL BE BANNED** if you include information about pirated torrents.
   - type: dropdown
     id: client
     attributes:

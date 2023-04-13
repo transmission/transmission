@@ -268,9 +268,24 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 
 // ---
 
+#ifndef __APPLE__
+
+std::string tr_strv_convert_utf8(std::string_view sv)
+{
+    return tr_strv_replace_invalid(sv);
+}
+
+#endif
+
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
+    // stripping characters after first \0
+    if (auto first_null = sv.find('\0'); first_null != std::string::npos)
+    {
+        sv = { std::data(sv), first_null };
+    }
     auto out = std::string{};
+    out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
 }
@@ -479,7 +494,7 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
 double tr_truncd(double x, int decimal_places)
 {
     auto buf = std::array<char, 128>{};
-    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
+    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}Lf}", x, DBL_DIG);
     *out = '\0';
 
     if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
@@ -494,15 +509,15 @@ std::string tr_strpercent(double x)
 {
     if (x < 5.0)
     {
-        return fmt::format("{:.2f}", tr_truncd(x, 2));
+        return fmt::format("{:.2Lf}", tr_truncd(x, 2));
     }
 
     if (x < 100.0)
     {
-        return fmt::format("{:.1f}", tr_truncd(x, 1));
+        return fmt::format("{:.1Lf}", tr_truncd(x, 1));
     }
 
-    return fmt::format("{:.0f}", x);
+    return fmt::format("{:.0Lf}", x);
 }
 
 std::string tr_strratio(double ratio, char const* infinity)
@@ -700,7 +715,7 @@ char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes
         precision = 1;
     }
 
-    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}f} {:s}", value, precision, units);
+    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}Lf} {:s}", value, precision, units);
     *out = '\0';
     return buf;
 }
@@ -742,7 +757,7 @@ std::string tr_formatter_speed_KBps(double kilo_per_second)
 
     if (speed <= 999.95) // 0.0 KB to 999.9 KB
     {
-        return fmt::format("{:d} {:s}", int(speed), std::data(speed_units[TR_FMT_KB].name));
+        return fmt::format("{:Ld} {:s}", int(speed), std::data(speed_units[TR_FMT_KB].name));
     }
 
     double const kilo = speed_units[TR_FMT_KB].value;
@@ -750,15 +765,15 @@ std::string tr_formatter_speed_KBps(double kilo_per_second)
 
     if (speed <= 99.995) // 0.98 MB to 99.99 MB
     {
-        return fmt::format("{:.2f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
 
     if (speed <= 999.95) // 100.0 MB to 999.9 MB
     {
-        return fmt::format("{:.1f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
 
-    return fmt::format("{:.1f} {:s}", speed / kilo, std::data(speed_units[TR_FMT_GB].name));
+    return fmt::format("{:.1Lf} {:s}", speed / kilo, std::data(speed_units[TR_FMT_GB].name));
 }
 
 size_t tr_mem_K = 0;
