@@ -40,13 +40,16 @@ This is a bugfix-only release. Everyone's feedback on 4.0.x has been very helpfu
 * Show announce URL's origins in the inspector's tracker list. ([#5382](https://github.com/transmission/transmission/pull/5382))
 * Added missing date-added field in the Inspector's info tab. ([#5386](https://github.com/transmission/transmission/pull/5386))
 
+### Daemon
+
+* Set the log level sooner at startup to ensure events aren't missed. ([#5345](https://github.com/transmission/transmission/pull/5345))
+
 ### transmission-remote
 
 * Fixed `4.0.0` bug in the display of how much of a torrent has been downloaded. ([#5265](https://github.com/transmission/transmission/pull/5265))
 
 ### Everything Else
 
-* Set the log level sooner at startup to ensure events aren't missed. ([#5345](https://github.com/transmission/transmission/pull/5345))
 * Bumped fallback version of [`libdeflate`](https://github.com/ebiggers/libdeflate) from v1.17 to bugfix release v1.18. ([#5388](https://github.com/transmission/transmission/pull/5388))
 * Documentation improvements. ([#5278](https://github.com/transmission/transmission/pull/5278))
 
@@ -67,6 +70,8 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 
 ### Contributions to GTK Client:
 
+* @albino ([lawrence](https://github.com/albino)):
+  * Fix: restore accidentally-deleted copyright notice (GTK). ([#5372](https://github.com/transmission/transmission/pull/5372))
 * @GaryElshaw ([Gary Elshaw](https://github.com/GaryElshaw)):
   * Fixed `4.0.0` preferences dialog being too large for small displays. ([#5360](https://github.com/transmission/transmission/pull/5360))
 
@@ -81,6 +86,11 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 * @timtas ([Tim Tassonis](https://github.com/timtas)):
   * Code review. ([#5318](https://github.com/transmission/transmission/pull/5318))
 
+### Contributions to Daemon:
+
+* @tearfur:
+  * Set the log level sooner at startup to ensure events aren't missed. ([#5345](https://github.com/transmission/transmission/pull/5345))
+
 ### Contributions to transmission-remote:
 
 * @hoimic:
@@ -88,12 +98,8 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 
 ### Contributions to Everything Else:
 
-* @albino ([lawrence](https://github.com/albino)):
-  * Fix: restore accidentally-deleted copyright notice (GTK). ([#5372](https://github.com/transmission/transmission/pull/5372))
 * @G-Ray ([Geoffrey Bonneville](https://github.com/G-Ray)):
   * Documentation improvements. ([#5278](https://github.com/transmission/transmission/pull/5278))
 * @nevack ([Dzmitry Neviadomski](https://github.com/nevack)):
   * Code review. ([#5286](https://github.com/transmission/transmission/pull/5286))
-* @tearfur:
-  * Set the log level sooner at startup to ensure events aren't missed. ([#5345](https://github.com/transmission/transmission/pull/5345))
 
