@@ -46,9 +46,9 @@ tr_global_ip_cache::~tr_global_ip_cache()
     TR_ASSERT(!session_.amInSessionThread());
 
     // Destroying mutex while someone owns it is undefined behaviour, so we acquire it first
-    std::scoped_lock const locks{ is_updating_mutex_[TR_AF_INET], is_updating_mutex_[TR_AF_INET6],
-                                  global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
-                                  source_addr_mutex_[TR_AF_INET], source_addr_mutex_[TR_AF_INET6] };
+    auto const locks = std::scoped_lock{ is_updating_mutex_[TR_AF_INET], is_updating_mutex_[TR_AF_INET6],
+                                         global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
+                                         source_addr_mutex_[TR_AF_INET], source_addr_mutex_[TR_AF_INET6] };
 
     TR_ASSERT(std::all_of(
         std::begin(is_updating_),
@@ -65,7 +65,7 @@ bool tr_global_ip_cache::try_shutdown() noexcept
 
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
-        std::unique_lock const lock{ is_updating_mutex_[i], std::try_to_lock };
+        auto const lock = std::unique_lock{ is_updating_mutex_[i], std::try_to_lock };
         if (!lock.owns_lock() || is_updating_[i] == is_updating_t::YES)
         {
             return false;
@@ -77,13 +77,13 @@ bool tr_global_ip_cache::try_shutdown() noexcept
 
 std::optional<tr_address> tr_global_ip_cache::global_addr(tr_address_type type) const noexcept
 {
-    std::shared_lock const lock{ global_addr_mutex_[type] };
+    auto const lock = std::shared_lock{ global_addr_mutex_[type] };
     return global_addr_[type];
 }
 
 std::optional<tr_address> tr_global_ip_cache::global_source_addr(tr_address_type type) const noexcept
 {
-    std::shared_lock const lock{ source_addr_mutex_[type] };
+    auto const lock = std::shared_lock{ source_addr_mutex_[type] };
     return source_addr_[type];
 }
 
@@ -121,28 +121,28 @@ void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
 void tr_global_ip_cache::set_global_addr(tr_address const& addr) noexcept
 {
     TR_ASSERT(addr.is_global_unicast_address());
-    std::lock_guard const lock{ global_addr_mutex_[addr.type] };
+    auto const lock = std::lock_guard{ global_addr_mutex_[addr.type] };
     global_addr_[addr.type] = addr;
     tr_logAddTrace(fmt::format("Cached global address {}", addr.display_name()));
 }
 
 void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
 {
-    std::lock_guard const lock{ global_addr_mutex_[type] };
+    auto const lock = std::lock_guard{ global_addr_mutex_[type] };
     global_addr_[type].reset();
     tr_logAddTrace(fmt::format("Unset {} global address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
 }
 
 void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
 {
-    std::lock_guard const lock{ source_addr_mutex_[addr.type] };
+    auto const lock = std::lock_guard{ source_addr_mutex_[addr.type] };
     source_addr_[addr.type] = addr;
     tr_logAddTrace(fmt::format("Cached source address {}", addr.display_name()));
 }
 
 void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 {
-    std::lock_guard const lock{ source_addr_mutex_[type] };
+    auto const lock = std::lock_guard{ source_addr_mutex_[type] };
     source_addr_[type].reset();
     tr_logAddTrace(fmt::format("Unset {} source address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
 
@@ -162,7 +162,7 @@ void tr_global_ip_cache::stop_timer(tr_address_type type) noexcept
 
 bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
 {
-    std::unique_lock lock{ is_updating_mutex_[type] };
+    auto lock = std::unique_lock{ is_updating_mutex_[type] };
     is_updating_cv_[type].wait(
         lock,
         [this, type]() { return is_updating_[type] == is_updating_t::NO || is_updating_[type] == is_updating_t::ABORT; });
@@ -179,7 +179,7 @@ bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
 void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
 {
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
-    std::unique_lock lock{ is_updating_mutex_[type] };
+    auto lock = std::unique_lock{ is_updating_mutex_[type] };
     is_updating_[type] = is_updating_t::NO;
     lock.unlock();
     is_updating_cv_[type].notify_one();
