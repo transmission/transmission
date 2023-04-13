@@ -115,6 +115,7 @@ export class Inspector extends EventTarget {
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
+      ['dateAdded', 'Date added:'],
       ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
       ['labels', 'Labels:'],
@@ -540,6 +541,18 @@ export class Inspector extends EventTarget {
       string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
     setTextContent(e.info.location, string);
+
+    // dateAdded
+    if (torrents.length === 0) {
+      string = none;
+    } else {
+      const get = (t) => t.getDateAdded();
+      const first = get(torrents[0]);
+      string = torrents.every((t) => get(t) === first)
+        ? new Date(first * 1000).toDateString()
+        : mixed;
+    }
+    setTextContent(e.info.dateAdded, string);
 
     // magnetLink
     if (torrents.length === 0) {
