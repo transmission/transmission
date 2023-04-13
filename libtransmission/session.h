@@ -779,7 +779,8 @@ public:
 
     [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
     {
-        return global_ip_cache_.has_ip_protocol(type);
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        return global_ip_cache_.khas_ip_protocol_[type];
     }
 
     struct PublicAddressResult

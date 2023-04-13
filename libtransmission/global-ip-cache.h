@@ -46,19 +46,17 @@ struct tr_session;
 class tr_global_ip_cache
 {
 public:
+    template<typename T>
+    using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
+
     explicit tr_global_ip_cache(tr_session& session_in);
     ~tr_global_ip_cache();
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache(tr_global_ip_cache&&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
-    bool try_shutdown() noexcept;
 
-    [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
-    {
-        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
-        return has_ip_protocol_[type];
-    }
+    bool try_shutdown() noexcept;
 
     [[nodiscard]] std::optional<tr_address> global_addr(tr_address_type type) const noexcept;
     [[nodiscard]] std::optional<tr_address> global_source_addr(tr_address_type type) const noexcept;
@@ -66,6 +64,9 @@ public:
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
     void update_addr(tr_address_type type) noexcept;
+
+    // Whether this machine supports this IP protocol
+    array_ip_t<std::atomic_bool> has_ip_protocol_ = { true, true };
 
 private:
     void set_global_addr(tr_address const& addr) noexcept;
@@ -91,9 +92,6 @@ private:
         tr_address const& bind_addr,
         int& err_out);
 
-    template<typename T>
-    using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
-
     tr_session const& session_;
 
     enum class is_updating_t
@@ -105,9 +103,6 @@ private:
     array_ip_t<is_updating_t> is_updating_ = {};
     array_ip_t<std::mutex> is_updating_mutex_;
     array_ip_t<std::condition_variable> is_updating_cv_;
-
-    // Whether this machine supports this IP protocol
-    array_ip_t<std::atomic_bool> has_ip_protocol_ = { true, true };
 
     // Never directly read/write IP addresses for the sake of being thread safe
     // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
