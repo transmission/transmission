@@ -81,10 +81,10 @@ set(TR_NAME ${PROJECT_NAME})
 
 # these should be the only five lines you need to change
 set(TR_VERSION_MAJOR "4")
-set(TR_VERSION_MINOR "0")
-set(TR_VERSION_PATCH "3")
+set(TR_VERSION_MINOR "1")
+set(TR_VERSION_PATCH "0")
 set(TR_VERSION_BETA_NUMBER "") # empty string for not beta
-set(TR_VERSION_DEV FALSE)
+set(TR_VERSION_DEV TRUE)
 
 # derived from above: release type
 if(TR_VERSION_DEV)
