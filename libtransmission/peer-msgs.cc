@@ -261,7 +261,7 @@ void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
                 __FILE__, \
                 __LINE__, \
                 (level), \
-                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->display_name(), (msgs)->client, text), \
+                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->display_name(), (msgs)->user_agent().sv(), text), \
                 (msgs)->torrent->name()); \
         } \
     } while (0)
@@ -269,6 +269,8 @@ void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 #define logdbg(msgs, text) myLogMacro(msgs, TR_LOG_DEBUG, text)
 #define logtrace(msgs, text) myLogMacro(msgs, TR_LOG_TRACE, text)
 #define logwarn(msgs, text) myLogMacro(msgs, TR_LOG_WARN, text)
+
+using ReadResult = std::pair<ReadState, size_t /*n_piece_data_bytes_read*/>;
 
 /**
  * Low-level communication state information about a connected peer.
@@ -291,9 +293,10 @@ public:
         tr_torrent* torrent_in,
         peer_atom* atom_in,
         std::shared_ptr<tr_peerIo> io_in,
+        tr_interned_string client,
         tr_peer_callback callback,
         void* callback_data)
-        : tr_peerMsgs{ torrent_in, atom_in }
+        : tr_peerMsgs{ torrent_in, atom_in, client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
         , outMessagesBatchPeriod{ LowPriorityIntervalSecs }
         , torrent{ torrent_in }
         , io{ std::move(io_in) }
@@ -331,6 +334,8 @@ public:
 
         io->set_callbacks(canRead, didWrite, gotError, this);
         updateDesiredRequestCount(this);
+
+        update_active();
     }
 
     tr_peerMsgsImpl(tr_peerMsgsImpl&&) = delete;
@@ -391,59 +396,9 @@ public:
         }
     }
 
-    [[nodiscard]] bool is_peer_choked() const noexcept override
-    {
-        return peer_is_choked_;
-    }
-
-    [[nodiscard]] bool is_peer_interested() const noexcept override
-    {
-        return peer_is_interested_;
-    }
-
-    [[nodiscard]] bool is_client_choked() const noexcept override
-    {
-        return client_is_choked_;
-    }
-
-    [[nodiscard]] bool is_client_interested() const noexcept override
-    {
-        return client_is_interested_;
-    }
-
-    [[nodiscard]] bool is_utp_connection() const noexcept override
-    {
-        return io->is_utp();
-    }
-
-    [[nodiscard]] bool is_encrypted() const override
-    {
-        return io->is_encrypted();
-    }
-
-    [[nodiscard]] bool is_incoming_connection() const override
-    {
-        return io->is_incoming();
-    }
-
     [[nodiscard]] tr_bandwidth& bandwidth() noexcept override
     {
         return io->bandwidth();
-    }
-
-    [[nodiscard]] bool is_active(tr_direction direction) const override
-    {
-        TR_ASSERT(tr_isDirection(direction));
-        auto const active = is_active_[direction];
-        TR_ASSERT(active == calculate_active(direction));
-        return active;
-    }
-
-    void update_active(tr_direction direction) override
-    {
-        TR_ASSERT(tr_isDirection(direction));
-
-        set_active(direction, calculate_active(direction));
     }
 
     [[nodiscard]] std::pair<tr_address, tr_port> socketAddress() const override
@@ -465,6 +420,8 @@ public:
     void onTorrentGotMetainfo() noexcept override
     {
         invalidatePercentDone();
+
+        update_active();
     }
 
     void invalidatePercentDone()
@@ -486,16 +443,16 @@ public:
         {
             // TODO logtrace(msgs, "Not changing choke to %d to avoid fibrillation", peer_is_choked);
         }
-        else if (peer_is_choked_ != peer_is_choked)
+        else if (this->peer_is_choked() != peer_is_choked)
         {
-            peer_is_choked_ = peer_is_choked;
+            set_peer_choked(peer_is_choked);
 
-            if (peer_is_choked_)
+            if (peer_is_choked)
             {
                 cancelAllRequestsToClient(this);
             }
 
-            protocolSendChoke(this, peer_is_choked_);
+            protocolSendChoke(this, peer_is_choked);
             chokeChangedAt = now;
             update_active(TR_CLIENT_TO_PEER);
         }
@@ -516,9 +473,9 @@ public:
 
     void set_interested(bool interested) override
     {
-        if (client_is_interested_ != interested)
+        if (client_is_interested() != interested)
         {
-            client_is_interested_ = interested;
+            set_client_interested(interested);
             sendInterest(this, interested);
             update_active(TR_PEER_TO_CLIENT);
         }
@@ -539,8 +496,8 @@ public:
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         TR_ASSERT(torrent->clientCanDownload());
-        TR_ASSERT(is_client_interested());
-        TR_ASSERT(!is_client_choked());
+        TR_ASSERT(client_is_interested());
+        TR_ASSERT(!client_is_choked());
 
         for (auto const *span = block_spans, *span_end = span + n_spans; span != span_end; ++span)
         {
@@ -587,7 +544,7 @@ public:
 private:
     [[nodiscard]] size_t maxAvailableReqs() const
     {
-        if (torrent->isDone() || !torrent->hasMetainfo() || client_is_choked_ || !client_is_interested_)
+        if (torrent->isDone() || !torrent->hasMetainfo() || client_is_choked() || !client_is_interested())
         {
             return 0;
         }
@@ -644,7 +601,7 @@ private:
     {
         if (direction == TR_CLIENT_TO_PEER)
         {
-            return is_peer_interested() && !is_peer_choked();
+            return peer_is_interested() && !peer_is_choked();
         }
 
         // TR_PEER_TO_CLIENT
@@ -654,36 +611,25 @@ private:
             return true;
         }
 
-        auto const active = is_client_interested() && !is_client_choked();
+        auto const active = client_is_interested() && !client_is_choked();
         TR_ASSERT(!active || !torrent->isDone());
         return active;
     }
 
-    void set_active(tr_direction direction, bool active)
+    void update_active()
     {
-        // TODO logtrace(msgs, "direction [%d] is_active [%d]", int(direction), int(is_active));
-        auto& val = is_active_[direction];
-        if (val != active)
-        {
-            val = active;
+        update_active(TR_UP);
+        update_active(TR_DOWN);
+    }
 
-            tr_swarmIncrementActivePeers(torrent->swarm, direction, active);
-        }
+    void update_active(tr_direction direction)
+    {
+        TR_ASSERT(tr_isDirection(direction));
+
+        set_active(direction, calculate_active(direction));
     }
 
 public:
-    /* Whether or not we've choked this peer. */
-    bool peer_is_choked_ = true;
-
-    /* whether or not the peer has indicated it will download from us. */
-    bool peer_is_interested_ = false;
-
-    /* whether or not the peer is choking us. */
-    bool client_is_choked_ = true;
-
-    /* whether or not we've indicated to the peer that we would download from them if unchoked. */
-    bool client_is_interested_ = false;
-
     bool peerSupportsPex = false;
     bool peerSupportsMetadataXfer = false;
     bool clientSentLtepHandshake = false;
@@ -746,7 +692,8 @@ public:
     tr_bitfield have_;
 
 private:
-    std::array<bool, 2> is_active_ = { false, false };
+    friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmission::Buffer& payload);
+    friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload);
 
     tr_peer_callback const callback_;
     void* const callback_data_;
@@ -1086,6 +1033,15 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
         pex.flags |= ADDED_F_SEED_FLAG;
     }
 
+    // http://bittorrent.org/beps/bep_0010.html
+    // Client name and version (as a utf-8 string). This is a much more
+    // reliable way of identifying the client than relying on the
+    // peer id encoding.
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&val, TR_KEY_v, &sv))
+    {
+        msgs->set_user_agent(tr_interned_string{ sv });
+    }
+
     /* get peer's listening port */
     if (tr_variantDictFindInt(&val, TR_KEY_p, &i))
     {
@@ -1269,8 +1225,6 @@ void parseLtep(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
     }
 }
 
-using ReadResult = std::pair<ReadState, size_t /*n_piece_data_bytes_read*/>;
-
 ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmission::Buffer& payload);
 
 void prefetchPieces(tr_peerMsgsImpl* msgs)
@@ -1294,7 +1248,7 @@ void prefetchPieces(tr_peerMsgsImpl* msgs)
 
 [[nodiscard]] bool canAddRequestFromPeer(tr_peerMsgsImpl const* const msgs, struct peer_request const& req)
 {
-    if (msgs->peer_is_choked_)
+    if (msgs->peer_is_choked())
     {
         logtrace(msgs, "rejecting request from choked peer");
         return false;
@@ -1461,7 +1415,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
     {
     case BtPeerMsgs::Choke:
         logtrace(msgs, "got Choke");
-        msgs->client_is_choked_ = true;
+        msgs->set_client_choked(true);
 
         if (!fext)
         {
@@ -1473,20 +1427,20 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
 
     case BtPeerMsgs::Unchoke:
         logtrace(msgs, "got Unchoke");
-        msgs->client_is_choked_ = false;
+        msgs->set_client_choked(false);
         msgs->update_active(TR_PEER_TO_CLIENT);
         updateDesiredRequestCount(msgs);
         break;
 
     case BtPeerMsgs::Interested:
         logtrace(msgs, "got Interested");
-        msgs->peer_is_interested_ = true;
+        msgs->set_peer_interested(true);
         msgs->update_active(TR_CLIENT_TO_PEER);
         break;
 
     case BtPeerMsgs::NotInterested:
         logtrace(msgs, "got Not Interested");
-        msgs->peer_is_interested_ = false;
+        msgs->set_peer_interested(false);
         msgs->update_active(TR_CLIENT_TO_PEER);
         break;
 
@@ -1888,8 +1842,8 @@ void updateBlockRequests(tr_peerMsgsImpl* msgs)
         return;
     }
 
-    TR_ASSERT(msgs->is_client_interested());
-    TR_ASSERT(!msgs->is_client_choked());
+    TR_ASSERT(msgs->client_is_interested());
+    TR_ASSERT(!msgs->client_is_choked());
 
     if (auto const requests = tr_peerMgrGetNextRequests(tor, msgs, n_wanted); !std::empty(requests))
     {
@@ -2272,8 +2226,9 @@ tr_peerMsgs* tr_peerMsgsNew(
     tr_torrent* torrent,
     peer_atom* atom,
     std::shared_ptr<tr_peerIo> io,
+    tr_interned_string user_agent,
     tr_peer_callback callback,
     void* callback_data)
 {
-    return new tr_peerMsgsImpl(torrent, atom, std::move(io), callback, callback_data);
+    return new tr_peerMsgsImpl(torrent, atom, std::move(io), user_agent, callback, callback_data);
 }
