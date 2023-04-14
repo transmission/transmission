@@ -296,7 +296,7 @@ auto getFilenamesInDir(std::string_view folder)
 {
     auto files = std::vector<std::string>{};
 
-    if (auto const odir = tr_sys_dir_open(tr_pathbuf{ folder }); odir != TR_BAD_SYS_DIR)
+    if (auto const odir = tr_sys_dir_open(folder); odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
         auto const prefix = std::string{ folder } + '/';

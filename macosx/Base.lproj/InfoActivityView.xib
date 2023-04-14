@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -133,7 +133,7 @@
                                 </textField>
                                 <segmentedControl verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="8">
                                     <rect key="frame" x="239" y="71" width="97" height="16"/>
-                                    <segmentedCell key="cell" controlSize="mini" borderStyle="border" alignment="left" style="rounded" trackingMode="selectAny" id="54">
+                                    <segmentedCell key="cell" controlSize="mini" borderStyle="border" alignment="left" segmentDistribution="fillProportionally" style="rounded" trackingMode="selectAny" id="54">
                                         <font key="font" metaFont="miniSystem"/>
                                         <segments>
                                             <segment label="Progress" imageScaling="none"/>

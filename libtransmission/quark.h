@@ -220,7 +220,6 @@ enum
     TR_KEY_paused,
     TR_KEY_pausedTorrentCount,
     TR_KEY_peer_congestion_algorithm,
-    TR_KEY_peer_id_ttl_hours,
     TR_KEY_peer_limit,
     TR_KEY_peer_limit_global,
     TR_KEY_peer_limit_per_torrent,

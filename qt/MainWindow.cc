@@ -617,27 +617,53 @@ void openSelect(QString const& path)
 #endif
 
 // if all torrents in a list have the same top folder, return it
-QString getTopFolder(FileList const& files)
+[[nodiscard]] QString getTopFolder(FileList const& files)
 {
     if (std::empty(files))
     {
-        return QString{};
+        return {};
     }
 
     auto const& first_filename = files.at(0).filename;
     auto const slash_index = first_filename.indexOf(QLatin1Char{ '/' });
     if (slash_index == -1)
     {
-        return QString{};
+        return {};
     }
 
     auto top = first_filename.left(slash_index);
     if (!std::all_of(std::begin(files), std::end(files), [&top](auto const& file) { return file.filename.startsWith(top); }))
     {
-        return QString{};
+        return {};
     }
 
     return top;
+}
+
+[[nodiscard]] bool isTopFolder(QDir const& parent, QString const& child)
+{
+    if (child.isEmpty())
+    {
+        return false;
+    }
+
+    auto const info = QFileInfo{ parent, child };
+    return info.exists() && info.isDir();
+}
+
+[[nodiscard]] QString getTopFolder(QDir const& parent, Torrent const* const tor)
+{
+    if (auto top = getTopFolder(tor->files()); isTopFolder(parent, top))
+    {
+        return top;
+    }
+
+    if (auto const& top = tor->name(); isTopFolder(parent, top))
+    {
+        return top;
+    }
+
+    return {};
 }
 } // namespace open_folder_helpers
 } // namespace
@@ -659,18 +685,9 @@ void MainWindow::openFolder()
         return;
     }
 
-    auto path = tor->getPath();
-
-    // TODO(ckerr): this is arguably an antifeature? Seems useful to me
-    // but can cause the folder to be less predictable, i.e. sometimes
-    // using the download folder and sometimes the torrent's top-level.
-    if (auto const top = getTopFolder(tor->files()); !top.isEmpty())
-    {
-        path += QLatin1Char{ '/' };
-        path += top;
-    }
-
-    openSelect(path);
+    auto const parent = QDir{ tor->getPath() };
+    auto const child = getTopFolder(parent, tor);
+    openSelect(parent.filePath(child));
 }
 
 void MainWindow::copyMagnetLinkToClipboard()

@@ -10,6 +10,7 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <event2/buffer.h>
 
@@ -197,6 +198,13 @@ public:
         return evbuffer_remove(buf_.get(), tgt, n_bytes);
     }
 
+    [[nodiscard]] auto to_uint8()
+    {
+        auto tmp = uint8_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return tmp;
+    }
+
     [[nodiscard]] uint16_t to_uint16()
     {
         auto tmp = uint16_t{};
@@ -245,6 +253,12 @@ public:
     [[nodiscard]] std::pair<std::byte*, size_t> pullup()
     {
         return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
+    }
+
+    [[nodiscard]] auto pullup_sv()
+    {
+        auto const [buf, buflen] = pullup();
+        return std::string_view{ reinterpret_cast<char const*>(buf), buflen };
     }
 
     void reserve(size_t n_bytes)

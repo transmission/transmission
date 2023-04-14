@@ -62,7 +62,7 @@
         <translation>&amp;Acepto</translation>
     </message>
     <message numerus="yes">
-        <location line="+105"/>
+        <location line="+110"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrents completado</numerusform>
@@ -78,7 +78,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+429"/>
+        <location filename="../DetailsDialog.cc" line="+432"/>
         <source>None</source>
         <translation>Ninguno</translation>
     </message>
@@ -230,12 +230,12 @@
         </translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>Añadir URLs de anuncio del tracker, unot por linea:</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+37"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -245,7 +245,7 @@
         <translation>No se han encontrado nuevas URLs.</translation>
     </message>
     <message>
-        <location line="-834"/>
+        <location line="-843"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -274,12 +274,12 @@
         <translation>N/D</translation>
     </message>
     <message>
-        <location line="+391"/>
+        <location line="+390"/>
         <source>Add URL(s)</source>
         <translation>Añadir URL(s)</translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>Renombrar...</translation>
+        <translation>Renombrar…</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Buscar...</translation>
+        <translation>Buscar…</translation>
     </message>
 </context>
 <context>
@@ -819,7 +819,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Calculando espacio libre...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;Calculando espacio libre…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>&amp;Abrir...</translation>
+        <translation>&amp;Abrir…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -920,7 +920,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation>&amp;Nuevo...</translation>
+        <translation>&amp;Nuevo…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1161,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation>&amp;Cambiar sesión...</translation>
+        <translation>&amp;Cambiar sesión…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Definir &amp;localización...</translation>
+        <translation>Definir &amp;localización…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation>Abrir &amp;URL...</translation>
+        <translation>Abrir &amp;URL…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1236,13 +1236,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+733"/>
+        <location line="+752"/>
         <location line="+9"/>
         <source>Limited at %1</source>
         <translation>Limitada a %1</translation>
     </message>
     <message>
-        <location line="-687"/>
+        <location line="-706"/>
         <source>Limit Upload Speed</source>
         <translation>Limitar velocidad de subida</translation>
     </message>
@@ -1258,7 +1258,7 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+720"/>
+        <location line="+739"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Detener a la proporción (%1)</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Abrir torrent</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-1003"/>
         <source>Speed Limits</source>
         <translation>Límites de velocidad</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+537"/>
         <source>Network Error</source>
         <translation>Error de red</translation>
     </message>
@@ -1740,7 +1740,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation>Probando puerto TCP...</translation>
+        <translation>Probando puerto TCP…</translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2106,7 +2106,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation>&lt;b&gt;Actualizar lista de bloqueos&lt;/b&gt;&lt;p&gt;Obteniendo nueva lista...&lt;/p&gt;</translation>
+        <translation>&lt;b&gt;Actualizar lista de bloqueos&lt;/b&gt;&lt;p&gt;Obteniendo nueva lista…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2178,12 +2178,12 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-308"/>
+        <location filename="../Application.cc" line="-313"/>
         <source>Invalid option</source>
         <translation>Opción inválida</translation>
     </message>
     <message>
-        <location line="+307"/>
+        <location line="+312"/>
         <source>Start Now</source>
         <translation>Empezar ahora</translation>
     </message>
@@ -2224,7 +2224,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+505"/>
         <source>Error Renaming Path</source>
         <translation>Error renombrando la ruta</translation>
     </message>
@@ -2536,7 +2536,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+210"/>
+        <location filename="../TrackerDelegate.cc" line="+216"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2576,7 +2576,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Solicitando recuento de pares ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Solicitando recuento de pares ahora… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2612,7 +2612,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Solicitando más pares ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Solicitando más pares ahora… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>

@@ -130,7 +130,7 @@ std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, si
 
 } // namespace
 
-std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, size_t n_wanted_blocks)
+std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
 {
     if (n_wanted_blocks == 0)
     {
@@ -155,18 +155,18 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, 
         }
 
         // walk the blocks in this piece
-        auto const [begin, end] = mediator.blockSpan(candidate.piece);
+        auto const [begin, end] = mediator_.blockSpan(candidate.piece);
         for (tr_block_index_t block = begin; block < end && std::size(blocks) < n_wanted_blocks; ++block)
         {
             // don't request blocks we've already got
-            if (!mediator.clientCanRequestBlock(block))
+            if (!mediator_.clientCanRequestBlock(block))
             {
                 continue;
             }
 
             // don't request from too many peers
-            size_t const n_peers = mediator.countActiveRequests(block);
-            if (size_t const max_peers = mediator.isEndgame() ? 2 : 1; n_peers >= max_peers)
+            size_t const n_peers = mediator_.countActiveRequests(block);
+            if (size_t const max_peers = mediator_.isEndgame() ? 2 : 1; n_peers >= max_peers)
             {
                 continue;
             }

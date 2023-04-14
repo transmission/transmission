@@ -621,22 +621,14 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
 // ---
 
-auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did_migrate_filename)
+auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
 {
     auto fields_loaded = tr_resume::fields_t{};
 
     TR_ASSERT(tr_isTorrent(tor));
     auto const was_dirty = tor->isDirty;
 
-    auto const migrated = tr_torrent_metainfo::migrateFile(
-        tor->session->resumeDir(),
-        tor->name(),
-        tor->infoHashString(),
-        ".resume"sv);
-    if (did_migrate_filename != nullptr)
-    {
-        *did_migrate_filename = migrated;
-    }
+    tr_torrent_metainfo::migrateFile(tor->session->resumeDir(), tor->name(), tor->infoHashString(), ".resume"sv);
 
     auto const filename = tor->resumeFile();
     if (!tr_sys_path_exists(filename))
@@ -865,7 +857,7 @@ auto useFallbackFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor cons
 }
 } // namespace
 
-fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, bool* did_rename_to_hash_only_name)
+fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -873,7 +865,7 @@ fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, boo
 
     ret |= useMandatoryFields(tor, fields_to_load, ctor);
     fields_to_load &= ~ret;
-    ret |= loadFromFile(tor, fields_to_load, did_rename_to_hash_only_name);
+    ret |= loadFromFile(tor, fields_to_load);
     fields_to_load &= ~ret;
     ret |= useFallbackFields(tor, fields_to_load, ctor);
 

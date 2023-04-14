@@ -351,6 +351,8 @@ public:
                 return;
             }
 
+            impl.paused_easy_handles.erase(easy_);
+
             if (auto const url = tr_urlParse(options.url); url)
             {
                 curl_easy_reset(easy);
@@ -462,7 +464,7 @@ public:
             // again when the transfer is unpaused.
             if (task->impl.mediator.clamp(*tag, bytes_used) < bytes_used)
             {
-                task->impl.paused_easy_handles.emplace(tr_time_msec(), task->easy());
+                task->impl.paused_easy_handles.emplace(task->easy(), tr_time_msec());
                 return CURL_WRITEFUNC_PAUSE;
             }
 
@@ -601,9 +603,9 @@ public:
 
         for (auto it = std::begin(paused); it != std::end(paused);)
         {
-            if (it->first + BandwidthPauseMsec < now)
+            if (it->second + BandwidthPauseMsec < now)
             {
-                curl_easy_pause(it->second, CURLPAUSE_CONT);
+                curl_easy_pause(it->first, CURLPAUSE_CONT);
                 it = paused.erase(it);
             }
             else
@@ -777,7 +779,7 @@ public:
 
     static inline auto curl_init_flag = std::once_flag{};
 
-    std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
+    std::map<CURL*, uint64_t /*tr_time_msec()*/> paused_easy_handles;
 
     static void curlInit()
     {

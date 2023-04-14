@@ -172,9 +172,7 @@ void tr_completion::removeBlock(tr_block_index_t block)
 
 void tr_completion::removePiece(tr_piece_index_t piece)
 {
-    auto const [begin, end] = block_info_->blockSpanForPiece(piece);
-
-    for (auto block = begin; block < end; ++block)
+    for (auto [block, end] = block_info_->blockSpanForPiece(piece); block < end; ++block)
     {
         removeBlock(block);
     }

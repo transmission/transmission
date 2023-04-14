@@ -24,8 +24,6 @@
 #include <windows.h> /* CreateProcess(), GetLastError() */
 #endif
 
-#include <event2/util.h> /* evutil_vsnprintf() */
-
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 
@@ -169,18 +167,6 @@ void tr_torrentClearError(tr_torrent* tor)
     tor->error_string.clear();
 }
 
-constexpr void tr_torrentUnsetPeerId(tr_torrent* tor)
-{
-    // triggers a rebuild next time tr_torrentGetPeerId() is called
-    tor->peer_id_ = {};
-}
-
-int peerIdTTL(tr_torrent const* tor)
-{
-    auto const ctime = tor->peer_id_creation_time_;
-    return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peerIdTTLHours() * 3600, tr_time());
-}
-
 /* returns true if the seed ratio applies --
  * it applies if the torrent's a seed AND it has a seed ratio set */
 bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_left, uint64_t* setme_goal)
@@ -217,20 +203,6 @@ bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
     return tr_torrentGetSeedRatioBytes(tor, &bytes_left, nullptr) && bytes_left == 0;
 }
 } // namespace
-
-tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
-{
-    bool const needs_new_peer_id = tor->peer_id_[0] == '\0' || // doesn't have one
-        (tor->isPublic() && (peerIdTTL(tor) <= 0)); // has one but it's expired
-
-    if (needs_new_peer_id)
-    {
-        tor->peer_id_ = tr_peerIdInit();
-        tor->peer_id_creation_time_ = tr_time();
-    }
-
-    return tor->peer_id_;
-}
 
 // --- PER-TORRENT UL / DL SPEEDS
 
@@ -877,12 +849,6 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
         tor->setRatioMode(TR_RATIOLIMIT_UNLIMITED);
     }
 
-    /* corresponds to the peer_id sent as a tracker request parameter.
-     * one tracker admin says: "When the same torrent is opened and
-     * closed and opened again without quitting Transmission ...
-     * change the peerid. It would help sometimes if a stopped event
-     * was missed to ensure that we didn't think someone was cheating. */
-    tr_torrentUnsetPeerId(tor);
     tor->isRunning = true;
     tor->setDirty();
     tor->session->runInSessionThread(torrentStartImpl, tor);
@@ -1105,15 +1071,9 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         // the same ones that would be saved back again, so don't let them
         // affect the 'is dirty' flag.
         auto const was_dirty = tor->isDirty;
-
-        bool resume_file_was_migrated = false;
-        loaded = tr_resume::load(tor, tr_resume::All, ctor, &resume_file_was_migrated);
+        loaded = tr_resume::load(tor, tr_resume::All, ctor);
         tor->isDirty = was_dirty;
-
-        if (resume_file_was_migrated)
-        {
-            tr_torrent_metainfo::migrateFile(session->torrentDir(), tor->name(), tor->infoHashString(), ".torrent"sv);
-        }
+        tr_torrent_metainfo::migrateFile(session->torrentDir(), tor->name(), tor->infoHashString(), ".torrent"sv);
     }
 
     tor->completeness = tor->completion.status();
@@ -1392,7 +1352,7 @@ void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)
 
     if (tor->download_dir != path)
     {
-        tor->setDownloadDir(path);
+        tor->setDownloadDir(path, true);
     }
 }
 
@@ -2433,6 +2393,28 @@ std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num)
 size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen)
 {
     return tr_strvToBuf(tr_torrentFindFile(tor, file_num), buf, buflen);
+}
+
+void tr_torrent::setDownloadDir(std::string_view path, bool is_new_torrent)
+{
+    download_dir = path;
+    markEdited();
+    setDirty();
+    refreshCurrentDir();
+
+    if (is_new_torrent)
+    {
+        if (session->shouldFullyVerifyAddedTorrents() || !torrent_init_helpers::isNewTorrentASeed(this))
+        {
+            tr_torrentVerify(this);
+        }
+        else
+        {
+            completion.setHasAll();
+            doneDate = addedDate;
+            recheckCompleteness();
+        }
+    }
 }
 
 // decide whether we should be looking for files in downloadDir or incompleteDir

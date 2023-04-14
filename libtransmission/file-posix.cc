@@ -379,7 +379,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     while (file_size > 0U)
     {
-        size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
+        size_t const chunk_size = std::min({ file_size, uint64_t{ SSIZE_MAX }, uint64_t{ INT32_MAX } });
         auto const copied = copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
 
         TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
@@ -432,7 +432,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         {
             while (file_size > 0U)
             {
-                size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
+                size_t const chunk_size = std::min({ file_size, uint64_t{ SSIZE_MAX }, uint64_t{ INT32_MAX } });
                 auto const copied = sendfile64(out, in, nullptr, chunk_size);
                 TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
@@ -1205,11 +1205,9 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
     return ret;
 }
 
-tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
+tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
-    DIR* ret = opendir(path);
+    auto* const ret = opendir(tr_pathbuf{ path });
 
     if (ret == nullptr)
     {
