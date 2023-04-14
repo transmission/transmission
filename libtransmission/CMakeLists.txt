@@ -279,6 +279,7 @@ target_link_libraries(${TR_NAME}
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
+        sfl::sfl
         natpmp::natpmp
         miniupnpc::libminiupnpc
         dht::dht
