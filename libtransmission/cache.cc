@@ -161,7 +161,7 @@ int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniqu
     return cacheTrim();
 }
 
-Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
+Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept
 {
     if (auto const [begin, end] = std::equal_range(
             std::begin(blocks_),
@@ -176,7 +176,7 @@ Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location 
     return std::end(blocks_);
 }
 
-int Cache::readBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len, uint8_t* setme)
+int Cache::readBlock(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme)
 {
     if (auto const iter = getBlock(torrent, loc); iter != std::end(blocks_))
     {
@@ -187,7 +187,7 @@ int Cache::readBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t 
     return tr_ioRead(torrent, loc, len, setme);
 }
 
-int Cache::prefetchBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len)
+int Cache::prefetchBlock(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len)
 {
     if (auto const iter = getBlock(torrent, loc); iter != std::end(blocks_))
     {
