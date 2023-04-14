@@ -54,7 +54,7 @@
     <message>
         <location line="+4"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Когда вы запускаете торрент, имеющиеся данные становятся доступны другим пользователям посредством раздачи. Вы несёте личную ответственность за всё переданное.</translation>
+        <translation>Когда вы запускаете торрент, имеющиеся данные становятся доступны другим пользователям, посредством раздачи. Вы несёте личную ответственность за всё переданное.</translation>
     </message>
     <message>
         <location line="+2"/>

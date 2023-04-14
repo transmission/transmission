@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# עומר א״ש <omeritzicschwartz@gmail.com>, 2022
+# 63f334ffc0709ba0fc2361b80bf3c0f0_00ffd1e <ab96c93ca0ac55ba7fa06385427e60dd_878890>, 2022
 # Avi Markovitz <avi.markovitz@gmail.com>, 2022
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
@@ -17,7 +17,7 @@ msgstr ""
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
-"Language-Team: Hebrew (https://www.transifex.com/transmissionbt/teams/33778/he/)\n"
+"Language-Team: Hebrew (https://app.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

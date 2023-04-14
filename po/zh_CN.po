@@ -6,11 +6,10 @@
 # Translators:
 # Clay Cheng <569735195@qq.com>, 2020
 # Lin Xue <iconteral@yahoo.com>, 2022
-# 依云 <lilydjwg@gmail.com>, 2022
 # 玉堂白鹤 <yjwork@qq.com>, 2022
-# Dingzhong Chen <wsxy162@gmail.com>, 2022
-# pluwen <pluwen@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# Dingzhong Chen <wsxy162@gmail.com>, 2023
+# pluwen <pluwen@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -19,8 +18,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
-"Language-Team: Chinese (China) (https://www.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
+"Last-Translator: pluwen <pluwen@gmail.com>, 2023\n"
+"Language-Team: Chinese (China) (https://app.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -105,7 +104,7 @@ msgstr "无法将 Transmission 注册为 {content_type} 处理程序：{error}�
 
 #: ../gtk/Application.cc:552
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
-msgstr ""
+msgstr "收到终止信号，正在尝试彻底关闭。如果卡住了请再试一次。"
 
 #: ../gtk/Application.cc:778
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
@@ -158,6 +157,7 @@ msgstr ""
 "Aron Xu <happyaron.xu@gmail.com>, 2012\n"
 "玉堂白鹤 <yjwork@qq.com>,2020\n"
 "Dingzhong Chen <wsxy162@gmail.com>, 2020-2022\n"
+"Pluwen Chen <pluwen@gmail.com>, 2023\n"
 "Launchpad 贡献者：\n"
 "  Alexey Kotlyarov https://launchpad.net/~koterpillar\n"
 "  Andrew Starr-Bochicchio https://launchpad.net/~andrewsomething\n"
@@ -213,7 +213,7 @@ msgstr "达到以下分享率停止做种："
 
 #: ../gtk/DetailsDialog.cc:537
 msgid "Seed regardless of activity"
-msgstr "忽略活跃度做种"
+msgstr "忽略活跃情况做种"
 
 #: ../gtk/DetailsDialog.cc:538
 msgid "Stop seeding if idle for N minutes:"
@@ -339,27 +339,27 @@ msgstr "积极解锁（Optimistic unchoke）"
 
 #: ../gtk/DetailsDialog.cc:1493
 msgid "Downloading from this peer"
-msgstr "正从此对等网络用户下载"
+msgstr "正从此节点下载"
 
 #: ../gtk/DetailsDialog.cc:1497
 msgid "We would download from this peer if they would let us"
-msgstr "若对方允许，将从此对等网络用户下载"
+msgstr "若对方允许，将从此节点下载"
 
 #: ../gtk/DetailsDialog.cc:1501
 msgid "Uploading to peer"
-msgstr "正上传至此对等网络用户"
+msgstr "正上传至此节点"
 
 #: ../gtk/DetailsDialog.cc:1505
 msgid "We would upload to this peer if they asked"
-msgstr "若对方请求，将上传至此对等网络用户"
+msgstr "若对方请求，将上传至此节点"
 
 #: ../gtk/DetailsDialog.cc:1509
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "对方已对我们解锁，但我们不感兴趣"
+msgstr "节点已对我们解锁，但我们不感兴趣"
 
 #: ../gtk/DetailsDialog.cc:1513
 msgid "We unchoked this peer, but they're not interested"
-msgstr "我们已解锁此对等网络用户，但是对方不感兴趣"
+msgstr "我们已解锁此节点，但对方不感兴趣"
 
 #: ../gtk/DetailsDialog.cc:1517
 msgid "Encrypted connection"
@@ -367,19 +367,19 @@ msgstr "加密连接"
 
 #: ../gtk/DetailsDialog.cc:1521
 msgid "Peer was found through Peer Exchange (PEX)"
-msgstr "通过 PEX 源交换找到的对等网络用户"
+msgstr "通过节点交换（PEX）找到的节点"
 
 #: ../gtk/DetailsDialog.cc:1525
 msgid "Peer was found through DHT"
-msgstr "通过 DHT 找到的对等网络用户"
+msgstr "通过 DHT 找到的节点"
 
 #: ../gtk/DetailsDialog.cc:1529
 msgid "Peer is an incoming connection"
-msgstr "通过入站连接的对等网络用户"
+msgstr "通过入站连接的节点"
 
 #: ../gtk/DetailsDialog.cc:1533
 msgid "Peer is connected over µTP"
-msgstr "通过 µTP 协议连接到的对等网络用户"
+msgstr "通过 µTP 协议连接到的节点"
 
 #: ../gtk/DetailsDialog.cc:1619
 msgid "Address"
@@ -437,12 +437,12 @@ msgstr "Web 种子"
 #: ../gtk/DetailsDialog.cc:1823
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] "在 {time_span_ago}获得了载有 {markup_begin}{peer_count} 个用户{markup_end}的列表"
+msgstr[0] "在 {time_span_ago}获得了载有 {markup_begin}{peer_count} 个节点{markup_end}的列表"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1835
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr "用户列表请求{markup_begin}超时 {time_span_ago}{markup_end}，将重试"
+msgstr "节点列表请求{markup_begin}超时 {time_span_ago}{markup_end}，将重试"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1844
@@ -455,16 +455,16 @@ msgstr "无计划更新"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Asking for more peers {time_span_from_now}"
-msgstr "将在 {time_span_from_now}请求更多用户"
+msgstr "将在 {time_span_from_now}请求更多节点"
 
 #: ../gtk/DetailsDialog.cc:1871
 msgid "Queued to ask for more peers"
-msgstr "已准备请求更多用户"
+msgstr "已排队请求更多节点"
 
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1879
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr "在 {markup_begin}{time_span_ago}{markup_end}请求了更多用户"
+msgstr "在 {markup_begin}{time_span_ago}{markup_end}请求了更多节点"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1904
@@ -488,15 +488,15 @@ msgstr "在 {time_span_ago}遇到抓取错误“{markup_begin}{error}{markup_end
 
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr "将在 {time_span_from_now}询问用户数量"
+msgstr "将在 {time_span_from_now}询问节点数量"
 
 #: ../gtk/DetailsDialog.cc:1941
 msgid "Queued to ask for peer counts"
-msgstr "已准备询问用户数量"
+msgstr "已准备询问节点数量"
 
 #: ../gtk/DetailsDialog.cc:1948
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr "在 {markup_begin}{time_span_ago}{markup_end}询问了用户数量"
+msgstr "在 {markup_begin}{time_span_ago}{markup_end}询问了节点数量"
 
 #: ../gtk/DetailsDialog.cc:2231
 msgid "{torrent_name} - Edit Trackers"
@@ -504,7 +504,7 @@ msgstr "{torrent_name}—编辑 Tracker 列表"
 
 #: ../gtk/DetailsDialog.cc:2265
 msgid "List contains invalid URLs"
-msgstr "列表包含无效的 URL"
+msgstr "列表包含无效的网址"
 
 #: ../gtk/DetailsDialog.cc:2270 ../gtk/FileList.cc:849
 msgid "Please correct the errors and try again."
@@ -535,7 +535,7 @@ msgstr[0] "移除 {count:L} 个 Torrents？"
 #: ../gtk/Dialogs.cc:58
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] ""
+msgstr[0] "删除这 {count:L} 个种子下载的文件吗？"
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -550,12 +550,12 @@ msgstr[0] "此种子尚未完成下载。"
 #: ../gtk/Dialogs.cc:78
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] "此种子已连接到其他用户。"
+msgstr[0] "此 Torrent 已连接到其他节点。"
 
 #: ../gtk/Dialogs.cc:85
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] "有一个种子已连接到其他用户。"
+msgstr[0] "其中一些种子文件已经连接到了节点。"
 
 #: ../gtk/Dialogs.cc:98
 msgid "One of these torrents has not finished downloading."
@@ -779,7 +779,7 @@ msgstr "调试"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr ""
+msgstr "无法为“{bus}”创建代理：{error}（{error_code}）"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -868,7 +868,7 @@ msgstr "无法更新屏蔽列表"
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "正在获取新的屏蔽列表……"
+msgstr "正在获取新的屏蔽列表…"
 
 #: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
@@ -918,7 +918,7 @@ msgstr "允许桌面休眠"
 
 #: ../gtk/Session.cc:1202
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr ""
+msgstr "无法找到标记 {tag} 的待处理 PRC 请求"
 
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"
@@ -996,12 +996,12 @@ msgstr "本地错误：“{error}”"
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
-msgstr[0] "正在从 {active_count} 个连接的用户中下载元数据（已完成 {percent_done}%）"
+msgstr[0] "正在从 {active_count} 个连接的节点中下载元数据（已完成 {percent_done}%）"
 
 #: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
-msgstr[0] "正在从 {active_count} / {connected_count} 个连接的用户和 web 种子中下载"
+msgstr[0] "正在从 {active_count} / {connected_count} 个连接的节点和 Web 种子中下载"
 
 #: ../gtk/Torrent.cc:537
 msgid "Downloading from {active_count} webseed"
@@ -1011,12 +1011,12 @@ msgstr[0] "正在从 {active_count} 个 web 种子中下载"
 #: ../gtk/Torrent.cc:545
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
-msgstr[0] "正在从 {active_count} / {connected_count} 个连接的用户中下载"
+msgstr[0] "正在从 {active_count} / {connected_count} 个连接的节点中下载"
 
 #: ../gtk/Torrent.cc:554
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
-msgstr[0] "正在向 {active_count} / {connected_count} 个连接的用户做种上传"
+msgstr[0] "正在向 {active_count} / {connected_count} 个连接的节点做种上传"
 
 #: ../gtk/Utils.cc:66
 msgid "KiB"
@@ -1160,15 +1160,15 @@ msgstr "无法打开种子"
 
 #: ../gtk/Utils.cc:429
 msgid "Couldn't move '{path}' to trash: {error} ({error_code})"
-msgstr ""
+msgstr "无法移动“{path}”至回收站：{error}（{error_code}）"
 
 #: ../gtk/Utils.cc:537
 msgid "Couldn't open '{url}'"
-msgstr ""
+msgstr "无法打开“{url}”"
 
 #: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
-msgstr "不支持的 URL：“{url}”"
+msgstr "不支持的网址：“{url}”"
 
 #. modal
 #: ../gtk/Utils.cc:760
@@ -1190,7 +1190,7 @@ msgstr "配置文件的位置"
 
 #: ../gtk/main.cc:81
 msgid "Start with all torrents paused"
-msgstr "启动时暂停所有任务"
+msgstr "启动时暂停全部 Torrent"
 
 #: ../gtk/main.cc:82
 msgid "Start minimized in notification area"
@@ -1202,11 +1202,11 @@ msgstr "显示版本并退出"
 
 #: ../gtk/main.cc:91
 msgid "[torrent files or urls]"
-msgstr "[种子文件或地址]"
+msgstr "[种子文件或网址]"
 
 #: ../gtk/main.cc:107
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr ""
+msgstr "运行“{program} --help”以查看完整的可用的命令行选项列表。\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1223,7 +1223,7 @@ msgstr "torrents;downloading;uploading;share;sharing;种子;下载;上传;分享
 
 #: ../gtk/transmission-gtk.desktop.in:21
 msgid "Start Transmission with All Torrents Paused"
-msgstr "启动 Transmission 时暂停所有任务"
+msgstr "启动 Transmission 时暂停全部任务"
 
 #: ../gtk/transmission-gtk.desktop.in:25
 msgid "Start Transmission Minimized"
@@ -1239,11 +1239,11 @@ msgstr "打开种子"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "打开 _URL…"
+msgstr "打开网址…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "打开 URL…"
+msgstr "打开网址…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
@@ -1255,7 +1255,7 @@ msgstr "全部开始(_S)"
 
 #: ../gtk/transmission.ui:35 ../gtk/transmission.ui:480
 msgid "Start all torrents"
-msgstr "开始所有任务"
+msgstr "开始全部 Torrent"
 
 #: ../gtk/transmission.ui:40 ../gtk/transmission.ui:473
 msgid "_Pause All"
@@ -1263,7 +1263,7 @@ msgstr "全部暂停(_P)"
 
 #: ../gtk/transmission.ui:41 ../gtk/transmission.ui:474
 msgid "Pause all torrents"
-msgstr "暂停所有任务"
+msgstr "暂停全部 Torrent"
 
 #: ../gtk/transmission.ui:49 ../gtk/transmission.ui:493
 msgid "_Quit"
@@ -1319,7 +1319,7 @@ msgstr "立即开始任务"
 
 #: ../gtk/transmission.ui:111 ../gtk/transmission.ui:380
 msgid "Ask Tracker for _More Peers"
-msgstr "向 Traker 请求更多用户(_M)"
+msgstr "向 Traker 请求更多节点（_M）"
 
 #: ../gtk/transmission.ui:114 ../gtk/transmission.ui:383
 msgid "_Queue"
@@ -1475,7 +1475,7 @@ msgstr "Tracker"
 
 #: ../gtk/ui/gtk3/AddTrackerDialog.ui:88 ../gtk/ui/gtk4/AddTrackerDialog.ui:32
 msgid "_Announce URL:"
-msgstr "公告 URL(_A)："
+msgstr "公告网址（_A）："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1495 ../gtk/ui/gtk4/StatsDialog.ui:253
 msgid "_Close"
@@ -1515,7 +1515,7 @@ msgstr "剩余时间："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:164 ../gtk/ui/gtk4/DetailsDialog.ui:109
 msgid "Last activity:"
-msgstr "最后活动："
+msgstr "最后活动时间："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:176 ../gtk/ui/gtk4/DetailsDialog.ui:119
 msgid "Error:"
@@ -1559,7 +1559,7 @@ msgstr "显示更多信息(_M)"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:617 ../gtk/ui/gtk4/DetailsDialog.ui:461
 msgid "Peers"
-msgstr "用户"
+msgstr "节点"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:738 ../gtk/ui/gtk4/DetailsDialog.ui:536
 msgid "Show _backup trackers"
@@ -1599,7 +1599,7 @@ msgstr "做种限制"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:998 ../gtk/ui/gtk4/DetailsDialog.ui:715
 msgid "_Ratio:"
-msgstr "分享率(_R)："
+msgstr "分享率（_R）："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1012 ../gtk/ui/gtk4/DetailsDialog.ui:727
 msgid "_Idle:"
@@ -1607,11 +1607,11 @@ msgstr "空闲(_I)："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1117 ../gtk/ui/gtk4/DetailsDialog.ui:787
 msgid "Peer Connections"
-msgstr "用户连接"
+msgstr "节点连接"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1141 ../gtk/ui/gtk4/DetailsDialog.ui:801
 msgid "_Maximum peers:"
-msgstr "最大用户数(_M)："
+msgstr "最大节点数(_M)："
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1417 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:982
 msgid "Options"
@@ -1619,15 +1619,15 @@ msgstr "选项"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:18
 msgid "Tracker Announce URLs"
-msgstr "Tracker 公告 URL"
+msgstr "Tracker 公告网址"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:88 ../gtk/ui/gtk3/MakeDialog.ui:315 ../gtk/ui/gtk4/EditTrackersDialog.ui:32 ../gtk/ui/gtk4/MakeDialog.ui:199
 msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
-"要添加一个备用 URL，请在主 URL 之后一行添加。\n"
-"要添加另一个主 URL，请空一行之后添加。"
+"要添加一个备用网址，请在主网址之后一行添加。\n"
+"要添加另一个主网址，请空一行之后添加。"
 
 #: ../gtk/ui/gtk3/EditTrackersDialog.ui:123 ../gtk/ui/gtk4/EditTrackersDialog.ui:63
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
@@ -1651,7 +1651,7 @@ msgstr "新建(_N)"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:91 ../gtk/ui/gtk4/MakeDialog.ui:33
 msgid "Sa_ve to:"
-msgstr "保存到(_V)："
+msgstr "保存到（_V）："
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:116 ../gtk/ui/gtk4/MakeDialog.ui:55
 msgid "Source F_older:"
@@ -1683,7 +1683,7 @@ msgstr "来源(_S)"
 
 #: ../gtk/ui/gtk3/MakeDialog.ui:387 ../gtk/ui/gtk4/MakeDialog.ui:258
 msgid "_Private torrent"
-msgstr "私有种子(_P)"
+msgstr "私有种子（_P）"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
@@ -1825,7 +1825,7 @@ msgstr "未完成"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:699 ../gtk/ui/gtk4/PrefsDialog.ui:472
 msgid "Append \"._part\" to incomplete files' names"
-msgstr "在未完成的文件名后面加上“._part”"
+msgstr "在未完成的文件名附加“.part”扩展名（_P）"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:716 ../gtk/ui/gtk4/PrefsDialog.ui:486
 msgid "Keep _incomplete torrents in:"
@@ -1842,7 +1842,7 @@ msgstr "下载"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:805 ../gtk/ui/gtk4/PrefsDialog.ui:552
 msgid "Limits"
-msgstr "限速"
+msgstr "限制"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:827 ../gtk/ui/gtk4/PrefsDialog.ui:566
 msgid "Stop seeding at _ratio:"
@@ -1875,7 +1875,7 @@ msgstr "屏蔽列表"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1031 ../gtk/ui/gtk4/PrefsDialog.ui:710
 msgid "Enable _blocklist:"
-msgstr "启用屏蔽列表(_B)："
+msgstr "启用屏蔽列表（_B）："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1046 ../gtk/ui/gtk4/PrefsDialog.ui:723
 msgid "Enable _automatic updates"
@@ -1895,7 +1895,7 @@ msgstr "用于入站连接的端口(_P)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1203 ../gtk/ui/gtk4/PrefsDialog.ui:834
 msgid "Pick a _random port every time Transmission is started"
-msgstr "在 Transmission 启动时随机选择端口(R)"
+msgstr "在 Transmission 启动时随机选择端口（_R）"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1220 ../gtk/ui/gtk4/PrefsDialog.ui:848
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1907,19 +1907,19 @@ msgstr "测试端口(_S)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1324 ../gtk/ui/gtk4/PrefsDialog.ui:917
 msgid "Peer Limits"
-msgstr "用户数限制"
+msgstr "节点限制"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1348 ../gtk/ui/gtk4/PrefsDialog.ui:931
 msgid "Maximum peers per _torrent:"
-msgstr "单个种子最大用户数(_T)："
+msgstr "单个种子最大节点数（_T）："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1362 ../gtk/ui/gtk4/PrefsDialog.ui:943
 msgid "Maximum peers _overall:"
-msgstr "全局最大用户数(_O)："
+msgstr "全局最大节点数（_O）："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
-msgstr "为用户通信启用 µ_TP"
+msgstr "为节点通信启用 µTP（_T）"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
@@ -1927,27 +1927,27 @@ msgstr "µTP 是一个用于减少网络拥堵的工具。"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1457 ../gtk/ui/gtk4/PrefsDialog.ui:1011
 msgid "Use PE_X to find more peers"
-msgstr "使用 PE_X 以寻找更多对等网络用户"
+msgstr "使用 PEX 以寻找更多节点"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1461 ../gtk/ui/gtk4/PrefsDialog.ui:1013
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
-msgstr "PEX 是用于跟你相连接的用户交换对等网络用户名单的工具。"
+msgstr "PEX 是用于跟你相连接的节点交换节点名单的工具。"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1475 ../gtk/ui/gtk4/PrefsDialog.ui:1026
 msgid "Use _DHT to find more peers"
-msgstr "使用 _DHT 以寻找更多对等网络用户"
+msgstr "使用 DHT 以寻找更多节点"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1479 ../gtk/ui/gtk4/PrefsDialog.ui:1028
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr "DHT 是个无需 Tracker 的寻找对等网络用户的工具。"
+msgstr "DHT 是个无需 Tracker 的寻找节点的工具。"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1493 ../gtk/ui/gtk4/PrefsDialog.ui:1041
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr "使用本地用户发现（LPD）寻找更多对等网络用户"
+msgstr "使用本地节点发现（LPD）寻找更多节点"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1497 ../gtk/ui/gtk4/PrefsDialog.ui:1043
 msgid "LPD is a tool for finding peers on your local network."
-msgstr "LPD 是用于在本地网络寻找对等网络用户的工具。"
+msgstr "LPD 是用于在本地网络寻找节点的工具。"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1532 ../gtk/ui/gtk4/PrefsDialog.ui:1063
 msgid "Default Public Trackers"
@@ -1960,10 +1960,10 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
-"将在所有公开种子任务上使用的 tracker。\n"
+"将在所有公开 Torrent 任务上使用的 tracker。\n"
 "\n"
-"要添加一个备用 URL，请在主 URL 之后一行添加。\n"
-"要添加另一个主 URL，请空一行之后添加。"
+"要添加一个备用网址，请在主网址之后一行添加。\n"
+"要添加另一个主网址，请空一行之后添加。"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1595 ../gtk/ui/gtk4/PrefsDialog.ui:1107
 msgid "Network"
@@ -1975,7 +1975,7 @@ msgstr "桌面"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1635 ../gtk/ui/gtk4/PrefsDialog.ui:1136
 msgid "_Inhibit hibernation when torrents are active"
-msgstr "种子活跃时禁止休眠(_I)"
+msgstr "种子活跃时禁止休眠（_I）"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1652 ../gtk/ui/gtk4/PrefsDialog.ui:1150
 msgid "Show Transmission icon in the _notification area"
@@ -2011,7 +2011,7 @@ msgstr "打开 Web 客户端(_O)"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1865 ../gtk/ui/gtk4/PrefsDialog.ui:1290
 msgid "HTTP _port:"
-msgstr "HTTP 端口(_P)："
+msgstr "HTTP 端口（_P）："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1877 ../gtk/ui/gtk4/PrefsDialog.ui:1303
 msgid "Use _authentication"
@@ -2027,7 +2027,7 @@ msgstr "密码(_W)："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1923 ../gtk/ui/gtk4/PrefsDialog.ui:1342
 msgid "Only allow these IP a_ddresses:"
-msgstr "只允许这些 IP 地址(_D)："
+msgstr "只允许这些 IP 地址（_D）："
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1945 ../gtk/ui/gtk4/PrefsDialog.ui:1358
 msgid "Addresses:"
@@ -2055,7 +2055,7 @@ msgstr "位置"
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:92 ../gtk/ui/gtk4/RelocateDialog.ui:34
 msgid "Torrent _location:"
-msgstr "种子位置(_L)："
+msgstr "Torrent 位置（_L）："
 
 #: ../gtk/ui/gtk3/RelocateDialog.ui:117 ../gtk/ui/gtk4/RelocateDialog.ui:57
 msgid "_Move from the current folder"
@@ -2083,11 +2083,11 @@ msgstr "总计"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:8 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:5
 msgid "Open URL"
-msgstr "打开 URL"
+msgstr "打开网址"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:64 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:18
 msgid "Open torrent from URL"
-msgstr "从 URL 打开种子"
+msgstr "从网址打开种子"
 
 #: ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:88 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:32
 msgid "_URL"
@@ -2146,7 +2146,7 @@ msgstr "无法解析行：“{line}”"
 
 #: ../libtransmission/blocklist.cc:384
 msgid "Rewriting old blocklist file format to new format"
-msgstr "将旧的黑名单文件格式重写为新的格式"
+msgstr "将旧的屏蔽列表文件格式重写为新的格式"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:41 ../libtransmission/crypto-utils-openssl.cc:56 ../libtransmission/crypto-utils-wolfssl.cc:44
 msgid "{crypto_library} error: {error} ({error_code})"
@@ -2339,7 +2339,7 @@ msgstr "无法打开会话锁定文件“{path}”：{error}（{error_code}）"
 
 #: ../libtransmission/session.cc:405
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr "正在监听 {hostport} 上的入站用户连接"
+msgstr "正在监听 {hostport} 上的入站节点连接"
 
 #: ../libtransmission/session.cc:646
 msgid "Transmission version {version} starting"
@@ -2405,7 +2405,7 @@ msgstr "无法将“{old_path}”移至“{path}”：{error}（{error_code}）"
 
 #: ../libtransmission/tr-dht.cc:541
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "无法解析“{filename}”行：“{line}”"
 
 #: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"
@@ -2417,7 +2417,7 @@ msgstr "无法绑定 IPv4 socket {address}：{error}（{error_code}）"
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "无法绑定 IPv6 socket {address}：{error}（{error_code}）"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
@@ -2500,7 +2500,7 @@ msgstr[0] "{file_count:L} 个文件，{total_size}\n"
 #: ../utils/create.cc:232
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
+msgstr[0] "{piece_count:L} 个分片，每片 {piece_size}\n"
 
 #: ../utils/remote.cc:139
 msgid "hour"

@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Aymen J, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -14,8 +14,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Aymen J, 2023\n"
-"Language-Team: Arabic (https://www.transifex.com/transmissionbt/teams/33778/ar/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Arabic (https://app.transifex.com/transmissionbt/teams/33778/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -116,11 +116,11 @@ msgstr ""
 
 #: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
-msgstr "<b>يجري غلق الاتصالات...</b>"
+msgstr "<b>يجري غلق الاتصالات…</b>"
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "يرسل مجاميع الرفع والتنزيل إلى المتتبع..."
+msgstr "يرسل مجاميع الرفع والتنزيل إلى المتتبع…"
 
 #: ../gtk/Application.cc:1024
 msgid "_Quit Now"
@@ -920,7 +920,7 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "يجلب قائمة حظر جديدة..."
+msgstr "يجلب قائمة حظر جديدة…"
 
 #: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
@@ -948,7 +948,7 @@ msgstr "تعذر نقل التورنت"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "قد يستغرق هذا لحظات..."
+msgstr "قد يستغرق هذا لحظات…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
@@ -1401,15 +1401,15 @@ msgstr "افتح تورنت"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "افتح _رابطا..."
+msgstr "افتح _رابطا…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "افتح رابطا..."
+msgstr "افتح رابطا…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr "_جديد..."
+msgstr "_جديد…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -1513,7 +1513,7 @@ msgstr "ألبث التورنت"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "عيّن _مكانا..."
+msgstr "عيّن _مكانا…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1847,7 +1847,7 @@ msgstr "تورنت _خاص"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "يُنشئ التورنت..."
+msgstr "يُنشئ التورنت…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"

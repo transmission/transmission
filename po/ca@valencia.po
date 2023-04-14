@@ -4,7 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2023
+# Sergio, 2023
 #
 #, fuzzy
 msgid ""
@@ -13,8 +14,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
-"Language-Team: Catalan (Valencian) (https://www.transifex.com/transmissionbt/teams/33778/ca@valencia/)\n"
+"Last-Translator: Sergio, 2023\n"
+"Language-Team: Catalan (Valencian) (https://app.transifex.com/transmissionbt/teams/33778/ca@valencia/)\n"
 "Language: ca@valencia\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -107,29 +108,29 @@ msgstr ""
 
 #: ../gtk/Application.cc:784 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
-msgstr ""
+msgstr "Cancel·lar"
 
 #: ../gtk/Application.cc:785
 msgid "I _Agree"
-msgstr ""
+msgstr "Estic d'acord"
 
 #: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Tancant connexions"
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "Enviant els totals de pujada i baixada cap al rastrejador..."
+msgstr "Enviant els totals de pujada i baixada cap al rastrejador…"
 
 #: ../gtk/Application.cc:1024
 msgid "_Quit Now"
-msgstr "I_x ara"
+msgstr "Ix ara"
 
 #: ../gtk/Application.cc:1086
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "No s'ha pogut afegir un torrent malmés"
-msgstr[1] "No s'han pogut afegir torrents malmesos"
+msgstr[1] "No s'han pogut afegir torrents corruptes"
 
 #: ../gtk/Application.cc:1093
 msgid "Couldn't add duplicate torrent"
@@ -185,12 +186,12 @@ msgstr "S'estan verificant les dades locals"
 
 #: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:330
 msgid "Queued for download"
-msgstr "S'ha encuat per baixar"
+msgstr "S'ha encuat per descarregar"
 
 #: ../gtk/DetailsDialog.cc:578 ../gtk/FilterBar.cc:473
 msgctxt "Verb"
 msgid "Downloading"
-msgstr "S'està baixant"
+msgstr "Descarregant"
 
 #: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
 msgid "Queued for seeding"
@@ -533,7 +534,7 @@ msgstr[1] "Alguns d'estos torrents no han finalitzat la baixada."
 
 #: ../gtk/Dialogs.cc:118
 msgid "_Delete"
-msgstr ""
+msgstr "Esborrar"
 
 #: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2025 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1424
 msgid "_Remove"
@@ -707,7 +708,7 @@ msgstr "Guarda el registre"
 
 #: ../gtk/MessageLogWindow.cc:255 ../gtk/ui/gtk3/EditTrackersDialog.ui:35 ../gtk/ui/gtk4/EditTrackersDialog.ui:92
 msgid "_Save"
-msgstr ""
+msgstr "Guardar"
 
 #: ../gtk/MessageLogWindow.cc:336
 msgid "Message"
@@ -725,7 +726,7 @@ msgstr ""
 #: ../gtk/MessageLogWindow.cc:484
 msgctxt "Logging level"
 msgid "Error"
-msgstr ""
+msgstr "Error"
 
 #: ../gtk/MessageLogWindow.cc:485
 msgctxt "Logging level"
@@ -780,7 +781,7 @@ msgstr "Obri un torrent"
 
 #: ../gtk/OptionsDialog.cc:374 ../gtk/PathButton.cc:148 ../gtk/transmission.ui:12 ../gtk/transmission.ui:458 ../gtk/ui/gtk3/MainWindow.ui:25 ../gtk/ui/gtk3/OptionsDialog.ui:36 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:35 ../gtk/ui/gtk4/MainWindow.ui:30 ../gtk/ui/gtk4/OptionsDialog.ui:184 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:72
 msgid "_Open"
-msgstr ""
+msgstr "Obrir"
 
 #: ../gtk/OptionsDialog.cc:385
 msgid "Show options dialog"
@@ -834,7 +835,7 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "Obtenint la nova llista de bloquejats..."
+msgstr "Obtenint la nova llista de bloquejats…"
 
 #: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
@@ -862,7 +863,7 @@ msgstr "No s'ha pogut moure el torrent"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "Això tardarà una mica..."
+msgstr "Això tardarà una mica…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
@@ -1064,7 +1065,7 @@ msgstr[1] ""
 
 #: ../gtk/Utils.cc:173 ../gtk/Utils.cc:204 ../gtk/Utils.cc:231 ../gtk/Utils.cc:264
 msgid "now"
-msgstr ""
+msgstr "ara"
 
 #: ../gtk/Utils.cc:180
 msgid "{days_ago:L} day ago"
@@ -1227,15 +1228,15 @@ msgstr "Obri un torrent"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "Obri l'_URL..."
+msgstr "Obri l'_URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "Obri l'URL..."
+msgstr "Obri l'URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr "_Nou..."
+msgstr "_Nou…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -1271,7 +1272,7 @@ msgstr "Desse_lecciona-ho tot"
 
 #: ../gtk/transmission.ui:72
 msgid "_Preferences"
-msgstr ""
+msgstr "Preferències"
 
 #: ../gtk/transmission.ui:77
 msgid "_Torrent"
@@ -1339,7 +1340,7 @@ msgstr "Fes una pausa al torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Estableix la _ubicació"
+msgstr "Estableix la _ubicació…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1531,7 +1532,7 @@ msgstr "Origen:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:402 ../gtk/ui/gtk4/DetailsDialog.ui:296
 msgid "Added:"
-msgstr ""
+msgstr "Afegit:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:416 ../gtk/ui/gtk4/DetailsDialog.ui:308
 msgid "Comment:"
@@ -1673,7 +1674,7 @@ msgstr "Torrent _particular"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "Creant el torrent..."
+msgstr "Creant el torrent…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"
@@ -1685,7 +1686,7 @@ msgstr ""
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:42 ../gtk/ui/gtk4/MessageLogWindow.ui:55
 msgid "Clear"
-msgstr ""
+msgstr "Netejar"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:67 ../gtk/ui/gtk4/MessageLogWindow.ui:84
 msgid "P_ause"

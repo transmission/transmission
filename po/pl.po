@@ -4,9 +4,9 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Piotr Drąg <piotrdrag@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
 # Marek Adamski, 2023
+# Piotr Drąg <piotrdrag@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -15,8 +15,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Marek Adamski, 2023\n"
-"Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2023\n"
+"Language-Team: Polish (https://app.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -159,7 +159,7 @@ msgid "translator-credits"
 msgstr ""
 "Tomasz Dominikowski <dominikowski@gmail.com>, 2006, 2007\n"
 "Marek Adamski, 2022\n"
-"Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2022\n"
+"Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2023\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Account Deactivated https://launchpad.net/~accountdeactivated\n"
@@ -821,7 +821,7 @@ msgstr "Debugowanie"
 
 #: ../gtk/Notify.cc:148
 msgid "Couldn't create proxy for '{bus}': {error} ({error_code})"
-msgstr "Nie można utworzyć proxy dla „{bus}”: {error} ({error_code})"
+msgstr "Nie można utworzyć pośrednika dla „{bus}”: {error} ({error_code})"
 
 #: ../gtk/Notify.cc:233
 msgid "Open File"
@@ -861,11 +861,11 @@ msgstr "_Otwórz"
 
 #: ../gtk/OptionsDialog.cc:385
 msgid "Show options dialog"
-msgstr "Pokaż _okno opcji"
+msgstr "Okno opcji"
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
-msgstr "Wybierz plik"
+msgstr "Wybór pliku"
 
 #: ../gtk/PathButton.cc:202
 msgid "(None)"
@@ -963,7 +963,7 @@ msgstr "Zezwolenie na hibernację"
 
 #: ../gtk/Session.cc:1202
 msgid "Couldn't find pending RPC request for tag {tag}"
-msgstr "Nie można znaleźć oczekującego żądania RPC dotyczącego tagu {tag}"
+msgstr "Nie można odnaleźć oczekującego żądania RPC dla znacznika {tag}"
 
 #: ../gtk/StatsDialog.cc:71
 msgid "Started {count:L} time"
@@ -1317,7 +1317,7 @@ msgstr "[pliki torrent lub adresy URL]"
 
 #: ../gtk/main.cc:107
 msgid "Run '{program} --help' to see a full list of available command line options.\n"
-msgstr "Uruchom polecenie „{program} --help”, aby zobaczyć pełną listę dostępnych opcji wiersza poleceń.\n"
+msgstr "Polecenie „{program} --help” wyświetli pełną listę dostępnych opcji wiersza poleceń.\n"
 
 #: ../gtk/transmission-gtk.desktop.in:4
 msgid "BitTorrent Client"
@@ -1474,7 +1474,7 @@ msgstr "Skopiuj odnośnik _magnet do schowka"
 
 #: ../gtk/transmission.ui:166 ../gtk/transmission.ui:435 ../gtk/ui/gtk3/MainWindow.ui:69 ../gtk/ui/gtk4/MainWindow.ui:63
 msgid "Remove torrent"
-msgstr "Usuwa torrent"
+msgstr "Usuń torrent"
 
 #: ../gtk/transmission.ui:172 ../gtk/transmission.ui:441
 msgid "_Delete Files and Remove"
@@ -1566,7 +1566,7 @@ msgstr "_O programie"
 
 #: ../gtk/transmission.ui:306
 msgid "_Sort Torrents By"
-msgstr "_Sortowanie torrentów według"
+msgstr "_Porządkowanie torrentów"
 
 #: ../gtk/transmission.ui:451
 msgid "_Show Transmission"
@@ -2030,11 +2030,11 @@ msgstr "_Maksymalna liczba partnerów:"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
-msgstr "Włącz µ_TP do komunikacji równorzędnej"
+msgstr "Kom_unikacja z partnerami przez µTP"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
-msgstr "µTP to narzędzie do zmniejszania przeciążenia sieci."
+msgstr "µTP umożliwia zmniejszenie przeciążenia sieci"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1457 ../gtk/ui/gtk4/PrefsDialog.ui:1011
 msgid "Use PE_X to find more peers"
@@ -2263,7 +2263,7 @@ msgstr "Nie można przetworzyć wiersza: „{line}”"
 
 #: ../libtransmission/blocklist.cc:384
 msgid "Rewriting old blocklist file format to new format"
-msgstr "Przepisywanie starego formatu pliku listy blokowania na nowy format"
+msgstr "Przepisywanie poprzedniego formatu pliku listy blokowania na nowy format"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:41 ../libtransmission/crypto-utils-openssl.cc:56 ../libtransmission/crypto-utils-wolfssl.cc:44
 msgid "{crypto_library} error: {error} ({error_code})"

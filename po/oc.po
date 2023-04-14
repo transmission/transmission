@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Quentin PAGÈS, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -14,8 +14,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Quentin PAGÈS, 2023\n"
-"Language-Team: Occitan (post 1500) (https://www.transifex.com/transmissionbt/teams/33778/oc/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Occitan (post 1500) (https://app.transifex.com/transmissionbt/teams/33778/oc/)\n"
 "Language: oc\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,19 +32,19 @@ msgstr ""
 
 #: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:168 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
 msgid "Couldn't read '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Lectura impossibla « {path} » : {error} ({error_code})"
 
 #: ../daemon/daemon.cc:260 ../gtk/Session.cc:863 ../gtk/Utils.cc:285 ../libtransmission/watchdir.cc:95
 msgid "Couldn't add torrent file '{path}'"
-msgstr ""
+msgstr "Apondon impossible del fichièr torrent « {path} »"
 
 #: ../daemon/daemon.cc:271
 msgid "Removing torrent file '{path}'"
-msgstr ""
+msgstr "Supression del fichièr torrent « {path} »"
 
 #: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:585
 msgid "Couldn't remove '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Supression impossibla « {path} » : {error} ({error_code})"
 
 #: ../daemon/daemon.cc:604
 msgid "Couldn't parse log level '{level}'"
@@ -76,7 +76,7 @@ msgstr ""
 
 #: ../daemon/daemon.cc:751
 msgid "Requiring authentication"
-msgstr ""
+msgstr "Autentificacion demandada"
 
 #: ../daemon/daemon.cc:772
 msgid "Watching '{path}' for new torrent files"
@@ -116,7 +116,7 @@ msgstr "_Accepti"
 
 #: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
-msgstr ""
+msgstr "Tampadura de las connexion…"
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
@@ -144,7 +144,7 @@ msgstr "Un client BitTorrent simple e rapid"
 
 #: ../gtk/Application.cc:1415
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Copyright © Lo projècte Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -232,15 +232,15 @@ msgstr "Torrent public"
 
 #: ../gtk/DetailsDialog.cc:715
 msgid "Created by {creator} on {date}"
-msgstr ""
+msgstr "Creat per {creator} lo {date}"
 
 #: ../gtk/DetailsDialog.cc:719
 msgid "Created by {creator}"
-msgstr ""
+msgstr "Creat per {creator}"
 
 #: ../gtk/DetailsDialog.cc:723
 msgid "Created on {date}"
-msgstr ""
+msgstr "Creat lo {date}"
 
 #: ../gtk/DetailsDialog.cc:837
 msgid "Unknown"
@@ -255,17 +255,17 @@ msgstr[1] ""
 #: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:394
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "({piece_count} pèça BitTorrent @ {piece_size})"
+msgstr[1] "({piece_count} pèças BitTorrent @ {piece_size})"
 
 #: ../gtk/DetailsDialog.cc:933
 msgid "{current_size} ({percent_done}%)"
-msgstr ""
+msgstr "{current_size} ({percent_done}%)"
 
 #: ../gtk/DetailsDialog.cc:941
 #, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
-msgstr ""
+msgstr "{current_size} ({percent_done}% de {percent_available}% disponible)"
 
 #: ../gtk/DetailsDialog.cc:950
 #, no-c-format
@@ -278,7 +278,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:1013
 msgid "{uploaded_size} (Ratio: {ratio})"
-msgstr ""
+msgstr "{uploaded_size} (Racio : {ratio})"
 
 #: ../gtk/DetailsDialog.cc:1054
 msgid "No errors"
@@ -407,7 +407,7 @@ msgstr ""
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1844
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Error obtenguda '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1857
 msgid "No updates scheduled"
@@ -415,7 +415,7 @@ msgstr "Cap de mesa a jorn pas prevista"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Demanda de mai de pars {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1871
 msgid "Queued to ask for more peers"
@@ -424,7 +424,7 @@ msgstr "En espèra per demandar mai de pars"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1879
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Demandat mai de pars {markup_begin} {time_span_ago} {markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1904
@@ -863,7 +863,7 @@ msgstr "Impossible de desplaçar lo torrent"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "Aquò pòt prene un momenton..."
+msgstr "Aquò pòt prene un momenton…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"

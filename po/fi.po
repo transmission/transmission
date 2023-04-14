@@ -6,8 +6,8 @@
 # Translators:
 # Otto Koskelah <otto@nise.fi>, 2017
 # Kimmo Kujansuu <mrkujansuu@gmail.com>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -16,8 +16,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2023\n"
-"Language-Team: Finnish (https://www.transifex.com/transmissionbt/teams/33778/fi/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Finnish (https://app.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -122,7 +122,7 @@ msgstr "Suljetaan yhteyksiä…"
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "Lähetetään seurantapalvelimelle lataus- ja lähetystilastot..."
+msgstr "Lähetetään seurantapalvelimelle lataus- ja lähetystilastot…"
 
 #: ../gtk/Application.cc:1024
 msgid "_Quit Now"
@@ -862,7 +862,7 @@ msgstr "Estolistaa ei voitu päivittää"
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "Noudetaan uutta estolistaa..."
+msgstr "Noudetaan uutta estolistaa…"
 
 #: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
@@ -890,7 +890,7 @@ msgstr "Torrenttia ei voitu siirtää"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "Tämä saattaa kestää hetken..."
+msgstr "Tämä saattaa kestää hetken…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
@@ -1255,15 +1255,15 @@ msgstr "Avaa torrent"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "Avaa o_soite..."
+msgstr "Avaa o_soite…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "Avaa osoite..."
+msgstr "Avaa osoite…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr "_Uusi..."
+msgstr "_Uusi…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -1367,7 +1367,7 @@ msgstr "Pysäytä torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Aseta s_ijainti..."
+msgstr "Aseta s_ijainti…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1703,7 +1703,7 @@ msgstr "_Yksityinen torrent"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "Luodaan torrentia..."
+msgstr "Luodaan torrentia…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"

@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Panwar108 <caspian7pena@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -14,8 +14,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Panwar108 <caspian7pena@gmail.com>, 2022\n"
-"Language-Team: Hindi (https://www.transifex.com/transmissionbt/teams/33778/hi/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Hindi (https://app.transifex.com/transmissionbt/teams/33778/hi/)\n"
 "Language: hi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -120,7 +120,7 @@ msgstr ""
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "कुल अपलोड/डाउनलोड ट्रैकर को भेजना जारी..."
+msgstr "कुल अपलोड/डाउनलोड ट्रैकर को भेजना जारी…"
 
 #: ../gtk/Application.cc:1024
 msgid "_Quit Now"
@@ -840,7 +840,7 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "नई अवरुद्ध सूची प्राप्ति जारी..."
+msgstr "नई अवरुद्ध सूची प्राप्ति जारी…"
 
 #: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
@@ -868,7 +868,7 @@ msgstr "टोरेंट अंतरण विफल"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "इसमें कुछ समय लग सकता है..."
+msgstr "इसमें कुछ समय लग सकता है…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
@@ -1233,15 +1233,15 @@ msgstr "टोरेंट खोलें"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "यूआरएल खोलें (_U)..."
+msgstr "यूआरएल खोलें (_U)…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "यूआरएल खोलें..."
+msgstr "यूआरएल खोलें…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr "नया (_N)..."
+msgstr "नया (_N)…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -1345,7 +1345,7 @@ msgstr "टोरेंट स्थगित करें"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "स्थान सेट करें (_L)..."
+msgstr "स्थान सेट करें (_L)…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1681,7 +1681,7 @@ msgstr "निजी टोरेंट (_P)"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "टोरेंट बनाना जारी..."
+msgstr "टोरेंट बनाना जारी…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"

@@ -8,7 +8,7 @@
 # Savvas Adamtziloglou <savvas-gr@greeklug.gr>, 2022
 # Michalis Zisis <mixasgr@greeklug.gr>, 2022
 # 49b67765f7beecf7587147363d590d62, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -17,8 +17,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
-"Language-Team: Greek (https://www.transifex.com/transmissionbt/teams/33778/el/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Greek (https://app.transifex.com/transmissionbt/teams/33778/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -896,7 +896,7 @@ msgstr "Δεν ήταν δυνατή η μετακίνηση του torrent"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "Αυτό μπορεί να πάρει λίγο χρόνο..."
+msgstr "Αυτό μπορεί να πάρει λίγο χρόνο…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"

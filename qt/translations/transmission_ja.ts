@@ -629,7 +629,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>改名...</translation>
+        <translation>改名…</translation>
     </message>
 </context>
 <context>
@@ -683,7 +683,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>検索...</translation>
+        <translation>検索…</translation>
     </message>
 </context>
 <context>
@@ -1727,7 +1727,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation>TCPポートを検査中...</translation>
+        <translation>TCPポートを検査中…</translation>
     </message>
     <message>
         <location line="+154"/>

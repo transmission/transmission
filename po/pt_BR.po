@@ -9,10 +9,10 @@
 # Gabriel P Machado <machado.gp@gmail.com>, 2022
 # Alex, 2022
 # Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2022
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Eduardo Lamblet <edlamblet@netscape.net>, 2023
 # LUIS PEDRO NUNES LESSA, 2023
 # Leonardo Colman Lopes <leonardo.dev@colman.com.br>, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -21,8 +21,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Leonardo Colman Lopes <leonardo.dev@colman.com.br>, 2023\n"
-"Language-Team: Portuguese (Brazil) (https://www.transifex.com/transmissionbt/teams/33778/pt_BR/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Portuguese (Brazil) (https://app.transifex.com/transmissionbt/teams/33778/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -123,11 +123,11 @@ msgstr "Concordo"
 
 #: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
-msgstr "Fechando conexões..."
+msgstr "Fechando conexões…"
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "Enviando total de enviados/baixados ao rastreador..."
+msgstr "Enviando total de enviados/baixados ao rastreador…"
 
 #: ../gtk/Application.cc:1024
 msgid "_Quit Now"
@@ -919,7 +919,7 @@ msgstr "Não foi possível atualizar a lista de bloqueio"
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "Obtendo nova lista de bloqueio..."
+msgstr "Obtendo nova lista de bloqueio…"
 
 #: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
@@ -935,7 +935,7 @@ msgstr "A porta está {markup_begin}aberta{markup_end}"
 
 #: ../gtk/PrefsDialog.cc:923
 msgid "Testing TCP port…"
-msgstr "Testando porta TCP..."
+msgstr "Testando porta TCP…"
 
 #: ../gtk/RelocateDialog.cc:84
 msgid "Moving '{torrent_name}'"
@@ -947,7 +947,7 @@ msgstr "Não pôde mover o torrent"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "Isso pode levar um tempo..."
+msgstr "Isso pode levar um tempo…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
@@ -1446,7 +1446,7 @@ msgstr "Pausar torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Definir _Local..."
+msgstr "Definir _Local…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1782,7 +1782,7 @@ msgstr "Torrent _privado"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "Criando torrent..."
+msgstr "Criando torrent…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"

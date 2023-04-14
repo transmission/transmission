@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -13,8 +13,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
-"Language-Team: Albanian (https://www.transifex.com/transmissionbt/teams/33778/sq/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Albanian (https://app.transifex.com/transmissionbt/teams/33778/sq/)\n"
 "Language: sq\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -119,7 +119,7 @@ msgstr ""
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "Duke dërguar totalin e ngarkimeve/shkarkimeve në gjurmues..."
+msgstr "Duke dërguar totalin e ngarkimeve/shkarkimeve në gjurmues…"
 
 #: ../gtk/Application.cc:1024
 msgid "_Quit Now"
@@ -836,7 +836,7 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "Duke marrë listën e re të bllokimeve..."
+msgstr "Duke marrë listën e re të bllokimeve…"
 
 #: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
@@ -864,7 +864,7 @@ msgstr "Nuk muda ta lëviz torrentin"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "Kjo mund të zgjasë pak"
+msgstr "Kjo mund të zgjasë pak…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
@@ -1237,7 +1237,7 @@ msgstr "Hap URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr "_I Ri..."
+msgstr "_I Ri…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -1341,7 +1341,7 @@ msgstr "Pauzo torrentin"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Vendos _Vendndodhjen..."
+msgstr "Vendos _Vendndodhjen…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1675,7 +1675,7 @@ msgstr "_Torrent privat"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "Duke krijuar torrent..."
+msgstr "Duke krijuar torrent…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"

@@ -5,8 +5,8 @@
 #
 # Translators:
 # Pieter Schalk Schoeman <pieter@sonbesie.co.za>, 2022
-# Gideon Wentink <gjwentink@gmail.com>, 2022
 # Mike Gelfand <mikedld@mikedld.com>, 2022
+# Gideon Wentink <gjwentink@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -15,8 +15,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
-"Language-Team: Afrikaans (https://www.transifex.com/transmissionbt/teams/33778/af/)\n"
+"Last-Translator: Gideon Wentink <gjwentink@gmail.com>, 2023\n"
+"Language-Team: Afrikaans (https://app.transifex.com/transmissionbt/teams/33778/af/)\n"
 "Language: af\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2127,109 +2127,109 @@ msgstr "Sukses"
 #: ../libtransmission/blocklist.cc:66 ../libtransmission/blocklist.cc:400
 msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Swartlys ‘{path}’ het {count} inskrywing"
+msgstr[1] "Swartlys ‘{path}’ het {count} inskrywings"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:242
 msgid "Couldn't parse line: '{line}'"
-msgstr ""
+msgstr "Kon nie reël parseer nie: {line}"
 
 #: ../libtransmission/blocklist.cc:384
 msgid "Rewriting old blocklist file format to new format"
-msgstr ""
+msgstr "Skryf tans ou swartlyslêerformaat na nuwe formaat"
 
 #: ../libtransmission/crypto-utils-ccrypto.cc:73 ../libtransmission/crypto-utils-mbedtls.cc:41 ../libtransmission/crypto-utils-openssl.cc:56 ../libtransmission/crypto-utils-wolfssl.cc:44
 msgid "{crypto_library} error: {error} ({error_code})"
-msgstr ""
+msgstr "{crypto_library} fout: {error} ({error_code})"
 
 #: ../libtransmission/inout.cc:126 ../libtransmission/inout.cc:151
 msgid "Couldn't get '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie ‘{path}’ kry nie: {error} ({error_code})"
 
 #: ../libtransmission/log.cc:300
 msgid "Too many messages like this! I won't log this message anymore this session."
-msgstr ""
+msgstr "Te veel van hierdie soort boodskappe! Ek sal nie meer hierdie boodskap in hierdie boekstaaf nie."
 
 #: ../libtransmission/makemeta.cc:75 ../libtransmission/watchdir.cc:53
 msgid "Skipping '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Oorslaan van ‘{path}’: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:151
 msgid "Couldn't create socket: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie sok skep nie: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:226
 msgid "Couldn't set source address {address} on {socket}: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie bronadres {address} instel op {socket} nie: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:246
 msgid "Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie sok {socket} koppel aan {address} :{port} nie: {error} ({error_code})"
 
 #: ../libtransmission/net.cc:313
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?"
-msgstr ""
+msgstr "Kon nie poort {port} bind op {address} nie: {error} ({error_code}) -- Loop ’n ander kopie van Transmission al?"
 
 #: ../libtransmission/net.cc:314
 msgid "Couldn't bind port {port} on {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie poort {port} bind op {address} nie: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:184
 msgid "Couldn't open '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie ‘{path}’ open nie: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:213
 msgid "Couldn't preallocate '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie ‘{path}’‘ vooraf toewys nie: {error} ({error_code})"
 
 #: ../libtransmission/open-files.cc:233
 msgid "Couldn't truncate '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie ‘{path}’ afknot nie: {error} ({error_code})"
 
 #: ../libtransmission/peer-io.cc:673
 msgid "Unknown state: {state}"
-msgstr ""
+msgstr "Onbekende staat: {state}"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:86
 msgid "Found public address '{address}'"
-msgstr ""
+msgstr "Openbare adres ‘{address}’ gevind"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:123
 msgid "Port {port} is no longer forwarded"
-msgstr ""
+msgstr "Poort {port} word nie meer aangestuur nie"
 
 #: ../libtransmission/port-forwarding-natpmp.cc:177
 msgid "Port {port} forwarded successfully"
-msgstr ""
+msgstr "Poort {port} suksesvol aangestuur"
 
 #: ../libtransmission/port-forwarding-upnp.cc:281
 msgid "Found Internet Gateway Device '{url}'"
-msgstr ""
+msgstr "Internetdeurgangtoestel ‘{url}’ gevind"
 
 #: ../libtransmission/port-forwarding-upnp.cc:282
 msgid "Local Address is '{address}'"
-msgstr ""
+msgstr "Lokale adres is ‘{address}’"
 
 #: ../libtransmission/port-forwarding-upnp.cc:306
 msgid "Port {port} is not forwarded"
-msgstr ""
+msgstr "Poort {port} word nie aangestuur nie"
 
 #: ../libtransmission/port-forwarding-upnp.cc:316
 msgid "Stopping port forwarding through '{url}', service '{type}'"
-msgstr ""
+msgstr "Stop poortaanstuur deur ‘{url}’, diens ‘{type}’"
 
 #: ../libtransmission/port-forwarding-upnp.cc:348
 msgid "Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"
-msgstr ""
+msgstr "Poortaanstuur deur ‘{url}’, diens ‘{type}’. (lokale adres: {address}:{port})"
 
 #: ../libtransmission/port-forwarding-upnp.cc:356
 msgid "Port {port} is forwarded"
-msgstr ""
+msgstr "Poort {port} word aangestuur"
 
 #: ../libtransmission/port-forwarding-upnp.cc:362
 msgid "If your router supports UPnP, please make sure UPnP is enabled!"
-msgstr ""
+msgstr "Indien u roeteerder UPnP ondersteun, maak seker dat UPnP geaktiveer is!"
 
 #: ../libtransmission/port-forwarding.cc:163
 msgid "Starting"
@@ -2249,49 +2249,49 @@ msgstr "Nie aangestuur nie"
 
 #: ../libtransmission/port-forwarding.cc:201
 msgid "Mapped private port {private_port} to public port {public_port}"
-msgstr ""
+msgstr "Privaat poort {private_port} na openbare poort {public_port} oorgesit"
 
 #: ../libtransmission/port-forwarding.cc:216
 msgid "State changed from '{old_state}' to '{state}'"
-msgstr ""
+msgstr "Status het verander van ‘{old_state}’ na ‘{state}’"
 
 #: ../libtransmission/rpc-server.cc:578
 msgid "Unix socket path must be fewer than {count} characters (including '{prefix}' prefix)"
-msgstr ""
+msgstr "Unix-sokpad moet minder wees as {count} karakters (insluitend ‘{prefix}’ prefiks)"
 
 #: ../libtransmission/rpc-server.cc:612
 msgid "Unix sockets are unsupported on Windows. Please change '{key}' in your settings."
-msgstr ""
+msgstr "Unix-sokke word nie ondersteun in Windows nie. Verander ‘{key}’ in u instellings."
 
 #: ../libtransmission/rpc-server.cc:639
 msgid "Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"
-msgstr ""
+msgstr "Kon nie RPC-sokmodus instellen op {mode:#o} nie, herstel na 0755"
 
 #: ../libtransmission/rpc-server.cc:702
 msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kon nie bind aan {address} na {count} poging nie, ek gee op"
+msgstr[1] "Kon nie bind aan {address} na {count} pogings nie, ek gee op"
 
 #: ../libtransmission/rpc-server.cc:713
 msgid "Listening for RPC and Web requests on '{address}'"
-msgstr ""
+msgstr "Luister na RPC- en webversoeke op ‘{address}’"
 
 #: ../libtransmission/rpc-server.cc:741
 msgid "Stopped listening for RPC and Web requests on '{address}'"
-msgstr ""
+msgstr "Luister nie meer na RPC- en webversoeke op ‘{address}’ nie"
 
 #: ../libtransmission/rpc-server.cc:763
 msgid "Added '{entry}' to host whitelist"
-msgstr ""
+msgstr "‘{entry}’ toegevoeg aan gasheer se witlys"
 
 #: ../libtransmission/rpc-server.cc:893
 msgid "The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"
-msgstr ""
+msgstr "De ‘{key}’-instelling is ‘{value}’ maar moet ’n IPv4- of IPv6-adres of ’n Unix-sokpad wees. Ons gebruik verstekwaarde ‘0.0.0.0’"
 
 #: ../libtransmission/rpc-server.cc:907
 msgid "Serving RPC and Web requests on {address}"
-msgstr ""
+msgstr "Bedien RPC- en webversoeke op {address}"
 
 #: ../libtransmission/rpc-server.cc:912
 msgid "Whitelist enabled"
@@ -2303,63 +2303,63 @@ msgstr "Wagwoord vereis"
 
 #: ../libtransmission/rpc-server.cc:923
 msgid "Serving RPC and Web requests from '{path}'"
-msgstr ""
+msgstr "Bedien RPC- en webversoeke van ‘{path}’"
 
 #: ../libtransmission/rpcimpl.cc:1384
 msgid "Couldn't test port: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie poort toets nie: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1418
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie swartlys ophaal nie: {error} ({error_code})"
 
 #: ../libtransmission/rpcimpl.cc:1552
 msgid "Couldn't fetch torrent: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie torrent ophaal nie: {error} ({error_code})"
 
 #: ../libtransmission/session-alt-speeds.cc:91
 msgid "Time to turn off turtle mode"
-msgstr ""
+msgstr "Tyd om skilpadmodus af te skakel"
 
 #: ../libtransmission/session-alt-speeds.cc:91
 msgid "Time to turn on turtle mode"
-msgstr ""
+msgstr "Tyd om skilpadmodus aan te skakel"
 
 #: ../libtransmission/session-id.cc:154
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie sessievergrendelingslêer open nie ‘{path}’: {error} ({error_code})"
 
 #: ../libtransmission/session.cc:405
 msgid "Listening to incoming peer connections on {hostport}"
-msgstr ""
+msgstr "Luister na inkomende eweknieverbindings op {hostport}"
 
 #: ../libtransmission/session.cc:646
 msgid "Transmission version {version} starting"
-msgstr ""
+msgstr "Transmission weergawe {version} begin"
 
 #: ../libtransmission/session.cc:1328
 msgid "Transmission version {version} shutting down"
-msgstr ""
+msgstr "Transmission weergawe {version} sluit af"
 
 #: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count} torrent gelaai"
+msgstr[1] "{count} torrents gelaai"
 
 #: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kon nie magneet-metainligting parsee nier: ‘{error}’. Laai weer {piece_count} deel af"
+msgstr[1] "Kon nie magneet-metainligting parsee nier: ‘{error}’. Laai weer {piece_count} dele af"
 
 #: ../libtransmission/torrent-metainfo.cc:717
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
-msgstr ""
+msgstr "Torrentlêer van ‘{old_path}’ na ‘{path}’ gemigreer"
 
 #: ../libtransmission/torrent.cc:120
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie metainligting van ‘{path}’ gebruik vir ‘{magnet}’ nie: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:157
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
@@ -2367,19 +2367,19 @@ msgstr "Geen data gevind! Maak seker u skywe is verbind of gebruik “Stel Liggi
 
 #: ../libtransmission/torrent.cc:464
 msgid "Calling script '{path}'"
-msgstr ""
+msgstr "oproep van skrip ‘{path}’"
 
 #: ../libtransmission/torrent.cc:473
 msgid "Couldn't call script '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie skrip ‘{path}’ oproep nie: {error} ({error_code})"
 
 #: ../libtransmission/torrent.cc:525
 msgid "Seed ratio reached; pausing torrent"
-msgstr ""
+msgstr "Saairatio bereik; torrent word laat wag"
 
 #: ../libtransmission/torrent.cc:532
 msgid "Seeding idle limit reached; pausing torrent"
-msgstr ""
+msgstr "Saai-onaktiefperk bereik; torrent word laat wag"
 
 #: ../libtransmission/torrent.cc:848
 msgid "Restarted manually -- disabling its seed ratio"
@@ -2387,7 +2387,7 @@ msgstr "Handmatig herbegin -- deaktiveer tans die saairatio"
 
 #: ../libtransmission/torrent.cc:868
 msgid "Pausing torrent"
-msgstr ""
+msgstr "Torrent word laat wag"
 
 #: ../libtransmission/torrent.cc:922
 msgid "Removing torrent"
@@ -2395,35 +2395,35 @@ msgstr "Verwyder tans torrent"
 
 #: ../libtransmission/torrent.cc:1250 ../libtransmission/torrent.cc:2306
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie ‘{old_path}’ skuif na ‘{path}’ nie: {error} ({error_code})"
 
 #: ../libtransmission/tr-dht.cc:541
 msgid "Couldn't parse '{filename}' line: '{line}'"
-msgstr ""
+msgstr "Kon nie ‘{filename}’-lyn: ‘{line}’ parseer nie"
 
 #: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie LPD initialiseer nie: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:159
 msgid "Couldn't bind IPv4 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie IPv4-sok bind nie {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-udp.cc:193
 msgid "Couldn't bind IPv6 socket {address}: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie IPv6-sok bind nie {address}: {error} ({error_code})"
 
 #: ../libtransmission/tr-utp.cc:102
 msgid "Unknown socket family"
-msgstr ""
+msgstr "Onbekende sokfamilie"
 
 #: ../libtransmission/utils.cc:83
 msgid "Couldn't read '{path}': Not a regular file"
-msgstr ""
+msgstr "Kon nie ‘{path}’ lees nie: nie gewoon lêer nie"
 
 #: ../libtransmission/variant-json.cc:98
 msgid "Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie JSON parseer op posisie nie {position} ‘{text}’: {error} ({error_code})"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/variant.cc:860
@@ -2432,55 +2432,55 @@ msgstr "Ongeldige metadata"
 
 #: ../libtransmission/watchdir-inotify.cc:79 ../libtransmission/watchdir-inotify.cc:91 ../libtransmission/watchdir-inotify.cc:103 ../libtransmission/watchdir-kqueue.cc:76 ../libtransmission/watchdir-kqueue.cc:89 ../libtransmission/watchdir-kqueue.cc:104
 msgid "Couldn't watch '{path}': {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie ‘{path}’ kyk nie: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:135 ../libtransmission/watchdir-kqueue.cc:147 ../libtransmission/watchdir-win32.cc:271
 msgid "Couldn't read event: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie gebeure lees nie: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:144 ../libtransmission/watchdir-win32.cc:280
 msgid "Couldn't read event: expected {expected_size}, got {actual_size}"
-msgstr ""
+msgstr "Kon nie gebeure lees nie: {expected_size} verwag, {actual_size} gekry"
 
 #: ../libtransmission/watchdir-inotify.cc:161 ../libtransmission/watchdir-win32.cc:305
 msgid "Couldn't read filename: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie lêernaam lees nie: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-inotify.cc:170 ../libtransmission/watchdir-win32.cc:314
 msgid "Couldn't read filename: expected {expected_size}, got {actual_size}"
-msgstr ""
+msgstr "Kon nie lêernaam lees nie: {expected_size} verwag, {actual_size} gekry"
 
 #: ../libtransmission/watchdir-win32.cc:142
 msgid "Couldn't convert '{path}' to native path"
-msgstr ""
+msgstr "Kon nie ‘{path}’ omskakel na oorspronklike pad"
 
 #: ../libtransmission/watchdir-win32.cc:171
 msgid "Couldn't create pipe: {error} ({error_code})"
-msgstr ""
+msgstr "Kon nie pyp skep nie: {error} ({error_code})"
 
 #: ../libtransmission/watchdir-win32.cc:195
 msgid "Couldn't create thread"
-msgstr ""
+msgstr "Kon nie draad skep nie"
 
 #: ../libtransmission/watchdir-win32.cc:224
 msgid "Couldn't read directory changes"
-msgstr ""
+msgstr "Kon nie gidswysigings lees nie"
 
 #: ../libtransmission/watchdir-win32.cc:231
 msgid "Couldn't wait for directory changes"
-msgstr ""
+msgstr "Kon nie wag vir gidswysigings nie"
 
 #: ../libtransmission/web.cc:175
 msgid "Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"
-msgstr ""
+msgstr "Sal spoordersertifikate verifieer m.b.v. envvar CURL_CA_BUNDLE: {bundle}"
 
 #: ../libtransmission/web.cc:176
 msgid "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"
-msgstr ""
+msgstr "NB: dit werk slegs indien u teen libcurl bou met openssl of gnutls, NIE nss"
 
 #: ../libtransmission/web.cc:177
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
-msgstr ""
+msgstr "NB: Ongeldige sertifikate word weergegee as ‘Kan geen verbinding maak met spoorder’ soos by talle ander foute"
 
 #: ../libtransmission/web.cc:448
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
@@ -2489,35 +2489,35 @@ msgstr ""
 #: ../utils/create.cc:226
 msgid "{file_count:L} file, {total_size}\n"
 msgid_plural "{file_count:L} files, {total_size}\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{file_count:L} lêer, {total_size}\n"
+msgstr[1] "{file_count:L} lêers, {total_size}\n"
 
 #: ../utils/create.cc:232
 msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{piece_count:L} stuk, {piece_size}\n"
+msgstr[1] "{piece_count:L} stukke, {piece_size} elk\n"
 
 #: ../utils/remote.cc:139
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "uur"
+msgstr[1] "uur"
 
 #: ../utils/remote.cc:140
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "minuut"
+msgstr[1] "minute"
 
 #: ../utils/remote.cc:141 ../utils/remote.cc:161
 msgid "seconds"
 msgid_plural "seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "sekonde"
+msgstr[1] "sekondes"
 
 #: ../utils/remote.cc:145
 msgid "day"
 msgid_plural "days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "dag"
+msgstr[1] "dae"

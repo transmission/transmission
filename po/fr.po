@@ -20,7 +20,7 @@ msgstr ""
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
-"Language-Team: French (https://www.transifex.com/transmissionbt/teams/33778/fr/)\n"
+"Language-Team: French (https://app.transifex.com/transmissionbt/teams/33778/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1279,7 +1279,7 @@ msgstr "Ouvrir une _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "Ouvrir une URL..."
+msgstr "Ouvrir une URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"

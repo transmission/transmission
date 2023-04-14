@@ -7,9 +7,9 @@
 # Alfredo Monclus <alfredomonclus@gmail.com>, 2017
 # Adolfo Jayme-Barrientos, 2021
 # GPL-advocate <adrlopgal@disroot.org>, 2022
-# picodotdev <pico.dev@gmail.com>, 2022
 # Rodrigo Lledó <rodhos92@gmail.com>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# picodotdev <pico.dev@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -18,8 +18,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
-"Language-Team: Spanish (https://www.transifex.com/transmissionbt/teams/33778/es/)\n"
+"Last-Translator: picodotdev <pico.dev@gmail.com>, 2023\n"
+"Language-Team: Spanish (https://app.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -120,11 +120,11 @@ msgstr "Yo _Acepto"
 
 #: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
-msgstr "Cerrando conexiones..."
+msgstr "Cerrando conexiones…"
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "Enviando totales de carga/descarga al rastreador…"
+msgstr "Enviando totales de subida/descarga al rastreador…"
 
 #: ../gtk/Application.cc:1024
 msgid "_Quit Now"
@@ -393,11 +393,11 @@ msgstr "Descargaríamos desde este par si nos lo permitiera"
 
 #: ../gtk/DetailsDialog.cc:1501
 msgid "Uploading to peer"
-msgstr "Cargando al par"
+msgstr "Subiendo al par"
 
 #: ../gtk/DetailsDialog.cc:1505
 msgid "We would upload to this peer if they asked"
-msgstr "Se cargaría a este par si lo solicitara"
+msgstr "Se subiría a este par si lo solicitara"
 
 #: ../gtk/DetailsDialog.cc:1509
 msgid "Peer has unchoked us, but we're not interested"
@@ -442,7 +442,7 @@ msgstr "Pet. descarga"
 
 #: ../gtk/DetailsDialog.cc:1650
 msgid "Up Reqs"
-msgstr "Pets. carga"
+msgstr "Pets. subida"
 
 #: ../gtk/DetailsDialog.cc:1657
 msgid "Dn Blocks"
@@ -450,7 +450,7 @@ msgstr "Bloques de descarga"
 
 #: ../gtk/DetailsDialog.cc:1664
 msgid "Up Blocks"
-msgstr "Bloques de carga"
+msgstr "Bloques de subida"
 
 #: ../gtk/DetailsDialog.cc:1671
 msgid "We Cancelled"
@@ -503,7 +503,7 @@ msgstr "No hay actualizaciones programadas"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Asking for more peers {time_span_from_now}"
-msgstr "Solicitando más pares {time_span_from_now}"
+msgstr "Solicitando más pares en {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1871
 msgid "Queued to ask for more peers"
@@ -517,7 +517,7 @@ msgstr "Se han solicitado más pares {markup_begin}{time_span_ago}{markup_end}"
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1904
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr "El rastreador tuvo {markup_begin}{seeder_count} {seeder_or_seeders} y {leecher_count}{leecher_or_leechers}{markup_end} {time_span_ago}"
+msgstr "El rastreador tuvo {markup_begin}{seeder_count} {seeder_or_seeders} y {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1906
 msgid "seeder"
@@ -887,7 +887,7 @@ msgstr "_Abrir"
 
 #: ../gtk/OptionsDialog.cc:385
 msgid "Show options dialog"
-msgstr "Mostrar pciones de diálogo"
+msgstr "Mostrar opciones de diálogo"
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
@@ -954,7 +954,7 @@ msgstr "El puerto está {markup_begin}abierto{markup_end}"
 
 #: ../gtk/PrefsDialog.cc:923
 msgid "Testing TCP port…"
-msgstr "Probando puerto TCP..."
+msgstr "Probando puerto TCP…"
 
 #: ../gtk/RelocateDialog.cc:84
 msgid "Moving '{torrent_name}'"
@@ -1183,30 +1183,30 @@ msgstr "ahora"
 #: ../gtk/Utils.cc:180
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] "Hace {days_ago:L} día"
-msgstr[1] "Hace {days_ago:L} días"
-msgstr[2] "Hace {days_ago:L} días"
+msgstr[0] "hace {days_ago:L} día"
+msgstr[1] "hace {days_ago:L} días"
+msgstr[2] "hace {days_ago:L} días"
 
 #: ../gtk/Utils.cc:186
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] "Hace {hours_ago:L} hora"
-msgstr[1] "Hace {hours_ago:L} hora"
-msgstr[2] "Hace {hours_ago:L} horas"
+msgstr[0] "hace {hours_ago:L} hora"
+msgstr[1] "hace {hours_ago:L} hora"
+msgstr[2] "hace {hours_ago:L} horas"
 
 #: ../gtk/Utils.cc:193
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] "Hace {minutes_ago:L} minuto"
-msgstr[1] "Hace {minutes_ago:L} minutos"
-msgstr[2] "Hace {minutes_ago:L} minutos"
+msgstr[0] "hace {minutes_ago:L} minuto"
+msgstr[1] "hace {minutes_ago:L} minutos"
+msgstr[2] "hace {minutes_ago:L} minutos"
 
 #: ../gtk/Utils.cc:200
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] "Hace {seconds_ago:L} segundo"
-msgstr[1] "Hace {seconds_ago:L} segundos"
-msgstr[2] "Hace {seconds_ago:L} segundos"
+msgstr[0] "hace {seconds_ago:L} segundo"
+msgstr[1] "hace {seconds_ago:L} segundos"
+msgstr[2] "hace {seconds_ago:L} segundos"
 
 #: ../gtk/Utils.cc:213
 msgid "{days:L} day"
@@ -1359,11 +1359,11 @@ msgstr "Abrir _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "Abrir URL..."
+msgstr "Abrir URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr "_Nuevo..."
+msgstr "_Nuevo…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -1467,7 +1467,7 @@ msgstr "Pausar torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Cambiar _ubicación..."
+msgstr "Cambiar _ubicación…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1611,7 +1611,7 @@ msgstr "Tengo:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:104 ../gtk/ui/gtk3/StatsDialog.ui:92 ../gtk/ui/gtk3/StatsDialog.ui:250 ../gtk/ui/gtk4/DetailsDialog.ui:59 ../gtk/ui/gtk4/StatsDialog.ui:33 ../gtk/ui/gtk4/StatsDialog.ui:151
 msgid "Uploaded:"
-msgstr "Cargado:"
+msgstr "Subido:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:116 ../gtk/ui/gtk3/StatsDialog.ui:117 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:69 ../gtk/ui/gtk4/StatsDialog.ui:54 ../gtk/ui/gtk4/StatsDialog.ui:172
 msgid "Downloaded:"
@@ -2111,7 +2111,7 @@ msgstr "Mostrar una notificación _cuando terminan los torrents"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1746 ../gtk/ui/gtk4/PrefsDialog.ui:1213
 msgid "Play a _sound when torrents finish"
-msgstr "Reproducir un _sonido cuando terminen los torrents"
+msgstr "Reproducir un _sonido cuando terminan los torrents"
 
 #: ../gtk/ui/gtk3/PrefsDialog.ui:1795 ../gtk/ui/gtk4/PrefsDialog.ui:1246
 msgid "Remote Control"
@@ -2474,9 +2474,9 @@ msgstr "Versión de Tranmission {version} cerrando"
 #: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
-msgstr[0] "Cargado {count} torrent"
-msgstr[1] "Cargados {count} torrents "
-msgstr[2] "Cargados {count} torrents"
+msgstr[0] "Subido {count} torrent"
+msgstr[1] "Subidos {count} torrents "
+msgstr[2] "Subidos {count} torrents"
 
 #: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"

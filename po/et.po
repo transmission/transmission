@@ -4,8 +4,8 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2022
 # Priit Uring, 2023
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
@@ -14,8 +14,8 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Priit Uring, 2023\n"
-"Language-Team: Estonian (https://www.transifex.com/transmissionbt/teams/33778/et/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Estonian (https://app.transifex.com/transmissionbt/teams/33778/et/)\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -116,7 +116,7 @@ msgstr "Mina _nõustun"
 
 #: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
-msgstr "Ühenduste sulgemine..."
+msgstr "Ühenduste sulgemine…"
 
 #: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
@@ -865,7 +865,7 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:923
 msgid "Testing TCP port…"
-msgstr "Testin TCP porti..."
+msgstr "Testin TCP porti…"
 
 #: ../gtk/RelocateDialog.cc:84
 msgid "Moving '{torrent_name}'"
