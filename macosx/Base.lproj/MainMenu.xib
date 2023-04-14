@@ -516,7 +516,7 @@
                             </menuItem>
                             <menuItem title="Hide Toolbar" id="1222">
                                 <connections>
-                                    <action selector="toggleToolbarShown:" target="-1" id="1251"/>
+                                    <action selector="toggleToolbarShown:" target="206" id="1251"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Customize Toolbar…" id="545">

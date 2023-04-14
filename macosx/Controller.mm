@@ -4125,6 +4125,11 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     [self updateMainWindow];
 }
 
+- (IBAction)toggleToolbarShown:(id)sender
+{
+    [self.fWindow toggleToolbarShown:sender];
+}
+
 - (void)focusFilterField
 {
     if (!self.fFilterBar)
@@ -4809,6 +4814,16 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         NSString* title = !self.fFilterBar ? NSLocalizedString(@"Show Filter Bar", "View menu -> Filter Bar") :
                                              NSLocalizedString(@"Hide Filter Bar", "View menu -> Filter Bar");
+        menuItem.title = title;
+
+        return self.fWindow.visible;
+    }
+
+    // enable toggle toolbar
+    if (action == @selector(toggleToolbarShown:))
+    {
+        NSString* title = !self.fWindow.toolbar.isVisible ? NSLocalizedString(@"Show Toolbar", "View menu -> Toolbar") :
+                                                            NSLocalizedString(@"Hide Toolbar", "View menu -> Toolbar");
         menuItem.title = title;
 
         return self.fWindow.visible;
