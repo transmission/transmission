@@ -137,7 +137,7 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
         return {};
     }
 
-    auto candidates = getCandidates(mediator);
+    auto candidates = getCandidates(mediator_);
 
     // We usually won't need all the candidates to be sorted until endgame, so don't
     // waste cycles sorting all of them here. partial sort is enough.
