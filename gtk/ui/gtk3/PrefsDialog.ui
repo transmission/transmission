@@ -1552,7 +1552,7 @@
                     <property name="column-spacing">12</property>
                     <child>
                       <object class="GtkScrolledWindow" id="default_trackers_scroll">
-                        <property name="height-request">100</property>
+                        <property name="height-request">90</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="hexpand">True</property>

@@ -5,24 +5,24 @@
 #
 # Translators:
 # 王証源 <jrthsr700tmax@gmail.com>, 2020
-# Mike Gelfand <mikedld@mikedld.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-09 00:31+0000\n"
+"POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
-"Language-Team: Chinese (Taiwan) (https://www.transifex.com/transmissionbt/teams/33778/zh_TW/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Chinese (Taiwan) (https://app.transifex.com/transmissionbt/teams/33778/zh_TW/)\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:512
+#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:527
 msgid "None"
 msgstr "無"
 
@@ -30,7 +30,7 @@ msgstr "無"
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:162 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
+#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:168 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -42,7 +42,7 @@ msgstr ""
 msgid "Removing torrent file '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:570
+#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:585
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -70,7 +70,7 @@ msgstr ""
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1175 ../libtransmission/torrent.cc:2164 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:183 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1141 ../libtransmission/torrent.cc:2130 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -94,60 +94,60 @@ msgstr ""
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:394
+#: ../gtk/Application.cc:395
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:551
+#: ../gtk/Application.cc:552
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/Application.cc:777
+#: ../gtk/Application.cc:778
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr "Transmission 是一個檔案分享程式。當您在執行 Torrent 時，其資料將透過上傳的方式提供給其他人。任何您分享的任何內容皆須負起相關責任。"
 
-#: ../gtk/Application.cc:783 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
+#: ../gtk/Application.cc:784 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
 msgstr ""
 
-#: ../gtk/Application.cc:784
+#: ../gtk/Application.cc:785
 msgid "I _Agree"
 msgstr "我 _同意"
 
-#: ../gtk/Application.cc:1013
+#: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
 msgstr ""
 
-#: ../gtk/Application.cc:1018
+#: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "正在傳送上傳/下載總量至追蹤器..."
+msgstr "正在傳送上傳/下載總量至追蹤器…"
 
-#: ../gtk/Application.cc:1023
+#: ../gtk/Application.cc:1024
 msgid "_Quit Now"
 msgstr "馬上結束(_Q)"
 
-#: ../gtk/Application.cc:1085
+#: ../gtk/Application.cc:1086
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "無法新增已損壞的 torrent"
 
-#: ../gtk/Application.cc:1092
+#: ../gtk/Application.cc:1093
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "無法新增重複的 torrent"
 
-#: ../gtk/Application.cc:1413
+#: ../gtk/Application.cc:1414
 msgid "A fast and easy BitTorrent client"
 msgstr "一個快速而簡單的 BitTorrent 用戶端"
 
-#: ../gtk/Application.cc:1414
+#: ../gtk/Application.cc:1415
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1420
+#: ../gtk/Application.cc:1421
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -264,12 +264,12 @@ msgstr ""
 msgid "Unknown"
 msgstr "未知"
 
-#: ../gtk/DetailsDialog.cc:874 ../gtk/MakeDialog.cc:387
+#: ../gtk/DetailsDialog.cc:874 ../gtk/MakeDialog.cc:388
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] ""
 
-#: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:393
+#: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:394
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] ""
@@ -541,7 +541,7 @@ msgstr[0] "這些 torrent 其中有些已經完成下載。"
 msgid "_Delete"
 msgstr ""
 
-#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2021 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1420
+#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2025 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1424
 msgid "_Remove"
 msgstr "移除(_R)"
 
@@ -703,7 +703,7 @@ msgstr ""
 msgid "Scanned {file_size}"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:381 ../gtk/MakeDialog.cc:544 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
+#: ../gtk/MakeDialog.cc:382 ../gtk/MakeDialog.cc:545 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
 msgid "No source selected"
 msgstr "未選擇來源"
 
@@ -839,9 +839,9 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "正在取得新的封鎖清單..."
+msgstr "正在取得新的封鎖清單…"
 
-#: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1266 ../gtk/ui/gtk4/PrefsDialog.ui:885
+#: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
 msgstr "未知狀態"
 
@@ -867,7 +867,7 @@ msgstr "無法移動 Torrent"
 
 #: ../gtk/RelocateDialog.cc:147
 msgid "This may take a moment…"
-msgstr "這可能會花上一段時間..."
+msgstr "這可能會花上一段時間…"
 
 #: ../gtk/Session.cc:798 ../libtransmission/watchdir-win32.cc:155 ../libtransmission/watchdir-win32.cc:163
 msgid "Couldn't read '{path}'"
@@ -951,7 +951,7 @@ msgstr ""
 msgid "Stalled"
 msgstr "失速"
 
-#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2213
+#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2179
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
@@ -1210,15 +1210,15 @@ msgstr "開啟 torrent"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "開啟網址(_U)..."
+msgstr "開啟網址(_U)…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "開啟網址..."
+msgstr "開啟網址…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr "新增(_N)..."
+msgstr "新增(_N)…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -1322,7 +1322,7 @@ msgstr "暫停 Torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "設定位置(_L)..."
+msgstr "設定位置(_L)…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1400,7 +1400,7 @@ msgstr "依剩餘時間排序(_L)"
 msgid "Re_verse Sort Order"
 msgstr "反轉排列順序(_V)"
 
-#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1478
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1482
 msgid "_Help"
 msgstr "幫助(_H)"
 
@@ -1436,7 +1436,7 @@ msgstr "顯示 Transmission(_S)"
 msgid "Enable Alternative Speed _Limits"
 msgstr "啟用替代速度限制(_L)"
 
-#: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2006 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1412
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2010 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1416
 msgid "_Add"
 msgstr "加入(_A)"
 
@@ -1448,7 +1448,7 @@ msgstr "追蹤器"
 msgid "_Announce URL:"
 msgstr "發布網址(_A)："
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1491 ../gtk/ui/gtk4/StatsDialog.ui:253
+#: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1495 ../gtk/ui/gtk4/StatsDialog.ui:253
 msgid "_Close"
 msgstr ""
 
@@ -1544,7 +1544,7 @@ msgstr "結合的 Torrent 屬性無法使用檔案列出功能"
 msgid "Files"
 msgstr "檔案"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:390 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:245
+#: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:391 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:246
 msgid "Speed"
 msgstr "速度"
 
@@ -1584,7 +1584,7 @@ msgstr "用戶連線"
 msgid "_Maximum peers:"
 msgstr "最大用戶數(_M)："
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1415 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:980
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1417 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:982
 msgid "Options"
 msgstr "選項"
 
@@ -1656,7 +1656,7 @@ msgstr "私人 Torrent(_P)"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "正在建立 torrent..."
+msgstr "正在建立 torrent…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"
@@ -1702,7 +1702,7 @@ msgstr "選擇目標資料夾"
 msgid "_Start when added"
 msgstr "加入之後便開始(_S)"
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:478 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
+#: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:479 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:315
 msgid "Mo_ve torrent file to the trash"
 msgstr ""
 
@@ -1710,219 +1710,219 @@ msgstr ""
 msgid "Transmission Preferences"
 msgstr "Transmission 偏好設定"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:72 ../gtk/ui/gtk4/PrefsDialog.ui:26
+#: ../gtk/ui/gtk3/PrefsDialog.ui:73 ../gtk/ui/gtk4/PrefsDialog.ui:27
 msgid "Speed Limits"
 msgstr "速度限制"
 
 #. Checkbox to limit upload speed
-#: ../gtk/ui/gtk3/PrefsDialog.ui:94 ../gtk/ui/gtk4/PrefsDialog.ui:40
+#: ../gtk/ui/gtk3/PrefsDialog.ui:95 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
 msgstr ""
 
 #. Checkbox to limit download speed
-#: ../gtk/ui/gtk3/PrefsDialog.ui:109 ../gtk/ui/gtk4/PrefsDialog.ui:52
+#: ../gtk/ui/gtk3/PrefsDialog.ui:110 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:174 ../gtk/ui/gtk4/PrefsDialog.ui:96
+#: ../gtk/ui/gtk3/PrefsDialog.ui:175 ../gtk/ui/gtk4/PrefsDialog.ui:97
 msgid "Alternative Speed Limits"
 msgstr "替代速度限制"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:218 ../gtk/ui/gtk4/PrefsDialog.ui:118
+#: ../gtk/ui/gtk3/PrefsDialog.ui:219 ../gtk/ui/gtk4/PrefsDialog.ui:119
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr "手動或是在規劃好的時間內蓋掉一般的速度限制"
 
 #. Labels a spinbutton for alternate upload speed limits
-#: ../gtk/ui/gtk3/PrefsDialog.ui:234 ../gtk/ui/gtk4/PrefsDialog.ui:132
+#: ../gtk/ui/gtk3/PrefsDialog.ui:235 ../gtk/ui/gtk4/PrefsDialog.ui:133
 msgid "U_pload ({speed_units}):"
 msgstr ""
 
 #. Labels a spinbutton for alternate download speed limits
-#: ../gtk/ui/gtk3/PrefsDialog.ui:248 ../gtk/ui/gtk4/PrefsDialog.ui:144
+#: ../gtk/ui/gtk3/PrefsDialog.ui:249 ../gtk/ui/gtk4/PrefsDialog.ui:145
 msgid "Do_wnload ({speed_units}):"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:260 ../gtk/ui/gtk4/PrefsDialog.ui:156
+#: ../gtk/ui/gtk3/PrefsDialog.ui:261 ../gtk/ui/gtk4/PrefsDialog.ui:157
 msgid "_Scheduled times:"
 msgstr "規劃的時間(_S)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:278 ../gtk/ui/gtk4/PrefsDialog.ui:169
+#: ../gtk/ui/gtk3/PrefsDialog.ui:279 ../gtk/ui/gtk4/PrefsDialog.ui:170
 msgid "_On days:"
 msgstr "於(_O)："
 
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
-#: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
+#: ../gtk/ui/gtk3/PrefsDialog.ui:336 ../gtk/ui/gtk4/PrefsDialog.ui:213
 msgid "_to"
 msgstr "到(_T)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
+#: ../gtk/ui/gtk3/PrefsDialog.ui:408 ../gtk/ui/gtk4/PrefsDialog.ui:261
 msgctxt "Gerund"
 msgid "Adding"
 msgstr "加入"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:429 ../gtk/ui/gtk4/PrefsDialog.ui:274
+#: ../gtk/ui/gtk3/PrefsDialog.ui:430 ../gtk/ui/gtk4/PrefsDialog.ui:275
 msgid "Automatically add torrent files _from:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:444 ../gtk/ui/gtk4/PrefsDialog.ui:286
+#: ../gtk/ui/gtk3/PrefsDialog.ui:445 ../gtk/ui/gtk4/PrefsDialog.ui:287
 msgid "Show the Torrent Options _dialog"
 msgstr "顯示 Torrent 選項_對話框"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:461 ../gtk/ui/gtk4/PrefsDialog.ui:300
+#: ../gtk/ui/gtk3/PrefsDialog.ui:462 ../gtk/ui/gtk4/PrefsDialog.ui:301
 msgid "_Start added torrents"
 msgstr "_開始加入 Torrents"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:497 ../gtk/ui/gtk4/PrefsDialog.ui:328
+#: ../gtk/ui/gtk3/PrefsDialog.ui:498 ../gtk/ui/gtk4/PrefsDialog.ui:329
 msgid "Save to _Location:"
 msgstr "儲存到位置(_L)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:583 ../gtk/ui/gtk4/PrefsDialog.ui:392
+#: ../gtk/ui/gtk3/PrefsDialog.ui:584 ../gtk/ui/gtk4/PrefsDialog.ui:393
 msgid "Download Queue"
 msgstr "下載佇列"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:607 ../gtk/ui/gtk4/PrefsDialog.ui:406
+#: ../gtk/ui/gtk3/PrefsDialog.ui:608 ../gtk/ui/gtk4/PrefsDialog.ui:407
 msgid "Ma_ximum active downloads:"
 msgstr "最大下載活動:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:621 ../gtk/ui/gtk4/PrefsDialog.ui:418
+#: ../gtk/ui/gtk3/PrefsDialog.ui:622 ../gtk/ui/gtk4/PrefsDialog.ui:419
 msgid "Downloads sharing data in the last _N minutes are active:"
 msgstr "在過去 _N 分鐘前的下載資料分享為啟用:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:676 ../gtk/ui/gtk4/PrefsDialog.ui:457
+#: ../gtk/ui/gtk3/PrefsDialog.ui:677 ../gtk/ui/gtk4/PrefsDialog.ui:458
 msgid "Incomplete"
 msgstr "未完成"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:698 ../gtk/ui/gtk4/PrefsDialog.ui:471
+#: ../gtk/ui/gtk3/PrefsDialog.ui:699 ../gtk/ui/gtk4/PrefsDialog.ui:472
 msgid "Append \"._part\" to incomplete files' names"
 msgstr "附加「._part」到未完成檔案的名稱"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:715 ../gtk/ui/gtk4/PrefsDialog.ui:485
+#: ../gtk/ui/gtk3/PrefsDialog.ui:716 ../gtk/ui/gtk4/PrefsDialog.ui:486
 msgid "Keep _incomplete torrents in:"
 msgstr "保持不完整的 Torrent 於(_I)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:730 ../gtk/ui/gtk4/PrefsDialog.ui:497
+#: ../gtk/ui/gtk3/PrefsDialog.ui:731 ../gtk/ui/gtk4/PrefsDialog.ui:498
 msgid "Call scrip_t when done downloading:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:786 ../gtk/ui/gtk4/PrefsDialog.ui:536
+#: ../gtk/ui/gtk3/PrefsDialog.ui:787 ../gtk/ui/gtk4/PrefsDialog.ui:537
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "下載"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:804 ../gtk/ui/gtk4/PrefsDialog.ui:551
+#: ../gtk/ui/gtk3/PrefsDialog.ui:805 ../gtk/ui/gtk4/PrefsDialog.ui:552
 msgid "Limits"
 msgstr "限制"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:826 ../gtk/ui/gtk4/PrefsDialog.ui:565
+#: ../gtk/ui/gtk3/PrefsDialog.ui:827 ../gtk/ui/gtk4/PrefsDialog.ui:566
 msgid "Stop seeding at _ratio:"
 msgstr "停止播種當比率達(_R)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:841 ../gtk/ui/gtk4/PrefsDialog.ui:577
+#: ../gtk/ui/gtk3/PrefsDialog.ui:842 ../gtk/ui/gtk4/PrefsDialog.ui:578
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "閒置 _N 分鐘後停止播種："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:856 ../gtk/ui/gtk4/PrefsDialog.ui:589
+#: ../gtk/ui/gtk3/PrefsDialog.ui:857 ../gtk/ui/gtk4/PrefsDialog.ui:590
 msgid "Call scrip_t when done seeding:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:922 ../gtk/ui/gtk4/PrefsDialog.ui:638
+#: ../gtk/ui/gtk3/PrefsDialog.ui:923 ../gtk/ui/gtk4/PrefsDialog.ui:639
 msgctxt "Gerund"
 msgid "Seeding"
 msgstr "播種"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:940 ../gtk/ui/gtk3/PrefsDialog.ui:1147 ../gtk/ui/gtk4/PrefsDialog.ui:653 ../gtk/ui/gtk4/PrefsDialog.ui:791
+#: ../gtk/ui/gtk3/PrefsDialog.ui:941 ../gtk/ui/gtk3/PrefsDialog.ui:1148 ../gtk/ui/gtk4/PrefsDialog.ui:654 ../gtk/ui/gtk4/PrefsDialog.ui:792
 msgid "Privacy"
 msgstr "隱私"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:964 ../gtk/ui/gtk4/PrefsDialog.ui:667
+#: ../gtk/ui/gtk3/PrefsDialog.ui:965 ../gtk/ui/gtk4/PrefsDialog.ui:668
 msgid "_Encryption mode:"
 msgstr "加密模式(_E)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1008 ../gtk/ui/gtk4/PrefsDialog.ui:695
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1009 ../gtk/ui/gtk4/PrefsDialog.ui:696
 msgid "Blocklist"
 msgstr "黑名單"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1030 ../gtk/ui/gtk4/PrefsDialog.ui:709
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1031 ../gtk/ui/gtk4/PrefsDialog.ui:710
 msgid "Enable _blocklist:"
 msgstr "啟用黑名單(_B)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1045 ../gtk/ui/gtk4/PrefsDialog.ui:722
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1046 ../gtk/ui/gtk4/PrefsDialog.ui:723
 msgid "Enable _automatic updates"
 msgstr "啟用自動更新(_A)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1100 ../gtk/ui/gtk4/PrefsDialog.ui:763
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1101 ../gtk/ui/gtk4/PrefsDialog.ui:764
 msgid "_Update"
 msgstr "更新(_U)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1165 ../gtk/ui/gtk4/PrefsDialog.ui:806
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1167 ../gtk/ui/gtk4/PrefsDialog.ui:808
 msgid "Listening Port"
 msgstr "監聽連接埠"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1189 ../gtk/ui/gtk4/PrefsDialog.ui:820
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1191 ../gtk/ui/gtk4/PrefsDialog.ui:822
 msgid "_Port used for incoming connections:"
 msgstr "用來傳入連線的連接埠(_P)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1201 ../gtk/ui/gtk4/PrefsDialog.ui:832
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1203 ../gtk/ui/gtk4/PrefsDialog.ui:834
 msgid "Pick a _random port every time Transmission is started"
 msgstr "每次 Transmission 啟動時挑選一個隨機的連接埠(_R)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1218 ../gtk/ui/gtk4/PrefsDialog.ui:846
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1220 ../gtk/ui/gtk4/PrefsDialog.ui:848
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "啟用路由器的 UPnP 或 NAT-PMP 連接埠轉送功能(_F)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1280 ../gtk/ui/gtk4/PrefsDialog.ui:894
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1282 ../gtk/ui/gtk4/PrefsDialog.ui:896
 msgid "Te_st Port"
 msgstr "測試連接埠(_S)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1322 ../gtk/ui/gtk4/PrefsDialog.ui:915
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1324 ../gtk/ui/gtk4/PrefsDialog.ui:917
 msgid "Peer Limits"
 msgstr "用戶限制"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1346 ../gtk/ui/gtk4/PrefsDialog.ui:929
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1348 ../gtk/ui/gtk4/PrefsDialog.ui:931
 msgid "Maximum peers per _torrent:"
 msgstr "每個 _Torrent 的最大連接用戶數："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1360 ../gtk/ui/gtk4/PrefsDialog.ui:941
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1362 ../gtk/ui/gtk4/PrefsDialog.ui:943
 msgid "Maximum peers _overall:"
 msgstr "總共最大連接用戶數(_O)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1437 ../gtk/ui/gtk4/PrefsDialog.ui:994
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1441 ../gtk/ui/gtk4/PrefsDialog.ui:996
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1009
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1457 ../gtk/ui/gtk4/PrefsDialog.ui:1011
 msgid "Use PE_X to find more peers"
 msgstr "使用 PE_X 以尋找更多用戶"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1459 ../gtk/ui/gtk4/PrefsDialog.ui:1011
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1461 ../gtk/ui/gtk4/PrefsDialog.ui:1013
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr "PEX 是用來與您已連線的用戶交換用戶清單的工具。"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1473 ../gtk/ui/gtk4/PrefsDialog.ui:1024
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1475 ../gtk/ui/gtk4/PrefsDialog.ui:1026
 msgid "Use _DHT to find more peers"
 msgstr "使用 DHT 以尋找更多用戶(_D)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1477 ../gtk/ui/gtk4/PrefsDialog.ui:1026
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1479 ../gtk/ui/gtk4/PrefsDialog.ui:1028
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr "DHT 是不用透過追蹤器即可尋找用戶的工具。"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1491 ../gtk/ui/gtk4/PrefsDialog.ui:1039
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1493 ../gtk/ui/gtk4/PrefsDialog.ui:1041
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr "使用本地用戶探索 LPD 以尋找更多用戶(_L)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1495 ../gtk/ui/gtk4/PrefsDialog.ui:1041
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1497 ../gtk/ui/gtk4/PrefsDialog.ui:1043
 msgid "LPD is a tool for finding peers on your local network."
 msgstr "LPD 是一套用來尋找位於您本地網路上之用戶的工具。"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1530 ../gtk/ui/gtk4/PrefsDialog.ui:1061
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1532 ../gtk/ui/gtk4/PrefsDialog.ui:1063
 msgid "Default Public Trackers"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1562 ../gtk/ui/gtk4/PrefsDialog.ui:1084
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1565 ../gtk/ui/gtk4/PrefsDialog.ui:1087
 msgid ""
 "Trackers to use on all public torrents.\n"
 "\n"
@@ -1930,79 +1930,79 @@ msgid ""
 "To add a new primary URL, add it after a blank line."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1591 ../gtk/ui/gtk4/PrefsDialog.ui:1103
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1595 ../gtk/ui/gtk4/PrefsDialog.ui:1107
 msgid "Network"
 msgstr "網路"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1609 ../gtk/ui/gtk3/PrefsDialog.ui:1773 ../gtk/ui/gtk4/PrefsDialog.ui:1118 ../gtk/ui/gtk4/PrefsDialog.ui:1227
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1613 ../gtk/ui/gtk3/PrefsDialog.ui:1777 ../gtk/ui/gtk4/PrefsDialog.ui:1122 ../gtk/ui/gtk4/PrefsDialog.ui:1231
 msgid "Desktop"
 msgstr "桌面"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1631 ../gtk/ui/gtk4/PrefsDialog.ui:1132
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1635 ../gtk/ui/gtk4/PrefsDialog.ui:1136
 msgid "_Inhibit hibernation when torrents are active"
 msgstr "當 torrents 活動中時抑制休眠(_I)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1648 ../gtk/ui/gtk4/PrefsDialog.ui:1146
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1652 ../gtk/ui/gtk4/PrefsDialog.ui:1150
 msgid "Show Transmission icon in the _notification area"
 msgstr "顯示 Transmission 圖示於通知區域(_N)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1686 ../gtk/ui/gtk4/PrefsDialog.ui:1167
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1690 ../gtk/ui/gtk4/PrefsDialog.ui:1171
 msgid "Notification"
 msgstr "通知"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1708 ../gtk/ui/gtk4/PrefsDialog.ui:1181
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1712 ../gtk/ui/gtk4/PrefsDialog.ui:1185
 msgid "Show a notification when torrents are a_dded"
 msgstr "當 torrent 加入時顯示通知(_D)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1725 ../gtk/ui/gtk4/PrefsDialog.ui:1195
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1729 ../gtk/ui/gtk4/PrefsDialog.ui:1199
 msgid "Show a notification when torrents _finish"
 msgstr "當 torrent 完成時顯示通知(_F)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1742 ../gtk/ui/gtk4/PrefsDialog.ui:1209
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1746 ../gtk/ui/gtk4/PrefsDialog.ui:1213
 msgid "Play a _sound when torrents finish"
 msgstr "當 torrent 完成時播放音效(_S)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1791 ../gtk/ui/gtk4/PrefsDialog.ui:1242
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1795 ../gtk/ui/gtk4/PrefsDialog.ui:1246
 msgid "Remote Control"
 msgstr "遠端控制"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1819 ../gtk/ui/gtk4/PrefsDialog.ui:1261
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1823 ../gtk/ui/gtk4/PrefsDialog.ui:1265
 msgid "Allow _remote access"
 msgstr "允許_遠端存取"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1835 ../gtk/ui/gtk4/PrefsDialog.ui:1270
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1839 ../gtk/ui/gtk4/PrefsDialog.ui:1274
 msgid "_Open web client"
 msgstr "開啟網頁用戶端(_O)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1861 ../gtk/ui/gtk4/PrefsDialog.ui:1286
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1865 ../gtk/ui/gtk4/PrefsDialog.ui:1290
 msgid "HTTP _port:"
 msgstr "HTTP 連接埠(_P)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1873 ../gtk/ui/gtk4/PrefsDialog.ui:1299
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1877 ../gtk/ui/gtk4/PrefsDialog.ui:1303
 msgid "Use _authentication"
 msgstr "使用認證(_A)"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1893 ../gtk/ui/gtk4/PrefsDialog.ui:1313
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/PrefsDialog.ui:1317
 msgid "_Username:"
 msgstr "使用者名稱(_U)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1907 ../gtk/ui/gtk4/PrefsDialog.ui:1325
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1911 ../gtk/ui/gtk4/PrefsDialog.ui:1329
 msgid "Pass_word:"
 msgstr "密碼(_W)："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1919 ../gtk/ui/gtk4/PrefsDialog.ui:1338
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1923 ../gtk/ui/gtk4/PrefsDialog.ui:1342
 msgid "Only allow these IP a_ddresses:"
 msgstr "僅允許以下 IP 位址:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1941 ../gtk/ui/gtk4/PrefsDialog.ui:1354
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1945 ../gtk/ui/gtk4/PrefsDialog.ui:1358
 msgid "Addresses:"
 msgstr "位址："
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:2052 ../gtk/ui/gtk4/PrefsDialog.ui:1442
+#: ../gtk/ui/gtk3/PrefsDialog.ui:2056 ../gtk/ui/gtk4/PrefsDialog.ui:1446
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr "可用通配符表示 IP 位址，例如 192.168.*.*"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:2081 ../gtk/ui/gtk4/PrefsDialog.ui:1461
+#: ../gtk/ui/gtk3/PrefsDialog.ui:2085 ../gtk/ui/gtk4/PrefsDialog.ui:1465
 msgid "Remote"
 msgstr "遠端"
 
@@ -2058,11 +2058,11 @@ msgstr "從網址開啟 torrent"
 msgid "_URL"
 msgstr "網址(_U)"
 
-#: ../libtransmission/announcer-http.cc:465
+#: ../libtransmission/announcer-http.cc:448
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:676
+#: ../libtransmission/announcer-http.cc:659
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr ""
 
@@ -2074,7 +2074,7 @@ msgstr "未知的錯誤"
 msgid "Connection failed"
 msgstr "連線失敗"
 
-#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:554
+#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:567
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr ""
 
@@ -2117,7 +2117,7 @@ msgstr ""
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/inout.cc:146
+#: ../libtransmission/inout.cc:126 ../libtransmission/inout.cc:151
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -2324,55 +2324,55 @@ msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pi
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
 
-#: ../libtransmission/torrent-metainfo.cc:699
+#: ../libtransmission/torrent-metainfo.cc:717
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:122
+#: ../libtransmission/torrent.cc:120
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:159
+#: ../libtransmission/torrent.cc:157
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "找不到資料！請確定您已連接裝置，或是使用「設定位置」功能。若要重新下載，請移除該 torrent 並將它再次加入。"
 
-#: ../libtransmission/torrent.cc:492
+#: ../libtransmission/torrent.cc:464
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:501
+#: ../libtransmission/torrent.cc:473
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:553
+#: ../libtransmission/torrent.cc:525
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:560
+#: ../libtransmission/torrent.cc:532
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:876
+#: ../libtransmission/torrent.cc:848
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "手動重新啟動 -- 正在停用其播種比率"
 
-#: ../libtransmission/torrent.cc:902
+#: ../libtransmission/torrent.cc:868
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:956
+#: ../libtransmission/torrent.cc:922
 msgid "Removing torrent"
 msgstr "正在移除 Torrent"
 
-#: ../libtransmission/torrent.cc:1284 ../libtransmission/torrent.cc:2340
+#: ../libtransmission/torrent.cc:1250 ../libtransmission/torrent.cc:2306
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/tr-dht.cc:528
+#: ../libtransmission/tr-dht.cc:541
 msgid "Couldn't parse '{filename}' line: '{line}'"
 msgstr ""
 
-#: ../libtransmission/tr-lpd.cc:259
+#: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"
 msgstr ""
 
@@ -2467,22 +2467,22 @@ msgid "{piece_count:L} piece, {piece_size}\n"
 msgid_plural "{piece_count:L} pieces, {piece_size} each\n"
 msgstr[0] ""
 
-#: ../utils/remote.cc:140
+#: ../utils/remote.cc:139
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] ""
 
-#: ../utils/remote.cc:141
+#: ../utils/remote.cc:140
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] ""
 
-#: ../utils/remote.cc:142 ../utils/remote.cc:162
+#: ../utils/remote.cc:141 ../utils/remote.cc:161
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] ""
 
-#: ../utils/remote.cc:146
+#: ../utils/remote.cc:145
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
