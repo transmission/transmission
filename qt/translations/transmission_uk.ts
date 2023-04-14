@@ -283,7 +283,7 @@
         <translation>Додати URL(-и) </translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Високий</translation>
     </message>
@@ -637,7 +637,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>Перейменувати...</translation>
+        <translation>Перейменувати…</translation>
     </message>
 </context>
 <context>
@@ -691,7 +691,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Шукати...</translation>
+        <translation>Шукати…</translation>
     </message>
 </context>
 <context>
@@ -827,7 +827,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Обчислення вільного простору...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;Обчислення вільного простору…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1753,7 +1753,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation>Перевірка TCP-порту...</translation>
+        <translation>Перевірка TCP-порту…</translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2117,7 +2117,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>
             <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;Список блокувань тепер містить %Ln правило.&lt;/p&gt;</numerusform>
             <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;Список блокувань тепер містить %Ln правила.&lt;/p&gt;</numerusform>
-            <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;2Список блокувань тепер містить %Ln правил.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Успішно оновлено!&lt;/b&gt;&lt;p&gt;Список блокувань тепер містить %Ln правил.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>

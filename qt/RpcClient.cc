@@ -214,8 +214,14 @@ void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* 
 
     auto* self = static_cast<RpcClient*>(vself);
 
+    if (self->verbose_)
+    {
+        fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variantToStr(response, TR_VARIANT_FMT_JSON));
+    }
+
     TrVariantPtr const json = createVariant();
     *json = *response;
+
     variantInit(response, false);
 
     // this callback is invoked in the libtransmission thread, so we don't want

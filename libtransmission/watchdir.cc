@@ -110,7 +110,7 @@ void BaseWatchdir::processFile(std::string_view basename)
 void BaseWatchdir::scan()
 {
     tr_error* error = nullptr;
-    auto const dir = tr_sys_dir_open(dirname_.c_str(), &error);
+    auto const dir = tr_sys_dir_open(dirname_, &error);
     if (dir == TR_BAD_SYS_DIR)
     {
         tr_logAddWarn(fmt::format(
