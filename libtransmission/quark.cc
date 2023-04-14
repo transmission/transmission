@@ -18,7 +18,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, 401>{ ""sv,
+auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "activeTorrentCount"sv,
                                                              "activity-date"sv,
                                                              "activityDate"sv,
@@ -329,6 +329,7 @@ auto constexpr MyStatic = std::array<std::string_view, 401>{ ""sv,
                                                              "seedRatioMode"sv,
                                                              "seederCount"sv,
                                                              "seeding-time-seconds"sv,
+                                                             "sequentialDownload"sv,
                                                              "session-count"sv,
                                                              "session-id"sv,
                                                              "sessionCount"sv,

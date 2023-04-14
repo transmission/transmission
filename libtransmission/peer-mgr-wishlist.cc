@@ -19,15 +19,16 @@
 
 namespace
 {
+using SaltType = tr_piece_index_t;
 
 struct Candidate
 {
     tr_piece_index_t piece;
     size_t n_blocks_missing;
     tr_priority_t priority;
-    uint8_t salt;
+    SaltType salt;
 
-    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, uint8_t salt_in)
+    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, SaltType salt_in)
         : piece{ piece_in }
         , n_blocks_missing{ missing_in }
         , priority{ priority_in }
@@ -86,14 +87,16 @@ std::vector<Candidate> getCandidates(Wishlist::Mediator const& mediator)
     }
 
     // transform them into candidates
-    auto salter = tr_salt_shaker{};
+    auto salter = tr_salt_shaker<SaltType>{};
     auto const n = std::size(wanted_pieces);
     auto candidates = std::vector<Candidate>{};
+    auto const is_sequential = mediator.isSequentialDownload();
     candidates.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
         auto const [piece, n_missing] = wanted_pieces[i];
-        candidates.emplace_back(piece, n_missing, mediator.priority(piece), salter());
+        auto const salt = is_sequential ? piece : salter();
+        candidates.emplace_back(piece, n_missing, mediator.priority(piece), salt);
     }
 
     return candidates;
@@ -134,9 +137,10 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
         return {};
     }
 
-    // We usually won't need all the candidates until endgame, so don't
-    // waste cycles sorting all of them here. partial sort is enough.
     auto candidates = getCandidates(mediator_);
+
+    // We usually won't need all the candidates to be sorted until endgame, so don't
+    // waste cycles sorting all of them here. partial sort is enough.
     auto constexpr MaxSortedPieces = size_t{ 30 };
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));

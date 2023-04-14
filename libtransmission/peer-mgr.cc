@@ -828,7 +828,7 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed
  * REQUESTS
  *
  * There are two data structures associated with managing block requests:
- * 
+ *
  * 1. tr_swarm::active_requests, an opaque class that tracks what requests
  *    we currently have, i.e. which blocks and from which peers.
  *    This is used for cancelling requests that have been waiting
@@ -909,6 +909,11 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override
         {
             return torrent_->piecePriority(piece);
+        }
+
+        [[nodiscard]] bool isSequentialDownload() const override
+        {
+            return torrent_->isSequentialDownload();
         }
 
     private:

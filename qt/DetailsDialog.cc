@@ -1392,7 +1392,9 @@ void DetailsDialog::onAddTrackerClicked()
             auto urls_list = QList<QString>{};
             urls_list.reserve(std::size(urls));
             for (auto const& url : urls)
+            {
                 urls_list << url;
+            }
 
             torrentSet(torrent_ids_t{ std::begin(ids), std::end(ids) }, TR_KEY_trackerAdd, urls_list);
         }
