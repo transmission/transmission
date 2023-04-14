@@ -279,7 +279,7 @@
         <translation>Adicionar URL(s)</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>

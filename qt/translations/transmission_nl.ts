@@ -279,7 +279,7 @@
         <translation>URL(&apos;s) toevoegen</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Hoog</translation>
     </message>

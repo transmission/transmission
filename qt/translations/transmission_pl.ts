@@ -283,7 +283,7 @@
         <translation>Dodaj adres(y) URL</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Wysoki</translation>
     </message>

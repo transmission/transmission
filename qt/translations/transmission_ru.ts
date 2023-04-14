@@ -283,7 +283,7 @@
         <translation>Добавить ссылку(и)</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Высокий</translation>
     </message>
