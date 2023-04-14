@@ -121,6 +121,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
               withName:(NSString*)newName
      completionHandler:(void (^)(BOOL didRename))completionHandler;
 
+@property(nonatomic, readonly) time_t eta;
 @property(nonatomic, readonly) CGFloat progress;
 @property(nonatomic, readonly) CGFloat progressDone;
 @property(nonatomic, readonly) CGFloat progressLeft;
