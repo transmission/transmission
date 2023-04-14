@@ -11,11 +11,11 @@
 
 #define LIBTRANSMISSION_PEER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" // for tr_salt_shaker
-#include "peer-mgr-wishlist.h"
-#include "tr-assert.h"
+#include "libtransmission/crypto-utils.h" // for tr_salt_shaker
+#include "libtransmission/peer-mgr-wishlist.h"
+#include "libtransmission/tr-assert.h"
 
 namespace
 {

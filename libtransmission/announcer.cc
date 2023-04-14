@@ -22,19 +22,19 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "announcer-common.h"
-#include "announcer.h"
-#include "crypto-utils.h" /* tr_rand_int() */
-#include "log.h"
-#include "session.h"
-#include "timer.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/announce-list.h"
+#include "libtransmission/announcer-common.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/crypto-utils.h" /* tr_rand_int() */
+#include "libtransmission/log.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 

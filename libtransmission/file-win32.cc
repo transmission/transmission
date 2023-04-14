@@ -17,13 +17,13 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" /* tr_rand_int() */
-#include "error.h"
-#include "file.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/crypto-utils.h" /* tr_rand_int() */
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

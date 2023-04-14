@@ -11,17 +11,17 @@
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "net.h"
-#include "port-forwarding-natpmp.h"
-#include "port-forwarding-upnp.h"
-#include "port-forwarding.h"
-#include "timer.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h" // for _()
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/port-forwarding-natpmp.h"
+#include "libtransmission/port-forwarding-upnp.h"
+#include "libtransmission/port-forwarding.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 

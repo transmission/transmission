@@ -8,15 +8,15 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "tr-strbuf.h"
-#include "utils.h" // for _()
-#include "watchdir-base.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // for _()
+#include "libtransmission/watchdir-base.h"
 
 using namespace std::literals;
 
