@@ -86,7 +86,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     switch (info->type)
     {
     case TR_SYS_PATH_IS_DIRECTORY:
-        if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
+        if (tr_sys_dir_t odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
             for (;;)
             {

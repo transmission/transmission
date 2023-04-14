@@ -1349,7 +1349,7 @@ namespace load_torrents_helpers
         return {};
     }
 
-    auto const odir = tr_sys_dir_open(folder.c_str());
+    auto const odir = tr_sys_dir_open(folder);
     if (odir == TR_BAD_SYS_DIR)
     {
         return {};

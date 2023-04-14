@@ -1256,7 +1256,7 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
     return ret;
 }
 
-tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
+tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 
