@@ -16,10 +16,10 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "clients.h"
-#include "utils.h"
+#include "libtransmission/clients.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

@@ -23,16 +23,16 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "log.h"
-#include "quark.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
-#include "variant-common.h"
-#include "variant.h"
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant-common.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 using Buffer = libtransmission::Buffer;

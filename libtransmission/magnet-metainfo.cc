@@ -12,15 +12,15 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h"
-#include "error.h"
-#include "error-types.h"
-#include "magnet-metainfo.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 

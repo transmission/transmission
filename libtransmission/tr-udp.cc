@@ -11,13 +11,14 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
-#include "log.h"
-#include "net.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "tr-utp.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
 
 namespace
 {

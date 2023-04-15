@@ -51,8 +51,8 @@ private:
 
     current_time_func_t const get_current_time_;
 
-    mutable session_id_t current_value_;
-    mutable session_id_t previous_value_;
+    mutable session_id_t current_value_ = {};
+    mutable session_id_t previous_value_ = {};
     mutable tr_sys_file_t current_lock_file_ = TR_BAD_SYS_FILE;
     mutable tr_sys_file_t previous_lock_file_ = TR_BAD_SYS_FILE;
     mutable time_t expires_at_ = 0;

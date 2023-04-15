@@ -12,6 +12,7 @@
         <property name="vexpand">1</property>
         <child>
           <object class="GtkNotebook" id="dialog_pages">
+            <property name="height-request">-1</property>
             <property name="vexpand">1</property>
             <property name="focusable">1</property>
             <child>
@@ -798,6 +799,7 @@
                 <property name="position">4</property>
                 <property name="child">
                   <object class="GtkBox" id="network_page_layout">
+                    <property name="height-request">-1</property>
                     <property name="css-classes">tr-pad-large</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">6</property>
@@ -1070,9 +1072,10 @@
                         <property name="margin-start">18</property>
                         <property name="row-spacing">6</property>
                         <property name="column-spacing">12</property>
+                        <property name="vexpand">True</property>
                         <child>
                           <object class="GtkScrolledWindow" id="default_trackers_scroll">
-                            <property name="height-request">166</property>
+                            <property name="height-request">90</property>
                             <property name="focusable">1</property>
                             <property name="hexpand">1</property>
                             <property name="vexpand">1</property>
@@ -1085,6 +1088,7 @@
 
 To add a backup URL, add it on the next line after a primary URL.
 To add a new primary URL, add it after a blank line.</property>
+                                <property name="vexpand">True</property>
                               </object>
                             </property>
                             <layout>

@@ -12,19 +12,19 @@
 #include <fmt/core.h>
 #include <fmt/format.h> // fmt::ptr
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "magnet-metainfo.h"
-#include "peer-mgr.h" /* pex */
-#include "resume.h"
-#include "session.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/peer-mgr.h" /* pex */
+#include "libtransmission/resume.h"
+#include "libtransmission/session.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -900,6 +900,7 @@ void save(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->peerLimit());
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tor->getPriority());
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->start_when_stable);
+    tr_variantDictAddBool(&top, TR_KEY_sequentialDownload, tor->isSequentialDownload());
     savePeers(&top, tor);
 
     if (tor->hasMetainfo())

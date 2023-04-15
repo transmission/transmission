@@ -114,6 +114,7 @@ public:
 
     tr_bitfield& operator|=(tr_bitfield const& that) noexcept;
     tr_bitfield& operator&=(tr_bitfield const& that) noexcept;
+    [[nodiscard]] bool intersects(tr_bitfield const& that) const noexcept;
 
 private:
     [[nodiscard]] size_t countFlags() const noexcept;

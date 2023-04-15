@@ -32,19 +32,19 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h"
-#include "file.h"
-#include "log.h"
-#include "net.h"
-#include "peer-mgr.h" // for tr_peerMgrCompactToPex()
-#include "timer.h"
-#include "tr-assert.h"
-#include "tr-dht.h"
-#include "tr-strbuf.h"
-#include "variant.h"
-#include "utils.h" // for tr_time(), _()
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-mgr.h" // for tr_peerMgrCompactToPex()
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-dht.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/utils.h" // for tr_time(), _()
 
 using namespace std::literals;
 

@@ -26,14 +26,16 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 
-#include "crypto-utils.h"
-#include "log.h"
-#include "peer-io.h"
-#include "tr-assert.h"
-#include "utils-ev.h"
-#include "utils.h"
-#include "web.h"
-#include "web-utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils-ev.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 

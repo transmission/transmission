@@ -15,19 +15,19 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bandwidth.h"
-#include "cache.h"
-#include "peer-io.h"
-#include "peer-mgr.h"
-#include "timer.h"
-#include "torrent.h"
-#include "utils-ev.h"
-#include "utils.h"
-#include "web-utils.h"
-#include "web.h"
-#include "webseed.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/cache.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mgr.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/utils-ev.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
+#include "libtransmission/web.h"
+#include "libtransmission/webseed.h"
 
 using namespace std::literals;
 

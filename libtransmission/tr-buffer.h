@@ -16,13 +16,91 @@
 
 #include "error.h"
 #include "net.h" // tr_socket_t
+#include "tr-assert.h"
 #include "utils-ev.h"
 #include "utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission
 {
 
-class Buffer
+template<typename T, typename ValueType>
+class BufferWriter
+{
+public:
+    BufferWriter(T* out)
+        : out_{ out }
+    {
+        static_assert(sizeof(ValueType) == 1);
+    }
+
+    void add(void const* span_begin, size_t span_len)
+    {
+        auto const* const begin = reinterpret_cast<ValueType const*>(span_begin);
+        auto const* const end = begin + span_len;
+        out_->insert(std::end(*out_), begin, end);
+    }
+
+    template<typename ContiguousContainer>
+    void add(ContiguousContainer const& container)
+    {
+        add(std::data(container), std::size(container));
+    }
+
+    template<typename OneByteType>
+    void push_back(OneByteType ch)
+    {
+        add(&ch, 1);
+    }
+
+    void add_uint8(uint8_t uch)
+    {
+        add(&uch, 1);
+    }
+
+    void add_uint16(uint16_t hs)
+    {
+        uint16_t const ns = htons(hs);
+        add(&ns, sizeof(ns));
+    }
+
+    void add_hton16(uint16_t hs)
+    {
+        add_uint16(hs);
+    }
+
+    void add_uint32(uint32_t hl)
+    {
+        uint32_t const nl = htonl(hl);
+        add(&nl, sizeof(nl));
+    }
+
+    void eadd_hton32(uint32_t hl)
+    {
+        add_uint32(hl);
+    }
+
+    void add_uint64(uint64_t hll)
+    {
+        uint64_t const nll = tr_htonll(hll);
+        add(&nll, sizeof(nll));
+    }
+
+    void add_hton64(uint64_t hll)
+    {
+        add_uint64(hll);
+    }
+
+    void add_port(tr_port const& port)
+    {
+        auto nport = port.network();
+        add(&nport, sizeof(nport));
+    }
+
+private:
+    T* out_;
+};
+
+class Buffer : public BufferWriter<Buffer, std::byte>
 {
 public:
     class Iterator
@@ -134,16 +212,21 @@ public:
         size_t iov_offset_ = 0;
     };
 
-    Buffer() = default;
     Buffer(Buffer&&) = default;
     Buffer(Buffer const&) = delete;
     Buffer& operator=(Buffer const&) = delete;
     Buffer& operator=(Buffer&&) = default;
 
+    Buffer()
+        : BufferWriter<Buffer, std::byte>{ this }
+    {
+    }
+
     template<typename T>
     explicit Buffer(T const& data)
+        : BufferWriter<Buffer, std::byte>{ this }
     {
-        add(std::data(data), std::size(data));
+        add(data);
     }
 
     [[nodiscard]] auto size() const noexcept
@@ -255,6 +338,11 @@ public:
         return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
     }
 
+    [[nodiscard]] std::byte const* data() const
+    {
+        return reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1));
+    }
+
     [[nodiscard]] auto pullup_sv()
     {
         auto const [buf, buflen] = pullup();
@@ -289,80 +377,11 @@ public:
         return {};
     }
 
-    // Move all data from one buffer into another.
-    // This is a destructive add: the source buffer is empty after this call.
-    void add(Buffer& that)
-    {
-        evbuffer_add_buffer(buf_.get(), that.buf_.get());
-    }
-
-    void add(Buffer&& that)
-    {
-        evbuffer_add_buffer(buf_.get(), that.buf_.get());
-    }
-
-    void add(void const* bytes, size_t n_bytes)
-    {
-        evbuffer_add(buf_.get(), bytes, n_bytes);
-    }
-
     template<typename T>
-    void add(T const& data)
+    void insert(Iterator iter, T const* const begin, T const* const end)
     {
-        add(std::data(data), std::size(data));
-    }
-
-    template<
-        typename T,
-        typename std::enable_if_t<
-            std::is_same_v<T, char> || std::is_same_v<T, unsigned char> || std::is_same_v<T, std::byte>>* = nullptr>
-    void push_back(T ch)
-    {
-        add(&ch, 1);
-    }
-
-    void add_port(tr_port const& port)
-    {
-        auto nport = port.network();
-        add(&nport, sizeof(nport));
-    }
-
-    void add_uint8(uint8_t uch)
-    {
-        add(&uch, 1);
-    }
-
-    void add_uint16(uint16_t hs)
-    {
-        uint16_t const ns = htons(hs);
-        add(&ns, sizeof(ns));
-    }
-
-    void add_hton16(uint16_t hs)
-    {
-        add_uint16(hs);
-    }
-
-    void add_uint32(uint32_t hl)
-    {
-        uint32_t const nl = htonl(hl);
-        add(&nl, sizeof(nl));
-    }
-
-    void eadd_hton32(uint32_t hl)
-    {
-        add_uint32(hl);
-    }
-
-    void add_uint64(uint64_t hll)
-    {
-        uint64_t const nll = tr_htonll(hll);
-        add(&nll, sizeof(nll));
-    }
-
-    void add_hton64(uint64_t hll)
-    {
-        add_uint64(hll);
+        TR_ASSERT(iter == this->end()); // tr_buffer only supports appending
+        evbuffer_add(buf_.get(), begin, end - begin);
     }
 
 private:
