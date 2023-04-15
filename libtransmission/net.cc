@@ -27,17 +27,17 @@
 
 #include <libutp/utp.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "net.h"
-#include "peer-socket.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "tr-macros.h"
-#include "tr-utp.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 

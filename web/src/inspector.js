@@ -115,6 +115,7 @@ export class Inspector extends EventTarget {
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
+      ['dateAdded', 'Date added:'],
       ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
       ['labels', 'Labels:'],
@@ -541,6 +542,18 @@ export class Inspector extends EventTarget {
     }
     setTextContent(e.info.location, string);
 
+    // dateAdded
+    if (torrents.length === 0) {
+      string = none;
+    } else {
+      const get = (t) => t.getDateAdded();
+      const first = get(torrents[0]);
+      string = torrents.every((t) => get(t) === first)
+        ? new Date(first * 1000).toDateString()
+        : mixed;
+    }
+    setTextContent(e.info.dateAdded, string);
+
     // magnetLink
     if (torrents.length === 0) {
       setTextContent(e.info.magnetLink, none);
@@ -739,13 +752,14 @@ export class Inspector extends EventTarget {
         tier_div.classList.add('tier-list-row', index % 2 ? 'odd' : 'even');
 
         let element = document.createElement('div');
+        let site = '';
+        try {
+          site = new URL(tracker.announce).origin;
+        } catch {
+          site = [tracker.sitename || tracker.host || tracker.announce];
+        }
         element.classList.add('tier-list-tracker');
-        setTextContent(
-          element,
-          `${tracker.sitename || tracker.host || tracker.announce} - tier ${
-            tracker.tier + 1
-          }`
-        );
+        setTextContent(element, `${site} - tier ${tracker.tier + 1}`);
         element.setAttribute('title', tracker.announce);
         tier_div.append(element);
 

@@ -149,7 +149,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
         for (size_t i = 0; i < n_webseeds; ++i)
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", metainfo.webseed(i).c_str()];
+            [listSection appendFormat:@"<tr><td>%s</td></tr>", metainfo.webseed(i).c_str()];
         }
 
         [listSection appendString:@"</table>"];
@@ -169,10 +169,10 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
             [NSString localizedStringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Trackers", nil, bundle, "quicklook tracker header"), n];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", headerTitleString];
 
-#warning handle tiers?
+        // TODO: handle tiers?
         for (auto const& tracker : announce_list)
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce.c_str()];
+            [listSection appendFormat:@"<tr><td>%s</td></tr>", tracker.announce.c_str()];
         }
 
         [listSection appendString:@"</table>"];
@@ -196,15 +196,15 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
             NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
 
             NSString* shortenedFilePath = [fullFilePath substringFromIndex:name.length + 1];
-            NSString* shortenedFilePathAndSize = [NSString
-                stringWithFormat:@"%@ - %@", shortenedFilePath, [NSString stringForFileSize:size]];
+            NSString* fileSize = [NSString stringForFileSize:size];
 
             NSUInteger const width = 16;
-            [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@<td></tr>",
+            [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</td><td class=\"grey\">%@</td></tr>",
                                       generateIconData(shortenedFilePath.pathExtension, width, allImgProps),
                                       width,
                                       width,
-                                      shortenedFilePathAndSize];
+                                      shortenedFilePath,
+                                      fileSize];
         }
 
         [listSection appendString:@"</table>"];

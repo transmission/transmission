@@ -22,19 +22,19 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "announcer-common.h"
-#include "announcer.h"
-#include "crypto-utils.h" /* tr_rand_int() */
-#include "log.h"
-#include "session.h"
-#include "timer.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/announce-list.h"
+#include "libtransmission/announcer-common.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/crypto-utils.h" /* tr_rand_int() */
+#include "libtransmission/log.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -419,7 +419,7 @@ struct tr_tier
         return currentTracker();
     }
 
-    [[nodiscard]] std::optional<size_t> indexOf(tr_interned_string const& announce_url) const
+    [[nodiscard]] std::optional<size_t> indexOf(tr_interned_string announce_url) const
     {
         for (size_t i = 0, n = std::size(trackers); i < n; ++i)
         {
@@ -579,7 +579,7 @@ struct tr_torrent_announcer
         return nullptr;
     }
 
-    tr_tier* getTierFromScrape(tr_interned_string const& scrape_url)
+    tr_tier* getTierFromScrape(tr_interned_string scrape_url)
     {
         for (auto& tier : tiers)
         {
@@ -600,7 +600,7 @@ struct tr_torrent_announcer
     }
 
     [[nodiscard]] bool findTracker(
-        tr_interned_string const& announce_url,
+        tr_interned_string announce_url,
         tr_tier const** setme_tier,
         tr_tracker const** setme_tracker) const
     {

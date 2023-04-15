@@ -275,7 +275,7 @@
         <translation>Webcímek hozzáadása</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Magas</translation>
     </message>
@@ -683,7 +683,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Keresés...</translation>
+        <translation>Keresés…</translation>
     </message>
 </context>
 <context>
@@ -811,7 +811,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Szabad terület kiszámítása...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;Szabad terület kiszámítása…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -912,7 +912,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation>Ú&amp;j...</translation>
+        <translation>Ú&amp;j…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1158,12 +1158,12 @@
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>H&amp;ely megadása...</translation>
+        <translation>H&amp;ely megadása…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation>&amp;Webcím megnyitása...</translation>
+        <translation>&amp;Webcím megnyitása…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -2089,7 +2089,7 @@ Másik elsődleges webcímet egy üres sor hozzáadása után adhatsz hozzá.</t
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation>&lt;b&gt;Tiltólista frissítése&lt;/b&gt;&lt;p&gt;Új tiltólista letöltése...&lt;/p&gt;</translation>
+        <translation>&lt;b&gt;Tiltólista frissítése&lt;/b&gt;&lt;p&gt;Új tiltólista letöltése…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2549,7 +2549,7 @@ Másik elsődleges webcímet egy üres sor hozzáadása után adhatsz hozzá.</t
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Ügyfél számok lekérése... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Ügyfél számok lekérése… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2583,7 +2583,7 @@ Másik elsődleges webcímet egy üres sor hozzáadása után adhatsz hozzá.</t
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>További ügyfelek lekérése... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>További ügyfelek lekérése… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>

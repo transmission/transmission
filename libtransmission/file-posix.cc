@@ -51,13 +51,13 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -1205,11 +1205,9 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
     return ret;
 }
 
-tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
+tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
-    DIR* ret = opendir(path);
+    auto* const ret = opendir(tr_pathbuf{ path });
 
     if (ret == nullptr)
     {

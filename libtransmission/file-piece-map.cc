@@ -7,12 +7,12 @@
 #include <set>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "block-info.h"
-#include "file-piece-map.h"
-#include "torrent-metainfo.h"
-#include "tr-assert.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/file-piece-map.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-assert.h"
 
 void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
 {

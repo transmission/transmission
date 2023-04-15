@@ -7,10 +7,10 @@
    implement missing (or duplicate) functionality without exposing internal
    details in header files. */
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h"
-#include "tr-macros.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/tr-macros.h"
 
 // ---
 

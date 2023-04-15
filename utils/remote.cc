@@ -975,6 +975,11 @@ static void printDetails(tr_variant* top)
                 fmt::print("  Location: {:s}\n", sv);
             }
 
+            if (tr_variantDictFindBool(t, TR_KEY_sequentialDownload, &boolVal))
+            {
+                fmt::print("  Sequential Download: {:s}\n", (boolVal ? "Yes" : "No"));
+            }
+
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &j))
             {
                 fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * (i - j) / i));

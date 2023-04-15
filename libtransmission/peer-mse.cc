@@ -8,11 +8,11 @@
 
 #include <math/wide_integer/uintwide_t.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" // tr_sha1
-#include "peer-mse.h"
-#include "tr-arc4.h"
+#include "libtransmission/crypto-utils.h" // tr_sha1
+#include "libtransmission/peer-mse.h"
+#include "libtransmission/tr-arc4.h"
 
 using namespace std::literals;
 
