@@ -46,9 +46,6 @@ struct tr_session;
 class tr_global_ip_cache
 {
 public:
-    template<typename T>
-    using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
-
     explicit tr_global_ip_cache(tr_session& session_in);
     ~tr_global_ip_cache();
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
@@ -65,10 +62,15 @@ public:
 
     void update_addr(tr_address_type type) noexcept;
 
-    // Whether this machine supports this IP protocol
-    array_ip_t<std::atomic_bool> has_ip_protocol_ = { true, true };
+    [[nodiscard]] constexpr auto has_ip_protocol(tr_address_type type) const noexcept
+    {
+        return has_ip_protocol_[type];
+    }
 
 private:
+    template<typename T>
+    using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
+
     void set_global_addr(tr_address const& addr) noexcept;
     void unset_global_addr(tr_address_type type) noexcept;
     void set_source_addr(tr_address const& addr) noexcept;
@@ -115,6 +117,9 @@ private:
     // We don't want it to trigger after the IP addresses have been destroyed
     // (The destructor will acquire the IP address locks before proceeding, but still)
     array_ip_t<std::unique_ptr<libtransmission::Timer>> upkeep_timers_;
+
+    // Whether this machine supports this IP protocol
+    array_ip_t<bool> has_ip_protocol_ = { true, true };
 
     array_ip_t<std::atomic_size_t> ix_service_ = {};
     static auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
