@@ -40,19 +40,19 @@
 #include <fast_float/fast_float.h>
 #include <wildmat.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "mime-types.h"
-#include "net.h" // ntohl()
-#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/mime-types.h"
+#include "libtransmission/net.h" // ntohl()
+#include "libtransmission/platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -268,9 +268,24 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 
 // ---
 
+#ifndef __APPLE__
+
+std::string tr_strv_convert_utf8(std::string_view sv)
+{
+    return tr_strv_replace_invalid(sv);
+}
+
+#endif
+
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
+    // stripping characters after first \0
+    if (auto first_null = sv.find('\0'); first_null != std::string::npos)
+    {
+        sv = { std::data(sv), first_null };
+    }
     auto out = std::string{};
+    out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
 }
@@ -479,7 +494,7 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
 double tr_truncd(double x, int decimal_places)
 {
     auto buf = std::array<char, 128>{};
-    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
+    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}Lf}", x, DBL_DIG);
     *out = '\0';
 
     if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
@@ -494,15 +509,15 @@ std::string tr_strpercent(double x)
 {
     if (x < 5.0)
     {
-        return fmt::format("{:.2f}", tr_truncd(x, 2));
+        return fmt::format("{:.2Lf}", tr_truncd(x, 2));
     }
 
     if (x < 100.0)
     {
-        return fmt::format("{:.1f}", tr_truncd(x, 1));
+        return fmt::format("{:.1Lf}", tr_truncd(x, 1));
     }
 
-    return fmt::format("{:.0f}", x);
+    return fmt::format("{:.0Lf}", x);
 }
 
 std::string tr_strratio(double ratio, char const* infinity)
@@ -700,7 +715,7 @@ char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes
         precision = 1;
     }
 
-    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}f} {:s}", value, precision, units);
+    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}Lf} {:s}", value, precision, units);
     *out = '\0';
     return buf;
 }
@@ -740,25 +755,76 @@ std::string tr_formatter_speed_KBps(double kilo_per_second)
 
     auto speed = kilo_per_second;
 
-    if (speed <= 999.95) // 0.0 KB to 999.9 KB
+    if (speed < 999.95) // 0.0 KB to 999.9 KB (0.0 KiB to 999.9 KiB)
     {
-        return fmt::format("{:d} {:s}", int(speed), std::data(speed_units[TR_FMT_KB].name));
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
     }
 
     double const kilo = speed_units[TR_FMT_KB].value;
     speed /= kilo;
 
-    if (speed <= 99.995) // 0.98 MB to 99.99 MB
+    if (speed < 99.995) // 0.98 MB to 99.99 MB (1.00 MiB to 99.99 MiB)
     {
-        return fmt::format("{:.2f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+    if (speed < 999.95) // 100.0 MB to 999.9 MB (100.0 MiB to 999.9 MiB)
+    {
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
 
-    if (speed <= 999.95) // 100.0 MB to 999.9 MB
+    speed /= kilo;
+
+    if (speed < 99.995) // 0.98 GB to 99.99 GB (1.00 GiB to 99.99 GiB)
     {
-        return fmt::format("{:.1f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+    }
+    // 100.0 GB and above (100.0 GiB and above)
+    return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+}
+
+std::string tr_formatter_speed_compact_KBps(double kilo_per_second)
+{
+    using namespace formatter_impl;
+
+    auto speed = kilo_per_second;
+
+    if (speed < 99.95) // 0.0 KB to 99.9 KB (0.0 KiB to 99.9 KiB)
+    {
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
+    }
+    if (speed < 999.5) // 100 KB to 999 KB (100 KiB to 999 KiB)
+    {
+        return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
     }
 
-    return fmt::format("{:.1f} {:s}", speed / kilo, std::data(speed_units[TR_FMT_GB].name));
+    double const kilo = speed_units[TR_FMT_KB].value;
+    speed /= kilo;
+
+    if (speed < 9.995) // 0.98 MB to 9.99 MB (1.00 MiB to 9.99 MiB)
+    {
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+    if (speed < 99.95) // 10.0 MB to 99.9 MB (10.0 MiB to 99.9 MiB)
+    {
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+    if (speed < 999.5) // 100 MB to 999 MB (100 MiB to 999 MiB)
+    {
+        return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+
+    speed /= kilo;
+
+    if (speed < 9.995) // 0.98 GB to 9.99 GB (1.00 GiB to 9.99 GiB)
+    {
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+    }
+    if (speed < 99.95) // 10.0 GB to 99.9 GB (10.0 GiB to 99.9 GiB)
+    {
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+    }
+    // 100 GB and above (100 GiB and above)
+    return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
 }
 
 size_t tr_mem_K = 0;

@@ -8,14 +8,7 @@
 
 - (BOOL)isDarkMode
 {
-    if (@available(macOS 10.14, *))
-    {
-        return [self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua];
-    }
-    else
-    {
-        return NO;
-    }
+    return [self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua];
 }
 
 @end

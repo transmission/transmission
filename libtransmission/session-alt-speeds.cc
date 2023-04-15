@@ -5,12 +5,12 @@
 
 #include <fmt/chrono.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "session-alt-speeds.h"
-#include "variant.h"
-#include "utils.h" // for _()
+#include "libtransmission/log.h"
+#include "libtransmission/session-alt-speeds.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 

@@ -19,37 +19,37 @@
 
 #include <libdeflate.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "completion.h"
-#include "crypto-utils.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "peer-mgr.h"
-#include "quark.h"
-#include "rpcimpl.h"
-#include "session-id.h"
-#include "session.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "tr-macros.h"
-#include "tr-strbuf.h"
-#include "utils.h"
-#include "variant.h"
-#include "version.h"
-#include "web-utils.h"
-#include "web.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/completion.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/peer-mgr.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/rpcimpl.h"
+#include "libtransmission/session-id.h"
+#include "libtransmission/session.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/version.h"
+#include "libtransmission/web-utils.h"
+#include "libtransmission/web.h"
 
 using namespace std::literals;
 
 namespace
 {
 auto constexpr RecentlyActiveSeconds = time_t{ 60 };
-auto constexpr RpcVersion = int64_t{ 17 };
+auto constexpr RpcVersion = int64_t{ 18 };
 auto constexpr RpcVersionMin = int64_t{ 14 };
-auto constexpr RpcVersionSemver = "5.3.0"sv;
+auto constexpr RpcVersionSemver = "5.4.0"sv;
 
 enum class TrFormat
 {
@@ -610,6 +610,10 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
         tr_variantInitInt(initme, st->haveUnchecked);
         break;
 
+    case TR_KEY_sequentialDownload:
+        tr_variantDictAddBool(initme, TR_KEY_sequentialDownload, tor->isSequentialDownload());
+        break;
+
     case TR_KEY_haveValid:
         tr_variantInitInt(initme, st->haveValid);
         break;
@@ -853,7 +857,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
-                tr_variantListAddBool(initme, tr_torrentFile(tor, i).wanted);
+                tr_variantListAddInt(initme, tr_torrentFile(tor, i).wanted ? 1 : 0);
             }
         }
         break;
@@ -1226,6 +1230,11 @@ char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
             tr_torrentSetSpeedLimit_KBps(tor, TR_DOWN, tmp);
         }
 
+        if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_sequentialDownload, &val))
+        {
+            tor->setSequentialDownload(val);
+        }
+
         if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_downloadLimited, &val))
         {
             tor->useSpeedLimit(TR_DOWN, val);
@@ -1508,7 +1517,7 @@ void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
             tr_variantDictAdd(data->args_out, TR_KEY_torrent_duplicate),
             std::data(Fields),
             std::size(Fields));
-        tr_idle_function_done(data, "duplicate torrent"sv);
+        tr_idle_function_done(data, SuccessResult);
         return;
     }
 
@@ -1688,21 +1697,25 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
     }
     else
     {
+        auto ok = false;
+
         if (std::empty(filename))
         {
             auto const metainfo = tr_base64_decode(metainfo_base64);
-            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
+            ok = tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
+        }
+        else if (tr_sys_path_exists(tr_pathbuf{ filename }))
+        {
+            ok = tr_ctorSetMetainfoFromFile(ctor, filename);
         }
         else
         {
-            if (tr_sys_path_exists(tr_pathbuf{ filename }))
-            {
-                tr_ctorSetMetainfoFromFile(ctor, filename);
-            }
-            else
-            {
-                tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
-            }
+            ok = tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
+        }
+
+        if (!ok)
+        {
+            return "unrecognized info";
         }
 
         addTorrentImpl(idle_data, ctor);

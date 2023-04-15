@@ -7,14 +7,14 @@
 #include <string>
 #include <string_view>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "quark.h"
-#include "torrent-metainfo.h"
-#include "utils.h"
-#include "variant.h"
-#include "web-utils.h"
+#include "libtransmission/announce-list.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 

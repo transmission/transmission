@@ -37,4 +37,17 @@ typedef NS_ENUM(NSInteger, NSTableViewStyle) {
 
 #endif
 
+// Compatibility declarations to build `@available(macOS 13.0, *)` code with older Xcode 11.3.1 (the last 32-bit OS compatible Xcode)
+#ifndef __MAC_13_0
+
+typedef NS_ENUM(NSInteger, NSColorWellStyle) {
+    NSColorWellStyleMinimal = 1,
+} API_AVAILABLE(macos(13.0));
+
+@interface NSColorWell ()
+@property(assign) NSColorWellStyle colorWellStyle API_AVAILABLE(macos(13.0));
+@end
+
+#endif
+
 NS_ASSUME_NONNULL_END

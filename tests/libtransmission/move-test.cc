@@ -9,8 +9,6 @@
 #include <string_view>
 #include <utility>
 
-#include <event2/buffer.h>
-
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/cache.h> // tr_cacheWriteBlock()

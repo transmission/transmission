@@ -9,9 +9,9 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "quark.h"
+#include "libtransmission/quark.h"
 
 using namespace std::literals;
 
@@ -217,7 +217,6 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "paused"sv,
                                                              "pausedTorrentCount"sv,
                                                              "peer-congestion-algorithm"sv,
-                                                             "peer-id-ttl-hours"sv,
                                                              "peer-limit"sv,
                                                              "peer-limit-global"sv,
                                                              "peer-limit-per-torrent"sv,
@@ -330,6 +329,7 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "seedRatioMode"sv,
                                                              "seederCount"sv,
                                                              "seeding-time-seconds"sv,
+                                                             "sequentialDownload"sv,
                                                              "session-count"sv,
                                                              "session-id"sv,
                                                              "sessionCount"sv,

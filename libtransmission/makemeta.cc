@@ -15,18 +15,18 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "makemeta.h"
-#include "session.h" // TR_NAME
-#include "tr-assert.h"
-#include "utils.h" // for _()
-#include "variant.h"
-#include "version.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/makemeta.h"
+#include "libtransmission/session.h" // TR_NAME
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // for _()
+#include "libtransmission/variant.h"
+#include "libtransmission/version.h"
 
 using namespace std::literals;
 
@@ -86,7 +86,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     switch (info->type)
     {
     case TR_SYS_PATH_IS_DIRECTORY:
-        if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
+        if (tr_sys_dir_t odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
             for (;;)
             {
@@ -291,8 +291,12 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     auto top = tr_variant{};
     tr_variantInitDict(&top, 8);
 
-    // add the announce-list trackers
+    // add the announce URLs
     if (!std::empty(announceList()))
+    {
+        tr_variantDictAddStrView(&top, TR_KEY_announce, announceList().at(0).announce.sv());
+    }
+    if (std::size(announceList()) > 1U)
     {
         auto* const announce_list = tr_variantDictAddList(&top, TR_KEY_announce_list, 0);
         tr_variant* tier_list = nullptr;

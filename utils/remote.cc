@@ -19,7 +19,6 @@
 #include <curl/curl.h>
 
 #include <event2/buffer.h>
-#include <event2/util.h>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -544,9 +543,9 @@ static int getOptMode(int val)
     }
 }
 
-static std::string getEncodedMetainfo(std::string_view filename)
+static std::string getEncodedMetainfo(char const* filename)
 {
-    if (auto contents = std::vector<char>{}; tr_loadFile(filename, contents))
+    if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_loadFile(filename, contents))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
@@ -976,6 +975,11 @@ static void printDetails(tr_variant* top)
                 fmt::print("  Location: {:s}\n", sv);
             }
 
+            if (tr_variantDictFindBool(t, TR_KEY_sequentialDownload, &boolVal))
+            {
+                fmt::print("  Sequential Download: {:s}\n", (boolVal ? "Yes" : "No"));
+            }
+
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &j))
             {
                 fmt::print("  Percent Done: {:s}%\n", strlpercent(100.0 * (i - j) / i));
@@ -1020,7 +1024,7 @@ static void printDetails(tr_variant* top)
                 }
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_downloaded, &i))
+            if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i))
             {
                 if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
                 {

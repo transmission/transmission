@@ -204,6 +204,8 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
 
 [[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
 
+[[nodiscard]] std::string tr_strv_convert_utf8(std::string_view sv);
+
 [[nodiscard]] std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement = 0xFFFD /*�*/);
 
 /**
@@ -309,19 +311,21 @@ extern size_t tr_speed_K;
 extern size_t tr_mem_K;
 extern uint64_t tr_size_K; /* unused? */
 
-/* format a speed from KBps into a user-readable string. */
+/** @brief Format a speed from KBps into a user-readable string of at most 4 significant digits. */
 [[nodiscard]] std::string tr_formatter_speed_KBps(double kilo_per_second);
+/** @brief Format a speed from KBps into a user-readable string of at most 3 significant digits. */
+[[nodiscard]] std::string tr_formatter_speed_compact_KBps(double kilo_per_second);
 
-/* format a memory size from bytes into a user-readable string. */
+/** @brief Format a memory size from bytes into a user-readable string. */
 [[nodiscard]] std::string tr_formatter_mem_B(size_t bytes);
 
-/* format a memory size from MB into a user-readable string. */
+/** @brief Format a memory size from MB into a user-readable string. */
 [[nodiscard]] static inline std::string tr_formatter_mem_MB(double MBps)
 {
     return tr_formatter_mem_B((size_t)(MBps * tr_mem_K * tr_mem_K));
 }
 
-/* format a file size from bytes into a user-readable string. */
+/** @brief Format a file size from bytes into a user-readable string. */
 [[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
 
 void tr_formatter_get_units(void* dict);

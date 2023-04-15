@@ -6,6 +6,7 @@
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QColor>
+#include <QCoreApplication>
 #include <QDataStream>
 #include <QFile>
 #include <QFileIconProvider>
@@ -100,4 +101,26 @@ QColor Utils::getFadedColor(QColor const& color)
     QColor faded_color(color);
     faded_color.setAlpha(128);
     return faded_color;
+}
+
+void Utils::updateSpinBoxFormat(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder)
+{
+    QString const units_format = QCoreApplication::translate(context, format, nullptr, spinBox->value());
+    auto const placeholder_pos = units_format.indexOf(placeholder);
+    if (placeholder_pos == -1)
+    {
+        return;
+    }
+
+    auto const units_prefix = units_format.left(placeholder_pos);
+    auto const units_suffix = units_format.mid(placeholder_pos + placeholder.size());
+
+    if (spinBox->prefix() != units_prefix)
+    {
+        spinBox->setPrefix(units_prefix);
+    }
+    if (spinBox->suffix() != units_suffix)
+    {
+        spinBox->setSuffix(units_suffix);
+    }
 }

@@ -30,25 +30,25 @@
 
 #include <libdeflate.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" /* tr_ssha1_matches() */
-#include "error.h"
-#include "log.h"
-#include "net.h"
-#include "platform.h" /* tr_getWebClientDir() */
-#include "quark.h"
-#include "rpc-server.h"
-#include "rpcimpl.h"
-#include "session-id.h"
-#include "session.h"
-#include "timer.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h"
-#include "variant.h"
-#include "web-utils.h"
-#include "web.h"
+#include "libtransmission/crypto-utils.h" /* tr_ssha1_matches() */
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/platform.h" /* tr_getWebClientDir() */
+#include "libtransmission/quark.h"
+#include "libtransmission/rpc-server.h"
+#include "libtransmission/rpcimpl.h"
+#include "libtransmission/session-id.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/web-utils.h"
+#include "libtransmission/web.h"
 
 /* session-id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!

@@ -14,19 +14,19 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" /* tr_sha1() */
-#include "error.h"
-#include "log.h"
-#include "magnet-metainfo.h"
-#include "resume.h"
-#include "torrent-magnet.h"
-#include "torrent-metainfo.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/crypto-utils.h" // for tr_sha1()
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/resume.h"
+#include "libtransmission/torrent-magnet.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 namespace
 {

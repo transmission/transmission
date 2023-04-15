@@ -9,9 +9,11 @@
 
 #include <event2/event.h>
 
-#include "timer-ev.h"
-#include "tr-assert.h"
-#include "utils-ev.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/timer-ev.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils-ev.h"
 
 using namespace std::literals;
 

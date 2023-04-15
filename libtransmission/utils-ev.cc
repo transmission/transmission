@@ -5,13 +5,13 @@
 
 #include <memory>
 
-#include "event2/buffer.h"
-#include "event2/event.h"
-#include "event2/http.h"
+#include <event2/buffer.h>
+#include <event2/event.h>
+#include <event2/http.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "utils-ev.h"
+#include "libtransmission/utils-ev.h"
 
 namespace libtransmission::evhelpers
 {
