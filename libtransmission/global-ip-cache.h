@@ -6,12 +6,11 @@
 #include <array>
 #include <atomic>
 #include <condition_variable>
-#include <chrono> // operator ""min, operator ""s, std::chrono::milliseconds
+#include <chrono> // std::chrono::milliseconds
 #include <memory> // std::unique_ptr
 #include <mutex>
 #include <optional>
 #include <shared_mutex>
-#include <string_view> // operator ""sv
 
 #include "net.h"
 #include "timer.h"
@@ -23,8 +22,6 @@
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
-
-using namespace std::literals;
 
 struct tr_session;
 
@@ -122,7 +119,4 @@ private:
     array_ip_t<bool> has_ip_protocol_ = { true, true };
 
     array_ip_t<std::atomic_size_t> ix_service_ = {};
-    static auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
-    static auto constexpr UpkeepInterval = 30min;
-    static auto constexpr RetryUpkeepInterval = 30s;
 };

@@ -21,6 +21,17 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
+namespace
+{
+
+auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
+auto constexpr UpkeepInterval = 30min;
+auto constexpr RetryUpkeepInterval = 30s;
+
+} // anonymous namespace
+
 tr_global_ip_cache::tr_global_ip_cache(tr_session& session_in)
     : session_{ session_in }
     , upkeep_timers_{ session_in.timerMaker().create(), session_in.timerMaker().create() }
