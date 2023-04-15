@@ -345,20 +345,27 @@ public:
 
     void cancelOldRequests()
     {
+        auto const now = tr_time();
+
         for (auto* const peer : get_overdue_peers())
         {
             for (auto const block : active_requests.remove(peer))
             {
-                maybeSendCancelRequest(peer, block);
+                peer->cancel_block_request(block, now);
             }
         }
     }
 
     void cancelAllRequestsForBlock(tr_block_index_t block, tr_peer const* no_notify)
     {
+        auto const now = tr_time();
+
         for (auto* peer : active_requests.remove(block))
         {
-            maybeSendCancelRequest(peer, block, no_notify);
+            if (peer != no_notify)
+            {
+                peer->cancel_block_request(block, now);
+            }
         }
     }
 
@@ -666,16 +673,6 @@ public:
     time_t lastCancel = 0;
 
 private:
-    static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_peer const* muted = nullptr)
-    {
-        auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
-        if (msgs != nullptr && msgs != muted)
-        {
-            peer->cancels_sent_to_peer.add(tr_time(), 1);
-            msgs->cancel_block_request(block);
-        }
-    }
-
     [[nodiscard]] std::vector<tr_peer*> get_overdue_peers() const
     {
         static auto constexpr RequestTtlSecs = time_t{ 180 };
@@ -1576,7 +1573,7 @@ namespace peer_stat_helpers
 
     stats.blocksToPeer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
     stats.blocksToClient = peer->blocks_sent_to_client.count(now, CancelHistorySec);
-    stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
+    stats.cancelsToPeer = peer->cancels_sent_to_peer(now, CancelHistorySec);
     stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
 
     stats.activeReqsToPeer = peer->activeReqCount(TR_CLIENT_TO_PEER);
