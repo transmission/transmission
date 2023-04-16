@@ -15,7 +15,7 @@
 
 #include <libutp/utp.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

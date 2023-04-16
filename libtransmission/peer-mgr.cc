@@ -20,7 +20,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #define LIBTRANSMISSION_PEER_MODULE
 #include "libtransmission/transmission.h"
