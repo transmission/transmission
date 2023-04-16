@@ -217,7 +217,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     // set source address
-    auto const [source_addr, is_any] = session->publicAddress(addr.type);
+    auto const source_addr = session->publicAddress(addr.type);
     auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)

@@ -324,7 +324,7 @@ public:
         if (session->allowsDHT() && io->supports_dht())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
-            if (auto const [addr, is_any] = session->publicAddress(TR_AF_INET6); !is_any)
+            if (auto const addr = session->publicAddress(TR_AF_INET6); !addr.is_any())
             {
                 protocolSendPort(this, session->udpPort());
             }
@@ -935,7 +935,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantInitDict(&val, 8);
     tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode() != TR_CLEAR_PREFERRED);
 
-    if (auto const [addr, is_any] = msgs->session->publicAddress(TR_AF_INET6); !is_any)
+    if (auto const addr = msgs->session->publicAddress(TR_AF_INET6); !addr.is_any())
     {
         TR_ASSERT(addr.is_ipv6());
         tr_variantDictAddRaw(&val, TR_KEY_ipv6, &addr.addr.addr6, sizeof(addr.addr.addr6));
