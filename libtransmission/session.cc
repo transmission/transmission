@@ -303,7 +303,7 @@ std::optional<std::string_view> tr_session::WebMediator::userAgent() const
 
 std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 {
-    if (auto const [addr, is_any] = session_->publicAddress(TR_AF_INET); !is_any)
+    if (auto const addr = session_->publicAddress(TR_AF_INET); !addr.is_any())
     {
         return addr.display_name();
     }
@@ -313,7 +313,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 
 std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
 {
-    if (auto const [addr, is_any] = session_->publicAddress(TR_AF_INET6); !is_any)
+    if (auto const addr = session_->publicAddress(TR_AF_INET6); !addr.is_any())
     {
         return addr.display_name();
     }
@@ -417,15 +417,13 @@ tr_session::BoundSocket::~BoundSocket()
     }
 }
 
-tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) const noexcept
+tr_address tr_session::publicAddress(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET)
     {
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
-        static auto constexpr DefaultAddr = tr_address::any_ipv4();
-        auto addr = tr_address::from_string(settings_.bind_address_ipv4).value_or(DefaultAddr);
-        return { addr, addr == DefaultAddr };
+        return tr_address::from_string(settings_.bind_address_ipv4).value_or(tr_address::any_ipv4());
     }
 
     if (type == TR_AF_INET6)
@@ -435,8 +433,7 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
         // otherwise, use any_ipv6 (::).
         static auto constexpr AnyAddr = tr_address::any_ipv6();
         auto const default_addr = tr_globalIPv6().value_or(AnyAddr);
-        auto addr = tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
-        return { addr, addr == AnyAddr };
+        return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
     TR_ASSERT_MSG(false, "invalid type");
@@ -727,14 +724,14 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     {
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
-            auto const [addr, is_default] = publicAddress(TR_AF_INET);
+            auto const addr = publicAddress(TR_AF_INET);
             bound_ipv4_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
-            auto const [addr, is_default] = publicAddress(TR_AF_INET6);
+            auto const addr = publicAddress(TR_AF_INET6);
             bound_ipv6_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
