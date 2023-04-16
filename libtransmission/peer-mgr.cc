@@ -256,7 +256,8 @@ struct peer_atom
     }
 
     constexpr void incrementFailCount() noexcept {
-        if (this->num_fails != ~0) {
+        static auto constexpr Max = std::numeric_limits<decltype(num_fails)>::max();
+        if (this->num_fails != Max) {
             ++this->num_fails;
         }
     }
