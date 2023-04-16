@@ -164,7 +164,11 @@ auto constexpr KeepaliveIntervalSecs = int{ 100 };
 
 auto constexpr MetadataReqQ = int{ 64 };
 
-auto constexpr ReqQ = int{ 512 };
+// libtorrent-rasterbar defaults to 2000
+auto constexpr ReqQ = int{ 2000 };
+
+// libtorrent-rasterbar defaults to 500
+auto constexpr ReqC = int{ 500 };
 
 // used in lowering the outMessages queue period
 
@@ -557,7 +561,7 @@ private:
         size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
         size_t const estimated_blocks_in_period = (rate_bytes_per_second * Seconds) / tr_block_info::BlockSize;
-        size_t const ceil = reqq ? *reqq : 250;
+        size_t const ceil = reqq ? *reqq : ReqC;
 
         auto max_reqs = estimated_blocks_in_period;
         max_reqs = std::min(max_reqs, ceil);
@@ -647,6 +651,7 @@ public:
     /* if the peer supports the Extension Protocol in BEP 10 and
        supplied a reqq argument, it's stored here. */
     std::optional<size_t> reqq;
+    int reqc;
 
     std::unique_ptr<libtransmission::Timer> pex_timer_;
 
@@ -961,7 +966,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // http://bittorrent.org/beps/bep_0010.html
     // An integer, the number of outstanding request messages this
     // client supports without dropping any. The default in in
-    // libtorrent is 250.
+    // libtorrent is 2000.
     tr_variantDictAddInt(&val, TR_KEY_reqq, ReqQ);
 
     // https://www.bittorrent.org/beps/bep_0010.html

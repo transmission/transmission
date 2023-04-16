@@ -18,7 +18,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
+auto constexpr MyStatic = std::array<std::string_view, 403>{ ""sv,
                                                              "activeTorrentCount"sv,
                                                              "activity-date"sv,
                                                              "activityDate"sv,
@@ -290,6 +290,7 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "remote-session-username"sv,
                                                              "removed"sv,
                                                              "rename-partial-files"sv,
+                                                             "reqc"sv,
                                                              "reqq"sv,
                                                              "result"sv,
                                                              "rpc-authentication-required"sv,

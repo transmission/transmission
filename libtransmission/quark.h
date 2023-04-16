@@ -293,6 +293,7 @@ enum
     TR_KEY_remote_session_username,
     TR_KEY_removed,
     TR_KEY_rename_partial_files,
+    TR_KEY_reqc,
     TR_KEY_reqq,
     TR_KEY_result,
     TR_KEY_rpc_authentication_required,

@@ -226,24 +226,8 @@ struct peer_atom
                 sec = 10;
                 break;
 
-            case 2:
-                sec = 60 * 2;
-                break;
-
-            case 3:
-                sec = 60 * 15;
-                break;
-
-            case 4:
-                sec = 60 * 30;
-                break;
-
-            case 5:
-                sec = 60 * 60;
-                break;
-
             default:
-                sec = 60 * 120;
+                sec = ReconnectIntervalSecs * step;
                 break;
             }
         }
@@ -271,6 +255,12 @@ struct peer_atom
         return std::nullopt;
     }
 
+    constexpr void incrementFailCount(void) noexcept {
+        if (this->num_fails != ~0) {
+            ++this->num_fails;
+        }
+    }
+
     tr_address const addr;
 
     tr_port port = {};
@@ -296,6 +286,7 @@ private:
 
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
+    static auto constexpr ReconnectIntervalSecs = int{ 60 };
 
     static auto inline n_atoms = std::atomic<size_t>{};
 };
@@ -674,7 +665,7 @@ private:
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
 
     // how long we'll let requests we've made linger before we cancel them
-    static auto constexpr RequestTtlSecs = int{ 90 };
+    static auto constexpr RequestTtlSecs = int{ 60 };
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -753,7 +744,17 @@ private:
 
     // max number of peers to ask for per second overall.
     // this throttle is to avoid overloading the router
-    static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
+    // lt defaults to 30
+    static auto constexpr MaxConnectionsPerSecond = size_t{ 30 };
+
+    // TorrentConnectBoost is the number of peers to try
+    // to connect to immediately when the first tracker response
+    // is received for a torrent. This is a boost to given to new
+    // torrents to accelerate them starting up. The normal connect 
+    // scheduler is run once every second, this allows peers to be
+    // connected immediately instead of waiting for the session tick
+    // to trigger connections.
+    static auto constexpr TorrentConnectBoost = size_t{ 30 };
 };
 
 // --- tr_peer virtual functions
@@ -1028,8 +1029,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
             if (atom != nullptr)
             {
-                ++atom->num_fails;
-
+                atom->incrementFailCount();
                 if (!result.read_anything_from_peer)
                 {
                     tr_logAddTraceSwarm(
@@ -2012,7 +2012,7 @@ void closePeer(tr_peer* peer)
     }
     else
     {
-        ++atom->num_fails;
+        atom->incrementFailCount();
         tr_logAddTraceSwarm(s, fmt::format("incremented atom {} num_fails to {}", peer->display_name(), atom->num_fails));
     }
 
@@ -2461,7 +2461,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     {
         tr_logAddTraceSwarm(s, fmt::format("peerIo not created; marking peer {} as unreachable", atom.display_name()));
         atom.flags2 |= MyflagUnreachable;
-        ++atom.num_fails;
+        atom.incrementFailCount();
     }
     else
     {

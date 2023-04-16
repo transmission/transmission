@@ -52,6 +52,8 @@ struct tr_variant;
     V(TR_KEY_queue_stalled_minutes, queue_stalled_minutes, size_t, 30U, "") \
     V(TR_KEY_ratio_limit, ratio_limit, double, 2.0, "") \
     V(TR_KEY_ratio_limit_enabled, ratio_limit_enabled, bool, false, "") \
+    V(TR_KEY_reqc, reqc, size_t, 500, "") \
+    V(TR_KEY_reqq, reqq, size_t, 2000, "") \
     V(TR_KEY_rename_partial_files, is_incomplete_file_naming_enabled, bool, false, "") \
     V(TR_KEY_scrape_paused_torrents_enabled, should_scrape_paused_torrents, bool, true, "") \
     V(TR_KEY_script_torrent_added_enabled, script_torrent_added_enabled, bool, false, "") \
