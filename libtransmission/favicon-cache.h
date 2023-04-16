@@ -5,14 +5,6 @@
 
 #pragma once
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/file.h>
-#include <libtransmission/utils.h>
-#include <libtransmission/web-utils.h>
-#include <libtransmission/web.h>
-
-#include <fmt/core.h>
-
 #include <array>
 #include <chrono>
 #include <fstream>
@@ -24,6 +16,15 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <fmt/core.h>
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/file.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/web-utils.h>
+#include <libtransmission/web.h>
 
 template<typename Icon>
 class FaviconCache
@@ -107,14 +108,14 @@ private:
 
         ~InFlightData()
         {
-            invoke_callback({}); // ensure it's called once, even if no pixbuf
+            invoke_callback({}); // ensure it's called once, even if no icon
         }
 
-        void invoke_callback(Icon const& pixbuf)
+        void invoke_callback(Icon const& icon)
         {
             if (callback_)
             {
-                callback_(pixbuf);
+                callback_(icon);
                 callback_ = {};
             }
         }
@@ -122,6 +123,7 @@ private:
         [[nodiscard]] auto get_responses()
         {
             auto lock = std::lock_guard{ responses_mutex_ };
+
             auto tmp = decltype(responses_){};
             std::swap(tmp, responses_);
             return tmp;
@@ -130,6 +132,7 @@ private:
         void add_response(std::string contents, long code)
         {
             auto lock = std::lock_guard{ responses_mutex_ };
+
             responses_.emplace_back(std::move(contents), code);
         }
 
