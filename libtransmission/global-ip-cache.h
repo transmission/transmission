@@ -14,7 +14,6 @@
 
 #include "net.h"
 #include "timer.h"
-#include "tr-assert.h"
 #include "web.h"
 
 #pragma once
