@@ -255,7 +255,7 @@ struct peer_atom
         return std::nullopt;
     }
 
-    constexpr void incrementFailCount(void) noexcept {
+    constexpr void incrementFailCount() noexcept {
         if (this->num_fails != ~0) {
             ++this->num_fails;
         }
