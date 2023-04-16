@@ -8,7 +8,7 @@
 #include <cstring>
 #include <string_view>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

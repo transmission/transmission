@@ -6,7 +6,6 @@
 #include <chrono>
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #include <libutp/utp.h>
 

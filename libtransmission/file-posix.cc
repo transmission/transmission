@@ -49,7 +49,7 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

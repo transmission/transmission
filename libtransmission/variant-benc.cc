@@ -9,8 +9,8 @@
 #include <string_view>
 #include <optional>
 
+#include <fmt/core.h>
 #include <fmt/compile.h>
-#include <fmt/format.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 

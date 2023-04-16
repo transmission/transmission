@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

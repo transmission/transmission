@@ -15,7 +15,7 @@
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

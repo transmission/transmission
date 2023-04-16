@@ -29,7 +29,6 @@
 #include <event2/event.h>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
 #include <fmt/format.h> // fmt::ptr
 
 #include "libtransmission/transmission.h"

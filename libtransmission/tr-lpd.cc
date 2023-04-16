@@ -20,7 +20,7 @@
 
 #include <event2/event.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

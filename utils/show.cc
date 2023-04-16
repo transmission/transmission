@@ -14,7 +14,6 @@
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 
