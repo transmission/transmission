@@ -38,4 +38,11 @@ Copyright 2017 Endless Mobile, Inc.
   <content_rating type="oars-1.1">
     <content_attribute id="social-info">mild</content_attribute>
   </content_rating>
+  <releases>
+    <release date="2023-04-14" version="4.0.3" />
+    <release date="2023-03-16" version="4.0.2" />
+    <release date="2023-02-23" version="4.0.1" />
+    <release date="2023-02-08" version="4.0.0" />
+    <release date="2020-05-03" version="3.00" />
+  </releases>
 </component>
