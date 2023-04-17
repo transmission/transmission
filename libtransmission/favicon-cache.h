@@ -163,19 +163,19 @@ private:
     void scan_file_cache()
     {
         // ensure the folders exist
-        tr_sys_dir_create(cache_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
-        tr_sys_dir_create(icons_dir_, TR_SYS_DIR_CREATE_PARENTS, 0777);
+        tr_sys_dir_create(cache_dir_, TR_SYS_DIR_CREATE_PARENTS, 0700);
+        tr_sys_dir_create(icons_dir_, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
         // remember which hosts we've asked for a favicon so that we
         // don't re-ask them every time we start a new session
         if (auto ifs = std::ifstream{ scraped_sitenames_filename_ }; ifs.is_open())
         {
-            auto line = std::string{};
-            while (std::getline(ifs, line))
+            auto sitename = std::string{};
+            while (std::getline(ifs, sitename))
             {
-                if (auto const sitename = tr_strvStrip(line); !std::empty(sitename))
+                if (!std::empty(sitename) && !tr_strvStartsWith(sitename, '#'))
                 {
-                    icons_.try_emplace(std::string{ sitename });
+                    icons_.try_emplace(sitename);
                 }
             }
         }
