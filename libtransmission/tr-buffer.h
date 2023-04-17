@@ -378,7 +378,7 @@ public:
     }
 
     template<typename T>
-    void insert(Iterator iter, T const* const begin, T const* const end)
+    void insert([[maybe_unused]] Iterator iter, T const* const begin, T const* const end)
     {
         TR_ASSERT(iter == this->end()); // tr_buffer only supports appending
         evbuffer_add(buf_.get(), begin, end - begin);
