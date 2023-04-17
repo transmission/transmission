@@ -68,3 +68,8 @@ std::vector<std::string> tr_sys_dir_get_files(std::string_view folder, std::func
         }
     }
 }
+
+std::vector<std::string> tr_sys_dir_get_files(std::string_view folder)
+{
+    return tr_sys_dir_get_files(folder, [](char const*) { return true; });
+}

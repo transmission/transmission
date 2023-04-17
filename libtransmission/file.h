@@ -614,9 +614,9 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error = 
  */
 bool tr_sys_dir_close(tr_sys_dir_t handle, struct tr_error** error = nullptr);
 
-[[nodiscard]] std::vector<std::string> tr_sys_dir_get_files(
-    std::string_view folder,
-    std::function<bool(char const*)> test = [](char const*) { return true; });
+[[nodiscard]] std::vector<std::string> tr_sys_dir_get_files(std::string_view folder);
+
+[[nodiscard]] std::vector<std::string> tr_sys_dir_get_files(std::string_view folder, std::function<bool(char const*)> test);
 
 /** @} */
 /** @} */
