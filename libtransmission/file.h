@@ -616,7 +616,7 @@ bool tr_sys_dir_close(tr_sys_dir_t handle, struct tr_error** error = nullptr);
 
 [[nodiscard]] std::vector<std::string> tr_sys_dir_get_files(
     std::string_view folder,
-    std::function<bool(std::string_view)> const& test = [](auto const&) { return true; });
+    std::function<bool(std::string_view)> const& test = [](std::string_view /*filename*/) { return true; });
 
 /** @} */
 /** @} */
