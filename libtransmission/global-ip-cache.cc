@@ -103,26 +103,14 @@ std::optional<tr_address> tr_global_ip_cache::global_source_addr(tr_address_type
 
 void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept
 {
-    TR_ASSERT(tr_address::from_string(bind_address));
-    settings_bind_address[type] = bind_address;
+    settings_bind_addr_[type] = tr_address::from_string(bind_address);
 }
 
 tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 {
-    if (type == TR_AF_INET)
+    if (type == TR_AF_INET || type == TR_AF_INET6)
     {
-        // if user provided an address, use it.
-        // otherwise, use any_ipv4 (0.0.0.0).
-        static auto constexpr DefaultAddr = tr_address::any_ipv4();
-        return tr_address::from_string(settings_bind_address[type]).value_or(DefaultAddr);
-    }
-
-    if (type == TR_AF_INET6)
-    {
-        // if user provided an address, use it.
-        // otherwise, use any_ipv6 (::).
-        static auto constexpr DefaultAddr = tr_address::any_ipv6();
-        return tr_address::from_string(settings_bind_address[type]).value_or(DefaultAddr);
+        return settings_bind_addr_[type].value_or(type == TR_AF_INET ? tr_address::any_ipv4() : tr_address::any_ipv6());
     }
 
     TR_ASSERT_MSG(false, "invalid type");

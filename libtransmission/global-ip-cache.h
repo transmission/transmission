@@ -94,7 +94,7 @@ private:
 
     tr_web& web_;
 
-    array_ip_t<std::string_view> settings_bind_address;
+    array_ip_t<std::optional<tr_address>> settings_bind_addr_;
 
     enum class is_updating_t
     {
