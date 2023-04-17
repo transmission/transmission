@@ -132,10 +132,11 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
 {
     update_source_addr(type);
-    if (global_source_addr(type))
-    {
-        update_global_addr(type);
-    }
+    /* TODO: Temporarily disable because there is currently no way for this to work without using third party service */
+    //    if (global_source_addr(type))
+    //    {
+    //        update_global_addr(type);
+    //    }
 }
 
 void tr_global_ip_cache::set_global_addr(tr_address const& addr) noexcept

@@ -59,6 +59,7 @@ public:
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
     void update_addr(tr_address_type type) noexcept;
+    void set_global_addr(tr_address const& addr) noexcept;
 
     [[nodiscard]] constexpr auto has_ip_protocol(tr_address_type type) const noexcept
     {
@@ -69,7 +70,6 @@ private:
     template<typename T>
     using array_ip_t = std::array<T, NUM_TR_AF_INET_TYPES>;
 
-    void set_global_addr(tr_address const& addr) noexcept;
     void unset_global_addr(tr_address_type type) noexcept;
     void set_source_addr(tr_address const& addr) noexcept;
     void unset_addr(tr_address_type type) noexcept;
