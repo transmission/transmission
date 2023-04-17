@@ -27,10 +27,6 @@
 #include "IconCache.h"
 #include "Speed.h"
 
-#ifdef ERROR
-#undef ERROR
-#endif
-
 class QPixmap;
 
 class Prefs;
@@ -572,8 +568,8 @@ public:
         DOWNLOAD_LIMITED,
         DOWNLOAD_SPEED,
         EDIT_DATE,
-        ERROR,
-        ERROR_STRING,
+        TORRENT_ERROR,
+        TORRENT_ERROR_STRING,
         ETA,
         FAILED_EVER,
         FILE_COUNT,
