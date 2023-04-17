@@ -78,7 +78,7 @@ private:
     bool activity_filter_model_update();
 
     bool tracker_filter_model_update();
-    void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeModel::Path const& path);
+    void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const* pixbuf, Gtk::TreeModel::Path const& path);
 
     void update_filter_models(Torrent::ChangeFlags changes);
     void update_filter_models_idle(Torrent::ChangeFlags changes);
@@ -171,13 +171,13 @@ void FilterBar::Impl::tracker_model_update_count(Gtk::TreeModel::iterator const&
     }
 }
 
-void FilterBar::Impl::favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeModel::Path const& path)
+void FilterBar::Impl::favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const* pixbuf, Gtk::TreeModel::Path const& path)
 {
-    if (pixbuf != nullptr)
+    if (pixbuf != nullptr && *pixbuf != nullptr)
     {
         if (auto const iter = tracker_model_->get_iter(path); iter)
         {
-            iter->set_value(tracker_filter_cols.pixbuf, pixbuf);
+            iter->set_value(tracker_filter_cols.pixbuf, *pixbuf);
         }
     }
 }
@@ -300,9 +300,9 @@ bool FilterBar::Impl::tracker_filter_model_update()
             add->set_value(tracker_filter_cols.count, site.count);
             add->set_value(tracker_filter_cols.type, static_cast<int>(TrackerType::HOST));
             auto path = tracker_model_->get_path(add);
-            core_->favicon_cache().lookup(
+            core_->favicon_cache().load(
                 site.announce_url,
-                [this, path](auto const& pixbuf) { favicon_ready_cb(pixbuf, path); });
+                [this, path](auto const* pixbuf) { favicon_ready_cb(pixbuf, path); });
             ++i;
         }
         else // update row

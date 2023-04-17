@@ -188,6 +188,14 @@ private:
     void on_torrent_metadata_changed(tr_torrent* raw_torrent);
 
 private:
+    class WebMediator : public tr_web::Mediator
+    {
+        [[nodiscard]] time_t now() const override
+        {
+            return tr_time();
+        }
+    };
+
     Session& core_;
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)> signal_add_error_;
@@ -214,7 +222,10 @@ private:
     Glib::RefPtr<SortListModel<Torrent>> sorted_model_;
     Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
-    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>> favicon_cache_;
+
+    WebMediator web_mediator_ = {};
+    std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
+    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>> favicon_cache_{ *web_ };
 };
 
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
@@ -537,9 +548,8 @@ Session::Session(tr_session* session)
 Session::~Session() = default;
 
 Session::Impl::Impl(Session& core, tr_session* session)
-    : core_(core)
-    , session_(session)
-    , favicon_cache_(session_)
+    : core_{ core }
+    , session_{ session }
 {
     raw_model_ = Gio::ListStore<Torrent>::create();
     signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_.get(), &TorrentSorter::update)));
