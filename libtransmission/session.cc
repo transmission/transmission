@@ -428,7 +428,6 @@ tr_address tr_session::publicAddress(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, if we can determine which one to use via globalSourceIPv6 magic, use it.
         // otherwise, use any_ipv6 (::).
-        static auto constexpr DefaultAddr = tr_address::any_ipv6();
         auto const source_addr = globalSourceIP(type);
         return source_addr && source_addr->is_global_unicast_address() ? *source_addr : global_ip_cache_.bind_addr(type);
     }
