@@ -173,10 +173,7 @@ private:
             auto sitename = std::string{};
             while (std::getline(ifs, sitename))
             {
-                if (!std::empty(sitename) && !tr_strvStartsWith(sitename, '#'))
-                {
-                    icons_.try_emplace(sitename);
-                }
+                icons_.try_emplace(sitename);
             }
         }
 
