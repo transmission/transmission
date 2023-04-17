@@ -11,13 +11,14 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
-#include "log.h"
-#include "net.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "tr-utp.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
 
 namespace
 {
@@ -149,7 +150,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         auto optval = int{ 1 };
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
-        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET);
+        auto const addr = session_.publicAddress(TR_AF_INET);
         auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
 
         if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
@@ -183,7 +184,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         auto optval = int{ 1 };
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
-        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET6);
+        auto const addr = session_.publicAddress(TR_AF_INET6);
         auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
 
         if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)

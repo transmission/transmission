@@ -23,13 +23,13 @@
 #include <fmt/core.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "tr-strbuf.h"
-#include "utils.h" // for _()
-#include "utils-ev.h"
-#include "watchdir-base.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // for _()
+#include "libtransmission/utils-ev.h"
+#include "libtransmission/watchdir-base.h"
 
 namespace libtransmission
 {

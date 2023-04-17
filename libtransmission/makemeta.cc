@@ -13,20 +13,20 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "makemeta.h"
-#include "session.h" // TR_NAME
-#include "tr-assert.h"
-#include "utils.h" // for _()
-#include "variant.h"
-#include "version.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/makemeta.h"
+#include "libtransmission/session.h" // TR_NAME
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // for _()
+#include "libtransmission/variant.h"
+#include "libtransmission/version.h"
 
 using namespace std::literals;
 
@@ -86,7 +86,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     switch (info->type)
     {
     case TR_SYS_PATH_IS_DIRECTORY:
-        if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
+        if (tr_sys_dir_t odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
         {
             for (;;)
             {

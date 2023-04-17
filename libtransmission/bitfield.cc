@@ -8,12 +8,11 @@
 #include <climits> // SIZE_MAX
 #include <vector>
 
-#include "tr-popcount.h"
+#include "libtransmission/transmission.h"
 
-#include "transmission.h"
-
-#include "bitfield.h"
-#include "tr-assert.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-popcount.h"
 
 // ---
 
@@ -485,4 +484,27 @@ tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
 
     rebuildTrueCount();
     return *this;
+}
+
+bool tr_bitfield::intersects(tr_bitfield const& that) const noexcept
+{
+    if (hasNone() || that.hasNone())
+    {
+        return false;
+    }
+
+    if (hasAll() || that.hasAll())
+    {
+        return true;
+    }
+
+    for (size_t i = 0, n = std::min(std::size(flags_), std::size(that.flags_)); i < n; ++i)
+    {
+        if ((flags_[i] & that.flags_[i]) != 0U)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

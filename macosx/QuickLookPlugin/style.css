@@ -4,15 +4,35 @@ html {
   text-align: left;
 }
 
+table {
+  width: 100%;
+  border-spacing: 0;
+}
+
 th {
   color: rgb(50,50,50);
   font-weight: bold;
   text-align: left;
 }
 
+tr:nth-child(even) {
+  background: rgb(244,245,245);
+}
+tr:nth-child(even) td:first-child {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+tr:nth-child(even) td:last-child {
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
 td {
   color: rgb(80,80,80);
   text-align: left;
+}
+td.grey {
+  color: rgb(133,133,133);
 }
 
 img.icon {

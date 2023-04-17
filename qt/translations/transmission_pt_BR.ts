@@ -279,7 +279,7 @@
         <translation>Adicionar URL(s)</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>Renomear...</translation>
+        <translation>Renomear…</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Buscar...</translation>
+        <translation>Buscar…</translation>
     </message>
 </context>
 <context>
@@ -819,7 +819,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt; Calculando Espaço Livre...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt; Calculando Espaço Livre…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>&amp;Abrir...</translation>
+        <translation>&amp;Abrir…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -920,7 +920,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation>&amp;Novo...</translation>
+        <translation>&amp;Novo…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1161,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation>&amp;Alterar Sessão...</translation>
+        <translation>&amp;Alterar Sessão…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Ajustar &amp;Localização...</translation>
+        <translation>Ajustar &amp;Localização…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation>Abrir &amp;URL...</translation>
+        <translation>Abrir &amp;URL…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1740,7 +1740,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation>Testando Porta TCP...</translation>
+        <translation>Testando Porta TCP…</translation>
     </message>
     <message>
         <location line="+154"/>
@@ -2106,7 +2106,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation>&lt;b&gt;Atualizar lista de bloqueio&lt;/b&gt;&lt;p&gt;Obtendo nova lista de bloqueio...&lt;/p&gt;</translation>
+        <translation>&lt;b&gt;Atualizar lista de bloqueio&lt;/b&gt;&lt;p&gt;Obtendo nova lista de bloqueio…&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+93"/>
@@ -2576,7 +2576,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <location line="+73"/>
         <source>Asking for peer counts now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Solicitando a contagem de pares agora... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Solicitando a contagem de pares agora… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="-40"/>
@@ -2612,7 +2612,7 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
         <location line="-17"/>
         <source>Asking for more peers now… &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Solicitando mais pares agora...&lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Solicitando mais pares agora… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+56"/>

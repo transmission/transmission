@@ -194,7 +194,7 @@ private:
 
         [[nodiscard]] tr_address incomingPeerAddress() const override
         {
-            return session_.publicAddress(TR_AF_INET).address;
+            return session_.publicAddress(TR_AF_INET);
         }
 
         [[nodiscard]] tr_port localPeerPort() const override
@@ -783,13 +783,7 @@ public:
         return global_ip_cache_.has_ip_protocol(type);
     }
 
-    struct PublicAddressResult
-    {
-        tr_address address;
-        bool is_any_addr;
-    };
-
-    [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
+    [[nodiscard]] tr_address publicAddress(tr_address_type type) const noexcept;
 
     [[nodiscard]] std::optional<tr_address> globalIP(tr_address_type type) const noexcept
     {

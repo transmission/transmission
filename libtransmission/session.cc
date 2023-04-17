@@ -29,38 +29,37 @@
 #include <event2/event.h>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
 #include <fmt/format.h> // fmt::ptr
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "bandwidth.h"
-#include "blocklist.h"
-#include "cache.h"
-#include "crypto-utils.h"
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "net.h"
-#include "peer-io.h"
-#include "peer-mgr.h"
-#include "port-forwarding.h"
-#include "rpc-server.h"
-#include "session-id.h"
-#include "session.h"
-#include "timer-ev.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "tr-lpd.h"
-#include "tr-strbuf.h"
-#include "tr-utp.h"
-#include "utils.h"
-#include "variant.h"
-#include "verify.h"
-#include "version.h"
-#include "web.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/blocklist.h"
+#include "libtransmission/cache.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mgr.h"
+#include "libtransmission/port-forwarding.h"
+#include "libtransmission/rpc-server.h"
+#include "libtransmission/session-id.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer-ev.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-lpd.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/verify.h"
+#include "libtransmission/version.h"
+#include "libtransmission/web.h"
 
 using namespace std::literals;
 
@@ -303,7 +302,7 @@ std::optional<std::string_view> tr_session::WebMediator::userAgent() const
 
 std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 {
-    if (auto const [addr, is_any] = session_->publicAddress(TR_AF_INET); !is_any)
+    if (auto const addr = session_->publicAddress(TR_AF_INET); !addr.is_any())
     {
         return addr.display_name();
     }
@@ -313,7 +312,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 
 std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
 {
-    if (auto const [addr, is_any] = session_->publicAddress(TR_AF_INET6); !is_any)
+    if (auto const addr = session_->publicAddress(TR_AF_INET6); !addr.is_any())
     {
         return addr.display_name();
     }
@@ -417,15 +416,11 @@ tr_session::BoundSocket::~BoundSocket()
     }
 }
 
-tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) const noexcept
+tr_address tr_session::publicAddress(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET)
     {
-        // if user provided an address, use it.
-        // otherwise, use any_ipv4 (0.0.0.0).
-        static auto constexpr DefaultAddr = tr_address::any_ipv4();
-        auto addr = global_ip_cache_.bind_addr(type);
-        return { addr, addr == DefaultAddr };
+        return global_ip_cache_.bind_addr(type);
     }
 
     if (type == TR_AF_INET6)
@@ -435,8 +430,7 @@ tr_session::PublicAddressResult tr_session::publicAddress(tr_address_type type) 
         // otherwise, use any_ipv6 (::).
         static auto constexpr DefaultAddr = tr_address::any_ipv6();
         auto const source_addr = globalSourceIP(type);
-        auto addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr : global_ip_cache_.bind_addr(type);
-        return { addr, addr == DefaultAddr };
+        return source_addr && source_addr->is_global_unicast_address() ? *source_addr : global_ip_cache_.bind_addr(type);
     }
 
     TR_ASSERT_MSG(false, "invalid type");
@@ -736,14 +730,14 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     {
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
-            auto const [addr, is_default] = publicAddress(TR_AF_INET);
+            auto const addr = publicAddress(TR_AF_INET);
             bound_ipv4_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
-            auto const [addr, is_default] = publicAddress(TR_AF_INET6);
+            auto const addr = publicAddress(TR_AF_INET6);
             bound_ipv6_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
@@ -1364,7 +1358,7 @@ namespace load_torrents_helpers
         return {};
     }
 
-    auto const odir = tr_sys_dir_open(folder.c_str());
+    auto const odir = tr_sys_dir_open(folder);
     if (odir == TR_BAD_SYS_DIR)
     {
         return {};

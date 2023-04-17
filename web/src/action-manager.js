@@ -83,7 +83,7 @@ export class ActionManager extends EventTarget {
       },
       'verify-selected-torrents': {
         enabled: false,
-        shortcut: 'Control+V',
+        shortcut: 'Control+Shift+V',
         text: 'Verify local data',
       },
     });

@@ -9,20 +9,20 @@
 #include <string_view>
 #include <optional>
 
+#include <fmt/core.h>
 #include <fmt/compile.h>
-#include <fmt/format.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "benc.h"
-#include "quark.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
-#include "variant-common.h"
-#include "variant.h"
+#include "libtransmission/benc.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant-common.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
