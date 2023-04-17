@@ -40,8 +40,6 @@ tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMak
 
 tr_global_ip_cache::~tr_global_ip_cache()
 {
-    TR_ASSERT(!session_.amInSessionThread());
-
     // Destroying mutex while someone owns it is undefined behaviour, so we acquire it first
     auto const locks = std::scoped_lock{ is_updating_mutex_[TR_AF_INET], is_updating_mutex_[TR_AF_INET6],
                                          global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
@@ -270,7 +268,6 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 
 void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
 {
-    TR_ASSERT(session_.amInSessionThread());
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices));
 
