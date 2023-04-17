@@ -11,6 +11,8 @@
 #include <mutex>
 #include <optional>
 #include <shared_mutex>
+#include <string>
+#include <string_view>
 
 #include "net.h"
 #include "timer.h"
@@ -21,8 +23,6 @@
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
-
-struct tr_session;
 
 /**
  * Cache global IP addresses.
@@ -42,18 +42,20 @@ struct tr_session;
 class tr_global_ip_cache
 {
 public:
-    explicit tr_global_ip_cache(tr_session& session_in);
+    explicit tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in);
     ~tr_global_ip_cache();
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache(tr_global_ip_cache&&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
 
+    void init() noexcept;
     bool try_shutdown() noexcept;
 
     [[nodiscard]] std::optional<tr_address> global_addr(tr_address_type type) const noexcept;
     [[nodiscard]] std::optional<tr_address> global_source_addr(tr_address_type type) const noexcept;
 
+    void set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept;
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
     void update_addr(tr_address_type type) noexcept;
@@ -83,14 +85,18 @@ private:
     // Only use as a callback for web_->fetch()
     void on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept;
 
-    [[nodiscard]] static std::optional<tr_address> get_global_source_address(tr_address const& bind_addr, int& err_out);
+    [[nodiscard]] static std::optional<tr_address> get_global_source_address(
+        tr_address const& bind_addr,
+        int& err_out) noexcept;
     [[nodiscard]] static std::optional<tr_address> get_source_address(
         tr_address const& dst_addr,
         tr_port dst_port,
         tr_address const& bind_addr,
-        int& err_out);
+        int& err_out) noexcept;
 
-    tr_session const& session_;
+    tr_web& web_;
+
+    array_ip_t<std::string_view> settings_bind_address;
 
     enum class is_updating_t
     {

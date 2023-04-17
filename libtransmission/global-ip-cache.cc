@@ -32,24 +32,10 @@ auto constexpr RetryUpkeepInterval = 30s;
 
 } // anonymous namespace
 
-tr_global_ip_cache::tr_global_ip_cache(tr_session& session_in)
-    : session_{ session_in }
-    , upkeep_timers_{ session_in.timerMaker().create(), session_in.timerMaker().create() }
+tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in)
+    : web_{ web_in }
+    , upkeep_timers_{ timer_maker_in.create(), timer_maker_in.create() }
 {
-    static_assert(TR_AF_INET == 0);
-    static_assert(TR_AF_INET6 == 1);
-    static_assert(NUM_TR_AF_INET_TYPES == 2);
-
-    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
-    {
-        auto const type = static_cast<tr_address_type>(i);
-        auto const cb = [this, type]()
-        {
-            update_addr(type);
-        };
-        upkeep_timers_[i]->setCallback(cb);
-        start_timer(type, UpkeepInterval);
-    }
 }
 
 tr_global_ip_cache::~tr_global_ip_cache()
@@ -65,6 +51,24 @@ tr_global_ip_cache::~tr_global_ip_cache()
         std::begin(is_updating_),
         std::end(is_updating_),
         [](is_updating_t const& v) { return v == is_updating_t::ABORT; }));
+}
+
+void tr_global_ip_cache::init() noexcept
+{
+    static_assert(TR_AF_INET == 0);
+    static_assert(TR_AF_INET6 == 1);
+    static_assert(NUM_TR_AF_INET_TYPES == 2);
+
+    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        auto const type = static_cast<tr_address_type>(i);
+        auto const cb = [this, type]()
+        {
+            update_addr(type);
+        };
+        upkeep_timers_[i]->setCallback(cb);
+        start_timer(type, UpkeepInterval);
+    }
 }
 
 bool tr_global_ip_cache::try_shutdown() noexcept
@@ -98,6 +102,12 @@ std::optional<tr_address> tr_global_ip_cache::global_source_addr(tr_address_type
     return source_addr_[type];
 }
 
+void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept
+{
+    TR_ASSERT(tr_address::from_string(bind_address));
+    settings_bind_address[type] = bind_address;
+}
+
 tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET)
@@ -105,7 +115,7 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
         static auto constexpr DefaultAddr = tr_address::any_ipv4();
-        return tr_address::from_string(session_.bindAddress(type)).value_or(DefaultAddr);
+        return tr_address::from_string(settings_bind_address[type]).value_or(DefaultAddr);
     }
 
     if (type == TR_AF_INET6)
@@ -113,7 +123,7 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
         // if user provided an address, use it.
         // otherwise, use any_ipv6 (::).
         static auto constexpr DefaultAddr = tr_address::any_ipv6();
-        return tr_address::from_string(session_.bindAddress(type)).value_or(DefaultAddr);
+        return tr_address::from_string(settings_bind_address[type]).value_or(DefaultAddr);
     }
 
     TR_ASSERT_MSG(false, "invalid type");
@@ -216,7 +226,7 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
     options.ip_proto = type == TR_AF_INET ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
-    session_.fetch(std::move(options));
+    web_.fetch(std::move(options));
 }
 
 void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
@@ -309,7 +319,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
 // are modified from code by Juliusz Chroboczek and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
 // unbreaking the double-stack Internet.
-std::optional<tr_address> tr_global_ip_cache::get_global_source_address(tr_address const& bind_addr, int& err_out)
+std::optional<tr_address> tr_global_ip_cache::get_global_source_address(tr_address const& bind_addr, int& err_out) noexcept
 {
     // Pick some destination address to pretend to send a packet to
     static auto constexpr DstIPv4 = "91.121.74.28"sv;
@@ -339,7 +349,7 @@ std::optional<tr_address> tr_global_ip_cache::get_source_address(
     tr_address const& dst_addr,
     tr_port dst_port,
     tr_address const& bind_addr,
-    int& err_out)
+    int& err_out) noexcept
 {
     TR_ASSERT(dst_addr.type == bind_addr.type);
 
