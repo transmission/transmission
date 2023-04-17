@@ -89,14 +89,6 @@ private slots:
 #endif
 
 private:
-    class WebMediator : public tr_web::Mediator
-    {
-        [[nodiscard]] time_t now() const override
-        {
-            return tr_time();
-        }
-    };
-
     void maybeUpdateBlocklist() const;
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
@@ -115,7 +107,7 @@ private:
     QTranslator qt_translator_;
     QTranslator app_translator_;
 
-    WebMediator web_mediator_ = {};
+    tr_web::Mediator web_mediator_;
     std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
     FaviconCache<QPixmap> favicon_cache_{ *web_ };
 

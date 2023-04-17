@@ -188,14 +188,6 @@ private:
     void on_torrent_metadata_changed(tr_torrent* raw_torrent);
 
 private:
-    class WebMediator : public tr_web::Mediator
-    {
-        [[nodiscard]] time_t now() const override
-        {
-            return tr_time();
-        }
-    };
-
     Session& core_;
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)> signal_add_error_;
@@ -223,7 +215,7 @@ private:
     Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
 
-    WebMediator web_mediator_ = {};
+    tr_web::Mediator web_mediator_;
     std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
     FaviconCache<Glib::RefPtr<Gdk::Pixbuf>> favicon_cache_{ *web_ };
 };

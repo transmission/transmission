@@ -156,7 +156,10 @@ public:
             func(response);
         }
 
-        [[nodiscard]] virtual time_t now() const = 0;
+        [[nodiscard]] virtual time_t now() const
+        {
+            return time(nullptr);
+        }
     };
 
     // Note that tr_web does no management of the `mediator` reference.
