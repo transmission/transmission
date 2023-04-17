@@ -1341,7 +1341,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     auto n_torrents = size_t{};
     auto const& folder = session->torrentDir();
 
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto const& name) { return tr_strvEndsWith(name, ".torrent"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](char const* name) { return tr_strvEndsWith(name, ".torrent"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
@@ -1352,7 +1352,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     }
 
     auto buf = std::vector<char>{};
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto const& name) { return tr_strvEndsWith(name, ".magnet"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](char const* name) { return tr_strvEndsWith(name, ".magnet"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
