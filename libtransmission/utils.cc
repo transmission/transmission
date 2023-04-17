@@ -35,7 +35,7 @@
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include <fast_float/fast_float.h>
 #include <wildmat.h>

@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 #endif
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

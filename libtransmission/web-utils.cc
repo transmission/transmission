@@ -14,7 +14,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #define PSL_STATIC
 #include <libpsl.h>
