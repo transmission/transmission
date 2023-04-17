@@ -19,8 +19,6 @@
 
 #include <fmt/core.h>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/file.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h>
@@ -39,11 +37,6 @@ public:
         , scraped_sitenames_filename_{ fmt::format("{:s}/favicons-scraped.txt", cache_dir_) }
     {
     }
-
-    FaviconCache(FaviconCache&&) = delete;
-    FaviconCache(FaviconCache const&) = delete;
-    FaviconCache& operator=(FaviconCache&&) = delete;
-    FaviconCache& operator=(FaviconCache const&) = delete;
 
     [[nodiscard]] Icon const* find(std::string_view sitename) const noexcept
     {
