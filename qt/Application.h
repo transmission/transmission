@@ -55,14 +55,15 @@ public:
 
     void load_favicon(QString const& url)
     {
-        auto self = QPointer<Application>{ this };
+        auto weak_self = QPointer<Application>{ this };
+
         favicon_cache_.load(
             url.toStdString(),
-            [self = std::move(self)](QPixmap const* /*favicon_or_nullptr*/)
+            [weak_self = std::move(weak_self)](QPixmap const* /*favicon_or_nullptr*/)
             {
-                if (!self.isNull())
+                if (!weak_self.isNull())
                 {
-                    self.data()->faviconsChanged();
+                    weak_self.data()->faviconsChanged();
                 }
             });
     }
