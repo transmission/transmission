@@ -29,6 +29,14 @@ Copyright 2017 Endless Mobile, Inc.
     </p>
   </description>
   <url type="homepage">https://transmissionbt.com/</url>
+  <url type="bugtracker">https://github.com/transmission/transmission/issues</url>
+  <url type="faq">https://transmissionbt.com/help/gtk/latest/html/FAQ.html</url>
+  <url type="help">https://transmissionbt.com/help/gtk/latest/index.html</url>
+  <url type="donation">https://transmissionbt.com/donate</url>
+  <url type="translate">https://explore.transifex.com/transmissionbt/transmissionbt/</url>
+  <url type="contact">https://github.com/transmission/transmission/discussions</url>
+  <url type="vcs-browser">https://github.com/transmission/transmission</url>
+  <url type="contribute">https://github.com/transmission/transmission/blob/main/CONTRIBUTING.md</url>
   <screenshots>
     <screenshot type="default">
       <image type="source">https://raw.githubusercontent.com/transmission/transmission/main/gtk/screenshots/a.png</image>
