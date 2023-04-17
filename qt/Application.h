@@ -13,10 +13,12 @@
 #include <QRegularExpression>
 #include <QTimer>
 #include <QTranslator>
+#include <QWeakPointer>
 
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/favicon-cache.h>
+#include <libtransmission/web.h>
 
-#include "FaviconCache.h"
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
 
@@ -44,7 +46,29 @@ public:
         return *interned_strings_.insert(in).first;
     }
 
-    FaviconCache& faviconCache();
+    [[nodiscard]] QPixmap find_favicon(QString const& sitename) const
+    {
+        auto const key = sitename.toStdString();
+        auto const* const icon = favicon_cache_.find(key);
+        return icon != nullptr ? *icon : QPixmap{};
+    }
+
+    void load_favicon(QString const& url)
+    {
+        auto self = QPointer<Application>{ this };
+        favicon_cache_.load(
+            url.toStdString(),
+            [self = std::move(self)](QPixmap const* /*favicon_or_nullptr*/)
+            {
+                if (!self.isNull())
+                {
+                    self.data()->faviconsChanged();
+                }
+            });
+    }
+
+signals:
+    void faviconsChanged();
 
 public slots:
     void addTorrent(AddData const&) const;
@@ -65,6 +89,14 @@ private slots:
 #endif
 
 private:
+    class WebMediator : public tr_web::Mediator
+    {
+        [[nodiscard]] time_t now() const override
+        {
+            return tr_time();
+        }
+    };
+
     void maybeUpdateBlocklist() const;
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
@@ -82,7 +114,10 @@ private:
     time_t last_full_update_time_ = {};
     QTranslator qt_translator_;
     QTranslator app_translator_;
-    FaviconCache favicons_;
+
+    WebMediator web_mediator_ = {};
+    std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
+    FaviconCache<QPixmap> favicon_cache_{ *web_ };
 
     QString const config_name_ = QStringLiteral("transmission");
     QString const display_name_ = QStringLiteral("transmission-qt");

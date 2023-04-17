@@ -359,5 +359,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return trApp->faviconCache().find(sitename);
+    return trApp->find_favicon(sitename);
 }

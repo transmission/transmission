@@ -30,17 +30,30 @@ template<typename Icon>
 class FaviconCache
 {
 public:
-    using IconFunc = std::function<void(Icon const&)>;
+    using IconFunc = std::function<void(Icon const*)>;
 
-    FaviconCache(tr_session* const session)
-        : session_{ session }
+    FaviconCache(tr_web& web)
+        : web_{ web }
         , cache_dir_{ app_cache_dir() }
         , icons_dir_{ fmt::format("{:s}/{:s}", cache_dir_, "favicons") }
         , scraped_sitenames_filename_{ fmt::format("{:s}/favicons-scraped.txt", cache_dir_) }
     {
     }
 
-    void lookup(std::string_view url_in, IconFunc callback)
+    FaviconCache(FaviconCache&&) = delete;
+    FaviconCache(FaviconCache const&) = delete;
+    FaviconCache& operator=(FaviconCache&&) = delete;
+    FaviconCache& operator=(FaviconCache const&) = delete;
+
+    [[nodiscard]] Icon const* find(std::string_view sitename) const noexcept
+    {
+        auto const iter = icons_.find(sitename);
+        return iter != std::end(icons_) ? &iter->second : nullptr;
+    }
+
+    void load(
+        std::string_view url_in,
+        IconFunc callback = [](Icon const&) {})
     {
         std::call_once(scan_once_flag_, &FaviconCache::scan_file_cache, this);
 
@@ -51,14 +64,16 @@ public:
             return;
         }
 
-        // Try to download a favicon if we don't have one.
-        // Add a placeholder to prevent repeat downloads.
-        if (auto const [iter, inserted] = icons_.try_emplace(std::string{ url->sitename }); !inserted)
+        // If we already have it, use it.
+        if (auto const* const icon = find(url->sitename); icon != nullptr)
         {
-            callback(iter->second);
+            callback(icon);
             return;
         }
 
+        // We don't already have it, so fetch it.
+        // Add a placeholder to icons_ prevent repeat downloads.
+        icons_.try_emplace(std::string{ url->sitename });
         mark_site_as_scraped(url->sitename);
 
         // ports to try
@@ -85,11 +100,14 @@ public:
 
                     static constexpr auto TimeoutSecs = std::chrono::seconds{ 15 };
                     auto const favicon_url = fmt::format("{:s}://{:s}:{:d}/favicon.{:s}", scheme, url->host, ports[i], suffix);
-                    tr_sessionFetch(session_, { favicon_url, std::move(on_fetch_response), nullptr, TimeoutSecs });
+                    web_.fetch({ favicon_url, std::move(on_fetch_response), nullptr, TimeoutSecs });
                 }
             }
         }
     }
+
+    static inline constexpr auto Width = 16;
+    static inline constexpr auto Height = 16;
 
 private:
     class InFlightData
@@ -108,10 +126,10 @@ private:
 
         ~InFlightData()
         {
-            invoke_callback({}); // ensure it's called once, even if no icon
+            invoke_callback(nullptr); // ensure it's called once, even if no icon
         }
 
-        void invoke_callback(Icon const& icon)
+        void invoke_callback(Icon const* icon)
         {
             if (callback_)
             {
@@ -174,13 +192,13 @@ private:
         {
             auto const filename = fmt::format("{:s}/{:s}", icons_dir_, sitename);
 
-            if (auto icon = create_from_file(filename); icon)
+            if (auto icon = create_from_file(filename); !icon)
             {
-                icons_[sitename] = icon;
+                tr_sys_path_remove(filename);
             }
             else
             {
-                tr_sys_path_remove(filename);
+                icons_[sitename] = std::move(icon);
             }
         }
     }
@@ -202,25 +220,26 @@ private:
                 continue;
             }
 
-            if (auto const icon = create_from_data(std::data(contents), std::size(contents)); icon)
+            auto const icon = create_from_data(std::data(contents), std::size(contents));
+            if (!icon)
             {
-                // cache it in memory
-                icons_[in_flight->sitename()] = icon;
-
-                // cache it on disk
-                tr_saveFile(fmt::format("{:s}/{:s}", icons_dir_, in_flight->sitename()), contents);
-
-                // notify the user that we got it
-                in_flight->invoke_callback(icon);
-                return;
+                continue;
             }
+
+            // cache it in memory
+            auto& perm = icons_[in_flight->sitename()];
+            perm = std::move(icon);
+
+            // cache it on disk
+            tr_saveFile(fmt::format("{:s}/{:s}", icons_dir_, in_flight->sitename()), contents);
+
+            // notify the user that we got it
+            in_flight->invoke_callback(&perm);
+            return;
         }
     }
 
-    static inline constexpr auto Width = 16;
-    static inline constexpr auto Height = 16;
-
-    tr_session* const session_;
+    tr_web& web_;
     std::once_flag scan_once_flag_;
     std::string const cache_dir_;
     std::string const icons_dir_;
