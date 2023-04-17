@@ -1082,10 +1082,10 @@ private:
 
     /// other fields
 
-    // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_
+    // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::publicAddress())
     std::optional<BoundSocket> bound_ipv4_;
 
-    // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_
+    // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::publicAddress())
     std::optional<BoundSocket> bound_ipv6_;
 
 public:
@@ -1119,7 +1119,7 @@ private:
     // depends-on: settings_, session_thread_, timer_maker_, web_
     tr_global_ip_cache global_ip_cache_{ *this };
 
-    // depends-on: settings_, session_thread_, torrents_, global_ip_cache_
+    // depends-on: settings_, session_thread_, torrents_, global_ip_cache (via tr_session::publicAddress())
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 

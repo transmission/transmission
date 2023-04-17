@@ -21,10 +21,10 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-using namespace std::literals;
-
 namespace
 {
+
+using namespace std::literals;
 
 auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
 auto constexpr UpkeepInterval = 30min;
