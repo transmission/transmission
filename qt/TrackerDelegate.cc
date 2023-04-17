@@ -12,7 +12,6 @@
 #include <libtransmission/web-utils.h>
 #include <libtransmission/favicon-cache.h>
 
-#include "FaviconCache.h"
 #include "Formatter.h"
 #include "Torrent.h"
 #include "TrackerDelegate.h"

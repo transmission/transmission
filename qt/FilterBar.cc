@@ -16,7 +16,6 @@
 #include <QStandardItemModel>
 
 #include "Application.h"
-#include "FaviconCache.h"
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
 #include "Filters.h"
