@@ -66,6 +66,7 @@ void tr_global_ip_cache::init() noexcept
         };
         upkeep_timers_[i]->setCallback(cb);
         start_timer(type, UpkeepInterval);
+        update_addr(type);
     }
 }
 
