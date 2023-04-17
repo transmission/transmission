@@ -36,8 +36,6 @@
  * you have connectivity to the public internet. And if the global address is
  * the same with the source address, then you are not behind an NAT.
  *
- * Note: This class isn't meant to be accessed by anyone other than tr_session,
- * so it has no public methods.
  */
 class tr_global_ip_cache
 {
