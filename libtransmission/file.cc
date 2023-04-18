@@ -71,13 +71,3 @@ std::vector<std::string> tr_sys_dir_get_files(
         }
     }
 }
-
-std::vector<std::string> tr_sys_dir_get_files(std::string_view folder, tr_error** error)
-{
-    static constexpr auto AllFiles = [](std::string_view)
-    {
-        return true;
-    };
-
-    return tr_sys_dir_get_files(folder, AllFiles, error);
-}
