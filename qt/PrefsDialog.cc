@@ -550,7 +550,7 @@ void PrefsDialog::initPrivacyTab()
 void PrefsDialog::onIdleLimitChanged()
 {
     //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
-    auto const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s)");
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s)");
     auto const placeholder = QStringLiteral("%1");
     Utils::updateSpinBoxFormat(ui_.idleLimitSpin, "PrefsDialog", units_format, placeholder);
 }
@@ -576,7 +576,7 @@ void PrefsDialog::initSeedingTab()
 void PrefsDialog::onQueueStalledMinutesChanged()
 {
     //: Spin box format, "Download is inactive if data sharing stopped: [ 5 minutes ago ]"
-    auto const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s) ago");
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s) ago");
     auto const placeholder = QStringLiteral("%1");
     Utils::updateSpinBoxFormat(ui_.queueStalledMinutesSpin, "PrefsDialog", units_format, placeholder);
 }
