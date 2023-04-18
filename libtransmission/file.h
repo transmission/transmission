@@ -8,9 +8,11 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -611,6 +613,16 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error = 
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
 bool tr_sys_dir_close(tr_sys_dir_t handle, struct tr_error** error = nullptr);
+
+[[nodiscard]] constexpr bool tr_basename_is_not_dotfile(std::string_view sv)
+{
+    return std::empty(sv) || sv.front() != '.';
+}
+
+[[nodiscard]] std::vector<std::string> tr_sys_dir_get_files(
+    std::string_view folder,
+    std::function<bool(std::string_view name)> const& test = tr_basename_is_not_dotfile,
+    tr_error** error = nullptr);
 
 /** @} */
 /** @} */

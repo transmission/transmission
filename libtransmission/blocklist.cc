@@ -294,25 +294,12 @@ auto parseFile(std::string_view filename)
 
 auto getFilenamesInDir(std::string_view folder)
 {
-    auto files = std::vector<std::string>{};
-
-    if (auto const odir = tr_sys_dir_open(folder); odir != TR_BAD_SYS_DIR)
+    auto const prefix = std::string{ folder } + '/';
+    auto files = tr_sys_dir_get_files(folder);
+    for (auto& file : files)
     {
-        char const* name = nullptr;
-        auto const prefix = std::string{ folder } + '/';
-        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
-        {
-            if (name[0] == '.') // ignore dotfiles
-            {
-                continue;
-            }
-
-            files.emplace_back(prefix + name);
-        }
-
-        tr_sys_dir_close(odir);
+        file.insert(0, prefix);
     }
-
     return files;
 }
 

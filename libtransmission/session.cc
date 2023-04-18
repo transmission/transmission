@@ -1336,45 +1336,12 @@ namespace
 {
 namespace load_torrents_helpers
 {
-[[nodiscard]] std::vector<std::string> get_matching_files(
-    std::string const& folder,
-    std::function<bool(std::string_view)> const& test)
-{
-    if (auto const info = tr_sys_path_get_info(folder); !info || !info->isFolder())
-    {
-        return {};
-    }
-
-    auto const odir = tr_sys_dir_open(folder);
-    if (odir == TR_BAD_SYS_DIR)
-    {
-        return {};
-    }
-
-    auto filenames = std::vector<std::string>{};
-    for (;;)
-    {
-        char const* const name = tr_sys_dir_read_name(odir);
-
-        if (name == nullptr)
-        {
-            tr_sys_dir_close(odir);
-            return filenames;
-        }
-
-        if (test(name))
-        {
-            filenames.emplace_back(name);
-        }
-    }
-}
-
 void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size_t>* loaded_promise)
 {
     auto n_torrents = size_t{};
     auto const& folder = session->torrentDir();
 
-    for (auto const& name : get_matching_files(folder, [](auto const& name) { return tr_strvEndsWith(name, ".torrent"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strvEndsWith(name, ".torrent"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
@@ -1385,7 +1352,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     }
 
     auto buf = std::vector<char>{};
-    for (auto const& name : get_matching_files(folder, [](auto const& name) { return tr_strvEndsWith(name, ".magnet"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strvEndsWith(name, ".magnet"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
