@@ -254,7 +254,7 @@ void updateDesiredRequestCount(tr_peerMsgsImpl* msgs);
 #define myLogMacro(msgs, level, text) \
     do \
     { \
-        if (true || tr_logLevelIsActive(level)) \
+        if (tr_logLevelIsActive(level)) \
         { \
             tr_logAddMessage( \
                 __FILE__, \
