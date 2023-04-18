@@ -30,9 +30,8 @@ class FaviconCache
 public:
     using IconFunc = std::function<void(Icon const*)>;
 
-    FaviconCache(tr_web& web)
-        : web_{ web }
-        , cache_dir_{ app_cache_dir() }
+    FaviconCache()
+        : cache_dir_{ app_cache_dir() }
         , icons_dir_{ fmt::format("{:s}/{:s}", cache_dir_, "favicons") }
         , scraped_sitenames_filename_{ fmt::format("{:s}/favicons-scraped.txt", cache_dir_) }
     {
@@ -93,7 +92,7 @@ public:
 
                     static constexpr auto TimeoutSecs = std::chrono::seconds{ 15 };
                     auto const favicon_url = fmt::format("{:s}://{:s}:{:d}/favicon.{:s}", scheme, url->host, ports[i], suffix);
-                    web_.fetch({ favicon_url, std::move(on_fetch_response), nullptr, TimeoutSecs });
+                    in_flight->web().fetch({ favicon_url, std::move(on_fetch_response), nullptr, TimeoutSecs });
                 }
             }
         }
@@ -147,12 +146,20 @@ private:
             responses_.emplace_back(std::move(contents), code);
         }
 
+        [[nodiscard]] auto& web()
+        {
+            return *web_;
+        }
+
     private:
         IconFunc callback_;
         std::string const sitename_;
 
         std::mutex responses_mutex_;
         std::vector<std::pair<std::string, long>> responses_;
+
+        tr_web::Mediator mediator_;
+        std::unique_ptr<tr_web> web_ = tr_web::create(mediator_);
     };
 
     [[nodiscard]] Icon create_from_file(std::string_view filename) const;
@@ -229,7 +236,6 @@ private:
         }
     }
 
-    tr_web& web_;
     std::once_flag scan_once_flag_;
     std::string const cache_dir_;
     std::string const icons_dir_;

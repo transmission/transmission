@@ -17,7 +17,6 @@
 
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/favicon-cache.h>
-#include <libtransmission/web.h>
 
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
@@ -108,9 +107,7 @@ private:
     QTranslator qt_translator_;
     QTranslator app_translator_;
 
-    tr_web::Mediator web_mediator_;
-    std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
-    FaviconCache<QPixmap> favicon_cache_{ *web_ };
+    FaviconCache<QPixmap> favicon_cache_;
 
     QString const config_name_ = QStringLiteral("transmission");
     QString const display_name_ = QStringLiteral("transmission-qt");

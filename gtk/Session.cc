@@ -215,9 +215,7 @@ private:
     Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
 
-    tr_web::Mediator web_mediator_;
-    std::unique_ptr<tr_web> web_ = tr_web::create(web_mediator_);
-    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>> favicon_cache_{ *web_ };
+    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>> favicon_cache_;
 };
 
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
