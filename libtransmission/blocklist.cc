@@ -392,15 +392,14 @@ void Blocklist::ensureLoaded() const
 std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled)
 {
     // check for files that need to be updated
-    for (auto const& base : getFilenamesInDir(blocklist_dir))
+    for (auto const& src_file : getFilenamesInDir(blocklist_dir))
     {
-        if (tr_strvEndsWith(base, BinFileSuffix))
+        if (tr_strvEndsWith(src_file, BinFileSuffix))
         {
             continue;
         }
 
         // ensure this src_file has an up-to-date corresponding bin_file
-        auto const src_file = fmt::format("{:s}/{:s}", blocklist_dir, base);
         auto const src_info = tr_sys_path_get_info(src_file);
         auto const bin_file = tr_pathbuf{ src_file, BinFileSuffix };
         auto const bin_info = tr_sys_path_get_info(bin_file);
@@ -415,11 +414,11 @@ std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklis
     }
 
     auto ret = std::vector<Blocklist>{};
-    for (auto const& base : getFilenamesInDir(blocklist_dir))
+    for (auto const& bin_file : getFilenamesInDir(blocklist_dir))
     {
-        if (tr_strvEndsWith(base, BinFileSuffix))
+        if (tr_strvEndsWith(bin_file, BinFileSuffix))
         {
-            ret.emplace_back(fmt::format("{:s}/{:s}", blocklist_dir, base), is_enabled);
+            ret.emplace_back(bin_file, is_enabled);
         }
     }
     return ret;
