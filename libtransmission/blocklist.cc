@@ -295,7 +295,7 @@ auto parseFile(std::string_view filename)
 auto getFilenamesInDir(std::string_view folder)
 {
     auto const prefix = std::string{ folder } + '/';
-    auto files = tr_sys_dir_get_files(folder, tr_strvIsNotDotFile);
+    auto files = tr_sys_dir_get_files(folder);
     for (auto& file : files)
     {
         file.insert(0, prefix);
