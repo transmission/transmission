@@ -47,8 +47,7 @@ std::vector<std::string> tr_sys_dir_get_files(
         return {};
     }
 
-    auto const szfolder = tr_pathbuf{ folder };
-    auto const odir = tr_sys_dir_open(szfolder, error);
+    auto const odir = tr_sys_dir_open(folder, error);
     if (odir == TR_BAD_SYS_DIR)
     {
         return {};
