@@ -121,4 +121,6 @@ private:
     array_ip_t<bool> has_ip_protocol_ = { true, true };
 
     array_ip_t<std::atomic_size_t> ix_service_ = {};
+
+    friend class GlobalIPTest;
 };

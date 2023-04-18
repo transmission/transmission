@@ -100,6 +100,10 @@ std::optional<tr_address> tr_global_ip_cache::global_source_addr(tr_address_type
 void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept
 {
     settings_bind_addr_[type] = tr_address::from_string(bind_address);
+    if (settings_bind_addr_[type] && type != settings_bind_addr_[type]->type)
+    {
+        settings_bind_addr_[type].reset();
+    }
     update_addr(type);
 }
 
