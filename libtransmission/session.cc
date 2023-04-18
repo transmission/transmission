@@ -642,8 +642,6 @@ void tr_session::initImpl(init_data& data)
 
     setSettings(client_settings, true);
 
-    this->global_ip_cache_->init();
-
     if (this->allowsLPD())
     {
         this->lpd_ = tr_lpd::create(lpd_mediator_, eventBase());

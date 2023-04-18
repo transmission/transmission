@@ -47,7 +47,6 @@ public:
     tr_global_ip_cache& operator=(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache& operator=(tr_global_ip_cache&&) = delete;
 
-    void init() noexcept;
     bool try_shutdown() noexcept;
 
     [[nodiscard]] std::optional<tr_address> global_addr(tr_address_type type) const noexcept;

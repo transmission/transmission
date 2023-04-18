@@ -36,23 +36,6 @@ tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMak
     : web_{ web_in }
     , upkeep_timers_{ timer_maker_in.create(), timer_maker_in.create() }
 {
-}
-
-tr_global_ip_cache::~tr_global_ip_cache()
-{
-    // Destroying mutex while someone owns it is undefined behaviour, so we acquire it first
-    auto const locks = std::scoped_lock{ is_updating_mutex_[TR_AF_INET], is_updating_mutex_[TR_AF_INET6],
-                                         global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
-                                         source_addr_mutex_[TR_AF_INET], source_addr_mutex_[TR_AF_INET6] };
-
-    TR_ASSERT(std::all_of(
-        std::begin(is_updating_),
-        std::end(is_updating_),
-        [](is_updating_t const& v) { return v == is_updating_t::ABORT; }));
-}
-
-void tr_global_ip_cache::init() noexcept
-{
     static_assert(TR_AF_INET == 0);
     static_assert(TR_AF_INET6 == 1);
     static_assert(NUM_TR_AF_INET_TYPES == 2);
@@ -104,6 +87,7 @@ std::optional<tr_address> tr_global_ip_cache::global_source_addr(tr_address_type
 void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept
 {
     settings_bind_addr_[type] = tr_address::from_string(bind_address);
+    update_addr(type);
 }
 
 tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
@@ -120,7 +104,7 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
 {
     update_source_addr(type);
-    /* TODO: Temporarily disable because there is currently no way for this to work without using third party service */
+    /* TODO: Temporarily disable because there is currently no way for this to work without using third party services */
     //    if (global_source_addr(type))
     //    {
     //        update_global_addr(type);
