@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <chrono>
 #include <ctime>
 #include <memory>
 #include <string>
@@ -72,12 +73,13 @@ protected:
     void SetUp() override
     {
         ::testing::Test::SetUp();
+        web_->startShutdown(std::chrono::milliseconds::max()); // Prevent sending actual requests
         global_ip_cache_ = std::make_unique<tr_global_ip_cache>(*web_, timer_maker_);
     }
 
     void TearDown() override
     {
-        ::testing::Test::SetUp();
+        ::testing::Test::TearDown();
         global_ip_cache_->try_shutdown();
     }
 
