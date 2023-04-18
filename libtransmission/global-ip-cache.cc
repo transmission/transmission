@@ -53,6 +53,19 @@ tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMak
     }
 }
 
+tr_global_ip_cache::~tr_global_ip_cache()
+{
+    // Destroying mutex while someone owns it is undefined behaviour, so we acquire it first
+    auto const locks = std::scoped_lock{ is_updating_mutex_[TR_AF_INET], is_updating_mutex_[TR_AF_INET6],
+                                         global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
+                                         source_addr_mutex_[TR_AF_INET], source_addr_mutex_[TR_AF_INET6] };
+
+    TR_ASSERT(std::all_of(
+        std::begin(is_updating_),
+        std::end(is_updating_),
+        [](is_updating_t const& v) { return v == is_updating_t::ABORT; }));
+}
+
 bool tr_global_ip_cache::try_shutdown() noexcept
 {
     for (auto& timer : upkeep_timers_)
