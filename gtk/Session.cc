@@ -645,7 +645,7 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent* raw_torrent)
         [this, core = get_core_ptr(), torrent_id = tr_torrentId(raw_torrent)]()
         {
             /* update the torrent's collated name */
-            if (auto const [torrent, position] = find_torrent_by_id(torrent_id); torrent != nullptr)
+            if (auto const& [torrent, position] = find_torrent_by_id(torrent_id); torrent)
             {
                 torrent->update();
             }
@@ -912,7 +912,7 @@ void Session::Impl::torrents_added()
 
 void Session::torrent_changed(tr_torrent_id_t id)
 {
-    if (auto const [torrent, position] = impl_->find_torrent_by_id(id); torrent != nullptr)
+    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
     {
         torrent->update();
     }
@@ -920,7 +920,7 @@ void Session::torrent_changed(tr_torrent_id_t id)
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
-    if (auto const [torrent, position] = impl_->find_torrent_by_id(id); torrent != nullptr)
+    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
     {
         /* remove from the gui */
         impl_->get_raw_model()->remove(position);
