@@ -44,8 +44,5 @@ std::string FaviconCache<Icon>::app_cache_dir() const
 template<>
 void FaviconCache<Icon>::add_to_ui_thread(std::function<void()> idlefunc)
 {
-    QMetaObject::invokeMethod(
-        qApp,
-        [idlefunc = std::move(idlefunc)]() { idlefunc(); },
-        Qt::QueuedConnection);
+    QMetaObject::invokeMethod(qApp, std::move(idlefunc), Qt::QueuedConnection);
 }
