@@ -16,7 +16,7 @@
 
 #include "test-fixtures.h"
 
-class GlobalIPTest : public ::testing::Test
+class GlobalIPCacheTest : public ::testing::Test
 {
 protected:
     class MockMediator final : public tr_web::Mediator
@@ -81,15 +81,15 @@ protected:
         global_ip_cache_->try_shutdown();
     }
 
-    MockMediator mediator_;
+    std::unique_ptr<tr_global_ip_cache> global_ip_cache_;
+
+    MockMediator mediator_{};
     std::unique_ptr<tr_web> web_ = tr_web::create(mediator_);
 
-    MockTimerMaker timer_maker_;
-
-    std::unique_ptr<tr_global_ip_cache> global_ip_cache_;
+    MockTimerMaker timer_maker_{};
 };
 
-TEST_F(GlobalIPTest, bindAddr)
+TEST_F(GlobalIPCacheTest, bindAddr)
 {
     static auto const Ipv4Tests = std::array<std::pair<std::string, std::string_view>, 4>{
         { { "8.8.8.8"s, "8.8.8.8"sv },
@@ -104,16 +104,57 @@ TEST_F(GlobalIPTest, bindAddr)
           { "asdasd"s, "::"sv } }
     };
 
+    // IPv4
     for (auto const& [addr_str, expected] : Ipv4Tests)
     {
         global_ip_cache_->set_settings_bind_addr(TR_AF_INET, addr_str);
         auto const addr = global_ip_cache_->bind_addr(TR_AF_INET);
         EXPECT_EQ(addr.display_name(), expected);
     }
+
+    // IPv6
     for (auto const& [addr_str, expected] : Ipv6Tests)
     {
         global_ip_cache_->set_settings_bind_addr(TR_AF_INET6, addr_str);
         auto const addr = global_ip_cache_->bind_addr(TR_AF_INET6);
         EXPECT_EQ(addr.display_name(), expected);
+    }
+}
+
+TEST_F(GlobalIPCacheTest, setGlobalAddr)
+{
+    auto constexpr AddrStr = std::array{ "8.8.8.8"sv,
+                                         "192.168.133.133"sv,
+                                         "172.16.241.133"sv,
+                                         "2001:1890:1112:1::20"sv,
+                                         "fd12:3456:789a:1::1"sv };
+    auto constexpr IPv4Tests = std::array{ true, false, false, false, false };
+    auto constexpr IPv6Tests = std::array{ false, false, false, true, false };
+
+    static_assert(std::size(AddrStr) == std::size(IPv4Tests));
+    static_assert(std::size(AddrStr) == std::size(IPv6Tests));
+
+    // IPv4
+    for (std::size_t i = 0; i < std::size(AddrStr); ++i)
+    {
+        auto const addr = tr_address::from_string(AddrStr[i]);
+        ASSERT_TRUE(addr);
+        EXPECT_EQ(global_ip_cache_->set_global_addr(TR_AF_INET, *addr), IPv4Tests[i]);
+        if (IPv4Tests[i])
+        {
+            EXPECT_EQ(global_ip_cache_->global_addr(TR_AF_INET)->display_name(), AddrStr[i]);
+        }
+    }
+
+    // IPv6
+    for (std::size_t i = 0; i < std::size(AddrStr); ++i)
+    {
+        auto const addr = tr_address::from_string(AddrStr[i]);
+        ASSERT_TRUE(addr);
+        EXPECT_EQ(global_ip_cache_->set_global_addr(TR_AF_INET6, *addr), IPv6Tests[i]);
+        if (IPv6Tests[i])
+        {
+            EXPECT_EQ(global_ip_cache_->global_addr(TR_AF_INET6)->display_name(), AddrStr[i]);
+        }
     }
 }

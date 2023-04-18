@@ -791,9 +791,9 @@ public:
         return global_ip_cache_->global_addr(type);
     }
 
-    void globalIP(tr_address const& addr) noexcept
+    bool globalIP(tr_address const& addr) noexcept
     {
-        global_ip_cache_->set_global_addr(addr);
+        return global_ip_cache_->set_global_addr(addr.type, addr);
     }
 
     [[nodiscard]] std::optional<tr_address> globalSourceIP(tr_address_type type) const noexcept

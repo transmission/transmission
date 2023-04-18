@@ -41,6 +41,7 @@ class tr_global_ip_cache
 {
 public:
     explicit tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in);
+    tr_global_ip_cache() = delete;
     ~tr_global_ip_cache();
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
     tr_global_ip_cache(tr_global_ip_cache&&) = delete;
@@ -56,7 +57,7 @@ public:
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
     void update_addr(tr_address_type type) noexcept;
-    void set_global_addr(tr_address const& addr) noexcept;
+    bool set_global_addr(tr_address_type type, tr_address const& addr) noexcept;
 
     [[nodiscard]] constexpr auto has_ip_protocol(tr_address_type type) const noexcept
     {
@@ -122,5 +123,5 @@ private:
 
     array_ip_t<std::atomic_size_t> ix_service_ = {};
 
-    friend class GlobalIPTest;
+    friend class GlobalIPCacheTest;
 };

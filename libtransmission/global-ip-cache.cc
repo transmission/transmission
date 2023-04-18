@@ -128,12 +128,16 @@ void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
     //    }
 }
 
-void tr_global_ip_cache::set_global_addr(tr_address const& addr) noexcept
+bool tr_global_ip_cache::set_global_addr(tr_address_type type, tr_address const& addr) noexcept
 {
-    TR_ASSERT(addr.is_global_unicast_address());
-    auto const lock = std::lock_guard{ global_addr_mutex_[addr.type] };
-    global_addr_[addr.type] = addr;
-    tr_logAddTrace(fmt::format("Cached global address {}", addr.display_name()));
+    if (type == addr.type && addr.is_global_unicast_address())
+    {
+        auto const lock = std::lock_guard{ global_addr_mutex_[addr.type] };
+        global_addr_[addr.type] = addr;
+        tr_logAddTrace(fmt::format("Cached global address {}", addr.display_name()));
+        return true;
+    }
+    return false;
 }
 
 void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
@@ -270,10 +274,8 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
         auto const ip = tr_strvStrip(response.body);
 
         // Update member
-        if (auto addr = tr_address::from_string(ip); addr && addr->is_global_unicast_address() && addr->type == type)
+        if (auto addr = tr_address::from_string(ip); addr && set_global_addr(type, *addr))
         {
-            set_global_addr(*addr);
-
             success = true;
             upkeep_timers_[type]->setInterval(UpkeepInterval);
 
