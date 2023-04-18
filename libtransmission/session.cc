@@ -420,6 +420,8 @@ tr_address tr_session::publicAddress(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET)
     {
+        // if user provided an address, use it.
+        // otherwise, use any_ipv4 (0.0.0.0).
         return global_ip_cache_->bind_addr(type);
     }
 
