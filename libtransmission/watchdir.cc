@@ -111,7 +111,7 @@ void BaseWatchdir::scan()
 {
     tr_error* error = nullptr;
 
-    for (auto const& file : tr_sys_dir_get_files(dirname_, tr_strvIsNotDotFile, &error))
+    for (auto const& file : tr_sys_dir_get_files(dirname_, tr_basename_is_not_dotfile, &error))
     {
         processFile(file);
     }

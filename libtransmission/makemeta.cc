@@ -86,7 +86,7 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     switch (info->type)
     {
     case TR_SYS_PATH_IS_DIRECTORY:
-        for (auto const& name : tr_sys_dir_get_files(path, tr_strvIsNotDotFile))
+        for (auto const& name : tr_sys_dir_get_files(path))
         {
             if (!std::empty(subpath))
             {

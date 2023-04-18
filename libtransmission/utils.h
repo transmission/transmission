@@ -183,11 +183,6 @@ template<typename T>
     return !std::empty(sv) && sv.back() == key;
 }
 
-[[nodiscard]] constexpr bool tr_strvIsNotDotFile(std::string_view sv)
-{
-    return !tr_strvStartsWith(sv, '.');
-}
-
 constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
 {
     auto pos = sv->find(delim);
