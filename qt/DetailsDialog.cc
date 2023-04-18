@@ -1311,7 +1311,7 @@ void DetailsDialog::onIdleModeChanged(int index)
 void DetailsDialog::onIdleLimitChanged()
 {
     //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
-    auto const units_format = QT_TRANSLATE_N_NOOP("DetailsDialog", "%1 minute(s)");
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("DetailsDialog", "%1 minute(s)");
     auto const placeholder = QStringLiteral("%1");
     Utils::updateSpinBoxFormat(ui_.idleSpin, "DetailsDialog", units_format, placeholder);
 }
