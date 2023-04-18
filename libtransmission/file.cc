@@ -37,7 +37,10 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_er
     return ret;
 }
 
-std::vector<std::string> tr_sys_dir_get_files(std::string_view folder, std::function<bool(char const*)> const& test)
+std::vector<std::string> tr_sys_dir_get_files(
+    std::string_view folder,
+    std::function<bool(std::string_view)> const& test,
+    tr_error** error)
 {
     if (auto const info = tr_sys_path_get_info(folder); !info || !info->isFolder())
     {
@@ -45,7 +48,7 @@ std::vector<std::string> tr_sys_dir_get_files(std::string_view folder, std::func
     }
 
     auto const szfolder = tr_pathbuf{ folder };
-    auto const odir = tr_sys_dir_open(szfolder);
+    auto const odir = tr_sys_dir_open(szfolder, error);
     if (odir == TR_BAD_SYS_DIR)
     {
         return {};
@@ -54,11 +57,11 @@ std::vector<std::string> tr_sys_dir_get_files(std::string_view folder, std::func
     auto filenames = std::vector<std::string>{};
     for (;;)
     {
-        char const* const name = tr_sys_dir_read_name(odir);
+        char const* const name = tr_sys_dir_read_name(odir, error);
 
         if (name == nullptr)
         {
-            tr_sys_dir_close(odir);
+            tr_sys_dir_close(odir, error);
             return filenames;
         }
 
@@ -69,7 +72,12 @@ std::vector<std::string> tr_sys_dir_get_files(std::string_view folder, std::func
     }
 }
 
-std::vector<std::string> tr_sys_dir_get_files(std::string_view folder)
+std::vector<std::string> tr_sys_dir_get_files(std::string_view folder, tr_error** error)
 {
-    return tr_sys_dir_get_files(folder, [](char const*) { return true; });
+    static constexpr auto AllFiles = [](std::string_view)
+    {
+        return true;
+    };
+
+    return tr_sys_dir_get_files(folder, AllFiles, error);
 }

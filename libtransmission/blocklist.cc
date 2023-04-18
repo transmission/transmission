@@ -294,11 +294,13 @@ auto parseFile(std::string_view filename)
 
 auto getFilenamesInDir(std::string_view folder)
 {
-    constexpr auto Test = [](auto const& base)
+    auto const prefix = std::string{ folder } + '/';
+    auto files = tr_sys_dir_get_files(folder, tr_strvIsNotDotFile);
+    for (auto& file : files)
     {
-        return base != "/"sv;
-    };
-    return tr_sys_dir_get_files(folder, Test);
+        file.insert(0, prefix);
+    }
+    return files;
 }
 
 } // namespace
