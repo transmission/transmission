@@ -51,7 +51,6 @@ tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMak
         };
         upkeep_timers_[i]->setCallback(cb);
         start_timer(type, UpkeepInterval);
-        update_addr(type);
     }
 }
 
