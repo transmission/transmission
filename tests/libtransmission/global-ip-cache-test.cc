@@ -6,16 +6,21 @@
 #include <array>
 #include <chrono>
 #include <ctime>
+#include <functional>
 #include <memory>
+#include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 
-#include "libtransmission/global-ip-cache.h"
-#include "libtransmission/net.h"
-#include "libtransmission/timer.h"
-#include "libtransmission/web.h"
+#include <libtransmission/global-ip-cache.h>
+#include <libtransmission/net.h>
+#include <libtransmission/timer.h>
+#include <libtransmission/web.h>
 
-#include "test-fixtures.h"
+#include "gtest/gtest.h"
+
+using namespace std::literals;
 
 class GlobalIPCacheTest : public ::testing::Test
 {

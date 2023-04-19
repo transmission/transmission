@@ -12,11 +12,10 @@
 #include <optional>
 #include <shared_mutex>
 #include <string>
-#include <string_view>
 
-#include "net.h"
-#include "timer.h"
-#include "web.h"
+#include "libtransmission/net.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/web.h"
 
 #pragma once
 

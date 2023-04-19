@@ -4,7 +4,10 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::all_of
+#include <chrono>
 #include <cstddef>
+#include <string_view>
+#include <utility> // std::move
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -15,11 +18,10 @@
 
 #include <fmt/core.h>
 
-#include "log.h"
-#include "global-ip-cache.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/global-ip-cache.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 namespace
 {
