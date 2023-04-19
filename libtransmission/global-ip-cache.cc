@@ -271,10 +271,8 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
 
     if (response.status == 200 /* HTTP_OK */)
     {
-        auto const ip = tr_strvStrip(response.body);
-
         // Update member
-        if (auto addr = tr_address::from_string(ip); addr && set_global_addr(type, *addr))
+        if (auto addr = tr_address::from_string(tr_strvStrip(response.body)); addr && set_global_addr(type, *addr))
         {
             success = true;
             upkeep_timers_[type]->setInterval(UpkeepInterval);
