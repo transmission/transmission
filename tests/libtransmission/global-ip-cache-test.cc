@@ -73,7 +73,7 @@ protected:
     void SetUp() override
     {
         ::testing::Test::SetUp();
-        web_->startShutdown(std::chrono::milliseconds::max()); // Prevent sending actual requests
+        web_->startShutdown(std::chrono::milliseconds::max()); // Prevent sending actual HTTP requests
         global_ip_cache_ = std::make_unique<tr_global_ip_cache>(*web_, timer_maker_);
     }
 
@@ -159,4 +159,32 @@ TEST_F(GlobalIPCacheTest, setGlobalAddr)
             EXPECT_EQ(global_ip_cache_->global_addr(TR_AF_INET6)->display_name(), AddrStr[i]);
         }
     }
+}
+
+TEST_F(GlobalIPCacheTest, globalSourceIPv4)
+{
+    global_ip_cache_->set_settings_bind_addr(TR_AF_INET, "0.0.0.0"s);
+    auto const addr = global_ip_cache_->global_source_addr(TR_AF_INET);
+    if (!addr)
+    {
+        GTEST_SKIP() << "globalSourceIPv4 did not return an address, either:\n"
+                     << "1. globalSourceIPv4 is broken\n"
+                     << "2. Your system does not support IPv4\n"
+                     << "3. You don't have IPv4 connectivity to public internet";
+    }
+    EXPECT_TRUE(addr->is_ipv4());
+}
+
+TEST_F(GlobalIPCacheTest, globalSourceIPv6)
+{
+    global_ip_cache_->set_settings_bind_addr(TR_AF_INET6, "::"s);
+    auto const addr = global_ip_cache_->global_source_addr(TR_AF_INET6);
+    if (!addr)
+    {
+        GTEST_SKIP() << "globalSourceIPv6 did not return an address, either:\n"
+                     << "1. globalSourceIPv6 is broken\n"
+                     << "2. Your system does not support IPv6\n"
+                     << "3. You don't have IPv6 connectivity to public internet";
+    }
+    EXPECT_TRUE(addr->is_ipv6());
 }
