@@ -1310,13 +1310,10 @@ void DetailsDialog::onIdleModeChanged(int index)
 
 void DetailsDialog::onIdleLimitChanged()
 {
-    //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    QString const units_suffix = tr(" minute(s)", nullptr, ui_.idleSpin->value());
-
-    if (ui_.idleSpin->suffix() != units_suffix)
-    {
-        ui_.idleSpin->setSuffix(units_suffix);
-    }
+    //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("DetailsDialog", "%1 minute(s)");
+    auto const placeholder = QStringLiteral("%1");
+    Utils::updateSpinBoxFormat(ui_.idleSpin, "DetailsDialog", units_format, placeholder);
 }
 
 void DetailsDialog::onRatioModeChanged(int index)
@@ -1389,10 +1386,14 @@ void DetailsDialog::onAddTrackerClicked()
     {
         for (auto const& [ids, urls] : ids_to_urls)
         {
-            torrentSet(
-                torrent_ids_t{ std::begin(ids), std::end(ids) },
-                TR_KEY_trackerAdd,
-                QList<QString>{ std::begin(urls), std::end(urls) });
+            auto urls_list = QList<QString>{};
+            urls_list.reserve(std::size(urls));
+            for (auto const& url : urls)
+            {
+                urls_list << url;
+            }
+
+            torrentSet(torrent_ids_t{ std::begin(ids), std::end(ids) }, TR_KEY_trackerAdd, urls_list);
         }
     }
 }

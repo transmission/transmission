@@ -8,7 +8,7 @@
 #include <memory>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 

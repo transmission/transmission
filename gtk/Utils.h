@@ -23,7 +23,6 @@
 #include <gtkmm/window.h>
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #include <cstddef>
 #include <ctime>

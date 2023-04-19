@@ -445,3 +445,63 @@ TEST(Bitfield, bitwiseAnd)
     b &= a;
     EXPECT_NEAR(0.1F, a.percent(), 0.01);
 }
+
+TEST(Bitfield, intersects)
+{
+    auto a = tr_bitfield{ 100 };
+    auto b = tr_bitfield{ 100 };
+
+    a.setHasAll();
+    b.setHasNone();
+    EXPECT_FALSE(a.intersects(b));
+    EXPECT_FALSE(b.intersects(a));
+
+    a.setHasAll();
+    b.setHasAll();
+    EXPECT_TRUE(a.intersects(b));
+    EXPECT_TRUE(b.intersects(a));
+
+    a.setHasNone();
+    b.setHasNone();
+    EXPECT_FALSE(a.intersects(b));
+    EXPECT_FALSE(b.intersects(a));
+
+    a.setHasNone();
+    b.setHasNone();
+    a.setSpan(0, std::size(a) / 2U);
+    b.setSpan(std::size(a) / 2U, std::size(a));
+    EXPECT_EQ(0.5, a.percent());
+    EXPECT_EQ(0.5, b.percent());
+    EXPECT_FALSE(a.intersects(b));
+    EXPECT_FALSE(b.intersects(a));
+
+    a.setHasNone();
+    b.setHasNone();
+    for (size_t i = 0; i < std::size(a); ++i)
+    {
+        if ((i % 2U) != 0U)
+        {
+            a.set(i);
+        }
+        else
+        {
+            b.set(i);
+        }
+    }
+    EXPECT_FALSE(a.intersects(b));
+    EXPECT_FALSE(b.intersects(a));
+
+    a.setHasNone();
+    a.setSpan(0U, std::size(a) / 10U);
+    b.setHasNone();
+    b.setSpan(0U, std::size(a) / 20U);
+    EXPECT_TRUE(a.intersects(b));
+    EXPECT_TRUE(b.intersects(a));
+
+    a.setHasNone();
+    a.setSpan(0U, std::size(a) / 10U);
+    b.setHasNone();
+    b.setSpan(0U, std::size(a) / 20U);
+    EXPECT_TRUE(a.intersects(b));
+    EXPECT_TRUE(b.intersects(a));
+}

@@ -8,7 +8,7 @@
 
 #include <algorithm> /* std::max() */
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "daemon.h"
 

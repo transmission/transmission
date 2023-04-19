@@ -21,12 +21,13 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include "transmission.h"
-#include "log.h"
-#include "net.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "watchdir-base.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/watchdir-base.h"
 
 namespace libtransmission
 {

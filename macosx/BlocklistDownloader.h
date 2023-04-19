@@ -6,10 +6,10 @@
 
 @class BlocklistDownloaderViewController;
 
-typedef NS_ENUM(unsigned int, blocklistDownloadState) { //
-    BLOCKLIST_DL_START,
-    BLOCKLIST_DL_DOWNLOADING,
-    BLOCKLIST_DL_PROCESSING
+typedef NS_ENUM(NSUInteger, BlocklistDownloadState) { //
+    BlocklistDownloadStateStart,
+    BlocklistDownloadStateDownloading,
+    BlocklistDownloadStateProcessing
 };
 
 @interface BlocklistDownloader : NSObject<NSURLSessionDownloadDelegate>

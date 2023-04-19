@@ -9,7 +9,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 /**
  * A memory buffer which uses a builtin array of N bytes, using heap

@@ -13,20 +13,20 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "makemeta.h"
-#include "session.h" // TR_NAME
-#include "tr-assert.h"
-#include "utils.h" // for _()
-#include "variant.h"
-#include "version.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/makemeta.h"
+#include "libtransmission/session.h" // TR_NAME
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // for _()
+#include "libtransmission/variant.h"
+#include "libtransmission/version.h"
 
 using namespace std::literals;
 
@@ -86,33 +86,16 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
     switch (info->type)
     {
     case TR_SYS_PATH_IS_DIRECTORY:
-        if (tr_sys_dir_t odir = tr_sys_dir_open(path.c_str()); odir != TR_BAD_SYS_DIR)
+        for (auto const& name : tr_sys_dir_get_files(path))
         {
-            for (;;)
+            if (!std::empty(subpath))
             {
-                char const* const name = tr_sys_dir_read_name(odir);
-
-                if (name == nullptr)
-                {
-                    break;
-                }
-
-                if (name[0] == '.') // skip dotfiles
-                {
-                    continue;
-                }
-
-                if (!std::empty(subpath))
-                {
-                    walkTree(top, tr_pathbuf{ subpath, '/', name }, files);
-                }
-                else
-                {
-                    walkTree(top, name, files);
-                }
+                walkTree(top, tr_pathbuf{ subpath, '/', name }, files);
             }
-
-            tr_sys_dir_close(odir);
+            else
+            {
+                walkTree(top, name, files);
+            }
         }
         break;
 

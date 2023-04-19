@@ -279,7 +279,7 @@
         <translation>URL(s) hinzufügen</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Hoch</translation>
     </message>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>Umbenennen...</translation>
+        <translation>Umbenennen…</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Suche ...</translation>
+        <translation>Suche…</translation>
     </message>
 </context>
 <context>
@@ -819,7 +819,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Berechne freien Platz ...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;Berechne freien Platz…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>&amp;Öffne ...</translation>
+        <translation>&amp;Öffne…</translation>
     </message>
     <message>
         <location line="+3"/>

@@ -193,7 +193,7 @@ private:
 
         [[nodiscard]] tr_address incomingPeerAddress() const override
         {
-            return session_.publicAddress(TR_AF_INET).address;
+            return session_.publicAddress(TR_AF_INET);
         }
 
         [[nodiscard]] tr_port localPeerPort() const override
@@ -777,13 +777,7 @@ public:
 
     [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
 
-    struct PublicAddressResult
-    {
-        tr_address address;
-        bool is_any_addr;
-    };
-
-    [[nodiscard]] PublicAddressResult publicAddress(tr_address_type type) const noexcept;
+    [[nodiscard]] tr_address publicAddress(tr_address_type type) const noexcept;
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
     {

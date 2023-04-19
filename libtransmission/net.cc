@@ -27,17 +27,17 @@
 
 #include <libutp/utp.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "net.h"
-#include "peer-socket.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "tr-macros.h"
-#include "tr-utp.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -217,7 +217,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     // set source address
-    auto const [source_addr, is_any] = session->publicAddress(addr.type);
+    auto const source_addr = session->publicAddress(addr.type);
     auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
@@ -368,7 +368,7 @@ bool tr_net_hasIPv6(tr_port port)
     if (!already_done)
     {
         int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv4(), port, true, &err);
+        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv6(), port, true, &err);
 
         if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
         {
@@ -581,13 +581,15 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 
     auto addr = tr_address{};
 
-    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr) == 1)
+    addr.addr.addr4 = {};
+    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr.addr4) == 1)
     {
         addr.type = TR_AF_INET;
         return addr;
     }
 
-    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr) == 1)
+    addr.addr.addr6 = {};
+    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr.addr6) == 1)
     {
         addr.type = TR_AF_INET6;
         return addr;

@@ -9,16 +9,16 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "quark.h"
+#include "libtransmission/quark.h"
 
 using namespace std::literals;
 
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, 403>{ ""sv,
+auto constexpr MyStatic = std::array<std::string_view, 404>{ ""sv,
                                                              "activeTorrentCount"sv,
                                                              "activity-date"sv,
                                                              "activityDate"sv,
@@ -331,6 +331,7 @@ auto constexpr MyStatic = std::array<std::string_view, 403>{ ""sv,
                                                              "seedRatioMode"sv,
                                                              "seederCount"sv,
                                                              "seeding-time-seconds"sv,
+                                                             "sequentialDownload"sv,
                                                              "session-count"sv,
                                                              "session-id"sv,
                                                              "sessionCount"sv,

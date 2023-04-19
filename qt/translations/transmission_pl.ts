@@ -280,10 +280,10 @@
     <message>
         <location line="+390"/>
         <source>Add URL(s)</source>
-        <translation>Dodaj adres(y) URL</translation>
+        <translation>Dodaj adresy URL</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Wysoki</translation>
     </message>
@@ -1301,7 +1301,7 @@
     <message>
         <location line="+6"/>
         <source>Show &amp;options dialog</source>
-        <translation>Okno &amp;opcji</translation>
+        <translation>O&amp;kno opcji</translation>
     </message>
     <message>
         <location line="-8"/>
@@ -2019,12 +2019,12 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
     <message>
         <location line="+342"/>
         <source>µTP is a tool for reducing network congestion.</source>
-        <translation>µTP to narzędzie do zmniejszania przeciążenia sieci.</translation>
+        <translation>µTP umożliwia zmniejszenie przeciążenia sieci</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Enable µ&amp;TP for peer connections</source>
-        <translation>Włącz µ&amp;TP do komunikacji równorzędnej</translation>
+        <translation>Kom_unikacja z&#xa0;partnerami przez µTP</translation>
     </message>
     <message>
         <location line="+61"/>
@@ -2115,9 +2115,9 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="-101"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).&lt;/p&gt;</source>
         <translation>
-            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln regułę.&lt;/p&gt;</numerusform>
-            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguły.&lt;/p&gt;</numerusform>
-            <numerusform>&lt;b&gt;Zaktualizowano pomyślnie!&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguł.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Zaktualizowano.&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln regułę.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Zaktualizowano.&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguły.&lt;/p&gt;</numerusform>
+            <numerusform>&lt;b&gt;Zaktualizowano.&lt;/b&gt;&lt;p&gt;Lista blokowania ma teraz %Ln reguł.&lt;/p&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -2264,18 +2264,18 @@ Kolejny podstawowy adres URL należy dodać po pustym wierszu.</translation>
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Zduplikowany torrent</numerusform>
-            <numerusform>Zduplikowane torrenty</numerusform>
-            <numerusform>Zduplikowane torrenty</numerusform>
+            <numerusform>Podwójny torrent</numerusform>
+            <numerusform>Podwójne torrenty</numerusform>
+            <numerusform>Podwójne torrenty</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
-            <numerusform>Nie można dodać %n zduplikowanego torrenta</numerusform>
-            <numerusform>Nie można dodać %n zduplikowanych torrentów</numerusform>
-            <numerusform>Nie można dodać %n zduplikowanych torrentów</numerusform>
+            <numerusform>Nie można dodać %n podwójnego torrenta</numerusform>
+            <numerusform>Nie można dodać %n podwójnych torrentów</numerusform>
+            <numerusform>Nie można dodać %n podwójnych torrentów</numerusform>
         </translation>
     </message>
 </context>

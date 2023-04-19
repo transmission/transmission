@@ -295,7 +295,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>مرتفعة</translation>
     </message>
@@ -649,7 +649,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>أعد التسمية...</translation>
+        <translation>أعد التسمية…</translation>
     </message>
 </context>
 <context>
@@ -937,7 +937,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>&amp;إفتح...</translation>
+        <translation>&amp;إفتح…</translation>
     </message>
     <message>
         <location line="+3"/>
