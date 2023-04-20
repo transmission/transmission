@@ -93,13 +93,11 @@ public:
             if (auto& fut = iter->second; fut.wait_for(0ms) == std::future_status::ready)
             {
                 auto const addr = fut.get();
-                fmt::print("{:s}:{:d} lookup done {:s}:{:d}\n", __FILE__, __LINE__, host, port.host());
                 cache_[key] = addr ? Cache{ *addr, now, State::Success } : Cache{ {}, now, State::Failed };
                 pending_.erase(iter);
             }
             else
             {
-                fmt::print("{:s}:{:d} pending {:s}:{:d}\n", __FILE__, __LINE__, host, port.host());
                 return { State::Pending, {} };
             }
         }
@@ -108,15 +106,12 @@ public:
         {
             if (auto const& [addr, created_at, state] = iter->second; now - created_at < CacheTtl)
             {
-                fmt::print("{:s}:{:d} cached {:s}:{:d}\n", __FILE__, __LINE__, host, port.host());
                 return { state, addr };
             }
 
-            fmt::print("{:s}:{:d} expired {:s}:{:d}\n", __FILE__, __LINE__, host, port.host());
             cache_.erase(iter); // expired
         }
 
-        fmt::print("{:s}:{:d} starting lookup {:s}:{:d}\n", __FILE__, __LINE__, host, port.host());
         pending_[key] = std::async(std::launch::async, lookup, host, port, logname);
         return { State::Pending, {} };
     }
