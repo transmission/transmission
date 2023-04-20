@@ -311,7 +311,7 @@ void addLabels(tr_torrent const* tor, tr_variant* list)
 
 void addFileStats(tr_torrent const* tor, tr_variant* list)
 {
-    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
+    for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);
@@ -323,7 +323,7 @@ void addFileStats(tr_torrent const* tor, tr_variant* list)
 
 void addFiles(tr_torrent const* tor, tr_variant* list)
 {
-    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
+    for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);
@@ -585,16 +585,16 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
         break;
 
     case TR_KEY_file_count:
-        tr_variantInitInt(initme, tor->fileCount());
+        tr_variantInitInt(initme, tor->file_count());
         break;
 
     case TR_KEY_files:
-        tr_variantInitList(initme, tor->fileCount());
+        tr_variantInitList(initme, tor->file_count());
         addFiles(tor, initme);
         break;
 
     case TR_KEY_fileStats:
-        tr_variantInitList(initme, tor->fileCount());
+        tr_variantInitList(initme, tor->file_count());
         addFileStats(tor, initme);
         break;
 
@@ -710,9 +710,9 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
         break;
 
     case TR_KEY_pieces:
-        if (tor->hasMetainfo())
+        if (tor->has_metainfo())
         {
-            auto const bytes = tor->createPieceBitfield();
+            auto const bytes = tor->create_piece_bitfield();
             auto const enc = tr_base64_encode({ reinterpret_cast<char const*>(std::data(bytes)), std::size(bytes) });
             tr_variantInitStr(initme, enc);
         }
@@ -737,7 +737,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
 
     case TR_KEY_priorities:
         {
-            auto const n = tor->fileCount();
+            auto const n = tor->file_count();
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
@@ -853,7 +853,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
 
     case TR_KEY_wanted:
         {
-            auto const n = tor->fileCount();
+            auto const n = tor->file_count();
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
@@ -1013,7 +1013,7 @@ char const* setLabels(tr_torrent* tor, tr_variant* list)
 char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr_variant* list)
 {
     char const* errmsg = nullptr;
-    auto const n_files = tor->fileCount();
+    auto const n_files = tor->file_count();
 
     auto files = std::vector<tr_file_index_t>{};
     files.reserve(n_files);
@@ -1050,7 +1050,7 @@ char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
 {
     char const* errmsg = nullptr;
 
-    auto const n_files = tor->fileCount();
+    auto const n_files = tor->file_count();
     auto const n_items = tr_variantListSize(list);
 
     auto files = std::vector<tr_file_index_t>{};

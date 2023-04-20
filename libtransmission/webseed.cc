@@ -264,7 +264,7 @@ public:
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         auto* const tor = getTorrent();
-        if (tor == nullptr || !tor->isRunning || tor->isDone())
+        if (tor == nullptr || !tor->isRunning || tor->is_done())
         {
             return;
         }
@@ -288,7 +288,7 @@ public:
             return {};
         }
 
-        if (auto const* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->isDone())
+        if (auto const* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->is_done())
         {
             return {};
         }
@@ -388,7 +388,7 @@ void useFetchedBlocks(tr_webseed_task* task)
             break;
         }
 
-        if (tor->hasBlock(task->loc.block))
+        if (tor->has_block(task->loc.block))
         {
             evbuffer_drain(buf, block_size);
         }
@@ -515,7 +515,7 @@ void task_request_next_chunk(tr_webseed_task* task)
     auto const loc = tor->byte_loc(task->loc.byte + evbuffer_get_length(task->content()));
 
     auto const [file_index, file_offset] = tor->file_offset(loc);
-    auto const left_in_file = tor->fileSize(file_index) - file_offset;
+    auto const left_in_file = tor->file_size(file_index) - file_offset;
     auto const left_in_task = task->end_byte - loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);
     TR_ASSERT(this_chunk > 0U);
@@ -523,7 +523,7 @@ void task_request_next_chunk(tr_webseed_task* task)
     webseed->connection_limiter.taskStarted();
 
     auto url = tr_urlbuf{};
-    makeUrl(webseed, tor->fileSubpath(file_index), std::back_inserter(url));
+    makeUrl(webseed, tor->file_subpath(file_index), std::back_inserter(url));
     auto options = tr_web::FetchOptions{ url.sv(), onPartialDataFetched, task };
     options.range = fmt::format(FMT_STRING("{:d}-{:d}"), file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor->id();

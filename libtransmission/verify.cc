@@ -78,18 +78,18 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
 
     while (!stop_flag && piece < tor->piece_count())
     {
-        auto const file_length = tor->fileSize(file_index);
+        auto const file_length = tor->file_size(file_index);
 
         /* if we're starting a new piece... */
         if (piece_pos == 0)
         {
-            had_piece = tor->hasPiece(piece);
+            had_piece = tor->has_piece(piece);
         }
 
         /* if we're starting a new file... */
         if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
-            auto const found = tor->findFile(file_index);
+            auto const found = tor->find_file(file_index);
             fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
             prev_file_index = file_index;
         }
@@ -225,7 +225,7 @@ void tr_verify_worker::add(tr_torrent* tor)
 
     auto node = Node{};
     node.torrent = tor;
-    node.current_size = tor->hasTotal();
+    node.current_size = tor->has_total();
 
     auto const lock = std::lock_guard(verify_mutex_);
     tor->setVerifyState(TR_VERIFY_WAIT);

@@ -81,7 +81,7 @@ protected:
 
     static bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t file_index, std::string_view str)
     {
-        if (auto const found = tor->findFile(file_index); found)
+        if (auto const found = tor->find_file(file_index); found)
         {
             EXPECT_TRUE(tr_sys_path_exists(found->filename()));
             auto contents = std::vector<char>{};
@@ -137,7 +137,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(tr_isTorrent(tor));
 
     // sanity check the info
-    EXPECT_EQ(tr_file_index_t{ 1 }, tor->fileCount());
+    EXPECT_EQ(tr_file_index_t{ 1 }, tor->file_count());
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
 
     // sanity check the (empty) stats
@@ -251,7 +251,7 @@ TEST_F(RenameTest, multifileTorrent)
     // sanity check the info
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
     EXPECT_EQ(TotalSize, tor->total_size());
-    EXPECT_EQ(tr_file_index_t{ 4 }, tor->fileCount());
+    EXPECT_EQ(tr_file_index_t{ 4 }, tor->file_count());
 
     for (tr_file_index_t i = 0; i < 4; ++i)
     {
@@ -302,7 +302,7 @@ TEST_F(RenameTest, multifileTorrent)
     // (while the branch is renamed: confirm that the .resume file remembers the changes)
     tr_resume::save(tor);
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
-    tor->setFileSubpath(1, "gabba gabba hey"sv);
+    tor->set_file_subpath(1, "gabba gabba hey"sv);
     auto const loaded = tr_resume::load(tor, tr_resume::All, ctor);
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Filenames));
     EXPECT_EQ(ExpectedFiles[0], tr_torrentFile(tor, 0).name);
@@ -442,9 +442,9 @@ TEST_F(RenameTest, partialFile)
     EXPECT_EQ(TotalSize, tor->total_size());
     EXPECT_EQ(PieceSize, tor->piece_size());
     EXPECT_EQ(PieceCount, tor->piece_count());
-    EXPECT_EQ("files-filled-with-zeroes/1048576"sv, tor->fileSubpath(0));
-    EXPECT_EQ("files-filled-with-zeroes/4096"sv, tor->fileSubpath(1));
-    EXPECT_EQ("files-filled-with-zeroes/512"sv, tor->fileSubpath(2));
+    EXPECT_EQ("files-filled-with-zeroes/1048576"sv, tor->file_subpath(0));
+    EXPECT_EQ("files-filled-with-zeroes/4096"sv, tor->file_subpath(1));
+    EXPECT_EQ("files-filled-with-zeroes/512"sv, tor->file_subpath(2));
     EXPECT_NE(0, tr_torrentFile(tor, 0).have);
     EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).have + PieceSize);
     EXPECT_EQ(Length[1], tr_torrentFile(tor, 1).have);
@@ -466,7 +466,7 @@ TEST_F(RenameTest, partialFile)
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
-        EXPECT_EQ(strings[i], tor->fileSubpath(i));
+        EXPECT_EQ(strings[i], tor->file_subpath(i));
     }
 
     strings[0] = "foo/bar.part";

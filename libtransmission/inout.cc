@@ -74,7 +74,7 @@ enum class IoMode
 
 bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_index, IoMode io_mode)
 {
-    if (auto found = tor->findFile(file_index); found)
+    if (auto found = tor->find_file(file_index); found)
     {
         setme.assign(found->filename());
         return true;
@@ -89,7 +89,7 @@ bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_
     // Let's figure out where it goes so that we can create it.
     auto const base = tor->currentDir();
     auto const suffix = tor->session->isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
-    setme.assign(base, '/', tor->fileSubpath(file_index), suffix);
+    setme.assign(base, '/', tor->file_subpath(file_index), suffix);
     return true;
 }
 
@@ -103,10 +103,10 @@ void readOrWriteBytes(
     size_t buflen,
     tr_error** error)
 {
-    TR_ASSERT(file_index < tor->fileCount());
+    TR_ASSERT(file_index < tor->file_count());
 
     bool const do_write = io_mode == IoMode::Write;
-    auto const file_size = tor->fileSize(file_index);
+    auto const file_size = tor->file_size(file_index);
     TR_ASSERT(file_size == 0 || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
 
@@ -124,7 +124,7 @@ void readOrWriteBytes(
         auto const err = ENOENT;
         auto const msg = fmt::format(
             _("Couldn't get '{path}': {error} ({error_code})"),
-            fmt::arg("path", tor->fileSubpath(file_index)),
+            fmt::arg("path", tor->file_subpath(file_index)),
             fmt::arg("error", tr_strerror(err)),
             fmt::arg("error_code", err));
         tr_error_set(error, err, msg);
@@ -166,7 +166,7 @@ void readOrWriteBytes(
                 tor,
                 fmt::format(
                     _("Couldn't read '{path}': {error} ({error_code})"),
-                    fmt::arg("path", tor->fileSubpath(file_index)),
+                    fmt::arg("path", tor->file_subpath(file_index)),
                     fmt::arg("error", my_error->message),
                     fmt::arg("error_code", my_error->code)));
             tr_error_propagate(error, &my_error);
@@ -181,7 +181,7 @@ void readOrWriteBytes(
                 tor,
                 fmt::format(
                     _("Couldn't save '{path}': {error} ({error_code})"),
-                    fmt::arg("path", tor->fileSubpath(file_index)),
+                    fmt::arg("path", tor->file_subpath(file_index)),
                     fmt::arg("error", my_error->message),
                     fmt::arg("error_code", my_error->code)));
             tr_error_propagate(error, &my_error);
@@ -207,7 +207,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
 
     while (buflen != 0)
     {
-        uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->fileSize(file_index) - file_offset });
+        uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->file_size(file_index) - file_offset });
 
         tr_error* error = nullptr;
         readOrWriteBytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, &error);
