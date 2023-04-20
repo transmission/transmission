@@ -347,7 +347,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(AnnounceKey))
         {
-            tm_.announceList().add(value, tier_);
+            tm_.announce_list().add(value, tier_);
         }
         else if (pathIs(EncodingKey))
         {
@@ -355,11 +355,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(UrlListKey))
         {
-            tm_.addWebseed(value);
+            tm_.add_webseed(value);
         }
         else if (pathIs(InfoKey, NameKey) || pathIs(InfoKey, NameUtf8Key))
         {
-            tm_.setName(value);
+            tm_.set_name(value);
         }
         else if (pathIs(InfoKey, PiecesKey))
         {
@@ -383,16 +383,16 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathStartsWith(AnnounceListKey))
         {
-            tm_.announceList().add(value, tier_);
+            tm_.announce_list().add(value, tier_);
         }
         else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
         {
-            tm_.addWebseed(value);
+            tm_.add_webseed(value);
         }
         else if (pathIs(MagnetInfoKey, DisplayNameKey) && std::empty(tm_.name()))
         {
             // compatibility with Transmission <= 3.0
-            tm_.setName(value);
+            tm_.set_name(value);
         }
         else if (pathIs(MagnetInfoKey, InfoHashKey))
         {

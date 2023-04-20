@@ -404,12 +404,12 @@ public:
 
     [[nodiscard]] constexpr auto const& announceList() const noexcept
     {
-        return metainfo_.announceList();
+        return metainfo_.announce_list();
     }
 
     [[nodiscard]] constexpr auto& announceList() noexcept
     {
-        return metainfo_.announceList();
+        return metainfo_.announce_list();
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto trackerCount() const noexcept
@@ -435,7 +435,7 @@ public:
 
     [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
     {
-        return metainfo_.webseedCount();
+        return metainfo_.webseed_count();
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto const& webseed(size_t i) const
@@ -447,7 +447,7 @@ public:
 
     void setName(std::string_view name)
     {
-        metainfo_.setName(name);
+        metainfo_.set_name(name);
     }
 
     [[nodiscard]] constexpr auto const& name() const noexcept
@@ -457,7 +457,7 @@ public:
 
     [[nodiscard]] constexpr auto const& infoHash() const noexcept
     {
-        return metainfo_.infoHash();
+        return metainfo_.info_hash();
     }
 
     [[nodiscard]] constexpr auto isPrivate() const noexcept
@@ -472,7 +472,7 @@ public:
 
     [[nodiscard]] constexpr auto const& infoHashString() const noexcept
     {
-        return metainfo_.infoHashString();
+        return metainfo_.info_hash_string();
     }
 
     [[nodiscard]] constexpr auto dateCreated() const noexcept

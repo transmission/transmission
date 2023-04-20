@@ -82,7 +82,7 @@ protected:
         EXPECT_EQ(builder.name(), metainfo.name());
         EXPECT_EQ(builder.comment(), metainfo.comment());
         EXPECT_EQ(builder.isPrivate(), metainfo.isPrivate());
-        EXPECT_EQ(builder.announceList().toString(), metainfo.announceList().toString());
+        EXPECT_EQ(builder.announceList().toString(), metainfo.announce_list().toString());
         return metainfo;
     }
 };
@@ -147,7 +147,7 @@ TEST_F(MakemetaTest, webseeds)
     builder.setWebseeds(std::vector<std::string>{ std::string{ Webseed } });
 
     auto const metainfo = testBuilder(builder);
-    EXPECT_EQ(1U, metainfo.webseedCount());
+    EXPECT_EQ(1U, metainfo.webseed_count());
     EXPECT_EQ(Webseed, metainfo.webseed(0));
 }
 
@@ -291,12 +291,12 @@ TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
 
     builder.setPrivate(true);
     auto private_metainfo = testBuilder(builder);
-    EXPECT_NE(base_metainfo.infoHash(), private_metainfo.infoHash());
+    EXPECT_NE(base_metainfo.info_hash(), private_metainfo.info_hash());
 
     builder.setSource("FOO");
     auto private_source_metainfo = testBuilder(builder);
-    EXPECT_NE(base_metainfo.infoHash(), private_source_metainfo.infoHash());
-    EXPECT_NE(private_metainfo.infoHash(), private_source_metainfo.infoHash());
+    EXPECT_NE(base_metainfo.info_hash(), private_source_metainfo.info_hash());
+    EXPECT_NE(private_metainfo.info_hash(), private_source_metainfo.info_hash());
 }
 
 } // namespace libtransmission::test

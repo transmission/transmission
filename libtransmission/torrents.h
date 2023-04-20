@@ -43,12 +43,12 @@ public:
 
     [[nodiscard]] tr_torrent const* get(tr_torrent_metainfo const& metainfo) const
     {
-        return get(metainfo.infoHash());
+        return get(metainfo.info_hash());
     }
 
     [[nodiscard]] tr_torrent* get(tr_torrent_metainfo const& metainfo)
     {
-        return get(metainfo.infoHash());
+        return get(metainfo.info_hash());
     }
 
     // These convenience functions use get(tr_sha1_digest_t const&)
