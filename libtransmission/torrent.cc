@@ -926,9 +926,9 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
 
     if (tor->isDeleting)
     {
-        tr_torrent_metainfo::removeFile(tor->session->torrentDir(), tor->name(), tor->infoHashString(), ".torrent"sv);
-        tr_torrent_metainfo::removeFile(tor->session->torrentDir(), tor->name(), tor->infoHashString(), ".magnet"sv);
-        tr_torrent_metainfo::removeFile(tor->session->resumeDir(), tor->name(), tor->infoHashString(), ".resume"sv);
+        tr_torrent_metainfo::remove_file(tor->session->torrentDir(), tor->name(), tor->infoHashString(), ".torrent"sv);
+        tr_torrent_metainfo::remove_file(tor->session->torrentDir(), tor->name(), tor->infoHashString(), ".magnet"sv);
+        tr_torrent_metainfo::remove_file(tor->session->resumeDir(), tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
     freeTorrent(tor);
@@ -1073,7 +1073,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         auto const was_dirty = tor->isDirty;
         loaded = tr_resume::load(tor, tr_resume::All, ctor);
         tor->isDirty = was_dirty;
-        tr_torrent_metainfo::migrateFile(session->torrentDir(), tor->name(), tor->infoHashString(), ".torrent"sv);
+        tr_torrent_metainfo::migrate_file(session->torrentDir(), tor->name(), tor->infoHashString(), ".torrent"sv);
     }
 
     tor->completeness = tor->completion.status();

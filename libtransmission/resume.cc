@@ -627,7 +627,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
     TR_ASSERT(tr_isTorrent(tor));
     auto const was_dirty = tor->isDirty;
 
-    tr_torrent_metainfo::migrateFile(tor->session->resumeDir(), tor->name(), tor->infoHashString(), ".resume"sv);
+    tr_torrent_metainfo::migrate_file(tor->session->resumeDir(), tor->name(), tor->infoHashString(), ".resume"sv);
 
     auto const filename = tor->resumeFile();
     if (!tr_sys_path_exists(filename))

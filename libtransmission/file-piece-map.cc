@@ -60,13 +60,13 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
 
 void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
 {
-    auto const n = tm.fileCount();
+    auto const n = tm.file_count();
     auto file_sizes = std::vector<uint64_t>(n);
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        file_sizes[i] = tm.fileSize(i);
+        file_sizes[i] = tm.file_size(i);
     }
-    reset({ tm.totalSize(), tm.pieceSize() }, std::data(file_sizes), std::size(file_sizes));
+    reset({ tm.total_size(), tm.piece_size() }, std::data(file_sizes), std::size(file_sizes));
 }
 
 tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piece) const

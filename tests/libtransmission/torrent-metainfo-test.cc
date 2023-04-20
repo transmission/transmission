@@ -37,7 +37,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
 
     auto metainfo = tr_torrent_metainfo{};
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
-    EXPECT_EQ(0U, metainfo.fileCount()); // because it's a magnet link
+    EXPECT_EQ(0U, metainfo.file_count()); // because it's a magnet link
     EXPECT_EQ(2U, std::size(metainfo.announce_list()));
     EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
 }
@@ -78,7 +78,7 @@ TEST_F(TorrentMetainfoTest, bucket)
     for (auto const& test : tests)
     {
         auto metainfo = tr_torrent_metainfo{};
-        EXPECT_EQ(test.expected_parse_result, metainfo.parseBenc(test.benc));
+        EXPECT_EQ(test.expected_parse_result, metainfo.parse_benc(test.benc));
     }
 }
 
@@ -91,7 +91,7 @@ TEST_F(TorrentMetainfoTest, parseBencFuzzRegressions)
     for (auto const& test : Tests)
     {
         auto tm = tr_torrent_metainfo{};
-        tm.parseBenc(tr_base64_decode(test));
+        tm.parse_benc(tr_base64_decode(test));
     }
 }
 
@@ -106,7 +106,7 @@ TEST_F(TorrentMetainfoTest, parseBencFuzz)
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
         auto tm = tr_torrent_metainfo{};
-        tm.parseBenc({ std::data(buf), std::size(buf) });
+        tm.parse_benc({ std::data(buf), std::size(buf) });
     }
 }
 
@@ -177,9 +177,9 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
     EXPECT_EQ(nullptr, error) << *error;
     auto const* const metainfo = tr_ctorGetMetainfo(ctor);
     EXPECT_NE(nullptr, metainfo);
-    EXPECT_EQ(336, metainfo->infoDictOffset());
-    EXPECT_EQ(26583, metainfo->infoDictSize());
-    EXPECT_EQ(592, metainfo->piecesOffset());
+    EXPECT_EQ(336, metainfo->info_dict_offset());
+    EXPECT_EQ(26583, metainfo->info_dict_size());
+    EXPECT_EQ(592, metainfo->pieces_offset());
     tr_ctorFree(ctor);
 }
 
@@ -264,7 +264,7 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
 {
     auto tm = tr_torrent_metainfo{};
-    EXPECT_FALSE(tm.parseBenc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
+    EXPECT_FALSE(tm.parse_benc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
 }
 
 } // namespace libtransmission::test

@@ -212,7 +212,7 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
         tr_variantDictAddStr(top, TR_KEY_created_by, val);
     }
 
-    if (auto const val = tm.dateCreated(); val != 0)
+    if (auto const val = tm.date_created(); val != 0)
     {
         tr_variantDictAddInt(top, TR_KEY_creation_date, val);
     }
@@ -276,7 +276,7 @@ bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error
 
     // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parseBenc(benc))
+    if (!metainfo.parse_benc(benc))
     {
         return false;
     }
