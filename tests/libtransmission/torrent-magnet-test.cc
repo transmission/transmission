@@ -46,11 +46,11 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
 
     auto torrent_metainfo = tr_torrent_metainfo{};
     tr_error* error = nullptr;
-    EXPECT_TRUE(torrent_metainfo.parseBenc(benc, &error));
+    EXPECT_TRUE(torrent_metainfo.parse_benc(benc, &error));
     EXPECT_EQ(nullptr, error) << error->message;
     tr_error_clear(&error);
 
-    EXPECT_EQ(tor->pieceHash(0), torrent_metainfo.pieceHash(0));
+    EXPECT_EQ(tor->pieceHash(0), torrent_metainfo.piece_hash(0));
 }
 
 } // namespace libtransmission::test

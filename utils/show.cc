@@ -188,16 +188,16 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     {
         fmt::print("GENERAL\n\n");
         fmt::print("  Name: {:s}\n", metainfo.name());
-        if (metainfo.hasV1Metadata())
+        if (metainfo.has_v1_metadata())
         {
             fmt::print("  Hash v1: {:s}\n", metainfo.info_hash_string());
         }
-        if (metainfo.hasV2Metadata())
+        if (metainfo.has_v2_metadata())
         {
             fmt::print("  Hash v2: {:s}\n", metainfo.info_hash2_string());
         }
         fmt::print("  Created by: {:s}\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator());
-        fmt::print("  Created on: {:s}\n\n", toString(metainfo.dateCreated()));
+        fmt::print("  Created on: {:s}\n\n", toString(metainfo.date_created()));
 
         if (!std::empty(metainfo.comment()))
         {
@@ -209,10 +209,10 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
             fmt::print("  Source: {:s}\n", metainfo.source());
         }
 
-        fmt::print("  Piece Count: {:d}\n", metainfo.pieceCount());
-        fmt::print("  Piece Size: {:s}\n", tr_formatter_mem_B(metainfo.pieceSize()));
-        fmt::print("  Total Size: {:s}\n", tr_formatter_size_B(metainfo.totalSize()));
-        fmt::print("  Privacy: {:s}\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
+        fmt::print("  Piece Count: {:d}\n", metainfo.piece_count());
+        fmt::print("  Piece Size: {:s}\n", tr_formatter_mem_B(metainfo.piece_size()));
+        fmt::print("  Total Size: {:s}\n", tr_formatter_size_B(metainfo.total_size()));
+        fmt::print("  Privacy: {:s}\n", metainfo.is_private() ? "Private torrent" : "Public torrent");
     }
 
     /**
@@ -263,21 +263,21 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         }
 
         auto filenames = std::vector<std::string>{};
-        for (tr_file_index_t i = 0, n = metainfo.fileCount(); i < n; ++i)
+        for (tr_file_index_t i = 0, n = metainfo.file_count(); i < n; ++i)
         {
             std::string filename;
             if (opts.show_bytesize)
             {
-                filename = std::to_string(metainfo.fileSize(i));
+                filename = std::to_string(metainfo.file_size(i));
                 filename += " ";
-                filename += metainfo.fileSubpath(i);
+                filename += metainfo.file_subpath(i);
             }
             else
             {
                 filename = "  ";
-                filename += metainfo.fileSubpath(i);
+                filename += metainfo.file_subpath(i);
                 filename += " (";
-                filename += tr_formatter_size_B(metainfo.fileSize(i));
+                filename += tr_formatter_size_B(metainfo.file_size(i));
                 filename += ')';
             }
             filenames.emplace_back(filename);

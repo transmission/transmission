@@ -84,7 +84,7 @@ struct tr_torrent final : public tr_completion::torrent_view
 public:
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
-        , completion{ this, &this->metainfo_.blockInfo() }
+        , completion{ this, &this->metainfo_.block_info() }
     {
     }
 
@@ -102,7 +102,7 @@ public:
 
     tr_sha1_digest_t pieceHash(tr_piece_index_t i) const
     {
-        return metainfo_.pieceHash(i);
+        return metainfo_.piece_hash(i);
     }
 
     // these functions should become private when possible,
@@ -164,12 +164,12 @@ public:
 
     [[nodiscard]] constexpr auto const& blockInfo() const noexcept
     {
-        return metainfo_.blockInfo();
+        return metainfo_.block_info();
     }
 
     [[nodiscard]] constexpr auto blockCount() const noexcept
     {
-        return metainfo_.blockCount();
+        return metainfo_.block_count();
     }
     [[nodiscard]] constexpr auto byteLoc(uint64_t byte) const noexcept
     {
@@ -177,35 +177,35 @@ public:
     }
     [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const noexcept
     {
-        return metainfo_.blockLoc(block);
+        return metainfo_.block_loc(block);
     }
     [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
-        return metainfo_.pieceLoc(piece, offset, length);
+        return metainfo_.piece_loc(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
-        return metainfo_.blockSize(block);
+        return metainfo_.block_size(block);
     }
     [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const noexcept
     {
-        return metainfo_.blockSpanForPiece(piece);
+        return metainfo_.block_span_for_piece(piece);
     }
     [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
-        return metainfo_.pieceCount();
+        return metainfo_.piece_count();
     }
     [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
-        return metainfo_.pieceSize();
+        return metainfo_.piece_size();
     }
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
-        return metainfo_.pieceSize(piece);
+        return metainfo_.piece_size(piece);
     }
     [[nodiscard]] constexpr auto totalSize() const noexcept
     {
-        return metainfo_.totalSize();
+        return metainfo_.total_size();
     }
 
     /// COMPLETION
@@ -378,22 +378,22 @@ public:
 
     [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
     {
-        return metainfo_.fileCount();
+        return metainfo_.file_count();
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto const& fileSubpath(tr_file_index_t i) const
     {
-        return metainfo_.fileSubpath(i);
+        return metainfo_.file_subpath(i);
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const
     {
-        return metainfo_.fileSize(i);
+        return metainfo_.file_size(i);
     }
 
     void setFileSubpath(tr_file_index_t i, std::string_view subpath)
     {
-        metainfo_.setFileSubpath(i, subpath);
+        metainfo_.set_file_subpath(i, subpath);
     }
 
     [[nodiscard]] std::optional<tr_torrent_files::FoundFile> findFile(tr_file_index_t file_index) const;
@@ -462,7 +462,7 @@ public:
 
     [[nodiscard]] constexpr auto isPrivate() const noexcept
     {
-        return metainfo_.isPrivate();
+        return metainfo_.is_private();
     }
 
     [[nodiscard]] constexpr auto isPublic() const noexcept
@@ -477,22 +477,22 @@ public:
 
     [[nodiscard]] constexpr auto dateCreated() const noexcept
     {
-        return metainfo_.dateCreated();
+        return metainfo_.date_created();
     }
 
     [[nodiscard]] auto torrentFile() const
     {
-        return metainfo_.torrentFile(session->torrentDir());
+        return metainfo_.torrent_file(session->torrentDir());
     }
 
     [[nodiscard]] auto magnetFile() const
     {
-        return metainfo_.magnetFile(session->torrentDir());
+        return metainfo_.magnet_file(session->torrentDir());
     }
 
     [[nodiscard]] auto resumeFile() const
     {
-        return metainfo_.resumeFile(session->resumeDir());
+        return metainfo_.resume_file(session->resumeDir());
     }
 
     [[nodiscard]] auto magnet() const
@@ -517,12 +517,12 @@ public:
 
     [[nodiscard]] constexpr auto infoDictSize() const noexcept
     {
-        return metainfo_.infoDictSize();
+        return metainfo_.info_dict_size();
     }
 
     [[nodiscard]] constexpr auto infoDictOffset() const noexcept
     {
-        return metainfo_.infoDictOffset();
+        return metainfo_.info_dict_offset();
     }
 
     /// METAINFO - PIECE CHECKSUMS

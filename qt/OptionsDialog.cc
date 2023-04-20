@@ -141,7 +141,7 @@ void OptionsDialog::reload()
         break;
 
     case AddData::METAINFO:
-        ok = metainfo.parseBenc(add_.metainfo.toStdString());
+        ok = metainfo.parse_benc(add_.metainfo.toStdString());
         break;
 
     default:
@@ -166,7 +166,7 @@ void OptionsDialog::reload()
 
     if (metainfo_)
     {
-        auto const n_files = metainfo_->fileCount();
+        auto const n_files = metainfo_->file_count();
         priorities_.assign(n_files, TR_PRI_NORMAL);
         wanted_.assign(n_files, true);
 
@@ -176,9 +176,9 @@ void OptionsDialog::reload()
             f.index = i;
             f.priority = priorities_[i];
             f.wanted = wanted_[i];
-            f.size = metainfo_->fileSize(i);
+            f.size = metainfo_->file_size(i);
             f.have = 0;
-            f.filename = QString::fromStdString(metainfo_->fileSubpath(i));
+            f.filename = QString::fromStdString(metainfo_->file_subpath(i));
             files_.push_back(f);
         }
     }

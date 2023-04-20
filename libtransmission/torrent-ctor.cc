@@ -82,7 +82,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_err
 
     ctor->torrent_filename = filename;
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
-    return ctor->metainfo.parseBenc(contents_sv, error);
+    return ctor->metainfo.parse_benc(contents_sv, error);
 }
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
@@ -95,7 +95,7 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
     ctor->torrent_filename.clear();
     ctor->contents.assign(metainfo, metainfo + len);
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
-    return ctor->metainfo.parseBenc(contents_sv, error);
+    return ctor->metainfo.parse_benc(contents_sv, error);
 }
 
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error)
