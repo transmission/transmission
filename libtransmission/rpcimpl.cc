@@ -1754,8 +1754,8 @@ char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, s
         if (names.empty() || names.count(name.sv()) > 0)
         {
             tr_variant* dict = tr_variantListAddDict(list, 5);
-            auto limits = group->getLimits();
-            tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
+            auto limits = group->get_limits();
+            tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
             tr_variantDictAddStr(dict, TR_KEY_name, name);
             tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit_KBps);
             tr_variantDictAddBool(dict, TR_KEY_speed_limit_down_enabled, limits.down_limited);
@@ -1778,7 +1778,7 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
     }
 
     auto& group = session->getBandwidthGroup(name);
-    auto limits = group.getLimits();
+    auto limits = group.get_limits();
 
     (void)tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &limits.down_limited);
     (void)tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &limits.up_limited);
@@ -1793,12 +1793,12 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
         limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
     }
 
-    group.setLimits(&limits);
+    group.set_limits(&limits);
 
     if (auto honors = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))
     {
-        group.honorParentLimits(TR_UP, honors);
-        group.honorParentLimits(TR_DOWN, honors);
+        group.honor_parent_limits(TR_UP, honors);
+        group.honor_parent_limits(TR_DOWN, honors);
     }
 
     return nullptr;

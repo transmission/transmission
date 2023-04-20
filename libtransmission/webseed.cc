@@ -199,7 +199,7 @@ public:
         if (dir == TR_DOWN)
         {
             is_active = !std::empty(tasks);
-            bytes_per_second = bandwidth_.getPieceSpeedBytesPerSecond(now, dir);
+            bytes_per_second = bandwidth_.get_piece_speed_bytes_per_second(now, dir);
         }
 
         if (setme_bytes_per_second != nullptr)
@@ -247,7 +247,7 @@ public:
 
     void gotPieceData(uint32_t n_bytes)
     {
-        bandwidth_.notifyBandwidthConsumed(TR_DOWN, n_bytes, true, tr_time_msec());
+        bandwidth_.notify_bandwidth_consumed(TR_DOWN, n_bytes, true, tr_time_msec());
         publish(tr_peer_event::GotPieceData(n_bytes));
         connection_limiter.gotData();
     }
