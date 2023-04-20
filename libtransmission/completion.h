@@ -37,7 +37,7 @@ struct tr_completion
         , block_info_{ block_info }
         , blocks_{ block_info_->block_count() }
     {
-        blocks_.setHasNone();
+        blocks_.set_has_none();
     }
 
     [[nodiscard]] constexpr tr_bitfield const& blocks() const noexcept
@@ -47,7 +47,7 @@ struct tr_completion
 
     [[nodiscard]] constexpr bool hasAll() const noexcept
     {
-        return hasMetainfo() && blocks_.hasAll();
+        return hasMetainfo() && blocks_.has_all();
     }
 
     [[nodiscard]] TR_CONSTEXPR20 bool hasBlock(tr_block_index_t block) const
@@ -62,7 +62,7 @@ struct tr_completion
 
     [[nodiscard]] constexpr bool hasNone() const noexcept
     {
-        return !hasMetainfo() || blocks_.hasNone();
+        return !hasMetainfo() || blocks_.has_none();
     }
 
     [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const

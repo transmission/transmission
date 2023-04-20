@@ -63,16 +63,16 @@ TEST_F(CompletionTest, setBlocks)
     auto torrent = TestTorrent{};
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
     auto completion = tr_completion(&torrent, &block_info);
-    EXPECT_FALSE(completion.blocks().hasAll());
+    EXPECT_FALSE(completion.blocks().has_all());
     EXPECT_FALSE(completion.hasAll());
     EXPECT_EQ(0, completion.hasTotal());
 
     auto bitfield = tr_bitfield{ block_info.block_count() };
-    bitfield.setHasAll();
+    bitfield.set_has_all();
 
     // test that the bitfield did get replaced
     completion.setBlocks(bitfield);
-    EXPECT_TRUE(completion.blocks().hasAll());
+    EXPECT_TRUE(completion.blocks().has_all());
     EXPECT_TRUE(completion.hasAll());
     EXPECT_EQ(block_info.total_size(), completion.hasTotal());
 }
@@ -349,7 +349,7 @@ TEST_F(CompletionTest, createPieceBitfield)
     // and test that the new bitfield matches
     auto const pieces_raw_bitfield = completion.createPieceBitfield();
     tr_bitfield pieces{ size_t{ block_info.piece_count() } };
-    pieces.setRaw(std::data(pieces_raw_bitfield), std::size(pieces_raw_bitfield));
+    pieces.set_raw(std::data(pieces_raw_bitfield), std::size(pieces_raw_bitfield));
     for (uint64_t i = 0; i < block_info.piece_count(); ++i)
     {
         EXPECT_EQ(completion.hasPiece(i), pieces.test(i));
@@ -437,7 +437,7 @@ TEST_F(CompletionTest, countHasBytesInSpan)
 
     // torrent is complete
     auto blocks = tr_bitfield{ block_info.block_count() };
-    blocks.setHasAll();
+    blocks.set_has_all();
     completion.setBlocks(blocks);
 
     EXPECT_EQ(TotalSize, completion.countHasBytesInSpan({ 0, TotalSize }));
@@ -464,7 +464,7 @@ TEST_F(CompletionTest, countHasBytesInSpan)
     EXPECT_EQ(BlockSize * 2, completion.countHasBytesInSpan({ 0, BlockSize * 3 }));
     EXPECT_EQ(BlockSize * 1.5, completion.countHasBytesInSpan({ BlockSize / 2, BlockSize * 2 + BlockSize / 2 }));
     // test span where final block is missing
-    blocks.setHasAll();
+    blocks.set_has_all();
     blocks.unset(2);
     completion.setBlocks(blocks);
     EXPECT_EQ(BlockSize * 2, completion.countHasBytesInSpan({ 0, BlockSize * 3 }));

@@ -198,7 +198,7 @@ public:
 
     [[nodiscard]] bool isSeed() const noexcept
     {
-        return has().hasAll();
+        return has().has_all();
     }
 
     [[nodiscard]] virtual std::string display_name() const = 0;

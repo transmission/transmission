@@ -309,8 +309,8 @@ TEST_F(FilePieceMapTest, wanted)
     };
 
     // check everything is wanted by default
-    expected_files_wanted.setHasAll();
-    expected_pieces_wanted.setHasAll();
+    expected_files_wanted.set_has_all();
+    expected_pieces_wanted.set_has_all();
     compare_to_expected();
 
     // set the first file as not wanted.
@@ -319,7 +319,7 @@ TEST_F(FilePieceMapTest, wanted)
     bool const wanted = false;
     files_wanted.set(0, wanted);
     expected_files_wanted.set(0, wanted);
-    expected_pieces_wanted.setSpan(0, 5, wanted);
+    expected_pieces_wanted.set_span(0, 5, wanted);
     compare_to_expected();
 
     // now test when a piece has >1 file.
@@ -343,7 +343,7 @@ TEST_F(FilePieceMapTest, wanted)
     files_wanted.set(4, false);
     files_wanted.set(5, false);
     files_wanted.set(6, false);
-    expected_files_wanted.setSpan(1, 7, false);
+    expected_files_wanted.set_span(1, 7, false);
     expected_pieces_wanted.unset(5);
     compare_to_expected();
     // but as soon as any of them is turned back to wanted,
@@ -368,8 +368,8 @@ TEST_F(FilePieceMapTest, wanted)
     {
         files_wanted.set(i, false);
     }
-    expected_files_wanted.setHasNone();
-    expected_pieces_wanted.setHasNone();
+    expected_files_wanted.set_has_none();
+    expected_pieces_wanted.set_has_none();
     compare_to_expected();
 
     // *Sigh* OK what happens to files_wanted if you say the only
@@ -394,11 +394,11 @@ TEST_F(FilePieceMapTest, wanted)
     auto file_indices = std::vector<tr_file_index_t>(n_files);
     std::iota(std::begin(file_indices), std::end(file_indices), 0);
     files_wanted.set(std::data(file_indices), std::size(file_indices), true);
-    expected_files_wanted.setHasAll();
-    expected_pieces_wanted.setHasAll();
+    expected_files_wanted.set_has_all();
+    expected_pieces_wanted.set_has_all();
     compare_to_expected();
     files_wanted.set(std::data(file_indices), std::size(file_indices), false);
-    expected_files_wanted.setHasNone();
-    expected_pieces_wanted.setHasNone();
+    expected_files_wanted.set_has_none();
+    expected_pieces_wanted.set_has_none();
     compare_to_expected();
 }

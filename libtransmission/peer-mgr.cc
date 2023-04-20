@@ -1493,7 +1493,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         available |= peer->has();
     }
 
-    if (available.hasAll())
+    if (available.has_all())
     {
         return tor->leftUntilDone();
     }
