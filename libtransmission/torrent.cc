@@ -238,7 +238,7 @@ void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->bandwidth_.honorParentLimits(TR_UP, enabled) || tor->bandwidth_.honorParentLimits(TR_DOWN, enabled))
+    if (tor->bandwidth_.honor_parent_limits(TR_UP, enabled) || tor->bandwidth_.honor_parent_limits(TR_DOWN, enabled))
     {
         tor->setDirty();
     }
@@ -1046,8 +1046,8 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         tor->incomplete_dir = dir;
     }
-    tor->bandwidth_.setParent(&session->top_bandwidth_);
-    tor->bandwidth_.setPriority(tr_ctorGetBandwidthPriority(ctor));
+    tor->bandwidth_.set_parent(&session->top_bandwidth_);
+    tor->bandwidth_.set_priority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
@@ -1469,9 +1469,9 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
-    auto const piece_upload_speed_bytes_per_second = tor->bandwidth_.getPieceSpeedBytesPerSecond(now, TR_UP);
+    auto const piece_upload_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now, TR_UP);
     s->pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_bytes_per_second);
-    auto const piece_download_speed_bytes_per_second = tor->bandwidth_.getPieceSpeedBytesPerSecond(now, TR_DOWN);
+    auto const piece_download_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now, TR_DOWN);
     s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_bytes_per_second);
 
     s->percentComplete = tor->completion.percent_complete();
@@ -1980,12 +1980,12 @@ void tr_torrent::setBandwidthGroup(std::string_view group_name) noexcept
     if (std::empty(group_name))
     {
         this->bandwidth_group_ = tr_interned_string{};
-        this->bandwidth_.setParent(&this->session->top_bandwidth_);
+        this->bandwidth_.set_parent(&this->session->top_bandwidth_);
     }
     else
     {
         this->bandwidth_group_ = group_name;
-        this->bandwidth_.setParent(&this->session->getBandwidthGroup(group_name));
+        this->bandwidth_.set_parent(&this->session->getBandwidthGroup(group_name));
     }
 
     this->setDirty();
@@ -2005,9 +2005,9 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isPriority(priority));
 
-    if (tor->bandwidth_.getPriority() != priority)
+    if (tor->bandwidth_.get_priority() != priority)
     {
-        tor->bandwidth_.setPriority(priority);
+        tor->bandwidth_.set_priority(priority);
 
         tor->setDirty();
     }

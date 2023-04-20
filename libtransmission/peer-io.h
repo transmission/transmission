@@ -142,7 +142,7 @@ public:
 
     [[nodiscard]] auto get_piece_speed_bytes_per_second(uint64_t now, tr_direction dir) const noexcept
     {
-        return bandwidth_.getPieceSpeedBytesPerSecond(now, dir);
+        return bandwidth_.get_piece_speed_bytes_per_second(now, dir);
     }
 
     ///
@@ -195,7 +195,7 @@ public:
 
     void set_bandwidth(tr_bandwidth* parent)
     {
-        bandwidth_.setParent(parent);
+        bandwidth_.set_parent(parent);
     }
 
     ///
