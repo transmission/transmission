@@ -205,8 +205,8 @@ struct peer_request
 
 peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
 {
-    auto const loc = tor->blockLoc(block);
-    return peer_request{ loc.piece, loc.piece_offset, tor->blockSize(block) };
+    auto const loc = tor->block_loc(block);
+    return peer_request{ loc.piece, loc.piece_offset, tor->block_size(block) };
 }
 
 // ---
@@ -298,7 +298,7 @@ public:
         : tr_peerMsgs{ torrent_in, atom_in, client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
         , torrent{ torrent_in }
         , io{ std::move(io_in) }
-        , have_{ torrent_in->pieceCount() }
+        , have_{ torrent_in->piece_count() }
         , callback_{ callback }
         , callback_data_{ callback_data }
     {
@@ -490,14 +490,14 @@ public:
                 // Note that requests can't cross over a piece boundary.
                 // So if a piece isn't evenly divisible by the block size,
                 // we need to split our block request info per-piece chunks.
-                auto const byte_begin = torrent->blockLoc(block).byte;
-                auto const block_size = torrent->blockSize(block);
+                auto const byte_begin = torrent->block_loc(block).byte;
+                auto const block_size = torrent->block_size(block);
                 auto const byte_end = byte_begin + block_size;
                 for (auto offset = byte_begin; offset < byte_end;)
                 {
-                    auto const loc = torrent->byteLoc(offset);
+                    auto const loc = torrent->byte_loc(offset);
                     auto const left_in_block = block_size - loc.block_offset;
-                    auto const left_in_piece = torrent->pieceSize(loc.piece) - loc.piece_offset;
+                    auto const left_in_piece = torrent->piece_size(loc.piece) - loc.piece_offset;
                     auto const req_len = std::min(left_in_block, left_in_piece);
                     protocolSendRequest(this, { loc.piece, loc.piece_offset, req_len });
                     offset += req_len;
@@ -683,7 +683,7 @@ private:
         return len == 5U;
 
     case BtPeerMsgs::Bitfield:
-        return !tor->hasMetainfo() || len == 1 + ((tor->pieceCount() + 7U) / 8U);
+        return !tor->hasMetainfo() || len == 1 + ((tor->piece_count() + 7U) / 8U);
 
     case BtPeerMsgs::Request:
     case BtPeerMsgs::Cancel:
@@ -1274,7 +1274,7 @@ void prefetchPieces(tr_peerMsgsImpl* msgs)
     {
         if (auto& req = requests[i]; !req.prefetched)
         {
-            msgs->session->cache->prefetchBlock(msgs->torrent, msgs->torrent->pieceLoc(req.index, req.offset), req.length);
+            msgs->session->cache->prefetchBlock(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length);
             req.prefetched = true;
         }
     }
@@ -1331,9 +1331,9 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, libtransmission::Buffer& paylo
     auto const offset = payload.to_uint32();
     auto const len = std::size(payload);
 
-    auto const loc = msgs->torrent->pieceLoc(piece, offset);
+    auto const loc = msgs->torrent->piece_loc(piece, offset);
     auto const block = loc.block;
-    auto const block_size = msgs->torrent->blockSize(block);
+    auto const block_size = msgs->torrent->block_size(block);
 
     if (loc.block_offset + len > block_size)
     {
@@ -1431,7 +1431,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
         ui32 = payload.to_uint32();
         logtrace(msgs, fmt::format(FMT_STRING("got Have: {:d}"), ui32));
 
-        if (msgs->torrent->hasMetainfo() && ui32 >= msgs->torrent->pieceCount())
+        if (msgs->torrent->hasMetainfo() && ui32 >= msgs->torrent->piece_count())
         {
             msgs->publish(tr_peer_event::GotError(ERANGE));
             return { READ_ERR, {} };
@@ -1451,7 +1451,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
         {
             logtrace(msgs, "got a bitfield");
             auto const [buf, buflen] = payload.pullup();
-            msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : buflen * 8 };
+            msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->piece_count() : buflen * 8 };
             msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(buf), buflen);
             msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
             msgs->invalidatePercentDone();
@@ -1593,7 +1593,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
             if (fext)
             {
                 msgs->publish(
-                    tr_peer_event::GotRejected(msgs->torrent->blockInfo(), msgs->torrent->pieceLoc(r.index, r.offset).block));
+                    tr_peer_event::GotRejected(msgs->torrent->block_info(), msgs->torrent->piece_loc(r.index, r.offset).block));
             }
             else
             {
@@ -1623,7 +1623,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> 
     TR_ASSERT(msgs != nullptr);
 
     tr_torrent const* const tor = msgs->torrent;
-    auto const n_expected = msgs->torrent->blockSize(block);
+    auto const n_expected = msgs->torrent->block_size(block);
 
     if (!block_data)
     {
@@ -1631,7 +1631,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> 
         return EMSGSIZE;
     }
 
-    if (std::size(*block_data) != msgs->torrent->blockSize(block))
+    if (std::size(*block_data) != msgs->torrent->block_size(block))
     {
         logdbg(msgs, fmt::format("wrong block size: expected {:d}, got {:d}", n_expected, std::size(*block_data)));
         return EMSGSIZE;
@@ -1645,7 +1645,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> 
         return 0;
     }
 
-    auto const loc = msgs->torrent->blockLoc(block);
+    auto const loc = msgs->torrent->block_loc(block);
     if (msgs->torrent->hasPiece(loc.piece))
     {
         logtrace(msgs, "we did ask for this message, but the piece is already complete...");
@@ -1660,7 +1660,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> 
     }
 
     msgs->blame.set(loc.piece);
-    msgs->publish(tr_peer_event::GotBlock(tor->blockInfo(), block));
+    msgs->publish(tr_peer_event::GotBlock(tor->block_info(), block));
 
     return 0;
 }
@@ -1891,7 +1891,7 @@ namespace peer_pulse_helpers
     if (ok)
     {
         ok = msgs->session->cache
-                 ->readBlock(msgs->torrent, msgs->torrent->pieceLoc(req.index, req.offset), req.length, std::data(buf)) == 0;
+                 ->readBlock(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
     }
 
     if (ok)

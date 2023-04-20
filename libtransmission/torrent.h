@@ -162,48 +162,48 @@ public:
 
     /// BLOCK INFO
 
-    [[nodiscard]] constexpr auto const& blockInfo() const noexcept
+    [[nodiscard]] constexpr auto const& block_info() const noexcept
     {
         return metainfo_.block_info();
     }
 
-    [[nodiscard]] constexpr auto blockCount() const noexcept
+    [[nodiscard]] constexpr auto block_count() const noexcept
     {
         return metainfo_.block_count();
     }
-    [[nodiscard]] constexpr auto byteLoc(uint64_t byte) const noexcept
+    [[nodiscard]] constexpr auto byte_loc(uint64_t byte) const noexcept
     {
-        return metainfo_.byteLoc(byte);
+        return metainfo_.byte_loc(byte);
     }
-    [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const noexcept
+    [[nodiscard]] constexpr auto block_loc(tr_block_index_t block) const noexcept
     {
         return metainfo_.block_loc(block);
     }
-    [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
+    [[nodiscard]] constexpr auto piece_loc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
         return metainfo_.piece_loc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
+    [[nodiscard]] constexpr auto block_size(tr_block_index_t block) const noexcept
     {
         return metainfo_.block_size(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr auto block_span_for_piece(tr_piece_index_t piece) const noexcept
     {
         return metainfo_.block_span_for_piece(piece);
     }
-    [[nodiscard]] constexpr auto pieceCount() const noexcept
+    [[nodiscard]] constexpr auto piece_count() const noexcept
     {
         return metainfo_.piece_count();
     }
-    [[nodiscard]] constexpr auto pieceSize() const noexcept
+    [[nodiscard]] constexpr auto piece_size() const noexcept
     {
         return metainfo_.piece_size();
     }
-    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] constexpr auto piece_size(tr_piece_index_t piece) const noexcept
     {
         return metainfo_.piece_size(piece);
     }
-    [[nodiscard]] constexpr auto totalSize() const noexcept
+    [[nodiscard]] constexpr auto total_size() const noexcept
     {
         return metainfo_.total_size();
     }

@@ -521,8 +521,8 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
         break;
 
     case TR_KEY_availability:
-        tr_variantInitList(initme, tor->pieceCount());
-        for (tr_piece_index_t piece = 0, n = tor->pieceCount(); piece < n; ++piece)
+        tr_variantInitList(initme, tor->piece_count());
+        for (tr_piece_index_t piece = 0, n = tor->piece_count(); piece < n; ++piece)
         {
             tr_variantListAddInt(initme, tr_peerMgrPieceAvailability(tor, piece));
         }
@@ -724,11 +724,11 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
         break;
 
     case TR_KEY_pieceCount:
-        tr_variantInitInt(initme, tor->pieceCount());
+        tr_variantInitInt(initme, tor->piece_count());
         break;
 
     case TR_KEY_pieceSize:
-        tr_variantInitInt(initme, tor->pieceSize());
+        tr_variantInitInt(initme, tor->piece_size());
         break;
 
     case TR_KEY_primary_mime_type:
@@ -832,7 +832,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
         break;
 
     case TR_KEY_totalSize:
-        tr_variantInitInt(initme, tor->totalSize());
+        tr_variantInitInt(initme, tor->total_size());
         break;
 
     case TR_KEY_uploadedEver:

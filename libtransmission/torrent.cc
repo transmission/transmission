@@ -63,7 +63,7 @@ uint64_t tr_torrentTotalSize(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->totalSize();
+    return tor->total_size();
 }
 
 tr_torrent_id_t tr_torrentId(tr_torrent const* tor)
@@ -982,13 +982,13 @@ bool isNewTorrentASeed(tr_torrent* tor)
 
 void torrentInitFromInfoDict(tr_torrent* tor)
 {
-    tor->completion = tr_completion{ tor, &tor->blockInfo() };
+    tor->completion = tr_completion{ tor, &tor->block_info() };
     tor->obfuscated_hash = tr_sha1::digest("req2"sv, tor->infoHash());
     tor->fpm_.reset(tor->metainfo_);
     tor->file_mtimes_.resize(tor->fileCount());
     tor->file_priorities_.reset(&tor->fpm_);
     tor->files_wanted_.reset(&tor->fpm_);
-    tor->checked_pieces_ = tr_bitfield{ size_t(tor->pieceCount()) };
+    tor->checked_pieces_ = tr_bitfield{ size_t(tor->piece_count()) };
 }
 
 void on_metainfo_completed(tr_torrent* tor)
@@ -1593,7 +1593,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     }
 
     /* test some of the constraints */
-    TR_ASSERT(s->sizeWhenDone <= tor->totalSize());
+    TR_ASSERT(s->sizeWhenDone <= tor->total_size());
     TR_ASSERT(s->leftUntilDone <= s->sizeWhenDone);
     TR_ASSERT(s->desiredAvailable <= s->leftUntilDone);
 
@@ -1666,10 +1666,10 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.comment = tor->comment().c_str();
     ret.creator = tor->creator().c_str();
     ret.source = tor->source().c_str();
-    ret.total_size = tor->totalSize();
+    ret.total_size = tor->total_size();
     ret.date_created = tor->dateCreated();
-    ret.piece_size = tor->pieceSize();
-    ret.n_pieces = tor->pieceCount();
+    ret.piece_size = tor->piece_size();
+    ret.n_pieces = tor->piece_count();
     ret.is_private = tor->isPrivate();
     ret.is_folder = tor->fileCount() > 1 || (tor->fileCount() == 1 && tr_strvContains(tor->fileSubpath(0), '/'));
 
@@ -2042,7 +2042,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
 
     int err = 0;
 
-    if (index >= tor->pieceCount())
+    if (index >= tor->piece_count())
     {
         err = 1;
     }
@@ -2050,7 +2050,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 2;
     }
-    else if (offset + length > tor->pieceSize(index))
+    else if (offset + length > tor->piece_size(index))
     {
         err = 3;
     }
@@ -2058,7 +2058,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 4;
     }
-    else if (tor->pieceLoc(index, offset, length).byte > tor->totalSize())
+    else if (tor->piece_loc(index, offset, length).byte > tor->total_size())
     {
         err = 5;
     }
@@ -2076,13 +2076,13 @@ tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t fi
 {
     auto const [begin_byte, end_byte] = tor->fpm_.byte_span(file);
 
-    auto const begin_block = tor->byteLoc(begin_byte).block;
+    auto const begin_block = tor->byte_loc(begin_byte).block;
     if (begin_byte >= end_byte) // 0-byte file
     {
         return { begin_block, begin_block + 1 };
     }
 
-    auto const final_block = tor->byteLoc(end_byte - 1).block;
+    auto const final_block = tor->byte_loc(end_byte - 1).block;
     auto const end_block = final_block + 1;
     return { begin_block, end_block };
 }
@@ -2333,7 +2333,7 @@ void onPieceFailed(tr_torrent* tor, tr_piece_index_t piece)
 {
     tr_logAddDebugTor(tor, fmt::format("Piece {}, which was just downloaded, failed its checksum test", piece));
 
-    auto const n = tor->pieceSize(piece);
+    auto const n = tor->piece_size(piece);
     tor->corruptCur += n;
     tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
     tr_peerMgrGotBadPiece(tor, piece);
@@ -2352,7 +2352,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     if (tor->hasBlock(block))
     {
         tr_logAddDebugTor(tor, "we have this block already...");
-        auto const n = tor->blockSize(block);
+        auto const n = tor->block_size(block);
         tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
         return;
     }
@@ -2361,9 +2361,9 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 
     tor->completion.add_block(block);
 
-    auto const block_loc = tor->blockLoc(block);
+    auto const block_loc = tor->block_loc(block);
     auto const first_piece = block_loc.piece;
-    auto const last_piece = tor->byteLoc(block_loc.byte + tor->blockSize(block) - 1).piece;
+    auto const last_piece = tor->byte_loc(block_loc.byte + tor->block_size(block) - 1).piece;
     for (auto piece = first_piece; piece <= last_piece; ++piece)
     {
         if (!tor->hasPiece(piece))
@@ -2676,7 +2676,7 @@ void tr_torrent::setBlocks(tr_bitfield blocks)
 
 [[nodiscard]] bool tr_torrent::ensurePieceIsChecked(tr_piece_index_t piece)
 {
-    TR_ASSERT(piece < this->pieceCount());
+    TR_ASSERT(piece < this->piece_count());
 
     if (isPieceChecked(piece))
     {
@@ -2693,7 +2693,7 @@ void tr_torrent::setBlocks(tr_bitfield blocks)
 
 void tr_torrent::initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
 {
-    TR_ASSERT(std::size(checked) == this->pieceCount());
+    TR_ASSERT(std::size(checked) == this->piece_count());
     checked_pieces_ = checked;
 
     auto const n = this->fileCount();

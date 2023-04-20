@@ -48,8 +48,8 @@ public:
         : webseed{ webseed_in }
         , session{ tor->session }
         , blocks{ blocks_in }
-        , end_byte{ tor->blockLoc(blocks.end - 1).byte + tor->blockSize(blocks.end - 1) }
-        , loc{ tor->blockLoc(blocks.begin) }
+        , end_byte{ tor->block_loc(blocks.end - 1).byte + tor->block_size(blocks.end - 1) }
+        , loc{ tor->block_loc(blocks.begin) }
     {
     }
 
@@ -164,7 +164,7 @@ public:
         , callback{ callback_in }
         , callback_data{ callback_data_in }
         , idle_timer_{ session->timerMaker().create([this]() { on_idle(this); }) }
-        , have_{ tor->pieceCount() }
+        , have_{ tor->piece_count() }
         , bandwidth_{ &tor->bandwidth_ }
     {
         have_.set_has_all();
@@ -257,7 +257,7 @@ public:
         auto const* const tor = getTorrent();
         for (auto block = block_span.begin; block < block_span.end; ++block)
         {
-            publish(tr_peer_event::GotRejected(tor->blockInfo(), block));
+            publish(tr_peer_event::GotRejected(tor->block_info(), block));
         }
     }
 
@@ -353,7 +353,7 @@ public:
         if (auto const* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
         {
             session_->cache->writeBlock(tor_id_, block_, std::move(data_));
-            webseed_->publish(tr_peer_event::GotBlock(tor->blockInfo(), block_));
+            webseed_->publish(tr_peer_event::GotBlock(tor->block_info(), block_));
         }
 
         delete this;
@@ -382,7 +382,7 @@ void useFetchedBlocks(tr_webseed_task* task)
     auto* const buf = task->content();
     for (;;)
     {
-        auto const block_size = tor->blockSize(task->loc.block);
+        auto const block_size = tor->block_size(task->loc.block);
         if (evbuffer_get_length(buf) < block_size)
         {
             break;
@@ -401,7 +401,7 @@ void useFetchedBlocks(tr_webseed_task* task)
             session->runInSessionThread(&write_block_data::write_block_func, data);
         }
 
-        task->loc = tor->byteLoc(task->loc.byte + block_size);
+        task->loc = tor->byte_loc(task->loc.byte + block_size);
 
         TR_ASSERT(task->loc.byte <= task->end_byte);
         TR_ASSERT(task->loc.byte == task->end_byte || task->loc.block_offset == 0);
@@ -512,7 +512,7 @@ void task_request_next_chunk(tr_webseed_task* task)
         return;
     }
 
-    auto const loc = tor->byteLoc(task->loc.byte + evbuffer_get_length(task->content()));
+    auto const loc = tor->byte_loc(task->loc.byte + evbuffer_get_length(task->content()));
 
     auto const [file_index, file_offset] = tor->file_offset(loc);
     auto const left_in_file = tor->fileSize(file_index) - file_offset;

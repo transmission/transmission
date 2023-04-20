@@ -99,7 +99,7 @@ protected:
         EXPECT_EQ(TR_STAT_OK, tst->error);
         EXPECT_EQ(total_size, tst->sizeWhenDone);
         EXPECT_EQ(total_size, tst->leftUntilDone);
-        EXPECT_EQ(total_size, tor->totalSize());
+        EXPECT_EQ(total_size, tor->total_size());
         EXPECT_EQ(0, tst->haveValid);
     }
 
@@ -250,7 +250,7 @@ TEST_F(RenameTest, multifileTorrent)
 
     // sanity check the info
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
-    EXPECT_EQ(TotalSize, tor->totalSize());
+    EXPECT_EQ(TotalSize, tor->total_size());
     EXPECT_EQ(tr_file_index_t{ 4 }, tor->fileCount());
 
     for (tr_file_index_t i = 0; i < 4; ++i)
@@ -439,9 +439,9 @@ TEST_F(RenameTest, partialFile)
     ***/
 
     auto* tor = zeroTorrentInit(ZeroTorrentState::Partial);
-    EXPECT_EQ(TotalSize, tor->totalSize());
-    EXPECT_EQ(PieceSize, tor->pieceSize());
-    EXPECT_EQ(PieceCount, tor->pieceCount());
+    EXPECT_EQ(TotalSize, tor->total_size());
+    EXPECT_EQ(PieceSize, tor->piece_size());
+    EXPECT_EQ(PieceCount, tor->piece_count());
     EXPECT_EQ("files-filled-with-zeroes/1048576"sv, tor->fileSubpath(0));
     EXPECT_EQ("files-filled-with-zeroes/4096"sv, tor->fileSubpath(1));
     EXPECT_EQ("files-filled-with-zeroes/512"sv, tor->fileSubpath(2));
