@@ -212,57 +212,57 @@ public:
 
     [[nodiscard]] auto leftUntilDone() const
     {
-        return completion.leftUntilDone();
+        return completion.left_until_done();
     }
 
     [[nodiscard]] auto sizeWhenDone() const
     {
-        return completion.sizeWhenDone();
+        return completion.size_when_done();
     }
 
     [[nodiscard]] constexpr auto hasMetainfo() const noexcept
     {
-        return completion.hasMetainfo();
+        return completion.has_metainfo();
     }
 
     [[nodiscard]] constexpr auto hasAll() const noexcept
     {
-        return completion.hasAll();
+        return completion.has_all();
     }
 
     [[nodiscard]] constexpr auto hasNone() const noexcept
     {
-        return completion.hasNone();
+        return completion.has_none();
     }
 
     [[nodiscard]] auto hasPiece(tr_piece_index_t piece) const
     {
-        return completion.hasPiece(piece);
+        return completion.has_piece(piece);
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto hasBlock(tr_block_index_t block) const
     {
-        return completion.hasBlock(block);
+        return completion.has_block(block);
     }
 
     [[nodiscard]] auto countMissingBlocksInPiece(tr_piece_index_t piece) const
     {
-        return completion.countMissingBlocksInPiece(piece);
+        return completion.count_missing_blocks_in_piece(piece);
     }
 
     [[nodiscard]] auto countMissingBytesInPiece(tr_piece_index_t piece) const
     {
-        return completion.countMissingBytesInPiece(piece);
+        return completion.count_missing_bytes_in_piece(piece);
     }
 
     [[nodiscard]] constexpr auto hasTotal() const
     {
-        return completion.hasTotal();
+        return completion.has_total();
     }
 
     [[nodiscard]] auto createPieceBitfield() const
     {
-        return completion.createPieceBitfield();
+        return completion.create_piece_bitfield();
     }
 
     [[nodiscard]] constexpr bool isDone() const noexcept
@@ -287,14 +287,14 @@ public:
 
     void amountDoneBins(float* tab, int n_tabs) const
     {
-        return completion.amountDone(tab, n_tabs);
+        return completion.amount_done(tab, n_tabs);
     }
 
     void setBlocks(tr_bitfield blocks);
 
     void setHasPiece(tr_piece_index_t piece, bool has)
     {
-        completion.setHasPiece(piece, has);
+        completion.set_has_piece(piece, has);
     }
 
     /// FILE <-> PIECE
@@ -316,7 +316,7 @@ public:
 
     /// WANTED
 
-    [[nodiscard]] bool pieceIsWanted(tr_piece_index_t piece) const final
+    [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const final
     {
         return files_wanted_.pieceWanted(piece);
     }
@@ -931,7 +931,7 @@ private:
         auto const lock = unique_lock();
 
         files_wanted_.set(files, n_files, wanted);
-        completion.invalidateSizeWhenDone();
+        completion.invalidate_size_when_done();
 
         if (!is_bootstrapping)
         {

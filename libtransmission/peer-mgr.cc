@@ -878,7 +878,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const override
         {
-            return torrent_->pieceIsWanted(piece) && peer_->hasPiece(piece);
+            return torrent_->piece_is_wanted(piece) && peer_->hasPiece(piece);
         }
 
         [[nodiscard]] bool isEndgame() const override
@@ -1502,7 +1502,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (tr_piece_index_t i = 0, n = tor->pieceCount(); i < n; ++i)
     {
-        if (tor->pieceIsWanted(i) && available.test(i))
+        if (tor->piece_is_wanted(i) && available.test(i))
         {
             desired_available += tor->countMissingBytesInPiece(i);
         }
@@ -1708,7 +1708,7 @@ void updateInterest(tr_swarm* swarm)
         piece_is_interesting.resize(n);
         for (int i = 0; i < n; ++i)
         {
-            piece_is_interesting[i] = tor->pieceIsWanted(i) && !tor->hasPiece(i);
+            piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->hasPiece(i);
         }
 
         for (auto* const peer : peers)
