@@ -299,31 +299,31 @@ public:
 
     /// FILE <-> PIECE
 
-    [[nodiscard]] auto piecesInFile(tr_file_index_t file) const
+    [[nodiscard]] auto pieces_in_file(tr_file_index_t file) const
     {
-        return fpm_.pieceSpan(file);
+        return fpm_.piece_span(file);
     }
 
-    [[nodiscard]] auto fileOffset(tr_block_info::Location loc) const
+    [[nodiscard]] auto file_offset(tr_block_info::Location loc) const
     {
-        return fpm_.fileOffset(loc.byte);
+        return fpm_.file_offset(loc.byte);
     }
 
-    [[nodiscard]] auto byteSpan(tr_file_index_t file) const
+    [[nodiscard]] auto byte_span(tr_file_index_t file) const
     {
-        return fpm_.byteSpan(file);
+        return fpm_.byte_span(file);
     }
 
     /// WANTED
 
     [[nodiscard]] bool piece_is_wanted(tr_piece_index_t piece) const final
     {
-        return files_wanted_.pieceWanted(piece);
+        return files_wanted_.piece_wanted(piece);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool fileIsWanted(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 bool file_is_wanted(tr_file_index_t file) const
     {
-        return files_wanted_.fileWanted(file);
+        return files_wanted_.file_wanted(file);
     }
 
     void initFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted)
@@ -340,9 +340,9 @@ public:
 
     /// PRIORITIES
 
-    [[nodiscard]] tr_priority_t piecePriority(tr_piece_index_t piece) const
+    [[nodiscard]] tr_priority_t piece_priority(tr_piece_index_t piece) const
     {
-        return file_priorities_.piecePriority(piece);
+        return file_priorities_.piece_priority(piece);
     }
 
     void setFilePriorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)

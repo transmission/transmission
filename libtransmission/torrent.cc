@@ -1614,8 +1614,8 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
     TR_ASSERT(tr_isTorrent(tor));
 
     auto const& subpath = tor->fileSubpath(file);
-    auto const priority = tor->file_priorities_.filePriority(file);
-    auto const wanted = tor->files_wanted_.fileWanted(file);
+    auto const priority = tor->file_priorities_.file_priority(file);
+    auto const wanted = tor->files_wanted_.file_wanted(file);
     auto const length = tor->fileSize(file);
 
     if (tor->completeness == TR_SEED || length == 0)
@@ -1623,7 +1623,7 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
         return { subpath.c_str(), length, length, 1.0, priority, wanted };
     }
 
-    auto const have = tor->completion.count_has_bytes_in_span(tor->fpm_.byteSpan(file));
+    auto const have = tor->completion.count_has_bytes_in_span(tor->fpm_.byte_span(file));
     return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), priority, wanted };
 }
 
@@ -2074,7 +2074,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
 // TODO(ckerr) migrate to fpm?
 tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file)
 {
-    auto const [begin_byte, end_byte] = tor->fpm_.byteSpan(file);
+    auto const [begin_byte, end_byte] = tor->fpm_.byte_span(file);
 
     auto const begin_block = tor->byteLoc(begin_byte).block;
     if (begin_byte >= end_byte) // 0-byte file
@@ -2224,7 +2224,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 
     for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
-        if (auto const wanted = tor->files_wanted_.fileWanted(i); !wanted)
+        if (auto const wanted = tor->files_wanted_.file_wanted(i); !wanted)
         {
             continue;
         }
@@ -2319,7 +2319,7 @@ void onPieceCompleted(tr_torrent* tor, tr_piece_index_t piece)
     tr_peerMgrPieceCompleted(tor, piece);
 
     // if this piece completes any file, invoke the fileCompleted func for it
-    auto const span = tor->fpm_.fileSpan(piece);
+    auto const span = tor->fpm_.file_span(piece);
     for (auto file = span.begin; file < span.end; ++file)
     {
         if (tor->completion.has_blocks(tr_torGetFileBlockSpan(tor, file)))
@@ -2709,7 +2709,7 @@ void tr_torrent::initCheckedPieces(tr_bitfield const& checked, time_t const* mti
         // if a file has changed, mark its pieces as unchecked
         if (mtime == 0 || mtime != mtimes[i])
         {
-            auto const [begin, end] = piecesInFile(i);
+            auto const [begin, end] = pieces_in_file(i);
             checked_pieces_.unset_span(begin, end);
         }
     }

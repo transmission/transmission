@@ -514,7 +514,7 @@ void task_request_next_chunk(tr_webseed_task* task)
 
     auto const loc = tor->byteLoc(task->loc.byte + evbuffer_get_length(task->content()));
 
-    auto const [file_index, file_offset] = tor->fileOffset(loc);
+    auto const [file_index, file_offset] = tor->file_offset(loc);
     auto const left_in_file = tor->fileSize(file_index) - file_offset;
     auto const left_in_task = task->end_byte - loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);

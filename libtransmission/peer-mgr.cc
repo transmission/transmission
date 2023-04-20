@@ -908,7 +908,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override
         {
-            return torrent_->piecePriority(piece);
+            return torrent_->piece_priority(piece);
         }
 
         [[nodiscard]] bool isSequentialDownload() const override
