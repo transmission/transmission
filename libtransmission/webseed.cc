@@ -264,7 +264,7 @@ public:
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         auto* const tor = getTorrent();
-        if (tor == nullptr || !tor->isRunning || tor->is_done())
+        if (tor == nullptr || !tor->is_running() || tor->is_done())
         {
             return;
         }
@@ -288,7 +288,7 @@ public:
             return {};
         }
 
-        if (auto const* const tor = getTorrent(); tor == nullptr || !tor->isRunning || tor->is_done())
+        if (auto const* const tor = getTorrent(); tor == nullptr || !tor->is_running() || tor->is_done())
         {
             return {};
         }

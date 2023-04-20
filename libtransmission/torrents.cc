@@ -26,17 +26,17 @@ struct CompareTorrentByHash
 
     bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
-        return (*this)(a->infoHash(), b->infoHash());
+        return (*this)(a->info_hash(), b->info_hash());
     }
 
     bool operator()(tr_torrent const* a, tr_sha1_digest_t const& b) const
     {
-        return (*this)(a->infoHash(), b);
+        return (*this)(a->info_hash(), b);
     }
 
     bool operator()(tr_sha1_digest_t const& a, tr_torrent const* b) const
     {
-        return (*this)(a, b->infoHash());
+        return (*this)(a, b->info_hash());
     }
 };
 

@@ -88,19 +88,19 @@ public:
     {
     }
 
-    void setLocation(
+    void set_location(
         std::string_view location,
         bool move_from_old_path,
         double volatile* setme_progress,
         int volatile* setme_state);
 
-    void renamePath(
+    void rename_path(
         std::string_view oldpath,
         std::string_view newname,
         tr_torrent_rename_done_func callback,
         void* callback_user_data);
 
-    tr_sha1_digest_t pieceHash(tr_piece_index_t i) const
+    tr_sha1_digest_t piece_hash(tr_piece_index_t i) const
     {
         return metainfo_.piece_hash(i);
     }
@@ -110,7 +110,7 @@ public:
     // because much of tr_torrent's impl is in the non-member C bindings
 
     // Used to add metainfo to a magnet torrent.
-    void setMetainfo(tr_torrent_metainfo tm);
+    void set_metainfo(tr_torrent_metainfo tm);
 
     [[nodiscard]] auto unique_lock() const
     {
@@ -129,33 +129,33 @@ public:
         return bandwidth_;
     }
 
-    constexpr void setSpeedLimitBps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
+    constexpr void set_speed_limit_bps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
     {
         if (bandwidth().set_desired_speed_bytes_per_second(dir, bytes_per_second))
         {
-            setDirty();
+            set_dirty();
         }
     }
 
-    constexpr void useSpeedLimit(tr_direction dir, bool do_use)
+    constexpr void use_speed_limit(tr_direction dir, bool do_use)
     {
         if (bandwidth().set_limited(dir, do_use))
         {
-            setDirty();
+            set_dirty();
         }
     }
 
-    [[nodiscard]] constexpr auto speedLimitBps(tr_direction dir) const
+    [[nodiscard]] constexpr auto speed_limit_bps(tr_direction dir) const
     {
         return bandwidth().get_desired_speed_bytes_per_second(dir);
     }
 
-    [[nodiscard]] constexpr auto usesSessionLimits() const noexcept
+    [[nodiscard]] constexpr auto uses_session_limits() const noexcept
     {
         return bandwidth().are_parent_limits_honored(TR_UP);
     }
 
-    [[nodiscard]] constexpr auto usesSpeedLimit(tr_direction dir) const noexcept
+    [[nodiscard]] constexpr auto uses_speed_limit(tr_direction dir) const noexcept
     {
         return bandwidth().is_limited(dir);
     }
@@ -290,9 +290,9 @@ public:
         return completion.amount_done(tab, n_tabs);
     }
 
-    void setBlocks(tr_bitfield blocks);
+    void set_blocks(tr_bitfield blocks);
 
-    void setHasPiece(tr_piece_index_t piece, bool has)
+    void set_has_piece(tr_piece_index_t piece, bool has)
     {
         completion.set_has_piece(piece, has);
     }
@@ -326,17 +326,17 @@ public:
         return files_wanted_.file_wanted(file);
     }
 
-    void initFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted)
+    void init_files_wanted(tr_file_index_t const* files, size_t n_files, bool wanted)
     {
-        setFilesWanted(files, n_files, wanted, /*is_bootstrapping*/ true);
+        set_files_wanted(files, n_files, wanted, /*is_bootstrapping*/ true);
     }
 
-    void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted)
+    void set_files_wanted(tr_file_index_t const* files, size_t n_files, bool wanted)
     {
-        setFilesWanted(files, n_files, wanted, /*is_bootstrapping*/ false);
+        set_files_wanted(files, n_files, wanted, /*is_bootstrapping*/ false);
     }
 
-    void recheckCompleteness(); // TODO(ckerr): should be private
+    void recheck_completeness(); // TODO(ckerr): should be private
 
     /// PRIORITIES
 
@@ -345,33 +345,33 @@ public:
         return file_priorities_.piece_priority(piece);
     }
 
-    void setFilePriorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
+    void set_file_priorities(tr_file_index_t const* files, tr_file_index_t file_count, tr_priority_t priority)
     {
         file_priorities_.set(files, file_count, priority);
-        setDirty();
+        set_dirty();
     }
 
-    void setFilePriority(tr_file_index_t file, tr_priority_t priority)
+    void set_file_priority(tr_file_index_t file, tr_priority_t priority)
     {
         file_priorities_.set(file, priority);
-        setDirty();
+        set_dirty();
     }
 
     /// LOCATION
 
-    [[nodiscard]] constexpr tr_interned_string currentDir() const noexcept
+    [[nodiscard]] constexpr tr_interned_string current_dir() const noexcept
     {
-        return this->current_dir;
+        return current_dir_;
     }
 
-    [[nodiscard]] constexpr tr_interned_string downloadDir() const noexcept
+    [[nodiscard]] constexpr tr_interned_string download_dir() const noexcept
     {
-        return this->download_dir;
+        return download_dir_;
     }
 
-    [[nodiscard]] constexpr tr_interned_string incompleteDir() const noexcept
+    [[nodiscard]] constexpr tr_interned_string incomplete_dir() const noexcept
     {
-        return this->incomplete_dir;
+        return incomplete_dir_;
     }
 
     /// METAINFO - FILES
@@ -402,38 +402,38 @@ public:
 
     /// METAINFO - TRACKERS
 
-    [[nodiscard]] constexpr auto const& announceList() const noexcept
+    [[nodiscard]] constexpr auto const& announce_list() const noexcept
     {
         return metainfo_.announce_list();
     }
 
-    [[nodiscard]] constexpr auto& announceList() noexcept
+    [[nodiscard]] constexpr auto& announce_list() noexcept
     {
         return metainfo_.announce_list();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto trackerCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto tracker_count() const noexcept
     {
-        return std::size(this->announceList());
+        return std::size(this->announce_list());
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto const& tracker(size_t i) const
     {
-        return this->announceList().at(i);
+        return this->announce_list().at(i);
     }
 
-    [[nodiscard]] auto trackerList() const
+    [[nodiscard]] auto tracker_list() const
     {
-        return this->announceList().toString();
+        return this->announce_list().toString();
     }
 
-    bool setTrackerList(std::string_view text);
+    bool set_tracker_list(std::string_view text);
 
-    void onTrackerResponse(tr_tracker_event const* event);
+    void on_tracker_response(tr_tracker_event const* event);
 
     /// METAINFO - WEBSEEDS
 
-    [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto webseed_count() const noexcept
     {
         return metainfo_.webseed_count();
     }
@@ -445,7 +445,7 @@ public:
 
     /// METAINFO - OTHER
 
-    void setName(std::string_view name)
+    void set_name(std::string_view name)
     {
         metainfo_.set_name(name);
     }
@@ -455,42 +455,42 @@ public:
         return metainfo_.name();
     }
 
-    [[nodiscard]] constexpr auto const& infoHash() const noexcept
+    [[nodiscard]] constexpr auto const& info_hash() const noexcept
     {
         return metainfo_.info_hash();
     }
 
-    [[nodiscard]] constexpr auto isPrivate() const noexcept
+    [[nodiscard]] constexpr auto is_private() const noexcept
     {
         return metainfo_.is_private();
     }
 
-    [[nodiscard]] constexpr auto isPublic() const noexcept
+    [[nodiscard]] constexpr auto is_public() const noexcept
     {
-        return !this->isPrivate();
+        return !this->is_private();
     }
 
-    [[nodiscard]] constexpr auto const& infoHashString() const noexcept
+    [[nodiscard]] constexpr auto const& info_hash_string() const noexcept
     {
         return metainfo_.info_hash_string();
     }
 
-    [[nodiscard]] constexpr auto dateCreated() const noexcept
+    [[nodiscard]] constexpr auto date_created() const noexcept
     {
         return metainfo_.date_created();
     }
 
-    [[nodiscard]] auto torrentFile() const
+    [[nodiscard]] auto torrent_file() const
     {
         return metainfo_.torrent_file(session->torrentDir());
     }
 
-    [[nodiscard]] auto magnetFile() const
+    [[nodiscard]] auto magnet_file() const
     {
         return metainfo_.magnet_file(session->torrentDir());
     }
 
-    [[nodiscard]] auto resumeFile() const
+    [[nodiscard]] auto resume_file() const
     {
         return metainfo_.resume_file(session->resumeDir());
     }
@@ -515,90 +515,90 @@ public:
         return metainfo_.source();
     }
 
-    [[nodiscard]] constexpr auto infoDictSize() const noexcept
+    [[nodiscard]] constexpr auto info_dict_size() const noexcept
     {
         return metainfo_.info_dict_size();
     }
 
-    [[nodiscard]] constexpr auto infoDictOffset() const noexcept
+    [[nodiscard]] constexpr auto info_dict_offset() const noexcept
     {
         return metainfo_.info_dict_offset();
     }
 
     /// METAINFO - PIECE CHECKSUMS
 
-    [[nodiscard]] TR_CONSTEXPR20 bool isPieceChecked(tr_piece_index_t piece) const
+    [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
     {
         return checked_pieces_.test(piece);
     }
 
-    [[nodiscard]] bool checkPiece(tr_piece_index_t piece);
+    [[nodiscard]] bool check_piece(tr_piece_index_t piece);
 
-    [[nodiscard]] bool ensurePieceIsChecked(tr_piece_index_t piece);
+    [[nodiscard]] bool ensure_piece_is_checked(tr_piece_index_t piece);
 
-    void initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
+    void init_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
 
     ///
 
-    [[nodiscard]] constexpr auto isQueued() const noexcept
+    [[nodiscard]] constexpr auto is_queued() const noexcept
     {
-        return this->is_queued;
+        return this->is_queued_;
     }
 
-    [[nodiscard]] constexpr auto queueDirection() const noexcept
+    [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
         return this->is_done() ? TR_UP : TR_DOWN;
     }
 
-    [[nodiscard]] constexpr auto allowsPex() const noexcept
+    [[nodiscard]] constexpr auto allows_pex() const noexcept
     {
-        return this->isPublic() && this->session->allowsPEX();
+        return this->is_public() && this->session->allowsPEX();
     }
 
-    [[nodiscard]] constexpr auto allowsDht() const noexcept
+    [[nodiscard]] constexpr auto allows_dht() const noexcept
     {
-        return this->isPublic() && this->session->allowsDHT();
+        return this->is_public() && this->session->allowsDHT();
     }
 
-    [[nodiscard]] constexpr auto allowsLpd() const noexcept // local peer discovery
+    [[nodiscard]] constexpr auto allows_lpd() const noexcept // local peer discovery
     {
-        return this->isPublic() && this->session->allowsLPD();
+        return this->is_public() && this->session->allowsLPD();
     }
 
-    [[nodiscard]] constexpr bool clientCanDownload() const
+    [[nodiscard]] constexpr bool client_can_download() const
     {
-        return this->isPieceTransferAllowed(TR_PEER_TO_CLIENT);
+        return this->is_piece_transfer_allowed(TR_PEER_TO_CLIENT);
     }
 
-    [[nodiscard]] constexpr bool clientCanUpload() const
+    [[nodiscard]] constexpr bool client_can_upload() const
     {
-        return this->isPieceTransferAllowed(TR_CLIENT_TO_PEER);
+        return this->is_piece_transfer_allowed(TR_CLIENT_TO_PEER);
     }
 
-    void setLocalError(std::string_view errmsg)
+    void set_local_error(std::string_view errmsg)
     {
         this->error = TR_STAT_LOCAL_ERROR;
         this->error_announce_url = TR_KEY_NONE;
         this->error_string = errmsg;
     }
 
-    void setDownloadDir(std::string_view path, bool is_new_torrent = false);
+    void set_download_dir(std::string_view path, bool is_new_torrent = false);
 
-    void refreshCurrentDir();
+    void refresh_current_dir();
 
-    void setVerifyState(tr_verify_state state);
+    void set_verify_state(tr_verify_state state);
 
-    [[nodiscard]] constexpr auto verifyState() const noexcept
+    [[nodiscard]] constexpr auto verify_state() const noexcept
     {
         return verify_state_;
     }
 
-    constexpr void setVerifyProgress(float f) noexcept
+    constexpr void set_verify_progress(float f) noexcept
     {
         verify_progress_ = f;
     }
 
-    [[nodiscard]] constexpr std::optional<float> verifyProgress() const noexcept
+    [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
     {
         if (verify_state_ == TR_VERIFY_NOW)
         {
@@ -613,7 +613,7 @@ public:
         return unique_id_;
     }
 
-    constexpr void setDateActive(time_t t) noexcept
+    constexpr void set_date_active(time_t t) noexcept
     {
         this->activityDate = t;
 
@@ -627,22 +627,22 @@ public:
     {
         bool const is_seed = this->is_done();
 
-        if (this->verifyState() == TR_VERIFY_NOW)
+        if (this->verify_state() == TR_VERIFY_NOW)
         {
             return TR_STATUS_CHECK;
         }
 
-        if (this->verifyState() == TR_VERIFY_WAIT)
+        if (this->verify_state() == TR_VERIFY_WAIT)
         {
             return TR_STATUS_CHECK_WAIT;
         }
 
-        if (this->isRunning)
+        if (this->is_running())
         {
             return is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
         }
 
-        if (this->isQueued())
+        if (this->is_queued())
         {
             if (is_seed && this->session->queueEnabled(TR_UP))
             {
@@ -662,76 +662,91 @@ public:
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
-    [[nodiscard]] std::string_view primaryMimeType() const;
+    [[nodiscard]] std::string_view primary_mime_type() const;
 
-    constexpr void setSequentialDownload(bool is_sequential) noexcept
+    constexpr void set_sequential_download(bool is_sequential) noexcept
     {
-        this->sequential_download_ = is_sequential;
+        sequential_download_ = is_sequential;
     }
 
-    [[nodiscard]] constexpr auto isSequentialDownload() const noexcept
+    [[nodiscard]] constexpr auto is_sequential_download() const noexcept
     {
-        return this->sequential_download_;
+        return sequential_download_;
     }
 
-    constexpr void setDirty() noexcept
+    [[nodiscard]] constexpr bool is_running() const noexcept
     {
-        this->isDirty = true;
+        return is_running_;
     }
 
-    void markEdited();
-    void markChanged();
+    [[nodiscard]] constexpr auto is_stopping() const noexcept
+    {
+        return is_stopping_;
+    }
 
-    void setBandwidthGroup(std::string_view group_name) noexcept;
+    [[nodiscard]] constexpr auto is_dirty() const noexcept
+    {
+        return is_dirty_;
+    }
 
-    [[nodiscard]] constexpr auto getPriority() const noexcept
+    constexpr void set_dirty(bool dirty = true) noexcept
+    {
+        is_dirty_ = dirty;
+    }
+
+    void mark_edited();
+    void mark_changed();
+
+    void set_bandwidth_group(std::string_view group_name) noexcept;
+
+    [[nodiscard]] constexpr auto get_priority() const noexcept
     {
         return bandwidth().get_priority();
     }
 
-    [[nodiscard]] constexpr auto const& bandwidthGroup() const noexcept
+    [[nodiscard]] constexpr auto const& bandwidth_group() const noexcept
     {
         return bandwidth_group_;
     }
 
-    [[nodiscard]] constexpr auto idleLimitMode() const noexcept
+    [[nodiscard]] constexpr auto idle_limit_mode() const noexcept
     {
         return idle_limit_mode_;
     }
 
-    [[nodiscard]] constexpr auto idleLimitMinutes() const noexcept
+    [[nodiscard]] constexpr auto idle_limit_minutes() const noexcept
     {
         return idle_limit_minutes_;
     }
 
-    [[nodiscard]] constexpr auto peerLimit() const noexcept
+    [[nodiscard]] constexpr auto peer_limit() const noexcept
     {
         return max_connected_peers_;
     }
 
-    constexpr void setRatioMode(tr_ratiolimit mode) noexcept
+    constexpr void set_ratio_mode(tr_ratiolimit mode) noexcept
     {
         if (ratioLimitMode != mode)
         {
             ratioLimitMode = mode;
-            setDirty();
+            set_dirty();
         }
     }
 
-    constexpr void setIdleLimit(uint16_t idle_minutes) noexcept
+    constexpr void set_idle_limit(uint16_t idle_minutes) noexcept
     {
         if ((idle_limit_minutes_ != idle_minutes) && (idle_minutes > 0))
         {
             idle_limit_minutes_ = idle_minutes;
-            setDirty();
+            set_dirty();
         }
     }
 
-    [[nodiscard]] constexpr auto secondsDownloading(time_t now) const noexcept
+    [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
     {
         auto n_secs = seconds_downloading_before_current_start_;
 
-        if (isRunning)
+        if (is_running())
         {
             if (doneDate > startDate)
             {
@@ -746,11 +761,11 @@ public:
         return n_secs;
     }
 
-    [[nodiscard]] constexpr auto secondsSeeding(time_t now) const noexcept
+    [[nodiscard]] constexpr auto seconds_seeding(time_t now) const noexcept
     {
         auto n_secs = seconds_seeding_before_current_start_;
 
-        if (isRunning)
+        if (is_running())
         {
             if (doneDate > startDate)
             {
@@ -775,10 +790,10 @@ public:
         if (needs_completeness_check_)
         {
             needs_completeness_check_ = false;
-            recheckCompleteness();
+            recheck_completeness();
         }
 
-        if (isStopping)
+        if (is_stopping_)
         {
             tr_torrentStop(this);
         }
@@ -797,7 +812,7 @@ public:
     // should be called when done modifying the torrent's announce list.
     void on_announce_list_changed()
     {
-        markEdited();
+        mark_edited();
         session->announcer_->resetTorrent(this);
     }
 
@@ -866,15 +881,15 @@ public:
     tr_interned_string error_announce_url;
 
     // Where the files are when the torrent is complete.
-    tr_interned_string download_dir;
+    tr_interned_string download_dir_;
 
     // Where the files are when the torrent is incomplete.
     // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
-    tr_interned_string incomplete_dir;
+    tr_interned_string incomplete_dir_;
 
     // Where the files are now.
     // Will equal either download_dir or incomplete_dir
-    tr_interned_string current_dir;
+    tr_interned_string current_dir_;
 
     tr_stat_errtype error = TR_STAT_OK;
 
@@ -895,27 +910,27 @@ public:
 
     uint16_t idle_limit_minutes_ = 0;
 
-    bool finishedSeedingByIdle = false;
+    bool finished_seeding_by_idle_ = false;
 
-    bool isDeleting = false;
-    bool isDirty = false;
-    bool is_queued = false;
-    bool isRunning = false;
-    bool isStopping = false;
+    bool is_deleting_ = false;
+    bool is_dirty_ = false;
+    bool is_queued_ = false;
+    bool is_running_ = false;
+    bool is_stopping_ = false;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
     bool start_when_stable = false;
 
 private:
-    [[nodiscard]] constexpr bool isPieceTransferAllowed(tr_direction direction) const noexcept
+    [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
-        if (usesSpeedLimit(direction) && speedLimitBps(direction) <= 0)
+        if (uses_speed_limit(direction) && speed_limit_bps(direction) <= 0)
         {
             return false;
         }
 
-        if (usesSessionLimits())
+        if (uses_session_limits())
         {
             if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
             {
@@ -926,7 +941,7 @@ private:
         return true;
     }
 
-    void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
+    void set_files_wanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
     {
         auto const lock = unique_lock();
 
@@ -935,8 +950,8 @@ private:
 
         if (!is_bootstrapping)
         {
-            setDirty();
-            recheckCompleteness();
+            set_dirty();
+            recheck_completeness();
         }
     }
 

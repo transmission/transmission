@@ -87,7 +87,7 @@ bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_
 
     // We didn't find the file that we want to write to.
     // Let's figure out where it goes so that we can create it.
-    auto const base = tor->currentDir();
+    auto const base = tor->current_dir();
     auto const suffix = tor->session->isIncompleteFileNamingEnabled() ? tr_torrent_files::PartialFileSuffix : ""sv;
     setme.assign(base, '/', tor->file_subpath(file_index), suffix);
     return true;
@@ -216,7 +216,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
         {
             if (io_mode == IoMode::Write && tor->error != TR_STAT_LOCAL_ERROR)
             {
-                tor->setLocalError(error->message);
+                tor->set_local_error(error->message);
                 tr_torrentStop(tor);
             }
 
@@ -300,5 +300,5 @@ int tr_ioWrite(tr_torrent* tor, tr_block_info::Location const& loc, size_t len, 
 bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece)
 {
     auto const hash = recalculateHash(tor, piece);
-    return hash && *hash == tor->pieceHash(piece);
+    return hash && *hash == tor->piece_hash(piece);
 }

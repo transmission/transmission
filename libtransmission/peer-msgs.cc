@@ -302,7 +302,7 @@ public:
         , callback_{ callback }
         , callback_data_{ callback_data }
     {
-        if (torrent->allowsPex())
+        if (torrent->allows_pex())
         {
             pex_timer_ = session->timerMaker().create([this]() { sendPex(); });
             pex_timer_->startRepeating(SendPexInterval);
@@ -479,7 +479,7 @@ public:
 
     void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
-        TR_ASSERT(torrent->clientCanDownload());
+        TR_ASSERT(torrent->client_can_download());
         TR_ASSERT(client_is_interested());
         TR_ASSERT(!client_is_choked());
 
@@ -537,13 +537,13 @@ private:
         // TODO: this needs to consider all the other peers as well...
         uint64_t const now = tr_time_msec();
         auto rate_bytes_per_second = get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
-        if (torrent->usesSpeedLimit(TR_PEER_TO_CLIENT))
+        if (torrent->uses_speed_limit(TR_PEER_TO_CLIENT))
         {
-            rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speedLimitBps(TR_PEER_TO_CLIENT));
+            rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speed_limit_bps(TR_PEER_TO_CLIENT));
         }
 
         // honor the session limits, if enabled
-        if (torrent->usesSessionLimits())
+        if (torrent->uses_session_limits())
         {
             if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
                 irate_bytes_per_second)
@@ -914,11 +914,11 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     msgs->clientSentLtepHandshake = true;
 
     /* decide if we want to advertise metadata xfer support (BEP 9) */
-    bool const allow_metadata_xfer = msgs->torrent->isPublic();
+    bool const allow_metadata_xfer = msgs->torrent->is_public();
 
     /* decide if we want to advertise pex support */
     auto allow_pex = bool{};
-    if (!msgs->torrent->allowsPex())
+    if (!msgs->torrent->allows_pex())
     {
         allow_pex = false;
     }
@@ -945,7 +945,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // It also adds "metadata_size" to the handshake message (not the
     // "m" dictionary) specifying an integer value of the number of
     // bytes of the metadata.
-    if (auto const info_dict_size = msgs->torrent->infoDictSize();
+    if (auto const info_dict_size = msgs->torrent->info_dict_size();
         allow_metadata_xfer && msgs->torrent->has_metainfo() && info_dict_size > 0)
     {
         tr_variantDictAddInt(&val, TR_KEY_metadata_size, info_dict_size);
@@ -1158,7 +1158,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload_in)
 
     if (msg_type == MetadataMsgType::Request)
     {
-        if (piece >= 0 && msgs->torrent->has_metainfo() && msgs->torrent->isPublic() &&
+        if (piece >= 0 && msgs->torrent->has_metainfo() && msgs->torrent->is_public() &&
             std::size(msgs->peerAskedForMetadata) < MetadataReqQ)
         {
             msgs->peerAskedForMetadata.push(piece);
@@ -1179,7 +1179,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload_in)
 void parseUtPex(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
 {
     auto* const tor = msgs->torrent;
-    if (!tor->allowsPex())
+    if (!tor->allows_pex())
     {
         return;
     }
@@ -1793,7 +1793,7 @@ void updateBlockRequests(tr_peerMsgsImpl* msgs)
 {
     auto* const tor = msgs->torrent;
 
-    if (!tor->clientCanDownload())
+    if (!tor->client_can_download())
     {
         return;
     }
@@ -1853,7 +1853,7 @@ namespace peer_pulse_helpers
     tr_variantInitDict(&tmp, 3);
     tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
     tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
-    tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->infoDictSize());
+    tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->info_dict_size());
     auto const n_bytes_written = protocol_send_message(
         msgs,
         BtPeerMsgs::Ltep,
@@ -1879,11 +1879,11 @@ namespace peer_pulse_helpers
 
     if (ok)
     {
-        ok = msgs->torrent->ensurePieceIsChecked(req.index);
+        ok = msgs->torrent->ensure_piece_is_checked(req.index);
 
         if (!ok)
         {
-            msgs->torrent->setLocalError(
+            msgs->torrent->set_local_error(
                 fmt::format(FMT_STRING("Please Verify Local Data! Piece #{:d} is corrupt."), req.index));
         }
     }
@@ -1989,7 +1989,7 @@ void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 void tr_peerMsgsImpl::sendPex()
 {
     // only send pex if both the torrent and peer support it
-    if (!this->peerSupportsPex || !this->torrent->allowsPex())
+    if (!this->peerSupportsPex || !this->torrent->allows_pex())
     {
         return;
     }

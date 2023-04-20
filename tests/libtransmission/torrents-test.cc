@@ -42,7 +42,7 @@ TEST_F(TorrentsTest, simpleTests)
     EXPECT_EQ(1U, std::size(torrents));
 
     EXPECT_EQ(tor, torrents.get(id));
-    EXPECT_EQ(tor, torrents.get(tor->infoHash()));
+    EXPECT_EQ(tor, torrents.get(tor->info_hash()));
     EXPECT_EQ(tor, torrents.get(tor->magnet()));
 
     tm = tr_torrent_metainfo{};
