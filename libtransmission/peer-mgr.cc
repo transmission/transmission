@@ -77,7 +77,7 @@ private:
         info.info_hash = tor->infoHash();
         info.client_peer_id = tor->peer_id();
         info.id = tor->id();
-        info.is_done = tor->isDone();
+        info.is_done = tor->is_done();
         return info;
     }
 
@@ -358,7 +358,7 @@ public:
 
     [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
     {
-        if (!tor->isRunning || tor->isDone())
+        if (!tor->isRunning || tor->is_done())
         {
             return {};
         }
@@ -421,7 +421,7 @@ public:
     {
         /* we consider ourselves to be in endgame if the number of bytes
            we've got requested is >= the number of bytes left to download */
-        is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->leftUntilDone();
+        is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->left_until_done();
     }
 
     [[nodiscard]] constexpr auto isEndgame() const noexcept
@@ -873,7 +873,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const override
         {
-            return !torrent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
+            return !torrent_->has_block(block) && !swarm_->active_requests.has(block, peer_);
         }
 
         [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const override
@@ -893,7 +893,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] size_t countMissingBlocks(tr_piece_index_t piece) const override
         {
-            return torrent_->countMissingBlocksInPiece(piece);
+            return torrent_->count_missing_blocks_in_piece(piece);
         }
 
         [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const override
@@ -1275,7 +1275,7 @@ struct CompareAtomsByUsefulness
 
 [[nodiscard]] bool isAtomInteresting(tr_torrent const* tor, peer_atom const& atom)
 {
-    if (tor->isDone() && atom.isSeed())
+    if (tor->is_done() && atom.isSeed())
     {
         return false;
     }
@@ -1420,12 +1420,12 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
 
 int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece)
 {
-    if (!tor->hasMetainfo())
+    if (!tor->has_metainfo())
     {
         return 0;
     }
 
-    if (tor->isSeed() || tor->hasPiece(piece))
+    if (tor->is_seed() || tor->has_piece(piece))
     {
         return -1;
     }
@@ -1476,7 +1476,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     // common shortcuts...
 
-    if (!tor->isRunning || tor->isStopping || tor->isDone() || !tor->hasMetainfo())
+    if (!tor->isRunning || tor->isStopping || tor->is_done() || !tor->has_metainfo())
     {
         return 0;
     }
@@ -1495,7 +1495,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     if (available.has_all())
     {
-        return tor->leftUntilDone();
+        return tor->left_until_done();
     }
 
     auto desired_available = uint64_t{};
@@ -1504,7 +1504,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     {
         if (tor->piece_is_wanted(i) && available.test(i))
         {
-            desired_available += tor->countMissingBytesInPiece(i);
+            desired_available += tor->count_missing_bytes_in_piece(i);
         }
     }
 
@@ -1670,7 +1670,7 @@ namespace update_interest_helpers
     tr_peerMsgs const* const peer)
 {
     /* these cases should have already been handled by the calling code... */
-    TR_ASSERT(!tor->isDone());
+    TR_ASSERT(!tor->is_done());
     TR_ASSERT(tor->clientCanDownload());
 
     if (peer->isSeed())
@@ -1694,7 +1694,7 @@ void updateInterest(tr_swarm* swarm)
 {
     // sometimes this function isn't necessary
     auto const* const tor = swarm->tor;
-    if (tor->isDone() || !tor->clientCanDownload())
+    if (tor->is_done() || !tor->clientCanDownload())
     {
         return;
     }
@@ -1708,7 +1708,7 @@ void updateInterest(tr_swarm* swarm)
         piece_is_interesting.resize(n);
         for (int i = 0; i < n; ++i)
         {
-            piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->hasPiece(i);
+            piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
         }
 
         for (auto* const peer : peers)
@@ -1774,7 +1774,7 @@ struct ChokeData
 /* get a rate for deciding which peers to choke and unchoke. */
 [[nodiscard]] auto getRateBps(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
 {
-    if (tor->isDone())
+    if (tor->is_done())
     {
         return peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
     }
@@ -1963,7 +1963,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     auto const* const atom = peer->atom;
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tor->isDone() && peer->isSeed())
+    if (tor->is_done() && peer->isSeed())
     {
         return !tor->allowsPex() || now - atom->time >= 30;
     }
@@ -2243,7 +2243,7 @@ namespace connect_helpers
     }
 
     // not if we're both seeds
-    if (tor->isDone() && atom.isSeed())
+    if (tor->is_done() && atom.isSeed())
     {
         return false;
     }
@@ -2332,7 +2332,7 @@ struct peer_candidate
     score = addValToKey(score, 1, i);
 
     /* prefer torrents we're downloading with */
-    i = tor->isDone() ? 1 : 0;
+    i = tor->is_done() ? 1 : 0;
     score = addValToKey(score, 1, i);
 
     /* prefer peers that are known to be connectible */
@@ -2381,7 +2381,7 @@ struct peer_candidate
 
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
-        bool const seeding = tor->isDone();
+        bool const seeding = tor->is_done();
         if (seeding && swarm->isAllSeeds() && tor->isPrivate())
         {
             continue;

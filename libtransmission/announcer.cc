@@ -914,11 +914,11 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     req.up = tier->byteCounts[TR_ANN_UP];
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req.leftUntilComplete = tor->hasMetainfo() ? tor->total_size() - tor->hasTotal() : INT64_MAX;
+    req.leftUntilComplete = tor->has_metainfo() ? tor->total_size() - tor->has_total() : INT64_MAX;
     req.event = event;
     req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req.key = tor->announce_key();
-    req.partial_seed = tor->isPartialSeed();
+    req.partial_seed = tor->is_partial_seed();
     tier->buildLogName(req.log_name, sizeof(req.log_name));
     return req;
 }
@@ -1491,7 +1491,7 @@ int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer swarms where we might download */
-    if (auto const is_done_a = a->tor->isDone(), is_done_b = b->tor->isDone(); is_done_a != is_done_b)
+    if (auto const is_done_a = a->tor->is_done(), is_done_b = b->tor->is_done(); is_done_a != is_done_b)
     {
         return is_done_a ? 1 : -1;
     }

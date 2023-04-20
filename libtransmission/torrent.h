@@ -210,72 +210,72 @@ public:
 
     /// COMPLETION
 
-    [[nodiscard]] auto leftUntilDone() const
+    [[nodiscard]] auto left_until_done() const
     {
         return completion.left_until_done();
     }
 
-    [[nodiscard]] auto sizeWhenDone() const
+    [[nodiscard]] auto size_when_done() const
     {
         return completion.size_when_done();
     }
 
-    [[nodiscard]] constexpr auto hasMetainfo() const noexcept
+    [[nodiscard]] constexpr auto has_metainfo() const noexcept
     {
         return completion.has_metainfo();
     }
 
-    [[nodiscard]] constexpr auto hasAll() const noexcept
+    [[nodiscard]] constexpr auto has_all() const noexcept
     {
         return completion.has_all();
     }
 
-    [[nodiscard]] constexpr auto hasNone() const noexcept
+    [[nodiscard]] constexpr auto has_none() const noexcept
     {
         return completion.has_none();
     }
 
-    [[nodiscard]] auto hasPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
     {
         return completion.has_piece(piece);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto hasBlock(tr_block_index_t block) const
+    [[nodiscard]] TR_CONSTEXPR20 auto has_block(tr_block_index_t block) const
     {
         return completion.has_block(block);
     }
 
-    [[nodiscard]] auto countMissingBlocksInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto count_missing_blocks_in_piece(tr_piece_index_t piece) const
     {
         return completion.count_missing_blocks_in_piece(piece);
     }
 
-    [[nodiscard]] auto countMissingBytesInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto count_missing_bytes_in_piece(tr_piece_index_t piece) const
     {
         return completion.count_missing_bytes_in_piece(piece);
     }
 
-    [[nodiscard]] constexpr auto hasTotal() const
+    [[nodiscard]] constexpr auto has_total() const
     {
         return completion.has_total();
     }
 
-    [[nodiscard]] auto createPieceBitfield() const
+    [[nodiscard]] auto create_piece_bitfield() const
     {
         return completion.create_piece_bitfield();
     }
 
-    [[nodiscard]] constexpr bool isDone() const noexcept
+    [[nodiscard]] constexpr bool is_done() const noexcept
     {
         return completeness != TR_LEECH;
     }
 
-    [[nodiscard]] constexpr bool isSeed() const noexcept
+    [[nodiscard]] constexpr bool is_seed() const noexcept
     {
         return completeness == TR_SEED;
     }
 
-    [[nodiscard]] constexpr bool isPartialSeed() const noexcept
+    [[nodiscard]] constexpr bool is_partial_seed() const noexcept
     {
         return completeness == TR_PARTIAL_SEED;
     }
@@ -285,7 +285,7 @@ public:
         return completion.blocks();
     }
 
-    void amountDoneBins(float* tab, int n_tabs) const
+    void amount_done_bins(float* tab, int n_tabs) const
     {
         return completion.amount_done(tab, n_tabs);
     }
@@ -376,29 +376,29 @@ public:
 
     /// METAINFO - FILES
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
     {
         return metainfo_.file_count();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto const& fileSubpath(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto const& file_subpath(tr_file_index_t i) const
     {
         return metainfo_.file_subpath(i);
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const
+    [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const
     {
         return metainfo_.file_size(i);
     }
 
-    void setFileSubpath(tr_file_index_t i, std::string_view subpath)
+    void set_file_subpath(tr_file_index_t i, std::string_view subpath)
     {
         metainfo_.set_file_subpath(i, subpath);
     }
 
-    [[nodiscard]] std::optional<tr_torrent_files::FoundFile> findFile(tr_file_index_t file_index) const;
+    [[nodiscard]] std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const;
 
-    [[nodiscard]] bool hasAnyLocalData() const;
+    [[nodiscard]] bool has_any_local_data() const;
 
     /// METAINFO - TRACKERS
 
@@ -547,7 +547,7 @@ public:
 
     [[nodiscard]] constexpr auto queueDirection() const noexcept
     {
-        return this->isDone() ? TR_UP : TR_DOWN;
+        return this->is_done() ? TR_UP : TR_DOWN;
     }
 
     [[nodiscard]] constexpr auto allowsPex() const noexcept
@@ -625,7 +625,7 @@ public:
 
     [[nodiscard]] constexpr auto activity() const noexcept
     {
-        bool const is_seed = this->isDone();
+        bool const is_seed = this->is_done();
 
         if (this->verifyState() == TR_VERIFY_NOW)
         {

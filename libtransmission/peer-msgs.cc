@@ -528,7 +528,7 @@ public:
 private:
     [[nodiscard]] size_t maxAvailableReqs() const
     {
-        if (torrent->isDone() || !torrent->hasMetainfo() || client_is_choked() || !client_is_interested())
+        if (torrent->is_done() || !torrent->has_metainfo() || client_is_choked() || !client_is_interested())
         {
             return 0;
         }
@@ -574,13 +574,13 @@ private:
 
         // TR_PEER_TO_CLIENT
 
-        if (!torrent->hasMetainfo())
+        if (!torrent->has_metainfo())
         {
             return true;
         }
 
         auto const active = client_is_interested() && !client_is_choked();
-        TR_ASSERT(!active || !torrent->isDone());
+        TR_ASSERT(!active || !torrent->is_done());
         return active;
     }
 
@@ -683,7 +683,7 @@ private:
         return len == 5U;
 
     case BtPeerMsgs::Bitfield:
-        return !tor->hasMetainfo() || len == 1 + ((tor->piece_count() + 7U) / 8U);
+        return !tor->has_metainfo() || len == 1 + ((tor->piece_count() + 7U) / 8U);
 
     case BtPeerMsgs::Request:
     case BtPeerMsgs::Cancel:
@@ -946,7 +946,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // "m" dictionary) specifying an integer value of the number of
     // bytes of the metadata.
     if (auto const info_dict_size = msgs->torrent->infoDictSize();
-        allow_metadata_xfer && msgs->torrent->hasMetainfo() && info_dict_size > 0)
+        allow_metadata_xfer && msgs->torrent->has_metainfo() && info_dict_size > 0)
     {
         tr_variantDictAddInt(&val, TR_KEY_metadata_size, info_dict_size);
     }
@@ -988,7 +988,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // the extension handshake 'upload_only'. Setting the value of this
     // key to 1 indicates that this peer is not interested in downloading
     // anything.
-    tr_variantDictAddBool(&val, TR_KEY_upload_only, msgs->torrent->isDone());
+    tr_variantDictAddBool(&val, TR_KEY_upload_only, msgs->torrent->is_done());
 
     if (allow_metadata_xfer || allow_pex)
     {
@@ -1149,7 +1149,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload_in)
         /* NOOP */
     }
 
-    if (msg_type == MetadataMsgType::Data && !msgs->torrent->hasMetainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
+    if (msg_type == MetadataMsgType::Data && !msgs->torrent->has_metainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
         piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
         size_t const piece_len = msg_end - benc_end;
@@ -1158,7 +1158,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload_in)
 
     if (msg_type == MetadataMsgType::Request)
     {
-        if (piece >= 0 && msgs->torrent->hasMetainfo() && msgs->torrent->isPublic() &&
+        if (piece >= 0 && msgs->torrent->has_metainfo() && msgs->torrent->isPublic() &&
             std::size(msgs->peerAskedForMetadata) < MetadataReqQ)
         {
             msgs->peerAskedForMetadata.push(piece);
@@ -1300,7 +1300,7 @@ void prefetchPieces(tr_peerMsgsImpl* msgs)
         return false;
     }
 
-    if (!msgs->torrent->hasPiece(req.index))
+    if (!msgs->torrent->has_piece(req.index))
     {
         logtrace(msgs, "rejecting request for a piece we don't have.");
         return false;
@@ -1431,7 +1431,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
         ui32 = payload.to_uint32();
         logtrace(msgs, fmt::format(FMT_STRING("got Have: {:d}"), ui32));
 
-        if (msgs->torrent->hasMetainfo() && ui32 >= msgs->torrent->piece_count())
+        if (msgs->torrent->has_metainfo() && ui32 >= msgs->torrent->piece_count())
         {
             msgs->publish(tr_peer_event::GotError(ERANGE));
             return { READ_ERR, {} };
@@ -1451,7 +1451,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
         {
             logtrace(msgs, "got a bitfield");
             auto const [buf, buflen] = payload.pullup();
-            msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->piece_count() : buflen * 8 };
+            msgs->have_ = tr_bitfield{ msgs->torrent->has_metainfo() ? msgs->torrent->piece_count() : buflen * 8 };
             msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(buf), buflen);
             msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
             msgs->invalidatePercentDone();
@@ -1646,7 +1646,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> 
     }
 
     auto const loc = msgs->torrent->block_loc(block);
-    if (msgs->torrent->hasPiece(loc.piece))
+    if (msgs->torrent->has_piece(loc.piece))
     {
         logtrace(msgs, "we did ask for this message, but the piece is already complete...");
         return 0;
@@ -1875,7 +1875,7 @@ namespace peer_pulse_helpers
     msgs->peer_requested_.erase(std::begin(msgs->peer_requested_));
 
     auto buf = std::array<uint8_t, tr_block_info::BlockSize>{};
-    auto ok = msgs->isValidRequest(req) && msgs->torrent->hasPiece(req.index);
+    auto ok = msgs->isValidRequest(req) && msgs->torrent->has_piece(req.index);
 
     if (ok)
     {
@@ -1972,17 +1972,17 @@ void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 {
     bool const fext = msgs->io->supports_fext();
 
-    if (fext && msgs->torrent->hasAll())
+    if (fext && msgs->torrent->has_all())
     {
         protocol_send_message(msgs, BtPeerMsgs::FextHaveAll);
     }
-    else if (fext && msgs->torrent->hasNone())
+    else if (fext && msgs->torrent->has_none())
     {
         protocol_send_message(msgs, BtPeerMsgs::FextHaveNone);
     }
-    else if (!msgs->torrent->hasNone())
+    else if (!msgs->torrent->has_none())
     {
-        protocol_send_message(msgs, BtPeerMsgs::Bitfield, msgs->torrent->createPieceBitfield());
+        protocol_send_message(msgs, BtPeerMsgs::Bitfield, msgs->torrent->create_piece_bitfield());
     }
 }
 

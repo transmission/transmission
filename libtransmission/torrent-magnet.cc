@@ -69,7 +69,7 @@ auto create_all_needed(int n_pieces)
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
-    if (tor->hasMetainfo())
+    if (tor->has_metainfo())
     {
         return false;
     }
@@ -116,7 +116,7 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
 
-    if (!tor->hasMetainfo())
+    if (!tor->has_metainfo())
     {
         return {};
     }
@@ -413,7 +413,7 @@ std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 {
-    if (tor->hasMetainfo())
+    if (tor->has_metainfo())
     {
         return 1.0;
     }

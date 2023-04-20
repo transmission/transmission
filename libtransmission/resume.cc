@@ -139,7 +139,7 @@ auto loadGroup(tr_variant* dict, tr_torrent* tor)
 
 void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
-    auto const n = tor->fileCount();
+    auto const n = tor->file_count();
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_dnd, n);
 
     for (tr_file_index_t i = 0; i < n; ++i)
@@ -153,7 +153,7 @@ auto loadDND(tr_variant* dict, tr_torrent* tor)
     auto ret = tr_resume::fields_t{};
     tr_variant* list = nullptr;
 
-    if (auto const n = tor->fileCount(); tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
+    if (auto const n = tor->file_count(); tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
     {
         auto wanted = std::vector<tr_file_index_t>{};
         auto unwanted = std::vector<tr_file_index_t>{};
@@ -196,7 +196,7 @@ auto loadDND(tr_variant* dict, tr_torrent* tor)
 
 void saveFilePriorities(tr_variant* dict, tr_torrent const* tor)
 {
-    auto const n = tor->fileCount();
+    auto const n = tor->file_count();
 
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_priority, n);
     for (tr_file_index_t i = 0; i < n; ++i)
@@ -209,7 +209,7 @@ auto loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = tr_resume::fields_t{};
 
-    auto const n = tor->fileCount();
+    auto const n = tor->file_count();
     tr_variant* list = nullptr;
     if (tr_variantDictFindList(dict, TR_KEY_priority, &list) && tr_variantListSize(list) == n)
     {
@@ -376,11 +376,11 @@ auto loadName(tr_variant* dict, tr_torrent* tor)
 
 void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 {
-    auto const n = tor->fileCount();
+    auto const n = tor->file_count();
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_files, n);
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        tr_variantListAddStrView(list, tor->fileSubpath(i));
+        tr_variantListAddStrView(list, tor->file_subpath(i));
     }
 }
 
@@ -394,14 +394,14 @@ auto loadFilenames(tr_variant* dict, tr_torrent* tor)
         return ret;
     }
 
-    auto const n_files = tor->fileCount();
+    auto const n_files = tor->file_count();
     auto const n_list = tr_variantListSize(list);
     for (tr_file_index_t i = 0; i < n_files && i < n_list; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            tor->setFileSubpath(i, sv);
+            tor->set_file_subpath(i, sv);
         }
     }
 
@@ -498,7 +498,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         auto checked = tr_bitfield(tor->piece_count());
         auto mtimes = std::vector<time_t>{};
-        auto const n_files = tor->fileCount();
+        auto const n_files = tor->file_count();
         mtimes.reserve(n_files);
 
         // try to load mtimes
@@ -765,7 +765,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
         fields_loaded |= loadProgress(&top, tor);
     }
 
-    if (!tor->isDone() && (fields_to_load & tr_resume::FilePriorities) != 0)
+    if (!tor->is_done() && (fields_to_load & tr_resume::FilePriorities) != 0)
     {
         fields_loaded |= loadFilePriorities(&top, tor);
     }
@@ -902,7 +902,7 @@ void save(tr_torrent* tor)
     tr_variantDictAddBool(&top, TR_KEY_sequentialDownload, tor->isSequentialDownload());
     savePeers(&top, tor);
 
-    if (tor->hasMetainfo())
+    if (tor->has_metainfo())
     {
         saveFilePriorities(&top, tor);
         saveDND(&top, tor);
