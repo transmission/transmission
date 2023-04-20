@@ -121,22 +121,22 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
         return {};
     }
 
-    auto const n_pieces = std::max(1, static_cast<int>(tor->infoDictSize() / METADATA_PIECE_SIZE));
+    auto const n_pieces = std::max(1, static_cast<int>(tor->info_dict_size() / METADATA_PIECE_SIZE));
     if (piece < 0 || piece >= n_pieces)
     {
         return {};
     }
 
-    auto in = std::ifstream{ tor->torrentFile(), std::ios_base::in };
+    auto in = std::ifstream{ tor->torrent_file(), std::ios_base::in };
     if (!in.is_open())
     {
         return {};
     }
 
-    auto const info_dict_size = tor->infoDictSize();
+    auto const info_dict_size = tor->info_dict_size();
     TR_ASSERT(info_dict_size > 0);
     auto const offset_in_info_dict = static_cast<uint64_t>(piece) * METADATA_PIECE_SIZE;
-    if (auto const offset_in_file = tor->infoDictOffset() + offset_in_info_dict; !in.seekg(offset_in_file))
+    if (auto const offset_in_file = tor->info_dict_offset() + offset_in_info_dict; !in.seekg(offset_in_file))
     {
         return {};
     }
@@ -160,16 +160,16 @@ bool tr_torrentUseMetainfoFromFile(
     tr_error** error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, tor->torrentFile(), error))
+    if (!tr_sys_path_copy(filename_in, tor->torrent_file(), error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnetFile());
+    tr_sys_path_remove(tor->magnet_file());
 
     // tor should keep this metainfo
-    tor->setMetainfo(*metainfo);
+    tor->set_metainfo(*metainfo);
 
     if (tor->incompleteMetadata != nullptr)
     {
@@ -254,7 +254,7 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
 bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
 {
     // test the info_dict checksum
-    if (tr_sha1::digest(m->metadata) != tor->infoHash())
+    if (tr_sha1::digest(m->metadata) != tor->info_hash())
     {
         return false;
     }
@@ -282,16 +282,16 @@ bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error
     }
 
     // save it
-    if (!tr_saveFile(tor->torrentFile(), benc, error))
+    if (!tr_saveFile(tor->torrent_file(), benc, error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnetFile());
+    tr_sys_path_remove(tor->magnet_file());
 
     // tor should keep this metainfo
-    tor->setMetainfo(metainfo);
+    tor->set_metainfo(metainfo);
 
     return true;
 }

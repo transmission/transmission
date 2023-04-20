@@ -151,9 +151,9 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tor->setFilePriorities(std::data(ctor->low), std::size(ctor->low), TR_PRI_LOW);
-    tor->setFilePriorities(std::data(ctor->normal), std::size(ctor->normal), TR_PRI_NORMAL);
-    tor->setFilePriorities(std::data(ctor->high), std::size(ctor->high), TR_PRI_HIGH);
+    tor->set_file_priorities(std::data(ctor->low), std::size(ctor->low), TR_PRI_LOW);
+    tor->set_file_priorities(std::data(ctor->normal), std::size(ctor->normal), TR_PRI_NORMAL);
+    tor->set_file_priorities(std::data(ctor->high), std::size(ctor->high), TR_PRI_HIGH);
 }
 
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, bool wanted)
@@ -164,8 +164,8 @@ void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tor->initFilesWanted(std::data(ctor->unwanted), std::size(ctor->unwanted), false);
-    tor->initFilesWanted(std::data(ctor->wanted), std::size(ctor->wanted), true);
+    tor->init_files_wanted(std::data(ctor->unwanted), std::size(ctor->unwanted), false);
+    tor->init_files_wanted(std::data(ctor->wanted), std::size(ctor->wanted), true);
 }
 
 // ---

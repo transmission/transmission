@@ -74,7 +74,7 @@ private:
         }
 
         auto info = TorrentInfo{};
-        info.info_hash = tor->infoHash();
+        info.info_hash = tor->info_hash();
         info.client_peer_id = tor->peer_id();
         info.id = tor->id();
         info.is_done = tor->is_done();
@@ -358,7 +358,7 @@ public:
 
     [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
     {
-        if (!tor->isRunning || tor->is_done())
+        if (!tor->is_running() || tor->is_done())
         {
             return {};
         }
@@ -445,7 +445,7 @@ public:
 
     void rebuildWebseeds()
     {
-        auto const n = tor->webseedCount();
+        auto const n = tor->webseed_count();
 
         webseeds.clear();
         webseeds.reserve(n);
@@ -541,8 +541,8 @@ public:
 
                 tor->uploadedCur += event.length;
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
-                tor->setDateActive(now);
-                tor->setDirty();
+                tor->set_date_active(now);
+                tor->set_dirty();
                 tor->session->addUploaded(event.length);
 
                 if (peer->atom != nullptr)
@@ -559,8 +559,8 @@ public:
                 auto* const tor = s->tor;
 
                 tor->downloadedCur += event.length;
-                tor->setDateActive(now);
-                tor->setDirty();
+                tor->set_date_active(now);
+                tor->set_dirty();
                 tor->session->addDownloaded(event.length);
 
                 if (peer->atom != nullptr)
@@ -913,7 +913,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] bool isSequentialDownload() const override
         {
-            return torrent_->isSequentialDownload();
+            return torrent_->is_sequential_download();
         }
 
     private:
@@ -1068,7 +1068,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", atom->display_name()));
         }
-        else if (result.io->is_incoming() && s->peerCount() >= s->tor->peerLimit())
+        else if (result.io->is_incoming() && s->peerCount() >= s->tor->peer_limit())
         {
             /* too many peers already */
         }
@@ -1476,7 +1476,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     // common shortcuts...
 
-    if (!tor->isRunning || tor->isStopping || tor->is_done() || !tor->has_metainfo())
+    if (!tor->is_running() || tor->is_stopping() || tor->is_done() || !tor->has_metainfo())
     {
         return 0;
     }
@@ -1671,7 +1671,7 @@ namespace update_interest_helpers
 {
     /* these cases should have already been handled by the calling code... */
     TR_ASSERT(!tor->is_done());
-    TR_ASSERT(tor->clientCanDownload());
+    TR_ASSERT(tor->client_can_download());
 
     if (peer->isSeed())
     {
@@ -1694,7 +1694,7 @@ void updateInterest(tr_swarm* swarm)
 {
     // sometimes this function isn't necessary
     auto const* const tor = swarm->tor;
-    if (tor->is_done() || !tor->clientCanDownload())
+    if (tor->is_done() || !tor->client_can_download())
     {
         return;
     }
@@ -1781,7 +1781,7 @@ struct ChokeData
 
     /* downloading a private torrent... take upload speed into account
      * because there may only be a small window of opportunity to share */
-    if (tor->isPrivate())
+    if (tor->is_private())
     {
         return peer->get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT) +
             peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
@@ -1804,7 +1804,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     auto choked = std::vector<ChokeData>{};
     choked.reserve(peer_count);
     auto const* const session = s->manager->session;
-    bool const choke_all = !s->tor->clientCanUpload();
+    bool const choke_all = !s->tor->client_can_upload();
     bool const is_maxed_out = s->tor->bandwidth_.is_maxed_out(TR_UP, now);
 
     /* an optimistic unchoke peer's "optimistic"
@@ -1921,13 +1921,13 @@ void tr_peerMgr::rechokePulse() const
 
     for (auto* const tor : session->torrents())
     {
-        if (tor->isRunning)
+        if (tor->is_running())
         {
             // possibly stop torrents that have seeded enough
             tr_torrentCheckSeedLimit(tor);
         }
 
-        if (tor->isRunning)
+        if (tor->is_running())
         {
             if (auto* const swarm = tor->swarm; swarm->stats.peer_count > 0)
             {
@@ -1965,13 +1965,13 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     /* disconnect if we're both seeds and enough time has passed for PEX */
     if (tor->is_done() && peer->isSeed())
     {
-        return !tor->allowsPex() || now - atom->time >= 30;
+        return !tor->allows_pex() || now - atom->time >= 30;
     }
 
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     {
-        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(tor->peerLimit() * 0.9));
+        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(tor->peer_limit() * 0.9));
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         float const strictness = peer_count >= relax_strictness_if_fewer_than_n ?
@@ -2142,9 +2142,9 @@ void tr_peerMgr::reconnectPulse()
     // if we're over the per-torrent peer limits, cull some peers
     for (auto* const tor : session->torrents())
     {
-        if (tor->isRunning)
+        if (tor->is_running())
         {
-            enforceSwarmPeerLimit(tor->swarm, tor->peerLimit());
+            enforceSwarmPeerLimit(tor->swarm, tor->peer_limit());
         }
     }
 
@@ -2310,7 +2310,7 @@ struct peer_candidate
     score = addValToKey(score, 32, i);
 
     /* prefer peers belonging to a torrent of a higher priority */
-    switch (tor->getPriority())
+    switch (tor->get_priority())
     {
     case TR_PRI_HIGH:
         i = 0;
@@ -2382,13 +2382,13 @@ struct peer_candidate
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
         bool const seeding = tor->is_done();
-        if (seeding && swarm->isAllSeeds() && tor->isPrivate())
+        if (seeding && swarm->isAllSeeds() && tor->is_private())
         {
             continue;
         }
 
         /* if we've already got enough peers in this torrent... */
-        if (tor->peerLimit() <= swarm->peerCount())
+        if (tor->peer_limit() <= swarm->peerCount())
         {
             continue;
         }
@@ -2453,7 +2453,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
         &session->top_bandwidth_,
         atom.addr,
         atom.port,
-        s->tor->infoHash(),
+        s->tor->info_hash(),
         s->tor->completeness == TR_SEED,
         utp);
 
