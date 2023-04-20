@@ -190,11 +190,11 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         fmt::print("  Name: {:s}\n", metainfo.name());
         if (metainfo.hasV1Metadata())
         {
-            fmt::print("  Hash v1: {:s}\n", metainfo.infoHashString());
+            fmt::print("  Hash v1: {:s}\n", metainfo.info_hash_string());
         }
         if (metainfo.hasV2Metadata())
         {
-            fmt::print("  Hash v2: {:s}\n", metainfo.infoHash2String());
+            fmt::print("  Hash v2: {:s}\n", metainfo.info_hash2_string());
         }
         fmt::print("  Created by: {:s}\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator());
         fmt::print("  Created on: {:s}\n\n", toString(metainfo.dateCreated()));
@@ -224,7 +224,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         fmt::print("\nTRACKERS\n");
         auto current_tier = std::optional<tr_tracker_tier_t>{};
         auto print_tier = size_t{ 1 };
-        for (auto const& tracker : metainfo.announceList())
+        for (auto const& tracker : metainfo.announce_list())
         {
             if (!current_tier || current_tier != tracker.tier)
             {
@@ -240,7 +240,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         ***
         **/
 
-        if (auto const n_webseeds = metainfo.webseedCount(); n_webseeds > 0)
+        if (auto const n_webseeds = metainfo.webseed_count(); n_webseeds > 0)
         {
             fmt::print("\nWEBSEEDS\n\n");
 
@@ -315,7 +315,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
     auto mediator = Mediator{};
     auto web = tr_web::create(mediator);
 
-    for (auto const& tracker : metainfo.announceList())
+    for (auto const& tracker : metainfo.announce_list())
     {
         if (std::empty(tracker.scrape))
         {
@@ -326,7 +326,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         auto scrape_url = tr_urlbuf{ tracker.scrape.sv() };
         auto delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
         scrape_url.append(delimiter, "info_hash=");
-        tr_urlPercentEncode(std::back_inserter(scrape_url), metainfo.infoHash());
+        tr_urlPercentEncode(std::back_inserter(scrape_url), metainfo.info_hash());
         fmt::print("{:s} ... ", scrape_url);
         fflush(stdout);
 
@@ -367,8 +367,8 @@ void doScrape(tr_torrent_metainfo const& metainfo)
             tr_quark key;
             tr_variant* val;
 
-            auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.infoHash())),
-                                            std::size(metainfo.infoHash()) };
+            auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.info_hash())),
+                                            std::size(metainfo.info_hash()) };
 
             while (tr_variantDictChild(files, child_pos, &key, &val))
             {

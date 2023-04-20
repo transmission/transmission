@@ -169,17 +169,17 @@ public:
 
     [[nodiscard]] auto torrentFile(std::string_view torrent_dir) const
     {
-        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
+        return makeFilename(torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".torrent");
     }
 
     [[nodiscard]] auto magnetFile(std::string_view torrent_dir) const
     {
-        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
+        return makeFilename(torrent_dir, name(), info_hash_string(), BasenameFormat::Hash, ".magnet");
     }
 
     [[nodiscard]] auto resumeFile(std::string_view resume_dir) const
     {
-        return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
+        return makeFilename(resume_dir, name(), info_hash_string(), BasenameFormat::Hash, ".resume");
     }
 
     static bool migrateFile(
@@ -218,7 +218,7 @@ private:
 
     [[nodiscard]] auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
-        return makeFilename(dirname, name(), infoHashString(), format, suffix);
+        return makeFilename(dirname, name(), info_hash_string(), format, suffix);
     }
 
     tr_block_info block_info_ = tr_block_info{ 0, 0 };

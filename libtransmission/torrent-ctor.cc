@@ -295,7 +295,7 @@ tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor)
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
 {
-    return !std::empty(ctor->metainfo.infoHashString()) ? &ctor->metainfo : nullptr;
+    return !std::empty(ctor->metainfo.info_hash_string()) ? &ctor->metainfo : nullptr;
 }
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor)

@@ -44,7 +44,7 @@ QString getNameFromMagnet(QString const& magnet)
         return QString::fromStdString(tmp.name());
     }
 
-    return QString::fromStdString(tmp.infoHashString());
+    return QString::fromStdString(tmp.info_hash_string());
 }
 
 } // namespace

@@ -217,7 +217,7 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
         tr_variantDictAddInt(top, TR_KEY_creation_date, val);
     }
 
-    if (auto const& announce_list = tm.announceList(); !std::empty(announce_list))
+    if (auto const& announce_list = tm.announce_list(); !std::empty(announce_list))
     {
         auto const n = std::size(announce_list);
         if (n == 1)
@@ -241,7 +241,7 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
         }
     }
 
-    if (auto const n_webseeds = tm.webseedCount(); n_webseeds > 0)
+    if (auto const n_webseeds = tm.webseed_count(); n_webseeds > 0)
     {
         auto* const webseeds_variant = tr_variantDictAddList(top, TR_KEY_url_list, n_webseeds);
         for (size_t i = 0; i < n_webseeds; ++i)

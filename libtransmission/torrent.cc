@@ -83,7 +83,7 @@ tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo 
         return nullptr;
     }
 
-    return session->torrents().get(metainfo->infoHash());
+    return session->torrents().get(metainfo->info_hash());
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
@@ -1193,13 +1193,13 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 
     // is the metainfo valid?
     auto metainfo = tr_ctorStealMetainfo(ctor);
-    if (std::empty(metainfo.infoHashString()))
+    if (std::empty(metainfo.info_hash_string()))
     {
         return nullptr;
     }
 
     // is it a duplicate?
-    if (auto* const duplicate_of = session->torrents().get(metainfo.infoHash()); duplicate_of != nullptr)
+    if (auto* const duplicate_of = session->torrents().get(metainfo.info_hash()); duplicate_of != nullptr)
     {
         if (setme_duplicate_of != nullptr)
         {
@@ -2115,7 +2115,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
         return false;
     }
 
-    this->metainfo_.announceList() = announce_list;
+    this->metainfo_.announce_list() = announce_list;
     this->markEdited();
 
     // magnet links

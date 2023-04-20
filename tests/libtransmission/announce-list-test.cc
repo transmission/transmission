@@ -381,8 +381,8 @@ TEST_F(AnnounceListTest, save)
     EXPECT_TRUE(std::equal(
         std::begin(announce_list),
         std::end(announce_list),
-        std::begin(modified_tm.announceList()),
-        std::end(modified_tm.announceList())));
+        std::begin(modified_tm.announce_list()),
+        std::end(modified_tm.announce_list())));
 
     // cleanup
     (void)std::remove(test_file.c_str());

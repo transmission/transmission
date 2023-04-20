@@ -38,7 +38,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
     auto metainfo = tr_torrent_metainfo{};
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
     EXPECT_EQ(0U, metainfo.fileCount()); // because it's a magnet link
-    EXPECT_EQ(2U, std::size(metainfo.announceList()));
+    EXPECT_EQ(2U, std::size(metainfo.announce_list()));
     EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
 }
 
@@ -232,7 +232,7 @@ TEST_F(TorrentMetainfoTest, HoffmanStyleWebseeds)
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv };
     auto tm = tr_torrent_metainfo{};
     EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 2 }, tm.webseedCount());
+    EXPECT_EQ(size_t{ 2 }, tm.webseed_count());
     EXPECT_EQ(
         "https://cdimage.debian.org/cdimage/release/11.2.0//srv/cdbuilder.debian.org/dst/deb-cd/weekly-builds/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso"sv,
         tm.webseed(0));
@@ -246,7 +246,7 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedList)
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-list.torrent"sv };
     auto tm = tr_torrent_metainfo{};
     EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 2 }, tm.webseedCount());
+    EXPECT_EQ(size_t{ 2 }, tm.webseed_count());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
     EXPECT_EQ("http://webseed-two.com/"sv, tm.webseed(1));
 }
@@ -256,7 +256,7 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-string.torrent"sv };
     auto tm = tr_torrent_metainfo{};
     EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 1 }, tm.webseedCount());
+    EXPECT_EQ(size_t{ 1 }, tm.webseed_count());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
 }
 

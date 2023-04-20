@@ -45,7 +45,7 @@ struct CompareTorrentByHash
 tr_torrent* tr_torrents::get(std::string_view magnet_link)
 {
     auto magnet = tr_magnet_metainfo{};
-    return magnet.parseMagnet(magnet_link) ? get(magnet.infoHash()) : nullptr;
+    return magnet.parseMagnet(magnet_link) ? get(magnet.info_hash()) : nullptr;
 }
 
 tr_torrent* tr_torrents::get(tr_sha1_digest_t const& hash)

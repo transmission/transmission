@@ -38,7 +38,7 @@ WatchDir::AddResult WatchDir::metainfoTest(QString const& filename) const
         return AddResult::Error;
     }
 
-    if (model_.hasTorrent(TorrentHash{ metainfo.infoHash() }))
+    if (model_.hasTorrent(TorrentHash{ metainfo.info_hash() }))
     {
         return AddResult::Duplicate;
     }
