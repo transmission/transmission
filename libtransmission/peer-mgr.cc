@@ -580,7 +580,7 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotRej:
-            s->active_requests.remove(s->tor->pieceLoc(event.pieceIndex, event.offset).block, peer);
+            s->active_requests.remove(s->tor->piece_loc(event.pieceIndex, event.offset).block, peer);
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
@@ -603,7 +603,7 @@ public:
         case tr_peer_event::Type::ClientGotBlock:
             {
                 auto* const tor = s->tor;
-                auto const loc = tor->pieceLoc(event.pieceIndex, event.offset);
+                auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->cancelAllRequestsForBlock(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 tr_torrentGotBlock(tor, loc.block);
@@ -762,7 +762,7 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     : session{ tor->session }
     , swarm{ tor->swarm }
     , atom{ atom_in }
-    , blame{ tor->blockCount() }
+    , blame{ tor->block_count() }
 {
 }
 
@@ -898,12 +898,12 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const override
         {
-            return torrent_->blockSpanForPiece(piece);
+            return torrent_->block_span_for_piece(piece);
         }
 
         [[nodiscard]] tr_piece_index_t countAllPieces() const override
         {
-            return torrent_->pieceCount();
+            return torrent_->piece_count();
         }
 
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override
@@ -966,7 +966,7 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 
     if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
     {
-        tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->pieceSize(p));
+        tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->piece_size(p));
     }
 
     // bookkeeping
@@ -1214,7 +1214,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
 void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index)
 {
     auto* const swarm = tor->swarm;
-    auto const byte_count = tor->pieceSize(piece_index);
+    auto const byte_count = tor->piece_size(piece_index);
 
     for (auto* const peer : swarm->peers)
     {
@@ -1442,7 +1442,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 
     std::fill_n(tab, n_tabs, int8_t{});
 
-    auto const interval = tor->pieceCount() / static_cast<float>(n_tabs);
+    auto const interval = tor->piece_count() / static_cast<float>(n_tabs);
     for (tr_piece_index_t i = 0; i < n_tabs; ++i)
     {
         auto const piece = static_cast<tr_piece_index_t>(i * interval);
@@ -1500,7 +1500,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     auto desired_available = uint64_t{};
 
-    for (tr_piece_index_t i = 0, n = tor->pieceCount(); i < n; ++i)
+    for (tr_piece_index_t i = 0, n = tor->piece_count(); i < n; ++i)
     {
         if (tor->piece_is_wanted(i) && available.test(i))
         {
@@ -1508,7 +1508,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         }
     }
 
-    TR_ASSERT(desired_available <= tor->totalSize());
+    TR_ASSERT(desired_available <= tor->total_size());
     return desired_available;
 }
 
@@ -1678,7 +1678,7 @@ namespace update_interest_helpers
         return true;
     }
 
-    for (tr_piece_index_t i = 0; i < tor->pieceCount(); ++i)
+    for (tr_piece_index_t i = 0; i < tor->piece_count(); ++i)
     {
         if (piece_is_interesting[i] && peer->hasPiece(i))
         {
@@ -1701,7 +1701,7 @@ void updateInterest(tr_swarm* swarm)
 
     if (auto const& peers = swarm->peers; !std::empty(peers))
     {
-        int const n = tor->pieceCount();
+        int const n = tor->piece_count();
 
         // build a bitfield of interesting pieces...
         auto piece_is_interesting = std::vector<bool>{};

@@ -198,7 +198,7 @@ void readOrWriteBytes(
 /* returns 0 on success, or an errno on failure */
 int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location loc, uint8_t* buf, size_t buflen)
 {
-    if (loc.piece >= tor->pieceCount())
+    if (loc.piece >= tor->piece_count())
     {
         return EINVAL;
     }
@@ -241,19 +241,19 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
 std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_t piece)
 {
     TR_ASSERT(tor != nullptr);
-    TR_ASSERT(piece < tor->pieceCount());
+    TR_ASSERT(piece < tor->piece_count());
 
     auto sha = tr_sha1::create();
     auto buffer = std::array<uint8_t, tr_block_info::BlockSize>{};
 
     auto& cache = tor->session->cache;
-    auto const [begin_byte, end_byte] = tor->blockInfo().byte_span_for_piece(piece);
-    auto const [begin_block, end_block] = tor->blockSpanForPiece(piece);
+    auto const [begin_byte, end_byte] = tor->block_info().byte_span_for_piece(piece);
+    auto const [begin_block, end_block] = tor->block_span_for_piece(piece);
     auto n_bytes_checked = size_t{};
     for (auto block = begin_block; block < end_block; ++block)
     {
-        auto const block_loc = tor->blockLoc(block);
-        auto const block_len = tor->blockSize(block);
+        auto const block_loc = tor->block_loc(block);
+        auto const block_len = tor->block_size(block);
         if (auto const success = cache->readBlock(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
         {
             return {};
@@ -276,7 +276,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
         n_bytes_checked += (end - begin);
     }
 
-    TR_ASSERT(tor->pieceSize(piece) == n_bytes_checked);
+    TR_ASSERT(tor->piece_size(piece) == n_bytes_checked);
     return sha->finish();
 }
 

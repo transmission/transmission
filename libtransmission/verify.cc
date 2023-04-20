@@ -76,7 +76,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
 
     tr_logAddDebugTor(tor, "verifying torrent...");
 
-    while (!stop_flag && piece < tor->pieceCount())
+    while (!stop_flag && piece < tor->piece_count())
     {
         auto const file_length = tor->fileSize(file_index);
 
@@ -95,7 +95,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
         }
 
         /* figure out how much we can read this pass */
-        uint64_t left_in_piece = tor->pieceSize(piece) - piece_pos;
+        uint64_t left_in_piece = tor->piece_size(piece) - piece_pos;
         uint64_t left_in_file = file_length - file_pos;
         uint64_t bytes_this_pass = std::min(left_in_file, left_in_piece);
         bytes_this_pass = std::min(bytes_this_pass, uint64_t(std::size(buffer)));
@@ -140,7 +140,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
 
             sha->clear();
             ++piece;
-            tor->setVerifyProgress(piece / float(tor->pieceCount()));
+            tor->setVerifyProgress(piece / float(tor->piece_count()));
             piece_pos = 0;
         }
 
@@ -171,8 +171,8 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
         fmt::format(
             "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
             end - begin,
-            tor->totalSize(),
-            tor->totalSize() / (1 + (end - begin))));
+            tor->total_size(),
+            tor->total_size() / (1 + (end - begin))));
 
     return changed;
 }

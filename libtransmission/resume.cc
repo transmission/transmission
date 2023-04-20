@@ -496,7 +496,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
     {
         /// CHECKED PIECES
 
-        auto checked = tr_bitfield(tor->pieceCount());
+        auto checked = tr_bitfield(tor->piece_count());
         auto mtimes = std::vector<time_t>{};
         auto const n_files = tor->fileCount();
         mtimes.reserve(n_files);
@@ -567,7 +567,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         /// COMPLETION
 
-        auto blocks = tr_bitfield{ tor->blockCount() };
+        auto blocks = tr_bitfield{ tor->block_count() };
         char const* err = nullptr;
         if (tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks); b != nullptr)
         {
