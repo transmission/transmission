@@ -161,7 +161,7 @@ void tr_files_wanted::reset(tr_file_piece_map const* fpm)
 {
     fpm_ = fpm;
     wanted_ = tr_bitfield{ std::size(*fpm) };
-    wanted_.setHasAll(); // by default we want all files
+    wanted_.set_has_all(); // by default we want all files
 }
 
 void tr_files_wanted::set(tr_file_index_t file, bool wanted)
@@ -179,7 +179,7 @@ void tr_files_wanted::set(tr_file_index_t const* files, size_t n, bool wanted)
 
 bool tr_files_wanted::pieceWanted(tr_piece_index_t piece) const
 {
-    if (wanted_.hasAll())
+    if (wanted_.has_all())
     {
         return true;
     }

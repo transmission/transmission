@@ -105,7 +105,7 @@ std::vector<uint8_t> tr_completion::createPieceBitfield() const
     {
         flags[piece] = hasPiece(piece);
     }
-    pieces.setFromBools(flags.get(), n);
+    pieces.set_from_bools(flags.get(), n);
 
     return pieces.raw();
 }
@@ -140,7 +140,7 @@ void tr_completion::setHasAll() noexcept
 {
     auto const total_size = block_info_->total_size();
 
-    blocks_.setHasAll();
+    blocks_.set_has_all();
     size_now_ = total_size;
     size_when_done_ = total_size;
     has_valid_ = total_size;

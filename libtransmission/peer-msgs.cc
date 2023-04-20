@@ -1351,11 +1351,11 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, libtransmission::Buffer& paylo
     auto& incoming_block = blocks.try_emplace(block, block_size).first->second;
     payload.to_buf(std::data(*incoming_block.buf) + loc.block_offset, len);
     msgs->publish(tr_peer_event::GotPieceData(len));
-    incoming_block.have.setSpan(loc.block_offset, loc.block_offset + len);
+    incoming_block.have.set_span(loc.block_offset, loc.block_offset + len);
     logtrace(msgs, fmt::format("got {:d} bytes for req {:d}:{:d}->{:d}", len, piece, offset, len));
 
     // if we haven't gotten the entire block yet, wait for more
-    if (!incoming_block.have.hasAll())
+    if (!incoming_block.have.has_all())
     {
         return { READ_LATER, len };
     }
@@ -1452,7 +1452,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
             logtrace(msgs, "got a bitfield");
             auto const [buf, buflen] = payload.pullup();
             msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : buflen * 8 };
-            msgs->have_.setRaw(reinterpret_cast<uint8_t const*>(buf), buflen);
+            msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(buf), buflen);
             msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
             msgs->invalidatePercentDone();
             break;
@@ -1554,7 +1554,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
 
         if (fext)
         {
-            msgs->have_.setHasAll();
+            msgs->have_.set_has_all();
             msgs->publish(tr_peer_event::GotHaveAll());
             msgs->invalidatePercentDone();
         }
@@ -1571,7 +1571,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
 
         if (fext)
         {
-            msgs->have_.setHasNone();
+            msgs->have_.set_has_none();
             msgs->publish(tr_peer_event::GotHaveNone());
             msgs->invalidatePercentDone();
         }

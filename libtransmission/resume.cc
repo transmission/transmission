@@ -413,11 +413,11 @@ auto loadFilenames(tr_variant* dict, tr_torrent* tor)
 
 void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
 {
-    if (b.hasNone() || (std::empty(b) != 0U))
+    if (b.has_none() || (std::empty(b) != 0U))
     {
         tr_variantInitStr(benc, "none"sv);
     }
-    else if (b.hasAll())
+    else if (b.has_all())
     {
         tr_variantInitStrView(benc, "all"sv);
     }
@@ -432,15 +432,15 @@ void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawlen)
 {
     if (raw == nullptr || rawlen == 0 || (rawlen == 4 && memcmp(raw, "none", 4) == 0))
     {
-        bitfield.setHasNone();
+        bitfield.set_has_none();
     }
     else if (rawlen == 3 && memcmp(raw, "all", 3) == 0)
     {
-        bitfield.setHasAll();
+        bitfield.set_has_all();
     }
     else
     {
-        bitfield.setRaw(raw, rawlen);
+        bitfield.set_raw(raw, rawlen);
     }
 }
 
@@ -587,7 +587,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
         {
             if (sv == "all"sv)
             {
-                blocks.setHasAll();
+                blocks.set_has_all();
             }
             else
             {
@@ -596,7 +596,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else if (tr_variantDictFindRaw(prog, TR_KEY_bitfield, &raw, &rawlen))
         {
-            blocks.setRaw(raw, rawlen);
+            blocks.set_raw(raw, rawlen);
         }
         else
         {

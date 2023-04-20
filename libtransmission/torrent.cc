@@ -1768,7 +1768,7 @@ void onVerifyDoneThreadFunc(tr_torrent* const tor)
     if (tor->start_when_stable)
     {
         auto opts = torrent_start_opts{};
-        opts.has_local_data = !tor->checked_pieces_.hasNone();
+        opts.has_local_data = !tor->checked_pieces_.has_none();
         torrentStart(tor, opts);
     }
 }
@@ -2710,7 +2710,7 @@ void tr_torrent::initCheckedPieces(tr_bitfield const& checked, time_t const* mti
         if (mtime == 0 || mtime != mtimes[i])
         {
             auto const [begin, end] = piecesInFile(i);
-            checked_pieces_.unsetSpan(begin, end);
+            checked_pieces_.unset_span(begin, end);
         }
     }
 }

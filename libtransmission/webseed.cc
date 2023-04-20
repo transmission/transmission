@@ -167,7 +167,7 @@ public:
         , have_{ tor->pieceCount() }
         , bandwidth_{ &tor->bandwidth_ }
     {
-        have_.setHasAll();
+        have_.set_has_all();
         idle_timer_->startRepeating(IdleTimerInterval);
     }
 
