@@ -191,7 +191,7 @@ bool tr_metainfo_builder::blockingMakeChecksums(tr_error** error)
 
         TR_ASSERT(piece_index < pieceCount());
 
-        uint32_t const piece_size = block_info_.pieceSize(piece_index);
+        auto const piece_size = block_info_.piece_size(piece_index);
         buf.resize(piece_size);
         auto* bufptr = std::data(buf);
 

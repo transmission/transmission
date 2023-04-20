@@ -53,7 +53,7 @@ public:
     // The current piece being tested and the total number of pieces in the torrent.
     [[nodiscard]] constexpr std::pair<tr_piece_index_t, tr_piece_index_t> checksumStatus() const noexcept
     {
-        return std::make_pair(checksum_piece_, block_info_.pieceCount());
+        return std::make_pair(checksum_piece_, block_info_.piece_count());
     }
 
     // Tell the `makeChecksums()` worker thread to cleanly exit ASAP.
@@ -150,12 +150,12 @@ public:
 
     [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
-        return block_info_.pieceSize();
+        return block_info_.piece_size();
     }
 
     [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
-        return block_info_.pieceCount();
+        return block_info_.piece_count();
     }
 
     [[nodiscard]] constexpr auto const& source() const noexcept

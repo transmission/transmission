@@ -556,7 +556,7 @@ private:
                 return false;
             }
 
-            tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
+            tm_.block_info_.init_sizes(tm_.files_.totalSize(), piece_size_);
             return true;
         }
 
