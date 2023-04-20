@@ -29,7 +29,7 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
     {
         auto const file_size = file_sizes[i];
         auto const begin_byte = offset;
-        auto const begin_piece = block_info.byteLoc(begin_byte).piece;
+        auto const begin_piece = block_info.byte_loc(begin_byte).piece;
         auto end_byte = tr_byte_index_t{};
         auto end_piece = tr_piece_index_t{};
 
@@ -39,7 +39,7 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
         {
             end_byte = offset + file_size;
             auto const final_byte = end_byte - 1;
-            auto const final_piece = block_info.byteLoc(final_byte).piece;
+            auto const final_piece = block_info.byte_loc(final_byte).piece;
             end_piece = final_piece + 1;
 
             edge_pieces.insert(final_piece);

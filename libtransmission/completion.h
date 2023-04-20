@@ -35,7 +35,7 @@ struct tr_completion
     explicit tr_completion(torrent_view const* tor, tr_block_info const* block_info)
         : tor_{ tor }
         , block_info_{ block_info }
-        , blocks_{ block_info_->blockCount() }
+        , blocks_{ block_info_->block_count() }
     {
         blocks_.setHasNone();
     }
@@ -67,7 +67,7 @@ struct tr_completion
 
     [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const
     {
-        return block_info_->pieceSize() != 0 && countMissingBlocksInPiece(piece) == 0;
+        return block_info_->piece_size() != 0 && countMissingBlocksInPiece(piece) == 0;
     }
 
     [[nodiscard]] constexpr uint64_t hasTotal() const noexcept
@@ -84,7 +84,7 @@ struct tr_completion
 
     [[nodiscard]] constexpr double percentComplete() const
     {
-        auto const denom = block_info_->totalSize();
+        auto const denom = block_info_->total_size();
         return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
     }
 
@@ -120,13 +120,13 @@ struct tr_completion
 
     [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
     {
-        auto const [begin, end] = block_info_->blockSpanForPiece(piece);
+        auto const [begin, end] = block_info_->block_span_for_piece(piece);
         return (end - begin) - blocks_.count(begin, end);
     }
 
     [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t piece) const
     {
-        return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
+        return block_info_->piece_size(piece) - countHasBytesInPiece(piece);
     }
 
     void amountDone(float* tab, size_t n_tabs) const;
@@ -169,7 +169,7 @@ private:
 
     [[nodiscard]] uint64_t countHasBytesInPiece(tr_piece_index_t piece) const
     {
-        return countHasBytesInSpan(block_info_->byteSpanForPiece(piece));
+        return countHasBytesInSpan(block_info_->byte_span_for_piece(piece));
     }
 
     void removeBlock(tr_block_index_t block);

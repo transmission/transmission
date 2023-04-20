@@ -50,9 +50,9 @@ protected:
                 FileSizes[14] + FileSizes[15] + FileSizes[16] ==
             TotalSize);
 
-        EXPECT_EQ(11U, block_info_.pieceCount());
-        EXPECT_EQ(PieceSize, block_info_.pieceSize());
-        EXPECT_EQ(TotalSize, block_info_.totalSize());
+        EXPECT_EQ(11U, block_info_.piece_count());
+        EXPECT_EQ(PieceSize, block_info_.piece_size());
+        EXPECT_EQ(TotalSize, block_info_.total_size());
         EXPECT_EQ(TotalSize, std::accumulate(std::begin(FileSizes), std::end(FileSizes), uint64_t{ 0 }));
     }
 };
@@ -123,7 +123,7 @@ TEST_F(FilePieceMapTest, pieceSpan)
         offset += FileSizes[file];
     }
     EXPECT_EQ(TotalSize, offset);
-    EXPECT_EQ(block_info_.pieceCount(), fpm.pieceSpan(std::size(FileSizes) - 1).end);
+    EXPECT_EQ(block_info_.piece_count(), fpm.pieceSpan(std::size(FileSizes) - 1).end);
 }
 
 TEST_F(FilePieceMapTest, priorities)
@@ -134,7 +134,7 @@ TEST_F(FilePieceMapTest, priorities)
 
     // make a helper to compare file & piece priorities
     auto expected_file_priorities = std::vector<tr_priority_t>(n_files, TR_PRI_NORMAL);
-    auto expected_piece_priorities = std::vector<tr_priority_t>(block_info_.pieceCount(), TR_PRI_NORMAL);
+    auto expected_piece_priorities = std::vector<tr_priority_t>(block_info_.piece_count(), TR_PRI_NORMAL);
     auto const compare_to_expected = [&, this]()
     {
         for (tr_file_index_t i = 0; i < n_files; ++i)
@@ -143,7 +143,7 @@ TEST_F(FilePieceMapTest, priorities)
             auto const actual = int{ file_priorities.filePriority(i) };
             EXPECT_EQ(expected, actual) << "idx[" << i << "] expected [" << expected << "] actual [" << actual << ']';
         }
-        for (tr_piece_index_t i = 0; i < block_info_.pieceCount(); ++i)
+        for (tr_piece_index_t i = 0; i < block_info_.piece_count(); ++i)
         {
             auto const expected = int{ expected_piece_priorities[i] };
             auto const actual = int{ file_priorities.piecePriority(i) };
@@ -295,14 +295,14 @@ TEST_F(FilePieceMapTest, wanted)
 
     // make a helper to compare file & piece priorities
     auto expected_files_wanted = tr_bitfield(n_files);
-    auto expected_pieces_wanted = tr_bitfield(block_info_.pieceCount());
+    auto expected_pieces_wanted = tr_bitfield(block_info_.piece_count());
     auto const compare_to_expected = [&, this]()
     {
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
             EXPECT_EQ(int(expected_files_wanted.test(i)), int(files_wanted.fileWanted(i)));
         }
-        for (tr_piece_index_t i = 0; i < block_info_.pieceCount(); ++i)
+        for (tr_piece_index_t i = 0; i < block_info_.piece_count(); ++i)
         {
             EXPECT_EQ(int(expected_pieces_wanted.test(i)), int(files_wanted.pieceWanted(i)));
         }

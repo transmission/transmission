@@ -69,43 +69,43 @@ public:
 
     [[nodiscard]] constexpr auto blockCount() const noexcept
     {
-        return blockInfo().blockCount();
+        return blockInfo().block_count();
     }
     [[nodiscard]] constexpr auto byteLoc(uint64_t nth_byte) const noexcept
     {
-        return blockInfo().byteLoc(nth_byte);
+        return blockInfo().byte_loc(nth_byte);
     }
     [[nodiscard]] constexpr auto blockLoc(tr_block_index_t block) const noexcept
     {
-        return blockInfo().blockLoc(block);
+        return blockInfo().block_loc(block);
     }
     [[nodiscard]] constexpr auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept
     {
-        return blockInfo().pieceLoc(piece, offset, length);
+        return blockInfo().piece_loc(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
-        return blockInfo().blockSize(block);
+        return blockInfo().block_size(block);
     }
     [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const noexcept
     {
-        return blockInfo().blockSpanForPiece(piece);
+        return blockInfo().block_span_for_piece(piece);
     }
     [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
-        return blockInfo().pieceCount();
+        return blockInfo().piece_count();
     }
     [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
-        return blockInfo().pieceSize();
+        return blockInfo().piece_size();
     }
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
-        return blockInfo().pieceSize(piece);
+        return blockInfo().piece_size(piece);
     }
     [[nodiscard]] constexpr auto totalSize() const noexcept
     {
-        return blockInfo().totalSize();
+        return blockInfo().total_size();
     }
 
     // OTHER PROPERTIES
