@@ -14,10 +14,13 @@
 #include <QWidget>
 
 #include <libtransmission/tr-macros.h>
+#include <QComboBox>
 
 #include "FaviconCache.h"
 #include "Torrent.h"
 #include "Typedefs.h"
+#include "FilterUI.h"
+#include "IconToolButton.h"
 
 class QLabel;
 class QString;
@@ -27,7 +30,7 @@ class Prefs;
 class TorrentFilter;
 class TorrentModel;
 
-class FilterBar : public QWidget
+class FilterBar : public FilterUI
 {
     Q_OBJECT
     TR_DISABLE_COPY_MOVE(FilterBar)
@@ -38,57 +41,20 @@ public:
 public slots:
     void clear();
 
-private:
-    FilterBarComboBox* createTrackerCombo(QStandardItemModel*);
-    FilterBarComboBox* createActivityCombo();
-    void refreshTrackers();
+protected:
+    QComboBox* createTrackerUI(QStandardItemModel*);
+    QComboBox* createActivityUI();
 
-    enum
-    {
-        ACTIVITY,
-        TRACKERS,
-
-        NUM_FLAGS
-    };
-
-    using Pending = std::bitset<NUM_FLAGS>;
-
-    Prefs& prefs_;
-    TorrentModel const& torrents_;
-    TorrentFilter const& filter_;
-
-    std::map<QString, int> sitename_counts_;
-    FilterBarComboBox* const activity_combo_ = createActivityCombo();
-    FilterBarComboBox* tracker_combo_ = {};
+    QComboBox* const activity_ui_ = createActivityUI();
+    QComboBox* tracker_ui_ = {};
     QLabel* count_label_ = {};
-    QStandardItemModel* const tracker_model_ = new QStandardItemModel{ this };
-    QTimer recount_timer_;
-    QLineEdit* const line_edit_ = new QLineEdit{ this };
-    Pending pending_ = {};
-    bool is_bootstrapping_ = {};
+    QLineEdit* line_edit_ = new QLineEdit{ this };
+    IconToolButton* btn_ = new IconToolButton(this);
 
 private slots:
-    void recount();
-    void recountSoon(Pending const& fields);
+    void recount() override;
 
-    void recountActivitySoon()
-    {
-        recountSoon(Pending().set(ACTIVITY));
-    }
-
-    void recountTrackersSoon()
-    {
-        recountSoon(Pending().set(TRACKERS));
-    }
-
-    void recountAllSoon()
-    {
-        recountSoon(Pending().set(ACTIVITY).set(TRACKERS));
-    }
-
-    void refreshPref(int key);
+    void refreshPref(int key) override;
     void onActivityIndexChanged(int index);
-    void onTextChanged(QString const&);
-    void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
     void onTrackerIndexChanged(int index);
 };

@@ -1,9 +1,8 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
-// or any future license endorsed by Mnemosyne LLC.
+// This file Copyright © 2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include "FilterBar.h"
+#include "FilterView.h"
 
 #include <cstdint> // uint64_t
 #include <map>
@@ -11,12 +10,11 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include <QStandardItemModel>
+#include <QListView>
 
 #include "Application.h"
 #include "FaviconCache.h"
-#include "FilterBarComboBox.h"
 #include "Filters.h"
 #include "Prefs.h"
 #include "Torrent.h"
@@ -30,16 +28,31 @@ enum
     TRACKER_ROLE
 };
 
-QComboBox* FilterBar::createActivityUI()
+QSize FilterView::sizeHint() const
 {
-    auto* c = new FilterBarComboBox(this);
-    auto* delegate = new FilterUIDelegate(this, c);
-    c->setItemDelegate(delegate);
+    return {qMax(activity_ui_->sizeHintForColumn(0), tracker_ui_->sizeHintForColumn(0)), 1};
+}
+
+QListView* FilterView::createActivityUI()
+{
+    auto* lv = new QListView(this);
+    auto* delegate = new FilterUIDelegate(this, lv);
+    lv->setItemDelegate(delegate);
 
     auto* model = FilterUI::createActivityModel(this);
 
-    c->setModel(model);
-    return c;
+    lv->setModel(model);
+    lv->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    lv->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    lv->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    int max_height = 0;
+    for (int i = 0; i < model->rowCount(); i++) {
+        max_height += lv->sizeHintForRow(i);
+    }
+    lv->setMaximumHeight(max_height + 2*style()->pixelMetric(QStyle::PM_DefaultFrameWidth));
+
+    return lv;
 }
 
 namespace
@@ -58,11 +71,11 @@ auto constexpr ActivityFields = FilterMode::TorrentFields;
 
 } // namespace
 
-QComboBox* FilterBar::createTrackerUI(QStandardItemModel* model)
+QListView* FilterView::createTrackerUI(QStandardItemModel* model)
 {
-    auto* c = new FilterBarComboBox(this);
-    auto* delegate = new FilterUIDelegate(this, c);
-    c->setItemDelegate(delegate);
+    auto* lv = new QListView(this);
+    auto* delegate = new FilterUIDelegate(this, lv);
+    lv->setItemDelegate(delegate);
 
     auto* row = new QStandardItem(tr("All"));
     row->setData(QString(), TRACKER_ROLE);
@@ -74,38 +87,41 @@ QComboBox* FilterBar::createTrackerUI(QStandardItemModel* model)
     model->appendRow(new QStandardItem); // separator
     FilterUIDelegate::setSeparator(model, model->index(1, 0));
 
-    c->setModel(model);
-    return c;
+    lv->setModel(model);
+    lv->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    lv->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    lv->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    return lv;
 }
 
-FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent)
+FilterView::FilterView(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent)
     : FilterUI(prefs, torrents, filter, parent)
 {
-    auto* h = new QHBoxLayout(this);
-    h->setContentsMargins(1, 1, 1, 1);
+    auto* v = new QVBoxLayout(this);
+    v->setContentsMargins(1, 1, 1, 1);
+
+    auto* h = new QHBoxLayout();
 
     h->addWidget(btn_);
-    connect(btn_, &IconToolButton::clicked, this, &FilterBar::toggleUI);
-
-    count_label_ = new QLabel(tr("Show:"), this);
-    h->addWidget(count_label_);
-
-    h->addWidget(activity_ui_);
-
-    tracker_ui_ = createTrackerUI(tracker_model_);
-    h->addWidget(tracker_ui_);
-
-    h->addStretch();
+    connect(btn_, &IconToolButton::clicked, this, &FilterView::toggleUI);
 
     line_edit_->setClearButtonEnabled(true);
     line_edit_->setPlaceholderText(tr("Search…"));
-    line_edit_->setMaximumWidth(250);
     h->addWidget(line_edit_, 1);
-    connect(line_edit_, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
+    connect(line_edit_, &QLineEdit::textChanged, this, &FilterView::onTextChanged);
+
+    v->addLayout(h);
+
+    tracker_ui_ = createTrackerUI(tracker_model_);
+    v->addWidget(tracker_ui_);
+
+    v->addWidget(activity_ui_);
+    setMinimumWidth(activity_ui_->sizeHintForColumn(0) + style()->pixelMetric(QStyle::PM_DefaultFrameWidth) + style()->pixelMetric(QStyle::PM_ScrollBarExtent));
 
     // listen for changes from the other players
-    connect(activity_ui_, qOverload<int>(&QComboBox::currentIndexChanged), this, &FilterBar::onActivityIndexChanged);
-    connect(tracker_ui_, qOverload<int>(&QComboBox::currentIndexChanged), this, &FilterBar::onTrackerIndexChanged);
+    connect(activity_ui_, &QListView::clicked, this, &FilterView::onActivityIndexChanged);
+    connect(tracker_ui_, &QListView::clicked, this, &FilterView::onTrackerIndexChanged);
 
     recountAllSoon();
     is_bootstrapping_ = false; // NOLINT cppcoreguidelines-prefer-member-initializer
@@ -117,14 +133,14 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     }
 }
 
-void FilterBar::clear()
+void FilterView::clear()
 {
-    activity_ui_->setCurrentIndex(0);
-    tracker_ui_->setCurrentIndex(0);
+    activity_ui_->clearSelection();
+    tracker_ui_->clearSelection();
     line_edit_->clear();
 }
 
-void FilterBar::refreshPref(int key)
+void FilterView::refreshPref(int key)
 {
     switch (key)
     {
@@ -136,7 +152,7 @@ void FilterBar::refreshPref(int key)
                 QAbstractItemModel const* const model = activity_ui_->model();
                 QModelIndexList indices;
                 indices = model->match(model->index(0, 0), ACTIVITY_ROLE, modes.first().mode());
-                activity_ui_->setCurrentIndex(indices.isEmpty() ? 0 : indices.first().row());
+                activity_ui_->setCurrentIndex(indices.first());
             }
             break;
         }
@@ -150,20 +166,15 @@ void FilterBar::refreshPref(int key)
                 auto rows = tracker_model_->findItems(display_name);
                 if (!rows.isEmpty())
                 {
-                    tracker_ui_->setCurrentIndex(rows.front()->row());
+                    tracker_ui_->setCurrentIndex(rows.front()->index());
                 }
-                else // hm, we don't seem to have this tracker anymore...
+                else
                 {
-                    if (display_name.isEmpty()) // set combobox to "All" if it is selected in FilterView
-                    {
-                        tracker_ui_->setCurrentIndex(0);
-                    }
-
                     bool const is_bootstrapping = tracker_model_->rowCount() <= 2;
 
                     if (!is_bootstrapping)
                     {
-                        prefs_.set(key, QStringList());
+                        prefs_.set(key, QString());
                     }
                 }
             }
@@ -172,29 +183,31 @@ void FilterBar::refreshPref(int key)
     }
 }
 
-void FilterBar::onTrackerIndexChanged(int i)
+void FilterView::onTrackerIndexChanged(QModelIndex i)
 {
     if (!is_bootstrapping_)
     {
-        auto const display_name = tracker_ui_->itemData(i, TRACKER_ROLE).toString();
         auto *const display_names = new QStringList;
-        display_names->append(display_name);
+        for (QModelIndex const display_index : tracker_ui_->selectionModel()->selectedIndexes()) {
+            display_names->append(tracker_model_->data(display_index, TRACKER_ROLE).toString());
+        }
         prefs_.set(Prefs::FILTER_TRACKERS, *display_names);
     }
 }
 
-void FilterBar::onActivityIndexChanged(int i)
+void FilterView::onActivityIndexChanged(QModelIndex i)
 {
     if (!is_bootstrapping_)
     {
-        auto const mode = FilterMode(activity_ui_->itemData(i, ACTIVITY_ROLE).toInt());
         auto *const modes = new QList<FilterMode>;
-        modes->append(mode);
+        for (QModelIndex const mode_index : activity_ui_->selectionModel()->selectedIndexes()) {
+            modes->append(FilterMode(activity_ui_->model()->data(mode_index, ACTIVITY_ROLE).toInt()));
+        }
         prefs_.set(Prefs::FILTER_MODE, *modes);
     }
 }
 
-void FilterBar::recount()
+void FilterView::recount()
 {
     QAbstractItemModel* model = activity_ui_->model();
 

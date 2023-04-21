@@ -34,8 +34,12 @@ target_sources(${TR_NAME}-qt
         FilterBar.h
         FilterBarComboBox.cc
         FilterBarComboBox.h
-        FilterBarComboBoxDelegate.cc
-        FilterBarComboBoxDelegate.h
+        FilterUI.cc
+        FilterUI.h
+        FilterUIDelegate.cc
+        FilterUIDelegate.h
+        FilterView.cc
+        FilterView.h
         Filters.cc
         Filters.h
         Formatter.cc

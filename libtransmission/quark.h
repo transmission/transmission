@@ -339,6 +339,7 @@ enum
     TR_KEY_show_backup_trackers,
     TR_KEY_show_extra_peer_details,
     TR_KEY_show_filterbar,
+    TR_KEY_show_filterbar_alt_view,
     TR_KEY_show_notification_area_icon,
     TR_KEY_show_options_window,
     TR_KEY_show_statusbar,

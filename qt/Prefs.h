@@ -45,6 +45,7 @@ public:
         SORT_REVERSED,
         COMPACT_VIEW,
         FILTERBAR,
+        FILTERBAR_ALT_VIEW,
         STATUSBAR,
         STATUSBAR_STATS,
         SHOW_TRACKER_SCRAPES,
