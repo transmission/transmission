@@ -116,7 +116,7 @@ public:
         auto lock = std::unique_lock{ cache_mutex_ };
         for (auto const& [key, cache] : cache_)
         {
-            if (cache.result != Result::Success)
+            if (cache.result == Result::Pending)
             {
                 continue;
             }
@@ -133,15 +133,21 @@ public:
                 continue;
             }
 
-            if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&cache.addr)); addrport)
+            auto addr = family == Family::IPv4 ? tr_address::any_ipv4() : tr_address::any_ipv6();
+            if (cache.result == Result::Success)
             {
-                auto& addresses = tmp[fmt::format("{:s}:{:d}", host, port.host())];
-                if (!std::empty(addresses))
+                if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&cache.addr)); addrport)
                 {
-                    addresses += ',';
+                    addr = addrport->first;
                 }
-                addresses += addrport->first.display_name();
             }
+
+            auto& addresses = tmp[fmt::format("{:s}:{:d}", host, port.host())];
+            if (!std::empty(addresses))
+            {
+                addresses += ',';
+            }
+            addresses += addr.display_name();
         }
 
         auto ret = std::vector<std::string>{};
