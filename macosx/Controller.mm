@@ -1254,7 +1254,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         //determine to show the options window
-        auto const is_multifile = metainfo.fileCount() > 1;
+        auto const is_multifile = metainfo.file_count() > 1;
         BOOL const showWindow = type == AddTypeShowOptions ||
             ([self.fDefaults boolForKey:@"DownloadAsk"] && (is_multifile || ![self.fDefaults boolForKey:@"DownloadAskMulti"]) &&
              (type != AddTypeAuto || ![self.fDefaults boolForKey:@"DownloadAskManual"]));

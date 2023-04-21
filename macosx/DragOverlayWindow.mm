@@ -73,9 +73,9 @@
             {
                 ++count;
 
-                size += metainfo.totalSize();
+                size += metainfo.total_size();
 
-                auto const n_files = metainfo.fileCount();
+                auto const n_files = metainfo.file_count();
                 fileCount += n_files;
                 // only useful when one torrent
                 if (count == 1)
