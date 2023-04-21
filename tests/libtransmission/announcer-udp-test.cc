@@ -14,9 +14,10 @@
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/announcer.h>
 #include <libtransmission/announcer-common.h>
+#include <libtransmission/announcer.h>
 #include <libtransmission/crypto-utils.h> // for tr_rand_obj()
+#include <libtransmission/dns-cache.h>
 #include <libtransmission/peer-mgr.h> // for tr_pex
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-buffer.h>
@@ -37,6 +38,52 @@ private:
     }
 
 protected:
+    class MockDnsCache final : public libtransmission::DnsCache
+    {
+    public:
+        MockDnsCache() = default;
+        virtual ~MockDnsCache() = default;
+
+        MockDnsCache(MockDnsCache&&) = delete;
+        MockDnsCache(MockDnsCache const&) = delete;
+        MockDnsCache& operator= (MockDnsCache&&) = delete;
+        MockDnsCache& operator= (MockDnsCache const&) = delete;
+
+        std::tuple<Result, sockaddr_storage, socklen_t> get(
+            std::string_view host,
+            tr_port port,
+            time_t /*now*/,
+            Family /*family*/,
+            Protocol /*protocol*/) override
+        {
+            if (auto const addr = tr_address::from_string(host); addr)
+            {
+                auto const [ss, sslen] = addr->to_sockaddr(port);
+                return { Result::Success, ss, sslen };
+            }
+
+            return { Result::Failed, {}, {} };
+        }
+
+        [[nodiscard]] bool is_pending(
+            [[maybe_unused]] std::string_view host, \
+            [[maybe_unused]] tr_port port, \
+            [[maybe_unused]] Family family, \
+            [[maybe_unused]] Protocol protocol) const override
+        {
+            return false;
+        }
+
+        [[nodiscard]] std::vector<std::tuple<std::string, tr_port, Family, Protocol, Result, sockaddr_storage, socklen_t>> dump(
+            time_t /*now*/,
+            [[maybe_unused]] std::optional<Family> family_wanted = {},
+            [[maybe_unused]] std::optional<Protocol> protocol_wanted = {}) const override
+        {
+            TR_ASSERT(false && "not implemented");
+            return {};
+        }
+    };
+
     class MockMediator final : public tr_announcer_udp::Mediator
     {
     public:
@@ -78,9 +125,16 @@ protected:
             socklen_t sslen_ = {};
         };
 
+        [[nodiscard]] libtransmission::DnsCache& dns_cache() override
+        {
+            return dns_cache_;
+        }
+
         std::deque<Sent> sent_;
 
         std::unique_ptr<event_base, void (*)(event_base*)> const event_base_;
+
+        MockDnsCache dns_cache_;
     };
 
     static void expectEqual(tr_scrape_response const& expected, tr_scrape_response const& actual)

@@ -55,12 +55,28 @@ public:
         Failed
     };
 
+    virtual std::tuple<Result, sockaddr_storage, socklen_t> get(
+        std::string_view host,
+        tr_port port,
+        time_t now,
+        Family family,
+        Protocol protocol) = 0;
+
+    [[nodiscard]] virtual bool is_pending(std::string_view host, tr_port port, Family family, Protocol protocol) const = 0;
+
+    [[nodiscard]] virtual std::vector<std::tuple<std::string, tr_port, Family, Protocol, Result, sockaddr_storage, socklen_t>>
+    dump(time_t now, std::optional<Family> family_wanted = {}, std::optional<Protocol> protocol_wanted = {}) const = 0;
+};
+
+class DnsCacheImpl : public DnsCache
+{
+public:
     std::tuple<Result, sockaddr_storage, socklen_t> get(
         std::string_view host,
         tr_port port,
         time_t now,
         Family family,
-        Protocol protocol) noexcept
+        Protocol protocol) override
     {
         auto const key = Key{ host, port, family, protocol };
 
@@ -96,7 +112,7 @@ public:
         return { Result::Pending, {}, {} };
     }
 
-    [[nodiscard]] bool is_pending(std::string_view host, tr_port port, Family family, Protocol protocol) const noexcept
+    [[nodiscard]] bool is_pending(std::string_view host, tr_port port, Family family, Protocol protocol) const override
     {
         auto const key = Key{ host, port, family, protocol };
 
@@ -104,23 +120,18 @@ public:
         return pending_.count(key) != 0U;
     }
 
-    [[nodiscard]] auto dump(
-        time_t now, //
-        std::optional<Family> family_wanted = {}, //
-        std::optional<Protocol> protocol_wanted = {}) const
+    [[nodiscard]] std::vector<std::tuple<std::string, tr_port, Family, Protocol, Result, sockaddr_storage, socklen_t>> dump(
+        time_t now,
+        std::optional<Family> family_wanted = {},
+        std::optional<Protocol> protocol_wanted = {}) const override
     {
         check_pending(now);
 
-        auto tmp = std::map<std::string /*host:port*/, std::string /*comma-separated addresses*/>{};
-
         auto lock = std::unique_lock{ cache_mutex_ };
+        auto ret = std::vector<std::tuple<std::string, tr_port, Family, Protocol, Result, sockaddr_storage, socklen_t>>{};
+        ret.reserve(std::size(cache_));
         for (auto const& [key, cache] : cache_)
         {
-            if (cache.result == Result::Pending)
-            {
-                continue;
-            }
-
             auto const& [host, port, family, protocol] = key;
 
             if (family_wanted && *family_wanted != family)
@@ -133,28 +144,7 @@ public:
                 continue;
             }
 
-            auto addr = family == Family::IPv4 ? tr_address::any_ipv4() : tr_address::any_ipv6();
-            if (cache.result == Result::Success)
-            {
-                if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&cache.addr)); addrport)
-                {
-                    addr = addrport->first;
-                }
-            }
-
-            auto& addresses = tmp[fmt::format("{:s}:{:d}", host, port.host())];
-            if (!std::empty(addresses))
-            {
-                addresses += ',';
-            }
-            addresses += addr.display_name();
-        }
-
-        auto ret = std::vector<std::string>{};
-        ret.reserve(std::size(tmp));
-        for (auto const& [hostport, addresses] : tmp)
-        {
-            ret.emplace_back(fmt::format("{:s}:{:s}", hostport, addresses));
+            ret.emplace_back(host, port, family, protocol, cache.result, cache.addr.first, cache.addr.second);
         }
         return ret;
     }

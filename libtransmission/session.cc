@@ -322,10 +322,46 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
     return std::nullopt;
 }
 
-std::vector<std::string> tr_session::WebMediator::resolved_hosts() const
+std::vector<std::string /*HOST:PORT:ADDRESS[,ADDRESS]*/> tr_session::WebMediator::resolved_hosts() const
 {
+    using DnsCache = libtransmission::DnsCache;
+
     auto const now = tr_time();
-    return session_->dns_cache_.dump(now);
+    auto tmp = std::map<std::string /*host:port*/, std::string /*address[,address]*/>{};
+
+    for (auto const& [host, port, family, protocol, result, ss, sslen] :
+         session_->dns_cache_.dump(now, {}, DnsCache::Protocol::TCP))
+    {
+        auto addrstr = std::string{};
+
+        if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss)); addrport)
+        {
+            addrstr = addrport->first.display_name();
+        }
+        else if (family == DnsCache::Family::IPv4)
+        {
+            addrstr = tr_address::any_ipv4().display_name();
+        }
+        else
+        {
+            addrstr = tr_address::any_ipv6().display_name();
+        }
+
+        auto& addresses = tmp[fmt::format("{:s}:{:d}", host, port.host())];
+        if (!std::empty(addresses))
+        {
+            addresses += ',';
+        }
+        addresses += addrstr;
+    }
+
+    auto ret = std::vector<std::string>{};
+    ret.reserve(std::size(tmp));
+    for (auto const& [hostport, addresses] : tmp)
+    {
+        ret.emplace_back(fmt::format("{:s}:{:s}", hostport, addresses));
+    }
+    return ret;
 }
 
 size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const

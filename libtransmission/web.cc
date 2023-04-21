@@ -515,6 +515,17 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
 
+        if (auto const resolved = mediator.resolved_hosts(); !std::empty(resolved))
+        {
+            curl_slist* slist = nullptr;
+            for (auto const& str : resolved)
+            {
+                slist = curl_slist_append(slist, str.c_str());
+            }
+            (void)curl_easy_setopt(e, CURLOPT_RESOLVE, slist);
+            curl_slist_free_all(slist);
+        }
+
 #ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, &task);
