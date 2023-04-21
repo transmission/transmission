@@ -61,6 +61,7 @@
 #include "libtransmission/verify.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -319,6 +320,12 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
     }
 
     return std::nullopt;
+}
+
+std::vector<std::string> tr_session::WebMediator::resolved_hosts() const
+{
+    auto const now = tr_time();
+    return session_->dns_cache_.dump(now);
 }
 
 size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
@@ -2171,7 +2178,24 @@ void tr_session::addIncoming(tr_peer_socket&& socket)
 
 void tr_session::addTorrent(tr_torrent* tor)
 {
+    using DnsCache = libtransmission::DnsCache;
+
     tor->unique_id_ = torrents().add(tor);
 
     tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
+
+    auto const now = tr_time();
+    for (auto const& tracker : tor->announceList())
+    {
+        if (auto const parsed = tr_urlParse(tracker.announce); parsed)
+        {
+            auto const host = std::string{ parsed->host };
+            auto const port = tr_port::fromHost(parsed->port);
+
+            dns_cache_.get(host, port, now, DnsCache::Family::IPv4, DnsCache::Protocol::TCP);
+            dns_cache_.get(host, port, now, DnsCache::Family::IPv6, DnsCache::Protocol::TCP);
+            dns_cache_.get(host, port, now, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
+            dns_cache_.get(host, port, now, DnsCache::Family::IPv6, DnsCache::Protocol::UDP);
+        }
+    }
 }

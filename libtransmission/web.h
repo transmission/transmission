@@ -13,6 +13,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 struct evbuffer;
 
@@ -137,6 +138,13 @@ public:
         [[nodiscard]] virtual std::optional<std::string_view> userAgent() const
         {
             return std::nullopt;
+        }
+
+        // strings with host name resolve information
+        // https://curl.se/libcurl/c/CURLOPT_RESOLVE.html
+        [[nodiscard]] virtual std::vector<std::string> resolved_hosts() const
+        {
+            return {};
         }
 
         // Notify the system that `byte_count` of download bandwidth was used

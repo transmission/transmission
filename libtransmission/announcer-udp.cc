@@ -3,16 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // for std::find_if()
+#include <algorithm> // for std::find_if(), std::sort()
 #include <cerrno> // for errno, EAFNOSUPPORT
 #include <climits> // for CHAR_BIT
 #include <cstring> // for memset()
 #include <ctime>
-#include <future>
 #include <list>
 #include <map>
 #include <memory>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 #ifdef _WIN32
@@ -45,6 +45,7 @@
 namespace
 {
 using namespace std::literals;
+using DnsCache = libtransmission::DnsCache;
 
 // size defined by bep15
 using tau_connection_t = uint64_t;
@@ -70,6 +71,7 @@ enum tau_action_t
 
 // --- DNS CACHE
 
+#if 0
 class DnsCache
 {
 public:
@@ -80,13 +82,27 @@ public:
         Failed
     };
 
+    enum class Family
+    {
+        IPv4,
+        IPv6
+    };
+
+    enum class Protocol
+    {
+        TCP,
+        UDP
+    };
+
     [[nodiscard]] std::pair<State, Sockaddr> get(
         tr_interned_string host,
         tr_port port,
         time_t now,
+        Family family,
+        Protocol protocol,
         tr_interned_string logname) noexcept
     {
-        auto const key = Key{ host, port };
+        auto const key = Key{ host, port, family, protocol };
 
         if (auto const iter = pending_.find(key); iter != std::end(pending_))
         {
@@ -112,19 +128,53 @@ public:
             cache_.erase(iter); // expired
         }
 
-        pending_[key] = std::async(std::launch::async, lookup, host, port, logname);
+        pending_[key] = std::async(std::launch::async, lookup, host, port, family, protocol, logname);
         return { State::Pending, {} };
     }
 
-    [[nodiscard]] bool is_pending(tr_interned_string host, tr_port port) const noexcept
+    [[nodiscard]] bool is_pending(tr_interned_string host, tr_port port, Family family, Protocol protocol) const noexcept
     {
-        return pending_.count({ host, port }) != 0U;
+        return pending_.count({ host, port, family, protocol }) != 0U;
+    }
+
+    [[nodiscard]] auto dump(std::optional<Family> family_wanted = {}, std::optional<Protocol> protocol_wanted = {}) const
+    {
+        auto ret = std::vector<std::string>{};
+
+        for (auto const& [key, cache] : cache_)
+        {
+            if (cache.state != State::Success)
+            {
+                continue;
+            }
+
+            auto const& [host, port, family, protocol] = key;
+
+            if (family_wanted && *family_wanted != family)
+            {
+                continue;
+            }
+
+            if (protocol_wanted && *protocol_wanted != protocol)
+            {
+                continue;
+            }
+
+            if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&cache.addr.first)); addrport)
+            {
+                TR_ASSERT(addrport->second == port);
+                ret.emplace_back(fmt::format("{:s}:{:d}:{:s}", host.sv(), port.host(), addrport->first.display_name()));
+            }
+        }
+
+        std::sort(std::begin(ret), std::end(ret));
+        return ret;
     }
 
 private:
     static inline constexpr auto CacheTtl = time_t{ 3600 };
 
-    using Key = std::pair<tr_interned_string, tr_port>;
+    using Key = std::tuple<tr_interned_string, tr_port, Family, Protocol>;
     using MaybeSockaddr = std::optional<Sockaddr>;
 
     struct Cache
@@ -137,15 +187,15 @@ private:
     std::map<Key, Cache> cache_;
     std::map<Key, std::future<MaybeSockaddr>> pending_;
 
-    [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
+    [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, Family family, Protocol protocol, tr_interned_string logname)
     {
         auto szport = std::array<char, 16>{};
         *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
 
         auto hints = addrinfo{};
-        hints.ai_family = AF_INET; // https://github.com/transmission/transmission/issues/4719
-        hints.ai_protocol = IPPROTO_UDP;
-        hints.ai_socktype = SOCK_DGRAM;
+        hints.ai_family = family == Family::IPv4 ? AF_INET : AF_INET6;
+        hints.ai_protocol = protocol == Protocol::TCP ? IPPROTO_TCP : IPPROTO_UDP;
+        hints.ai_socktype = protocol == Protocol::TCP ? SOCK_STREAM : SOCK_DGRAM;
 
         addrinfo* info = nullptr;
         if (int const rc = getaddrinfo(host.c_str(), std::data(szport), &hints, &info); rc != 0)
@@ -170,6 +220,7 @@ private:
         return std::make_pair(ss, len);
     }
 };
+#endif
 
 // --- SCRAPE
 
@@ -441,8 +492,13 @@ struct tau_tracker
             return;
         }
 
-        auto const [state, addr] = dns_cache.get(this->host, this->port, now, this->key);
-        if (state == DnsCache::State::Pending)
+        auto const [result, ss, sslen] = mediator_.dns_cache().get(
+            this->host.sv(),
+            this->port,
+            now,
+            DnsCache::Family::IPv4,
+            DnsCache::Protocol::UDP);
+        if (result == DnsCache::Result::Pending)
         {
             return;
         }
@@ -457,7 +513,7 @@ struct tau_tracker
                 this->connecting_at));
 
         // also need a valid connection ID...
-        if (state == DnsCache::State::Success && !is_connected(now) && this->connecting_at == 0)
+        if (result == DnsCache::Result::Success && !is_connected(now) && this->connecting_at == 0)
         {
             this->connecting_at = now;
             this->connection_transaction_id = tau_transaction_new();
@@ -469,7 +525,7 @@ struct tau_tracker
             buf.add_uint32(this->connection_transaction_id);
 
             auto const [bytes, n_bytes] = buf.pullup();
-            this->sendto(addr, bytes, n_bytes);
+            this->sendto({ ss, sslen }, bytes, n_bytes);
         }
 
         if (timeout_reqs)
@@ -477,9 +533,9 @@ struct tau_tracker
             timeout_requests(now);
         }
 
-        if (state == DnsCache::State::Success && is_connected(now))
+        if (result == DnsCache::Result::Success && is_connected(now))
         {
-            send_requests(addr);
+            send_requests({ ss, sslen });
         }
     }
 
@@ -493,7 +549,8 @@ private:
 
     [[nodiscard]] bool isIdle() const noexcept
     {
-        return std::empty(announces) && std::empty(scrapes) && !dns_cache.is_pending(host, port);
+        return std::empty(announces) && std::empty(scrapes) &&
+            !mediator_.dns_cache().is_pending(host, port, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
     }
 
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
@@ -613,7 +670,6 @@ public:
 private:
     Mediator& mediator_;
 
-    static inline DnsCache dns_cache = {}; // NOLINT
     static inline constexpr auto ConnectionRequestTtl = int{ 30 };
 };
 

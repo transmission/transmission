@@ -19,6 +19,7 @@
 
 #include "transmission.h"
 
+#include "dns-cache.h"
 #include "interned-string.h"
 #include "net.h"
 
@@ -135,6 +136,7 @@ public:
     public:
         virtual ~Mediator() noexcept = default;
         virtual void sendto(void const* buf, size_t buflen, sockaddr const* addr, socklen_t addrlen) = 0;
+        virtual libtransmission::DnsCache& dns_cache() = 0;
         [[nodiscard]] virtual std::optional<tr_address> announce_ip() const = 0;
     };
 
