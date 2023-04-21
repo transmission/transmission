@@ -10,6 +10,7 @@
 #include <ctime>
 #include <future>
 #include <map>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -63,12 +64,15 @@ public:
     {
         auto const key = Key{ host, port, family, protocol };
 
+        auto const pending_lock = std::unique_lock{ pending_mutex_ };
         if (auto const iter = pending_.find(key); iter != std::end(pending_))
         {
             if (auto& fut = iter->second; fut.wait_for(std::chrono::milliseconds{ 0 }) == std::future_status::ready)
             {
                 auto const addr = fut.get();
+                auto const cache_lock = std::unique_lock{ cache_mutex_ };
                 cache_[key] = addr ? Cache{ *addr, now, Result::Success } : Cache{ {}, now, Result::Failed };
+
                 pending_.erase(iter);
             }
             else
@@ -77,6 +81,7 @@ public:
             }
         }
 
+        auto const cache_lock = std::unique_lock{ cache_mutex_ };
         if (auto const iter = cache_.find(key); iter != std::end(cache_))
         {
             if (auto const& [addr, created_at, result] = iter->second; now - created_at < CacheTtlSecs)
@@ -94,6 +99,8 @@ public:
     [[nodiscard]] bool is_pending(std::string_view host, tr_port port, Family family, Protocol protocol) const noexcept
     {
         auto const key = Key{ host, port, family, protocol };
+
+        auto const lock = std::unique_lock{ pending_mutex_ };
         return pending_.count(key) != 0U;
     }
 
@@ -106,6 +113,7 @@ public:
 
         auto tmp = std::map<std::string /*host:port*/, std::string /*comma-separated addresses*/>{};
 
+        auto lock = std::unique_lock{ cache_mutex_ };
         for (auto const& [key, cache] : cache_)
         {
             if (cache.result != Result::Success)
@@ -183,6 +191,9 @@ private:
 
     void check_pending(time_t now) const
     {
+        auto const pending_lock = std::unique_lock{ pending_mutex_ };
+        auto const cache_lock = std::unique_lock{ cache_mutex_ };
+
         if (auto iter = std::begin(pending_); iter != std::end(pending_))
         {
             if (auto& [key, fut] = *iter; fut.wait_for(std::chrono::milliseconds{ 0 }) == std::future_status::ready)
@@ -196,8 +207,11 @@ private:
 
     static inline constexpr auto CacheTtlSecs = time_t{ 3600 };
 
-    mutable std::map<Key, Cache> cache_;
+    mutable std::mutex pending_mutex_;
     mutable std::map<Key, std::future<MaybeSockaddr>> pending_;
+
+    mutable std::mutex cache_mutex_;
+    mutable std::map<Key, Cache> cache_;
 };
 
 } // namespace libtransmission
