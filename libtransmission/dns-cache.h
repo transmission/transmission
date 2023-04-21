@@ -64,23 +64,7 @@ public:
     {
         auto const key = Key{ host, port, family, protocol };
 
-        auto const pending_lock = std::unique_lock{ pending_mutex_ };
-        if (auto const iter = pending_.find(key); iter != std::end(pending_))
-        {
-            if (auto& fut = iter->second; fut.wait_for(std::chrono::milliseconds{ 0 }) == std::future_status::ready)
-            {
-                auto const addr = fut.get();
-                auto const cache_lock = std::unique_lock{ cache_mutex_ };
-                cache_[key] = addr ? Cache{ *addr, now, Result::Success } : Cache{ {}, now, Result::Failed };
-
-                pending_.erase(iter);
-            }
-            else
-            {
-                return { Result::Pending, {}, {} };
-            }
-        }
-
+        // do we already have it?
         auto const cache_lock = std::unique_lock{ cache_mutex_ };
         if (auto const iter = cache_.find(key); iter != std::end(cache_))
         {
@@ -92,7 +76,23 @@ public:
             cache_.erase(iter); // expired
         }
 
-        pending_[key] = std::async(std::launch::async, lookup, std::string{ host }, port, family, protocol);
+        // did we already request it?
+        auto const pending_lock = std::unique_lock{ pending_mutex_ };
+        if (auto const iter = pending_.find(key); iter != std::end(pending_))
+        {
+            if (auto& fut = iter->second; fut.wait_for(std::chrono::milliseconds{ 0 }) == std::future_status::ready)
+            {
+                auto const addr = fut.get();
+                auto& perm = cache_[key];
+                perm = addr ? Cache{ *addr, now, Result::Success } : Cache{ {}, now, Result::Failed };
+                pending_.erase(iter);
+                return { perm.result, perm.addr.first, perm.addr.second };
+            }
+
+            return { Result::Pending, {}, {} };
+        }
+
+        pending_.try_emplace(key, std::async(std::launch::async, lookup, std::string{ host }, port, family, protocol));
         return { Result::Pending, {}, {} };
     }
 
