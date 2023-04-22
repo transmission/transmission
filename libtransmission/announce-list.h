@@ -105,7 +105,7 @@ public:
         return add(announce_url_sv, this->nextTier());
     }
 
-    bool add(std::string_view announce_url_sv, tr_tracker_tier_t tier);
+    bool add(std::string_view announce_url_in, tr_tracker_tier_t tier);
     void add(tr_announce_list const& src);
     bool remove(std::string_view announce_url);
     bool remove(tr_tracker_id_t id);
