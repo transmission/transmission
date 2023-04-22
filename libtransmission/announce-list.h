@@ -15,6 +15,7 @@
 
 #include "quark.h"
 #include "interned-string.h"
+#include "web-utils.h"
 
 struct tr_error;
 struct tr_url_parsed_t;
@@ -30,6 +31,7 @@ public:
         tr_interned_string sitename; // 'example'
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
+        tr_url_parsed_t announce_parsed = {};
 
         [[nodiscard]] constexpr int compare(tracker_info const& that) const noexcept // <=>
         {

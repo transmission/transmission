@@ -72,22 +72,24 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
     return add(announce_url_sv, tier);
 }
 
-bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t tier)
+bool tr_announce_list::add(std::string_view announce_url_in, tr_tracker_tier_t tier)
 {
-    auto const announce = tr_urlParseTracker(announce_url_sv);
-    if (!announce || !can_add(*announce))
+    auto const announce_url = tr_interned_string{ announce_url_in };
+    auto const announce_parsed = tr_urlParseTracker(announce_url.sv());
+    if (!announce_parsed || !can_add(*announce_parsed))
     {
         return false;
     }
 
     auto tracker = tracker_info{};
-    tracker.announce = announce_url_sv;
-    tracker.tier = get_tier(tier, *announce);
+    tracker.announce = announce_url;
+    tracker.announce_parsed = *announce_parsed;
+    tracker.tier = get_tier(tier, *announce_parsed);
     tracker.id = next_unique_id();
-    tracker.host_and_port = fmt::format(FMT_STRING("{:s}:{:d}"), announce->host, announce->port);
-    tracker.sitename = announce->sitename;
+    tracker.host_and_port = fmt::format(FMT_STRING("{:s}:{:d}"), announce_parsed->host, announce_parsed->port);
+    tracker.sitename = announce_parsed->sitename;
 
-    if (auto const scrape_str = announce_to_scrape(announce_url_sv); scrape_str)
+    if (auto const scrape_str = announce_to_scrape(announce_url); scrape_str)
     {
         tracker.scrape = *scrape_str;
     }

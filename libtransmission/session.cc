@@ -2223,15 +2223,12 @@ void tr_session::addTorrent(tr_torrent* tor)
     auto const now = tr_time();
     for (auto const& tracker : tor->announceList())
     {
-        if (auto const parsed = tr_urlParse(tracker.announce); parsed)
-        {
-            auto const host = std::string{ parsed->host };
-            auto const port = tr_port::fromHost(parsed->port);
+        auto const host = tracker.announce_parsed.host;
+        auto const port = tr_port::fromHost(tracker.announce_parsed.port);
 
-            dns_cache_.get(host, port, now, DnsCache::Family::IPv4, DnsCache::Protocol::TCP);
-            dns_cache_.get(host, port, now, DnsCache::Family::IPv6, DnsCache::Protocol::TCP);
-            dns_cache_.get(host, port, now, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
-            dns_cache_.get(host, port, now, DnsCache::Family::IPv6, DnsCache::Protocol::UDP);
-        }
+        dns_cache_.get(host, port, now, DnsCache::Family::IPv4, DnsCache::Protocol::TCP);
+        dns_cache_.get(host, port, now, DnsCache::Family::IPv6, DnsCache::Protocol::TCP);
+        dns_cache_.get(host, port, now, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
+        dns_cache_.get(host, port, now, DnsCache::Family::IPv6, DnsCache::Protocol::UDP);
     }
 }
