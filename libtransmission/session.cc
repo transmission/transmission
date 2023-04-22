@@ -1302,6 +1302,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     verifier_.reset();
     save_timer_.reset();
     now_timer_.reset();
+    dns_timer_.reset();
     rpc_server_.reset();
     dht_.reset();
     lpd_.reset();
@@ -2189,6 +2190,9 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->start_repeating(1s);
 
+    dns_timer_ = timerMaker().create([this]() { onDnsTimer(); });
+    dns_timer_->startRepeating(10min);
+
     // Periodically save the .resume files of any torrents whose
     // status has recently changed. This prevents loss of metadata
     // in the case of a crash, unclean shutdown, clumsy user, etc.
@@ -2214,11 +2218,26 @@ void tr_session::addIncoming(tr_peer_socket&& socket)
 
 void tr_session::addTorrent(tr_torrent* tor)
 {
-    using DnsCache = libtransmission::DnsCache;
-
     tor->unique_id_ = torrents().add(tor);
 
     tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
+
+    update_dns_cache(tor);
+}
+
+void tr_session::onDnsTimer()
+{
+    auto const lock = unique_lock();
+
+    for (auto const* const tor : torrents())
+    {
+        update_dns_cache(tor);
+    }
+}
+
+void tr_session::update_dns_cache(tr_torrent const* tor)
+{
+    using DnsCache = libtransmission::DnsCache;
 
     auto const now = tr_time();
     for (auto const& tracker : tor->announceList())

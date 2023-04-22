@@ -89,7 +89,7 @@ public:
                 return { result, addr.first, addr.second };
             }
 
-            cache_.erase(iter); // expired
+            cache_.erase(iter); // we did have it, but the TTL has expired
         }
 
         // did we already request it?

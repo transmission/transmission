@@ -517,10 +517,12 @@ public:
 
         if (auto const resolved = mediator.resolved_hosts(); !std::empty(resolved))
         {
+            fmt::print("{:s}:{:d} ===\n", __FILE__, __LINE__);
             curl_slist* slist = nullptr;
-            for (auto const& str : resolved)
+            for (auto const& line : resolved)
             {
-                slist = curl_slist_append(slist, str.c_str());
+                fmt::print("{:s}:{:d} {:s}\n", __FILE__, __LINE__, line);
+                slist = curl_slist_append(slist, line.c_str());
             }
             (void)curl_easy_setopt(e, CURLOPT_RESOLVE, slist);
             curl_slist_free_all(slist);

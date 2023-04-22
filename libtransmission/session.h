@@ -886,6 +886,8 @@ public:
         }
     }
 
+    void update_dns_cache(tr_torrent const* tor);
+
 private:
     constexpr bool& scriptEnabledFlag(TrScript i)
     {
@@ -930,6 +932,7 @@ private:
     void closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
 
     void onNowTimer();
+    void onDnsTimer();
 
     static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
 
@@ -1169,6 +1172,9 @@ private:
 
     // depends-on: torrents_
     std::unique_ptr<libtransmission::Timer> save_timer_;
+
+    // depends-on: dns_cache_, torrents_
+    std::unique_ptr<libtransmission::Timer> dns_timer_;
 
     std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
 
