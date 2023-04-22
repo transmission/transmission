@@ -13,8 +13,10 @@
 
 #define LIBTRANSMISSION_PEER_MODULE
 
-#include "peer-mgr-active-requests.h"
-#include "tr-assert.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/peer-mgr-active-requests.h"
+#include "libtransmission/tr-assert.h"
 
 namespace
 {

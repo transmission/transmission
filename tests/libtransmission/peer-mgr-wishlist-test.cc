@@ -28,6 +28,7 @@ protected:
         mutable std::set<tr_piece_index_t> can_request_piece_;
         tr_piece_index_t piece_count_ = 0;
         bool is_endgame_ = false;
+        bool is_sequential_download_ = false;
 
         [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const final
         {
@@ -42,6 +43,11 @@ protected:
         [[nodiscard]] bool isEndgame() const final
         {
             return is_endgame_;
+        }
+
+        [[nodiscard]] bool isSequentialDownload() const final
+        {
+            return is_sequential_download_;
         }
 
         [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const final

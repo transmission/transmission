@@ -8,11 +8,11 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "completion.h"
-#include "torrent.h"
-#include "tr-assert.h"
+#include "libtransmission/completion.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
 
 uint64_t tr_completion::computeHasValid() const
 {

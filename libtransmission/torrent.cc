@@ -27,28 +27,28 @@
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "bandwidth.h"
-#include "completion.h"
-#include "crypto-utils.h" /* for tr_sha1 */
-#include "error.h"
-#include "file.h"
-#include "inout.h" /* tr_ioTestPiece() */
-#include "log.h"
-#include "magnet-metainfo.h"
-#include "peer-mgr.h"
-#include "resume.h"
-#include "session.h"
-#include "subprocess.h"
-#include "torrent-magnet.h"
-#include "torrent-metainfo.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "version.h"
-#include "web-utils.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/completion.h"
+#include "libtransmission/crypto-utils.h" // for tr_sha1()
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/inout.h" // tr_ioTestPiece()
+#include "libtransmission/log.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/peer-mgr.h"
+#include "libtransmission/resume.h"
+#include "libtransmission/session.h"
+#include "libtransmission/subprocess.h"
+#include "libtransmission/torrent-magnet.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/version.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -2559,8 +2559,8 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
 
 void torrentRenamePath(
     tr_torrent* const tor,
-    std::string oldpath, // NOLINT performance-unnecessary-value-param
-    std::string newname, // NOLINT performance-unnecessary-value-param
+    std::string const& oldpath, // NOLINT performance-unnecessary-value-param
+    std::string const& newname, // NOLINT performance-unnecessary-value-param
     tr_torrent_rename_done_func callback,
     void* const callback_user_data)
 {

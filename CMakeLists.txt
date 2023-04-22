@@ -3,9 +3,12 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW)
 endif()
+if(POLICY CMP0114)
+    cmake_policy(SET CMP0114 NEW)
+endif()
 
 # Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
-set(MACOS_SUPPORT_MINIMUM 10.13)
+set(MACOS_SUPPORT_MINIMUM 10.14.6)
 
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
@@ -81,10 +84,10 @@ set(TR_NAME ${PROJECT_NAME})
 
 # these should be the only five lines you need to change
 set(TR_VERSION_MAJOR "4")
-set(TR_VERSION_MINOR "0")
-set(TR_VERSION_PATCH "3")
+set(TR_VERSION_MINOR "1")
+set(TR_VERSION_PATCH "0")
 set(TR_VERSION_BETA_NUMBER "") # empty string for not beta
-set(TR_VERSION_DEV FALSE)
+set(TR_VERSION_DEV TRUE)
 
 # derived from above: release type
 if(TR_VERSION_DEV)

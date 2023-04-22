@@ -15,14 +15,15 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "log.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 #define TR_CRYPTO_X509_FALLBACK
-#include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
+#include "libtransmission/crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
 // ---
 

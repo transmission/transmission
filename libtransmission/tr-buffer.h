@@ -16,13 +16,91 @@
 
 #include "error.h"
 #include "net.h" // tr_socket_t
+#include "tr-assert.h"
 #include "utils-ev.h"
 #include "utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission
 {
 
-class Buffer
+template<typename T, typename ValueType>
+class BufferWriter
+{
+public:
+    BufferWriter(T* out)
+        : out_{ out }
+    {
+        static_assert(sizeof(ValueType) == 1);
+    }
+
+    void add(void const* span_begin, size_t span_len)
+    {
+        auto const* const begin = reinterpret_cast<ValueType const*>(span_begin);
+        auto const* const end = begin + span_len;
+        out_->insert(std::end(*out_), begin, end);
+    }
+
+    template<typename ContiguousContainer>
+    void add(ContiguousContainer const& container)
+    {
+        add(std::data(container), std::size(container));
+    }
+
+    template<typename OneByteType>
+    void push_back(OneByteType ch)
+    {
+        add(&ch, 1);
+    }
+
+    void add_uint8(uint8_t uch)
+    {
+        add(&uch, 1);
+    }
+
+    void add_uint16(uint16_t hs)
+    {
+        uint16_t const ns = htons(hs);
+        add(&ns, sizeof(ns));
+    }
+
+    void add_hton16(uint16_t hs)
+    {
+        add_uint16(hs);
+    }
+
+    void add_uint32(uint32_t hl)
+    {
+        uint32_t const nl = htonl(hl);
+        add(&nl, sizeof(nl));
+    }
+
+    void eadd_hton32(uint32_t hl)
+    {
+        add_uint32(hl);
+    }
+
+    void add_uint64(uint64_t hll)
+    {
+        uint64_t const nll = tr_htonll(hll);
+        add(&nll, sizeof(nll));
+    }
+
+    void add_hton64(uint64_t hll)
+    {
+        add_uint64(hll);
+    }
+
+    void add_port(tr_port const& port)
+    {
+        auto nport = port.network();
+        add(&nport, sizeof(nport));
+    }
+
+private:
+    T* out_;
+};
+
+class Buffer : public BufferWriter<Buffer, std::byte>
 {
 public:
     class Iterator
@@ -34,28 +112,30 @@ public:
         using reference = value_type&;
         using iterator_category = std::random_access_iterator_tag;
 
-        Iterator(evbuffer* buf, size_t offset)
+        constexpr Iterator(evbuffer* buf, size_t offset)
             : buf_{ buf }
+            , buf_offset_{ offset }
         {
-            set_offset(offset);
         }
 
-        [[nodiscard]] constexpr value_type& operator*() noexcept
+        [[nodiscard]] value_type& operator*() noexcept
         {
-            return static_cast<value_type*>(iov_.iov_base)[iov_offset_];
+            auto& info = iov();
+            return static_cast<value_type*>(info.iov.iov_base)[info.offset];
         }
 
-        [[nodiscard]] constexpr value_type operator*() const noexcept
+        [[nodiscard]] value_type operator*() const noexcept
         {
-            return static_cast<value_type*>(iov_.iov_base)[iov_offset_];
+            auto const& info = iov();
+            return static_cast<value_type*>(info.iov.iov_base)[info.offset];
         }
 
-        [[nodiscard]] Iterator operator+(size_t n_bytes)
+        [[nodiscard]] constexpr Iterator operator+(size_t n_bytes)
         {
             return Iterator{ buf_, offset() + n_bytes };
         }
 
-        [[nodiscard]] Iterator operator-(size_t n_bytes)
+        [[nodiscard]] constexpr Iterator operator-(size_t n_bytes)
         {
             return Iterator{ buf_, offset() - n_bytes };
         }
@@ -65,85 +145,116 @@ public:
             return offset() - that.offset();
         }
 
-        Iterator& operator++() noexcept
+        constexpr Iterator& operator++() noexcept
         {
-            *this += 1U;
+            inc_offset(1U);
             return *this;
         }
 
-        Iterator& operator+=(size_t n_bytes)
+        constexpr Iterator& operator+=(size_t n_bytes)
         {
-            if (iov_offset_ + n_bytes < iov_.iov_len)
-            {
-                iov_offset_ += n_bytes;
-            }
-            else
-            {
-                inc_offset(n_bytes);
-            }
-
+            inc_offset(n_bytes);
             return *this;
         }
 
-        Iterator& operator--() noexcept
+        constexpr Iterator& operator--() noexcept
         {
-            if (iov_offset_ > 0)
-            {
-                --iov_offset_;
-            }
-            else
-            {
-                set_offset(offset() - 1);
-            }
+            dec_offset(1);
             return *this;
         }
 
         [[nodiscard]] constexpr bool operator==(Iterator const& that) const noexcept
         {
-            return offset() == that.offset();
+            return this->buf_ == that.buf_ && this->offset() == that.offset();
         }
 
         [[nodiscard]] constexpr bool operator!=(Iterator const& that) const noexcept
         {
-            return offset() != that.offset();
+            return !(*this == that);
         }
 
     private:
+        struct IovInfo
+        {
+            evbuffer_iovec iov = {};
+            size_t offset = 0;
+        };
+
         [[nodiscard]] constexpr size_t offset() const noexcept
         {
-            return ptr_.pos + iov_offset_;
+            return buf_offset_;
         }
 
-        void inc_offset(size_t increment)
+        constexpr void dec_offset(size_t increment)
         {
-            evbuffer_ptr_set(buf_, &ptr_, iov_offset_ + increment, EVBUFFER_PTR_ADD);
-            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
-            iov_offset_ = 0;
+            buf_offset_ -= increment;
+
+            if (iov_)
+            {
+                if (iov_->offset >= increment)
+                {
+                    iov_->offset -= increment;
+                }
+                else
+                {
+                    iov_.reset();
+                }
+            }
         }
 
-        void set_offset(size_t offset)
+        constexpr void inc_offset(size_t increment)
         {
-            evbuffer_ptr_set(buf_, &ptr_, offset, EVBUFFER_PTR_SET);
-            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
-            iov_offset_ = 0;
+            buf_offset_ += increment;
+
+            if (iov_)
+            {
+                if (iov_->offset + increment < iov_->iov.iov_len)
+                {
+                    iov_->offset += increment;
+                }
+                else
+                {
+                    iov_.reset();
+                }
+            }
         }
+
+        [[nodiscard]] IovInfo& iov() const noexcept
+        {
+            if (!iov_)
+            {
+                auto ptr = evbuffer_ptr{};
+                auto iov = IovInfo{};
+                evbuffer_ptr_set(buf_, &ptr, buf_offset_, EVBUFFER_PTR_SET);
+                evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov.iov, 1);
+                iov.offset = 0;
+                iov_ = iov;
+            }
+
+            return *iov_;
+        }
+
+        mutable std::optional<IovInfo> iov_;
 
         evbuffer* buf_;
-        evbuffer_ptr ptr_ = {};
-        evbuffer_iovec iov_ = {};
-        size_t iov_offset_ = 0;
+        size_t buf_offset_ = 0;
     };
 
-    Buffer() = default;
     Buffer(Buffer&&) = default;
     Buffer(Buffer const&) = delete;
     Buffer& operator=(Buffer const&) = delete;
     Buffer& operator=(Buffer&&) = default;
 
+    Buffer()
+        : BufferWriter<Buffer, std::byte>{ this }
+    {
+    }
+
     template<typename T>
     explicit Buffer(T const& data)
+        : BufferWriter<Buffer, std::byte>{ this }
     {
-        add(std::data(data), std::size(data));
+        add(data);
     }
 
     [[nodiscard]] auto size() const noexcept
@@ -255,6 +366,11 @@ public:
         return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
     }
 
+    [[nodiscard]] std::byte const* data() const
+    {
+        return reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1));
+    }
+
     [[nodiscard]] auto pullup_sv()
     {
         auto const [buf, buflen] = pullup();
@@ -289,80 +405,11 @@ public:
         return {};
     }
 
-    // Move all data from one buffer into another.
-    // This is a destructive add: the source buffer is empty after this call.
-    void add(Buffer& that)
-    {
-        evbuffer_add_buffer(buf_.get(), that.buf_.get());
-    }
-
-    void add(Buffer&& that)
-    {
-        evbuffer_add_buffer(buf_.get(), that.buf_.get());
-    }
-
-    void add(void const* bytes, size_t n_bytes)
-    {
-        evbuffer_add(buf_.get(), bytes, n_bytes);
-    }
-
     template<typename T>
-    void add(T const& data)
+    void insert([[maybe_unused]] Iterator iter, T const* const begin, T const* const end)
     {
-        add(std::data(data), std::size(data));
-    }
-
-    template<
-        typename T,
-        typename std::enable_if_t<
-            std::is_same_v<T, char> || std::is_same_v<T, unsigned char> || std::is_same_v<T, std::byte>>* = nullptr>
-    void push_back(T ch)
-    {
-        add(&ch, 1);
-    }
-
-    void add_port(tr_port const& port)
-    {
-        auto nport = port.network();
-        add(&nport, sizeof(nport));
-    }
-
-    void add_uint8(uint8_t uch)
-    {
-        add(&uch, 1);
-    }
-
-    void add_uint16(uint16_t hs)
-    {
-        uint16_t const ns = htons(hs);
-        add(&ns, sizeof(ns));
-    }
-
-    void add_hton16(uint16_t hs)
-    {
-        add_uint16(hs);
-    }
-
-    void add_uint32(uint32_t hl)
-    {
-        uint32_t const nl = htonl(hl);
-        add(&nl, sizeof(nl));
-    }
-
-    void eadd_hton32(uint32_t hl)
-    {
-        add_uint32(hl);
-    }
-
-    void add_uint64(uint64_t hll)
-    {
-        uint64_t const nll = tr_htonll(hll);
-        add(&nll, sizeof(nll));
-    }
-
-    void add_hton64(uint64_t hll)
-    {
-        add_uint64(hll);
+        TR_ASSERT(iter == this->end()); // tr_buffer only supports appending
+        evbuffer_add(buf_.get(), begin, end - begin);
     }
 
 private:

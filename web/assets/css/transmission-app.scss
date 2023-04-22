@@ -4,9 +4,11 @@
 // Colors related to torrent status
 $blue-100: #dbedff;
 $blue-300: #79b8ff;
+$blue-500: #0366d6;
 $green-200: #bef5cb;
 $green-300: #85e89d;
 $green-500: #28a745;
+$green-700: #22863a;
 $grey-200: #e1e4e8;
 $grey-500: #828282;
 $grey-700: #373737;
@@ -14,6 +16,7 @@ $grey-800: #292929;
 $grey-900: #191919;
 $red-500: #d73a49;
 $white: #fff;
+$dark-mode-white: #c9d1d9;
 $yellow-300: #ffea7f;
 $grey-40: #666;
 $nice-grey: #f8f8f8;
@@ -82,7 +85,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
 
   @media (prefers-color-scheme: dark) {
     --color-bg-hover: #{$grey-40};
-    --color-fg-primary: #fff;
+    --color-fg-primary: #{$dark-mode-white};
     --color-bg-primary: #{$grey-800};
     --color-bg-primary-hover: #{$grey-700};
     --color-bg-odd: #{$grey-900};
@@ -90,29 +93,38 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-menu: #{$grey-800};
     --color-fg-secondary: #{$nice-grey};
     --color-fg-on-popup: #{$nice-grey};
-    --color-fg-disabled: #{$nice-grey};
+    --color-fg-disabled: #{$dark-mode-white};
     --color-bg-popup: #{$grey-800};
     --color-bg-warn: #cf6679;
     --color-fg-warn: #{$dark-mode-black};
-    --color-border: #{$nice-grey};
-    --color-border-selected: #d0d7de;
+    --color-border: #{$dark-mode-white};
+    --color-border-selected: #{$grey-500};
     --color-fg-tertiary: #{$grey-500};
     --color-toolbar-background: #{$grey-800};
     --color-inspector-background: #{$grey-800};
     --color-inspector-tabs: #{$nice-grey};
     --color-bg-selected: #{$default-accent-color-dark};
     --color-bg-tabs: #{$grey-700};
-    --color-progressbar-background-1: #426389;
     --color-default-border: #{$default-border-dark};
-    --color-progressbar-seed-1: #{$green-500};
-    --color-progressbar-seed-2: #{$green-300};
+    --color-progressbar-seed-1: #{$green-700};
+    --color-progressbar-seed-2: #{$green-500};
     --color-progressbar-paused: #{$grey-500};
+    --color-progressbar-leech: #{$blue-500};
     --color-progressbar-seed-paused: #{$grey-500};
   }
   @media (prefers-color-scheme: light) {
+    --progress: 100%;
+    --color-fg-error: #{$red-500};
+    --color-fg-port-closed: #{$red-500};
+    --color-fg-port-open: #{$green-500};
+    --color-progressbar-verify: #{$yellow-300};
+    --color-progressbar-magnet: #{$yellow-300};
+    --color-progressbar-paused: #{$grey-200};
+    --color-progressbar-leech: #{$blue-300};
+    --color-progressbar-queued: #{$blue-100};
     --color-bg-hover: #{$nice-grey};
     --color-fg-primary: #404040;
-    --color-bg-primary: #fff;
+    --color-bg-primary: #{$white};
     --color-bg-even: #{$white};
     --color-bg-odd: #{$nice-grey};
     --color-bg-menu: #{$nice-grey};
@@ -130,7 +142,6 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-tabs: #{$nice-grey-darker};
     --color-inspector-tabs: #{$nice-grey};
     --color-bg-selected: #{$default-accent-color};
-    --color-progressbar-background-1: #{$nice-grey};
     --color-default-border: #{$default-border-light};
     --color-dialog-border: #{$nice-grey};
     --color-progressbar-seed-1: #{$green-300};
@@ -467,7 +478,7 @@ $video-image: '../img/film.svg';
     .torrent-progress-details,
     .torrent-peer-details {
       color: var(--color-fg-primary);
-      font-size: x-small;
+      font-size: small;
     }
 
     &.compact {
@@ -880,6 +891,7 @@ $video-image: '../img/film.svg';
     border: 1px solid transparent;
     border-radius: 6px;
     color: var(--color-fg-primary);
+    font-weight: 400;
   }
 }
 
@@ -908,7 +920,6 @@ $video-image: '../img/film.svg';
     background-color: var(--color-bg-even);
     border: 1px solid var(--color-fg-primary);
     border-radius: 6px;
-    font-weight: 500;
   }
 }
 
@@ -1314,6 +1325,7 @@ $video-image: '../img/film.svg';
   a,
   button,
   label {
+    color: var(--color-fg-primary);
     display: inline-flex;
     font-size: 1em;
     width: 100%;
@@ -1646,18 +1658,28 @@ dialog {
   font-style: italic;
 }
 
-#torrent-upload-frame {
-  border: 0;
-  display: block; /* Don't change this : safari forms won't target hidden frames (they open a new window) */
-  height: 0;
-  left: -1000px;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  top: -1000px;
-  width: 0;
-}
-
 .ui-menu {
   width: 200px;
+}
+
+.upload-div {
+  display: none;
+}
+
+.dropzone {
+  background: var(--color-bg-primary);
+  border: 2px dashed var(--color-border);
+  border-radius: 5px;
+  color: var(--color-fg-primary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2em;
+  font-weight: bold;
+  height: 100%;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 100%;
 }

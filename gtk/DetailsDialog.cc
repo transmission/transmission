@@ -49,7 +49,6 @@
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #include <algorithm>
 #include <array>

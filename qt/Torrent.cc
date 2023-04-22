@@ -210,7 +210,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(downloadLimited, download_limited, DOWNLOAD_LIMITED)
             HANDLE_KEY(downloadedEver, downloaded_ever, DOWNLOADED_EVER)
             HANDLE_KEY(editDate, edit_date, EDIT_DATE)
-            HANDLE_KEY(error, error, ERROR)
+            HANDLE_KEY(error, error, TORRENT_ERROR)
             HANDLE_KEY(eta, eta, ETA)
             HANDLE_KEY(fileStats, files, FILES)
             HANDLE_KEY(files, files, FILES)
@@ -269,7 +269,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(comment, comment, COMMENT)
             HANDLE_KEY(creator, creator, CREATOR)
             HANDLE_KEY(downloadDir, download_dir, DOWNLOAD_DIR)
-            HANDLE_KEY(errorString, error_string, ERROR_STRING)
+            HANDLE_KEY(errorString, error_string, TORRENT_ERROR_STRING)
 
 #undef HANDLE_KEY
         default:
