@@ -9,7 +9,7 @@ export class ActionManager extends EventTarget {
     this.actions = Object.seal({
       'deselect-all': {
         enabled: false,
-        shortcut: 'Control+D',
+        shortcut: 'D',
         text: 'Deselect all',
       },
       'move-bottom': { enabled: false, text: 'Move to the back of the queue' },
@@ -18,13 +18,13 @@ export class ActionManager extends EventTarget {
       'move-up': { enabled: false, text: 'Move up in the queue' },
       'open-torrent': {
         enabled: true,
-        shortcut: 'Control+O',
+        shortcut: 'O',
         text: 'Open torrent…',
       },
       'pause-all-torrents': { enabled: false, text: 'Pause all' },
       'pause-selected-torrents': {
         enabled: false,
-        shortcut: 'Control+U',
+        shortcut: 'U',
         text: 'Pause',
       },
       'reannounce-selected-torrents': {
@@ -34,19 +34,19 @@ export class ActionManager extends EventTarget {
       'remove-selected-torrents': { enabled: false, text: 'Remove from list…' },
       'resume-selected-torrents': {
         enabled: false,
-        shortcut: 'Control+R',
+        shortcut: 'R',
         text: 'Resume',
       },
       'resume-selected-torrents-now': { enabled: false, text: 'Resume now' },
       'select-all': {
         enabled: false,
-        shortcut: 'Control+A',
+        shortcut: 'A',
         text: 'Select all',
       },
       'show-about-dialog': { enabled: true, text: 'About' },
       'show-inspector': {
         enabled: false,
-        shortcut: 'Control+I',
+        shortcut: 'I',
         text: 'Torrent Inspector',
       },
       'show-labels-dialog': {
@@ -55,24 +55,24 @@ export class ActionManager extends EventTarget {
       },
       'show-move-dialog': {
         enabled: false,
-        shortcut: 'Control+L',
+        shortcut: 'L',
         text: 'Set location…',
       },
       'show-overflow-menu': { enabled: true, text: 'More options…' },
       'show-preferences-dialog': {
         enabled: true,
-        shortcut: 'Control+P',
+        shortcut: 'P',
         text: 'Edit preferences',
       },
       'show-rename-dialog': {
         enabled: false,
-        shortcut: 'Control+N',
+        shortcut: 'N',
         text: 'Rename…',
       },
       'show-shortcuts-dialog': { enabled: true, text: 'Keyboard shortcuts' },
       'show-statistics-dialog': {
         enabled: true,
-        shortcut: 'Control+S',
+        shortcut: 'S',
         text: 'Statistics',
       },
       'start-all-torrents': { enabled: false, text: 'Start all' },
@@ -83,7 +83,7 @@ export class ActionManager extends EventTarget {
       },
       'verify-selected-torrents': {
         enabled: false,
-        shortcut: 'Control+Shift+V',
+        shortcut: 'V',
         text: 'Verify local data',
       },
     });
