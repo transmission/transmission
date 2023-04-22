@@ -46,8 +46,8 @@ protected:
 
         MockDnsCache(MockDnsCache&&) = delete;
         MockDnsCache(MockDnsCache const&) = delete;
-        MockDnsCache& operator= (MockDnsCache&&) = delete;
-        MockDnsCache& operator= (MockDnsCache const&) = delete;
+        MockDnsCache& operator=(MockDnsCache&&) = delete;
+        MockDnsCache& operator=(MockDnsCache const&) = delete;
 
         std::tuple<Result, sockaddr_storage, socklen_t> get(
             std::string_view host,
@@ -66,9 +66,9 @@ protected:
         }
 
         [[nodiscard]] bool is_pending(
-            [[maybe_unused]] std::string_view host, \
-            [[maybe_unused]] tr_port port, \
-            [[maybe_unused]] Family family, \
+            [[maybe_unused]] std::string_view host,
+            [[maybe_unused]] tr_port port,
+            [[maybe_unused]] Family family,
             [[maybe_unused]] Protocol protocol) const override
         {
             return false;

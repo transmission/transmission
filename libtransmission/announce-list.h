@@ -26,7 +26,7 @@ public:
     {
         tr_interned_string announce;
         tr_interned_string scrape;
-        tr_interned_string host; // 'example.org:80'
+        tr_interned_string host_and_port; // 'example.org:80'
         tr_interned_string sitename; // 'example'
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;

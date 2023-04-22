@@ -1684,10 +1684,10 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     {
         auto const tracker = tr_torrentTracker(self.fHandle, i);
 
-        NSString* host = @(tracker.host);
-        if (!best || [host localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
+        NSString* host_and_port = @(tracker.host_and_port);
+        if (!best || [host_and_port localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
         {
-            best = host;
+            best = host_and_port;
         }
     }
 

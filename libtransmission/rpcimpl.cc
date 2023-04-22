@@ -362,7 +362,7 @@ void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
     tr_variantDictAddInt(d, TR_KEY_downloadCount, tracker.downloadCount);
     tr_variantDictAddBool(d, TR_KEY_hasAnnounced, tracker.hasAnnounced);
     tr_variantDictAddBool(d, TR_KEY_hasScraped, tracker.hasScraped);
-    tr_variantDictAddStr(d, TR_KEY_host, tracker.host);
+    tr_variantDictAddStr(d, TR_KEY_host, tracker.host_and_port);
     tr_variantDictAddStr(d, TR_KEY_sitename, tracker.sitename);
     tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
     tr_variantDictAddBool(d, TR_KEY_isBackup, tracker.isBackup);
