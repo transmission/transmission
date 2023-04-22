@@ -259,7 +259,6 @@ public:
 
     Buffer(Buffer const&) = delete;
     Buffer& operator=(Buffer const&) = delete;
-    ~Buffer() = default;
 
     template<typename T>
     explicit Buffer(T const& data)
