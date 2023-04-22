@@ -412,6 +412,11 @@ public:
         evbuffer_add(buf_.get(), begin, end - begin);
     }
 
+    void swap(Buffer& that)
+    {
+        buf_.swap(that.buf_);
+    }
+
 private:
     evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
 
