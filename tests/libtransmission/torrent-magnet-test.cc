@@ -42,15 +42,15 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
         info_dict_size += std::size(*info_dict_data);
     }
     benc.append("e");
-    EXPECT_EQ(tor->infoDictSize(), info_dict_size);
+    EXPECT_EQ(tor->info_dict_size(), info_dict_size);
 
     auto torrent_metainfo = tr_torrent_metainfo{};
     tr_error* error = nullptr;
-    EXPECT_TRUE(torrent_metainfo.parseBenc(benc, &error));
+    EXPECT_TRUE(torrent_metainfo.parse_benc(benc, &error));
     EXPECT_EQ(nullptr, error) << error->message;
     tr_error_clear(&error);
 
-    EXPECT_EQ(tor->pieceHash(0), torrent_metainfo.pieceHash(0));
+    EXPECT_EQ(tor->piece_hash(0), torrent_metainfo.piece_hash(0));
 }
 
 } // namespace libtransmission::test

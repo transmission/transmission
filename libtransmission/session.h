@@ -791,7 +791,7 @@ public:
 
     [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
     {
-        return top_bandwidth_.getPieceSpeedBytesPerSecond(0, dir);
+        return top_bandwidth_.get_piece_speed_bytes_per_second(0, dir);
     }
 
     [[nodiscard]] std::optional<tr_bytes_per_second_t> activeSpeedLimitBps(tr_direction dir) const noexcept;
