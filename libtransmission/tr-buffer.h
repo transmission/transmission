@@ -14,6 +14,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+
 #include "error.h"
 #include "net.h" // tr_socket_t
 #include "tr-assert.h"
@@ -22,6 +24,80 @@
 
 namespace libtransmission
 {
+
+template<typename container_type, typename value_type>
+class BufferReader
+{
+public:
+    BufferReader(container_type* in)
+        : in_{ in }
+    {
+        static_assert(sizeof(value_type) == 1);
+    }
+
+    [[nodiscard]] auto size() const noexcept
+    {
+        return std::size(*in_);
+    }
+
+    [[nodiscard]] auto const* data() const noexcept
+    {
+        return std::data(*in_);
+    }
+
+    void drain(size_t n)
+    {
+        in_->drain(std::min(n, std::size(*in_)));
+    }
+
+    template<typename T>
+    [[nodiscard]]  bool starts_with(T const& needle) const
+    {
+        auto const n_bytes = std::size(needle);
+        auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
+        auto const needle_end = needle_begin + n_bytes;
+        return n_bytes <= std::size(*in_) && std::equal(needle_begin, needle_end, std::cbegin(*in_));
+    }
+
+    auto to_buf(void* tgt, size_t n_bytes)
+    {
+        n_bytes = std::min(n_bytes, std::size(*in_));
+        std::copy_n(std::data(*in_), n_bytes, reinterpret_cast<value_type*>(tgt));
+        drain(n_bytes);
+        return n_bytes;
+    }
+
+    [[nodiscard]] auto to_uint8()
+    {
+        auto tmp = uint8_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return tmp;
+    }
+
+    [[nodiscard]] uint16_t to_uint16()
+    {
+        auto tmp = uint16_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return ntohs(tmp);
+    }
+
+    [[nodiscard]] uint32_t to_uint32()
+    {
+        auto tmp = uint32_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return ntohl(tmp);
+    }
+
+    [[nodiscard]] uint64_t to_uint64()
+    {
+        auto tmp = uint64_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return tr_ntohll(tmp);
+    }
+
+private:
+    container_type* in_;
+};
 
 template<typename T, typename ValueType>
 class BufferWriter
@@ -39,6 +115,16 @@ public:
         auto const* const end = begin + span_len;
         out_->insert(std::end(*out_), begin, end);
     }
+
+#if 0
+    template<typename container_type>
+    void add(BufferReader<container_type, ValueType>& in)
+    {
+        auto const n_bytes = std::size(in);
+        add(std::data(in), n_bytes);
+        in.drain(n_bytes);
+    }
+#endif
 
     template<typename ContiguousContainer>
     void add(ContiguousContainer const& container)
@@ -100,7 +186,9 @@ private:
     T* out_;
 };
 
-class Buffer : public BufferWriter<Buffer, std::byte>
+class Buffer :
+    public BufferReader<Buffer, std::byte>,
+    public BufferWriter<Buffer, std::byte>
 {
 public:
     using value_type = std::byte;
@@ -122,6 +210,8 @@ public:
         [[nodiscard]] value_type& operator*() noexcept
         {
             auto& info = iov();
+            TR_ASSERT(info.iov.iov_base != nullptr);
+            TR_ASSERT(info.offset < info.iov.iov_len);
             return static_cast<value_type*>(info.iov.iov_base)[info.offset];
         }
 
@@ -230,6 +320,8 @@ public:
                 evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov.iov, 1);
                 iov.offset = 0;
                 iov_ = iov;
+
+                fmt::print("{:s}:{:d} buffer {:p} buf_offset_ {:d} iov.ptr {:p} iov.len {:d}\n", __FILE__, __LINE__, fmt::ptr(buf_), buf_offset_, fmt::ptr(iov.iov.iov_base), iov.iov.iov_len);
             }
 
             return *iov_;
@@ -242,12 +334,14 @@ public:
     };
 
     Buffer()
-        : BufferWriter<Buffer, value_type>{ this }
+        : BufferReader<Buffer, value_type>{ this }
+        , BufferWriter<Buffer, value_type>{ this }
     {
     }
 
     Buffer(Buffer&& that)
-        : BufferWriter<Buffer, value_type>(this)
+        : BufferReader<Buffer, value_type>{ this }
+        , BufferWriter<Buffer, value_type>{ this }
         , buf_{ std::move(that.buf_) }
     {
     }
@@ -263,7 +357,8 @@ public:
 
     template<typename T>
     explicit Buffer(T const& data)
-        : BufferWriter<Buffer, value_type>{ this }
+        : BufferReader<Buffer, value_type>{ this }
+        , BufferWriter<Buffer, value_type>{ this }
     {
         add(data);
     }
@@ -280,6 +375,7 @@ public:
 
     [[nodiscard]] auto begin() noexcept
     {
+        fmt::print("{:s}:{:d} begin this {:p} evbuffer {:p}\n", __FILE__, __LINE__, fmt::ptr(this), fmt::ptr(buf_.get()));
         return Iterator{ buf_.get(), 0U };
     }
 
@@ -298,15 +394,6 @@ public:
         return Iterator{ buf_.get(), size() };
     }
 
-    template<typename T>
-    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
-    {
-        auto const n_bytes = std::size(needle);
-        auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
-        auto const needle_end = needle_begin + n_bytes;
-        return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
-    }
-
     [[nodiscard]] std::string to_string() const
     {
         auto str = std::string{};
@@ -315,6 +402,7 @@ public:
         return str;
     }
 
+#if 0
     auto to_buf(void* tgt, size_t n_bytes)
     {
         return evbuffer_remove(buf_.get(), tgt, n_bytes);
@@ -347,15 +435,16 @@ public:
         to_buf(&tmp, sizeof(tmp));
         return tr_ntohll(tmp);
     }
-
-    void drain(size_t n_bytes)
-    {
-        evbuffer_drain(buf_.get(), n_bytes);
-    }
+#endif
 
     void clear()
     {
         drain(size());
+    }
+
+    void drain(size_t n_bytes)
+    {
+        evbuffer_drain(buf_.get(), n_bytes);
     }
 
     // Returns the number of bytes written. Check `error` for error.
@@ -438,3 +527,14 @@ private:
 };
 
 } // namespace libtransmission
+
+namespace std {
+    template<>
+    struct iterator_traits<libtransmission::Buffer::Iterator> {
+        using difference_type = libtransmission::Buffer::Iterator::difference_type;
+        using iterator_category = libtransmission::Buffer::Iterator::iterator_category;
+        using value_type = libtransmission::Buffer::value_type;
+        using pointer = value_type*;
+        using reference = value_type&;
+    };
+}

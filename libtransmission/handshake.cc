@@ -12,6 +12,8 @@
 
 #include <fmt/core.h>
 
+#include <sfl/small_vector.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bitfield.h"
@@ -24,6 +26,209 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/utils.h"
+
+namespace libtransmission
+{
+
+template<size_t N>
+class SmallBuffer : public BufferWriter<SmallBuffer<N>, std::byte>
+{
+public:
+    using value_type = std::byte;
+    using container_type = sfl::small_vector<value_type, N>;
+    using iterator = typename container_type::iterator;
+
+    SmallBuffer()
+        : BufferWriter<SmallBuffer, std::byte>{ this }
+    {
+    }
+
+    template<typename T>
+    explicit SmallBuffer(T const& data)
+        : BufferWriter<SmallBuffer, value_type>{ this }
+    {
+        add(data);
+    }
+
+    SmallBuffer(SmallBuffer&&) = delete;
+    SmallBuffer(SmallBuffer const&) = delete;
+    SmallBuffer& operator=(SmallBuffer&&) = delete;
+    SmallBuffer& operator=(SmallBuffer const&) = delete;
+
+    [[nodiscard]] auto size() const noexcept
+    {
+        return evbuffer_get_length(buf_.get());
+    }
+
+    [[nodiscard]] auto empty() const noexcept
+    {
+        return evbuffer_get_length(buf_.get()) == 0;
+    }
+
+    [[nodiscard]] auto begin() noexcept
+    {
+        return std::begin(buf_);
+    }
+
+    [[nodiscard]] auto end() noexcept
+    {
+        return std::end(buf_);
+    }
+
+    [[nodiscard]] auto begin() const noexcept
+    {
+        return std::begin(buf_);
+    }
+
+    [[nodiscard]] auto end() const noexcept
+    {
+        return std::end(buf_);
+    }
+
+    template<typename T>
+    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
+    {
+        auto const n_bytes = std::size(needle);
+        auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
+        auto const needle_end = needle_begin + n_bytes;
+        return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
+    }
+
+    [[nodiscard]] auto to_string() const
+    {
+        return std::string{ reinterpret_cast<char const*>(data()), size() };
+    }
+
+    void to_buf(void* tgt, size_t n_bytes)
+    {
+        n_bytes = std::min(n_bytes, size());
+        std::copy_n(buf_.begin(), n_bytes, tgt);
+        drain(n_bytes);
+    }
+
+    [[nodiscard]] auto to_uint8()
+    {
+        auto tmp = uint8_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return tmp;
+    }
+
+    [[nodiscard]] uint16_t to_uint16()
+    {
+        auto tmp = uint16_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return ntohs(tmp);
+    }
+
+    [[nodiscard]] uint32_t to_uint32()
+    {
+        auto tmp = uint32_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return ntohl(tmp);
+    }
+
+    [[nodiscard]] uint64_t to_uint64()
+    {
+        auto tmp = uint64_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return tr_ntohll(tmp);
+    }
+
+    void drain(size_t n_bytes)
+    {
+        buf_.erase(buf_.begin(), std::min(n_bytes, size()));
+    }
+
+    void clear()
+    {
+        buf_.clear();
+    }
+
+#if 0
+    // Returns the number of bytes written. Check `error` for error.
+    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    {
+        EVUTIL_SET_SOCKET_ERROR(0);
+        auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
+        auto const err = EVUTIL_SOCKET_ERROR();
+        if (res >= 0)
+        {
+            return static_cast<size_t>(res);
+        }
+        tr_error_set(error, err, tr_net_strerror(err));
+        return 0;
+    }
+
+    [[nodiscard]] std::pair<value_type*, size_t> pullup()
+    {
+        return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
+    }
+#endif
+
+    [[nodiscard]] value_type const* data() const
+    {
+        return std::data(buf_);
+    }
+
+#if 0
+    [[nodiscard]] auto pullup_sv()
+    {
+        auto const [buf, buflen] = pullup();
+        return std::string_view{ reinterpret_cast<char const*>(buf), buflen };
+    }
+#endif
+
+    void reserve(size_t n_bytes)
+    {
+        buf_.reserve(n_bytes);
+    }
+
+#if 0
+    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    {
+        EVUTIL_SET_SOCKET_ERROR(0);
+        auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
+        auto const err = EVUTIL_SOCKET_ERROR();
+
+        if (res > 0)
+        {
+            return static_cast<size_t>(res);
+        }
+
+        if (res == 0)
+        {
+            tr_error_set_from_errno(error, ENOTCONN);
+        }
+        else
+        {
+            tr_error_set(error, err, tr_net_strerror(err));
+        }
+
+        return {};
+    }
+#endif
+
+    template<typename T>
+    void insert([[maybe_unused]] iterator iter, T const* const begin, T const* const end)
+    {
+        buf_.insert(iter, begin, end - begin);
+    }
+
+private:
+    container_type buf_ = {};
+
+    [[nodiscard]] auto cbegin() const noexcept
+    {
+        return buf_.cbegin();
+    }
+
+    [[nodiscard]] auto cend() const noexcept
+    {
+        return buf_.cend();
+    }
+};
+
+} // namespace libtransmission
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
