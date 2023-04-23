@@ -127,7 +127,17 @@ public:
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
-    void write(libtransmission::Buffer& buf, bool is_piece_data);
+    template<typename T>
+    void write(libtransmission::BufferReader<T, std::byte>& buf, bool is_piece_data)
+    {
+        auto const len = std::size(buf);
+        encrypt(len, std::data(buf));
+        outbuf_info_.emplace_back(std::size(buf), is_piece_data);
+        fmt::print("before write outbuf_.size() {:d} buf.size() {:d}\n", std::size(outbuf_), std::size(buf));
+        outbuf_.add(buf);
+        fmt::print("after write outbuf_.size() {:d} buf.size() {:d}\n", std::size(outbuf_), std::size(buf));
+        buf.drain(len);
+    }
 
     size_t flush_outgoing_protocol_msgs();
 

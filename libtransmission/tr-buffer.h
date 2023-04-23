@@ -40,7 +40,12 @@ public:
         return std::size(*in_);
     }
 
-    [[nodiscard]] auto const* data() const noexcept
+    [[nodiscard]] value_type* data() noexcept
+    {
+        return std::data(*in_);
+    }
+
+    [[nodiscard]] value_type const* data() const noexcept
     {
         return std::data(*in_);
     }
@@ -464,6 +469,11 @@ public:
     [[nodiscard]] std::pair<value_type*, size_t> pullup()
     {
         return { reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1)), size() };
+    }
+
+    [[nodiscard]] value_type* data()
+    {
+        return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
     }
 
     [[nodiscard]] value_type const* data() const
