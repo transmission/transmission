@@ -581,6 +581,7 @@ void tr_peerIo::write(libtransmission::Buffer& buf, bool is_piece_data)
     encrypt(len, bytes);
     outbuf_info_.emplace_back(std::size(buf), is_piece_data);
     outbuf_.add(buf);
+    buf.clear();
 }
 
 void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
