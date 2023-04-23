@@ -369,7 +369,7 @@ TEST_F(AnnounceListTest, save)
 
     // load the scratch that we saved to
     auto modified_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(modified_tm.parseTorrentFile(test_file.sv()));
+    EXPECT_TRUE(modified_tm.parse_torrent_file(test_file.sv()));
 
     // test that non-announce parts of the metainfo are the same
     EXPECT_EQ(original_tm.name(), modified_tm.name());

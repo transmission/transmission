@@ -33,7 +33,7 @@ WatchDir::WatchDir(TorrentModel const& model)
 WatchDir::AddResult WatchDir::metainfoTest(QString const& filename) const
 {
     auto metainfo = tr_torrent_metainfo();
-    if (!metainfo.parseTorrentFile(filename.toUtf8().constData()))
+    if (!metainfo.parse_torrent_file(filename.toUtf8().constData()))
     {
         return AddResult::Error;
     }

@@ -224,14 +224,14 @@ TEST_F(TorrentMetainfoTest, magnetInfoHash)
     // compatibility with magnet torrents created by Transmission <= 3.0
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/gimp-2.10.32-1-arm64.dmg.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
 }
 
 TEST_F(TorrentMetainfoTest, HoffmanStyleWebseeds)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
     EXPECT_EQ(size_t{ 2 }, tm.webseed_count());
     EXPECT_EQ(
         "https://cdimage.debian.org/cdimage/release/11.2.0//srv/cdbuilder.debian.org/dst/deb-cd/weekly-builds/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso"sv,
@@ -245,7 +245,7 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedList)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-list.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
     EXPECT_EQ(size_t{ 2 }, tm.webseed_count());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
     EXPECT_EQ("http://webseed-two.com/"sv, tm.webseed(1));
@@ -255,7 +255,7 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-string.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
     EXPECT_EQ(size_t{ 1 }, tm.webseed_count());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
 }

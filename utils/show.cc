@@ -428,7 +428,7 @@ int tr_main(int argc, char* argv[])
     /* try to parse the torrent file */
     auto metainfo = tr_torrent_metainfo{};
     tr_error* error = nullptr;
-    auto const parsed = metainfo.parseTorrentFile(opts.filename, nullptr, &error);
+    auto const parsed = metainfo.parse_torrent_file(opts.filename, nullptr, &error);
     if (error != nullptr)
     {
         fmt::print(stderr, "Error parsing torrent file '{:s}': {:s} ({:d})\n", opts.filename, error->message, error->code);

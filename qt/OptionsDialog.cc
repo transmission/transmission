@@ -137,7 +137,7 @@ void OptionsDialog::reload()
         break;
 
     case AddData::FILENAME:
-        ok = metainfo.parseTorrentFile(add_.filename.toStdString());
+        ok = metainfo.parse_torrent_file(add_.filename.toStdString());
         break;
 
     case AddData::METAINFO:

@@ -69,7 +69,7 @@
             [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
         {
             auto metainfo = tr_torrent_metainfo{};
-            if (metainfo.parseTorrentFile(file.UTF8String))
+            if (metainfo.parse_torrent_file(file.UTF8String))
             {
                 ++count;
 
