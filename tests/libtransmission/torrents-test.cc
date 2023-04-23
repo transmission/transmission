@@ -25,7 +25,7 @@ TEST_F(TorrentsTest, simpleTests)
     auto owned = std::vector<std::unique_ptr<tr_torrent>>{};
 
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(TorrentFile));
+    EXPECT_TRUE(tm.parse_torrent_file(TorrentFile));
     owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
     auto* const tor = owned.back().get();
 
@@ -42,11 +42,11 @@ TEST_F(TorrentsTest, simpleTests)
     EXPECT_EQ(1U, std::size(torrents));
 
     EXPECT_EQ(tor, torrents.get(id));
-    EXPECT_EQ(tor, torrents.get(tor->infoHash()));
+    EXPECT_EQ(tor, torrents.get(tor->info_hash()));
     EXPECT_EQ(tor, torrents.get(tor->magnet()));
 
     tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(TorrentFile));
+    EXPECT_TRUE(tm.parse_torrent_file(TorrentFile));
     EXPECT_EQ(tor, torrents.get(tm));
 
     // cleanup
@@ -68,7 +68,7 @@ TEST_F(TorrentsTest, rangedLoop)
     {
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
-        EXPECT_TRUE(tm.parseTorrentFile(path));
+        EXPECT_TRUE(tm.parse_torrent_file(path));
         owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
 
         auto* const tor = owned.back().get();
@@ -101,7 +101,7 @@ TEST_F(TorrentsTest, removedSince)
     {
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
-        EXPECT_TRUE(tm.parseTorrentFile(path));
+        EXPECT_TRUE(tm.parse_torrent_file(path));
         owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
 
         auto* const tor = owned.back().get();

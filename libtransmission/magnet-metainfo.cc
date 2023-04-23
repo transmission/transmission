@@ -169,7 +169,7 @@ std::optional<tr_sha256_digest_t> parseHash2(std::string_view sv)
 
 tr_urlbuf tr_magnet_metainfo::magnet() const
 {
-    auto s = tr_urlbuf{ "magnet:?xt=urn:btih:"sv, infoHashString() };
+    auto s = tr_urlbuf{ "magnet:?xt=urn:btih:"sv, info_hash_string() };
 
     if (!std::empty(name_))
     {
@@ -177,7 +177,7 @@ tr_urlbuf tr_magnet_metainfo::magnet() const
         tr_urlPercentEncode(std::back_inserter(s), name_);
     }
 
-    for (auto const& tracker : this->announceList())
+    for (auto const& tracker : this->announce_list())
     {
         s += "&tr="sv;
         tr_urlPercentEncode(std::back_inserter(s), tracker.announce.sv());
@@ -192,7 +192,7 @@ tr_urlbuf tr_magnet_metainfo::magnet() const
     return s;
 }
 
-void tr_magnet_metainfo::addWebseed(std::string_view webseed)
+void tr_magnet_metainfo::add_webseed(std::string_view webseed)
 {
     if (!tr_urlIsValid(webseed))
     {
@@ -229,7 +229,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     {
         if (key == "dn"sv)
         {
-            this->setName(tr_urlPercentDecode(value));
+            this->set_name(tr_urlPercentDecode(value));
         }
         else if (key == "tr"sv || tr_strvStartsWith(key, "tr."sv))
         {
@@ -265,11 +265,11 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
         }
     }
 
-    info_hash_str_ = tr_sha1_to_string(this->infoHash());
+    info_hash_str_ = tr_sha1_to_string(this->info_hash());
 
     if (std::empty(name()))
     {
-        this->setName(info_hash_str_);
+        this->set_name(info_hash_str_);
     }
 
     return got_hash;

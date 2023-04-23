@@ -1208,7 +1208,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     for (NSString* torrentPath in filenames)
     {
         auto metainfo = tr_torrent_metainfo{};
-        if (!metainfo.parseTorrentFile(torrentPath.UTF8String)) // invalid torrent
+        if (!metainfo.parse_torrent_file(torrentPath.UTF8String)) // invalid torrent
         {
             if (type != AddTypeAuto)
             {
@@ -1254,7 +1254,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         //determine to show the options window
-        auto const is_multifile = metainfo.fileCount() > 1;
+        auto const is_multifile = metainfo.file_count() > 1;
         BOOL const showWindow = type == AddTypeShowOptions ||
             ([self.fDefaults boolForKey:@"DownloadAsk"] && (is_multifile || ![self.fDefaults boolForKey:@"DownloadAskMulti"]) &&
              (type != AddTypeAuto || ![self.fDefaults boolForKey:@"DownloadAskManual"]));
@@ -3536,7 +3536,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         auto metainfo = tr_torrent_metainfo{};
-        if (!metainfo.parseTorrentFile(fullFile.UTF8String))
+        if (!metainfo.parse_torrent_file(fullFile.UTF8String))
         {
             continue;
         }
@@ -3862,7 +3862,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             {
                 torrent = YES;
                 auto metainfo = tr_torrent_metainfo{};
-                if (metainfo.parseTorrentFile(fileToParse.path.UTF8String))
+                if (metainfo.parse_torrent_file(fileToParse.path.UTF8String))
                 {
                     if (!self.fOverlayWindow)
                     {
@@ -3937,7 +3937,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             {
                 torrent = YES;
                 auto metainfo = tr_torrent_metainfo{};
-                if (metainfo.parseTorrentFile(file.path.UTF8String))
+                if (metainfo.parse_torrent_file(file.path.UTF8String))
                 {
                     [filesToOpen addObject:file.path];
                 }
