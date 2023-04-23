@@ -82,7 +82,7 @@
                 {
                     if (n_files == 1)
                     {
-                        name = [NSString convertedStringFromCString:metainfo.fileSubpath(0).c_str()];
+                        name = [NSString convertedStringFromCString:metainfo.file_subpath(0).c_str()];
                     }
                     else
                     {
