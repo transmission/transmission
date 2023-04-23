@@ -365,24 +365,24 @@ TEST_F(AnnounceListTest, save)
 
     // load the original
     auto original_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(original_tm.parseBenc({ std::data(original_content), std::size(original_content) }));
+    EXPECT_TRUE(original_tm.parse_benc({ std::data(original_content), std::size(original_content) }));
 
     // load the scratch that we saved to
     auto modified_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(modified_tm.parseTorrentFile(test_file.sv()));
+    EXPECT_TRUE(modified_tm.parse_torrent_file(test_file.sv()));
 
     // test that non-announce parts of the metainfo are the same
     EXPECT_EQ(original_tm.name(), modified_tm.name());
-    EXPECT_EQ(original_tm.fileCount(), modified_tm.fileCount());
-    EXPECT_EQ(original_tm.dateCreated(), modified_tm.dateCreated());
-    EXPECT_EQ(original_tm.pieceCount(), modified_tm.pieceCount());
+    EXPECT_EQ(original_tm.file_count(), modified_tm.file_count());
+    EXPECT_EQ(original_tm.date_created(), modified_tm.date_created());
+    EXPECT_EQ(original_tm.piece_count(), modified_tm.piece_count());
 
     // test that the saved version has the updated announce list
     EXPECT_TRUE(std::equal(
         std::begin(announce_list),
         std::end(announce_list),
-        std::begin(modified_tm.announceList()),
-        std::end(modified_tm.announceList())));
+        std::begin(modified_tm.announce_list()),
+        std::end(modified_tm.announce_list())));
 
     // cleanup
     (void)std::remove(test_file.c_str());

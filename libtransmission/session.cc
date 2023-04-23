@@ -103,12 +103,12 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
             limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
         }
 
-        group.setLimits(&limits);
+        group.set_limits(&limits);
 
         if (auto honors = bool{}; tr_variantDictFindBool(dict, TR_KEY_honorsSessionLimits, &honors))
         {
-            group.honorParentLimits(TR_UP, honors);
-            group.honorParentLimits(TR_DOWN, honors);
+            group.honor_parent_limits(TR_UP, honors);
+            group.honor_parent_limits(TR_DOWN, honors);
         }
     }
     tr_variantClear(&groups_dict);
@@ -123,7 +123,7 @@ int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 
     for (auto const& [name, group] : groups)
     {
-        auto const limits = group->getLimits();
+        auto const limits = group->get_limits();
 
         auto* const dict = tr_variantDictAddDict(&groups_dict, name.quark(), 5);
         tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
@@ -131,7 +131,7 @@ int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
         tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
         tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
         tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
-        tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
+        tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
     }
 
     auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
@@ -146,12 +146,12 @@ void update_bandwidth(tr_session* session, tr_direction dir)
 {
     if (auto const limit_bytes_per_second = session->activeSpeedLimitBps(dir); limit_bytes_per_second)
     {
-        session->top_bandwidth_.setLimited(dir, *limit_bytes_per_second > 0U);
-        session->top_bandwidth_.setDesiredSpeedBytesPerSecond(dir, *limit_bytes_per_second);
+        session->top_bandwidth_.set_limited(dir, *limit_bytes_per_second > 0U);
+        session->top_bandwidth_.set_desired_speed_bytes_per_second(dir, *limit_bytes_per_second);
     }
     else
     {
-        session->top_bandwidth_.setLimited(dir, false);
+        session->top_bandwidth_.set_limited(dir, false);
     }
 }
 } // namespace
@@ -204,7 +204,7 @@ std::vector<tr_torrent_id_t> tr_session::DhtMediator::torrentsAllowingDHT() cons
     ids.reserve(std::size(torrents));
     for (auto const* const tor : torrents)
     {
-        if (tor->isRunning && tor->allowsDht())
+        if (tor->is_running() && tor->allows_dht())
         {
             ids.push_back(tor->id());
         }
@@ -217,7 +217,7 @@ tr_sha1_digest_t tr_session::DhtMediator::torrentInfoHash(tr_torrent_id_t id) co
 {
     if (auto const* const tor = session_.torrents().get(id); tor != nullptr)
     {
-        return tor->infoHash();
+        return tor->info_hash();
     }
 
     return {};
@@ -242,7 +242,7 @@ bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_add
     }
 
     tr_torrent* const tor = session_.torrents_.get(*digest);
-    if (!tr_isTorrent(tor) || !tor->allowsLpd())
+    if (!tr_isTorrent(tor) || !tor->allows_lpd())
     {
         return false;
     }
@@ -261,9 +261,9 @@ std::vector<tr_lpd::Mediator::TorrentInfo> tr_session::LpdMediator::torrents() c
     for (auto const* const tor : session_.torrents())
     {
         auto info = tr_lpd::Mediator::TorrentInfo{};
-        info.info_hash_str = tor->infoHashString();
+        info.info_hash_str = tor->info_hash_string();
         info.activity = tor->activity();
-        info.allows_lpd = tor->allowsLpd();
+        info.allows_lpd = tor->allows_lpd();
         info.announce_after = tor->lpdAnnounceAt;
         ret.emplace_back(info);
     }
@@ -334,7 +334,7 @@ void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byt
 
     if (auto* const tor = session_->torrents().get(torrent_id); tor != nullptr)
     {
-        tor->bandwidth_.notifyBandwidthConsumed(TR_DOWN, byte_count, true, tr_time_msec());
+        tor->bandwidth_.notify_bandwidth_consumed(TR_DOWN, byte_count, true, tr_time_msec());
     }
 }
 
@@ -1235,7 +1235,7 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    auto const bps = session != nullptr ? session->top_bandwidth_.getRawSpeedBytesPerSecond(0, dir) : 0;
+    auto const bps = session != nullptr ? session->top_bandwidth_.get_raw_speed_bytes_per_second(0, dir) : 0;
     return tr_toSpeedKBps(bps);
 }
 
@@ -1526,7 +1526,7 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
     {
         for (auto* const tor : torrents())
         {
-            if (tor->isPublic())
+            if (tor->is_public())
             {
                 announcer_->resetTorrent(tor);
             }
@@ -1957,7 +1957,7 @@ std::vector<tr_torrent*> tr_session::getNextQueuedTorrents(tr_direction dir, siz
     candidates.reserve(std::size(torrents()));
     for (auto* const tor : torrents())
     {
-        if (tor->isQueued() && (dir == tor->queueDirection()))
+        if (tor->is_queued() && (dir == tor->queue_direction()))
         {
             candidates.push_back(tor);
         }

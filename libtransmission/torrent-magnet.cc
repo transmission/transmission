@@ -69,7 +69,7 @@ auto create_all_needed(int n_pieces)
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
-    if (tor->hasMetainfo())
+    if (tor->has_metainfo())
     {
         return false;
     }
@@ -116,27 +116,27 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
 
-    if (!tor->hasMetainfo())
+    if (!tor->has_metainfo())
     {
         return {};
     }
 
-    auto const n_pieces = std::max(1, static_cast<int>(tor->infoDictSize() / METADATA_PIECE_SIZE));
+    auto const n_pieces = std::max(1, static_cast<int>(tor->info_dict_size() / METADATA_PIECE_SIZE));
     if (piece < 0 || piece >= n_pieces)
     {
         return {};
     }
 
-    auto in = std::ifstream{ tor->torrentFile(), std::ios_base::in };
+    auto in = std::ifstream{ tor->torrent_file(), std::ios_base::in };
     if (!in.is_open())
     {
         return {};
     }
 
-    auto const info_dict_size = tor->infoDictSize();
+    auto const info_dict_size = tor->info_dict_size();
     TR_ASSERT(info_dict_size > 0);
     auto const offset_in_info_dict = static_cast<uint64_t>(piece) * METADATA_PIECE_SIZE;
-    if (auto const offset_in_file = tor->infoDictOffset() + offset_in_info_dict; !in.seekg(offset_in_file))
+    if (auto const offset_in_file = tor->info_dict_offset() + offset_in_info_dict; !in.seekg(offset_in_file))
     {
         return {};
     }
@@ -160,16 +160,16 @@ bool tr_torrentUseMetainfoFromFile(
     tr_error** error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, tor->torrentFile(), error))
+    if (!tr_sys_path_copy(filename_in, tor->torrent_file(), error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnetFile());
+    tr_sys_path_remove(tor->magnet_file());
 
     // tor should keep this metainfo
-    tor->setMetainfo(*metainfo);
+    tor->set_metainfo(*metainfo);
 
     if (tor->incompleteMetadata != nullptr)
     {
@@ -212,12 +212,12 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
         tr_variantDictAddStr(top, TR_KEY_created_by, val);
     }
 
-    if (auto const val = tm.dateCreated(); val != 0)
+    if (auto const val = tm.date_created(); val != 0)
     {
         tr_variantDictAddInt(top, TR_KEY_creation_date, val);
     }
 
-    if (auto const& announce_list = tm.announceList(); !std::empty(announce_list))
+    if (auto const& announce_list = tm.announce_list(); !std::empty(announce_list))
     {
         auto const n = std::size(announce_list);
         if (n == 1)
@@ -241,7 +241,7 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
         }
     }
 
-    if (auto const n_webseeds = tm.webseedCount(); n_webseeds > 0)
+    if (auto const n_webseeds = tm.webseed_count(); n_webseeds > 0)
     {
         auto* const webseeds_variant = tr_variantDictAddList(top, TR_KEY_url_list, n_webseeds);
         for (size_t i = 0; i < n_webseeds; ++i)
@@ -254,7 +254,7 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
 bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
 {
     // test the info_dict checksum
-    if (tr_sha1::digest(m->metadata) != tor->infoHash())
+    if (tr_sha1::digest(m->metadata) != tor->info_hash())
     {
         return false;
     }
@@ -276,22 +276,22 @@ bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error
 
     // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parseBenc(benc))
+    if (!metainfo.parse_benc(benc))
     {
         return false;
     }
 
     // save it
-    if (!tr_saveFile(tor->torrentFile(), benc, error))
+    if (!tr_saveFile(tor->torrent_file(), benc, error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnetFile());
+    tr_sys_path_remove(tor->magnet_file());
 
     // tor should keep this metainfo
-    tor->setMetainfo(metainfo);
+    tor->set_metainfo(metainfo);
 
     return true;
 }
@@ -413,7 +413,7 @@ std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 {
-    if (tor->hasMetainfo())
+    if (tor->has_metainfo())
     {
         return 1.0;
     }

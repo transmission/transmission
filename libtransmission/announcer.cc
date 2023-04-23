@@ -627,10 +627,10 @@ struct tr_torrent_announcer
 private:
     [[nodiscard]] static tr_announce_list getAnnounceList(tr_torrent const* tor)
     {
-        auto announce_list = tor->announceList();
+        auto announce_list = tor->announce_list();
 
         // if it's a public torrent, add the default trackers
-        if (tor->isPublic())
+        if (tor->is_public())
         {
             announce_list.add(tor->session->defaultTrackers());
         }
@@ -734,7 +734,7 @@ bool tr_announcerCanManualAnnounce(tr_torrent const* tor)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->torrent_announcer != nullptr);
 
-    return tor->isRunning && tor->torrent_announcer->canManualAnnounce();
+    return tor->is_running() && tor->torrent_announcer->canManualAnnounce();
 }
 
 time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
@@ -909,16 +909,16 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     req.port = announcer->session->advertisedPeerPort();
     req.announce_url = current_tracker->announce_url;
     req.tracker_id = current_tracker->tracker_id;
-    req.info_hash = tor->infoHash();
+    req.info_hash = tor->info_hash();
     req.peer_id = tor->peer_id();
     req.up = tier->byteCounts[TR_ANN_UP];
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req.leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
+    req.leftUntilComplete = tor->has_metainfo() ? tor->total_size() - tor->has_total() : INT64_MAX;
     req.event = event;
     req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req.key = tor->announce_key();
-    req.partial_seed = tor->isPartialSeed();
+    req.partial_seed = tor->is_partial_seed();
     tier->buildLogName(req.log_name, sizeof(req.log_name));
     return req;
 }
@@ -1023,7 +1023,7 @@ void tr_announcer_impl::onAnnounceDone(
            Don't bother publishing if there are other trackers -- it's
            all too common for people to load up dozens of dead trackers
            in a torrent's metainfo... */
-        if (tier->tor->trackerCount() < 2)
+        if (tier->tor->tracker_count() < 2)
         {
             publishError(tier, response.errmsg);
         }
@@ -1436,7 +1436,7 @@ void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tier
                 continue;
             }
 
-            req->info_hash[req->info_hash_count] = tier->tor->infoHash();
+            req->info_hash[req->info_hash_count] = tier->tor->info_hash();
             ++req->info_hash_count;
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
@@ -1450,7 +1450,7 @@ void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tier
             req->scrape_url = scrape_info->scrape_url;
             tier->buildLogName(req->log_name, sizeof(req->log_name));
 
-            req->info_hash[req->info_hash_count] = tier->tor->infoHash();
+            req->info_hash[req->info_hash_count] = tier->tor->info_hash();
             ++req->info_hash_count;
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
@@ -1491,7 +1491,7 @@ int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer swarms where we might download */
-    if (auto const is_done_a = a->tor->isDone(), is_done_b = b->tor->isDone(); is_done_a != is_done_b)
+    if (auto const is_done_a = a->tor->is_done(), is_done_b = b->tor->is_done(); is_done_a != is_done_b)
     {
         return is_done_a ? 1 : -1;
     }
@@ -1533,7 +1533,7 @@ void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)
     tier->lastAnnounceStartTime = now;
 
     auto tier_id = tier->id;
-    auto is_running_on_success = tor->isRunning;
+    auto is_running_on_success = tor->is_running();
 
     announcer->announce(
         req,
@@ -1693,7 +1693,7 @@ namespace tracker_view_helpers
         {
             view.announceState = TR_TRACKER_ACTIVE;
         }
-        else if (!tor.isRunning || tier.announceAt == 0)
+        else if (!tor.is_running() || tier.announceAt == 0)
         {
             view.announceState = TR_TRACKER_INACTIVE;
         }
@@ -1795,7 +1795,7 @@ void tr_announcer_impl::resetTorrent(tr_torrent* tor)
     }
 
     // kickstart any tiers that didn't get started
-    if (tor->isRunning)
+    if (tor->is_running())
     {
         auto const now = tr_time();
         for (auto& tier : newer->tiers)

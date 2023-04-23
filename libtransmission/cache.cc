@@ -105,7 +105,7 @@ int Cache::writeContiguous(CIter const begin, CIter const end) const
         return EINVAL;
     }
 
-    auto const loc = tor->blockLoc(block);
+    auto const loc = tor->block_loc(block);
 
     if (auto const err = tr_ioWrite(tor, loc, std::size(*towrite), std::data(*towrite)); err != 0)
     {

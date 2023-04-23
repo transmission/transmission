@@ -96,7 +96,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     auto lock = session->unique_lock();
 
     auto io = std::make_shared<tr_peerIo>(session, info_hash, is_incoming, is_seed, parent);
-    io->bandwidth().setPeer(io);
+    io->bandwidth().set_peer(io);
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
     return io;
 }
@@ -254,11 +254,11 @@ void tr_peerIo::did_write_wrapper(size_t bytes_transferred)
         size_t const overhead = socket_.guess_packet_overhead(payload);
         uint64_t const now = tr_time_msec();
 
-        bandwidth().notifyBandwidthConsumed(TR_UP, payload, is_piece_data, now);
+        bandwidth().notify_bandwidth_consumed(TR_UP, payload, is_piece_data, now);
 
         if (overhead > 0)
         {
-            bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
+            bandwidth().notify_bandwidth_consumed(TR_UP, overhead, false, now);
         }
 
         if (did_write_ != nullptr)
@@ -363,18 +363,18 @@ void tr_peerIo::can_read_wrapper()
         {
             if (piece != 0)
             {
-                bandwidth().notifyBandwidthConsumed(TR_DOWN, piece, true, now);
+                bandwidth().notify_bandwidth_consumed(TR_DOWN, piece, true, now);
             }
 
             if (used != piece)
             {
-                bandwidth().notifyBandwidthConsumed(TR_DOWN, used - piece, false, now);
+                bandwidth().notify_bandwidth_consumed(TR_DOWN, used - piece, false, now);
             }
         }
 
         if (overhead > 0)
         {
-            bandwidth().notifyBandwidthConsumed(TR_DOWN, overhead, false, now);
+            bandwidth().notify_bandwidth_consumed(TR_DOWN, overhead, false, now);
         }
 
         switch (read_state)
@@ -769,7 +769,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
             if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
                 tr_logAddTraceIo(io, fmt::format("{:d} overhead bytes via utp", args->len));
-                io->bandwidth().notifyBandwidthConsumed(args->send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
+                io->bandwidth().notify_bandwidth_consumed(args->send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
             }
             return {};
         });

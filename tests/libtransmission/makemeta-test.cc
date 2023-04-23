@@ -69,20 +69,20 @@ protected:
         EXPECT_EQ(error, nullptr) << *error;
 
         auto metainfo = tr_torrent_metainfo{};
-        EXPECT_TRUE(metainfo.parseBenc(builder.benc()));
-        EXPECT_EQ(builder.fileCount(), metainfo.fileCount());
-        EXPECT_EQ(builder.pieceSize(), metainfo.pieceSize());
-        EXPECT_EQ(builder.totalSize(), metainfo.totalSize());
-        EXPECT_EQ(builder.totalSize(), metainfo.totalSize());
-        for (size_t i = 0, n = std::min(builder.fileCount(), metainfo.fileCount()); i < n; ++i)
+        EXPECT_TRUE(metainfo.parse_benc(builder.benc()));
+        EXPECT_EQ(builder.fileCount(), metainfo.file_count());
+        EXPECT_EQ(builder.pieceSize(), metainfo.piece_size());
+        EXPECT_EQ(builder.totalSize(), metainfo.total_size());
+        EXPECT_EQ(builder.totalSize(), metainfo.total_size());
+        for (size_t i = 0, n = std::min(builder.fileCount(), metainfo.file_count()); i < n; ++i)
         {
             EXPECT_EQ(builder.fileSize(i), metainfo.files().fileSize(i));
             EXPECT_EQ(builder.path(i), metainfo.files().path(i));
         }
         EXPECT_EQ(builder.name(), metainfo.name());
         EXPECT_EQ(builder.comment(), metainfo.comment());
-        EXPECT_EQ(builder.isPrivate(), metainfo.isPrivate());
-        EXPECT_EQ(builder.announceList().toString(), metainfo.announceList().toString());
+        EXPECT_EQ(builder.isPrivate(), metainfo.is_private());
+        EXPECT_EQ(builder.announceList().toString(), metainfo.announce_list().toString());
         return metainfo;
     }
 };
@@ -120,7 +120,7 @@ TEST_F(MakemetaTest, isPrivate)
     {
         auto builder = tr_metainfo_builder{ filename };
         builder.setPrivate(is_private);
-        EXPECT_EQ(is_private, testBuilder(builder).isPrivate());
+        EXPECT_EQ(is_private, testBuilder(builder).is_private());
     }
 }
 
@@ -133,7 +133,7 @@ TEST_F(MakemetaTest, pieceSize)
     {
         auto builder = tr_metainfo_builder{ filename };
         builder.setPieceSize(piece_size);
-        EXPECT_EQ(piece_size, testBuilder(builder).pieceSize());
+        EXPECT_EQ(piece_size, testBuilder(builder).piece_size());
     }
 }
 
@@ -147,7 +147,7 @@ TEST_F(MakemetaTest, webseeds)
     builder.setWebseeds(std::vector<std::string>{ std::string{ Webseed } });
 
     auto const metainfo = testBuilder(builder);
-    EXPECT_EQ(1U, metainfo.webseedCount());
+    EXPECT_EQ(1U, metainfo.webseed_count());
     EXPECT_EQ(Webseed, metainfo.webseed(0));
 }
 
@@ -168,7 +168,7 @@ TEST_F(MakemetaTest, anonymizeTrue)
     builder.setAnonymize(true);
     auto const metainfo = testBuilder(builder);
     EXPECT_EQ(""sv, metainfo.creator());
-    EXPECT_EQ(time_t{}, metainfo.dateCreated());
+    EXPECT_EQ(time_t{}, metainfo.date_created());
 }
 
 TEST_F(MakemetaTest, anonymizeFalse)
@@ -181,8 +181,8 @@ TEST_F(MakemetaTest, anonymizeFalse)
     auto const metainfo = testBuilder(builder);
     EXPECT_TRUE(tr_strvContains(metainfo.creator(), TR_NAME)) << metainfo.creator();
     auto const now = time(nullptr);
-    EXPECT_LE(metainfo.dateCreated(), now);
-    EXPECT_LE(now - 60, metainfo.dateCreated());
+    EXPECT_LE(metainfo.date_created(), now);
+    EXPECT_LE(now - 60, metainfo.date_created());
 }
 
 TEST_F(MakemetaTest, nameIsRootMultifile)
@@ -291,12 +291,12 @@ TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
 
     builder.setPrivate(true);
     auto private_metainfo = testBuilder(builder);
-    EXPECT_NE(base_metainfo.infoHash(), private_metainfo.infoHash());
+    EXPECT_NE(base_metainfo.info_hash(), private_metainfo.info_hash());
 
     builder.setSource("FOO");
     auto private_source_metainfo = testBuilder(builder);
-    EXPECT_NE(base_metainfo.infoHash(), private_source_metainfo.infoHash());
-    EXPECT_NE(private_metainfo.infoHash(), private_source_metainfo.infoHash());
+    EXPECT_NE(base_metainfo.info_hash(), private_source_metainfo.info_hash());
+    EXPECT_NE(private_metainfo.info_hash(), private_source_metainfo.info_hash());
 }
 
 } // namespace libtransmission::test
