@@ -103,11 +103,12 @@ private:
 class Buffer : public BufferWriter<Buffer, std::byte>
 {
 public:
+    using value_type = std::byte;
+
     class Iterator
     {
     public:
         using difference_type = long;
-        using value_type = std::byte;
         using pointer = value_type*;
         using reference = value_type&;
         using iterator_category = std::random_access_iterator_tag;
@@ -241,12 +242,12 @@ public:
     };
 
     Buffer()
-        : BufferWriter<Buffer, std::byte>{ this }
+        : BufferWriter<Buffer, value_type>{ this }
     {
     }
 
     Buffer(Buffer&& that)
-        : BufferWriter<Buffer, std::byte>(this)
+        : BufferWriter<Buffer, value_type>(this)
         , buf_{ std::move(that.buf_) }
     {
     }
@@ -262,7 +263,7 @@ public:
 
     template<typename T>
     explicit Buffer(T const& data)
-        : BufferWriter<Buffer, std::byte>{ this }
+        : BufferWriter<Buffer, value_type>{ this }
     {
         add(data);
     }
@@ -301,7 +302,7 @@ public:
     [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
-        auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
+        auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
         auto const needle_end = needle_begin + n_bytes;
         return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
     }
@@ -371,14 +372,14 @@ public:
         return 0;
     }
 
-    [[nodiscard]] std::pair<std::byte*, size_t> pullup()
+    [[nodiscard]] std::pair<value_type*, size_t> pullup()
     {
-        return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
+        return { reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1)), size() };
     }
 
-    [[nodiscard]] std::byte const* data() const
+    [[nodiscard]] value_type const* data() const
     {
-        return reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1));
+        return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
     }
 
     [[nodiscard]] auto pullup_sv()
