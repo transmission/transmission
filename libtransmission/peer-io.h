@@ -127,8 +127,7 @@ public:
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
-    template<typename T>
-    void write(libtransmission::BufferReader<T, std::byte>& buf, bool is_piece_data)
+    void write(libtransmission::BufferReader<std::byte>& buf, bool is_piece_data)
     {
         auto const len = std::size(buf);
         encrypt(len, std::data(buf));

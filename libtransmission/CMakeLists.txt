@@ -279,7 +279,6 @@ target_link_libraries(${TR_NAME}
         CURL::libcurl
         FastFloat::fast_float
         psl::psl
-        sfl::sfl
         natpmp::natpmp
         miniupnpc::libminiupnpc
         dht::dht
@@ -297,6 +296,7 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
     PUBLIC
+        sfl::sfl
         fmt::fmt-header-only
         libevent::event)
 

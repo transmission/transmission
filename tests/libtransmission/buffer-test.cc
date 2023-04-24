@@ -115,9 +115,7 @@ TEST_F(BufferTest, NonBufferWriter)
     auto constexpr Bang = "!"sv;
 
     auto out1 = Buffer{};
-
-    auto out2_vec = std::vector<std::byte>{};
-    auto out2 = libtransmission::BufferWriter<std::vector<std::byte>, std::byte>{ &out2_vec };
+    auto out2 = libtransmission::SmallBuffer<1024>{};
 
     out1.add_uint8(1);
     out2.add_uint8(1);
@@ -138,6 +136,6 @@ TEST_F(BufferTest, NonBufferWriter)
     out2.add(Bang);
 
     auto const result1 = out1.pullup_sv();
-    auto const result2 = std::string_view{ reinterpret_cast<char const*>(std::data(out2_vec)), std::size(out2_vec) };
+    auto const result2 = out2.to_string();
     EXPECT_EQ(result1, result2);
 }

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // for std::byte
 #include <iterator>
 #include <limits>
 #include <memory>
@@ -27,34 +27,44 @@
 namespace libtransmission
 {
 
-template<typename container_type, typename value_type>
+template<typename value_type>
 class BufferReader
 {
 public:
-    BufferReader(container_type* in)
-        : in_{ in }
+    virtual ~BufferReader() = default;
+    virtual void drain(size_t n_bytes) = 0;
+    [[nodiscard]] virtual size_t size() const noexcept = 0;
+    [[nodiscard]] virtual value_type const* data() const noexcept = 0;
+    [[nodiscard]] virtual value_type* data() noexcept = 0;
+
+    [[nodiscard]] auto empty() const noexcept
     {
-        static_assert(sizeof(value_type) == 1);
+        return size() == 0U;
     }
 
-    [[nodiscard]] auto size() const noexcept
+    [[nodiscard]] auto* begin() noexcept
     {
-        return std::size(*in_);
+        return data();
     }
 
-    [[nodiscard]] value_type* data() noexcept
+    [[nodiscard]] auto const* begin() const noexcept
     {
-        return std::data(*in_);
+        return data();
     }
 
-    [[nodiscard]] value_type const* data() const noexcept
+    [[nodiscard]] auto* end() noexcept
     {
-        return std::data(*in_);
+        return begin() + size();
     }
 
-    void drain(size_t n)
+    [[nodiscard]] auto const* end() const noexcept
     {
-        in_->drain(std::min(n, in_->size()));
+        return begin() + size();
+    }
+
+    [[nodiscard]] auto to_string() const
+    {
+        return std::string{ reinterpret_cast<char const*>(data()), size() };
     }
 
     template<typename T>
@@ -63,13 +73,13 @@ public:
         auto const n_bytes = std::size(needle);
         auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
         auto const needle_end = needle_begin + n_bytes;
-        return n_bytes <= std::size(*in_) && std::equal(needle_begin, needle_end, std::cbegin(*in_));
+        return n_bytes <= size() && std::equal(needle_begin, needle_end, data());
     }
 
     auto to_buf(void* tgt, size_t n_bytes)
     {
-        n_bytes = std::min(n_bytes, std::size(*in_));
-        std::copy_n(std::data(*in_), n_bytes, reinterpret_cast<value_type*>(tgt));
+        n_bytes = std::min(n_bytes, size());
+        std::copy_n(data(), n_bytes, reinterpret_cast<value_type*>(tgt));
         drain(n_bytes);
         return n_bytes;
     }
@@ -101,37 +111,28 @@ public:
         to_buf(&tmp, sizeof(tmp));
         return tr_ntohll(tmp);
     }
-
-private:
-    container_type* in_;
 };
 
-template<typename T, typename ValueType>
+template<typename value_type>
 class BufferWriter
 {
 public:
-    BufferWriter(T* out)
-        : out_{ out }
+    BufferWriter()
     {
-        static_assert(sizeof(ValueType) == 1);
+        static_assert(sizeof(value_type) == 1);
     }
+
+    virtual ~BufferWriter() = default;
+
+    virtual void commit_space(size_t n_bytes) = 0;
+    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) = 0;
 
     void add(void const* span_begin, size_t span_len)
     {
-        auto const* const begin = reinterpret_cast<ValueType const*>(span_begin);
-        auto const* const end = begin + span_len;
-        out_->insert(std::end(*out_), begin, end);
+        auto [buf, buflen] = reserve_space(span_len);
+        std::copy_n(reinterpret_cast<value_type const*>(span_begin), span_len, buf);
+        commit_space(span_len);
     }
-
-#if 0
-    template<typename container_type>
-    void add(BufferReader<container_type, ValueType>& in)
-    {
-        auto const n_bytes = std::size(in);
-        add(std::data(in), n_bytes);
-        in.drain(n_bytes);
-    }
-#endif
 
     template<typename ContiguousContainer>
     void add(ContiguousContainer const& container)
@@ -188,265 +189,39 @@ public:
         auto nport = port.network();
         add(&nport, sizeof(nport));
     }
-
-private:
-    T* out_;
 };
 
 class Buffer
-    : public BufferReader<Buffer, std::byte>
-    , public BufferWriter<Buffer, std::byte>
+    : public BufferReader<std::byte>
+    , public BufferWriter<std::byte>
 {
 public:
     using value_type = std::byte;
 
-    class Iterator
+    Buffer() = default;
+    Buffer(Buffer&& that) = default;
+    Buffer& operator=(Buffer&& that) = default;
+
+    template<typename T>
+    explicit Buffer(T const& data)
     {
-    public:
-        using difference_type = long;
-        using pointer = value_type*;
-        using reference = value_type&;
-        using iterator_category = std::random_access_iterator_tag;
-
-        constexpr Iterator(evbuffer* const buf, size_t offset)
-            : buf_{ buf }
-            , buf_offset_{ offset }
-        {
-        }
-
-        [[nodiscard]] value_type& operator*() noexcept
-        {
-            auto& info = iov();
-            TR_ASSERT(info.iov.iov_base != nullptr);
-            TR_ASSERT(info.offset < info.iov.iov_len);
-            return static_cast<value_type*>(info.iov.iov_base)[info.offset];
-        }
-
-        [[nodiscard]] value_type operator*() const noexcept
-        {
-            auto const& info = iov();
-            return static_cast<value_type*>(info.iov.iov_base)[info.offset];
-        }
-
-        [[nodiscard]] constexpr Iterator operator+(size_t n_bytes)
-        {
-            return Iterator{ buf_, offset() + n_bytes };
-        }
-
-        [[nodiscard]] constexpr Iterator operator-(size_t n_bytes)
-        {
-            return Iterator{ buf_, offset() - n_bytes };
-        }
-
-        [[nodiscard]] constexpr auto operator-(Iterator const& that) const noexcept
-        {
-            return offset() - that.offset();
-        }
-
-        constexpr Iterator& operator++() noexcept
-        {
-            inc_offset(1U);
-            return *this;
-        }
-
-        constexpr Iterator& operator+=(size_t n_bytes)
-        {
-            inc_offset(n_bytes);
-            return *this;
-        }
-
-        constexpr Iterator& operator--() noexcept
-        {
-            dec_offset(1);
-            return *this;
-        }
-
-        [[nodiscard]] constexpr bool operator==(Iterator const& that) const noexcept
-        {
-            return this->buf_ == that.buf_ && this->offset() == that.offset();
-        }
-
-        [[nodiscard]] constexpr bool operator!=(Iterator const& that) const noexcept
-        {
-            return !(*this == that);
-        }
-
-    private:
-        struct IovInfo
-        {
-            evbuffer_iovec iov = {};
-            size_t offset = 0;
-        };
-
-        [[nodiscard]] constexpr size_t offset() const noexcept
-        {
-            return buf_offset_;
-        }
-
-        constexpr void dec_offset(size_t increment)
-        {
-            buf_offset_ -= increment;
-
-            if (iov_)
-            {
-                if (iov_->offset >= increment)
-                {
-                    iov_->offset -= increment;
-                }
-                else
-                {
-                    iov_.reset();
-                }
-            }
-        }
-
-        constexpr void inc_offset(size_t increment)
-        {
-            buf_offset_ += increment;
-
-            if (iov_)
-            {
-                if (iov_->offset + increment < iov_->iov.iov_len)
-                {
-                    iov_->offset += increment;
-                }
-                else
-                {
-                    iov_.reset();
-                }
-            }
-        }
-
-        [[nodiscard]] IovInfo& iov() const noexcept
-        {
-            if (!iov_)
-            {
-                auto ptr = evbuffer_ptr{};
-                auto iov = IovInfo{};
-                evbuffer_ptr_set(buf_, &ptr, buf_offset_, EVBUFFER_PTR_SET);
-                evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov.iov, 1);
-                iov.offset = 0;
-                iov_ = iov;
-            }
-
-            return *iov_;
-        }
-
-        mutable std::optional<IovInfo> iov_;
-
-        evbuffer* buf_;
-        size_t buf_offset_ = 0;
-    };
-
-    Buffer()
-        : BufferReader<Buffer, value_type>{ this }
-        , BufferWriter<Buffer, value_type>{ this }
-    {
-    }
-
-    Buffer(Buffer&& that)
-        : BufferReader<Buffer, value_type>{ this }
-        , BufferWriter<Buffer, value_type>{ this }
-        , buf_{ std::move(that.buf_) }
-    {
-    }
-
-    Buffer& operator=(Buffer&& that)
-    {
-        buf_ = std::move(that.buf_);
-        return *this;
+        add(data);
     }
 
     Buffer(Buffer const&) = delete;
     Buffer& operator=(Buffer const&) = delete;
 
-    template<typename T>
-    explicit Buffer(T const& data)
-        : BufferReader<Buffer, value_type>{ this }
-        , BufferWriter<Buffer, value_type>{ this }
-    {
-        add(data);
-    }
-
-    [[nodiscard]] auto size() const noexcept
+    [[nodiscard]] size_t size() const noexcept override
     {
         return evbuffer_get_length(buf_.get());
     }
-
-    [[nodiscard]] auto empty() const noexcept
-    {
-        return evbuffer_get_length(buf_.get()) == 0;
-    }
-
-    [[nodiscard]] auto begin() noexcept
-    {
-        return Iterator{ buf_.get(), 0U };
-    }
-
-    [[nodiscard]] auto end() noexcept
-    {
-        return Iterator{ buf_.get(), size() };
-    }
-
-    [[nodiscard]] auto begin() const noexcept
-    {
-        return Iterator{ buf_.get(), 0U };
-    }
-
-    [[nodiscard]] auto end() const noexcept
-    {
-        return Iterator{ buf_.get(), size() };
-    }
-
-    [[nodiscard]] std::string to_string() const
-    {
-        auto str = std::string{};
-        str.resize(size());
-        evbuffer_copyout(buf_.get(), std::data(str), std::size(str));
-        return str;
-    }
-
-#if 0
-    auto to_buf(void* tgt, size_t n_bytes)
-    {
-        return evbuffer_remove(buf_.get(), tgt, n_bytes);
-    }
-
-    [[nodiscard]] auto to_uint8()
-    {
-        auto tmp = uint8_t{};
-        to_buf(&tmp, sizeof(tmp));
-        return tmp;
-    }
-
-    [[nodiscard]] uint16_t to_uint16()
-    {
-        auto tmp = uint16_t{};
-        to_buf(&tmp, sizeof(tmp));
-        return ntohs(tmp);
-    }
-
-    [[nodiscard]] uint32_t to_uint32()
-    {
-        auto tmp = uint32_t{};
-        to_buf(&tmp, sizeof(tmp));
-        return ntohl(tmp);
-    }
-
-    [[nodiscard]] uint64_t to_uint64()
-    {
-        auto tmp = uint64_t{};
-        to_buf(&tmp, sizeof(tmp));
-        return tr_ntohll(tmp);
-    }
-#endif
 
     void clear()
     {
         drain(size());
     }
 
-    void drain(size_t n_bytes)
+    void drain(size_t n_bytes) override
     {
         evbuffer_drain(buf_.get(), n_bytes);
     }
@@ -470,12 +245,12 @@ public:
         return { reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1)), size() };
     }
 
-    [[nodiscard]] value_type* data()
+    [[nodiscard]] value_type* data() noexcept override
     {
         return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
     }
 
-    [[nodiscard]] value_type const* data() const
+    [[nodiscard]] value_type const* data() const noexcept override
     {
         return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
     }
@@ -514,137 +289,74 @@ public:
         return {};
     }
 
-    template<typename T>
-    void insert([[maybe_unused]] Iterator iter, T const* const begin, T const* const end)
+    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        TR_ASSERT(iter == this->end()); // tr_buffer only supports appending
-        evbuffer_add(buf_.get(), begin, end - begin);
+        evbuffer_iovec iov = {};
+        evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
+        return { static_cast<value_type*>(iov.iov_base), static_cast<size_t>(iov.iov_len) };
+    }
+
+    virtual void commit_space(size_t n_bytes) override
+    {
+        evbuffer_iovec iov = {};
+        evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
+        iov.iov_len = n_bytes;
+        evbuffer_commit_space(buf_.get(), &iov, 1);
     }
 
 private:
     evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
-
-    [[nodiscard]] Iterator cbegin() const noexcept
-    {
-        return Iterator{ buf_.get(), 0U };
-    }
-
-    [[nodiscard]] Iterator cend() const noexcept
-    {
-        return Iterator{ buf_.get(), size() };
-    }
 };
 
-template<size_t N>
+template<size_t N, typename value_type = std::byte>
 class SmallBuffer
-    : public BufferReader<SmallBuffer<N>, std::byte>
-    , public BufferWriter<SmallBuffer<N>, std::byte>
+    : public BufferReader<value_type>
+    , public BufferWriter<value_type>
 {
 public:
-    using value_type = std::byte;
-    using container_type = sfl::small_vector<value_type, N>;
-    using iterator = typename container_type::iterator;
-
-    SmallBuffer()
-        : BufferReader<SmallBuffer, std::byte>{ this }
-        , BufferWriter<SmallBuffer, std::byte>{ this }
-    {
-    }
-
-    template<typename T>
-    explicit SmallBuffer(T const& data)
-        : BufferReader<SmallBuffer, std::byte>{ this }
-        , BufferWriter<SmallBuffer, std::byte>{ this }
-    {
-        add(data);
-    }
-
+    SmallBuffer() = default;
     SmallBuffer(SmallBuffer&&) = delete;
     SmallBuffer(SmallBuffer const&) = delete;
     SmallBuffer& operator=(SmallBuffer&&) = delete;
     SmallBuffer& operator=(SmallBuffer const&) = delete;
 
-    [[nodiscard]] auto size() const noexcept
+    [[nodiscard]] size_t size() const noexcept override
     {
-        return std::size(buf_);
+        return committed_size_;
     }
 
-    [[nodiscard]] auto empty() const noexcept
-    {
-        return std::empty(buf_);
-    }
-
-    [[nodiscard]] auto begin() noexcept
-    {
-        return std::begin(buf_);
-    }
-
-    [[nodiscard]] auto end() noexcept
-    {
-        return std::end(buf_);
-    }
-
-    [[nodiscard]] auto begin() const noexcept
-    {
-        return std::begin(buf_);
-    }
-
-    [[nodiscard]] auto end() const noexcept
-    {
-        return std::end(buf_);
-    }
-
-    [[nodiscard]] value_type* data()
+    [[nodiscard]] value_type* data() noexcept override
     {
         return std::data(buf_);
     }
 
-    [[nodiscard]] value_type const* data() const
+    [[nodiscard]] value_type const* data() const noexcept override
     {
         return std::data(buf_);
     }
 
-    void drain(size_t n_bytes)
+    void drain(size_t n_bytes) override
     {
+        // FIXME: should not call erase()
+        n_bytes = std::min(n_bytes, size());
         buf_.erase(buf_.begin(), buf_.begin() + n_bytes);
+        committed_size_ -= n_bytes;
     }
 
-    void reserve(size_t n_bytes)
+    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        buf_.reserve(n_bytes);
+        buf_.resize(committed_size_ + n_bytes);
+        return { data() + committed_size_, buf_.capacity() - committed_size_ };
     }
 
-    template<typename T>
-    void insert(iterator iter, T const* const begin, T const* const end)
+    virtual void commit_space(size_t n_bytes) override
     {
-        buf_.insert(iter, begin, end);
+        committed_size_ += n_bytes;
     }
 
 private:
-    container_type buf_ = {};
-
-    [[nodiscard]] auto cbegin() const noexcept
-    {
-        return buf_.cbegin();
-    }
-
-    [[nodiscard]] auto cend() const noexcept
-    {
-        return buf_.cend();
-    }
+    sfl::small_vector<value_type, N> buf_ = {};
+    size_t committed_size_ = {};
 };
 
 } // namespace libtransmission
-
-namespace std
-{
-template<>
-struct iterator_traits<libtransmission::Buffer::Iterator>
-{
-    using difference_type = libtransmission::Buffer::Iterator::difference_type;
-    using iterator_category = libtransmission::Buffer::Iterator::iterator_category;
-    using value_type = libtransmission::Buffer::value_type;
-    using pointer = value_type*;
-    using reference = value_type&;
-};
-} // namespace std

@@ -797,10 +797,11 @@ void build_peer_message(tr_peerMsgsImpl const* const msgs, BufferWriter& out, ui
     auto const old_len = std::size(out);
     auto msg_len = sizeof(type);
     ((msg_len += get_param_length(args)), ...);
-    out.reserve(old_len + msg_len);
+    out.reserve_space(msg_len);
     out.add_uint32(msg_len);
     out.add_uint8(type);
     (add_param(out, args), ...);
+    out.commit_space(msg_len);
 
     TR_ASSERT(old_len + sizeof(uint32_t) + msg_len);
     TR_ASSERT(messageLengthIsCorrect(msgs->torrent, type, msg_len));
