@@ -14,16 +14,16 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "subprocess.h"
-#include "tr-assert.h"
-#include "tr-macros.h"
-#include "tr-strbuf.h"
-#include "utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/subprocess.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

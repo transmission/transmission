@@ -59,39 +59,48 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
 
   @media (prefers-color-scheme: dark) {
     --color-bg-hover: #{colors.$grey-40};
-    --color-fg-primary: #fff;
+    --color-fg-primary: #{colors.$dark-mode-white};
     --color-bg-primary: #{colors.$grey-800};
     --color-bg-primary-hover: #{colors.$grey-700};
-    --color-bg-odd: #{colors.$grey-800};
-    --color-bg-even: #{colors.$grey-900};
+    --color-bg-odd: #{colors.$grey-900};
+    --color-bg-even: #{colors.$grey-800};
     --color-bg-menu: #{colors.$grey-800};
     --color-fg-secondary: #{colors.$nice-grey};
     --color-fg-on-popup: #{colors.$nice-grey};
-    --color-fg-disabled: #{colors.$grey-500};
+    --color-fg-disabled: #{colors.$dark-mode-white};
     --color-bg-popup: #{colors.$grey-800};
     --color-bg-warn: #cf6679;
     --color-fg-warn: #{colors.$dark-mode-black};
-    --color-border: #{colors.$nice-grey};
-    --color-border-selected: #d0d7de;
+    --color-border: #{colors.$dark-mode-white};
+    --color-border-selected: #{colors.$grey-500};
     --color-fg-tertiary: #{colors.$grey-500};
     --color-toolbar-background: #{colors.$grey-800};
     --color-inspector-background: #{colors.$grey-800};
     --color-inspector-tabs: #{colors.$nice-grey};
     --color-bg-selected: #{colors.$default-accent-color-dark};
     --color-bg-tabs: #{colors.$grey-700};
-    --color-progressbar-background-1: #426389;
     --color-default-border: #{colors.$default-border-dark};
-    --color-progressbar-seed-1: #{colors.$green-500};
-    --color-progressbar-seed-2: #{colors.$green-300};
+    --color-progressbar-seed-1: #{colors.$green-700};
+    --color-progressbar-seed-2: #{colors.$green-500};
     --color-progressbar-paused: #{colors.$grey-500};
+    --color-progressbar-leech: #{colors.$blue-500};
     --color-progressbar-seed-paused: #{colors.$grey-500};
   }
   @media (prefers-color-scheme: light) {
+    --progress: 100%;
+    --color-fg-error: #{colors.$red-500};
+    --color-fg-port-closed: #{colors.$red-500};
+    --color-fg-port-open: #{colors.$green-500};
+    --color-progressbar-verify: #{colors.$yellow-300};
+    --color-progressbar-magnet: #{colors.$yellow-300};
+    --color-progressbar-paused: #{colors.$grey-200};
+    --color-progressbar-leech: #{colors.$blue-300};
+    --color-progressbar-queued: #{colors.$blue-100};
     --color-bg-hover: #{colors.$nice-grey};
     --color-fg-primary: #404040;
-    --color-bg-primary: #fff;
-    --color-bg-even: #{colors.$nice-grey};
-    --color-bg-odd: #{colors.$white};
+    --color-bg-primary: #{colors.$white};
+    --color-bg-even: #{colors.$white};
+    --color-bg-odd: #{colors.$nice-grey};
     --color-bg-menu: #{colors.$nice-grey};
     --color-fg-on-popup: #{colors.$grey-900};
     --color-bg-popup: #{colors.$white};
@@ -107,7 +116,6 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-tabs: #{colors.$nice-grey-darker};
     --color-inspector-tabs: #{colors.$nice-grey};
     --color-bg-selected: #{colors.$default-accent-color};
-    --color-progressbar-background-1: #{colors.$nice-grey};
     --color-default-border: #{colors.$default-border-light};
     --color-dialog-border: #{colors.$nice-grey};
     --color-progressbar-seed-1: #{colors.$green-300};
@@ -592,7 +600,7 @@ $video-image: '../img/film.svg';
     .torrent-progress-details,
     .torrent-peer-details {
       color: var(--color-fg-primary);
-      font-size: x-small;
+      font-size: small;
     }
 
     &.compact {
@@ -998,6 +1006,7 @@ $video-image: '../img/film.svg';
     border: 1px solid transparent;
     border-radius: 0.375rem;
     color: var(--color-fg-primary);
+    font-weight: 400;
   }
 }
 
@@ -1425,6 +1434,8 @@ $video-image: '../img/film.svg';
   a,
   button,
   label {
+    color: var(--color-fg-primary);
+    display: inline-flex;
     font-size: 1em;
     width: 100%;
   }
@@ -1728,18 +1739,28 @@ dialog {
   font-style: italic;
 }
 
-#torrent-upload-frame {
-  border: 0;
-  display: block; /* Don't change this : safari forms won't target hidden frames (they open a new window) */
-  height: 0;
-  left: -1000px;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  top: -1000px;
-  width: 0;
-}
-
 .ui-menu {
   width: 200px;
+}
+
+.upload-div {
+  display: none;
+}
+
+.dropzone {
+  background: var(--color-bg-primary);
+  border: 2px dashed var(--color-border);
+  border-radius: 5px;
+  color: var(--color-fg-primary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2em;
+  font-weight: bold;
+  height: 100%;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  width: 100%;
 }

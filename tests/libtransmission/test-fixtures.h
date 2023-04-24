@@ -459,12 +459,12 @@ protected:
         if (state != ZeroTorrentState::NoFiles)
         {
             auto const* const metainfo = tr_ctorGetMetainfo(ctor);
-            for (tr_file_index_t i = 0, n = metainfo->fileCount(); i < n; ++i)
+            for (tr_file_index_t i = 0, n = metainfo->file_count(); i < n; ++i)
             {
                 auto const base = state == ZeroTorrentState::Partial && tr_sessionIsIncompleteDirEnabled(session_) ?
                     tr_sessionGetIncompleteDir(session_) :
                     tr_sessionGetDownloadDir(session_);
-                auto const& subpath = metainfo->fileSubpath(i);
+                auto const& subpath = metainfo->file_subpath(i);
                 auto const partial = state == ZeroTorrentState::Partial && i == 0;
                 auto const suffix = std::string_view{ partial ? ".part" : "" };
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
@@ -474,10 +474,10 @@ protected:
                 tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
-                auto const file_size = metainfo->fileSize(i);
+                auto const file_size = metainfo->file_size(i);
                 for (uint64_t j = 0; j < file_size; ++j)
                 {
-                    auto const ch = partial && j < metainfo->pieceSize() ? '\1' : '\0';
+                    auto const ch = partial && j < metainfo->piece_size() ? '\1' : '\0';
                     tr_sys_file_write(fd, &ch, 1, nullptr);
                 }
 

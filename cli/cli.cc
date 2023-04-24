@@ -10,7 +10,7 @@
 
 #include <signal.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
@@ -68,7 +68,7 @@ static sig_atomic_t manualUpdate = false;
 
 static char const* torrentPath = nullptr;
 
-static auto constexpr Options = std::array<tr_option, 19>{
+static auto constexpr Options = std::array<tr_option, 20>{
     { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
       { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
@@ -93,6 +93,8 @@ static auto constexpr Options = std::array<tr_option, 19>{
       { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+      { 500, "sequential-download", "Download pieces sequentially", "seq", false, nullptr },
+
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
@@ -257,7 +259,8 @@ int tr_main(int argc, char* argv[])
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);
 
-    if (tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr) || tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr))
+    if (tr_sys_path_exists(torrentPath) ? tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr) :
+                                          tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr))
     {
         // all good
     }
@@ -443,6 +446,10 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
 
         case 912:
             tr_variantDictAddInt(d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            break;
+
+        case 500:
+            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
             break;
 
         case TR_OPT_UNK:

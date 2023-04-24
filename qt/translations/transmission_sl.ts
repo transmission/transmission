@@ -287,7 +287,7 @@
         <translation>Dodaj URL-je</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Visoko</translation>
     </message>
@@ -2139,7 +2139,7 @@ Za dodajanje nadaljnjega glavnega URL, ga dodajte za prazno vrstico.</translatio
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist…&lt;/p&gt;</source>
-        <translation>&lt;b&gt;Posodobi seznam blokad&lt;/b&gt;&lt;p&gt;Pridobivanje novega seznama blokad...</translation>
+        <translation>&lt;b&gt;Posodobi seznam blokad&lt;/b&gt;&lt;p&gt;Pridobivanje novega seznama blokad…</translation>
     </message>
     <message>
         <location line="+93"/>

@@ -30,21 +30,21 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h"
-#include "file.h"
-#include "log.h"
-#include "net.h"
-#include "peer-mgr.h" // for tr_peerMgrCompactToPex()
-#include "timer.h"
-#include "tr-assert.h"
-#include "tr-dht.h"
-#include "tr-strbuf.h"
-#include "variant.h"
-#include "utils.h" // for tr_time(), _()
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-mgr.h" // for tr_peerMgrCompactToPex()
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-dht.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/variant.h"
+#include "libtransmission/utils.h" // for tr_time(), _()
 
 using namespace std::literals;
 
@@ -379,11 +379,11 @@ private:
 
     static auto remove_bad_pex(std::vector<tr_pex>&& pex)
     {
-        static constexpr auto IsBadPex = [](tr_pex const& pex)
+        static constexpr auto IsBadPex = [](tr_pex const& candidate)
         {
             // paper over a bug in some DHT implementation that gives port 1.
             // Xref: https://github.com/transmission/transmission/issues/527
-            return pex.port.host() == 1;
+            return candidate.port == tr_port::fromHost(1);
         };
 
         pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));

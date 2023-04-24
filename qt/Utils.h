@@ -11,6 +11,7 @@
 #include <QHash>
 #include <QPointer>
 #include <QRect>
+#include <QSpinBox>
 #include <QString>
 
 class QAbstractItemView;
@@ -74,4 +75,6 @@ public:
             dialog->activateWindow();
         }
     }
+
+    static void updateSpinBoxFormat(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder);
 };

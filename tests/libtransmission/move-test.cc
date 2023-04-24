@@ -58,7 +58,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_EQ(path, tr_torrentFindFile(tor, 0));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
     EXPECT_EQ(path, tr_torrentFindFile(tor, 1));
-    EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(tor->piece_size(), tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
     // auto completeness = completeness_unset;
@@ -93,7 +93,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
         data.session = session_;
         data.tor = tor;
 
-        auto const [begin, end] = tor->blockSpanForPiece(data.pieceIndex);
+        auto const [begin, end] = tor->block_span_for_piece(data.pieceIndex);
 
         for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {

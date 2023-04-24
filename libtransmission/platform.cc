@@ -32,16 +32,16 @@
 #include <FindDirectory.h>
 #endif
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "file.h"
-#include "log.h"
-#include "platform.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/platform.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

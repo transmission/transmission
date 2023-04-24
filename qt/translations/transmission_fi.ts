@@ -279,7 +279,7 @@
         <translation>Lisää yksi tai useampi URL-osoite</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Korkea</translation>
     </message>

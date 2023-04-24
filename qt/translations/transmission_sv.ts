@@ -279,7 +279,7 @@
         <translation>Lägg till webbadresser</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Hög</translation>
     </message>

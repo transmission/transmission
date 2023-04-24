@@ -20,34 +20,34 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #define LIBTRANSMISSION_PEER_MODULE
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "bandwidth.h"
-#include "blocklist.h"
-#include "cache.h"
-#include "clients.h"
-#include "completion.h"
-#include "crypto-utils.h"
-#include "handshake.h"
-#include "log.h"
-#include "net.h"
-#include "peer-io.h"
-#include "peer-mgr-active-requests.h"
-#include "peer-mgr-wishlist.h"
-#include "peer-mgr.h"
-#include "peer-msgs.h"
-#include "session.h"
-#include "timer.h"
-#include "torrent.h"
-#include "torrent-magnet.h"
-#include "tr-assert.h"
-#include "tr-utp.h"
-#include "utils.h"
-#include "webseed.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/blocklist.h"
+#include "libtransmission/cache.h"
+#include "libtransmission/clients.h"
+#include "libtransmission/completion.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/handshake.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mgr-active-requests.h"
+#include "libtransmission/peer-mgr-wishlist.h"
+#include "libtransmission/peer-mgr.h"
+#include "libtransmission/peer-msgs.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/torrent-magnet.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/webseed.h"
 
 using namespace std::literals;
 
@@ -74,10 +74,10 @@ private:
         }
 
         auto info = TorrentInfo{};
-        info.info_hash = tor->infoHash();
+        info.info_hash = tor->info_hash();
         info.client_peer_id = tor->peer_id();
         info.id = tor->id();
-        info.is_done = tor->isDone();
+        info.is_done = tor->is_done();
         return info;
     }
 
@@ -358,7 +358,7 @@ public:
 
     [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
     {
-        if (!tor->isRunning || tor->isDone())
+        if (!tor->is_running() || tor->is_done())
         {
             return {};
         }
@@ -369,7 +369,7 @@ public:
             [&now](auto const& webseed) { return webseed->isTransferringPieces(now, TR_DOWN, nullptr); });
     }
 
-    [[nodiscard]] auto peerCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto peerCount() const noexcept
     {
         return std::size(peers);
     }
@@ -421,7 +421,7 @@ public:
     {
         /* we consider ourselves to be in endgame if the number of bytes
            we've got requested is >= the number of bytes left to download */
-        is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->leftUntilDone();
+        is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->left_until_done();
     }
 
     [[nodiscard]] constexpr auto isEndgame() const noexcept
@@ -445,7 +445,7 @@ public:
 
     void rebuildWebseeds()
     {
-        auto const n = tor->webseedCount();
+        auto const n = tor->webseed_count();
 
         webseeds.clear();
         webseeds.reserve(n);
@@ -541,8 +541,8 @@ public:
 
                 tor->uploadedCur += event.length;
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
-                tor->setDateActive(now);
-                tor->setDirty();
+                tor->set_date_active(now);
+                tor->set_dirty();
                 tor->session->addUploaded(event.length);
 
                 if (peer->atom != nullptr)
@@ -559,8 +559,8 @@ public:
                 auto* const tor = s->tor;
 
                 tor->downloadedCur += event.length;
-                tor->setDateActive(now);
-                tor->setDirty();
+                tor->set_date_active(now);
+                tor->set_dirty();
                 tor->session->addDownloaded(event.length);
 
                 if (peer->atom != nullptr)
@@ -580,7 +580,7 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotRej:
-            s->active_requests.remove(s->tor->pieceLoc(event.pieceIndex, event.offset).block, peer);
+            s->active_requests.remove(s->tor->piece_loc(event.pieceIndex, event.offset).block, peer);
             break;
 
         case tr_peer_event::Type::ClientGotChoke:
@@ -603,7 +603,7 @@ public:
         case tr_peer_event::Type::ClientGotBlock:
             {
                 auto* const tor = s->tor;
-                auto const loc = tor->pieceLoc(event.pieceIndex, event.offset);
+                auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
                 s->cancelAllRequestsForBlock(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 tr_torrentGotBlock(tor, loc.block);
@@ -762,7 +762,7 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     : session{ tor->session }
     , swarm{ tor->swarm }
     , atom{ atom_in }
-    , blame{ tor->blockCount() }
+    , blame{ tor->block_count() }
 {
 }
 
@@ -828,7 +828,7 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed
  * REQUESTS
  *
  * There are two data structures associated with managing block requests:
- * 
+ *
  * 1. tr_swarm::active_requests, an opaque class that tracks what requests
  *    we currently have, i.e. which blocks and from which peers.
  *    This is used for cancelling requests that have been waiting
@@ -873,12 +873,12 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const override
         {
-            return !torrent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
+            return !torrent_->has_block(block) && !swarm_->active_requests.has(block, peer_);
         }
 
         [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const override
         {
-            return torrent_->pieceIsWanted(piece) && peer_->hasPiece(piece);
+            return torrent_->piece_is_wanted(piece) && peer_->hasPiece(piece);
         }
 
         [[nodiscard]] bool isEndgame() const override
@@ -893,22 +893,27 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] size_t countMissingBlocks(tr_piece_index_t piece) const override
         {
-            return torrent_->countMissingBlocksInPiece(piece);
+            return torrent_->count_missing_blocks_in_piece(piece);
         }
 
         [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const override
         {
-            return torrent_->blockSpanForPiece(piece);
+            return torrent_->block_span_for_piece(piece);
         }
 
         [[nodiscard]] tr_piece_index_t countAllPieces() const override
         {
-            return torrent_->pieceCount();
+            return torrent_->piece_count();
         }
 
         [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override
         {
-            return torrent_->piecePriority(piece);
+            return torrent_->piece_priority(piece);
+        }
+
+        [[nodiscard]] bool isSequentialDownload() const override
+        {
+            return torrent_->is_sequential_download();
         }
 
     private:
@@ -961,7 +966,7 @@ void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
 
     if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
     {
-        tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->pieceSize(p));
+        tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->piece_size(p));
     }
 
     // bookkeeping
@@ -972,7 +977,7 @@ namespace
 {
 namespace handshake_helpers
 {
-void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, struct peer_atom* atom, tr_quark client)
+void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, struct peer_atom* atom, tr_interned_string client)
 {
     TR_ASSERT(atom != nullptr);
     TR_ASSERT(tr_isTorrent(tor));
@@ -980,8 +985,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
     tr_swarm* swarm = tor->swarm;
 
-    auto* peer = tr_peerMsgsNew(tor, atom, std::move(io), &tr_swarm::peerCallbackFunc, swarm);
-    peer->client = client;
+    auto* peer = tr_peerMsgsNew(tor, atom, std::move(io), client, &tr_swarm::peerCallbackFunc, swarm);
     atom->is_connected = true;
 
     swarm->peers.push_back(peer);
@@ -991,11 +995,6 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
     TR_ASSERT(swarm->stats.peer_count == swarm->peerCount());
     TR_ASSERT(swarm->stats.peer_from_count[atom->fromFirst] <= swarm->stats.peer_count);
-
-    // TODO is this needed?
-    // isn't it already initialized in tr_peerMsgsImpl's ctor?
-    peer->update_active(TR_UP);
-    peer->update_active(TR_DOWN);
 }
 
 /* FIXME: this is kind of a mess. */
@@ -1069,7 +1068,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", atom->display_name()));
         }
-        else if (result.io->is_incoming() && s->peerCount() >= s->tor->peerLimit())
+        else if (result.io->is_incoming() && s->peerCount() >= s->tor->peer_limit())
         {
             /* too many peers already */
         }
@@ -1079,12 +1078,12 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         }
         else
         {
-            auto client = tr_quark{ TR_KEY_NONE };
+            auto client = tr_interned_string{};
             if (result.peer_id)
             {
                 auto buf = std::array<char, 128>{};
                 tr_clientForId(std::data(buf), sizeof(buf), *result.peer_id);
-                client = tr_quark_new(std::data(buf));
+                client = tr_interned_string{ tr_quark_new(std::data(buf)) };
             }
 
             result.io->set_bandwidth(&s->tor->bandwidth_);
@@ -1215,7 +1214,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
 void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index)
 {
     auto* const swarm = tor->swarm;
-    auto const byte_count = tor->pieceSize(piece_index);
+    auto const byte_count = tor->piece_size(piece_index);
 
     for (auto* const peer : swarm->peers)
     {
@@ -1276,7 +1275,7 @@ struct CompareAtomsByUsefulness
 
 [[nodiscard]] bool isAtomInteresting(tr_torrent const* tor, peer_atom const& atom)
 {
-    if (tor->isDone() && atom.isSeed())
+    if (tor->is_done() && atom.isSeed())
     {
         return false;
     }
@@ -1319,10 +1318,11 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     auto atoms = std::vector<peer_atom const*>{};
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
-        atoms.reserve(s->peerCount());
+        auto const& peers = s->peers;
+        atoms.reserve(std::size(peers));
         std::transform(
-            std::begin(s->peers),
-            std::end(s->peers),
+            std::begin(peers),
+            std::end(peers),
             std::back_inserter(atoms),
             [](auto const* peer) { return peer->atom; });
     }
@@ -1416,23 +1416,16 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
             swarm->mark_atom_as_seed(*peer->atom);
         }
     }
-
-    /* update the bittorrent peers' willingness... */
-    for (auto* peer : swarm->peers)
-    {
-        peer->update_active(TR_UP);
-        peer->update_active(TR_DOWN);
-    }
 }
 
 int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece)
 {
-    if (!tor->hasMetainfo())
+    if (!tor->has_metainfo())
     {
         return 0;
     }
 
-    if (tor->isSeed() || tor->hasPiece(piece))
+    if (tor->is_seed() || tor->has_piece(piece))
     {
         return -1;
     }
@@ -1449,7 +1442,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
 
     std::fill_n(tab, n_tabs, int8_t{});
 
-    auto const interval = tor->pieceCount() / static_cast<float>(n_tabs);
+    auto const interval = tor->piece_count() / static_cast<float>(n_tabs);
     for (tr_piece_index_t i = 0; i < n_tabs; ++i)
     {
         auto const piece = static_cast<tr_piece_index_t>(i * interval);
@@ -1457,31 +1450,23 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     }
 }
 
-tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm)
+tr_swarm_stats tr_swarmGetStats(tr_swarm const* const swarm)
 {
     TR_ASSERT(swarm != nullptr);
+
+    auto count_active_peers = [&swarm](tr_direction dir)
+    {
+        return std::count_if(
+            std::begin(swarm->peers),
+            std::end(swarm->peers),
+            [dir](auto const& peer) { return peer->is_active(dir); });
+    };
+
     auto& stats = swarm->stats;
+    stats.active_peer_count[TR_UP] = count_active_peers(TR_UP);
+    stats.active_peer_count[TR_DOWN] = count_active_peers(TR_DOWN);
     stats.active_webseed_count = swarm->countActiveWebseeds(tr_time_msec());
     return stats;
-}
-
-void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active)
-{
-    int n = swarm->stats.active_peer_count[direction];
-
-    if (is_active)
-    {
-        ++n;
-    }
-    else
-    {
-        --n;
-    }
-
-    TR_ASSERT(n >= 0);
-    TR_ASSERT(n <= swarm->stats.peer_count);
-
-    swarm->stats.active_peer_count[direction] = n;
 }
 
 /* count how many bytes we want that connected peers have */
@@ -1491,13 +1476,13 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     // common shortcuts...
 
-    if (!tor->isRunning || tor->isStopping || tor->isDone() || !tor->hasMetainfo())
+    if (!tor->is_running() || tor->is_stopping() || tor->is_done() || !tor->has_metainfo())
     {
         return 0;
     }
 
     tr_swarm const* const swarm = tor->swarm;
-    if (swarm == nullptr || swarm->peerCount() == 0U)
+    if (swarm == nullptr || std::empty(swarm->peers))
     {
         return 0;
     }
@@ -1508,22 +1493,22 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
         available |= peer->has();
     }
 
-    if (available.hasAll())
+    if (available.has_all())
     {
-        return tor->leftUntilDone();
+        return tor->left_until_done();
     }
 
     auto desired_available = uint64_t{};
 
-    for (tr_piece_index_t i = 0, n = tor->pieceCount(); i < n; ++i)
+    for (tr_piece_index_t i = 0, n = tor->piece_count(); i < n; ++i)
     {
-        if (tor->pieceIsWanted(i) && available.test(i))
+        if (tor->piece_is_wanted(i) && available.test(i))
         {
-            desired_available += tor->countMissingBytesInPiece(i);
+            desired_available += tor->count_missing_bytes_in_piece(i);
         }
     }
 
-    TR_ASSERT(desired_available <= tor->totalSize());
+    TR_ASSERT(desired_available <= tor->total_size());
     return desired_available;
 }
 
@@ -1542,7 +1527,7 @@ namespace
 namespace peer_stat_helpers
 {
 
-[[nodiscard]] auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
+[[nodiscard]] auto get_peer_stats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
 {
     auto stats = tr_peer_stat{};
     auto const* const atom = peer->atom;
@@ -1550,7 +1535,7 @@ namespace peer_stat_helpers
     auto const [addr, port] = peer->socketAddress();
 
     addr.display_name(stats.addr, sizeof(stats.addr));
-    stats.client = peer->client.c_str();
+    stats.client = peer->user_agent().c_str();
     stats.port = port.host();
     stats.from = atom->fromFirst;
     stats.progress = peer->percentDone();
@@ -1558,10 +1543,10 @@ namespace peer_stat_helpers
     stats.isEncrypted = peer->is_encrypted();
     stats.rateToPeer_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_CLIENT_TO_PEER));
     stats.rateToClient_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_PEER_TO_CLIENT));
-    stats.peerIsChoked = peer->is_peer_choked();
-    stats.peerIsInterested = peer->is_peer_interested();
-    stats.clientIsChoked = peer->is_client_choked();
-    stats.clientIsInterested = peer->is_client_interested();
+    stats.peerIsChoked = peer->peer_is_choked();
+    stats.peerIsInterested = peer->peer_is_interested();
+    stats.clientIsChoked = peer->client_is_choked();
+    stats.clientIsInterested = peer->client_is_interested();
     stats.isIncoming = peer->is_incoming_connection();
     stats.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
     stats.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
@@ -1649,16 +1634,17 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->swarm->manager != nullptr);
 
-    auto const n = tor->swarm->peerCount();
+    auto const peers = tor->swarm->peers;
+    auto const n = std::size(peers);
     auto* const ret = new tr_peer_stat[n];
 
     auto const now = tr_time();
     auto const now_msec = tr_time_msec();
     std::transform(
-        std::begin(tor->swarm->peers),
-        std::end(tor->swarm->peers),
+        std::begin(peers),
+        std::end(peers),
         ret,
-        [&now, &now_msec](auto const* peer) { return getPeerStats(peer, now, now_msec); });
+        [&now, &now_msec](auto const* peer) { return get_peer_stats(peer, now, now_msec); });
 
     *setme_count = n;
     return ret;
@@ -1684,15 +1670,15 @@ namespace update_interest_helpers
     tr_peerMsgs const* const peer)
 {
     /* these cases should have already been handled by the calling code... */
-    TR_ASSERT(!tor->isDone());
-    TR_ASSERT(tor->clientCanDownload());
+    TR_ASSERT(!tor->is_done());
+    TR_ASSERT(tor->client_can_download());
 
     if (peer->isSeed())
     {
         return true;
     }
 
-    for (tr_piece_index_t i = 0; i < tor->pieceCount(); ++i)
+    for (tr_piece_index_t i = 0; i < tor->piece_count(); ++i)
     {
         if (piece_is_interesting[i] && peer->hasPiece(i))
         {
@@ -1708,24 +1694,24 @@ void updateInterest(tr_swarm* swarm)
 {
     // sometimes this function isn't necessary
     auto const* const tor = swarm->tor;
-    if (tor->isDone() || !tor->clientCanDownload())
+    if (tor->is_done() || !tor->client_can_download())
     {
         return;
     }
 
-    if (auto const peer_count = swarm->peerCount(); peer_count > 0)
+    if (auto const& peers = swarm->peers; !std::empty(peers))
     {
-        int const n = tor->pieceCount();
+        int const n = tor->piece_count();
 
         // build a bitfield of interesting pieces...
         auto piece_is_interesting = std::vector<bool>{};
         piece_is_interesting.resize(n);
         for (int i = 0; i < n; ++i)
         {
-            piece_is_interesting[i] = tor->pieceIsWanted(i) && !tor->hasPiece(i);
+            piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
         }
 
-        for (auto* const peer : swarm->peers)
+        for (auto* const peer : peers)
         {
             peer->set_interested(isPeerInteresting(tor, piece_is_interesting, peer));
         }
@@ -1788,14 +1774,14 @@ struct ChokeData
 /* get a rate for deciding which peers to choke and unchoke. */
 [[nodiscard]] auto getRateBps(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
 {
-    if (tor->isDone())
+    if (tor->is_done())
     {
         return peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
     }
 
     /* downloading a private torrent... take upload speed into account
      * because there may only be a small window of opportunity to share */
-    if (tor->isPrivate())
+    if (tor->is_private())
     {
         return peer->get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT) +
             peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
@@ -1813,12 +1799,12 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 {
     auto const lock = s->unique_lock();
 
-    auto const peer_count = s->peerCount();
     auto& peers = s->peers;
+    auto const peer_count = std::size(peers);
     auto choked = std::vector<ChokeData>{};
     choked.reserve(peer_count);
     auto const* const session = s->manager->session;
-    bool const choke_all = !s->tor->clientCanUpload();
+    bool const choke_all = !s->tor->client_can_upload();
     bool const is_maxed_out = s->tor->bandwidth_.is_maxed_out(TR_UP, now);
 
     /* an optimistic unchoke peer's "optimistic"
@@ -1852,8 +1838,8 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
                 peer,
                 getRateBps(s->tor, peer, now),
                 salter(),
-                peer->is_peer_interested(),
-                peer->is_peer_choked(),
+                peer->peer_is_interested(),
+                peer->peer_is_choked(),
                 true);
         }
     }
@@ -1935,13 +1921,13 @@ void tr_peerMgr::rechokePulse() const
 
     for (auto* const tor : session->torrents())
     {
-        if (tor->isRunning)
+        if (tor->is_running())
         {
             // possibly stop torrents that have seeded enough
             tr_torrentCheckSeedLimit(tor);
         }
 
-        if (tor->isRunning)
+        if (tor->is_running())
         {
             if (auto* const swarm = tor->swarm; swarm->stats.peer_count > 0)
             {
@@ -1977,15 +1963,15 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     auto const* const atom = peer->atom;
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tor->isDone() && peer->isSeed())
+    if (tor->is_done() && peer->isSeed())
     {
-        return !tor->allowsPex() || now - atom->time >= 30;
+        return !tor->allows_pex() || now - atom->time >= 30;
     }
 
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     {
-        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(tor->peerLimit() * 0.9));
+        auto const relax_strictness_if_fewer_than_n = static_cast<size_t>(std::lround(tor->peer_limit() * 0.9));
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         float const strictness = peer_count >= relax_strictness_if_fewer_than_n ?
@@ -2066,9 +2052,11 @@ struct ComparePeerByActivity
 
 [[nodiscard]] auto getPeersToClose(tr_swarm const* const swarm, time_t const now_sec)
 {
-    auto peers_to_close = std::vector<tr_peer*>{};
+    auto const& peers = swarm->peers;
+    auto const peer_count = std::size(peers);
 
-    auto const peer_count = swarm->peerCount();
+    auto peers_to_close = std::vector<tr_peer*>{};
+    peers_to_close.reserve(peer_count);
     for (auto* peer : swarm->peers)
     {
         if (shouldPeerBeClosed(swarm, peer, peer_count, now_sec))
@@ -2154,9 +2142,9 @@ void tr_peerMgr::reconnectPulse()
     // if we're over the per-torrent peer limits, cull some peers
     for (auto* const tor : session->torrents())
     {
-        if (tor->isRunning)
+        if (tor->is_running())
         {
-            enforceSwarmPeerLimit(tor->swarm, tor->peerLimit());
+            enforceSwarmPeerLimit(tor->swarm, tor->peer_limit());
         }
     }
 
@@ -2255,7 +2243,7 @@ namespace connect_helpers
     }
 
     // not if we're both seeds
-    if (tor->isDone() && atom.isSeed())
+    if (tor->is_done() && atom.isSeed())
     {
         return false;
     }
@@ -2322,7 +2310,7 @@ struct peer_candidate
     score = addValToKey(score, 32, i);
 
     /* prefer peers belonging to a torrent of a higher priority */
-    switch (tor->getPriority())
+    switch (tor->get_priority())
     {
     case TR_PRI_HIGH:
         i = 0;
@@ -2344,7 +2332,7 @@ struct peer_candidate
     score = addValToKey(score, 1, i);
 
     /* prefer torrents we're downloading with */
-    i = tor->isDone() ? 1 : 0;
+    i = tor->is_done() ? 1 : 0;
     score = addValToKey(score, 1, i);
 
     /* prefer peers that are known to be connectible */
@@ -2393,14 +2381,14 @@ struct peer_candidate
 
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
-        bool const seeding = tor->isDone();
-        if (seeding && swarm->isAllSeeds() && tor->isPrivate())
+        bool const seeding = tor->is_done();
+        if (seeding && swarm->isAllSeeds() && tor->is_private())
         {
             continue;
         }
 
         /* if we've already got enough peers in this torrent... */
-        if (tor->peerLimit() <= swarm->peerCount())
+        if (tor->peer_limit() <= swarm->peerCount())
         {
             continue;
         }
@@ -2465,7 +2453,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
         &session->top_bandwidth_,
         atom.addr,
         atom.port,
-        s->tor->infoHash(),
+        s->tor->info_hash(),
         s->tor->completeness == TR_SEED,
         utp);
 

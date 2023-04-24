@@ -1075,7 +1075,7 @@
                         <property name="vexpand">True</property>
                         <child>
                           <object class="GtkScrolledWindow" id="default_trackers_scroll">
-                            <property name="height-request">100</property>
+                            <property name="height-request">90</property>
                             <property name="focusable">1</property>
                             <property name="hexpand">1</property>
                             <property name="vexpand">1</property>
