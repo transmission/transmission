@@ -733,23 +733,26 @@ template<typename T>
 
 // ---
 
-void add_param(Buffer& buffer, uint8_t param) noexcept
+template<typename BufferWriter>
+void add_param(BufferWriter& buffer, uint8_t param) noexcept
 {
     buffer.add_uint8(param);
 }
 
-void add_param(Buffer& buffer, uint16_t param) noexcept
+template<typename BufferWriter>
+void add_param(BufferWriter& buffer, uint16_t param) noexcept
 {
     buffer.add_uint16(param);
 }
 
-void add_param(Buffer& buffer, uint32_t param) noexcept
+template<typename BufferWriter>
+void add_param(BufferWriter& buffer, uint32_t param) noexcept
 {
     buffer.add_uint32(param);
 }
 
-template<typename T>
-void add_param(Buffer& buffer, T const& param) noexcept
+template<typename BufferWriter, typename T>
+void add_param(BufferWriter& buffer, T const& param) noexcept
 {
     buffer.add(param);
 }
@@ -786,8 +789,8 @@ template<typename... Args>
 }
 } // namespace
 
-template<typename... Args>
-void build_peer_message(tr_peerMsgsImpl const* const msgs, Buffer& out, uint8_t type, Args const&... args)
+template<typename BufferWriter, typename... Args>
+void build_peer_message(tr_peerMsgsImpl const* const msgs, BufferWriter& out, uint8_t type, Args const&... args)
 {
     logtrace(msgs, build_log_message(type, args...));
 
@@ -809,7 +812,8 @@ size_t protocol_send_message(tr_peerMsgsImpl const* const msgs, uint8_t type, Ar
 {
     using namespace protocol_send_message_helpers;
 
-    auto out = Buffer{};
+    static auto constexpr MaxPieceMessageSize = sizeof(uint8_t) + sizeof(uint32_t) * 3U + tr_block_info::BlockSize;
+    auto out = libtransmission::SmallBuffer<MaxPieceMessageSize>{};
     build_peer_message(msgs, out, type, args...);
     auto const n_bytes_added = std::size(out);
     msgs->io->write(out, type == BtPeerMsgs::Piece);
@@ -820,7 +824,7 @@ size_t protocol_send_keepalive(tr_peerMsgsImpl* msgs)
 {
     logtrace(msgs, "sending 'keepalive'");
 
-    auto out = Buffer{};
+    auto out = libtransmission::SmallBuffer<32>{};
     out.add_uint32(0);
 
     auto const n_bytes_added = std::size(out);

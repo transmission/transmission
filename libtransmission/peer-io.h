@@ -133,9 +133,7 @@ public:
         auto const len = std::size(buf);
         encrypt(len, std::data(buf));
         outbuf_info_.emplace_back(std::size(buf), is_piece_data);
-        fmt::print("before write outbuf_.size() {:d} buf.size() {:d}\n", std::size(outbuf_), std::size(buf));
         outbuf_.add(buf);
-        fmt::print("after write outbuf_.size() {:d} buf.size() {:d}\n", std::size(outbuf_), std::size(buf));
         buf.drain(len);
     }
 
