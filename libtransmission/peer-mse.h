@@ -11,6 +11,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm> // for std::copy_n
 #include <array>
 #include <cstddef> // size_t, std::byte
 #include <memory>
@@ -96,6 +97,19 @@ public:
         if (enc_active_)
         {
             enc_key_.process(buf, buf, buf_len);
+        }
+    }
+
+    template<typename T>
+    constexpr void encrypt(T const* src_data, T* dst_data, size_t n_bytes)
+    {
+        if (enc_active_)
+        {
+            enc_key_.process(src_data, dst_data, n_bytes);
+        }
+        else
+        {
+            std::copy_n(src_data, n_bytes, dst_data);
         }
     }
 

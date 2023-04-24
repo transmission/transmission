@@ -34,8 +34,7 @@ public:
     virtual ~BufferReader() = default;
     virtual void drain(size_t n_bytes) = 0;
     [[nodiscard]] virtual size_t size() const noexcept = 0;
-    [[nodiscard]] virtual value_type const* data() const noexcept = 0;
-    [[nodiscard]] virtual value_type* data() noexcept = 0;
+    [[nodiscard]] virtual value_type const* data() const = 0;
 
     [[nodiscard]] auto empty() const noexcept
     {
@@ -47,17 +46,17 @@ public:
         return data();
     }
 
-    [[nodiscard]] auto const* begin() const noexcept
+    [[nodiscard]] auto const* begin() const
     {
         return data();
     }
 
-    [[nodiscard]] auto* end() noexcept
+    [[nodiscard]] auto* end()
     {
         return begin() + size();
     }
 
-    [[nodiscard]] auto const* end() const noexcept
+    [[nodiscard]] auto const* end() const
     {
         return begin() + size();
     }
@@ -65,6 +64,11 @@ public:
     [[nodiscard]] auto to_string() const
     {
         return std::string{ reinterpret_cast<char const*>(data()), size() };
+    }
+
+    [[nodiscard]] auto to_string_view() const
+    {
+        return std::string_view{ reinterpret_cast<char const*>(data()), size() };
     }
 
     template<typename T>
@@ -117,15 +121,9 @@ template<typename value_type>
 class BufferWriter
 {
 public:
-    BufferWriter()
-    {
-        static_assert(sizeof(value_type) == 1);
-    }
-
     virtual ~BufferWriter() = default;
-
-    virtual void commit_space(size_t n_bytes) = 0;
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) = 0;
+    virtual void commit_space(size_t n_bytes) = 0;
 
     void add(void const* span_begin, size_t span_len)
     {
@@ -216,11 +214,6 @@ public:
         return evbuffer_get_length(buf_.get());
     }
 
-    void clear()
-    {
-        drain(size());
-    }
-
     void drain(size_t n_bytes) override
     {
         evbuffer_drain(buf_.get(), n_bytes);
@@ -240,30 +233,9 @@ public:
         return 0;
     }
 
-    [[nodiscard]] std::pair<value_type*, size_t> pullup()
-    {
-        return { reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1)), size() };
-    }
-
-    [[nodiscard]] value_type* data() noexcept override
-    {
-        return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
-    }
-
     [[nodiscard]] value_type const* data() const noexcept override
     {
         return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
-    }
-
-    [[nodiscard]] auto pullup_sv()
-    {
-        auto const [buf, buflen] = pullup();
-        return std::string_view{ reinterpret_cast<char const*>(buf), buflen };
-    }
-
-    void reserve(size_t n_bytes)
-    {
-        evbuffer_expand(buf_.get(), n_bytes - size());
     }
 
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
@@ -325,12 +297,7 @@ public:
         return end_pos_ - begin_pos_;
     }
 
-    [[nodiscard]] value_type* data() noexcept override
-    {
-        return std::data(buf_) + begin_pos_;
-    }
-
-    [[nodiscard]] value_type const* data() const noexcept override
+    [[nodiscard]] value_type const* data() const override
     {
         return std::data(buf_) + begin_pos_;
     }

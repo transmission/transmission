@@ -1020,7 +1020,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
 {
     msgs->peerSentLtepHandshake = true;
 
-    auto const handshake_sv = payload.pullup_sv();
+    auto const handshake_sv = payload.to_string_view();
 
     auto val = tr_variant{};
     if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, handshake_sv) || !tr_variantIsDict(&val))
@@ -1132,7 +1132,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload_in)
     int64_t piece = -1;
     int64_t total_size = 0;
 
-    auto const tmp = payload_in.pullup_sv();
+    auto const tmp = payload_in.to_string_view();
     auto const* const msg_end = std::data(tmp) + std::size(tmp);
 
     auto dict = tr_variant{};
@@ -1189,7 +1189,7 @@ void parseUtPex(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
         return;
     }
 
-    auto const tmp = payload.pullup_sv();
+    auto const tmp = payload.to_string_view();
 
     if (tr_variant val; tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp))
     {
@@ -1455,9 +1455,9 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
     case BtPeerMsgs::Bitfield:
         {
             logtrace(msgs, "got a bitfield");
-            auto const [buf, buflen] = payload.pullup();
-            msgs->have_ = tr_bitfield{ msgs->torrent->has_metainfo() ? msgs->torrent->piece_count() : buflen * 8 };
-            msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(buf), buflen);
+            auto const n_bytes = std::size(payload);
+            msgs->have_ = tr_bitfield{ msgs->torrent->has_metainfo() ? msgs->torrent->piece_count() : n_bytes * 8 };
+            msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(std::data(payload)), n_bytes);
             msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
             msgs->invalidatePercentDone();
             break;
