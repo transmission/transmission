@@ -322,41 +322,44 @@ public:
 
     [[nodiscard]] size_t size() const noexcept override
     {
-        return committed_size_;
+        return end_pos_ - begin_pos_;
     }
 
     [[nodiscard]] value_type* data() noexcept override
     {
-        return std::data(buf_);
+        return std::data(buf_) + begin_pos_;
     }
 
     [[nodiscard]] value_type const* data() const noexcept override
     {
-        return std::data(buf_);
+        return std::data(buf_) + begin_pos_;
     }
 
     void drain(size_t n_bytes) override
     {
-        // FIXME: should not call erase()
-        n_bytes = std::min(n_bytes, size());
-        buf_.erase(buf_.begin(), buf_.begin() + n_bytes);
-        committed_size_ -= n_bytes;
+        begin_pos_ += std::min(n_bytes, size());
+
+        if (begin_pos_ == end_pos_)
+        {
+            begin_pos_ = end_pos_ = 0U;
+        }
     }
 
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        buf_.resize(committed_size_ + n_bytes);
-        return { data() + committed_size_, buf_.capacity() - committed_size_ };
+        buf_.resize(end_pos_ + n_bytes);
+        return { &buf_[end_pos_], n_bytes };
     }
 
     virtual void commit_space(size_t n_bytes) override
     {
-        committed_size_ += n_bytes;
+        end_pos_ += n_bytes;
     }
 
 private:
     sfl::small_vector<value_type, N> buf_ = {};
-    size_t committed_size_ = {};
+    size_t begin_pos_ = {};
+    size_t end_pos_ = {};
 };
 
 } // namespace libtransmission
