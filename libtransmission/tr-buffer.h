@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include <sfl/small_vector.hpp>
+
 #include <event2/buffer.h>
 
 #include <fmt/core.h>
@@ -52,11 +54,11 @@ public:
 
     void drain(size_t n)
     {
-        in_->drain(std::min(n, std::size(*in_)));
+        in_->drain(std::min(n, in_->size()));
     }
 
     template<typename T>
-    [[nodiscard]]  bool starts_with(T const& needle) const
+    [[nodiscard]] bool starts_with(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
         auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
@@ -191,9 +193,9 @@ private:
     T* out_;
 };
 
-class Buffer :
-    public BufferReader<Buffer, std::byte>,
-    public BufferWriter<Buffer, std::byte>
+class Buffer
+    : public BufferReader<Buffer, std::byte>
+    , public BufferWriter<Buffer, std::byte>
 {
 public:
     using value_type = std::byte;
@@ -325,8 +327,6 @@ public:
                 evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr, &iov.iov, 1);
                 iov.offset = 0;
                 iov_ = iov;
-
-                fmt::print("{:s}:{:d} buffer {:p} buf_offset_ {:d} iov.ptr {:p} iov.len {:d}\n", __FILE__, __LINE__, fmt::ptr(buf_), buf_offset_, fmt::ptr(iov.iov.iov_base), iov.iov.iov_len);
             }
 
             return *iov_;
@@ -380,7 +380,6 @@ public:
 
     [[nodiscard]] auto begin() noexcept
     {
-        fmt::print("{:s}:{:d} begin this {:p} evbuffer {:p}\n", __FILE__, __LINE__, fmt::ptr(this), fmt::ptr(buf_.get()));
         return Iterator{ buf_.get(), 0U };
     }
 
@@ -536,15 +535,116 @@ private:
     }
 };
 
+template<size_t N>
+class SmallBuffer
+    : public BufferReader<SmallBuffer<N>, std::byte>
+    , public BufferWriter<SmallBuffer<N>, std::byte>
+{
+public:
+    using value_type = std::byte;
+    using container_type = sfl::small_vector<value_type, N>;
+    using iterator = typename container_type::iterator;
+
+    SmallBuffer()
+        : BufferReader<SmallBuffer, std::byte>{ this }
+        , BufferWriter<SmallBuffer, std::byte>{ this }
+    {
+    }
+
+    template<typename T>
+    explicit SmallBuffer(T const& data)
+        : BufferReader<SmallBuffer, std::byte>{ this }
+        , BufferWriter<SmallBuffer, std::byte>{ this }
+    {
+        add(data);
+    }
+
+    SmallBuffer(SmallBuffer&&) = delete;
+    SmallBuffer(SmallBuffer const&) = delete;
+    SmallBuffer& operator=(SmallBuffer&&) = delete;
+    SmallBuffer& operator=(SmallBuffer const&) = delete;
+
+    [[nodiscard]] auto size() const noexcept
+    {
+        return std::size(buf_);
+    }
+
+    [[nodiscard]] auto empty() const noexcept
+    {
+        return std::empty(buf_);
+    }
+
+    [[nodiscard]] auto begin() noexcept
+    {
+        return std::begin(buf_);
+    }
+
+    [[nodiscard]] auto end() noexcept
+    {
+        return std::end(buf_);
+    }
+
+    [[nodiscard]] auto begin() const noexcept
+    {
+        return std::begin(buf_);
+    }
+
+    [[nodiscard]] auto end() const noexcept
+    {
+        return std::end(buf_);
+    }
+
+    [[nodiscard]] value_type* data()
+    {
+        return std::data(buf_);
+    }
+
+    [[nodiscard]] value_type const* data() const
+    {
+        return std::data(buf_);
+    }
+
+    void drain(size_t n_bytes)
+    {
+        buf_.erase(buf_.begin(), buf_.begin() + n_bytes);
+    }
+
+    void reserve(size_t n_bytes)
+    {
+        buf_.reserve(n_bytes);
+    }
+
+    template<typename T>
+    void insert(iterator iter, T const* const begin, T const* const end)
+    {
+        buf_.insert(iter, begin, end);
+    }
+
+private:
+    container_type buf_ = {};
+
+    [[nodiscard]] auto cbegin() const noexcept
+    {
+        return buf_.cbegin();
+    }
+
+    [[nodiscard]] auto cend() const noexcept
+    {
+        return buf_.cend();
+    }
+};
+
 } // namespace libtransmission
 
-namespace std {
-    template<>
-    struct iterator_traits<libtransmission::Buffer::Iterator> {
-        using difference_type = libtransmission::Buffer::Iterator::difference_type;
-        using iterator_category = libtransmission::Buffer::Iterator::iterator_category;
-        using value_type = libtransmission::Buffer::value_type;
-        using pointer = value_type*;
-        using reference = value_type&;
-    };
-}
+namespace std
+{
+template<>
+struct iterator_traits<libtransmission::Buffer::Iterator>
+{
+    using difference_type = libtransmission::Buffer::Iterator::difference_type;
+    using iterator_category = libtransmission::Buffer::Iterator::iterator_category;
+    using value_type = libtransmission::Buffer::value_type;
+    using pointer = value_type*;
+    using reference = value_type&;
+};
+} // namespace std
