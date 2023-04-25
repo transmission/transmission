@@ -318,6 +318,14 @@ export class Transmission extends EventTarget {
         this.refilterAllSoon();
         break;
       }
+      case Prefs.ContrastMode: {
+        // Add custom class to the body/html element to get the appropriate contrast color scheme
+        document.body.classList.remove('contrast-more');
+        document.body.classList.remove('contrast-less');
+        document.body.classList.add(`contrast-${value}`);
+        // this.refilterAllSoon();
+        break;
+      }
 
       case Prefs.FilterMode:
       case Prefs.SortDirection:

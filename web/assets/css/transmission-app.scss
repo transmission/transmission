@@ -65,9 +65,9 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-odd: #{colors.$grey-900};
     --color-bg-even: #{colors.$grey-800};
     --color-bg-menu: #{colors.$grey-800};
-    --color-fg-secondary: #{colors.$nice-grey};
-    --color-fg-on-popup: #{colors.$nice-grey};
-    --color-fg-disabled: #{colors.$dark-mode-white};
+    --color-fg-secondary: #{colors.$grey-100};
+    --color-fg-on-popup: #{colors.$grey-100};
+    --color-fg-disabled: #{colors.$grey-500};
     --color-bg-popup: #{colors.$grey-800};
     --color-bg-warn: #cf6679;
     --color-fg-warn: #{colors.$dark-mode-black};
@@ -76,15 +76,54 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-fg-tertiary: #{colors.$grey-500};
     --color-toolbar-background: #{colors.$grey-800};
     --color-inspector-background: #{colors.$grey-800};
-    --color-inspector-tabs: #{colors.$nice-grey};
+    --color-inspector-tabs: #{colors.$grey-100};
     --color-bg-selected: #{colors.$default-accent-color-dark};
     --color-bg-tabs: #{colors.$grey-700};
+    --color-fg-tabs: #{colors.$dark-mode-white};
     --color-default-border: #{colors.$default-border-dark};
     --color-progressbar-seed-1: #{colors.$green-700};
     --color-progressbar-seed-2: #{colors.$green-500};
     --color-progressbar-paused: #{colors.$grey-500};
     --color-progressbar-leech: #{colors.$blue-500};
     --color-progressbar-seed-paused: #{colors.$grey-500};
+
+    .contrast-more {
+      --color-fg-error: #{colors.$red-500};
+      --color-fg-port-closed: #{colors.$red-500};
+      --color-fg-port-open: #{colors.$green-500};
+      --color-bg-hover: #{colors.$grey-40};
+      --color-fg-primary: #{colors.$white};
+      --color-bg-primary: #{colors.$black};
+      --color-bg-primary-hover: #{colors.$black};
+      --color-bg-odd: #{colors.$black};
+      --color-bg-even: #{colors.$black};
+      --color-bg-menu: #{colors.$black};
+      --color-fg-secondary: #{colors.$white};
+      --color-fg-on-popup: #{colors.$white};
+      --color-fg-disabled: #{colors.$white};
+      --color-bg-popup: #{colors.$black};
+      --color-bg-warn: #cf6679;
+      --color-fg-warn: #{colors.$black};
+      --color-border: #{colors.$white};
+      --color-border-selected: #{colors.$white};
+      --color-fg-tertiary: #{colors.$white};
+      --color-toolbar-background: #{colors.$black};
+      --color-inspector-background: #{colors.$black};
+      --color-inspector-tabs: #{colors.$white};
+      --color-bg-selected: #{colors.$blue-500};
+      --color-bg-tabs: #{colors.$white};
+      --color-fg-tabs: #{colors.$black};
+      --color-default-border: #{colors.$white};
+      --color-progressbar-seed-1: #{colors.$green-700};
+      --color-progressbar-seed-2: #{colors.$green-500};
+      --color-progressbar-seed-paused: #{colors.$grey-500};
+      --color-progressbar-background-2: #{colors.$grey-500};
+      --color-progressbar-verify: #{colors.$yellow-300};
+      --color-progressbar-magnet: #{colors.$yellow-300};
+      --color-progressbar-paused: #{colors.$grey-500};
+      --color-progressbar-leech: #{colors.$blue-500};
+      --color-progressbar-queued: #{colors.$blue-100};
+    }
   }
   @media (prefers-color-scheme: light) {
     --progress: 100%;
@@ -96,12 +135,12 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-progressbar-paused: #{colors.$grey-200};
     --color-progressbar-leech: #{colors.$blue-300};
     --color-progressbar-queued: #{colors.$blue-100};
-    --color-bg-hover: #{colors.$nice-grey};
+    --color-bg-hover: #{colors.$grey-100};
     --color-fg-primary: #404040;
     --color-bg-primary: #{colors.$white};
     --color-bg-even: #{colors.$white};
-    --color-bg-odd: #{colors.$nice-grey};
-    --color-bg-menu: #{colors.$nice-grey};
+    --color-bg-odd: #{colors.$grey-100};
+    --color-bg-menu: #{colors.$grey-100};
     --color-fg-on-popup: #{colors.$grey-900};
     --color-bg-popup: #{colors.$white};
     --color-fg-secondary: #{colors.$grey-500};
@@ -111,16 +150,55 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-warn: #e4606d5b;
     --color-fg-warn: #cf212e;
     --color-fg-disabled: #{colors.$grey-500};
-    --color-toolbar-background: #{colors.$nice-grey};
+    --color-toolbar-background: #{colors.$grey-100};
     --color-inspector-background: #{colors.$white};
-    --color-bg-tabs: #{colors.$nice-grey-darker};
-    --color-inspector-tabs: #{colors.$nice-grey};
+    --color-bg-tabs: #{colors.$grey-100-darker};
+    --color-fg-tabs: #404040;
+    --color-inspector-tabs: #{colors.$grey-100};
     --color-bg-selected: #{colors.$default-accent-color};
     --color-default-border: #{colors.$default-border-light};
-    --color-dialog-border: #{colors.$nice-grey};
+    --color-dialog-border: #{colors.$grey-100};
     --color-progressbar-seed-1: #{colors.$green-300};
     --color-progressbar-seed-2: #{colors.$green-200};
     --color-progressbar-seed-paused: #{colors.$grey-200};
+
+    .contrast-more {
+      --color-fg-error: #{colors.$red-500};
+      --color-fg-port-closed: #{colors.$red-500};
+      --color-fg-port-open: #{colors.$green-500};
+      --color-bg-hover: #{colors.$grey-40};
+      --color-fg-primary: #{colors.$black};
+      --color-bg-primary: #{colors.$white};
+      --color-bg-primary-hover: #{colors.$white};
+      --color-bg-odd: #{colors.$white};
+      --color-bg-even: #{colors.$white};
+      --color-bg-menu: #{colors.$white};
+      --color-fg-secondary: #{colors.$black};
+      --color-fg-on-popup: #{colors.$black};
+      --color-fg-disabled: #{colors.$black};
+      --color-bg-popup: #{colors.$white};
+      --color-bg-warn: #cf6679;
+      --color-fg-warn: #{colors.$white};
+      --color-border: #{colors.$black};
+      --color-border-selected: #{colors.$black};
+      --color-fg-tertiary: #{colors.$black};
+      --color-toolbar-background: #{colors.$white};
+      --color-inspector-background: #{colors.$white};
+      --color-inspector-tabs: #{colors.$black};
+      --color-bg-selected: #{colors.$blue-300};
+      --color-bg-tabs: #{colors.$black};
+      --color-fg-tabs: #{colors.$white};
+      --color-default-border: #{colors.$black};
+      --color-progressbar-seed-1: #{colors.$green-700};
+      --color-progressbar-seed-2: #{colors.$green-500};
+      --color-progressbar-seed-paused: #{colors.$grey-500};
+      --color-progressbar-background-2: #{colors.$grey-500};
+      --color-progressbar-verify: #{colors.$yellow-300};
+      --color-progressbar-magnet: #{colors.$yellow-300};
+      --color-progressbar-paused: #{colors.$grey-500};
+      --color-progressbar-leech: #{colors.$blue-500};
+      --color-progressbar-queued: #{colors.$blue-100};
+    }
   }
 }
 
@@ -354,7 +432,10 @@ input[type='checkbox'] {
 
     &:disabled {
       cursor: default;
-      opacity: 0.25;
+      // opacity: 0.25;
+      svg {
+        stroke: var(--color-fg-disabled);
+      }
     }
   }
 }
@@ -1023,6 +1104,7 @@ $video-image: '../img/film.svg';
   &:checked,
   &.selected {
     background-color: var(--color-bg-tabs);
+    color: var(--color-fg-tabs);
     font-weight: 500;
   }
 }
@@ -1227,7 +1309,7 @@ $video-image: '../img/film.svg';
   }
 
   .torrent-row td {
-    background: var(--color-default-border);
+    background: var(--color-bg-odd);
     color: var(--color-fg-primary);
     font-size: normal;
     font-weight: bolder;
