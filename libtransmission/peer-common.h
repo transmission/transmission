@@ -219,7 +219,7 @@ public:
 
     virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
-    virtual void cancel_block_request(tr_block_index_t, time_t now)
+    virtual void cancel_block_request(tr_block_index_t, time_t now) noexcept
     {
         cancels_sent_to_peer_.add(now, 1);
     }

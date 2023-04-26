@@ -413,7 +413,7 @@ public:
         updateInterest();
     }
 
-    void cancel_block_request(tr_block_index_t block, time_t now) override
+    void cancel_block_request(tr_block_index_t block, time_t now) noexcept override
     {
         tr_peer::cancel_block_request(block, now);
 

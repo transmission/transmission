@@ -29,7 +29,7 @@ public:
      * @param when the current time in sec, such as from tr_time()
      * @param n how many items to add to the history's counter
      */
-    constexpr void add(time_t now, SizeType n)
+    constexpr void add(time_t now, SizeType n) noexcept
     {
         if (timestamps_[newest_] != now)
         {
