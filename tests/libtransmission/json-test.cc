@@ -5,9 +5,11 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include <clocale> // setlocale()
+#include <locale>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <tuple>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
@@ -23,11 +25,26 @@ protected:
     void SetUp() override
     {
         auto const* locale_str = GetParam();
-        if (setlocale(LC_NUMERIC, locale_str) == nullptr)
+        try
+        {
+            old_locale_ = std::locale::global(std::locale{ {}, new std::numpunct_byname<char>{ locale_str } });
+        }
+        catch (std::runtime_error const&)
         {
             GTEST_SKIP();
         }
     }
+
+    void TearDown() override
+    {
+        if (old_locale_)
+        {
+            std::ignore = std::locale::global(*old_locale_);
+        }
+    }
+
+private:
+    std::optional<std::locale> old_locale_;
 };
 
 TEST_P(JSONTest, testElements)

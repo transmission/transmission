@@ -3276,6 +3276,8 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, i
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     auto config = Config{};
     auto port = DefaultPort;
     auto host = std::string{};
