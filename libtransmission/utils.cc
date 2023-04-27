@@ -14,11 +14,14 @@
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
 #include <ctime> // nanosleep()
+#include <iostream>
 #include <iterator> // for std::back_inserter
+#include <locale>
 #include <optional>
 #include <set>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 #ifdef _WIN32
@@ -57,6 +60,23 @@
 using namespace std::literals;
 
 time_t libtransmission::detail::tr_time::current_time = {};
+
+// ---
+
+void tr_locale_set_global(char const* locale_name) noexcept
+{
+    try
+    {
+        std::ignore = std::locale::global(std::locale{ locale_name });
+
+        std::ignore = std::cout.imbue(std::locale{});
+        std::ignore = std::cerr.imbue(std::locale{});
+    }
+    catch (std::exception const&)
+    {
+        // Ignore.
+    }
+}
 
 // ---
 

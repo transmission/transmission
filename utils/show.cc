@@ -399,6 +399,8 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     tr_logSetQueueEnabled(false);
     tr_logSetLevel(TR_LOG_ERROR);
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);

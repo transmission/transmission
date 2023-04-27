@@ -56,6 +56,8 @@ struct tr_error;
 #define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 
+void tr_locale_set_global(char const* locale_name) noexcept;
+
 // ---
 
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
