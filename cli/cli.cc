@@ -199,6 +199,8 @@ static std::string getConfigDir(int argc, char const** argv)
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     tr_variant settings;
 
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
