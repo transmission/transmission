@@ -429,7 +429,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
 
 TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 {
-    // build the expected reponse
+    // build the expected response
     auto expected_response = tr_scrape_response{};
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
@@ -598,7 +598,7 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     expected_response.min_interval = 0; // not specified in UDP announce
     expected_response.seeders = Seeders;
     expected_response.leechers = Leechers;
-    expected_response.downloads = -1; // not specified in UDP anounce
+    expected_response.downloads = -1; // not specified in UDP announce
     expected_response.pex = std::vector<tr_pex>{ tr_pex{ addresses[0].first, addresses[0].second },
                                                  tr_pex{ addresses[1].first, addresses[1].second },
                                                  tr_pex{ addresses[2].first, addresses[2].second } };
