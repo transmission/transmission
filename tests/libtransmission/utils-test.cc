@@ -43,7 +43,7 @@ TEST_F(UtilsTest, trStrvContains)
     EXPECT_TRUE(tr_strvContains("test "sv, "test"sv));
     EXPECT_TRUE(tr_strvContains("test"sv, ""sv));
     EXPECT_TRUE(tr_strvContains("test"sv, "t"sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, "test"sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, "te"sv));
     EXPECT_TRUE(tr_strvContains("test"sv, "test"sv));
     EXPECT_TRUE(tr_strvContains("this is a test"sv, "test"sv));
     EXPECT_TRUE(tr_strvContains(""sv, ""sv));
