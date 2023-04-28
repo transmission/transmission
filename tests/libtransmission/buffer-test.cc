@@ -49,7 +49,7 @@ TEST_F(BufferTest, startsWithInMultiSegment)
 
     buf->add(Buffer{ World });
     EXPECT_TRUE(buf->starts_with(Hello));
-    EXPECT_TRUE(buf->starts_with("Hello, World"sv));
+    EXPECT_TRUE(buf->starts_with("Hello, Worl"sv));
     EXPECT_TRUE(buf->starts_with("Hello, World"sv));
     EXPECT_FALSE(buf->starts_with("Hello, World!"sv));
     EXPECT_FALSE(buf->starts_with("Hello!"sv));
