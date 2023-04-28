@@ -43,7 +43,7 @@ TEST_F(UtilsTest, trStrvContains)
     EXPECT_TRUE(tr_strvContains("test "sv, "test"sv));
     EXPECT_TRUE(tr_strvContains("test"sv, ""sv));
     EXPECT_TRUE(tr_strvContains("test"sv, "t"sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, "te"sv));
+    EXPECT_TRUE(tr_strvContains("test"sv, "test"sv));
     EXPECT_TRUE(tr_strvContains("test"sv, "test"sv));
     EXPECT_TRUE(tr_strvContains("this is a test"sv, "test"sv));
     EXPECT_TRUE(tr_strvContains(""sv, ""sv));
@@ -232,7 +232,7 @@ TEST_F(UtilsTest, trStrlcpy)
         "a",
         "",
         "12345678901234567890",
-        "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
+        "This, very useful string contains a total of 104 characters not counting null. Almost like an easter egg!"
     };
 
     for (auto const& test : tests)
