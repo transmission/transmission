@@ -25,7 +25,7 @@ TEST_F(BufferTest, startsWithInSingleSegment)
 
     buf.add(World);
     EXPECT_TRUE(buf.starts_with(Hello));
-    EXPECT_TRUE(buf.starts_with("Hello, Worl"sv));
+    EXPECT_TRUE(buf.starts_with("Hello, World"sv));
     EXPECT_TRUE(buf.starts_with("Hello, World"sv));
     EXPECT_FALSE(buf.starts_with("Hello, World!"sv));
     EXPECT_FALSE(buf.starts_with("Hello!"sv));
@@ -33,7 +33,7 @@ TEST_F(BufferTest, startsWithInSingleSegment)
     buf.add(Bang);
     EXPECT_FALSE(buf.starts_with("Hello!"));
     EXPECT_TRUE(buf.starts_with(Hello));
-    EXPECT_TRUE(buf.starts_with("Hello, Worl"sv));
+    EXPECT_TRUE(buf.starts_with("Hello, World"sv));
     EXPECT_TRUE(buf.starts_with("Hello, World"sv));
     EXPECT_TRUE(buf.starts_with("Hello, World!"sv));
 }
@@ -49,7 +49,7 @@ TEST_F(BufferTest, startsWithInMultiSegment)
 
     buf->add(Buffer{ World });
     EXPECT_TRUE(buf->starts_with(Hello));
-    EXPECT_TRUE(buf->starts_with("Hello, Worl"sv));
+    EXPECT_TRUE(buf->starts_with("Hello, World"sv));
     EXPECT_TRUE(buf->starts_with("Hello, World"sv));
     EXPECT_FALSE(buf->starts_with("Hello, World!"sv));
     EXPECT_FALSE(buf->starts_with("Hello!"sv));
@@ -57,7 +57,7 @@ TEST_F(BufferTest, startsWithInMultiSegment)
     buf->add(Buffer{ Bang });
     EXPECT_FALSE(buf->starts_with("Hello!"));
     EXPECT_TRUE(buf->starts_with(Hello));
-    EXPECT_TRUE(buf->starts_with("Hello, Worl"sv));
+    EXPECT_TRUE(buf->starts_with("Hello, World"sv));
     EXPECT_TRUE(buf->starts_with("Hello, World"sv));
     EXPECT_TRUE(buf->starts_with("Hello, World!"sv));
 }
