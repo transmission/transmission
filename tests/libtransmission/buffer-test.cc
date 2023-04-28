@@ -25,7 +25,7 @@ TEST_F(BufferTest, startsWithInSingleSegment)
 
     buf.add(World);
     EXPECT_TRUE(buf.starts_with(Hello));
-    EXPECT_TRUE(buf.starts_with("Hello, World"sv));
+    EXPECT_TRUE(buf.starts_with("Hello, Worl"sv));
     EXPECT_TRUE(buf.starts_with("Hello, World"sv));
     EXPECT_FALSE(buf.starts_with("Hello, World!"sv));
     EXPECT_FALSE(buf.starts_with("Hello!"sv));
