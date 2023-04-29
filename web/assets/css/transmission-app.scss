@@ -334,7 +334,7 @@ $pauseresume-size-number: 20;
 $pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border: 1;
 $progressbar-height: 14;
-$popup-top: 61px; // TODO: ugly that this is hardcoded
+$popup-top: 51px; // TODO: ugly that this is hardcoded
 
 .flex {
   flex-grow: 1;
@@ -715,7 +715,6 @@ $video-image: '../img/film.svg';
 #prefs-dialog {
   $background-color: var(--color-inspector-background);
   background: $background-color;
-  border: 0;
   bottom: 0;
   box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
@@ -1170,6 +1169,7 @@ $video-image: '../img/film.svg';
 
   .status {
     cursor: pointer;
+    width: 10%;
   }
 }
 
@@ -1231,7 +1231,6 @@ $video-image: '../img/film.svg';
     font-size: 13px;
     font-weight: 400;
     list-style: none;
-    margin-right: 10px;
     padding: 5px 15px;
 
     &:hover:not(:disabled),
