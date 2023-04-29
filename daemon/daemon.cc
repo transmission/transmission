@@ -939,6 +939,8 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     int ret;
     tr_daemon daemon;
     bool foreground;

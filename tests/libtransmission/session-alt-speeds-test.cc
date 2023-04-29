@@ -125,7 +125,7 @@ TEST_F(SessionAltSpeedsTest, canSchedule)
     alt_speeds.checkScheduler();
     EXPECT_EQ(n_changes, std::size(mediator.changelog_));
 
-    // Confirm that crossin the threshold does enable
+    // Confirm that crossing the threshold does enable
     now += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
     mediator.current_time_ = now;
     alt_speeds.checkScheduler();
@@ -141,7 +141,7 @@ TEST_F(SessionAltSpeedsTest, canSchedule)
     alt_speeds.checkScheduler();
     EXPECT_EQ(n_changes, std::size(mediator.changelog_));
 
-    // Confirm that crossin the threshold does disable
+    // Confirm that crossing the threshold does disable
     now += std::chrono::duration_cast<std::chrono::seconds>(1min).count();
     mediator.current_time_ = now;
     alt_speeds.checkScheduler();

@@ -16,7 +16,6 @@
 #include <QStandardItemModel>
 
 #include "Application.h"
-#include "FaviconCache.h"
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
 #include "Filters.h"
@@ -93,7 +92,7 @@ FilterBarComboBox* FilterBar::createActivityCombo()
 namespace
 {
 
-QString getCountString(size_t n)
+[[nodiscard]] auto getCountString(size_t n)
 {
     return QStringLiteral("%L1").arg(n);
 }
@@ -101,6 +100,18 @@ QString getCountString(size_t n)
 Torrent::fields_t constexpr TrackerFields = {
     static_cast<uint64_t>(1) << Torrent::TRACKER_STATS,
 };
+
+[[nodiscard]] auto displayName(QString const& sitename)
+{
+    auto name = sitename;
+
+    if (!name.isEmpty())
+    {
+        name.front() = name.front().toTitleCase();
+    }
+
+    return name;
+}
 
 auto constexpr ActivityFields = FilterMode::TorrentFields;
 
@@ -133,13 +144,12 @@ void FilterBar::refreshTrackers()
     auto update_tracker_item = [](QStandardItem* i, auto const& it)
     {
         auto const& [sitename, count] = *it;
-        auto const display_name = FaviconCache::getDisplayName(sitename);
-        auto const icon = trApp->faviconCache().find(sitename);
+        auto const display_name = displayName(sitename);
 
         i->setData(display_name, Qt::DisplayRole);
         i->setData(display_name, TRACKER_ROLE);
         i->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
-        i->setData(icon, Qt::DecorationRole);
+        i->setData(trApp->find_favicon(sitename), Qt::DecorationRole);
         i->setData(static_cast<int>(count), FilterBarComboBox::CountRole);
 
         return i;
@@ -243,7 +253,7 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     connect(&torrents_, &TorrentModel::rowsRemoved, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::torrentsChanged, this, &FilterBar::onTorrentsChanged);
     connect(&recount_timer_, &QTimer::timeout, this, &FilterBar::recount);
-    connect(&trApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
+    connect(trApp, &Application::faviconsChanged, this, &FilterBar::recountTrackersSoon);
 
     recountAllSoon();
     is_bootstrapping_ = false; // NOLINT cppcoreguidelines-prefer-member-initializer

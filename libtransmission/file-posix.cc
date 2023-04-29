@@ -49,15 +49,15 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0

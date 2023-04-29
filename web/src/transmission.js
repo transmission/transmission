@@ -318,6 +318,14 @@ export class Transmission extends EventTarget {
         this.refilterAllSoon();
         break;
       }
+      case Prefs.ContrastMode: {
+        // Add custom class to the body/html element to get the appropriate contrast color scheme
+        document.body.classList.remove('contrast-more');
+        document.body.classList.remove('contrast-less');
+        document.body.classList.add(`contrast-${value}`);
+        // this.refilterAllSoon();
+        break;
+      }
 
       case Prefs.FilterMode:
       case Prefs.SortDirection:
@@ -557,7 +565,10 @@ export class Transmission extends EventTarget {
   static _dragenter(event_) {
     if (event_.dataTransfer && event_.dataTransfer.types) {
       const copy_types = new Set(['text/uri-list', 'text/plain']);
-      if (event_.dataTransfer.types.some((type) => copy_types.has(type))) {
+      if (
+        event_.dataTransfer.types.some((type) => copy_types.has(type)) ||
+        event_.dataTransfer.types.includes('Files')
+      ) {
         event_.stopPropagation();
         event_.preventDefault();
         event_.dataTransfer.dropEffect = 'copy';
@@ -589,8 +600,8 @@ export class Transmission extends EventTarget {
       return true;
     }
 
-    const type = event_.data.Transfer.types
-      .filter((t) => ['text/uri-list', 'text/plain'].contains(t))
+    const type = event_.dataTransfer.types
+      .filter((t) => ['text/uri-list', 'text/plain'].includes(t))
       .pop();
     for (const uri of event_.dataTransfer
       .getData(type)
@@ -600,6 +611,11 @@ export class Transmission extends EventTarget {
       this.remote.addTorrentByUrl(uri, paused);
     }
 
+    const { files } = event_.dataTransfer;
+
+    if (files.length > 0) {
+      this.openDialog = new OpenDialog(this, this.remote, '', files);
+    }
     event_.preventDefault();
     return false;
   }

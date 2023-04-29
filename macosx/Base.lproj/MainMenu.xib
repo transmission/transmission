@@ -454,6 +454,11 @@
                                                 <action selector="setSort:" target="206" id="1906"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem title="ETA" tag="8" id="zLF-YR-Oq6">
+                                            <connections>
+                                                <action selector="setSort:" target="206" id="fEQ-9j-ALl"/>
+                                            </connections>
+                                        </menuItem>
                                         <menuItem title="Size" tag="7" id="3430">
                                             <connections>
                                                 <action selector="setSort:" target="206" id="3431"/>
@@ -511,7 +516,7 @@
                             </menuItem>
                             <menuItem title="Hide Toolbar" id="1222">
                                 <connections>
-                                    <action selector="toggleToolbarShown:" target="-1" id="1251"/>
+                                    <action selector="toggleToolbarShown:" target="206" id="1251"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Customize Toolbar…" id="545">

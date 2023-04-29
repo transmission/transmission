@@ -3717,19 +3717,6 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"third-party/dht",
-					"third-party/fast_float/include",
-					"third-party/wide-integer",
-					"third-party/libb64/include",
-					"third-party/libdeflate",
-					"third-party/libpsl/include",
-					"third-party/libutp/include",
-					"third-party/utfcpp/source",
-					"third-party/jsonsl",
-					"third-party/wildmat",
-				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
@@ -3742,13 +3729,24 @@
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/fmt/include",
+					"third-party/jsonsl",
+					"third-party/libb64/include",
+					"third-party/libdeflate",
 					"third-party/libevent/include",
+					"third-party/libnatpmp",
+					"third-party/libpsl/include",
+					"third-party/libutp/include",
+					"third-party/miniupnpc",
+					"third-party/utfcpp/source",
+					"third-party/wide-integer",
+					"third-party/wildmat",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/libnatpmp",
-					"third-party/miniupnpc",
+					"."
 				);
 			};
 			name = Debug;
@@ -3909,7 +3907,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.14.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3985,13 +3983,24 @@
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/fmt/include",
+					"third-party/jsonsl",
+					"third-party/libb64/include",
+					"third-party/libdeflate",
 					"third-party/libevent/include",
+					"third-party/libnatpmp",
+					"third-party/libpsl/include",
+					"third-party/libutp/include",
+					"third-party/miniupnpc",
+					"third-party/utfcpp/source",
+					"third-party/wide-integer",
+					"third-party/wildmat",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/libnatpmp",
-					"third-party/miniupnpc",
+					".",
 				);
 			};
 			name = Release;
@@ -4105,7 +4114,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.14.6;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DFMT_HEADER_ONLY",
@@ -4205,7 +4214,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MACOSX_DEPLOYMENT_TARGET = 10.14.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -4300,13 +4309,24 @@
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/fmt/include",
+					"third-party/jsonsl",
+					"third-party/libb64/include",
+					"third-party/libdeflate",
 					"third-party/libevent/include",
+					"third-party/libnatpmp",
+					"third-party/libpsl/include",
+					"third-party/libutp/include",
+					"third-party/miniupnpc",
+					"third-party/utfcpp/source",
+					"third-party/wide-integer",
+					"third-party/wildmat",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/libnatpmp",
-					"third-party/miniupnpc",
+					".",
 				);
 			};
 			name = "Release - Debug";

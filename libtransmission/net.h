@@ -305,6 +305,11 @@ struct tr_address
         return type == TR_AF_INET || type == TR_AF_INET6;
     }
 
+    [[nodiscard]] auto is_any() const noexcept
+    {
+        return *this == (is_ipv4() ? any_ipv4() : any_ipv6());
+    }
+
     [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
 };
 

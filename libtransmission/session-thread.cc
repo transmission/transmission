@@ -22,13 +22,13 @@
 #include <event2/event.h>
 #include <event2/thread.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "session-thread.h"
-#include "tr-assert.h"
-#include "utils.h" // for tr_net_init()
-#include "utils-ev.h"
+#include "libtransmission/log.h"
+#include "libtransmission/session-thread.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // for tr_net_init()
+#include "libtransmission/utils-ev.h"
 
 using namespace std::literals;
 

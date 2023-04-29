@@ -497,7 +497,7 @@ TEST_F(DhtTest, stopsBootstrappingWhenSwarmHealthIsGoodEnough)
     waitFor(event_base_, MockTimerInterval * 10);
 
     // Confirm that the number of nodes pinged is unchanged,
-    // indicating that boostrapping is done
+    // indicating that bootstrapping is done
     EXPECT_EQ(TurnGoodAfterNthPing, std::size(mock_dht.pinged_));
 }
 

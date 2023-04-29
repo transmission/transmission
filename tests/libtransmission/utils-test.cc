@@ -232,7 +232,7 @@ TEST_F(UtilsTest, trStrlcpy)
         "a",
         "",
         "12345678901234567890",
-        "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
+        "This, very useful string contains a total of 105 characters not counting null. Almost like an easter egg!"
     };
 
     for (auto const& test : tests)

@@ -9,7 +9,7 @@ import { setTextContent } from './utils.js';
 
 const TorrentRendererHelper = {
   formatDL: (t) => {
-    return `▼${Formatter.speedBps(t.getDownloadSpeed())}`;
+    return `▼ ${Formatter.speedBps(t.getDownloadSpeed())}`;
   },
   formatETA: (t) => {
     const eta = t.getETA();
@@ -25,7 +25,7 @@ const TorrentRendererHelper = {
     return '';
   },
   formatUL: (t) => {
-    return `▲${Formatter.speedBps(t.getUploadSpeed())}`;
+    return `▲ ${Formatter.speedBps(t.getUploadSpeed())}`;
   },
   getProgressInfo: (controller, t) => {
     const status = t.getStatus();

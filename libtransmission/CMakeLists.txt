@@ -50,6 +50,7 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
+        favicon-cache.h
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
@@ -264,9 +265,7 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         $<$<BOOL:${HAVE_LIBINTL}>:${LIBINTL_LIBRARY}>) # gettext, ngettext
 
 target_include_directories(${TR_NAME}
-    PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}
-    INTERFACE
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_BINARY_DIR}/..)
 
@@ -306,6 +305,7 @@ if(INSTALL_LIB)
         FILES
             error-types.h
             error.h
+            favicon-cache.h
             file.h
             log.h
             makemeta.h
