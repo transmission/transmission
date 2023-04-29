@@ -828,10 +828,10 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     }
     if (self.fStat->leftUntilDone <= 0)
     {
-        // We return smallest amount of time remaining for simpliest compliance with sorting.
+        // We return smallest amount of time remaining for simplest compliance with sorting.
         return 0;
     }
-    // We return highest amount of time remaining for simpliest compliance with sorting.
+    // We return highest amount of time remaining for simplest compliance with sorting.
     return LONG_MAX;
 }
 
