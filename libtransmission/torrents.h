@@ -33,8 +33,7 @@ public:
     // O(1)
     [[nodiscard]] TR_CONSTEXPR20 tr_torrent* get(tr_torrent_id_t id)
     {
-        auto const uid = static_cast<size_t>(id);
-        return uid >= std::size(by_id_) ? nullptr : by_id_.at(uid);
+        return id >= std::size(by_id_) ? nullptr : by_id_.at(id);
     }
 
     // O(log n)
