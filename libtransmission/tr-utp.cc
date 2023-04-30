@@ -61,7 +61,7 @@ struct UTPSocket* utp_create_socket(struct_utp_context* /*ctx*/)
     return nullptr;
 }
 
-int utp_connect(UTPSocket* /*socket*/, sockaddr const* /*to*/, socklen_t /*token*/)
+int utp_connect(UTPSocket* /*socket*/, sockaddr const* /*to*/, socklen_t /*tolen*/)
 {
     return -1;
 }
@@ -108,9 +108,9 @@ void utp_send_to(
     uint8_t const* const buf,
     size_t const buflen,
     struct sockaddr const* const to,
-    socklen_t const token)
+    socklen_t const tolen)
 {
-    ss->udp_core_->sendto(buf, buflen, to, token);
+    ss->udp_core_->sendto(buf, buflen, to, tolen);
 }
 
 uint64 utp_callback(utp_callback_arguments* args)
