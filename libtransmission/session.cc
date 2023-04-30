@@ -764,7 +764,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     }
 
     // Sends out announce messages with advertisedPeerPort(), so this
-    // section neesd be happen here after the peer port settings changes
+    // section needs to happen here after the peer port settings changes
     if (auto const& val = new_settings.lpd_enabled; force || val != old_settings.lpd_enabled)
     {
         if (val)

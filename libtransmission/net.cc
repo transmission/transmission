@@ -842,7 +842,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
         // TODO: 2000::/3 is commonly used for global unicast but technically
         // other spaces would be allowable too, so we should test those here.
-        // See RFC 4291 in the Section 2.4 lising global unicast as everything
+        // See RFC 4291 in the Section 2.4 listing global unicast as everything
         // that's not link-local, multicast, loopback, or unspecified.
         return (a[0] & 0xE0) == 0x20;
     }

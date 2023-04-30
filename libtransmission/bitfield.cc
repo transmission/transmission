@@ -203,7 +203,7 @@ void tr_bitfield::ensureBitsAlloced(size_t n)
 {
     bool const has_all = hasAll();
 
-    /* Cant use getBytesNeededSafe as n can be > SIZE_MAX - 8. */
+    /* Can't use getBytesNeededSafe as n can be > SIZE_MAX - 8. */
     size_t const bytes_needed = has_all ? getBytesNeeded(std::max(n, true_count_)) : getBytesNeeded(n);
 
     if (std::size(flags_) < bytes_needed)
