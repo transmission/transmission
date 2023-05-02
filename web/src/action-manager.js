@@ -77,6 +77,7 @@ export class ActionManager extends EventTarget {
       },
       'start-all-torrents': { enabled: false, text: 'Start all' },
       'toggle-compact-rows': { enabled: true, text: 'Compact rows' },
+      'toggle-contrast': { enabled: true, text: 'High contrast UI' },
       'trash-selected-torrents': {
         enabled: false,
         text: 'Trash data and remove from list…',

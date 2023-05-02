@@ -143,6 +143,8 @@ std::string tr_getcwd()
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     tr_logSetLevel(TR_LOG_ERROR);
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);

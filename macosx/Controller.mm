@@ -3002,7 +3002,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         //for each torrent, removes the previous piece info if it's not in allTorrents, and keeps track of which torrents we already found in allTorrents
         void (^removePreviousFinishedPieces)(id, NSUInteger, BOOL*) = ^(Torrent* torrent, NSUInteger /*idx*/, BOOL* /*stop*/) {
-            //we used to keep track of which torrents we already found in allTorrents, but it wasn't safe fo concurrent enumeration
+            //we used to keep track of which torrents we already found in allTorrents, but it wasn't safe for concurrent enumeration
             if (![allTorrents containsObject:torrent])
             {
                 torrent.previousFinishedPieces = nil;
@@ -4598,7 +4598,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         return YES;
     }
 
-    //only enable some items if it is in a context menu or the window is useable
+    //only enable some items if it is in a context menu or the window is usable
     BOOL canUseTable = self.fWindow.keyWindow || menuItem.menu.supermenu != NSApp.mainMenu;
 
     //enable open items

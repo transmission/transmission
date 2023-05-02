@@ -27,10 +27,8 @@
 
 #include <fmt/core.h>
 
-#include <clocale>
 #include <cstdio>
 #include <string>
-#include <tuple>
 
 namespace
 {
@@ -53,7 +51,7 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 int main(int argc, char** argv)
 {
     /* init i18n */
-    std::ignore = std::setlocale(LC_ALL, "");
+    tr_locale_set_global("");
     bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);
     bind_textdomain_codeset(AppTranslationDomainName, "UTF-8");
     textdomain(AppTranslationDomainName);
