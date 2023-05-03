@@ -69,6 +69,12 @@ public:
         }
     }
 
+    void saveForceDirty()
+    {
+            save();
+            is_dirty_ = false;
+    }
+
 private:
     static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b);
 
