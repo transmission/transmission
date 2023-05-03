@@ -41,7 +41,7 @@ NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableD
     return [@"cid:" stringByAppendingString:iconFileName];
 }
 
-OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options)
+OSStatus GeneratePreviewForURL(void* /*thisInterface*/, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options)
 {
     // Before proceeding make sure the user didn't cancel the request
     if (QLPreviewRequestIsCancelled(preview))
@@ -54,7 +54,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     //try to parse the torrent file
     auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parseTorrentFile(((__bridge NSURL*)url).path.UTF8String))
+    if (!metainfo.parse_torrent_file(((__bridge NSURL*)url).path.UTF8String))
     {
         return noErr;
     }
@@ -71,7 +71,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     NSString* name = @(metainfo.name().c_str());
 
-    auto const n_files = metainfo.fileCount();
+    auto const n_files = metainfo.file_count();
     auto const is_multifile = n_files > 1;
     NSString* fileTypeString = is_multifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : name.pathExtension;
 
@@ -82,7 +82,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
                              width,
                              name];
 
-    NSString* fileSizeString = [NSString stringForFileSize:metainfo.totalSize()];
+    NSString* fileSizeString = [NSString stringForFileSize:metainfo.total_size()];
     if (is_multifile)
     {
         NSString* fileCountString = [NSString
@@ -91,7 +91,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     }
     [htmlString appendFormat:@"<p>%@</p>", fileSizeString];
 
-    auto const date_created = metainfo.dateCreated();
+    auto const date_created = metainfo.date_created();
     NSString* dateCreatedString = date_created > 0 ?
         [NSDateFormatter localizedStringFromDate:[NSDate dateWithTimeIntervalSince1970:date_created] dateStyle:NSDateFormatterLongStyle
                                        timeStyle:NSDateFormatterShortStyle] :
@@ -135,7 +135,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     NSMutableArray* lists = [NSMutableArray array];
 
-    auto const n_webseeds = metainfo.webseedCount();
+    auto const n_webseeds = metainfo.webseed_count();
     if (n_webseeds > 0)
     {
         NSMutableString* listSection = [NSMutableString string];
@@ -157,7 +157,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [lists addObject:listSection];
     }
 
-    auto const& announce_list = metainfo.announceList();
+    auto const& announce_list = metainfo.announce_list();
     if (!std::empty(announce_list))
     {
         NSMutableString* listSection = [NSMutableString string];
@@ -198,11 +198,11 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
             NSString* shortenedFilePath = [fullFilePath substringFromIndex:name.length + 1];
             NSString* fileSize = [NSString stringForFileSize:size];
 
-            NSUInteger const width = 16;
+            NSUInteger const icon_width = 16;
             [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</td><td class=\"grey\">%@</td></tr>",
-                                      generateIconData(shortenedFilePath.pathExtension, width, allImgProps),
-                                      width,
-                                      width,
+                                      generateIconData(shortenedFilePath.pathExtension, icon_width, allImgProps),
+                                      icon_width,
+                                      icon_width,
                                       shortenedFilePath,
                                       fileSize];
         }
@@ -234,7 +234,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     return noErr;
 }
 
-void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview)
+void CancelPreviewGeneration(void* /*thisInterface*/, QLPreviewRequestRef preview)
 {
     // Implement only if supported
 }

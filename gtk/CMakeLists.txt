@@ -13,7 +13,6 @@ target_sources(${TR_NAME}-gtk
         Dialogs.cc
         Dialogs.h
         FaviconCache.cc
-        FaviconCache.h
         FileList.cc
         FileList.h
         FilterBar.cc

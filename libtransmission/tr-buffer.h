@@ -112,7 +112,7 @@ public:
         using reference = value_type&;
         using iterator_category = std::random_access_iterator_tag;
 
-        constexpr Iterator(evbuffer* buf, size_t offset)
+        constexpr Iterator(evbuffer* const buf, size_t offset)
             : buf_{ buf }
             , buf_offset_{ offset }
         {
@@ -240,15 +240,25 @@ public:
         size_t buf_offset_ = 0;
     };
 
-    Buffer(Buffer&&) = default;
-    Buffer(Buffer const&) = delete;
-    Buffer& operator=(Buffer const&) = delete;
-    Buffer& operator=(Buffer&&) = default;
-
     Buffer()
         : BufferWriter<Buffer, std::byte>{ this }
     {
     }
+
+    Buffer(Buffer&& that)
+        : BufferWriter<Buffer, std::byte>(this)
+        , buf_{ std::move(that.buf_) }
+    {
+    }
+
+    Buffer& operator=(Buffer&& that)
+    {
+        buf_ = std::move(that.buf_);
+        return *this;
+    }
+
+    Buffer(Buffer const&) = delete;
+    Buffer& operator=(Buffer const&) = delete;
 
     template<typename T>
     explicit Buffer(T const& data)

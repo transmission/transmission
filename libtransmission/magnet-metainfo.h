@@ -28,7 +28,7 @@ public:
 
     [[nodiscard]] tr_urlbuf magnet() const;
 
-    [[nodiscard]] constexpr auto const& infoHash() const noexcept
+    [[nodiscard]] constexpr auto const& info_hash() const noexcept
     {
         return info_hash_;
     }
@@ -38,7 +38,7 @@ public:
         return name_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto webseedCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto webseed_count() const noexcept
     {
         return std::size(webseed_urls_);
     }
@@ -48,32 +48,32 @@ public:
         return webseed_urls_.at(i);
     }
 
-    [[nodiscard]] constexpr auto& announceList() noexcept
+    [[nodiscard]] constexpr auto& announce_list() noexcept
     {
         return announce_list_;
     }
 
-    [[nodiscard]] constexpr auto const& announceList() const noexcept
+    [[nodiscard]] constexpr auto const& announce_list() const noexcept
     {
         return announce_list_;
     }
 
-    [[nodiscard]] constexpr std::string const& infoHashString() const noexcept
+    [[nodiscard]] constexpr std::string const& info_hash_string() const noexcept
     {
         return info_hash_str_;
     }
 
-    [[nodiscard]] constexpr std::string const& infoHash2String() const noexcept
+    [[nodiscard]] constexpr std::string const& info_hash2_string() const noexcept
     {
         return info_hash2_str_;
     }
 
-    void setName(std::string_view name)
+    void set_name(std::string_view name)
     {
         name_ = tr_strv_convert_utf8(name);
     }
 
-    void addWebseed(std::string_view webseed);
+    void add_webseed(std::string_view webseed);
 
 protected:
     tr_announce_list announce_list_;
