@@ -465,7 +465,7 @@ void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
 {
     tr_session_settings{}.save(setme_dictionary);
     tr_rpc_server::defaultSettings(setme_dictionary);
-    tr_session_alt_speeds::defaultSettings(setme_dictionary);
+    tr_session_alt_speeds::default_settings(setme_dictionary);
 }
 
 void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
@@ -603,7 +603,7 @@ void tr_session::onNowTimer()
 
     // tr_session upkeep tasks to perform once per second
     tr_timeUpdate(std::chrono::system_clock::to_time_t(now));
-    alt_speeds_.checkScheduler();
+    alt_speeds_.check_scheduler();
 
     // set the timer to kick again right after (10ms after) the next second
     auto const target_time = std::chrono::time_point_cast<std::chrono::seconds>(now) + 1s + 10ms;
@@ -1023,7 +1023,7 @@ time_t tr_session::AltSpeedMediator::time()
     return tr_time();
 }
 
-void tr_session::AltSpeedMediator::isActiveChanged(bool is_active, tr_session_alt_speeds::ChangeReason reason)
+void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_alt_speeds::ChangeReason reason)
 {
     auto const in_session_thread = [session = &session_, is_active, reason]()
     {
@@ -1102,7 +1102,7 @@ void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kiloby
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    session->alt_speeds_.setLimitKBps(dir, limit);
+    session->alt_speeds_.set_limit_kbps(dir, limit);
     update_bandwidth(session, dir);
 }
 
@@ -1111,55 +1111,55 @@ tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, 
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return session->alt_speeds_.limitKBps(dir);
+    return session->alt_speeds_.limit_kbps(dir);
 }
 
 void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->alt_speeds_.setSchedulerEnabled(enabled);
+    session->alt_speeds_.set_scheduler_enabled(enabled);
 }
 
 bool tr_sessionUsesAltSpeedTime(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->alt_speeds_.isSchedulerEnabled();
+    return session->alt_speeds_.is_scheduler_enabled();
 }
 
 void tr_sessionSetAltSpeedBegin(tr_session* session, size_t minutes_since_midnight)
 {
     TR_ASSERT(session != nullptr);
 
-    session->alt_speeds_.setStartMinute(minutes_since_midnight);
+    session->alt_speeds_.set_start_minute(minutes_since_midnight);
 }
 
 size_t tr_sessionGetAltSpeedBegin(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->alt_speeds_.startMinute();
+    return session->alt_speeds_.start_minute();
 }
 void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight)
 {
     TR_ASSERT(session != nullptr);
 
-    session->alt_speeds_.setEndMinute(minutes_since_midnight);
+    session->alt_speeds_.set_end_minute(minutes_since_midnight);
 }
 
 size_t tr_sessionGetAltSpeedEnd(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->alt_speeds_.endMinute();
+    return session->alt_speeds_.end_minute();
 }
 
 void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day days)
 {
     TR_ASSERT(session != nullptr);
 
-    session->alt_speeds_.setWeekdays(days);
+    session->alt_speeds_.set_weekdays(days);
 }
 
 tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session)
@@ -1171,14 +1171,14 @@ tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session)
 
 void tr_sessionUseAltSpeed(tr_session* session, bool enabled)
 {
-    session->alt_speeds_.setActive(enabled, tr_session_alt_speeds::ChangeReason::User);
+    session->alt_speeds_.set_active(enabled, tr_session_alt_speeds::ChangeReason::User);
 }
 
 bool tr_sessionUsesAltSpeed(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->alt_speeds_.isActive();
+    return session->alt_speeds_.is_active();
 }
 
 void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data)

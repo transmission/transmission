@@ -115,7 +115,7 @@ private:
         {
         }
 
-        void isActiveChanged(bool is_active, tr_session_alt_speeds::ChangeReason reason) override;
+        void is_active_changed(bool is_active, tr_session_alt_speeds::ChangeReason reason) override;
 
         [[nodiscard]] time_t time() override;
 
