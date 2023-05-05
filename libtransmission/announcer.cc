@@ -1006,7 +1006,7 @@ void tr_announcer_impl::onAnnounceDone(
 
     if (response.external_ip)
     {
-        session->setExternalIP(*response.external_ip);
+        session->set_global_address(*response.external_ip);
     }
 
     if (!response.did_connect)
