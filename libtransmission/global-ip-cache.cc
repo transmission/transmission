@@ -313,7 +313,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
         {
             stop_timer(type); // No point in retrying
             has_ip_protocol_[type] = false;
-            tr_logAddWarn(fmt::format(_("Your machine does not support {protocol}"), fmt::arg("protocol", protocol)));
+            tr_logAddInfo(fmt::format(_("Your machine does not support {protocol}"), fmt::arg("protocol", protocol)));
         }
     }
 
