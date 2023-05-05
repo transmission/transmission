@@ -192,22 +192,22 @@ private:
         {
         }
 
-        [[nodiscard]] tr_address incomingPeerAddress() const override
+        [[nodiscard]] tr_address incoming_peer_address() const override
         {
             return session_.publicAddress(TR_AF_INET);
         }
 
-        [[nodiscard]] tr_port localPeerPort() const override
+        [[nodiscard]] tr_port local_peer_port() const override
         {
             return session_.localPeerPort();
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();
         }
 
-        void onPortForwarded(tr_port public_port) override
+        void on_port_forwarded(tr_port public_port) override
         {
             if (session_.advertised_peer_port_ != public_port)
             {

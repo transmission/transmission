@@ -44,7 +44,7 @@ public:
     tr_port_forwarding_impl& operator=(tr_port_forwarding_impl&&) = delete;
     tr_port_forwarding_impl& operator=(tr_port_forwarding_impl const&) = delete;
 
-    void localPortChanged() override
+    void local_port_changed() override
     {
         if (!is_enabled_)
         {
@@ -56,7 +56,7 @@ public:
         startTimer();
     }
 
-    void setEnabled(bool enabled) override
+    void set_enabled(bool enabled) override
     {
         if (enabled)
         {
@@ -70,7 +70,7 @@ public:
         }
     }
 
-    [[nodiscard]] bool isEnabled() const noexcept override
+    [[nodiscard]] bool is_enabled() const noexcept override
     {
         return is_enabled_;
     }
@@ -103,7 +103,7 @@ private:
 
     void startTimer()
     {
-        timer_ = mediator_.timerMaker().create([this]() { this->onTimer(); });
+        timer_ = mediator_.timer_maker().create([this]() { this->onTimer(); });
         restartTimer();
     }
 
@@ -192,11 +192,11 @@ private:
 
         auto const old_state = state();
 
-        auto const result = natpmp_->pulse(mediator_.localPeerPort(), is_enabled);
+        auto const result = natpmp_->pulse(mediator_.local_peer_port(), is_enabled);
         natpmp_state_ = result.state;
         if (!std::empty(result.local_port) && !std::empty(result.advertised_port))
         {
-            mediator_.onPortForwarded(result.advertised_port);
+            mediator_.on_port_forwarded(result.advertised_port);
             tr_logAddInfo(fmt::format(
                 _("Mapped private port {private_port} to public port {public_port}"),
                 fmt::arg("private_port", result.local_port.host()),
@@ -205,10 +205,10 @@ private:
 
         upnp_state_ = tr_upnpPulse(
             upnp_,
-            mediator_.localPeerPort(),
+            mediator_.local_peer_port(),
             is_enabled,
             do_check,
-            mediator_.incomingPeerAddress().display_name());
+            mediator_.incoming_peer_address().display_name());
 
         if (auto const new_state = state(); new_state != old_state)
         {

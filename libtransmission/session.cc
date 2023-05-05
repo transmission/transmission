@@ -760,7 +760,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 
     if (port_changed)
     {
-        port_forwarding_->localPortChanged();
+        port_forwarding_->local_port_changed();
     }
 
     bool const dht_changed = new_settings.dht_enabled != old_settings.dht_enabled;
@@ -1584,7 +1584,7 @@ void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled)
         [session, enabled]()
         {
             session->settings_.port_forwarding_enabled = enabled;
-            session->port_forwarding_->setEnabled(enabled);
+            session->port_forwarding_->set_enabled(enabled);
         });
 }
 
@@ -1592,7 +1592,7 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->port_forwarding_->isEnabled();
+    return session->port_forwarding_->is_enabled();
 }
 
 // ---
