@@ -140,7 +140,7 @@ private:
             session_.udp_core_->sendto(buf, buflen, addr, addrlen);
         }
 
-        [[nodiscard]] std::optional<tr_address> announceIP() const override
+        [[nodiscard]] std::optional<tr_address> announce_ip() const override
         {
             if (!session_.useAnnounceIP())
             {
