@@ -40,12 +40,12 @@ public:
 
     [[nodiscard]] virtual std::string_view dirname() const noexcept = 0;
 
-    [[nodiscard]] static constexpr auto generic_rescan_interval() noexcept
+    [[nodiscard]] static auto generic_rescan_interval() noexcept
     {
         return generic_rescan_interval_;
     }
 
-    static constexpr void set_generic_rescan_interval(std::chrono::milliseconds interval) noexcept
+    static void set_generic_rescan_interval(std::chrono::milliseconds interval) noexcept
     {
         generic_rescan_interval_ = interval;
     }
