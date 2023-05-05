@@ -164,7 +164,7 @@ bool tr_global_ip_cache::try_shutdown() noexcept
     return true;
 }
 
-void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept
+void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string_view bind_address) noexcept
 {
     settings_bind_addr_[type] = tr_address::from_string(bind_address);
     if (settings_bind_addr_[type] && type != settings_bind_addr_[type]->type)

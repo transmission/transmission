@@ -12,6 +12,7 @@
 #include <optional>
 #include <shared_mutex>
 #include <string>
+#include <string_view>
 
 #include "libtransmission/net.h"
 #include "libtransmission/timer.h"
@@ -61,7 +62,7 @@ public:
         return source_addr_[type];
     }
 
-    void set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept;
+    void set_settings_bind_addr(tr_address_type type, std::string_view bind_address) noexcept;
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
     void update_addr(tr_address_type type) noexcept;
