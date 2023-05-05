@@ -168,7 +168,7 @@ public:
         , bandwidth_{ &tor->bandwidth_ }
     {
         have_.set_has_all();
-        idle_timer_->startRepeating(IdleTimerInterval);
+        idle_timer_->start_repeating(IdleTimerInterval);
     }
 
     tr_webseed(tr_webseed&&) = delete;

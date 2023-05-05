@@ -901,7 +901,7 @@ tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_i
     , mediator_{ mediator }
     , encryption_mode_{ mode }
 {
-    timeout_timer_->startSingleShot(HandshakeTimeoutSec);
+    timeout_timer_->start_single_shot(HandshakeTimeoutSec);
 
     peer_io_->set_callbacks(&tr_handshake::can_read, nullptr, &tr_handshake::on_error, this);
 

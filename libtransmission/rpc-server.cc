@@ -654,7 +654,7 @@ auto rpc_server_start_retry(tr_rpc_server* server)
 
     ++server->start_retry_counter;
     auto const interval = std::min(ServerStartRetryDelayIncrement * server->start_retry_counter, ServerStartRetryMaxDelay);
-    server->start_retry_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    server->start_retry_timer->start_single_shot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
     return interval;
 }
 

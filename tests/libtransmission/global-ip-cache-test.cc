@@ -39,15 +39,15 @@ protected:
         {
         }
 
-        void setCallback(std::function<void()> /* callback */) override
+        void set_callback(std::function<void()> /* callback */) override
         {
         }
 
-        void setRepeating(bool /* is_repeating */ = true) override
+        void set_repeating(bool /* is_repeating */ = true) override
         {
         }
 
-        void setInterval(std::chrono::milliseconds /* msec */) override
+        void set_interval(std::chrono::milliseconds /* msec */) override
         {
         }
 
@@ -60,7 +60,7 @@ protected:
             return {};
         }
 
-        [[nodiscard]] bool isRepeating() const noexcept override
+        [[nodiscard]] bool is_repeating() const noexcept override
         {
             return {};
         }

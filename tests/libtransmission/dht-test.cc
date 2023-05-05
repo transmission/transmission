@@ -254,19 +254,19 @@ protected:
             real_timer_->stop();
         }
 
-        void setCallback(std::function<void()> callback) override
+        void set_callback(std::function<void()> callback) override
         {
-            real_timer_->setCallback(std::move(callback));
+            real_timer_->set_callback(std::move(callback));
         }
 
-        void setRepeating(bool repeating = true) override
+        void set_repeating(bool repeating = true) override
         {
-            real_timer_->setRepeating(repeating);
+            real_timer_->set_repeating(repeating);
         }
 
-        void setInterval(std::chrono::milliseconds /*interval*/) override
+        void set_interval(std::chrono::milliseconds /*interval*/) override
         {
-            real_timer_->setInterval(MockTimerInterval);
+            real_timer_->set_interval(MockTimerInterval);
         }
 
         void start() override
@@ -279,9 +279,9 @@ protected:
             return real_timer_->interval();
         }
 
-        [[nodiscard]] bool isRepeating() const noexcept override
+        [[nodiscard]] bool is_repeating() const noexcept override
         {
-            return real_timer_->isRepeating();
+            return real_timer_->is_repeating();
         }
 
     private:

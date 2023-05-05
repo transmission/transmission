@@ -123,22 +123,22 @@ private:
             do_port_check_ = true;
             if (auto const now = tr_time(); natpmp_->renewTime() > now)
             {
-                timer_->startSingleShot(std::chrono::seconds{ natpmp_->renewTime() - now });
+                timer_->start_single_shot(std::chrono::seconds{ natpmp_->renewTime() - now });
             }
             else // ???
             {
-                timer_->startSingleShot(1min);
+                timer_->start_single_shot(1min);
             }
             break;
 
         case TR_PORT_ERROR:
             // some kind of an error. wait a minute and retry
-            timer_->startSingleShot(1min);
+            timer_->start_single_shot(1min);
             break;
 
         default:
             // in progress. pulse frequently.
-            timer_->startSingleShot(333ms);
+            timer_->start_single_shot(333ms);
             break;
         }
     }

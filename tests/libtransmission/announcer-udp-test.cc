@@ -278,8 +278,8 @@ protected:
     {
         auto timer_maker = libtransmission::EvTimerMaker{ mediator.eventBase() };
         auto timer = timer_maker.create();
-        timer->setCallback([&announcer]() { announcer->upkeep(); });
-        timer->startRepeating(200ms);
+        timer->set_callback([&announcer]() { announcer->upkeep(); });
+        timer->start_repeating(200ms);
         return timer;
     }
 

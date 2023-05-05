@@ -83,7 +83,7 @@ private:
 
     void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept
     {
-        upkeep_timers_[type]->startRepeating(msec);
+        upkeep_timers_[type]->start_repeating(msec);
     }
 
     void stop_timer(tr_address_type type) noexcept

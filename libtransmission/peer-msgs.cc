@@ -305,7 +305,7 @@ public:
         if (torrent->allows_pex())
         {
             pex_timer_ = session->timerMaker().create([this]() { sendPex(); });
-            pex_timer_->startRepeating(SendPexInterval);
+            pex_timer_->start_repeating(SendPexInterval);
         }
 
         if (io->supports_utp())

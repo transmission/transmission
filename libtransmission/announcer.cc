@@ -131,8 +131,8 @@ public:
         , upkeep_timer_{ session_in->timerMaker().create() }
         , n_pending_stops_{ n_pending_stops }
     {
-        upkeep_timer_->setCallback([this]() { this->upkeep(); });
-        upkeep_timer_->startRepeating(UpkeepInterval);
+        upkeep_timer_->set_callback([this]() { this->upkeep(); });
+        upkeep_timer_->start_repeating(UpkeepInterval);
     }
 
     ~tr_announcer_impl() override

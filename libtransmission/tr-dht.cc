@@ -145,12 +145,12 @@ public:
         }
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
         get_nodes_from_name("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_queue_);
-        bootstrap_timer_->startSingleShot(100ms);
+        bootstrap_timer_->start_single_shot(100ms);
 
         mediator_.api().init(udp4_socket_, udp6_socket_, std::data(id_), nullptr);
 
         on_announce_timer();
-        announce_timer_->startRepeating(1s);
+        announce_timer_->start_repeating(1s);
 
         on_periodic_timer();
     }
@@ -202,7 +202,7 @@ public:
         // Being slightly late is fine,
         // and has the added benefit of adding some jitter.
         auto const interval = call_again_in_n_secs + std::chrono::milliseconds{ tr_rand_int(1000U) };
-        periodic_timer_->startSingleShot(interval);
+        periodic_timer_->start_single_shot(interval);
     }
 
 private:
@@ -311,7 +311,7 @@ private:
         add_node(address, port);
         ++n_bootstrapped_;
 
-        bootstrap_timer_->startSingleShot(bootstrap_interval(n_bootstrapped_));
+        bootstrap_timer_->start_single_shot(bootstrap_interval(n_bootstrapped_));
     }
 
     ///
@@ -361,7 +361,7 @@ private:
         // Being slightly late is fine,
         // and has the added benefit of adding some jitter.
         auto const interval = call_again_in_n_secs + std::chrono::milliseconds{ tr_rand_int(1000U) };
-        periodic_timer_->startSingleShot(interval);
+        periodic_timer_->start_single_shot(interval);
     }
 
     [[nodiscard]] std::chrono::seconds periodic(

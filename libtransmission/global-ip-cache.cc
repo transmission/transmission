@@ -127,7 +127,7 @@ tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMak
         {
             update_addr(type);
         };
-        upkeep_timers_[i]->setCallback(cb);
+        upkeep_timers_[i]->set_callback(cb);
         start_timer(type, UpkeepInterval);
     }
 }
@@ -307,7 +307,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
     {
         // Stop the update process since we have no public internet connectivity
         unset_addr(type);
-        upkeep_timers_[type]->setInterval(RetryUpkeepInterval);
+        upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
         tr_logAddDebug(fmt::format(_("Couldn't obtain source {protocol} address"), fmt::arg("protocol", protocol)));
         if (err == EAFNOSUPPORT)
         {
@@ -334,7 +334,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
         if (auto addr = tr_address::from_string(tr_strvStrip(response.body)); addr && set_global_addr(type, *addr))
         {
             success = true;
-            upkeep_timers_[type]->setInterval(UpkeepInterval);
+            upkeep_timers_[type]->set_interval(UpkeepInterval);
 
             tr_logAddInfo(fmt::format(
                 _("Successfully updated global {type} address to {ip} using {url}"),
@@ -355,7 +355,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     {
         tr_logAddDebug(fmt::format("Couldn't obtain global {} address", protocol));
         unset_global_addr(type);
-        upkeep_timers_[type]->setInterval(RetryUpkeepInterval);
+        upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
     }
 
     ix_service_[type] = 0U;

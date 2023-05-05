@@ -26,8 +26,8 @@ public:
         : BaseWatchdir{ dirname, std::move(callback), timer_maker }
         , rescan_timer_{ timer_maker.create() }
     {
-        rescan_timer_->setCallback([this]() { scan(); });
-        rescan_timer_->startRepeating(rescan_interval);
+        rescan_timer_->set_callback([this]() { scan(); });
+        rescan_timer_->start_repeating(rescan_interval);
         scan();
     }
 

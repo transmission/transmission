@@ -612,7 +612,7 @@ void tr_session::onNowTimer()
     {
         target_interval += 1s;
     }
-    now_timer_->setInterval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
+    now_timer_->set_interval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
 }
 
 void tr_session::initImpl(init_data& data)
@@ -1303,7 +1303,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // recycle the now-unused save_timer_ here to wait for UDP shutdown
     TR_ASSERT(!save_timer_);
     save_timer_ = timerMaker().create([this, closed_promise, deadline]() { closeImplPart2(closed_promise, deadline); });
-    save_timer_->startRepeating(50ms);
+    save_timer_->start_repeating(50ms);
 }
 
 void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
@@ -2140,7 +2140,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     , rpc_server_{ std::make_unique<tr_rpc_server>(this, settings_dict) }
 {
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
-    now_timer_->startRepeating(1s);
+    now_timer_->start_repeating(1s);
 
     // Periodically save the .resume files of any torrents whose
     // status has recently changed. This prevents loss of metadata
@@ -2155,7 +2155,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
 
             stats().save();
         });
-    save_timer_->startRepeating(SaveIntervalSecs);
+    save_timer_->start_repeating(SaveIntervalSecs);
 
     verifier_->add_callback(tr_torrentOnVerifyDone);
 }
