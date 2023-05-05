@@ -1519,7 +1519,7 @@ void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb)
     TR_ASSERT(session != nullptr);
 
     session->settings_.cache_size_mb = mb;
-    session->cache->setLimit(tr_toMemBytes(mb));
+    session->cache->set_limit(tr_toMemBytes(mb));
 }
 
 size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
@@ -2040,13 +2040,13 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
 
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
 {
-    this->cache->flushTorrent(tor);
+    this->cache->flush_torrent(tor);
     openFiles().closeTorrent(tor->id());
 }
 
 void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept
 {
-    this->cache->flushFile(tor, file_num);
+    this->cache->flush_file(tor, file_num);
     openFiles().closeFile(tor->id(), file_num);
 }
 
