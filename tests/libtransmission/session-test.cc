@@ -226,8 +226,8 @@ TEST_F(SessionTest, sessionId)
     GTEST_SKIP();
 #endif
 
-    EXPECT_FALSE(tr_session_id::isLocal(""));
-    EXPECT_FALSE(tr_session_id::isLocal("test"));
+    EXPECT_FALSE(tr_session_id::is_local(""));
+    EXPECT_FALSE(tr_session_id::is_local("test"));
 
     current_time_mock::set(0U);
     auto session_id = std::make_unique<tr_session_id>(current_time_mock::get);
@@ -236,44 +236,44 @@ TEST_F(SessionTest, sessionId)
     EXPECT_EQ(session_id->sv(), session_id->c_str()) << session_id->sv() << ", " << session_id->c_str();
     EXPECT_EQ(48U, strlen(session_id->c_str()));
     auto session_id_str_1 = std::string{ session_id->sv() };
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_1));
 
     current_time_mock::set(current_time_mock::get() + (3600U - 1U));
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_1));
     auto session_id_str_2 = std::string{ session_id->sv() };
     EXPECT_EQ(session_id_str_1, session_id_str_2);
 
     current_time_mock::set(3600U);
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_1));
     session_id_str_2 = std::string{ session_id->sv() };
     EXPECT_NE(session_id_str_1, session_id_str_2);
     EXPECT_EQ(session_id_str_2, session_id->c_str());
     EXPECT_EQ(48U, strlen(session_id->c_str()));
 
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_2));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_1));
     current_time_mock::set(7200U);
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_1));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_2));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_1));
 
     auto const session_id_str_3 = std::string{ session_id->sv() };
     EXPECT_EQ(48U, std::size(session_id_str_3));
     EXPECT_NE(session_id_str_2, session_id_str_3);
     EXPECT_NE(session_id_str_1, session_id_str_3);
 
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_3));
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
-    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_3));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_2));
+    EXPECT_FALSE(tr_session_id::is_local(session_id_str_1));
 
     current_time_mock::set(36000U);
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_3));
-    EXPECT_TRUE(tr_session_id::isLocal(session_id_str_2));
-    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_3));
+    EXPECT_TRUE(tr_session_id::is_local(session_id_str_2));
+    EXPECT_FALSE(tr_session_id::is_local(session_id_str_1));
 
     session_id.reset();
-    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_3));
-    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_2));
-    EXPECT_FALSE(tr_session_id::isLocal(session_id_str_1));
+    EXPECT_FALSE(tr_session_id::is_local(session_id_str_3));
+    EXPECT_FALSE(tr_session_id::is_local(session_id_str_2));
+    EXPECT_FALSE(tr_session_id::is_local(session_id_str_1));
 }
 
 TEST_F(SessionTest, getDefaultSettingsIncludesSubmodules)

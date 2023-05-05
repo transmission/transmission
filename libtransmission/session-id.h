@@ -36,7 +36,7 @@ public:
      * relative paths to absolute before passing through RPC, or presenting
      * different UI for local and remote sessions.
      */
-    [[nodiscard]] static bool isLocal(std::string_view) noexcept;
+    [[nodiscard]] static bool is_local(std::string_view) noexcept;
 
     // current session identifier
     [[nodiscard]] std::string_view sv() const noexcept;
@@ -47,7 +47,7 @@ private:
     static auto constexpr SessionIdDurationSec = time_t{ 60 * 60 }; /* expire in an hour */
 
     using session_id_t = std::array<char, SessionIdSize + 1>; // add one for '\0'
-    static session_id_t make_session_id();
+    [[nodiscard]] static session_id_t make_session_id();
 
     current_time_func_t const get_current_time_;
 
