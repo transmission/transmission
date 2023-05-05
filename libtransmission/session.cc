@@ -1325,7 +1325,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
 
     stats().save();
     peer_mgr_.reset();
-    openFiles().closeAll();
+    openFiles().close_all();
     tr_utpClose(this);
     this->udp_core_.reset();
 
@@ -2041,13 +2041,13 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
 {
     this->cache->flush_torrent(tor);
-    openFiles().closeTorrent(tor->id());
+    openFiles().close_torrent(tor->id());
 }
 
 void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept
 {
     this->cache->flush_file(tor, file_num);
-    openFiles().closeFile(tor->id(), file_num);
+    openFiles().close_file(tor->id(), file_num);
 }
 
 // ---
