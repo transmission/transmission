@@ -464,7 +464,7 @@ void get_settings_filename(tr_pathbuf& setme, char const* config_dir, char const
 void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
 {
     tr_session_settings{}.save(setme_dictionary);
-    tr_rpc_server::defaultSettings(setme_dictionary);
+    tr_rpc_server::default_settings(setme_dictionary);
     tr_session_alt_speeds::default_settings(setme_dictionary);
 }
 
@@ -1703,31 +1703,31 @@ char const* tr_blocklistGetURL(tr_session const* session)
 
 void tr_session::setRpcWhitelist(std::string_view whitelist) const
 {
-    this->rpc_server_->setWhitelist(whitelist);
+    this->rpc_server_->set_whitelist(whitelist);
 }
 
 void tr_session::useRpcWhitelist(bool enabled) const
 {
-    this->rpc_server_->setWhitelistEnabled(enabled);
+    this->rpc_server_->set_whitelist_enabled(enabled);
 }
 
 bool tr_session::useRpcWhitelist() const
 {
-    return this->rpc_server_->isWhitelistEnabled();
+    return this->rpc_server_->is_whitelist_enabled();
 }
 
 void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->setEnabled(is_enabled);
+    session->rpc_server_->set_enabled(is_enabled);
 }
 
 bool tr_sessionIsRPCEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->isEnabled();
+    return session->rpc_server_->is_enabled();
 }
 
 void tr_sessionSetRPCPort(tr_session* session, uint16_t hport)
@@ -1736,7 +1736,7 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t hport)
 
     if (session->rpc_server_)
     {
-        session->rpc_server_->setPort(tr_port::fromHost(hport));
+        session->rpc_server_->set_port(tr_port::fromHost(hport));
     }
 }
 
@@ -1787,21 +1787,21 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->setPassword(password != nullptr ? password : "");
+    session->rpc_server_->set_password(password != nullptr ? password : "");
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->getSaltedPassword().c_str();
+    return session->rpc_server_->get_salted_password().c_str();
 }
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->setUsername(username != nullptr ? username : "");
+    session->rpc_server_->set_username(username != nullptr ? username : "");
 }
 
 char const* tr_sessionGetRPCUsername(tr_session const* session)
@@ -1815,14 +1815,14 @@ void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->setPasswordEnabled(enabled);
+    session->rpc_server_->set_password_enabled(enabled);
 }
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->isPasswordEnabled();
+    return session->rpc_server_->is_password_enabled();
 }
 
 // ---
@@ -1936,34 +1936,38 @@ size_t tr_sessionGetQueueStalledMinutes(tr_session const* session)
     return session->queueStalledMinutes();
 }
 
+// ---
+
 void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(max_bad_requests > 0);
 
-    session->rpc_server_->setAntiBruteForceLimit(max_bad_requests);
+    session->rpc_server_->set_anti_brute_force_limit(max_bad_requests);
 }
 
 int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->getAntiBruteForceLimit();
+    return session->rpc_server_->get_anti_brute_force_limit();
 }
 
 void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->rpc_server_->setAntiBruteForceEnabled(is_enabled);
+    session->rpc_server_->set_anti_brute_force_enabled(is_enabled);
 }
 
 bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->rpc_server_->isAntiBruteForceEnabled();
+    return session->rpc_server_->is_anti_brute_force_enabled();
 }
+
+// ---
 
 std::vector<tr_torrent*> tr_session::getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const
 {
