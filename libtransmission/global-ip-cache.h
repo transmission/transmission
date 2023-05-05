@@ -49,8 +49,17 @@ public:
 
     bool try_shutdown() noexcept;
 
-    [[nodiscard]] std::optional<tr_address> global_addr(tr_address_type type) const noexcept;
-    [[nodiscard]] std::optional<tr_address> global_source_addr(tr_address_type type) const noexcept;
+    [[nodiscard]] std::optional<tr_address> global_addr(tr_address_type type) const noexcept
+    {
+        auto const lock = std::shared_lock{ global_addr_mutex_[type] };
+        return global_addr_[type];
+    }
+
+    [[nodiscard]] std::optional<tr_address> global_source_addr(tr_address_type type) const noexcept
+    {
+        auto const lock = std::shared_lock{ source_addr_mutex_[type] };
+        return source_addr_[type];
+    }
 
     void set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept;
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
@@ -71,8 +80,16 @@ private:
     void set_source_addr(tr_address const& addr) noexcept;
     void unset_addr(tr_address_type type) noexcept;
 
-    void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept;
-    void stop_timer(tr_address_type type) noexcept;
+    void start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept
+    {
+        upkeep_timers_[type]->startRepeating(msec);
+    }
+
+    void stop_timer(tr_address_type type) noexcept
+    {
+        upkeep_timers_[type]->stop();
+    }
+
     [[nodiscard]] bool set_is_updating(tr_address_type type) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
 

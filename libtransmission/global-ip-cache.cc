@@ -164,18 +164,6 @@ bool tr_global_ip_cache::try_shutdown() noexcept
     return true;
 }
 
-std::optional<tr_address> tr_global_ip_cache::global_addr(tr_address_type type) const noexcept
-{
-    auto const lock = std::shared_lock{ global_addr_mutex_[type] };
-    return global_addr_[type];
-}
-
-std::optional<tr_address> tr_global_ip_cache::global_source_addr(tr_address_type type) const noexcept
-{
-    auto const lock = std::shared_lock{ source_addr_mutex_[type] };
-    return source_addr_[type];
-}
-
 void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string const& bind_address) noexcept
 {
     settings_bind_addr_[type] = tr_address::from_string(bind_address);
@@ -241,16 +229,6 @@ void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 
     // No public internet connectivity means no global IP address
     unset_global_addr(type);
-}
-
-void tr_global_ip_cache::start_timer(tr_address_type type, std::chrono::milliseconds msec) noexcept
-{
-    upkeep_timers_[type]->startRepeating(msec);
-}
-
-void tr_global_ip_cache::stop_timer(tr_address_type type) noexcept
-{
-    upkeep_timers_[type]->stop();
 }
 
 bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
