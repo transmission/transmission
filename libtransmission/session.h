@@ -33,6 +33,7 @@
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "cache.h"
+#include "global-ip-cache.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
@@ -464,11 +465,6 @@ public:
 
     [[nodiscard]] bool useRpcWhitelist() const;
 
-    void setExternalIP(tr_address external_ip)
-    {
-        external_ip_ = external_ip;
-    }
-
     // peer networking
 
     [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
@@ -509,6 +505,10 @@ public:
 
     void closeTorrentFiles(tr_torrent* tor) noexcept;
     void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
+
+    // bind address
+
+    [[nodiscard]] std::string bindAddress(tr_address_type type) const noexcept;
 
     // announce ip
 
@@ -777,7 +777,30 @@ public:
 
     [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
 
+    [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
+    {
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        return global_ip_cache_->has_ip_protocol(type);
+    }
+
     [[nodiscard]] tr_address publicAddress(tr_address_type type) const noexcept;
+
+    [[nodiscard]] std::optional<tr_address> global_address(tr_address_type type) const noexcept
+    {
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        return global_ip_cache_->global_addr(type);
+    }
+
+    bool set_global_address(tr_address const& addr) noexcept
+    {
+        return global_ip_cache_->set_global_addr(addr.type, addr);
+    }
+
+    [[nodiscard]] std::optional<tr_address> global_source_address(tr_address_type type) const noexcept
+    {
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        return global_ip_cache_->global_source_addr(type);
+    }
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
     {
@@ -905,7 +928,6 @@ private:
     static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
 
     friend class libtransmission::test::SessionTest;
-    friend struct tr_bindinfo;
 
     friend bool tr_blocklistExists(tr_session const* session);
     friend bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session);
@@ -1002,7 +1024,6 @@ private:
     /// trivial type fields
 
     tr_session_settings settings_;
-    std::optional<tr_address> external_ip_;
 
     queue_start_callback_t queue_start_callback_ = nullptr;
     void* queue_start_user_data_ = nullptr;
@@ -1060,14 +1081,14 @@ private:
 
     /// other fields
 
-    // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_
+    // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::publicAddress())
     std::optional<BoundSocket> bound_ipv4_;
 
-    // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_
+    // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::publicAddress())
     std::optional<BoundSocket> bound_ipv6_;
 
 public:
-    // depends-on: settings_, announcer_udp_
+    // depends-on: settings_, announcer_udp_, global_ip_cache_
     // FIXME(ckerr): circular dependency udp_core -> announcer_udp -> announcer_udp_mediator -> udp_core
     std::unique_ptr<tr_udp_core> udp_core_;
 
@@ -1094,7 +1115,10 @@ private:
     // depends-on: open_files_
     tr_torrents torrents_;
 
-    // depends-on: settings_, session_thread_, torrents_
+    // depends-on: settings_, session_thread_, timer_maker_, web_
+    std::unique_ptr<tr_global_ip_cache> global_ip_cache_;
+
+    // depends-on: settings_, session_thread_, torrents_, global_ip_cache (via tr_session::publicAddress())
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 

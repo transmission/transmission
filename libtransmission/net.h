@@ -327,7 +327,7 @@ void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
 void tr_net_close_socket(tr_socket_t fd);
 
-bool tr_net_hasIPv6(tr_port);
+[[nodiscard]] bool tr_net_hasIPv6(tr_port);
 
 // --- TOS / DSCP
 
@@ -402,5 +402,3 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * @param err an errno on Unix/Linux and an WSAError on win32)
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
-
-[[nodiscard]] std::optional<tr_address> tr_globalIPv6();
