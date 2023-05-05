@@ -538,7 +538,7 @@ protected:
         };
 
         session_ = sessionInit(settings());
-        session_->verifier_->addCallback(callback);
+        session_->verifier_->add_callback(callback);
     }
 
     virtual void TearDown() override
