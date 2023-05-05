@@ -39,7 +39,7 @@
 class tr_global_ip_cache
 {
 public:
-    explicit tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in);
+    tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in);
     tr_global_ip_cache() = delete;
     ~tr_global_ip_cache();
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
