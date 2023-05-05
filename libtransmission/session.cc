@@ -41,6 +41,7 @@
 #include "libtransmission/error-types.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
+#include "libtransmission/global-ip-cache.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
@@ -422,17 +423,16 @@ tr_address tr_session::publicAddress(tr_address_type type) const noexcept
     {
         // if user provided an address, use it.
         // otherwise, use any_ipv4 (0.0.0.0).
-        return tr_address::from_string(settings_.bind_address_ipv4).value_or(tr_address::any_ipv4());
+        return global_ip_cache_->bind_addr(type);
     }
 
     if (type == TR_AF_INET6)
     {
         // if user provided an address, use it.
-        // otherwise, if we can determine which one to use via tr_globalIPv6 magic, use it.
+        // otherwise, if we can determine which one to use via globalSourceIPv6 magic, use it.
         // otherwise, use any_ipv6 (::).
-        static auto constexpr AnyAddr = tr_address::any_ipv6();
-        auto const default_addr = tr_globalIPv6().value_or(AnyAddr);
-        return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
+        auto const source_addr = global_source_address(type);
+        return source_addr && source_addr->is_global_unicast_address() ? *source_addr : global_ip_cache_->bind_addr(type);
     }
 
     TR_ASSERT_MSG(false, "invalid type");
@@ -639,6 +639,8 @@ void tr_session::initImpl(init_data& data)
 
     this->blocklists_ = libtransmission::Blocklist::loadBlocklists(blocklist_dir_, useBlocklist());
 
+    this->global_ip_cache_ = std::make_unique<tr_global_ip_cache>(*web_, timerMaker());
+
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
     setSettings(client_settings, true);
@@ -695,6 +697,15 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     if (auto const& val = new_settings.cache_size_mb; force || val != old_settings.cache_size_mb)
     {
         tr_sessionSetCacheLimit_MB(this, val);
+    }
+
+    if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
+    {
+        global_ip_cache_->set_settings_bind_addr(TR_AF_INET, new_settings.bind_address_ipv4);
+    }
+    if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
+    {
+        global_ip_cache_->set_settings_bind_addr(TR_AF_INET6, new_settings.bind_address_ipv6);
     }
 
     if (auto const& val = new_settings.default_trackers_str; force || val != old_settings.default_trackers_str)
@@ -1279,7 +1290,11 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // Tell the announcer to start shutdown, which sends out the stop
     // events and stops scraping.
     this->announcer_->startShutdown();
-    // ...and now that those are queued, tell web_ that we're shutting
+    // ...since global_ip_cache_ relies on web_ to update global addresses,
+    // we tell it to stop updating before web_ starts to refuse new requests.
+    // But we keep it intact for now, so that udp_core_ can continue.
+    this->global_ip_cache_->try_shutdown();
+    // ...and now that those are done, tell web_ that we're shutting
     // down soon. This leaves the `event=stopped` going but refuses any
     // new tasks.
     this->web_->startShutdown(10s);
@@ -1294,8 +1309,10 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
 void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
 {
     // try to keep the UDP announcer alive long enough to send out
-    // all the &event=stopped tracker announces
-    if (n_pending_stops_ != 0U && std::chrono::steady_clock::now() < deadline)
+    // all the &event=stopped tracker announces.
+    // also wait for all ip cache updates to finish so that web_ can
+    // safely destruct.
+    if ((n_pending_stops_ != 0U || !global_ip_cache_->try_shutdown()) && std::chrono::steady_clock::now() < deadline)
     {
         announcer_udp_->upkeep();
         return;
@@ -2031,6 +2048,22 @@ void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noe
 {
     this->cache->flushFile(tor, file_num);
     openFiles().closeFile(tor->id(), file_num);
+}
+
+// ---
+
+std::string tr_session::bindAddress(tr_address_type type) const noexcept
+{
+    switch (type)
+    {
+    case TR_AF_INET:
+        return settings_.bind_address_ipv4;
+    case TR_AF_INET6:
+        return settings_.bind_address_ipv6;
+    default:
+        TR_ASSERT_MSG(false, "invalid type");
+        return {};
+    }
 }
 
 // ---
