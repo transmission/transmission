@@ -70,5 +70,4 @@ private:
     static constexpr auto Zero = tr_session_stats{ TR_RATIO_NA, 0U, 0U, 0U, 0U, 0U };
     tr_session_stats single_ = Zero;
     tr_session_stats old_ = Zero;
-
 };
