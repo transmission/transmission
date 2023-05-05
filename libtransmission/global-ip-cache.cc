@@ -32,7 +32,85 @@ auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https:/
 auto constexpr UpkeepInterval = 30min;
 auto constexpr RetryUpkeepInterval = 30s;
 
-} // anonymous namespace
+} // namespace
+
+namespace
+{
+// Functions contained in external_source_ip_helpers are modified from code
+// by Juliusz Chroboczek and is covered under the same license as dht.cc.
+// Please feel free to copy them into your software if it can help
+// unbreaking the double-stack Internet.
+namespace external_source_ip_helpers
+{
+
+// Get the source address used for a given destination address.
+// Since there is no official interface to get this information,
+// we create a connected UDP socket (connected UDP... hmm...)
+// and check its source address.
+//
+// Since it's a UDP socket, this doesn't actually send any packets
+[[nodiscard]] std::optional<tr_address> get_source_address(
+    tr_address const& dst_addr,
+    tr_port dst_port,
+    tr_address const& bind_addr,
+    int& err_out) noexcept
+{
+    TR_ASSERT(dst_addr.type == bind_addr.type);
+
+    auto const save = errno;
+
+    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
+    auto const [bind_ss, bind_sslen] = bind_addr.to_sockaddr(tr_port::fromHost(0));
+    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
+    {
+        if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == 0)
+        {
+            if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
+            {
+                auto src_ss = sockaddr_storage{};
+                auto src_sslen = socklen_t{ sizeof(src_ss) };
+                if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
+                {
+                    if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
+                    {
+                        tr_net_close_socket(sock);
+                        errno = save;
+                        return addrport->first;
+                    }
+                }
+            }
+        }
+
+        tr_net_close_socket(sock);
+    }
+
+    err_out = errno;
+    errno = save;
+    return {};
+}
+
+[[nodiscard]] std::optional<tr_address> get_global_source_address(tr_address const& bind_addr, int& err_out) noexcept
+{
+    // Pick some destination address to pretend to send a packet to
+    static auto constexpr DstIPv4 = "91.121.74.28"sv;
+    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
+    auto const dst_addr = tr_address::from_string(bind_addr.is_ipv4() ? DstIPv4 : DstIPv6);
+    auto const dst_port = tr_port::fromHost(6969);
+
+    // In order for address selection to work right,
+    // this should be a global unicast address, not Teredo or 6to4
+    TR_ASSERT(dst_addr && dst_addr->is_global_unicast_address());
+
+    if (dst_addr)
+    {
+        return get_source_address(*dst_addr, dst_port, bind_addr, err_out);
+    }
+
+    return {};
+}
+
+} // namespace external_source_ip_helpers
+} // namespace
 
 tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in)
     : web_{ web_in }
@@ -225,6 +303,8 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
 
 void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 {
+    using namespace external_source_ip_helpers;
+
     TR_ASSERT(has_ip_protocol_[type]);
 
     if (!set_is_updating(type))
@@ -302,74 +382,4 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
 
     ix_service_[type] = 0U;
     unset_is_updating(type);
-}
-
-// tr_global_ip_cache::get_global_source_address() and tr_global_ip_cache::get_source_address
-// are modified from code by Juliusz Chroboczek and is covered under the same license as dht.cc.
-// Please feel free to copy them into your software if it can help
-// unbreaking the double-stack Internet.
-std::optional<tr_address> tr_global_ip_cache::get_global_source_address(tr_address const& bind_addr, int& err_out) noexcept
-{
-    // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    auto const dst_addr = tr_address::from_string(bind_addr.is_ipv4() ? DstIPv4 : DstIPv6);
-    auto const dst_port = tr_port::fromHost(6969);
-
-    // In order for address selection to work right,
-    // this should be a global unicast address, not Teredo or 6to4
-    TR_ASSERT(dst_addr && dst_addr->is_global_unicast_address());
-
-    if (dst_addr)
-    {
-        return get_source_address(*dst_addr, dst_port, bind_addr, err_out);
-    }
-
-    return {};
-}
-
-// Get the source address used for a given destination address.
-// Since there is no official interface to get this information,
-// we create a connected UDP socket (connected UDP... hmm...)
-// and check its source address.
-//
-// Since it's a UDP socket, this doesn't actually send any packets
-std::optional<tr_address> tr_global_ip_cache::get_source_address(
-    tr_address const& dst_addr,
-    tr_port dst_port,
-    tr_address const& bind_addr,
-    int& err_out) noexcept
-{
-    TR_ASSERT(dst_addr.type == bind_addr.type);
-
-    auto const save = errno;
-
-    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    auto const [bind_ss, bind_sslen] = bind_addr.to_sockaddr(tr_port::fromHost(0));
-    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
-    {
-        if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == 0)
-        {
-            if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
-            {
-                auto src_ss = sockaddr_storage{};
-                auto src_sslen = socklen_t{ sizeof(src_ss) };
-                if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
-                {
-                    if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
-                    {
-                        tr_net_close_socket(sock);
-                        errno = save;
-                        return addrport->first;
-                    }
-                }
-            }
-        }
-
-        tr_net_close_socket(sock);
-    }
-
-    err_out = errno;
-    errno = save;
-    return {};
 }

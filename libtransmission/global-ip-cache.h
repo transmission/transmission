@@ -82,15 +82,6 @@ private:
     // Only use as a callback for web_->fetch()
     void on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept;
 
-    [[nodiscard]] static std::optional<tr_address> get_global_source_address(
-        tr_address const& bind_addr,
-        int& err_out) noexcept;
-    [[nodiscard]] static std::optional<tr_address> get_source_address(
-        tr_address const& dst_addr,
-        tr_port dst_port,
-        tr_address const& bind_addr,
-        int& err_out) noexcept;
-
     tr_web& web_;
 
     array_ip_t<std::optional<tr_address>> settings_bind_addr_;
