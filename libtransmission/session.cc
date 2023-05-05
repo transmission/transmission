@@ -1306,7 +1306,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
     this->announcer_.reset();
     this->announcer_udp_.reset();
 
-    stats().saveForceDirty();
+    stats().save();
     peer_mgr_.reset();
     openFiles().closeAll();
     tr_utpClose(this);
@@ -2136,7 +2136,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
                 tr_torrentSave(tor);
             }
 
-            stats().saveForceDirty();
+            stats().save();
         });
     save_timer_->startRepeating(SaveIntervalSecs);
 
