@@ -82,7 +82,7 @@ protected:
         EXPECT_EQ(builder.name(), metainfo.name());
         EXPECT_EQ(builder.comment(), metainfo.comment());
         EXPECT_EQ(builder.isPrivate(), metainfo.is_private());
-        EXPECT_EQ(builder.announceList().toString(), metainfo.announce_list().toString());
+        EXPECT_EQ(builder.announceList().to_string(), metainfo.announce_list().to_string());
         return metainfo;
     }
 };
