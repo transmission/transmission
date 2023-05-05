@@ -82,7 +82,6 @@ void tr_stats::save() const
 void tr_stats::clear()
 {
     single_ = old_ = Zero;
-    is_dirty_ = true;
     start_time_ = tr_time();
 }
 

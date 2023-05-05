@@ -30,7 +30,7 @@ public:
 
     ~tr_stats()
     {
-        saveIfDirty();
+        save();
     }
 
     void clear();
@@ -45,34 +45,22 @@ public:
     constexpr void addUploaded(uint32_t n_bytes) noexcept
     {
         single_.uploadedBytes += n_bytes;
-        is_dirty_ = true;
     }
 
     constexpr void addDownloaded(uint32_t n_bytes) noexcept
     {
         single_.downloadedBytes += n_bytes;
-        is_dirty_ = true;
     }
 
     constexpr void addFileCreated() noexcept
     {
         ++single_.filesAdded;
-        is_dirty_ = true;
     }
 
-    void saveIfDirty()
-    {
-        if (is_dirty_)
-        {
-            save();
-            is_dirty_ = false;
-        }
-    }
+    void save() const;
 
 private:
     static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b);
-
-    void save() const;
 
     static tr_session_stats loadOldStats(std::string_view config_dir);
 
@@ -82,6 +70,4 @@ private:
     static constexpr auto Zero = tr_session_stats{ TR_RATIO_NA, 0U, 0U, 0U, 0U, 0U };
     tr_session_stats single_ = Zero;
     tr_session_stats old_ = Zero;
-
-    bool is_dirty_ = false;
 };
