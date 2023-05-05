@@ -164,21 +164,21 @@ private:
 
         ~DhtMediator() noexcept override = default;
 
-        [[nodiscard]] std::vector<tr_torrent_id_t> torrentsAllowingDHT() const override;
+        [[nodiscard]] std::vector<tr_torrent_id_t> torrents_allowing_dht() const override;
 
-        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t id) const override;
+        [[nodiscard]] tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t id) const override;
 
-        [[nodiscard]] std::string_view configDir() const override
+        [[nodiscard]] std::string_view config_dir() const override
         {
             return session_.config_dir_;
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();
         }
 
-        void addPex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override;
+        void add_pex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override;
 
     private:
         tr_session& session_;
@@ -872,7 +872,7 @@ public:
     {
         if (dht_)
         {
-            dht_->addNode(addr, port);
+            dht_->add_node(addr, port);
         }
     }
 

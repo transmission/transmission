@@ -197,7 +197,7 @@ tr_peer_id_t tr_peerIdInit()
 
 // ---
 
-std::vector<tr_torrent_id_t> tr_session::DhtMediator::torrentsAllowingDHT() const
+std::vector<tr_torrent_id_t> tr_session::DhtMediator::torrents_allowing_dht() const
 {
     auto ids = std::vector<tr_torrent_id_t>{};
     auto const& torrents = session_.torrents();
@@ -214,7 +214,7 @@ std::vector<tr_torrent_id_t> tr_session::DhtMediator::torrentsAllowingDHT() cons
     return ids;
 }
 
-tr_sha1_digest_t tr_session::DhtMediator::torrentInfoHash(tr_torrent_id_t id) const
+tr_sha1_digest_t tr_session::DhtMediator::torrent_info_hash(tr_torrent_id_t id) const
 {
     if (auto const* const tor = session_.torrents().get(id); tor != nullptr)
     {
@@ -224,7 +224,7 @@ tr_sha1_digest_t tr_session::DhtMediator::torrentInfoHash(tr_torrent_id_t id) co
     return {};
 }
 
-void tr_session::DhtMediator::addPex(tr_sha1_digest_t const& info_hash, tr_pex const* pex, size_t n_pex)
+void tr_session::DhtMediator::add_pex(tr_sha1_digest_t const& info_hash, tr_pex const* pex, size_t n_pex)
 {
     if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
     {
