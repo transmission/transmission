@@ -149,16 +149,14 @@ ItemLayout::ItemLayout(
 
 QSize TorrentDelegateMin::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    auto const is_magnet = !tor.hasMetadata();
     auto const m = margin(*QApplication::style());
-    auto const layout = ItemLayout(
-        is_magnet ? progressString(tor) : tor.name(),
-        shortStatusString(tor),
-        QIcon(),
-        option.font,
-        option.direction,
-        QPoint(0, 0),
-        option.rect.width() - m.width() * 2);
+    auto const layout = ItemLayout{ tor.name(),
+                                    shortStatusString(tor),
+                                    QIcon{},
+                                    option.font,
+                                    option.direction,
+                                    QPoint{},
+                                    option.rect.width() - m.width() * 2 };
     return layout.size() + m * 2;
 }
 
@@ -167,7 +165,6 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     auto const* style = QApplication::style();
 
     bool const is_paused(tor.isPaused());
-    bool const is_magnet(!tor.hasMetadata());
 
     bool const is_item_selected((option.state & QStyle::State_Selected) != 0);
     bool const is_item_enabled((option.state & QStyle::State_Enabled) != 0);
@@ -233,14 +230,13 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     // layout
     QSize const m(margin(*style));
     QRect const content_rect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
-    ItemLayout const layout(
-        is_magnet ? progressString(tor) : tor.name(),
-        shortStatusString(tor),
-        emblem_icon,
-        option.font,
-        option.direction,
-        content_rect.topLeft(),
-        content_rect.width());
+    auto const layout = ItemLayout{ tor.name(), //
+                                    shortStatusString(tor),
+                                    emblem_icon,
+                                    option.font,
+                                    option.direction,
+                                    content_rect.topLeft(),
+                                    content_rect.width() };
 
     // render
     if (tor.hasError() && !is_item_selected)
