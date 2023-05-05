@@ -386,7 +386,7 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
 }
 
 tr_session::BoundSocket::BoundSocket(
-    event_base* evbase,
+    struct event_base* evbase,
     tr_address const& addr,
     tr_port port,
     IncomingCallback cb,
@@ -618,7 +618,7 @@ void tr_session::onNowTimer()
 void tr_session::initImpl(init_data& data)
 {
     auto lock = unique_lock();
-    TR_ASSERT(amInSessionThread());
+    TR_ASSERT(am_in_session_thread());
 
     auto* const client_settings = data.client_settings;
     TR_ASSERT(tr_variantIsDict(client_settings));
@@ -647,7 +647,7 @@ void tr_session::initImpl(init_data& data)
 
     if (this->allowsLPD())
     {
-        this->lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
+        this->lpd_ = tr_lpd::create(lpd_mediator_, event_base());
     }
 
     tr_utpInit(this);
@@ -659,7 +659,7 @@ void tr_session::initImpl(init_data& data)
 
 void tr_session::setSettings(tr_variant* settings_dict, bool force)
 {
-    TR_ASSERT(amInSessionThread());
+    TR_ASSERT(am_in_session_thread());
     TR_ASSERT(tr_variantIsDict(settings_dict));
 
     // load the session settings
@@ -735,14 +735,14 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
             auto const addr = publicAddress(TR_AF_INET);
-            bound_ipv4_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv4_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
             auto const addr = publicAddress(TR_AF_INET6);
-            bound_ipv6_.emplace(eventBase(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
+            bound_ipv6_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
     }
@@ -776,7 +776,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     {
         if (val)
         {
-            lpd_ = tr_lpd::create(lpd_mediator_, eventBase());
+            lpd_ = tr_lpd::create(lpd_mediator_, event_base());
         }
         else
         {
@@ -1336,7 +1336,7 @@ void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono:
 void tr_sessionClose(tr_session* session, size_t timeout_secs)
 {
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(!session->amInSessionThread());
+    TR_ASSERT(!session->am_in_session_thread());
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
 
@@ -2133,7 +2133,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     , torrent_dir_{ makeTorrentDir(config_dir) }
     , blocklist_dir_{ makeBlocklistDir(config_dir) }
     , session_thread_{ tr_session_thread::create() }
-    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(eventBase()) }
+    , timer_maker_{ std::make_unique<libtransmission::EvTimerMaker>(event_base()) }
     , settings_{ settings_dict }
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }

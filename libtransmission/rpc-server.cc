@@ -671,8 +671,8 @@ void startServer(tr_rpc_server* server)
         return;
     }
 
-    struct event_base* base = server->session->eventBase();
-    struct evhttp* httpd = evhttp_new(base);
+    auto* const base = server->session->event_base();
+    auto* const httpd = evhttp_new(base);
 
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
 

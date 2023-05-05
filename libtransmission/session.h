@@ -316,9 +316,9 @@ public:
         return *timer_maker_;
     }
 
-    [[nodiscard]] auto amInSessionThread() const noexcept
+    [[nodiscard]] auto am_in_session_thread() const noexcept
     {
-        return session_thread_->amInSessionThread();
+        return session_thread_->am_in_session_thread();
     }
 
     void runInSessionThread(std::function<void(void)>&& func)
@@ -332,9 +332,9 @@ public:
         session_thread_->run(std::forward<Func&&>(func), std::forward<Args>(args)...);
     }
 
-    [[nodiscard]] auto eventBase() noexcept
+    [[nodiscard]] auto* event_base() noexcept
     {
-        return session_thread_->eventBase();
+        return session_thread_->event_base();
     }
 
     [[nodiscard]] constexpr auto& torrents()
