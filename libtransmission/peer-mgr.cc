@@ -543,7 +543,7 @@ public:
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
                 tor->set_date_active(now);
                 tor->set_dirty();
-                tor->session->addUploaded(event.length);
+                tor->session->add_uploaded(event.length);
 
                 if (peer->atom != nullptr)
                 {
@@ -561,7 +561,7 @@ public:
                 tor->downloadedCur += event.length;
                 tor->set_date_active(now);
                 tor->set_dirty();
-                tor->session->addDownloaded(event.length);
+                tor->session->add_downloaded(event.length);
 
                 if (peer->atom != nullptr)
                 {

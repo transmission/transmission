@@ -614,19 +614,19 @@ public:
         return session_stats_;
     }
 
-    constexpr void addUploaded(uint32_t n_bytes) noexcept
+    constexpr void add_uploaded(uint32_t n_bytes) noexcept
     {
-        stats().addUploaded(n_bytes);
+        stats().add_uploaded(n_bytes);
     }
 
-    constexpr void addDownloaded(uint32_t n_bytes) noexcept
+    constexpr void add_downloaded(uint32_t n_bytes) noexcept
     {
-        stats().addDownloaded(n_bytes);
+        stats().add_downloaded(n_bytes);
     }
 
-    constexpr void addFileCreated() noexcept
+    constexpr void add_file_created() noexcept
     {
-        stats().addFileCreated();
+        stats().add_file_created();
     }
 
     // The incoming peer port that's been opened on the local machine

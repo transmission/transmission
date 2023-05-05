@@ -140,7 +140,7 @@ void readOrWriteBytes(
         if (fd && do_write)
         {
             // make a note that we just created a file
-            tor->session->addFileCreated();
+            tor->session->add_file_created();
         }
     }
 
