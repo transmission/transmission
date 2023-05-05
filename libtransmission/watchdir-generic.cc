@@ -37,7 +37,7 @@ private:
 
 } // namespace
 
-std::unique_ptr<Watchdir> Watchdir::createGeneric(
+std::unique_ptr<Watchdir> Watchdir::create_generic(
     std::string_view dirname,
     Callback callback,
     libtransmission::TimerMaker& timer_maker,
