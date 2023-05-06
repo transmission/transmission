@@ -506,10 +506,6 @@ public:
     void closeTorrentFiles(tr_torrent* tor) noexcept;
     void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
 
-    // bind address
-
-    [[nodiscard]] std::string bindAddress(tr_address_type type) const noexcept;
-
     // announce ip
 
     [[nodiscard]] constexpr std::string const& announceIP() const noexcept
