@@ -360,32 +360,6 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
     return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
-bool tr_net_hasIPv6(tr_port port)
-{
-    static bool result = false;
-    static bool already_done = false;
-
-    if (!already_done)
-    {
-        int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv6(), port, true, &err);
-
-        if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
-        {
-            result = true;
-        }
-
-        if (fd != TR_BAD_SOCKET)
-        {
-            tr_net_close_socket(fd);
-        }
-
-        already_done = true;
-    }
-
-    return result;
-}
-
 std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
 {
     TR_ASSERT(session != nullptr);
