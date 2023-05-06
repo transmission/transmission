@@ -36,11 +36,11 @@ auto constexpr RetryUpkeepInterval = 30s;
 
 namespace
 {
-// Functions contained in external_source_ip_helpers are modified from code
+// Functions contained in global_source_ip_helpers are modified from code
 // by Juliusz Chroboczek and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
 // unbreaking the double-stack Internet.
-namespace external_source_ip_helpers
+namespace global_source_ip_helpers
 {
 
 // Get the source address used for a given destination address.
@@ -109,7 +109,7 @@ namespace external_source_ip_helpers
     return {};
 }
 
-} // namespace external_source_ip_helpers
+} // namespace global_source_ip_helpers
 } // namespace
 
 tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in)
@@ -281,7 +281,7 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
 
 void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 {
-    using namespace external_source_ip_helpers;
+    using namespace global_source_ip_helpers;
 
     TR_ASSERT(has_ip_protocol_[type]);
 

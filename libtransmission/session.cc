@@ -701,11 +701,11 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 
     if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
     {
-        global_ip_cache_->set_settings_bind_addr(TR_AF_INET, new_settings.bind_address_ipv4);
+        global_ip_cache_->set_settings_bind_addr(TR_AF_INET, val);
     }
     if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
     {
-        global_ip_cache_->set_settings_bind_addr(TR_AF_INET6, new_settings.bind_address_ipv6);
+        global_ip_cache_->set_settings_bind_addr(TR_AF_INET6, val);
     }
 
     if (auto const& val = new_settings.default_trackers_str; force || val != old_settings.default_trackers_str)
