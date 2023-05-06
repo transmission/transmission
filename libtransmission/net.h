@@ -327,8 +327,6 @@ void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
 void tr_net_close_socket(tr_socket_t fd);
 
-[[nodiscard]] bool tr_net_hasIPv6(tr_port);
-
 // --- TOS / DSCP
 
 /**

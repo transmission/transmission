@@ -175,7 +175,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
     }
 
-    if (!tr_net_hasIPv6(udp_port_))
+    if (!session.has_ip_protocol(TR_AF_INET6))
     {
         // no IPv6; do nothing
     }

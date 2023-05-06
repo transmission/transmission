@@ -429,7 +429,7 @@ tr_address tr_session::publicAddress(tr_address_type type) const noexcept
     if (type == TR_AF_INET6)
     {
         // if user provided an address, use it.
-        // otherwise, if we can determine which one to use via globalSourceIPv6 magic, use it.
+        // otherwise, if we can determine which one to use via global_source_address(ipv6) magic, use it.
         // otherwise, use any_ipv6 (::).
         auto const source_addr = global_source_address(type);
         return source_addr && source_addr->is_global_unicast_address() ? *source_addr : global_ip_cache_->bind_addr(type);
@@ -2048,22 +2048,6 @@ void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noe
 {
     this->cache->flushFile(tor, file_num);
     openFiles().closeFile(tor->id(), file_num);
-}
-
-// ---
-
-std::string tr_session::bindAddress(tr_address_type type) const noexcept
-{
-    switch (type)
-    {
-    case TR_AF_INET:
-        return settings_.bind_address_ipv4;
-    case TR_AF_INET6:
-        return settings_.bind_address_ipv6;
-    default:
-        TR_ASSERT_MSG(false, "invalid type");
-        return {};
-    }
 }
 
 // ---
