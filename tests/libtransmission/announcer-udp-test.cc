@@ -57,7 +57,7 @@ protected:
             return event_base_.get();
         }
 
-        [[nodiscard]] std::optional<tr_address> announceIP() const override
+        [[nodiscard]] std::optional<tr_address> announce_ip() const override
         {
             return {};
         }
@@ -181,7 +181,7 @@ protected:
         auto arr = std::array<uint8_t, 256>{};
         buf.to_buf(std::data(arr), response_size);
 
-        return announcer.handleMessage(std::data(arr), response_size);
+        return announcer.handle_message(std::data(arr), response_size);
     }
 
     [[nodiscard]] static auto sendConnectionResponse(tr_announcer_udp& announcer, uint32_t transaction_id)
@@ -195,7 +195,7 @@ protected:
         auto arr = std::array<uint8_t, 128>{};
         auto response_size = std::size(buf);
         buf.to_buf(std::data(arr), response_size);
-        EXPECT_TRUE(announcer.handleMessage(std::data(arr), response_size));
+        EXPECT_TRUE(announcer.handle_message(std::data(arr), response_size));
 
         return connection_id;
     }
@@ -278,8 +278,8 @@ protected:
     {
         auto timer_maker = libtransmission::EvTimerMaker{ mediator.eventBase() };
         auto timer = timer_maker.create();
-        timer->setCallback([&announcer]() { announcer->upkeep(); });
-        timer->startRepeating(200ms);
+        timer->set_callback([&announcer]() { announcer->upkeep(); });
+        timer->start_repeating(200ms);
         return timer;
     }
 
@@ -335,7 +335,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size));
 
     // confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());
@@ -419,7 +419,7 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size));
 
     // Confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());
@@ -548,7 +548,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_FALSE(announcer->handleMessage(std::data(arr), response_size));
+    EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size));
 
     // send a connection response but with an *invalid* action
     buf.clear();
@@ -557,7 +557,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     buf.add_uint64(tr_rand_obj<uint64_t>());
     response_size = std::size(buf);
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_FALSE(announcer->handleMessage(std::data(arr), response_size));
+    EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size));
 
     // but after discarding invalid messages,
     // a valid connection response should still work
@@ -644,7 +644,7 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 512>{};
     buf.to_buf(std::data(arr), response_size);
-    EXPECT_TRUE(announcer->handleMessage(std::data(arr), response_size));
+    EXPECT_TRUE(announcer->handle_message(std::data(arr), response_size));
 
     // Confirm that announcer processed the response
     EXPECT_TRUE(response.has_value());

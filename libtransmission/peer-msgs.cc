@@ -305,7 +305,7 @@ public:
         if (torrent->allows_pex())
         {
             pex_timer_ = session->timerMaker().create([this]() { sendPex(); });
-            pex_timer_->startRepeating(SendPexInterval);
+            pex_timer_->start_repeating(SendPexInterval);
         }
 
         if (io->supports_utp())
@@ -1274,7 +1274,7 @@ void prefetchPieces(tr_peerMsgsImpl* msgs)
     {
         if (auto& req = requests[i]; !req.prefetched)
         {
-            msgs->session->cache->prefetchBlock(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length);
+            msgs->session->cache->prefetch_block(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length);
             req.prefetched = true;
         }
     }
@@ -1654,7 +1654,7 @@ int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> 
 
     // NB: if writeBlock() fails the torrent may be paused.
     // If this happens, `msgs` will be a dangling pointer and must no longer be used.
-    if (auto const err = msgs->session->cache->writeBlock(tor->id(), block, std::move(block_data)); err != 0)
+    if (auto const err = msgs->session->cache->write_block(tor->id(), block, std::move(block_data)); err != 0)
     {
         return err;
     }
@@ -1891,7 +1891,7 @@ namespace peer_pulse_helpers
     if (ok)
     {
         ok = msgs->session->cache
-                 ->readBlock(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
+                 ->read_block(msgs->torrent, msgs->torrent->piece_loc(req.index, req.offset), req.length, std::data(buf)) == 0;
     }
 
     if (ok)

@@ -254,19 +254,19 @@ protected:
             real_timer_->stop();
         }
 
-        void setCallback(std::function<void()> callback) override
+        void set_callback(std::function<void()> callback) override
         {
-            real_timer_->setCallback(std::move(callback));
+            real_timer_->set_callback(std::move(callback));
         }
 
-        void setRepeating(bool repeating = true) override
+        void set_repeating(bool repeating = true) override
         {
-            real_timer_->setRepeating(repeating);
+            real_timer_->set_repeating(repeating);
         }
 
-        void setInterval(std::chrono::milliseconds /*interval*/) override
+        void set_interval(std::chrono::milliseconds /*interval*/) override
         {
-            real_timer_->setInterval(MockTimerInterval);
+            real_timer_->set_interval(MockTimerInterval);
         }
 
         void start() override
@@ -279,9 +279,9 @@ protected:
             return real_timer_->interval();
         }
 
-        [[nodiscard]] bool isRepeating() const noexcept override
+        [[nodiscard]] bool is_repeating() const noexcept override
         {
-            return real_timer_->isRepeating();
+            return real_timer_->is_repeating();
         }
 
     private:
@@ -313,12 +313,12 @@ protected:
         {
         }
 
-        [[nodiscard]] std::vector<tr_torrent_id_t> torrentsAllowingDHT() const override
+        [[nodiscard]] std::vector<tr_torrent_id_t> torrents_allowing_dht() const override
         {
             return torrents_allowing_dht_;
         }
 
-        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t id) const override
+        [[nodiscard]] tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t id) const override
         {
             if (auto const iter = info_hashes_.find(id); iter != std::end(info_hashes_))
             {
@@ -328,12 +328,12 @@ protected:
             return {};
         }
 
-        [[nodiscard]] std::string_view configDir() const override
+        [[nodiscard]] std::string_view config_dir() const override
         {
             return config_dir_;
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return mock_timer_maker_;
         }
@@ -343,7 +343,7 @@ protected:
             return mock_dht_;
         }
 
-        void addPex(tr_sha1_digest_t const& /*info_hash*/, tr_pex const* /*pex*/, size_t /*n_pex*/) override
+        void add_pex(tr_sha1_digest_t const& /*info_hash*/, tr_pex const* /*pex*/, size_t /*n_pex*/) override
         {
         }
 
@@ -589,7 +589,7 @@ TEST_F(DhtTest, pingsAddedNodes)
     EXPECT_TRUE(addr.has_value());
     assert(addr.has_value());
     auto constexpr Port = tr_port::fromHost(128);
-    dht->addNode(*addr, Port);
+    dht->add_node(*addr, Port);
 
     ASSERT_EQ(1U, std::size(mediator.mock_dht_.pinged_));
     EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().address);

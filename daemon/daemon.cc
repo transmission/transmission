@@ -777,7 +777,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             };
 
             auto timer_maker = libtransmission::EvTimerMaker{ ev_base_ };
-            watchdir = force_generic ? Watchdir::createGeneric(dir, handler, timer_maker) :
+            watchdir = force_generic ? Watchdir::create_generic(dir, handler, timer_maker) :
                                        Watchdir::create(dir, handler, timer_maker, ev_base_);
         }
     }

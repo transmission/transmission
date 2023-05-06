@@ -56,7 +56,7 @@ bool tr_announce_list::remove(tr_tracker_id_t id)
 
 bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url_sv)
 {
-    if (auto const announce = tr_urlParseTracker(announce_url_sv); !announce || !canAdd(*announce))
+    if (auto const announce = tr_urlParseTracker(announce_url_sv); !announce || !can_add(*announce))
     {
         return false;
     }
@@ -75,19 +75,19 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
 bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t tier)
 {
     auto const announce = tr_urlParseTracker(announce_url_sv);
-    if (!announce || !canAdd(*announce))
+    if (!announce || !can_add(*announce))
     {
         return false;
     }
 
     auto tracker = tracker_info{};
     tracker.announce = announce_url_sv;
-    tracker.tier = getTier(tier, *announce);
-    tracker.id = nextUniqueId();
+    tracker.tier = get_tier(tier, *announce);
+    tracker.id = next_unique_id();
     tracker.host = fmt::format(FMT_STRING("{:s}:{:d}"), announce->host, announce->port);
     tracker.sitename = announce->sitename;
 
-    if (auto const scrape_str = announceToScrape(announce_url_sv); scrape_str)
+    if (auto const scrape_str = announce_to_scrape(announce_url_sv); scrape_str)
     {
         tracker.scrape = *scrape_str;
     }
@@ -121,7 +121,7 @@ void tr_announce_list::add(tr_announce_list const& src)
     }
 }
 
-std::optional<std::string> tr_announce_list::announceToScrape(std::string_view announce)
+std::optional<std::string> tr_announce_list::announce_to_scrape(std::string_view announce)
 {
     // To derive the scrape URL use the following steps:
     // Begin with the announce URL. Find the last '/' in it.
@@ -145,9 +145,9 @@ std::optional<std::string> tr_announce_list::announceToScrape(std::string_view a
     return {};
 }
 
-tr_quark tr_announce_list::announceToScrape(tr_quark announce)
+tr_quark tr_announce_list::announce_to_scrape(tr_quark announce)
 {
-    if (auto const scrape_str = announceToScrape(tr_quark_get_string_view(announce)); scrape_str)
+    if (auto const scrape_str = announce_to_scrape(tr_quark_get_string_view(announce)); scrape_str)
     {
         return tr_quark_new(*scrape_str);
     }
@@ -160,7 +160,7 @@ tr_tracker_tier_t tr_announce_list::nextTier() const
     return std::empty(trackers_) ? 0 : trackers_.back().tier + 1;
 }
 
-tr_tracker_id_t tr_announce_list::nextUniqueId()
+tr_tracker_id_t tr_announce_list::next_unique_id()
 {
     static tr_tracker_id_t id = 0;
     return id++;
@@ -187,7 +187,7 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view a
 // if two announce URLs differ only by scheme, put them in the same tier.
 // (note: this can leave gaps in the `tier` values, but since the calling
 // function doesn't care, there's no point in removing the gaps...)
-tr_tracker_tier_t tr_announce_list::getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const
+tr_tracker_tier_t tr_announce_list::get_tier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const
 {
     auto const is_sibling = [&announce](auto const& tracker)
     {
@@ -207,7 +207,7 @@ tr_tracker_tier_t tr_announce_list::getTier(tr_tracker_tier_t tier, tr_url_parse
     return it != std::end(trackers_) ? it->tier : tier;
 }
 
-bool tr_announce_list::canAdd(tr_url_parsed_t const& announce)
+bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
 {
     // looking at components instead of the full original URL lets
     // us weed out implicit-vs-explicit port duplicates e.g.
@@ -316,7 +316,7 @@ bool tr_announce_list::parse(std::string_view text)
     return true;
 }
 
-std::string tr_announce_list::toString() const
+std::string tr_announce_list::to_string() const
 {
     auto text = std::string{};
     auto current_tier = std::optional<tr_tracker_tier_t>{};

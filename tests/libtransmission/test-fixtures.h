@@ -494,7 +494,7 @@ protected:
     void blockingTorrentVerify(tr_torrent* tor)
     {
         EXPECT_NE(nullptr, tor->session);
-        EXPECT_FALSE(tor->session->amInSessionThread());
+        EXPECT_FALSE(tor->session->am_in_session_thread());
 
         auto verified_lock = std::unique_lock(verified_mutex_);
 
@@ -538,7 +538,7 @@ protected:
         };
 
         session_ = sessionInit(settings());
-        session_->verifier_->addCallback(callback);
+        session_->verifier_->add_callback(callback);
     }
 
     virtual void TearDown() override

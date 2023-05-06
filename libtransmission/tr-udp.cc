@@ -114,12 +114,12 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
         if (session->dht_)
         {
             buf[rc] = '\0'; // libdht requires zero-terminated messages
-            session->dht_->handleMessage(std::data(buf), rc, from_sa, fromlen);
+            session->dht_->handle_message(std::data(buf), rc, from_sa, fromlen);
         }
     }
     else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
     {
-        if (!session->announcer_udp_->handleMessage(std::data(buf), rc))
+        if (!session->announcer_udp_->handle_message(std::data(buf), rc))
         {
             tr_logAddTrace("Couldn't parse UDP tracker packet.");
         }
@@ -170,7 +170,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketTOS(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_.reset(event_new(session_.eventBase(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp4_event_.reset(event_new(session_.event_base(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp4_event_.get(), nullptr);
         }
     }
@@ -204,7 +204,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_.reset(event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp6_event_.reset(event_new(session_.event_base(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp6_event_.get(), nullptr);
 
 #ifdef IPV6_V6ONLY

@@ -115,7 +115,7 @@ private:
         {
         }
 
-        void isActiveChanged(bool is_active, tr_session_alt_speeds::ChangeReason reason) override;
+        void is_active_changed(bool is_active, tr_session_alt_speeds::ChangeReason reason) override;
 
         [[nodiscard]] time_t time() override;
 
@@ -140,7 +140,7 @@ private:
             session_.udp_core_->sendto(buf, buflen, addr, addrlen);
         }
 
-        [[nodiscard]] std::optional<tr_address> announceIP() const override
+        [[nodiscard]] std::optional<tr_address> announce_ip() const override
         {
             if (!session_.useAnnounceIP())
             {
@@ -164,21 +164,21 @@ private:
 
         ~DhtMediator() noexcept override = default;
 
-        [[nodiscard]] std::vector<tr_torrent_id_t> torrentsAllowingDHT() const override;
+        [[nodiscard]] std::vector<tr_torrent_id_t> torrents_allowing_dht() const override;
 
-        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t id) const override;
+        [[nodiscard]] tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t id) const override;
 
-        [[nodiscard]] std::string_view configDir() const override
+        [[nodiscard]] std::string_view config_dir() const override
         {
             return session_.config_dir_;
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();
         }
 
-        void addPex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override;
+        void add_pex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override;
 
     private:
         tr_session& session_;
@@ -192,22 +192,22 @@ private:
         {
         }
 
-        [[nodiscard]] tr_address incomingPeerAddress() const override
+        [[nodiscard]] tr_address incoming_peer_address() const override
         {
             return session_.publicAddress(TR_AF_INET);
         }
 
-        [[nodiscard]] tr_port localPeerPort() const override
+        [[nodiscard]] tr_port local_peer_port() const override
         {
             return session_.localPeerPort();
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return session_.timerMaker();
         }
 
-        void onPortForwarded(tr_port public_port) override
+        void on_port_forwarded(tr_port public_port) override
         {
             if (session_.advertised_peer_port_ != public_port)
             {
@@ -316,9 +316,9 @@ public:
         return *timer_maker_;
     }
 
-    [[nodiscard]] auto amInSessionThread() const noexcept
+    [[nodiscard]] auto am_in_session_thread() const noexcept
     {
-        return session_thread_->amInSessionThread();
+        return session_thread_->am_in_session_thread();
     }
 
     void runInSessionThread(std::function<void(void)>&& func)
@@ -332,9 +332,9 @@ public:
         session_thread_->run(std::forward<Func&&>(func), std::forward<Args>(args)...);
     }
 
-    [[nodiscard]] auto eventBase() noexcept
+    [[nodiscard]] auto* event_base() noexcept
     {
-        return session_thread_->eventBase();
+        return session_thread_->event_base();
     }
 
     [[nodiscard]] constexpr auto& torrents()
@@ -614,19 +614,19 @@ public:
         return session_stats_;
     }
 
-    constexpr void addUploaded(uint32_t n_bytes) noexcept
+    constexpr void add_uploaded(uint32_t n_bytes) noexcept
     {
-        stats().addUploaded(n_bytes);
+        stats().add_uploaded(n_bytes);
     }
 
-    constexpr void addDownloaded(uint32_t n_bytes) noexcept
+    constexpr void add_downloaded(uint32_t n_bytes) noexcept
     {
-        stats().addDownloaded(n_bytes);
+        stats().add_downloaded(n_bytes);
     }
 
-    constexpr void addFileCreated() noexcept
+    constexpr void add_file_created() noexcept
     {
-        stats().addFileCreated();
+        stats().add_file_created();
     }
 
     // The incoming peer port that's been opened on the local machine
@@ -872,7 +872,7 @@ public:
     {
         if (dht_)
         {
-            dht_->addNode(addr, port);
+            dht_->add_node(addr, port);
         }
     }
 

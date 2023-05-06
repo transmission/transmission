@@ -200,7 +200,7 @@ int tr_main(int argc, char* argv[])
     fmt::print("Creating torrent \"{:s}\"\n", options.outfile);
 
     auto builder = tr_metainfo_builder(options.infile);
-    auto const n_files = builder.fileCount();
+    auto const n_files = builder.file_count();
     if (n_files == 0U)
     {
         fprintf(stderr, "ERROR: Cannot find specified input file or directory.\n");
@@ -218,45 +218,45 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    if (options.piece_size != 0 && !builder.setPieceSize(options.piece_size))
+    if (options.piece_size != 0 && !builder.set_piece_size(options.piece_size))
     {
         fmt::print(stderr, "ERROR: piece size must be at least 16 KiB and must be a power of two.\n");
         return EXIT_FAILURE;
     }
 
     fmt::print(
-        tr_ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.fileCount()),
-        fmt::arg("file_count", builder.fileCount()),
-        fmt::arg("total_size", tr_formatter_size_B(builder.totalSize())));
+        tr_ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.file_count()),
+        fmt::arg("file_count", builder.file_count()),
+        fmt::arg("total_size", tr_formatter_size_B(builder.total_size())));
 
     fmt::print(
         tr_ngettext(
             "{piece_count:L} piece, {piece_size}\n",
             "{piece_count:L} pieces, {piece_size} each\n",
-            builder.pieceCount()),
-        fmt::arg("piece_count", builder.pieceCount()),
-        fmt::arg("piece_size", tr_formatter_size_B(builder.pieceSize())));
+            builder.piece_count()),
+        fmt::arg("piece_count", builder.piece_count()),
+        fmt::arg("piece_size", tr_formatter_size_B(builder.piece_size())));
 
     if (!std::empty(options.comment))
     {
-        builder.setComment(options.comment);
+        builder.set_comment(options.comment);
     }
 
     if (!std::empty(options.source))
     {
-        builder.setSource(options.source);
+        builder.set_source(options.source);
     }
 
-    builder.setPrivate(options.is_private);
-    builder.setAnonymize(options.anonymize);
-    builder.setWebseeds(std::move(options.webseeds));
-    builder.setAnnounceList(std::move(options.trackers));
+    builder.set_private(options.is_private);
+    builder.set_anonymize(options.anonymize);
+    builder.set_webseeds(std::move(options.webseeds));
+    builder.set_announce_list(std::move(options.trackers));
 
-    auto future = builder.makeChecksums();
+    auto future = builder.make_checksums();
     auto last = std::optional<tr_piece_index_t>{};
     while (future.wait_for(std::chrono::milliseconds(500)) != std::future_status::ready)
     {
-        auto const [current, total] = builder.checksumStatus();
+        auto const [current, total] = builder.checksum_status();
 
         if (!last || current != *last)
         {

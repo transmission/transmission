@@ -24,12 +24,12 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" // tr_time(), tr_formatter
 
-Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
+Cache::Key Cache::make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {
     return std::make_pair(torrent->id(), loc.block);
 }
 
-std::pair<Cache::CIter, Cache::CIter> Cache::findContiguous(CIter const begin, CIter const end, CIter const iter) noexcept
+std::pair<Cache::CIter, Cache::CIter> Cache::find_contiguous(CIter const begin, CIter const end, CIter const iter) noexcept
 {
     if (iter == end)
     {
@@ -70,7 +70,7 @@ std::pair<Cache::CIter, Cache::CIter> Cache::findContiguous(CIter const begin, C
     return std::make_pair(span_begin, span_end);
 }
 
-int Cache::writeContiguous(CIter const begin, CIter const end) const
+int Cache::write_contiguous(CIter const begin, CIter const end) const
 {
     // The most common case without an extra data copy.
     auto const* towrite = begin->buf.get();
@@ -117,31 +117,31 @@ int Cache::writeContiguous(CIter const begin, CIter const end) const
     return {};
 }
 
-size_t Cache::getMaxBlocks(int64_t max_bytes) noexcept
+size_t Cache::get_max_blocks(int64_t max_bytes) noexcept
 {
     return std::lldiv(max_bytes, tr_block_info::BlockSize).quot;
 }
 
-int Cache::setLimit(int64_t new_limit)
+int Cache::set_limit(int64_t new_limit)
 {
     max_bytes_ = new_limit;
-    max_blocks_ = getMaxBlocks(new_limit);
+    max_blocks_ = get_max_blocks(new_limit);
 
     tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(max_bytes_), max_blocks_));
 
-    return cacheTrim();
+    return cache_trim();
 }
 
 Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
     : torrents_{ torrents }
-    , max_blocks_(getMaxBlocks(max_bytes))
+    , max_blocks_(get_max_blocks(max_bytes))
     , max_bytes_(max_bytes)
 {
 }
 
 // ---
 
-int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme)
+int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme)
 {
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
@@ -158,15 +158,15 @@ int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniqu
     ++cache_writes_;
     cache_write_bytes_ += std::size(*iter->buf);
 
-    return cacheTrim();
+    return cache_trim();
 }
 
-Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept
+Cache::CIter Cache::get_block(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept
 {
     if (auto const [begin, end] = std::equal_range(
             std::begin(blocks_),
             std::end(blocks_),
-            makeKey(torrent, loc),
+            make_key(torrent, loc),
             CompareCacheBlockByKey{});
         begin < end)
     {
@@ -176,9 +176,9 @@ Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location 
     return std::end(blocks_);
 }
 
-int Cache::readBlock(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme)
+int Cache::read_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme)
 {
-    if (auto const iter = getBlock(torrent, loc); iter != std::end(blocks_))
+    if (auto const iter = get_block(torrent, loc); iter != std::end(blocks_))
     {
         std::copy_n(std::begin(*iter->buf), len, setme);
         return {};
@@ -187,9 +187,9 @@ int Cache::readBlock(tr_torrent* torrent, tr_block_info::Location const& loc, ui
     return tr_ioRead(torrent, loc, len, setme);
 }
 
-int Cache::prefetchBlock(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len)
+int Cache::prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len)
 {
-    if (auto const iter = getBlock(torrent, loc); iter != std::end(blocks_))
+    if (auto const iter = get_block(torrent, loc); iter != std::end(blocks_))
     {
         return {}; // already have it
     }
@@ -199,13 +199,13 @@ int Cache::prefetchBlock(tr_torrent* torrent, tr_block_info::Location const& loc
 
 // ---
 
-int Cache::flushSpan(CIter const begin, CIter const end)
+int Cache::flush_span(CIter const begin, CIter const end)
 {
     for (auto walk = begin; walk < end;)
     {
-        auto const [contig_begin, contig_end] = findContiguous(begin, end, walk);
+        auto const [contig_begin, contig_end] = find_contiguous(begin, end, walk);
 
-        if (auto const err = writeContiguous(contig_begin, contig_end); err != 0)
+        if (auto const err = write_contiguous(contig_begin, contig_end); err != 0)
         {
             return err;
         }
@@ -217,28 +217,28 @@ int Cache::flushSpan(CIter const begin, CIter const end)
     return {};
 }
 
-int Cache::flushFile(tr_torrent const* torrent, tr_file_index_t file)
+int Cache::flush_file(tr_torrent const* torrent, tr_file_index_t file)
 {
     auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
     auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, file);
 
-    return flushSpan(
+    return flush_span(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), compare),
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), compare));
 }
 
-int Cache::flushTorrent(tr_torrent const* torrent)
+int Cache::flush_torrent(tr_torrent const* torrent)
 {
     auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
 
-    return flushSpan(
+    return flush_span(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), compare),
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), compare));
 }
 
-int Cache::flushOldest()
+int Cache::flush_oldest()
 {
     auto const oldest = std::min_element(
         std::begin(blocks_),
@@ -250,9 +250,9 @@ int Cache::flushOldest()
         return 0;
     }
 
-    auto const [begin, end] = findContiguous(std::begin(blocks_), std::end(blocks_), oldest);
+    auto const [begin, end] = find_contiguous(std::begin(blocks_), std::end(blocks_), oldest);
 
-    if (auto const err = writeContiguous(begin, end); err != 0)
+    if (auto const err = write_contiguous(begin, end); err != 0)
     {
         return err;
     }
@@ -261,11 +261,11 @@ int Cache::flushOldest()
     return 0;
 }
 
-int Cache::cacheTrim()
+int Cache::cache_trim()
 {
     while (std::size(blocks_) > max_blocks_)
     {
-        if (auto const err = flushOldest(); err != 0)
+        if (auto const err = flush_oldest(); err != 0)
         {
             return err;
         }

@@ -13,7 +13,7 @@
 
 using namespace std::literals;
 
-tr_session_stats tr_stats::loadOldStats(std::string_view config_dir)
+tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
 {
     auto ret = tr_session_stats{};
 

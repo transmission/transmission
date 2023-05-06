@@ -168,7 +168,7 @@ public:
         , bandwidth_{ &tor->bandwidth_ }
     {
         have_.set_has_all();
-        idle_timer_->startRepeating(IdleTimerInterval);
+        idle_timer_->start_repeating(IdleTimerInterval);
     }
 
     tr_webseed(tr_webseed&&) = delete;
@@ -352,7 +352,7 @@ public:
     {
         if (auto const* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
         {
-            session_->cache->writeBlock(tor_id_, block_, std::move(data_));
+            session_->cache->write_block(tor_id_, block_, std::move(data_));
             webseed_->publish(tr_peer_event::GotBlock(tor->block_info(), block_));
         }
 

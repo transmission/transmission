@@ -58,7 +58,7 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
     return 0;
 }
 
-bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& stop_flag)
+bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& stop_flag)
 {
     auto const begin = tr_time();
 
@@ -177,7 +177,7 @@ bool tr_verify_worker::verifyTorrent(tr_torrent* tor, std::atomic<bool> const& s
     return changed;
 }
 
-void tr_verify_worker::verifyThreadFunc()
+void tr_verify_worker::verify_thread_func()
 {
     for (;;)
     {
@@ -205,7 +205,7 @@ void tr_verify_worker::verifyThreadFunc()
         auto* const tor = current_node_->torrent;
         tr_logAddTraceTor(tor, "Verifying torrent");
         tor->set_verify_state(TR_VERIFY_NOW);
-        auto const changed = verifyTorrent(tor, stop_current_);
+        auto const changed = verify_torrent(tor, stop_current_);
         tor->set_verify_state(TR_VERIFY_NONE);
         TR_ASSERT(tr_isTorrent(tor));
 
@@ -214,7 +214,7 @@ void tr_verify_worker::verifyThreadFunc()
             tor->set_dirty();
         }
 
-        callCallback(tor, stop_current_);
+        call_callback(tor, stop_current_);
     }
 }
 
@@ -233,7 +233,7 @@ void tr_verify_worker::add(tr_torrent* tor)
 
     if (!verify_thread_id_)
     {
-        auto thread = std::thread(&tr_verify_worker::verifyThreadFunc, this);
+        auto thread = std::thread(&tr_verify_worker::verify_thread_func, this);
         verify_thread_id_ = thread.get_id();
         thread.detach();
     }
@@ -261,7 +261,7 @@ void tr_verify_worker::remove(tr_torrent* tor)
 
         if (iter != std::end(todo_))
         {
-            callCallback(tor, true);
+            call_callback(tor, true);
             todo_.erase(iter);
         }
     }

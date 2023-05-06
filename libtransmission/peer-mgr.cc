@@ -543,7 +543,7 @@ public:
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
                 tor->set_date_active(now);
                 tor->set_dirty();
-                tor->session->addUploaded(event.length);
+                tor->session->add_uploaded(event.length);
 
                 if (peer->atom != nullptr)
                 {
@@ -561,7 +561,7 @@ public:
                 tor->downloadedCur += event.length;
                 tor->set_date_active(now);
                 tor->set_dirty();
-                tor->session->addDownloaded(event.length);
+                tor->session->add_downloaded(event.length);
 
                 if (peer->atom != nullptr)
                 {
@@ -690,9 +690,9 @@ struct tr_peerMgr
         , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulseMarshall(); }) }
         , refill_upkeep_timer_{ session->timerMaker().create([this]() { refillUpkeep(); }) }
     {
-        bandwidth_timer_->startRepeating(BandwidthPeriod);
-        rechoke_timer_->startRepeating(RechokePeriod);
-        refill_upkeep_timer_->startRepeating(RefillUpkeepPeriod);
+        bandwidth_timer_->start_repeating(BandwidthPeriod);
+        rechoke_timer_->start_repeating(RechokePeriod);
+        refill_upkeep_timer_->start_repeating(RefillUpkeepPeriod);
     }
 
     tr_peerMgr(tr_peerMgr&&) = delete;
@@ -713,7 +713,7 @@ struct tr_peerMgr
 
     void rechokeSoon() noexcept
     {
-        rechoke_timer_->setInterval(100ms);
+        rechoke_timer_->set_interval(100ms);
     }
 
     void bandwidthPulse();
@@ -737,7 +737,7 @@ private:
     void rechokePulseMarshall()
     {
         rechokePulse();
-        rechoke_timer_->setInterval(RechokePeriod);
+        rechoke_timer_->set_interval(RechokePeriod);
     }
 
     std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;

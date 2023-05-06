@@ -855,7 +855,7 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
 void torrentStop(tr_torrent* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->session->amInSessionThread());
+    TR_ASSERT(tor->session->am_in_session_thread());
     auto const lock = tor->unique_lock();
 
     tor->is_running_ = false;
@@ -913,7 +913,7 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
 
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->session != nullptr);
-    TR_ASSERT(tor->session->amInSessionThread());
+    TR_ASSERT(tor->session->am_in_session_thread());
 
     if (!tor->session->isClosing())
     {
@@ -1226,7 +1226,7 @@ void setLocationInSessionThread(
     int volatile* setme_state)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->session->amInSessionThread());
+    TR_ASSERT(tor->session->am_in_session_thread());
 
     auto ok = bool{ true };
     if (move_from_old_path)
@@ -1754,7 +1754,7 @@ namespace verify_helpers
 {
 void onVerifyDoneThreadFunc(tr_torrent* const tor)
 {
-    TR_ASSERT(tor->session->amInSessionThread());
+    TR_ASSERT(tor->session->am_in_session_thread());
 
     if (tor->is_deleting_)
     {
@@ -1773,7 +1773,7 @@ void onVerifyDoneThreadFunc(tr_torrent* const tor)
 
 void verifyTorrent(tr_torrent* const tor)
 {
-    TR_ASSERT(tor->session->amInSessionThread());
+    TR_ASSERT(tor->session->am_in_session_thread());
     auto const lock = tor->unique_lock();
 
     if (tor->is_deleting_)
@@ -2345,7 +2345,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     using namespace got_block_helpers;
 
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->session->amInSessionThread());
+    TR_ASSERT(tor->session->am_in_session_thread());
 
     if (tor->has_block(block))
     {

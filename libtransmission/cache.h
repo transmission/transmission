@@ -28,20 +28,20 @@ class Cache
 public:
     Cache(tr_torrents& torrents, int64_t max_bytes);
 
-    int setLimit(int64_t new_limit);
+    int set_limit(int64_t new_limit);
 
-    [[nodiscard]] constexpr auto getLimit() const noexcept
+    [[nodiscard]] constexpr auto get_limit() const noexcept
     {
         return max_bytes_;
     }
 
     // @return any error code from cacheTrim()
-    int writeBlock(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme);
+    int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme);
 
-    int readBlock(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme);
-    int prefetchBlock(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len);
-    int flushTorrent(tr_torrent const* torrent);
-    int flushFile(tr_torrent const* torrent, tr_file_index_t file);
+    int read_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme);
+    int prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len);
+    int flush_torrent(tr_torrent const* torrent);
+    int flush_file(tr_torrent const* torrent, tr_file_index_t file);
 
 private:
     using Key = std::pair<tr_torrent_id_t, tr_block_index_t>;
@@ -68,25 +68,25 @@ private:
         }
     };
 
-    [[nodiscard]] static Key makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept;
+    [[nodiscard]] static Key make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept;
 
-    [[nodiscard]] static std::pair<CIter, CIter> findContiguous(CIter const begin, CIter const end, CIter const iter) noexcept;
+    [[nodiscard]] static std::pair<CIter, CIter> find_contiguous(CIter const begin, CIter const end, CIter const iter) noexcept;
 
     // @return any error code from tr_ioWrite()
-    [[nodiscard]] int writeContiguous(CIter const begin, CIter const end) const;
+    [[nodiscard]] int write_contiguous(CIter const begin, CIter const end) const;
 
     // @return any error code from writeContiguous()
-    [[nodiscard]] int flushSpan(CIter const begin, CIter const end);
+    [[nodiscard]] int flush_span(CIter const begin, CIter const end);
 
     // @return any error code from writeContiguous()
-    [[nodiscard]] int flushOldest();
+    [[nodiscard]] int flush_oldest();
 
     // @return any error code from writeContiguous()
-    [[nodiscard]] int cacheTrim();
+    [[nodiscard]] int cache_trim();
 
-    [[nodiscard]] static size_t getMaxBlocks(int64_t max_bytes) noexcept;
+    [[nodiscard]] static size_t get_max_blocks(int64_t max_bytes) noexcept;
 
-    [[nodiscard]] CIter getBlock(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept;
+    [[nodiscard]] CIter get_block(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept;
 
     tr_torrents& torrents_;
 

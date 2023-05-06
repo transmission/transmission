@@ -25,7 +25,7 @@ public:
         , start_time_{ now }
     {
         single_.sessionCount = 1;
-        old_ = loadOldStats(config_dir_);
+        old_ = load_old_stats(config_dir_);
     }
 
     ~tr_stats()
@@ -42,17 +42,17 @@ public:
         return add(current(), old_);
     }
 
-    constexpr void addUploaded(uint32_t n_bytes) noexcept
+    constexpr void add_uploaded(uint32_t n_bytes) noexcept
     {
         single_.uploadedBytes += n_bytes;
     }
 
-    constexpr void addDownloaded(uint32_t n_bytes) noexcept
+    constexpr void add_downloaded(uint32_t n_bytes) noexcept
     {
         single_.downloadedBytes += n_bytes;
     }
 
-    constexpr void addFileCreated() noexcept
+    constexpr void add_file_created() noexcept
     {
         ++single_.filesAdded;
     }
@@ -62,7 +62,7 @@ public:
 private:
     static tr_session_stats add(tr_session_stats const& a, tr_session_stats const& b);
 
-    static tr_session_stats loadOldStats(std::string_view config_dir);
+    static tr_session_stats load_old_stats(std::string_view config_dir);
 
     std::string const config_dir_;
     time_t start_time_;

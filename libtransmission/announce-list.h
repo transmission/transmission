@@ -121,18 +121,18 @@ public:
      * - Blank line denotes a new tier
      */
     bool parse(std::string_view text);
-    [[nodiscard]] std::string toString() const;
+    [[nodiscard]] std::string to_string() const;
 
     bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
 
-    [[nodiscard]] static std::optional<std::string> announceToScrape(std::string_view announce);
-    [[nodiscard]] static tr_quark announceToScrape(tr_quark announce);
+    [[nodiscard]] static std::optional<std::string> announce_to_scrape(std::string_view announce);
+    [[nodiscard]] static tr_quark announce_to_scrape(tr_quark announce);
 
 private:
-    [[nodiscard]] tr_tracker_tier_t getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
+    [[nodiscard]] tr_tracker_tier_t get_tier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
 
-    bool canAdd(tr_url_parsed_t const& announce);
-    static tr_tracker_id_t nextUniqueId();
+    [[nodiscard]] bool can_add(tr_url_parsed_t const& announce) const noexcept;
+    static tr_tracker_id_t next_unique_id();
     trackers_t::iterator find(std::string_view announce);
     trackers_t::iterator find(tr_tracker_id_t id);
 
