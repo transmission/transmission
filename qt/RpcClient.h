@@ -60,18 +60,10 @@ public:
     void start(QUrl const& url);
 
     bool isLocal() const;
+    QUrl const& url() const;
 
-    [[nodiscard]] constexpr auto& url() const noexcept
-    {
-        return url_;
-    }
-
+    RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
-
-    auto exec(tr_quark method, tr_variant* args)
-    {
-        return exec(tr_quark_get_string_view(method), args);
-    }
 
 signals:
     void httpAuthenticationRequired();
@@ -86,11 +78,7 @@ private slots:
 private:
     RpcResponseFuture sendRequest(TrVariantPtr json);
     QNetworkAccessManager* networkAccessManager();
-
-    [[nodiscard]] constexpr auto getNextTag() noexcept
-    {
-        return next_tag_++;
-    }
+    int64_t getNextTag();
 
     void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);

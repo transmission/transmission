@@ -90,6 +90,16 @@ bool RpcClient::isLocal() const
     return false;
 }
 
+QUrl const& RpcClient::url() const
+{
+    return url_;
+}
+
+RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
+{
+    return exec(tr_quark_get_string_view(method), args);
+}
+
 RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
 {
     TrVariantPtr const json = createVariant();
@@ -102,6 +112,11 @@ RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
     }
 
     return sendRequest(json);
+}
+
+int64_t RpcClient::getNextTag()
+{
+    return next_tag_++;
 }
 
 void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise)
