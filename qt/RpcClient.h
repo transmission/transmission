@@ -60,7 +60,11 @@ public:
     void start(QUrl const& url);
 
     bool isLocal() const;
-    QUrl const& url() const;
+
+    [[nodiscard]] constexpr auto& url() const noexcept
+    {
+        return url_;
+    }
 
     RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
@@ -79,7 +83,7 @@ private:
     RpcResponseFuture sendRequest(TrVariantPtr json);
     QNetworkAccessManager* networkAccessManager();
 
-    [[nodiscard]] constexpr auto getNextTag()
+    [[nodiscard]] constexpr auto getNextTag() noexcept
     {
         return next_tag_++;
     }
