@@ -2191,7 +2191,7 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     now_timer_->start_repeating(1s);
 
     dns_timer_ = timerMaker().create([this]() { onDnsTimer(); });
-    dns_timer_->startRepeating(10min);
+    dns_timer_->start_repeating(10min);
 
     // Periodically save the .resume files of any torrents whose
     // status has recently changed. This prevents loss of metadata
@@ -2240,7 +2240,7 @@ void tr_session::update_dns_cache(tr_torrent const* tor)
     using DnsCache = libtransmission::DnsCache;
 
     auto const now = tr_time();
-    for (auto const& tracker : tor->announceList())
+    for (auto const& tracker : tor->announce_list())
     {
         auto const host = tracker.announce_parsed.host;
         auto const port = tr_port::fromHost(tracker.announce_parsed.port);
