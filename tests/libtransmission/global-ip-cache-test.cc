@@ -98,17 +98,17 @@ protected:
 
 TEST_F(GlobalIPCacheTest, bindAddr)
 {
-    static auto const Ipv4Tests = std::array<std::pair<std::string, std::string_view>, 4>{
-        { { "8.8.8.8"s, "8.8.8.8"sv },
-          { "192.168.133.133"s, "192.168.133.133"sv },
-          { "2001:1890:1112:1::20"s, "0.0.0.0"sv },
-          { "asdasd"s, "0.0.0.0"sv } }
+    static constexpr auto Ipv4Tests = std::array<std::pair<std::string_view, std::string_view>, 4>{
+        { { "8.8.8.8"sv, "8.8.8.8"sv },
+          { "192.168.133.133"sv, "192.168.133.133"sv },
+          { "2001:1890:1112:1::20"sv, "0.0.0.0"sv },
+          { "asdasd"sv, "0.0.0.0"sv } }
     };
-    static auto const Ipv6Tests = std::array<std::pair<std::string, std::string_view>, 4>{
-        { { "fd12:3456:789a:1::1"s, "fd12:3456:789a:1::1"sv },
-          { "192.168.133.133"s, "::"sv },
-          { "2001:1890:1112:1::20"s, "2001:1890:1112:1::20"sv },
-          { "asdasd"s, "::"sv } }
+    static constexpr auto Ipv6Tests = std::array<std::pair<std::string_view, std::string_view>, 4>{
+        { { "fd12:3456:789a:1::1"sv, "fd12:3456:789a:1::1"sv },
+          { "192.168.133.133"sv, "::"sv },
+          { "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv },
+          { "asdasd"sv, "::"sv } }
     };
 
     // IPv4
