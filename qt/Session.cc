@@ -1040,7 +1040,7 @@ void Session::addTorrent(AddData add_me, tr_variant* args_dict, bool trash_origi
         });
 
     q->add(
-        [this, add_me](RpcResponse const& r)
+        [this, add_me, trash_original](RpcResponse const& r)
         {
             bool session_has_torrent = false;
 
@@ -1060,22 +1060,22 @@ void Session::addTorrent(AddData add_me, tr_variant* args_dict, bool trash_origi
                 }
             }
 
-            if (session_has_torrent && !add_me.filename.isEmpty())
+            if (auto const& filename = add_me.filename;
+                session_has_torrent && !filename.isEmpty() && add_me.type == AddData::FILENAME)
             {
-                QFile(add_me.filename).rename(QStringLiteral("%1.added").arg(add_me.filename));
+                auto file = QFile{ filename };
+
+                if (trash_original)
+                {
+                    file.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
+                    file.remove();
+                }
+                else
+                {
+                    file.rename(QStringLiteral("%1.added").arg(filename));
+                }
             }
         });
-
-    if (trash_original && add_me.type == AddData::FILENAME)
-    {
-        q->add(
-            [add_me]()
-            {
-                QFile original(add_me.filename);
-                original.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
-                original.remove();
-            });
-    }
 
     q->run();
 }
