@@ -78,7 +78,11 @@ private slots:
 private:
     RpcResponseFuture sendRequest(TrVariantPtr json);
     QNetworkAccessManager* networkAccessManager();
-    int64_t getNextTag();
+
+    [[nodiscard]] constexpr auto getNextTag()
+    {
+        return next_tag_++;
+    }
 
     void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);

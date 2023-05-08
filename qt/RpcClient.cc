@@ -114,11 +114,6 @@ RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
     return sendRequest(json);
 }
 
-int64_t RpcClient::getNextTag()
-{
-    return next_tag_++;
-}
-
 void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise)
 {
     if (!request_)
