@@ -270,7 +270,7 @@ std::unique_ptr<tr_announcer> tr_announcer::create(
 struct tr_tracker
 {
     explicit tr_tracker(tr_announcer_impl* announcer, tr_announce_list::tracker_info const& info)
-        : host{ info.host }
+        : host_and_port{ info.host_and_port }
         , announce_url{ info.announce }
         , sitename{ info.sitename }
         , scrape_info{ std::empty(info.scrape) ? nullptr : announcer->scrape_info(info.scrape) }
@@ -305,7 +305,7 @@ struct tr_tracker
         }
     }
 
-    tr_interned_string const host;
+    tr_interned_string const host_and_port;
     tr_interned_string const announce_url;
     std::string_view const sitename;
     tr_scrape_info* const scrape_info;
@@ -443,8 +443,8 @@ struct tr_tier
     {
         auto const* const torrent_name = tr_torrentName(tor);
         auto const* const current_tracker = currentTracker();
-        auto const host_sv = current_tracker == nullptr ? "?"sv : current_tracker->host.sv();
-        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s} at {:s}"), torrent_name, host_sv).out = '\0';
+        auto const host_and_port_sv = current_tracker == nullptr ? "?"sv : current_tracker->host_and_port.sv();
+        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s} at {:s}"), torrent_name, host_and_port_sv).out = '\0';
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -1250,10 +1250,10 @@ void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* e
 
     // schedule a rescrape
     auto const interval = current_tracker->getRetryInterval();
-    auto const* const host_cstr = current_tracker->host.c_str();
+    auto const* const host_and_port_cstr = current_tracker->host_and_port.c_str();
     tr_logAddDebugTier(
         tier,
-        fmt::format("Tracker '{}' scrape error: {} (Retrying in {} seconds)", host_cstr, errmsg, interval));
+        fmt::format("Tracker '{}' scrape error: {} (Retrying in {} seconds)", host_and_port_cstr, errmsg, interval));
     tier->lastScrapeSucceeded = false;
     tier->scheduleNextScrape(interval);
 }
@@ -1625,7 +1625,7 @@ namespace tracker_view_helpers
     auto const now = tr_time();
     auto view = tr_tracker_view{};
 
-    view.host = tracker.host.c_str();
+    view.host_and_port = tracker.host_and_port.c_str();
     view.announce = tracker.announce_url.c_str();
     view.scrape = tracker.scrape_info == nullptr ? "" : tracker.scrape_info->scrape_url.c_str();
     *std::copy_n(
