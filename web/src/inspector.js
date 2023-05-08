@@ -724,6 +724,23 @@ export class Inspector extends EventTarget {
     };
   }
 
+  static _getOrigin(tracker) {
+    try {
+      // `new URL` fails on FF and Chrome when the scheme is 'udp',
+      // so munge the URL to be something that won't break
+      const udp_prefix = 'udp://';
+      const is_udp = tracker.announce.startsWith(udp_prefix);
+      if (is_udp) {
+        const http_prefix = 'http://';
+        const munged = tracker.announce.replace(udp_prefix, http_prefix);
+        return new URL(munged).origin.replace(http_prefix, udp_prefix);
+      }
+      return new URL(tracker.announce).origin;
+    } catch {
+      return [tracker.sitename || tracker.host || tracker.announce];
+    }
+  }
+
   _updateTiers() {
     const na = 'N/A';
     const { list } = this.elements.tiers;
@@ -752,12 +769,7 @@ export class Inspector extends EventTarget {
         tier_div.classList.add('tier-list-row', index % 2 ? 'odd' : 'even');
 
         let element = document.createElement('div');
-        let site = '';
-        try {
-          site = new URL(tracker.announce).origin;
-        } catch {
-          site = [tracker.sitename || tracker.host || tracker.announce];
-        }
+        const site = Inspector._getOrigin(tracker);
         element.classList.add('tier-list-tracker');
         setTextContent(element, `${site} - tier ${tracker.tier + 1}`);
         element.setAttribute('title', tracker.announce);

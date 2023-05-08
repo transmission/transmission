@@ -11,7 +11,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "tr-macros.h" // tr_sha1_digest_t
 

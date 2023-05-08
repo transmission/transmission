@@ -18,7 +18,7 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" // tr_time_msec()
 
-tr_bytes_per_second_t tr_bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
+tr_bytes_per_second_t tr_bandwidth::get_speed_bytes_per_second(RateControl& r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
     {
@@ -52,7 +52,7 @@ tr_bytes_per_second_t tr_bandwidth::getSpeedBytesPerSecond(RateControl& r, unsig
     return r.cache_val_;
 }
 
-void tr_bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r, size_t size)
+void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateControl* r, size_t size)
 {
     if (r->date_[r->newest_] + GranularityMSec >= now)
     {
@@ -77,7 +77,7 @@ void tr_bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl*
 
 tr_bandwidth::tr_bandwidth(tr_bandwidth* parent)
 {
-    this->setParent(parent);
+    this->set_parent(parent);
 }
 
 // ---
@@ -112,7 +112,7 @@ void tr_bandwidth::deparent() noexcept
     parent_ = nullptr;
 }
 
-void tr_bandwidth::setParent(tr_bandwidth* new_parent)
+void tr_bandwidth::set_parent(tr_bandwidth* new_parent)
 {
     TR_ASSERT(this != new_parent);
 
@@ -133,7 +133,7 @@ void tr_bandwidth::setParent(tr_bandwidth* new_parent)
 
 // ---
 
-void tr_bandwidth::allocateBandwidth(
+void tr_bandwidth::allocate_bandwidth(
     tr_priority_t parent_priority,
     unsigned int period_msec,
     std::vector<std::shared_ptr<tr_peerIo>>& peer_pool)
@@ -160,11 +160,11 @@ void tr_bandwidth::allocateBandwidth(
     // traverse & repeat for the subtree
     for (auto* child : this->children_)
     {
-        child->allocateBandwidth(priority, period_msec, peer_pool);
+        child->allocate_bandwidth(priority, period_msec, peer_pool);
     }
 }
 
-void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peers, tr_direction dir)
+void tr_bandwidth::phase_one(std::vector<tr_peerIo*>& peers, tr_direction dir)
 {
     // First phase of IO. Tries to distribute bandwidth fairly to keep faster
     // peers from starving the others.
@@ -215,7 +215,7 @@ void tr_bandwidth::allocate(unsigned int period_msec)
     // allocateBandwidth () is a helper function with two purposes:
     // 1. allocate bandwidth to b and its subtree
     // 2. accumulate an array of all the peerIos from b and its subtree.
-    this->allocateBandwidth(TR_PRI_LOW, period_msec, refs);
+    this->allocate_bandwidth(TR_PRI_LOW, period_msec, refs);
 
     for (auto const& io : refs)
     {
@@ -242,8 +242,8 @@ void tr_bandwidth::allocate(unsigned int period_msec)
     // and/or peers that can use it
     for (auto& peers : peer_arrays)
     {
-        phaseOne(peers, TR_UP);
-        phaseOne(peers, TR_DOWN);
+        phase_one(peers, TR_UP);
+        phase_one(peers, TR_DOWN);
     }
 
     // Second phase of IO. To help us scale in high bandwidth situations,
@@ -276,8 +276,8 @@ size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) co
                 now = tr_time_msec();
             }
 
-            auto const current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
-            auto const desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
+            auto const current = this->get_raw_speed_bytes_per_second(now, TR_DOWN);
+            auto const desired = this->get_desired_speed_bytes_per_second(TR_DOWN);
             auto const r = desired >= 1 ? static_cast<double>(current) / desired : 0.0;
 
             if (r > 1.0)
@@ -303,7 +303,7 @@ size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) co
     return byte_count;
 }
 
-void tr_bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, bool is_piece_data, uint64_t now)
+void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count, bool is_piece_data, uint64_t now)
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -330,35 +330,35 @@ void tr_bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, 
 
 #endif
 
-    notifyBandwidthConsumedBytes(now, &band->raw_, byte_count);
+    notify_bandwidth_consumed_bytes(now, &band->raw_, byte_count);
 
     if (is_piece_data)
     {
-        notifyBandwidthConsumedBytes(now, &band->piece_, byte_count);
+        notify_bandwidth_consumed_bytes(now, &band->piece_, byte_count);
     }
 
     if (this->parent_ != nullptr)
     {
-        this->parent_->notifyBandwidthConsumed(dir, byte_count, is_piece_data, now);
+        this->parent_->notify_bandwidth_consumed(dir, byte_count, is_piece_data, now);
     }
 }
 
 // ---
 
-tr_bandwidth_limits tr_bandwidth::getLimits() const
+tr_bandwidth_limits tr_bandwidth::get_limits() const
 {
     tr_bandwidth_limits limits;
-    limits.up_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_UP));
-    limits.down_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_DOWN));
-    limits.up_limited = this->isLimited(TR_UP);
-    limits.down_limited = this->isLimited(TR_DOWN);
+    limits.up_limit_KBps = tr_toSpeedKBps(this->get_desired_speed_bytes_per_second(TR_UP));
+    limits.down_limit_KBps = tr_toSpeedKBps(this->get_desired_speed_bytes_per_second(TR_DOWN));
+    limits.up_limited = this->is_limited(TR_UP);
+    limits.down_limited = this->is_limited(TR_DOWN);
     return limits;
 }
 
-void tr_bandwidth::setLimits(tr_bandwidth_limits const* limits)
+void tr_bandwidth::set_limits(tr_bandwidth_limits const* limits)
 {
-    this->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(limits->up_limit_KBps));
-    this->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(limits->down_limit_KBps));
-    this->setLimited(TR_UP, limits->up_limited);
-    this->setLimited(TR_DOWN, limits->down_limited);
+    this->set_desired_speed_bytes_per_second(TR_UP, tr_toSpeedBytes(limits->up_limit_KBps));
+    this->set_desired_speed_bytes_per_second(TR_DOWN, tr_toSpeedBytes(limits->down_limit_KBps));
+    this->set_limited(TR_UP, limits->up_limited);
+    this->set_limited(TR_DOWN, limits->down_limited);
 }

@@ -26,17 +26,17 @@ struct CompareTorrentByHash
 
     bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
-        return (*this)(a->infoHash(), b->infoHash());
+        return (*this)(a->info_hash(), b->info_hash());
     }
 
     bool operator()(tr_torrent const* a, tr_sha1_digest_t const& b) const
     {
-        return (*this)(a->infoHash(), b);
+        return (*this)(a->info_hash(), b);
     }
 
     bool operator()(tr_sha1_digest_t const& a, tr_torrent const* b) const
     {
-        return (*this)(a, b->infoHash());
+        return (*this)(a, b->info_hash());
     }
 };
 
@@ -45,7 +45,7 @@ struct CompareTorrentByHash
 tr_torrent* tr_torrents::get(std::string_view magnet_link)
 {
     auto magnet = tr_magnet_metainfo{};
-    return magnet.parseMagnet(magnet_link) ? get(magnet.infoHash()) : nullptr;
+    return magnet.parseMagnet(magnet_link) ? get(magnet.info_hash()) : nullptr;
 }
 
 tr_torrent* tr_torrents::get(tr_sha1_digest_t const& hash)

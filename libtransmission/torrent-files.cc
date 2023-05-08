@@ -13,7 +13,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

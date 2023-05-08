@@ -323,7 +323,7 @@ TEST_F(AnnounceListTest, announceToScrape)
 
     for (auto const test : Tests)
     {
-        auto const scrape = tr_announce_list::announceToScrape(tr_quark_new(test.announce));
+        auto const scrape = tr_announce_list::announce_to_scrape(tr_quark_new(test.announce));
         EXPECT_EQ(tr_quark_new(test.expected_scrape), scrape);
     }
 }
@@ -365,24 +365,24 @@ TEST_F(AnnounceListTest, save)
 
     // load the original
     auto original_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(original_tm.parseBenc({ std::data(original_content), std::size(original_content) }));
+    EXPECT_TRUE(original_tm.parse_benc({ std::data(original_content), std::size(original_content) }));
 
     // load the scratch that we saved to
     auto modified_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(modified_tm.parseTorrentFile(test_file.sv()));
+    EXPECT_TRUE(modified_tm.parse_torrent_file(test_file.sv()));
 
     // test that non-announce parts of the metainfo are the same
     EXPECT_EQ(original_tm.name(), modified_tm.name());
-    EXPECT_EQ(original_tm.fileCount(), modified_tm.fileCount());
-    EXPECT_EQ(original_tm.dateCreated(), modified_tm.dateCreated());
-    EXPECT_EQ(original_tm.pieceCount(), modified_tm.pieceCount());
+    EXPECT_EQ(original_tm.file_count(), modified_tm.file_count());
+    EXPECT_EQ(original_tm.date_created(), modified_tm.date_created());
+    EXPECT_EQ(original_tm.piece_count(), modified_tm.piece_count());
 
     // test that the saved version has the updated announce list
     EXPECT_TRUE(std::equal(
         std::begin(announce_list),
         std::end(announce_list),
-        std::begin(modified_tm.announceList()),
-        std::end(modified_tm.announceList())));
+        std::begin(modified_tm.announce_list()),
+        std::end(modified_tm.announce_list())));
 
     // cleanup
     (void)std::remove(test_file.c_str());
@@ -417,7 +417,7 @@ TEST_F(AnnounceListTest, parseThreeTier)
     EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.sv());
     EXPECT_EQ(2U, announce_list.at(2).tier);
-    EXPECT_EQ(fmt::format("{:s}\n", Text), announce_list.toString());
+    EXPECT_EQ(fmt::format("{:s}\n", Text), announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)
@@ -439,7 +439,7 @@ TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)
     EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.sv());
     EXPECT_EQ(2U, announce_list.at(2).tier);
-    EXPECT_EQ(Text, announce_list.toString());
+    EXPECT_EQ(Text, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithExcessLf)
@@ -477,7 +477,7 @@ TEST_F(AnnounceListTest, parseThreeTierWithExcessLf)
         "https://www.example.com/b/announce\n"
         "\n"
         "https://www.example.com/c/announce\n"sv;
-    EXPECT_EQ(ExpectedText, announce_list.toString());
+    EXPECT_EQ(ExpectedText, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithWhitespace)
@@ -510,7 +510,7 @@ TEST_F(AnnounceListTest, parseThreeTierWithWhitespace)
         "https://www.example.com/b/announce\n"
         "\n"
         "https://www.example.com/c/announce\n"sv;
-    EXPECT_EQ(ExpectedText, announce_list.toString());
+    EXPECT_EQ(ExpectedText, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierCrLf)
@@ -539,7 +539,7 @@ TEST_F(AnnounceListTest, parseThreeTierCrLf)
         "https://www.example.com/b/announce\n"
         "\n"
         "https://www.example.com/c/announce\n"sv;
-    EXPECT_EQ(ExpectedText, announce_list.toString());
+    EXPECT_EQ(ExpectedText, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseMultiTrackerInTier)
@@ -583,7 +583,7 @@ TEST_F(AnnounceListTest, parseMultiTrackerInTier)
     EXPECT_EQ("https://www.example.com/i/announce", announce_list.at(8).announce.sv());
     EXPECT_EQ(2U, announce_list.at(8).tier);
 
-    EXPECT_EQ(Text, announce_list.toString());
+    EXPECT_EQ(Text, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, parseInvalidUrl)
@@ -632,7 +632,7 @@ TEST_F(AnnounceListTest, addAnnounceListWithSingleTracker)
         "https://www.bar.com/announce\n"
         "\n"
         "https://www.baz.com/announce\n"sv;
-    EXPECT_EQ(Expected, announce_list.toString());
+    EXPECT_EQ(Expected, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, addAnnounceWithSingleTier)
@@ -659,7 +659,7 @@ TEST_F(AnnounceListTest, addAnnounceWithSingleTier)
         "\n"
         "https://www.baz.com/announce\n"
         "https://www.qux.com/announce\n"sv;
-    EXPECT_EQ(Expected, announce_list.toString());
+    EXPECT_EQ(Expected, announce_list.to_string());
 }
 
 TEST_F(AnnounceListTest, addAnnounceListWithMultiTier)
@@ -688,5 +688,5 @@ TEST_F(AnnounceListTest, addAnnounceListWithMultiTier)
         "https://www.baz.com/announce\n"
         "\n"
         "https://www.qux.com/announce\n"sv;
-    EXPECT_EQ(Expected, announce_list.toString());
+    EXPECT_EQ(Expected, announce_list.to_string());
 }

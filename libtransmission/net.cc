@@ -217,7 +217,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     // set source address
-    auto const [source_addr, is_any] = session->publicAddress(addr.type);
+    auto const source_addr = session->publicAddress(addr.type);
     auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
@@ -360,32 +360,6 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
     return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
-bool tr_net_hasIPv6(tr_port port)
-{
-    static bool result = false;
-    static bool already_done = false;
-
-    if (!already_done)
-    {
-        int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv6(), port, true, &err);
-
-        if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
-        {
-            result = true;
-        }
-
-        if (fd != TR_BAD_SOCKET)
-        {
-            tr_net_close_socket(fd);
-        }
-
-        already_done = true;
-    }
-
-    return result;
-}
-
 std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
 {
     TR_ASSERT(session != nullptr);
@@ -415,94 +389,6 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
 void tr_net_close_socket(tr_socket_t sockfd)
 {
     evutil_closesocket(sockfd);
-}
-
-namespace
-{
-// code in global_ipv6_herlpers is written by Juliusz Chroboczek
-// and is covered under the same license as dht.cc.
-// Please feel free to copy them into your software if it can help
-// unbreaking the double-stack Internet.
-namespace global_ipv6_helpers
-{
-
-// Get the source address used for a given destination address.
-// Since there is no official interface to get this information,
-// we create a connected UDP socket (connected UDP... hmm...)
-// and check its source address.
-//
-// Since it's a UDP socket, this doesn't actually send any packets
-[[nodiscard]] std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port)
-{
-    auto const save = errno;
-
-    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
-    {
-        if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
-        {
-            auto src_ss = sockaddr_storage{};
-            auto src_sslen = socklen_t{ sizeof(src_ss) };
-            if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
-            {
-                if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
-                {
-                    evutil_closesocket(sock);
-                    errno = save;
-                    return addrport->first;
-                }
-            }
-        }
-
-        evutil_closesocket(sock);
-    }
-
-    errno = save;
-    return {};
-}
-
-[[nodiscard]] std::optional<tr_address> global_address(int af)
-{
-    // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6);
-    auto const dst_port = tr_port::fromHost(6969);
-
-    // In order for address selection to work right,
-    // this should be a native IPv6 address, not Teredo or 6to4
-    TR_ASSERT(dst_addr.has_value() && dst_addr->is_global_unicast_address());
-
-    if (dst_addr)
-    {
-        if (auto addr = get_source_address(*dst_addr, dst_port); addr && addr->is_global_unicast_address())
-        {
-            return addr;
-        }
-    }
-
-    return {};
-}
-
-} // namespace global_ipv6_helpers
-} // namespace
-
-/* Return our global IPv6 address, with caching. */
-std::optional<tr_address> tr_globalIPv6()
-{
-    using namespace global_ipv6_helpers;
-
-    // recheck our cached value every half hour
-    static auto constexpr CacheSecs = 1800;
-    static auto cache_val = std::optional<tr_address>{};
-    static auto cache_expires_at = time_t{};
-    if (auto const now = tr_time(); cache_expires_at <= now)
-    {
-        cache_expires_at = now + CacheSecs;
-        cache_val = global_address(AF_INET6);
-    }
-
-    return cache_val;
 }
 
 // ---
@@ -842,7 +728,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
         // TODO: 2000::/3 is commonly used for global unicast but technically
         // other spaces would be allowable too, so we should test those here.
-        // See RFC 4291 in the Section 2.4 lising global unicast as everything
+        // See RFC 4291 in the Section 2.4 listing global unicast as everything
         // that's not link-local, multicast, loopback, or unspecified.
         return (a[0] & 0xE0) == 0x20;
     }

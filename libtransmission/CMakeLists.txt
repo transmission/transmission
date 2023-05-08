@@ -50,12 +50,15 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
+        favicon-cache.h
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
         file-win32.cc
         file.cc
         file.h
+        global-ip-cache.cc
+        global-ip-cache.h
         handshake.cc
         handshake.h
         history.h
@@ -304,6 +307,7 @@ if(INSTALL_LIB)
         FILES
             error-types.h
             error.h
+            favicon-cache.h
             file.h
             log.h
             makemeta.h

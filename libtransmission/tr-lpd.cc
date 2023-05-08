@@ -20,7 +20,7 @@
 
 #include <event2/event.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 
@@ -213,9 +213,9 @@ public:
             return;
         }
 
-        announce_timer_->startRepeating(AnnounceInterval);
+        announce_timer_->start_repeating(AnnounceInterval);
         announceUpkeep();
-        dos_timer_->startRepeating(DosInterval);
+        dos_timer_->start_repeating(DosInterval);
         dosUpkeep();
     }
 

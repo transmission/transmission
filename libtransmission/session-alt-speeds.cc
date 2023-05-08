@@ -27,7 +27,7 @@ void tr_session_alt_speeds::load(tr_variant* src)
     ALT_SPEEDS_FIELDS(V)
 #undef V
 
-    updateScheduler();
+    update_scheduler();
 }
 
 void tr_session_alt_speeds::save(tr_variant* tgt) const
@@ -39,7 +39,7 @@ void tr_session_alt_speeds::save(tr_variant* tgt) const
 #undef V
 }
 
-void tr_session_alt_speeds::defaultSettings(tr_variant* tgt)
+void tr_session_alt_speeds::default_settings(tr_variant* tgt)
 {
 #define V(key, field, type, default_value, comment) \
     { \
@@ -53,7 +53,7 @@ void tr_session_alt_speeds::defaultSettings(tr_variant* tgt)
 
 // --- minutes
 
-void tr_session_alt_speeds::updateMinutes()
+void tr_session_alt_speeds::update_minutes()
 {
     minutes_.reset();
 
@@ -71,39 +71,39 @@ void tr_session_alt_speeds::updateMinutes()
     }
 }
 
-void tr_session_alt_speeds::updateScheduler()
+void tr_session_alt_speeds::update_scheduler()
 {
-    updateMinutes();
+    update_minutes();
     scheduler_set_is_active_to_.reset();
-    checkScheduler();
+    check_scheduler();
 }
 
-void tr_session_alt_speeds::checkScheduler()
+void tr_session_alt_speeds::check_scheduler()
 {
-    if (!isSchedulerEnabled())
+    if (!is_scheduler_enabled())
     {
         return;
     }
 
-    if (auto const active = isActiveMinute(mediator_.time());
+    if (auto const active = is_active_minute(mediator_.time());
         !scheduler_set_is_active_to_ || scheduler_set_is_active_to_ != active)
     {
         tr_logAddInfo(active ? _("Time to turn on turtle mode") : _("Time to turn off turtle mode"));
         scheduler_set_is_active_to_ = active;
-        setActive(active, ChangeReason::Scheduler);
+        set_active(active, ChangeReason::Scheduler);
     }
 }
 
-void tr_session_alt_speeds::setActive(bool active, ChangeReason reason)
+void tr_session_alt_speeds::set_active(bool active, ChangeReason reason)
 {
     if (is_active_ != active)
     {
         is_active_ = active;
-        mediator_.isActiveChanged(is_active_, reason);
+        mediator_.is_active_changed(is_active_, reason);
     }
 }
 
-[[nodiscard]] bool tr_session_alt_speeds::isActiveMinute(time_t time) const noexcept
+[[nodiscard]] bool tr_session_alt_speeds::is_active_minute(time_t time) const noexcept
 {
     auto const tm = fmt::localtime(time);
 

@@ -10,7 +10,7 @@
 
 #include <signal.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
@@ -199,6 +199,8 @@ static std::string getConfigDir(int argc, char const** argv)
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     tr_variant settings;
 
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
@@ -259,7 +261,8 @@ int tr_main(int argc, char* argv[])
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);
 
-    if (tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr) || tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr))
+    if (tr_sys_path_exists(torrentPath) ? tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr) :
+                                          tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr))
     {
         // all good
     }

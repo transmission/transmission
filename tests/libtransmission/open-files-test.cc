@@ -135,7 +135,7 @@ TEST_F(OpenFilesTest, closeFileClosesTheFile)
     EXPECT_TRUE(session_->openFiles().get(0, 0, false));
 
     // close the file
-    session_->openFiles().closeFile(0, 0);
+    session_->openFiles().close_file(0, 0);
 
     // confirm that its fd is no longer cached
     EXPECT_FALSE(session_->openFiles().get(0, 0, false));
@@ -155,12 +155,12 @@ TEST_F(OpenFilesTest, closeTorrentClosesTheTorrentFiles)
     EXPECT_TRUE(session_->openFiles().get(TorId, 3, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
 
     // confirm that closing a different torrent does not affect these files
-    session_->openFiles().closeTorrent(TorId + 1);
+    session_->openFiles().close_torrent(TorId + 1);
     EXPECT_TRUE(session_->openFiles().get(TorId, 1, false));
     EXPECT_TRUE(session_->openFiles().get(TorId, 3, false));
 
     // confirm that closing this torrent closes and uncaches the files
-    session_->openFiles().closeTorrent(TorId);
+    session_->openFiles().close_torrent(TorId);
     EXPECT_FALSE(session_->openFiles().get(TorId, 1, false));
     EXPECT_FALSE(session_->openFiles().get(TorId, 3, false));
 }

@@ -14,7 +14,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 

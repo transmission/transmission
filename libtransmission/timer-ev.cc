@@ -64,7 +64,7 @@ public:
         is_running_ = true;
     }
 
-    void setCallback(std::function<void()> callback) override
+    void set_callback(std::function<void()> callback) override
     {
         callback_ = std::move(callback);
     }
@@ -74,9 +74,9 @@ public:
         return interval_;
     }
 
-    void setInterval(std::chrono::milliseconds interval) override
+    void set_interval(std::chrono::milliseconds interval) override
     {
-        TR_ASSERT_MSG(interval.count() > 0 || !isRepeating(), "repeating timers must have a positive interval");
+        TR_ASSERT_MSG(interval.count() > 0 || !is_repeating(), "repeating timers must have a positive interval");
 
         if (interval_ == interval)
         {
@@ -87,12 +87,12 @@ public:
         applyChanges();
     }
 
-    [[nodiscard]] bool isRepeating() const noexcept override
+    [[nodiscard]] bool is_repeating() const noexcept override
     {
         return is_repeating_;
     }
 
-    void setRepeating(bool repeating) override
+    void set_repeating(bool repeating) override
     {
         if (is_repeating_ == repeating)
         {
@@ -112,7 +112,7 @@ private:
     void applyChanges()
     {
         auto const old_events = event_get_events(evtimer_.get());
-        auto const new_events = events(isRepeating());
+        auto const new_events = events(is_repeating());
         auto const was_running = isRunning();
 
         if (was_running)
