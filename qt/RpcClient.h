@@ -66,8 +66,12 @@ public:
         return url_;
     }
 
-    RpcResponseFuture exec(tr_quark method, tr_variant* args);
     RpcResponseFuture exec(std::string_view method, tr_variant* args);
+
+    auto exec(tr_quark method, tr_variant* args)
+    {
+        return exec(tr_quark_get_string_view(method), args);
+    }
 
 signals:
     void httpAuthenticationRequired();

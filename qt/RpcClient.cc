@@ -90,11 +90,6 @@ bool RpcClient::isLocal() const
     return false;
 }
 
-RpcResponseFuture RpcClient::exec(tr_quark method, tr_variant* args)
-{
-    return exec(tr_quark_get_string_view(method), args);
-}
-
 RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
 {
     TrVariantPtr const json = createVariant();
