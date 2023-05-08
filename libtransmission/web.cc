@@ -228,6 +228,8 @@ public:
         Task(tr_web::Impl& impl_in, tr_web::FetchOptions&& options_in)
             : impl{ impl_in }
             , options{ std::move(options_in) }
+            , resolved_hosts_{ impl.mediator.resolved_hosts() }
+            , curlopt_resolve_{ make_curlopt_resolve(resolved_hosts_) }
         {
             auto const parsed = tr_urlParse(options.url);
             easy_ = parsed ? impl.get_easy(parsed->host) : nullptr;
@@ -245,11 +247,17 @@ public:
         ~Task()
         {
             easy_dispose(easy_);
+            curl_slist_free_all(curlopt_resolve_);
         }
 
-        [[nodiscard]] constexpr auto* easy() const
+        [[nodiscard]] constexpr auto* easy() const noexcept
         {
             return easy_;
+        }
+
+        [[nodiscard]] constexpr auto* curlopt_resolve() const noexcept
+        {
+            return curlopt_resolve_;
         }
 
         [[nodiscard]] auto* body() const
@@ -365,11 +373,30 @@ public:
             }
         }
 
+        [[nodiscard]] static curl_slist* make_curlopt_resolve(std::vector<std::string> const& resolved_hosts)
+        {
+            curl_slist* slist = nullptr;
+
+            for (auto const& line : resolved_hosts)
+            {
+                slist = curl_slist_append(slist, line.c_str());
+            }
+
+            return slist;
+        }
+
         libtransmission::evhelpers::evbuffer_unique_ptr privbuf{ evbuffer_new() };
 
         tr_web::FetchOptions options;
 
         CURL* easy_;
+
+        // CURLOPT_RESOLVE uses curlopt_resolve_ as a raw pointer without
+        // making an internal copy, so we need to manage the memory
+        // ourselves.  resolved_hosts_ holds the strings; curlopt_resolve_
+        // is a list that points to the strings owned by resolved_hosts_.
+        std::vector<std::string> const resolved_hosts_;
+        curl_slist* const curlopt_resolve_;
     };
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
@@ -514,19 +541,7 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, &task);
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task.ipProtocol());
-
-        if (auto const resolved = mediator.resolved_hosts(); !std::empty(resolved))
-        {
-            fmt::print("{:s}:{:d} ===\n", __FILE__, __LINE__);
-            curl_slist* slist = nullptr;
-            for (auto const& line : resolved)
-            {
-                fmt::print("{:s}:{:d} {:s}\n", __FILE__, __LINE__, line);
-                slist = curl_slist_append(slist, line.c_str());
-            }
-            (void)curl_easy_setopt(e, CURLOPT_RESOLVE, slist);
-            curl_slist_free_all(slist);
-        }
+        (void)curl_easy_setopt(e, CURLOPT_RESOLVE, task.curlopt_resolve());
 
 #ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
