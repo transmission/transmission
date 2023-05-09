@@ -76,7 +76,7 @@ public:
         Family family,
         Protocol protocol) override
     {
-        auto const key = Key{ host, port, family, protocol };
+        auto key = Key{ host, port, family, protocol };
 
         // do we already have it?
         auto const cache_lock = std::unique_lock{ cache_mutex_ };
@@ -106,16 +106,16 @@ public:
             return { Result::Pending, {}, {} };
         }
 
-        pending_.try_emplace(key, std::async(std::launch::async, lookup, std::string{ host }, port, family, protocol));
+        pending_.try_emplace(
+            std::move(key),
+            std::async(std::launch::async, lookup, std::string{ host }, port, family, protocol));
         return { Result::Pending, {}, {} };
     }
 
     [[nodiscard]] bool is_pending(std::string_view host, tr_port port, Family family, Protocol protocol) const override
     {
-        auto const key = Key{ host, port, family, protocol };
-
         auto const lock = std::unique_lock{ pending_mutex_ };
-        return pending_.count(key) != 0U;
+        return pending_.count(Key{ host, port, family, protocol }) != 0U;
     }
 
     [[nodiscard]] std::vector<std::tuple<std::string, tr_port, Family, Protocol, Result, sockaddr_storage, socklen_t>> dump(
