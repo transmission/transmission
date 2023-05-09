@@ -100,7 +100,7 @@ public:
             {
                 auto const addr = fut.get();
                 auto& perm = cache_[key];
-                perm = addr ? Cache{ *addr, now, Result::Success } : Cache{ {}, now, Result::Failed };
+                perm = addr ? Entry{ *addr, now, Result::Success } : Entry{ {}, now, Result::Failed };
                 pending_.erase(iter);
                 return { perm.result, perm.addr.first, perm.addr.second };
             }
@@ -150,11 +150,11 @@ public:
     }
 
 private:
-    using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
     using Key = std::tuple<std::string, tr_port, Family, Protocol>;
+    using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
     using MaybeSockaddr = std::optional<Sockaddr>;
 
-    struct Cache
+    struct Entry
     {
         Sockaddr addr = {};
         time_t created_at = {};
@@ -190,13 +190,17 @@ private:
         auto const pending_lock = std::unique_lock{ pending_mutex_ };
         auto const cache_lock = std::unique_lock{ cache_mutex_ };
 
-        if (auto iter = std::begin(pending_); iter != std::end(pending_))
+        for (auto iter = std::begin(pending_); iter != std::end(pending_);)
         {
             if (auto& [key, fut] = *iter; fut.wait_for(std::chrono::milliseconds{ 0 }) == std::future_status::ready)
             {
                 auto const addr = fut.get();
-                cache_[key] = addr ? Cache{ *addr, now, Result::Success } : Cache{ {}, now, Result::Failed };
+                cache_[key] = addr ? Entry{ *addr, now, Result::Success } : Entry{ {}, now, Result::Failed };
                 iter = pending_.erase(iter);
+            }
+            else
+            {
+                ++iter;
             }
         }
     }
@@ -207,7 +211,7 @@ private:
     mutable std::map<Key, std::future<MaybeSockaddr>> pending_;
 
     mutable std::mutex cache_mutex_;
-    mutable std::map<Key, Cache> cache_;
+    mutable std::map<Key, Entry> cache_;
 };
 
 } // namespace libtransmission
