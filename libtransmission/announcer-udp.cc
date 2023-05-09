@@ -339,12 +339,8 @@ struct tau_tracker
             return;
         }
 
-        auto const [result, ss, sslen] = mediator_.dns_cache().get(
-            this->host.sv(),
-            this->port,
-            now,
-            DnsCache::Family::IPv4,
-            DnsCache::Protocol::UDP);
+        auto const [result, ss, sslen] = mediator_.dns_cache()
+                                             .get(now, this->host, this->port, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
         if (result == DnsCache::Result::Pending)
         {
             return;

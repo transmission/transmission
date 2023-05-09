@@ -324,30 +324,30 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
 
 std::vector<std::string /*HOST:PORT:ADDRESS[,ADDRESS]*/> tr_session::WebMediator::resolved_hosts() const
 {
-    using DnsCache = libtransmission::DnsCache;
-
-    auto const now = tr_time();
-    auto tmp = std::map<std::string /*host:port*/, std::string /*address[,address]*/>{};
-    auto addr_strbuf = std::array<char, TR_ADDRSTRLEN>{};
-
-    for (auto const& [host, port, family, protocol, result, ss, sslen] :
-         session_->dns_cache_.dump(now, {}, DnsCache::Protocol::TCP))
-    {
-        if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss)); addrport)
+    auto host_addresses = std::map<std::string /*host:port*/, std::string /*address[,address]*/>{};
+    session_->dns_cache_.walk(
+        tr_time(),
+        [&host_addresses](auto const& entry)
         {
-            auto const addr_sv = addrport->first.display_name(std::data(addr_strbuf), std::size(addr_strbuf));
-
-            if (auto [iter, is_new] = tmp.try_emplace(fmt::format("{:s}:{:d}", host, port.host()), addr_sv); !is_new)
+            if (auto const addr = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&entry.ss)); addr)
             {
-                iter->second += ',';
-                iter->second += addr_sv;
+                auto addr_strbuf = std::array<char, TR_ADDRSTRLEN>{};
+                auto const addr_sv = addr->first.display_name(std::data(addr_strbuf), std::size(addr_strbuf));
+                auto key = fmt::format("{:s}:{:d}", entry.host, entry.port.host());
+
+                if (auto const [iter, is_new] = host_addresses.try_emplace(std::move(key), addr_sv); !is_new)
+                {
+                    iter->second += ',';
+                    iter->second += addr_sv;
+                }
             }
-        }
-    }
+        },
+        {}, // any family
+        libtransmission::DnsCache::Protocol::TCP);
 
     auto ret = std::vector<std::string>{};
-    ret.reserve(std::size(tmp));
-    for (auto const& [hostport, addresses] : tmp)
+    ret.reserve(std::size(host_addresses));
+    for (auto const& [hostport, addresses] : host_addresses)
     {
         ret.emplace_back(fmt::format("{:s}:{:s}", hostport, addresses));
     }
@@ -2232,12 +2232,12 @@ void tr_session::update_dns_cache(tr_torrent const* tor)
     auto const now = tr_time();
     for (auto const& tracker : tor->announce_list())
     {
-        auto const host = tracker.announce_parsed.host;
+        auto const& host = tracker.announce_parsed.host;
         auto const port = tr_port::fromHost(tracker.announce_parsed.port);
 
-        dns_cache_.get(host, port, now, DnsCache::Family::IPv4, DnsCache::Protocol::TCP);
-        dns_cache_.get(host, port, now, DnsCache::Family::IPv6, DnsCache::Protocol::TCP);
-        dns_cache_.get(host, port, now, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
-        dns_cache_.get(host, port, now, DnsCache::Family::IPv6, DnsCache::Protocol::UDP);
+        dns_cache_.get(now, host, port, DnsCache::Family::IPv4, DnsCache::Protocol::TCP);
+        dns_cache_.get(now, host, port, DnsCache::Family::IPv6, DnsCache::Protocol::TCP);
+        dns_cache_.get(now, host, port, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
+        dns_cache_.get(now, host, port, DnsCache::Family::IPv6, DnsCache::Protocol::UDP);
     }
 }

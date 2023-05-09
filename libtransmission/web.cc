@@ -237,8 +237,8 @@ public:
             response.user_data = options.done_func_user_data;
         }
 
-        // Some of the curl_easy_setopt() args took a pointer to this task.
-        // Disable moving so that we don't accidentally invalidate those pointers.
+        // Some of the curl_easy_setopt() args take raw pointers to this task,
+        // so disable copy/move to ensure we don't clobber those pointers.
         Task(Task&&) = delete;
         Task(Task const&) = delete;
         Task& operator=(Task&&) = delete;
@@ -392,9 +392,9 @@ public:
         CURL* easy_;
 
         // CURLOPT_RESOLVE uses curlopt_resolve_ as a raw pointer without
-        // making an internal copy, so we need to manage the memory
-        // ourselves.  resolved_hosts_ holds the strings; curlopt_resolve_
-        // is a list that points to the strings owned by resolved_hosts_.
+        // making an internal copy, so we must manage the memory ourselves.
+        // resolved_hosts_ owns the strings and curlopt_resolve_ is a list
+        // of raw pointers to them.
         std::vector<std::string> const resolved_hosts_;
         curl_slist* const curlopt_resolve_;
     };

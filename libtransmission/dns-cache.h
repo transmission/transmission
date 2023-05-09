@@ -7,6 +7,7 @@
 
 #include <array>
 #include <chrono>
+#include <cstring> // for memcpy
 #include <ctime> // for time_t
 #include <future>
 #include <map>
@@ -14,7 +15,6 @@
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <vector>
 
 #include <fmt/core.h>
 
@@ -53,26 +53,42 @@ public:
         Failed
     };
 
+    struct WalkEntry
+    {
+        std::string_view host;
+        tr_port port;
+        Family family;
+        Protocol protocol;
+        Result result;
+        sockaddr_storage ss;
+        socklen_t sslen;
+    };
+
     virtual std::tuple<Result, sockaddr_storage, socklen_t> get(
+        time_t now,
         std::string_view host,
         tr_port port,
-        time_t now,
         Family family,
         Protocol protocol) = 0;
 
     [[nodiscard]] virtual bool is_pending(std::string_view host, tr_port port, Family family, Protocol protocol) const = 0;
 
-    [[nodiscard]] virtual std::vector<std::tuple<std::string, tr_port, Family, Protocol, Result, sockaddr_storage, socklen_t>>
-    dump(time_t now, std::optional<Family> family_wanted = {}, std::optional<Protocol> protocol_wanted = {}) const = 0;
+    // Note: walk() locks the DnsCache, so `func` should have a limited scope.
+    // For example, it should not invoke other DnsCache methods.
+    virtual void walk(
+        time_t now,
+        std::function<void(WalkEntry const&)> const& func,
+        std::optional<Family> family_wanted = {},
+        std::optional<Protocol> protocol_wanted = {}) const = 0;
 };
 
 class DefaultDnsCache : public DnsCache
 {
 public:
     std::tuple<Result, sockaddr_storage, socklen_t> get(
+        time_t now,
         std::string_view host,
         tr_port port,
-        time_t now,
         Family family,
         Protocol protocol) override
     {
@@ -118,16 +134,15 @@ public:
         return pending_.count(Key{ host, port, family, protocol }) != 0U;
     }
 
-    [[nodiscard]] std::vector<std::tuple<std::string, tr_port, Family, Protocol, Result, sockaddr_storage, socklen_t>> dump(
+    void walk(
         time_t now,
+        std::function<void(WalkEntry const&)> const& func,
         std::optional<Family> family_wanted = {},
         std::optional<Protocol> protocol_wanted = {}) const override
     {
         check_pending(now);
 
         auto lock = std::unique_lock{ cache_mutex_ };
-        auto ret = std::vector<std::tuple<std::string, tr_port, Family, Protocol, Result, sockaddr_storage, socklen_t>>{};
-        ret.reserve(std::size(cache_));
         for (auto const& [key, cache] : cache_)
         {
             auto const& [host, port, family, protocol] = key;
@@ -142,9 +157,8 @@ public:
                 continue;
             }
 
-            ret.emplace_back(host, port, family, protocol, cache.result, cache.addr.first, cache.addr.second);
+            func({ host, port, family, protocol, cache.result, cache.addr.first, cache.addr.second });
         }
-        return ret;
     }
 
 private:
