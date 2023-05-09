@@ -7,7 +7,7 @@
 
 #include <array>
 #include <chrono>
-#include <ctime>
+#include <ctime> // for time_t
 #include <future>
 #include <map>
 #include <mutex>
@@ -26,9 +26,7 @@
 #include <netdb.h>
 #endif
 
-#include "libtransmission/transmission.h"
-
-#include "libtransmission/net.h" // tr_address, tr_port
+#include "libtransmission/net.h" // for tr_port
 
 namespace libtransmission
 {
