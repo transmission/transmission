@@ -328,31 +328,21 @@ std::vector<std::string /*HOST:PORT:ADDRESS[,ADDRESS]*/> tr_session::WebMediator
 
     auto const now = tr_time();
     auto tmp = std::map<std::string /*host:port*/, std::string /*address[,address]*/>{};
+    auto addr_strbuf = std::array<char, TR_ADDRSTRLEN>{};
 
     for (auto const& [host, port, family, protocol, result, ss, sslen] :
          session_->dns_cache_.dump(now, {}, DnsCache::Protocol::TCP))
     {
-        auto addrstr = std::string{};
+        if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss)); addrport)
+        {
+            auto const addr_sv = addrport->first.display_name(std::data(addr_strbuf), std::size(addr_strbuf));
 
-        if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss)); addrport)
-        {
-            addrstr = addrport->first.display_name();
+            if (auto [iter, is_new] = tmp.try_emplace(fmt::format("{:s}:{:d}", host, port.host()), addr_sv); !is_new)
+            {
+                iter->second += ',';
+                iter->second += addr_sv;
+            }
         }
-        else if (family == DnsCache::Family::IPv4)
-        {
-            addrstr = tr_address::any_ipv4().display_name();
-        }
-        else
-        {
-            addrstr = tr_address::any_ipv6().display_name();
-        }
-
-        auto& addresses = tmp[fmt::format("{:s}:{:d}", host, port.host())];
-        if (!std::empty(addresses))
-        {
-            addresses += ',';
-        }
-        addresses += addrstr;
     }
 
     auto ret = std::vector<std::string>{};
