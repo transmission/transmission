@@ -418,7 +418,7 @@ namespace script_helpers
 
     for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
     {
-        buf << tr_torrentTracker(tor, i).host;
+        buf << tr_torrentTracker(tor, i).host_and_port;
 
         if (++i < n)
         {
