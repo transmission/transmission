@@ -188,12 +188,17 @@ private:
     void check_pending(time_t now) const
     {
         auto const pending_lock = std::unique_lock{ pending_mutex_ };
-        auto const cache_lock = std::unique_lock{ cache_mutex_ };
+        auto cache_lock = std::unique_lock{ cache_mutex_, std::defer_lock };
 
         for (auto iter = std::begin(pending_); iter != std::end(pending_);)
         {
             if (auto& [key, fut] = *iter; fut.wait_for(std::chrono::milliseconds{ 0 }) == std::future_status::ready)
             {
+                if (!cache_lock)
+                {
+                    cache_lock.lock();
+                }
+
                 auto const addr = fut.get();
                 cache_[key] = addr ? Entry{ *addr, now, Result::Success } : Entry{ {}, now, Result::Failed };
                 iter = pending_.erase(iter);
