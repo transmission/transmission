@@ -21,22 +21,21 @@
 #endif
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "announcer-common.h"
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "log.h"
-#include "peer-io.h"
-#include "peer-mgr.h" // for tr_pex::fromCompact4()
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/announcer-common.h"
+#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/log.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 #define logwarn(interned, msg) tr_logAddWarn(msg, (interned).sv())
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())
@@ -588,7 +587,7 @@ public:
         }
 
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
-        auto const addr = mediator_.announceIP();
+        auto const addr = mediator_.announce_ip();
         uint32_t const announce_ip = addr && addr->is_ipv4() ? addr->addr.addr4.s_addr : 0;
         tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
         tracker->upkeep(false);
@@ -616,7 +615,7 @@ public:
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
-    bool handleMessage(uint8_t const* msg, size_t msglen) override
+    bool handle_message(uint8_t const* msg, size_t msglen) override
     {
         if (msglen < sizeof(uint32_t) * 2)
         {

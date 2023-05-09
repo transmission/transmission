@@ -10,20 +10,20 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bitfield.h"
-#include "clients.h"
-#include "crypto-utils.h"
-#include "handshake.h"
-#include "log.h"
-#include "peer-io.h"
-#include "timer.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/clients.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/handshake.h"
+#include "libtransmission/log.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
@@ -81,7 +81,7 @@ tr_handshake::ParseResult tr_handshake::parse_handshake(tr_peerIo* peer_io)
     auto flags = tr_bitfield{ HandshakeFlagsBits };
     auto reserved = std::array<uint8_t, HandshakeFlagsBytes>{};
     peer_io->read_bytes(std::data(reserved), std::size(reserved));
-    flags.setRaw(std::data(reserved), std::size(reserved));
+    flags.set_raw(std::data(reserved), std::size(reserved));
     peer_io->set_supports_dht(flags.test(DhtFlag));
     peer_io->set_supports_ltep(flags.test(LtepFlag));
     peer_io->set_supports_fext(flags.test(FextFlag));
@@ -363,7 +363,7 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
     auto reserved = std::array<uint8_t, HandshakeFlagsBytes>{};
     auto flags = tr_bitfield{ HandshakeFlagsBits };
     peer_io->read_bytes(std::data(reserved), std::size(reserved));
-    flags.setRaw(std::data(reserved), std::size(reserved));
+    flags.set_raw(std::data(reserved), std::size(reserved));
     peer_io->set_supports_dht(flags.test(DhtFlag));
     peer_io->set_supports_ltep(flags.test(LtepFlag));
     peer_io->set_supports_fext(flags.test(FextFlag));
@@ -901,7 +901,7 @@ tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_i
     , mediator_{ mediator }
     , encryption_mode_{ mode }
 {
-    timeout_timer_->startSingleShot(HandshakeTimeoutSec);
+    timeout_timer_->start_single_shot(HandshakeTimeoutSec);
 
     peer_io_->set_callbacks(&tr_handshake::can_read, nullptr, &tr_handshake::on_error, this);
 

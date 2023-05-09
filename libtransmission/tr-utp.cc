@@ -6,22 +6,21 @@
 #include <chrono>
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #include <libutp/utp.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" // tr_rand_int()
-#include "log.h"
-#include "net.h"
-#include "peer-io.h"
-#include "peer-mgr.h"
-#include "peer-socket.h"
-#include "session.h"
-#include "timer.h"
-#include "tr-utp.h"
-#include "utils.h"
+#include "libtransmission/crypto-utils.h" // tr_rand_int()
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mgr.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -166,7 +165,7 @@ void restart_timer(tr_session* session)
         interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
 
-    session->utp_timer->startSingleShot(interval);
+    session->utp_timer->start_single_shot(interval);
 }
 
 void timer_callback(void* vsession)

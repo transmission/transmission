@@ -9,7 +9,7 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
@@ -322,6 +322,8 @@ static bool setSource(tr_variant* metainfo, char const* source_value)
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     int changedCount = 0;
 
     tr_logSetLevel(TR_LOG_ERROR);

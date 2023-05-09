@@ -3,15 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include <libutp/utp.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "peer-socket.h"
-#include "net.h"
-#include "session.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/net.h"
+#include "libtransmission/session.h"
 
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())

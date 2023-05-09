@@ -147,6 +147,11 @@ public:
         return signal_torrents_changed_;
     }
 
+    [[nodiscard]] constexpr auto& favicon_cache()
+    {
+        return favicon_cache_;
+    }
+
 private:
     Glib::RefPtr<Session> get_core_ptr() const;
 
@@ -209,6 +214,8 @@ private:
     Glib::RefPtr<SortListModel<Torrent>> sorted_model_;
     Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
+
+    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>> favicon_cache_;
 };
 
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
@@ -531,8 +538,8 @@ Session::Session(tr_session* session)
 Session::~Session() = default;
 
 Session::Impl::Impl(Session& core, tr_session* session)
-    : core_(core)
-    , session_(session)
+    : core_{ core }
+    , session_{ session }
 {
     raw_model_ = Gio::ListStore<Torrent>::create();
     signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_.get(), &TorrentSorter::update)));
@@ -645,7 +652,7 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent* raw_torrent)
         [this, core = get_core_ptr(), torrent_id = tr_torrentId(raw_torrent)]()
         {
             /* update the torrent's collated name */
-            if (auto const [torrent, position] = find_torrent_by_id(torrent_id); torrent != nullptr)
+            if (auto const& [torrent, position] = find_torrent_by_id(torrent_id); torrent)
             {
                 torrent->update();
             }
@@ -912,7 +919,7 @@ void Session::Impl::torrents_added()
 
 void Session::torrent_changed(tr_torrent_id_t id)
 {
-    if (auto const [torrent, position] = impl_->find_torrent_by_id(id); torrent != nullptr)
+    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
     {
         torrent->update();
     }
@@ -920,7 +927,7 @@ void Session::torrent_changed(tr_torrent_id_t id)
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
-    if (auto const [torrent, position] = impl_->find_torrent_by_id(id); torrent != nullptr)
+    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
     {
         /* remove from the gui */
         impl_->get_raw_model()->remove(position);
@@ -1357,6 +1364,11 @@ tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
     }
 
     return tor;
+}
+
+FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& Session::favicon_cache() const
+{
+    return impl_->favicon_cache();
 }
 
 void Session::open_folder(tr_torrent_id_t torrent_id) const

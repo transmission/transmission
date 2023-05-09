@@ -777,7 +777,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             };
 
             auto timer_maker = libtransmission::EvTimerMaker{ ev_base_ };
-            watchdir = force_generic ? Watchdir::createGeneric(dir, handler, timer_maker) :
+            watchdir = force_generic ? Watchdir::create_generic(dir, handler, timer_maker) :
                                        Watchdir::create(dir, handler, timer_maker, ev_base_);
         }
     }
@@ -939,6 +939,8 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     int ret;
     tr_daemon daemon;
     bool foreground;
