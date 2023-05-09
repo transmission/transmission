@@ -1088,7 +1088,7 @@ private:
 
     std::vector<libtransmission::Blocklist> blocklists_;
 
-    libtransmission::DnsCacheImpl dns_cache_;
+    libtransmission::DefaultDnsCache dns_cache_;
 
     /// other fields
 

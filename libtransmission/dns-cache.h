@@ -68,7 +68,7 @@ public:
     dump(time_t now, std::optional<Family> family_wanted = {}, std::optional<Protocol> protocol_wanted = {}) const = 0;
 };
 
-class DnsCacheImpl : public DnsCache
+class DefaultDnsCache : public DnsCache
 {
 public:
     std::tuple<Result, sockaddr_storage, socklen_t> get(
