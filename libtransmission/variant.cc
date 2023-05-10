@@ -17,6 +17,8 @@
 
 #include <fmt/core.h>
 
+#include <sfl/small_vector.hpp>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "libtransmission/transmission.h"
@@ -683,7 +685,8 @@ protected:
         size_t idx = {};
     };
 
-    void sort(std::vector<ByKey>& sortbuf)
+    template<typename ByKeyContainer>
+    void sort(ByKeyContainer& sortbuf)
     {
         if (!tr_variantIsDict(&v))
         {
@@ -763,8 +766,10 @@ public:
 
 private:
     size_t size = 0;
-    std::vector<WalkNode> stack;
-    std::vector<WalkNode::ByKey> sortbuf;
+
+    static auto constexpr InitialCapacity = size_t{ 32U };
+    sfl::small_vector<WalkNode, InitialCapacity> stack;
+    sfl::small_vector<WalkNode::ByKey, InitialCapacity> sortbuf;
 };
 
 /**

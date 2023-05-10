@@ -36,7 +36,6 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
-using Buffer = libtransmission::Buffer;
 
 namespace
 {
@@ -443,7 +442,7 @@ struct JsonWalk
     }
 
     std::deque<ParentState> parents;
-    Buffer out;
+    libtransmission::SmallBuffer<1024 * 16> out;
     bool doIndent;
 };
 
@@ -547,20 +546,22 @@ void jsonBoolFunc(tr_variant const* val, void* vdata)
 
 void jsonRealFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct JsonWalk*>(vdata);
+    auto* const data = static_cast<struct JsonWalk*>(vdata);
+
+    auto const [buf, buflen] = data->out.reserve_space(64);
+    auto* walk = reinterpret_cast<char*>(buf);
+    auto const* const begin = walk;
 
     if (fabs(val->val.d - (int)val->val.d) < 0.00001)
     {
-        auto buf = std::array<char, 64>{};
-        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
-        data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
+        walk = fmt::format_to(walk, FMT_COMPILE("{:.0f}"), val->val.d);
     }
     else
     {
-        auto buf = std::array<char, 64>{};
-        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
-        data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
+        walk = fmt::format_to(walk, FMT_COMPILE("{:.4f}"), val->val.d);
     }
+
+    data->out.commit_space(walk - begin);
 
     jsonChildFunc(data);
 }
@@ -586,7 +587,7 @@ void jsonRealFunc(tr_variant const* val, void* vdata)
 
 void jsonStringFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct JsonWalk*>(vdata);
+    auto* const data = static_cast<struct JsonWalk*>(vdata);
 
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(val, &sv);
@@ -667,7 +668,7 @@ void jsonStringFunc(tr_variant const* val, void* vdata)
 
 void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct JsonWalk*>(vdata);
+    auto* const data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPushParent(data, val);
     data->out.push_back('{');
@@ -681,7 +682,7 @@ void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 void jsonListBeginFunc(tr_variant const* val, void* vdata)
 {
     size_t const n_children = tr_variantListSize(val);
-    auto* data = static_cast<struct JsonWalk*>(vdata);
+    auto* const data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPushParent(data, val);
     data->out.push_back('[');
@@ -694,7 +695,7 @@ void jsonListBeginFunc(tr_variant const* val, void* vdata)
 
 void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct JsonWalk*>(vdata);
+    auto* const data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPopParent(data);
 
