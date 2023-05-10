@@ -168,7 +168,7 @@ TEST_F(GlobalIPCacheTest, setGlobalAddr)
 
 TEST_F(GlobalIPCacheTest, globalSourceIPv4)
 {
-    global_ip_cache_->set_settings_bind_addr(TR_AF_INET, "0.0.0.0"s);
+    global_ip_cache_->set_settings_bind_addr(TR_AF_INET, "0.0.0.0"sv);
     global_ip_cache_->update_source_addr(TR_AF_INET);
     auto const addr = global_ip_cache_->global_source_addr(TR_AF_INET);
     if (!addr)
@@ -183,7 +183,7 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv4)
 
 TEST_F(GlobalIPCacheTest, globalSourceIPv6)
 {
-    global_ip_cache_->set_settings_bind_addr(TR_AF_INET6, "::"s);
+    global_ip_cache_->set_settings_bind_addr(TR_AF_INET6, "::"sv);
     global_ip_cache_->update_source_addr(TR_AF_INET6);
     auto const addr = global_ip_cache_->global_source_addr(TR_AF_INET6);
     if (!addr)
