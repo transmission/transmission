@@ -212,7 +212,6 @@ void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
 void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
 {
     TR_ASSERT(has_ip_protocol_[type]);
-    TR_ASSERT(global_source_addr(type));
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
 
     if (ix_service_[type] == 0U && !set_is_updating(type))
