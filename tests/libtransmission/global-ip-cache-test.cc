@@ -195,3 +195,43 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv6)
     }
     EXPECT_TRUE(addr->is_ipv6());
 }
+
+TEST_F(GlobalIPCacheTest, onResponseIPQuery)
+{
+    auto constexpr HttpCodes = std::array{ 200, 404, 403 };
+    auto constexpr HttpTests = std::array{ true, false, false };
+    auto constexpr AddrStr = std::array{
+        "8.8.8.8"sv,      "192.168.133.133"sv,     "172.16.241.133"sv, "2001:1890:1112:1::20"sv, "fd12:3456:789a:1::1"sv,
+        "91.121.74.28"sv, "2001:1890:1112:1::20"sv
+    };
+    auto constexpr AddrTests = std::array{ std::array{ true, false, false, false, false, true, false /* IPv4 */ },
+                                           std::array{ false, false, false, true, false, false, true /* IPv6 */ } };
+    static_assert(TR_AF_INET == 0);
+    static_assert(TR_AF_INET6 == 1);
+    static_assert(NUM_TR_AF_INET_TYPES == 2);
+    static_assert(std::size(HttpCodes) == std::size(HttpTests));
+    static_assert(std::size(AddrStr) == std::size(AddrTests[TR_AF_INET]));
+    static_assert(std::size(AddrStr) == std::size(AddrTests[TR_AF_INET6]));
+
+    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
+    {
+        for (std::size_t j = 0; j < std::size(HttpCodes); ++j)
+        {
+            for (std::size_t k = 0; k < std::size(AddrStr); ++k)
+            {
+                auto const type = static_cast<tr_address_type>(i);
+                auto const response = tr_web::FetchResponse{ HttpCodes[j], std::string{ AddrStr[k] }, true, false };
+
+                global_ip_cache_->update_global_addr(type);
+                global_ip_cache_->on_response_ip_query(type, response);
+
+                auto const global_addr = global_ip_cache_->global_addr(type);
+                EXPECT_EQ(static_cast<bool>(global_addr), HttpTests[j] && AddrTests[i][k]);
+                if (global_addr)
+                {
+                    EXPECT_EQ(global_addr->display_name(), AddrStr[k]);
+                }
+            }
+        }
+    }
+}
