@@ -135,7 +135,7 @@ TEST_F(BufferTest, NonBufferWriter)
     out1.add(Bang);
     out2.add(Bang);
 
-    auto const result1 = out1.pullup_sv();
+    auto const result1 = out1.to_string_view();
     auto const result2 = out2.to_string();
     EXPECT_EQ(result1, result2);
 }

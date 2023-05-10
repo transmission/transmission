@@ -565,7 +565,7 @@ void jsonRealFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-void write_escaped_char(Buffer& out, std::string_view& sv)
+[[nodiscard]] char* write_escaped_char(char* buf, char const* const end, std::string_view& sv)
 {
     auto u16buf = std::array<std::uint16_t, 2>{};
 
@@ -577,12 +577,11 @@ void write_escaped_char(Buffer& out, std::string_view& sv)
 
     for (auto it = std::cbegin(u16buf); it != end16; ++it)
     {
-        auto arr = std::array<char, 16>{};
-        auto const result = fmt::format_to_n(std::data(arr), std::size(arr), FMT_COMPILE("\\u{:04x}"), *it);
-        out.add(std::data(arr), result.size);
+        buf = fmt::format_to_n(buf, end - buf - 1, FMT_COMPILE("\\u{:04x}"), *it).out;
     }
 
     sv.remove_prefix(walk8 - begin8 - 1);
+    return buf;
 }
 
 void jsonStringFunc(tr_variant const* val, void* vdata)
@@ -593,62 +592,75 @@ void jsonStringFunc(tr_variant const* val, void* vdata)
     (void)!tr_variantGetStrView(val, &sv);
 
     auto& out = data->out;
-    out.reserve(std::size(data->out) + std::size(sv) * 6 + 2);
-    out.push_back('"');
+    auto const [buf, buflen] = out.reserve_space(std::size(sv) * 6 + 2);
+    auto* walk = reinterpret_cast<char*>(buf);
+    auto const* const begin = walk;
+    auto const* const end = begin + buflen;
+
+    *walk++ = '"';
 
     for (; !std::empty(sv); sv.remove_prefix(1))
     {
         switch (sv.front())
         {
         case '\b':
-            out.add(R"(\b)"sv);
+            *walk++ = '\\';
+            *walk++ = 'b';
             break;
 
         case '\f':
-            out.add(R"(\f)"sv);
+            *walk++ = '\\';
+            *walk++ = 'f';
             break;
 
         case '\n':
-            out.add(R"(\n)"sv);
+            *walk++ = '\\';
+            *walk++ = 'n';
             break;
 
         case '\r':
-            out.add(R"(\r)"sv);
+            *walk++ = '\\';
+            *walk++ = 'r';
             break;
 
         case '\t':
-            out.add(R"(\t)"sv);
+            *walk++ = '\\';
+            *walk++ = 't';
             break;
 
         case '"':
-            out.add(R"(\")"sv);
+            *walk++ = '\\';
+            *walk++ = '"';
             break;
 
         case '\\':
-            out.add(R"(\\)"sv);
+            *walk++ = '\\';
+            *walk++ = '\\';
             break;
 
         default:
             if (isprint((unsigned char)sv.front()) != 0)
             {
-                out.push_back(sv.front());
+                *walk++ = sv.front();
             }
             else
             {
                 try
                 {
-                    write_escaped_char(out, sv);
+                    walk = write_escaped_char(walk, end, sv);
                 }
                 catch (utf8::exception const&)
                 {
-                    out.push_back('?');
+                    *walk++ = '?';
                 }
             }
             break;
         }
     }
 
-    out.push_back('"');
+    *walk++ = '"';
+    TR_ASSERT(walk <= end);
+    out.commit_space(walk - begin);
 
     jsonChildFunc(data);
 }
