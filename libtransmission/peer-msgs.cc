@@ -46,7 +46,6 @@
 #endif
 
 using namespace std::literals;
-using Buffer = libtransmission::Buffer;
 
 namespace
 {
@@ -122,6 +121,11 @@ auto constexpr Ltep = uint8_t{ 20 };
 }
 
 } // namespace BtPeerMsgs
+
+// sized to hold a piece message
+using PeerMessageBuffer = libtransmission::
+    SmallBuffer<sizeof(uint8_t) + sizeof(uint32_t) * 2U + tr_block_info::BlockSize, std::byte>;
+using PeerMessageReader = libtransmission::BufferReader<std::byte>;
 
 namespace LtepMessages
 {
@@ -217,7 +221,7 @@ struct tr_incoming
 {
     std::optional<uint32_t> length; // the full message payload length. Includes the +1 for id length
     std::optional<uint8_t> id; // the protocol message, e.g. BtPeerMsgs::Piece
-    Buffer payload;
+    PeerMessageBuffer payload;
 
     struct incoming_piece_data
     {
@@ -653,8 +657,8 @@ public:
     tr_bitfield have_;
 
 private:
-    friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmission::Buffer& payload);
-    friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload);
+    friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, PeerMessageReader& payload);
+    friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, PeerMessageReader& payload);
 
     tr_peer_callback const callback_;
     void* const callback_data_;
@@ -813,8 +817,7 @@ size_t protocol_send_message(tr_peerMsgsImpl const* const msgs, uint8_t type, Ar
 {
     using namespace protocol_send_message_helpers;
 
-    static auto constexpr MaxPieceMessageSize = sizeof(uint8_t) + sizeof(uint32_t) * 3U + tr_block_info::BlockSize;
-    auto out = libtransmission::SmallBuffer<MaxPieceMessageSize>{};
+    auto out = PeerMessageBuffer{};
     build_peer_message(msgs, out, type, args...);
     auto const n_bytes_added = std::size(out);
     msgs->io->write(out, type == BtPeerMsgs::Piece);
@@ -1016,7 +1019,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantClear(&val);
 }
 
-void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
+void parseLtepHandshake(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
 {
     msgs->peerSentLtepHandshake = true;
 
@@ -1126,7 +1129,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
     tr_variantClear(&val);
 }
 
-void parseUtMetadata(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload_in)
+void parseUtMetadata(tr_peerMsgsImpl* msgs, PeerMessageReader& payload_in)
 {
     int64_t msg_type = -1;
     int64_t piece = -1;
@@ -1181,7 +1184,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload_in)
     }
 }
 
-void parseUtPex(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
+void parseUtPex(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
 {
     auto* const tor = msgs->torrent;
     if (!tor->allows_pex())
@@ -1229,7 +1232,7 @@ void parseUtPex(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
     }
 }
 
-void parseLtep(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
+void parseLtep(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
 {
     TR_ASSERT(!std::empty(payload));
 
@@ -1264,7 +1267,7 @@ void parseLtep(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
     }
 }
 
-ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmission::Buffer& payload);
+ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, PeerMessageReader& payload);
 
 void prefetchPieces(tr_peerMsgsImpl* msgs)
 {
@@ -1329,7 +1332,7 @@ void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 
 int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> block_data, tr_block_index_t block);
 
-ReadResult read_piece_data(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
+ReadResult read_piece_data(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
 {
     // <index><begin><block>
     auto const piece = payload.to_uint32();
@@ -1372,7 +1375,7 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, libtransmission::Buffer& paylo
     return { ok ? READ_NOW : READ_ERR, len };
 }
 
-ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmission::Buffer& payload)
+ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, PeerMessageReader& payload)
 {
     bool const fext = msgs->io->supports_fext();
 
@@ -1761,7 +1764,7 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     current_message_len.reset();
     auto const message_type = *current_message_type;
     current_message_type.reset();
-    auto payload = libtransmission::Buffer{};
+    auto payload = PeerMessageBuffer{};
     std::swap(payload, current_payload);
 
     auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, message_type, payload);

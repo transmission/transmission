@@ -287,9 +287,9 @@ class SmallBuffer
 {
 public:
     SmallBuffer() = default;
-    SmallBuffer(SmallBuffer&&) = delete;
+    SmallBuffer(SmallBuffer&&) = default;
+    SmallBuffer& operator=(SmallBuffer&&) = default;
     SmallBuffer(SmallBuffer const&) = delete;
-    SmallBuffer& operator=(SmallBuffer&&) = delete;
     SmallBuffer& operator=(SmallBuffer const&) = delete;
 
     [[nodiscard]] size_t size() const noexcept override
