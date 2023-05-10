@@ -115,6 +115,21 @@ public:
         to_buf(&tmp, sizeof(tmp));
         return tr_ntohll(tmp);
     }
+
+    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    {
+        if (auto const n_sent = send(sockfd, data(), std::min(n_bytes, size()), 0); n_sent >= 0)
+        {
+            drain(n_sent);
+            fmt::print("{:p} sent {:d} (of {:d}) to socket {:d}\n", fmt::ptr(this), n_sent, n_bytes, sockfd);
+            return n_sent;
+        }
+
+        auto const err = sockerrno;
+        tr_error_set(error, err, tr_net_strerror(err));
+        fmt::print("{:p} error {:s}\n", fmt::ptr(this), tr_net_strerror(err));
+        return {};
+    }
 };
 
 template<typename value_type>
@@ -187,6 +202,22 @@ public:
         auto nport = port.network();
         add(&nport, sizeof(nport));
     }
+
+    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    {
+        auto const [buf, buflen] = reserve_space(n_bytes);
+        if (auto const n_read = recv(sockfd, buf, buflen, 0); n_read >= 0)
+        {
+            commit_space(n_read);
+            fmt::print("{:p} read {:d} bytes (of {:d}) from socket {:d}\n", fmt::ptr(this), n_read, n_bytes, sockfd);
+            return n_read;
+        }
+
+        auto const err = sockerrno;
+        tr_error_set(error, err, tr_net_strerror(err));
+        fmt::print("{:p} error {:s}\n", fmt::ptr(this), tr_net_strerror(err));
+        return {};
+    }
 };
 
 class Buffer
@@ -219,6 +250,7 @@ public:
         evbuffer_drain(buf_.get(), n_bytes);
     }
 
+#if 0
     // Returns the number of bytes written. Check `error` for error.
     size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
@@ -232,12 +264,14 @@ public:
         tr_error_set(error, err, tr_net_strerror(err));
         return 0;
     }
+#endif
 
     [[nodiscard]] value_type const* data() const noexcept override
     {
         return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
     }
 
+#if 0
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);
@@ -260,6 +294,7 @@ public:
 
         return {};
     }
+#endif
 
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
