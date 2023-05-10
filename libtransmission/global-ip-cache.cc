@@ -168,6 +168,7 @@ bool tr_global_ip_cache::try_shutdown() noexcept
     return true;
 }
 
+// (Almost) always a good idea to call update_addr() after calling this function
 void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string_view bind_address) noexcept
 {
     settings_bind_addr_[type] = tr_address::from_string(bind_address);
