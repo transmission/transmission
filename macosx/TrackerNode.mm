@@ -58,7 +58,7 @@
 
 - (NSString*)host
 {
-    return @(self.fStat.host);
+    return @(self.fStat.host_and_port);
 }
 
 - (NSString*)fullAnnounceAddress

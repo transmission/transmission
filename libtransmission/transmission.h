@@ -1274,7 +1274,7 @@ struct tr_tracker_view
 {
     char const* announce; // full announce URL
     char const* scrape; // full scrape URL
-    char const* host; // uniquely-identifying tracker name (`${host}:${port}`)
+    char const* host_and_port; // uniquely-identifying tracker name (`${host}:${port}`)
 
     // The tracker site's name. Uses the first label before the public suffix
     // (https://publicsuffix.org/) in the announce URL's host.
