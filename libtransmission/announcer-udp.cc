@@ -49,6 +49,8 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
+using InBuf = libtransmission::BufferReader<std::byte>;
+
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
 auto tau_transaction_new()
@@ -83,7 +85,7 @@ struct tau_scrape_request
         }
 
         // build the payload
-        auto buf = libtransmission::Buffer{};
+        auto buf = libtransmission::SmallBuffer<4096>{};
         buf.add_uint32(TAU_ACTION_SCRAPE);
         buf.add_uint32(transaction_id);
         for (int i = 0; i < in.info_hash_count; ++i)
@@ -114,7 +116,7 @@ struct tau_scrape_request
         requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         response.did_connect = true;
         response.did_timeout = false;
@@ -177,7 +179,7 @@ struct tau_announce_request
         response.info_hash = in.info_hash;
 
         // build the payload
-        auto buf = libtransmission::Buffer{};
+        auto buf = libtransmission::SmallBuffer<128>{};
         buf.add_uint32(TAU_ACTION_ANNOUNCE);
         buf.add_uint32(transaction_id);
         buf.add(in.info_hash);
@@ -214,7 +216,7 @@ struct tau_announce_request
         this->requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
@@ -309,7 +311,7 @@ struct tau_tracker
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
-    void on_connection_response(tau_action_t action, libtransmission::Buffer& buf)
+    void on_connection_response(tau_action_t action, InBuf& buf)
     {
         this->connecting_at = 0;
         this->connection_transaction_id = 0;
@@ -372,7 +374,7 @@ struct tau_tracker
             this->connection_transaction_id = tau_transaction_new();
             logtrace(this->key, fmt::format("Trying to connect. Transaction ID is {}", this->connection_transaction_id));
 
-            auto buf = libtransmission::Buffer{};
+            auto buf = libtransmission::SmallBuffer<128>{};
             buf.add_uint64(0x41727101980LL);
             buf.add_uint32(TAU_ACTION_CONNECT);
             buf.add_uint32(this->connection_transaction_id);
@@ -460,7 +462,7 @@ private:
     {
         if (this->connecting_at != 0 && this->connecting_at + ConnectionRequestTtl < now)
         {
-            auto empty_buf = libtransmission::Buffer{};
+            auto empty_buf = libtransmission::SmallBuffer<128>{};
             on_connection_response(TAU_ACTION_ERROR, empty_buf);
         }
 
@@ -533,7 +535,7 @@ private:
     {
         logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
 
-        auto buf = libtransmission::Buffer{};
+        auto buf = libtransmission::SmallBuffer<4096>{};
         buf.add_uint64(this->connection_id);
         buf.add(payload, payload_len);
 
@@ -620,7 +622,7 @@ public:
         }
 
         // extract the action_id and see if it makes sense
-        auto buf = libtransmission::Buffer{};
+        auto buf = libtransmission::SmallBuffer<4096>{};
         buf.add(msg, msglen);
         auto const action_id = static_cast<tau_action_t>(buf.to_uint32());
 
