@@ -28,7 +28,11 @@ namespace
 
 using namespace std::literals;
 
-auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
+static_assert(TR_AF_INET == 0);
+static_assert(TR_AF_INET6 == 1);
+auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissionbt.com/"sv },
+                                             std::array{ "https://ip6.transmissionbt.com/"sv } };
+
 auto constexpr UpkeepInterval = 30min;
 auto constexpr RetryUpkeepInterval = 30s;
 
@@ -171,7 +175,6 @@ void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::strin
     {
         settings_bind_addr_[type].reset();
     }
-    update_addr(type);
 }
 
 tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
@@ -183,16 +186,6 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 
     TR_ASSERT_MSG(false, "invalid type");
     return {};
-}
-
-void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
-{
-    update_source_addr(type);
-    /* TODO: Temporarily disable because there is currently no way for this to work without using third party services */
-    //    if (global_source_addr(type))
-    //    {
-    //        update_global_addr(type);
-    //    }
 }
 
 bool tr_global_ip_cache::set_global_addr(tr_address_type type, tr_address const& addr) noexcept
@@ -207,60 +200,20 @@ bool tr_global_ip_cache::set_global_addr(tr_address_type type, tr_address const&
     return false;
 }
 
-void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
+void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
 {
-    auto const lock = std::lock_guard{ global_addr_mutex_[type] };
-    global_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} global address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
-}
-
-void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
-{
-    auto const lock = std::lock_guard{ source_addr_mutex_[addr.type] };
-    source_addr_[addr.type] = addr;
-    tr_logAddTrace(fmt::format("Cached source address {}", addr.display_name()));
-}
-
-void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
-{
-    auto const lock = std::lock_guard{ source_addr_mutex_[type] };
-    source_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} source address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
-
-    // No public internet connectivity means no global IP address
-    unset_global_addr(type);
-}
-
-bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
-{
-    auto lock = std::unique_lock{ is_updating_mutex_[type] };
-    is_updating_cv_[type].wait(
-        lock,
-        [this, type]() { return is_updating_[type] == is_updating_t::NO || is_updating_[type] == is_updating_t::ABORT; });
-    if (is_updating_[type] != is_updating_t::NO)
+    update_source_addr(type);
+    if (global_source_addr(type))
     {
-        return false;
+        update_global_addr(type);
     }
-    is_updating_[type] = is_updating_t::YES;
-    lock.unlock();
-    is_updating_cv_[type].notify_one();
-    return true;
-}
-
-void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
-{
-    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
-    auto lock = std::unique_lock{ is_updating_mutex_[type] };
-    is_updating_[type] = is_updating_t::NO;
-    lock.unlock();
-    is_updating_cv_[type].notify_one();
 }
 
 void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
 {
     TR_ASSERT(has_ip_protocol_[type]);
     TR_ASSERT(global_source_addr(type));
-    TR_ASSERT(ix_service_[type] < std::size(IPQueryServices));
+    TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
 
     if (ix_service_[type] == 0U && !set_is_updating(type))
     {
@@ -269,7 +222,7 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
     // Update global address
-    auto options = tr_web::FetchOptions{ IPQueryServices[ix_service_[type]],
+    auto options = tr_web::FetchOptions{ IPQueryServices[type][ix_service_[type]],
                                          [this, type](tr_web::FetchResponse const& response)
                                          { this->on_response_ip_query(type, response); },
                                          nullptr };
@@ -323,7 +276,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
 void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
 {
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
-    TR_ASSERT(ix_service_[type] < std::size(IPQueryServices));
+    TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
 
     auto const protocol = type == TR_AF_INET ? "IPv4"sv : "IPv6"sv;
     auto success = bool{ false };
@@ -340,12 +293,12 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
                 _("Successfully updated global {type} address to {ip} using {url}"),
                 fmt::arg("type", protocol),
                 fmt::arg("ip", addr->display_name()),
-                fmt::arg("url", IPQueryServices[ix_service_[type]])));
+                fmt::arg("url", IPQueryServices[type][ix_service_[type]])));
         }
     }
 
     // Try next IP query URL
-    if (!success && ++ix_service_[type] < std::size(IPQueryServices))
+    if (!success && ++ix_service_[type] < std::size(IPQueryServices[type]))
     {
         update_global_addr(type);
         return;
@@ -360,4 +313,53 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
 
     ix_service_[type] = 0U;
     unset_is_updating(type);
+}
+
+void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
+{
+    auto const lock = std::lock_guard{ global_addr_mutex_[type] };
+    global_addr_[type].reset();
+    tr_logAddTrace(fmt::format("Unset {} global address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
+}
+
+void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
+{
+    auto const lock = std::lock_guard{ source_addr_mutex_[addr.type] };
+    source_addr_[addr.type] = addr;
+    tr_logAddTrace(fmt::format("Cached source address {}", addr.display_name()));
+}
+
+void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
+{
+    auto const lock = std::lock_guard{ source_addr_mutex_[type] };
+    source_addr_[type].reset();
+    tr_logAddTrace(fmt::format("Unset {} source address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
+
+    // No public internet connectivity means no global IP address
+    unset_global_addr(type);
+}
+
+bool tr_global_ip_cache::set_is_updating(tr_address_type type) noexcept
+{
+    auto lock = std::unique_lock{ is_updating_mutex_[type] };
+    is_updating_cv_[type].wait(
+        lock,
+        [this, type]() { return is_updating_[type] == is_updating_t::NO || is_updating_[type] == is_updating_t::ABORT; });
+    if (is_updating_[type] != is_updating_t::NO)
+    {
+        return false;
+    }
+    is_updating_[type] = is_updating_t::YES;
+    lock.unlock();
+    is_updating_cv_[type].notify_one();
+    return true;
+}
+
+void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
+{
+    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
+    auto lock = std::unique_lock{ is_updating_mutex_[type] };
+    is_updating_[type] = is_updating_t::NO;
+    lock.unlock();
+    is_updating_cv_[type].notify_one();
 }

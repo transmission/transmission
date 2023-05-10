@@ -65,8 +65,14 @@ public:
     void set_settings_bind_addr(tr_address_type type, std::string_view bind_address) noexcept;
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
-    void update_addr(tr_address_type type) noexcept;
     bool set_global_addr(tr_address_type type, tr_address const& addr) noexcept;
+
+    void update_addr(tr_address_type type) noexcept;
+    void update_global_addr(tr_address_type type) noexcept;
+    void update_source_addr(tr_address_type type) noexcept;
+
+    // Only use as a callback for web_->fetch()
+    void on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept;
 
     [[nodiscard]] constexpr auto has_ip_protocol(tr_address_type type) const noexcept
     {
@@ -93,12 +99,6 @@ private:
 
     [[nodiscard]] bool set_is_updating(tr_address_type type) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
-
-    void update_global_addr(tr_address_type type) noexcept;
-    void update_source_addr(tr_address_type type) noexcept;
-
-    // Only use as a callback for web_->fetch()
-    void on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept;
 
     tr_web& web_;
 
