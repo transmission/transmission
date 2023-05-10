@@ -432,7 +432,9 @@ tr_address tr_session::publicAddress(tr_address_type type) const noexcept
         // otherwise, if we can determine which one to use via global_source_address(ipv6) magic, use it.
         // otherwise, use any_ipv6 (::).
         auto const source_addr = global_source_address(type);
-        return source_addr && source_addr->is_global_unicast_address() ? *source_addr : global_ip_cache_->bind_addr(type);
+        auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
+                                                                                            tr_address::any_ipv6();
+        return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
     TR_ASSERT_MSG(false, "invalid type");
