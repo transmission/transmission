@@ -50,11 +50,6 @@ public:
         return data();
     }
 
-    [[nodiscard]] auto* end()
-    {
-        return begin() + size();
-    }
-
     [[nodiscard]] auto const* end() const
     {
         return begin() + size();
@@ -200,11 +195,10 @@ public:
         add(&nport, sizeof(nport));
     }
 
-#if 0
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         auto const [buf, buflen] = reserve_space(n_bytes);
-        if (auto const n_read = recv(sockfd, buf, buflen, 0); n_read >= 0)
+        if (auto const n_read = recv(sockfd, buf, n_bytes, 0); n_read >= 0)
         {
             commit_space(n_read);
             fmt::print("{:p} read {:d} bytes (of {:d}) from socket {:d}\n", fmt::ptr(this), n_read, n_bytes, sockfd);
@@ -216,10 +210,9 @@ public:
         fmt::print("{:p} error {:s}\n", fmt::ptr(this), tr_net_strerror(err));
         return {};
     }
-#endif
 };
 
-class Buffer
+class Buffer final
     : public BufferReader<std::byte>
     , public BufferWriter<std::byte>
 {
@@ -227,17 +220,16 @@ public:
     using value_type = std::byte;
 
     Buffer() = default;
-    Buffer(Buffer&& that) = default;
-    Buffer& operator=(Buffer&& that) = default;
+    Buffer(Buffer&&) = default;
+    Buffer(Buffer const&) = delete;
+    Buffer& operator=(Buffer&&) = default;
+    Buffer& operator=(Buffer const&) = delete;
 
     template<typename T>
     explicit Buffer(T const& data)
     {
         add(data);
     }
-
-    Buffer(Buffer const&) = delete;
-    Buffer& operator=(Buffer const&) = delete;
 
     [[nodiscard]] size_t size() const noexcept override
     {
@@ -249,66 +241,9 @@ public:
         evbuffer_drain(buf_.get(), n_bytes);
     }
 
-    // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
-    {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
-        auto const err = EVUTIL_SOCKET_ERROR();
-        if (res >= 0)
-        {
-            return static_cast<size_t>(res);
-        }
-        tr_error_set(error, err, tr_net_strerror(err));
-        return 0;
-    }
-
-#if 0
-    [[nodiscard]] std::pair<value_type*, size_t> pullup()
-    {
-        return { reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1)), size() };
-    }
-#endif
-
-    [[nodiscard]] value_type const* data() const noexcept override
+    [[nodiscard]] value_type const* data() const override
     {
         return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
-    }
-
-#if 0
-    [[nodiscard]] auto pullup_sv()
-    {
-        auto const [buf, buflen] = pullup();
-        return std::string_view{ reinterpret_cast<char const*>(buf), buflen };
-    }
-
-    void reserve(size_t n_bytes)
-    {
-        evbuffer_expand(buf_.get(), n_bytes - size());
-    }
-#endif
-
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
-    {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
-        auto const err = EVUTIL_SOCKET_ERROR();
-
-        if (res > 0)
-        {
-            return static_cast<size_t>(res);
-        }
-
-        if (res == 0)
-        {
-            tr_error_set_from_errno(error, ENOTCONN);
-        }
-        else
-        {
-            tr_error_set(error, err, tr_net_strerror(err));
-        }
-
-        return {};
     }
 
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
