@@ -123,11 +123,24 @@ public:
 
     [[nodiscard]] size_t get_write_buffer_space(uint64_t now) const noexcept;
 
-    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data);
+    template<typename T>
+    void write_bytes(T const* buf, size_t n_bytes, bool is_piece_data)
+    {
+        outbuf_info_.emplace_back(n_bytes, is_piece_data);
+
+        auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
+        filter_.encrypt(reinterpret_cast<std::byte const*>(buf), resbuf, n_bytes);
+        outbuf_.commit_space(n_bytes);
+    }
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
-    void write(libtransmission::Buffer& buf, bool is_piece_data);
+    void write(libtransmission::BufferReader<std::byte>& buf, bool is_piece_data)
+    {
+        auto const n_bytes = std::size(buf);
+        write_bytes(std::data(buf), n_bytes, is_piece_data);
+        buf.drain(n_bytes);
+    }
 
     size_t flush_outgoing_protocol_msgs();
 
