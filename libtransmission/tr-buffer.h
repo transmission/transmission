@@ -112,7 +112,7 @@ public:
 
     size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
-        if (auto const n_sent = send(sockfd, reinterpret_cast<char*>(data()), std::min(n_bytes, size()), 0); n_sent >= 0)
+        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), std::min(n_bytes, size()), 0); n_sent >= 0)
         {
             drain(n_sent);
             return n_sent;
