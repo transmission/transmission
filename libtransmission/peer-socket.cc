@@ -70,7 +70,7 @@ void tr_peer_socket::close()
     handle = {};
 }
 
-size_t tr_peer_socket::try_write(Buffer& buf, size_t max, tr_error** error) const
+size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) const
 {
     if (max == size_t{})
     {
