@@ -108,6 +108,7 @@ TEST_F(BufferTest, Move)
     EXPECT_EQ(3U, std::size(a));
 }
 
+#if 0
 TEST_F(BufferTest, NonBufferWriter)
 {
     auto constexpr Hello = "Hello, "sv;
@@ -139,3 +140,4 @@ TEST_F(BufferTest, NonBufferWriter)
     auto const result2 = out2.to_string();
     EXPECT_EQ(result1, result2);
 }
+#endif

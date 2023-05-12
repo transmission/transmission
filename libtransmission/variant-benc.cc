@@ -286,8 +286,8 @@ void saveIntFunc(tr_variant const* val, void* vout)
     auto const [buf, buflen] = out->reserve_space(64U);
     auto* walk = reinterpret_cast<char*>(buf);
     auto const* const begin = walk;
-    auto const* const end = fmt::format_to(walk, FMT_COMPILE("i{:d}e"), val->val.i);
-    out->commit_space(end - begin);
+    walk = fmt::format_to(walk, FMT_COMPILE("i{:d}e"), val->val.i);
+    out->commit_space(walk - begin);
 }
 
 void saveBoolFunc(tr_variant const* val, void* vout)

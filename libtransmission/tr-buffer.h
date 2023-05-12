@@ -9,6 +9,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -49,11 +50,6 @@ public:
     [[nodiscard]] auto const* begin() const
     {
         return data();
-    }
-
-    [[nodiscard]] auto* end()
-    {
-        return begin() + size();
     }
 
     [[nodiscard]] auto const* end() const
@@ -118,16 +114,14 @@ public:
 
     size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
-        if (auto const n_sent = send(sockfd, data(), std::min(n_bytes, size()), 0); n_sent >= 0)
+        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), std::min(n_bytes, size()), 0); n_sent >= 0)
         {
             drain(n_sent);
-            fmt::print("{:p} sent {:d} (of {:d}) to socket {:d}\n", fmt::ptr(this), n_sent, n_bytes, sockfd);
             return n_sent;
         }
 
         auto const err = sockerrno;
         tr_error_set(error, err, tr_net_strerror(err));
-        fmt::print("{:p} error {:s}\n", fmt::ptr(this), tr_net_strerror(err));
         return {};
     }
 };
@@ -206,7 +200,7 @@ public:
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         auto const [buf, buflen] = reserve_space(n_bytes);
-        if (auto const n_read = recv(sockfd, buf, buflen, 0); n_read >= 0)
+        if (auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0); n_read >= 0)
         {
             commit_space(n_read);
             fmt::print("{:p} read {:d} bytes (of {:d}) from socket {:d}\n", fmt::ptr(this), n_read, n_bytes, sockfd);
@@ -220,7 +214,7 @@ public:
     }
 };
 
-class Buffer
+class Buffer final
     : public BufferReader<std::byte>
     , public BufferWriter<std::byte>
 {
@@ -228,17 +222,16 @@ public:
     using value_type = std::byte;
 
     Buffer() = default;
-    Buffer(Buffer&& that) = default;
-    Buffer& operator=(Buffer&& that) = default;
+    Buffer(Buffer&&) = default;
+    Buffer(Buffer const&) = delete;
+    Buffer& operator=(Buffer&&) = default;
+    Buffer& operator=(Buffer const&) = delete;
 
     template<typename T>
     explicit Buffer(T const& data)
     {
         add(data);
     }
-
-    Buffer(Buffer const&) = delete;
-    Buffer& operator=(Buffer const&) = delete;
 
     [[nodiscard]] size_t size() const noexcept override
     {
@@ -250,69 +243,32 @@ public:
         evbuffer_drain(buf_.get(), n_bytes);
     }
 
-#if 0
-    // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
-    {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
-        auto const err = EVUTIL_SOCKET_ERROR();
-        if (res >= 0)
-        {
-            return static_cast<size_t>(res);
-        }
-        tr_error_set(error, err, tr_net_strerror(err));
-        return 0;
-    }
-#endif
-
-    [[nodiscard]] value_type const* data() const noexcept override
+    [[nodiscard]] value_type const* data() const override
     {
         return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
     }
 
-#if 0
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
-    {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
-        auto const err = EVUTIL_SOCKET_ERROR();
-
-        if (res > 0)
-        {
-            return static_cast<size_t>(res);
-        }
-
-        if (res == 0)
-        {
-            tr_error_set_from_errno(error, ENOTCONN);
-        }
-        else
-        {
-            tr_error_set(error, err, tr_net_strerror(err));
-        }
-
-        return {};
-    }
-#endif
-
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        evbuffer_iovec iov = {};
+        auto iov = evbuffer_iovec{};
         evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
+        TR_ASSERT(iov.iov_len >= n_bytes);
+        reserved_space_ = iov;
         return { static_cast<value_type*>(iov.iov_base), static_cast<size_t>(iov.iov_len) };
     }
 
     virtual void commit_space(size_t n_bytes) override
     {
-        evbuffer_iovec iov = {};
-        evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
-        iov.iov_len = n_bytes;
-        evbuffer_commit_space(buf_.get(), &iov, 1);
+        TR_ASSERT(reserved_space_);
+        TR_ASSERT(reserved_space_->iov_len >= n_bytes);
+        reserved_space_->iov_len = n_bytes;
+        evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
+        reserved_space_.reset();
     }
 
 private:
     evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
+    std::optional<evbuffer_iovec> reserved_space_;
 };
 
 template<size_t N, typename value_type = std::byte>

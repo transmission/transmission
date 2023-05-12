@@ -47,6 +47,11 @@
 
 using namespace std::literals;
 
+// sized to hold a piece message
+using PeerMessageBuffer = libtransmission::
+    SmallBuffer<sizeof(uint8_t) + sizeof(uint32_t) * 2U + tr_block_info::BlockSize, std::byte>;
+using PeerMessageReader = libtransmission::BufferReader<std::byte>;
+
 namespace
 {
 
@@ -121,11 +126,6 @@ auto constexpr Ltep = uint8_t{ 20 };
 }
 
 } // namespace BtPeerMsgs
-
-// sized to hold a piece message
-using PeerMessageBuffer = libtransmission::
-    SmallBuffer<sizeof(uint8_t) + sizeof(uint32_t) * 2U + tr_block_info::BlockSize, std::byte>;
-using PeerMessageReader = libtransmission::BufferReader<std::byte>;
 
 namespace LtepMessages
 {
@@ -798,16 +798,12 @@ void build_peer_message(tr_peerMsgsImpl const* const msgs, BufferWriter& out, ui
 {
     logtrace(msgs, build_log_message(type, args...));
 
-    auto const old_len = std::size(out);
     auto msg_len = sizeof(type);
     ((msg_len += get_param_length(args)), ...);
-    out.reserve_space(msg_len);
     out.add_uint32(msg_len);
     out.add_uint8(type);
     (add_param(out, args), ...);
-    out.commit_space(msg_len);
 
-    TR_ASSERT(old_len + sizeof(uint32_t) + msg_len);
     TR_ASSERT(messageLengthIsCorrect(msgs->torrent, type, msg_len));
 }
 } // namespace protocol_send_message_helpers
@@ -1456,15 +1452,12 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, PeerMessageRe
         break;
 
     case BtPeerMsgs::Bitfield:
-        {
-            logtrace(msgs, "got a bitfield");
-            auto const n_bytes = std::size(payload);
-            msgs->have_ = tr_bitfield{ msgs->torrent->has_metainfo() ? msgs->torrent->piece_count() : n_bytes * 8 };
-            msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(std::data(payload)), n_bytes);
-            msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
-            msgs->invalidatePercentDone();
-            break;
-        }
+        logtrace(msgs, "got a bitfield");
+        msgs->have_ = tr_bitfield{ msgs->torrent->has_metainfo() ? msgs->torrent->piece_count() : std::size(payload) * 8 };
+        msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(std::data(payload)), std::size(payload));
+        msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
+        msgs->invalidatePercentDone();
+        break;
 
     case BtPeerMsgs::Request:
         {
