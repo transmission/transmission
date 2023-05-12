@@ -198,7 +198,7 @@ public:
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         auto const [buf, buflen] = reserve_space(n_bytes);
-        if (auto const n_read = recv(sockfd, buf, n_bytes, 0); n_read >= 0)
+        if (auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0); n_read >= 0)
         {
             commit_space(n_read);
             fmt::print("{:p} read {:d} bytes (of {:d}) from socket {:d}\n", fmt::ptr(this), n_read, n_bytes, sockfd);
