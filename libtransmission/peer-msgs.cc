@@ -791,14 +791,12 @@ void build_peer_message(tr_peerMsgsImpl const* const msgs, Buffer& out, uint8_t 
 {
     logtrace(msgs, build_log_message(type, args...));
 
-    auto const old_len = std::size(out);
     auto msg_len = sizeof(type);
     ((msg_len += get_param_length(args)), ...);
     out.add_uint32(msg_len);
     out.add_uint8(type);
     (add_param(out, args), ...);
 
-    TR_ASSERT(old_len + sizeof(uint32_t) + msg_len);
     TR_ASSERT(messageLengthIsCorrect(msgs->torrent, type, msg_len));
 }
 } // namespace protocol_send_message_helpers
