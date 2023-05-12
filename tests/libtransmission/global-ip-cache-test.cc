@@ -77,6 +77,18 @@ protected:
     private:
         MockTimerMaker timer_maker_;
     };
+
+    void TearDown() override
+    {
+        ::testing::Test::TearDown();
+        if (global_ip_cache_)
+        {
+            global_ip_cache_->try_shutdown();
+        }
+    }
+
+    // To be created within the test body
+    std::unique_ptr<tr_global_ip_cache> global_ip_cache_;
 };
 
 TEST_F(GlobalIPCacheTest, bindAddr)
@@ -106,14 +118,14 @@ TEST_F(GlobalIPCacheTest, bindAddr)
     };
 
     auto mediator = LocalMockMediator{};
-    auto cache = tr_global_ip_cache::create(mediator);
+    global_ip_cache_ = tr_global_ip_cache::create(mediator);
 
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
         mediator.j_ = 0;
         for (std::size_t& j = mediator.j_; j < std::size(AddrTests[i]); ++j)
         {
-            auto const addr = cache->bind_addr(static_cast<tr_address_type>(i));
+            auto const addr = global_ip_cache_->bind_addr(static_cast<tr_address_type>(i));
             EXPECT_EQ(addr.display_name(), AddrTests[i][j].second);
         }
     }
@@ -135,7 +147,7 @@ TEST_F(GlobalIPCacheTest, setGlobalAddr)
     static_assert(std::size(AddrStr) == std::size(AddrTests[TR_AF_INET6]));
 
     auto mediator = MockMediator{};
-    auto cache = tr_global_ip_cache::create(mediator);
+    global_ip_cache_ = tr_global_ip_cache::create(mediator);
 
     for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
@@ -144,10 +156,10 @@ TEST_F(GlobalIPCacheTest, setGlobalAddr)
             auto const type = static_cast<tr_address_type>(i);
             auto const addr = tr_address::from_string(AddrStr[j]);
             ASSERT_TRUE(addr);
-            EXPECT_EQ(cache->set_global_addr(type, *addr), AddrTests[i][j]);
-            if (AddrTests[i][j])
+            EXPECT_EQ(global_ip_cache_->set_global_addr(type, *addr), AddrTests[i][j]);
+            if (auto const val = global_ip_cache_->global_addr(type); val && AddrTests[i][j])
             {
-                EXPECT_EQ(cache->global_addr(type)->display_name(), AddrStr[j]);
+                EXPECT_EQ(val->display_name(), AddrStr[j]);
             }
         }
     }
@@ -163,10 +175,10 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv4)
         }
     };
     auto mediator = LocalMockMediator{};
-    auto cache = tr_global_ip_cache::create(mediator);
+    global_ip_cache_ = tr_global_ip_cache::create(mediator);
 
-    cache->update_source_addr(TR_AF_INET);
-    auto const addr = cache->global_source_addr(TR_AF_INET);
+    global_ip_cache_->update_source_addr(TR_AF_INET);
+    auto const addr = global_ip_cache_->global_source_addr(TR_AF_INET);
     if (!addr)
     {
         GTEST_SKIP() << "globalSourceIPv4 did not return an address, either:\n"
@@ -187,10 +199,10 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv6)
         }
     };
     auto mediator = LocalMockMediator{};
-    auto cache = tr_global_ip_cache::create(mediator);
+    global_ip_cache_ = tr_global_ip_cache::create(mediator);
 
-    cache->update_source_addr(TR_AF_INET6);
-    auto const addr = cache->global_source_addr(TR_AF_INET6);
+    global_ip_cache_->update_source_addr(TR_AF_INET6);
+    auto const addr = global_ip_cache_->global_source_addr(TR_AF_INET6);
     if (!addr)
     {
         GTEST_SKIP() << "globalSourceIPv6 did not return an address, either:\n"
@@ -228,26 +240,29 @@ TEST_F(GlobalIPCacheTest, onResponseIPQuery)
             options.done_func(response);
         }
 
-        long http_code{};
         std::size_t address_type{};
+        long http_code{};
         std::size_t k_{};
     };
 
     auto mediator = LocalMockMediator{};
-    auto cache = tr_global_ip_cache::create(mediator);
+    global_ip_cache_ = tr_global_ip_cache::create(mediator);
 
-    for (std::size_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
+    mediator.address_type = 0;
+    for (std::size_t& i = mediator.address_type; i < NUM_TR_AF_INET_TYPES; ++i)
     {
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-        for (long j = 100; j <= 599; ++j)
+        mediator.http_code = 100;
+        for (long& j = mediator.http_code; j <= 599; ++j)
         {
-            for (std::size_t k = 0; k < std::size(AddrStr); ++k)
+            mediator.k_ = 0;
+            for (std::size_t& k = mediator.k_; k < std::size(AddrStr); ++k)
             {
                 auto const type = static_cast<tr_address_type>(i);
 
-                cache->update_global_addr(type);
+                global_ip_cache_->update_global_addr(type);
 
-                auto const global_addr = cache->global_addr(type);
+                auto const global_addr = global_ip_cache_->global_addr(type);
                 EXPECT_EQ(static_cast<bool>(global_addr), j == 200 /* HTTP_OK */ && AddrTests[i][k]);
                 if (global_addr)
                 {
