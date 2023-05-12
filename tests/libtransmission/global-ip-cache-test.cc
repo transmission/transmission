@@ -263,7 +263,7 @@ TEST_F(GlobalIPCacheTest, onResponseIPQuery)
                 global_ip_cache_->update_global_addr(type);
 
                 auto const global_addr = global_ip_cache_->global_addr(type);
-                EXPECT_EQ(static_cast<bool>(global_addr), j == 200 /* HTTP_OK */ && AddrTests[i][k]);
+                EXPECT_EQ(!!global_addr, j == 200 /* HTTP_OK */ && AddrTests[i][k]);
                 if (global_addr)
                 {
                     EXPECT_EQ(global_addr->display_name(), AddrStr[k]);
