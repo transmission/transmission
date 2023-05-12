@@ -40,7 +40,28 @@
 class tr_global_ip_cache
 {
 public:
-    tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in);
+    struct Mediator
+    {
+        virtual ~Mediator() = default;
+
+        virtual void fetch(tr_web::FetchOptions&& /* options */)
+        {
+        }
+
+        [[nodiscard]] virtual std::string_view settings_bind_addr(tr_address_type /* type */)
+        {
+            return {};
+        }
+
+        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+    };
+
+private:
+    explicit tr_global_ip_cache(Mediator& mediator_in);
+
+public:
+    [[nodiscard]] static std::unique_ptr<tr_global_ip_cache> create(Mediator& mediator_in);
+
     tr_global_ip_cache() = delete;
     ~tr_global_ip_cache();
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
@@ -62,7 +83,6 @@ public:
         return source_addr_[type];
     }
 
-    void set_settings_bind_addr(tr_address_type type, std::string_view bind_address) noexcept;
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
     bool set_global_addr(tr_address_type type, tr_address const& addr) noexcept;
@@ -100,13 +120,11 @@ private:
     [[nodiscard]] bool set_is_updating(tr_address_type type) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
 
-    tr_web& web_;
-
-    array_ip_t<std::optional<tr_address>> settings_bind_addr_;
+    Mediator& mediator_;
 
     enum class is_updating_t
     {
-        NO,
+        NO = 0,
         YES,
         ABORT
     };

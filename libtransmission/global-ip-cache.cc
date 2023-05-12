@@ -116,9 +116,9 @@ namespace global_source_ip_helpers
 } // namespace global_source_ip_helpers
 } // namespace
 
-tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in)
-    : web_{ web_in }
-    , upkeep_timers_{ timer_maker_in.create(), timer_maker_in.create() }
+tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
+    : mediator_{ mediator_in }
+    , upkeep_timers_{ mediator_in.timer_maker().create(), mediator_in.timer_maker().create() }
 {
     static_assert(TR_AF_INET == 0);
     static_assert(TR_AF_INET6 == 1);
@@ -134,6 +134,11 @@ tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMak
         upkeep_timers_[i]->set_callback(cb);
         start_timer(type, UpkeepInterval);
     }
+}
+
+std::unique_ptr<tr_global_ip_cache> tr_global_ip_cache::create(tr_global_ip_cache::Mediator& mediator_in)
+{
+    return std::unique_ptr<tr_global_ip_cache>(new tr_global_ip_cache(mediator_in));
 }
 
 tr_global_ip_cache::~tr_global_ip_cache()
@@ -168,21 +173,16 @@ bool tr_global_ip_cache::try_shutdown() noexcept
     return true;
 }
 
-// (Almost) always a good idea to call update_addr() after calling this function
-void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string_view bind_address) noexcept
-{
-    settings_bind_addr_[type] = tr_address::from_string(bind_address);
-    if (settings_bind_addr_[type] && type != settings_bind_addr_[type]->type)
-    {
-        settings_bind_addr_[type].reset();
-    }
-}
-
 tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET || type == TR_AF_INET6)
     {
-        return settings_bind_addr_[type].value_or(type == TR_AF_INET ? tr_address::any_ipv4() : tr_address::any_ipv6());
+        auto const addr = tr_address::from_string(mediator_.settings_bind_addr(type));
+        if (addr && type == addr->type)
+        {
+            return *addr;
+        }
+        return type == TR_AF_INET ? tr_address::any_ipv4() : tr_address::any_ipv6();
     }
 
     TR_ASSERT_MSG(false, "invalid type");
@@ -229,7 +229,7 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
     options.ip_proto = type == TR_AF_INET ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
-    web_.fetch(std::move(options));
+    mediator_.fetch(std::move(options));
 }
 
 void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
