@@ -227,12 +227,35 @@ struct tr_incoming
     {
         explicit incoming_piece_data(uint32_t block_size)
             : buf{ std::make_unique<std::vector<uint8_t>>(block_size) }
-            , have{ block_size }
+            , block_size_{ block_size }
         {
         }
 
+        [[nodiscard]] bool add_span(size_t begin, size_t end)
+        {
+            if (begin > end || end > block_size_)
+            {
+                return false;
+            }
+
+            for (; begin < end; ++begin)
+            {
+                have_.set(begin);
+            }
+
+            return true;
+        }
+
+        [[nodiscard]] auto has_all() const noexcept
+        {
+            return have_.count() >= block_size_;
+        }
+
         std::unique_ptr<std::vector<uint8_t>> buf;
-        tr_bitfield have;
+
+    private:
+        std::bitset<tr_block_info::BlockSize> have_;
+        size_t const block_size_;
     };
 
     std::map<tr_block_index_t, incoming_piece_data> blocks;
@@ -1355,11 +1378,16 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
     auto& incoming_block = blocks.try_emplace(block, block_size).first->second;
     payload.to_buf(std::data(*incoming_block.buf) + loc.block_offset, len);
     msgs->publish(tr_peer_event::GotPieceData(len));
-    incoming_block.have.set_span(loc.block_offset, loc.block_offset + len);
+
+    if (!incoming_block.add_span(loc.block_offset, loc.block_offset + len))
+    {
+        return { READ_ERR, len }; // invalid span
+    }
+
     logtrace(msgs, fmt::format("got {:d} bytes for req {:d}:{:d}->{:d}", len, piece, offset, len));
 
     // if we haven't gotten the entire block yet, wait for more
-    if (!incoming_block.have.has_all())
+    if (!incoming_block.has_all())
     {
         return { READ_LATER, len };
     }

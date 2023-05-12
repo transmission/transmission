@@ -36,7 +36,9 @@ public:
     template<typename... T>
     [[nodiscard]] static tr_sha1_digest_t digest(T const&... args)
     {
-        auto context = tr_sha1::create();
+        static thread_local auto context = tr_sha1::create(); // NOLINT(exit-time-destructors)
+
+        context->clear();
         (context->add(std::data(args), std::size(args)), ...);
         return context->finish();
     }

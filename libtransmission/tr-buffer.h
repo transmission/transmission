@@ -212,6 +212,7 @@ public:
     }
 };
 
+#if 0
 class Buffer final
     : public BufferReader<std::byte>
     , public BufferWriter<std::byte>
@@ -268,6 +269,7 @@ private:
     evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
     std::optional<evbuffer_iovec> reserved_space_;
 };
+#endif
 
 template<size_t N, typename value_type = std::byte>
 class SmallBuffer

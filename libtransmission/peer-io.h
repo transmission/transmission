@@ -347,8 +347,9 @@ private:
 
     tr_sha1_digest_t info_hash_;
 
-    libtransmission::Buffer inbuf_;
-    libtransmission::Buffer outbuf_;
+    using Buffer = libtransmission::SmallBuffer<tr_block_info::BlockSize * 5U>;
+    Buffer inbuf_;
+    Buffer outbuf_;
 
     tr_session* const session_;
 
