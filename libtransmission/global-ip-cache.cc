@@ -279,7 +279,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
 
     auto const protocol = type == TR_AF_INET ? "IPv4"sv : "IPv6"sv;
-    auto success = bool{ false };
+    auto success = false;
 
     if (response.status == 200 /* HTTP_OK */)
     {
