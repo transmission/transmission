@@ -49,6 +49,8 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
+using InBuf = libtransmission::BufferReader<std::byte>;
+
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
 auto tau_transaction_new()
@@ -114,7 +116,7 @@ struct tau_scrape_request
         requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         response.did_connect = true;
         response.did_timeout = false;
@@ -214,7 +216,7 @@ struct tau_announce_request
         this->requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
@@ -309,7 +311,7 @@ struct tau_tracker
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
-    void on_connection_response(tau_action_t action, libtransmission::Buffer& buf)
+    void on_connection_response(tau_action_t action, InBuf& buf)
     {
         this->connecting_at = 0;
         this->connection_transaction_id = 0;
