@@ -13,13 +13,14 @@
 
 #include <algorithm> // for std::copy_n
 #include <array>
-#include <cstddef> // size_t, std::byte
+#include <cstddef> // for size_t, std::byte
 #include <memory>
 
-#include "tr-macros.h" // tr_sha1_digest_t
+#include "tr-macros.h" // for tr_sha1_digest_t
 #include "tr-arc4.h"
 
 class tr_arc4;
+class tr_sha1;
 
 // Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
 namespace tr_message_stream_encryption
@@ -78,7 +79,7 @@ private:
 class Filter
 {
 public:
-    void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    void decrypt_init(bool is_incoming, DH const&, tr_sha1&, tr_sha1_digest_t const& info_hash);
 
     template<typename T>
     constexpr void decrypt(size_t buf_len, T* buf)
@@ -89,7 +90,7 @@ public:
         }
     }
 
-    void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    void encrypt_init(bool is_incoming, DH const&, tr_sha1&, tr_sha1_digest_t const& info_hash);
 
     template<typename T>
     constexpr void encrypt(size_t buf_len, T* buf)

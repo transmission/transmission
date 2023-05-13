@@ -16,7 +16,6 @@
 
 #include "transmission.h"
 
-#include "block-info.h"
 #include "error.h"
 #include "net.h"
 #include "tr-assert.h"
@@ -58,7 +57,7 @@ public:
     using InBuf = libtransmission::BufferWriter<std::byte>;
     using OutBuf = libtransmission::BufferReader<std::byte>;
 
-    size_t try_read(Buffer& buf, size_t max, tr_error** error) const;
+    size_t try_read(InBuf& buf, size_t max, bool is_buf_empty, tr_error** error) const;
     size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
 
     [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept

@@ -7,7 +7,7 @@
 #define TR_CRYPTO_UTILS_H
 
 #include <array>
-#include <cstddef> // size_t
+#include <cstddef> // for size_t
 #include <cstdint>
 #include <limits>
 #include <memory>
@@ -16,7 +16,7 @@
 #include <string>
 #include <string_view>
 
-#include "transmission.h" // tr_sha1_digest_t
+#include "tr-macros.h" // for tr_sha1_digest_t
 
 /**
  * @addtogroup utils Utilities
@@ -34,13 +34,17 @@ public:
     [[nodiscard]] virtual tr_sha1_digest_t finish() = 0;
 
     template<typename... T>
-    [[nodiscard]] static tr_sha1_digest_t digest(T const&... args)
+    [[nodiscard]] auto make_digest(T const&... args)
     {
-        static thread_local auto context = tr_sha1::create(); // NOLINT(exit-time-destructors)
+        clear();
+        (add(std::data(args), std::size(args)), ...);
+        return finish();
+    }
 
-        context->clear();
-        (context->add(std::data(args), std::size(args)), ...);
-        return context->finish();
+    template<typename... T>
+    [[nodiscard]] static auto digest(T const&... args)
+    {
+        return create()->make_digest(args...);
     }
 };
 

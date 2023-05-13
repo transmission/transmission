@@ -22,6 +22,7 @@
 
 #include "transmission.h"
 
+#include "crypto-utils.h"
 #include "net.h"
 #include "peer-mse.h" // tr_message_stream_encryption::DH
 #include "peer-io.h"
@@ -299,6 +300,8 @@ private:
     ///
 
     DH dh_ = {};
+
+    std::unique_ptr<tr_sha1> const sha1_ = tr_sha1::create();
 
     DoneFunc on_done_;
 

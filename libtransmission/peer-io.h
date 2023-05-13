@@ -18,6 +18,7 @@
 #include "transmission.h"
 
 #include "bandwidth.h"
+#include "block-info.h"
 #include "net.h" // tr_address
 #include "peer-mse.h"
 #include "peer-socket.h"
@@ -269,14 +270,14 @@ public:
         return filter_.is_active();
     }
 
-    void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+    void decrypt_init(bool is_incoming, DH const& dh, tr_sha1& sha1, tr_sha1_digest_t const& info_hash)
     {
-        filter_.decryptInit(is_incoming, dh, info_hash);
+        filter_.decrypt_init(is_incoming, dh, sha1, info_hash);
     }
 
-    void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+    void encrypt_init(bool is_incoming, DH const& dh, tr_sha1& sha1, tr_sha1_digest_t const& info_hash)
     {
-        filter_.encryptInit(is_incoming, dh, info_hash);
+        filter_.encrypt_init(is_incoming, dh, sha1, info_hash);
     }
 
     ///
