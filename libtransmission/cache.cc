@@ -73,7 +73,8 @@ std::pair<Cache::CIter, Cache::CIter> Cache::find_contiguous(CIter const begin, 
 int Cache::write_contiguous(CIter const begin, CIter const end) const
 {
     // The most common case without an extra data copy.
-    auto const* towrite = begin->buf.get();
+    auto const* out = std::data(*begin->buf);
+    auto outlen = std::size(*begin->buf);
 
     // Contiguous area to join more than one block, if any.
     auto buf = std::vector<uint8_t>{};
@@ -94,7 +95,8 @@ int Cache::write_contiguous(CIter const begin, CIter const end) const
             buf.insert(std::end(buf), std::begin(*iter->buf), std::end(*iter->buf));
         }
         TR_ASSERT(std::size(buf) == buflen);
-        towrite = &buf;
+        out = std::data(buf);
+        outlen = std::size(buf);
     }
 
     // save it
@@ -107,13 +109,13 @@ int Cache::write_contiguous(CIter const begin, CIter const end) const
 
     auto const loc = tor->block_loc(block);
 
-    if (auto const err = tr_ioWrite(tor, loc, std::size(*towrite), std::data(*towrite)); err != 0)
+    if (auto const err = tr_ioWrite(tor, loc, outlen, out); err != 0)
     {
         return err;
     }
 
     ++disk_writes_;
-    disk_write_bytes_ += std::size(*towrite);
+    disk_write_bytes_ += outlen;
     return {};
 }
 
@@ -141,7 +143,7 @@ Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
 
 // ---
 
-int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme)
+int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<BlockData> writeme)
 {
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
