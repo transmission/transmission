@@ -58,7 +58,7 @@ public:
     using InBuf = libtransmission::BufferWriter<std::byte>;
     using OutBuf = libtransmission::BufferReader<std::byte>;
 
-    size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error** error) const;
+    size_t try_read(Buffer& buf, size_t max, tr_error** error) const;
     size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
 
     [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept

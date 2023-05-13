@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <cerrno>
 #include <cstring>
 #include <ctime>
