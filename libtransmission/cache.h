@@ -26,6 +26,44 @@ struct tr_torrent;
 class Cache
 {
 public:
+    class BlockData
+    {
+    public:
+        BlockData(size_t size)
+            : size_{ size }
+        {
+        }
+
+        [[nodiscard]] constexpr auto size() const noexcept
+        {
+            return size_;
+        }
+
+        [[nodiscard]] constexpr auto* data() noexcept
+        {
+            return std::data(data_);
+        }
+
+        [[nodiscard]] constexpr const auto* data() const noexcept
+        {
+            return std::data(data_);
+        }
+
+        [[nodiscard]] constexpr auto* begin() const noexcept
+        {
+            return data();
+        }
+
+        [[nodiscard]] constexpr auto* end() const noexcept
+        {
+            return begin() + size();
+        }
+
+    private:
+        std::array<uint8_t, tr_block_info::BlockSize> data_;
+        size_t const size_;
+    };
+
     Cache(tr_torrents& torrents, int64_t max_bytes);
 
     int set_limit(int64_t new_limit);
@@ -36,7 +74,7 @@ public:
     }
 
     // @return any error code from cacheTrim()
-    int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme);
+    int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<BlockData> writeme);
 
     int read_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme);
     int prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len);
@@ -49,7 +87,7 @@ private:
     struct CacheBlock
     {
         Key key;
-        std::unique_ptr<std::vector<uint8_t>> buf;
+        std::unique_ptr<BlockData> buf;
         time_t time_added = {};
     };
 
