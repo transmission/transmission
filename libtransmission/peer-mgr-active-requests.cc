@@ -198,7 +198,9 @@ bool ActiveRequests::has(tr_block_index_t block, tr_peer const* peer) const
 // count how many peers we're asking for `block`
 size_t ActiveRequests::count(tr_block_index_t block) const
 {
-    return std::size(impl_->blocks_[block]);
+    auto const& blocks = impl_->blocks_;
+    auto const iter = blocks.find(block);
+    return iter == std::end(blocks) ? 0U : std::size(iter->second);
 }
 
 // count how many active block requests we have to `peer`
