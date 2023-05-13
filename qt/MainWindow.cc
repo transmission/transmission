@@ -588,15 +588,15 @@ namespace open_folder_helpers
 void openSelect(QString const& path)
 {
     auto const explorer = QStringLiteral("explorer");
-    QString param;
+    QStringList params;
 
     if (!QFileInfo(path).isDir())
     {
-        param = QStringLiteral("/select,");
+        params.append(QStringLiteral("/select,"));
     }
 
-    param += QDir::toNativeSeparators(path);
-    QProcess::startDetached(explorer, QStringList(param));
+    params.append(QDir::toNativeSeparators(path));
+    QProcess::startDetached(explorer, params);
 }
 #elif defined(Q_OS_MAC)
 void openSelect(QString const& path)
@@ -665,6 +665,40 @@ void openSelect(QString const& path)
 
     return {};
 }
+
+[[nodiscard]] QString getTopFile(QDir const& parent, Torrent const* const tor)
+{
+    // no "files" key means this is a single file torrent, as per BEP 3
+    if (tor->files().size() == 0)
+    {
+        if (tor->hasName())
+        {
+            auto const info = QFileInfo{ parent, tor->name() };
+            if (info.exists() && (info.isDir() || info.isFile()))
+            {
+                return tor->name();
+            }
+        }
+    }
+    // this torrent is without a root folder, but has a list of file(s)
+    else
+    {
+        for (auto const& file : tor->files())
+        {
+            auto const info = QFileInfo{ parent, file.filename };
+            if (!info.exists() || info.isRelative())
+            {
+                continue;
+            }
+            if (info.isDir() || info.isFile())
+            {
+                return file.filename;
+            }
+        }
+    }
+
+    return {};
+}
 } // namespace open_folder_helpers
 } // namespace
 
@@ -687,7 +721,17 @@ void MainWindow::openFolder()
 
     auto const parent = QDir{ tor->getPath() };
     auto const child = getTopFolder(parent, tor);
-    openSelect(parent.filePath(child));
+
+    auto open_target = parent.filePath(child);
+
+    // If this torrent has no root folder, target its file contents instead,
+    // so that the OS file explorer can properly focus on it.
+    if (child.isEmpty())
+    {
+        open_target += QStringLiteral("/") + getTopFile(parent, tor);
+    }
+
+    openSelect(open_target);
 }
 
 void MainWindow::copyMagnetLinkToClipboard()
