@@ -76,6 +76,8 @@ if [ -n "$fix" ]; then
 fi
 
 # format JS
+# but only if js has changed
+git diff --cached --quiet -- "web/**" && exit $exitcode
 cd "${root}/web" || exit 1
 npm_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
 if ! npm ci --no-audit --no-fund --no-progress &>/dev/null; then
