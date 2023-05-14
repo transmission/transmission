@@ -65,24 +65,24 @@ protected:
 
     static auto testBuilder(tr_metainfo_builder& builder)
     {
-        tr_error* error = builder.makeChecksums().get();
+        tr_error* error = builder.make_checksums().get();
         EXPECT_EQ(error, nullptr) << *error;
 
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parse_benc(builder.benc()));
-        EXPECT_EQ(builder.fileCount(), metainfo.file_count());
-        EXPECT_EQ(builder.pieceSize(), metainfo.piece_size());
-        EXPECT_EQ(builder.totalSize(), metainfo.total_size());
-        EXPECT_EQ(builder.totalSize(), metainfo.total_size());
-        for (size_t i = 0, n = std::min(builder.fileCount(), metainfo.file_count()); i < n; ++i)
+        EXPECT_EQ(builder.file_count(), metainfo.file_count());
+        EXPECT_EQ(builder.piece_size(), metainfo.piece_size());
+        EXPECT_EQ(builder.total_size(), metainfo.total_size());
+        EXPECT_EQ(builder.total_size(), metainfo.total_size());
+        for (size_t i = 0, n = std::min(builder.file_count(), metainfo.file_count()); i < n; ++i)
         {
-            EXPECT_EQ(builder.fileSize(i), metainfo.files().fileSize(i));
+            EXPECT_EQ(builder.file_size(i), metainfo.files().fileSize(i));
             EXPECT_EQ(builder.path(i), metainfo.files().path(i));
         }
         EXPECT_EQ(builder.name(), metainfo.name());
         EXPECT_EQ(builder.comment(), metainfo.comment());
-        EXPECT_EQ(builder.isPrivate(), metainfo.is_private());
-        EXPECT_EQ(builder.announceList().toString(), metainfo.announce_list().toString());
+        EXPECT_EQ(builder.is_private(), metainfo.is_private());
+        EXPECT_EQ(builder.announce_list().to_string(), metainfo.announce_list().to_string());
         return metainfo;
     }
 };
@@ -94,7 +94,7 @@ TEST_F(MakemetaTest, comment)
     auto builder = tr_metainfo_builder{ filename };
 
     static auto constexpr Comment = "This is the comment"sv;
-    builder.setComment(Comment);
+    builder.set_comment(Comment);
 
     EXPECT_EQ(Comment, testBuilder(builder).comment());
 }
@@ -106,7 +106,7 @@ TEST_F(MakemetaTest, source)
     auto builder = tr_metainfo_builder{ filename };
 
     static auto constexpr Source = "This is the source"sv;
-    builder.setSource(Source);
+    builder.set_source(Source);
 
     EXPECT_EQ(Source, testBuilder(builder).source());
 }
@@ -119,7 +119,7 @@ TEST_F(MakemetaTest, isPrivate)
     for (bool const is_private : { true, false })
     {
         auto builder = tr_metainfo_builder{ filename };
-        builder.setPrivate(is_private);
+        builder.set_private(is_private);
         EXPECT_EQ(is_private, testBuilder(builder).is_private());
     }
 }
@@ -132,7 +132,7 @@ TEST_F(MakemetaTest, pieceSize)
     for (uint32_t const piece_size : { 16384, 32768 })
     {
         auto builder = tr_metainfo_builder{ filename };
-        builder.setPieceSize(piece_size);
+        builder.set_piece_size(piece_size);
         EXPECT_EQ(piece_size, testBuilder(builder).piece_size());
     }
 }
@@ -144,7 +144,7 @@ TEST_F(MakemetaTest, webseeds)
     auto builder = tr_metainfo_builder{ filename };
 
     static auto constexpr Webseed = "https://www.example.com/linux.iso"sv;
-    builder.setWebseeds(std::vector<std::string>{ std::string{ Webseed } });
+    builder.set_webseeds(std::vector<std::string>{ std::string{ Webseed } });
 
     auto const metainfo = testBuilder(builder);
     EXPECT_EQ(1U, metainfo.webseed_count());
@@ -165,7 +165,7 @@ TEST_F(MakemetaTest, anonymizeTrue)
     auto const [filename, payload] = files.front();
 
     auto builder = tr_metainfo_builder{ filename };
-    builder.setAnonymize(true);
+    builder.set_anonymize(true);
     auto const metainfo = testBuilder(builder);
     EXPECT_EQ(""sv, metainfo.creator());
     EXPECT_EQ(time_t{}, metainfo.date_created());
@@ -177,7 +177,7 @@ TEST_F(MakemetaTest, anonymizeFalse)
     auto const [filename, payload] = files.front();
 
     auto builder = tr_metainfo_builder{ filename };
-    builder.setAnonymize(false);
+    builder.set_anonymize(false);
     auto const metainfo = testBuilder(builder);
     EXPECT_TRUE(tr_strvContains(metainfo.creator(), TR_NAME)) << metainfo.creator();
     auto const now = time(nullptr);
@@ -202,16 +202,16 @@ TEST_F(MakemetaTest, singleFile)
     auto trackers = tr_announce_list{};
     trackers.add("udp://tracker.openbittorrent.com:80"sv, trackers.nextTier());
     trackers.add("udp://tracker.publicbt.com:80"sv, trackers.nextTier());
-    builder.setAnnounceList(std::move(trackers));
+    builder.set_announce_list(std::move(trackers));
 
     static auto constexpr Comment = "This is the comment"sv;
-    builder.setComment(Comment);
+    builder.set_comment(Comment);
 
     static auto constexpr IsPrivate = false;
-    builder.setPrivate(IsPrivate);
+    builder.set_private(IsPrivate);
 
     static auto constexpr Anonymize = false;
-    builder.setAnonymize(Anonymize);
+    builder.set_anonymize(Anonymize);
 
     testBuilder(builder);
 }
@@ -226,10 +226,10 @@ TEST_F(MakemetaTest, announceSingleTracker)
     static auto constexpr SingleAnnounce = "udp://tracker.openbittorrent.com:80"sv;
     auto trackers = tr_announce_list{};
     trackers.add(SingleAnnounce, trackers.nextTier());
-    builder.setAnnounceList(std::move(trackers));
+    builder.set_announce_list(std::move(trackers));
 
     // generate the torrent and parse it as a variant
-    EXPECT_EQ(nullptr, builder.makeChecksums().get());
+    EXPECT_EQ(nullptr, builder.make_checksums().get());
     auto top = tr_variant{};
     auto const benc = builder.benc();
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
@@ -257,10 +257,10 @@ TEST_F(MakemetaTest, announceMultiTracker)
     {
         trackers.add(url, trackers.nextTier());
     }
-    builder.setAnnounceList(std::move(trackers));
+    builder.set_announce_list(std::move(trackers));
 
     // generate the torrent and parse it as a variant
-    EXPECT_EQ(nullptr, builder.makeChecksums().get());
+    EXPECT_EQ(nullptr, builder.make_checksums().get());
     auto top = tr_variant{};
     auto const benc = builder.benc();
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
@@ -268,13 +268,13 @@ TEST_F(MakemetaTest, announceMultiTracker)
     // confirm there's an "announce" entry
     auto single_announce = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&top, TR_KEY_announce, &single_announce));
-    EXPECT_EQ(builder.announceList().at(0).announce.sv(), single_announce);
+    EXPECT_EQ(builder.announce_list().at(0).announce.sv(), single_announce);
 
     // confirm there's an "announce-list" entry
     tr_variant* announce_list_variant = nullptr;
     EXPECT_TRUE(tr_variantDictFindList(&top, TR_KEY_announce_list, &announce_list_variant));
     EXPECT_NE(nullptr, announce_list_variant);
-    EXPECT_EQ(std::size(builder.announceList()), tr_variantListSize(announce_list_variant));
+    EXPECT_EQ(std::size(builder.announce_list()), tr_variantListSize(announce_list_variant));
 
     tr_variantClear(&top);
 }
@@ -286,14 +286,14 @@ TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
     auto builder = tr_metainfo_builder{ filename };
     auto trackers = tr_announce_list{};
     trackers.add("udp://tracker.openbittorrent.com:80"sv, trackers.nextTier());
-    builder.setAnnounceList(std::move(trackers));
+    builder.set_announce_list(std::move(trackers));
     auto base_metainfo = testBuilder(builder);
 
-    builder.setPrivate(true);
+    builder.set_private(true);
     auto private_metainfo = testBuilder(builder);
     EXPECT_NE(base_metainfo.info_hash(), private_metainfo.info_hash());
 
-    builder.setSource("FOO");
+    builder.set_source("FOO");
     auto private_source_metainfo = testBuilder(builder);
     EXPECT_NE(base_metainfo.info_hash(), private_source_metainfo.info_hash());
     EXPECT_NE(private_metainfo.info_hash(), private_source_metainfo.info_hash());

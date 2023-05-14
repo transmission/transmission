@@ -135,7 +135,7 @@ public:
     public:
         virtual ~Mediator() noexcept = default;
         virtual void sendto(void const* buf, size_t buflen, sockaddr const* addr, socklen_t addrlen) = 0;
-        [[nodiscard]] virtual std::optional<tr_address> announceIP() const = 0;
+        [[nodiscard]] virtual std::optional<tr_address> announce_ip() const = 0;
     };
 
     virtual ~tr_announcer_udp() noexcept = default;
@@ -150,5 +150,5 @@ public:
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
-    virtual bool handleMessage(uint8_t const* msg, size_t msglen) = 0;
+    virtual bool handle_message(uint8_t const* msg, size_t msglen) = 0;
 };

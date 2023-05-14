@@ -82,17 +82,17 @@ public:
     public:
         virtual ~Mediator() = default;
 
-        [[nodiscard]] virtual std::vector<tr_torrent_id_t> torrentsAllowingDHT() const = 0;
-        [[nodiscard]] virtual tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t) const = 0;
+        [[nodiscard]] virtual std::vector<tr_torrent_id_t> torrents_allowing_dht() const = 0;
+        [[nodiscard]] virtual tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t) const = 0;
 
-        [[nodiscard]] virtual std::string_view configDir() const = 0;
-        [[nodiscard]] virtual libtransmission::TimerMaker& timerMaker() = 0;
+        [[nodiscard]] virtual std::string_view config_dir() const = 0;
+        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual API& api()
         {
             return api_;
         }
 
-        virtual void addPex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) = 0;
+        virtual void add_pex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) = 0;
 
     private:
         API api_;
@@ -105,6 +105,6 @@ public:
         tr_socket_t udp6_socket);
     virtual ~tr_dht() = default;
 
-    virtual void addNode(tr_address const& address, tr_port port) = 0;
-    virtual void handleMessage(unsigned char const* msg, size_t msglen, struct sockaddr* from, socklen_t fromlen) = 0;
+    virtual void add_node(tr_address const& address, tr_port port) = 0;
+    virtual void handle_message(unsigned char const* msg, size_t msglen, struct sockaddr* from, socklen_t fromlen) = 0;
 };

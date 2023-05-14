@@ -178,8 +178,8 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
     if (socket_.is_tcp())
     {
-        event_read_.reset(event_new(session_->eventBase(), socket_.handle.tcp, EV_READ, &tr_peerIo::event_read_cb, this));
-        event_write_.reset(event_new(session_->eventBase(), socket_.handle.tcp, EV_WRITE, &tr_peerIo::event_write_cb, this));
+        event_read_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_READ, &tr_peerIo::event_read_cb, this));
+        event_write_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_WRITE, &tr_peerIo::event_write_cb, this));
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())
@@ -231,8 +231,8 @@ bool tr_peerIo::reconnect()
         return false;
     }
 
-    this->event_read_.reset(event_new(session_->eventBase(), socket_.handle.tcp, EV_READ, event_read_cb, this));
-    this->event_write_.reset(event_new(session_->eventBase(), socket_.handle.tcp, EV_WRITE, event_write_cb, this));
+    this->event_read_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_READ, event_read_cb, this));
+    this->event_write_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_WRITE, event_write_cb, this));
 
     event_enable(pending_events);
 
@@ -573,30 +573,6 @@ size_t tr_peerIo::get_write_buffer_space(uint64_t now) const noexcept
     size_t const desired_len = get_desired_output_buffer_size(this, now);
     size_t const current_len = std::size(outbuf_);
     return desired_len > current_len ? desired_len - current_len : 0U;
-}
-
-void tr_peerIo::write(libtransmission::Buffer& buf, bool is_piece_data)
-{
-    auto [bytes, len] = buf.pullup();
-    encrypt(len, bytes);
-    outbuf_info_.emplace_back(std::size(buf), is_piece_data);
-    outbuf_.add(buf);
-    buf.clear();
-}
-
-void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
-{
-    auto const old_size = std::size(outbuf_);
-
-    outbuf_.reserve(old_size + n_bytes);
-    outbuf_.add(bytes, n_bytes);
-
-    for (auto iter = std::begin(outbuf_) + old_size, end = std::end(outbuf_); iter != end; ++iter)
-    {
-        encrypt(1, &*iter);
-    }
-
-    outbuf_info_.emplace_back(n_bytes, is_piece_data);
 }
 
 // ---

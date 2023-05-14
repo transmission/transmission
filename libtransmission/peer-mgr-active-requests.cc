@@ -106,13 +106,8 @@ bool ActiveRequests::has(tr_block_index_t block, tr_peer const* peer) const noex
 size_t ActiveRequests::count(tr_block_index_t block) const noexcept
 {
     auto const& btop = impl_->block_to_peers_;
-
-    if (auto const iter = btop.find(block); iter != std::end(btop))
-    {
-        return std::size(iter->second);
-    }
-
-    return {};
+    auto const iter = btop.find(block);
+    return iter != std::end(btop) ? std::size(iter->second) : 0U;
 }
 
 // count how many active block requests we have to `peer`

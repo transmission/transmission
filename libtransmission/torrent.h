@@ -424,7 +424,7 @@ public:
 
     [[nodiscard]] auto tracker_list() const
     {
-        return this->announce_list().toString();
+        return this->announce_list().to_string();
     }
 
     bool set_tracker_list(std::string_view text);

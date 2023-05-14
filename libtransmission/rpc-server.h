@@ -58,28 +58,28 @@ public:
 
     void load(tr_variant* src);
     void save(tr_variant* tgt) const;
-    static void defaultSettings(tr_variant* tgt);
+    static void default_settings(tr_variant* tgt);
 
     [[nodiscard]] constexpr tr_port port() const noexcept
     {
         return port_;
     }
 
-    void setPort(tr_port port) noexcept;
+    void set_port(tr_port port) noexcept;
 
-    [[nodiscard]] constexpr auto isEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_enabled() const noexcept
     {
         return is_enabled_;
     }
 
-    void setEnabled(bool is_enabled);
+    void set_enabled(bool is_enabled);
 
-    [[nodiscard]] constexpr auto isWhitelistEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_whitelist_enabled() const noexcept
     {
         return is_whitelist_enabled_;
     }
 
-    constexpr void setWhitelistEnabled(bool is_whitelist_enabled) noexcept
+    constexpr void set_whitelist_enabled(bool is_whitelist_enabled) noexcept
     {
         is_whitelist_enabled_ = is_whitelist_enabled;
     }
@@ -89,42 +89,42 @@ public:
         return whitelist_str_;
     }
 
-    void setWhitelist(std::string_view whitelist);
+    void set_whitelist(std::string_view whitelist);
 
     [[nodiscard]] constexpr auto const& username() const noexcept
     {
         return username_;
     }
 
-    void setUsername(std::string_view username);
+    void set_username(std::string_view username);
 
-    [[nodiscard]] constexpr auto isPasswordEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_password_enabled() const noexcept
     {
         return is_password_enabled_;
     }
 
-    void setPasswordEnabled(bool enabled);
+    void set_password_enabled(bool enabled);
 
-    [[nodiscard]] constexpr auto const& getSaltedPassword() const noexcept
+    [[nodiscard]] constexpr auto const& get_salted_password() const noexcept
     {
         return salted_password_;
     }
 
-    void setPassword(std::string_view password) noexcept;
+    void set_password(std::string_view password) noexcept;
 
-    [[nodiscard]] constexpr auto isAntiBruteForceEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_anti_brute_force_enabled() const noexcept
     {
         return is_anti_brute_force_enabled_;
     }
 
-    void setAntiBruteForceEnabled(bool enabled) noexcept;
+    void set_anti_brute_force_enabled(bool enabled) noexcept;
 
-    [[nodiscard]] constexpr auto getAntiBruteForceLimit() const noexcept
+    [[nodiscard]] constexpr auto get_anti_brute_force_limit() const noexcept
     {
         return anti_brute_force_limit_;
     }
 
-    constexpr void setAntiBruteForceLimit(int limit) noexcept
+    constexpr void set_anti_brute_force_limit(int limit) noexcept
     {
         anti_brute_force_limit_ = limit;
     }
@@ -136,11 +136,11 @@ public:
         return url_;
     }
 
-    void setUrl(std::string_view url);
+    void set_url(std::string_view url);
 
-    [[nodiscard]] std::string getBindAddress() const;
+    [[nodiscard]] std::string get_bind_address() const;
 
-    [[nodiscard]] constexpr auto socketMode() const noexcept
+    [[nodiscard]] constexpr auto socket_mode() const noexcept
     {
         return socket_mode_;
     }

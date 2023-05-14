@@ -114,12 +114,12 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
         if (session->dht_)
         {
             buf[rc] = '\0'; // libdht requires zero-terminated messages
-            session->dht_->handleMessage(std::data(buf), rc, from_sa, fromlen);
+            session->dht_->handle_message(std::data(buf), rc, from_sa, fromlen);
         }
     }
     else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
     {
-        if (!session->announcer_udp_->handleMessage(std::data(buf), rc))
+        if (!session->announcer_udp_->handle_message(std::data(buf), rc))
         {
             tr_logAddTrace("Couldn't parse UDP tracker packet.");
         }
@@ -170,12 +170,12 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketTOS(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_.reset(event_new(session_.eventBase(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp4_event_.reset(event_new(session_.event_base(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp4_event_.get(), nullptr);
         }
     }
 
-    if (!tr_net_hasIPv6(udp_port_))
+    if (!session.has_ip_protocol(TR_AF_INET6))
     {
         // no IPv6; do nothing
     }
@@ -204,7 +204,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_.reset(event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp6_event_.reset(event_new(session_.event_base(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp6_event_.get(), nullptr);
 
 #ifdef IPV6_V6ONLY
@@ -238,6 +238,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
+    auto const addrport = tr_address::from_sockaddr(to);
     if (to->sa_family != AF_INET && to->sa_family != AF_INET6)
     {
         errno = EAFNOSUPPORT;
@@ -247,13 +248,20 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         // don't warn on bad sockets; the system may not support IPv6
         return;
     }
+    else if (
+        addrport && addrport->first.is_global_unicast_address() &&
+        !session_.global_source_address(to->sa_family == AF_INET ? TR_AF_INET : TR_AF_INET6))
+    {
+        // don't try to connect to a global address if we don't have connectivity to public internet
+        return;
+    }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
     {
         return;
     }
 
     auto display_name = std::string{};
-    if (auto const addrport = tr_address::from_sockaddr(to); addrport)
+    if (addrport)
     {
         auto const& [addr, port] = *addrport;
         display_name = addr.display_name(port);

@@ -118,7 +118,7 @@ tr_session_id::~tr_session_id()
     destroy_lockfile(previous_lock_file_, std::data(previous_value_));
 }
 
-bool tr_session_id::isLocal(std::string_view session_id) noexcept
+bool tr_session_id::is_local(std::string_view session_id) noexcept
 {
     if (std::empty(session_id))
     {

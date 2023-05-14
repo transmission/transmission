@@ -325,9 +325,9 @@ void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
     send_simple_response(req, HTTP_BADMETHOD);
 }
 
-bool isAddressAllowed(tr_rpc_server const* server, char const* address)
+bool is_address_allowed(tr_rpc_server const* server, char const* address)
 {
-    if (!server->isWhitelistEnabled())
+    if (!server->is_whitelist_enabled())
     {
         return true;
     }
@@ -348,7 +348,7 @@ bool isIPAddressWithOptionalPort(char const* host)
 bool isHostnameAllowed(tr_rpc_server const* server, evhttp_request const* req)
 {
     /* If password auth is enabled, any hostname is permitted. */
-    if (server->isPasswordEnabled())
+    if (server->is_password_enabled())
     {
         return true;
     }
@@ -392,9 +392,9 @@ bool test_session_id(tr_rpc_server const* server, evhttp_request const* req)
     return session_id != nullptr && server->session->sessionId() == session_id;
 }
 
-bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
+bool is_authorized(tr_rpc_server const* server, char const* auth_header)
 {
-    if (!server->isPasswordEnabled())
+    if (!server->is_password_enabled())
     {
         return true;
     }
@@ -428,13 +428,13 @@ void handle_request(struct evhttp_request* req, void* arg)
     {
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
-        if (server->isAntiBruteForceEnabled() && server->login_attempts_ >= server->anti_brute_force_limit_)
+        if (server->is_anti_brute_force_enabled() && server->login_attempts_ >= server->anti_brute_force_limit_)
         {
             send_simple_response(req, HttpErrorForbidden);
             return;
         }
 
-        if (!isAddressAllowed(server, req->remote_host))
+        if (!is_address_allowed(server, req->remote_host))
         {
             send_simple_response(req, HttpErrorForbidden);
             return;
@@ -455,10 +455,10 @@ void handle_request(struct evhttp_request* req, void* arg)
             return;
         }
 
-        if (!isAuthorized(server, evhttp_find_header(req->input_headers, "Authorization")))
+        if (!is_authorized(server, evhttp_find_header(req->input_headers, "Authorization")))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            if (server->isAntiBruteForceEnabled())
+            if (server->is_anti_brute_force_enabled())
             {
                 ++server->login_attempts_;
             }
@@ -643,18 +643,18 @@ bool bindUnixSocket(
 #endif
 }
 
-void startServer(tr_rpc_server* server);
+void start_server(tr_rpc_server* server);
 
 auto rpc_server_start_retry(tr_rpc_server* server)
 {
     if (!server->start_retry_timer)
     {
-        server->start_retry_timer = server->session->timerMaker().create([server]() { startServer(server); });
+        server->start_retry_timer = server->session->timerMaker().create([server]() { start_server(server); });
     }
 
     ++server->start_retry_counter;
     auto const interval = std::min(ServerStartRetryDelayIncrement * server->start_retry_counter, ServerStartRetryMaxDelay);
-    server->start_retry_timer->startSingleShot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
+    server->start_retry_timer->start_single_shot(std::chrono::duration_cast<std::chrono::milliseconds>(interval));
     return interval;
 }
 
@@ -664,19 +664,19 @@ void rpc_server_start_retry_cancel(tr_rpc_server* server)
     server->start_retry_counter = 0;
 }
 
-void startServer(tr_rpc_server* server)
+void start_server(tr_rpc_server* server)
 {
     if (server->httpd)
     {
         return;
     }
 
-    struct event_base* base = server->session->eventBase();
-    struct evhttp* httpd = evhttp_new(base);
+    auto* const base = server->session->event_base();
+    auto* const httpd = evhttp_new(base);
 
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
 
-    auto const address = server->getBindAddress();
+    auto const address = server->get_bind_address();
     auto const port = server->port();
 
     bool const success = server->bind_address_->type == TR_RPC_AF_UNIX ?
@@ -716,7 +716,7 @@ void startServer(tr_rpc_server* server)
     rpc_server_start_retry_cancel(server);
 }
 
-void stopServer(tr_rpc_server* server)
+void stop_server(tr_rpc_server* server)
 {
     auto const lock = server->session->unique_lock();
 
@@ -728,7 +728,7 @@ void stopServer(tr_rpc_server* server)
         return;
     }
 
-    auto const address = server->getBindAddress();
+    auto const address = server->get_bind_address();
 
     httpd.reset();
 
@@ -742,16 +742,16 @@ void stopServer(tr_rpc_server* server)
         fmt::arg("address", tr_rpc_address_with_port(server))));
 }
 
-void restartServer(tr_rpc_server* const server)
+void restart_server(tr_rpc_server* const server)
 {
-    if (server->isEnabled())
+    if (server->is_enabled())
     {
-        stopServer(server);
-        startServer(server);
+        stop_server(server);
+        start_server(server);
     }
 }
 
-auto parseWhitelist(std::string_view whitelist)
+auto parse_whitelist(std::string_view whitelist)
 {
     auto list = std::vector<std::string>{};
 
@@ -769,7 +769,7 @@ auto parseWhitelist(std::string_view whitelist)
 
 } // namespace
 
-void tr_rpc_server::setEnabled(bool is_enabled)
+void tr_rpc_server::set_enabled(bool is_enabled)
 {
     is_enabled_ = is_enabled;
 
@@ -778,16 +778,16 @@ void tr_rpc_server::setEnabled(bool is_enabled)
         {
             if (!is_enabled_)
             {
-                stopServer(this);
+                stop_server(this);
             }
             else
             {
-                startServer(this);
+                start_server(this);
             }
         });
 }
 
-void tr_rpc_server::setPort(tr_port port) noexcept
+void tr_rpc_server::set_port(tr_port port) noexcept
 {
     if (port_ == port)
     {
@@ -796,33 +796,33 @@ void tr_rpc_server::setPort(tr_port port) noexcept
 
     port_ = port;
 
-    if (isEnabled())
+    if (is_enabled())
     {
-        session->runInSessionThread(&restartServer, this);
+        session->runInSessionThread(&restart_server, this);
     }
 }
 
-void tr_rpc_server::setUrl(std::string_view url)
+void tr_rpc_server::set_url(std::string_view url)
 {
     url_ = url;
     tr_logAddDebug(fmt::format(FMT_STRING("setting our URL to '{:s}'"), url_));
 }
 
-void tr_rpc_server::setWhitelist(std::string_view whitelist)
+void tr_rpc_server::set_whitelist(std::string_view whitelist)
 {
     this->whitelist_str_ = whitelist;
-    this->whitelist_ = parseWhitelist(whitelist);
+    this->whitelist_ = parse_whitelist(whitelist);
 }
 
 // --- PASSWORD
 
-void tr_rpc_server::setUsername(std::string_view username)
+void tr_rpc_server::set_username(std::string_view username)
 {
     username_ = username;
     tr_logAddDebug(fmt::format(FMT_STRING("setting our username to '{:s}'"), username_));
 }
 
-void tr_rpc_server::setPassword(std::string_view password) noexcept
+void tr_rpc_server::set_password(std::string_view password) noexcept
 {
     auto const is_salted = tr_ssha1_test(password);
     salted_password_ = is_salted ? password : tr_ssha1(password);
@@ -830,19 +830,19 @@ void tr_rpc_server::setPassword(std::string_view password) noexcept
     tr_logAddDebug(fmt::format(FMT_STRING("setting our salted password to '{:s}'"), salted_password_));
 }
 
-void tr_rpc_server::setPasswordEnabled(bool enabled)
+void tr_rpc_server::set_password_enabled(bool enabled)
 {
     is_password_enabled_ = enabled;
     tr_logAddDebug(fmt::format("setting password-enabled to '{}'", enabled));
 }
 
-std::string tr_rpc_server::getBindAddress() const
+std::string tr_rpc_server::get_bind_address() const
 {
     auto buf = std::array<char, TrUnixAddrStrLen>{};
     return tr_rpc_address_to_string(*this->bind_address_, std::data(buf), std::size(buf));
 }
 
-void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept
+void tr_rpc_server::set_anti_brute_force_enabled(bool enabled) noexcept
 {
     is_anti_brute_force_enabled_ = enabled;
 
@@ -881,11 +881,11 @@ void tr_rpc_server::load(tr_variant* src)
         url_ = fmt::format(FMT_STRING("{:s}/"), url_);
     }
 
-    this->host_whitelist_ = parseWhitelist(host_whitelist_str_);
-    this->setPasswordEnabled(authentication_required_);
-    this->setWhitelist(whitelist_str_);
-    this->setUsername(username_);
-    this->setPassword(salted_password_);
+    this->host_whitelist_ = parse_whitelist(host_whitelist_str_);
+    this->set_password_enabled(authentication_required_);
+    this->set_whitelist(whitelist_str_);
+    this->set_username(username_);
+    this->set_password(salted_password_);
 
     if (!tr_rpc_address_from_string(*bind_address_, bind_address_str_))
     {
@@ -898,21 +898,21 @@ void tr_rpc_server::load(tr_variant* src)
 
     if (bind_address_->type == TR_RPC_AF_UNIX)
     {
-        this->setWhitelistEnabled(false);
+        this->set_whitelist_enabled(false);
         this->is_host_whitelist_enabled_ = false;
     }
-    if (this->isEnabled())
+    if (this->is_enabled())
     {
         auto const rpc_uri = tr_rpc_address_with_port(this) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
-        session->runInSessionThread(startServer, this);
+        session->runInSessionThread(start_server, this);
 
-        if (this->isWhitelistEnabled())
+        if (this->is_whitelist_enabled())
         {
             tr_logAddInfo(_("Whitelist enabled"));
         }
 
-        if (this->isPasswordEnabled())
+        if (this->is_password_enabled())
         {
             tr_logAddInfo(_("Password required"));
         }
@@ -933,7 +933,7 @@ void tr_rpc_server::save(tr_variant* tgt) const
 #undef V
 }
 
-void tr_rpc_server::defaultSettings(tr_variant* tgt){
+void tr_rpc_server::default_settings(tr_variant* tgt){
 #define V(key, field, type, default_value, comment) \
     { \
         tr_variantDictRemove(tgt, key); \
@@ -945,5 +945,5 @@ void tr_rpc_server::defaultSettings(tr_variant* tgt){
 
 tr_rpc_server::~tr_rpc_server()
 {
-    stopServer(this);
+    stop_server(this);
 }

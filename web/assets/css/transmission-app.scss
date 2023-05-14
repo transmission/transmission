@@ -16,6 +16,7 @@ $grey-800: #292929;
 $grey-900: #191919;
 $red-500: #d73a49;
 $white: #fff;
+$black: #000;
 $dark-mode-white: #c9d1d9;
 $yellow-300: #ffea7f;
 $grey-40: #666;
@@ -111,6 +112,44 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-progressbar-paused: #{$grey-500};
     --color-progressbar-leech: #{$blue-500};
     --color-progressbar-seed-paused: #{$grey-500};
+
+    .contrast-more {
+      --color-fg-error: #{$red-500};
+      --color-fg-port-closed: #{$red-500};
+      --color-fg-port-open: #{$green-500};
+      --color-bg-hover: #{$grey-40};
+      --color-fg-primary: #{$white};
+      --color-bg-primary: #{$black};
+      --color-bg-primary-hover: #{$black};
+      --color-bg-odd: #{$black};
+      --color-bg-even: #{$black};
+      --color-bg-menu: #{$black};
+      --color-fg-secondary: #{$white};
+      --color-fg-on-popup: #{$white};
+      --color-fg-disabled: #{$white};
+      --color-bg-popup: #{$black};
+      --color-bg-warn: #cf6679;
+      --color-fg-warn: #{$black};
+      --color-border: #{$white};
+      --color-border-selected: #{$white};
+      --color-fg-tertiary: #{$white};
+      --color-toolbar-background: #{$black};
+      --color-inspector-background: #{$black};
+      --color-inspector-tabs: #{$white};
+      --color-bg-selected: #{$blue-500};
+      --color-bg-tabs: #{$black};
+      --color-fg-tabs: #{$white};
+      --color-default-border: #{$white};
+      --color-progressbar-seed-1: #{$green-700};
+      --color-progressbar-seed-2: #{$green-500};
+      --color-progressbar-seed-paused: #{$grey-500};
+      --color-progressbar-background-2: #{$grey-500};
+      --color-progressbar-verify: #{$yellow-300};
+      --color-progressbar-magnet: #{$yellow-300};
+      --color-progressbar-paused: #{$grey-500};
+      --color-progressbar-leech: #{$blue-500};
+      --color-progressbar-queued: #{$blue-100};
+    }
   }
   @media (prefers-color-scheme: light) {
     --progress: 100%;
@@ -147,6 +186,44 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-progressbar-seed-1: #{$green-300};
     --color-progressbar-seed-2: #{$green-200};
     --color-progressbar-seed-paused: #{$grey-200};
+
+    .contrast-more {
+      --color-fg-error: #{$red-500};
+      --color-fg-port-closed: #{$red-500};
+      --color-fg-port-open: #{$green-500};
+      --color-bg-hover: #{$grey-40};
+      --color-fg-primary: #{$black};
+      --color-bg-primary: #{$white};
+      --color-bg-primary-hover: #{$white};
+      --color-bg-odd: #{$white};
+      --color-bg-even: #{$white};
+      --color-bg-menu: #{$white};
+      --color-fg-secondary: #{$black};
+      --color-fg-on-popup: #{$black};
+      --color-fg-disabled: #{$black};
+      --color-bg-popup: #{$white};
+      --color-bg-warn: #cf6679;
+      --color-fg-warn: #{$white};
+      --color-border: #{$black};
+      --color-border-selected: #{$black};
+      --color-fg-tertiary: #{$black};
+      --color-toolbar-background: #{$white};
+      --color-inspector-background: #{$white};
+      --color-inspector-tabs: #{$black};
+      --color-bg-selected: #{$blue-300};
+      --color-bg-tabs: #{$white};
+      --color-fg-tabs: #{$black};
+      --color-default-border: #{$black};
+      --color-progressbar-seed-1: #{$green-700};
+      --color-progressbar-seed-2: #{$green-500};
+      --color-progressbar-seed-paused: #{$grey-500};
+      --color-progressbar-background-2: #{$grey-500};
+      --color-progressbar-verify: #{$yellow-300};
+      --color-progressbar-magnet: #{$yellow-300};
+      --color-progressbar-paused: #{$grey-500};
+      --color-progressbar-leech: #{$blue-500};
+      --color-progressbar-queued: #{$blue-100};
+    }
   }
 }
 
@@ -239,7 +316,10 @@ $toolbar-height: $toolbar-height-number * 1px;
 
     &:disabled {
       cursor: default;
-      opacity: 0.25;
+      // opacity: 0.25;
+      svg {
+        stroke: var(--color-fg-disabled);
+      }
     }
   }
 
@@ -334,7 +414,7 @@ $pauseresume-size-number: 20;
 $pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border: 1;
 $progressbar-height: 14;
-$popup-top: 61px; // TODO: ugly that this is hardcoded
+$popup-top: 51px; // TODO: ugly that this is hardcoded
 
 .flex {
   flex-grow: 1;
@@ -715,7 +795,6 @@ $video-image: '../img/film.svg';
 #prefs-dialog {
   $background-color: var(--color-inspector-background);
   background: $background-color;
-  border: 0;
   bottom: 0;
   box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
@@ -1117,7 +1196,7 @@ $video-image: '../img/film.svg';
   }
 
   .torrent-row td {
-    background: var(--color-default-border);
+    background: var(--color-bg-odd);
     color: var(--color-fg-primary);
     font-size: normal;
     font-weight: bolder;
@@ -1170,6 +1249,7 @@ $video-image: '../img/film.svg';
 
   .status {
     cursor: pointer;
+    width: 10%;
   }
 }
 
@@ -1231,7 +1311,6 @@ $video-image: '../img/film.svg';
     font-size: 13px;
     font-weight: 400;
     list-style: none;
-    margin-right: 10px;
     padding: 5px 15px;
 
     &:hover:not(:disabled),
