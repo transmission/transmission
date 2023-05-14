@@ -9,6 +9,8 @@
 #include <utility>
 #include <vector>
 
+#include <sfl/small_flat_set.hpp>
+
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include "libtransmission/transmission.h"
@@ -102,7 +104,7 @@ std::vector<Candidate> getCandidates(Wishlist::Mediator const& mediator)
     return candidates;
 }
 
-std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, size_t n_blocks)
+std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* const sorted_blocks, size_t n_blocks)
 {
     if (n_blocks == 0)
     {
@@ -145,7 +147,9 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 
-    auto blocks = std::set<tr_block_index_t>{};
+    static auto constexpr StaticSize = 4096U;
+    auto blocks = sfl::small_flat_set<tr_block_index_t, StaticSize>{};
+    blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates)
     {
         // do we have enough?
@@ -175,6 +179,5 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
         }
     }
 
-    auto const blocks_v = std::vector<tr_block_index_t>{ std::begin(blocks), std::end(blocks) };
-    return makeSpans(std::data(blocks_v), std::size(blocks_v));
+    return makeSpans(std::data(blocks), std::size(blocks));
 }
