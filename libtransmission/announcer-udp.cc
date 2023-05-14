@@ -227,7 +227,8 @@ struct tau_announce_request
             response.leechers = buf.to_uint32();
             response.seeders = buf.to_uint32();
 
-            response.pex = tr_pex::from_compact_ipv4(std::data(buf), std::size(buf), nullptr, 0);
+            auto const [bytes, n_bytes] = buf.pullup();
+            response.pex = tr_pex::from_compact_ipv4(bytes, n_bytes, nullptr, 0);
             requestFinished();
         }
         else
@@ -377,7 +378,8 @@ struct tau_tracker
             buf.add_uint32(TAU_ACTION_CONNECT);
             buf.add_uint32(this->connection_transaction_id);
 
-            this->sendto(std::data(buf), std::size(buf));
+            auto const [bytes, n_bytes] = buf.pullup();
+            this->sendto(bytes, n_bytes);
         }
 
         if (timeout_reqs)
@@ -537,7 +539,8 @@ private:
         buf.add_uint64(this->connection_id);
         buf.add(payload, payload_len);
 
-        this->sendto(std::data(buf), std::size(buf));
+        auto const [bytes, n_bytes] = buf.pullup();
+        this->sendto(bytes, n_bytes);
     }
 
 public:

@@ -551,7 +551,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size));
 
     // send a connection response but with an *invalid* action
-    buf = {};
+    buf.clear();
     buf.add_uint32(ScrapeAction);
     buf.add_uint32(transaction_id);
     buf.add_uint64(tr_rand_obj<uint64_t>());
