@@ -36,6 +36,7 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
+using Buffer = libtransmission::Buffer;
 
 namespace
 {
@@ -442,7 +443,7 @@ struct JsonWalk
     }
 
     std::deque<ParentState> parents;
-    libtransmission::Buffer out;
+    Buffer out;
     bool doIndent;
 };
 
@@ -546,27 +547,25 @@ void jsonBoolFunc(tr_variant const* val, void* vdata)
 
 void jsonRealFunc(tr_variant const* val, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
-
-    auto const [buf, buflen] = data->out.reserve_space(64);
-    auto* walk = reinterpret_cast<char*>(buf);
-    auto const* const begin = walk;
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     if (fabs(val->val.d - (int)val->val.d) < 0.00001)
     {
-        walk = fmt::format_to(walk, FMT_COMPILE("{:.0f}"), val->val.d);
+        auto buf = std::array<char, 64>{};
+        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
+        data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
     else
     {
-        walk = fmt::format_to(walk, FMT_COMPILE("{:.4f}"), val->val.d);
+        auto buf = std::array<char, 64>{};
+        auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
+        data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
-
-    data->out.commit_space(walk - begin);
 
     jsonChildFunc(data);
 }
 
-[[nodiscard]] char* write_escaped_char(char* buf, char const* const end, std::string_view& sv)
+void write_escaped_char(Buffer& out, std::string_view& sv)
 {
     auto u16buf = std::array<std::uint16_t, 2>{};
 
@@ -578,97 +577,85 @@ void jsonRealFunc(tr_variant const* val, void* vdata)
 
     for (auto it = std::cbegin(u16buf); it != end16; ++it)
     {
-        buf = fmt::format_to_n(buf, end - buf - 1, FMT_COMPILE("\\u{:04x}"), *it).out;
+        auto arr = std::array<char, 16>{};
+        auto const result = fmt::format_to_n(std::data(arr), std::size(arr), FMT_COMPILE("\\u{:04x}"), *it);
+        out.add(std::data(arr), result.size);
     }
 
     sv.remove_prefix(walk8 - begin8 - 1);
-    return buf;
 }
 
 void jsonStringFunc(tr_variant const* val, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(val, &sv);
 
     auto& out = data->out;
-    auto const [buf, buflen] = out.reserve_space(std::size(sv) * 6 + 2);
-    auto* walk = reinterpret_cast<char*>(buf);
-    auto const* const begin = walk;
-    auto const* const end = begin + buflen;
-
-    *walk++ = '"';
+    out.reserve(std::size(data->out) + std::size(sv) * 6 + 2);
+    out.push_back('"');
 
     for (; !std::empty(sv); sv.remove_prefix(1))
     {
         switch (sv.front())
         {
         case '\b':
-            *walk++ = '\\';
-            *walk++ = 'b';
+            out.add(R"(\b)"sv);
             break;
 
         case '\f':
-            *walk++ = '\\';
-            *walk++ = 'f';
+            out.add(R"(\f)"sv);
             break;
 
         case '\n':
-            *walk++ = '\\';
-            *walk++ = 'n';
+            out.add(R"(\n)"sv);
             break;
 
         case '\r':
-            *walk++ = '\\';
-            *walk++ = 'r';
+            out.add(R"(\r)"sv);
             break;
 
         case '\t':
-            *walk++ = '\\';
-            *walk++ = 't';
+            out.add(R"(\t)"sv);
             break;
 
         case '"':
-            *walk++ = '\\';
-            *walk++ = '"';
+            out.add(R"(\")"sv);
             break;
 
         case '\\':
-            *walk++ = '\\';
-            *walk++ = '\\';
+            out.add(R"(\\)"sv);
             break;
 
         default:
             if (isprint((unsigned char)sv.front()) != 0)
             {
-                *walk++ = sv.front();
+                out.push_back(sv.front());
             }
             else
             {
                 try
                 {
-                    walk = write_escaped_char(walk, end, sv);
+                    write_escaped_char(out, sv);
                 }
                 catch (utf8::exception const&)
                 {
-                    *walk++ = '?';
+                    out.push_back('?');
                 }
             }
             break;
         }
     }
 
-    *walk++ = '"';
-    TR_ASSERT(walk <= end);
-    out.commit_space(walk - begin);
+    out.push_back('"');
 
     jsonChildFunc(data);
 }
 
 void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPushParent(data, val);
     data->out.push_back('{');
@@ -682,7 +669,7 @@ void jsonDictBeginFunc(tr_variant const* val, void* vdata)
 void jsonListBeginFunc(tr_variant const* val, void* vdata)
 {
     size_t const n_children = tr_variantListSize(val);
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPushParent(data, val);
     data->out.push_back('[');
@@ -695,7 +682,7 @@ void jsonListBeginFunc(tr_variant const* val, void* vdata)
 
 void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
+    auto* data = static_cast<struct JsonWalk*>(vdata);
 
     jsonPopParent(data);
 
