@@ -240,27 +240,32 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
     auto const info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readVC requires an info_hash");
 
-    // find the end of PadB by looking for `ENCRYPT(VC)`
-    auto needle = VC;
-    auto filter = tr_message_stream_encryption::Filter{};
-    filter.encryptInit(true, dh_, info_hash);
-    filter.encrypt(std::size(needle), std::data(needle));
+    // We need to find the end of PadB by looking for `ENCRYPT(VC)`,
+    // so calculate and cache the value of `ENCRYPT(VC)`.
+    if (!encrypted_vc_)
+    {
+        auto needle = VC;
+        auto filter = tr_message_stream_encryption::Filter{};
+        filter.encryptInit(true, dh_, info_hash);
+        filter.encrypt(std::size(needle), std::data(needle));
+        encrypted_vc_ = needle;
+    }
 
     for (size_t i = 0; i < PadbMaxlen; ++i)
     {
-        if (peer_io->read_buffer_size() < std::size(needle))
+        if (peer_io->read_buffer_size() < std::size(*encrypted_vc_))
         {
             tr_logAddTraceHand(this, "not enough bytes... returning read_more");
             return READ_LATER;
         }
 
-        if (peer_io->read_buffer_starts_with(needle))
+        if (peer_io->read_buffer_starts_with(*encrypted_vc_))
         {
             tr_logAddTraceHand(this, "got it!");
             // We already know it's a match; now we just need to
             // consume it from the read buffer.
             peer_io->decrypt_init(peer_io->is_incoming(), dh_, info_hash);
-            peer_io->read_bytes(std::data(needle), std::size(needle));
+            peer_io->read_bytes(std::data(*encrypted_vc_), std::size(*encrypted_vc_));
             set_state(tr_handshake::State::AwaitingCryptoSelect);
             return READ_NOW;
         }
