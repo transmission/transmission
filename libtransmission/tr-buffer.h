@@ -201,11 +201,13 @@ public:
         if (auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0); n_read >= 0)
         {
             commit_space(n_read);
+            fmt::print("{:p} read {:d} bytes (of {:d}) from socket {:d}\n", fmt::ptr(this), n_read, n_bytes, sockfd);
             return n_read;
         }
 
         auto const err = sockerrno;
         tr_error_set(error, err, tr_net_strerror(err));
+        fmt::print("{:p} error {:s}\n", fmt::ptr(this), tr_net_strerror(err));
         return {};
     }
 };
@@ -234,14 +236,14 @@ public:
         return evbuffer_get_length(buf_.get());
     }
 
-    [[nodiscard]] value_type const* data() const override
-    {
-        return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
-    }
-
     void drain(size_t n_bytes) override
     {
         evbuffer_drain(buf_.get(), n_bytes);
+    }
+
+    [[nodiscard]] value_type const* data() const override
+    {
+        return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
     }
 
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
