@@ -36,6 +36,7 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
+using Buffer = libtransmission::Buffer;
 
 namespace
 {
@@ -442,7 +443,7 @@ struct JsonWalk
     }
 
     std::deque<ParentState> parents;
-    libtransmission::Buffer out;
+    Buffer out;
     bool doIndent;
 };
 
