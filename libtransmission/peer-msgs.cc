@@ -227,7 +227,7 @@ struct tr_incoming
     struct incoming_piece_data
     {
         explicit incoming_piece_data(uint32_t block_size)
-            : buf{ std::make_unique<std::vector<uint8_t>>(block_size) }
+            : buf{ std::make_unique<Cache::BlockData>(block_size) }
             , block_size_{ block_size }
         {
         }
@@ -252,7 +252,7 @@ struct tr_incoming
             return have_.count() >= block_size_;
         }
 
-        std::unique_ptr<std::vector<uint8_t>> buf;
+        std::unique_ptr<Cache::BlockData> buf;
 
     private:
         std::bitset<tr_block_info::BlockSize> have_;
@@ -1350,7 +1350,7 @@ void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
     }
 }
 
-int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> block_data, tr_block_index_t block);
+int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<Cache::BlockData> block_data, tr_block_index_t block);
 
 ReadResult read_piece_data(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
 {
@@ -1648,7 +1648,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, PeerMessageRe
 }
 
 /* returns 0 on success, or an errno on failure */
-int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>> block_data, tr_block_index_t const block)
+int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<Cache::BlockData> block_data, tr_block_index_t const block)
 {
     TR_ASSERT(msgs != nullptr);
 
