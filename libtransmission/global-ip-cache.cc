@@ -30,6 +30,13 @@ using namespace std::literals;
 
 static_assert(TR_AF_INET == 0);
 static_assert(TR_AF_INET6 == 1);
+
+auto constexpr protocol_str(tr_address_type type) noexcept
+{
+    auto constexpr Map = std::array{ "IPv4"sv, "IPv6"sv };
+    return Map[type];
+}
+
 auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissionbt.com/"sv },
                                              std::array{ "https://ip6.transmissionbt.com/"sv } };
 
@@ -243,7 +250,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
     }
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
-    auto const protocol = type == TR_AF_INET ? "IPv4"sv : "IPv6"sv;
+    auto const protocol = protocol_str(type);
 
     auto err = int{ 0 };
     auto const& source_addr = get_global_source_address(bind_addr(type), err);
@@ -260,7 +267,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
         // Stop the update process since we have no public internet connectivity
         unset_addr(type);
         upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
-        tr_logAddDebug(fmt::format(_("Couldn't obtain source {protocol} address"), fmt::arg("protocol", protocol)));
+        tr_logAddDebug(fmt::format("Couldn't obtain source {} address", protocol));
         if (err == EAFNOSUPPORT)
         {
             stop_timer(type); // No point in retrying
@@ -277,7 +284,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
 
-    auto const protocol = type == TR_AF_INET ? "IPv4"sv : "IPv6"sv;
+    auto const protocol = protocol_str(type);
     auto success = false;
 
     if (response.status == 200 /* HTTP_OK */)
@@ -318,7 +325,7 @@ void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
 {
     auto const lock = std::lock_guard{ global_addr_mutex_[type] };
     global_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} global address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
+    tr_logAddTrace(fmt::format("Unset {} global address cache", protocol_str(type)));
 }
 
 void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
@@ -332,7 +339,7 @@ void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 {
     auto const lock = std::lock_guard{ source_addr_mutex_[type] };
     source_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} source address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
+    tr_logAddTrace(fmt::format("Unset {} source address cache", protocol_str(type)));
 
     // No public internet connectivity means no global IP address
     unset_global_addr(type);
