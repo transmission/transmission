@@ -5,10 +5,12 @@
 
 #pragma once
 
+#include <algorithm> // for std::copy_n
 #include <cstddef>
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -23,21 +25,19 @@
 namespace libtransmission
 {
 
-template<typename T, typename ValueType>
+template<typename value_type>
 class BufferWriter
 {
 public:
-    BufferWriter(T* out)
-        : out_{ out }
-    {
-        static_assert(sizeof(ValueType) == 1);
-    }
+    virtual ~BufferWriter() = default;
+    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) = 0;
+    virtual void commit_space(size_t n_bytes) = 0;
 
     void add(void const* span_begin, size_t span_len)
     {
-        auto const* const begin = reinterpret_cast<ValueType const*>(span_begin);
-        auto const* const end = begin + span_len;
-        out_->insert(std::end(*out_), begin, end);
+        auto [buf, buflen] = reserve_space(span_len);
+        std::copy_n(reinterpret_cast<value_type const*>(span_begin), span_len, buf);
+        commit_space(span_len);
     }
 
     template<typename ContiguousContainer>
@@ -90,19 +90,18 @@ public:
         add_uint64(hll);
     }
 
-    void add_port(tr_port const& port)
+    void add_port(tr_port port)
     {
         auto nport = port.network();
         add(&nport, sizeof(nport));
     }
-
-private:
-    T* out_;
 };
 
-class Buffer : public BufferWriter<Buffer, std::byte>
+class Buffer final : public BufferWriter<std::byte>
 {
 public:
+    using value_type = std::byte;
+
     class Iterator
     {
     public:
@@ -240,31 +239,34 @@ public:
         size_t buf_offset_ = 0;
     };
 
-    Buffer()
-        : BufferWriter<Buffer, std::byte>{ this }
-    {
-    }
-
-    Buffer(Buffer&& that)
-        : BufferWriter<Buffer, std::byte>(this)
-        , buf_{ std::move(that.buf_) }
-    {
-    }
-
-    Buffer& operator=(Buffer&& that)
-    {
-        buf_ = std::move(that.buf_);
-        return *this;
-    }
-
+    Buffer() = default;
+    Buffer(Buffer&&) = default;
     Buffer(Buffer const&) = delete;
+    Buffer& operator=(Buffer&&) = default;
     Buffer& operator=(Buffer const&) = delete;
 
     template<typename T>
     explicit Buffer(T const& data)
-        : BufferWriter<Buffer, std::byte>{ this }
     {
         add(data);
+    }
+
+    [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
+    {
+        auto iov = evbuffer_iovec{};
+        evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
+        TR_ASSERT(iov.iov_len >= n_bytes);
+        reserved_space_ = iov;
+        return { static_cast<value_type*>(iov.iov_base), static_cast<size_t>(iov.iov_len) };
+    }
+
+    void commit_space(size_t n_bytes) override
+    {
+        TR_ASSERT(reserved_space_);
+        TR_ASSERT(reserved_space_->iov_len >= n_bytes);
+        reserved_space_->iov_len = n_bytes;
+        evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
+        reserved_space_.reset();
     }
 
     [[nodiscard]] auto size() const noexcept
@@ -424,6 +426,7 @@ public:
 
 private:
     evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
+    std::optional<evbuffer_iovec> reserved_space_;
 
     [[nodiscard]] Iterator cbegin() const noexcept
     {
