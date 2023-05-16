@@ -43,6 +43,11 @@ public:
     {
         return std::string_view{ reinterpret_cast<char const*>(data()), size() };
     }
+
+    [[nodiscard]] auto to_string() const
+    {
+        return std::string{ to_string_view() };
+    }
 };
 
 template<typename value_type>
@@ -339,14 +344,6 @@ public:
         auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
         auto const needle_end = needle_begin + n_bytes;
         return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
-    }
-
-    [[nodiscard]] std::string to_string() const
-    {
-        auto str = std::string{};
-        str.resize(size());
-        evbuffer_copyout(buf_.get(), std::data(str), std::size(str));
-        return str;
     }
 
     auto to_buf(void* tgt, size_t n_bytes)
