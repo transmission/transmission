@@ -53,41 +53,6 @@ public:
     {
         return std::string{ to_string_view() };
     }
-
-    void to_buf(void* tgt, size_t n_bytes)
-    {
-        n_bytes = std::min(n_bytes, size());
-        std::copy_n(data(), n_bytes, static_cast<value_type*>(tgt));
-        drain(n_bytes);
-    }
-
-    [[nodiscard]] auto to_uint8()
-    {
-        auto tmp = uint8_t{};
-        to_buf(&tmp, sizeof(tmp));
-        return tmp;
-    }
-
-    [[nodiscard]] uint16_t to_uint16()
-    {
-        auto tmp = uint16_t{};
-        to_buf(&tmp, sizeof(tmp));
-        return ntohs(tmp);
-    }
-
-    [[nodiscard]] uint32_t to_uint32()
-    {
-        auto tmp = uint32_t{};
-        to_buf(&tmp, sizeof(tmp));
-        return ntohl(tmp);
-    }
-
-    [[nodiscard]] uint64_t to_uint64()
-    {
-        auto tmp = uint64_t{};
-        to_buf(&tmp, sizeof(tmp));
-        return tr_ntohll(tmp);
-    }
 };
 
 template<typename value_type>
@@ -384,6 +349,39 @@ public:
         auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
         auto const needle_end = needle_begin + n_bytes;
         return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
+    }
+
+    auto to_buf(void* tgt, size_t n_bytes)
+    {
+        return evbuffer_remove(buf_.get(), tgt, n_bytes);
+    }
+
+    [[nodiscard]] auto to_uint8()
+    {
+        auto tmp = uint8_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return tmp;
+    }
+
+    [[nodiscard]] uint16_t to_uint16()
+    {
+        auto tmp = uint16_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return ntohs(tmp);
+    }
+
+    [[nodiscard]] uint32_t to_uint32()
+    {
+        auto tmp = uint32_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return ntohl(tmp);
+    }
+
+    [[nodiscard]] uint64_t to_uint64()
+    {
+        auto tmp = uint64_t{};
+        to_buf(&tmp, sizeof(tmp));
+        return tr_ntohll(tmp);
     }
 
     // Returns the number of bytes written. Check `error` for error.
