@@ -33,6 +33,16 @@ public:
     virtual void drain(size_t n_bytes) = 0;
     [[nodiscard]] virtual size_t size() const noexcept = 0;
     [[nodiscard]] virtual value_type const* data() const = 0;
+
+    [[nodiscard]] auto empty() const noexcept
+    {
+        return size() == 0;
+    }
+
+    [[nodiscard]] auto to_string_view() const
+    {
+        return std::string_view{ reinterpret_cast<char const*>(data()), size() };
+    }
 };
 
 template<typename value_type>
@@ -302,11 +312,6 @@ public:
 
     //
 
-    [[nodiscard]] auto empty() const noexcept
-    {
-        return size() == 0;
-    }
-
     [[nodiscard]] auto begin() noexcept
     {
         return Iterator{ buf_.get(), 0U };
@@ -399,12 +404,6 @@ public:
     [[nodiscard]] std::pair<std::byte*, size_t> pullup()
     {
         return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
-    }
-
-    [[nodiscard]] auto pullup_sv()
-    {
-        auto const [buf, buflen] = pullup();
-        return std::string_view{ reinterpret_cast<char const*>(buf), buflen };
     }
 
     void reserve(size_t n_bytes)

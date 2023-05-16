@@ -138,7 +138,7 @@ TEST_F(BufferTest, NonBufferWriter)
     out1.add(Bang);
     out2.add(Bang);
 
-    auto const result1 = out1.pullup_sv();
+    auto const result1 = out1.to_string_view();
     auto const result2 = std::string_view{ reinterpret_cast<char const*>(std::data(out2_vec)), std::size(out2_vec) };
     EXPECT_EQ(result1, result2);
 }
