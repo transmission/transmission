@@ -39,11 +39,6 @@ public:
         return size() == 0;
     }
 
-    void clear()
-    {
-        drain(size());
-    }
-
     [[nodiscard]] auto to_string_view() const
     {
         return std::string_view{ reinterpret_cast<char const*>(data()), size() };
@@ -382,6 +377,11 @@ public:
         auto tmp = uint64_t{};
         to_buf(&tmp, sizeof(tmp));
         return tr_ntohll(tmp);
+    }
+
+    void clear()
+    {
+        drain(size());
     }
 
     // Returns the number of bytes written. Check `error` for error.
