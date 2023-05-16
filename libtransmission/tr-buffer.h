@@ -431,13 +431,6 @@ public:
         return {};
     }
 
-    template<typename T>
-    void insert([[maybe_unused]] Iterator iter, T const* const begin, T const* const end)
-    {
-        TR_ASSERT(iter == this->end()); // tr_buffer only supports appending
-        evbuffer_add(buf_.get(), begin, end - begin);
-    }
-
 private:
     evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
     std::optional<evbuffer_iovec> reserved_space_;
