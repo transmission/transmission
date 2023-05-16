@@ -26,6 +26,16 @@ namespace libtransmission
 {
 
 template<typename value_type>
+class BufferReader
+{
+public:
+    virtual ~BufferReader() = default;
+    virtual void drain(size_t n_bytes) = 0;
+    [[nodiscard]] virtual size_t size() const noexcept = 0;
+    [[nodiscard]] virtual value_type const* data() const = 0;
+};
+
+template<typename value_type>
 class BufferWriter
 {
 public:
@@ -97,7 +107,9 @@ public:
     }
 };
 
-class Buffer final : public BufferWriter<std::byte>
+class Buffer final
+    : public BufferReader<std::byte>
+    , public BufferWriter<std::byte>
 {
 public:
     using value_type = std::byte;
@@ -251,6 +263,25 @@ public:
         add(data);
     }
 
+    // -- BufferReader
+
+    [[nodiscard]] size_t size() const noexcept override
+    {
+        return evbuffer_get_length(buf_.get());
+    }
+
+    [[nodiscard]] std::byte const* data() const override
+    {
+        return reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1));
+    }
+
+    void drain(size_t n_bytes) override
+    {
+        evbuffer_drain(buf_.get(), n_bytes);
+    }
+
+    // -- BufferWriter
+
     [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
         auto iov = evbuffer_iovec{};
@@ -269,14 +300,11 @@ public:
         reserved_space_.reset();
     }
 
-    [[nodiscard]] auto size() const noexcept
-    {
-        return evbuffer_get_length(buf_.get());
-    }
+    //
 
     [[nodiscard]] auto empty() const noexcept
     {
-        return evbuffer_get_length(buf_.get()) == 0;
+        return size() == 0;
     }
 
     [[nodiscard]] auto begin() noexcept
@@ -349,11 +377,6 @@ public:
         return tr_ntohll(tmp);
     }
 
-    void drain(size_t n_bytes)
-    {
-        evbuffer_drain(buf_.get(), n_bytes);
-    }
-
     void clear()
     {
         drain(size());
@@ -376,11 +399,6 @@ public:
     [[nodiscard]] std::pair<std::byte*, size_t> pullup()
     {
         return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
-    }
-
-    [[nodiscard]] std::byte const* data() const
-    {
-        return reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1));
     }
 
     [[nodiscard]] auto pullup_sv()
