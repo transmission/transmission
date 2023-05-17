@@ -253,11 +253,6 @@ public:
         return 0;
     }
 
-    [[nodiscard]] std::pair<std::byte*, size_t> pullup()
-    {
-        return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
-    }
-
     void reserve(size_t n_bytes)
     {
         evbuffer_expand(buf_.get(), n_bytes - size());

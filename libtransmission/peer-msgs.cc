@@ -1477,15 +1477,12 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, libtransmissi
         break;
 
     case BtPeerMsgs::Bitfield:
-        {
-            logtrace(msgs, "got a bitfield");
-            auto const [buf, buflen] = payload.pullup();
-            msgs->have_ = tr_bitfield{ msgs->torrent->has_metainfo() ? msgs->torrent->piece_count() : buflen * 8 };
-            msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(buf), buflen);
-            msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
-            msgs->invalidatePercentDone();
-            break;
-        }
+        logtrace(msgs, "got a bitfield");
+        msgs->have_ = tr_bitfield{ msgs->torrent->has_metainfo() ? msgs->torrent->piece_count() : std::size(payload) * 8 };
+        msgs->have_.set_raw(reinterpret_cast<uint8_t const*>(std::data(payload)), std::size(payload));
+        msgs->publish(tr_peer_event::GotBitfield(&msgs->have_));
+        msgs->invalidatePercentDone();
+        break;
 
     case BtPeerMsgs::Request:
         {
