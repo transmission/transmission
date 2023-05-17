@@ -139,7 +139,8 @@ public:
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
-    void write(libtransmission::Buffer& buf, bool is_piece_data)
+    template<typename T>
+    void write(libtransmission::BufferReader<T>& buf, bool is_piece_data)
     {
         auto const n_bytes = std::size(buf);
         write_bytes(std::data(buf), n_bytes, is_piece_data);
