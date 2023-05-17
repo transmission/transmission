@@ -253,11 +253,6 @@ public:
         return 0;
     }
 
-    void reserve(size_t n_bytes)
-    {
-        evbuffer_expand(buf_.get(), n_bytes - size());
-    }
-
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
         EVUTIL_SET_SOCKET_ERROR(0);

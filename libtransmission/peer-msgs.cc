@@ -818,7 +818,6 @@ void build_peer_message(tr_peerMsgsImpl const* const msgs, Buffer& out, uint8_t 
     auto const old_len = std::size(out);
     auto msg_len = sizeof(type);
     ((msg_len += get_param_length(args)), ...);
-    out.reserve(old_len + msg_len);
     out.add_uint32(msg_len);
     out.add_uint8(type);
     (add_param(out, args), ...);
