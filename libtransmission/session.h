@@ -33,6 +33,7 @@
 #include "bandwidth.h"
 #include "bitfield.h"
 #include "cache.h"
+#include "dns-cache.h"
 #include "global-ip-cache.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
@@ -128,8 +129,9 @@ private:
     class AnnouncerUdpMediator final : public tr_announcer_udp::Mediator
     {
     public:
-        explicit AnnouncerUdpMediator(tr_session& session) noexcept
+        explicit AnnouncerUdpMediator(tr_session& session, libtransmission::DnsCache& dns_cache) noexcept
             : session_{ session }
+            , dns_cache_{ dns_cache }
         {
         }
 
@@ -150,8 +152,14 @@ private:
             return tr_address::from_string(session_.announceIP());
         }
 
+        [[nodiscard]] libtransmission::DnsCache& dns_cache() override
+        {
+            return dns_cache_;
+        }
+
     private:
         tr_session& session_;
+        libtransmission::DnsCache& dns_cache_;
     };
 
     class DhtMediator : public tr_dht::Mediator
@@ -232,8 +240,10 @@ private:
         [[nodiscard]] std::optional<std::string> publicAddressV4() const override;
         [[nodiscard]] std::optional<std::string> publicAddressV6() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
+        [[nodiscard]] std::vector<std::string> resolved_hosts() const override;
         [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
         [[nodiscard]] time_t now() const override;
+
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread
         void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
@@ -876,6 +886,8 @@ public:
         }
     }
 
+    void update_dns_cache(tr_torrent const* tor);
+
 private:
     constexpr bool& scriptEnabledFlag(TrScript i)
     {
@@ -920,6 +932,7 @@ private:
     void closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
 
     void onNowTimer();
+    void onDnsTimer();
 
     static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
 
@@ -1075,6 +1088,8 @@ private:
 
     std::vector<libtransmission::Blocklist> blocklists_;
 
+    libtransmission::DefaultDnsCache dns_cache_;
+
     /// other fields
 
     // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::publicAddress())
@@ -1132,8 +1147,8 @@ private:
     // depends-on: lpd_mediator_
     std::unique_ptr<tr_lpd> lpd_;
 
-    // depends-on: udp_core_
-    AnnouncerUdpMediator announcer_udp_mediator_{ *this };
+    // depends-on: udp_core_, dns_cache_
+    AnnouncerUdpMediator announcer_udp_mediator_{ *this, dns_cache_ };
 
     // depends-on: timer_maker_, torrents_, peer_mgr_
     DhtMediator dht_mediator_{ *this };
@@ -1157,6 +1172,9 @@ private:
 
     // depends-on: torrents_
     std::unique_ptr<libtransmission::Timer> save_timer_;
+
+    // depends-on: dns_cache_, torrents_
+    std::unique_ptr<libtransmission::Timer> dns_timer_;
 
     std::unique_ptr<tr_verify_worker> verifier_ = std::make_unique<tr_verify_worker>();
 

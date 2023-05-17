@@ -61,6 +61,7 @@
 #include "libtransmission/verify.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -319,6 +320,38 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
     }
 
     return std::nullopt;
+}
+
+std::vector<std::string /*HOST:PORT:ADDRESS[,ADDRESS]*/> tr_session::WebMediator::resolved_hosts() const
+{
+    auto host_addresses = std::map<std::string /*host:port*/, std::string /*address[,address]*/>{};
+    session_->dns_cache_.walk(
+        tr_time(),
+        [&host_addresses](auto const& entry)
+        {
+            if (auto const addr = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&entry.ss)); addr)
+            {
+                auto addr_strbuf = std::array<char, TR_ADDRSTRLEN>{};
+                auto const addr_sv = addr->first.display_name(std::data(addr_strbuf), std::size(addr_strbuf));
+                auto key = fmt::format("{:s}:{:d}", entry.host, entry.port.host());
+
+                if (auto const [iter, is_new] = host_addresses.try_emplace(std::move(key), addr_sv); !is_new)
+                {
+                    iter->second += ',';
+                    iter->second += addr_sv;
+                }
+            }
+        },
+        {}, // any family
+        libtransmission::DnsCache::Protocol::TCP);
+
+    auto ret = std::vector<std::string>{};
+    ret.reserve(std::size(host_addresses));
+    for (auto const& [hostport, addresses] : host_addresses)
+    {
+        ret.emplace_back(fmt::format("{:s}:{:s}", hostport, addresses));
+    }
+    return ret;
 }
 
 size_t tr_session::WebMediator::clamp(int torrent_id, size_t byte_count) const
@@ -1259,6 +1292,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     verifier_.reset();
     save_timer_.reset();
     now_timer_.reset();
+    dns_timer_.reset();
     rpc_server_.reset();
     dht_.reset();
     lpd_.reset();
@@ -2146,6 +2180,9 @@ tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
     now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->start_repeating(1s);
 
+    dns_timer_ = timerMaker().create([this]() { onDnsTimer(); });
+    dns_timer_->start_repeating(10min);
+
     // Periodically save the .resume files of any torrents whose
     // status has recently changed. This prevents loss of metadata
     // in the case of a crash, unclean shutdown, clumsy user, etc.
@@ -2174,4 +2211,33 @@ void tr_session::addTorrent(tr_torrent* tor)
     tor->unique_id_ = torrents().add(tor);
 
     tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
+
+    update_dns_cache(tor);
+}
+
+void tr_session::onDnsTimer()
+{
+    auto const lock = unique_lock();
+
+    for (auto const* const tor : torrents())
+    {
+        update_dns_cache(tor);
+    }
+}
+
+void tr_session::update_dns_cache(tr_torrent const* tor)
+{
+    using DnsCache = libtransmission::DnsCache;
+
+    auto const now = tr_time();
+    for (auto const& tracker : tor->announce_list())
+    {
+        auto const& host = tracker.announce_parsed.host;
+        auto const port = tr_port::fromHost(tracker.announce_parsed.port);
+
+        dns_cache_.get(now, host, port, DnsCache::Family::IPv4, DnsCache::Protocol::TCP);
+        dns_cache_.get(now, host, port, DnsCache::Family::IPv6, DnsCache::Protocol::TCP);
+        dns_cache_.get(now, host, port, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
+        dns_cache_.get(now, host, port, DnsCache::Family::IPv6, DnsCache::Protocol::UDP);
+    }
 }

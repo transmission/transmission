@@ -3,15 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> // for std::find_if()
+#include <algorithm> // for std::find_if(), std::sort()
 #include <cerrno> // for errno, EAFNOSUPPORT
 #include <climits> // for CHAR_BIT
 #include <cstring> // for memset()
 #include <ctime>
-#include <future>
 #include <list>
+#include <map>
 #include <memory>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 #ifdef _WIN32
@@ -44,10 +45,13 @@
 namespace
 {
 using namespace std::literals;
+using DnsCache = libtransmission::DnsCache;
 
 // size defined by bep15
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
+
+using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
 
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
@@ -298,15 +302,9 @@ struct tau_tracker
     {
     }
 
-    void sendto(std::byte const* buf, size_t buflen)
+    void sendto(Sockaddr addr, std::byte const* buf, size_t buflen)
     {
-        TR_ASSERT(addr_);
-        if (!addr_)
-        {
-            return;
-        }
-
-        auto const& [ss, sslen] = *addr_;
+        auto const& [ss, sslen] = addr;
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
@@ -335,25 +333,16 @@ struct tau_tracker
     {
         time_t const now = tr_time();
 
-        // do we have a DNS request that's ready?
-        if (addr_pending_dns_ && addr_pending_dns_->wait_for(0ms) == std::future_status::ready)
-        {
-            addr_ = addr_pending_dns_->get();
-            addr_pending_dns_.reset();
-            addr_expires_at_ = now + DnsRetryIntervalSecs;
-        }
-
         // are there any requests pending?
         if (this->isIdle())
         {
             return;
         }
 
-        // update the addr if our lookup is past its shelf date
-        if (!addr_pending_dns_ && addr_expires_at_ <= now)
+        auto const [result, ss, sslen] = mediator_.dns_cache()
+                                             .get(now, this->host, this->port, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
+        if (result == DnsCache::Result::Pending)
         {
-            addr_.reset();
-            addr_pending_dns_ = std::async(std::launch::async, lookup, this->host, this->port, this->key);
             return;
         }
 
@@ -366,8 +355,8 @@ struct tau_tracker
                 now,
                 this->connecting_at));
 
-        /* also need a valid connection ID... */
-        if (addr_ && !is_connected(now) && this->connecting_at == 0)
+        // also need a valid connection ID...
+        if (result == DnsCache::Result::Success && !is_connected(now) && this->connecting_at == 0)
         {
             this->connecting_at = now;
             this->connection_transaction_id = tau_transaction_new();
@@ -379,7 +368,7 @@ struct tau_tracker
             buf.add_uint32(this->connection_transaction_id);
 
             auto const [bytes, n_bytes] = buf.pullup();
-            this->sendto(bytes, n_bytes);
+            this->sendto({ ss, sslen }, bytes, n_bytes);
         }
 
         if (timeout_reqs)
@@ -387,14 +376,13 @@ struct tau_tracker
             timeout_requests(now);
         }
 
-        if (addr_ && is_connected(now))
+        if (result == DnsCache::Result::Success && is_connected(now))
         {
-            send_requests();
+            send_requests({ ss, sslen });
         }
     }
 
 private:
-    using Sockaddr = std::pair<sockaddr_storage, socklen_t>;
     using MaybeSockaddr = std::optional<Sockaddr>;
 
     [[nodiscard]] constexpr bool is_connected(time_t now) const noexcept
@@ -402,42 +390,10 @@ private:
         return connection_id != tau_connection_t{} && now < connection_expiration_time;
     }
 
-    [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
-    {
-        auto szport = std::array<char, 16>{};
-        *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
-
-        auto hints = addrinfo{};
-        hints.ai_family = AF_INET; // https://github.com/transmission/transmission/issues/4719
-        hints.ai_protocol = IPPROTO_UDP;
-        hints.ai_socktype = SOCK_DGRAM;
-
-        addrinfo* info = nullptr;
-        if (int const rc = getaddrinfo(host.c_str(), std::data(szport), &hints, &info); rc != 0)
-        {
-            logwarn(
-                logname,
-                fmt::format(
-                    _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
-                    fmt::arg("address", host.sv()),
-                    fmt::arg("port", port.host()),
-                    fmt::arg("error", gai_strerror(rc)),
-                    fmt::arg("error_code", static_cast<int>(rc))));
-            return {};
-        }
-
-        auto ss = sockaddr_storage{};
-        auto const len = info->ai_addrlen;
-        memcpy(&ss, info->ai_addr, len);
-        freeaddrinfo(info);
-
-        logdbg(logname, "DNS lookup succeeded");
-        return std::make_pair(ss, len);
-    }
-
     [[nodiscard]] bool isIdle() const noexcept
     {
-        return std::empty(announces) && std::empty(scrapes) && !addr_pending_dns_;
+        return std::empty(announces) && std::empty(scrapes) &&
+            !mediator_.dns_cache().is_pending(host, port, DnsCache::Family::IPv4, DnsCache::Protocol::UDP);
     }
 
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
@@ -490,19 +446,17 @@ private:
 
     ///
 
-    void send_requests()
+    void send_requests(Sockaddr addr)
     {
-        TR_ASSERT(!addr_pending_dns_);
-        TR_ASSERT(addr_);
         TR_ASSERT(this->connecting_at == 0);
         TR_ASSERT(this->connection_expiration_time > tr_time());
 
-        send_requests(this->announces);
-        send_requests(this->scrapes);
+        send_requests(addr, this->announces);
+        send_requests(addr, this->scrapes);
     }
 
     template<typename T>
-    void send_requests(std::list<T>& reqs)
+    void send_requests(Sockaddr addr, std::list<T>& reqs)
     {
         auto const now = tr_time();
 
@@ -518,7 +472,7 @@ private:
 
             logdbg(this->key, fmt::format("sending req {}", fmt::ptr(&req)));
             req.sent_at = now;
-            send_request(std::data(req.payload), std::size(req.payload));
+            send_request(addr, std::data(req.payload), std::size(req.payload));
 
             if (req.has_callback())
             {
@@ -531,7 +485,7 @@ private:
         }
     }
 
-    void send_request(std::byte const* payload, size_t payload_len)
+    void send_request(Sockaddr addr, std::byte const* payload, size_t payload_len)
     {
         logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
 
@@ -540,7 +494,7 @@ private:
         buf.add(payload, payload_len);
 
         auto const [bytes, n_bytes] = buf.pullup();
-        this->sendto(bytes, n_bytes);
+        this->sendto(addr, bytes, n_bytes);
     }
 
 public:
@@ -559,12 +513,6 @@ public:
 private:
     Mediator& mediator_;
 
-    std::optional<std::future<MaybeSockaddr>> addr_pending_dns_ = {};
-
-    MaybeSockaddr addr_ = {};
-    time_t addr_expires_at_ = 0;
-
-    static inline constexpr auto DnsRetryIntervalSecs = time_t{ 3600 };
     static inline constexpr auto ConnectionRequestTtl = int{ 30 };
 };
 
