@@ -102,6 +102,19 @@ public:
         to_buf(&tmp, sizeof(tmp));
         return tr_ntohll(tmp);
     }
+
+    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    {
+        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), std::min(n_bytes, size()), 0); n_sent >= 0)
+        {
+            drain(n_sent);
+            return n_sent;
+        }
+
+        auto const err = sockerrno;
+        tr_error_set(error, err, tr_net_strerror(err));
+        return {};
+    }
 };
 
 template<typename value_type>
@@ -174,6 +187,20 @@ public:
         auto nport = port.network();
         add(&nport, sizeof(nport));
     }
+
+    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    {
+        auto const [buf, buflen] = reserve_space(n_bytes);
+        if (auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0); n_read >= 0)
+        {
+            commit_space(n_read);
+            return n_read;
+        }
+
+        auto const err = sockerrno;
+        tr_error_set(error, err, tr_net_strerror(err));
+        return {};
+    }
 };
 
 class Buffer final
@@ -195,8 +222,6 @@ public:
         add(data);
     }
 
-    // -- BufferReader
-
     [[nodiscard]] size_t size() const noexcept override
     {
         return evbuffer_get_length(buf_.get());
@@ -211,8 +236,6 @@ public:
     {
         evbuffer_drain(buf_.get(), n_bytes);
     }
-
-    // -- BufferWriter
 
     [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
@@ -230,45 +253,6 @@ public:
         reserved_space_->iov_len = n_bytes;
         evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
         reserved_space_.reset();
-    }
-
-    //
-
-    // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
-    {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
-        auto const err = EVUTIL_SOCKET_ERROR();
-        if (res >= 0)
-        {
-            return static_cast<size_t>(res);
-        }
-        tr_error_set(error, err, tr_net_strerror(err));
-        return 0;
-    }
-
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
-    {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
-        auto const err = EVUTIL_SOCKET_ERROR();
-
-        if (res > 0)
-        {
-            return static_cast<size_t>(res);
-        }
-
-        if (res == 0)
-        {
-            tr_error_set_from_errno(error, ENOTCONN);
-        }
-        else
-        {
-            tr_error_set(error, err, tr_net_strerror(err));
-        }
-
-        return {};
     }
 
 private:
