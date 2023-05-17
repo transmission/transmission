@@ -39,6 +39,15 @@ public:
         return size() == 0;
     }
 
+    template<typename T>
+    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle)
+    {
+        auto const n_bytes = std::size(needle);
+        auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
+        auto const needle_end = needle_begin + n_bytes;
+        return n_bytes <= size() && std::equal(needle_begin, needle_end, data());
+    }
+
     [[nodiscard]] auto to_string_view() const
     {
         return std::string_view{ reinterpret_cast<char const*>(data()), size() };
@@ -370,15 +379,6 @@ public:
     [[nodiscard]] auto end() const noexcept
     {
         return Iterator{ buf_.get(), size() };
-    }
-
-    template<typename T>
-    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
-    {
-        auto const n_bytes = std::size(needle);
-        auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
-        auto const needle_end = needle_begin + n_bytes;
-        return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
     }
 
     void clear()
