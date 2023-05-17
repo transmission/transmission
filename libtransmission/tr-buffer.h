@@ -234,11 +234,6 @@ public:
 
     //
 
-    void clear()
-    {
-        drain(size());
-    }
-
     // Returns the number of bytes written. Check `error` for error.
     size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
