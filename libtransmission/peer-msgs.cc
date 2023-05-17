@@ -1039,7 +1039,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
 {
     msgs->peerSentLtepHandshake = true;
 
-    auto const handshake_sv = payload.pullup_sv();
+    auto const handshake_sv = payload.to_string_view();
 
     auto val = tr_variant{};
     if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, handshake_sv) || !tr_variantIsDict(&val))
@@ -1151,7 +1151,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload_in)
     int64_t piece = -1;
     int64_t total_size = 0;
 
-    auto const tmp = payload_in.pullup_sv();
+    auto const tmp = payload_in.to_string_view();
     auto const* const msg_end = std::data(tmp) + std::size(tmp);
 
     auto dict = tr_variant{};
@@ -1208,7 +1208,7 @@ void parseUtPex(tr_peerMsgsImpl* msgs, libtransmission::Buffer& payload)
         return;
     }
 
-    auto const tmp = payload.pullup_sv();
+    auto const tmp = payload.to_string_view();
 
     if (tr_variant val; tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp))
     {
