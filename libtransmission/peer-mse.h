@@ -11,6 +11,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm> // for std::copy_n()
 #include <array>
 #include <cstddef> // size_t, std::byte
 #include <memory>
@@ -77,26 +78,20 @@ private:
 class Filter
 {
 public:
-    void decryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    void decrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
     template<typename T>
-    constexpr void decrypt(size_t buf_len, T* buf)
+    constexpr void decrypt(T const* buf_in, size_t buf_len, T* buf_out) noexcept
     {
-        if (dec_active_)
-        {
-            dec_key_.process(buf, buf, buf_len);
-        }
+        process(buf_in, buf_len, buf_out, dec_active_, dec_key_);
     }
 
-    void encryptInit(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    void encrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
     template<typename T>
-    constexpr void encrypt(size_t buf_len, T* buf)
+    constexpr void encrypt(T const* buf_in, size_t buf_len, T* buf_out) noexcept
     {
-        if (enc_active_)
-        {
-            enc_key_.process(buf, buf, buf_len);
-        }
+        process(buf_in, buf_len, buf_out, enc_active_, enc_key_);
     }
 
     [[nodiscard]] constexpr auto is_active() const noexcept
@@ -105,6 +100,19 @@ public:
     }
 
 private:
+    template<typename T>
+    static constexpr void process(T const* buf_in, size_t buf_len, T* buf_out, bool active, tr_arc4& arc4) noexcept
+    {
+        if (active)
+        {
+            arc4.process(reinterpret_cast<uint8_t const*>(buf_in), buf_len, reinterpret_cast<uint8_t*>(buf_out));
+        }
+        else
+        {
+            std::copy_n(buf_in, buf_len, buf_out);
+        }
+    }
+
     tr_arc4 dec_key_ = {};
     tr_arc4 enc_key_ = {};
     bool dec_active_ = false;

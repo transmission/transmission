@@ -103,7 +103,7 @@ void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
 
 // --- Filter
 
-void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void Filter::decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
@@ -112,7 +112,7 @@ void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const&
     dec_key_.discard(1024);
 }
 
-void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void Filter::encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);

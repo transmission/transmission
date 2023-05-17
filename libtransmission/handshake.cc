@@ -244,10 +244,11 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
     // so calculate and cache the value of `ENCRYPT(VC)`.
     if (!encrypted_vc_)
     {
-        auto needle = VC;
         auto filter = tr_message_stream_encryption::Filter{};
-        filter.encryptInit(true, dh_, info_hash);
-        filter.encrypt(std::size(needle), std::data(needle));
+        filter.encrypt_init(true, dh_, info_hash);
+
+        auto needle = decltype(VC){};
+        filter.encrypt(std::data(VC), std::size(VC), std::data(needle));
         encrypted_vc_ = needle;
     }
 
