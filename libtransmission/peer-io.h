@@ -108,7 +108,12 @@ public:
 
     void read_buffer_drain(size_t byte_count);
 
-    void read_bytes(void* bytes, size_t byte_count);
+    void read_bytes(void* bytes, size_t n_bytes)
+    {
+        n_bytes = std::min(n_bytes, std::size(inbuf_));
+        filter_.decrypt(std::data(inbuf_), n_bytes, reinterpret_cast<std::byte*>(bytes));
+        inbuf_.drain(n_bytes);
+    }
 
     void read_uint8(uint8_t* setme)
     {
@@ -123,11 +128,23 @@ public:
 
     [[nodiscard]] size_t get_write_buffer_space(uint64_t now) const noexcept;
 
-    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data);
+    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
+    {
+        outbuf_info_.emplace_back(n_bytes, is_piece_data);
+
+        auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
+        filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
+        outbuf_.commit_space(n_bytes);
+    }
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
-    void write(libtransmission::Buffer& buf, bool is_piece_data);
+    void write(libtransmission::Buffer& buf, bool is_piece_data)
+    {
+        auto const n_bytes = std::size(buf);
+        write_bytes(std::data(buf), n_bytes, is_piece_data);
+        buf.drain(n_bytes);
+    }
 
     size_t flush_outgoing_protocol_msgs();
 
@@ -258,12 +275,12 @@ public:
 
     void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        filter_.decryptInit(is_incoming, dh, info_hash);
+        filter_.decrypt_init(is_incoming, dh, info_hash);
     }
 
     void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        filter_.encryptInit(is_incoming, dh, info_hash);
+        filter_.encrypt_init(is_incoming, dh, info_hash);
     }
 
     ///
@@ -286,16 +303,6 @@ private:
         {
             got_error_(this, error, user_data_);
         }
-    }
-
-    void decrypt(size_t buflen, void* buf)
-    {
-        filter_.decrypt(buflen, buf);
-    }
-
-    void encrypt(size_t buflen, void* buf)
-    {
-        filter_.encrypt(buflen, buf);
     }
 
     void on_utp_state_change(int new_state);
