@@ -102,6 +102,27 @@ public:
         to_buf(&tmp, sizeof(tmp));
         return tr_ntohll(tmp);
     }
+
+    // Returns the number of bytes written. Check `error` for error.
+    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    {
+        n_bytes = std::min(n_bytes, size());
+
+        if (n_bytes == 0U)
+        {
+            return {};
+        }
+
+        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0U)
+        {
+            drain(n_sent);
+            return n_sent;
+        }
+
+        auto const err = sockerrno;
+        tr_error_set(error, err, tr_net_strerror(err));
+        return {};
+    }
 };
 
 template<typename value_type>
@@ -233,20 +254,6 @@ public:
     }
 
     //
-
-    // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
-    {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
-        auto const err = EVUTIL_SOCKET_ERROR();
-        if (res >= 0)
-        {
-            return static_cast<size_t>(res);
-        }
-        tr_error_set(error, err, tr_net_strerror(err));
-        return 0;
-    }
 
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
