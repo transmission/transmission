@@ -49,6 +49,8 @@ using namespace std::literals;
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
+using InBuf = libtransmission::BufferReader<std::byte>;
+
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
 auto tau_transaction_new()
@@ -114,7 +116,7 @@ struct tau_scrape_request
         requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         response.did_connect = true;
         response.did_timeout = false;
@@ -214,7 +216,7 @@ struct tau_announce_request
         this->requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
@@ -227,8 +229,7 @@ struct tau_announce_request
             response.leechers = buf.to_uint32();
             response.seeders = buf.to_uint32();
 
-            auto const [bytes, n_bytes] = buf.pullup();
-            response.pex = tr_pex::from_compact_ipv4(bytes, n_bytes, nullptr, 0);
+            response.pex = tr_pex::from_compact_ipv4(std::data(buf), std::size(buf), nullptr, 0);
             requestFinished();
         }
         else
@@ -310,7 +311,7 @@ struct tau_tracker
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
-    void on_connection_response(tau_action_t action, libtransmission::Buffer& buf)
+    void on_connection_response(tau_action_t action, InBuf& buf)
     {
         this->connecting_at = 0;
         this->connection_transaction_id = 0;
@@ -378,8 +379,7 @@ struct tau_tracker
             buf.add_uint32(TAU_ACTION_CONNECT);
             buf.add_uint32(this->connection_transaction_id);
 
-            auto const [bytes, n_bytes] = buf.pullup();
-            this->sendto(bytes, n_bytes);
+            this->sendto(std::data(buf), std::size(buf));
         }
 
         if (timeout_reqs)
@@ -539,8 +539,7 @@ private:
         buf.add_uint64(this->connection_id);
         buf.add(payload, payload_len);
 
-        auto const [bytes, n_bytes] = buf.pullup();
-        this->sendto(bytes, n_bytes);
+        this->sendto(std::data(buf), std::size(buf));
     }
 
 public:
