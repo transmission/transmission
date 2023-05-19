@@ -78,6 +78,7 @@ auto constexpr MyStatic = std::array<std::string_view, TR_N_KEYS>{
     "creator"sv,
     "cumulative-stats"sv,
     "current-stats"sv,
+    "daemon-startPaused"sv,
     "date"sv,
     "dateCreated"sv,
     "default-trackers"sv,
