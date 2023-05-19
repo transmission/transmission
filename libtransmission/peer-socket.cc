@@ -85,12 +85,10 @@ size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) cons
 #ifdef WITH_UTP
     if (is_utp())
     {
-        // NB: libutp doesn't change `data` but requires the arg to be non-const anyway
-        auto* const data = const_cast<std::byte*>(std::data(buf));
-        auto const datalen = std::size(buf);
-
         errno = 0;
-        auto const n_written = utp_write(handle.utp, data, std::min(datalen, max));
+        // NB: utp_write() does not modify its 2nd arg, but a wart in
+        // libutp's public API requires it to be non-const anyway :shrug:
+        auto const n_written = utp_write(handle.utp, const_cast<std::byte*>(std::data(buf)), std::min(std::size(buf), max));
         auto const error_code = errno;
 
         if (n_written > 0)

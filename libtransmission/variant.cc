@@ -685,8 +685,8 @@ protected:
         size_t idx = {};
     };
 
-    template<typename ByKeyContainer>
-    void sort(ByKeyContainer& sortbuf)
+    template<typename Container>
+    void sort(Container& sortbuf)
     {
         if (!tr_variantIsDict(&v))
         {

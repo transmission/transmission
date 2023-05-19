@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <cstddef> // for std::byte
+#include <algorithm> // for std::copy_n
+#include <cstddef>
 #include <iterator>
 #include <limits>
 #include <memory>
@@ -16,8 +17,6 @@
 #include <sfl/small_vector.hpp>
 
 #include <event2/buffer.h>
-
-#include <fmt/core.h>
 
 #include "error.h"
 #include "net.h" // tr_socket_t
@@ -39,27 +38,26 @@ public:
 
     [[nodiscard]] auto empty() const noexcept
     {
-        return size() == 0U;
+        return size() == 0;
     }
 
-    [[nodiscard]] auto* begin() noexcept
+    [[nodiscard]] auto const* begin() const noexcept
     {
         return data();
     }
 
-    [[nodiscard]] auto const* begin() const
-    {
-        return data();
-    }
-
-    [[nodiscard]] auto const* end() const
+    [[nodiscard]] auto const* end() const noexcept
     {
         return begin() + size();
     }
 
-    [[nodiscard]] auto to_string() const
+    template<typename T>
+    [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
     {
-        return std::string{ reinterpret_cast<char const*>(data()), size() };
+        auto const n_bytes = std::size(needle);
+        auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
+        auto const needle_end = needle_begin + n_bytes;
+        return n_bytes <= size() && std::equal(needle_begin, needle_end, data());
     }
 
     [[nodiscard]] auto to_string_view() const
@@ -67,21 +65,16 @@ public:
         return std::string_view{ reinterpret_cast<char const*>(data()), size() };
     }
 
-    template<typename T>
-    [[nodiscard]] bool starts_with(T const& needle) const
+    [[nodiscard]] auto to_string() const
     {
-        auto const n_bytes = std::size(needle);
-        auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
-        auto const needle_end = needle_begin + n_bytes;
-        return n_bytes <= size() && std::equal(needle_begin, needle_end, data());
+        return std::string{ to_string_view() };
     }
 
-    auto to_buf(void* tgt, size_t n_bytes)
+    void to_buf(void* tgt, size_t n_bytes)
     {
         n_bytes = std::min(n_bytes, size());
-        std::copy_n(data(), n_bytes, reinterpret_cast<value_type*>(tgt));
+        std::copy_n(data(), n_bytes, static_cast<value_type*>(tgt));
         drain(n_bytes);
-        return n_bytes;
     }
 
     [[nodiscard]] auto to_uint8()
@@ -112,9 +105,17 @@ public:
         return tr_ntohll(tmp);
     }
 
+    // Returns the number of bytes written. Check `error` for error.
     size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
-        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), std::min(n_bytes, size()), 0); n_sent >= 0)
+        n_bytes = std::min(n_bytes, size());
+
+        if (n_bytes == 0U)
+        {
+            return {};
+        }
+
+        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0U)
         {
             drain(n_sent);
             return n_sent;
@@ -191,7 +192,7 @@ public:
         add_uint64(hll);
     }
 
-    void add_port(tr_port const& port)
+    void add_port(tr_port port)
     {
         auto nport = port.network();
         add(&nport, sizeof(nport));
@@ -199,8 +200,13 @@ public:
 
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
+        if (n_bytes == 0U)
+        {
+            return {};
+        }
+
         auto const [buf, buflen] = reserve_space(n_bytes);
-        if (auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0); n_read >= 0)
+        if (auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(buflen, n_bytes), 0); n_read >= 0U)
         {
             commit_space(n_read);
             return n_read;
@@ -232,6 +238,8 @@ public:
         add(data);
     }
 
+    // -- BufferReader
+
     [[nodiscard]] size_t size() const noexcept override
     {
         return evbuffer_get_length(buf_.get());
@@ -239,7 +247,7 @@ public:
 
     [[nodiscard]] value_type const* data() const override
     {
-        return reinterpret_cast<value_type*>(evbuffer_pullup(buf_.get(), -1));
+        return reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1));
     }
 
     void drain(size_t n_bytes) override
@@ -247,7 +255,9 @@ public:
         evbuffer_drain(buf_.get(), n_bytes);
     }
 
-    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
+    // -- BufferWriter
+
+    [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
         auto iov = evbuffer_iovec{};
         evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
@@ -256,7 +266,7 @@ public:
         return { static_cast<value_type*>(iov.iov_base), static_cast<size_t>(iov.iov_len) };
     }
 
-    virtual void commit_space(size_t n_bytes) override
+    void commit_space(size_t n_bytes) override
     {
         TR_ASSERT(reserved_space_);
         TR_ASSERT(reserved_space_->iov_len >= n_bytes);
@@ -264,6 +274,8 @@ public:
         evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
         reserved_space_.reset();
     }
+
+    //
 
 private:
     evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
@@ -282,6 +294,12 @@ public:
     SmallBuffer& operator=(SmallBuffer&&) = default;
     SmallBuffer(SmallBuffer const&) = delete;
     SmallBuffer& operator=(SmallBuffer const&) = delete;
+
+    template<typename ContiguousContainer>
+    explicit SmallBuffer(ContiguousContainer const& data)
+    {
+        BufferWriter<value_type>::add(data);
+    }
 
     [[nodiscard]] size_t size() const noexcept override
     {

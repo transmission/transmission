@@ -7,7 +7,7 @@
 #define TR_CRYPTO_UTILS_H
 
 #include <array>
-#include <cstddef> // for size_t
+#include <cstddef> // size_t
 #include <cstdint>
 #include <limits>
 #include <memory>
@@ -34,17 +34,11 @@ public:
     [[nodiscard]] virtual tr_sha1_digest_t finish() = 0;
 
     template<typename... T>
-    [[nodiscard]] auto make_digest(T const&... args)
-    {
-        clear();
-        (add(std::data(args), std::size(args)), ...);
-        return finish();
-    }
-
-    template<typename... T>
     [[nodiscard]] static auto digest(T const&... args)
     {
-        return create()->make_digest(args...);
+        auto context = tr_sha1::create();
+        (context->add(std::data(args), std::size(args)), ...);
+        return context->finish();
     }
 };
 

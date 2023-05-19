@@ -577,18 +577,6 @@ size_t tr_peerIo::get_write_buffer_space(uint64_t now) const noexcept
 
 // ---
 
-void tr_peerIo::read_bytes(void* bytes, size_t byte_count)
-{
-    TR_ASSERT(read_buffer_size() >= byte_count);
-
-    inbuf_.to_buf(bytes, byte_count);
-
-    if (is_encrypted())
-    {
-        decrypt(byte_count, bytes);
-    }
-}
-
 void tr_peerIo::read_uint16(uint16_t* setme)
 {
     auto tmp = uint16_t{};

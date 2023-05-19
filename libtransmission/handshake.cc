@@ -188,15 +188,15 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     auto outbuf = libtransmission::SmallBuffer<4096>{};
 
     /* HASH('req1', S) */
-    outbuf.add(sha1_->digest("req1"sv, dh_.secret()));
+    outbuf.add(tr_sha1::digest("req1"sv, dh_.secret()));
 
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readYb requires an info_hash");
 
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        auto const req2 = sha1_->digest("req2"sv, info_hash);
-        auto const req3 = sha1_->digest("req3"sv, dh_.secret());
+        auto const req2 = tr_sha1::digest("req2"sv, info_hash);
+        auto const req3 = tr_sha1::digest("req3"sv, dh_.secret());
         auto x_or = tr_sha1_digest_t{};
         for (size_t i = 0, n = std::size(x_or); i < n; ++i)
         {
@@ -210,7 +210,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
      * PadC is reserved for future extensions to the handshake...
      * standard practice at this time is for it to be zero-length */
     peer_io->write(outbuf, false);
-    peer_io->encrypt_init(peer_io->is_incoming(), dh_, *sha1_, info_hash);
+    peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
     outbuf.add(VC);
     outbuf.add_uint32(crypto_provide());
     outbuf.add_uint16(0);
@@ -240,27 +240,33 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
     auto const info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readVC requires an info_hash");
 
-    // find the end of PadB by looking for `ENCRYPT(VC)`
-    auto needle = VC;
-    auto filter = tr_message_stream_encryption::Filter{};
-    filter.encrypt_init(true, dh_, *sha1_, info_hash);
-    filter.encrypt(std::size(needle), std::data(needle));
+    // We need to find the end of PadB by looking for `ENCRYPT(VC)`,
+    // so calculate and cache the value of `ENCRYPT(VC)`.
+    if (!encrypted_vc_)
+    {
+        auto filter = tr_message_stream_encryption::Filter{};
+        filter.encrypt_init(true, dh_, info_hash);
+
+        auto needle = decltype(VC){};
+        filter.encrypt(std::data(VC), std::size(VC), std::data(needle));
+        encrypted_vc_ = needle;
+    }
 
     for (size_t i = 0; i < PadbMaxlen; ++i)
     {
-        if (peer_io->read_buffer_size() < std::size(needle))
+        if (peer_io->read_buffer_size() < std::size(*encrypted_vc_))
         {
             tr_logAddTraceHand(this, "not enough bytes... returning read_more");
             return READ_LATER;
         }
 
-        if (peer_io->read_buffer_starts_with(needle))
+        if (peer_io->read_buffer_starts_with(*encrypted_vc_))
         {
             tr_logAddTraceHand(this, "got it!");
             // We already know it's a match; now we just need to
             // consume it from the read buffer.
-            peer_io->decrypt_init(peer_io->is_incoming(), dh_, *sha1_, info_hash);
-            peer_io->read_bytes(std::data(needle), std::size(needle));
+            peer_io->decrypt_init(peer_io->is_incoming(), dh_, info_hash);
+            peer_io->read_bytes(std::data(*encrypted_vc_), std::size(*encrypted_vc_));
             set_state(tr_handshake::State::AwaitingCryptoSelect);
             return READ_NOW;
         }
@@ -460,7 +466,7 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
 ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
 {
     // find the end of PadA by looking for HASH('req1', S)
-    auto const needle = sha1_->digest("req1"sv, dh_.secret());
+    auto const needle = tr_sha1::digest("req1"sv, dh_.secret());
 
     for (size_t i = 0; i < PadaMaxlen; ++i)
     {
@@ -507,7 +513,7 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
     auto req2 = tr_sha1_digest_t{};
     peer_io->read_bytes(std::data(req2), std::size(req2));
 
-    auto const req3 = sha1_->digest("req3"sv, dh_.secret());
+    auto const req3 = tr_sha1::digest("req3"sv, dh_.secret());
     for (size_t i = 0; i < std::size(obfuscated_hash); ++i)
     {
         obfuscated_hash[i] = req2[i] ^ req3[i];
@@ -536,7 +542,7 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readCryptoProvide requires an info_hash");
-    peer_io->decrypt_init(peer_io->is_incoming(), dh_, *sha1_, info_hash);
+    peer_io->decrypt_init(peer_io->is_incoming(), dh_, info_hash);
 
     auto vc_in = vc_t{};
     peer_io->read_bytes(std::data(vc_in), std::size(vc_in));
@@ -593,7 +599,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
 
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
-    peer_io->encrypt_init(peer_io->is_incoming(), dh_, *sha1_, info_hash);
+    peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
     auto outbuf = libtransmission::SmallBuffer<4096>{};
 
     // send VC

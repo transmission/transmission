@@ -49,9 +49,10 @@
 using namespace std::literals;
 
 // sized to hold a piece message
-using PeerMessageBuffer = libtransmission::
+using MessageBuffer = libtransmission::
     SmallBuffer<sizeof(uint8_t) + sizeof(uint32_t) * 2U + tr_block_info::BlockSize, std::byte>;
-using PeerMessageReader = libtransmission::BufferReader<std::byte>;
+using MessageReader = libtransmission::BufferReader<std::byte>;
+using MessageWriter = libtransmission::BufferWriter<std::byte>;
 
 namespace
 {
@@ -222,7 +223,7 @@ struct tr_incoming
 {
     std::optional<uint32_t> length; // the full message payload length. Includes the +1 for id length
     std::optional<uint8_t> id; // the protocol message, e.g. BtPeerMsgs::Piece
-    PeerMessageBuffer payload;
+    MessageBuffer payload;
 
     struct incoming_piece_data
     {
@@ -681,8 +682,8 @@ public:
     tr_bitfield have_;
 
 private:
-    friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, PeerMessageReader& payload);
-    friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, PeerMessageReader& payload);
+    friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader& payload);
+    friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload);
 
     tr_peer_callback const callback_;
     void* const callback_data_;
@@ -761,26 +762,23 @@ template<typename T>
 
 // ---
 
-template<typename BufferWriter>
-void add_param(BufferWriter& buffer, uint8_t param) noexcept
+void add_param(MessageWriter& buffer, uint8_t param) noexcept
 {
     buffer.add_uint8(param);
 }
 
-template<typename BufferWriter>
-void add_param(BufferWriter& buffer, uint16_t param) noexcept
+void add_param(MessageWriter& buffer, uint16_t param) noexcept
 {
     buffer.add_uint16(param);
 }
 
-template<typename BufferWriter>
-void add_param(BufferWriter& buffer, uint32_t param) noexcept
+void add_param(MessageWriter& buffer, uint32_t param) noexcept
 {
     buffer.add_uint32(param);
 }
 
-template<typename BufferWriter, typename T>
-void add_param(BufferWriter& buffer, T const& param) noexcept
+template<typename T>
+void add_param(MessageWriter& buffer, T const& param) noexcept
 {
     buffer.add(param);
 }
@@ -817,8 +815,8 @@ template<typename... Args>
 }
 } // namespace
 
-template<typename BufferWriter, typename... Args>
-void build_peer_message(tr_peerMsgsImpl const* const msgs, BufferWriter& out, uint8_t type, Args const&... args)
+template<typename... Args>
+void build_peer_message(tr_peerMsgsImpl const* const msgs, MessageWriter& out, uint8_t type, Args const&... args)
 {
     logtrace(msgs, build_log_message(type, args...));
 
@@ -837,7 +835,7 @@ size_t protocol_send_message(tr_peerMsgsImpl const* const msgs, uint8_t type, Ar
 {
     using namespace protocol_send_message_helpers;
 
-    auto out = PeerMessageBuffer{};
+    auto out = MessageBuffer{};
     build_peer_message(msgs, out, type, args...);
     auto const n_bytes_added = std::size(out);
     msgs->io->write(out, type == BtPeerMsgs::Piece);
@@ -848,7 +846,7 @@ size_t protocol_send_keepalive(tr_peerMsgsImpl* msgs)
 {
     logtrace(msgs, "sending 'keepalive'");
 
-    auto out = libtransmission::SmallBuffer<32>{};
+    auto out = MessageBuffer{};
     out.add_uint32(0);
 
     auto const n_bytes_added = std::size(out);
@@ -1039,7 +1037,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantClear(&val);
 }
 
-void parseLtepHandshake(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
+void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
     msgs->peerSentLtepHandshake = true;
 
@@ -1149,7 +1147,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
     tr_variantClear(&val);
 }
 
-void parseUtMetadata(tr_peerMsgsImpl* msgs, PeerMessageReader& payload_in)
+void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
 {
     int64_t msg_type = -1;
     int64_t piece = -1;
@@ -1204,7 +1202,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, PeerMessageReader& payload_in)
     }
 }
 
-void parseUtPex(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
+void parseUtPex(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
     auto* const tor = msgs->torrent;
     if (!tor->allows_pex())
@@ -1252,7 +1250,7 @@ void parseUtPex(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
     }
 }
 
-void parseLtep(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
+void parseLtep(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
     TR_ASSERT(!std::empty(payload));
 
@@ -1287,7 +1285,7 @@ void parseLtep(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
     }
 }
 
-ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, PeerMessageReader& payload);
+ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader& payload);
 
 void prefetchPieces(tr_peerMsgsImpl* msgs)
 {
@@ -1352,7 +1350,7 @@ void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 
 int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<Cache::BlockData> block_data, tr_block_index_t block);
 
-ReadResult read_piece_data(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
+ReadResult read_piece_data(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
     // <index><begin><block>
     auto const piece = payload.to_uint32();
@@ -1400,7 +1398,7 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, PeerMessageReader& payload)
     return { ok ? READ_NOW : READ_ERR, len };
 }
 
-ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, PeerMessageReader& payload)
+ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader& payload)
 {
     bool const fext = msgs->io->supports_fext();
 
@@ -1786,7 +1784,7 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     current_message_len.reset();
     auto const message_type = *current_message_type;
     current_message_type.reset();
-    auto payload = PeerMessageBuffer{};
+    auto payload = MessageBuffer{};
     std::swap(payload, current_payload);
 
     auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, message_type, payload);

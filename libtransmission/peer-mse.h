@@ -11,16 +11,15 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <algorithm> // for std::copy_n
+#include <algorithm> // for std::copy_n()
 #include <array>
-#include <cstddef> // for size_t, std::byte
+#include <cstddef> // size_t, std::byte
 #include <memory>
 
-#include "tr-macros.h" // for tr_sha1_digest_t
+#include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-arc4.h"
 
 class tr_arc4;
-class tr_sha1;
 
 // Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
 namespace tr_message_stream_encryption
@@ -79,39 +78,20 @@ private:
 class Filter
 {
 public:
-    void decrypt_init(bool is_incoming, DH const&, tr_sha1&, tr_sha1_digest_t const& info_hash);
+    void decrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
     template<typename T>
-    constexpr void decrypt(size_t buf_len, T* buf)
+    constexpr void decrypt(T const* buf_in, size_t buf_len, T* buf_out) noexcept
     {
-        if (dec_active_)
-        {
-            dec_key_.process(buf, buf, buf_len);
-        }
+        process(buf_in, buf_len, buf_out, dec_active_, dec_key_);
     }
 
-    void encrypt_init(bool is_incoming, DH const&, tr_sha1&, tr_sha1_digest_t const& info_hash);
+    void encrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
     template<typename T>
-    constexpr void encrypt(size_t buf_len, T* buf)
+    constexpr void encrypt(T const* buf_in, size_t buf_len, T* buf_out) noexcept
     {
-        if (enc_active_)
-        {
-            enc_key_.process(buf, buf, buf_len);
-        }
-    }
-
-    template<typename T>
-    constexpr void encrypt(T const* src_data, T* dst_data, size_t n_bytes)
-    {
-        if (enc_active_)
-        {
-            enc_key_.process(src_data, dst_data, n_bytes);
-        }
-        else
-        {
-            std::copy_n(src_data, n_bytes, dst_data);
-        }
+        process(buf_in, buf_len, buf_out, enc_active_, enc_key_);
     }
 
     [[nodiscard]] constexpr auto is_active() const noexcept
@@ -120,6 +100,19 @@ public:
     }
 
 private:
+    template<typename T>
+    static constexpr void process(T const* buf_in, size_t buf_len, T* buf_out, bool active, tr_arc4& arc4) noexcept
+    {
+        if (active)
+        {
+            arc4.process(reinterpret_cast<uint8_t const*>(buf_in), buf_len, reinterpret_cast<uint8_t*>(buf_out));
+        }
+        else
+        {
+            std::copy_n(buf_in, buf_len, buf_out);
+        }
+    }
+
     tr_arc4 dec_key_ = {};
     tr_arc4 enc_key_ = {};
     bool dec_active_ = false;

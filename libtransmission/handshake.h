@@ -22,7 +22,6 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h"
 #include "net.h"
 #include "peer-mse.h" // tr_message_stream_encryption::DH
 #include "peer-io.h"
@@ -250,6 +249,11 @@ private:
     using vc_t = std::array<std::byte, 8>;
     static auto constexpr VC = vc_t{};
 
+    // Used when resynchronizing in read_vc(). This value is cached to avoid
+    // the cost of recomputing it. MSE spec: "Since the length of [PadB is]
+    // unknown, A will be able to resynchronize on ENCRYPT(VC)".
+    std::optional<vc_t> encrypted_vc_;
+
     ///
 
     static constexpr auto DhPoolMaxSize = size_t{ 32 };
@@ -300,8 +304,6 @@ private:
     ///
 
     DH dh_ = {};
-
-    std::unique_ptr<tr_sha1> const sha1_ = tr_sha1::create();
 
     DoneFunc on_done_;
 
