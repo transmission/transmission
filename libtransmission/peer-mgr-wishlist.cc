@@ -170,7 +170,7 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
 
             // don't request from too many peers
             size_t const n_peers = mediator_.countActiveRequests(block);
-            if (size_t const max_peers = mediator_.isEndgame() ? 2 : 1; n_peers >= max_peers)
+            if (size_t const max_peers = mediator_.isEndgame() ? EndgameMaxPeers : 1; n_peers >= max_peers)
             {
                 continue;
             }

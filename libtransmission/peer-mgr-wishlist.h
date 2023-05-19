@@ -22,6 +22,8 @@
 class Wishlist
 {
 public:
+    static auto constexpr EndgameMaxPeers = size_t{ 2U };
+
     struct Mediator
     {
         [[nodiscard]] virtual bool clientCanRequestBlock(tr_block_index_t block) const = 0;

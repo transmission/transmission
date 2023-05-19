@@ -15,8 +15,11 @@
 #include <utility>
 #include <vector>
 
+#include <sfl/small_vector.hpp>
+
 #include "transmission.h" // tr_block_index_t
 #include "peer-common.h" // tr_peer*
+#include "peer-mgr-wishlist.h" // EndgameMaxPeers
 
 /**
  * Bookkeeping for the active requests we have --
@@ -25,6 +28,8 @@
 class ActiveRequests
 {
 public:
+    static auto constexpr MaxPeers = Wishlist::EndgameMaxPeers;
+
     ActiveRequests();
     ~ActiveRequests();
 
@@ -38,7 +43,7 @@ public:
     std::vector<tr_block_index_t> remove(tr_peer const* peer);
 
     // erase any record of requests to `block` and return the previously-associated peers
-    std::vector<tr_peer*> remove(tr_block_index_t block);
+    void remove(tr_block_index_t block, sfl::small_vector<tr_peer*, MaxPeers>& setme);
 
     // return true if there's a record of a request for `block` from `peer`
     [[nodiscard]] bool has(tr_block_index_t block, tr_peer const* peer) const;

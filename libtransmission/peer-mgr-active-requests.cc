@@ -11,52 +11,15 @@
 #include <unordered_set>
 #include <vector>
 
+#include <sfl/small_flat_map.hpp>
+
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/peer-mgr-active-requests.h"
+#include "libtransmission/peer-mgr-wishlist.h"
 #include "libtransmission/tr-assert.h"
-
-namespace
-{
-
-struct peer_at
-{
-    tr_peer* peer;
-    time_t when;
-
-    peer_at(tr_peer* p, time_t w)
-        : peer{ p }
-        , when{ w }
-    {
-    }
-
-    [[nodiscard]] int compare(peer_at const& that) const // <=>
-    {
-        if (peer != that.peer)
-        {
-            return peer < that.peer ? -1 : 1;
-        }
-
-        return 0;
-    }
-
-    bool operator==(peer_at const& that) const
-    {
-        return compare(that) == 0;
-    }
-};
-
-struct PeerAtHash
-{
-    std::size_t operator()(peer_at const& pa) const noexcept
-    {
-        return std::hash<tr_peer*>{}(pa.peer);
-    }
-};
-
-} // namespace
 
 class ActiveRequests::Impl
 {
@@ -97,7 +60,7 @@ public:
 
     std::unordered_map<tr_peer const*, size_t> count_;
 
-    std::unordered_map<tr_block_index_t, std::unordered_set<peer_at, PeerAtHash>> blocks_;
+    std::unordered_map<tr_block_index_t, sfl::small_flat_map<tr_peer const*, time_t, MaxPeers>> blocks_;
 
 private:
     size_t size_ = 0;
@@ -126,8 +89,7 @@ bool ActiveRequests::add(tr_block_index_t block, tr_peer* peer, time_t when)
 bool ActiveRequests::remove(tr_block_index_t block, tr_peer const* peer)
 {
     auto const it = impl_->blocks_.find(block);
-    auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
-    auto const removed = it != std::end(impl_->blocks_) && it->second.erase(key) != 0;
+    auto const removed = it != std::end(impl_->blocks_) && it->second.erase(peer) != 0;
 
     if (removed)
     {
@@ -148,10 +110,9 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
     auto removed = std::vector<tr_block_index_t>{};
     removed.reserve(impl_->blocks_.size());
 
-    auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
     for (auto const& [block, peers_at] : impl_->blocks_)
     {
-        if (peers_at.count(key) != 0U)
+        if (peers_at.count(peer) != 0U)
         {
             removed.push_back(block);
         }
@@ -166,9 +127,9 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
 }
 
 // remove requests for `block` and return the associated peers
-std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
+void ActiveRequests::remove(tr_block_index_t block, sfl::small_vector<tr_peer*, MaxPeers>& removed)
 {
-    auto removed = std::vector<tr_peer*>{};
+    removed.clear();
 
     if (auto it = impl_->blocks_.find(block); it != std::end(impl_->blocks_))
     {
@@ -178,7 +139,7 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
             std::begin(it->second),
             std::end(it->second),
             std::begin(removed),
-            [](auto const& sent) { return sent.peer; });
+            [](auto const& iter) { return const_cast<tr_peer*>(iter.first); });
         impl_->blocks_.erase(block);
     }
 
@@ -186,15 +147,13 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
     {
         impl_->decCount(peer);
     }
-
-    return removed;
 }
 
 // return true if there's an active request to `peer` for `block`
 bool ActiveRequests::has(tr_block_index_t block, tr_peer const* peer) const
 {
     auto const it = impl_->blocks_.find(block);
-    return it != std::end(impl_->blocks_) && (it->second.count(peer_at{ const_cast<tr_peer*>(peer), 0 }) != 0U);
+    return it != std::end(impl_->blocks_) && (it->second.count(peer) != 0U);
 }
 
 // count how many peers we're asking for `block`
@@ -225,11 +184,11 @@ std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(ti
 
     for (auto const& [block, peers_at] : impl_->blocks_)
     {
-        for (auto const& sent : peers_at)
+        for (auto const& [peer, sent_at] : peers_at)
         {
-            if (sent.when < when)
+            if (sent_at < when)
             {
-                sent_before.emplace_back(block, sent.peer);
+                sent_before.emplace_back(block, const_cast<tr_peer*>(peer));
             }
         }
     }

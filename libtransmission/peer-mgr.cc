@@ -350,7 +350,9 @@ public:
 
     void cancelAllRequestsForBlock(tr_block_index_t block, tr_peer const* no_notify)
     {
-        for (auto* peer : active_requests.remove(block))
+        auto removed = sfl::small_vector<tr_peer*, ActiveRequests::MaxPeers>{};
+        active_requests.remove(block, removed);
+        for (auto* peer : removed)
         {
             maybeSendCancelRequest(peer, block, no_notify);
         }
