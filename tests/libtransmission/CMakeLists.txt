@@ -52,6 +52,7 @@ target_sources(libtransmission-test
         torrent-magnet-test.cc
         torrent-metainfo-test.cc
         torrents-test.cc
+        trash-test.cc
         utils-test.cc
         variant-test.cc
         watchdir-test.cc

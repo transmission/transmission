@@ -59,7 +59,6 @@ static void tr_prefs_init_defaults(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_show_toolbar, true);
     tr_variantDictAddBool(d, TR_KEY_show_filterbar, true);
     tr_variantDictAddBool(d, TR_KEY_show_statusbar, true);
-    tr_variantDictAddBool(d, TR_KEY_trash_can_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_show_notification_area_icon, false);
     tr_variantDictAddBool(d, TR_KEY_show_tracker_scrapes, false);
     tr_variantDictAddBool(d, TR_KEY_show_extra_peer_details, false);

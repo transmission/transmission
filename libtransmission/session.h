@@ -703,6 +703,11 @@ public:
         return !settings_.should_start_added_torrents;
     }
 
+    [[nodiscard]] constexpr auto shouldTrashFiles() const noexcept
+    {
+        return settings_.should_move_files_to_trash;
+    }
+
     [[nodiscard]] constexpr auto shouldFullyVerifyAddedTorrents() const noexcept
     {
         return settings_.torrent_added_verify_mode == TR_VERIFY_ADDED_FULL;

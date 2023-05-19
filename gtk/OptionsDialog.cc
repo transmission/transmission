@@ -129,7 +129,7 @@ void OptionsDialog::Impl::addResponseCB(int response)
 
             if (trash_check_->get_active())
             {
-                gtr_file_trash_or_remove(filename_, nullptr);
+                core_->file_trash_or_remove(filename_, nullptr);
             }
 
             gtr_save_recent_dir("download", core_, downloadDir_);

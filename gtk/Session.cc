@@ -5,6 +5,7 @@
 #include "Session.h"
 
 #include "Actions.h"
+#include "libtransmission/error.h"
 #include "ListModelAdapter.h"
 #include "Notify.h"
 #include "Prefs.h"
@@ -707,7 +708,7 @@ Glib::RefPtr<Torrent> Session::Impl::create_new_torrent(tr_ctor* ctor)
 
             if (!is_internal)
             {
-                gtr_file_trash_or_remove(source, nullptr);
+                core_.file_trash_or_remove(source, nullptr);
             }
         }
     }
@@ -936,8 +937,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
         tr_torrentRemove(
             &torrent->get_underlying(),
             delete_files,
-            [](char const* filename, void* /*user_data*/, tr_error** error)
-            { return gtr_file_trash_or_remove(filename, error); },
+            [](char const* filename, void* /*user_data*/, tr_error** error) { return gtr_file_trash(filename, error); },
             nullptr);
     }
 }
@@ -1389,6 +1389,41 @@ void Session::open_folder(tr_torrent_id_t torrent_id) const
             gtr_open_file(Glib::build_filename(currentDir, tr_torrentName(tor)));
         }
     }
+}
+
+bool Session::file_trash_or_remove(std::string const& filename, tr_error** error) const
+{
+    bool trashed = false;
+    bool result = true;
+
+    g_return_val_if_fail(!filename.empty(), false);
+
+    if (tr_sessionGetTrashFiles(get_session()))
+    {
+        trashed = gtr_file_trash(filename, error);
+    }
+
+    if (!trashed)
+    {
+        auto const file = Gio::File::create_for_path(filename);
+        try
+        {
+            file->remove();
+        }
+        catch (Glib::Error const& e)
+        {
+            gtr_message(fmt::format(
+                _("Couldn't remove '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+                fmt::arg("error_code", e.code())));
+            tr_error_clear(error);
+            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
+            result = false;
+        }
+    }
+
+    return result;
 }
 
 sigc::signal<void(Session::ErrorCode, Glib::ustring const&)>& Session::signal_add_error()

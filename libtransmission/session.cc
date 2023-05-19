@@ -1235,6 +1235,13 @@ bool tr_sessionGetPaused(tr_session const* session)
     return session->shouldPauseAddedTorrents();
 }
 
+bool tr_sessionGetTrashFiles(tr_session* session)
+{
+    TR_ASSERT(session != nullptr);
+
+    return session->shouldTrashFiles();
+}
+
 void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 {
     TR_ASSERT(session != nullptr);

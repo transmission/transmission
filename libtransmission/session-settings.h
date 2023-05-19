@@ -68,6 +68,11 @@ struct tr_variant;
     V(TR_KEY_speed_limit_up_enabled, speed_limit_up_enabled, bool, false, "") \
     V(TR_KEY_start_added_torrents, should_start_added_torrents, bool, true, "") \
     V(TR_KEY_tcp_enabled, tcp_enabled, bool, true, "") \
+    V(TR_KEY_trash_can_enabled, \
+      should_move_files_to_trash, \
+      bool, \
+      false, \
+      "Files should be moved to trash can instead of immediately deleted") \
     V(TR_KEY_trash_original_torrent_files, should_delete_source_torrents, bool, false, "") \
     V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \

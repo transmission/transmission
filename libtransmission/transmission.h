@@ -568,6 +568,8 @@ void tr_sessionSetPeerLimitPerTorrent(tr_session* session, uint16_t max_peers);
 bool tr_sessionGetPaused(tr_session const* session);
 void tr_sessionSetPaused(tr_session* session, bool is_paused);
 
+bool tr_sessionGetTrashFiles(tr_session* session);
+
 void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
 
 tr_priority_t tr_torrentGetPriority(tr_torrent const* tor);
@@ -854,7 +856,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 using tr_fileFunc = bool (*)(char const* filename, void* user_data, struct tr_error** error);
 
 /** @brief Removes our torrent and .resume files for this torrent */
-void tr_torrentRemove(tr_torrent* torrent, bool delete_flag, tr_fileFunc delete_func, void* user_data);
+void tr_torrentRemove(tr_torrent* torrent, bool delete_flag, tr_fileFunc trash_func, void* user_data);
 
 /** @brief Start a torrent */
 void tr_torrentStart(tr_torrent* torrent);

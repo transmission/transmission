@@ -6,6 +6,7 @@
 #include <algorithm> // std::find()
 #include <cctype>
 #include <functional>
+#include <iostream>
 #include <iterator>
 #include <optional>
 #include <set>
@@ -15,19 +16,22 @@
 
 #include <fmt/core.h>
 
+#include "libtransmission/file.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/torrent-files.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
 namespace
 {
 
-using file_func_t = std::function<void(char const* filename)>;
+using file_func_t = std::function<void(tr_pathbuf const& filename)>;
 
 bool isFolder(std::string_view path)
 {
@@ -60,7 +64,7 @@ bool isEmptyFolder(char const* path)
     return true;
 }
 
-void depthFirstWalk(char const* path, file_func_t const& func, std::optional<int> max_depth = {})
+void depthFirstWalk(tr_pathbuf const& path, file_func_t const& func, std::optional<int> max_depth = {})
 {
     if (isFolder(path) && (!max_depth || *max_depth > 0))
     {
@@ -75,7 +79,7 @@ void depthFirstWalk(char const* path, file_func_t const& func, std::optional<int
                     continue;
                 }
 
-                depthFirstWalk(tr_pathbuf{ path, '/', name }.c_str(), func, max_depth ? *max_depth - 1 : max_depth);
+                depthFirstWalk(tr_pathbuf{ path, '/', name }, func, max_depth ? *max_depth - 1 : max_depth);
             }
 
             tr_sys_dir_close(odir);
@@ -219,15 +223,7 @@ bool tr_torrent_files::move(
     // after moving the files, remove any leftover empty directories
     if (!err)
     {
-        auto const remove_empty_directories = [](char const* filename)
-        {
-            if (isEmptyFolder(filename))
-            {
-                tr_sys_path_remove(filename, nullptr);
-            }
-        };
-
-        remove(old_parent, parent_name, remove_empty_directories);
+        remove(old_parent);
     }
 
     return !err;
@@ -237,14 +233,14 @@ bool tr_torrent_files::move(
 
 /**
  * This convoluted code does something (seemingly) simple:
- * remove the torrent's local files.
+ * trash the torrent's local files.
  *
  * Fun complications:
  * 1. Try to preserve the directory hierarchy in the recycle bin.
  * 2. If there are nontorrent files, don't delete them...
  * 3. ...unless the other files are "junk", such as .DS_Store
  */
-void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func) const
+void tr_torrent_files::trash(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& trash_func) const
 {
     auto const parent = tr_pathbuf{ parent_in };
 
@@ -256,6 +252,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
 
     // make a tmpdir
     auto tmpdir = tr_pathbuf{ parent, '/', tmpdir_prefix, "__XXXXXX"sv };
+    // TODO: handle error
     tr_sys_dir_create_temp(std::data(tmpdir));
 
     // move the local data to the tmpdir
@@ -264,30 +261,32 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     {
         if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
         {
+            // TODO: handle error
             tr_moveFile(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
         }
     }
 
     // Make a list of the top-level torrent files & folders
     // because we'll need it below in the 'remove junk' phase
-    auto const path = tr_pathbuf{ parent, '/', tmpdir_prefix };
-    auto top_files = std::set<std::string>{ std::string{ path } };
+    std::set<tr_pathbuf> top_files;
+    top_files.emplace(parent, '/', tmpdir_prefix);
     depthFirstWalk(
         tmpdir,
         [&parent, &tmpdir, &top_files](char const* filename)
         {
             if (tmpdir != filename)
             {
-                top_files.emplace(tr_pathbuf{ parent, '/', tr_sys_path_basename(filename) });
+                top_files.emplace(parent, '/', tr_sys_path_basename(filename));
             }
         },
         1);
 
-    auto const func_wrapper = [&tmpdir, &func](char const* filename)
+    auto const func_wrapper = [&tmpdir, &trash_func](char const* filename)
     {
         if (tmpdir != filename)
         {
-            func(filename);
+            // TODO: handle error
+            trash_func(filename, nullptr);
         }
     };
 
@@ -303,7 +302,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     // OK we've removed the local data.
     // What's left are empty folders, junk, and user-generated files.
     // Remove the first two categories and leave the third alone.
-    auto const remove_junk = [](char const* filename)
+    auto const remove_junk = [](tr_pathbuf const& filename)
     {
         if (isEmptyFolder(filename) || isJunkFile(filename))
         {
@@ -312,7 +311,43 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     };
     for (auto const& filename : top_files)
     {
-        depthFirstWalk(filename.c_str(), remove_junk);
+        depthFirstWalk(filename, remove_junk);
+    }
+}
+
+void tr_torrent_files::remove(std::string_view parent) const
+{
+    auto const paths = std::array<std::string_view, 1>{ parent };
+    std::set<tr_pathbuf> dirs_found;
+    for (tr_file_index_t idx = 0, n_files = fileCount(); idx < n_files; ++idx)
+    {
+        if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
+        {
+            tr_sys_path_remove(found->filename());
+
+            // Stores the top-level dir of the file. This feels weird because
+            // I thought torrents have at most one top-level dir, but I am
+            // following suit of "trash()" function.
+            auto subpath = found->subpath();
+            if (auto dir_limit = subpath.find('/'); dir_limit != ""sv.npos)
+            {
+                dirs_found.emplace(parent, '/', subpath.substr(0, dir_limit));
+            }
+        }
+    }
+
+    // Remove empty folders and junk files
+    for (auto const& dir : dirs_found)
+    {
+        depthFirstWalk(
+            dir,
+            [](tr_pathbuf const& filename)
+            {
+                if (isEmptyFolder(filename) || isJunkFile(filename))
+                {
+                    tr_sys_path_remove(filename);
+                }
+            });
     }
 }
 

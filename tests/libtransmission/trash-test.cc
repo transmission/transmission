@@ -20,12 +20,17 @@
 using namespace std::literals;
 using SubpathAndSize = std::pair<std::string_view, uint64_t>;
 
-class RemoveTest : public libtransmission::test::SandboxedTest
+class TrashTest : public libtransmission::test::SandboxedTest
 {
 protected:
     static constexpr std::string_view Content = "Hello, World!"sv;
     static constexpr std::string_view JunkBasename = ".DS_Store"sv;
     static constexpr std::string_view NonJunkBasename = "passwords.txt"sv;
+
+    static void sysPathRemove(char const* filename, tr_error** error)
+    {
+        tr_sys_path_remove(filename, error);
+    }
 
     static auto aliceFiles()
     {
@@ -200,7 +205,7 @@ protected:
     }
 };
 
-TEST_F(RemoveTest, RemovesSingleFile)
+TEST_F(TrashTest, RemovesSingleFile)
 {
     auto const parent = sandboxDir();
     auto expected_tree = std::set<std::string>{ parent };
@@ -210,12 +215,12 @@ TEST_F(RemoveTest, RemovesSingleFile)
     expected_tree = createFiles(files, parent.c_str());
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent);
+    files.trash(parent, "tmpdir_prefix"sv, sysPathRemove);
     expected_tree = { parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
-TEST_F(RemoveTest, RemovesSubtree)
+TEST_F(TrashTest, RemovesSubtree)
 {
     auto const parent = sandboxDir();
     auto expected_tree = std::set<std::string>{ parent };
@@ -225,12 +230,12 @@ TEST_F(RemoveTest, RemovesSubtree)
     expected_tree = createFiles(files, parent.c_str());
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent);
+    files.trash(parent, "tmpdir_prefix"sv, sysPathRemove);
     expected_tree = { parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
-TEST_F(RemoveTest, RemovesLeftoverJunk)
+TEST_F(TrashTest, RemovesLeftoverJunk)
 {
     auto const parent = sandboxDir();
     auto expected_tree = std::set<std::string>{ parent };
@@ -246,12 +251,12 @@ TEST_F(RemoveTest, RemovesLeftoverJunk)
     expected_tree.emplace(junk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent);
+    files.trash(parent, "tmpdir_prefix"sv, sysPathRemove);
     expected_tree = { parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
-TEST_F(RemoveTest, LeavesSiblingsAlone)
+TEST_F(TrashTest, LeavesSiblingsAlone)
 {
     auto const parent = sandboxDir();
     auto expected_tree = std::set<std::string>{ parent };
@@ -274,12 +279,12 @@ TEST_F(RemoveTest, LeavesSiblingsAlone)
     expected_tree.emplace(non_junk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent);
+    files.trash(parent, "tmpdir_prefix"sv, sysPathRemove);
     expected_tree = { parent, junk_file.c_str(), non_junk_file.c_str() };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
-TEST_F(RemoveTest, LeavesNonJunkAlone)
+TEST_F(TrashTest, LeavesNonJunkAlone)
 {
     auto const parent = sandboxDir();
     auto expected_tree = std::set<std::string>{ parent };
@@ -295,7 +300,42 @@ TEST_F(RemoveTest, LeavesNonJunkAlone)
     expected_tree.emplace(nonjunk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    files.remove(parent);
+    files.trash(parent, "tmpdir_prefix"sv, sysPathRemove);
     expected_tree = { parent, std::string{ tr_sys_path_dirname(nonjunk_file) }, nonjunk_file.c_str() };
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+}
+
+TEST_F(TrashTest, PreservesDirectoryHierarchyIfPossible)
+{
+    auto const parent = sandboxDir();
+    auto expected_tree = std::set<std::string>{ parent };
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    // add a recycle bin
+    auto const recycle_bin = tr_pathbuf{ parent, "/Trash"sv };
+    tr_sys_dir_create(recycle_bin, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    expected_tree.emplace(recycle_bin);
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    auto const files = aliceFiles();
+    expected_tree = createFiles(files, parent.c_str());
+    expected_tree.emplace(recycle_bin);
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    auto const recycle_func = [&recycle_bin](char const* filename, tr_error**)
+    {
+        tr_sys_path_rename(filename, tr_pathbuf{ recycle_bin, '/', tr_sys_path_basename(filename) });
+    };
+    files.trash(parent, "tmpdir_prefix"sv, recycle_func);
+
+    // after remove, the subtree should be:
+    expected_tree = { parent, recycle_bin.c_str() };
+    for (tr_file_index_t i = 0, n = files.fileCount(); i < n; ++i)
+    {
+        expected_tree.emplace(tr_pathbuf{ recycle_bin, '/', files.path(i) });
+    }
+    expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox"sv });
+    expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox/history"sv });
+    expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox/history/files"sv });
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }

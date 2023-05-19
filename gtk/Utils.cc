@@ -408,52 +408,25 @@ void setup_tree_view_button_event_handling(
 #endif
 }
 
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
+bool gtr_file_trash(std::string const& filename, tr_error** error)
 {
-    bool trashed = false;
-    bool result = true;
-
-    g_return_val_if_fail(!filename.empty(), false);
-
     auto const file = Gio::File::create_for_path(filename);
 
-    if (gtr_pref_flag_get(TR_KEY_trash_can_enabled))
+    try
     {
-        try
-        {
-            trashed = file->trash();
-        }
-        catch (Glib::Error const& e)
-        {
-            gtr_message(fmt::format(
-                _("Couldn't move '{path}' to trash: {error} ({error_code})"),
-                fmt::arg("path", filename),
-                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                fmt::arg("error_code", e.code())));
-            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
-        }
+        return file->trash();
     }
-
-    if (!trashed)
+    catch (Glib::Error const& e)
     {
-        try
-        {
-            file->remove();
-        }
-        catch (Glib::Error const& e)
-        {
-            gtr_message(fmt::format(
-                _("Couldn't remove '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename),
-                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                fmt::arg("error_code", e.code())));
-            tr_error_clear(error);
-            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
-            result = false;
-        }
-    }
+        gtr_message(fmt::format(
+            _("Couldn't move '{path}' to trash: {error} ({error_code})"),
+            fmt::arg("path", filename),
+            fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
+            fmt::arg("error_code", e.code())));
+        tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
 
-    return result;
+        return false;
+    }
 }
 
 namespace

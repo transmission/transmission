@@ -135,6 +135,8 @@ public:
 
     void open_folder(tr_torrent_id_t torrent_id) const;
 
+    bool file_trash_or_remove(std::string const& filename, tr_error** error) const;
+
     sigc::signal<void(ErrorCode, Glib::ustring const&)>& signal_add_error();
     sigc::signal<void(tr_ctor*)>& signal_add_prompt();
     sigc::signal<void(bool)>& signal_blocklist_updated();
