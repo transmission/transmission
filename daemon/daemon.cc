@@ -428,7 +428,6 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
     int c;
     char const* optstr;
 
-    paused_ = false;
     *dump_settings = false;
     *foreground = false;
 
@@ -899,6 +898,9 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
 
     /* load settings from defaults + config file */
     settings_ = load_settings(config_dir_.c_str());
+
+    paused_ = false;
+    tr_variantDictFindBool(&settings_, TR_KEY_daemon_startPaused, &paused_);
 
     bool dumpSettings;
 
