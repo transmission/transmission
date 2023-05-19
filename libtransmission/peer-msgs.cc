@@ -1358,6 +1358,8 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, MessageReader& payload)
     auto const block = loc.block;
     auto const block_size = msgs->torrent->block_size(block);
 
+    logtrace(msgs, fmt::format("got {:d} bytes for req {:d}:{:d}->{:d}", len, piece, offset, len));
+
     if (loc.block_offset + len > block_size)
     {
         logwarn(msgs, fmt::format("got unaligned piece {:d}:{:d}->{:d}", piece, offset, len));
@@ -1370,25 +1372,30 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, MessageReader& payload)
         return { READ_ERR, len };
     }
 
+    msgs->publish(tr_peer_event::GotPieceData(len));
+
+    if (loc.block_offset == 0U && len == block_size) // simple case: one message has entire block
+    {
+        auto buf = std::make_unique<Cache::BlockData>(block_size);
+        payload.to_buf(std::data(*buf), len);
+        auto const ok = clientGotBlock(msgs, std::move(buf), block) == 0;
+        return { ok ? READ_NOW : READ_ERR, len };
+    }
+
     auto& blocks = msgs->incoming.blocks;
     auto& incoming_block = blocks.try_emplace(block, block_size).first->second;
     payload.to_buf(std::data(*incoming_block.buf) + loc.block_offset, len);
-    msgs->publish(tr_peer_event::GotPieceData(len));
 
     if (!incoming_block.add_span(loc.block_offset, loc.block_offset + len))
     {
         return { READ_ERR, len }; // invalid span
     }
 
-    logtrace(msgs, fmt::format("got {:d} bytes for req {:d}:{:d}->{:d}", len, piece, offset, len));
-
-    // if we haven't gotten the entire block yet, wait for more
     if (!incoming_block.has_all())
     {
-        return { READ_LATER, len };
+        return { READ_LATER, len }; // we don't have the full block yet
     }
 
-    // we've got the entire block, so send it along.
     auto block_buf = std::move(incoming_block.buf);
     blocks.erase(block); // note: invalidates `incoming_block` local
     auto const ok = clientGotBlock(msgs, std::move(block_buf), block) == 0;
