@@ -53,7 +53,7 @@ public:
     [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
-        auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
+        auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
         auto const needle_end = needle_begin + n_bytes;
         return n_bytes <= size() && std::equal(needle_begin, needle_end, data());
     }
@@ -195,6 +195,32 @@ public:
         auto nport = port.network();
         add(&nport, sizeof(nport));
     }
+
+    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    {
+        auto const [buf, buflen] = reserve_space(n_bytes);
+        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
+        auto const err = sockerrno;
+
+        if (n_read > 0)
+        {
+            commit_space(n_read);
+            return static_cast<size_t>(n_read);
+        }
+
+        // When a stream socket peer has performed an orderly shutdown,
+        // the return value will be 0 (the traditional "end-of-file" return).
+        if (n_read == 0)
+        {
+            tr_error_set_from_errno(error, ENOTCONN);
+        }
+        else
+        {
+            tr_error_set(error, err, tr_net_strerror(err));
+        }
+
+        return {};
+    }
 };
 
 class Buffer final
@@ -216,8 +242,6 @@ public:
         add(data);
     }
 
-    // -- BufferReader
-
     [[nodiscard]] size_t size() const noexcept override
     {
         return evbuffer_get_length(buf_.get());
@@ -225,15 +249,13 @@ public:
 
     [[nodiscard]] value_type const* data() const override
     {
-        return reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1));
+        return reinterpret_cast<value_type const*>(evbuffer_pullup(buf_.get(), -1));
     }
 
     void drain(size_t n_bytes) override
     {
         evbuffer_drain(buf_.get(), n_bytes);
     }
-
-    // -- BufferWriter
 
     [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
@@ -251,31 +273,6 @@ public:
         reserved_space_->iov_len = n_bytes;
         evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
         reserved_space_.reset();
-    }
-
-    //
-
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
-    {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
-        auto const err = EVUTIL_SOCKET_ERROR();
-
-        if (res > 0)
-        {
-            return static_cast<size_t>(res);
-        }
-
-        if (res == 0)
-        {
-            tr_error_set_from_errno(error, ENOTCONN);
-        }
-        else
-        {
-            tr_error_set(error, err, tr_net_strerror(err));
-        }
-
-        return {};
     }
 
 private:
