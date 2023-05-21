@@ -1361,6 +1361,8 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, MessageReader& payload)
     auto const block = loc.block;
     auto const block_size = msgs->torrent->block_size(block);
 
+    logtrace(msgs, fmt::format("got {:d} bytes for req {:d}:{:d}->{:d}", len, piece, offset, len));
+
     if (loc.block_offset + len > block_size)
     {
         logwarn(msgs, fmt::format("got unaligned piece {:d}:{:d}->{:d}", piece, offset, len));
@@ -1372,9 +1374,6 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, MessageReader& payload)
         logwarn(msgs, fmt::format("got unrequested piece {:d}:{:d}->{:d}", piece, offset, len));
         return { READ_ERR, len };
     }
-
-    fmt::print("{:c} ", len < block_size ? 'n' : 'Y');
-    msgs->publish(tr_peer_event::GotPieceData(len));
 
     logtrace(msgs, fmt::format("got {:d} bytes for req {:d}:{:d}->{:d}", len, piece, offset, len));
 

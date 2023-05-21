@@ -55,7 +55,7 @@ public:
     [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
-        auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
+        auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
         auto const needle_end = needle_begin + n_bytes;
         return n_bytes <= size() && std::equal(needle_begin, needle_end, data());
     }
@@ -206,39 +206,48 @@ public:
         }
 
         auto const [buf, buflen] = reserve_space(n_bytes);
-        if (auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(buflen, n_bytes), 0); n_read >= 0U)
+        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
+        auto const err = sockerrno;
+
+        if (n_read > 0)
         {
             commit_space(n_read);
-            return n_read;
+            return static_cast<size_t>(n_read);
         }
 
-        auto const err = sockerrno;
-        tr_error_set(error, err, tr_net_strerror(err));
+        // When a stream socket peer has performed an orderly shutdown,
+        // the return value will be 0 (the traditional "end-of-file" return).
+        if (n_read == 0)
+        {
+            tr_error_set_from_errno(error, ENOTCONN);
+        }
+        else
+        {
+            tr_error_set(error, err, tr_net_strerror(err));
+        }
+
         return {};
     }
 };
 
-#if 0
-class Buffer final
+class EvBuffer final
     : public BufferReader<std::byte>
     , public BufferWriter<std::byte>
 {
 public:
     using value_type = std::byte;
 
-    Buffer() = default;
-    Buffer(Buffer&&) = default;
-    Buffer(Buffer const&) = delete;
-    Buffer& operator=(Buffer&&) = default;
-    Buffer& operator=(Buffer const&) = delete;
+    EvBuffer() = default;
+    EvBuffer(EvBuffer&&) = default;
+    EvBuffer(EvBuffer const&) = delete;
+    EvBuffer& operator=(EvBuffer&&) = default;
+    EvBuffer& operator=(EvBuffer const&) = delete;
 
     template<typename T>
-    explicit Buffer(T const& data)
+    explicit EvBuffer(T const& data)
     {
         add(data);
     }
-
-    // -- BufferReader
 
     [[nodiscard]] size_t size() const noexcept override
     {
@@ -247,15 +256,13 @@ public:
 
     [[nodiscard]] value_type const* data() const override
     {
-        return reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1));
+        return reinterpret_cast<value_type const*>(evbuffer_pullup(buf_.get(), -1));
     }
 
     void drain(size_t n_bytes) override
     {
         evbuffer_drain(buf_.get(), n_bytes);
     }
-
-    // -- BufferWriter
 
     [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
@@ -275,16 +282,13 @@ public:
         reserved_space_.reset();
     }
 
-    //
-
 private:
     evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
     std::optional<evbuffer_iovec> reserved_space_;
 };
-#endif
 
 template<size_t N, typename value_type = std::byte>
-class SmallBuffer
+class SmallBuffer final
     : public BufferReader<value_type>
     , public BufferWriter<value_type>
 {
