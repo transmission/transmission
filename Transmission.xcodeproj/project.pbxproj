@@ -3725,6 +3725,19 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/dht",
+					"third-party/fast_float/include",
+					"third-party/wide-integer",
+					"third-party/libb64/include",
+					"third-party/libdeflate",
+					"third-party/libpsl/include",
+					"third-party/libutp/include",
+					"third-party/utfcpp/source",
+					"third-party/jsonsl",
+					"third-party/wildmat",
+				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
@@ -3744,17 +3757,17 @@
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
-					"third-party/libnatpmp",
+					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/miniupnpc",
+					"third-party/miniupnpc/*.h",
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"."
+					.,
 				);
 			};
 			name = Debug;
@@ -3998,17 +4011,17 @@
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
-					"third-party/libnatpmp",
+					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/miniupnpc",
+					"third-party/miniupnpc/*.h",
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					".",
+					.,
 				);
 			};
 			name = Release;
@@ -4324,17 +4337,17 @@
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
-					"third-party/libnatpmp",
+					"third-party/libnatpmp/*.h",
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
-					"third-party/miniupnpc",
+					"third-party/miniupnpc/*.h",
 					"third-party/utfcpp/source",
 					"third-party/wide-integer",
 					"third-party/wildmat",
 				);
 				USER_HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					".",
+					.,
 				);
 			};
 			name = "Release - Debug";

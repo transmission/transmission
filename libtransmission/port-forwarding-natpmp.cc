@@ -13,7 +13,7 @@
 #include <fmt/core.h>
 
 #define ENABLE_STRNATPMPERR
-#include <natpmp.h>
+#include "natpmp.h"
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
