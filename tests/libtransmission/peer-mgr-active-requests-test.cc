@@ -96,13 +96,13 @@ TEST_F(PeerMgrActiveRequestsTest, peersAreRemoved)
 
     // try removing requests for that block (should remove the 1 active request)
     auto const removed = requests.remove(block);
-    EXPECT_EQ(std::vector<tr_peer*>{ peer }, removed);
+    EXPECT_EQ(ActiveRequests::Peers{ peer }, removed);
     EXPECT_EQ(0U, requests.count(block));
     EXPECT_EQ(0U, requests.count(peer));
     EXPECT_EQ(0U, requests.size());
 
     // try removing requests for that block again (should remove nothing)
-    EXPECT_EQ(std::vector<tr_peer*>{}, requests.remove(block));
+    EXPECT_EQ(ActiveRequests::Peers{}, requests.remove(block));
 }
 
 TEST_F(PeerMgrActiveRequestsTest, multiplePeersAreRemoved)
@@ -124,7 +124,7 @@ TEST_F(PeerMgrActiveRequestsTest, multiplePeersAreRemoved)
     EXPECT_EQ(3U, requests.size());
 
     // now remove block_a, which was req'd by peer_a_ and peer_b_
-    auto expected = std::vector<tr_peer*>{ peer_a_, peer_b_ };
+    auto expected = ActiveRequests::Peers{ peer_a_, peer_b_ };
     std::sort(std::begin(expected), std::end(expected));
     auto removed = requests.remove(block_a);
     std::sort(std::begin(removed), std::end(removed));
@@ -135,11 +135,11 @@ TEST_F(PeerMgrActiveRequestsTest, multipleBlocksAreRemoved)
 {
     // setup
     auto requests = ActiveRequests{};
-    auto const block_a1 = tr_block_index_t{ 128 };
-    auto const when_a1 = 300;
+    auto constexpr block_a1 = tr_block_index_t{ 128 };
+    auto constexpr when_a1 = 300;
     EXPECT_TRUE(requests.add(block_a1, peer_a_, when_a1));
-    auto const block_a2 = tr_block_index_t{ 256 };
-    auto const when_a2 = 400;
+    auto constexpr block_a2 = tr_block_index_t{ 256 };
+    auto constexpr when_a2 = 400;
     EXPECT_TRUE(requests.add(block_a2, peer_a_, when_a2));
     EXPECT_EQ(2U, requests.size());
     EXPECT_EQ(2U, requests.count(peer_a_));
@@ -161,8 +161,7 @@ TEST_F(PeerMgrActiveRequestsTest, multipleBlocksAreRemoved)
 TEST_F(PeerMgrActiveRequestsTest, sentBefore)
 {
     // setup
-    auto requests = ActiveRequests{};
-    auto const block_a1 = tr_block_index_t{ 128 };
+    auto requests = ActiveRequests{}; auto const block_a1 = tr_block_index_t{ 128 };
     auto const when_a1 = 300;
     EXPECT_TRUE(requests.add(block_a1, peer_a_, when_a1));
     auto const block_a2 = tr_block_index_t{ 256 };

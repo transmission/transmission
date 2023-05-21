@@ -127,9 +127,9 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
 }
 
 // remove requests for `block` and return the associated peers
-void ActiveRequests::remove(tr_block_index_t block, sfl::small_vector<tr_peer*, MaxPeers>& removed)
+ActiveRequests::Peers ActiveRequests::remove(tr_block_index_t block)
 {
-    removed.clear();
+    auto removed = Peers{};
 
     if (auto it = impl_->blocks_.find(block); it != std::end(impl_->blocks_))
     {
@@ -147,6 +147,8 @@ void ActiveRequests::remove(tr_block_index_t block, sfl::small_vector<tr_peer*, 
     {
         impl_->decCount(peer);
     }
+
+    return removed;
 }
 
 // return true if there's an active request to `peer` for `block`
