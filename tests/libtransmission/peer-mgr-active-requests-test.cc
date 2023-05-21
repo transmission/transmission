@@ -96,13 +96,13 @@ TEST_F(PeerMgrActiveRequestsTest, peersAreRemoved)
 
     // try removing requests for that block (should remove the 1 active request)
     auto const removed = requests.remove(block);
-    EXPECT_EQ(ActiveRequests::Peers{ peer }, removed);
+    EXPECT_EQ(ActiveRequests::BlockPeers{ peer }, removed);
     EXPECT_EQ(0U, requests.count(block));
     EXPECT_EQ(0U, requests.count(peer));
     EXPECT_EQ(0U, requests.size());
 
     // try removing requests for that block again (should remove nothing)
-    EXPECT_EQ(ActiveRequests::Peers{}, requests.remove(block));
+    EXPECT_EQ(ActiveRequests::BlockPeers{}, requests.remove(block));
 }
 
 TEST_F(PeerMgrActiveRequestsTest, multiplePeersAreRemoved)
@@ -124,7 +124,7 @@ TEST_F(PeerMgrActiveRequestsTest, multiplePeersAreRemoved)
     EXPECT_EQ(3U, requests.size());
 
     // now remove block_a, which was req'd by peer_a_ and peer_b_
-    auto expected = ActiveRequests::Peers{ peer_a_, peer_b_ };
+    auto expected = ActiveRequests::BlockPeers{ peer_a_, peer_b_ };
     std::sort(std::begin(expected), std::end(expected));
     auto removed = requests.remove(block_a);
     std::sort(std::begin(removed), std::end(removed));

@@ -60,7 +60,7 @@ public:
 
     std::unordered_map<tr_peer const*, size_t> count_;
 
-    std::unordered_map<tr_block_index_t, sfl::small_flat_map<tr_peer const*, time_t, MaxPeers>> blocks_;
+    std::unordered_map<tr_block_index_t, sfl::small_flat_map<tr_peer const*, time_t, MaxPeersPerBlock>> blocks_;
 
 private:
     size_t size_ = 0;
@@ -127,9 +127,9 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
 }
 
 // remove requests for `block` and return the associated peers
-ActiveRequests::Peers ActiveRequests::remove(tr_block_index_t block)
+ActiveRequests::BlockPeers ActiveRequests::remove(tr_block_index_t block)
 {
-    auto removed = Peers{};
+    auto removed = BlockPeers{};
 
     if (auto it = impl_->blocks_.find(block); it != std::end(impl_->blocks_))
     {

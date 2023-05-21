@@ -28,8 +28,8 @@
 class ActiveRequests
 {
 public:
-    static auto constexpr MaxPeers = Wishlist::EndgameMaxPeers;
-    using Peers = sfl::small_vector<tr_peer*, MaxPeers>;
+    static auto constexpr MaxPeersPerBlock = Wishlist::EndgameMaxPeers;
+    using BlockPeers = sfl::small_vector<tr_peer*, MaxPeersPerBlock>;
 
     ActiveRequests();
     ~ActiveRequests();
@@ -44,7 +44,7 @@ public:
     std::vector<tr_block_index_t> remove(tr_peer const* peer);
 
     // erase any record of requests to `block` and return the previously-associated peers
-    Peers remove(tr_block_index_t block);
+    BlockPeers remove(tr_block_index_t block);
 
     // return true if there's a record of a request for `block` from `peer`
     [[nodiscard]] bool has(tr_block_index_t block, tr_peer const* peer) const;
