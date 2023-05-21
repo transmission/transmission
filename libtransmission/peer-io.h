@@ -15,6 +15,8 @@
 #include <memory>
 #include <utility> // std::pair
 
+#include <event2/util.h> // for evutil_socket_t
+
 #include "transmission.h"
 
 #include "bandwidth.h"

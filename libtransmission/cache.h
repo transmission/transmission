@@ -16,6 +16,8 @@
 #include <utility> // for std::pair
 #include <vector>
 
+#include <sfl/small_vector.hpp>
+
 #include "transmission.h"
 
 #include "block-info.h"
@@ -26,43 +28,7 @@ struct tr_torrent;
 class Cache
 {
 public:
-    class BlockData
-    {
-    public:
-        BlockData(size_t size)
-            : size_{ size }
-        {
-        }
-
-        [[nodiscard]] constexpr auto size() const noexcept
-        {
-            return size_;
-        }
-
-        [[nodiscard]] constexpr auto* data() noexcept
-        {
-            return std::data(data_);
-        }
-
-        [[nodiscard]] constexpr const auto* data() const noexcept
-        {
-            return std::data(data_);
-        }
-
-        [[nodiscard]] constexpr auto* begin() const noexcept
-        {
-            return data();
-        }
-
-        [[nodiscard]] constexpr auto* end() const noexcept
-        {
-            return begin() + size();
-        }
-
-    private:
-        std::array<uint8_t, tr_block_info::BlockSize> data_;
-        size_t const size_;
-    };
+    using BlockData = sfl::small_vector<uint8_t, tr_block_info::BlockSize>;
 
     Cache(tr_torrents& torrents, int64_t max_bytes);
 

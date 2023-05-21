@@ -161,7 +161,8 @@ TEST_F(PeerMgrActiveRequestsTest, multipleBlocksAreRemoved)
 TEST_F(PeerMgrActiveRequestsTest, sentBefore)
 {
     // setup
-    auto requests = ActiveRequests{}; auto const block_a1 = tr_block_index_t{ 128 };
+    auto requests = ActiveRequests{};
+    auto const block_a1 = tr_block_index_t{ 128 };
     auto const when_a1 = 300;
     EXPECT_TRUE(requests.add(block_a1, peer_a_, when_a1));
     auto const block_a2 = tr_block_index_t{ 256 };
