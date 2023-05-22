@@ -79,11 +79,11 @@ protected:
 
     void TearDown() override
     {
-        ::testing::Test::TearDown();
         if (global_ip_cache_)
         {
             global_ip_cache_->try_shutdown();
         }
+        ::testing::Test::TearDown();
     }
 
     // To be created within the test body
