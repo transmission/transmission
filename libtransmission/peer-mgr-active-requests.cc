@@ -11,7 +11,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include <sfl/small_flat_map.hpp>
+#include <small/map.hpp>
 
 #define LIBTRANSMISSION_PEER_MODULE
 
@@ -60,7 +60,7 @@ public:
 
     std::unordered_map<tr_peer const*, size_t> count_;
 
-    std::unordered_map<tr_block_index_t, sfl::small_flat_map<tr_peer const*, time_t, MaxPeersPerBlock>> blocks_;
+    std::unordered_map<tr_block_index_t, small::map<tr_peer const*, time_t, MaxPeersPerBlock>> blocks_;
 
 private:
     size_t size_ = 0;

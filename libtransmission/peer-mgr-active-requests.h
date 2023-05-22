@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-#include <sfl/small_vector.hpp>
+#include <small/vector.hpp>
 
 #include "transmission.h" // tr_block_index_t
 #include "peer-common.h" // tr_peer*
@@ -29,7 +29,7 @@ class ActiveRequests
 {
 public:
     static auto constexpr MaxPeersPerBlock = Wishlist::EndgameMaxPeers;
-    using BlockPeers = sfl::small_vector<tr_peer*, MaxPeersPerBlock>;
+    using BlockPeers = small::max_size_vector<tr_peer*, MaxPeersPerBlock>;
 
     ActiveRequests();
     ~ActiveRequests();

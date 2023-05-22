@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-#include <sfl/small_flat_set.hpp>
+#include <small/set.hpp>
 
 #define LIBTRANSMISSION_PEER_MODULE
 
@@ -148,7 +148,7 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 
     static auto constexpr StaticSize = 4096U;
-    auto blocks = sfl::small_flat_set<tr_block_index_t, StaticSize>{};
+    auto blocks = small::set<tr_block_index_t, StaticSize>{};
     blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates)
     {

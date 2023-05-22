@@ -17,7 +17,7 @@
 
 #include <fmt/core.h>
 
-#include <sfl/small_vector.hpp>
+#include <small/vector.hpp>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -642,6 +642,8 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark key)
 class WalkNode
 {
 public:
+    WalkNode() = default;
+
     explicit WalkNode(tr_variant const* v_in)
     {
         assign(v_in);
@@ -768,8 +770,8 @@ private:
     size_t size = 0;
 
     static auto constexpr InitialCapacity = size_t{ 32U };
-    sfl::small_vector<WalkNode, InitialCapacity> stack;
-    sfl::small_vector<WalkNode::ByKey, InitialCapacity> sortbuf;
+    small::vector<WalkNode, InitialCapacity> stack;
+    small::vector<WalkNode::ByKey, InitialCapacity> sortbuf;
 };
 
 /**

@@ -206,7 +206,7 @@ endif()
 set(CMAKE_FOLDER "third-party")
 find_package(FastFloat)
 find_package(Fmt)
-find_package(SFL)
+find_package(Small)
 find_package(UtfCpp)
 find_package(WideInteger)
 

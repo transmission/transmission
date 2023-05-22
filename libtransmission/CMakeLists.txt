@@ -296,8 +296,8 @@ target_link_libraries(${TR_NAME}
         $<$<BOOL:${WIN32}>:shlwapi>
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
     PUBLIC
-        sfl::sfl
         fmt::fmt-header-only
+        small::small
         libevent::event)
 
 if(INSTALL_LIB)

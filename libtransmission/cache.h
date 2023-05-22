@@ -16,7 +16,7 @@
 #include <utility> // for std::pair
 #include <vector>
 
-#include <sfl/small_vector.hpp>
+#include <small/vector.hpp>
 
 #include "transmission.h"
 
@@ -28,7 +28,7 @@ struct tr_torrent;
 class Cache
 {
 public:
-    using BlockData = sfl::small_vector<uint8_t, tr_block_info::BlockSize>;
+    using BlockData = small::max_size_vector<uint8_t, tr_block_info::BlockSize>;
 
     Cache(tr_torrents& torrents, int64_t max_bytes);
 

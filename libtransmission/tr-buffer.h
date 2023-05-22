@@ -14,7 +14,7 @@
 #include <string>
 #include <string_view>
 
-#include <sfl/small_vector.hpp>
+#include <small/vector.hpp>
 
 #include "error.h"
 #include "net.h" // tr_socket_t
@@ -278,7 +278,7 @@ public:
     }
 
 private:
-    sfl::small_vector<value_type, N> buf_ = {};
+    small::vector<value_type, N> buf_ = {};
     size_t begin_pos_ = {};
     size_t end_pos_ = {};
 };
