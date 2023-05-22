@@ -47,6 +47,3 @@
 [submodule "third-party/wide-integer"]
 	path = third-party/wide-integer
 	url = https://github.com/transmission/wide-integer
-[submodule "third-party/sfl-library"]
-	path = third-party/sfl-library
-	url = https://github.com/transmission/sfl-library.git
