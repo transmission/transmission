@@ -2453,6 +2453,37 @@ bool renameArgsAreValid(std::string_view oldpath, std::string_view newname)
         !tr_strvContains(newname, TR_PATH_DELIMITER);
 }
 
+bool renameNoCollision(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
+{
+    std::string newpath{};
+    if (tr_strvContains(oldpath, TR_PATH_DELIMITER))
+    {
+        newpath = fmt::format(FMT_STRING("{:s}/{:s}"sv), tr_sys_path_dirname(oldpath), newname);
+    }
+    else
+    {
+        newpath = newname;
+    }
+    if (newpath == oldpath)
+    {
+        return true;
+    }
+
+    auto const newpath_as_dir = tr_pathbuf{ newpath, '/' };
+    auto const n_files = tor->file_count();
+
+    for (tr_file_index_t i = 0; i < n_files; ++i)
+    {
+        auto const& name = tor->file_subpath(i);
+        if (name == newpath || tr_strvStartsWith(name, newpath_as_dir))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
 {
     auto indices = std::vector<tr_file_index_t>{};
@@ -2568,6 +2599,10 @@ void torrentRenamePath(
     int error = 0;
 
     if (!renameArgsAreValid(oldpath, newname))
+    {
+        error = EINVAL;
+    }
+    else if (!renameNoCollision(tor, oldpath, newname))
     {
         error = EINVAL;
     }
