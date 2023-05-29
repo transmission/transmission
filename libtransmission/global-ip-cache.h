@@ -33,7 +33,7 @@
  *
  * The idea is, if this class successfully cached a source address, that means
  * you have connectivity to the public internet. And if the global address is
- * the same with the source address, then you are not behind an NAT.
+ * the same as the source address, then you are not behind a NAT.
  *
  */
 class tr_global_ip_cache

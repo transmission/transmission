@@ -33,6 +33,13 @@ static_assert(TR_AF_INET6 == 1);
 
 auto constexpr protocol_str(tr_address_type type) noexcept
 {
+    /* TODO: very slight performance nit
+     * - If upgrading to C++20, change Map to a consteval lambda:
+     *   auto map = []() consteval { return std::array{ "IPv4"sv, "IPv6"sv }; };
+     * - If upgrading to C++23, change Map to static constexpr
+     *
+     * Ref: https://wg21.link/p2647r1
+     */
     auto constexpr Map = std::array{ "IPv4"sv, "IPv6"sv };
     return Map[type];
 }
