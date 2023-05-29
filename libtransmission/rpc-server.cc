@@ -121,17 +121,6 @@ public:
     {
     }
 
-    void set_inaddr_any()
-    {
-        type_ = TR_RPC_INET_ADDR;
-        inet_addr_ = tr_address::any_ipv4();
-    }
-
-    [[nodiscard]] constexpr auto is_valid() const noexcept
-    {
-        return type_ == TR_RPC_UNIX_ADDR || type_ == TR_RPC_INET_ADDR;
-    }
-
     [[nodiscard]] constexpr auto is_unix_addr() const noexcept
     {
         return type_ == TR_RPC_UNIX_ADDR;
@@ -162,7 +151,6 @@ public:
 
     [[nodiscard]] std::string to_string(tr_port port = {}) const
     {
-        TR_ASSERT(this->is_valid());
         if (type_ == TR_RPC_UNIX_ADDR)
         {
             return unix_addr_.to_string();
@@ -176,7 +164,7 @@ public:
     }
 
 private:
-    tr_rpc_address_type type_{};
+    tr_rpc_address_type type_ = TR_RPC_INET_ADDR;
     struct tr_address inet_addr_;
     class tr_unix_addr unix_addr_;
 };
@@ -895,11 +883,11 @@ void tr_rpc_server::load(tr_variant* src)
 
     if (!bind_address_->from_string(bind_address_str_))
     {
+        // NOTE: bind_address_ is default initialized to INADDR_ANY
         tr_logAddWarn(fmt::format(
             _("The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
             fmt::format("key", tr_quark_get_string_view(TR_KEY_rpc_bind_address)),
             fmt::format("value", bind_address_str_)));
-        bind_address_->set_inaddr_any();
     }
 
     if (bind_address_->is_unix_addr())
