@@ -953,7 +953,7 @@ static void printDetails(tr_variant* top)
                 {
                     if (tr_variantGetStrView(tr_variantListChild(l, child_idx), &sv))
                     {
-                        fmt::print(child_idx == 1 ? "{:s}" : ", {:s}", sv);
+                        fmt::print(child_idx == 0 ? "{:s}" : ", {:s}", sv);
                     }
                 }
 
