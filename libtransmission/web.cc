@@ -188,6 +188,11 @@ public:
             this->user_agent = *ua;
         }
 
+        if (auto const& proxyUrl = mediator.proxyUrl(); proxyUrl)
+        {
+            this->proxy_url = *proxyUrl;
+        }
+
         auto const lock = std::unique_lock{ tasks_mutex_ };
         curl_thread = std::make_unique<std::thread>(&Impl::curlThreadFunc, this);
     }
@@ -386,6 +391,7 @@ public:
 
     std::string cookie_file;
     std::string user_agent;
+    std::string proxy_url;
 
     std::unique_ptr<std::thread> curl_thread;
 
@@ -579,6 +585,11 @@ public:
         if (auto const& file = cookie_file; !std::empty(file))
         {
             (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, file.c_str());
+        }
+
+        if (!proxy_url.empty())
+        {
+            (void)curl_easy_setopt(e, CURLOPT_PROXY, proxy_url.c_str());
         }
 
         if (auto const& range = task.range(); range)
