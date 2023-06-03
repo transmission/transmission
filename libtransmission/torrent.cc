@@ -1615,14 +1615,15 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file)
     auto const priority = tor->file_priorities_.file_priority(file);
     auto const wanted = tor->files_wanted_.file_wanted(file);
     auto const length = tor->file_size(file);
+    auto const [begin, end] = tor->pieces_in_file(file);
 
     if (tor->completeness == TR_SEED || length == 0)
     {
-        return { subpath.c_str(), length, length, 1.0, priority, wanted };
+        return { subpath.c_str(), length, length, 1.0, begin, end, priority, wanted };
     }
 
     auto const have = tor->completion.count_has_bytes_in_span(tor->fpm_.byte_span(file));
-    return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), priority, wanted };
+    return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), begin, end, priority, wanted };
 }
 
 size_t tr_torrentFileCount(tr_torrent const* torrent)
