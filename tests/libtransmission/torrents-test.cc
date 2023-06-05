@@ -14,6 +14,8 @@
 
 #include "gtest/gtest.h"
 
+#include "test-fixtures.h"
+
 using namespace std::literals;
 
 using TorrentsTest = ::testing::Test;
@@ -127,4 +129,14 @@ TEST_F(TorrentsTest, removedSince)
     EXPECT_EQ(remove, torrents.removedSince(200));
     remove = { torrents_v[0]->id(), torrents_v[1]->id(), torrents_v[2]->id(), torrents_v[3]->id() };
     EXPECT_EQ(remove, torrents.removedSince(50));
+}
+
+using TorrentsPieceSpanTest = libtransmission::test::SessionTest;
+
+TEST_F(TorrentsPieceSpanTest, exposesFilePieceSpan)
+{
+    auto tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    auto file_view = tr_torrentFile(tor, 0);
+    EXPECT_EQ(file_view.beginPiece, 0);
+    EXPECT_EQ(file_view.endPiece, 32);
 }
