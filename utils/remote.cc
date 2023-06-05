@@ -118,7 +118,17 @@ static std::string etaToString(int64_t eta)
         return fmt::format(FMT_STRING("{:d} hrs"), eta / (60 * 60));
     }
 
-    return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
+    if (eta < (60 * 60 * 24 * 1000))
+    {
+        return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
+    }
+   
+    if (eta < (60 * 60 * 24 * 365 * 100LL))
+    {
+        return fmt::format(FMT_STRING("{:d} years"), eta / (60 * 60 * 24 * 365));
+    }
+
+    return "Infinity";
 }
 
 static std::string tr_strltime(time_t seconds)
