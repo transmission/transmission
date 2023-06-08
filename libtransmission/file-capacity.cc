@@ -30,6 +30,9 @@
 #else
 #include <sys/quota.h> /* quotactl() */
 #endif
+#ifndef btodb
+#define btodb(num) ((num) >> 10)
+#endif
 #ifdef HAVE_GETMNTENT
 #ifdef __sun
 #include <fcntl.h>
