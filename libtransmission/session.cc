@@ -432,7 +432,9 @@ tr_address tr_session::publicAddress(tr_address_type type) const noexcept
         // otherwise, if we can determine which one to use via global_source_address(ipv6) magic, use it.
         // otherwise, use any_ipv6 (::).
         auto const source_addr = global_source_address(type);
-        return source_addr && source_addr->is_global_unicast_address() ? *source_addr : global_ip_cache_->bind_addr(type);
+        auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
+                                                                                            tr_address::any_ipv6();
+        return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
     TR_ASSERT_MSG(false, "invalid type");
@@ -639,8 +641,6 @@ void tr_session::initImpl(init_data& data)
 
     this->blocklists_ = libtransmission::Blocklist::loadBlocklists(blocklist_dir_, useBlocklist());
 
-    this->global_ip_cache_ = std::make_unique<tr_global_ip_cache>(*web_, timerMaker());
-
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
     setSettings(client_settings, true);
@@ -701,11 +701,11 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 
     if (auto const& val = new_settings.bind_address_ipv4; force || val != old_settings.bind_address_ipv4)
     {
-        global_ip_cache_->set_settings_bind_addr(TR_AF_INET, new_settings.bind_address_ipv4);
+        global_ip_cache_->update_addr(TR_AF_INET);
     }
     if (auto const& val = new_settings.bind_address_ipv6; force || val != old_settings.bind_address_ipv6)
     {
-        global_ip_cache_->set_settings_bind_addr(TR_AF_INET6, new_settings.bind_address_ipv6);
+        global_ip_cache_->update_addr(TR_AF_INET6);
     }
 
     if (auto const& val = new_settings.default_trackers_str; force || val != old_settings.default_trackers_str)

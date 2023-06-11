@@ -28,7 +28,25 @@ namespace
 
 using namespace std::literals;
 
-auto constexpr IPQueryServices = std::array{ "https://icanhazip.com"sv, "https://api64.ipify.org"sv };
+static_assert(TR_AF_INET == 0);
+static_assert(TR_AF_INET6 == 1);
+
+auto constexpr protocol_str(tr_address_type type) noexcept
+{
+    /* TODO: very slight performance nit
+     * - If upgrading to C++20, change Map to a consteval lambda:
+     *   auto map = []() consteval { return std::array{ "IPv4"sv, "IPv6"sv }; };
+     * - If upgrading to C++23, change Map to static constexpr
+     *
+     * Ref: https://wg21.link/p2647r1
+     */
+    auto constexpr Map = std::array{ "IPv4"sv, "IPv6"sv };
+    return Map[type];
+}
+
+auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissionbt.com/"sv },
+                                             std::array{ "https://ip6.transmissionbt.com/"sv } };
+
 auto constexpr UpkeepInterval = 30min;
 auto constexpr RetryUpkeepInterval = 30s;
 
@@ -36,11 +54,11 @@ auto constexpr RetryUpkeepInterval = 30s;
 
 namespace
 {
-// Functions contained in external_source_ip_helpers are modified from code
+// Functions contained in global_source_ip_helpers are modified from code
 // by Juliusz Chroboczek and is covered under the same license as dht.cc.
 // Please feel free to copy them into your software if it can help
 // unbreaking the double-stack Internet.
-namespace external_source_ip_helpers
+namespace global_source_ip_helpers
 {
 
 // Get the source address used for a given destination address.
@@ -109,12 +127,12 @@ namespace external_source_ip_helpers
     return {};
 }
 
-} // namespace external_source_ip_helpers
+} // namespace global_source_ip_helpers
 } // namespace
 
-tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in)
-    : web_{ web_in }
-    , upkeep_timers_{ timer_maker_in.create(), timer_maker_in.create() }
+tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
+    : mediator_{ mediator_in }
+    , upkeep_timers_{ mediator_in.timer_maker().create(), mediator_in.timer_maker().create() }
 {
     static_assert(TR_AF_INET == 0);
     static_assert(TR_AF_INET6 == 1);
@@ -130,6 +148,11 @@ tr_global_ip_cache::tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMak
         upkeep_timers_[i]->set_callback(cb);
         start_timer(type, UpkeepInterval);
     }
+}
+
+std::unique_ptr<tr_global_ip_cache> tr_global_ip_cache::create(tr_global_ip_cache::Mediator& mediator_in)
+{
+    return std::unique_ptr<tr_global_ip_cache>(new tr_global_ip_cache(mediator_in));
 }
 
 tr_global_ip_cache::~tr_global_ip_cache()
@@ -164,35 +187,19 @@ bool tr_global_ip_cache::try_shutdown() noexcept
     return true;
 }
 
-void tr_global_ip_cache::set_settings_bind_addr(tr_address_type type, std::string_view bind_address) noexcept
-{
-    settings_bind_addr_[type] = tr_address::from_string(bind_address);
-    if (settings_bind_addr_[type] && type != settings_bind_addr_[type]->type)
-    {
-        settings_bind_addr_[type].reset();
-    }
-    update_addr(type);
-}
-
 tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET || type == TR_AF_INET6)
     {
-        return settings_bind_addr_[type].value_or(type == TR_AF_INET ? tr_address::any_ipv4() : tr_address::any_ipv6());
+        if (auto const addr = tr_address::from_string(mediator_.settings_bind_addr(type)); addr && type == addr->type)
+        {
+            return *addr;
+        }
+        return type == TR_AF_INET ? tr_address::any_ipv4() : tr_address::any_ipv6();
     }
 
     TR_ASSERT_MSG(false, "invalid type");
     return {};
-}
-
-void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
-{
-    update_source_addr(type);
-    /* TODO: Temporarily disable because there is currently no way for this to work without using third party services */
-    //    if (global_source_addr(type))
-    //    {
-    //        update_global_addr(type);
-    //    }
 }
 
 bool tr_global_ip_cache::set_global_addr(tr_address_type type, tr_address const& addr) noexcept
@@ -207,11 +214,125 @@ bool tr_global_ip_cache::set_global_addr(tr_address_type type, tr_address const&
     return false;
 }
 
+void tr_global_ip_cache::update_addr(tr_address_type type) noexcept
+{
+    update_source_addr(type);
+    if (global_source_addr(type))
+    {
+        update_global_addr(type);
+    }
+}
+
+void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
+{
+    TR_ASSERT(has_ip_protocol_[type]);
+    TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
+
+    if (ix_service_[type] == 0U && !set_is_updating(type))
+    {
+        return;
+    }
+    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
+
+    // Update global address
+    auto options = tr_web::FetchOptions{ IPQueryServices[type][ix_service_[type]],
+                                         [this, type](tr_web::FetchResponse const& response)
+                                         { this->on_response_ip_query(type, response); },
+                                         nullptr };
+    options.ip_proto = type == TR_AF_INET ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
+    options.sndbuf = 4096;
+    options.rcvbuf = 4096;
+    mediator_.fetch(std::move(options));
+}
+
+void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
+{
+    using namespace global_source_ip_helpers;
+
+    TR_ASSERT(has_ip_protocol_[type]);
+
+    if (!set_is_updating(type))
+    {
+        return;
+    }
+    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
+
+    auto const protocol = protocol_str(type);
+
+    auto err = int{ 0 };
+    auto const& source_addr = get_global_source_address(bind_addr(type), err);
+    if (source_addr)
+    {
+        set_source_addr(*source_addr);
+        tr_logAddInfo(fmt::format(
+            _("Successfully updated source {protocol} address to {ip}"),
+            fmt::arg("protocol", protocol),
+            fmt::arg("ip", source_addr->display_name())));
+    }
+    else
+    {
+        // Stop the update process since we have no public internet connectivity
+        unset_addr(type);
+        upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
+        tr_logAddDebug(fmt::format("Couldn't obtain source {} address", protocol));
+        if (err == EAFNOSUPPORT)
+        {
+            stop_timer(type); // No point in retrying
+            has_ip_protocol_[type] = false;
+            tr_logAddInfo(fmt::format(_("Your machine does not support {protocol}"), fmt::arg("protocol", protocol)));
+        }
+    }
+
+    unset_is_updating(type);
+}
+
+void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
+{
+    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
+    TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
+
+    auto const protocol = protocol_str(type);
+    auto success = false;
+
+    if (response.status == 200 /* HTTP_OK */)
+    {
+        // Update member
+        if (auto addr = tr_address::from_string(tr_strvStrip(response.body)); addr && set_global_addr(type, *addr))
+        {
+            success = true;
+            upkeep_timers_[type]->set_interval(UpkeepInterval);
+
+            tr_logAddInfo(fmt::format(
+                _("Successfully updated global {type} address to {ip} using {url}"),
+                fmt::arg("type", protocol),
+                fmt::arg("ip", addr->display_name()),
+                fmt::arg("url", IPQueryServices[type][ix_service_[type]])));
+        }
+    }
+
+    // Try next IP query URL
+    if (!success && ++ix_service_[type] < std::size(IPQueryServices[type]))
+    {
+        update_global_addr(type);
+        return;
+    }
+
+    if (!success)
+    {
+        tr_logAddDebug(fmt::format("Couldn't obtain global {} address", protocol));
+        unset_global_addr(type);
+        upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
+    }
+
+    ix_service_[type] = 0U;
+    unset_is_updating(type);
+}
+
 void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
 {
     auto const lock = std::lock_guard{ global_addr_mutex_[type] };
     global_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} global address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
+    tr_logAddTrace(fmt::format("Unset {} global address cache", protocol_str(type)));
 }
 
 void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
@@ -225,7 +346,7 @@ void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 {
     auto const lock = std::lock_guard{ source_addr_mutex_[type] };
     source_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} source address cache", type == TR_AF_INET ? "IPv4"sv : "IPv6"sv));
+    tr_logAddTrace(fmt::format("Unset {} source address cache", protocol_str(type)));
 
     // No public internet connectivity means no global IP address
     unset_global_addr(type);
@@ -254,110 +375,4 @@ void tr_global_ip_cache::unset_is_updating(tr_address_type type) noexcept
     is_updating_[type] = is_updating_t::NO;
     lock.unlock();
     is_updating_cv_[type].notify_one();
-}
-
-void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
-{
-    TR_ASSERT(has_ip_protocol_[type]);
-    TR_ASSERT(global_source_addr(type));
-    TR_ASSERT(ix_service_[type] < std::size(IPQueryServices));
-
-    if (ix_service_[type] == 0U && !set_is_updating(type))
-    {
-        return;
-    }
-    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
-
-    // Update global address
-    auto options = tr_web::FetchOptions{ IPQueryServices[ix_service_[type]],
-                                         [this, type](tr_web::FetchResponse const& response)
-                                         { this->on_response_ip_query(type, response); },
-                                         nullptr };
-    options.ip_proto = type == TR_AF_INET ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
-    options.sndbuf = 4096;
-    options.rcvbuf = 4096;
-    web_.fetch(std::move(options));
-}
-
-void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
-{
-    using namespace external_source_ip_helpers;
-
-    TR_ASSERT(has_ip_protocol_[type]);
-
-    if (!set_is_updating(type))
-    {
-        return;
-    }
-    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
-
-    auto const protocol = type == TR_AF_INET ? "IPv4"sv : "IPv6"sv;
-
-    auto err = int{};
-    auto const& source_addr = get_global_source_address(bind_addr(type), err);
-    if (source_addr)
-    {
-        set_source_addr(*source_addr);
-        tr_logAddInfo(fmt::format(
-            _("Successfully updated source {protocol} address to {ip}"),
-            fmt::arg("protocol", protocol),
-            fmt::arg("ip", source_addr->display_name())));
-    }
-    else
-    {
-        // Stop the update process since we have no public internet connectivity
-        unset_addr(type);
-        upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
-        tr_logAddDebug(fmt::format(_("Couldn't obtain source {protocol} address"), fmt::arg("protocol", protocol)));
-        if (err == EAFNOSUPPORT)
-        {
-            stop_timer(type); // No point in retrying
-            has_ip_protocol_[type] = false;
-            tr_logAddInfo(fmt::format(_("Your machine does not support {protocol}"), fmt::arg("protocol", protocol)));
-        }
-    }
-
-    unset_is_updating(type);
-}
-
-void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept
-{
-    TR_ASSERT(is_updating_[type] == is_updating_t::YES);
-    TR_ASSERT(ix_service_[type] < std::size(IPQueryServices));
-
-    auto const protocol = type == TR_AF_INET ? "IPv4"sv : "IPv6"sv;
-    auto success = bool{ false };
-
-    if (response.status == 200 /* HTTP_OK */)
-    {
-        // Update member
-        if (auto addr = tr_address::from_string(tr_strvStrip(response.body)); addr && set_global_addr(type, *addr))
-        {
-            success = true;
-            upkeep_timers_[type]->set_interval(UpkeepInterval);
-
-            tr_logAddInfo(fmt::format(
-                _("Successfully updated global {type} address to {ip} using {url}"),
-                fmt::arg("type", protocol),
-                fmt::arg("ip", addr->display_name()),
-                fmt::arg("url", IPQueryServices[ix_service_[type]])));
-        }
-    }
-
-    // Try next IP query URL
-    if (!success && ++ix_service_[type] < std::size(IPQueryServices))
-    {
-        update_global_addr(type);
-        return;
-    }
-
-    if (!success)
-    {
-        tr_logAddDebug(fmt::format("Couldn't obtain global {} address", protocol));
-        unset_global_addr(type);
-        upkeep_timers_[type]->set_interval(RetryUpkeepInterval);
-    }
-
-    ix_service_[type] = 0U;
-    unset_is_updating(type);
 }
