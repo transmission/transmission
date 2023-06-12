@@ -2459,7 +2459,7 @@ bool renameArgsAreValid(tr_torrent const* tor, std::string_view oldpath, std::st
         tr_pathbuf{ tr_sys_path_dirname(oldpath), '/', newname } :
         tr_pathbuf{ newname };
 
-    if (oldpath == newpath)
+    if (newpath == oldpath)
     {
         return true;
     }
@@ -2469,8 +2469,8 @@ bool renameArgsAreValid(tr_torrent const* tor, std::string_view oldpath, std::st
 
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
-        std::string_view name = tor->file_subpath(i);
-        if (name == newpath || tr_strvStartsWith(name, newpath_as_dir))
+        auto const& name = tor->file_subpath(i);
+        if (newpath == name || tr_strvStartsWith(name, newpath_as_dir))
         {
             return false;
         }
