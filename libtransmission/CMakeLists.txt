@@ -297,7 +297,8 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
     PUBLIC
         fmt::fmt-header-only
-        libevent::event)
+        libevent::event
+        small::small)
 
 if(INSTALL_LIB)
     install(
