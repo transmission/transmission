@@ -968,9 +968,9 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
 
 // ---
 
-[[nodiscard]] std::pair<std::vector<tr_quark>, char const* /*errmsg*/> makeLabels(tr_variant* list)
+[[nodiscard]] std::pair<tr_torrent::labels_t, char const* /*errmsg*/> makeLabels(tr_variant* list)
 {
-    auto labels = std::vector<tr_quark>{};
+    auto labels = tr_torrent::labels_t{};
     size_t const n = tr_variantListSize(list);
     labels.reserve(n);
 
@@ -993,7 +993,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             return { {}, "labels cannot contain comma (,) character" };
         }
 
-        labels.emplace_back(tr_quark_new(label));
+        labels.emplace(tr_quark_new(label));
     }
 
     return { labels, nullptr };
@@ -1008,7 +1008,7 @@ char const* setLabels(tr_torrent* tor, tr_variant* list)
         return errmsg;
     }
 
-    tor->setLabels(labels);
+    tor->set_labels(std::move(labels));
     return nullptr;
 }
 

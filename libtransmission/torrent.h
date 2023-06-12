@@ -17,6 +17,8 @@
 #include <utility>
 #include <vector>
 
+#include <small/set.hpp>
+
 #include "transmission.h"
 
 #include "announce-list.h"
@@ -82,6 +84,8 @@ struct tr_incomplete_metadata;
 struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
+    using labels_t = small::set<tr_quark, 0>;
+
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
         , completion{ this, &this->metainfo_.block_info() }
@@ -658,7 +662,13 @@ public:
         return TR_STATUS_STOPPED;
     }
 
-    void setLabels(std::vector<tr_quark> const& new_labels);
+    void set_labels(labels_t new_labels)
+    {
+        auto const lock = unique_lock();
+        this->labels = std::move(new_labels);
+        this->labels.shrink_to_fit();
+        this->set_dirty();
+    }
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
@@ -836,7 +846,6 @@ public:
 
     std::string error_string;
 
-    using labels_t = std::vector<tr_quark>;
     labels_t labels;
 
     // when Transmission thinks the torrent's files were last changed

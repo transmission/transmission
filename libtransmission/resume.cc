@@ -102,18 +102,18 @@ auto loadLabels(tr_variant* dict, tr_torrent* tor)
     }
 
     auto const n = tr_variantListSize(list);
-    auto labels = std::vector<tr_quark>{};
+    auto labels = tr_torrent::labels_t{};
     labels.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            labels.emplace_back(tr_quark_new(sv));
+            labels.emplace(tr_quark_new(sv));
         }
     }
 
-    tor->setLabels(labels);
+    tor->set_labels(std::move(labels));
     return tr_resume::Labels;
 }
 
