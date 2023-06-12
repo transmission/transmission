@@ -951,9 +951,9 @@ static void printDetails(tr_variant* top)
 
                 for (size_t child_idx = 0, n_children = tr_variantListSize(l); child_idx < n_children; ++child_idx)
                 {
-                    if (tr_variantGetStrView(tr_variantListChild(l, child_idx++), &sv))
+                    if (tr_variantGetStrView(tr_variantListChild(l, child_idx), &sv))
                     {
-                        fmt::print(child_idx == 1 ? "{:s}" : ", {:s}", sv);
+                        fmt::print(child_idx == 0 ? "{:s}" : ", {:s}", sv);
                     }
                 }
 
