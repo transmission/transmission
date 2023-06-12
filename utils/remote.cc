@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <vector>
 #include <cassert>
 #include <cctype> /* isspace */
 #include <cinttypes> // PRId64
@@ -15,6 +16,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <algorithm>
 
 #include <curl/curl.h>
 
@@ -778,7 +780,7 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
     TR_KEY_webseedsSendingToUs
 };
 
-static auto constexpr ListKeys = std::array<tr_quark, 14>{
+static auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
@@ -792,7 +794,8 @@ static auto constexpr ListKeys = std::array<tr_quark, 14>{
     TR_KEY_rateUpload,
     TR_KEY_sizeWhenDone,
     TR_KEY_status,
-    TR_KEY_uploadRatio
+    TR_KEY_uploadRatio,
+    TR_KEY_addedDate
 };
 
 // clang-format on
@@ -1470,7 +1473,31 @@ static void printTorrentList(tr_variant* top)
             "Status",
             "Name");
 
-        for (size_t i = 0, n = tr_variantListSize(list); i < n; ++i)
+        size_t num_torrents = tr_variantListSize(list);
+
+        std::vector<tr_variant*> tptrs;
+        tptrs.reserve(num_torrents);
+
+        for (size_t i = 0; i < num_torrents; ++i)
+        {
+            tr_variant* d = tr_variantListChild(list, i);
+            if (tr_variantDictFindInt(d, TR_KEY_id, nullptr))
+                tptrs.push_back(d);
+        }
+
+        std::sort(
+            tptrs.begin(),
+            tptrs.end(),
+            [](tr_variant* f, tr_variant* s)
+            {
+                int64_t f_time, s_time;
+                if (tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time) && tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time))
+                    return f_time < s_time;
+                else
+                    return false;
+            });
+
+        for (auto const d : tptrs)
         {
             int64_t torId;
             int64_t eta;
@@ -1481,7 +1508,6 @@ static void printTorrentList(tr_variant* top)
             int64_t leftUntilDone;
             double ratio;
             auto name = std::string_view{};
-            tr_variant* d = tr_variantListChild(list, i);
 
             if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) && tr_variantDictFindInt(d, TR_KEY_id, &torId) &&
                 tr_variantDictFindInt(d, TR_KEY_leftUntilDone, &leftUntilDone) &&
