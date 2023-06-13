@@ -6,6 +6,7 @@
 #pragma once
 
 #include <algorithm> // std::move
+#include <cmath>
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <future>
@@ -182,41 +183,15 @@ public:
 
     [[nodiscard]] constexpr static uint32_t default_piece_size(uint64_t total_size) noexcept
     {
-        uint32_t const KiB = 1024;
-        uint32_t const MiB = 1048576;
-        uint32_t const GiB = 1073741824;
+        // Ideally, we want approximately 2^10 = 1024 pieces, give or take a few hundred pieces.
+        // So we subtract 10 from the log2 of total size.
+        // The ideal number of pieces is up for debate.
+        auto exp = std::log2(total_size) - 10;
 
-        if (total_size >= 2 * GiB)
-        {
-            return 2 * MiB;
-        }
+        // We want a piece size between 16KiB (2^14 bytes) and 16MiB (2^24 bytes) for maximum compatibility
+        exp = std::clamp(exp, 14., 24.);
 
-        if (total_size >= 1 * GiB)
-        {
-            return 1 * MiB;
-        }
-
-        if (total_size >= 512 * MiB)
-        {
-            return 512 * KiB;
-        }
-
-        if (total_size >= 350 * MiB)
-        {
-            return 256 * KiB;
-        }
-
-        if (total_size >= 150 * MiB)
-        {
-            return 128 * KiB;
-        }
-
-        if (total_size >= 50 * MiB)
-        {
-            return 64 * KiB;
-        }
-
-        return 32 * KiB; /* less than 50 meg */
+        return static_cast<uint32_t>(1u) << static_cast<uint8_t>(exp);
     }
 
     [[nodiscard]] constexpr static bool is_legal_piece_size(uint32_t x)
