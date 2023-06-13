@@ -21,6 +21,7 @@
 #include "block-info.h"
 #include "file.h"
 #include "torrent-files.h"
+#include "tr-assert.h"
 #include "utils.h" // for tr_saveFile()
 
 class tr_metainfo_builder
@@ -181,8 +182,10 @@ public:
 
     ///
 
-    [[nodiscard]] static uint32_t default_piece_size(uint64_t total_size) noexcept
+    [[nodiscard]] inline static uint32_t default_piece_size(uint64_t total_size) noexcept
     {
+        TR_ASSERT(total_size != 0);
+
         // Ideally, we want approximately 2^10 = 1024 pieces, give or take a few hundred pieces.
         // So we subtract 10 from the log2 of total size.
         // The ideal number of pieces is up for debate.
