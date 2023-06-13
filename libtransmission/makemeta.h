@@ -181,7 +181,7 @@ public:
 
     ///
 
-    [[nodiscard]] constexpr static uint32_t default_piece_size(uint64_t total_size) noexcept
+    [[nodiscard]] static uint32_t default_piece_size(uint64_t total_size) noexcept
     {
         // Ideally, we want approximately 2^10 = 1024 pieces, give or take a few hundred pieces.
         // So we subtract 10 from the log2 of total size.
