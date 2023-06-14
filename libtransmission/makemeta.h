@@ -194,7 +194,7 @@ public:
         // We want a piece size between 16KiB (2^14 bytes) and 16MiB (2^24 bytes) for maximum compatibility
         exp = std::clamp(exp, 14., 24.);
 
-        return static_cast<uint32_t>(1u) << static_cast<uint8_t>(exp);
+        return static_cast<uint32_t>(1U) << std::lround(exp);
     }
 
     [[nodiscard]] constexpr static bool is_legal_piece_size(uint32_t x)
