@@ -110,9 +110,8 @@ namespace global_source_ip_helpers
 [[nodiscard]] std::optional<tr_address> get_global_source_address(tr_address const& bind_addr, int& err_out) noexcept
 {
     // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    auto const dst_addr = tr_address::from_string(bind_addr.is_ipv4() ? DstIPv4 : DstIPv6);
+    static auto constexpr DstIP = std::array{ "91.121.74.28"sv, "2001:1890:1112:1::20"sv };
+    auto const dst_addr = tr_address::from_string(DstIP[bind_addr.type]);
     auto const dst_port = tr_port::fromHost(6969);
 
     // In order for address selection to work right,
