@@ -36,7 +36,7 @@ auto TR_CONSTEXPR23 protocol_str(tr_address_type type) noexcept
 {
     /* TODO: very slight performance nit
      * - If upgrading to C++20, change Map to a consteval lambda:
-     *   auto map = []() consteval { return std::array{ "IPv4"sv, "IPv6"sv }; };
+     *   static auto Map = []() consteval { return std::array{ "IPv4"sv, "IPv6"sv }; };
      * - If upgrading to C++23, change Map to static constexpr
      *
      * Ref: https://wg21.link/p2647r1
@@ -235,11 +235,13 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
     // Update global address
+    static auto constexpr IPProtocolMap = std::array{ tr_web::FetchOptions::IPProtocol::V4,
+                                                      tr_web::FetchOptions::IPProtocol::V6 };
     auto options = tr_web::FetchOptions{ IPQueryServices[type][ix_service_[type]],
                                          [this, type](tr_web::FetchResponse const& response)
                                          { this->on_response_ip_query(type, response); },
                                          nullptr };
-    options.ip_proto = type == TR_AF_INET ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
+    options.ip_proto = IPProtocolMap[type];
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
     mediator_.fetch(std::move(options));
