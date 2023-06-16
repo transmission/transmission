@@ -39,15 +39,9 @@
 
 #else
 
-static void sd_notify(int /*status*/, char const* /*str*/)
-{
-    // no-op
-}
-
-static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
-{
-    // no-op
-}
+// no-op
+#define sd_notify(status, str)
+#define sd_notifyf(status, fmt, ...)
 
 #endif
 
