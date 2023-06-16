@@ -257,8 +257,8 @@ uint64_t tr_time_msec()
  */
 size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
 {
-    auto* dst = static_cast<char*>(vdst);
-    auto const* const src = static_cast<char const*>(vsrc);
+    auto* dst = reinterpret_cast<char*>(vdst);
+    auto const* const src = reinterpret_cast<char const*>(vsrc);
 
     TR_ASSERT(dst != nullptr);
     TR_ASSERT(src != nullptr);
@@ -274,7 +274,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
     if (denominator > 0)
     {
-        return numerator / (double)denominator;
+        return numerator / static_cast<double>(denominator);
     }
 
     if (numerator > 0)
@@ -717,7 +717,7 @@ char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes
         unit = &u[3];
     }
 
-    double const value = double(bytes) / unit->value;
+    double const value = static_cast<double>(bytes) / unit->value;
     auto const* const units = std::data(unit->name);
 
     auto precision = int{};
