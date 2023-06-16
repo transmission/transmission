@@ -66,10 +66,10 @@ void tr_locale_set_global(char const* locale_name) noexcept
 {
     try
     {
-        std::ignore = std::locale::global(std::locale{ locale_name });
+        std::locale::global(std::locale{ locale_name });
 
-        std::ignore = std::cout.imbue(std::locale{});
-        std::ignore = std::cerr.imbue(std::locale{});
+        std::cout.imbue(std::locale{});
+        std::cerr.imbue(std::locale{});
     }
     catch (std::exception const&)
     {
