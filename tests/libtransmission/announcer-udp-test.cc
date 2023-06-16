@@ -51,7 +51,7 @@ protected:
         {
             auto target = tr_address::from_sockaddr(sa);
             ASSERT_TRUE(target);
-            sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
+            sent_.emplace_back(reinterpret_cast<char const*>(buf), buflen, sa, salen);
         }
 
         [[nodiscard]] auto* eventBase()

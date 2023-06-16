@@ -394,7 +394,7 @@ private:
     {
         if ((type & EV_READ) != 0)
         {
-            static_cast<tr_lpd_impl*>(vself)->onCanRead();
+            reinterpret_cast<tr_lpd_impl*>(vself)->onCanRead();
         }
     }
 

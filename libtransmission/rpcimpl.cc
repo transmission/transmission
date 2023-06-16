@@ -1345,7 +1345,7 @@ char const* torrentSetLocation(
 
 void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char const* newname, int error, void* user_data)
 {
-    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto* data = reinterpret_cast<struct tr_rpc_idle_data*>(user_data);
 
     tr_variantDictAddInt(data->args_out, TR_KEY_id, tr_torrentId(tor));
     tr_variantDictAddStr(data->args_out, TR_KEY_path, oldpath);
@@ -1385,7 +1385,7 @@ char const* torrentRenamePath(
 void onPortTested(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
-    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto* data = reinterpret_cast<struct tr_rpc_idle_data*>(user_data);
 
     if (status != 200)
     {
@@ -1417,7 +1417,7 @@ char const* portTest(tr_session* session, tr_variant* /*args_in*/, tr_variant* /
 void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
-    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto* data = reinterpret_cast<struct tr_rpc_idle_data*>(user_data);
     auto* const session = data->session;
 
     if (status != 200)
@@ -1542,7 +1542,7 @@ struct add_torrent_idle_data
 void onMetadataFetched(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
-    auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
+    auto* data = reinterpret_cast<struct add_torrent_idle_data*>(user_data);
 
     tr_logAddTrace(fmt::format(
         "torrentAdd: HTTP response code was {} ({}); response length was {} bytes",

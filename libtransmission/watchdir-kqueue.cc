@@ -133,7 +133,7 @@ private:
 
     static void onKqueueEvent(evutil_socket_t /*fd*/, short /*type*/, void* vself)
     {
-        static_cast<KQueueWatchdir*>(vself)->handleKqueueEvent();
+        reinterpret_cast<KQueueWatchdir*>(vself)->handleKqueueEvent();
     }
 
     void handleKqueueEvent()

@@ -414,7 +414,7 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark key, std::byte const** set
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string(&initme->val.s, { static_cast<char const*>(value), value_len });
+    tr_variant_string_set_string(&initme->val.s, { reinterpret_cast<char const*>(value), value_len });
 }
 
 void tr_variantInitQuark(tr_variant* initme, tr_quark value)

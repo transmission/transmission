@@ -281,7 +281,7 @@ using OutBuf = libtransmission::SmallBuffer<1024 * 16, std::byte>;
 
 void saveIntFunc(tr_variant const* val, void* vout)
 {
-    auto out = static_cast<OutBuf*>(vout);
+    auto out = reinterpret_cast<OutBuf*>(vout);
 
     auto const [buf, buflen] = out->reserve_space(64U);
     auto* walk = reinterpret_cast<char*>(buf);
@@ -292,7 +292,7 @@ void saveIntFunc(tr_variant const* val, void* vout)
 
 void saveBoolFunc(tr_variant const* val, void* vout)
 {
-    static_cast<OutBuf*>(vout)->add(val->val.b ? "i1e"sv : "i0e"sv);
+    reinterpret_cast<OutBuf*>(vout)->add(val->val.b ? "i1e"sv : "i0e"sv);
 }
 
 void saveStringImpl(OutBuf* out, std::string_view sv)
@@ -310,7 +310,7 @@ void saveStringFunc(tr_variant const* v, void* vout)
 {
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
-    saveStringImpl(static_cast<OutBuf*>(vout), sv);
+    saveStringImpl(reinterpret_cast<OutBuf*>(vout), sv);
 }
 
 void saveRealFunc(tr_variant const* val, void* vout)
@@ -319,22 +319,22 @@ void saveRealFunc(tr_variant const* val, void* vout)
 
     auto buf = std::array<char, 64>{};
     auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
-    saveStringImpl(static_cast<OutBuf*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
+    saveStringImpl(reinterpret_cast<OutBuf*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 
 void saveDictBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<OutBuf*>(vbuf)->push_back('d');
+    reinterpret_cast<OutBuf*>(vbuf)->push_back('d');
 }
 
 void saveListBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<OutBuf*>(vbuf)->push_back('l');
+    reinterpret_cast<OutBuf*>(vbuf)->push_back('l');
 }
 
 void saveContainerEndFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<OutBuf*>(vbuf)->push_back('e');
+    reinterpret_cast<OutBuf*>(vbuf)->push_back('e');
 }
 
 struct VariantWalkFuncs const walk_funcs = {

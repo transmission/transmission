@@ -115,7 +115,7 @@ void utp_send_to(
 
 uint64 utp_callback(utp_callback_arguments* args)
 {
-    auto* const session = static_cast<tr_session*>(utp_context_get_userdata(args->context));
+    auto* const session = reinterpret_cast<tr_session*>(utp_context_get_userdata(args->context));
 
     TR_ASSERT(session != nullptr);
     TR_ASSERT(session->utp_context == args->context);
@@ -170,7 +170,7 @@ void restart_timer(tr_session* session)
 
 void timer_callback(void* vsession)
 {
-    auto* session = static_cast<tr_session*>(vsession);
+    auto* session = reinterpret_cast<tr_session*>(vsession);
 
     /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */
     utp_issue_deferred_acks(session->utp_context);

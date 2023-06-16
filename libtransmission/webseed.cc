@@ -412,7 +412,7 @@ void useFetchedBlocks(tr_webseed_task* task)
 void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask)
 {
     size_t const n_added = info->n_added;
-    auto* const task = static_cast<tr_webseed_task*>(vtask);
+    auto* const task = reinterpret_cast<tr_webseed_task*>(vtask);
     if (n_added == 0 || task->dead)
     {
         return;
@@ -446,7 +446,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
     auto const& [status, body, did_connect, did_timeout, vtask] = web_response;
     bool const success = status == 206;
 
-    auto* const task = static_cast<tr_webseed_task*>(vtask);
+    auto* const task = reinterpret_cast<tr_webseed_task*>(vtask);
 
     if (task->dead)
     {

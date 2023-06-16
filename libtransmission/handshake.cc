@@ -681,7 +681,7 @@ ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
 
 ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
 {
-    auto* handshake = static_cast<tr_handshake*>(vhandshake);
+    auto* handshake = reinterpret_cast<tr_handshake*>(vhandshake);
 
     bool ready_for_more = true;
 
@@ -777,7 +777,7 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
 
 void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandshake)
 {
-    auto* handshake = static_cast<tr_handshake*>(vhandshake);
+    auto* handshake = reinterpret_cast<tr_handshake*>(vhandshake);
 
     if (io->is_utp() && !io->is_incoming() && handshake->is_state(State::AwaitingYb))
     {

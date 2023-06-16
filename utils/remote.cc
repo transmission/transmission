@@ -799,7 +799,7 @@ static auto constexpr ListKeys = std::array<tr_quark, 14>{
 
 static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 {
-    auto* const buf = static_cast<evbuffer*>(vbuf);
+    auto* const buf = reinterpret_cast<evbuffer*>(vbuf);
     size_t const byteCount = size * nmemb;
     evbuffer_add(buf, ptr, byteCount);
     return byteCount;
@@ -808,8 +808,8 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 /* look for a session id in the header in case the server gives back a 409 */
 static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
-    auto& config = *static_cast<Config*>(vconfig);
-    auto const* const line = static_cast<char const*>(ptr);
+    auto& config = *reinterpret_cast<Config*>(vconfig);
+    auto const* const line = reinterpret_cast<char const*>(ptr);
     size_t const line_len = size * nmemb;
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
     size_t const key_len = strlen(key);

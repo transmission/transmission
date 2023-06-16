@@ -115,7 +115,7 @@ private:
 
     static void onInotifyEvent(struct bufferevent* event, void* vself)
     {
-        static_cast<INotifyWatchdir*>(vself)->handleInotifyEvent(event);
+        reinterpret_cast<INotifyWatchdir*>(vself)->handleInotifyEvent(event);
     }
 
     void handleInotifyEvent(struct bufferevent* event)

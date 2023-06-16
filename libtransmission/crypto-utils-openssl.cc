@@ -263,5 +263,5 @@ bool tr_rand_buffer_crypto(void* buffer, size_t length)
 
     TR_ASSERT(buffer != nullptr);
 
-    return check_result(RAND_bytes(static_cast<unsigned char*>(buffer), (int)length));
+    return check_result(RAND_bytes(reinterpret_cast<unsigned char*>(buffer), (int)length));
 }

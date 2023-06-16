@@ -73,11 +73,11 @@ extern "C"
         int len3)
     {
         auto* setme = reinterpret_cast<std::byte*>(hash_return);
-        std::fill_n(static_cast<char*>(hash_return), hash_size, '\0');
+        std::fill_n(reinterpret_cast<char*>(hash_return), hash_size, '\0');
 
-        auto const sv1 = std::string_view{ static_cast<char const*>(v1), size_t(len1) };
-        auto const sv2 = std::string_view{ static_cast<char const*>(v2), size_t(len2) };
-        auto const sv3 = std::string_view{ static_cast<char const*>(v3), size_t(len3) };
+        auto const sv1 = std::string_view{ reinterpret_cast<char const*>(v1), size_t(len1) };
+        auto const sv2 = std::string_view{ reinterpret_cast<char const*>(v2), size_t(len2) };
+        auto const sv3 = std::string_view{ reinterpret_cast<char const*>(v3), size_t(len3) };
         auto const digest = tr_sha1::digest(sv1, sv2, sv3);
         std::copy_n(std::data(digest), std::min(size_t(hash_size), std::size(digest)), setme);
     }
@@ -90,7 +90,7 @@ extern "C"
 
     int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr const* to, int tolen)
     {
-        return static_cast<int>(sendto(sockfd, static_cast<char const*>(buf), len, flags, to, tolen));
+        return static_cast<int>(sendto(sockfd, reinterpret_cast<char const*>(buf), len, flags, to, tolen));
     }
 
 #if defined(_WIN32) && !defined(__MINGW32__)

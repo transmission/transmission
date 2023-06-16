@@ -403,7 +403,7 @@ void tr_daemon::periodic_update(void)
 
 static void periodic_update(evutil_socket_t /*fd*/, short /*what*/, void* arg)
 {
-    static_cast<tr_daemon*>(arg)->periodic_update();
+    reinterpret_cast<tr_daemon*>(arg)->periodic_update();
 }
 
 static tr_rpc_callback_status on_rpc_callback(
@@ -414,7 +414,7 @@ static tr_rpc_callback_status on_rpc_callback(
 {
     if (type == TR_RPC_SESSION_CLOSE)
     {
-        static_cast<tr_daemon*>(arg)->stop();
+        reinterpret_cast<tr_daemon*>(arg)->stop();
     }
     return TR_RPC_OK;
 }

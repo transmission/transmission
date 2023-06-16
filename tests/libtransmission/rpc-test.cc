@@ -71,7 +71,7 @@ TEST_F(RpcTest, sessionGet)
 {
     auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response, void* setme) noexcept
     {
-        *static_cast<tr_variant*>(setme) = *response;
+        *reinterpret_cast<tr_variant*>(setme) = *response;
         tr_variantInitBool(response, false);
     };
 

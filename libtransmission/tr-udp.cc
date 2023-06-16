@@ -108,7 +108,7 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
          is between 0 and 3
        - the above cannot be µTP packets, since these start with a 4-bit
          version number (1). */
-    auto* const session = static_cast<tr_session*>(vsession);
+    auto* const session = reinterpret_cast<tr_session*>(vsession);
     if (buf[0] == 'd')
     {
         if (session->dht_)
@@ -255,7 +255,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         // don't try to connect to a global address if we don't have connectivity to public internet
         return;
     }
-    else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
+    else if (::sendto(sock, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
     {
         return;
     }

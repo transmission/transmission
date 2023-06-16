@@ -320,7 +320,7 @@ size_t tr_peerIo::try_write(size_t max)
 
 void tr_peerIo::event_write_cb([[maybe_unused]] evutil_socket_t fd, short /*event*/, void* vio)
 {
-    auto* const io = static_cast<tr_peerIo*>(vio);
+    auto* const io = reinterpret_cast<tr_peerIo*>(vio);
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for writing");
 
     TR_ASSERT(io->socket_.is_tcp());
@@ -444,7 +444,7 @@ void tr_peerIo::event_read_cb([[maybe_unused]] evutil_socket_t fd, short /*event
 {
     static auto constexpr MaxLen = RcvBuf;
 
-    auto* const io = static_cast<tr_peerIo*>(vio);
+    auto* const io = reinterpret_cast<tr_peerIo*>(vio);
     tr_logAddTraceIo(io, "libevent says this peer socket is ready for reading");
 
     TR_ASSERT(io->socket_.is_tcp());
@@ -683,7 +683,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         UTP_ON_READ,
         [](utp_callback_arguments* args) -> uint64
         {
-            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            if (auto* const io = reinterpret_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
                 io->inbuf_.add(args->buf, args->len);
                 io->set_enabled(TR_DOWN, true);
@@ -697,7 +697,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         UTP_GET_READ_BUFFER_SIZE,
         [](utp_callback_arguments* args) -> uint64
         {
-            if (auto const* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            if (auto const* const io = reinterpret_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
                 // We use this callback to enforce speed limits by telling
                 // libutp to read no more than `target_dl_bytes` bytes.
@@ -718,7 +718,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         UTP_ON_ERROR,
         [](utp_callback_arguments* args) -> uint64
         {
-            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            if (auto* const io = reinterpret_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
                 io->on_utp_error(args->error_code);
             }
@@ -730,7 +730,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         UTP_ON_OVERHEAD_STATISTICS,
         [](utp_callback_arguments* args) -> uint64
         {
-            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            if (auto* const io = reinterpret_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
                 tr_logAddTraceIo(io, fmt::format("{:d} overhead bytes via utp", args->len));
                 io->bandwidth().notify_bandwidth_consumed(args->send != 0 ? TR_UP : TR_DOWN, args->len, false, tr_time_msec());
@@ -743,7 +743,7 @@ void tr_peerIo::utp_init([[maybe_unused]] struct_utp_context* ctx)
         UTP_ON_STATE_CHANGE,
         [](utp_callback_arguments* args) -> uint64
         {
-            if (auto* const io = static_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
+            if (auto* const io = reinterpret_cast<tr_peerIo*>(utp_get_userdata(args->socket)); io != nullptr)
             {
                 io->on_utp_state_change(args->state);
             }

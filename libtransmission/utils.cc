@@ -868,7 +868,7 @@ void tr_formatter_get_units(void* vdict)
 {
     using namespace formatter_impl;
 
-    auto* dict = static_cast<tr_variant*>(vdict);
+    auto* dict = reinterpret_cast<tr_variant*>(vdict);
 
     tr_variantDictReserve(dict, 6);
 

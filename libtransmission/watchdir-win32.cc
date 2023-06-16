@@ -200,7 +200,7 @@ private:
 
     static unsigned int __stdcall staticThreadFunc(void* vself)
     {
-        return static_cast<Win32Watchdir*>(vself)->threadFunc();
+        return reinterpret_cast<Win32Watchdir*>(vself)->threadFunc();
     }
 
     unsigned int threadFunc()
@@ -237,12 +237,12 @@ private:
 
     static void onFirstScan(evutil_socket_t /*unused*/, short /*unused*/, void* vself)
     {
-        static_cast<Win32Watchdir*>(vself)->scan();
+        reinterpret_cast<Win32Watchdir*>(vself)->scan();
     }
 
     static void onBufferEvent(struct bufferevent* event, void* vself)
     {
-        static_cast<Win32Watchdir*>(vself)->processBufferEvent(event);
+        reinterpret_cast<Win32Watchdir*>(vself)->processBufferEvent(event);
     }
 
     void processBufferEvent(struct bufferevent* event)
