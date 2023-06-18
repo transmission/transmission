@@ -126,7 +126,13 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     //disable highlight color and set manually in drawRow
     [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setNeedsDisplay) name:@"RefreshTorrentTable" object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshTorrentTable) name:@"RefreshTorrentTable"
+                                             object:nil];
+}
+
+- (void)refreshTorrentTable
+{
+    self.needsDisplay = YES;
 }
 
 - (BOOL)isGroupCollapsed:(NSInteger)value
