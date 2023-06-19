@@ -414,6 +414,9 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/FelinaeX", "Genus Felinae"));
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
 
+    // rename filename collision
+    EXPECT_EQ(EINVAL, torrentRenameAndWait(tor, "Felidae/Felinae/Felis/catus/Kyphi", "Saffron"));
+    EXPECT_STREQ("Felidae", tr_torrentName(tor));
     /***
     ****
     ***/
