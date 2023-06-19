@@ -674,7 +674,7 @@
 "Peers" = "Eşler";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port" = "Kapı";
+"Port: %@" = "Kapı: %@";
 
 /* Preferences -> Network -> port status */
 "Port check site is down" = "Kapı denetim alanı çalışmıyor";

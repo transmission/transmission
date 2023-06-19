@@ -203,7 +203,7 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
 
     pref_widget.setPrefKey(pref_key);
     updateWidgetValue(widget, pref_key);
-    widgets_.insert(pref_key, widget);
+    widgets_.try_emplace(pref_key, widget);
 
     if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
     {
@@ -807,11 +807,9 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    key2widget_t::iterator const it(widgets_.find(key));
-
-    if (it != widgets_.end())
+    if (auto iter = widgets_.find(key); iter != std::end(widgets_))
     {
-        QWidget* w(it.value());
+        QWidget* const w = iter->second;
 
         w->blockSignals(true);
 

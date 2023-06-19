@@ -11,7 +11,6 @@
 #include <mutex>
 #include <optional>
 #include <shared_mutex>
-#include <string>
 #include <string_view>
 
 #include "libtransmission/net.h"
@@ -34,13 +33,34 @@
  *
  * The idea is, if this class successfully cached a source address, that means
  * you have connectivity to the public internet. And if the global address is
- * the same with the source address, then you are not behind an NAT.
+ * the same as the source address, then you are not behind a NAT.
  *
  */
 class tr_global_ip_cache
 {
 public:
-    tr_global_ip_cache(tr_web& web_in, libtransmission::TimerMaker& timer_maker_in);
+    struct Mediator
+    {
+        virtual ~Mediator() = default;
+
+        virtual void fetch(tr_web::FetchOptions&& /* options */)
+        {
+        }
+
+        [[nodiscard]] virtual std::string_view settings_bind_addr(tr_address_type /* type */)
+        {
+            return {};
+        }
+
+        [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
+    };
+
+private:
+    explicit tr_global_ip_cache(Mediator& mediator_in);
+
+public:
+    [[nodiscard]] static std::unique_ptr<tr_global_ip_cache> create(Mediator& mediator_in);
+
     tr_global_ip_cache() = delete;
     ~tr_global_ip_cache();
     tr_global_ip_cache(tr_global_ip_cache const&) = delete;
@@ -62,11 +82,16 @@ public:
         return source_addr_[type];
     }
 
-    void set_settings_bind_addr(tr_address_type type, std::string_view bind_address) noexcept;
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
-    void update_addr(tr_address_type type) noexcept;
     bool set_global_addr(tr_address_type type, tr_address const& addr) noexcept;
+
+    void update_addr(tr_address_type type) noexcept;
+    void update_global_addr(tr_address_type type) noexcept;
+    void update_source_addr(tr_address_type type) noexcept;
+
+    // Only use as a callback for web_->fetch()
+    void on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept;
 
     [[nodiscard]] constexpr auto has_ip_protocol(tr_address_type type) const noexcept
     {
@@ -94,19 +119,11 @@ private:
     [[nodiscard]] bool set_is_updating(tr_address_type type) noexcept;
     void unset_is_updating(tr_address_type type) noexcept;
 
-    void update_global_addr(tr_address_type type) noexcept;
-    void update_source_addr(tr_address_type type) noexcept;
-
-    // Only use as a callback for web_->fetch()
-    void on_response_ip_query(tr_address_type type, tr_web::FetchResponse const& response) noexcept;
-
-    tr_web& web_;
-
-    array_ip_t<std::optional<tr_address>> settings_bind_addr_;
+    Mediator& mediator_;
 
     enum class is_updating_t
     {
-        NO,
+        NO = 0,
         YES,
         ABORT
     };

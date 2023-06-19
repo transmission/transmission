@@ -674,7 +674,7 @@
 "Peers" = "Modparter";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port" = "Port";
+"Port: %@" = "Port: %@";
 
 /* Preferences -> Network -> port status */
 "Port check site is down" = "Port checksite er nede";
