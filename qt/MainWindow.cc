@@ -1110,7 +1110,11 @@ void MainWindow::toggleWindows(bool do_show)
         }
 
         raise();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+        this->activateWindow();
+#else
         QApplication::setActiveWindow(this);
+#endif
     }
 }
 
