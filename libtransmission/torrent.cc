@@ -2447,10 +2447,36 @@ namespace
 {
 namespace rename_helpers
 {
-bool renameArgsAreValid(std::string_view oldpath, std::string_view newname)
+bool renameArgsAreValid(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
 {
-    return !std::empty(oldpath) && !std::empty(newname) && newname != "."sv && newname != ".."sv &&
-        !tr_strvContains(newname, TR_PATH_DELIMITER);
+    if (std::empty(oldpath) || std::empty(newname) || newname == "."sv || newname == ".."sv ||
+        tr_strvContains(newname, TR_PATH_DELIMITER))
+    {
+        return false;
+    }
+
+    auto const newpath = tr_strvContains(oldpath, TR_PATH_DELIMITER) ?
+        tr_pathbuf{ tr_sys_path_dirname(oldpath), '/', newname } :
+        tr_pathbuf{ newname };
+
+    if (newpath == oldpath)
+    {
+        return true;
+    }
+
+    auto const newpath_as_dir = tr_pathbuf{ newpath, '/' };
+    auto const n_files = tor->file_count();
+
+    for (tr_file_index_t i = 0; i < n_files; ++i)
+    {
+        auto const& name = tor->file_subpath(i);
+        if (newpath == name || tr_strvStartsWith(name, newpath_as_dir))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
@@ -2567,7 +2593,7 @@ void torrentRenamePath(
 
     int error = 0;
 
-    if (!renameArgsAreValid(oldpath, newname))
+    if (!renameArgsAreValid(tor, oldpath, newname))
     {
         error = EINVAL;
     }
