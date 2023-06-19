@@ -958,10 +958,14 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     tr_variantInitDict(&val, 8);
     tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode() != TR_CLEAR_PREFERRED);
 
-    if (auto const addr = msgs->session->publicAddress(TR_AF_INET6); !addr.is_any())
+    // If connecting to global peer, then use global address
+    // Otherwise we are connecting to local peer, use bind address directly
+    if (auto const addr = msgs->io->address().is_global_unicast_address() ? msgs->session->global_address(TR_AF_INET6) :
+                                                                            msgs->session->publicAddress(TR_AF_INET6);
+        addr && !addr->is_any())
     {
-        TR_ASSERT(addr.is_ipv6());
-        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &addr.addr.addr6, sizeof(addr.addr.addr6));
+        TR_ASSERT(addr->is_ipv6());
+        tr_variantDictAddRaw(&val, TR_KEY_ipv6, &addr->addr.addr6, sizeof(addr->addr.addr6));
     }
 
     // http://bittorrent.org/beps/bep_0009.html
