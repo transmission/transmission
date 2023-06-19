@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <QMap>
+#include <map>
 
 #include <libtransmission/tr-macros.h>
 
@@ -50,7 +50,7 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
-    using key2widget_t = QMap<int, QWidget*>;
+    using key2widget_t = std::map<int, QWidget*>;
 
     bool updateWidgetValue(QWidget* widget, int pref_key) const;
     void linkWidgetToPref(QWidget* widget, int pref_key);
