@@ -66,13 +66,19 @@ if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
 fi
 
 # enforce east const
-matches="$(find_cfiles -exec perl -ne 'print "west const:",$ARGV,":",$_ if /((?:^|[(<,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/' '{}' '+')"
+# look for 'const'
+#  - as the first token in the line
+#  - or preceded by 'static'
+#  - or following any of (<,;
+#  - but not if 'const' is followed by ` override` (const virtual function)
+#  - but not if 'const' is followed by ` = 0` (const virtual function)
+matches="$(find_cfiles -exec perl -ne 'print "west const:",$ARGV,":",$_ if /((?:^|[(<,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+((\w+\s*\[)|(override)|(\=\ 0)))/' '{}' '+')"
 if [ -n "$matches" ]; then
   echo "$matches"
   exitcode=1
 fi
 if [ -n "$fix" ]; then
-  find_cfiles -exec perl -pi -e 's/((?:^|[(<,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+\w+\s*\[)/\1>\2</g' '{}' '+'
+  find_cfiles -exec perl -pi -e 's/((?:^|[(<,;]|\bstatic\s+)\s*)\b(const)\b(?!\s+((\w+\s*\[)|(override)|(\=\ 0)))/\1>\2</g' '{}' '+'
 fi
 
 # format JS
