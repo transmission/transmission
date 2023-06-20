@@ -296,8 +296,9 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
     PUBLIC
         fmt::fmt-header-only
+        libevent::event
         small::small
-        libevent::event)
+        span-lite::span-lite)
 
 if(INSTALL_LIB)
     install(

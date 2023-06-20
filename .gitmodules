@@ -50,3 +50,6 @@
 [submodule "third-party/small"]
 	path = third-party/small
 	url = https://github.com/transmission/small.git
+[submodule "third-party/span-lite"]
+	path = third-party/span-lite
+	url = https://github.com/transmission/span-lite.git
