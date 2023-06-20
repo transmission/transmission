@@ -326,8 +326,10 @@ void addFiles(tr_torrent const* tor, tr_variant* list)
     for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
-        tr_variant* d = tr_variantListAddDict(list, 3);
+        tr_variant* d = tr_variantListAddDict(list, 5);
+        tr_variantDictAddInt(d, TR_KEY_beginPiece, file.beginPiece);
         tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
+        tr_variantDictAddInt(d, TR_KEY_endPiece, file.endPiece);
         tr_variantDictAddInt(d, TR_KEY_length, file.length);
         tr_variantDictAddStr(d, TR_KEY_name, file.name);
     }

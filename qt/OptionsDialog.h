@@ -5,12 +5,12 @@
 
 #pragma once
 
+#include <map>
 #include <optional>
 #include <vector>
 
 #include <QDir>
 #include <QFile>
-#include <QMap>
 #include <QSet>
 #include <QString>
 #include <QTimer>
@@ -54,7 +54,7 @@ private slots:
     void onSessionUpdated();
 
 private:
-    using mybins_t = QMap<uint32_t, int32_t>;
+    using mybins_t = std::map<uint32_t, int32_t>;
 
     void reload();
     void updateWidgetsLocality();

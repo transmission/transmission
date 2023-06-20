@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <map>
 #include <memory>
 
 #include <libtransmission/transmission.h> // priorities
@@ -463,7 +464,7 @@ void FileTreeModel::emitSubtreeChanged(QModelIndex const& idx, int first_column,
 
 void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 {
-    QMap<bool, QModelIndexList> wanted_indices;
+    std::map<bool, QModelIndexList> wanted_indices;
 
     for (QModelIndex const& i : getOrphanIndices(indices))
     {
@@ -473,7 +474,7 @@ void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 
     for (int i = 0; i <= 1; ++i)
     {
-        if (wanted_indices.contains(i))
+        if (wanted_indices.count(i) != 0)
         {
             setWanted(wanted_indices[i], i != 0);
         }
@@ -482,7 +483,7 @@ void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 
 void FileTreeModel::twiddlePriority(QModelIndexList const& indices)
 {
-    QMap<int, QModelIndexList> priority_indices;
+    std::map<int, QModelIndexList> priority_indices;
 
     for (QModelIndex const& i : getOrphanIndices(indices))
     {
@@ -508,7 +509,7 @@ void FileTreeModel::twiddlePriority(QModelIndexList const& indices)
 
     for (int i = TR_PRI_LOW; i <= TR_PRI_HIGH; ++i)
     {
-        if (priority_indices.contains(i))
+        if (priority_indices.count(i) != 0U)
         {
             setPriority(priority_indices[i], i);
         }

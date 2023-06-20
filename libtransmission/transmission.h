@@ -1334,6 +1334,8 @@ struct tr_file_view
     uint64_t have; // the current size of the file, i.e. how much we've downloaded
     uint64_t length; // the total size of the file
     double progress; // have / length
+    tr_piece_index_t beginPiece; // piece index where this file starts
+    tr_piece_index_t endPiece; // piece index where this file ends (exclusive)
     tr_priority_t priority; // the file's priority
     bool wanted; // do we want to download this file?
 };

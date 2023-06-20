@@ -21,7 +21,7 @@
 
 struct evhttp;
 struct tr_variant;
-struct tr_rpc_address;
+class tr_rpc_address;
 struct libdeflate_compressor;
 
 namespace libtransmission
@@ -153,7 +153,7 @@ public:
     std::vector<std::string> whitelist_;
     std::string const web_client_dir_;
 
-    std::unique_ptr<struct tr_rpc_address> bind_address_;
+    std::unique_ptr<class tr_rpc_address> bind_address_;
 
     std::unique_ptr<libtransmission::Timer> start_retry_timer;
     libtransmission::evhelpers::evhttp_unique_ptr httpd;

@@ -275,6 +275,42 @@ private:
         tr_session& session_;
     };
 
+    class GlobalIPCacheMediator final : public tr_global_ip_cache::Mediator
+    {
+    public:
+        explicit GlobalIPCacheMediator(tr_session& session) noexcept
+            : session_(session)
+        {
+        }
+
+        void fetch(tr_web::FetchOptions&& options) override
+        {
+            session_.fetch(std::move(options));
+        }
+
+        [[nodiscard]] std::string_view settings_bind_addr(tr_address_type type) override
+        {
+            switch (type)
+            {
+            case TR_AF_INET:
+                return session_.settings_.bind_address_ipv4;
+            case TR_AF_INET6:
+                return session_.settings_.bind_address_ipv6;
+            default:
+                TR_ASSERT_MSG(false, "Invalid type");
+                return {};
+            }
+        }
+
+        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
+        {
+            return session_.timerMaker();
+        }
+
+    private:
+        tr_session& session_;
+    };
+
     // UDP connectivity used for the DHT and µTP
     class tr_udp_core
     {
@@ -1112,7 +1148,8 @@ private:
     tr_torrents torrents_;
 
     // depends-on: settings_, session_thread_, timer_maker_, web_
-    std::unique_ptr<tr_global_ip_cache> global_ip_cache_;
+    GlobalIPCacheMediator global_ip_cache_mediator_{ *this };
+    std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = tr_global_ip_cache::create(global_ip_cache_mediator_);
 
     // depends-on: settings_, session_thread_, torrents_, global_ip_cache (via tr_session::publicAddress())
     WebMediator web_mediator_{ this };

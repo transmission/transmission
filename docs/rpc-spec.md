@@ -294,6 +294,8 @@ The 'source' column here corresponds to the data structure there.
 | `bytesCompleted` | number | tr_file_view
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
+| `beginPiece` | number | tr_file_view
+| `endPiece` | number | tr_file_view
 
 
 `fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
@@ -1009,3 +1011,5 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 |:---|:---
 | `torrent-get` | new arg `sequentialDownload`
 | `torrent-set` | new arg `sequentialDownload`
+| `torrent-get` | new arg `files.beginPiece`
+| `torrent-get` | new arg `files.endPiece`

@@ -45,6 +45,10 @@
 
 using namespace std::literals;
 
+// FIXME(ckerr) do not merge these three lines.
+// This comment is to make CI think libtransmission has
+// changed so that it will run the libtransmission CI tests
+
 namespace
 {
 #ifdef _WIN32

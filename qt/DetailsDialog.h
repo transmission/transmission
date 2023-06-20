@@ -5,11 +5,11 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <unordered_set>
 
 #include <QString>
-#include <QMap>
 #include <QSet>
 #include <QTimer>
 
@@ -137,7 +137,7 @@ private:
     std::shared_ptr<TrackerModelFilter> tracker_filter_;
     std::shared_ptr<TrackerDelegate> tracker_delegate_;
 
-    QMap<QString, QTreeWidgetItem*> peers_;
+    std::map<QString, QTreeWidgetItem*> peers_;
 
     QIcon const icon_encrypted_ = QIcon(QStringLiteral(":/icons/encrypted.svg"));
     QIcon const icon_unencrypted_ = {};

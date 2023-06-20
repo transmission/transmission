@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #import "TorrentCell.h"
+#import "FileNameCell.h"
 #import "GroupsController.h"
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
@@ -48,12 +49,34 @@ static CGFloat const kPiecesTotalPercent = 0.6;
 
 static NSInteger const kMaxPieces = 18 * 18;
 
+static NSMutableParagraphStyle* sParagraphStyle()
+{
+    NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
+    paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
+    return paragraphStyle;
+}
+static NSDictionary<NSAttributedStringKey, id>* const kTitleAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:12.0],
+    NSParagraphStyleAttributeName : sParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.labelColor
+};
+static NSDictionary<NSAttributedStringKey, id>* const kStatusAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:10.0],
+    NSParagraphStyleAttributeName : sParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.secondaryLabelColor
+};
+static NSDictionary<NSAttributedStringKey, id>* const kTitleEmphasizedAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:12.0],
+    NSParagraphStyleAttributeName : sParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.whiteColor
+};
+static NSDictionary<NSAttributedStringKey, id>* const kStatusEmphasizedAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:10.0],
+    NSParagraphStyleAttributeName : sParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.whiteColor
+};
+
 @interface TorrentCell ()
-
-@property(nonatomic, readonly) NSUserDefaults* fDefaults;
-
-@property(nonatomic, readonly) NSMutableDictionary* fTitleAttributes;
-@property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
 
 @property(nonatomic) BOOL fTracking;
 @property(nonatomic) BOOL fMouseDownControlButton;
@@ -62,13 +85,6 @@ static NSInteger const kMaxPieces = 18 * 18;
 @property(nonatomic, readonly) NSColor* fBarBorderColor;
 @property(nonatomic, readonly) NSColor* fBluePieceColor;
 @property(nonatomic, readonly) NSColor* fBarMinimalBorderColor;
-
-@property(nonatomic, readonly) NSAttributedString* attributedTitle;
-- (NSAttributedString*)attributedStatusString:(NSString*)string;
-
-@property(nonatomic, readonly) NSString* buttonString;
-@property(nonatomic, readonly) NSString* statusString;
-@property(nonatomic, readonly) NSString* minimalStatusString;
 
 @end
 
@@ -79,17 +95,6 @@ static NSInteger const kMaxPieces = 18 * 18;
 {
     if ((self = [super init]))
     {
-        NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
-        paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
-
-        _fTitleAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
-        _fTitleAttributes[NSFontAttributeName] = [NSFont messageFontOfSize:12.0];
-        _fTitleAttributes[NSParagraphStyleAttributeName] = paragraphStyle;
-
-        _fStatusAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
-        _fStatusAttributes[NSFontAttributeName] = [NSFont messageFontOfSize:10.0];
-        _fStatusAttributes[NSParagraphStyleAttributeName] = paragraphStyle;
-
         _fBluePieceColor = [NSColor colorWithCalibratedRed:0.0 green:0.4 blue:0.8 alpha:1.0];
         _fBarBorderColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.2];
         _fBarMinimalBorderColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.015];
@@ -100,8 +105,6 @@ static NSInteger const kMaxPieces = 18 * 18;
 - (id)copyWithZone:(NSZone*)zone
 {
     TorrentCell* copy = [super copyWithZone:zone];
-    copy->_fTitleAttributes = [_fTitleAttributes mutableCopyWithZone:zone];
-    copy->_fStatusAttributes = [_fStatusAttributes mutableCopyWithZone:zone];
     copy->_fBluePieceColor = _fBluePieceColor;
     copy->_fBarBorderColor = _fBarBorderColor;
     copy->_fBarMinimalBorderColor = _fBarMinimalBorderColor;
@@ -333,27 +336,14 @@ static NSInteger const kMaxPieces = 18 * 18;
                          hints:nil];
     }
 
-    //text color
-    NSColor *titleColor, *statusColor;
-    if (self.backgroundStyle == NSBackgroundStyleEmphasized)
-    {
-        titleColor = statusColor = NSColor.whiteColor;
-    }
-    else
-    {
-        titleColor = NSColor.labelColor;
-        statusColor = NSColor.secondaryLabelColor;
-    }
-
-    self.fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
-    self.fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
+    AttributesStyle style = self.backgroundStyle == NSBackgroundStyleEmphasized ? AttributesStyleEmphasized : AttributesStyleNormal;
 
     CGFloat titleRightBound;
     //minimal status
     if (minimal)
     {
-        NSAttributedString* minimalString = [self attributedStatusString:self.minimalStatusString];
-        NSRect minimalStatusRect = [self rectForMinimalStatusWithString:minimalString inBounds:cellFrame];
+        NSAttributedString* minimalString = [self attributedStatusString:self.minimalStatusString style:style];
+        NSRect minimalStatusRect = [self rectForMinimalStatusWithStringSize:[minimalString size] inBounds:cellFrame];
 
         if (!self.hover)
         {
@@ -365,7 +355,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     //progress
     else
     {
-        NSAttributedString* progressString = [self attributedStatusString:torrent.progressString];
+        NSAttributedString* progressString = [self attributedStatusString:torrent.progressString style:style];
         NSRect progressRect = [self rectForProgressWithStringInBounds:cellFrame];
 
         [progressString drawInRect:progressRect];
@@ -455,8 +445,9 @@ static NSInteger const kMaxPieces = 18 * 18;
     }
 
     //title
-    NSAttributedString* titleString = self.attributedTitle;
-    NSRect titleRect = [self rectForTitleWithString:titleString withRightBound:titleRightBound inBounds:cellFrame minimal:minimal];
+    NSAttributedString* titleString = [self attributedTitleWithStyle:style];
+    NSRect titleRect = [self rectForTitleWithStringSize:[titleString size] withRightBound:titleRightBound inBounds:cellFrame
+                                                minimal:minimal];
     [titleString drawInRect:titleRect];
 
     //priority icon
@@ -480,7 +471,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     //status
     if (!minimal)
     {
-        NSAttributedString* statusString = [self attributedStatusString:self.statusString];
+        NSAttributedString* statusString = [self attributedStatusString:self.statusString style:style];
         [statusString drawInRect:[self rectForStatusWithStringInBounds:cellFrame]];
     }
 }
@@ -493,8 +484,8 @@ static NSInteger const kMaxPieces = 18 * 18;
     CGFloat titleRightBound;
     if (minimal)
     {
-        NSAttributedString* minimalString = [self attributedStatusString:self.minimalStatusString];
-        NSRect minimalStatusRect = [self rectForMinimalStatusWithString:minimalString inBounds:cellFrame];
+        NSAttributedString* minimalString = [self attributedStatusString:self.minimalStatusString style:AttributesStyleNormal];
+        NSRect minimalStatusRect = [self rectForMinimalStatusWithStringSize:[minimalString size] inBounds:cellFrame];
 
         titleRightBound = NSMinX(minimalStatusRect);
 
@@ -509,15 +500,17 @@ static NSInteger const kMaxPieces = 18 * 18;
         titleRightBound = NSMaxX(cellFrame);
     }
 
-    NSAttributedString* titleString = self.attributedTitle;
-    NSRect realRect = [self rectForTitleWithString:titleString withRightBound:titleRightBound inBounds:cellFrame minimal:minimal];
+    NSAttributedString* titleString = [self attributedTitleWithStyle:AttributesStyleNormal];
+    NSSize titleStringSize = [titleString size];
+    NSRect realRect = [self rectForTitleWithStringSize:titleStringSize withRightBound:titleRightBound inBounds:cellFrame
+                                               minimal:minimal];
 
-    NSAssert([titleString size].width >= NSWidth(realRect), @"Full rect width should not be less than the used title rect width!");
+    NSAssert(titleStringSize.width >= NSWidth(realRect), @"Full rect width should not be less than the used title rect width!");
 
-    if ([titleString size].width > NSWidth(realRect) &&
+    if (titleStringSize.width > NSWidth(realRect) &&
         NSMouseInRect([view convertPoint:view.window.mouseLocationOutsideOfEventStream fromView:nil], realRect, view.flipped))
     {
-        realRect.size.width = [titleString size].width;
+        realRect.size.width = titleStringSize.width;
         return NSInsetRect(realRect, -kPaddingExpansionFrame, -kPaddingExpansionFrame);
     }
 
@@ -529,8 +522,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     cellFrame.origin.x += kPaddingExpansionFrame;
     cellFrame.origin.y += kPaddingExpansionFrame;
 
-    self.fTitleAttributes[NSForegroundColorAttributeName] = NSColor.labelColor;
-    NSAttributedString* titleString = self.attributedTitle;
+    NSAttributedString* titleString = [self attributedTitleWithStyle:AttributesStyleNormal];
     [titleString drawInRect:cellFrame];
 }
 
@@ -711,10 +703,10 @@ static NSInteger const kMaxPieces = 18 * 18;
                  hints:nil];
 }
 
-- (NSRect)rectForMinimalStatusWithString:(NSAttributedString*)string inBounds:(NSRect)bounds
+- (NSRect)rectForMinimalStatusWithStringSize:(NSSize)stringSize inBounds:(NSRect)bounds
 {
     NSRect result;
-    result.size = [string size];
+    result.size = stringSize;
 
     result.origin.x = NSMaxX(bounds) - (kPaddingHorizontal + NSWidth(result) + kPaddingEdgeMax);
     result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
@@ -722,10 +714,10 @@ static NSInteger const kMaxPieces = 18 * 18;
     return result;
 }
 
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string
-                  withRightBound:(CGFloat)rightBound
-                        inBounds:(NSRect)bounds
-                         minimal:(BOOL)minimal
+- (NSRect)rectForTitleWithStringSize:(NSSize)stringSize
+                      withRightBound:(CGFloat)rightBound
+                            inBounds:(NSRect)bounds
+                             minimal:(BOOL)minimal
 {
     NSRect result;
     result.origin.x = NSMinX(bounds) + kPaddingHorizontal + (minimal ? kImageSizeMin : kImageSizeRegular) + kPaddingBetweenImageAndTitle;
@@ -748,7 +740,7 @@ static NSInteger const kMaxPieces = 18 * 18;
     {
         result.size.width -= kPriorityIconSize + kPaddingBetweenTitleAndPriority;
     }
-    result.size.width = MIN(NSWidth(result), [string size].width);
+    result.size.width = MIN(NSWidth(result), stringSize.width);
 
     return result;
 }
@@ -857,15 +849,17 @@ static NSInteger const kMaxPieces = 18 * 18;
     return NSMakeRect(NSMinX(bounds) - padding * 0.5, NSMidY(bounds) - imageSize * 0.5, imageSize, imageSize);
 }
 
-- (NSAttributedString*)attributedTitle
+- (NSAttributedString*)attributedTitleWithStyle:(AttributesStyle)style
 {
     NSString* title = ((Torrent*)self.representedObject).name;
-    return [[NSAttributedString alloc] initWithString:title attributes:self.fTitleAttributes];
+    return [[NSAttributedString alloc] initWithString:title
+                                           attributes:style == AttributesStyleEmphasized ? kTitleEmphasizedAttributes : kTitleAttributes];
 }
 
-- (NSAttributedString*)attributedStatusString:(NSString*)string
+- (NSAttributedString*)attributedStatusString:(NSString*)string style:(AttributesStyle)style
 {
-    return [[NSAttributedString alloc] initWithString:string attributes:self.fStatusAttributes];
+    return [[NSAttributedString alloc] initWithString:string
+                                           attributes:style == AttributesStyleEmphasized ? kStatusEmphasizedAttributes : kStatusAttributes];
 }
 
 - (NSString*)buttonString
