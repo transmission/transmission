@@ -61,14 +61,15 @@ public:
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual bool allows_dht() const = 0;
         [[nodiscard]] virtual bool allows_tcp() const = 0;
-        [[nodiscard]] virtual bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const = 0;
+        [[nodiscard]] virtual bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr, tr_port const& port)
+            const = 0;
         [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
         [[nodiscard]] virtual DH::private_key_bigend_t private_key() const
         {
             return DH::randomPrivateKey();
         }
 
-        virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const&) = 0;
+        virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const&, tr_port const&) = 0;
     };
 
     tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc on_done);
