@@ -764,6 +764,16 @@ public:
         return settings_.pex_enabled;
     }
 
+    [[nodiscard]] constexpr auto allowsHTTracker() const noexcept
+    {
+        return settings_.httracker_enabled;
+    }
+
+    [[nodiscard]] constexpr auto allowsUDPTracker() const noexcept
+    {
+        return settings_.udptracker_enabled;
+    }
+
     [[nodiscard]] constexpr auto allowsTCP() const noexcept
     {
         return settings_.tcp_enabled;

@@ -2212,6 +2212,14 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         tr_variantDictAddBool(d, key, s->allowsPEX());
         break;
 
+    case TR_KEY_httracker_enabled:
+        tr_variantDictAddBool(d, key, s->allowsHTTracker());
+        break;
+
+    case TR_KEY_udptracker_enabled:
+        tr_variantDictAddBool(d, key, s->allowsUDPTracker());
+        break;
+
     case TR_KEY_tcp_enabled:
         tr_variantDictAddBool(d, key, s->allowsTCP());
         break;

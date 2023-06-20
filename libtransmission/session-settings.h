@@ -30,6 +30,7 @@ struct tr_variant;
     V(TR_KEY_download_queue_enabled, download_queue_enabled, bool, true, "") \
     V(TR_KEY_download_queue_size, download_queue_size, size_t, 5U, "") \
     V(TR_KEY_encryption, encryption_mode, tr_encryption_mode, TR_ENCRYPTION_PREFERRED, "") \
+    V(TR_KEY_httracker_enabled, httracker_enabled, bool, true, "") \
     V(TR_KEY_idle_seeding_limit, idle_seeding_limit_minutes, size_t, 30U, "") \
     V(TR_KEY_idle_seeding_limit_enabled, idle_seeding_limit_enabled, bool, false, "") \
     V(TR_KEY_incomplete_dir, incomplete_dir, std::string, tr_getDefaultDownloadDir(), "") \
@@ -69,6 +70,7 @@ struct tr_variant;
     V(TR_KEY_start_added_torrents, should_start_added_torrents, bool, true, "") \
     V(TR_KEY_tcp_enabled, tcp_enabled, bool, true, "") \
     V(TR_KEY_trash_original_torrent_files, should_delete_source_torrents, bool, false, "") \
+    V(TR_KEY_udptracker_enabled, udptracker_enabled, bool, true, "") \
     V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
