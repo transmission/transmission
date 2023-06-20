@@ -18,16 +18,11 @@
 #include "Formatter.h"
 #include "IconCache.h"
 
-QHash<QString, int> const& FileTreeItem::getMyChildRows()
+std::unordered_map<QString, int> const& FileTreeItem::getMyChildRows() const
 {
-    int const n = childCount();
-
     // ensure that all the rows are hashed
-    while (first_unhashed_row_ < n)
-    {
-        child_rows_.insert(children_[first_unhashed_row_]->name(), first_unhashed_row_);
-        ++first_unhashed_row_;
-    }
+    for (int const n = childCount(); first_unhashed_row_ < n; ++first_unhashed_row_)
+        child_rows_.emplace(children_[first_unhashed_row_]->name(), first_unhashed_row_);
 
     return child_rows_;
 }
@@ -50,7 +45,7 @@ FileTreeItem::~FileTreeItem()
     }
 
     // remove this child from the parent
-    parent_->child_rows_.remove(name());
+    parent_->child_rows_.erase(name());
     it = siblings.erase(it);
 
     // invalidate the row numbers of the siblings that came after this child
@@ -67,28 +62,30 @@ void FileTreeItem::appendChild(FileTreeItem* child)
 
 FileTreeItem* FileTreeItem::child(QString const& filename)
 {
-    FileTreeItem* item(nullptr);
+    auto const& child_rows = getMyChildRows();
 
-    if (int const row = getMyChildRows().value(filename, -1); row != -1)
+    if (auto const iter = child_rows.find(filename); iter != std::end(child_rows))
     {
-        item = child(row);
+        auto* const item = child(iter->second);
         assert(filename == item->name());
+        return item;
     }
 
-    return item;
+    return {};
 }
 
 int FileTreeItem::row() const
 {
-    int i(-1);
+    auto const& child_rows = parent_->getMyChildRows();
 
-    if (parent_ != nullptr)
+    if (auto const iter = child_rows.find(name()); iter != std::end(child_rows))
     {
-        i = parent_->getMyChildRows().value(name(), -1);
-        assert(i == -1 || this == parent_->children_[i]);
+        auto const idx = iter->second;
+        assert(this == parent_->children_[idx]);
+        return idx;
     }
 
-    return i;
+    return -1;
 }
 
 QVariant FileTreeItem::data(int column, int role) const
