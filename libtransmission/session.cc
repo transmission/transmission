@@ -222,11 +222,11 @@ tr_sha1_digest_t tr_session::DhtMediator::torrent_info_hash(tr_torrent_id_t id) 
     return {};
 }
 
-void tr_session::DhtMediator::add_pex(tr_sha1_digest_t const& info_hash, tr_pex const* pex, size_t n_pex)
+void tr_session::DhtMediator::add_pex(tr_sha1_digest_t const& info_hash, nonstd::span<tr_pex const> pex)
 {
     if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
     {
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n_pex);
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, std::data(pex), std::size(pex));
     }
 }
 

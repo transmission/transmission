@@ -26,6 +26,8 @@
 #include <utility> // for std::pair
 #include <vector>
 
+#include <nonstd/span.hpp>
+
 #include <event2/util.h> // for evutil_socket_t
 
 #include "transmission.h"
@@ -180,7 +182,7 @@ private:
             return session_.timerMaker();
         }
 
-        void add_pex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) override;
+        void add_pex(tr_sha1_digest_t const&, nonstd::span<tr_pex const> pex) override;
 
     private:
         tr_session& session_;

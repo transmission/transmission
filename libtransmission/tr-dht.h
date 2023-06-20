@@ -14,6 +14,8 @@
 #include <string_view>
 #include <vector>
 
+#include <nonstd/span.hpp>
+
 #include <dht/dht.h>
 
 #include "transmission.h"
@@ -94,7 +96,7 @@ public:
             return api_;
         }
 
-        virtual void add_pex(tr_sha1_digest_t const&, tr_pex const* pex, size_t n_pex) = 0;
+        virtual void add_pex(tr_sha1_digest_t const&, nonstd::span<tr_pex const> pex) = 0;
 
     private:
         API api_;

@@ -398,12 +398,12 @@ private:
         if (event == DHT_EVENT_VALUES)
         {
             auto const pex = remove_bad_pex(tr_pex::from_compact_ipv4(data, data_len, nullptr, 0));
-            self->mediator_.add_pex(hash, std::data(pex), std::size(pex));
+            self->mediator_.add_pex(hash, pex);
         }
         else if (event == DHT_EVENT_VALUES6)
         {
             auto const pex = remove_bad_pex(tr_pex::from_compact_ipv6(data, data_len, nullptr, 0));
-            self->mediator_.add_pex(hash, std::data(pex), std::size(pex));
+            self->mediator_.add_pex(hash, pex);
         }
     }
 
