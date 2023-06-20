@@ -81,8 +81,9 @@ public:
             return true;
         }
 
-        [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t, std::pair<tr_address, tr_port> const& socket_address)
-            const override
+        [[nodiscard]] bool is_peer_known_seed(
+            tr_torrent_id_t /*tor_id*/,
+            std::pair<tr_address, tr_port> const& /*socket_address*/) const override
         {
             return false;
         }
@@ -100,7 +101,8 @@ public:
             return private_key_;
         }
 
-        void set_utp_failed(tr_sha1_digest_t const&, std::pair<tr_address, tr_port> const& socket_address) override
+        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, std::pair<tr_address, tr_port> const& /*socket_address*/)
+            override
         {
         }
 
