@@ -1118,8 +1118,9 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
     else /* we don't have a connection to them yet... */
     {
+        auto const& socket_address = socket.socketAddress();
         manager->incoming_handshakes.try_emplace(
-            socket.socketAddress(),
+            socket_address,
             &manager->handshake_mediator_,
             tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),
