@@ -1582,15 +1582,15 @@ static constexpr tr_quark priorityKey(int priority)
     }
 }
 
-void DetailsDialog::onFilePriorityChanged(QSet<int> const& indices, int priority)
+void DetailsDialog::onFilePriorityChanged(file_indices_t const& indices, int priority)
 {
-    torrentSet(priorityKey(priority), indices.values());
+    torrentSet(priorityKey(priority), QList<int>{ std::begin(indices), std::end(indices) });
 }
 
-void DetailsDialog::onFileWantedChanged(QSet<int> const& indices, bool wanted)
+void DetailsDialog::onFileWantedChanged(file_indices_t const& indices, bool wanted)
 {
     tr_quark const key = wanted ? TR_KEY_files_wanted : TR_KEY_files_unwanted;
-    torrentSet(key, indices.values());
+    torrentSet(key, QList<int>{ std::begin(indices), std::end(indices) });
 }
 
 void DetailsDialog::onPathEdited(QString const& old_path, QString const& new_name)
