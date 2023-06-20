@@ -113,7 +113,7 @@ void WatchDir::watcherActivated(QString const& path)
 
     // update our file list so that we can use it
     // for comparison the next time around
-    watch_dir_files_ = std::set<QString>{ std::begin(files), std::end(files) };
+    watch_dir_files_ = { std::begin(files), std::end(files) };
 }
 
 void WatchDir::rescanAllWatchedDirectories()
