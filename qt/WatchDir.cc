@@ -79,48 +79,41 @@ void WatchDir::watcherActivated(QString const& path)
     auto const dir = QDir{ path };
 
     // get the list of files currently in the watch directory
-    QSet<QString> files;
-
-    for (QString const& str : dir.entryList(QDir::Readable | QDir::Files))
-    {
-        files.insert(str);
-    }
+    auto const dir = QDir{ path };
+    auto const files = dir.entryList(QDir::Readable | QDir::Files);
 
     // try to add any new files which end in torrent
-    auto const new_files = files - watch_dir_files_;
     auto const torrent_suffix = QStringLiteral(".torrent");
-
-    for (QString const& name : new_files)
+    for (auto const& name : files)
     {
-        if (name.endsWith(torrent_suffix, Qt::CaseInsensitive))
+        if (!name.endsWith(torrent_suffix, Qt::CaseInsensitive) || watch_dir_files_.count(name) != 0U)
+            continue;
+
+        auto const filename = dir.absoluteFilePath(name);
+        switch (metainfoTest(filename))
         {
-            QString const filename = dir.absoluteFilePath(name);
+        case AddResult::Success:
+            emit torrentFileAdded(filename);
+            break;
 
-            switch (metainfoTest(filename))
+        case AddResult::Duplicate:
+            break;
+
+        case AddResult::Error:
             {
-            case AddResult::Success:
-                emit torrentFileAdded(filename);
-                break;
-
-            case AddResult::Duplicate:
-                break;
-
-            case AddResult::Error:
-                {
-                    // give the torrent a few seconds to finish downloading
-                    auto* t = new QTimer{ this };
-                    t->setObjectName(dir.absoluteFilePath(name));
-                    t->setSingleShot(true);
-                    connect(t, &QTimer::timeout, this, &WatchDir::onTimeout);
-                    t->start(5000);
-                }
+                // give the torrent a few seconds to finish downloading
+                auto* t = new QTimer(this);
+                t->setObjectName(dir.absoluteFilePath(name));
+                t->setSingleShot(true);
+                connect(t, &QTimer::timeout, this, &WatchDir::onTimeout);
+                t->start(5000);
             }
         }
     }
 
     // update our file list so that we can use it
     // for comparison the next time around
-    watch_dir_files_ = files;
+    watch_dir_files_ = std::set<QString>{ std::begin(files), std::end(files) };
 }
 
 void WatchDir::rescanAllWatchedDirectories()
