@@ -300,7 +300,7 @@ private:
     static auto inline n_atoms = std::atomic<size_t>{};
 };
 
-using Handshakes = std::map<tr_address, tr_handshake>;
+using Handshakes = std::map<std::pair<tr_address, tr_port>, tr_handshake>;
 
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
@@ -1011,11 +1011,11 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
     if (result.io->is_incoming())
     {
-        manager->incoming_handshakes.erase(addr);
+        manager->incoming_handshakes.erase(std::make_pair(addr, port));
     }
     else if (s != nullptr)
     {
-        s->outgoing_handshakes.erase(addr);
+        s->outgoing_handshakes.erase(std::make_pair(addr, port));
     }
 
     auto const lock = manager->unique_lock();
@@ -1112,15 +1112,15 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket.display_name()));
         socket.close();
     }
-    else if (manager->incoming_handshakes.count(socket.address()) != 0U)
+    else if (manager->incoming_handshakes.count(socket.socketAddress()) != 0U)
     {
         socket.close();
     }
     else /* we don't have a connection to them yet... */
     {
-        auto address = socket.address();
+        auto const& socket_address = socket.socketAddress();
         manager->incoming_handshakes.try_emplace(
-            address,
+            socket_address,
             &manager->handshake_mediator_,
             tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),
@@ -2225,8 +2225,8 @@ void tr_peerMgr::bandwidthPulse()
 
 bool tr_swarm::peer_is_in_use(peer_atom const& atom) const
 {
-    return atom.is_connected || outgoing_handshakes.count(atom.addr) != 0U ||
-        manager->incoming_handshakes.count(atom.addr) != 0U;
+    return atom.is_connected || outgoing_handshakes.count(std::make_pair(atom.addr, atom.port)) != 0U ||
+        manager->incoming_handshakes.count(std::make_pair(atom.addr, atom.port)) != 0U;
 }
 
 namespace
@@ -2466,7 +2466,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     else
     {
         s->outgoing_handshakes.try_emplace(
-            atom.addr,
+            std::make_pair(atom.addr, atom.port),
             &mgr->handshake_mediator_,
             peer_io,
             session->encryptionMode(),
