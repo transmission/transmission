@@ -3,8 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
-#include <vector>
 #include <cassert>
 #include <cctype> /* isspace */
 #include <cinttypes> // PRId64
@@ -16,7 +16,7 @@
 #include <set>
 #include <string>
 #include <string_view>
-#include <algorithm>
+#include <vector>
 
 #include <curl/curl.h>
 
@@ -781,6 +781,7 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
 };
 
 static auto constexpr ListKeys = std::array<tr_quark, 15>{
+    TR_KEY_addedDate,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
@@ -794,8 +795,7 @@ static auto constexpr ListKeys = std::array<tr_quark, 15>{
     TR_KEY_rateUpload,
     TR_KEY_sizeWhenDone,
     TR_KEY_status,
-    TR_KEY_uploadRatio,
-    TR_KEY_addedDate
+    TR_KEY_uploadRatio
 };
 
 // clang-format on
@@ -1491,13 +1491,12 @@ static void printTorrentList(tr_variant* top)
             [](tr_variant* f, tr_variant* s)
             {
                 int64_t f_time, s_time;
-                if (tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time) && tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time))
-                    return f_time < s_time;
-                else
-                    return false;
+                return tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time)
+                    && tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time)
+                    && f_time < s_time;
             });
 
-        for (auto const d : tptrs)
+        for (auto const& d : tptrs)
         {
             int64_t torId;
             int64_t eta;
