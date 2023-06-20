@@ -10,11 +10,12 @@
 
 #include <QCoreApplication>
 #include <QHash>
-#include <QSet>
 #include <QString>
 #include <QVariant>
 
 #include <libtransmission/tr-macros.h>
+
+#include "Typedefs.h"
 
 class FileTreeItem
 {
@@ -67,8 +68,8 @@ public:
 
     QVariant data(int column, int role) const;
     std::pair<int, int> update(QString const& name, bool want, int priority, uint64_t have, bool update_fields);
-    void setSubtreeWanted(bool, QSet<int>& file_ids);
-    void setSubtreePriority(int priority, QSet<int>& file_ids);
+    void setSubtreeWanted(bool wanted, file_indices_t& setme_changed_ids);
+    void setSubtreePriority(int priority, file_indices_t& setme_changed_ids);
 
     [[nodiscard]] constexpr auto fileIndex() const noexcept
     {

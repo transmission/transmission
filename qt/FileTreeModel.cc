@@ -525,7 +525,7 @@ void FileTreeModel::setWanted(QModelIndexList const& indices, bool wanted)
 
     QModelIndexList const orphan_indices = getOrphanIndices(indices);
 
-    QSet<int> file_ids;
+    auto file_ids = file_indices_t{};
 
     for (QModelIndex const& i : orphan_indices)
     {
@@ -544,7 +544,7 @@ void FileTreeModel::setWanted(QModelIndexList const& indices, bool wanted)
         emitParentsChanged(i, COL_SIZE, COL_WANTED, &parent_indices);
     }
 
-    if (!file_ids.isEmpty())
+    if (!std::empty(file_ids))
     {
         emit wantedChanged(file_ids, wanted);
     }
@@ -559,7 +559,7 @@ void FileTreeModel::setPriority(QModelIndexList const& indices, int priority)
 
     QModelIndexList const orphan_indices = getOrphanIndices(indices);
 
-    QSet<int> file_ids;
+    auto file_ids = file_indices_t{};
 
     for (QModelIndex const& i : orphan_indices)
     {
@@ -578,7 +578,7 @@ void FileTreeModel::setPriority(QModelIndexList const& indices, int priority)
         emitParentsChanged(i, COL_PRIORITY, COL_PRIORITY, &parent_indices);
     }
 
-    if (!file_ids.isEmpty())
+    if (!std::empty(file_ids))
     {
         emit priorityChanged(file_ids, priority);
     }

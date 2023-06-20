@@ -11,7 +11,6 @@
 
 #include <QDir>
 #include <QFile>
-#include <QSet>
 #include <QString>
 #include <QTimer>
 
@@ -20,6 +19,7 @@
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
 #include "Torrent.h" // FileList
+#include "Typedefs.h" // file_indices_t
 #include "ui_OptionsDialog.h"
 
 #include <libtransmission/transmission.h>
@@ -45,8 +45,8 @@ public:
 
 private slots:
     void onAccepted();
-    void onPriorityChanged(QSet<int> const& file_indices, int);
-    void onWantedChanged(QSet<int> const& file_indices, bool);
+    void onPriorityChanged(file_indices_t const& file_indices, int);
+    void onWantedChanged(file_indices_t const& file_indices, bool);
 
     void onSourceChanged();
     void onDestinationChanged();

@@ -14,6 +14,8 @@
 
 #include <libtransmission/tr-macros.h>
 
+#include "Typedefs.h" // file_indices_t
+
 class FileTreeItem;
 
 class FileTreeModel final : public QAbstractItemModel
@@ -77,8 +79,8 @@ public:
     bool setData(QModelIndex const& index, QVariant const& value, int role = Qt::EditRole) override;
 
 signals:
-    void priorityChanged(QSet<int> const& file_indices, int);
-    void wantedChanged(QSet<int> const& file_indices, bool);
+    void priorityChanged(file_indices_t const& file_indices, int);
+    void wantedChanged(file_indices_t const& file_indices, bool);
     void pathEdited(QString const& oldpath, QString const& new_name);
     void openRequested(QString const& path);
 
