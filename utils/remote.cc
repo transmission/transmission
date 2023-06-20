@@ -118,12 +118,17 @@ static std::string etaToString(int64_t eta)
         return fmt::format(FMT_STRING("{:d} hrs"), eta / (60 * 60));
     }
 
-    if (eta < (60 * 60 * 24 * 1000))
+    if (eta < (60 * 60 * 24 * 30))
     {
         return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
     }
 
-    if (eta < (60 * 60 * 24 * 365 * 100LL))
+    if (eta < (60 * 60 * 24 * 30 * 12))
+    {
+        return fmt::format(FMT_STRING("{:d} months"), eta / (60 * 60 * 24 * 30));
+    }
+
+    if (eta < (60 * 60 * 24 * 365 * 1000LL)) // up to 999 years
     {
         return fmt::format(FMT_STRING("{:d} years"), eta / (60 * 60 * 24 * 365));
     }
@@ -1494,7 +1499,7 @@ static void printTorrentList(tr_variant* top)
                     std::string{ "n/a" };
 
                 fmt::print(
-                    FMT_STRING("{:6d}{:c}  {:>4s}  {:>9s}  {:<8s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:s}\n"),
+                    FMT_STRING("{:6d}{:c}  {:>4s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:s}\n"),
                     torId,
                     error_mark,
                     done_str,
@@ -1513,7 +1518,7 @@ static void printTorrentList(tr_variant* top)
         }
 
         fmt::print(
-            FMT_STRING("Sum:           {:>9s}            {:6.1f}  {:6.1f}\n"),
+            FMT_STRING("Sum:           {:>9s}             {:6.1f}  {:6.1f}\n"),
             strlsize(total_size).c_str(),
             total_up / static_cast<double>(tr_speed_K),
             total_down / static_cast<double>(tr_speed_K));
