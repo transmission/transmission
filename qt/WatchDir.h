@@ -6,10 +6,10 @@
 #pragma once
 
 #include <memory>
+#include <set>
 
 #include <QObject>
 #include <QFileSystemWatcher>
-#include <QSet>
 #include <QString>
 
 #include <libtransmission/tr-macros.h>
@@ -47,6 +47,6 @@ private:
 
     TorrentModel const& model_;
 
-    QSet<QString> watch_dir_files_;
+    std::set<QString> watch_dir_files_;
     std::unique_ptr<QFileSystemWatcher> watcher_;
 };
