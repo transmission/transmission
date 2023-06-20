@@ -479,12 +479,14 @@ public:
 
     [[nodiscard]] peer_atom* get_existing_atom(std::pair<tr_address, tr_port> const& socket_address) noexcept
     {
-        return pool.count(socket_address) != 0U ? &pool.at(socket_address) : nullptr;
+        auto it = pool.find(socket_address);
+        return it != pool.end() ? &it->second : nullptr;
     }
 
     [[nodiscard]] peer_atom const* get_existing_atom(std::pair<tr_address, tr_port> const& socket_address) const noexcept
     {
-        return pool.count(socket_address) != 0U ? &pool.at(socket_address) : nullptr;
+        auto const& it = pool.find(socket_address);
+        return it != pool.cend() ? &it->second : nullptr;
     }
 
     [[nodiscard]] bool peer_is_a_seed(std::pair<tr_address, tr_port> const& socket_address) const noexcept
