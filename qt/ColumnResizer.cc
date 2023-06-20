@@ -42,7 +42,7 @@ ColumnResizer::ColumnResizer(QObject* parent)
 
 void ColumnResizer::addLayout(QGridLayout* layout)
 {
-    layouts_ << layout;
+    layouts_.emplace(layout);
     scheduleUpdate();
 }
 
