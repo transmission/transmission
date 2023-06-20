@@ -1136,16 +1136,16 @@ void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
     swarm->markAllSeedsFlagDirty();
 }
 
-size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex)
+size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, nonstd::span<tr_pex const> pex)
 {
     size_t n_used = 0;
     tr_swarm* s = tor->swarm;
     auto const lock = s->manager->unique_lock();
 
-    for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
+    for (auto const& peer : pex)
     {
-        if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers())
+        if (tr_isPex(&peer) && /* safeguard against corrupt data */
+            !s->manager->session->addressIsBlocked(peer.addr) && peer.is_valid_for_peers())
         {
             s->ensure_atom_exists(std::make_pair(pex->addr, pex->port), pex->flags, from);
             ++n_used;

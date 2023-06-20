@@ -1134,14 +1134,14 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     {
         pex.addr.type = TR_AF_INET;
         memcpy(&pex.addr.addr.addr4, addr, 4);
-        tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
+        tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, { &pex, 1U });
     }
 
     if (msgs->io->is_incoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) && addr_len == 16)
     {
         pex.addr.type = TR_AF_INET6;
         memcpy(&pex.addr.addr.addr6, addr, 16);
-        tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
+        tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, { &pex, 1U });
     }
 
     /* get peer's maximum request queue size */
@@ -1234,7 +1234,7 @@ void parseUtPex(tr_peerMsgsImpl* msgs, MessageReader& payload)
 
             auto pex = tr_pex::from_compact_ipv4(added, added_len, added_f, added_f_len);
             pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex);
         }
 
         if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
@@ -1249,7 +1249,7 @@ void parseUtPex(tr_peerMsgsImpl* msgs, MessageReader& payload)
 
             auto pex = tr_pex::from_compact_ipv6(added, added_len, added_f, added_f_len);
             pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex);
         }
 
         tr_variantClear(&val);

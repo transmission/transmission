@@ -226,7 +226,7 @@ void tr_session::DhtMediator::add_pex(tr_sha1_digest_t const& info_hash, nonstd:
 {
     if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
     {
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, std::data(pex), std::size(pex));
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex);
     }
 }
 
@@ -248,7 +248,7 @@ bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_add
 
     // we found a suitable peer, add it to the torrent
     auto pex = tr_pex{ address, port };
-    tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, &pex, 1U);
+    tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, { &pex, 1U });
     tr_logAddDebugTor(tor, fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), address.display_name(port)));
     return true;
 }

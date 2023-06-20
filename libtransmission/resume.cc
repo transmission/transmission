@@ -54,7 +54,7 @@ size_t addPeers(tr_torrent* tor, uint8_t const* buf, size_t buflen)
 
     auto pex = std::array<tr_pex, MaxRememberedPeers>{};
     memcpy(std::data(pex), buf, sizeof(tr_pex) * n_pex);
-    return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, std::data(pex), n_pex);
+    return tr_peerMgrAddPex(tor, TR_PEER_FROM_RESUME, { std::data(pex), n_pex });
 }
 
 auto loadPeers(tr_variant* dict, tr_torrent* tor)

@@ -19,6 +19,8 @@
 #include <winsock2.h> /* struct in_addr */
 #endif
 
+#include <nonstd/span.hpp>
+
 #include "net.h" /* tr_address */
 #include "peer-common.h"
 #include "peer-socket.h"
@@ -177,7 +179,7 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket);
 
-size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
+size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, nonstd::span<tr_pex const> pex);
 
 void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor);
 
