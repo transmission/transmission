@@ -225,7 +225,7 @@ Prefs::Prefs(QString config_dir)
 
     // these are the prefs that don't get saved to settings.json
     // when the application exits.
-    temporary_prefs_ << FILTER_TEXT;
+    temporary_prefs_.insert(FILTER_TEXT);
 
     tr_variant top;
     tr_variantInitDict(&top, 0);
@@ -330,7 +330,7 @@ Prefs::~Prefs()
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        if (temporary_prefs_.contains(i))
+        if (temporary_prefs_.count(i) != 0U)
         {
             continue;
         }
