@@ -1459,7 +1459,7 @@ static void printTorrentList(tr_variant* top)
         double total_down = 0;
 
         printf(
-            "%6s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
+            "%6s   %-4s  %9s  %-9s  %6s  %6s  %-5s  %-11s  %s\n",
             "ID",
             "Done",
             "Have",
