@@ -256,7 +256,7 @@ public:
         }
     }
 
-    void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
+    void requestBlocks(nonstd::span<tr_block_span_t const> block_spans) override
     {
         auto* const tor = getTorrent();
         if (tor == nullptr || !tor->is_running() || tor->is_done())
@@ -264,14 +264,14 @@ public:
             return;
         }
 
-        for (auto const *span = block_spans, *end = span + n_spans; span != end; ++span)
+        for (auto const& span : block_spans)
         {
-            auto* const task = new tr_webseed_task{ tor, this, *span };
+            auto* const task = new tr_webseed_task{ tor, this, span };
             evbuffer_add_cb(task->content(), onBufferGotData, task);
             tasks.insert(task);
             task_request_next_chunk(task);
 
-            tr_peerMgrClientSentRequests(tor, this, *span);
+            tr_peerMgrClientSentRequests(tor, this, span);
         }
     }
 
@@ -433,7 +433,7 @@ void on_idle(tr_webseed* webseed)
     {
         spans.resize(max_spans);
     }
-    webseed->requestBlocks(std::data(spans), std::size(spans));
+    webseed->requestBlocks(spans);
 }
 
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)

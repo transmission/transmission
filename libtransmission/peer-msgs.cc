@@ -501,15 +501,15 @@ public:
         return tr_torrentReqIsValid(torrent, req.index, req.offset, req.length);
     }
 
-    void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
+    void requestBlocks(nonstd::span<tr_block_span_t const> block_spans) override
     {
         TR_ASSERT(torrent->client_can_download());
         TR_ASSERT(client_is_interested());
         TR_ASSERT(!client_is_choked());
 
-        for (auto const *span = block_spans, *span_end = span + n_spans; span != span_end; ++span)
+        for (auto const& span : block_spans)
         {
-            for (auto [block, block_end] = *span; block < block_end; ++block)
+            for (auto [block, block_end] = span; block < block_end; ++block)
             {
                 // Note that requests can't cross over a piece boundary.
                 // So if a piece isn't evenly divisible by the block size,
@@ -528,7 +528,7 @@ public:
                 }
             }
 
-            tr_peerMgrClientSentRequests(torrent, this, *span);
+            tr_peerMgrClientSentRequests(torrent, this, span);
         }
     }
 
@@ -1858,7 +1858,7 @@ void updateBlockRequests(tr_peerMsgsImpl* msgs)
 
     if (auto const requests = tr_peerMgrGetNextRequests(tor, msgs, n_wanted); !std::empty(requests))
     {
-        msgs->requestBlocks(std::data(requests), std::size(requests));
+        msgs->requestBlocks(requests);
     }
 }
 

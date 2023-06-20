@@ -14,6 +14,8 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <string>
 
+#include <nonstd/span.hpp>
+
 #include "transmission.h"
 
 #include "bitfield.h"
@@ -215,7 +217,7 @@ public:
         return bytes_per_second;
     }
 
-    virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
+    virtual void requestBlocks(nonstd::span<tr_block_span_t const> block_spans) = 0;
 
     struct RequestLimit
     {
