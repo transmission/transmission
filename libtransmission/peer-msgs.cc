@@ -351,7 +351,7 @@ public:
         if (session->allowsDHT() && io->supports_dht())
         {
             // only send PORT over IPv6 iff IPv6 DHT is running (BEP-32).
-            if (auto const addr = session->publicAddress(TR_AF_INET6); !addr.is_any())
+            if (auto const addr = session->bind_address(TR_AF_INET6); !addr.is_any())
             {
                 protocolSendPort(this, session->udpPort());
             }
@@ -961,8 +961,15 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     // If connecting to global peer, then use global address
     // Otherwise we are connecting to local peer, use bind address directly
+    if (auto const addr = msgs->io->address().is_global_unicast_address() ? msgs->session->global_address(TR_AF_INET) :
+                                                                            msgs->session->bind_address(TR_AF_INET);
+        addr && !addr->is_any())
+    {
+        TR_ASSERT(addr->is_ipv4());
+        tr_variantDictAddRaw(&val, TR_KEY_ipv4, &addr->addr.addr4, sizeof(addr->addr.addr4));
+    }
     if (auto const addr = msgs->io->address().is_global_unicast_address() ? msgs->session->global_address(TR_AF_INET6) :
-                                                                            msgs->session->publicAddress(TR_AF_INET6);
+                                                                            msgs->session->bind_address(TR_AF_INET6);
         addr && !addr->is_any())
     {
         TR_ASSERT(addr->is_ipv6());
