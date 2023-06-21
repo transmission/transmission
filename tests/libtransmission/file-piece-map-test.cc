@@ -393,11 +393,11 @@ TEST_F(FilePieceMapTest, wanted)
     // test the batch API
     auto file_indices = std::vector<tr_file_index_t>(n_files);
     std::iota(std::begin(file_indices), std::end(file_indices), 0);
-    files_wanted.set(std::data(file_indices), std::size(file_indices), true);
+    files_wanted.set(file_indices, true);
     expected_files_wanted.set_has_all();
     expected_pieces_wanted.set_has_all();
     compare_to_expected();
-    files_wanted.set(std::data(file_indices), std::size(file_indices), false);
+    files_wanted.set(file_indices, false);
     expected_files_wanted.set_has_none();
     expected_pieces_wanted.set_has_none();
     compare_to_expected();

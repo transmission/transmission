@@ -91,7 +91,7 @@ TEST_F(NetTest, compact4)
     // ...serialize that back again too
     std::fill(std::begin(compact4), std::end(compact4), std::byte{});
     out = std::data(compact4);
-    out = tr_pex::to_compact_ipv4(out, std::data(pex), std::size(pex));
+    out = tr_pex::to_compact_ipv4(out, pex);
     EXPECT_EQ(std::data(compact4) + std::size(compact4), out);
     EXPECT_EQ(Compact4, compact4);
 }
@@ -145,7 +145,7 @@ TEST_F(NetTest, compact6)
     // ...serialize that back again too
     std::fill(std::begin(compact6), std::end(compact6), std::byte{});
     out = std::data(compact6);
-    out = tr_pex::to_compact_ipv6(out, std::data(pex), std::size(pex));
+    out = tr_pex::to_compact_ipv6(out, pex);
     EXPECT_EQ(std::data(compact6) + std::size(compact6), out);
     EXPECT_EQ(Compact6, compact6);
 }
