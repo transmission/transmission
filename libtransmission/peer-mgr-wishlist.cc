@@ -9,13 +9,14 @@
 #include <utility>
 #include <vector>
 
+#include <small/set.hpp>
+
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
 #include "libtransmission/peer-mgr-wishlist.h"
-#include "libtransmission/tr-assert.h"
 
 namespace
 {
@@ -102,7 +103,7 @@ std::vector<Candidate> getCandidates(Wishlist::Mediator const& mediator)
     return candidates;
 }
 
-std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, size_t n_blocks)
+std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* const sorted_blocks, size_t n_blocks)
 {
     if (n_blocks == 0)
     {
@@ -145,7 +146,9 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 
-    auto blocks = std::set<tr_block_index_t>{};
+    static auto constexpr StaticSize = 4096U;
+    auto blocks = small::set<tr_block_index_t, StaticSize>{};
+    blocks.reserve(n_wanted_blocks);
     for (auto const& candidate : candidates)
     {
         // do we have enough?
@@ -166,7 +169,7 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
 
             // don't request from too many peers
             size_t const n_peers = mediator_.countActiveRequests(block);
-            if (size_t const max_peers = mediator_.isEndgame() ? 2 : 1; n_peers >= max_peers)
+            if (size_t const max_peers = mediator_.isEndgame() ? EndgameMaxPeers : 1; n_peers >= max_peers)
             {
                 continue;
             }
@@ -175,6 +178,5 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
         }
     }
 
-    auto const blocks_v = std::vector<tr_block_index_t>{ std::begin(blocks), std::end(blocks) };
-    return makeSpans(std::data(blocks_v), std::size(blocks_v));
+    return makeSpans(std::data(blocks), std::size(blocks));
 }
