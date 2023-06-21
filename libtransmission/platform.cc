@@ -19,6 +19,9 @@
 #include <process.h> /* _beginthreadex(), _endthreadex() */
 #include <windows.h>
 #include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
+#ifdef small // workaround name collision between libsmall and rpcndr.h
+#undef small
+#endif
 #else
 #include <pwd.h>
 #include <unistd.h> /* getuid() */
