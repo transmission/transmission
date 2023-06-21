@@ -336,8 +336,9 @@ public:
 
         if (io->supports_utp())
         {
-            tr_peerMgrSetUtpSupported(torrent, socketAddress());
-            tr_peerMgrSetUtpFailed(torrent, socketAddress(), false);
+            auto const& socket_address = socketAddress();
+            tr_peerMgrSetUtpSupported(torrent, socket_address);
+            tr_peerMgrSetUtpFailed(torrent, socket_address, false);
         }
 
         if (io->supports_ltep())

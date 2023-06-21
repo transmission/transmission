@@ -479,7 +479,7 @@ public:
 
     [[nodiscard]] peer_atom* get_existing_atom(std::pair<tr_address, tr_port> const& socket_address) noexcept
     {
-        auto it = pool.find(socket_address);
+        auto&& it = pool.find(socket_address);
         return it != pool.end() ? &it->second : nullptr;
     }
 
@@ -1010,7 +1010,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
     auto* const s = manager->get_existing_swarm(result.io->torrent_hash());
 
-    auto const socket_address = result.io->socket_address();
+    auto const& socket_address = result.io->socket_address();
 
     if (result.io->is_incoming())
     {
@@ -1121,9 +1121,9 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
     else /* we don't have a connection to them yet... */
     {
-        auto const& socket_address = socket.socketAddress();
+        auto&& socket_address = socket.socketAddress();
         manager->incoming_handshakes.try_emplace(
-            socket_address,
+            std::move(socket_address),
             &manager->handshake_mediator_,
             tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),
