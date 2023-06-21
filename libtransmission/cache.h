@@ -9,12 +9,14 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint> // for size_t
+#include <cstddef> // for size_t
 #include <cstdint> // for intX_t, uintX_t
 #include <ctime>
 #include <memory> // for std::unique_ptr
 #include <utility> // for std::pair
 #include <vector>
+
+#include <small/vector.hpp>
 
 #include "transmission.h"
 
@@ -26,43 +28,7 @@ struct tr_torrent;
 class Cache
 {
 public:
-    class BlockData
-    {
-    public:
-        BlockData(size_t size)
-            : size_{ size }
-        {
-        }
-
-        [[nodiscard]] constexpr auto size() const noexcept
-        {
-            return size_;
-        }
-
-        [[nodiscard]] constexpr auto* data() noexcept
-        {
-            return std::data(data_);
-        }
-
-        [[nodiscard]] constexpr const auto* data() const noexcept
-        {
-            return std::data(data_);
-        }
-
-        [[nodiscard]] constexpr auto* begin() const noexcept
-        {
-            return data();
-        }
-
-        [[nodiscard]] constexpr auto* end() const noexcept
-        {
-            return begin() + size();
-        }
-
-    private:
-        std::array<uint8_t, tr_block_info::BlockSize> data_;
-        size_t const size_;
-    };
+    using BlockData = small::max_size_vector<uint8_t, tr_block_info::BlockSize>;
 
     Cache(tr_torrents& torrents, int64_t max_bytes);
 
