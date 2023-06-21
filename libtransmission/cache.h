@@ -9,7 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint> // for size_t
+#include <cstddef> // for size_t
 #include <cstdint> // for intX_t, uintX_t
 #include <ctime>
 #include <memory> // for std::unique_ptr
