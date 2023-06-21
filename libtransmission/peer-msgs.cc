@@ -1804,8 +1804,7 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     current_message_len.reset();
     auto const message_type = *current_message_type;
     current_message_type.reset();
-    auto payload = MessageBuffer{};
-    std::swap(payload, current_payload);
+    auto payload = MessageBuffer{ std::data(current_payload), std::size(current_payload) };
 
     auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, message_type, payload);
     *piece = n_piece_bytes_read;

@@ -162,12 +162,12 @@ protected:
         return std::make_pair(transaction_id, info_hashes);
     }
 
-    [[nodiscard]] static auto waitForAnnouncerToSendMessage(MockMediator& mediator)
+    static void waitForAnnouncerToSendMessage(MockMediator& mediator, libtransmission::Buffer& setme)
     {
         libtransmission::test::waitFor(mediator.eventBase(), [&mediator]() { return !std::empty(mediator.sent_); });
-        auto buf = libtransmission::Buffer(mediator.sent_.back().buf_);
+        setme.clear();
+        setme.add(mediator.sent_.back().buf_);
         mediator.sent_.pop_back();
-        return buf;
     }
 
     [[nodiscard]] static bool sendError(tr_announcer_udp& announcer, uint32_t transaction_id, std::string_view errmsg)
@@ -313,7 +313,8 @@ TEST_F(AnnouncerUdpTest, canScrape)
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto sent = libtransmission::Buffer{};
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto connect_transaction_id = parseConnectionRequest(sent);
 
     // Have the tracker respond to the request
@@ -321,7 +322,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
 
     // The announcer should have sent a UDP scrape request.
     // Inspect that request for validity.
-    sent = waitForAnnouncerToSendMessage(mediator);
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
     expectEqual(request, info_hashes);
 
@@ -350,7 +351,7 @@ TEST_F(AnnouncerUdpTest, canScrape)
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    sent = waitForAnnouncerToSendMessage(mediator);
+    waitForAnnouncerToSendMessage(mediator, sent);
     std::tie(scrape_transaction_id, info_hashes) = parseScrapeRequest(sent, connection_id);
     expectEqual(request, info_hashes);
 }
@@ -368,7 +369,8 @@ TEST_F(AnnouncerUdpTest, canDestructCleanlyEvenWhenBusy)
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto sent = libtransmission::Buffer{};
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto const connect_transaction_id = parseConnectionRequest(sent);
     EXPECT_NE(0U, connect_transaction_id);
 
@@ -396,13 +398,14 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     announcer->scrape(request, [&response](tr_scrape_response const& resp) { response = resp; });
 
     // Announcer will request a connection. Verify and grant the request
-    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto sent = libtransmission::Buffer{};
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto connect_transaction_id = parseConnectionRequest(sent);
     auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id);
 
     // The announcer should have sent a UDP scrape request.
     // Inspect that request for validity.
-    sent = waitForAnnouncerToSendMessage(mediator);
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
     expectEqual(request, info_hashes);
 
@@ -457,7 +460,8 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto sent = libtransmission::Buffer{};
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto connect_transaction_id = parseConnectionRequest(sent);
 
     // Have the tracker respond to the request
@@ -465,7 +469,7 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
 
     // The announcer should have sent a UDP scrape request.
     // Inspect that request for validity.
-    sent = waitForAnnouncerToSendMessage(mediator);
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto const [scrape_transaction_id, info_hashes] = parseScrapeRequest(sent, connection_id);
 
     // Have the tracker respond to the request with an "unable to scrape" error
@@ -506,7 +510,8 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto sent = libtransmission::Buffer{};
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto transaction_id = parseConnectionRequest(sent);
 
     // Have the tracker respond to the request with an "unable to connect" error
@@ -537,7 +542,8 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
 
     // The announcer should have sent a UDP connection request.
     // Inspect that request for validity.
-    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto sent = libtransmission::Buffer{};
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto transaction_id = parseConnectionRequest(sent);
 
     // send a connection response but with an *invalid* transaction id
@@ -551,7 +557,7 @@ TEST_F(AnnouncerUdpTest, handleMessageReturnsFalseOnInvalidMessage)
     EXPECT_FALSE(announcer->handle_message(std::data(arr), response_size));
 
     // send a connection response but with an *invalid* action
-    buf = {};
+    buf.clear();
     buf.add_uint32(ScrapeAction);
     buf.add_uint32(transaction_id);
     buf.add_uint64(tr_rand_obj<uint64_t>());
@@ -617,13 +623,14 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     announcer->announce(request, [&response](tr_announce_response const& resp) { response = resp; });
 
     // Announcer will request a connection. Verify and grant the request
-    auto sent = waitForAnnouncerToSendMessage(mediator);
+    auto sent = libtransmission::Buffer{};
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto connect_transaction_id = parseConnectionRequest(sent);
     auto const connection_id = sendConnectionResponse(*announcer, connect_transaction_id);
 
     // The announcer should have sent a UDP announce request.
     // Inspect that request for validity.
-    sent = waitForAnnouncerToSendMessage(mediator);
+    waitForAnnouncerToSendMessage(mediator, sent);
     auto udp_ann_req = parseAnnounceRequest(sent, connection_id);
     expectEqual(request, udp_ann_req);
 

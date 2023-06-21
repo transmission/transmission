@@ -123,6 +123,11 @@ public:
         tr_error_set(error, err, tr_net_strerror(err));
         return {};
     }
+
+    void clear()
+    {
+        drain(size());
+    }
 };
 
 template<typename value_type>
@@ -235,15 +240,20 @@ class SmallBuffer final
 {
 public:
     SmallBuffer() = default;
-    SmallBuffer(SmallBuffer&&) = default;
-    SmallBuffer& operator=(SmallBuffer&&) = default;
+    SmallBuffer(SmallBuffer&&) = delete;
+    SmallBuffer& operator=(SmallBuffer&&) = delete;
     SmallBuffer(SmallBuffer const&) = delete;
     SmallBuffer& operator=(SmallBuffer const&) = delete;
 
+    explicit SmallBuffer(void const* const data, size_t n_bytes)
+    {
+        BufferWriter<value_type>::add(data, n_bytes);
+    }
+
     template<typename ContiguousContainer>
     explicit SmallBuffer(ContiguousContainer const& data)
+        : SmallBuffer{ std::data(data), std::size(data) }
     {
-        BufferWriter<value_type>::add(data);
     }
 
     [[nodiscard]] size_t size() const noexcept override
