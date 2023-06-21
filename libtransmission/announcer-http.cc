@@ -208,7 +208,7 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
         "&downloaded={downloaded}"
         "&left={left}"
         "&numwant={numwant}"
-        "&key={key}"
+        "&key={key:08X}"
         "&compact=1"
         "&supportcrypto=1",
         fmt::arg("url", req.announce_url),
