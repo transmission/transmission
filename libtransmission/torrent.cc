@@ -1332,7 +1332,7 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent::find_file(tr_file_index_t
 
     auto paths = std::array<std::string_view, 4>{};
     auto const n_paths = buildSearchPathArray(this, std::data(paths));
-    return metainfo_.files().find(file_index, std::data(paths), n_paths);
+    return metainfo_.files().find(file_index, { std::data(paths), n_paths });
 }
 
 bool tr_torrent::has_any_local_data() const
@@ -1341,7 +1341,7 @@ bool tr_torrent::has_any_local_data() const
 
     auto paths = std::array<std::string_view, 4>{};
     auto const n_paths = buildSearchPathArray(this, std::data(paths));
-    return metainfo_.files().hasAnyLocalData(std::data(paths), n_paths);
+    return metainfo_.files().hasAnyLocalData({ std::data(paths), n_paths });
 }
 
 void tr_torrentSetDownloadDir(tr_torrent* tor, char const* path)

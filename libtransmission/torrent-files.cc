@@ -112,16 +112,13 @@ bool isJunkFile(std::string_view filename)
 
 std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     tr_file_index_t file_index,
-    std::string_view const* paths,
-    size_t n_paths) const
+    nonstd::span<std::string_view const> paths) const
 {
     auto filename = tr_pathbuf{};
     auto const& subpath = path(file_index);
 
-    for (size_t path_idx = 0; path_idx < n_paths; ++path_idx)
+    for (auto const& base : paths)
     {
-        auto const base = paths[path_idx];
-
         filename.assign(base, '/', subpath);
         if (auto const info = tr_sys_path_get_info(filename); info)
         {
@@ -138,11 +135,11 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     return {};
 }
 
-bool tr_torrent_files::hasAnyLocalData(std::string_view const* paths, size_t n_paths) const
+bool tr_torrent_files::hasAnyLocalData(nonstd::span<std::string_view const> paths) const
 {
     for (tr_file_index_t i = 0, n = fileCount(); i < n; ++i)
     {
-        if (find(i, paths, n_paths))
+        if (find(i, paths))
         {
             return true;
         }
@@ -187,7 +184,7 @@ bool tr_torrent_files::move(
 
     for (tr_file_index_t i = 0, n = fileCount(); i < n; ++i)
     {
-        auto const found = find(i, std::data(paths), std::size(paths));
+        auto const found = find(i, paths);
         if (!found)
         {
             continue;
@@ -262,7 +259,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     auto const paths = std::array<std::string_view, 1>{ parent.sv() };
     for (tr_file_index_t idx = 0, n_files = fileCount(); idx < n_files; ++idx)
     {
-        if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
+        if (auto const found = find(idx, paths); found)
         {
             tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
         }

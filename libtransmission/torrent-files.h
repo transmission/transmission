@@ -16,6 +16,8 @@
 #include <utility>
 #include <vector>
 
+#include <nonstd/span.hpp>
+
 #include "transmission.h"
 
 #include "file.h"
@@ -152,8 +154,8 @@ public:
         size_t base_len_;
     };
 
-    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, std::string_view const* paths, size_t n_paths) const;
-    [[nodiscard]] bool hasAnyLocalData(std::string_view const* paths, size_t n_paths) const;
+    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t file, nonstd::span<std::string_view const> paths) const;
+    [[nodiscard]] bool hasAnyLocalData(nonstd::span<std::string_view const> paths) const;
 
     static void makeSubpathPortable(std::string_view path, tr_pathbuf& append_me);
 

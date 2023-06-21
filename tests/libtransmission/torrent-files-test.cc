@@ -82,14 +82,14 @@ TEST_F(TorrentFilesTest, find)
     auto const search_path_2 = tr_pathbuf{ "/tmp"sv };
 
     auto search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    auto found = files.find(file_index, std::data(search_path), std::size(search_path));
+    auto found = files.find(file_index, search_path);
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
     EXPECT_EQ(filename, found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
-    found = files.find(file_index, std::data(search_path), std::size(search_path));
+    found = files.find(file_index, search_path);
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
     EXPECT_EQ(filename, found->filename());
@@ -98,21 +98,21 @@ TEST_F(TorrentFilesTest, find)
     auto const partial_filename = tr_pathbuf{ filename, tr_torrent_files::PartialFileSuffix };
     EXPECT_TRUE(tr_sys_path_rename(filename, partial_filename));
     search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    found = files.find(file_index, std::data(search_path), std::size(search_path));
+    found = files.find(file_index, search_path);
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
     EXPECT_EQ(partial_filename, found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
-    found = files.find(file_index, std::data(search_path), std::size(search_path));
+    found = files.find(file_index, search_path);
     EXPECT_TRUE(found.has_value());
     assert(found.has_value());
     EXPECT_EQ(partial_filename, found->filename());
 
     // what about if we look for a file that does not exist
     EXPECT_TRUE(tr_sys_path_remove(partial_filename));
-    EXPECT_FALSE(files.find(file_index, std::data(search_path), std::size(search_path)));
+    EXPECT_FALSE(files.find(file_index, search_path));
 }
 
 TEST_F(TorrentFilesTest, hasAnyLocalData)
@@ -127,11 +127,11 @@ TEST_F(TorrentFilesTest, hasAnyLocalData)
     auto const search_path_1 = tr_pathbuf{ sandboxDir() };
     auto const search_path_2 = tr_pathbuf{ "/tmp"sv };
 
-    auto search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    EXPECT_TRUE(files.hasAnyLocalData(std::data(search_path), 2U));
-    EXPECT_TRUE(files.hasAnyLocalData(std::data(search_path), 1U));
-    EXPECT_FALSE(files.hasAnyLocalData(std::data(search_path) + 1, 1U));
-    EXPECT_FALSE(files.hasAnyLocalData(std::data(search_path), 0U));
+    auto search_path = std::array<std::string_view, 2>{ search_path_1.sv(), search_path_2.sv() };
+    EXPECT_TRUE(files.hasAnyLocalData({ std::data(search_path), 2U }));
+    EXPECT_TRUE(files.hasAnyLocalData({ std::data(search_path), 1U }));
+    EXPECT_FALSE(files.hasAnyLocalData({ std::data(search_path) + 1, 1U }));
+    EXPECT_FALSE(files.hasAnyLocalData({ std::data(search_path), 0U }));
 }
 
 TEST_F(TorrentFilesTest, isSubpathPortable)
