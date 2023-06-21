@@ -168,11 +168,11 @@ void tr_files_wanted::set(tr_file_index_t file, bool wanted)
     wanted_.set(file, wanted);
 }
 
-void tr_files_wanted::set(tr_file_index_t const* files, size_t n, bool wanted)
+void tr_files_wanted::set(nonstd::span<tr_file_index_t const> files, bool wanted)
 {
-    for (size_t i = 0; i < n; ++i)
+    for (auto const& idx : files)
     {
-        set(files[i], wanted);
+        set(idx, wanted);
     }
 }
 

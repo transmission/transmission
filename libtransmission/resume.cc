@@ -172,8 +172,8 @@ auto loadDND(tr_variant* dict, tr_torrent* tor)
             }
         }
 
-        tor->init_files_wanted(std::data(unwanted), std::size(unwanted), false);
-        tor->init_files_wanted(std::data(wanted), std::size(wanted), true);
+        tor->init_files_wanted(unwanted, false);
+        tor->init_files_wanted(wanted, true);
 
         ret = tr_resume::Dnd;
     }

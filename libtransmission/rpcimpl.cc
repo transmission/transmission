@@ -1081,7 +1081,7 @@ char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
         std::iota(std::begin(files), std::end(files), 0);
     }
 
-    tor->set_files_wanted(std::data(files), std::size(files), wanted);
+    tor->set_files_wanted(files, wanted);
 
     return errmsg;
 }

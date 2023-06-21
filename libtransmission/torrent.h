@@ -17,6 +17,8 @@
 #include <utility>
 #include <vector>
 
+#include <nonstd/span.hpp>
+
 #include "transmission.h"
 
 #include "announce-list.h"
@@ -326,14 +328,14 @@ public:
         return files_wanted_.file_wanted(file);
     }
 
-    void init_files_wanted(tr_file_index_t const* files, size_t n_files, bool wanted)
+    void init_files_wanted(nonstd::span<tr_file_index_t const> files, bool wanted)
     {
-        set_files_wanted(files, n_files, wanted, /*is_bootstrapping*/ true);
+        set_files_wanted(files, wanted, /*is_bootstrapping*/ true);
     }
 
-    void set_files_wanted(tr_file_index_t const* files, size_t n_files, bool wanted)
+    void set_files_wanted(nonstd::span<tr_file_index_t const> files, bool wanted)
     {
-        set_files_wanted(files, n_files, wanted, /*is_bootstrapping*/ false);
+        set_files_wanted(files, wanted, /*is_bootstrapping*/ false);
     }
 
     void recheck_completeness(); // TODO(ckerr): should be private
@@ -941,11 +943,11 @@ private:
         return true;
     }
 
-    void set_files_wanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
+    void set_files_wanted(nonstd::span<tr_file_index_t const> files, bool wanted, bool is_bootstrapping)
     {
         auto const lock = unique_lock();
 
-        files_wanted_.set(files, n_files, wanted);
+        files_wanted_.set(files, wanted);
         completion.invalidate_size_when_done();
 
         if (!is_bootstrapping)

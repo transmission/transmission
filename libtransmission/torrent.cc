@@ -1947,7 +1947,7 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    tor->set_files_wanted(files, n_files, wanted);
+    tor->set_files_wanted({ files, n_files }, wanted);
 }
 
 // ---

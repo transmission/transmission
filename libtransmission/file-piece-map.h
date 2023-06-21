@@ -14,6 +14,8 @@
 #include <cstddef> // for size_t
 #include <vector>
 
+#include <nonstd/span.hpp>
+
 #include "transmission.h"
 
 #include "bitfield.h"
@@ -164,7 +166,7 @@ public:
     void reset(tr_file_piece_map const* fpm);
 
     void set(tr_file_index_t file, bool wanted);
-    void set(tr_file_index_t const* files, size_t n, bool wanted);
+    void set(nonstd::span<tr_file_index_t const> files, bool wanted);
 
     [[nodiscard]] TR_CONSTEXPR20 bool file_wanted(tr_file_index_t file) const
     {

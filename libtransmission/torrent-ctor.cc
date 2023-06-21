@@ -164,8 +164,8 @@ void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tor->init_files_wanted(std::data(ctor->unwanted), std::size(ctor->unwanted), false);
-    tor->init_files_wanted(std::data(ctor->wanted), std::size(ctor->wanted), true);
+    tor->init_files_wanted(ctor->unwanted, false);
+    tor->init_files_wanted(ctor->wanted, true);
 }
 
 // ---
