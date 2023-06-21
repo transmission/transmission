@@ -204,11 +204,12 @@ if(WIN32)
 endif()
 
 set(CMAKE_FOLDER "third-party")
-
-find_package(Fmt)
-find_package(WideInteger)
 find_package(FastFloat)
+find_package(Fmt)
+find_package(Small)
 find_package(UtfCpp)
+find_package(WideInteger)
+
 find_package(Threads)
 find_package(PkgConfig QUIET)
 
