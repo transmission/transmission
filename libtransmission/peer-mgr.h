@@ -79,21 +79,21 @@ struct tr_pex
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, tr_pex const* pex, size_t n_pex)
+    static OutputIt to_compact_ipv4(OutputIt out, nonstd::span<tr_pex const> pex)
     {
-        for (size_t i = 0; i < n_pex; ++i)
+        for (auto const& peer : pex)
         {
-            out = pex[i].to_compact_ipv4(out);
+            out = peer.to_compact_ipv4(out);
         }
         return out;
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, tr_pex const* pex, size_t n_pex)
+    static OutputIt to_compact_ipv6(OutputIt out, nonstd::span<tr_pex const> pex)
     {
-        for (size_t i = 0; i < n_pex; ++i)
+        for (auto const& peer : pex)
         {
-            out = pex[i].to_compact_ipv6(out);
+            out = peer.to_compact_ipv6(out);
         }
         return out;
     }

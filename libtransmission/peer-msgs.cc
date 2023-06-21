@@ -2099,7 +2099,7 @@ void tr_peerMsgsImpl::sendPex()
     {
         // "added"
         tmpbuf.clear();
-        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), std::data(added), std::size(added));
+        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), added);
         TR_ASSERT(std::size(tmpbuf) == std::size(added) * 6);
         tr_variantDictAddRaw(&val, TR_KEY_added, std::data(tmpbuf), std::size(tmpbuf));
 
@@ -2121,7 +2121,7 @@ void tr_peerMsgsImpl::sendPex()
     {
         // "dropped"
         tmpbuf.clear();
-        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
+        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), dropped);
         TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * 6);
         tr_variantDictAddRaw(&val, TR_KEY_dropped, std::data(tmpbuf), std::size(tmpbuf));
     }
@@ -2129,7 +2129,7 @@ void tr_peerMsgsImpl::sendPex()
     if (!std::empty(added6))
     {
         tmpbuf.clear();
-        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), std::data(added6), std::size(added6));
+        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), added6);
         TR_ASSERT(std::size(tmpbuf) == std::size(added6) * 18);
         tr_variantDictAddRaw(&val, TR_KEY_added6, std::data(tmpbuf), std::size(tmpbuf));
 
@@ -2151,7 +2151,7 @@ void tr_peerMsgsImpl::sendPex()
     {
         // "dropped6"
         tmpbuf.clear();
-        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), std::data(dropped6), std::size(dropped6));
+        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), dropped6);
         TR_ASSERT(std::size(tmpbuf) == std::size(dropped6) * 18);
         tr_variantDictAddRaw(&val, TR_KEY_dropped6, std::data(tmpbuf), std::size(tmpbuf));
     }
