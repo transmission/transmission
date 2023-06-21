@@ -47,7 +47,10 @@
 #endif
 
 using namespace std::literals;
-using MessageBuffer = libtransmission::Buffer;
+
+// sized to hold a piece message
+using MessageBuffer = libtransmission::
+    SmallBuffer<sizeof(uint8_t) + sizeof(uint32_t) * 2U + tr_block_info::BlockSize, std::byte>;
 using MessageReader = libtransmission::BufferReader<std::byte>;
 using MessageWriter = libtransmission::BufferWriter<std::byte>;
 
@@ -1385,9 +1388,9 @@ ReadResult read_piece_data(tr_peerMsgsImpl* msgs, MessageReader& payload)
         return { READ_ERR, len };
     }
 
-    msgs->publish(tr_peer_event::GotPieceData(len));
+    logtrace(msgs, fmt::format("got {:d} bytes for req {:d}:{:d}->{:d}", len, piece, offset, len));
 
-    if (loc.block_offset == 0U && len == block_size) // simple case: one message has entire block
+    if (loc.block_offset == 0U && len == block_size) // simple case: got the full block in one message
     {
         auto buf = std::make_unique<Cache::BlockData>(block_size);
         payload.to_buf(std::data(*buf), len);
