@@ -14,7 +14,7 @@
 #include <string>
 #include <string_view>
 
-#include <event2/buffer.h>
+#include <small/vector.hpp>
 
 #include "error.h"
 #include "net.h" // tr_socket_t
@@ -198,6 +198,11 @@ public:
 
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
+        if (n_bytes == 0U)
+        {
+            return {};
+        }
+
         auto const [buf, buflen] = reserve_space(n_bytes);
         auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
         auto const err = sockerrno;
@@ -223,61 +228,61 @@ public:
     }
 };
 
-class Buffer final
-    : public BufferReader<std::byte>
-    , public BufferWriter<std::byte>
+template<size_t N, typename value_type = std::byte>
+class SmallBuffer final
+    : public BufferReader<value_type>
+    , public BufferWriter<value_type>
 {
 public:
-    using value_type = std::byte;
+    SmallBuffer() = default;
+    SmallBuffer(SmallBuffer&&) = default;
+    SmallBuffer& operator=(SmallBuffer&&) = default;
+    SmallBuffer(SmallBuffer const&) = delete;
+    SmallBuffer& operator=(SmallBuffer const&) = delete;
 
-    Buffer() = default;
-    Buffer(Buffer&&) = default;
-    Buffer(Buffer const&) = delete;
-    Buffer& operator=(Buffer&&) = default;
-    Buffer& operator=(Buffer const&) = delete;
-
-    template<typename T>
-    explicit Buffer(T const& data)
+    template<typename ContiguousContainer>
+    explicit SmallBuffer(ContiguousContainer const& data)
     {
-        add(data);
+        BufferWriter<value_type>::add(data);
     }
 
     [[nodiscard]] size_t size() const noexcept override
     {
-        return evbuffer_get_length(buf_.get());
+        return end_pos_ - begin_pos_;
     }
 
     [[nodiscard]] value_type const* data() const override
     {
-        return reinterpret_cast<value_type const*>(evbuffer_pullup(buf_.get(), -1));
+        return std::data(buf_) + begin_pos_;
     }
 
     void drain(size_t n_bytes) override
     {
-        evbuffer_drain(buf_.get(), n_bytes);
+        begin_pos_ += std::min(n_bytes, size());
+
+        if (begin_pos_ == end_pos_)
+        {
+            begin_pos_ = end_pos_ = 0U;
+        }
     }
 
-    [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
+    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        auto iov = evbuffer_iovec{};
-        evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
-        TR_ASSERT(iov.iov_len >= n_bytes);
-        reserved_space_ = iov;
-        return { static_cast<value_type*>(iov.iov_base), static_cast<size_t>(iov.iov_len) };
+        buf_.resize(end_pos_ + n_bytes);
+        return { &buf_[end_pos_], n_bytes };
     }
 
-    void commit_space(size_t n_bytes) override
+    virtual void commit_space(size_t n_bytes) override
     {
-        TR_ASSERT(reserved_space_);
-        TR_ASSERT(reserved_space_->iov_len >= n_bytes);
-        reserved_space_->iov_len = n_bytes;
-        evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
-        reserved_space_.reset();
+        end_pos_ += n_bytes;
     }
 
 private:
-    evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
-    std::optional<evbuffer_iovec> reserved_space_;
+    small::vector<value_type, N> buf_ = {};
+    size_t begin_pos_ = {};
+    size_t end_pos_ = {};
 };
+
+using Buffer = SmallBuffer<0, std::byte>;
 
 } // namespace libtransmission
