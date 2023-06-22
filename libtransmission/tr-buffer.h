@@ -293,6 +293,4 @@ private:
     size_t end_pos_ = {};
 };
 
-//using Buffer = SmallBuffer<0, std::byte>;
-
 } // namespace libtransmission
