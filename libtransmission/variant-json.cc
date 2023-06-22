@@ -442,7 +442,7 @@ struct JsonWalk
     }
 
     std::deque<ParentState> parents;
-    libtransmission::SmallBuffer<1024 * 16> out;
+    libtransmission::Buffer out;
     bool doIndent;
 };
 

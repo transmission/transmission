@@ -11,7 +11,7 @@
 
 using BufferTest = ::testing::Test;
 using namespace std::literals;
-using Buffer = libtransmission::SmallBuffer<1024>;
+using Buffer = libtransmission::Buffer;
 
 TEST_F(BufferTest, startsWithInSingleSegment)
 {
@@ -62,6 +62,52 @@ TEST_F(BufferTest, startsWithInMultiSegment)
     EXPECT_TRUE(buf->starts_with("Hello, World!"sv));
 }
 
+TEST_F(BufferTest, Move)
+{
+    auto constexpr TwoChars = "12"sv;
+    auto constexpr SixChars = "123456"sv;
+    auto constexpr TenChars = "1234567890"sv;
+
+    auto a = Buffer{ TwoChars };
+    auto b = Buffer{ SixChars };
+    auto c = Buffer{ TenChars };
+
+    auto lens = std::array<size_t, 3>{ std::size(TwoChars), std::size(SixChars), std::size(TenChars) };
+
+    EXPECT_EQ(lens[0], std::size(a));
+    EXPECT_EQ(lens[1], std::size(b));
+    EXPECT_EQ(lens[2], std::size(c));
+
+    std::swap(a, b);
+    EXPECT_EQ(lens[0], std::size(b));
+    EXPECT_EQ(lens[1], std::size(a));
+    EXPECT_EQ(lens[2], std::size(c));
+
+    std::swap(a, c);
+    EXPECT_EQ(lens[0], std::size(b));
+    EXPECT_EQ(lens[1], std::size(c));
+    EXPECT_EQ(lens[2], std::size(a));
+
+    std::swap(b, c);
+    EXPECT_EQ(lens[0], std::size(c));
+    EXPECT_EQ(lens[1], std::size(b));
+    EXPECT_EQ(lens[2], std::size(a));
+
+    a.add(std::data(TwoChars), std::size(TwoChars));
+
+    {
+        auto constexpr OneChar = "1"sv;
+        auto d = Buffer{ OneChar };
+
+        std::swap(a, d);
+        EXPECT_EQ(1U, std::size(a));
+    }
+
+    EXPECT_EQ(1U, std::size(a));
+    a.add(std::data(TwoChars), std::size(TwoChars));
+    EXPECT_EQ(3U, std::size(a));
+}
+
 TEST_F(BufferTest, Numbers)
 {
     for (auto i = 0; i < 100; ++i)
@@ -103,7 +149,9 @@ TEST_F(BufferTest, NonBufferWriter)
     auto constexpr Bang = "!"sv;
 
     auto out1 = Buffer{};
-    auto out2 = libtransmission::SmallBuffer<1024>{};
+
+    auto out2_vec = std::vector<std::byte>{};
+    auto out2 = libtransmission::BufferWriter<std::vector<std::byte>, std::byte>{ &out2_vec };
 
     out1.add_uint8(1);
     out2.add_uint8(1);
@@ -124,7 +172,7 @@ TEST_F(BufferTest, NonBufferWriter)
     out2.add(Bang);
 
     auto const result1 = out1.to_string_view();
-    auto const result2 = out2.to_string();
+    auto const result2 = std::string_view{ reinterpret_cast<char const*>(std::data(out2_vec)), std::size(out2_vec) };
     EXPECT_EQ(result1, result2);
 }
 #endif

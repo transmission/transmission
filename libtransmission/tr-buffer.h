@@ -14,7 +14,7 @@
 #include <string>
 #include <string_view>
 
-#include <small/vector.hpp>
+#include <event2/buffer.h>
 
 #include "error.h"
 #include "net.h" // tr_socket_t
@@ -123,11 +123,6 @@ public:
         tr_error_set(error, err, tr_net_strerror(err));
         return {};
     }
-
-    void clear()
-    {
-        drain(size());
-    }
 };
 
 template<typename value_type>
@@ -203,11 +198,6 @@ public:
 
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
-        if (n_bytes == 0U)
-        {
-            return {};
-        }
-
         auto const [buf, buflen] = reserve_space(n_bytes);
         auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
         auto const err = sockerrno;
@@ -233,64 +223,61 @@ public:
     }
 };
 
-template<size_t N, typename value_type = std::byte, typename GrowthFactor = std::ratio<3, 2>>
-class SmallBuffer final
-    : public BufferReader<value_type>
-    , public BufferWriter<value_type>
+class Buffer final
+    : public BufferReader<std::byte>
+    , public BufferWriter<std::byte>
 {
 public:
-    SmallBuffer() = default;
-    SmallBuffer(SmallBuffer&&) = delete;
-    SmallBuffer& operator=(SmallBuffer&&) = delete;
-    SmallBuffer(SmallBuffer const&) = delete;
-    SmallBuffer& operator=(SmallBuffer const&) = delete;
+    using value_type = std::byte;
 
-    explicit SmallBuffer(void const* const data, size_t n_bytes)
-    {
-        BufferWriter<value_type>::add(data, n_bytes);
-    }
+    Buffer() = default;
+    Buffer(Buffer&&) = default;
+    Buffer(Buffer const&) = delete;
+    Buffer& operator=(Buffer&&) = default;
+    Buffer& operator=(Buffer const&) = delete;
 
-    template<typename ContiguousContainer>
-    explicit SmallBuffer(ContiguousContainer const& data)
-        : SmallBuffer{ std::data(data), std::size(data) }
+    template<typename T>
+    explicit Buffer(T const& data)
     {
+        add(data);
     }
 
     [[nodiscard]] size_t size() const noexcept override
     {
-        return end_pos_ - begin_pos_;
+        return evbuffer_get_length(buf_.get());
     }
 
     [[nodiscard]] value_type const* data() const override
     {
-        return std::data(buf_) + begin_pos_;
+        return reinterpret_cast<value_type const*>(evbuffer_pullup(buf_.get(), -1));
     }
 
     void drain(size_t n_bytes) override
     {
-        begin_pos_ += std::min(n_bytes, size());
-
-        if (begin_pos_ == end_pos_)
-        {
-            begin_pos_ = end_pos_ = 0U;
-        }
+        evbuffer_drain(buf_.get(), n_bytes);
     }
 
-    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
+    [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        buf_.resize(end_pos_ + n_bytes);
-        return { &buf_[end_pos_], n_bytes };
+        auto iov = evbuffer_iovec{};
+        evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
+        TR_ASSERT(iov.iov_len >= n_bytes);
+        reserved_space_ = iov;
+        return { static_cast<value_type*>(iov.iov_base), static_cast<size_t>(iov.iov_len) };
     }
 
-    virtual void commit_space(size_t n_bytes) override
+    void commit_space(size_t n_bytes) override
     {
-        end_pos_ += n_bytes;
+        TR_ASSERT(reserved_space_);
+        TR_ASSERT(reserved_space_->iov_len >= n_bytes);
+        reserved_space_->iov_len = n_bytes;
+        evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
+        reserved_space_.reset();
     }
 
 private:
-    small::vector<value_type, N, std::allocator<value_type>, std::true_type, size_t, GrowthFactor> buf_ = {};
-    size_t begin_pos_ = {};
-    size_t end_pos_ = {};
+    evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
+    std::optional<evbuffer_iovec> reserved_space_;
 };
 
 } // namespace libtransmission
