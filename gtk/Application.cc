@@ -584,8 +584,8 @@ void Application::Impl::on_startup()
         css_provider,
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    std::ignore = FilterBar();
-    std::ignore = PathButton();
+    FilterBar();
+    PathButton();
 
     tr_session* session = nullptr;
 
