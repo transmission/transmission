@@ -502,17 +502,9 @@ public:
         TR_ASSERT(addr.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
 
-        peer_atom* atom = get_existing_atom(socket_address);
-
-        if (atom == nullptr)
-        {
-            atom = &pool.emplace(
-                            std::piecewise_construct,
-                            std::forward_as_tuple(socket_address),
-                            std::forward_as_tuple(addr, port, flags, from))
-                        .first->second;
-        }
-        else
+        auto&& [atom_it, is_new] = pool.try_emplace(socket_address, addr, port, flags, from);
+        peer_atom* atom = &atom_it->second;
+        if (!is_new)
         {
             atom->fromBest = std::min(atom->fromBest, from);
             atom->flags |= flags;
