@@ -257,8 +257,8 @@ uint64_t tr_time_msec()
  */
 size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
 {
-    auto* dst = reinterpret_cast<char*>(vdst);
-    auto const* const src = reinterpret_cast<char const*>(vsrc);
+    auto* dst = static_cast<char*>(vdst);
+    auto const* const src = static_cast<char const*>(vsrc);
 
     TR_ASSERT(dst != nullptr);
     TR_ASSERT(src != nullptr);
