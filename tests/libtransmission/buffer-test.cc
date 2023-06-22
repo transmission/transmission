@@ -11,7 +11,7 @@
 
 using BufferTest = ::testing::Test;
 using namespace std::literals;
-using Buffer = libtransmission::SmallBuffer<1024>;
+using Buffer = libtransmission::Buffer;
 
 TEST_F(BufferTest, startsWithInSingleSegment)
 {
@@ -103,7 +103,9 @@ TEST_F(BufferTest, NonBufferWriter)
     auto constexpr Bang = "!"sv;
 
     auto out1 = Buffer{};
-    auto out2 = libtransmission::SmallBuffer<1024>{};
+
+    auto out2_vec = std::vector<std::byte>{};
+    auto out2 = libtransmission::BufferWriter<std::vector<std::byte>, std::byte>{ &out2_vec };
 
     out1.add_uint8(1);
     out2.add_uint8(1);
@@ -124,7 +126,7 @@ TEST_F(BufferTest, NonBufferWriter)
     out2.add(Bang);
 
     auto const result1 = out1.to_string_view();
-    auto const result2 = out2.to_string();
+    auto const result2 = std::string_view{ reinterpret_cast<char const*>(std::data(out2_vec)), std::size(out2_vec) };
     EXPECT_EQ(result1, result2);
 }
 #endif
