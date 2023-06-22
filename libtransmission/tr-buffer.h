@@ -233,7 +233,7 @@ public:
     }
 };
 
-template<size_t N, typename value_type = std::byte>
+template<size_t N, typename value_type = std::byte, typename GrowthFactor = std::ratio<3, 2>>
 class SmallBuffer final
     : public BufferReader<value_type>
     , public BufferWriter<value_type>
@@ -288,11 +288,9 @@ public:
     }
 
 private:
-    small::vector<value_type, N> buf_ = {};
+    small::vector<value_type, N, std::allocator<value_type>, std::true_type, size_t, GrowthFactor> buf_ = {};
     size_t begin_pos_ = {};
     size_t end_pos_ = {};
 };
-
-using Buffer = SmallBuffer<0, std::byte>;
 
 } // namespace libtransmission
