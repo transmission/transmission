@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cerrno> // for ENOENT
+#include <cmath>
 #include <optional>
 #include <set>
 #include <string>
@@ -375,4 +376,19 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     auto ret = tr_variantToStr(&top, TR_VARIANT_FMT_BENC);
     tr_variantClear(&top);
     return ret;
+}
+
+uint32_t tr_metainfo_builder::default_piece_size(uint64_t total_size) noexcept
+{
+    TR_ASSERT(total_size != 0);
+
+    // Ideally, we want approximately 2^10 = 1024 pieces, give or take a few hundred pieces.
+    // So we subtract 10 from the log2 of total size.
+    // The ideal number of pieces is up for debate.
+    auto exp = std::log2(total_size) - 10;
+
+    // We want a piece size between 16KiB (2^14 bytes) and 16MiB (2^24 bytes) for maximum compatibility
+    exp = std::clamp(exp, 14., 24.);
+
+    return uint32_t{ 1U } << std::lround(exp);
 }
