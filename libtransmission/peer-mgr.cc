@@ -107,15 +107,16 @@ public:
         return session_.allowsTCP();
     }
 
-    void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const& addr, tr_port const& port) override
+    void set_utp_failed(tr_sha1_digest_t const& info_hash, std::pair<tr_address, tr_port> const& socket_address) override
     {
         if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
         {
-            tr_peerMgrSetUtpFailed(tor, addr, port, true);
+            tr_peerMgrSetUtpFailed(tor, socket_address, true);
         }
     }
 
-    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr, tr_port const& port) const override;
+    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, std::pair<tr_address, tr_port> const& socket_address)
+        const override;
 
     [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
     {
@@ -462,7 +463,10 @@ public:
     {
         if (!pool_is_all_seeds_)
         {
-            pool_is_all_seeds_ = std::all_of(std::begin(pool), std::end(pool), [](auto const& atom) { return atom.isSeed(); });
+            pool_is_all_seeds_ = std::all_of(
+                std::begin(pool),
+                std::end(pool),
+                [](auto const& key_val) { return key_val.second.isSeed(); });
         }
 
         return *pool_is_all_seeds_;
@@ -473,42 +477,34 @@ public:
         pool_is_all_seeds_.reset();
     }
 
-    [[nodiscard]] peer_atom* get_existing_atom(tr_address const& addr, tr_port const& port) noexcept
+    [[nodiscard]] peer_atom* get_existing_atom(std::pair<tr_address, tr_port> const& socket_address) noexcept
     {
-        auto const iter = std::find_if(
-            std::begin(pool),
-            std::end(pool),
-            [&addr, &port](auto const& atom) { return atom.addr == addr && atom.port == port; });
-        return iter != std::end(pool) ? &*iter : nullptr;
+        auto&& it = pool.find(socket_address);
+        return it != pool.end() ? &it->second : nullptr;
     }
 
-    [[nodiscard]] peer_atom const* get_existing_atom(tr_address const& addr, tr_port const& port) const noexcept
+    [[nodiscard]] peer_atom const* get_existing_atom(std::pair<tr_address, tr_port> const& socket_address) const noexcept
     {
-        auto const iter = std::find_if(
-            std::begin(pool),
-            std::end(pool),
-            [&addr, &port](auto const& atom) { return atom.addr == addr && atom.port == port; });
-        return iter != std::end(pool) ? &*iter : nullptr;
+        auto const& it = pool.find(socket_address);
+        return it != pool.cend() ? &it->second : nullptr;
     }
 
-    [[nodiscard]] bool peer_is_a_seed(tr_address const& addr, tr_port const& port) const noexcept
+    [[nodiscard]] bool peer_is_a_seed(std::pair<tr_address, tr_port> const& socket_address) const noexcept
     {
-        auto const* const atom = get_existing_atom(addr, port);
+        auto const* const atom = get_existing_atom(socket_address);
         return atom != nullptr && atom->isSeed();
     }
 
-    peer_atom* ensure_atom_exists(tr_address const& addr, tr_port const& port, uint8_t const flags, uint8_t const from)
+    peer_atom* ensure_atom_exists(std::pair<tr_address, tr_port> const& socket_address, uint8_t const flags, uint8_t const from)
     {
+        auto const& [addr, port] = socket_address;
+
         TR_ASSERT(addr.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
 
-        peer_atom* atom = get_existing_atom(addr, port);
-
-        if (atom == nullptr)
-        {
-            atom = &pool.emplace_back(addr, port, flags, from);
-        }
-        else
+        auto&& [atom_it, is_new] = pool.try_emplace(socket_address, addr, port, flags, from);
+        peer_atom* atom = &atom_it->second;
+        if (!is_new)
         {
             atom->fromBest = std::min(atom->fromBest, from);
             atom->flags |= flags;
@@ -651,9 +647,8 @@ public:
     std::vector<tr_peerMsgs*> peers;
 
     // tr_peers hold pointers to the items in this container,
-    // so use a deque instead of vector to prevent insertion from
-    // invalidating those pointers
-    std::deque<peer_atom> pool;
+    // therefore references to elements within cannot invalidate
+    std::map<std::pair<tr_address, tr_port>, peer_atom> pool;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
@@ -799,7 +794,7 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
        since the blocklist has changed, erase that cached value */
     for (auto* const tor : mgr->session->torrents())
     {
-        for (auto& atom : tor->swarm->pool)
+        for (auto& [socket_address, atom] : tor->swarm->pool)
         {
             atom.setBlocklistedDirty();
         }
@@ -808,17 +803,17 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 
 // ---
 
-void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr, tr_port const& port)
+void tr_peerMgrSetUtpSupported(tr_torrent* tor, std::pair<tr_address, tr_port> const& socket_address)
 {
-    if (auto* const atom = tor->swarm->get_existing_atom(addr, port); atom != nullptr)
+    if (auto* const atom = tor->swarm->get_existing_atom(socket_address); atom != nullptr)
     {
         atom->flags |= ADDED_F_UTP_FLAGS;
     }
 }
 
-void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, tr_port const& port, bool failed)
+void tr_peerMgrSetUtpFailed(tr_torrent* tor, std::pair<tr_address, tr_port> const& socket_address, bool failed)
 {
-    if (auto* const atom = tor->swarm->get_existing_atom(addr, port); atom != nullptr)
+    if (auto* const atom = tor->swarm->get_existing_atom(socket_address); atom != nullptr)
     {
         atom->utp_failed = failed;
     }
@@ -1007,15 +1002,15 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
     auto* const s = manager->get_existing_swarm(result.io->torrent_hash());
 
-    auto const [addr, port] = result.io->socket_address();
+    auto const& socket_address = result.io->socket_address();
 
     if (result.io->is_incoming())
     {
-        manager->incoming_handshakes.erase(std::make_pair(addr, port));
+        manager->incoming_handshakes.erase(socket_address);
     }
     else if (s != nullptr)
     {
-        s->outgoing_handshakes.erase(std::make_pair(addr, port));
+        s->outgoing_handshakes.erase(socket_address);
     }
 
     auto const lock = manager->unique_lock();
@@ -1024,7 +1019,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
     {
         if (s != nullptr)
         {
-            struct peer_atom* atom = s->get_existing_atom(addr, port);
+            struct peer_atom* atom = s->get_existing_atom(socket_address);
 
             if (atom != nullptr)
             {
@@ -1045,7 +1040,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
     }
     else /* looking good */
     {
-        struct peer_atom* atom = s->ensure_atom_exists(addr, port, 0, TR_PEER_FROM_INCOMING);
+        struct peer_atom* atom = s->ensure_atom_exists(socket_address, 0, TR_PEER_FROM_INCOMING);
 
         atom->time = tr_time();
         atom->piece_data_time = 0;
@@ -1118,9 +1113,9 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
     else /* we don't have a connection to them yet... */
     {
-        auto const& socket_address = socket.socketAddress();
+        auto&& socket_address = socket.socketAddress();
         manager->incoming_handshakes.try_emplace(
-            socket_address,
+            std::move(socket_address),
             &manager->handshake_mediator_,
             tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),
@@ -1134,7 +1129,7 @@ void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
 
     auto* const swarm = tor->swarm;
 
-    for (auto& atom : swarm->pool)
+    for (auto& [socket_address, atom] : swarm->pool)
     {
         swarm->mark_atom_as_seed(atom);
     }
@@ -1153,7 +1148,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
         if (tr_isPex(pex) && /* safeguard against corrupt data */
             !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers())
         {
-            s->ensure_atom_exists(pex->addr, pex->port, pex->flags, from);
+            s->ensure_atom_exists(std::make_pair(pex->addr, pex->port), pex->flags, from);
             ++n_used;
         }
     }
@@ -1328,7 +1323,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     }
     else /* TR_PEERS_INTERESTING */
     {
-        for (auto const& atom : s->pool)
+        for (auto const& [socket_address, atom] : s->pool)
         {
             if (isAtomInteresting(tor, atom))
             {
@@ -2399,7 +2394,7 @@ struct peer_candidate
             continue;
         }
 
-        for (auto& atom : swarm->pool)
+        for (auto& [socket_address, atom] : swarm->pool)
         {
             if (isPeerCandidate(tor, atom, now))
             {
@@ -2493,8 +2488,8 @@ void tr_peerMgr::makeNewPeerConnections(size_t max)
 
 // ---
 
-bool HandshakeMediator::is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr, tr_port const& port) const
+bool HandshakeMediator::is_peer_known_seed(tr_torrent_id_t tor_id, std::pair<tr_address, tr_port> const& socket_address) const
 {
     auto const* const tor = session_.torrents().get(tor_id);
-    return tor != nullptr && tor->swarm != nullptr && tor->swarm->peer_is_a_seed(addr, port);
+    return tor != nullptr && tor->swarm != nullptr && tor->swarm->peer_is_a_seed(socket_address);
 }
