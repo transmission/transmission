@@ -2466,11 +2466,11 @@ bool renameArgsAreValid(tr_torrent const* tor, std::string_view oldpath, std::st
     }
 
     auto const newpath_as_dir = tr_pathbuf{ newpath, '/' };
-    auto const n_files = tor->file_count();
+    auto const n_files = tor->fileCount();
 
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
-        auto const& name = tor->file_subpath(i);
+        auto const& name = tor->fileSubpath(i);
         if (newpath == name || tr_strvStartsWith(name, newpath_as_dir))
         {
             return false;
