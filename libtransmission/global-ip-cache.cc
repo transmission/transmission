@@ -21,6 +21,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 namespace
@@ -31,7 +32,7 @@ using namespace std::literals;
 static_assert(TR_AF_INET == 0);
 static_assert(TR_AF_INET6 == 1);
 
-auto constexpr protocol_str(tr_address_type type) noexcept
+auto TR_CONSTEXPR23 protocol_str(tr_address_type type) noexcept
 {
     /* TODO: very slight performance nit
      * - If upgrading to C++20, change Map to a consteval lambda:
@@ -40,8 +41,8 @@ auto constexpr protocol_str(tr_address_type type) noexcept
      *
      * Ref: https://wg21.link/p2647r1
      */
-    auto constexpr Map = std::array{ "IPv4"sv, "IPv6"sv };
-    return Map[type];
+    static auto TR_CONSTEXPR23 map = std::array{ "IPv4"sv, "IPv6"sv };
+    return map[type];
 }
 
 auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissionbt.com/"sv },
