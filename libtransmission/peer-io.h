@@ -20,6 +20,7 @@
 #include "transmission.h"
 
 #include "bandwidth.h"
+#include "block-info.h"
 #include "net.h" // tr_address
 #include "peer-mse.h"
 #include "peer-socket.h"
@@ -291,7 +292,16 @@ public:
     static void utp_init(struct_utp_context* ctx);
 
 private:
+    // size of the buffer we use to hold incoming & outgoing messages
+    static constexpr auto InitialBufferSize = tr_block_info::BlockSize + sizeof(uint8_t) + sizeof(uint32_t) + sizeof(uint32_t);
+
+    // our target socket receive buffer size
     static constexpr auto RcvBuf = size_t{ 256 * 1024 };
+
+    // start with a buffer size large enough to hold a BT block message,
+    // but avoid repeated reallocs by scaling up very quickly (5X) when
+    // we need more capacity.
+    using Buffer = libtransmission::SmallBuffer<InitialBufferSize, std::byte, std::ratio<5, 1>>;
 
     friend class libtransmission::test::HandshakeTest;
 
@@ -344,8 +354,8 @@ private:
 
     tr_sha1_digest_t info_hash_;
 
-    libtransmission::Buffer inbuf_;
-    libtransmission::Buffer outbuf_;
+    Buffer inbuf_;
+    Buffer outbuf_;
 
     tr_session* const session_;
 
