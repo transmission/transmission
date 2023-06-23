@@ -129,7 +129,7 @@ int Cache::set_limit(size_t new_limit)
     max_bytes_ = new_limit;
     max_blocks_ = get_max_blocks(new_limit);
 
-    tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(new_limit), max_blocks_));
+    tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(max_bytes_), max_blocks_));
 
     return cache_trim();
 }
