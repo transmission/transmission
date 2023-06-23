@@ -17,6 +17,8 @@
 
 #include <fmt/core.h>
 
+#include <small/vector.hpp>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "libtransmission/transmission.h"
@@ -640,6 +642,8 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark key)
 class WalkNode
 {
 public:
+    WalkNode() = default;
+
     explicit WalkNode(tr_variant const* v_in)
     {
         assign(v_in);
@@ -683,7 +687,8 @@ protected:
         size_t idx = {};
     };
 
-    void sort(std::vector<ByKey>& sortbuf)
+    template<typename Container>
+    void sort(Container& sortbuf)
     {
         if (!tr_variantIsDict(&v))
         {
@@ -763,8 +768,10 @@ public:
 
 private:
     size_t size = 0;
-    std::vector<WalkNode> stack;
-    std::vector<WalkNode::ByKey> sortbuf;
+
+    static auto constexpr InitialCapacity = size_t{ 32U };
+    small::vector<WalkNode, InitialCapacity> stack;
+    small::vector<WalkNode::ByKey, InitialCapacity> sortbuf;
 };
 
 /**

@@ -303,7 +303,7 @@ std::optional<std::string_view> tr_session::WebMediator::userAgent() const
 
 std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 {
-    if (auto const addr = session_->publicAddress(TR_AF_INET); !addr.is_any())
+    if (auto const addr = session_->bind_address(TR_AF_INET); !addr.is_any())
     {
         return addr.display_name();
     }
@@ -313,7 +313,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
 
 std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
 {
-    if (auto const addr = session_->publicAddress(TR_AF_INET6); !addr.is_any())
+    if (auto const addr = session_->bind_address(TR_AF_INET6); !addr.is_any())
     {
         return addr.display_name();
     }
@@ -417,7 +417,7 @@ tr_session::BoundSocket::~BoundSocket()
     }
 }
 
-tr_address tr_session::publicAddress(tr_address_type type) const noexcept
+tr_address tr_session::bind_address(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET)
     {
@@ -734,14 +734,14 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     {
         if (auto const& val = new_settings.bind_address_ipv4; force || port_changed || val != old_settings.bind_address_ipv4)
         {
-            auto const addr = publicAddress(TR_AF_INET);
+            auto const addr = bind_address(TR_AF_INET);
             bound_ipv4_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }
 
         if (auto const& val = new_settings.bind_address_ipv6; force || port_changed || val != old_settings.bind_address_ipv6)
         {
-            auto const addr = publicAddress(TR_AF_INET6);
+            auto const addr = bind_address(TR_AF_INET6);
             bound_ipv6_.emplace(event_base(), addr, local_peer_port_, &tr_session::onIncomingPeerConnection, this);
             addr_changed = true;
         }

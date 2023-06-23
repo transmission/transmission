@@ -180,44 +180,7 @@ public:
 
     ///
 
-    [[nodiscard]] constexpr static uint32_t default_piece_size(uint64_t total_size) noexcept
-    {
-        uint32_t const KiB = 1024;
-        uint32_t const MiB = 1048576;
-        uint32_t const GiB = 1073741824;
-
-        if (total_size >= 2 * GiB)
-        {
-            return 2 * MiB;
-        }
-
-        if (total_size >= 1 * GiB)
-        {
-            return 1 * MiB;
-        }
-
-        if (total_size >= 512 * MiB)
-        {
-            return 512 * KiB;
-        }
-
-        if (total_size >= 350 * MiB)
-        {
-            return 256 * KiB;
-        }
-
-        if (total_size >= 150 * MiB)
-        {
-            return 128 * KiB;
-        }
-
-        if (total_size >= 50 * MiB)
-        {
-            return 64 * KiB;
-        }
-
-        return 32 * KiB; /* less than 50 meg */
-    }
+    [[nodiscard]] static uint32_t default_piece_size(uint64_t total_size) noexcept;
 
     [[nodiscard]] constexpr static bool is_legal_piece_size(uint32_t x)
     {

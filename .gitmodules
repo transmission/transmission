@@ -47,3 +47,6 @@
 [submodule "third-party/wide-integer"]
 	path = third-party/wide-integer
 	url = https://github.com/transmission/wide-integer
+[submodule "third-party/small"]
+	path = third-party/small
+	url = https://github.com/transmission/small.git

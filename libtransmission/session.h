@@ -194,7 +194,7 @@ private:
 
         [[nodiscard]] tr_address incoming_peer_address() const override
         {
-            return session_.publicAddress(TR_AF_INET);
+            return session_.bind_address(TR_AF_INET);
         }
 
         [[nodiscard]] tr_port local_peer_port() const override
@@ -815,7 +815,7 @@ public:
         return global_ip_cache_->has_ip_protocol(type);
     }
 
-    [[nodiscard]] tr_address publicAddress(tr_address_type type) const noexcept;
+    [[nodiscard]] tr_address bind_address(tr_address_type type) const noexcept;
 
     [[nodiscard]] std::optional<tr_address> global_address(tr_address_type type) const noexcept
     {
@@ -1113,10 +1113,10 @@ private:
 
     /// other fields
 
-    // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::publicAddress())
+    // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::bind_address())
     std::optional<BoundSocket> bound_ipv4_;
 
-    // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::publicAddress())
+    // depends-on: session_thread_, settings_.bind_address_ipv6, local_peer_port_, global_ip_cache (via tr_session::bind_address())
     std::optional<BoundSocket> bound_ipv6_;
 
 public:
@@ -1151,7 +1151,7 @@ private:
     GlobalIPCacheMediator global_ip_cache_mediator_{ *this };
     std::unique_ptr<tr_global_ip_cache> global_ip_cache_ = tr_global_ip_cache::create(global_ip_cache_mediator_);
 
-    // depends-on: settings_, session_thread_, torrents_, global_ip_cache (via tr_session::publicAddress())
+    // depends-on: settings_, session_thread_, torrents_, global_ip_cache (via tr_session::bind_address())
     WebMediator web_mediator_{ this };
     std::unique_ptr<tr_web> web_ = tr_web::create(this->web_mediator_);
 

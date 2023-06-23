@@ -82,8 +82,8 @@ enum tr_encryption_mode
     TR_ENCRYPTION_REQUIRED
 };
 
-#define TR_RATIO_NA -1
-#define TR_RATIO_INF -2
+#define TR_RATIO_NA (-1)
+#define TR_RATIO_INF (-2)
 
 // --- Startup & Shutdown
 

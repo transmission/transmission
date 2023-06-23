@@ -39,7 +39,7 @@ protected:
     {
         if (old_locale_)
         {
-            std::ignore = std::locale::global(*old_locale_);
+            std::locale::global(*old_locale_);
         }
     }
 
