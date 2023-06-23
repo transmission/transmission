@@ -4,6 +4,12 @@
 
 #import <AppKit/AppKit.h>
 
+typedef NS_ENUM(NSInteger, AttributesStyle) {
+    AttributesStyleNormal,
+    AttributesStyleEmphasized,
+    AttributesStyleDisabled,
+};
+
 @interface FileNameCell : NSActionCell
 
 - (NSRect)imageRectForBounds:(NSRect)bounds;

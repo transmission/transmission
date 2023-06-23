@@ -57,6 +57,8 @@ target_sources(${TR_NAME}
         file-win32.cc
         file.cc
         file.h
+        global-ip-cache.cc
+        global-ip-cache.h
         handshake.cc
         handshake.h
         history.h
@@ -295,6 +297,7 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
     PUBLIC
         fmt::fmt-header-only
+        small::small
         libevent::event)
 
 if(INSTALL_LIB)

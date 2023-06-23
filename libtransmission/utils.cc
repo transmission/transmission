@@ -9,7 +9,6 @@
 #include <cerrno>
 #include <cfloat> // DBL_DIG
 #include <chrono>
-#include <clocale> // localeconv()
 #include <cstdint> // SIZE_MAX
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
@@ -67,10 +66,10 @@ void tr_locale_set_global(char const* locale_name) noexcept
 {
     try
     {
-        std::ignore = std::locale::global(std::locale{ locale_name });
+        std::locale::global(std::locale{ locale_name });
 
-        std::ignore = std::cout.imbue(std::locale{});
-        std::ignore = std::cerr.imbue(std::locale{});
+        std::cout.imbue(std::locale{});
+        std::cerr.imbue(std::locale{});
     }
     catch (std::exception const&)
     {
@@ -275,7 +274,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
     if (denominator > 0)
     {
-        return numerator / (double)denominator;
+        return numerator / static_cast<double>(denominator);
     }
 
     if (numerator > 0)
@@ -514,10 +513,10 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
 double tr_truncd(double x, int decimal_places)
 {
     auto buf = std::array<char, 128>{};
-    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}Lf}", x, DBL_DIG);
+    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
     *out = '\0';
 
-    if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
+    if (auto* const pt = strchr(std::data(buf), '.'); pt != nullptr)
     {
         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
@@ -718,7 +717,7 @@ char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes
         unit = &u[3];
     }
 
-    double const value = double(bytes) / unit->value;
+    double const value = static_cast<double>(bytes) / unit->value;
     auto const* const units = std::data(unit->name);
 
     auto precision = int{};

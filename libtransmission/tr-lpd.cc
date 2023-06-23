@@ -213,9 +213,9 @@ public:
             return;
         }
 
-        announce_timer_->startRepeating(AnnounceInterval);
+        announce_timer_->start_repeating(AnnounceInterval);
         announceUpkeep();
-        dos_timer_->startRepeating(DosInterval);
+        dos_timer_->start_repeating(DosInterval);
         dosUpkeep();
     }
 

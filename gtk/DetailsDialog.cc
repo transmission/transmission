@@ -1964,7 +1964,8 @@ void buildTrackerSummary(
     // hostname
     gstr << text_dir_mark.at(static_cast<int>(direction));
     gstr << (tracker.isBackup ? "<i>" : "<b>");
-    gstr << Glib::Markup::escape_text(!key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host, key) : tracker.host);
+    gstr << Glib::Markup::escape_text(
+        !key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host_and_port, key) : tracker.host_and_port);
     gstr << (tracker.isBackup ? "</i>" : "</b>");
 
     if (!tracker.isBackup)

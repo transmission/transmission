@@ -395,7 +395,7 @@ void register_magnet_link_handler()
             _("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"),
             fmt::arg("content_type", content_type),
             fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code())));
+            fmt::arg("error_code", static_cast<int>(e.code()))));
     }
 }
 
@@ -584,8 +584,8 @@ void Application::Impl::on_startup()
         css_provider,
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    std::ignore = FilterBar();
-    std::ignore = PathButton();
+    FilterBar();
+    PathButton();
 
     tr_session* session = nullptr;
 

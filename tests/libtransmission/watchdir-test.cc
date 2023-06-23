@@ -59,7 +59,7 @@ protected:
         SandboxedTest::SetUp();
         ev_base_.reset(event_base_new(), event_base_free);
         timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(ev_base_.get());
-        Watchdir::setGenericRescanInterval(GenericRescanInterval);
+        Watchdir::set_generic_rescan_interval(GenericRescanInterval);
     }
 
     void TearDown() override
@@ -73,7 +73,7 @@ protected:
     {
         auto const force_generic = GetParam() == WatchMode::GENERIC;
         auto watchdir = force_generic ?
-            Watchdir::createGeneric(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
+            Watchdir::create_generic(path, std::move(callback), *timer_maker_, GenericRescanInterval) :
             Watchdir::create(path, std::move(callback), *timer_maker_, ev_base_.get());
 
         if (auto* const base_watchdir = dynamic_cast<impl::BaseWatchdir*>(watchdir.get()); base_watchdir != nullptr)

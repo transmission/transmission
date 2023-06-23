@@ -140,7 +140,7 @@ void readOrWriteBytes(
         if (fd && do_write)
         {
             // make a note that we just created a file
-            tor->session->addFileCreated();
+            tor->session->add_file_created();
         }
     }
 
@@ -254,7 +254,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     {
         auto const block_loc = tor->block_loc(block);
         auto const block_len = tor->block_size(block);
-        if (auto const success = cache->readBlock(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
+        if (auto const success = cache->read_block(tor, block_loc, block_len, std::data(buffer)) == 0; !success)
         {
             return {};
         }

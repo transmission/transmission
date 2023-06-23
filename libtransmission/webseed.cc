@@ -168,7 +168,7 @@ public:
         , bandwidth_{ &tor->bandwidth_ }
     {
         have_.set_has_all();
-        idle_timer_->startRepeating(IdleTimerInterval);
+        idle_timer_->start_repeating(IdleTimerInterval);
     }
 
     tr_webseed(tr_webseed&&) = delete;
@@ -338,7 +338,7 @@ public:
         tr_session* session,
         tr_torrent_id_t tor_id,
         tr_block_index_t block,
-        std::unique_ptr<std::vector<uint8_t>>& data,
+        std::unique_ptr<Cache::BlockData> data,
         tr_webseed* webseed)
         : session_{ session }
         , tor_id_{ tor_id }
@@ -352,7 +352,7 @@ public:
     {
         if (auto const* const tor = tr_torrentFindFromId(session_, tor_id_); tor != nullptr)
         {
-            session_->cache->writeBlock(tor_id_, block_, std::move(data_));
+            session_->cache->write_block(tor_id_, block_, std::move(data_));
             webseed_->publish(tr_peer_event::GotBlock(tor->block_info(), block_));
         }
 
@@ -363,7 +363,7 @@ private:
     tr_session* const session_;
     tr_torrent_id_t const tor_id_;
     tr_block_index_t const block_;
-    std::unique_ptr<std::vector<uint8_t>> data_;
+    std::unique_ptr<Cache::BlockData> data_;
     tr_webseed* const webseed_;
 };
 
@@ -394,10 +394,9 @@ void useFetchedBlocks(tr_webseed_task* task)
         }
         else
         {
-            auto block_buf = std::make_unique<std::vector<uint8_t>>();
-            block_buf->resize(block_size);
+            auto block_buf = std::make_unique<Cache::BlockData>(block_size);
             evbuffer_remove(task->content(), std::data(*block_buf), std::size(*block_buf));
-            auto* const data = new write_block_data{ session, tor->id(), task->loc.block, block_buf, webseed };
+            auto* const data = new write_block_data{ session, tor->id(), task->loc.block, std::move(block_buf), webseed };
             session->runInSessionThread(&write_block_data::write_block_func, data);
         }
 

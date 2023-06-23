@@ -239,7 +239,6 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew update
           brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
@@ -513,7 +512,6 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew update
           brew install cmake gettext ninja node pkg-config
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}

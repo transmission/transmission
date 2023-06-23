@@ -165,7 +165,7 @@ void restart_timer(tr_session* session)
         interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
 
-    session->utp_timer->startSingleShot(interval);
+    session->utp_timer->start_single_shot(interval);
 }
 
 void timer_callback(void* vsession)

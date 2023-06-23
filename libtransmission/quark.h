@@ -50,6 +50,7 @@ enum
     TR_KEY_availability, // rpc
     TR_KEY_bandwidth_priority,
     TR_KEY_bandwidthPriority,
+    TR_KEY_beginPiece,
     TR_KEY_bind_address_ipv4,
     TR_KEY_bind_address_ipv6,
     TR_KEY_bitfield,
@@ -111,6 +112,7 @@ enum
     TR_KEY_editDate,
     TR_KEY_encoding,
     TR_KEY_encryption,
+    TR_KEY_endPiece,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,

@@ -76,13 +76,13 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::unique_ptr<std::vector<uint8_t>> buf = {};
+        std::unique_ptr<Cache::BlockData> buf = {};
         bool done = {};
     };
 
     auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
-        data->session->cache->writeBlock(data->tor->id(), data->block, std::move(data->buf));
+        data->session->cache->write_block(data->tor->id(), data->block, std::move(data->buf));
         tr_torrentGotBlock(data->tor, data->block);
         data->done = true;
     };
@@ -97,7 +97,8 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
         for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {
-            data.buf = std::make_unique<std::vector<uint8_t>>(tr_block_info::BlockSize, '\0');
+            data.buf = std::make_unique<Cache::BlockData>(tr_block_info::BlockSize);
+            std::fill_n(std::data(*data.buf), tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
             session_->runInSessionThread(test_incomplete_dir_threadfunc, &data);

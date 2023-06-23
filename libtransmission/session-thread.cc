@@ -158,7 +158,7 @@ public:
     {
         auto lock = std::unique_lock(is_looping_mutex_);
 
-        thread_ = std::thread(&tr_session_thread_impl::sessionThreadFunc, this, eventBase());
+        thread_ = std::thread(&tr_session_thread_impl::sessionThreadFunc, this, event_base());
         thread_id_ = thread_.get_id();
 
         // wait for the session thread's main loop to start
@@ -172,36 +172,36 @@ public:
 
     ~tr_session_thread_impl() override
     {
-        TR_ASSERT(!amInSessionThread());
+        TR_ASSERT(!am_in_session_thread());
         TR_ASSERT(is_looping_);
 
         // Stop the first event loop. This is the steady-state loop that runs
         // continuously, even when there are no events. See: sessionThreadFunc()
         is_shutting_down_ = true;
-        event_base_loopexit(eventBase(), nullptr);
+        event_base_loopexit(event_base(), nullptr);
 
         // Wait on the second event loop. This is the shutdown loop that exits
         // as soon as there are no events. This step is to give pending tasks
         // a chance to finish.
         auto lock = std::unique_lock(is_looping_mutex_);
         is_looping_cv_.wait_for(lock, Deadline, [this]() { return !is_looping_; });
-        event_base_loopexit(eventBase(), nullptr);
+        event_base_loopexit(event_base(), nullptr);
         thread_.join();
     }
 
-    [[nodiscard]] struct event_base* eventBase() noexcept override
+    [[nodiscard]] struct event_base* event_base() noexcept override
     {
         return evbase_.get();
     }
 
-    [[nodiscard]] bool amInSessionThread() const noexcept override
+    [[nodiscard]] bool am_in_session_thread() const noexcept override
     {
         return thread_id_ == std::this_thread::get_id();
     }
 
     void run(std::function<void(void)>&& func) override
     {
-        if (amInSessionThread())
+        if (am_in_session_thread())
         {
             func();
         }
@@ -259,7 +259,7 @@ private:
     }
     void onWorkAvailable()
     {
-        TR_ASSERT(amInSessionThread());
+        TR_ASSERT(am_in_session_thread());
 
         // steal the work queue
         auto work_queue_lock = std::unique_lock(work_queue_mutex_);

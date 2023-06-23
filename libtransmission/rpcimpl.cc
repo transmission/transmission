@@ -326,8 +326,10 @@ void addFiles(tr_torrent const* tor, tr_variant* list)
     for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
-        tr_variant* d = tr_variantListAddDict(list, 3);
+        tr_variant* d = tr_variantListAddDict(list, 5);
+        tr_variantDictAddInt(d, TR_KEY_beginPiece, file.beginPiece);
         tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
+        tr_variantDictAddInt(d, TR_KEY_endPiece, file.endPiece);
         tr_variantDictAddInt(d, TR_KEY_length, file.length);
         tr_variantDictAddStr(d, TR_KEY_name, file.name);
     }
@@ -362,7 +364,7 @@ void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
     tr_variantDictAddInt(d, TR_KEY_downloadCount, tracker.downloadCount);
     tr_variantDictAddBool(d, TR_KEY_hasAnnounced, tracker.hasAnnounced);
     tr_variantDictAddBool(d, TR_KEY_hasScraped, tracker.hasScraped);
-    tr_variantDictAddStr(d, TR_KEY_host, tracker.host);
+    tr_variantDictAddStr(d, TR_KEY_host, tracker.host_and_port);
     tr_variantDictAddStr(d, TR_KEY_sitename, tracker.sitename);
     tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
     tr_variantDictAddBool(d, TR_KEY_isBackup, tracker.isBackup);
