@@ -30,9 +30,9 @@ class Cache
 public:
     using BlockData = small::max_size_vector<uint8_t, tr_block_info::BlockSize>;
 
-    Cache(tr_torrents& torrents, int64_t max_bytes);
+    Cache(tr_torrents& torrents, size_t max_bytes);
 
-    int set_limit(int64_t new_limit);
+    int set_limit(size_t new_limit);
 
     [[nodiscard]] constexpr auto get_limit() const noexcept
     {
@@ -88,7 +88,7 @@ private:
     // @return any error code from writeContiguous()
     [[nodiscard]] int cache_trim();
 
-    [[nodiscard]] static size_t get_max_blocks(int64_t max_bytes) noexcept;
+    [[nodiscard]] static size_t get_max_blocks(size_t max_bytes) noexcept;
 
     [[nodiscard]] CIter get_block(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept;
 
