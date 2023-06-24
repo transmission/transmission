@@ -318,6 +318,14 @@ export class Transmission extends EventTarget {
         this.refilterAllSoon();
         break;
       }
+      case Prefs.ContrastMode: {
+        // Add custom class to the body/html element to get the appropriate contrast color scheme
+        document.body.classList.remove('contrast-more');
+        document.body.classList.remove('contrast-less');
+        document.body.classList.add(`contrast-${value}`);
+        // this.refilterAllSoon();
+        break;
+      }
 
       case Prefs.FilterMode:
       case Prefs.SortDirection:
@@ -471,12 +479,15 @@ export class Transmission extends EventTarget {
     const { ctrlKey, keyCode, metaKey, shiftKey, target } = event_;
 
     // look for a shortcut
-    const aria_keys = Transmission._createKeyShortcutFromKeyboardEvent(event_);
-    const action = this.action_manager.getActionForShortcut(aria_keys);
-    if (action) {
-      event_.preventDefault();
-      this.action_manager.click(action);
-      return;
+    const is_input_focused = target.matches('input');
+    if (!is_input_focused) {
+      const shortcut = Transmission._createKeyShortcutFromKeyboardEvent(event_);
+      const action = this.action_manager.getActionForShortcut(shortcut);
+      if (action) {
+        event_.preventDefault();
+        this.action_manager.click(action);
+        return;
+      }
     }
 
     const esc_key = keyCode === 27; // esc key pressed
@@ -487,7 +498,6 @@ export class Transmission extends EventTarget {
     }
 
     const any_popup_active = document.querySelector('.popup:not(.hidden)');
-    const is_input_focused = target.matches('input');
     const rows = this._rows;
 
     // Some shortcuts can only be used if the following conditions are met:
@@ -555,7 +565,10 @@ export class Transmission extends EventTarget {
   static _dragenter(event_) {
     if (event_.dataTransfer && event_.dataTransfer.types) {
       const copy_types = new Set(['text/uri-list', 'text/plain']);
-      if (event_.dataTransfer.types.some((type) => copy_types.has(type))) {
+      if (
+        event_.dataTransfer.types.some((type) => copy_types.has(type)) ||
+        event_.dataTransfer.types.includes('Files')
+      ) {
         event_.stopPropagation();
         event_.preventDefault();
         event_.dataTransfer.dropEffect = 'copy';
@@ -587,8 +600,8 @@ export class Transmission extends EventTarget {
       return true;
     }
 
-    const type = event_.data.Transfer.types
-      .filter((t) => ['text/uri-list', 'text/plain'].contains(t))
+    const type = event_.dataTransfer.types
+      .filter((t) => ['text/uri-list', 'text/plain'].includes(t))
       .pop();
     for (const uri of event_.dataTransfer
       .getData(type)
@@ -598,6 +611,11 @@ export class Transmission extends EventTarget {
       this.remote.addTorrentByUrl(uri, paused);
     }
 
+    const { files } = event_.dataTransfer;
+
+    if (files.length > 0) {
+      this.openDialog = new OpenDialog(this, this.remote, '', files);
+    }
     event_.preventDefault();
     return false;
   }

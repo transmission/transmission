@@ -279,7 +279,7 @@
         <translation>URL(&apos;s) toevoegen</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Hoog</translation>
     </message>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>Hernoemen...</translation>
+        <translation>Hernoemen…</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Zoeken...</translation>
+        <translation>Zoeken…</translation>
     </message>
 </context>
 <context>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>&amp;Openen...</translation>
+        <translation>&amp;Openen…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -920,7 +920,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation>&amp;Nieuw...</translation>
+        <translation>&amp;Nieuw…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,7 +1161,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation>&amp;Verander sessie...</translation>
+        <translation>&amp;Verander sessie…</translation>
     </message>
     <message>
         <location line="+8"/>

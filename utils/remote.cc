@@ -19,10 +19,9 @@
 #include <curl/curl.h>
 
 #include <event2/buffer.h>
-#include <event2/util.h>
 
 #include <fmt/chrono.h>
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h>
@@ -119,7 +118,22 @@ static std::string etaToString(int64_t eta)
         return fmt::format(FMT_STRING("{:d} hrs"), eta / (60 * 60));
     }
 
-    return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
+    if (eta < (60 * 60 * 24 * 30))
+    {
+        return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
+    }
+
+    if (eta < (60 * 60 * 24 * 30 * 12))
+    {
+        return fmt::format(FMT_STRING("{:d} months"), eta / (60 * 60 * 24 * 30));
+    }
+
+    if (eta < (60 * 60 * 24 * 365 * 1000LL)) // up to 999 years
+    {
+        return fmt::format(FMT_STRING("{:d} years"), eta / (60 * 60 * 24 * 365));
+    }
+
+    return "∞";
 }
 
 static std::string tr_strltime(time_t seconds)
@@ -952,9 +966,9 @@ static void printDetails(tr_variant* top)
 
                 for (size_t child_idx = 0, n_children = tr_variantListSize(l); child_idx < n_children; ++child_idx)
                 {
-                    if (tr_variantGetStrView(tr_variantListChild(l, child_idx++), &sv))
+                    if (tr_variantGetStrView(tr_variantListChild(l, child_idx), &sv))
                     {
-                        fmt::print(child_idx == 1 ? "{:s}" : ", {:s}", sv);
+                        fmt::print(child_idx == 0 ? "{:s}" : ", {:s}", sv);
                     }
                 }
 
@@ -974,6 +988,11 @@ static void printDetails(tr_variant* top)
             if (tr_variantDictFindStrView(t, TR_KEY_downloadDir, &sv))
             {
                 fmt::print("  Location: {:s}\n", sv);
+            }
+
+            if (tr_variantDictFindBool(t, TR_KEY_sequentialDownload, &boolVal))
+            {
+                fmt::print("  Sequential Download: {:s}\n", (boolVal ? "Yes" : "No"));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &j))
@@ -1020,7 +1039,7 @@ static void printDetails(tr_variant* top)
                 }
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_downloaded, &i))
+            if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i))
             {
                 if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
                 {
@@ -1440,7 +1459,7 @@ static void printTorrentList(tr_variant* top)
         double total_down = 0;
 
         printf(
-            "%6s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
+            "%6s   %-4s  %9s  %-9s  %6s  %6s  %-5s  %-11s  %s\n",
             "ID",
             "Done",
             "Have",
@@ -1480,7 +1499,7 @@ static void printTorrentList(tr_variant* top)
                     std::string{ "n/a" };
 
                 fmt::print(
-                    FMT_STRING("{:6d}{:c}  {:>4s}  {:>9s}  {:<8s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:s}\n"),
+                    FMT_STRING("{:6d}{:c}  {:>4s}  {:>9s}  {:<9s}  {:6.1f}  {:6.1f}  {:>5s}  {:<11s}  {:s}\n"),
                     torId,
                     error_mark,
                     done_str,
@@ -1499,7 +1518,7 @@ static void printTorrentList(tr_variant* top)
         }
 
         fmt::print(
-            FMT_STRING("Sum:           {:>9s}            {:6.1f}  {:6.1f}\n"),
+            FMT_STRING("Sum:           {:>9s}             {:6.1f}  {:6.1f}\n"),
             strlsize(total_size).c_str(),
             total_up / static_cast<double>(tr_speed_K),
             total_down / static_cast<double>(tr_speed_K));
@@ -3272,6 +3291,8 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, i
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     auto config = Config{};
     auto port = DefaultPort;
     auto host = std::string{};

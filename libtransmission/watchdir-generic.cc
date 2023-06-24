@@ -7,9 +7,9 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "watchdir-base.h"
+#include "libtransmission/watchdir-base.h"
 
 namespace libtransmission
 {
@@ -26,8 +26,8 @@ public:
         : BaseWatchdir{ dirname, std::move(callback), timer_maker }
         , rescan_timer_{ timer_maker.create() }
     {
-        rescan_timer_->setCallback([this]() { scan(); });
-        rescan_timer_->startRepeating(rescan_interval);
+        rescan_timer_->set_callback([this]() { scan(); });
+        rescan_timer_->start_repeating(rescan_interval);
         scan();
     }
 
@@ -37,7 +37,7 @@ private:
 
 } // namespace
 
-std::unique_ptr<Watchdir> Watchdir::createGeneric(
+std::unique_ptr<Watchdir> Watchdir::create_generic(
     std::string_view dirname,
     Callback callback,
     libtransmission::TimerMaker& timer_maker,
@@ -54,7 +54,7 @@ std::unique_ptr<Watchdir> Watchdir::create(
     libtransmission::TimerMaker& timer_maker,
     struct event_base* /*evbase*/)
 {
-    return std::make_unique<GenericWatchdir>(dirname, std::move(callback), timer_maker, genericRescanInterval());
+    return std::make_unique<GenericWatchdir>(dirname, std::move(callback), timer_maker, generic_rescan_interval());
 }
 #endif
 

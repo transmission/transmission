@@ -19,6 +19,9 @@
 #include <process.h> /* _beginthreadex(), _endthreadex() */
 #include <windows.h>
 #include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
+#ifdef small // workaround name collision between libsmall and rpcndr.h
+#undef small
+#endif
 #else
 #include <pwd.h>
 #include <unistd.h> /* getuid() */
@@ -32,18 +35,22 @@
 #include <FindDirectory.h>
 #endif
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "file.h"
-#include "log.h"
-#include "platform.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/platform.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
+
+// FIXME(ckerr) do not merge these three lines.
+// This comment is to make CI think libtransmission has
+// changed so that it will run the libtransmission CI tests
 
 namespace
 {

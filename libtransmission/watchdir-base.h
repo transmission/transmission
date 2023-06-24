@@ -34,7 +34,7 @@ public:
         , callback_{ std::move(callback) }
         , retry_timer_{ timer_maker.create() }
     {
-        retry_timer_->setCallback([this]() { onRetryTimer(); });
+        retry_timer_->set_callback([this]() { onRetryTimer(); });
     }
 
     BaseWatchdir(BaseWatchdir&&) = delete;
@@ -114,7 +114,7 @@ private:
             using namespace std::chrono;
             auto const now = steady_clock::now();
             auto duration = duration_cast<milliseconds>(*next_kick_time - now);
-            retry_timer_->startSingleShot(duration);
+            retry_timer_->start_single_shot(duration);
         }
     }
 

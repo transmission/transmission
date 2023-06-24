@@ -203,7 +203,7 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
 
     pref_widget.setPrefKey(pref_key);
     updateWidgetValue(widget, pref_key);
-    widgets_.insert(pref_key, widget);
+    widgets_.try_emplace(pref_key, widget);
 
     if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
     {
@@ -549,13 +549,10 @@ void PrefsDialog::initPrivacyTab()
 
 void PrefsDialog::onIdleLimitChanged()
 {
-    //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    QString const units_suffix = tr(" minute(s)", nullptr, ui_.idleLimitSpin->value());
-
-    if (ui_.idleLimitSpin->suffix() != units_suffix)
-    {
-        ui_.idleLimitSpin->setSuffix(units_suffix);
-    }
+    //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s)");
+    auto const placeholder = QStringLiteral("%1");
+    Utils::updateSpinBoxFormat(ui_.idleLimitSpin, "PrefsDialog", units_format, placeholder);
 }
 
 void PrefsDialog::initSeedingTab()
@@ -578,13 +575,10 @@ void PrefsDialog::initSeedingTab()
 
 void PrefsDialog::onQueueStalledMinutesChanged()
 {
-    //: Spin box suffix, "Download is inactive if data sharing stopped: [ 5 minutes ago ]" (includes leading space after the number, if needed)
-    QString const units_suffix = tr(" minute(s) ago", nullptr, ui_.queueStalledMinutesSpin->value());
-
-    if (ui_.queueStalledMinutesSpin->suffix() != units_suffix)
-    {
-        ui_.queueStalledMinutesSpin->setSuffix(units_suffix);
-    }
+    //: Spin box format, "Download is inactive if data sharing stopped: [ 5 minutes ago ]"
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s) ago");
+    auto const placeholder = QStringLiteral("%1");
+    Utils::updateSpinBoxFormat(ui_.queueStalledMinutesSpin, "PrefsDialog", units_format, placeholder);
 }
 
 void PrefsDialog::initDownloadingTab()
@@ -813,11 +807,9 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    key2widget_t::iterator const it(widgets_.find(key));
-
-    if (it != widgets_.end())
+    if (auto iter = widgets_.find(key); iter != std::end(widgets_))
     {
-        QWidget* w(it.value());
+        QWidget* const w = iter->second;
 
         w->blockSignals(true);
 

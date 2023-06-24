@@ -476,19 +476,19 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.fPortStatusProgress stopAnimation:self];
     switch (self.fPortChecker.status)
     {
-    case PORT_STATUS_OPEN:
+    case PortStatusOpen:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port is open", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusAvailable];
         break;
-    case PORT_STATUS_CLOSED:
+    case PortStatusClosed:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusUnavailable];
         break;
-    case PORT_STATUS_ERROR:
+    case PortStatusError:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
         break;
-    case PORT_STATUS_CHECKING:
+    case PortStatusChecking:
         break;
     default:
         NSAssert(NO, @"Port checker returned invalid status: %d", self.fPortChecker.status);

@@ -279,7 +279,7 @@
         <translation>Gehitu URLa(k)</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Altua</translation>
     </message>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>Berrizendatu...</translation>
+        <translation>Berrizendatu…</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Bilatu...</translation>
+        <translation>Bilatu…</translation>
     </message>
 </context>
 <context>
@@ -920,7 +920,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;New…</source>
-        <translation>&amp;Berria...</translation>
+        <translation>&amp;Berria…</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1161,17 +1161,17 @@
     <message>
         <location line="+5"/>
         <source>&amp;Change Session…</source>
-        <translation>&amp;Aldatu Saioa...</translation>
+        <translation>&amp;Aldatu Saioa…</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Set &amp;Location…</source>
-        <translation>Zehaztu &amp;Kokapena...</translation>
+        <translation>Zehaztu &amp;Kokapena…</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Open &amp;URL…</source>
-        <translation>Ireki &amp;URLa...</translation>
+        <translation>Ireki &amp;URLa…</translation>
     </message>
     <message>
         <location line="-15"/>
@@ -1740,7 +1740,7 @@ Beste URL nagusi bat gehitzeko, errenkada huts baten ondoren gehitu ezazu.</tran
     <message>
         <location line="+5"/>
         <source>Testing TCP Port…</source>
-        <translation>TCP Ataka probatzen...</translation>
+        <translation>TCP Ataka probatzen…</translation>
     </message>
     <message>
         <location line="+154"/>

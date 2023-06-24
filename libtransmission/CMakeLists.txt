@@ -10,6 +10,10 @@ endif()
 
 check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
 
+add_compile_options(
+    # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
+    $<$<AND:$<BOOL:${APPLE}>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-arc>)
+
 add_library(${TR_NAME} STATIC)
 
 target_sources(${TR_NAME}
@@ -46,12 +50,15 @@ target_sources(${TR_NAME}
         error-types.h
         error.cc
         error.h
+        favicon-cache.h
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
         file-win32.cc
         file.cc
         file.h
+        global-ip-cache.cc
+        global-ip-cache.h
         handshake.cc
         handshake.h
         history.h
@@ -150,6 +157,7 @@ target_sources(${TR_NAME}
         utils-ev.h
         utils.cc
         utils.h
+        utils.mm
         variant-benc.cc
         variant-common.h
         variant-converters.cc
@@ -198,6 +206,7 @@ tr_allow_compile_if(
         watchdir-kqueue.cc
     [=[[APPLE]]=]
         tr-assert.mm
+        utils.mm
     [=[[NOT APPLE]]=]
         tr-assert.cc
     [=[[WIN32]]=]
@@ -258,9 +267,7 @@ tr_target_compile_definitions_for_functions(${TR_NAME}
         $<$<BOOL:${HAVE_LIBINTL}>:${LIBINTL_LIBRARY}>) # gettext, ngettext
 
 target_include_directories(${TR_NAME}
-    PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}
-    INTERFACE
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/..
         ${CMAKE_CURRENT_BINARY_DIR}/..)
 
@@ -290,6 +297,7 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
     PUBLIC
         fmt::fmt-header-only
+        small::small
         libevent::event)
 
 if(INSTALL_LIB)
@@ -300,6 +308,7 @@ if(INSTALL_LIB)
         FILES
             error-types.h
             error.h
+            favicon-cache.h
             file.h
             log.h
             makemeta.h

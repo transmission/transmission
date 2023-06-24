@@ -21,7 +21,6 @@
 #include <QItemSelectionModel>
 #include <QLabel>
 #include <QList>
-#include <QMap>
 #include <QMessageBox>
 #include <QResizeEvent>
 #include <QRegularExpression>
@@ -1098,20 +1097,23 @@ void DetailsDialog::refreshUI()
     ///  Peers tab
     ///
 
-    QMap<QString, QTreeWidgetItem*> peers2;
+    auto peers2 = decltype(peers_){};
     QList<QTreeWidgetItem*> new_items;
 
     for (Torrent const* const t : torrents)
     {
         QString const id_str(QString::number(t->id()));
-        PeerList const peers = t->peers();
 
-        for (Peer const& peer : peers)
+        for (Peer const& peer : t->peers())
         {
             QString const key = id_str + QLatin1Char(':') + peer.address;
-            auto* item = dynamic_cast<PeerItem*>(peers_.value(key, nullptr));
 
-            if (item == nullptr) // new peer has connected
+            PeerItem* item = nullptr;
+            if (auto iter = peers_.find(key); iter != std::end(peers_))
+            {
+                item = dynamic_cast<PeerItem*>(iter->second);
+            }
+            else // new peer has connected
             {
                 item = new PeerItem(peer);
                 item->setTextAlignment(COL_UP, Qt::AlignRight | Qt::AlignVCenter);
@@ -1124,7 +1126,7 @@ void DetailsDialog::refreshUI()
                 new_items << item;
             }
 
-            QString const code = peer.flags;
+            auto const& code = peer.flags;
             item->setStatus(code);
             item->refresh(peer);
 
@@ -1207,23 +1209,22 @@ void DetailsDialog::refreshUI()
             item->setText(COL_STATUS, code);
             item->setToolTip(COL_STATUS, code_tip);
 
-            peers2.insert(key, item);
+            peers2.try_emplace(key, item);
         }
     }
 
     ui_.peersView->addTopLevelItems(new_items);
 
-    for (QString const& key : peers_.keys())
+    for (auto const& [key, item] : peers_)
     {
-        if (!peers2.contains(key)) // old peer has disconnected
+        if (peers2.count(key) == 0U) // old peer has disconnected
         {
-            QTreeWidgetItem* item = peers_.value(key, nullptr);
             ui_.peersView->takeTopLevelItem(ui_.peersView->indexOfTopLevelItem(item));
             delete item;
         }
     }
 
-    peers_ = peers2;
+    peers_ = std::move(peers2);
 
     if (single)
     {
@@ -1310,13 +1311,10 @@ void DetailsDialog::onIdleModeChanged(int index)
 
 void DetailsDialog::onIdleLimitChanged()
 {
-    //: Spin box suffix, "Stop seeding if idle for: [ 5 minutes ]" (includes leading space after the number, if needed)
-    QString const units_suffix = tr(" minute(s)", nullptr, ui_.idleSpin->value());
-
-    if (ui_.idleSpin->suffix() != units_suffix)
-    {
-        ui_.idleSpin->setSuffix(units_suffix);
-    }
+    //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("DetailsDialog", "%1 minute(s)");
+    auto const placeholder = QStringLiteral("%1");
+    Utils::updateSpinBoxFormat(ui_.idleSpin, "DetailsDialog", units_format, placeholder);
 }
 
 void DetailsDialog::onRatioModeChanged(int index)
@@ -1389,10 +1387,14 @@ void DetailsDialog::onAddTrackerClicked()
     {
         for (auto const& [ids, urls] : ids_to_urls)
         {
-            torrentSet(
-                torrent_ids_t{ std::begin(ids), std::end(ids) },
-                TR_KEY_trackerAdd,
-                QList<QString>{ std::begin(urls), std::end(urls) });
+            auto urls_list = QList<QString>{};
+            urls_list.reserve(std::size(urls));
+            for (auto const& url : urls)
+            {
+                urls_list << url;
+            }
+
+            torrentSet(torrent_ids_t{ std::begin(ids), std::end(ids) }, TR_KEY_trackerAdd, urls_list);
         }
     }
 }

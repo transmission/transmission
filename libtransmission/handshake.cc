@@ -10,20 +10,20 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bitfield.h"
-#include "clients.h"
-#include "crypto-utils.h"
-#include "handshake.h"
-#include "log.h"
-#include "peer-io.h"
-#include "timer.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/clients.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/handshake.h"
+#include "libtransmission/log.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
@@ -81,7 +81,7 @@ tr_handshake::ParseResult tr_handshake::parse_handshake(tr_peerIo* peer_io)
     auto flags = tr_bitfield{ HandshakeFlagsBits };
     auto reserved = std::array<uint8_t, HandshakeFlagsBytes>{};
     peer_io->read_bytes(std::data(reserved), std::size(reserved));
-    flags.setRaw(std::data(reserved), std::size(reserved));
+    flags.set_raw(std::data(reserved), std::size(reserved));
     peer_io->set_supports_dht(flags.test(DhtFlag));
     peer_io->set_supports_ltep(flags.test(LtepFlag));
     peer_io->set_supports_fext(flags.test(FextFlag));
@@ -240,27 +240,33 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
     auto const info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readVC requires an info_hash");
 
-    // find the end of PadB by looking for `ENCRYPT(VC)`
-    auto needle = VC;
-    auto filter = tr_message_stream_encryption::Filter{};
-    filter.encryptInit(true, dh_, info_hash);
-    filter.encrypt(std::size(needle), std::data(needle));
+    // We need to find the end of PadB by looking for `ENCRYPT(VC)`,
+    // so calculate and cache the value of `ENCRYPT(VC)`.
+    if (!encrypted_vc_)
+    {
+        auto filter = tr_message_stream_encryption::Filter{};
+        filter.encrypt_init(true, dh_, info_hash);
+
+        auto needle = decltype(VC){};
+        filter.encrypt(std::data(VC), std::size(VC), std::data(needle));
+        encrypted_vc_ = needle;
+    }
 
     for (size_t i = 0; i < PadbMaxlen; ++i)
     {
-        if (peer_io->read_buffer_size() < std::size(needle))
+        if (peer_io->read_buffer_size() < std::size(*encrypted_vc_))
         {
             tr_logAddTraceHand(this, "not enough bytes... returning read_more");
             return READ_LATER;
         }
 
-        if (peer_io->read_buffer_starts_with(needle))
+        if (peer_io->read_buffer_starts_with(*encrypted_vc_))
         {
             tr_logAddTraceHand(this, "got it!");
             // We already know it's a match; now we just need to
             // consume it from the read buffer.
             peer_io->decrypt_init(peer_io->is_incoming(), dh_, info_hash);
-            peer_io->read_bytes(std::data(needle), std::size(needle));
+            peer_io->read_bytes(std::data(*encrypted_vc_), std::size(*encrypted_vc_));
             set_state(tr_handshake::State::AwaitingCryptoSelect);
             return READ_NOW;
         }
@@ -363,7 +369,7 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
     auto reserved = std::array<uint8_t, HandshakeFlagsBytes>{};
     auto flags = tr_bitfield{ HandshakeFlagsBits };
     peer_io->read_bytes(std::data(reserved), std::size(reserved));
-    flags.setRaw(std::data(reserved), std::size(reserved));
+    flags.set_raw(std::data(reserved), std::size(reserved));
     peer_io->set_supports_dht(flags.test(DhtFlag));
     peer_io->set_supports_ltep(flags.test(LtepFlag));
     peer_io->set_supports_fext(flags.test(FextFlag));
@@ -516,7 +522,7 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
     if (auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash); info)
     {
         bool const client_is_seed = info->is_done;
-        bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->address());
+        bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->socket_address());
         tr_logAddTraceHand(this, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
         peer_io->set_torrent_hash(info->info_hash);
 
@@ -782,7 +788,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
         if ((error.code == ETIMEDOUT || error.code == ECONNREFUSED) && info)
         {
-            handshake->mediator_->set_utp_failed(info_hash, io->address());
+            handshake->mediator_->set_utp_failed(info_hash, io->socket_address());
         }
 
         if (handshake->mediator_->allows_tcp() && io->reconnect())
@@ -901,7 +907,7 @@ tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_i
     , mediator_{ mediator }
     , encryption_mode_{ mode }
 {
-    timeout_timer_->startSingleShot(HandshakeTimeoutSec);
+    timeout_timer_->start_single_shot(HandshakeTimeoutSec);
 
     peer_io_->set_callbacks(&tr_handshake::can_read, nullptr, &tr_handshake::on_error, this);
 

@@ -7,26 +7,26 @@
 # Alfredo Monclus <alfredomonclus@gmail.com>, 2017
 # Adolfo Jayme-Barrientos, 2021
 # GPL-advocate <adrlopgal@disroot.org>, 2022
-# picodotdev <pico.dev@gmail.com>, 2022
 # Rodrigo Lledó <rodhos92@gmail.com>, 2023
 # Mike Gelfand <mikedld@mikedld.com>, 2023
+# picodotdev <pico.dev@gmail.com>, 2023
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-09 00:31+0000\n"
+"POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
-"Language-Team: Spanish (https://www.transifex.com/transmissionbt/teams/33778/es/)\n"
+"Last-Translator: picodotdev <pico.dev@gmail.com>, 2023\n"
+"Language-Team: Spanish (https://app.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:512
+#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:527
 msgid "None"
 msgstr "Ninguno"
 
@@ -34,7 +34,7 @@ msgstr "Ninguno"
 msgid "Inf"
 msgstr "Inf"
 
-#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:162 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
+#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:168 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr "No se pudo leer «{path}»: {error} ({error_code})"
 
@@ -46,7 +46,7 @@ msgstr "No se pudo añadir el archivo torrent «{path}»"
 msgid "Removing torrent file '{path}'"
 msgstr "Eliminado archivo torrent «{path}»"
 
-#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:570
+#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:585
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr "No se pudo eliminar «{path}»: {error} ({error_code})"
 
@@ -74,7 +74,7 @@ msgstr "Cargando preferencias desde «{path}»"
 msgid "Saved pidfile '{path}'"
 msgstr "Archivo pid guardado «{path}»"
 
-#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1175 ../libtransmission/torrent.cc:2164 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:183 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1141 ../libtransmission/torrent.cc:2130 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr "No se pudo guardar «{path}»: {error} ({error_code})"
 
@@ -98,64 +98,64 @@ msgstr "No se pudo añadir el evento: {error} ({error_code})"
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr "No se pudo lanzar el bucle de eventos del demonio: {error} ({error_code})"
 
-#: ../gtk/Application.cc:394
+#: ../gtk/Application.cc:395
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr "No se pudo registrar Transmission como un gestor de {content_type}: {error} ({error_code})"
 
-#: ../gtk/Application.cc:551
+#: ../gtk/Application.cc:552
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr "Se ha obtenido la señal de finalización, intentando terminar limpiamente. Vuélvalo a hacer si se bloquea."
 
-#: ../gtk/Application.cc:777
+#: ../gtk/Application.cc:778
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr "Transmission es un programa para compartir archivos. Cuando ejecuta un torrent, sus datos se pondrán a disposición de otros cargándolos a la red. La responsabilidad sobre cualquier contenido que comparta es completamente suya."
 
-#: ../gtk/Application.cc:783 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
+#: ../gtk/Application.cc:784 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
 msgstr "_Cancelar"
 
-#: ../gtk/Application.cc:784
+#: ../gtk/Application.cc:785
 msgid "I _Agree"
 msgstr "Yo _Acepto"
 
-#: ../gtk/Application.cc:1013
+#: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
-msgstr "Cerrando conexiones..."
+msgstr "Cerrando conexiones…"
 
-#: ../gtk/Application.cc:1018
+#: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
-msgstr "Enviando totales de carga/descarga al rastreador…"
+msgstr "Enviando totales de subida/descarga al rastreador…"
 
-#: ../gtk/Application.cc:1023
+#: ../gtk/Application.cc:1024
 msgid "_Quit Now"
 msgstr "_Salir ahora"
 
-#: ../gtk/Application.cc:1085
+#: ../gtk/Application.cc:1086
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "No se pudo añadir el torrent dañado"
 msgstr[1] "No se pudieron añadir los torrents dañados"
 msgstr[2] "No se pudieron añadir los torrents dañados"
 
-#: ../gtk/Application.cc:1092
+#: ../gtk/Application.cc:1093
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "No se pudo añadir el torrent duplicado"
 msgstr[1] "No se pudieron añadir los torrents duplicados"
 msgstr[2] "No se pudieron añadir los torrents duplicados"
 
-#: ../gtk/Application.cc:1413
+#: ../gtk/Application.cc:1414
 msgid "A fast and easy BitTorrent client"
 msgstr "Un cliente de BitTorrent rápido y sencillo"
 
-#: ../gtk/Application.cc:1414
+#: ../gtk/Application.cc:1415
 msgid "Copyright © The Transmission Project"
 msgstr "Copyright © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1420
+#: ../gtk/Application.cc:1421
 msgid "translator-credits"
 msgstr ""
 "Vicente Carro Fernandez , 2006\n"
@@ -331,14 +331,14 @@ msgstr "Creado el {date}"
 msgid "Unknown"
 msgstr "Desconocido"
 
-#: ../gtk/DetailsDialog.cc:874 ../gtk/MakeDialog.cc:387
+#: ../gtk/DetailsDialog.cc:874 ../gtk/MakeDialog.cc:388
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] "{total_size} en {file_count:L} archivo"
 msgstr[1] "{total_size} en {file_count:L} archivos"
 msgstr[2] "{total_size} en {file_count:L} archivos"
 
-#: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:393
+#: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:394
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] "({piece_count} pieza BitTorrent @ {piece_size})"
@@ -393,11 +393,11 @@ msgstr "Descargaríamos desde este par si nos lo permitiera"
 
 #: ../gtk/DetailsDialog.cc:1501
 msgid "Uploading to peer"
-msgstr "Cargando al par"
+msgstr "Subiendo al par"
 
 #: ../gtk/DetailsDialog.cc:1505
 msgid "We would upload to this peer if they asked"
-msgstr "Se cargaría a este par si lo solicitara"
+msgstr "Se subiría a este par si lo solicitara"
 
 #: ../gtk/DetailsDialog.cc:1509
 msgid "Peer has unchoked us, but we're not interested"
@@ -442,7 +442,7 @@ msgstr "Pet. descarga"
 
 #: ../gtk/DetailsDialog.cc:1650
 msgid "Up Reqs"
-msgstr "Pets. carga"
+msgstr "Pets. subida"
 
 #: ../gtk/DetailsDialog.cc:1657
 msgid "Dn Blocks"
@@ -450,7 +450,7 @@ msgstr "Bloques de descarga"
 
 #: ../gtk/DetailsDialog.cc:1664
 msgid "Up Blocks"
-msgstr "Bloques de carga"
+msgstr "Bloques de subida"
 
 #: ../gtk/DetailsDialog.cc:1671
 msgid "We Cancelled"
@@ -503,7 +503,7 @@ msgstr "No hay actualizaciones programadas"
 
 #: ../gtk/DetailsDialog.cc:1864
 msgid "Asking for more peers {time_span_from_now}"
-msgstr "Solicitando más pares {time_span_from_now}"
+msgstr "Solicitando más pares en {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1871
 msgid "Queued to ask for more peers"
@@ -517,7 +517,7 @@ msgstr "Se han solicitado más pares {markup_begin}{time_span_ago}{markup_end}"
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:1904
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr "El rastreador tuvo {markup_begin}{seeder_count} {seeder_or_seeders} y {leecher_count}{leecher_or_leechers}{markup_end} {time_span_ago}"
+msgstr "El rastreador tuvo {markup_begin}{seeder_count} {seeder_or_seeders} y {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1906
 msgid "seeder"
@@ -634,7 +634,7 @@ msgstr[2] "Algunos torrents no se han descargado todavía."
 msgid "_Delete"
 msgstr "_Eliminar"
 
-#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2021 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1420
+#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2025 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1424
 msgid "_Remove"
 msgstr "_Quitar"
 
@@ -800,7 +800,7 @@ msgstr "No se pudo crear «{path}»: {error} ({error_code})"
 msgid "Scanned {file_size}"
 msgstr "Analizado {file_size}"
 
-#: ../gtk/MakeDialog.cc:381 ../gtk/MakeDialog.cc:544 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
+#: ../gtk/MakeDialog.cc:382 ../gtk/MakeDialog.cc:545 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
 msgid "No source selected"
 msgstr "Ningún origen seleccionado"
 
@@ -887,7 +887,7 @@ msgstr "_Abrir"
 
 #: ../gtk/OptionsDialog.cc:385
 msgid "Show options dialog"
-msgstr "Mostrar pciones de diálogo"
+msgstr "Mostrar opciones de diálogo"
 
 #: ../gtk/PathButton.cc:145
 msgid "Select a File"
@@ -940,7 +940,7 @@ msgstr "No se pudo actualizar la lista de blqueos"
 msgid "Getting new blocklist…"
 msgstr "Obteniendo una lista de bloqueo nueva…"
 
-#: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1266 ../gtk/ui/gtk4/PrefsDialog.ui:885
+#: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
 msgstr "Estado desconocido"
 
@@ -954,7 +954,7 @@ msgstr "El puerto está {markup_begin}abierto{markup_end}"
 
 #: ../gtk/PrefsDialog.cc:923
 msgid "Testing TCP port…"
-msgstr "Probando puerto TCP..."
+msgstr "Probando puerto TCP…"
 
 #: ../gtk/RelocateDialog.cc:84
 msgid "Moving '{torrent_name}'"
@@ -1052,7 +1052,7 @@ msgstr "{download_speed} ▼ {upload_speed} ▲"
 msgid "Stalled"
 msgstr "Estancado"
 
-#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2213
+#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2179
 msgid "Tracker warning: '{warning}'"
 msgstr "Advertencia de rastreador: «{warning}»"
 
@@ -1183,30 +1183,30 @@ msgstr "ahora"
 #: ../gtk/Utils.cc:180
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] "Hace {days_ago:L} día"
-msgstr[1] "Hace {days_ago:L} días"
-msgstr[2] "Hace {days_ago:L} días"
+msgstr[0] "hace {days_ago:L} día"
+msgstr[1] "hace {days_ago:L} días"
+msgstr[2] "hace {days_ago:L} días"
 
 #: ../gtk/Utils.cc:186
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] "Hace {hours_ago:L} hora"
-msgstr[1] "Hace {hours_ago:L} hora"
-msgstr[2] "Hace {hours_ago:L} horas"
+msgstr[0] "hace {hours_ago:L} hora"
+msgstr[1] "hace {hours_ago:L} hora"
+msgstr[2] "hace {hours_ago:L} horas"
 
 #: ../gtk/Utils.cc:193
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] "Hace {minutes_ago:L} minuto"
-msgstr[1] "Hace {minutes_ago:L} minutos"
-msgstr[2] "Hace {minutes_ago:L} minutos"
+msgstr[0] "hace {minutes_ago:L} minuto"
+msgstr[1] "hace {minutes_ago:L} minutos"
+msgstr[2] "hace {minutes_ago:L} minutos"
 
 #: ../gtk/Utils.cc:200
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] "Hace {seconds_ago:L} segundo"
-msgstr[1] "Hace {seconds_ago:L} segundos"
-msgstr[2] "Hace {seconds_ago:L} segundos"
+msgstr[0] "hace {seconds_ago:L} segundo"
+msgstr[1] "hace {seconds_ago:L} segundos"
+msgstr[2] "hace {seconds_ago:L} segundos"
 
 #: ../gtk/Utils.cc:213
 msgid "{days:L} day"
@@ -1359,11 +1359,11 @@ msgstr "Abrir _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "Abrir URL..."
+msgstr "Abrir URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
-msgstr "_Nuevo..."
+msgstr "_Nuevo…"
 
 #: ../gtk/transmission.ui:34 ../gtk/transmission.ui:479
 msgid "_Start All"
@@ -1467,7 +1467,7 @@ msgstr "Pausar torrent"
 
 #: ../gtk/transmission.ui:149 ../gtk/transmission.ui:418
 msgid "Set _Location…"
-msgstr "Cambiar _ubicación..."
+msgstr "Cambiar _ubicación…"
 
 #: ../gtk/transmission.ui:153 ../gtk/transmission.ui:422
 msgid "_Verify Local Data"
@@ -1545,7 +1545,7 @@ msgstr "Ordenar por tiempo re_stante"
 msgid "Re_verse Sort Order"
 msgstr "_Invertir el orden"
 
-#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1478
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1482
 msgid "_Help"
 msgstr "Ay_uda"
 
@@ -1581,7 +1581,7 @@ msgstr "Mo_strar Transmission"
 msgid "Enable Alternative Speed _Limits"
 msgstr "Activar _límites de velocidad alternativos"
 
-#: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2006 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1412
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2010 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1416
 msgid "_Add"
 msgstr "_Añadir"
 
@@ -1593,7 +1593,7 @@ msgstr "Rastreador"
 msgid "_Announce URL:"
 msgstr "_Anunciar URL:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1491 ../gtk/ui/gtk4/StatsDialog.ui:253
+#: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1495 ../gtk/ui/gtk4/StatsDialog.ui:253
 msgid "_Close"
 msgstr "_Cerrar"
 
@@ -1611,7 +1611,7 @@ msgstr "Tengo:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:104 ../gtk/ui/gtk3/StatsDialog.ui:92 ../gtk/ui/gtk3/StatsDialog.ui:250 ../gtk/ui/gtk4/DetailsDialog.ui:59 ../gtk/ui/gtk4/StatsDialog.ui:33 ../gtk/ui/gtk4/StatsDialog.ui:151
 msgid "Uploaded:"
-msgstr "Cargado:"
+msgstr "Subido:"
 
 #: ../gtk/ui/gtk3/DetailsDialog.ui:116 ../gtk/ui/gtk3/StatsDialog.ui:117 ../gtk/ui/gtk3/StatsDialog.ui:275 ../gtk/ui/gtk4/DetailsDialog.ui:69 ../gtk/ui/gtk4/StatsDialog.ui:54 ../gtk/ui/gtk4/StatsDialog.ui:172
 msgid "Downloaded:"
@@ -1689,7 +1689,7 @@ msgstr "Lista de archivos no disponible para propiedades de torrents combinadas"
 msgid "Files"
 msgstr "Archivos"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:390 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:245
+#: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:391 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:246
 msgid "Speed"
 msgstr "Velocidad"
 
@@ -1729,7 +1729,7 @@ msgstr "Conexiones de pares"
 msgid "_Maximum peers:"
 msgstr "_Máximo número de pares:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1415 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:980
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1417 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:982
 msgid "Options"
 msgstr "Opciones"
 
@@ -1849,7 +1849,7 @@ msgstr "Seleccionar carpeta de destino"
 msgid "_Start when added"
 msgstr "_Iniciar torrents al añadirlos"
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:478 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
+#: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:479 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:315
 msgid "Mo_ve torrent file to the trash"
 msgstr "Mo_ver archivo torrent a la papelera"
 
@@ -1857,219 +1857,219 @@ msgstr "Mo_ver archivo torrent a la papelera"
 msgid "Transmission Preferences"
 msgstr "Preferencias de Transmission"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:72 ../gtk/ui/gtk4/PrefsDialog.ui:26
+#: ../gtk/ui/gtk3/PrefsDialog.ui:73 ../gtk/ui/gtk4/PrefsDialog.ui:27
 msgid "Speed Limits"
 msgstr "Límites de velocidad"
 
 #. Checkbox to limit upload speed
-#: ../gtk/ui/gtk3/PrefsDialog.ui:94 ../gtk/ui/gtk4/PrefsDialog.ui:40
+#: ../gtk/ui/gtk3/PrefsDialog.ui:95 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
 msgstr "_Subida ({speed_units}):"
 
 #. Checkbox to limit download speed
-#: ../gtk/ui/gtk3/PrefsDialog.ui:109 ../gtk/ui/gtk4/PrefsDialog.ui:52
+#: ../gtk/ui/gtk3/PrefsDialog.ui:110 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
 msgstr "Descarga ({speed_units}):"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:174 ../gtk/ui/gtk4/PrefsDialog.ui:96
+#: ../gtk/ui/gtk3/PrefsDialog.ui:175 ../gtk/ui/gtk4/PrefsDialog.ui:97
 msgid "Alternative Speed Limits"
 msgstr "Límites de velocidad alternativos"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:218 ../gtk/ui/gtk4/PrefsDialog.ui:118
+#: ../gtk/ui/gtk3/PrefsDialog.ui:219 ../gtk/ui/gtk4/PrefsDialog.ui:119
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr "Sobrescribir los límites de velocidad normal manualmente o en las programaciones"
 
 #. Labels a spinbutton for alternate upload speed limits
-#: ../gtk/ui/gtk3/PrefsDialog.ui:234 ../gtk/ui/gtk4/PrefsDialog.ui:132
+#: ../gtk/ui/gtk3/PrefsDialog.ui:235 ../gtk/ui/gtk4/PrefsDialog.ui:133
 msgid "U_pload ({speed_units}):"
 msgstr "Su_bida ({speed_units}):"
 
 #. Labels a spinbutton for alternate download speed limits
-#: ../gtk/ui/gtk3/PrefsDialog.ui:248 ../gtk/ui/gtk4/PrefsDialog.ui:144
+#: ../gtk/ui/gtk3/PrefsDialog.ui:249 ../gtk/ui/gtk4/PrefsDialog.ui:145
 msgid "Do_wnload ({speed_units}):"
 msgstr "Des_carga ({speed_units}):"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:260 ../gtk/ui/gtk4/PrefsDialog.ui:156
+#: ../gtk/ui/gtk3/PrefsDialog.ui:261 ../gtk/ui/gtk4/PrefsDialog.ui:157
 msgid "_Scheduled times:"
 msgstr "_Horas de programación:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:278 ../gtk/ui/gtk4/PrefsDialog.ui:169
+#: ../gtk/ui/gtk3/PrefsDialog.ui:279 ../gtk/ui/gtk4/PrefsDialog.ui:170
 msgid "_On days:"
 msgstr "L_os días:"
 
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
-#: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
+#: ../gtk/ui/gtk3/PrefsDialog.ui:336 ../gtk/ui/gtk4/PrefsDialog.ui:213
 msgid "_to"
 msgstr "_a"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
+#: ../gtk/ui/gtk3/PrefsDialog.ui:408 ../gtk/ui/gtk4/PrefsDialog.ui:261
 msgctxt "Gerund"
 msgid "Adding"
 msgstr "Añadiendo"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:429 ../gtk/ui/gtk4/PrefsDialog.ui:274
+#: ../gtk/ui/gtk3/PrefsDialog.ui:430 ../gtk/ui/gtk4/PrefsDialog.ui:275
 msgid "Automatically add torrent files _from:"
 msgstr "Añadir automáticamente archivos torrent _desde:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:444 ../gtk/ui/gtk4/PrefsDialog.ui:286
+#: ../gtk/ui/gtk3/PrefsDialog.ui:445 ../gtk/ui/gtk4/PrefsDialog.ui:287
 msgid "Show the Torrent Options _dialog"
 msgstr "Mostrar el diálogo de _opciones"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:461 ../gtk/ui/gtk4/PrefsDialog.ui:300
+#: ../gtk/ui/gtk3/PrefsDialog.ui:462 ../gtk/ui/gtk4/PrefsDialog.ui:301
 msgid "_Start added torrents"
 msgstr "Iniciar todos los torrents"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:497 ../gtk/ui/gtk4/PrefsDialog.ui:328
+#: ../gtk/ui/gtk3/PrefsDialog.ui:498 ../gtk/ui/gtk4/PrefsDialog.ui:329
 msgid "Save to _Location:"
 msgstr "Guardar en _la ubicación:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:583 ../gtk/ui/gtk4/PrefsDialog.ui:392
+#: ../gtk/ui/gtk3/PrefsDialog.ui:584 ../gtk/ui/gtk4/PrefsDialog.ui:393
 msgid "Download Queue"
 msgstr "Cola de descargas"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:607 ../gtk/ui/gtk4/PrefsDialog.ui:406
+#: ../gtk/ui/gtk3/PrefsDialog.ui:608 ../gtk/ui/gtk4/PrefsDialog.ui:407
 msgid "Ma_ximum active downloads:"
 msgstr "Máximas _descargas activas:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:621 ../gtk/ui/gtk4/PrefsDialog.ui:418
+#: ../gtk/ui/gtk3/PrefsDialog.ui:622 ../gtk/ui/gtk4/PrefsDialog.ui:419
 msgid "Downloads sharing data in the last _N minutes are active:"
 msgstr "Descargas compartiendo datos activas en los últimos N minutos:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:676 ../gtk/ui/gtk4/PrefsDialog.ui:457
+#: ../gtk/ui/gtk3/PrefsDialog.ui:677 ../gtk/ui/gtk4/PrefsDialog.ui:458
 msgid "Incomplete"
 msgstr "Incompleto"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:698 ../gtk/ui/gtk4/PrefsDialog.ui:471
+#: ../gtk/ui/gtk3/PrefsDialog.ui:699 ../gtk/ui/gtk4/PrefsDialog.ui:472
 msgid "Append \"._part\" to incomplete files' names"
 msgstr "Añadir «._part» a los nombres de archivos incompletos"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:715 ../gtk/ui/gtk4/PrefsDialog.ui:485
+#: ../gtk/ui/gtk3/PrefsDialog.ui:716 ../gtk/ui/gtk4/PrefsDialog.ui:486
 msgid "Keep _incomplete torrents in:"
 msgstr "Guardar torrents _incompletos en:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:730 ../gtk/ui/gtk4/PrefsDialog.ui:497
+#: ../gtk/ui/gtk3/PrefsDialog.ui:731 ../gtk/ui/gtk4/PrefsDialog.ui:498
 msgid "Call scrip_t when done downloading:"
 msgstr "Llamar a scrip_t al completar la descarga:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:786 ../gtk/ui/gtk4/PrefsDialog.ui:536
+#: ../gtk/ui/gtk3/PrefsDialog.ui:787 ../gtk/ui/gtk4/PrefsDialog.ui:537
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "Descargas"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:804 ../gtk/ui/gtk4/PrefsDialog.ui:551
+#: ../gtk/ui/gtk3/PrefsDialog.ui:805 ../gtk/ui/gtk4/PrefsDialog.ui:552
 msgid "Limits"
 msgstr "Límites"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:826 ../gtk/ui/gtk4/PrefsDialog.ui:565
+#: ../gtk/ui/gtk3/PrefsDialog.ui:827 ../gtk/ui/gtk4/PrefsDialog.ui:566
 msgid "Stop seeding at _ratio:"
 msgstr "Deja_r de compartir al alcanzar la proporción:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:841 ../gtk/ui/gtk4/PrefsDialog.ui:577
+#: ../gtk/ui/gtk3/PrefsDialog.ui:842 ../gtk/ui/gtk4/PrefsDialog.ui:578
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "Dejar de compartir si está inactivo por _N minutos:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:856 ../gtk/ui/gtk4/PrefsDialog.ui:589
+#: ../gtk/ui/gtk3/PrefsDialog.ui:857 ../gtk/ui/gtk4/PrefsDialog.ui:590
 msgid "Call scrip_t when done seeding:"
 msgstr "Llamar al scrip_t al completar la siembra:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:922 ../gtk/ui/gtk4/PrefsDialog.ui:638
+#: ../gtk/ui/gtk3/PrefsDialog.ui:923 ../gtk/ui/gtk4/PrefsDialog.ui:639
 msgctxt "Gerund"
 msgid "Seeding"
 msgstr "Compartiendo"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:940 ../gtk/ui/gtk3/PrefsDialog.ui:1147 ../gtk/ui/gtk4/PrefsDialog.ui:653 ../gtk/ui/gtk4/PrefsDialog.ui:791
+#: ../gtk/ui/gtk3/PrefsDialog.ui:941 ../gtk/ui/gtk3/PrefsDialog.ui:1148 ../gtk/ui/gtk4/PrefsDialog.ui:654 ../gtk/ui/gtk4/PrefsDialog.ui:792
 msgid "Privacy"
 msgstr "Privacidad"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:964 ../gtk/ui/gtk4/PrefsDialog.ui:667
+#: ../gtk/ui/gtk3/PrefsDialog.ui:965 ../gtk/ui/gtk4/PrefsDialog.ui:668
 msgid "_Encryption mode:"
 msgstr "Modo d_e cifrado:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1008 ../gtk/ui/gtk4/PrefsDialog.ui:695
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1009 ../gtk/ui/gtk4/PrefsDialog.ui:696
 msgid "Blocklist"
 msgstr "Lista de bloqueos"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1030 ../gtk/ui/gtk4/PrefsDialog.ui:709
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1031 ../gtk/ui/gtk4/PrefsDialog.ui:710
 msgid "Enable _blocklist:"
 msgstr "Activar lista de _bloqueo:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1045 ../gtk/ui/gtk4/PrefsDialog.ui:722
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1046 ../gtk/ui/gtk4/PrefsDialog.ui:723
 msgid "Enable _automatic updates"
 msgstr "Activar _actualizaciones automáticas"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1100 ../gtk/ui/gtk4/PrefsDialog.ui:763
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1101 ../gtk/ui/gtk4/PrefsDialog.ui:764
 msgid "_Update"
 msgstr "Act_ualizar"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1165 ../gtk/ui/gtk4/PrefsDialog.ui:806
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1167 ../gtk/ui/gtk4/PrefsDialog.ui:808
 msgid "Listening Port"
 msgstr "Puerto de escucha"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1189 ../gtk/ui/gtk4/PrefsDialog.ui:820
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1191 ../gtk/ui/gtk4/PrefsDialog.ui:822
 msgid "_Port used for incoming connections:"
 msgstr "_Puerto usado para conexiones entrantes:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1201 ../gtk/ui/gtk4/PrefsDialog.ui:832
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1203 ../gtk/ui/gtk4/PrefsDialog.ui:834
 msgid "Pick a _random port every time Transmission is started"
 msgstr "Escoger un puerto al a_zar cada vez que inicie Transmission"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1218 ../gtk/ui/gtk4/PrefsDialog.ui:846
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1220 ../gtk/ui/gtk4/PrefsDialog.ui:848
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "Utilizar _redirección de puertos UPnP o NAT-PMP desde mi enrutador"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1280 ../gtk/ui/gtk4/PrefsDialog.ui:894
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1282 ../gtk/ui/gtk4/PrefsDialog.ui:896
 msgid "Te_st Port"
 msgstr "_Comprobar puerto"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1322 ../gtk/ui/gtk4/PrefsDialog.ui:915
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1324 ../gtk/ui/gtk4/PrefsDialog.ui:917
 msgid "Peer Limits"
 msgstr "Límite de conexiones"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1346 ../gtk/ui/gtk4/PrefsDialog.ui:929
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1348 ../gtk/ui/gtk4/PrefsDialog.ui:931
 msgid "Maximum peers per _torrent:"
 msgstr "Máximo número de pares por _torrent:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1360 ../gtk/ui/gtk4/PrefsDialog.ui:941
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1362 ../gtk/ui/gtk4/PrefsDialog.ui:943
 msgid "Maximum peers _overall:"
 msgstr "Máximo número de pares en total:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1437 ../gtk/ui/gtk4/PrefsDialog.ui:994
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
 msgstr "Habilitar µ_TP para comuniación con pares"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1441 ../gtk/ui/gtk4/PrefsDialog.ui:996
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
 msgstr "µTP es una herramienta para reducir la congestión de la red."
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1009
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1457 ../gtk/ui/gtk4/PrefsDialog.ui:1011
 msgid "Use PE_X to find more peers"
 msgstr "Usar PE_X para buscar más pares"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1459 ../gtk/ui/gtk4/PrefsDialog.ui:1011
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1461 ../gtk/ui/gtk4/PrefsDialog.ui:1013
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr "PEX es una herramienta para intercambiar listas de pares con los pares a los que está conectado."
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1473 ../gtk/ui/gtk4/PrefsDialog.ui:1024
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1475 ../gtk/ui/gtk4/PrefsDialog.ui:1026
 msgid "Use _DHT to find more peers"
 msgstr "Usar _DHT para buscar más pares"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1477 ../gtk/ui/gtk4/PrefsDialog.ui:1026
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1479 ../gtk/ui/gtk4/PrefsDialog.ui:1028
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr "DHT es una herramienta para buscar pares sin un rastreador."
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1491 ../gtk/ui/gtk4/PrefsDialog.ui:1039
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1493 ../gtk/ui/gtk4/PrefsDialog.ui:1041
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr "Usar el descubridor de pares _locales para buscar más pares"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1495 ../gtk/ui/gtk4/PrefsDialog.ui:1041
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1497 ../gtk/ui/gtk4/PrefsDialog.ui:1043
 msgid "LPD is a tool for finding peers on your local network."
 msgstr "DPL es una herramienta para encontrar pares en su red local."
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1530 ../gtk/ui/gtk4/PrefsDialog.ui:1061
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1532 ../gtk/ui/gtk4/PrefsDialog.ui:1063
 msgid "Default Public Trackers"
 msgstr "Rastreadores públicos por defecto"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1562 ../gtk/ui/gtk4/PrefsDialog.ui:1084
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1565 ../gtk/ui/gtk4/PrefsDialog.ui:1087
 msgid ""
 "Trackers to use on all public torrents.\n"
 "\n"
@@ -2081,79 +2081,79 @@ msgstr ""
 "Para añadir una copia de seguridad de URL, añádala en la siguiente línea después de la URL primaria.\n"
 "Para añadir una nueva URL primaria, añádala después de una línea en blanco. "
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1591 ../gtk/ui/gtk4/PrefsDialog.ui:1103
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1595 ../gtk/ui/gtk4/PrefsDialog.ui:1107
 msgid "Network"
 msgstr "Red"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1609 ../gtk/ui/gtk3/PrefsDialog.ui:1773 ../gtk/ui/gtk4/PrefsDialog.ui:1118 ../gtk/ui/gtk4/PrefsDialog.ui:1227
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1613 ../gtk/ui/gtk3/PrefsDialog.ui:1777 ../gtk/ui/gtk4/PrefsDialog.ui:1122 ../gtk/ui/gtk4/PrefsDialog.ui:1231
 msgid "Desktop"
 msgstr "Escritorio"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1631 ../gtk/ui/gtk4/PrefsDialog.ui:1132
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1635 ../gtk/ui/gtk4/PrefsDialog.ui:1136
 msgid "_Inhibit hibernation when torrents are active"
 msgstr "_Inhibir la hibernación cuando hay torrents activos"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1648 ../gtk/ui/gtk4/PrefsDialog.ui:1146
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1652 ../gtk/ui/gtk4/PrefsDialog.ui:1150
 msgid "Show Transmission icon in the _notification area"
 msgstr "Mostrar el icono de Transmission en el área de _notificación"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1686 ../gtk/ui/gtk4/PrefsDialog.ui:1167
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1690 ../gtk/ui/gtk4/PrefsDialog.ui:1171
 msgid "Notification"
 msgstr "Notificación"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1708 ../gtk/ui/gtk4/PrefsDialog.ui:1181
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1712 ../gtk/ui/gtk4/PrefsDialog.ui:1185
 msgid "Show a notification when torrents are a_dded"
 msgstr "Mostrar una notificación cuando se aña_den torrents"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1725 ../gtk/ui/gtk4/PrefsDialog.ui:1195
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1729 ../gtk/ui/gtk4/PrefsDialog.ui:1199
 msgid "Show a notification when torrents _finish"
 msgstr "Mostrar una notificación _cuando terminan los torrents"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1742 ../gtk/ui/gtk4/PrefsDialog.ui:1209
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1746 ../gtk/ui/gtk4/PrefsDialog.ui:1213
 msgid "Play a _sound when torrents finish"
-msgstr "Reproducir un _sonido cuando terminen los torrents"
+msgstr "Reproducir un _sonido cuando terminan los torrents"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1791 ../gtk/ui/gtk4/PrefsDialog.ui:1242
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1795 ../gtk/ui/gtk4/PrefsDialog.ui:1246
 msgid "Remote Control"
 msgstr "Control remoto"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1819 ../gtk/ui/gtk4/PrefsDialog.ui:1261
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1823 ../gtk/ui/gtk4/PrefsDialog.ui:1265
 msgid "Allow _remote access"
 msgstr "Permitir control remoto"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1835 ../gtk/ui/gtk4/PrefsDialog.ui:1270
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1839 ../gtk/ui/gtk4/PrefsDialog.ui:1274
 msgid "_Open web client"
 msgstr "Abrir navegad_or web"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1861 ../gtk/ui/gtk4/PrefsDialog.ui:1286
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1865 ../gtk/ui/gtk4/PrefsDialog.ui:1290
 msgid "HTTP _port:"
 msgstr "_Puerto HTTP:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1873 ../gtk/ui/gtk4/PrefsDialog.ui:1299
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1877 ../gtk/ui/gtk4/PrefsDialog.ui:1303
 msgid "Use _authentication"
 msgstr "Usar _autenticación"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1893 ../gtk/ui/gtk4/PrefsDialog.ui:1313
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/PrefsDialog.ui:1317
 msgid "_Username:"
 msgstr "_Usuario:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1907 ../gtk/ui/gtk4/PrefsDialog.ui:1325
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1911 ../gtk/ui/gtk4/PrefsDialog.ui:1329
 msgid "Pass_word:"
 msgstr "Contra_seña:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1919 ../gtk/ui/gtk4/PrefsDialog.ui:1338
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1923 ../gtk/ui/gtk4/PrefsDialog.ui:1342
 msgid "Only allow these IP a_ddresses:"
 msgstr "Permitir la conexión sólo a estas _direcciones IP:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1941 ../gtk/ui/gtk4/PrefsDialog.ui:1354
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1945 ../gtk/ui/gtk4/PrefsDialog.ui:1358
 msgid "Addresses:"
 msgstr "Direcciones:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:2052 ../gtk/ui/gtk4/PrefsDialog.ui:1442
+#: ../gtk/ui/gtk3/PrefsDialog.ui:2056 ../gtk/ui/gtk4/PrefsDialog.ui:1446
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr "Las direcciones IP pueden incluir comodines, como 192.168.*.*"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:2081 ../gtk/ui/gtk4/PrefsDialog.ui:1461
+#: ../gtk/ui/gtk3/PrefsDialog.ui:2085 ../gtk/ui/gtk4/PrefsDialog.ui:1465
 msgid "Remote"
 msgstr "Remoto"
 
@@ -2209,11 +2209,11 @@ msgstr "Abrir torrent desde un URL"
 msgid "_URL"
 msgstr "_URL"
 
-#: ../libtransmission/announcer-http.cc:465
+#: ../libtransmission/announcer-http.cc:448
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr "No se pudo analizar la respuesta de anuncio: {error} ({error_code})"
 
-#: ../libtransmission/announcer-http.cc:676
+#: ../libtransmission/announcer-http.cc:659
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr "No se pudo analizar la respuesta de rastreo: {error} ({error_code})"
 
@@ -2225,7 +2225,7 @@ msgstr "Error Desconocido"
 msgid "Connection failed"
 msgstr "Conexión fallida"
 
-#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:554
+#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:567
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr "No se pudo recuperar «{address}:{port}»: {error} ({error_code})"
 
@@ -2272,7 +2272,7 @@ msgstr "Reescribiendo antiguo formato de archivo de lista de bloqueo a nuevo for
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr "{crypto_library} error: {error} ({error_code})"
 
-#: ../libtransmission/inout.cc:146
+#: ../libtransmission/inout.cc:126 ../libtransmission/inout.cc:151
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr "No se pudo obtener «{path}»:  {error} ({error_code})"
 
@@ -2474,9 +2474,9 @@ msgstr "Versión de Tranmission {version} cerrando"
 #: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
-msgstr[0] "Cargado {count} torrent"
-msgstr[1] "Cargados {count} torrents "
-msgstr[2] "Cargados {count} torrents"
+msgstr[0] "Subido {count} torrent"
+msgstr[1] "Subidos {count} torrents "
+msgstr[2] "Subidos {count} torrents"
 
 #: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
@@ -2485,55 +2485,55 @@ msgstr[0] "No se pudo analizar metainfo de magnet «{error}». Redescargando {pi
 msgstr[1] "No se pudo analizar metainfo de magnet «{error}». Redescargando {piece_count} piezas"
 msgstr[2] "No se pudo analizar la metainformación del enlace magnético «{error}». Redescargando {piece_count} piezas"
 
-#: ../libtransmission/torrent-metainfo.cc:699
+#: ../libtransmission/torrent-metainfo.cc:717
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr "Migrado archivo torrent de «{old_path}» a «{path}»"
 
-#: ../libtransmission/torrent.cc:122
+#: ../libtransmission/torrent.cc:120
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr "No se pudo usar metainformación de «{path}» para «{magnet}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:159
+#: ../libtransmission/torrent.cc:157
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "No se encontraron datos. Asegúrese de que sus unidades estén conectadas o use «Establecer ubicación». Para volver a descargar, quite el torrent y vuelva a añadirlo."
 
-#: ../libtransmission/torrent.cc:492
+#: ../libtransmission/torrent.cc:464
 msgid "Calling script '{path}'"
 msgstr "Invicando script «{path}»"
 
-#: ../libtransmission/torrent.cc:501
+#: ../libtransmission/torrent.cc:473
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr "No se pudo invocar script «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/torrent.cc:553
+#: ../libtransmission/torrent.cc:525
 msgid "Seed ratio reached; pausing torrent"
 msgstr "Proporción de sembrado alcanzado; pausando torrent"
 
-#: ../libtransmission/torrent.cc:560
+#: ../libtransmission/torrent.cc:532
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr "Límite de inactividad de sembrado alcanzado; pausando torrent"
 
-#: ../libtransmission/torrent.cc:876
+#: ../libtransmission/torrent.cc:848
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Se ha reiniciado manualmente, desactivando su relación de compartición"
 
-#: ../libtransmission/torrent.cc:902
+#: ../libtransmission/torrent.cc:868
 msgid "Pausing torrent"
 msgstr "Pausando torrent"
 
-#: ../libtransmission/torrent.cc:956
+#: ../libtransmission/torrent.cc:922
 msgid "Removing torrent"
 msgstr "Eliminando torrent"
 
-#: ../libtransmission/torrent.cc:1284 ../libtransmission/torrent.cc:2340
+#: ../libtransmission/torrent.cc:1250 ../libtransmission/torrent.cc:2306
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr "No se pudo mover «{old_path}» a «{path}»: {error} ({error_code})"
 
-#: ../libtransmission/tr-dht.cc:528
+#: ../libtransmission/tr-dht.cc:541
 msgid "Couldn't parse '{filename}' line: '{line}'"
 msgstr "No se pudo analizar «{filename}» en la línea: «{line}»"
 
-#: ../libtransmission/tr-lpd.cc:259
+#: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"
 msgstr "No se pudo inicializar LPD: {error} ({error_code})"
 
@@ -2632,28 +2632,28 @@ msgstr[0] "{piece_count:L} pieza, {piece_size}\n"
 msgstr[1] "{piece_count:L} piezas, {piece_size} cada una\n"
 msgstr[2] "{piece_count:L} piezas, {piece_size} cada una\n"
 
-#: ../utils/remote.cc:140
+#: ../utils/remote.cc:139
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] "hora"
 msgstr[1] "horas"
 msgstr[2] "horas"
 
-#: ../utils/remote.cc:141
+#: ../utils/remote.cc:140
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] "minuto"
 msgstr[1] "minutos"
 msgstr[2] "minutos"
 
-#: ../utils/remote.cc:142 ../utils/remote.cc:162
+#: ../utils/remote.cc:141 ../utils/remote.cc:161
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] "segundo"
 msgstr[1] "segundos"
 msgstr[2] "segundos"
 
-#: ../utils/remote.cc:146
+#: ../utils/remote.cc:145
 msgid "day"
 msgid_plural "days"
 msgstr[0] "día"

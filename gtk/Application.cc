@@ -99,9 +99,10 @@ namespace
 auto const AppIconName = "transmission"sv; // TODO(C++20): Use ""s
 
 char const* const LICENSE =
-    "Copyright 2005-2022. All code is copyrighted by the respective authors.\n"
+    "Copyright 2005-2023. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
+    "GNU GPL, versions 2 or 3, or by any future license endorsed by Mnemosyne LLC."
     "\n"
     "In addition, linking to and/or using OpenSSL is allowed.\n"
     "\n"
@@ -394,7 +395,7 @@ void register_magnet_link_handler()
             _("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"),
             fmt::arg("content_type", content_type),
             fmt::arg("error", e.what()),
-            fmt::arg("error_code", e.code())));
+            fmt::arg("error_code", static_cast<int>(e.code()))));
     }
 }
 
@@ -583,8 +584,8 @@ void Application::Impl::on_startup()
         css_provider,
         GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
-    std::ignore = FilterBar();
-    std::ignore = PathButton();
+    FilterBar();
+    PathButton();
 
     tr_session* session = nullptr;
 

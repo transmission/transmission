@@ -3,21 +3,21 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
 #include <pthread.h>
 #ifdef HAVE_SYS_SIGNALFD_H
 #include <sys/signalfd.h>
 #endif /* signalfd API */
 #include <event2/event.h>
-#include <signal.h>
-#include <stdlib.h> /* abort(), daemon(), exit() */
+#include <csignal>
+#include <cstdlib> /* abort(), daemon(), exit() */
 #include <fcntl.h> /* open() */
 #include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
 
 #include <string_view>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "daemon.h"
 

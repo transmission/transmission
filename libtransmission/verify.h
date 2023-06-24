@@ -29,7 +29,7 @@ public:
 
     ~tr_verify_worker();
 
-    void addCallback(callback_func callback)
+    void add_callback(callback_func callback)
     {
         callbacks_.emplace_back(std::move(callback));
     }
@@ -52,7 +52,7 @@ private:
         }
     };
 
-    void callCallback(tr_torrent* tor, bool aborted) const
+    void call_callback(tr_torrent* tor, bool aborted) const
     {
         for (auto const& callback : callbacks_)
         {
@@ -60,8 +60,8 @@ private:
         }
     }
 
-    void verifyThreadFunc();
-    [[nodiscard]] static bool verifyTorrent(tr_torrent* tor, std::atomic<bool> const& stop_flag);
+    void verify_thread_func();
+    [[nodiscard]] static bool verify_torrent(tr_torrent* tor, std::atomic<bool> const& stop_flag);
 
     std::list<callback_func> callbacks_;
     std::mutex verify_mutex_;

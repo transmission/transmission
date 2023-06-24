@@ -13,14 +13,14 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "log.h"
-#include "torrent-files.h"
-#include "utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

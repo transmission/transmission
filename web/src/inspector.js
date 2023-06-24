@@ -115,6 +115,7 @@ export class Inspector extends EventTarget {
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
+      ['dateAdded', 'Date added:'],
       ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
       ['labels', 'Labels:'],
@@ -312,7 +313,8 @@ export class Inspector extends EventTarget {
         string = `${fmt.size(verified)} (100%)`;
       }
     }
-    setTextContent(e.info.have, string);
+
+    setTextContent(e.info.have, fmt.stringSanitizer(string));
 
     // availability
     if (torrents.length === 0) {
@@ -326,7 +328,7 @@ export class Inspector extends EventTarget {
       );
       string = `${fmt.percentString((100 * available) / sizeWhenDone)}%`;
     }
-    setTextContent(e.info.availability, string);
+    setTextContent(e.info.availability, fmt.stringSanitizer(string));
 
     //  downloaded
     if (torrents.length === 0) {
@@ -344,7 +346,8 @@ export class Inspector extends EventTarget {
         ? `${fmt.size(d)} (+${fmt.size(f)} discarded after failed checksum)`
         : fmt.size(d);
     }
-    setTextContent(e.info.downloaded, string);
+
+    setTextContent(e.info.downloaded, fmt.stringSanitizer(string));
 
     // uploaded
     if (torrents.length === 0) {
@@ -448,7 +451,7 @@ export class Inspector extends EventTarget {
         string = 'None';
       }
     }
-    setTextContent(e.info.size, string);
+    setTextContent(e.info.size, fmt.stringSanitizer(string));
 
     // hash
     if (torrents.length === 0) {
@@ -538,6 +541,18 @@ export class Inspector extends EventTarget {
       string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
     setTextContent(e.info.location, string);
+
+    // dateAdded
+    if (torrents.length === 0) {
+      string = none;
+    } else {
+      const get = (t) => t.getDateAdded();
+      const first = get(torrents[0]);
+      string = torrents.every((t) => get(t) === first)
+        ? new Date(first * 1000).toDateString()
+        : mixed;
+    }
+    setTextContent(e.info.dateAdded, string);
 
     // magnetLink
     if (torrents.length === 0) {
@@ -709,6 +724,23 @@ export class Inspector extends EventTarget {
     };
   }
 
+  static _getOrigin(tracker) {
+    try {
+      // `new URL` fails on FF and Chrome when the scheme is 'udp',
+      // so munge the URL to be something that won't break
+      const udp_prefix = 'udp://';
+      const is_udp = tracker.announce.startsWith(udp_prefix);
+      if (is_udp) {
+        const http_prefix = 'http://';
+        const munged = tracker.announce.replace(udp_prefix, http_prefix);
+        return new URL(munged).origin.replace(http_prefix, udp_prefix);
+      }
+      return new URL(tracker.announce).origin;
+    } catch {
+      return [tracker.sitename || tracker.host || tracker.announce];
+    }
+  }
+
   _updateTiers() {
     const na = 'N/A';
     const { list } = this.elements.tiers;
@@ -737,13 +769,9 @@ export class Inspector extends EventTarget {
         tier_div.classList.add('tier-list-row', index % 2 ? 'odd' : 'even');
 
         let element = document.createElement('div');
+        const site = Inspector._getOrigin(tracker);
         element.classList.add('tier-list-tracker');
-        setTextContent(
-          element,
-          `${tracker.sitename || tracker.host || tracker.announce} - tier ${
-            tracker.tier + 1
-          }`
-        );
+        setTextContent(element, `${site} - tier ${tracker.tier + 1}`);
         element.setAttribute('title', tracker.announce);
         tier_div.append(element);
 

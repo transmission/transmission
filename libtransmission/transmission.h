@@ -82,8 +82,8 @@ enum tr_encryption_mode
     TR_ENCRYPTION_REQUIRED
 };
 
-#define TR_RATIO_NA -1
-#define TR_RATIO_INF -2
+#define TR_RATIO_NA (-1)
+#define TR_RATIO_INF (-2)
 
 // --- Startup & Shutdown
 
@@ -1274,7 +1274,7 @@ struct tr_tracker_view
 {
     char const* announce; // full announce URL
     char const* scrape; // full scrape URL
-    char const* host; // uniquely-identifying tracker name (`${host}:${port}`)
+    char const* host_and_port; // uniquely-identifying tracker name (`${host}:${port}`)
 
     // The tracker site's name. Uses the first label before the public suffix
     // (https://publicsuffix.org/) in the announce URL's host.
@@ -1334,6 +1334,8 @@ struct tr_file_view
     uint64_t have; // the current size of the file, i.e. how much we've downloaded
     uint64_t length; // the total size of the file
     double progress; // have / length
+    tr_piece_index_t beginPiece; // piece index where this file starts
+    tr_piece_index_t endPiece; // piece index where this file ends (exclusive)
     tr_priority_t priority; // the file's priority
     bool wanted; // do we want to download this file?
 };

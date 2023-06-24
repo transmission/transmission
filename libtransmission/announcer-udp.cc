@@ -21,22 +21,21 @@
 #endif
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "announcer-common.h"
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "log.h"
-#include "peer-io.h"
-#include "peer-mgr.h" // for tr_pex::fromCompact4()
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/announcer-common.h"
+#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/log.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 #define logwarn(interned, msg) tr_logAddWarn(msg, (interned).sv())
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())
@@ -49,6 +48,8 @@ using namespace std::literals;
 // size defined by bep15
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
+
+using InBuf = libtransmission::BufferReader<std::byte>;
 
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
@@ -115,7 +116,7 @@ struct tau_scrape_request
         requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         response.did_connect = true;
         response.did_timeout = false;
@@ -215,7 +216,7 @@ struct tau_announce_request
         this->requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
@@ -228,8 +229,7 @@ struct tau_announce_request
             response.leechers = buf.to_uint32();
             response.seeders = buf.to_uint32();
 
-            auto const [bytes, n_bytes] = buf.pullup();
-            response.pex = tr_pex::from_compact_ipv4(bytes, n_bytes, nullptr, 0);
+            response.pex = tr_pex::from_compact_ipv4(std::data(buf), std::size(buf), nullptr, 0);
             requestFinished();
         }
         else
@@ -311,7 +311,7 @@ struct tau_tracker
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
-    void on_connection_response(tau_action_t action, libtransmission::Buffer& buf)
+    void on_connection_response(tau_action_t action, InBuf& buf)
     {
         this->connecting_at = 0;
         this->connection_transaction_id = 0;
@@ -379,8 +379,7 @@ struct tau_tracker
             buf.add_uint32(TAU_ACTION_CONNECT);
             buf.add_uint32(this->connection_transaction_id);
 
-            auto const [bytes, n_bytes] = buf.pullup();
-            this->sendto(bytes, n_bytes);
+            this->sendto(std::data(buf), std::size(buf));
         }
 
         if (timeout_reqs)
@@ -540,8 +539,7 @@ private:
         buf.add_uint64(this->connection_id);
         buf.add(payload, payload_len);
 
-        auto const [bytes, n_bytes] = buf.pullup();
-        this->sendto(bytes, n_bytes);
+        this->sendto(std::data(buf), std::size(buf));
     }
 
 public:
@@ -588,7 +586,7 @@ public:
         }
 
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
-        auto const addr = mediator_.announceIP();
+        auto const addr = mediator_.announce_ip();
         uint32_t const announce_ip = addr && addr->is_ipv4() ? addr->addr.addr4.s_addr : 0;
         tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
         tracker->upkeep(false);
@@ -616,7 +614,7 @@ public:
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
-    bool handleMessage(uint8_t const* msg, size_t msglen) override
+    bool handle_message(uint8_t const* msg, size_t msglen) override
     {
         if (msglen < sizeof(uint32_t) * 2)
         {

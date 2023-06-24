@@ -11,23 +11,24 @@
 
 #define LIBTRANSMISSION_PEER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" // for tr_salt_shaker
-#include "peer-mgr-wishlist.h"
-#include "tr-assert.h"
+#include "libtransmission/crypto-utils.h" // for tr_salt_shaker
+#include "libtransmission/peer-mgr-wishlist.h"
+#include "libtransmission/tr-assert.h"
 
 namespace
 {
+using SaltType = tr_piece_index_t;
 
 struct Candidate
 {
     tr_piece_index_t piece;
     size_t n_blocks_missing;
     tr_priority_t priority;
-    uint8_t salt;
+    SaltType salt;
 
-    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, uint8_t salt_in)
+    Candidate(tr_piece_index_t piece_in, size_t missing_in, tr_priority_t priority_in, SaltType salt_in)
         : piece{ piece_in }
         , n_blocks_missing{ missing_in }
         , priority{ priority_in }
@@ -86,14 +87,16 @@ std::vector<Candidate> getCandidates(Wishlist::Mediator const& mediator)
     }
 
     // transform them into candidates
-    auto salter = tr_salt_shaker{};
+    auto salter = tr_salt_shaker<SaltType>{};
     auto const n = std::size(wanted_pieces);
     auto candidates = std::vector<Candidate>{};
+    auto const is_sequential = mediator.isSequentialDownload();
     candidates.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
         auto const [piece, n_missing] = wanted_pieces[i];
-        candidates.emplace_back(piece, n_missing, mediator.priority(piece), salter());
+        auto const salt = is_sequential ? piece : salter();
+        candidates.emplace_back(piece, n_missing, mediator.priority(piece), salt);
     }
 
     return candidates;
@@ -127,16 +130,17 @@ std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, si
 
 } // namespace
 
-std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, size_t n_wanted_blocks)
+std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
 {
     if (n_wanted_blocks == 0)
     {
         return {};
     }
 
-    // We usually won't need all the candidates until endgame, so don't
+    auto candidates = getCandidates(mediator_);
+
+    // We usually won't need all the candidates to be sorted until endgame, so don't
     // waste cycles sorting all of them here. partial sort is enough.
-    auto candidates = getCandidates(mediator);
     auto constexpr MaxSortedPieces = size_t{ 30 };
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
@@ -151,18 +155,18 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, 
         }
 
         // walk the blocks in this piece
-        auto const [begin, end] = mediator.blockSpan(candidate.piece);
+        auto const [begin, end] = mediator_.blockSpan(candidate.piece);
         for (tr_block_index_t block = begin; block < end && std::size(blocks) < n_wanted_blocks; ++block)
         {
             // don't request blocks we've already got
-            if (!mediator.clientCanRequestBlock(block))
+            if (!mediator_.clientCanRequestBlock(block))
             {
                 continue;
             }
 
             // don't request from too many peers
-            size_t const n_peers = mediator.countActiveRequests(block);
-            if (size_t const max_peers = mediator.isEndgame() ? 2 : 1; n_peers >= max_peers)
+            size_t const n_peers = mediator_.countActiveRequests(block);
+            if (size_t const max_peers = mediator_.isEndgame() ? 2 : 1; n_peers >= max_peers)
             {
                 continue;
             }

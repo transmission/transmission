@@ -151,15 +151,15 @@ TEST_F(UtilsTest, strvReplaceInvalid)
     EXPECT_EQ(out, tr_strv_replace_invalid(out));
 }
 
-TEST_F(UtilsTest, strvReplaceInvalidFuzz)
+TEST_F(UtilsTest, strvConvertUtf8Fuzz)
 {
     auto buf = std::vector<char>{};
     for (size_t i = 0; i < 1000; ++i)
     {
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const out = tr_strv_replace_invalid({ std::data(buf), std::size(buf) });
-        EXPECT_EQ(out, tr_strv_replace_invalid(out));
+        auto const out = tr_strv_convert_utf8({ std::data(buf), std::size(buf) });
+        EXPECT_EQ(out, tr_strv_convert_utf8(out));
     }
 }
 
@@ -232,7 +232,7 @@ TEST_F(UtilsTest, trStrlcpy)
         "a",
         "",
         "12345678901234567890",
-        "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
+        "This, very useful string contains a total of 105 characters not counting null. Almost like an easter egg!"
     };
 
     for (auto const& test : tests)

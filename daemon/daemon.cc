@@ -39,15 +39,9 @@
 
 #else
 
-static void sd_notify(int /*status*/, char const* /*str*/)
-{
-    // no-op
-}
-
-static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
-{
-    // no-op
-}
+// no-op
+#define sd_notify(status, str)
+#define sd_notifyf(status, fmt, ...)
 
 #endif
 
@@ -695,7 +689,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     /* setup event state */
     ev_base_ = event_base_new();
 
-    if (ev_base_ == nullptr || setup_signals() == false)
+    if (ev_base_ == nullptr || !setup_signals())
     {
         auto const error_code = errno;
         auto const errmsg = fmt::format(
@@ -777,7 +771,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             };
 
             auto timer_maker = libtransmission::EvTimerMaker{ ev_base_ };
-            watchdir = force_generic ? Watchdir::createGeneric(dir, handler, timer_maker) :
+            watchdir = force_generic ? Watchdir::create_generic(dir, handler, timer_maker) :
                                        Watchdir::create(dir, handler, timer_maker, ev_base_);
         }
     }
@@ -939,6 +933,8 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     int ret;
     tr_daemon daemon;
     bool foreground;

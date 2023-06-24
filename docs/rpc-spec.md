@@ -157,6 +157,7 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
+| `sequentialDownload`  | boolean  | download torrent pieces sequentially
 | `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
 | `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
@@ -267,6 +268,7 @@ The 'source' column here corresponds to the data structure there.
 | `seedIdleMode`| number| tr_inactivelimit
 | `seedRatioLimit`| double| tr_torrent
 | `seedRatioMode`| number| tr_ratiolimit
+| `sequentialDownload`| boolean| tr_torrent
 | `sizeWhenDone`| number| tr_stat
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
@@ -292,6 +294,8 @@ The 'source' column here corresponds to the data structure there.
 | `bytesCompleted` | number | tr_file_view
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
+| `beginPiece` | number | tr_file_view
+| `endPiece` | number | tr_file_view
 
 
 `fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
@@ -603,6 +607,7 @@ except:
 * `rpc-version-semver`
 * `rpc-version`
 * `session-id`
+* `units`
 * `version`
 
 Response arguments: none
@@ -1000,3 +1005,11 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `group-set` | new method
 | `group-get` | new method
 | `torrent-get` | :warning: old arg `wanted` was implemented as an array of `0` or `1` in Transmission 3.00 and older, despite being documented as an array of booleans. Transmission 4.0.0 and 4.0.1 "fixed" this by returning an array of booleans; but in practical terms, this change caused an unannounced breaking change for any 3rd party code that expected `0` or `1`. For this reason, 4.0.2 restored the 3.00 behavior and updated this spec to match the code.
+
+Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
+| Method | Description
+|:---|:---
+| `torrent-get` | new arg `sequentialDownload`
+| `torrent-set` | new arg `sequentialDownload`
+| `torrent-get` | new arg `files.beginPiece`
+| `torrent-get` | new arg `files.endPiece`
