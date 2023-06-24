@@ -10,7 +10,6 @@
 #endif
 
 #include <cstddef> // size_t
-#include <ctime> // time_t
 #include <memory>
 #include <utility>
 #include <vector>
@@ -29,7 +28,7 @@ public:
     ~ActiveRequests();
 
     // record that we've requested `block` from `peer`
-    bool add(tr_block_index_t block, tr_peer* peer, time_t when);
+    bool add(tr_block_index_t block, tr_peer* peer);
 
     // erase any record of a request for `block` from `peer`
     bool remove(tr_block_index_t block, tr_peer const* peer);
@@ -41,19 +40,16 @@ public:
     std::vector<tr_peer*> remove(tr_block_index_t block);
 
     // return true if there's a record of a request for `block` from `peer`
-    [[nodiscard]] bool has(tr_block_index_t block, tr_peer const* peer) const;
+    [[nodiscard]] bool has(tr_block_index_t block, tr_peer const* peer) const noexcept;
 
     // count how many peers we're asking for `block`
-    [[nodiscard]] size_t count(tr_block_index_t block) const;
+    [[nodiscard]] size_t count(tr_block_index_t block) const noexcept;
 
     // count how many active block requests we have to `peer`
-    [[nodiscard]] size_t count(tr_peer const* peer) const;
+    [[nodiscard]] size_t count(tr_peer const* peer) const noexcept;
 
     // return the total number of active requests
-    [[nodiscard]] size_t size() const;
-
-    // returns the active requests sent before `when`
-    [[nodiscard]] std::vector<std::pair<tr_block_index_t, tr_peer*>> sentBefore(time_t when) const;
+    [[nodiscard]] size_t size() const noexcept;
 
 private:
     class Impl;

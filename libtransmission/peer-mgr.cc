@@ -193,6 +193,11 @@ struct peer_atom
         return value;
     }
 
+    [[nodiscard]] constexpr auto piece_data_time() const noexcept
+    {
+        return std::max(client_sent_piece_data_at_, client_got_piece_data_at_);
+    }
+
     [[nodiscard]] constexpr int getReconnectIntervalSecs(time_t const now) const noexcept
     {
         auto sec = int{};
@@ -201,7 +206,7 @@ struct peer_atom
         /* if we were recently connected to this peer and transferring piece
          * data, try to reconnect to them sooner rather that later -- we don't
          * want network troubles to get in the way of a good peer. */
-        if (!unreachable && now - this->piece_data_time <= MinimumReconnectIntervalSecs * 2)
+        if (!unreachable && now - piece_data_time() <= MinimumReconnectIntervalSecs * 2)
         {
             sec = MinimumReconnectIntervalSecs;
         }
@@ -279,7 +284,9 @@ struct peer_atom
     uint16_t num_fails = {};
 
     time_t time = {}; /* when the peer's connection status last changed */
-    time_t piece_data_time = {};
+    time_t client_got_piece_data_at_ = {};
+    time_t client_requested_piece_data_at_ = {};
+    time_t client_sent_piece_data_at_ = {};
 
     time_t lastConnectionAttemptAt = {};
     time_t lastConnectionAt = {};
@@ -340,20 +347,26 @@ public:
     void cancelOldRequests()
     {
         auto const now = tr_time();
-        auto const oldest = now - RequestTtlSecs;
 
-        for (auto const& [block, peer] : active_requests.sentBefore(oldest))
+        for (auto* const peer : get_overdue_peers())
         {
-            maybeSendCancelRequest(peer, block, nullptr);
-            active_requests.remove(block, peer);
+            for (auto const block : active_requests.remove(peer))
+            {
+                peer->cancel_block_request(block, now);
+            }
         }
     }
 
     void cancelAllRequestsForBlock(tr_block_index_t block, tr_peer const* no_notify)
     {
+        auto const now = tr_time();
+
         for (auto* peer : active_requests.remove(block))
         {
-            maybeSendCancelRequest(peer, block, no_notify);
+            if (peer != no_notify)
+            {
+                peer->cancel_block_request(block, now);
+            }
         }
     }
 
@@ -543,7 +556,7 @@ public:
 
                 if (peer->atom != nullptr)
                 {
-                    peer->atom->piece_data_time = now;
+                    peer->atom->client_sent_piece_data_at_ = now;
                 }
 
                 break;
@@ -561,7 +574,7 @@ public:
 
                 if (peer->atom != nullptr)
                 {
-                    peer->atom->piece_data_time = now;
+                    peer->atom->client_got_piece_data_at_ = now;
                 }
 
                 break;
@@ -655,21 +668,28 @@ public:
     time_t lastCancel = 0;
 
 private:
-    static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)
+    [[nodiscard]] std::vector<tr_peer*> get_overdue_peers() const
     {
-        auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
-        if (msgs != nullptr && msgs != muted)
-        {
-            peer->cancels_sent_to_peer.add(tr_time(), 1);
-            msgs->cancel_block_request(block);
-        }
+        static auto constexpr RequestTtlSecs = time_t{ 180 };
+        auto const now = tr_time();
+
+        auto overdue = std::vector<tr_peer*>{};
+        overdue.reserve(std::size(peers));
+        std::copy_if(
+            std::begin(peers),
+            std::end(peers),
+            std::back_inserter(overdue),
+            [now](auto const* const peer)
+            {
+                auto const* const atom = peer->atom;
+                auto const timer_begin = std::max(atom->client_requested_piece_data_at_, atom->client_got_piece_data_at_);
+                return timer_begin && timer_begin + RequestTtlSecs < now;
+            });
+        return overdue;
     }
 
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
-
-    // how long we'll let requests we've made linger before we cancel them
-    static auto constexpr RequestTtlSecs = int{ 90 };
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -839,11 +859,9 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, std::pair<tr_address, tr_port> cons
 // TODO: if we keep this, add equivalent API to ActiveRequest
 void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span)
 {
-    auto const now = tr_time();
-
     for (tr_block_index_t block = span.begin; block < span.end; ++block)
     {
-        torrent->swarm->active_requests.add(block, peer, now);
+        torrent->swarm->active_requests.add(block, peer);
     }
 }
 
@@ -1043,7 +1061,6 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         struct peer_atom* atom = s->ensure_atom_exists(socket_address, 0, TR_PEER_FROM_INCOMING);
 
         atom->time = tr_time();
-        atom->piece_data_time = 0;
         atom->lastConnectionAt = tr_time();
 
         if (!result.io->is_incoming())
@@ -1239,9 +1256,11 @@ struct CompareAtomsByUsefulness
 {
     [[nodiscard]] constexpr static int compare(peer_atom const& a, peer_atom const& b) noexcept // <=>
     {
-        if (a.piece_data_time != b.piece_data_time)
+        auto const a_piece_time = a.piece_data_time();
+        auto const b_piece_time = b.piece_data_time();
+        if (a_piece_time != b_piece_time)
         {
-            return a.piece_data_time > b.piece_data_time ? -1 : 1;
+            return a_piece_time > b_piece_time ? -1 : 1;
         }
 
         if (a.fromBest != b.fromBest)
@@ -1549,7 +1568,7 @@ namespace peer_stat_helpers
 
     stats.blocksToPeer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
     stats.blocksToClient = peer->blocks_sent_to_client.count(now, CancelHistorySec);
-    stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
+    stats.cancelsToPeer = peer->cancels_sent_to_peer(now, CancelHistorySec);
     stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
 
     stats.activeReqsToPeer = peer->activeReqCount(TR_CLIENT_TO_PEER);
@@ -1975,7 +1994,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
         auto const lo = MinUploadIdleSecs;
         auto const hi = MaxUploadIdleSecs;
         time_t const limit = hi - (hi - lo) * strictness;
-        time_t const idle_time = now - std::max(atom->time, atom->piece_data_time);
+        time_t const idle_time = now - std::max(atom->time, atom->piece_data_time());
 
         if (idle_time > limit)
         {
@@ -2000,7 +2019,7 @@ void closePeer(tr_peer* peer)
     /* if we transferred piece data, then they might be good peers,
        so reset their `num_fails' weight to zero. otherwise we connected
        to them fruitlessly, so mark it as another fail */
-    if (auto* const atom = peer->atom; atom->piece_data_time != 0)
+    if (auto* const atom = peer->atom; atom->piece_data_time() != 0)
     {
         tr_logAddTraceSwarm(s, fmt::format("resetting atom {} num_fails to 0", peer->display_name()));
         atom->num_fails = 0;
@@ -2024,13 +2043,15 @@ struct ComparePeerByActivity
             return a->do_purge ? 1 : -1;
         }
 
-        /* the one to give us data more recently goes first */
-        if (a->atom->piece_data_time != b->atom->piece_data_time)
+        // primary key: most recent piece activity
+        auto const a_piece_time = a->atom->piece_data_time();
+        auto const b_piece_time = b->atom->piece_data_time();
+        if (a_piece_time != b_piece_time)
         {
-            return a->atom->piece_data_time > b->atom->piece_data_time ? -1 : 1;
+            return a_piece_time > b_piece_time ? -1 : 1;
         }
 
-        /* the one we connected to most recently goes first */
+        // secondary key: most recent connection
         if (a->atom->time != b->atom->time)
         {
             return a->atom->time > b->atom->time ? -1 : 1;

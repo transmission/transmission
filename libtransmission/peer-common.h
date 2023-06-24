@@ -219,6 +219,16 @@ public:
 
     virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
 
+    virtual void cancel_block_request(tr_block_index_t, time_t now) noexcept
+    {
+        cancels_sent_to_peer_.add(now, 1);
+    }
+
+    [[nodiscard]] constexpr auto cancels_sent_to_peer(time_t now, unsigned int age_sec) const noexcept
+    {
+        return cancels_sent_to_peer_.count(now, age_sec);
+    }
+
     struct RequestLimit
     {
         // How many blocks we could request.
@@ -258,8 +268,9 @@ public:
     // how many blocks this peer has sent us
     tr_recentHistory<uint16_t> blocks_sent_to_client;
 
+private:
     // how many requests we made to this peer and then canceled
-    tr_recentHistory<uint16_t> cancels_sent_to_peer;
+    tr_recentHistory<uint16_t> cancels_sent_to_peer_;
 };
 
 // ---
