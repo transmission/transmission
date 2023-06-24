@@ -86,12 +86,12 @@ class tr_unix_addr
 public:
     [[nodiscard]] std::string to_string() const
     {
-        return std::empty(unix_socket_path_) ? unix_socket_path_ : std::string(TrUnixSocketPrefix);
+        return std::empty(unix_socket_path_) ? std::string(TrUnixSocketPrefix) : unix_socket_path_;
     }
 
     [[nodiscard]] bool from_string(std::string_view src)
     {
-        if (!tr_strvStartsWith(TrUnixSocketPrefix, src))
+        if (!tr_strvStartsWith(src, TrUnixSocketPrefix))
         {
             return false;
         }
