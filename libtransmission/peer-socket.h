@@ -27,7 +27,8 @@ struct tr_session;
 class tr_peer_socket
 {
 public:
-    using Buffer = libtransmission::Buffer;
+    using InBuf = libtransmission::BufferWriter<std::byte>;
+    using OutBuf = libtransmission::BufferReader<std::byte>;
 
     tr_peer_socket() = default;
     tr_peer_socket(tr_session const* session, tr_address const& address, tr_port port, tr_socket_t sock);
@@ -56,8 +57,8 @@ public:
     }
     void close();
 
-    size_t try_write(Buffer& buf, size_t max, tr_error** error) const;
-    size_t try_read(Buffer& buf, size_t max, tr_error** error) const;
+    size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error** error) const;
+    size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
 
     [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
     {
