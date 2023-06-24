@@ -21,6 +21,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 namespace
@@ -31,17 +32,17 @@ using namespace std::literals;
 static_assert(TR_AF_INET == 0);
 static_assert(TR_AF_INET6 == 1);
 
-auto constexpr protocol_str(tr_address_type type) noexcept
+auto TR_CONSTEXPR23 protocol_str(tr_address_type type) noexcept
 {
     /* TODO: very slight performance nit
      * - If upgrading to C++20, change Map to a consteval lambda:
-     *   auto map = []() consteval { return std::array{ "IPv4"sv, "IPv6"sv }; };
+     *   static auto Map = []() consteval { return std::array{ "IPv4"sv, "IPv6"sv }; };
      * - If upgrading to C++23, change Map to static constexpr
      *
      * Ref: https://wg21.link/p2647r1
      */
-    auto constexpr Map = std::array{ "IPv4"sv, "IPv6"sv };
-    return Map[type];
+    static auto TR_CONSTEXPR23 map = std::array{ "IPv4"sv, "IPv6"sv };
+    return map[type];
 }
 
 auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissionbt.com/"sv },
@@ -110,9 +111,8 @@ namespace global_source_ip_helpers
 [[nodiscard]] std::optional<tr_address> get_global_source_address(tr_address const& bind_addr, int& err_out) noexcept
 {
     // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    auto const dst_addr = tr_address::from_string(bind_addr.is_ipv4() ? DstIPv4 : DstIPv6);
+    static auto constexpr DstIP = std::array{ "91.121.74.28"sv, "2001:1890:1112:1::20"sv };
+    auto const dst_addr = tr_address::from_string(DstIP[bind_addr.type]);
     auto const dst_port = tr_port::fromHost(6969);
 
     // In order for address selection to work right,
@@ -235,11 +235,13 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
     // Update global address
+    static auto constexpr IPProtocolMap = std::array{ tr_web::FetchOptions::IPProtocol::V4,
+                                                      tr_web::FetchOptions::IPProtocol::V6 };
     auto options = tr_web::FetchOptions{ IPQueryServices[type][ix_service_[type]],
                                          [this, type](tr_web::FetchResponse const& response)
                                          { this->on_response_ip_query(type, response); },
                                          nullptr };
-    options.ip_proto = type == TR_AF_INET ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
+    options.ip_proto = IPProtocolMap[type];
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
     mediator_.fetch(std::move(options));
@@ -297,7 +299,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     if (response.status == 200 /* HTTP_OK */)
     {
         // Update member
-        if (auto addr = tr_address::from_string(tr_strvStrip(response.body)); addr && set_global_addr(type, *addr))
+        if (auto const addr = tr_address::from_string(tr_strvStrip(response.body)); addr && set_global_addr(type, *addr))
         {
             success = true;
             upkeep_timers_[type]->set_interval(UpkeepInterval);
