@@ -15,6 +15,8 @@
 #include <memory>
 #include <utility> // std::pair
 
+#include <event2/util.h> // for evutil_socket_t
+
 #include "transmission.h"
 
 #include "bandwidth.h"
@@ -289,7 +291,10 @@ public:
     static void utp_init(struct_utp_context* ctx);
 
 private:
+    // our target socket receive buffer size
     static constexpr auto RcvBuf = size_t{ 256 * 1024 };
+
+    using PeerBuffer = libtransmission::Buffer;
 
     friend class libtransmission::test::HandshakeTest;
 
@@ -342,8 +347,8 @@ private:
 
     tr_sha1_digest_t info_hash_;
 
-    libtransmission::Buffer inbuf_;
-    libtransmission::Buffer outbuf_;
+    PeerBuffer inbuf_;
+    PeerBuffer outbuf_;
 
     tr_session* const session_;
 
