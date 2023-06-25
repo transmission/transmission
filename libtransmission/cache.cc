@@ -119,12 +119,12 @@ int Cache::write_contiguous(CIter const begin, CIter const end) const
     return {};
 }
 
-size_t Cache::get_max_blocks(int64_t max_bytes) noexcept
+size_t Cache::get_max_blocks(size_t max_bytes) noexcept
 {
-    return std::lldiv(max_bytes, tr_block_info::BlockSize).quot;
+    return max_bytes / tr_block_info::BlockSize;
 }
 
-int Cache::set_limit(int64_t new_limit)
+int Cache::set_limit(size_t new_limit)
 {
     max_bytes_ = new_limit;
     max_blocks_ = get_max_blocks(new_limit);
@@ -134,7 +134,7 @@ int Cache::set_limit(int64_t new_limit)
     return cache_trim();
 }
 
-Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
+Cache::Cache(tr_torrents& torrents, size_t max_bytes)
     : torrents_{ torrents }
     , max_blocks_(get_max_blocks(max_bytes))
     , max_bytes_(max_bytes)
