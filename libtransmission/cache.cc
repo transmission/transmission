@@ -145,6 +145,8 @@ int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniq
 {
     if (max_blocks_ == 0U)
     {
+        TR_ASSERT(std::empty(blocks_));
+
         // Bypass cache. This may be helpful for those whose filesystem
         // already has a cache layer for the very purpose of this cache
         auto* const tor = torrents_.get(tor_id);
