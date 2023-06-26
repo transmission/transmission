@@ -143,6 +143,13 @@ Cache::Cache(tr_torrents& torrents, size_t max_bytes)
 
 int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<BlockData> writeme)
 {
+    if (max_blocks_ == 0U)
+    {
+        // Bypass cache
+        auto* const tor = torrents_.get(tor_id);
+        return tr_ioWrite(tor, tor->block_loc(block), std::size(*writeme), std::data(*writeme));
+    }
+
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
     if (iter == std::end(blocks_) || iter->key != key)
