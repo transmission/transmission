@@ -34,11 +34,6 @@ public:
 
     int set_limit(size_t new_limit);
 
-    [[nodiscard]] constexpr auto get_limit() const noexcept
-    {
-        return max_bytes_;
-    }
-
     // @return any error code from cacheTrim()
     int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<BlockData> writeme);
 
@@ -96,7 +91,6 @@ private:
 
     Blocks blocks_ = {};
     size_t max_blocks_ = 0;
-    size_t max_bytes_ = 0;
 
     mutable size_t disk_writes_ = 0;
     mutable size_t disk_write_bytes_ = 0;
