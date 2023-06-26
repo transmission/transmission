@@ -74,13 +74,13 @@ private:
 
     [[nodiscard]] static Key make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept;
 
-    [[nodiscard]] static std::pair<CIter, CIter> find_contiguous(CIter const begin, CIter const end, CIter const iter) noexcept;
+    [[nodiscard]] static std::pair<CIter, CIter> find_contiguous(CIter begin, CIter end, CIter iter) noexcept;
 
     // @return any error code from tr_ioWrite()
-    [[nodiscard]] int write_contiguous(CIter const begin, CIter const end) const;
+    [[nodiscard]] int write_contiguous(CIter begin, CIter end) const;
 
     // @return any error code from writeContiguous()
-    [[nodiscard]] int flush_span(CIter const begin, CIter const end);
+    [[nodiscard]] int flush_span(CIter begin, CIter end);
 
     // @return any error code from writeContiguous()
     [[nodiscard]] int flush_oldest();
