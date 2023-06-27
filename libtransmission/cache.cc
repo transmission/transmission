@@ -31,11 +31,11 @@ Cache::Key Cache::make_key(tr_torrent const* torrent, tr_block_info::Location lo
 
 Cache::CIter Cache::find_span_end(CIter span_begin, CIter end) noexcept
 {
-    static constexpr auto not_adjacent = [](CacheBlock const& block1, CacheBlock const& block2)
+    static constexpr auto NotAdjacent = [](CacheBlock const& block1, CacheBlock const& block2)
     {
         return block1.key.first != block2.key.first || block1.key.second + 1 != block2.key.second;
     };
-    auto const span_end = std::adjacent_find(span_begin, end, not_adjacent);
+    auto const span_end = std::adjacent_find(span_begin, end, NotAdjacent);
     return span_end == end ? end : std::next(span_end);
 }
 
