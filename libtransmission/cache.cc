@@ -31,28 +31,12 @@ Cache::Key Cache::make_key(tr_torrent const* torrent, tr_block_info::Location lo
 
 Cache::CIter Cache::find_span_end(CIter span_begin, CIter end) noexcept
 {
-    if (span_begin >= end)
+    static constexpr auto not_adjacent = [](CacheBlock const& block1, CacheBlock const& block2)
     {
-        return span_begin;
-    }
-
-    auto span_end = std::next(span_begin);
-    for (auto key = span_begin->key;;)
-    {
-        if (span_end == end)
-        {
-            return end;
-        }
-
-        ++key.second;
-        auto const next = std::next(span_end);
-        if (span_end->key != key)
-        {
-            return span_end;
-        }
-
-        span_end = next;
-    }
+        return block1.key.first != block2.key.first || block1.key.second + 1 != block2.key.second;
+    };
+    auto const span_end = std::adjacent_find(span_begin, end, not_adjacent);
+    return span_end == end ? end : std::next(span_end);
 }
 
 std::pair<Cache::CIter, Cache::CIter> Cache::find_biggest_span(CIter const begin, CIter const end) noexcept
