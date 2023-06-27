@@ -22,52 +22,45 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h" // tr_time(), tr_formatter
+#include "libtransmission/utils.h" // tr_formatter
 
 Cache::Key Cache::make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {
     return std::make_pair(torrent->id(), loc.block);
 }
 
-std::pair<Cache::CIter, Cache::CIter> Cache::find_contiguous(CIter const begin, CIter const end, CIter const iter) noexcept
+Cache::CIter Cache::find_span_end(CIter span_begin, CIter end) noexcept
 {
-    if (iter == end)
+    static constexpr auto NotAdjacent = [](CacheBlock const& block1, CacheBlock const& block2)
     {
-        return std::make_pair(end, end);
+        return block1.key.first != block2.key.first || block1.key.second + 1 != block2.key.second;
+    };
+    auto const span_end = std::adjacent_find(span_begin, end, NotAdjacent);
+    return span_end == end ? end : std::next(span_end);
+}
+
+std::pair<Cache::CIter, Cache::CIter> Cache::find_biggest_span(CIter const begin, CIter const end) noexcept
+{
+    auto biggest_begin = begin;
+    auto biggest_end = begin;
+    auto biggest_len = std::distance(biggest_begin, biggest_end);
+
+    for (auto span_begin = begin; span_begin < end;)
+    {
+        auto span_end = find_span_end(span_begin, end);
+        auto const len = std::distance(span_begin, span_end);
+
+        if (len > biggest_len)
+        {
+            biggest_begin = span_begin;
+            biggest_end = span_end;
+            biggest_len = len;
+        }
+
+        std::advance(span_begin, len);
     }
 
-    auto span_begin = iter;
-    for (auto key = iter->key;;)
-    {
-        if (span_begin == begin)
-        {
-            break;
-        }
-
-        --key.second;
-        auto const prev = std::prev(span_begin);
-        if (prev->key != key)
-        {
-            break;
-        }
-    }
-
-    auto span_end = std::next(iter);
-    for (auto key = iter->key;;)
-    {
-        if (span_end == end)
-        {
-            break;
-        }
-
-        ++key.second;
-        if (span_end->key != key)
-        {
-            break;
-        }
-    }
-
-    return std::make_pair(span_begin, span_end);
+    return { biggest_begin, biggest_end };
 }
 
 int Cache::write_contiguous(CIter const begin, CIter const end) const
@@ -153,8 +146,6 @@ int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniq
         iter->key = key;
     }
 
-    iter->time_added = tr_time();
-
     iter->buf = std::move(writeme);
 
     ++cache_writes_;
@@ -203,16 +194,16 @@ int Cache::prefetch_block(tr_torrent* torrent, tr_block_info::Location const& lo
 
 int Cache::flush_span(CIter const begin, CIter const end)
 {
-    for (auto walk = begin; walk < end;)
+    for (auto span_begin = begin; span_begin < end;)
     {
-        auto const [contig_begin, contig_end] = find_contiguous(begin, end, walk);
+        auto const span_end = find_span_end(span_begin, end);
 
-        if (auto const err = write_contiguous(contig_begin, contig_end); err != 0)
+        if (auto const err = write_contiguous(span_begin, span_end); err != 0)
         {
             return err;
         }
 
-        walk = contig_end;
+        span_begin = span_end;
     }
 
     blocks_.erase(begin, end);
@@ -240,19 +231,14 @@ int Cache::flush_torrent(tr_torrent const* torrent)
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), compare));
 }
 
-int Cache::flush_oldest()
+int Cache::flush_biggest()
 {
-    auto const oldest = std::min_element(
-        std::begin(blocks_),
-        std::end(blocks_),
-        [](auto const& a, auto const& b) { return a.time_added < b.time_added; });
+    auto const [begin, end] = find_biggest_span(std::begin(blocks_), std::end(blocks_));
 
-    if (oldest == std::end(blocks_)) // nothing to flush
+    if (begin == end) // nothing to flush
     {
         return 0;
     }
-
-    auto const [begin, end] = find_contiguous(std::begin(blocks_), std::end(blocks_), oldest);
 
     if (auto const err = write_contiguous(begin, end); err != 0)
     {
@@ -267,7 +253,7 @@ int Cache::cache_trim()
 {
     while (std::size(blocks_) > max_blocks_)
     {
-        if (auto const err = flush_oldest(); err != 0)
+        if (auto const err = flush_biggest(); err != 0)
         {
             return err;
         }

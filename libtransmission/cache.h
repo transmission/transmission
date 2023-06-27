@@ -11,7 +11,6 @@
 
 #include <cstddef> // for size_t
 #include <cstdint> // for intX_t, uintX_t
-#include <ctime>
 #include <memory> // for std::unique_ptr
 #include <utility> // for std::pair
 #include <vector>
@@ -54,7 +53,6 @@ private:
     {
         Key key;
         std::unique_ptr<BlockData> buf;
-        time_t time_added = {};
     };
 
     using Blocks = std::vector<CacheBlock>;
@@ -74,16 +72,18 @@ private:
 
     [[nodiscard]] static Key make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept;
 
-    [[nodiscard]] static std::pair<CIter, CIter> find_contiguous(CIter const begin, CIter const end, CIter const iter) noexcept;
+    [[nodiscard]] static std::pair<CIter, CIter> find_biggest_span(CIter begin, CIter end) noexcept;
+
+    [[nodiscard]] static CIter find_span_end(CIter span_begin, CIter end) noexcept;
 
     // @return any error code from tr_ioWrite()
-    [[nodiscard]] int write_contiguous(CIter const begin, CIter const end) const;
+    [[nodiscard]] int write_contiguous(CIter begin, CIter end) const;
 
     // @return any error code from writeContiguous()
-    [[nodiscard]] int flush_span(CIter const begin, CIter const end);
+    [[nodiscard]] int flush_span(CIter begin, CIter end);
 
     // @return any error code from writeContiguous()
-    [[nodiscard]] int flush_oldest();
+    [[nodiscard]] int flush_biggest();
 
     // @return any error code from writeContiguous()
     [[nodiscard]] int cache_trim();
