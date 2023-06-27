@@ -21,7 +21,13 @@
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
 		3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11940D0B2EE300B5701F /* natpmp.h */; };
-		454BB0562941E8D800F99F38 /* GroupTextCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 454BB0542941E8D800F99F38 /* GroupTextCell.mm */; };
+		4521532B29AF891F009331B0 /* GroupCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4521532929AF891E009331B0 /* GroupCell.mm */; };
+		4521532E29AF9D61009331B0 /* TorrentCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4521532D29AF9D61009331B0 /* TorrentCell.mm */; };
+		4534164229B0EA8600F544C9 /* SmallTorrentCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4534164129B0EA8600F544C9 /* SmallTorrentCell.mm */; };
+		45489C5429AF6FB20098A812 /* TorrentCellActionButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45489C5029AF6FB10098A812 /* TorrentCellActionButton.mm */; };
+		45489C5629AF6FB20098A812 /* TorrentCellRevealButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45489C5229AF6FB10098A812 /* TorrentCellRevealButton.mm */; };
+		45489C5729AF6FB20098A812 /* TorrentCellControlButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45489C5329AF6FB10098A812 /* TorrentCellControlButton.mm */; };
+		4559D21629B32623004EFDF0 /* ProgressBarView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4559D21529B32623004EFDF0 /* ProgressBarView.mm */; };
 		457AF8EB28604AFC00BCF74F /* Toolbar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 457AF8EA28604AFC00BCF74F /* Toolbar.mm */; };
 		45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */; };
 		45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */; };
@@ -46,7 +52,6 @@
 		4D80185910BBC0B0008A4AF2 /* magnet-metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */; };
 		4D80185A10BBC0B0008A4AF2 /* magnet-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */; };
 		4D9A2BF009E16D21002D0FF9 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		4DCCBB3E09C3D71100D3CABF /* TorrentCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DCCBB3C09C3D71100D3CABF /* TorrentCell.mm */; };
 		4DE5CC9D0980656F00BE280E /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		4DE5CCA70980735700BE280E /* Badger.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CCA60980735700BE280E /* Badger.mm */; };
 		4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCCA0981D9BE00BE280E /* Defaults.plist */; };
@@ -642,8 +647,21 @@
 		3C7A11920D0B2EE300B5701F /* getgateway.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = getgateway.h; sourceTree = "<group>"; };
 		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = natpmp.c; sourceTree = "<group>"; };
 		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = natpmp.h; sourceTree = "<group>"; };
-		454BB0542941E8D800F99F38 /* GroupTextCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupTextCell.mm; sourceTree = "<group>"; };
-		454BB0552941E8D800F99F38 /* GroupTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupTextCell.h; sourceTree = "<group>"; };
+		4521532929AF891E009331B0 /* GroupCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupCell.mm; sourceTree = "<group>"; };
+		4521532A29AF891F009331B0 /* GroupCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupCell.h; sourceTree = "<group>"; };
+		4521532C29AF9D60009331B0 /* TorrentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TorrentCell.h; sourceTree = "<group>"; };
+		4521532D29AF9D61009331B0 /* TorrentCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCell.mm; sourceTree = "<group>"; };
+		4534164029B0EA8500F544C9 /* SmallTorrentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmallTorrentCell.h; sourceTree = "<group>"; };
+		4534164129B0EA8600F544C9 /* SmallTorrentCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SmallTorrentCell.mm; sourceTree = "<group>"; };
+		45489C4529AE70F00098A812 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		45489C4729AE79FC0098A812 /* TorrentCellActionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TorrentCellActionButton.h; sourceTree = "<group>"; };
+		45489C4A29AF10D00098A812 /* TorrentCellRevealButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TorrentCellRevealButton.h; sourceTree = "<group>"; };
+		45489C4B29AF10D10098A812 /* TorrentCellControlButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TorrentCellControlButton.h; sourceTree = "<group>"; };
+		45489C5029AF6FB10098A812 /* TorrentCellActionButton.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCellActionButton.mm; sourceTree = "<group>"; };
+		45489C5229AF6FB10098A812 /* TorrentCellRevealButton.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCellRevealButton.mm; sourceTree = "<group>"; };
+		45489C5329AF6FB10098A812 /* TorrentCellControlButton.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCellControlButton.mm; sourceTree = "<group>"; };
+		4559D21429B32622004EFDF0 /* ProgressBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressBarView.h; sourceTree = "<group>"; };
+		4559D21529B32623004EFDF0 /* ProgressBarView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressBarView.mm; sourceTree = "<group>"; };
 		455C0939287767270003A078 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/PrefsWindow.strings; sourceTree = "<group>"; };
 		455C093A287767290003A078 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/PrefsWindow.strings; sourceTree = "<group>"; };
 		455C093B2877672C0003A078 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PrefsWindow.strings; sourceTree = "<group>"; };
@@ -771,8 +789,6 @@
 		4D8017E910BBC073008A4AF2 /* torrent-magnet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-magnet.h"; sourceTree = "<group>"; };
 		4D80185710BBC0B0008A4AF2 /* magnet-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "magnet-metainfo.cc"; sourceTree = "<group>"; };
 		4D80185810BBC0B0008A4AF2 /* magnet-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "magnet-metainfo.h"; sourceTree = "<group>"; };
-		4DCCBB3C09C3D71100D3CABF /* TorrentCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCell.mm; sourceTree = "<group>"; };
-		4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TorrentCell.h; sourceTree = "<group>"; };
 		4DDBB71909E16BAE00284745 /* transmissioncli */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = transmissioncli; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE5CC9B0980656F00BE280E /* NSStringAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSStringAdditions.h; sourceTree = "<group>"; };
 		4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NSStringAdditions.mm; sourceTree = "<group>"; };
@@ -1457,10 +1473,20 @@
 				A27F0F320E19AD9800B2DB97 /* TorrentGroup.mm */,
 				4D364D9E091FBB2C00377D12 /* TorrentTableView.h */,
 				4D364D9F091FBB2C00377D12 /* TorrentTableView.mm */,
-				4DCCBB3D09C3D71100D3CABF /* TorrentCell.h */,
-				4DCCBB3C09C3D71100D3CABF /* TorrentCell.mm */,
-				454BB0552941E8D800F99F38 /* GroupTextCell.h */,
-				454BB0542941E8D800F99F38 /* GroupTextCell.mm */,
+				4521532C29AF9D60009331B0 /* TorrentCell.h */,
+				4521532D29AF9D61009331B0 /* TorrentCell.mm */,
+				4534164029B0EA8500F544C9 /* SmallTorrentCell.h */,
+				4534164129B0EA8600F544C9 /* SmallTorrentCell.mm */,
+				4521532A29AF891F009331B0 /* GroupCell.h */,
+				4521532929AF891E009331B0 /* GroupCell.mm */,
+				4559D21429B32622004EFDF0 /* ProgressBarView.h */,
+				4559D21529B32623004EFDF0 /* ProgressBarView.mm */,
+				45489C4729AE79FC0098A812 /* TorrentCellActionButton.h */,
+				45489C5029AF6FB10098A812 /* TorrentCellActionButton.mm */,
+				45489C4B29AF10D10098A812 /* TorrentCellControlButton.h */,
+				45489C5329AF6FB10098A812 /* TorrentCellControlButton.mm */,
+				45489C4A29AF10D00098A812 /* TorrentCellRevealButton.h */,
+				45489C5229AF6FB10098A812 /* TorrentCellRevealButton.mm */,
 				A21A9BE0106D86A800F1C3C1 /* TrackerNode.h */,
 				A21A9BE1106D86A800F1C3C1 /* TrackerNode.mm */,
 				A2725B6C0DE5C4F5003445E7 /* FileListNode.h */,
@@ -2797,7 +2823,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1420;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
@@ -3127,13 +3153,14 @@
 				A225A4C0187E369C00CDE823 /* ShareToolbarItem.mm in Sources */,
 				A2D77453154CC72B00A62B93 /* WebSeedTableView.mm in Sources */,
 				8D11072D0486CEB800E47090 /* main.mm in Sources */,
+				45489C5629AF6FB20098A812 /* TorrentCellRevealButton.mm in Sources */,
 				4DF0C5AB0899190500DD8943 /* Controller.mm in Sources */,
 				4D118E1A08CB46B20033958F /* PrefsController.mm in Sources */,
+				4521532E29AF9D61009331B0 /* TorrentCell.mm in Sources */,
 				4D364DA0091FBB2C00377D12 /* TorrentTableView.mm in Sources */,
 				4DE5CC9D0980656F00BE280E /* NSStringAdditions.mm in Sources */,
 				4DE5CCA70980735700BE280E /* Badger.mm in Sources */,
 				4DFBC2DF09C0970D00D5C571 /* Torrent.mm in Sources */,
-				4DCCBB3E09C3D71100D3CABF /* TorrentCell.mm in Sources */,
 				A200B9200A22798F007BBB1E /* InfoWindowController.mm in Sources */,
 				A2AF1C390A3D0F6200F1575D /* FileOutlineView.mm in Sources */,
 				A2710E770A86796000CE4F7D /* PrefsWindow.mm in Sources */,
@@ -3153,12 +3180,14 @@
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.mm in Sources */,
 				A21282A80CA6C66800EAEE0F /* StatusBarView.mm in Sources */,
 				A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */,
+				45489C5429AF6FB20098A812 /* TorrentCellActionButton.mm in Sources */,
 				A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */,
 				A2ED7D8F0CEF431B00970975 /* FilterButton.mm in Sources */,
 				45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */,
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.mm in Sources */,
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */,
+				4521532B29AF891F009331B0 /* GroupCell.mm in Sources */,
 				C841A28129197724009F18E8 /* NSKeyedUnarchiverAdditions.mm in Sources */,
 				A22180980D148A71007D09ED /* GroupsPrefsController.mm in Sources */,
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */,
@@ -3167,9 +3196,11 @@
 				45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */,
 				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.mm in Sources */,
 				A2725B6E0DE5C4F5003445E7 /* FileListNode.mm in Sources */,
+				4559D21629B32623004EFDF0 /* ProgressBarView.mm in Sources */,
 				A2725D5D0DE7507C003445E7 /* TrackerTableView.mm in Sources */,
 				A28F4F770E085BDC003A3882 /* ColorTextField.mm in Sources */,
 				A27F0F330E19AD9800B2DB97 /* TorrentGroup.mm in Sources */,
+				45489C5729AF6FB20098A812 /* TorrentCellControlButton.mm in Sources */,
 				C809AEE7291ECFD000BFDBE1 /* NSDataAdditions.mm in Sources */,
 				A222E9870E6B21D9009FB003 /* BlocklistDownloaderViewController.mm in Sources */,
 				A222EA7B0E6C32C4009FB003 /* BlocklistScheduler.mm in Sources */,
@@ -3192,10 +3223,10 @@
 				A2E57BA713109E6B00A7DAB1 /* FilterBarController.mm in Sources */,
 				A2B5B4E91880665E0071A66A /* ShareTorrentFileHelper.mm in Sources */,
 				A22BAE281388040500FB022F /* NSMutableArrayAdditions.mm in Sources */,
-				454BB0562941E8D800F99F38 /* GroupTextCell.mm in Sources */,
 				A2966E8713DAF74C007B52DF /* GlobalOptionsPopoverViewController.mm in Sources */,
 				A234EA541453563B000F3E97 /* NSImageAdditions.mm in Sources */,
 				A2AB883E16A399A6008FAD50 /* VDKQueue.mm in Sources */,
+				4534164229B0EA8600F544C9 /* SmallTorrentCell.mm in Sources */,
 				A2451E6916ACE4EB00586E0E /* FileRenameSheetController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

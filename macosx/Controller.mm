@@ -625,11 +625,10 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
     //set table size
     BOOL const small = [self.fDefaults boolForKey:@"SmallView"];
-    if (small)
-    {
-        self.fTableView.rowHeight = kRowHeightSmall;
-    }
-    self.fTableView.usesAlternatingRowBackgroundColors = !small;
+    self.fTableView.rowHeight = small ? kRowHeightSmall : kRowHeightRegular;
+    self.fTableView.usesAutomaticRowHeights = NO;
+    self.fTableView.floatsGroupRows = YES;
+    //self.fTableView.usesAlternatingRowBackgroundColors = !small;
 
     [self.fWindow setContentBorderThickness:NSMinY(self.fTableView.enclosingScrollView.frame) forEdge:NSMinYEdge];
     self.fWindow.movableByWindowBackground = YES;
@@ -2317,6 +2316,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         {
             [self.fInfoController updateInfoStats];
         }
+
+        [self.fTableView reloadVisibleRows];
     }
 
     //badge dock
@@ -3239,10 +3240,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //set all groups as expanded
         [self.fTableView removeAllCollapsedGroups];
 
-//since we're not doing this the right way (boo buggy animation), we need to remember selected values
-#warning when Lion-only and using views instead of cells, this likely won't be needed
-        NSArray* selectedValues = self.fTableView.selectedValues;
-
         beganUpdates = YES;
         [self.fTableView beginUpdates];
 
@@ -3285,11 +3282,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             //actually expand group rows
             for (TorrentGroup* group in self.fDisplayedTorrents)
                 [self.fTableView expandItem:group];
-        }
-
-        if (selectedValues)
-        {
-            [self.fTableView selectValues:selectedValues];
         }
     }
 
@@ -3597,66 +3589,6 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isItemExpandable:(id)item
 {
     return ![item isKindOfClass:[Torrent class]];
-}
-
-- (id)outlineView:(NSOutlineView*)outlineView objectValueForTableColumn:(NSTableColumn*)tableColumn byItem:(id)item
-{
-    if ([item isKindOfClass:[Torrent class]])
-    {
-        if (tableColumn)
-        {
-            return nil;
-        }
-        return ((Torrent*)item).hashString;
-    }
-    else
-    {
-        NSString* ident = tableColumn.identifier;
-        TorrentGroup* group = (TorrentGroup*)item;
-        if ([ident isEqualToString:@"Group"])
-        {
-            NSInteger groupIndex = group.groupIndex;
-            return groupIndex != -1 ? [GroupsController.groups nameForIndex:groupIndex] : NSLocalizedString(@"No Group", "Group table row");
-        }
-        else if ([ident isEqualToString:@"Color"])
-        {
-            NSInteger groupIndex = group.groupIndex;
-            return [GroupsController.groups imageForIndex:groupIndex];
-        }
-        else if ([ident isEqualToString:@"DL Image"])
-        {
-            NSImage* image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
-            image.accessibilityDescription = NSLocalizedString(@"DL", "Torrent -> status image");
-            return image;
-        }
-        else if ([ident isEqualToString:@"UL Image"])
-        {
-            if ([self.fDefaults boolForKey:@"DisplayGroupRowRatio"])
-            {
-                NSImage* image = [NSImage imageNamed:@"YingYangGroupTemplate"];
-                image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
-                return image;
-            }
-            else
-            {
-                NSImage* image = [NSImage imageNamed:@"UpArrowGroupTemplate"];
-                image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
-                return image;
-            }
-        }
-        else
-        {
-            if ([self.fDefaults boolForKey:@"DisplayGroupRowRatio"])
-            {
-                return [NSString stringForRatio:group.ratio];
-            }
-            else
-            {
-                CGFloat rate = [ident isEqualToString:@"UL"] ? group.uploadRate : group.downloadRate;
-                return [NSString stringForSpeed:rate];
-            }
-        }
-    }
 }
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView writeItems:(NSArray*)items toPasteboard:(NSPasteboard*)pasteboard
@@ -3980,7 +3912,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     BOOL makeSmall = ![self.fDefaults boolForKey:@"SmallView"];
     [self.fDefaults setBool:makeSmall forKey:@"SmallView"];
 
-    self.fTableView.usesAlternatingRowBackgroundColors = !makeSmall;
+    //self.fTableView.usesAlternatingRowBackgroundColors = !makeSmall;
 
     self.fTableView.rowHeight = makeSmall ? kRowHeightSmall : kRowHeightRegular;
 
@@ -5319,6 +5251,12 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
 
         height = (kGroupSeparatorHeight + self.fTableView.intercellSpacing.height) * groups +
             (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
+
+        //account for group padding...
+        if (groups > 1)
+        {
+            height += (groups - 1) * 20;
+        }
     }
     else
     {
