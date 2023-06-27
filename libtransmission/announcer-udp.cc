@@ -50,7 +50,7 @@ using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
 
 using InBuf = libtransmission::BufferReader<std::byte>;
-using PayloadBuffer = libtransmission::Buffer;
+using PayloadBuffer = libtransmission::StackBuffer<4096, std::byte>;
 
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
