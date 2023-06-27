@@ -125,6 +125,11 @@ public:
         tr_error_set(error, err, tr_net_strerror(err));
         return {};
     }
+
+    void clear()
+    {
+        drain(size());
+    }
 };
 
 template<typename value_type>
@@ -266,7 +271,7 @@ public:
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
         buf_.resize(end_pos_ + n_bytes);
-        return { &buf_[end_pos_], n_bytes };
+        return { buf_.data() + end_pos_, n_bytes };
     }
 
     virtual void commit_space(size_t n_bytes) override
