@@ -185,7 +185,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
 
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
-    auto outbuf = libtransmission::Buffer{};
+    auto outbuf = libtransmission::StackBuffer<1024U, std::byte>{};
 
     /* HASH('req1', S) */
     outbuf.add(tr_sha1::digest("req1"sv, dh_.secret()));
@@ -600,7 +600,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
     peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
-    auto outbuf = libtransmission::Buffer{};
+    auto outbuf = libtransmission::StackBuffer<1024U, std::byte>{};
 
     // send VC
     tr_logAddTraceHand(this, "sending vc");
