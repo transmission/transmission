@@ -169,7 +169,7 @@ void logAddImpl(
             {
                 return;
             }
-        } 
+        }
 
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
