@@ -48,13 +48,11 @@ Cache::CIter Cache::find_span_end(CIter span_begin, CIter end) noexcept
         auto const next = std::next(span_end);
         if (span_end->key != key)
         {
-            break;
+            return span_end;
         }
 
         span_end = next;
     }
-
-    return span_end;
 }
 
 std::pair<Cache::CIter, Cache::CIter> Cache::find_biggest_span(CIter const begin, CIter const end) noexcept
