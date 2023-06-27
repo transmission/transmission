@@ -28,48 +28,41 @@ Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc
     return std::make_pair(torrent->id(), loc.block);
 }
 
-std::pair<Cache::CIter, Cache::CIter> Cache::findContiguous(CIter const begin, CIter const end, CIter const iter) noexcept
+Cache::CIter Cache::find_span_end(CIter span_begin, CIter end) noexcept
 {
-    if (iter == end)
+    static constexpr auto NotAdjacent = [](CacheBlock const& block1, CacheBlock const& block2)
     {
-        return std::make_pair(end, end);
-    }
-
-    auto span_begin = iter;
-    for (auto key = iter->key;;)
-    {
-        if (span_begin == begin)
-        {
-            break;
-        }
-
-        --key.second;
-        auto const prev = std::prev(span_begin);
-        if (prev->key != key)
-        {
-            break;
-        }
-    }
-
-    auto span_end = std::next(iter);
-    for (auto key = iter->key;;)
-    {
-        if (span_end == end)
-        {
-            break;
-        }
-
-        ++key.second;
-        if (span_end->key != key)
-        {
-            break;
-        }
-    }
-
-    return std::make_pair(span_begin, span_end);
+        return block1.key.first != block2.key.first || block1.key.second + 1 != block2.key.second;
+    };
+    auto const span_end = std::adjacent_find(span_begin, end, NotAdjacent);
+    return span_end == end ? end : std::next(span_end);
 }
 
-int Cache::writeContiguous(CIter const begin, CIter const end) const
+std::pair<Cache::CIter, Cache::CIter> Cache::find_biggest_span(CIter const begin, CIter const end) noexcept
+{
+    auto biggest_begin = begin;
+    auto biggest_end = begin;
+    auto biggest_len = std::distance(biggest_begin, biggest_end);
+
+    for (auto span_begin = begin; span_begin < end;)
+    {
+        auto span_end = find_span_end(span_begin, end);
+        auto const len = std::distance(span_begin, span_end);
+
+        if (len > biggest_len)
+        {
+            biggest_begin = span_begin;
+            biggest_end = span_end;
+            biggest_len = len;
+        }
+
+        std::advance(span_begin, len);
+    }
+
+    return { biggest_begin, biggest_end };
+}
+
+int Cache::write_contiguous(CIter const begin, CIter const end) const
 {
     // The most common case without an extra data copy.
     auto const* towrite = begin->buf.get();
@@ -150,8 +143,6 @@ int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniqu
         iter->key = key;
     }
 
-    iter->time_added = tr_time();
-
     iter->buf = std::move(writeme);
 
     ++cache_writes_;
@@ -198,18 +189,18 @@ int Cache::prefetchBlock(tr_torrent* torrent, tr_block_info::Location loc, uint3
 
 // ---
 
-int Cache::flushSpan(CIter const begin, CIter const end)
+int Cache::flush_span(CIter const begin, CIter const end)
 {
-    for (auto walk = begin; walk < end;)
+    for (auto span_begin = begin; span_begin < end;)
     {
-        auto const [contig_begin, contig_end] = findContiguous(begin, end, walk);
+        auto const span_end = find_span_end(span_begin, end);
 
-        if (auto const err = writeContiguous(contig_begin, contig_end); err != 0)
+        if (auto const err = write_contiguous(span_begin, span_end); err != 0)
         {
             return err;
         }
 
-        walk = contig_end;
+        span_begin = span_end;
     }
 
     blocks_.erase(begin, end);
@@ -222,7 +213,7 @@ int Cache::flushFile(tr_torrent const* torrent, tr_file_index_t file)
     auto const tor_id = torrent->id();
     auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, file);
 
-    return flushSpan(
+    return flush_span(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), compare),
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), compare));
 }
@@ -232,26 +223,21 @@ int Cache::flushTorrent(tr_torrent const* torrent)
     auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
 
-    return flushSpan(
+    return flush_span(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), compare),
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), compare));
 }
 
-int Cache::flushOldest()
+int Cache::flush_biggest()
 {
-    auto const oldest = std::min_element(
-        std::begin(blocks_),
-        std::end(blocks_),
-        [](auto const& a, auto const& b) { return a.time_added < b.time_added; });
+    auto const [begin, end] = find_biggest_span(std::begin(blocks_), std::end(blocks_));
 
-    if (oldest == std::end(blocks_)) // nothing to flush
+    if (begin == end) // nothing to flush
     {
         return 0;
     }
 
-    auto const [begin, end] = findContiguous(std::begin(blocks_), std::end(blocks_), oldest);
-
-    if (auto const err = writeContiguous(begin, end); err != 0)
+    if (auto const err = write_contiguous(begin, end); err != 0)
     {
         return err;
     }
@@ -264,7 +250,7 @@ int Cache::cacheTrim()
 {
     while (std::size(blocks_) > max_blocks_)
     {
-        if (auto const err = flushOldest(); err != 0)
+        if (auto const err = flush_biggest(); err != 0)
         {
             return err;
         }
