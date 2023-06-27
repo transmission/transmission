@@ -277,7 +277,7 @@ namespace
 {
 namespace to_string_helpers
 {
-using OutBuf = libtransmission::Buffer;
+using OutBuf = libtransmission::StackBuffer<1024U * 8U, std::byte>;
 
 void saveIntFunc(tr_variant const* val, void* vout)
 {

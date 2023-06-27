@@ -15,9 +15,12 @@
 #include <memory>
 #include <utility> // std::pair
 
+#include <event2/util.h> // for evutil_socket_t
+
 #include "transmission.h"
 
 #include "bandwidth.h"
+#include "block-info.h"
 #include "net.h" // tr_address
 #include "peer-mse.h"
 #include "peer-socket.h"
@@ -289,7 +292,14 @@ public:
     static void utp_init(struct_utp_context* ctx);
 
 private:
+    // Our target socket receive buffer size.
+    // Gets read from the socket buffer into the PeerBuffer inbuf_.
     static constexpr auto RcvBuf = size_t{ 256 * 1024 };
+
+    // The buffer size for incoming & outgoing peer messages.
+    // Starts off with enough capacity to read a single BT Piece message,
+    // but has a 5x GrowthFactor so that it can quickly to high volume.
+    using PeerBuffer = libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
 
     friend class libtransmission::test::HandshakeTest;
 
@@ -342,8 +352,8 @@ private:
 
     tr_sha1_digest_t info_hash_;
 
-    libtransmission::Buffer inbuf_;
-    libtransmission::Buffer outbuf_;
+    PeerBuffer inbuf_;
+    PeerBuffer outbuf_;
 
     tr_session* const session_;
 

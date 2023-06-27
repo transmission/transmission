@@ -14,6 +14,8 @@
 #include <string>
 #include <string_view>
 
+#include <small/vector.hpp>
+
 #include <event2/buffer.h>
 
 #include "error.h"
@@ -123,6 +125,11 @@ public:
         tr_error_set(error, err, tr_net_strerror(err));
         return {};
     }
+
+    void clear()
+    {
+        drain(size());
+    }
 };
 
 template<typename value_type>
@@ -221,6 +228,61 @@ public:
 
         return {};
     }
+};
+
+template<size_t N, typename value_type = std::byte, typename GrowthFactor = std::ratio<3, 2>>
+class StackBuffer final
+    : public BufferReader<value_type>
+    , public BufferWriter<value_type>
+{
+public:
+    StackBuffer() = default;
+    StackBuffer(StackBuffer&&) = delete;
+    StackBuffer(StackBuffer const&) = delete;
+    StackBuffer& operator=(StackBuffer&&) = delete;
+    StackBuffer& operator=(StackBuffer const&) = delete;
+
+    template<typename ContiguousContainer>
+    explicit StackBuffer(ContiguousContainer const& data)
+    {
+        BufferWriter<value_type>::add(data);
+    }
+
+    [[nodiscard]] size_t size() const noexcept override
+    {
+        return end_pos_ - begin_pos_;
+    }
+
+    [[nodiscard]] value_type const* data() const override
+    {
+        return std::data(buf_) + begin_pos_;
+    }
+
+    void drain(size_t n_bytes) override
+    {
+        begin_pos_ += std::min(n_bytes, size());
+
+        if (begin_pos_ == end_pos_) // empty; reuse the buf
+        {
+            begin_pos_ = end_pos_ = 0U;
+        }
+    }
+
+    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
+    {
+        buf_.resize(end_pos_ + n_bytes);
+        return { buf_.data() + end_pos_, n_bytes };
+    }
+
+    virtual void commit_space(size_t n_bytes) override
+    {
+        end_pos_ += n_bytes;
+    }
+
+private:
+    small::vector<value_type, N, std::allocator<value_type>, std::true_type, size_t, GrowthFactor> buf_ = {};
+    size_t begin_pos_ = {};
+    size_t end_pos_ = {};
 };
 
 class Buffer final
