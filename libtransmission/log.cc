@@ -164,6 +164,11 @@ void logAddImpl(
         if (fp == TR_BAD_SYS_FILE)
         {
             fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
+            // if fp is still bad, do not write log
+            if (fp == TR_BAD_SYS_FILE)
+            {
+                return;
+            }
         }
 
         auto timestr = std::array<char, 64>{};
