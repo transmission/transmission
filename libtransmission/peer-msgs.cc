@@ -47,7 +47,9 @@
 #endif
 
 using namespace std::literals;
-using MessageBuffer = libtransmission::Buffer;
+
+// initial capacity is big enough to hold a BtPeerMsgs::Piece message
+using MessageBuffer = libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
 using MessageReader = libtransmission::BufferReader<std::byte>;
 using MessageWriter = libtransmission::BufferWriter<std::byte>;
 
@@ -1800,8 +1802,10 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     current_message_len.reset();
     auto const message_type = *current_message_type;
     current_message_type.reset();
+
     auto payload = MessageBuffer{};
-    std::swap(payload, current_payload);
+    payload.add(current_payload);
+    current_payload.clear();
 
     auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, message_type, payload);
     *piece = n_piece_bytes_read;
