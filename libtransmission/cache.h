@@ -86,9 +86,6 @@ private:
     [[nodiscard]] int flush_biggest();
 
     // @return any error code from writeContiguous()
-    [[nodiscard]] int flush_oldest();
-
-    // @return any error code from writeContiguous()
     [[nodiscard]] int cache_trim();
 
     [[nodiscard]] static size_t get_max_blocks(size_t max_bytes) noexcept;
