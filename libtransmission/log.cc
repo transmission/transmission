@@ -57,34 +57,6 @@ auto log_state = tr_log_state{};
 
 // ---
 
-tr_sys_file_t tr_logGetFile()
-{
-    static bool initialized = false;
-    static tr_sys_file_t file = TR_BAD_SYS_FILE;
-
-    if (!initialized)
-    {
-        switch (tr_env_get_int("TR_DEBUG_FD", 0))
-        {
-        case 1:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT);
-            break;
-
-        case 2:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
-            break;
-
-        default:
-            file = TR_BAD_SYS_FILE;
-            break;
-        }
-
-        initialized = true;
-    }
-
-    return file;
-}
-
 void logAddImpl(
     [[maybe_unused]] std::string_view file,
     [[maybe_unused]] long line,
@@ -159,16 +131,11 @@ void logAddImpl(
     }
     else
     {
-        tr_sys_file_t fp = tr_logGetFile();
+        static auto const fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
 
         if (fp == TR_BAD_SYS_FILE)
         {
-            fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
-            // if fp is still bad, do not write log
-            if (fp == TR_BAD_SYS_FILE)
-            {
-                return;
-            }
+            return;
         }
 
         auto timestr = std::array<char, 64>{};
