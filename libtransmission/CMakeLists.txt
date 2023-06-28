@@ -92,7 +92,6 @@ target_sources(${TR_NAME}
         peer-socket.cc
         peer-socket.h
         platform-quota.cc
-        platform-quota.h
         platform.cc
         platform.h
         port-forwarding-natpmp.cc

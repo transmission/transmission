@@ -16,7 +16,6 @@
 #include <type_traits>
 #include <vector>
 
-#include "platform-quota.h"
 #include "tr-macros.h"
 
 struct tr_error;
@@ -75,12 +74,6 @@ constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, 
 {
     return tr_saveFile(filename, std::string_view{ std::data(x), std::size(x) }, error);
 }
-
-/**
- * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
- * @return struct with free and total as zero or positive integer on success, -1 in case of error.
- */
-[[nodiscard]] tr_disk_space tr_dirSpace(std::string_view directory);
 
 /** @brief return the current date in milliseconds */
 [[nodiscard]] uint64_t tr_time_msec();

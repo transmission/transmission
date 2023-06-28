@@ -2181,7 +2181,14 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_download_dir_free_space:
-        tr_variantDictAddInt(d, key, tr_dirSpace(s->downloadDir()).free);
+        if (auto const capacity = tr_sys_path_get_capacity(s->downloadDir()); capacity)
+        {
+            tr_variantDictAddInt(d, key, capacity->free);
+        }
+        else
+        {
+            tr_variantDictAddInt(d, key, -1);
+        }
         break;
 
     case TR_KEY_download_queue_enabled:
@@ -2409,15 +2416,16 @@ char const* freeSpace(tr_session* /*session*/, tr_variant* args_in, tr_variant* 
 
     /* get the free space */
     auto const old_errno = errno;
-    errno = 0;
-    auto const dir_space = tr_dirSpace(path);
-    char const* const err = dir_space.free < 0 || dir_space.total < 0 ? tr_strerror(errno) : nullptr;
+    tr_error* error = nullptr;
+    auto const capacity = tr_sys_path_get_capacity(path, &error);
+    char const* const err = error != nullptr ? tr_strerror(error->code) : nullptr;
+    tr_error_clear(&error);
     errno = old_errno;
 
     /* response */
     tr_variantDictAddStr(args_out, TR_KEY_path, path);
-    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, dir_space.free);
-    tr_variantDictAddInt(args_out, TR_KEY_total_size, dir_space.total);
+    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, capacity ? capacity->free : -1);
+    tr_variantDictAddInt(args_out, TR_KEY_total_size, capacity ? capacity->total : -1);
     return err;
 }
 

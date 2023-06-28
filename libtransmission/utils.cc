@@ -50,7 +50,6 @@
 #include "libtransmission/log.h"
 #include "libtransmission/mime-types.h"
 #include "libtransmission/net.h" // ntohl()
-#include "libtransmission/platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
@@ -173,17 +172,6 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
 
     tr_logAddTrace(fmt::format("Saved '{}'", filename));
     return true;
-}
-
-tr_disk_space tr_dirSpace(std::string_view directory)
-{
-    if (std::empty(directory))
-    {
-        errno = EINVAL;
-        return { -1, -1 };
-    }
-
-    return tr_device_info_get_disk_space(tr_device_info_create(directory));
 }
 
 // ---
