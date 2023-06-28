@@ -11,7 +11,7 @@
 
 using BufferTest = ::testing::Test;
 using namespace std::literals;
-using Buffer = libtransmission::Buffer;
+using Buffer = libtransmission::StackBuffer<1024, std::byte>;
 
 TEST_F(BufferTest, startsWithInSingleSegment)
 {
@@ -60,52 +60,6 @@ TEST_F(BufferTest, startsWithInMultiSegment)
     EXPECT_TRUE(buf->starts_with("Hello, Worl"sv));
     EXPECT_TRUE(buf->starts_with("Hello, World"sv));
     EXPECT_TRUE(buf->starts_with("Hello, World!"sv));
-}
-
-TEST_F(BufferTest, Move)
-{
-    auto constexpr TwoChars = "12"sv;
-    auto constexpr SixChars = "123456"sv;
-    auto constexpr TenChars = "1234567890"sv;
-
-    auto a = Buffer{ TwoChars };
-    auto b = Buffer{ SixChars };
-    auto c = Buffer{ TenChars };
-
-    auto lens = std::array<size_t, 3>{ std::size(TwoChars), std::size(SixChars), std::size(TenChars) };
-
-    EXPECT_EQ(lens[0], std::size(a));
-    EXPECT_EQ(lens[1], std::size(b));
-    EXPECT_EQ(lens[2], std::size(c));
-
-    std::swap(a, b);
-    EXPECT_EQ(lens[0], std::size(b));
-    EXPECT_EQ(lens[1], std::size(a));
-    EXPECT_EQ(lens[2], std::size(c));
-
-    std::swap(a, c);
-    EXPECT_EQ(lens[0], std::size(b));
-    EXPECT_EQ(lens[1], std::size(c));
-    EXPECT_EQ(lens[2], std::size(a));
-
-    std::swap(b, c);
-    EXPECT_EQ(lens[0], std::size(c));
-    EXPECT_EQ(lens[1], std::size(b));
-    EXPECT_EQ(lens[2], std::size(a));
-
-    a.add(std::data(TwoChars), std::size(TwoChars));
-
-    {
-        auto constexpr OneChar = "1"sv;
-        auto d = Buffer{ OneChar };
-
-        std::swap(a, d);
-        EXPECT_EQ(1U, std::size(a));
-    }
-
-    EXPECT_EQ(1U, std::size(a));
-    a.add(std::data(TwoChars), std::size(TwoChars));
-    EXPECT_EQ(3U, std::size(a));
 }
 
 TEST_F(BufferTest, Numbers)
