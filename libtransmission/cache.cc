@@ -148,7 +148,7 @@ int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniq
     }
 
     auto const key = Key{ tor_id, block };
-    auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
+    auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey);
     if (iter == std::end(blocks_) || iter->key != key)
     {
         iter = blocks_.emplace(iter);
@@ -169,7 +169,7 @@ Cache::CIter Cache::get_block(tr_torrent const* torrent, tr_block_info::Location
             std::begin(blocks_),
             std::end(blocks_),
             make_key(torrent, loc),
-            CompareCacheBlockByKey{});
+            CompareCacheBlockByKey);
         begin < end)
     {
         return begin;
@@ -221,23 +221,21 @@ int Cache::flush_span(CIter const begin, CIter const end)
 
 int Cache::flush_file(tr_torrent const* torrent, tr_file_index_t file)
 {
-    auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
     auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, file);
 
     return flush_span(
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), compare),
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), compare));
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), CompareCacheBlockByKey),
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), CompareCacheBlockByKey));
 }
 
 int Cache::flush_torrent(tr_torrent const* torrent)
 {
-    auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
 
     return flush_span(
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), compare),
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), compare));
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), CompareCacheBlockByKey),
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), CompareCacheBlockByKey));
 }
 
 int Cache::flush_biggest()

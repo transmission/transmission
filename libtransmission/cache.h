@@ -53,18 +53,6 @@ private:
     using Blocks = std::vector<CacheBlock>;
     using CIter = Blocks::const_iterator;
 
-    struct CompareCacheBlockByKey
-    {
-        [[nodiscard]] constexpr bool operator()(Key const& key, CacheBlock const& block)
-        {
-            return key < block.key;
-        }
-        [[nodiscard]] constexpr bool operator()(CacheBlock const& block, Key const& key)
-        {
-            return block.key < key;
-        }
-    };
-
     [[nodiscard]] static Key make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept;
 
     [[nodiscard]] static std::pair<CIter, CIter> find_biggest_span(CIter begin, CIter end) noexcept;
@@ -96,4 +84,16 @@ private:
     mutable size_t disk_write_bytes_ = 0;
     mutable size_t cache_writes_ = 0;
     mutable size_t cache_write_bytes_ = 0;
+
+    static constexpr struct
+    {
+        [[nodiscard]] constexpr bool operator()(Key const& key, CacheBlock const& block)
+        {
+            return key < block.key;
+        }
+        [[nodiscard]] constexpr bool operator()(CacheBlock const& block, Key const& key)
+        {
+            return block.key < key;
+        }
+    } CompareCacheBlockByKey{};
 };
