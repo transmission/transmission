@@ -21,7 +21,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h" // tr_time(), tr_wait()
+#include "libtransmission/utils.h" // tr_time()
 #include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;
@@ -135,7 +135,7 @@ bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& 
             if (auto const now = tr_time(); last_slept_at != now)
             {
                 last_slept_at = now;
-                tr_wait(SleepPerSecondDuringVerify);
+                std::this_thread::sleep_for(SleepPerSecondDuringVerify);
             }
 
             sha->clear();
@@ -277,6 +277,6 @@ tr_verify_worker::~tr_verify_worker()
 
     while (verify_thread_id_.has_value())
     {
-        tr_wait(20ms);
+        std::this_thread::sleep_for(20ms);
     }
 }

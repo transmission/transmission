@@ -705,7 +705,7 @@ public:
                 ++repeats;
                 if (repeats > 1U)
                 {
-                    tr_wait(100ms);
+                    std::this_thread::sleep_for(100ms);
                 }
             }
             else
