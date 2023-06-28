@@ -23,7 +23,7 @@
 #include "tr-assert.h"
 #include "utils.h" // tr_time(), tr_formatter
 
-Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
+Cache::Key Cache::make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {
     return std::make_pair(torrent->id(), loc.block);
 }
@@ -136,7 +136,7 @@ Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
 int Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>> writeme)
 {
     auto const key = Key{ tor_id, block };
-    auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
+    auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey);
     if (iter == std::end(blocks_) || iter->key != key)
     {
         iter = blocks_.emplace(iter);
@@ -156,8 +156,8 @@ Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location 
     if (auto const [begin, end] = std::equal_range(
             std::begin(blocks_),
             std::end(blocks_),
-            makeKey(torrent, loc),
-            CompareCacheBlockByKey{});
+            make_key(torrent, loc),
+            CompareCacheBlockByKey);
         begin < end)
     {
         return begin;
@@ -209,23 +209,21 @@ int Cache::flush_span(CIter const begin, CIter const end)
 
 int Cache::flushFile(tr_torrent const* torrent, tr_file_index_t file)
 {
-    auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
     auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, file);
 
     return flush_span(
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), compare),
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), compare));
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), CompareCacheBlockByKey),
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), CompareCacheBlockByKey));
 }
 
 int Cache::flushTorrent(tr_torrent const* torrent)
 {
-    auto const compare = CompareCacheBlockByKey{};
     auto const tor_id = torrent->id();
 
     return flush_span(
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), compare),
-        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), compare));
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), CompareCacheBlockByKey),
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), CompareCacheBlockByKey));
 }
 
 int Cache::flush_biggest()
