@@ -16,12 +16,8 @@
 
 #include <small/vector.hpp>
 
-#include <event2/buffer.h>
-
 #include "error.h"
 #include "net.h" // tr_socket_t
-#include "tr-assert.h"
-#include "utils-ev.h"
 #include "utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission
@@ -283,63 +279,6 @@ private:
     small::vector<value_type, N, std::allocator<value_type>, std::true_type, size_t, GrowthFactor> buf_ = {};
     size_t begin_pos_ = {};
     size_t end_pos_ = {};
-};
-
-class Buffer final
-    : public BufferReader<std::byte>
-    , public BufferWriter<std::byte>
-{
-public:
-    using value_type = std::byte;
-
-    Buffer() = default;
-    Buffer(Buffer&&) = default;
-    Buffer(Buffer const&) = delete;
-    Buffer& operator=(Buffer&&) = default;
-    Buffer& operator=(Buffer const&) = delete;
-
-    template<typename T>
-    explicit Buffer(T const& data)
-    {
-        add(data);
-    }
-
-    [[nodiscard]] size_t size() const noexcept override
-    {
-        return evbuffer_get_length(buf_.get());
-    }
-
-    [[nodiscard]] value_type const* data() const override
-    {
-        return reinterpret_cast<value_type const*>(evbuffer_pullup(buf_.get(), -1));
-    }
-
-    void drain(size_t n_bytes) override
-    {
-        evbuffer_drain(buf_.get(), n_bytes);
-    }
-
-    [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
-    {
-        auto iov = evbuffer_iovec{};
-        evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
-        TR_ASSERT(iov.iov_len >= n_bytes);
-        reserved_space_ = iov;
-        return { static_cast<value_type*>(iov.iov_base), static_cast<size_t>(iov.iov_len) };
-    }
-
-    void commit_space(size_t n_bytes) override
-    {
-        TR_ASSERT(reserved_space_);
-        TR_ASSERT(reserved_space_->iov_len >= n_bytes);
-        reserved_space_->iov_len = n_bytes;
-        evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
-        reserved_space_.reset();
-    }
-
-private:
-    evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
-    std::optional<evbuffer_iovec> reserved_space_;
 };
 
 } // namespace libtransmission
