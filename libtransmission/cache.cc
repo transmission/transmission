@@ -119,10 +119,9 @@ size_t Cache::get_max_blocks(size_t max_bytes) noexcept
 
 int Cache::set_limit(size_t new_limit)
 {
-    max_bytes_ = new_limit;
     max_blocks_ = get_max_blocks(new_limit);
 
-    tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(max_bytes_), max_blocks_));
+    tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(new_limit), max_blocks_));
 
     return cache_trim();
 }
@@ -130,7 +129,6 @@ int Cache::set_limit(size_t new_limit)
 Cache::Cache(tr_torrents& torrents, size_t max_bytes)
     : torrents_{ torrents }
     , max_blocks_(get_max_blocks(max_bytes))
-    , max_bytes_(max_bytes)
 {
 }
 
@@ -138,6 +136,17 @@ Cache::Cache(tr_torrents& torrents, size_t max_bytes)
 
 int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<BlockData> writeme)
 {
+    if (max_blocks_ == 0U)
+    {
+        TR_ASSERT(std::empty(blocks_));
+
+        // Bypass cache. This may be helpful for those whose filesystem
+        // already has a cache layer for the very purpose of this cache
+        // https://github.com/transmission/transmission/pull/5668
+        auto* const tor = torrents_.get(tor_id);
+        return tr_ioWrite(tor, tor->block_loc(block), std::size(*writeme), std::data(*writeme));
+    }
+
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
     if (iter == std::end(blocks_) || iter->key != key)
