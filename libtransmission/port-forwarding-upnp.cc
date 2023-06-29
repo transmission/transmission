@@ -7,7 +7,6 @@
 #include <cerrno>
 #include <chrono>
 #include <future>
-#include <mutex>
 #include <string>
 #include <thread>
 #include <utility>
