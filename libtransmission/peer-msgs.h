@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <atomic>
 #include <cstddef> // for size_t
 #include <memory>

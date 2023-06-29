@@ -17,7 +17,6 @@
 
 #include <fmt/core.h>
 
-#include <array>
 #include <functional>
 #include <utility>
 
