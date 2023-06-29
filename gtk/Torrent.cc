@@ -17,7 +17,7 @@
 
 #include <fmt/core.h>
 
-#include <functional>
+#include <cmath>
 #include <utility>
 
 using namespace std::string_view_literals;
