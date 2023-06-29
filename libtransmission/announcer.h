@@ -14,6 +14,7 @@
 #include <cstdint> // uint32_t
 #include <ctime>
 #include <functional>
+#include <optional>
 #include <string_view>
 #include <vector>
 
