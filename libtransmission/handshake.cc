@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cerrno>
 #include <string_view>
 #include <utility>
 

@@ -6,7 +6,6 @@
 #include <algorithm> // for std::sort, std::transform
 #include <array> // std::array
 #include <cctype>
-#include <cerrno>
 #include <cfloat> // DBL_DIG
 #include <chrono>
 #include <cstdint> // SIZE_MAX

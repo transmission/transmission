@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cerrno>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib> // for abort()
