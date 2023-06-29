@@ -85,21 +85,21 @@ TEST_F(UtilsTest, trStrvSep)
     auto constexpr Delim = ',';
 
     auto sv = "token1,token2,token3"sv;
-    EXPECT_EQ("token1"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ("token3"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token1"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token3"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
 
     sv = " token1,token2"sv;
-    EXPECT_EQ(" token1"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ("token2"sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(" token1"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ("token2"sv, tr_strv_sep(&sv, Delim));
 
     sv = "token1;token2"sv;
-    EXPECT_EQ("token1;token2"sv, tr_strvSep(&sv, Delim));
-    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ("token1;token2"sv, tr_strv_sep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
 
     sv = ""sv;
-    EXPECT_EQ(""sv, tr_strvSep(&sv, Delim));
+    EXPECT_EQ(""sv, tr_strv_sep(&sv, Delim));
 }
 
 TEST_F(UtilsTest, trStrvStrip)

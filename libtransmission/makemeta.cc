@@ -348,7 +348,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
             auto* const path_list = tr_variantDictAddList(file_dict, TR_KEY_path, 0);
             auto token = std::string_view{};
-            while (tr_strvSep(&subpath, &token, '/'))
+            while (tr_strv_sep(&subpath, &token, '/'))
             {
                 tr_variantListAddStr(path_list, token);
             }

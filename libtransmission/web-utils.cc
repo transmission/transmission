@@ -317,7 +317,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     }
 
     // scheme
-    parsed.scheme = tr_strvSep(&url, ':');
+    parsed.scheme = tr_strv_sep(&url, ':');
     if (std::empty(parsed.scheme))
     {
         return std::nullopt;
@@ -342,7 +342,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         if (tr_strv_starts_with(remain, '['))
         {
             remain.remove_prefix(1); // '['
-            parsed.host = tr_strvSep(&remain, ']');
+            parsed.host = tr_strv_sep(&remain, ']');
             if (tr_strv_starts_with(remain, ':'))
             {
                 remain.remove_prefix(1);
@@ -357,7 +357,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         }
         else
         {
-            parsed.host = tr_strvSep(&remain, ':');
+            parsed.host = tr_strv_sep(&remain, ':');
         }
         parsed.sitename = getSiteName(parsed.host);
         parsed.port = parsePort(!std::empty(remain) ? remain : getPortForScheme(parsed.scheme));
@@ -418,8 +418,8 @@ std::string tr_urlTrackerLogName(std::string_view url)
 
 tr_url_query_view::iterator& tr_url_query_view::iterator::operator++()
 {
-    auto pair = tr_strvSep(&remain, '&');
-    keyval.first = tr_strvSep(&pair, '=');
+    auto pair = tr_strv_sep(&remain, '&');
+    keyval.first = tr_strv_sep(&pair, '=');
     keyval.second = pair;
     return *this;
 }

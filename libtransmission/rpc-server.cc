@@ -474,7 +474,7 @@ bool is_authorized(tr_rpc_server const* server, char const* auth_header)
     auth.remove_prefix(std::size(Prefix));
     auto const decoded_str = tr_base64_decode(auth);
     auto decoded = std::string_view{ decoded_str };
-    auto const username = tr_strvSep(&decoded, ':');
+    auto const username = tr_strv_sep(&decoded, ':');
     auto const password = decoded;
     return server->username() == username && tr_ssha1_matches(server->salted_password_, password);
 }

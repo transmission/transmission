@@ -484,7 +484,7 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
     auto values = std::set<int>{};
     auto token = std::string_view{};
     auto range = number_range{};
-    while (tr_strvSep(&str, &token, ',') && parseNumberSection(token, range))
+    while (tr_strv_sep(&str, &token, ',') && parseNumberSection(token, range))
     {
         for (auto i = range.low; i <= range.high; ++i)
         {

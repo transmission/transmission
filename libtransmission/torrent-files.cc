@@ -417,7 +417,7 @@ void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 void tr_torrent_files::makeSubpathPortable(std::string_view path, tr_pathbuf& append_me)
 {
     auto segment = std::string_view{};
-    while (tr_strvSep(&path, &segment, '/'))
+    while (tr_strv_sep(&path, &segment, '/'))
     {
         appendSanitizedComponent(segment, append_me);
         append_me.append('/');

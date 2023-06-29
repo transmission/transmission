@@ -285,7 +285,7 @@ bool tr_announce_list::parse(std::string_view text)
     auto current_tier = tr_tracker_tier_t{ 0 };
     auto current_tier_size = size_t{ 0 };
     auto line = std::string_view{};
-    while (tr_strvSep(&text, &line, '\n'))
+    while (tr_strv_sep(&text, &line, '\n'))
     {
         if (tr_strv_ends_with(line, '\r'))
         {

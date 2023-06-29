@@ -315,7 +315,7 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 
         auto sv = std::string_view{ buf };
         auto token = std::string_view{};
-        while (tr_strvSep(&sv, &token, ':'))
+        while (tr_strv_sep(&sv, &token, ':'))
         {
             token = tr_strvStrip(token);
             if (!std::empty(token))

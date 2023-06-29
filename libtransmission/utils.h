@@ -169,7 +169,7 @@ template<typename T>
     return !std::empty(sv) && sv.back() == key;
 }
 
-constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
+constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
 {
     auto pos = sv->find(delim);
     auto const ret = sv->substr(0, pos);
@@ -177,14 +177,14 @@ constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
     return ret;
 }
 
-constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char delim)
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
 {
     if (std::empty(*sv))
     {
         return false;
     }
 
-    *token = tr_strvSep(sv, delim);
+    *token = tr_strv_sep(sv, delim);
     return true;
 }
 
