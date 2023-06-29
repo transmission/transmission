@@ -220,7 +220,7 @@ TR_CONSTEXPR20 bool urlCharsAreValid(std::string_view url)
     };
 
     return !std::empty(url) &&
-        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return tr_strvContains(ValidChars, ch); });
+        std::all_of(std::begin(url), std::end(url), [&ValidChars](auto ch) { return tr_strv_contains(ValidChars, ch); });
 }
 
 bool tr_isValidTrackerScheme(std::string_view scheme)

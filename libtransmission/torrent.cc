@@ -1670,7 +1670,7 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.piece_size = tor->piece_size();
     ret.n_pieces = tor->piece_count();
     ret.is_private = tor->is_private();
-    ret.is_folder = tor->file_count() > 1 || (tor->file_count() == 1 && tr_strvContains(tor->file_subpath(0), '/'));
+    ret.is_folder = tor->file_count() > 1 || (tor->file_count() == 1 && tr_strv_contains(tor->file_subpath(0), '/'));
 
     return ret;
 }
@@ -2450,12 +2450,12 @@ namespace rename_helpers
 bool renameArgsAreValid(tr_torrent const* tor, std::string_view oldpath, std::string_view newname)
 {
     if (std::empty(oldpath) || std::empty(newname) || newname == "."sv || newname == ".."sv ||
-        tr_strvContains(newname, TR_PATH_DELIMITER))
+        tr_strv_contains(newname, TR_PATH_DELIMITER))
     {
         return false;
     }
 
-    auto const newpath = tr_strvContains(oldpath, TR_PATH_DELIMITER) ?
+    auto const newpath = tr_strv_contains(oldpath, TR_PATH_DELIMITER) ?
         tr_pathbuf{ tr_sys_path_dirname(oldpath), '/', newname } :
         tr_pathbuf{ newname };
 
@@ -2546,7 +2546,7 @@ void renameTorrentFileString(tr_torrent* tor, std::string_view oldpath, std::str
     auto const subpath = std::string_view{ tor->file_subpath(file_index) };
     auto const oldpath_len = std::size(oldpath);
 
-    if (!tr_strvContains(oldpath, TR_PATH_DELIMITER))
+    if (!tr_strv_contains(oldpath, TR_PATH_DELIMITER))
     {
         if (oldpath_len >= std::size(subpath))
         {
@@ -2614,7 +2614,7 @@ void torrentRenamePath(
             }
 
             /* update tr_info.name if user changed the toplevel */
-            if (std::size(file_indices) == tor->file_count() && !tr_strvContains(oldpath, '/'))
+            if (std::size(file_indices) == tor->file_count() && !tr_strv_contains(oldpath, '/'))
             {
                 tor->set_name(newname);
             }

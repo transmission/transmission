@@ -225,7 +225,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
 
-    if (bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv); !do_compress)
+    if (bool const do_compress = encoding != nullptr && tr_strv_contains(encoding, "gzip"sv); !do_compress)
     {
         evbuffer_add(out, std::data(content), std::size(content));
     }
@@ -328,7 +328,7 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
             subpath = DefaultPage;
         }
 
-        if (tr_strvContains(subpath, ".."sv))
+        if (tr_strv_contains(subpath, ".."sv))
         {
             send_simple_response(req, HTTP_NOTFOUND);
         }

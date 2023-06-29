@@ -34,19 +34,19 @@ using namespace std::literals;
 
 TEST_F(UtilsTest, trStrvContains)
 {
-    EXPECT_FALSE(tr_strvContains("a test is this"sv, "TEST"sv));
-    EXPECT_FALSE(tr_strvContains("test"sv, "testt"sv));
-    EXPECT_FALSE(tr_strvContains("test"sv, "this is a test"sv));
-    EXPECT_TRUE(tr_strvContains(" test "sv, "tes"sv));
-    EXPECT_TRUE(tr_strvContains(" test"sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains("a test is this"sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains("test "sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, ""sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, "t"sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, "te"sv));
-    EXPECT_TRUE(tr_strvContains("test"sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains("this is a test"sv, "test"sv));
-    EXPECT_TRUE(tr_strvContains(""sv, ""sv));
+    EXPECT_FALSE(tr_strv_contains("a test is this"sv, "TEST"sv));
+    EXPECT_FALSE(tr_strv_contains("test"sv, "testt"sv));
+    EXPECT_FALSE(tr_strv_contains("test"sv, "this is a test"sv));
+    EXPECT_TRUE(tr_strv_contains(" test "sv, "tes"sv));
+    EXPECT_TRUE(tr_strv_contains(" test"sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains("a test is this"sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains("test "sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains("test"sv, ""sv));
+    EXPECT_TRUE(tr_strv_contains("test"sv, "t"sv));
+    EXPECT_TRUE(tr_strv_contains("test"sv, "te"sv));
+    EXPECT_TRUE(tr_strv_contains("test"sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains("this is a test"sv, "test"sv));
+    EXPECT_TRUE(tr_strv_contains(""sv, ""sv));
 }
 
 TEST_F(UtilsTest, trStrvStartsWith)

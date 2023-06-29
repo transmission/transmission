@@ -130,7 +130,7 @@ std::string tr_base64_encode(std::string_view input)
         std::data(buf),
         std::data(buf) + len,
         std::back_inserter(str),
-        [](auto ch) { return !tr_strvContains("\r\n"sv, ch); });
+        [](auto ch) { return !tr_strv_contains("\r\n"sv, ch); });
     return str;
 }
 

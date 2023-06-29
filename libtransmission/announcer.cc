@@ -849,7 +849,7 @@ bool isUnregistered(char const* errmsg)
 
     auto constexpr Keys = std::array<std::string_view, 2>{ "unregistered torrent"sv, "torrent not registered"sv };
 
-    return std::any_of(std::begin(Keys), std::end(Keys), [&lower](auto const& key) { return tr_strvContains(lower, key); });
+    return std::any_of(std::begin(Keys), std::end(Keys), [&lower](auto const& key) { return tr_strv_contains(lower, key); });
 }
 
 void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
@@ -1230,7 +1230,7 @@ namespace on_scrape_done_helpers
     return std::any_of(
         std::begin(too_long_errors),
         std::end(too_long_errors),
-        [&errmsg](auto const& substr) { return tr_strvContains(errmsg, substr); });
+        [&errmsg](auto const& substr) { return tr_strv_contains(errmsg, substr); });
 }
 
 void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* errmsg)

@@ -988,7 +988,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             return { {}, "labels cannot be empty" };
         }
 
-        if (tr_strvContains(label, ','))
+        if (tr_strv_contains(label, ','))
         {
             return { {}, "labels cannot contain comma (,) character" };
         }

@@ -139,7 +139,7 @@ template<typename T>
 // --- std::string_view utils
 
 template<typename T>
-[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
+[[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept // c++23
 {
     return sv.find(key) != std::string_view::npos;
 }

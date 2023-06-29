@@ -194,7 +194,7 @@ tr_tracker_tier_t tr_announce_list::get_tier(tr_tracker_tier_t tier, tr_url_pars
         auto const tracker_announce = tracker.announce.sv();
 
         // fast test to avoid tr_urlParse()ing most trackers
-        if (!tr_strvContains(tracker_announce, announce.host))
+        if (!tr_strv_contains(tracker_announce, announce.host))
         {
             return false;
         }
@@ -217,7 +217,7 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
         auto const tracker_announce = tracker.announce.sv();
 
         // fast test to avoid tr_urlParse()ing most trackers
-        if (!tr_strvContains(tracker_announce, announce.host))
+        if (!tr_strv_contains(tracker_announce, announce.host))
         {
             return false;
         }
