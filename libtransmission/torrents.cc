@@ -17,7 +17,7 @@
 namespace
 {
 
-struct CompareTorrentByHash
+constexpr struct
 {
     bool operator()(tr_sha1_digest_t const& a, tr_sha1_digest_t const& b) const
     {
@@ -38,7 +38,7 @@ struct CompareTorrentByHash
     {
         return (*this)(a, b->infoHash());
     }
-};
+} CompareTorrentByHash{};
 
 } // namespace
 
@@ -50,13 +50,13 @@ tr_torrent* tr_torrents::get(std::string_view magnet_link)
 
 tr_torrent* tr_torrents::get(tr_sha1_digest_t const& hash)
 {
-    auto [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), hash, CompareTorrentByHash{});
+    auto [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), hash, CompareTorrentByHash);
     return begin == end ? nullptr : *begin;
 }
 
 tr_torrent const* tr_torrents::get(tr_sha1_digest_t const& hash) const
 {
-    auto [begin, end] = std::equal_range(std::cbegin(by_hash_), std::cend(by_hash_), hash, CompareTorrentByHash{});
+    auto [begin, end] = std::equal_range(std::cbegin(by_hash_), std::cend(by_hash_), hash, CompareTorrentByHash);
     return begin == end ? nullptr : *begin;
 }
 
@@ -64,7 +64,7 @@ tr_torrent_id_t tr_torrents::add(tr_torrent* tor)
 {
     auto const id = static_cast<tr_torrent_id_t>(std::size(by_id_));
     by_id_.push_back(tor);
-    by_hash_.insert(std::lower_bound(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{}), tor);
+    by_hash_.insert(std::lower_bound(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash), tor);
     return id;
 }
 
@@ -74,7 +74,7 @@ void tr_torrents::remove(tr_torrent const* tor, time_t current_time)
     TR_ASSERT(get(tor->id()) == tor);
 
     by_id_[tor->id()] = nullptr;
-    auto const [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{});
+    auto const [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash);
     by_hash_.erase(begin, end);
     removed_.emplace_back(tor->id(), current_time);
 }
