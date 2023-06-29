@@ -113,7 +113,7 @@ protected:
         }
     }
 
-    [[nodiscard]] static uint32_t parseConnectionRequest(std::vector<char> data)
+    [[nodiscard]] static uint32_t parseConnectionRequest(std::vector<char> const& data)
     {
         auto buf = MessageBuffer(data);
         EXPECT_EQ(ProtocolId, buf.to_uint64());
@@ -150,7 +150,7 @@ protected:
         return std::make_pair(buildScrapeRequestFromResponse(response), response);
     }
 
-    [[nodiscard]] static auto parseScrapeRequest(std::vector<char> data, uint64_t expected_connection_id)
+    [[nodiscard]] static auto parseScrapeRequest(std::vector<char> const& data, uint64_t expected_connection_id)
     {
         auto buf = MessageBuffer(data);
         EXPECT_EQ(expected_connection_id, buf.to_uint64());
@@ -254,7 +254,7 @@ protected:
         EXPECT_EQ(actual.external_ip, expected.external_ip);
     }
 
-    [[nodiscard]] static auto parseAnnounceRequest(std::vector<char> data, uint64_t connection_id)
+    [[nodiscard]] static auto parseAnnounceRequest(std::vector<char> const& data, uint64_t connection_id)
     {
         auto buf = MessageBuffer{ data };
         auto req = UdpAnnounceReq{};
