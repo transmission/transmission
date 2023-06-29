@@ -205,8 +205,6 @@ public:
 
     [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
 
-    [[nodiscard]] virtual tr_bandwidth& bandwidth() noexcept = 0;
-
     // requests that have been made but haven't been fulfilled yet
     [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
 

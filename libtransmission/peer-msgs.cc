@@ -409,11 +409,6 @@ public:
         }
     }
 
-    [[nodiscard]] tr_bandwidth& bandwidth() noexcept override
-    {
-        return io->bandwidth();
-    }
-
     [[nodiscard]] std::pair<tr_address, tr_port> socketAddress() const override
     {
         return io->socket_address();

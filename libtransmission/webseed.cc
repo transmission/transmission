@@ -210,11 +210,6 @@ public:
         return is_active;
     }
 
-    [[nodiscard]] tr_bandwidth& bandwidth() noexcept override
-    {
-        return bandwidth_;
-    }
-
     [[nodiscard]] TR_CONSTEXPR20 size_t activeReqCount(tr_direction dir) const noexcept override
     {
         if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
