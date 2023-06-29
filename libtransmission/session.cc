@@ -12,7 +12,6 @@
 #include <ctime>
 #include <future>
 #include <iterator> // for std::back_inserter
-#include <list>
 #include <memory>
 #include <numeric> // for std::accumulate()
 #include <string>
