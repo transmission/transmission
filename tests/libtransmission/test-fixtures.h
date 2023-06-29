@@ -89,7 +89,7 @@ inline bool waitFor(std::function<bool()> const& test, std::chrono::milliseconds
             return false;
         }
 
-        tr_wait(10ms);
+        std::this_thread::sleep_for(10ms);
     }
 }
 
