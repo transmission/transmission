@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <array>
 #include <cctype> // for isalpha()
 #include <cstring>
 #include <iterator> // for std::back_inserter
