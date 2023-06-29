@@ -10,14 +10,15 @@
 
 // --- Basic Types
 
-#include <stdbool.h> /* bool */
-#include <stddef.h> /* size_t */
-#include <stdint.h> /* uintN_t */
-#include <time.h> /* time_t */
+#include <stddef.h> // size_t
+#include <stdint.h> // uintN_t
+#include <time.h> // time_t
 
 #ifdef __cplusplus
 #include <string>
 #include <string_view>
+#else
+#include <stdbool.h> // bool
 #endif
 
 #include "tr-macros.h"

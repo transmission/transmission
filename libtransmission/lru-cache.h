@@ -6,7 +6,7 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
+#include <cstddef> // size_t
 #include <cstdint>
 #include <functional>
 #include <utility>

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <chrono>
-#include <cstddef>
+#include <cstddef> // size_t
 #include <functional>
 #include <memory>
 #include <optional>

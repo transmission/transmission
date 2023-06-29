@@ -10,6 +10,7 @@
 #endif
 
 #include <atomic>
+#include <cstddef> // size_t
 #include <string>
 #include <string_view>
 #include <utility> // for std::make_pair()

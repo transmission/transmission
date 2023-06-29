@@ -10,6 +10,7 @@
 #pragma once
 
 #include <bitset>
+#include <cstddef> // size_t
 #include <ctime> // for time_t
 #include <optional>
 

@@ -7,6 +7,7 @@
 
 #include <array>
 #include <chrono>
+#include <cstddef> // size_t
 #include <fstream>
 #include <functional>
 #include <iostream>
