@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <cstddef> // size_t
+#include <ctime> // time_t
 #include <functional>
 #include <memory>
 #include <optional>
