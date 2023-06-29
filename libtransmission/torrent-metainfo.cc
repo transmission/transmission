@@ -41,7 +41,7 @@ using namespace std::literals;
  */
 std::string tr_torrent_metainfo::fix_webseed_url(tr_torrent_metainfo const& tm, std::string_view url)
 {
-    url = tr_strvStrip(url);
+    url = tr_strv_strip(url);
 
     if (tm.file_count() > 1U && !std::empty(url) && url.back() != '/')
     {
@@ -350,7 +350,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(EncodingKey))
         {
-            encoding_ = tr_strvStrip(value);
+            encoding_ = tr_strv_strip(value);
         }
         else if (pathIs(UrlListKey))
         {

@@ -303,7 +303,7 @@ static_assert(keysAreOrdered());
 
 std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key_in)
 {
-    auto const key = tr_strlower(tr_strvStrip(key_in));
+    auto const key = tr_strlower(tr_strv_strip(key_in));
 
     for (auto const& [name, level] : LogKeys)
     {

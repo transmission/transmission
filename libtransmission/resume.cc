@@ -359,7 +359,7 @@ auto loadName(tr_variant* dict, tr_torrent* tor)
         return ret;
     }
 
-    name = tr_strvStrip(name);
+    name = tr_strv_strip(name);
     if (std::empty(name))
     {
         return ret;

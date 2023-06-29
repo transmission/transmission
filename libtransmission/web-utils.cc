@@ -296,7 +296,7 @@ std::string_view getSiteName(std::string_view host)
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 {
-    url = tr_strvStrip(url);
+    url = tr_strv_strip(url);
 
     auto parsed = tr_url_parsed_t{};
     parsed.full = url;

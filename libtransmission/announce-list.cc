@@ -292,7 +292,7 @@ bool tr_announce_list::parse(std::string_view text)
             line = line.substr(0, std::size(line) - 1);
         }
 
-        line = tr_strvStrip(line);
+        line = tr_strv_strip(line);
 
         if (std::empty(line))
         {

@@ -391,7 +391,7 @@ namespace
 void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 {
     // remove leading and trailing spaces
-    in = tr_strvStrip(in);
+    in = tr_strv_strip(in);
 
     // remove trailing periods
     while (tr_strv_ends_with(in, '.'))

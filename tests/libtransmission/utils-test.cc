@@ -104,13 +104,13 @@ TEST_F(UtilsTest, trStrvSep)
 
 TEST_F(UtilsTest, trStrvStrip)
 {
-    EXPECT_EQ(""sv, tr_strvStrip("              "sv));
-    EXPECT_EQ("test test"sv, tr_strvStrip("    test test     "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip("   test     "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip("   test "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip(" test       "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip(" test "sv));
-    EXPECT_EQ("test"sv, tr_strvStrip("test"sv));
+    EXPECT_EQ(""sv, tr_strv_strip("              "sv));
+    EXPECT_EQ("test test"sv, tr_strv_strip("    test test     "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip("   test     "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip("   test "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip(" test       "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip(" test "sv));
+    EXPECT_EQ("test"sv, tr_strv_strip("test"sv));
 }
 
 TEST_F(UtilsTest, strvReplaceInvalid)

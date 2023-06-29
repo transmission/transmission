@@ -211,7 +211,7 @@ void tr_magnet_metainfo::add_webseed(std::string_view webseed)
 
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
 {
-    magnet_link = tr_strvStrip(magnet_link);
+    magnet_link = tr_strv_strip(magnet_link);
     if (auto const hash = parseHash(magnet_link); hash)
     {
         return parseMagnet(fmt::format(FMT_STRING("magnet:?xt=urn:btih:{:s}"), tr_sha1_to_string(*hash)));
@@ -239,7 +239,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
         else if (key == "ws"sv)
         {
             auto const url = tr_urlPercentDecode(value);
-            auto const url_sv = tr_strvStrip(url);
+            auto const url_sv = tr_strv_strip(url);
             if (tr_urlIsValid(url_sv))
             {
                 this->webseed_urls_.emplace_back(url_sv);

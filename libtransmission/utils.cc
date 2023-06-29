@@ -212,7 +212,7 @@ char const* tr_strerror(int errnum)
 
 // ---
 
-std::string_view tr_strvStrip(std::string_view str)
+std::string_view tr_strv_strip(std::string_view str)
 {
     auto constexpr Test = [](auto ch)
     {

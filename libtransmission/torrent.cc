@@ -1972,7 +1972,7 @@ void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
 
 void tr_torrent::set_bandwidth_group(std::string_view group_name) noexcept
 {
-    group_name = tr_strvStrip(group_name);
+    group_name = tr_strv_strip(group_name);
 
     auto const lock = this->unique_lock();
 

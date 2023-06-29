@@ -188,7 +188,7 @@ constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char d
     return true;
 }
 
-[[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
+[[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
 
 [[nodiscard]] std::string tr_strv_convert_utf8(std::string_view sv);
 

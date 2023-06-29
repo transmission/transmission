@@ -982,7 +982,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             continue;
         }
 
-        label = tr_strvStrip(label);
+        label = tr_strv_strip(label);
         if (std::empty(label))
         {
             return { {}, "labels cannot be empty" };
@@ -1773,7 +1773,7 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
 {
     auto name = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
-    name = tr_strvStrip(name);
+    name = tr_strv_strip(name);
     if (std::empty(name))
     {
         return "No group name given";
