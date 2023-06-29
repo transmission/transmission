@@ -105,7 +105,7 @@ void logAddImpl(
 
 #else
 
-    if (tr_logGetQueueEnabled())
+    if (log_state.queue_enabled_)
     {
         auto* const newmsg = new tr_log_message{};
         newmsg->level = level;
@@ -169,11 +169,6 @@ void tr_logSetLevel(tr_log_level level)
 void tr_logSetQueueEnabled(bool is_enabled)
 {
     log_state.queue_enabled_ = is_enabled;
-}
-
-bool tr_logGetQueueEnabled()
-{
-    return log_state.queue_enabled_;
 }
 
 tr_log_message* tr_logGetQueue()
