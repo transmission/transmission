@@ -431,5 +431,5 @@ std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_torrentGetMagnetLink(tor), buf, buflen);
+    return tr_strv_to_buf(tr_torrentGetMagnetLink(tor), buf, buflen);
 }

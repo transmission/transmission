@@ -194,7 +194,7 @@ std::string tr_getDefaultConfigDir(std::string_view appname)
 
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
+    return tr_strv_to_buf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
 }
 
 std::string tr_getDefaultDownloadDir()
@@ -220,7 +220,7 @@ std::string tr_getDefaultDownloadDir()
 
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_getDefaultDownloadDir(), buf, buflen);
+    return tr_strv_to_buf(tr_getDefaultDownloadDir(), buf, buflen);
 }
 
 // ---

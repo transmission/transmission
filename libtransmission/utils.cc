@@ -175,7 +175,7 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
 
 // ---
 
-size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
+size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen)
 {
     size_t const len = std::size(src);
 

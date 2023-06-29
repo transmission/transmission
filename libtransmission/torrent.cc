@@ -1682,7 +1682,7 @@ std::string tr_torrentFilename(tr_torrent const* tor)
 
 size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_torrentFilename(tor), buf, buflen);
+    return tr_strv_to_buf(tr_torrentFilename(tor), buf, buflen);
 }
 
 // ---
@@ -2210,7 +2210,7 @@ std::string tr_torrentGetTrackerList(tr_torrent const* tor)
 
 size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_torrentGetTrackerList(tor), buf, buflen);
+    return tr_strv_to_buf(tr_torrentGetTrackerList(tor), buf, buflen);
 }
 
 // ---
@@ -2391,7 +2391,7 @@ std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num)
 
 size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_torrentFindFile(tor, file_num), buf, buflen);
+    return tr_strv_to_buf(tr_torrentFindFile(tor, file_num), buf, buflen);
 }
 
 void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
