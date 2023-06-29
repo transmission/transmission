@@ -283,21 +283,18 @@ TEST_F(UtilsTest, env)
     unsetenv(test_key);
 
     EXPECT_FALSE(tr_env_key_exists(test_key));
-    EXPECT_EQ(123, tr_env_get_int(test_key, 123));
     EXPECT_EQ(""sv, tr_env_get_string(test_key));
     EXPECT_EQ("a"sv, tr_env_get_string(test_key, "a"sv));
 
     setenv(test_key, "", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
-    EXPECT_EQ(456, tr_env_get_int(test_key, 456));
     EXPECT_EQ("", tr_env_get_string(test_key, ""));
     EXPECT_EQ("", tr_env_get_string(test_key, "b"));
 
     setenv(test_key, "135", 1);
 
     EXPECT_TRUE(tr_env_key_exists(test_key));
-    EXPECT_EQ(135, tr_env_get_int(test_key, 789));
     EXPECT_EQ("135", tr_env_get_string(test_key, ""));
     EXPECT_EQ("135", tr_env_get_string(test_key, "c"));
 }
