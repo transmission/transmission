@@ -91,7 +91,7 @@ bool isJunkFile(std::string_view filename)
 
 #ifdef __APPLE__
     // check for resource forks. <http://web.archive.org/web/20101010051608/http://support.apple.com/kb/TA20578>
-    if (tr_strvStartsWith(base, "._"sv))
+    if (tr_strv_starts_with(base, "._"sv))
     {
         return true;
     }
@@ -362,7 +362,7 @@ namespace
     return std::any_of(
         std::begin(ReservedPrefixes),
         std::end(ReservedPrefixes),
-        [in_upper_sv](auto const& prefix) { return tr_strvStartsWith(in_upper_sv, prefix); });
+        [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file

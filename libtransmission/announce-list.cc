@@ -137,7 +137,7 @@ std::optional<std::string> tr_announce_list::announce_to_scrape(std::string_view
     }
 
     // some torrents with UDP announce URLs don't have /announce
-    if (tr_strvStartsWith(announce, "udp:"sv))
+    if (tr_strv_starts_with(announce, "udp:"sv))
     {
         return std::string{ announce };
     }

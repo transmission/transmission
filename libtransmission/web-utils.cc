@@ -304,7 +304,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     // So many magnet links are malformed, e.g. not escaping text
     // in the display name, that we're better off handling magnets
     // as a special case before even scanning for invalid chars.
-    if (auto constexpr MagnetStart = "magnet:?"sv; tr_strvStartsWith(url, MagnetStart))
+    if (auto constexpr MagnetStart = "magnet:?"sv; tr_strv_starts_with(url, MagnetStart))
     {
         parsed.scheme = "magnet"sv;
         parsed.query = url.substr(std::size(MagnetStart));
@@ -327,7 +327,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     // The authority component is preceded by a double slash ("//") and is
     // terminated by the next slash ("/"), question mark ("?"), or number
     // sign ("#") character, or by the end of the URI.
-    if (auto key = "//"sv; tr_strvStartsWith(url, key))
+    if (auto key = "//"sv; tr_strv_starts_with(url, key))
     {
         url.remove_prefix(std::size(key));
         auto pos = url.find_first_of("/?#");
@@ -339,11 +339,11 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         // within square brackets ("[" and "]").  This is the only place where
         // square bracket characters are allowed in the URI syntax.
         auto remain = parsed.authority;
-        if (tr_strvStartsWith(remain, '['))
+        if (tr_strv_starts_with(remain, '['))
         {
             remain.remove_prefix(1); // '['
             parsed.host = tr_strvSep(&remain, ']');
-            if (tr_strvStartsWith(remain, ':'))
+            if (tr_strv_starts_with(remain, ':'))
             {
                 remain.remove_prefix(1);
             }
@@ -370,7 +370,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     url = pos == std::string_view::npos ? ""sv : url.substr(pos);
 
     // query
-    if (tr_strvStartsWith(url, '?'))
+    if (tr_strv_starts_with(url, '?'))
     {
         url.remove_prefix(1);
         pos = url.find('#');
@@ -379,7 +379,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     }
 
     // fragment
-    if (tr_strvStartsWith(url, '#'))
+    if (tr_strv_starts_with(url, '#'))
     {
         parsed.fragment = url.substr(1);
     }

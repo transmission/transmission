@@ -1398,7 +1398,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     }
     else /* success */
     {
-        bool const is_open = tr_strvStartsWith(body, '1');
+        bool const is_open = tr_strv_starts_with(body, '1');
         tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
         tr_idle_function_done(data, SuccessResult);
     }

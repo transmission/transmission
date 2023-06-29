@@ -2470,7 +2470,7 @@ bool renameArgsAreValid(tr_torrent const* tor, std::string_view oldpath, std::st
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
         auto const& name = tor->file_subpath(i);
-        if (newpath == name || tr_strvStartsWith(name, newpath_as_dir))
+        if (newpath == name || tr_strv_starts_with(name, newpath_as_dir))
         {
             return false;
         }
@@ -2488,7 +2488,7 @@ auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
         auto const& name = tor->file_subpath(i);
-        if (name == oldpath || tr_strvStartsWith(name, oldpath_as_dir))
+        if (name == oldpath || tr_strv_starts_with(name, oldpath_as_dir))
         {
             indices.push_back(i);
         }

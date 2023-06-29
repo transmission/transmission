@@ -452,7 +452,7 @@ bool parseNumberSection(std::string_view str, number_range& range)
         return true;
     }
 
-    if (!tr_strvStartsWith(str, Delimiter))
+    if (!tr_strv_starts_with(str, Delimiter))
     {
         return false;
     }

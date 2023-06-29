@@ -51,17 +51,17 @@ TEST_F(UtilsTest, trStrvContains)
 
 TEST_F(UtilsTest, trStrvStartsWith)
 {
-    EXPECT_FALSE(tr_strvStartsWith(""sv, "this is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a strin"sv, "this is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a strin"sv, "this is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, " his is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, "his is a string"sv));
-    EXPECT_FALSE(tr_strvStartsWith("this is a string"sv, "string"sv));
-    EXPECT_TRUE(tr_strvStartsWith(""sv, ""sv));
-    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, ""sv));
-    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this "sv));
-    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this is"sv));
-    EXPECT_TRUE(tr_strvStartsWith("this is a string"sv, "this"sv));
+    EXPECT_FALSE(tr_strv_starts_with(""sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a strin"sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a strin"sv, "this is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a string"sv, " his is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a string"sv, "his is a string"sv));
+    EXPECT_FALSE(tr_strv_starts_with("this is a string"sv, "string"sv));
+    EXPECT_TRUE(tr_strv_starts_with(""sv, ""sv));
+    EXPECT_TRUE(tr_strv_starts_with("this is a string"sv, ""sv));
+    EXPECT_TRUE(tr_strv_starts_with("this is a string"sv, "this "sv));
+    EXPECT_TRUE(tr_strv_starts_with("this is a string"sv, "this is"sv));
+    EXPECT_TRUE(tr_strv_starts_with("this is a string"sv, "this"sv));
 }
 
 TEST_F(UtilsTest, trStrvEndsWith)

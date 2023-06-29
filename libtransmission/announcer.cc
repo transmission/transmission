@@ -178,11 +178,11 @@ public:
         TR_ASSERT(!is_shutting_down_);
 
         if (auto const scrape_sv = request.scrape_url.sv();
-            tr_strvStartsWith(scrape_sv, "http://"sv) || tr_strvStartsWith(scrape_sv, "https://"sv))
+            tr_strv_starts_with(scrape_sv, "http://"sv) || tr_strv_starts_with(scrape_sv, "https://"sv))
         {
             tr_tracker_http_scrape(session, request, std::move(on_response));
         }
-        else if (tr_strvStartsWith(scrape_sv, "udp://"sv))
+        else if (tr_strv_starts_with(scrape_sv, "udp://"sv))
         {
             announcer_udp_.scrape(request, std::move(on_response));
         }
@@ -212,11 +212,11 @@ public:
         }
 
         if (auto const announce_sv = request.announce_url.sv();
-            tr_strvStartsWith(announce_sv, "http://"sv) || tr_strvStartsWith(announce_sv, "https://"sv))
+            tr_strv_starts_with(announce_sv, "http://"sv) || tr_strv_starts_with(announce_sv, "https://"sv))
         {
             tr_tracker_http_announce(session, request, std::move(on_response));
         }
-        else if (tr_strvStartsWith(announce_sv, "udp://"sv))
+        else if (tr_strv_starts_with(announce_sv, "udp://"sv))
         {
             announcer_udp_.announce(request, std::move(on_response));
         }

@@ -91,7 +91,7 @@ public:
 
     [[nodiscard]] bool from_string(std::string_view src)
     {
-        if (!tr_strvStartsWith(src, TrUnixSocketPrefix))
+        if (!tr_strv_starts_with(src, TrUnixSocketPrefix))
         {
             return false;
         }
@@ -466,7 +466,7 @@ bool is_authorized(tr_rpc_server const* server, char const* auth_header)
 
     auto constexpr Prefix = "Basic "sv;
     auto auth = std::string_view{ auth_header != nullptr ? auth_header : "" };
-    if (!tr_strvStartsWith(auth, Prefix))
+    if (!tr_strv_starts_with(auth, Prefix))
     {
         return false;
     }
@@ -532,7 +532,7 @@ void handle_request(struct evhttp_request* req, void* arg)
         server->login_attempts_ = 0;
 
         auto uri = std::string_view{ req->uri };
-        auto const location = tr_strvStartsWith(uri, server->url()) ? uri.substr(std::size(server->url())) : ""sv;
+        auto const location = tr_strv_starts_with(uri, server->url()) ? uri.substr(std::size(server->url())) : ""sv;
 
         if (std::empty(location) || location == "web"sv)
         {
@@ -540,7 +540,7 @@ void handle_request(struct evhttp_request* req, void* arg)
             evhttp_add_header(req->output_headers, "Location", new_location.c_str());
             send_simple_response(req, HTTP_MOVEPERM, nullptr);
         }
-        else if (tr_strvStartsWith(location, "web/"sv))
+        else if (tr_strv_starts_with(location, "web/"sv))
         {
             handle_web_client(req, server);
         }
@@ -581,7 +581,7 @@ void handle_request(struct evhttp_request* req, void* arg)
             send_simple_response(req, 409, tmp.c_str());
         }
 #endif
-        else if (tr_strvStartsWith(location, "rpc"sv))
+        else if (tr_strv_starts_with(location, "rpc"sv))
         {
             handle_rpc(req, server);
         }
