@@ -66,18 +66,18 @@ TEST_F(UtilsTest, trStrvStartsWith)
 
 TEST_F(UtilsTest, trStrvEndsWith)
 {
-    EXPECT_FALSE(tr_strvEndsWith(""sv, "string"sv));
-    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "alphabet"sv));
-    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "strin"sv));
-    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "this is"sv));
-    EXPECT_FALSE(tr_strvEndsWith("this is a string"sv, "this"sv));
-    EXPECT_FALSE(tr_strvEndsWith("tring"sv, "string"sv));
-    EXPECT_TRUE(tr_strvEndsWith(""sv, ""sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, " string"sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, ""sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "a string"sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "g"sv));
-    EXPECT_TRUE(tr_strvEndsWith("this is a string"sv, "string"sv));
+    EXPECT_FALSE(tr_strv_ends_with(""sv, "string"sv));
+    EXPECT_FALSE(tr_strv_ends_with("this is a string"sv, "alphabet"sv));
+    EXPECT_FALSE(tr_strv_ends_with("this is a string"sv, "strin"sv));
+    EXPECT_FALSE(tr_strv_ends_with("this is a string"sv, "this is"sv));
+    EXPECT_FALSE(tr_strv_ends_with("this is a string"sv, "this"sv));
+    EXPECT_FALSE(tr_strv_ends_with("tring"sv, "string"sv));
+    EXPECT_TRUE(tr_strv_ends_with(""sv, ""sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, " string"sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, ""sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, "a string"sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, "g"sv));
+    EXPECT_TRUE(tr_strv_ends_with("this is a string"sv, "string"sv));
 }
 
 TEST_F(UtilsTest, trStrvSep)

@@ -209,7 +209,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
 
     for (auto const& [suffix, mime_type] : Types)
     {
-        if (tr_strvEndsWith(path, suffix))
+        if (tr_strv_ends_with(path, suffix))
         {
             return mime_type;
         }
@@ -870,7 +870,7 @@ void tr_rpc_server::load(tr_variant* src)
     RPC_SETTINGS_FIELDS(V)
 #undef V
 
-    if (!tr_strvEndsWith(url_, '/'))
+    if (!tr_strv_ends_with(url_, '/'))
     {
         url_ = fmt::format(FMT_STRING("{:s}/"), url_);
     }

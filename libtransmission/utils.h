@@ -159,12 +159,12 @@ template<typename T>
     return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
 }
 
-[[nodiscard]] constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
+[[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, std::string_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
 }
 
-[[nodiscard]] constexpr bool tr_strvEndsWith(std::string_view sv, char key) // c++20
+[[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, char key) // c++20
 {
     return !std::empty(sv) && sv.back() == key;
 }

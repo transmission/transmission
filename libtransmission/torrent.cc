@@ -956,7 +956,7 @@ bool isNewTorrentASeed(tr_torrent* tor)
         }
 
         // it's not a new seed if a file is partial
-        if (tr_strvEndsWith(found->filename(), tr_torrent_files::PartialFileSuffix))
+        if (tr_strv_ends_with(found->filename(), tr_torrent_files::PartialFileSuffix))
         {
             return false;
         }
@@ -2513,7 +2513,7 @@ int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view
     if (tr_sys_path_exists(src))
     {
         auto const parent = tr_sys_path_dirname(src);
-        auto const tgt = tr_strvEndsWith(src, tr_torrent_files::PartialFileSuffix) ?
+        auto const tgt = tr_strv_ends_with(src, tr_torrent_files::PartialFileSuffix) ?
             tr_pathbuf{ parent, '/', newname, tr_torrent_files::PartialFileSuffix } :
             tr_pathbuf{ parent, '/', newname };
 

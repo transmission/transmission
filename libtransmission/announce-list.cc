@@ -287,7 +287,7 @@ bool tr_announce_list::parse(std::string_view text)
     auto line = std::string_view{};
     while (tr_strvSep(&text, &line, '\n'))
     {
-        if (tr_strvEndsWith(line, '\r'))
+        if (tr_strv_ends_with(line, '\r'))
         {
             line = line.substr(0, std::size(line) - 1);
         }
