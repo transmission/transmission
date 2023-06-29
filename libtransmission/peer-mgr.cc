@@ -11,7 +11,6 @@
 #include <cmath>
 #include <cstdint>
 #include <ctime> // time_t
-#include <deque>
 #include <map>
 #include <iterator> // std::back_inserter
 #include <memory>
