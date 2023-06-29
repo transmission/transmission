@@ -357,9 +357,6 @@ void tr_formatter_get_units(void* dict);
 /** @brief Check if environment variable exists. */
 [[nodiscard]] bool tr_env_key_exists(char const* key);
 
-/** @brief Get environment variable value as int. */
-[[nodiscard]] int tr_env_get_int(char const* key, int default_value);
-
 /** @brief Get environment variable value as string. */
 [[nodiscard]] std::string tr_env_get_string(std::string_view key, std::string_view default_value = {});
 

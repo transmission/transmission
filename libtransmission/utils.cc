@@ -907,21 +907,6 @@ bool tr_env_key_exists(char const* key)
 #endif
 }
 
-int tr_env_get_int(char const* key, int default_value)
-{
-    TR_ASSERT(key != nullptr);
-
-    if (auto const valstr = tr_env_get_string(key); !std::empty(valstr))
-    {
-        if (auto const valint = tr_parseNum<int>(valstr); valint)
-        {
-            return *valint;
-        }
-    }
-
-    return default_value;
-}
-
 std::string tr_env_get_string(std::string_view key, std::string_view default_value)
 {
 #ifdef _WIN32
