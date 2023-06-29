@@ -18,7 +18,6 @@
 #include "bitfield.h"
 #include "block-info.h"
 #include "history.h"
-#include "interned-string.h"
 #include "net.h" // tr_port
 
 /**

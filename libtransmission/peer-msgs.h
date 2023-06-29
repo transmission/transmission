@@ -14,6 +14,7 @@
 #include <memory>
 #include <utility> // for std::pair<>
 
+#include "interned-string.h"
 #include "peer-common.h" // for tr_peer
 
 class tr_peer;
