@@ -16,6 +16,8 @@
 
 #include <libtransmission/tr-macros.h>
 
+#include "Utils.h" // for std::hash<QString>
+
 class FileTreeItem
 {
     Q_DECLARE_TR_FUNCTIONS(FileTreeItem)
