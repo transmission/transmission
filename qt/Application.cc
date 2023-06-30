@@ -662,16 +662,13 @@ void Application::onNotificationActionInvoked(quint32 /* notification_id */, QSt
 
 int tr_main(int argc, char** argv)
 {
-    tr_curl_global_init();
+    auto const curl_mgr = tr_get_curl_mgr();
 
     tr_locale_set_global("");
 
     InteropHelper::initialize();
 
     Application const app(argc, argv);
-    auto ret = QApplication::exec();
 
-    tr_curl_global_cleanup();
-
-    return ret;
+    return QApplication::exec();
 }

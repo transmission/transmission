@@ -948,14 +948,19 @@ void tr_net_init()
 
 // ---
 
-void tr_curl_global_init()
+tr_curl_mgr::tr_curl_mgr()
 {
     curl_global_init(CURL_GLOBAL_ALL & ~CURL_GLOBAL_WIN32);
 }
 
-void tr_curl_global_cleanup()
+tr_curl_mgr::~tr_curl_mgr()
 {
     curl_global_cleanup();
+}
+
+std::unique_ptr<tr_curl_mgr> tr_get_curl_mgr()
+{
+    return std::make_unique<tr_curl_mgr>();
 }
 
 // --- mime-type

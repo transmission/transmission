@@ -10,13 +10,9 @@
 
 int main(int argc, char** argv)
 {
-    tr_curl_global_init();
+    auto const curl_mgr = tr_get_curl_mgr();
 
     tr_locale_set_global("");
 
-    int ret = NSApplicationMain(argc, (char const**)argv);
-
-    tr_curl_global_cleanup();
-
-    return ret;
+    return NSApplicationMain(argc, (char const**)argv);
 }

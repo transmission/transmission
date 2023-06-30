@@ -30,7 +30,7 @@
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
 
@@ -942,7 +942,7 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
-    tr_curl_global_init();
+    auto const curl_mgr = tr_get_curl_mgr();
 
     tr_locale_set_global("");
 
@@ -959,8 +959,6 @@ int tr_main(int argc, char* argv[])
     {
         daemon.handle_error(error);
     }
-
-    tr_curl_global_cleanup();
 
     return ret;
 }

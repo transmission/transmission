@@ -10,6 +10,7 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
 #include <ctime> // time_t
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -344,5 +345,10 @@ void tr_net_init();
 
 // ---
 
-void tr_curl_global_init();
-void tr_curl_global_cleanup();
+struct tr_curl_mgr
+{
+    tr_curl_mgr();
+    ~tr_curl_mgr();
+    TR_DISABLE_COPY_MOVE(tr_curl_mgr)
+};
+std::unique_ptr<tr_curl_mgr> tr_get_curl_mgr();
