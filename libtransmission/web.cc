@@ -160,8 +160,6 @@ public:
     explicit Impl(Mediator& mediator_in)
         : mediator{ mediator_in }
     {
-        std::call_once(curl_init_flag, curlInit);
-
         if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
         {
             curl_ca_bundle = std::move(bundle);
@@ -778,19 +776,7 @@ public:
         }
     }
 
-    static inline auto curl_init_flag = std::once_flag{};
-
     std::map<CURL*, uint64_t /*tr_time_msec()*/> paused_easy_handles;
-
-    static void curlInit()
-    {
-        // try to enable ssl for https support;
-        // but if that fails, try a plain vanilla init
-        if (curl_global_init(CURL_GLOBAL_SSL) != CURLE_OK)
-        {
-            curl_global_init(0);
-        }
-    }
 };
 
 tr_web::tr_web(Mediator& mediator)

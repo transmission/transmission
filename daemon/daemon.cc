@@ -22,6 +22,8 @@
 
 #include <event2/event.h>
 
+#include <curl/curl.h>
+
 #include <fmt/core.h>
 
 #include "daemon.h"
@@ -939,8 +941,20 @@ void tr_daemon::handle_error(tr_error* error) const
     tr_error_free(error);
 }
 
+static void tr_curl_init()
+{
+    // try to enable ssl for https support;
+    // but if that fails, try a plain vanilla init
+    if (curl_global_init(CURL_GLOBAL_SSL) != CURLE_OK)
+    {
+        curl_global_init(0);
+    }
+}
+
 int tr_main(int argc, char* argv[])
 {
+    tr_curl_init();
+
     tr_locale_set_global("");
 
     int ret;
@@ -956,5 +970,8 @@ int tr_main(int argc, char* argv[])
     {
         daemon.handle_error(error);
     }
+
+    curl_global_cleanup();
+
     return ret;
 }
