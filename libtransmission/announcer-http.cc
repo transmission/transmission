@@ -5,7 +5,6 @@
 
 #include <algorithm> // std::copy_n()
 #include <cctype>
-#include <chrono>
 #include <cstdio> /* fprintf() */
 #include <iomanip>
 #include <iostream>

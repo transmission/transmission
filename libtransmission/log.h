@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <ctime>
 #include <optional>
 #include <string>

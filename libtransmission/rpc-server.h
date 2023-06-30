@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
 #include <memory>
 #include <string>
 #include <string_view>

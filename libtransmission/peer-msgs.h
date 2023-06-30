@@ -9,11 +9,13 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <atomic>
 #include <cstddef> // for size_t
 #include <memory>
 #include <utility> // for std::pair<>
 
+#include "interned-string.h"
 #include "peer-common.h" // for tr_peer
 
 class tr_peer;

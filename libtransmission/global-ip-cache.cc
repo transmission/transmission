@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::all_of
-#include <chrono>
 #include <cstddef>
 #include <string_view>
 #include <utility> // std::move

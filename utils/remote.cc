@@ -8,7 +8,6 @@
 #include <cctype> /* isspace */
 #include <cinttypes> // PRId64
 #include <cerrno>
-#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring> /* strcmp */

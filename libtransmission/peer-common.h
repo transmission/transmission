@@ -10,6 +10,7 @@
 #endif
 
 #include <array>
+#include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <string>
 
@@ -18,7 +19,6 @@
 #include "bitfield.h"
 #include "block-info.h"
 #include "history.h"
-#include "interned-string.h"
 #include "net.h" // tr_port
 
 /**
