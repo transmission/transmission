@@ -269,7 +269,7 @@ void FileTreeView::onlyCheckSelectedItems()
 
     while (!std::empty(parents_queue))
     {
-        auto const parent_index = stds::move(parents_queue.front());
+        auto const parent_index = std::move(parents_queue.front());
         parents_queue.pop();
 
         if (std::binary_search(wanted_indices.begin(), wanted_indices.end(), parent_index))
