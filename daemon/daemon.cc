@@ -959,6 +959,5 @@ int tr_main(int argc, char* argv[])
     {
         daemon.handle_error(error);
     }
-
     return ret;
 }

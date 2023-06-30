@@ -669,6 +669,5 @@ int tr_main(int argc, char** argv)
     InteropHelper::initialize();
 
     Application const app(argc, argv);
-
     return QApplication::exec();
 }
