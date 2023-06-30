@@ -352,7 +352,7 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
     {
         if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
         {
-            if (auto d = tr_parseNum<double>(sv); d)
+            if (auto d = tr_num_parse<double>(sv); d)
             {
                 *setme = *d;
                 success = true;

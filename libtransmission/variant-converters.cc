@@ -171,7 +171,7 @@ std::optional<tr_mode_t> VariantConverter::load<tr_mode_t>(tr_variant* src)
 {
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
-        if (auto const mode = tr_parseNum<uint32_t>(val, nullptr, 8); mode)
+        if (auto const mode = tr_num_parse<uint32_t>(val, nullptr, 8); mode)
         {
             return static_cast<tr_mode_t>(*mode);
         }

@@ -347,7 +347,7 @@ void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl
         if ((state->special_flags & JSONSL_SPECIALf_NUMNOINT) != 0)
         {
             auto sv = std::string_view{ jsn->base + state->pos_begin, jsn->pos - state->pos_begin };
-            tr_variantInitReal(get_node(jsn), tr_parseNum<double>(sv).value_or(0.0));
+            tr_variantInitReal(get_node(jsn), tr_num_parse<double>(sv).value_or(0.0));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {

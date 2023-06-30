@@ -80,12 +80,6 @@ constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x,
 /** @brief return the current date in milliseconds */
 [[nodiscard]] uint64_t tr_time_msec();
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
-
-template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* setme_remainder = nullptr);
-
 #ifdef _WIN32
 
 [[nodiscard]] std::string tr_win32_format_message(uint32_t code);
@@ -211,6 +205,12 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen);
     @return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1] */
 [[nodiscard]] double tr_getRatio(uint64_t numerator, uint64_t denominator);
 
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
+
+template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr);
+
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
  *        newly-allocated array of all the integers in the set.
@@ -218,7 +218,7 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen);
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-[[nodiscard]] std::vector<int> tr_parseNumberRange(std::string_view str);
+[[nodiscard]] std::vector<int> tr_num_parse_range(std::string_view str);
 
 /**
  * @brief truncate a double value at a given number of decimal places.

@@ -183,7 +183,7 @@ std::optional<address_range_t> parseCidrLine(std::string_view line)
         return {};
     }
 
-    auto const pflen = tr_parseNum<size_t>(line.substr(pos + 1));
+    auto const pflen = tr_num_parse<size_t>(line.substr(pos + 1));
     if (!pflen)
     {
         return {};

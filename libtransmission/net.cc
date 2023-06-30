@@ -73,7 +73,7 @@ std::string tr_net_strerror(int err)
         }
     }
 
-    if (auto value = tr_parseNum<int>(needle); value)
+    if (auto value = tr_num_parse<int>(needle); value)
     {
         return tr_tos_t(*value);
     }

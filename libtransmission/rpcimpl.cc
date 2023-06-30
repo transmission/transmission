@@ -2597,7 +2597,7 @@ void tr_rpc_request_exec_json(
  */
 void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 {
-    auto const values = tr_parseNumberRange(str);
+    auto const values = tr_num_parse_range(str);
     auto const value_count = std::size(values);
 
     if (value_count == 0)

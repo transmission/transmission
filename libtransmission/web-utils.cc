@@ -179,7 +179,7 @@ namespace
 
 auto parsePort(std::string_view port_sv)
 {
-    auto const port = tr_parseNum<int>(port_sv);
+    auto const port = tr_num_parse<int>(port_sv);
 
     using PortLimits = std::numeric_limits<uint16_t>;
     return port && PortLimits::min() <= *port && *port <= PortLimits::max() ? *port : -1;
