@@ -76,7 +76,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
  * **lazy-bitfield-enabled:** Boolean (default = true) May help get around some ISP filtering. [Vuze specification](https://wiki.vuze.com/w/Commandline_options#Network_Options).
  * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
- * **message-level:** Number (0 = None, 1 = Error, 2 = Info, 3 = Debug, default = 2) Set verbosity of Transmission's log messages.
+ * **message-level:** Number (0 = None, 1 = Critical, 2 = Error, 3 = Warn, 4 = Info, 5 = Debug, 6 = Trace, default = 2) Set verbosity of Transmission's log messages.
  * **pex-enabled:** Boolean (default =  true) Enable [https://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
  * **pidfile:** String Path to file in which daemon PID will be stored (transmission-daemon only)
  * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html).
