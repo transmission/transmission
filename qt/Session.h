@@ -93,7 +93,7 @@ public:
 
     void torrentSetLocation(torrent_ids_t const& torrent_ids, QString const& path, bool do_move);
     void torrentRenamePath(torrent_ids_t const& torrent_ids, QString const& oldpath, QString const& newname);
-    void addTorrent(AddData add_me, tr_variant* args_dict, bool trash_original);
+    void addTorrent(AddData add_me, tr_variant* args_dict);
     void initTorrents(torrent_ids_t const& ids = {});
     void pauseTorrents(torrent_ids_t const& torrent_ids = {});
     void startTorrents(torrent_ids_t const& torrent_ids = {});
