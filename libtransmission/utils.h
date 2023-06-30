@@ -59,12 +59,6 @@ void tr_locale_set_global(char const* locale_name) noexcept;
 
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
-/**
- * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
- * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
- */
-[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
-
 bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
 
 bool tr_file_move(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
@@ -134,6 +128,12 @@ template<typename T>
 
 // --- std::string_view utils
 
+/**
+ * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
+ * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
+ */
+[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
+
 template<typename T>
 [[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept // c++23
 {
@@ -201,10 +201,6 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen);
 
 // ---
 
-/** @brief return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1]
-    @return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1] */
-[[nodiscard]] double tr_getRatio(uint64_t numerator, uint64_t denominator);
-
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
 
@@ -239,10 +235,12 @@ template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
 [[nodiscard]] std::string tr_strpercent(double x);
 
-/**
- * @param ratio    the ratio to convert to a string
- * @param infinity the string representation of "infinity"
- */
+/** @brief return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1]
+    @return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1] */
+[[nodiscard]] double tr_getRatio(uint64_t numerator, uint64_t denominator);
+
+/** @param ratio    the ratio to convert to a string
+    @param infinity the string representation of "infinity" */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
 
 // ---
