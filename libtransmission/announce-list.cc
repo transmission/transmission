@@ -275,7 +275,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
 
     // save it
-    return tr_saveFile(torrent_file, contents, error);
+    return tr_file_save(torrent_file, contents, error);
 }
 
 bool tr_announce_list::parse(std::string_view text)

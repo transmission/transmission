@@ -1130,7 +1130,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         else // magnet link
         {
             auto const magnet_link = tor->magnet();
-            tr_saveFile(filename, magnet_link, &error);
+            tr_file_save(filename, magnet_link, &error);
         }
 
         if (error != nullptr)
@@ -2123,7 +2123,7 @@ bool tr_torrent::set_tracker_list(std::string_view text)
         auto const magnet_file = this->magnet_file();
         auto const magnet_link = this->magnet();
         tr_error* save_error = nullptr;
-        if (!tr_saveFile(magnet_file, magnet_link, &save_error))
+        if (!tr_file_save(magnet_file, magnet_link, &save_error))
         {
             this->set_local_error(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),

@@ -229,7 +229,7 @@ private:
             perm = std::move(icon);
 
             // cache it on disk
-            tr_saveFile(fmt::format("{:s}/{:s}", icons_dir_, in_flight->sitename()), contents);
+            tr_file_save(fmt::format("{:s}/{:s}", icons_dir_, in_flight->sitename()), contents);
 
             // notify the user that we got it
             in_flight->invoke_callback(&perm);

@@ -284,7 +284,7 @@ bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error
     }
 
     // save it
-    if (!tr_saveFile(tor->torrent_file(), benc, error))
+    if (!tr_file_save(tor->torrent_file(), benc, error))
     {
         return false;
     }

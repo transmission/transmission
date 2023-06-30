@@ -222,7 +222,7 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
     {
         auto content = std::vector<char>{};
         tr_error* error = nullptr;
-        if (!tr_loadFile(filename, content, &error))
+        if (!tr_file_read(filename, content, &error))
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't read '{path}': {error} ({error_code})"),

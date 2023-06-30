@@ -559,7 +559,7 @@ static int getOptMode(int val)
 
 static std::string getEncodedMetainfo(char const* filename)
 {
-    if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_loadFile(filename, contents))
+    if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_file_read(filename, contents))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }

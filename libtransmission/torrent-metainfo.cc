@@ -672,7 +672,7 @@ bool tr_torrent_metainfo::parse_torrent_file(std::string_view filename, std::vec
         contents = &local_contents;
     }
 
-    return tr_loadFile(filename, *contents, error) && parse_benc({ std::data(*contents), std::size(*contents) }, error);
+    return tr_file_read(filename, *contents, error) && parse_benc({ std::data(*contents), std::size(*contents) }, error);
 }
 
 tr_pathbuf tr_torrent_metainfo::make_filename(

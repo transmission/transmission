@@ -1371,7 +1371,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
-        if (tr_loadFile(path, buf) &&
+        if (tr_file_read(path, buf) &&
             tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
             tr_torrentNew(ctor, nullptr) != nullptr)
         {

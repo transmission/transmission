@@ -203,7 +203,7 @@ bool tr_torrent_files::move(
         }
 
         tr_logAddTrace(fmt::format(FMT_STRING("Moving file #{:d} to '{:s}'"), i, old_path, path), parent_name);
-        if (!tr_moveFile(old_path, path, error))
+        if (!tr_file_move(old_path, path, error))
         {
             err = true;
             break;
@@ -264,7 +264,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     {
         if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
         {
-            tr_moveFile(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
+            tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
         }
     }
 

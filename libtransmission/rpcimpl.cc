@@ -1466,7 +1466,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
     auto const filename = tr_pathbuf{ session->configDir(), "/blocklist.tmp"sv };
-    if (tr_error* error = nullptr; !tr_saveFile(filename, content, &error))
+    if (tr_error* error = nullptr; !tr_file_save(filename, content, &error))
     {
         tr_idle_function_done(
             data,

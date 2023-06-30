@@ -637,7 +637,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
-    if (!tr_loadFile(filename, buf, &error) ||
+    if (!tr_file_read(filename, buf, &error) ||
         !tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, &error))
     {
         tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, error->message));

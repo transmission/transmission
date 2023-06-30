@@ -65,14 +65,16 @@ void tr_locale_set_global(char const* locale_name) noexcept;
  */
 [[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
 
-bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
 
-bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
+bool tr_file_move(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
+
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
 
 template<typename ContiguousRange>
-constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, tr_error** error = nullptr)
+constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error** error = nullptr)
 {
-    return tr_saveFile(filename, std::string_view{ std::data(x), std::size(x) }, error);
+    return tr_file_save(filename, std::string_view{ std::data(x), std::size(x) }, error);
 }
 
 /** @brief return the current date in milliseconds */
@@ -242,12 +244,6 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen);
  * @param infinity the string representation of "infinity"
  */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
-
-/**
- * @brief move a file
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_moveFile(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
 
 // ---
 

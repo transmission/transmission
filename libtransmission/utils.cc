@@ -77,7 +77,7 @@ void tr_locale_set_global(char const* locale_name) noexcept
 
 // ---
 
-bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error)
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error)
 {
     auto const szfilename = tr_pathbuf{ filename };
 
@@ -132,13 +132,13 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
     return true;
 }
 
-bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error)
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error)
 {
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
     if (auto const realname = tr_sys_path_resolve(filename); !std::empty(realname) && realname != filename)
     {
-        return tr_saveFile(realname, contents, error);
+        return tr_file_save(realname, contents, error);
     }
 
     // Write it to a temp file first.
@@ -545,7 +545,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
 // ---
 
-bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
+bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
 {
     auto const oldpath = tr_pathbuf{ oldpath_in };
     auto const newpath = tr_pathbuf{ newpath_in };
