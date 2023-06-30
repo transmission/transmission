@@ -198,8 +198,8 @@ static std::string getConfigDir(int argc, char const* const* argv)
 static auto onFileAdded(tr_session const* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
-    auto const is_torrent = tr_strvEndsWith(lowercase, ".torrent"sv);
-    auto const is_magnet = tr_strvEndsWith(lowercase, ".magnet"sv);
+    auto const is_torrent = tr_strv_ends_with(lowercase, ".torrent"sv);
+    auto const is_magnet = tr_strv_ends_with(lowercase, ".magnet"sv);
 
     if (!is_torrent && !is_magnet)
     {
@@ -222,7 +222,7 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
     {
         auto content = std::vector<char>{};
         tr_error* error = nullptr;
-        if (!tr_loadFile(filename, content, &error))
+        if (!tr_file_read(filename, content, &error))
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't read '{path}': {error} ({error_code})"),

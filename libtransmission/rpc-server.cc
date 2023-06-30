@@ -91,7 +91,7 @@ public:
 
     [[nodiscard]] bool from_string(std::string_view src)
     {
-        if (!tr_strvStartsWith(src, TrUnixSocketPrefix))
+        if (!tr_strv_starts_with(src, TrUnixSocketPrefix))
         {
             return false;
         }
@@ -209,7 +209,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
 
     for (auto const& [suffix, mime_type] : Types)
     {
-        if (tr_strvEndsWith(path, suffix))
+        if (tr_strv_ends_with(path, suffix))
         {
             return mime_type;
         }
@@ -225,7 +225,7 @@ void send_simple_response(struct evhttp_request* req, int code, char const* text
     char const* key = "Accept-Encoding";
     char const* encoding = evhttp_find_header(req->input_headers, key);
 
-    if (bool const do_compress = encoding != nullptr && tr_strvContains(encoding, "gzip"sv); !do_compress)
+    if (bool const do_compress = encoding != nullptr && tr_strv_contains(encoding, "gzip"sv); !do_compress)
     {
         evbuffer_add(out, std::data(content), std::size(content));
     }
@@ -276,7 +276,7 @@ void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::st
 
     auto content = std::vector<char>{};
 
-    if (tr_error* error = nullptr; !tr_loadFile(filename, content, &error))
+    if (tr_error* error = nullptr; !tr_file_read(filename, content, &error))
     {
         send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error->message).c_str());
         tr_error_free(error);
@@ -328,7 +328,7 @@ void handle_web_client(struct evhttp_request* req, tr_rpc_server const* server)
             subpath = DefaultPage;
         }
 
-        if (tr_strvContains(subpath, ".."sv))
+        if (tr_strv_contains(subpath, ".."sv))
         {
             send_simple_response(req, HTTP_NOTFOUND);
         }
@@ -466,7 +466,7 @@ bool is_authorized(tr_rpc_server const* server, char const* auth_header)
 
     auto constexpr Prefix = "Basic "sv;
     auto auth = std::string_view{ auth_header != nullptr ? auth_header : "" };
-    if (!tr_strvStartsWith(auth, Prefix))
+    if (!tr_strv_starts_with(auth, Prefix))
     {
         return false;
     }
@@ -474,7 +474,7 @@ bool is_authorized(tr_rpc_server const* server, char const* auth_header)
     auth.remove_prefix(std::size(Prefix));
     auto const decoded_str = tr_base64_decode(auth);
     auto decoded = std::string_view{ decoded_str };
-    auto const username = tr_strvSep(&decoded, ':');
+    auto const username = tr_strv_sep(&decoded, ':');
     auto const password = decoded;
     return server->username() == username && tr_ssha1_matches(server->salted_password_, password);
 }
@@ -532,7 +532,7 @@ void handle_request(struct evhttp_request* req, void* arg)
         server->login_attempts_ = 0;
 
         auto uri = std::string_view{ req->uri };
-        auto const location = tr_strvStartsWith(uri, server->url()) ? uri.substr(std::size(server->url())) : ""sv;
+        auto const location = tr_strv_starts_with(uri, server->url()) ? uri.substr(std::size(server->url())) : ""sv;
 
         if (std::empty(location) || location == "web"sv)
         {
@@ -540,7 +540,7 @@ void handle_request(struct evhttp_request* req, void* arg)
             evhttp_add_header(req->output_headers, "Location", new_location.c_str());
             send_simple_response(req, HTTP_MOVEPERM, nullptr);
         }
-        else if (tr_strvStartsWith(location, "web/"sv))
+        else if (tr_strv_starts_with(location, "web/"sv))
         {
             handle_web_client(req, server);
         }
@@ -581,7 +581,7 @@ void handle_request(struct evhttp_request* req, void* arg)
             send_simple_response(req, 409, tmp.c_str());
         }
 #endif
-        else if (tr_strvStartsWith(location, "rpc"sv))
+        else if (tr_strv_starts_with(location, "rpc"sv))
         {
             handle_rpc(req, server);
         }
@@ -753,7 +753,7 @@ auto parse_whitelist(std::string_view whitelist)
     while (!std::empty(whitelist))
     {
         auto const pos = whitelist.find_first_of(" ,;"sv);
-        auto const token = tr_strvStrip(whitelist.substr(0, pos));
+        auto const token = tr_strv_strip(whitelist.substr(0, pos));
         list.emplace_back(token);
         tr_logAddInfo(fmt::format(_("Added '{entry}' to host whitelist"), fmt::arg("entry", token)));
         whitelist = pos == std::string_view::npos ? ""sv : whitelist.substr(pos + 1);
@@ -870,7 +870,7 @@ void tr_rpc_server::load(tr_variant* src)
     RPC_SETTINGS_FIELDS(V)
 #undef V
 
-    if (!tr_strvEndsWith(url_, '/'))
+    if (!tr_strv_ends_with(url_, '/'))
     {
         url_ = fmt::format(FMT_STRING("{:s}/"), url_);
     }

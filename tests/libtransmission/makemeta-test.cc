@@ -179,7 +179,7 @@ TEST_F(MakemetaTest, anonymizeFalse)
     auto builder = tr_metainfo_builder{ filename };
     builder.set_anonymize(false);
     auto const metainfo = testBuilder(builder);
-    EXPECT_TRUE(tr_strvContains(metainfo.creator(), TR_NAME)) << metainfo.creator();
+    EXPECT_TRUE(tr_strv_contains(metainfo.creator(), TR_NAME)) << metainfo.creator();
     auto const now = time(nullptr);
     EXPECT_LE(metainfo.date_created(), now);
     EXPECT_LE(now - 60, metainfo.date_created());

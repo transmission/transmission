@@ -77,7 +77,7 @@ void tr_locale_set_global(char const* locale_name) noexcept
 
 // ---
 
-bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error)
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error)
 {
     auto const szfilename = tr_pathbuf{ filename };
 
@@ -132,13 +132,13 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
     return true;
 }
 
-bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error)
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error)
 {
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
     if (auto const realname = tr_sys_path_resolve(filename); !std::empty(realname) && realname != filename)
     {
-        return tr_saveFile(realname, contents, error);
+        return tr_file_save(realname, contents, error);
     }
 
     // Write it to a temp file first.
@@ -175,7 +175,7 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
 
 // ---
 
-size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
+size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen)
 {
     size_t const len = std::size(src);
 
@@ -212,7 +212,7 @@ char const* tr_strerror(int errnum)
 
 // ---
 
-std::string_view tr_strvStrip(std::string_view str)
+std::string_view tr_strv_strip(std::string_view str)
 {
     auto constexpr Test = [](auto ch)
     {
@@ -423,7 +423,7 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
 
 namespace
 {
-namespace tr_parseNumberRange_impl
+namespace tr_num_parse_range_impl
 {
 
 struct number_range
@@ -440,7 +440,7 @@ bool parseNumberSection(std::string_view str, number_range& range)
 {
     auto constexpr Delimiter = "-"sv;
 
-    auto const first = tr_parseNum<int>(str, &str);
+    auto const first = tr_num_parse<int>(str, &str);
     if (!first)
     {
         return false;
@@ -452,13 +452,13 @@ bool parseNumberSection(std::string_view str, number_range& range)
         return true;
     }
 
-    if (!tr_strvStartsWith(str, Delimiter))
+    if (!tr_strv_starts_with(str, Delimiter))
     {
         return false;
     }
 
     str.remove_prefix(std::size(Delimiter));
-    auto const second = tr_parseNum<int>(str);
+    auto const second = tr_num_parse<int>(str);
     if (!second)
     {
         return false;
@@ -468,7 +468,7 @@ bool parseNumberSection(std::string_view str, number_range& range)
     return true;
 }
 
-} // namespace tr_parseNumberRange_impl
+} // namespace tr_num_parse_range_impl
 } // namespace
 
 /**
@@ -477,14 +477,14 @@ bool parseNumberSection(std::string_view str, number_range& range)
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  * If a fragment of the string can't be parsed, nullptr is returned.
  */
-std::vector<int> tr_parseNumberRange(std::string_view str)
+std::vector<int> tr_num_parse_range(std::string_view str)
 {
-    using namespace tr_parseNumberRange_impl;
+    using namespace tr_num_parse_range_impl;
 
     auto values = std::set<int>{};
     auto token = std::string_view{};
     auto range = number_range{};
-    while (tr_strvSep(&str, &token, ',') && parseNumberSection(token, range))
+    while (tr_strv_sep(&str, &token, ',') && parseNumberSection(token, range))
     {
         for (auto i = range.low; i <= range.high; ++i)
         {
@@ -508,7 +508,7 @@ double tr_truncd(double x, int decimal_places)
         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
-    return tr_parseNum<double>(std::data(buf)).value_or(0.0);
+    return tr_num_parse<double>(std::data(buf)).value_or(0.0);
 }
 
 std::string tr_strpercent(double x)
@@ -545,7 +545,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
 // ---
 
-bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
+bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
 {
     auto const oldpath = tr_pathbuf{ oldpath_in };
     auto const newpath = tr_pathbuf{ newpath_in };
@@ -978,7 +978,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 #include <sstream>
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder, int base)
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
     auto const tmpstr = std::string(std::data(str), std::min(std::size(str), size_t{ 64 }));
@@ -1007,7 +1007,7 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 #include <charconv> // std::from_chars()
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder, int base)
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
     auto const* const begin_ch = std::data(str);
@@ -1030,19 +1030,19 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
 
 #endif // #if defined(__GNUC__) && !__has_include(<charconv>)
 
-template std::optional<long long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<int> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<char> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<long long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<int> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
-template std::optional<unsigned long long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned int> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned short> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned char> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned long long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned int> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder)
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
 {
     auto const* const begin_ch = std::data(str);
     auto const* const end_ch = begin_ch + std::size(str);
@@ -1060,4 +1060,4 @@ template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
     return val;
 }
 
-template std::optional<double> tr_parseNum(std::string_view sv, std::string_view* remainder);
+template std::optional<double> tr_num_parse(std::string_view sv, std::string_view* remainder);

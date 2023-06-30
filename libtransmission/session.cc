@@ -1356,7 +1356,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     auto n_torrents = size_t{};
     auto const& folder = session->torrentDir();
 
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strvEndsWith(name, ".torrent"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".torrent"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
@@ -1367,11 +1367,11 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     }
 
     auto buf = std::vector<char>{};
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strvEndsWith(name, ".magnet"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".magnet"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
-        if (tr_loadFile(path, buf) &&
+        if (tr_file_read(path, buf) &&
             tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
             tr_torrentNew(ctor, nullptr) != nullptr)
         {

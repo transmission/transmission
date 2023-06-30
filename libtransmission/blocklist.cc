@@ -20,7 +20,7 @@
 #include "libtransmission/net.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
-#include "libtransmission/utils.h" // for _(), tr_strerror(), tr_strvEndsWith()
+#include "libtransmission/utils.h" // for _(), tr_strerror(), tr_strv_ends_with()
 
 using namespace std::literals;
 
@@ -183,7 +183,7 @@ std::optional<address_range_t> parseCidrLine(std::string_view line)
         return {};
     }
 
-    auto const pflen = tr_parseNum<size_t>(line.substr(pos + 1));
+    auto const pflen = tr_num_parse<size_t>(line.substr(pos + 1));
     if (!pflen)
     {
         return {};
@@ -394,7 +394,7 @@ std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklis
     // check for files that need to be updated
     for (auto const& src_file : getFilenamesInDir(blocklist_dir))
     {
-        if (tr_strvEndsWith(src_file, BinFileSuffix))
+        if (tr_strv_ends_with(src_file, BinFileSuffix))
         {
             continue;
         }
@@ -416,7 +416,7 @@ std::vector<Blocklist> Blocklist::loadBlocklists(std::string_view const blocklis
     auto ret = std::vector<Blocklist>{};
     for (auto const& bin_file : getFilenamesInDir(blocklist_dir))
     {
-        if (tr_strvEndsWith(bin_file, BinFileSuffix))
+        if (tr_strv_ends_with(bin_file, BinFileSuffix))
         {
             ret.emplace_back(bin_file, is_enabled);
         }
