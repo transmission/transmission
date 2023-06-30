@@ -10,7 +10,13 @@
 
 int main(int argc, char** argv)
 {
+    tr_curl_global_init();
+
     tr_locale_set_global("");
 
-    return NSApplicationMain(argc, (char const**)argv);
+    int ret = NSApplicationMain(argc, (char const**)argv);
+
+    tr_curl_global_cleanup();
+
+    return ret;
 }

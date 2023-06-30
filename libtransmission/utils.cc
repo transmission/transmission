@@ -36,6 +36,8 @@
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
+#include <curl/curl.h>
+
 #include <fmt/core.h>
 
 #include <fast_float/fast_float.h>
@@ -942,6 +944,18 @@ void tr_net_init()
         initialized = true;
     }
 #endif
+}
+
+// ---
+
+void tr_curl_global_init()
+{
+    curl_global_init(CURL_GLOBAL_ALL & ~CURL_GLOBAL_WIN32);
+}
+
+void tr_curl_global_cleanup()
+{
+    curl_global_cleanup();
 }
 
 // --- mime-type

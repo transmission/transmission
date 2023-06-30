@@ -341,3 +341,8 @@ void tr_formatter_get_units(void* dict);
 // ---
 
 void tr_net_init();
+
+// ---
+
+void tr_curl_global_init();
+void tr_curl_global_cleanup();

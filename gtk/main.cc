@@ -50,6 +50,9 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 
 int main(int argc, char** argv)
 {
+    /* init cURL global constants */
+    tr_curl_global_init();
+
     /* init i18n */
     tr_locale_set_global("");
     bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);
@@ -132,5 +135,10 @@ int main(int argc, char** argv)
     gtr_notify_init();
 
     /* init the application for the specified config dir */
-    return Application(config_dir, start_paused, start_iconified).run(argc, argv);
+    auto ret = Application(config_dir, start_paused, start_iconified).run(argc, argv);
+
+    /* cleanup cURL global constants */
+    tr_curl_global_cleanup();
+
+    return ret;
 }

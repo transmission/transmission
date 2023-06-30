@@ -22,8 +22,6 @@
 
 #include <event2/event.h>
 
-#include <curl/curl.h>
-
 #include <fmt/core.h>
 
 #include "daemon.h"
@@ -32,6 +30,7 @@
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
+#include <libtransmission/transmission.h>
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
 
@@ -943,7 +942,7 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
-    curl_global_init(CURL_GLOBAL_ALL & ~CURL_GLOBAL_WIN32);
+    tr_curl_global_init();
 
     tr_locale_set_global("");
 
@@ -961,7 +960,7 @@ int tr_main(int argc, char* argv[])
         daemon.handle_error(error);
     }
 
-    curl_global_cleanup();
+    tr_curl_global_cleanup();
 
     return ret;
 }
