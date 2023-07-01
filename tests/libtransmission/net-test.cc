@@ -5,6 +5,7 @@
 
 #include <array>
 #include <string_view>
+#include <tuple>
 #include <utility>
 
 #include <libtransmission/transmission.h>
@@ -186,7 +187,8 @@ TEST_F(NetTest, ipCompare)
                                                 std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, -1 },
                                                 std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, 0 },
                                                 std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
-                                                std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 } };
+                                                std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
+                                                std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 } };
 
     for (auto const& [ip_str1, ip_str2, res] : IpPairs)
     {
