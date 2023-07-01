@@ -949,7 +949,7 @@ public:
 
     static void create()
     {
-        if (instance)
+        if (!instance)
         {
             instance = std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
         }
@@ -958,6 +958,8 @@ public:
 private:
     static std::unique_ptr<tr_net_init_mgr> instance;
 };
+
+std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::instance{};
 
 void tr_lib_init()
 {
