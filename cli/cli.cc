@@ -200,7 +200,7 @@ static std::string getConfigDir(int argc, char const** argv)
 
 int tr_main(int argc, char* argv[])
 {
-    tr_lib_init();
+    auto const init_mgr = tr_lib_init();
 
     tr_locale_set_global("");
 

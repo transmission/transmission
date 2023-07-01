@@ -932,33 +932,33 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 // ---
 
-class tr_net_init_mgr
+tr_net_init_mgr::tr_net_init_mgr()
 {
-private:
-    tr_net_init_mgr()
+    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
     {
-        if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
-        {
-            tr_logAddError("CURL failed to init.");
-        }
+        tr_logAddError("CURL failed to init.");
     }
-    TR_DISABLE_COPY_MOVE(tr_net_init_mgr)
+}
 
-public:
-    ~tr_net_init_mgr()
-    {
-        curl_global_cleanup();
-    }
-
-    static void create()
-    {
-        static auto instance = std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
-    }
-};
-
-void tr_lib_init()
+tr_net_init_mgr::~tr_net_init_mgr()
 {
-    tr_net_init_mgr::create();
+    curl_global_cleanup();
+}
+
+std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::create()
+{
+    if (!initialised)
+    {
+        return std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
+    }
+    return {};
+}
+
+bool tr_net_init_mgr::initialised = false;
+
+std::unique_ptr<tr_net_init_mgr> tr_lib_init()
+{
+    return tr_net_init_mgr::create();
 }
 
 // --- mime-type

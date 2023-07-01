@@ -398,7 +398,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
 int tr_main(int argc, char* argv[])
 {
-    tr_lib_init();
+    auto const init_mgr = tr_lib_init();
 
     tr_locale_set_global("");
 

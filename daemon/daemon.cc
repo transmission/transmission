@@ -939,7 +939,7 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
-    tr_lib_init();
+    auto const init_mgr = tr_lib_init();
 
     tr_locale_set_global("");
 
