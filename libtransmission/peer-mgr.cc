@@ -1147,7 +1147,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, nonstd::span<tr_pex const
         if (tr_isPex(&peer) && /* safeguard against corrupt data */
             !s->manager->session->addressIsBlocked(peer.addr) && peer.is_valid_for_peers())
         {
-            s->ensure_atom_exists(std::make_pair(pex->addr, pex->port), pex->flags, from);
+            s->ensure_atom_exists({ peer.addr, peer.port }, peer.flags, from);
             ++n_used;
         }
     }
