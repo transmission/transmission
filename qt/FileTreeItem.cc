@@ -22,7 +22,9 @@ std::unordered_map<QString, int> const& FileTreeItem::getMyChildRows() const
 {
     // ensure that all the rows are hashed
     for (int const n = childCount(); first_unhashed_row_ < n; ++first_unhashed_row_)
+    {
         child_rows_.emplace(children_[first_unhashed_row_]->name(), first_unhashed_row_);
+    }
 
     return child_rows_;
 }

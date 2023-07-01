@@ -249,7 +249,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     auto& cache = tor->session->cache;
     auto const [begin_byte, end_byte] = tor->block_info().byte_span_for_piece(piece);
     auto const [begin_block, end_block] = tor->block_span_for_piece(piece);
-    auto n_bytes_checked = size_t{};
+    [[maybe_unused]] auto n_bytes_checked = size_t{};
     for (auto block = begin_block; block < end_block; ++block)
     {
         auto const block_loc = tor->block_loc(block);
