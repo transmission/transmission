@@ -937,7 +937,10 @@ class tr_net_init_mgr
 private:
     tr_net_init_mgr()
     {
-        curl_global_init(CURL_GLOBAL_ALL);
+        if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
+        {
+            tr_logAddError("CURL failed to init.");
+        }
     }
     TR_DISABLE_COPY_MOVE(tr_net_init_mgr)
 
