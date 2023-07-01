@@ -10,7 +10,6 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
 #include <ctime> // time_t
-#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -341,4 +340,5 @@ void tr_formatter_get_units(void* dict);
 
 // ---
 
+/** @brief Initialise libtransmission for each app */
 void tr_lib_init();

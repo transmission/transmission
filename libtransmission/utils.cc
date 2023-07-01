@@ -15,6 +15,7 @@
 #include <iostream>
 #include <iterator> // for std::back_inserter
 #include <locale>
+#include <memory>
 #include <optional>
 #include <set>
 #include <string>
