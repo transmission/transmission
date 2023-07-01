@@ -3781,6 +3781,7 @@
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/jsonsl",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
@@ -3827,6 +3828,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 				);
 				WRAPPER_EXTENSION = app;
 			};
@@ -3849,6 +3851,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -3875,6 +3878,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -3897,6 +3901,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4040,6 +4045,7 @@
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/jsonsl",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
@@ -4076,6 +4082,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4108,6 +4115,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 				);
 				WRAPPER_EXTENSION = app;
 			};
@@ -4310,6 +4318,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 				);
 				WRAPPER_EXTENSION = app;
 			};
@@ -4332,6 +4341,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4371,6 +4381,7 @@
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/jsonsl",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
@@ -4411,6 +4422,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4433,6 +4445,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4513,6 +4526,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
 			};
@@ -4543,6 +4557,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
 			};
@@ -4573,6 +4588,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 				);
 				WRAPPER_EXTENSION = qlgenerator;
 			};
@@ -4643,6 +4659,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4665,6 +4682,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4858,6 +4876,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4880,6 +4899,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4902,6 +4922,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4924,6 +4945,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4946,6 +4968,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4968,6 +4991,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -4990,6 +5014,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -5012,6 +5037,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
@@ -5034,6 +5060,7 @@
 					"$(inherited)",
 					"third-party/fmt/include",
 					"third-party/small/include",
+					"third-party/span-lite/include",
 					"third-party/libevent/include",
 				);
 			};
