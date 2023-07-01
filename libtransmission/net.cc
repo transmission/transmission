@@ -596,9 +596,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
         return this->is_ipv4() ? 1 : -1;
     }
 
-    // in_addr_t is by definition uint32_t, so we convert it to int64_t,
-    // the smallest signed integer type that can contain all values of uint32_t.
-    return this->is_ipv4() ? static_cast<int>(int64_t{ ntohl(this->addr.addr4.s_addr) } - ntohl(that.addr.addr4.s_addr)) :
+    return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :
                              memcmp(&this->addr.addr6.s6_addr, &that.addr.addr6.s6_addr, sizeof(this->addr.addr6.s6_addr));
 }
 
