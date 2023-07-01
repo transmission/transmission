@@ -32,9 +32,8 @@ class AnnouncerUdpTest : public ::testing::Test
 private:
     void SetUp() override
     {
-        init_mgr_ = tr_lib_init();
-
         ::testing::Test::SetUp();
+        init_mgr_ = tr_lib_init();
         tr_timeUpdate(time(nullptr));
     }
 

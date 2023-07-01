@@ -528,9 +528,9 @@ protected:
 
     virtual void SetUp() override
     {
-        init_mgr_ = tr_lib_init();
-
         SandboxedTest::SetUp();
+
+        init_mgr_ = tr_lib_init();
 
         auto callback = [this](tr_torrent* tor, bool /*aborted*/)
         {
@@ -553,10 +553,11 @@ protected:
     }
 
 private:
-    std::unique_ptr<tr_net_init_mgr> init_mgr_;
     std::mutex verified_mutex_;
     std::condition_variable verified_cv_;
     std::vector<tr_torrent*> verified_;
+
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
 };
 
 } // namespace test

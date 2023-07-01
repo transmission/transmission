@@ -387,9 +387,9 @@ protected:
 
     void SetUp() override
     {
-        init_mgr_ = tr_lib_init();
-
         SandboxedTest::SetUp();
+
+        init_mgr_ = tr_lib_init();
 
         tr_session_thread::tr_evthread_init();
         event_base_ = event_base_new();
