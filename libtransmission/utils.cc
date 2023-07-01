@@ -931,36 +931,36 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 // ---
 
-void tr_net_init()
+class tr_net_init_mgr
 {
-#ifdef _WIN32
-    static bool initialized = false;
-
-    if (!initialized)
+private:
+    tr_net_init_mgr()
     {
-        WSADATA wsaData;
-        WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-        initialized = true;
+        curl_global_init(CURL_GLOBAL_ALL);
     }
-#endif
-}
+    TR_DISABLE_COPY_MOVE(tr_net_init_mgr)
 
-// ---
+public:
+    ~tr_net_init_mgr()
+    {
+        curl_global_cleanup();
+    }
 
-tr_curl_mgr::tr_curl_mgr()
+    static void create()
+    {
+        if (instance)
+        {
+            instance = std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
+        }
+    }
+
+private:
+    static std::unique_ptr<tr_net_init_mgr> instance;
+};
+
+void tr_lib_init()
 {
-    curl_global_init(CURL_GLOBAL_ALL & ~CURL_GLOBAL_WIN32);
-}
-
-tr_curl_mgr::~tr_curl_mgr()
-{
-    curl_global_cleanup();
-}
-
-std::unique_ptr<tr_curl_mgr> tr_get_curl_mgr()
-{
-    return std::make_unique<tr_curl_mgr>();
+    tr_net_init_mgr::create();
 }
 
 // --- mime-type

@@ -341,14 +341,4 @@ void tr_formatter_get_units(void* dict);
 
 // ---
 
-void tr_net_init();
-
-// ---
-
-struct tr_curl_mgr
-{
-    tr_curl_mgr();
-    ~tr_curl_mgr();
-    TR_DISABLE_COPY_MOVE(tr_curl_mgr)
-};
-std::unique_ptr<tr_curl_mgr> tr_get_curl_mgr();
+void tr_lib_init();

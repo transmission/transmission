@@ -692,9 +692,6 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
 
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
-    /* should go before libevent calls */
-    tr_net_init();
-
     /* setup event state */
     ev_base_ = event_base_new();
 
@@ -942,7 +939,7 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
-    auto const curl_mgr = tr_get_curl_mgr();
+    tr_lib_init();
 
     tr_locale_set_global("");
 

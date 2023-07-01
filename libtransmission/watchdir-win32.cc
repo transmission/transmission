@@ -134,7 +134,7 @@ private:
 
     void init(struct event_base* event_base)
     {
-        tr_net_init();
+        tr_lib_init();
 
         auto const path = dirname();
         auto const wide_path = tr_win32_utf8_to_native(path);

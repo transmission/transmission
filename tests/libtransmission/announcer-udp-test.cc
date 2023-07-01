@@ -32,7 +32,7 @@ class AnnouncerUdpTest : public ::testing::Test
 private:
     void SetUp() override
     {
-        tr_net_init();
+        tr_lib_init();
 
         ::testing::Test::SetUp();
         tr_timeUpdate(time(nullptr));

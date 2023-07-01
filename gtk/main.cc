@@ -50,8 +50,8 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 
 int main(int argc, char** argv)
 {
-    /* manage cURL global constants */
-    auto const curl_mgr = tr_get_curl_mgr();
+    /* init libtransmission */
+    tr_lib_init();
 
     /* init i18n */
     tr_locale_set_global("");
