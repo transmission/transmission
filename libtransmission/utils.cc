@@ -24,7 +24,6 @@
 #include <windows.h> /* Sleep(), GetEnvironmentVariable() */
 
 #include <shellapi.h> /* CommandLineToArgv() */
-#include <ws2tcpip.h> /* WSAStartup() */
 #endif
 
 #ifndef _WIN32
@@ -931,11 +930,7 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 tr_net_init_mgr::tr_net_init_mgr()
 {
-#ifdef _WIN32
-    WSADATA wsaData;
-    WSAStartup(MAKEWORD(2, 2), &wsaData);
-#endif
-    if (curl_global_init(CURL_GLOBAL_ALL & ~CURL_GLOBAL_WIN32) != CURLE_OK)
+    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
     {
         curl_global_init(CURL_GLOBAL_NOTHING);
     }
@@ -950,6 +945,7 @@ std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::create()
 {
     if (!initialised)
     {
+        initialised = true;
         return std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
     }
     return {};
