@@ -923,6 +923,7 @@ public:
     // e.g. fetching metadata from peers and/or verifying the torrent
     bool start_when_stable = false;
 
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> started_;

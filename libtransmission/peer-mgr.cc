@@ -318,11 +318,12 @@ public:
         : manager{ manager_in }
         , tor{ tor_in }
     {
-        tags_.push_back(tor->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t piece) { on_got_bad_piece(piece); }));
+        tags_.push_back(tor->done_.observe([this](tr_torrent*, bool) { on_torrent_done(); }));
+        tags_.push_back(tor->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t p) { on_got_bad_piece(p); }));
+        tags_.push_back(tor->piece_completed_.observe([this](tr_torrent*, tr_piece_index_t p) { on_piece_completed(p); }));
         tags_.push_back(tor->started_.observe([this](tr_torrent*) { on_torrent_started(); }));
         tags_.push_back(tor->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }));
         tags_.push_back(tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }));
-        tags_.push_back(tor->done_.observe([this](tr_torrent* /*tor*/, bool /*downloaded*/) { on_torrent_done(); }));
 
         rebuildWebseeds();
     }
@@ -687,6 +688,27 @@ private:
         mark_all_seeds_flag_dirty();
     }
 
+    void on_piece_completed(tr_piece_index_t piece)
+    {
+        bool piece_came_from_peers = false;
+
+        for (auto* const peer : peers)
+        {
+            // notify the peer that we now have this piece
+            peer->on_piece_completed(piece);
+
+            if (!piece_came_from_peers)
+            {
+                piece_came_from_peers = peer->blame.test(piece);
+            }
+        }
+
+        if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
+        {
+            tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->piece_size(piece));
+        }
+    }
+
     void on_got_bad_piece(tr_piece_index_t piece)
     {
         auto const byte_count = tor->piece_size(piece);
@@ -718,7 +740,7 @@ private:
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = int{ 90 };
 
-    small::max_size_vector<libtransmission::ObserverTag, 5> tags_;
+    small::max_size_vector<libtransmission::ObserverTag, 6> tags_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -992,30 +1014,6 @@ void tr_peerMgr::refillUpkeep() const
     {
         tor->swarm->cancelOldRequests();
     }
-}
-
-void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
-{
-    bool piece_came_from_peers = false;
-
-    for (auto* const peer : tor->swarm->peers)
-    {
-        // notify the peer that we now have this piece
-        peer->on_piece_completed(p);
-
-        if (!piece_came_from_peers)
-        {
-            piece_came_from_peers = peer->blame.test(p);
-        }
-    }
-
-    if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
-    {
-        tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->piece_size(p));
-    }
-
-    // bookkeeping
-    tor->set_needs_completeness_check();
 }
 
 namespace

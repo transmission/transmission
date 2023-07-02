@@ -208,6 +208,4 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor);
 
 [[nodiscard]] tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
 
-void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t pieceIndex);
-
 /* @} */

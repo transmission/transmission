@@ -2314,7 +2314,10 @@ void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
 
 void onPieceCompleted(tr_torrent* tor, tr_piece_index_t piece)
 {
-    tr_peerMgrPieceCompleted(tor, piece);
+    tor->piece_completed_.emit(tor, piece);
+
+    // bookkeeping
+    tor->set_needs_completeness_check();
 
     // if this piece completes any file, invoke the fileCompleted func for it
     auto const span = tor->fpm_.file_span(piece);
