@@ -179,8 +179,6 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket);
 
 size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
 
-void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor);
-
 enum
 {
     TR_PEERS_CONNECTED,

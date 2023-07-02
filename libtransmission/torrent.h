@@ -926,6 +926,7 @@ public:
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> started_;
+    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
 
 private:
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept

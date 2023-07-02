@@ -2168,7 +2168,7 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
     case tr_tracker_event::Type::Counts:
         if (is_private() && (event->leechers == 0))
         {
-            tr_peerMgrSetSwarmIsAllSeeds(this);
+            swarm_is_all_seeds_.emit(this);
         }
 
         break;
