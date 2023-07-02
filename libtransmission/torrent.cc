@@ -1174,7 +1174,7 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     metainfo_ = std::move(tm);
 
     torrentInitFromInfoDict(this);
-    tr_peerMgrOnTorrentGotMetainfo(this);
+    got_metainfo_.emit(this);
     session->onMetadataCompleted(this);
     this->set_dirty();
     this->mark_edited();

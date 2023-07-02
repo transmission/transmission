@@ -923,13 +923,14 @@ public:
     // e.g. fetching metadata from peers and/or verifying the torrent
     bool start_when_stable = false;
 
-    libtransmission::SimpleObservable<tr_torrent*> doomed_;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
-    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
-    libtransmission::SimpleObservable<tr_torrent*> stopped_;
-    libtransmission::SimpleObservable<tr_torrent*> started_;
-    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
     libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
+    libtransmission::SimpleObservable<tr_torrent*> doomed_;
+    libtransmission::SimpleObservable<tr_torrent*> got_metainfo_;
+    libtransmission::SimpleObservable<tr_torrent*> started_;
+    libtransmission::SimpleObservable<tr_torrent*> stopped_;
+    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
 
 private:
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept

@@ -325,6 +325,7 @@ public:
         tags_.push_back(tor->started_.observe([this](tr_torrent*) { on_torrent_started(); }));
         tags_.push_back(tor->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }));
         tags_.push_back(tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }));
+        tags_.push_back(tor->got_metainfo_.observe([this](tr_torrent* /*tor*/) { on_got_metainfo(); }));
 
         rebuildWebseeds();
     }
@@ -740,6 +741,24 @@ private:
         tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
     }
 
+    void on_got_metainfo()
+    {
+        // the webseed list may have changed...
+        rebuildWebseeds();
+
+        // some peer_msgs' progress fields may not be accurate if we
+        // didn't have the metadata before now... so refresh them all...
+        for (auto* peer : peers)
+        {
+            peer->onTorrentGotMetainfo();
+
+            if (peer->isSeed())
+            {
+                mark_atom_as_seed(*peer->atom);
+            }
+        }
+    }
+
     void on_torrent_started();
     void on_torrent_stopped();
 
@@ -749,7 +768,7 @@ private:
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = int{ 90 };
 
-    small::max_size_vector<libtransmission::ObserverTag, 7> tags_;
+    small::max_size_vector<libtransmission::ObserverTag, 8> tags_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -1394,26 +1413,6 @@ void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor)
     TR_ASSERT(tor->swarm == nullptr);
 
     tor->swarm = new tr_swarm{ manager, tor };
-}
-
-void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
-{
-    auto* const swarm = tor->swarm;
-
-    /* the webseed list may have changed... */
-    swarm->rebuildWebseeds();
-
-    /* some peer_msgs' progress fields may not be accurate if we
-       didn't have the metadata before now... so refresh them all... */
-    for (auto* peer : swarm->peers)
-    {
-        peer->onTorrentGotMetainfo();
-
-        if (peer->isSeed())
-        {
-            swarm->mark_atom_as_seed(*peer->atom);
-        }
-    }
 }
 
 int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece)
