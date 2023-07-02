@@ -317,12 +317,12 @@ public:
     tr_swarm(tr_peerMgr* manager_in, tr_torrent* tor_in) noexcept
         : manager{ manager_in }
         , tor{ tor_in }
-        , bad_piece_tag_{ tor->got_bad_piece_.observe([this](tr_torrent* /*tor*/, tr_piece_index_t piece)
-                                                      { on_got_bad_piece(piece); }) }
-        , started_tag_{ tor->started_.observe([this](tr_torrent* /*tor*/) { on_torrent_started(); }) }
-        , stopped_tag_{ tor->stopped_.observe([this](tr_torrent* /*tor*/) { on_torrent_stopped(); }) }
-        , swarm_is_all_seeds_tag_{ tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }) }
     {
+        tags_.push_back(tor->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t piece) { on_got_bad_piece(piece); }));
+        tags_.push_back(tor->started_.observe([this](tr_torrent*) { on_torrent_started(); }));
+        tags_.push_back(tor->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }));
+        tags_.push_back(tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }));
+
         rebuildWebseeds();
     }
 
@@ -712,10 +712,7 @@ private:
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = int{ 90 };
 
-    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Tag const bad_piece_tag_;
-    libtransmission::SimpleObservable<tr_torrent*>::Tag const started_tag_;
-    libtransmission::SimpleObservable<tr_torrent*>::Tag const stopped_tag_;
-    libtransmission::SimpleObservable<tr_torrent*>::Tag const swarm_is_all_seeds_tag_;
+    small::max_size_vector<libtransmission::ObserverTag, 4> tags_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -799,7 +796,7 @@ private:
     std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
     std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
 
-    libtransmission::SimpleObservable<>::Tag blocklist_tag_;
+    libtransmission::ObserverTag const blocklist_tag_;
 
     static auto constexpr BandwidthPeriod = 500ms;
     static auto constexpr RechokePeriod = 10s;

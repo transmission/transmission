@@ -20,6 +20,32 @@
 namespace libtransmission
 {
 
+class ObserverTag
+{
+public:
+    using Callback = std::function<void()>;
+
+    ObserverTag() = default;
+    ObserverTag(ObserverTag&&) = default;
+    ObserverTag& operator=(ObserverTag&&) = default;
+    ObserverTag(ObserverTag const&) = delete;
+    ObserverTag& operator=(ObserverTag const&) = delete;
+
+    ObserverTag(Callback on_destroy)
+        : on_destroy_{ std::move(on_destroy) }
+    {
+    }
+
+    ~ObserverTag()
+    {
+        if (on_destroy_)
+            on_destroy_();
+    }
+
+private:
+    Callback on_destroy_;
+};
+
 // A simple observer/observable implementation.
 // Intentionally avoids edge cases like thread safety and
 // remove-during-emit; this is meant to be as lightweight
@@ -27,46 +53,24 @@ namespace libtransmission
 template<typename... Args>
 class SimpleObservable
 {
-    using key_t = size_t;
+    using Key = size_t;
 
 public:
-    class Tag
-    {
-    public:
-        [[nodiscard]] bool operator<(Tag const& that) const
-        {
-            return key_ < that.key_;
-        }
-
-        ~Tag()
-        {
-            TR_ASSERT(observable_->observers_.count(key_) == 1U);
-            observable_->observers_.erase(key_);
-        }
-
-    private:
-        friend class SimpleObservable;
-        Tag(SimpleObservable* observable, key_t key)
-            : observable_{ observable }
-            , key_{ key }
-        {
-        }
-        SimpleObservable* observable_;
-        key_t key_;
-    };
-
-    using observer_t = std::function<void(Args...)>;
+    using Observer = std::function<void(Args...)>;
 
     ~SimpleObservable()
     {
         TR_ASSERT(std::empty(observers_));
     }
 
-    Tag observe(observer_t observer)
+    auto observe(Observer observer)
     {
         auto const key = next_key_++;
         observers_.emplace(key, std::move(observer));
-        return Tag{ this, key };
+        return ObserverTag{ [this, key]()
+                            {
+                                remove(key);
+                            } };
     }
 
     void emit(Args... args) const
@@ -78,9 +82,14 @@ public:
     }
 
 private:
-    friend class Tag;
-    static auto inline next_key_ = key_t{ 1U };
-    small::map<key_t, observer_t, 2> observers_;
+    void remove(Key key)
+    {
+        [[maybe_unused]] auto const n_removed = observers_.erase(key);
+        TR_ASSERT(n_removed == 1U);
+    }
+
+    static auto inline next_key_ = Key{ 1U };
+    small::map<Key, Observer, 2> observers_;
 };
 
 } // namespace libtransmission
