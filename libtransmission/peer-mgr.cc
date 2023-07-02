@@ -317,15 +317,17 @@ public:
     tr_swarm(tr_peerMgr* manager_in, tr_torrent* tor_in) noexcept
         : manager{ manager_in }
         , tor{ tor_in }
+        , tags_{ {
+              tor->done_.observe([this](tr_torrent*, bool) { on_torrent_done(); }),
+              tor->doomed_.observe([this](tr_torrent*) { on_torrent_doomed(); }),
+              tor->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t p) { on_got_bad_piece(p); }),
+              tor->got_metainfo_.observe([this](tr_torrent*) { on_got_metainfo(); }),
+              tor->piece_completed_.observe([this](tr_torrent*, tr_piece_index_t p) { on_piece_completed(p); }),
+              tor->started_.observe([this](tr_torrent*) { on_torrent_started(); }),
+              tor->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }),
+              tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }),
+          } }
     {
-        tags_.push_back(tor->done_.observe([this](tr_torrent*, bool) { on_torrent_done(); }));
-        tags_.push_back(tor->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t p) { on_got_bad_piece(p); }));
-        tags_.push_back(tor->piece_completed_.observe([this](tr_torrent*, tr_piece_index_t p) { on_piece_completed(p); }));
-        tags_.push_back(tor->doomed_.observe([this](tr_torrent*) { on_torrent_doomed(); }));
-        tags_.push_back(tor->started_.observe([this](tr_torrent*) { on_torrent_started(); }));
-        tags_.push_back(tor->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }));
-        tags_.push_back(tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }));
-        tags_.push_back(tor->got_metainfo_.observe([this](tr_torrent* /*tor*/) { on_got_metainfo(); }));
 
         rebuildWebseeds();
     }
@@ -768,7 +770,7 @@ private:
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = int{ 90 };
 
-    small::max_size_vector<libtransmission::ObserverTag, 8> tags_;
+    std::array<libtransmission::ObserverTag, 8> const tags_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
