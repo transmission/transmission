@@ -924,6 +924,8 @@ public:
     bool start_when_stable = false;
 
     libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
+    libtransmission::SimpleObservable<tr_torrent*> stopped_;
+    libtransmission::SimpleObservable<tr_torrent*> started_;
 
 private:
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept

@@ -720,7 +720,7 @@ void torrentStartImpl(tr_torrent* const tor)
     torrentResetTransferStats(tor);
     tor->session->announcer_->startTorrent(tor);
     tor->lpdAnnounceAt = now;
-    tr_peerMgrStartTorrent(tor);
+    tor->started_.emit(tor);
 }
 
 bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error** error)
@@ -869,7 +869,7 @@ void torrentStop(tr_torrent* const tor)
 
     tor->session->verifyRemove(tor);
 
-    tr_peerMgrStopTorrent(tor);
+    tor->stopped_.emit(tor);
     tor->session->announcer_->stopTorrent(tor);
 
     tor->session->closeTorrentFiles(tor);

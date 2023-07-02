@@ -319,6 +319,8 @@ public:
         , tor{ tor_in }
         , bad_piece_tag_{ tor_in->got_bad_piece_.observe([this](tr_torrent* /*tor*/, tr_piece_index_t piece)
                                                          { on_got_bad_piece(piece); }) }
+        , started_tag_{ tor_in->started_.observe([this](tr_torrent* /*tor*/) { on_torrent_started(); }) }
+        , stopped_tag_{ tor_in->stopped_.observe([this](tr_torrent* /*tor*/) { on_torrent_stopped(); }) }
     {
         rebuildWebseeds();
     }
@@ -688,6 +690,9 @@ private:
         tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
     }
 
+    void on_torrent_started();
+    void on_torrent_stopped();
+
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
 
@@ -695,6 +700,8 @@ private:
     static auto constexpr RequestTtlSecs = int{ 90 };
 
     libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Tag const bad_piece_tag_;
+    libtransmission::SimpleObservable<tr_torrent*>::Tag const started_tag_;
+    libtransmission::SimpleObservable<tr_torrent*>::Tag const stopped_tag_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -1358,23 +1365,16 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     return pex;
 }
 
-void tr_peerMgrStartTorrent(tr_torrent* tor)
+void tr_swarm::on_torrent_started()
 {
-    TR_ASSERT(tr_isTorrent(tor));
     auto const lock = tor->unique_lock();
-
-    tr_swarm* const swarm = tor->swarm;
-
-    swarm->is_running = true;
-
-    swarm->manager->rechokeSoon();
+    is_running = true;
+    manager->rechokeSoon();
 }
 
-void tr_peerMgrStopTorrent(tr_torrent* tor)
+void tr_swarm::on_torrent_stopped()
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->swarm->stop();
+    stop();
 }
 
 void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor)

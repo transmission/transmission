@@ -193,10 +193,6 @@ enum
     uint8_t peer_list_mode,
     size_t max_peer_count);
 
-void tr_peerMgrStartTorrent(tr_torrent* tor);
-
-void tr_peerMgrStopTorrent(tr_torrent* tor);
-
 void tr_peerMgrAddTorrent(tr_peerMgr* manager, struct tr_torrent* tor);
 
 void tr_peerMgrRemoveTorrent(tr_torrent* tor);
