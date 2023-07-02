@@ -1911,16 +1911,12 @@ void tr_torrent::recheck_completeness()
                 this->doneDate = tr_time();
             }
 
-            if (was_leeching && was_running)
-            {
-                /* clear interested flag on all peers */
-                tr_peerMgrClearInterest(this);
-            }
-
             if (this->current_dir() == this->incomplete_dir())
             {
                 this->set_location(this->download_dir(), true, nullptr, nullptr);
             }
+
+            done_.emit(this, recent_change);
         }
 
         this->session->onTorrentCompletenessChanged(this, completeness, was_running);

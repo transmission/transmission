@@ -322,6 +322,7 @@ public:
         tags_.push_back(tor->started_.observe([this](tr_torrent*) { on_torrent_started(); }));
         tags_.push_back(tor->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }));
         tags_.push_back(tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }));
+        tags_.push_back(tor->done_.observe([this](tr_torrent* /*tor*/, bool /*downloaded*/) { on_torrent_done(); }));
 
         rebuildWebseeds();
     }
@@ -669,6 +670,11 @@ private:
         pool_is_all_seeds_.reset();
     }
 
+    void on_torrent_done()
+    {
+        std::for_each(std::begin(peers), std::end(peers), [](auto* const peer) { peer->set_interested(false); });
+    }
+
     void on_swarm_is_all_seeds()
     {
         auto const lock = tor->unique_lock();
@@ -712,7 +718,7 @@ private:
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = int{ 90 };
 
-    small::max_size_vector<libtransmission::ObserverTag, 4> tags_;
+    small::max_size_vector<libtransmission::ObserverTag, 5> tags_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -1643,15 +1649,6 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
 
     *setme_count = n;
     return ret;
-}
-
-void tr_peerMgrClearInterest(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
-
-    auto& peers = tor->swarm->peers;
-    std::for_each(std::begin(peers), std::end(peers), [](auto* const peer) { peer->set_interested(false); });
 }
 
 namespace
