@@ -27,6 +27,7 @@
 #include "crypto-utils.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
+#include "observable.h"
 #include "log.h"
 #include "session.h"
 #include "torrent-metainfo.h"
@@ -921,6 +922,8 @@ public:
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
     bool start_when_stable = false;
+
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
 
 private:
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept

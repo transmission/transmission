@@ -38,6 +38,7 @@
 #include "global-ip-cache.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
+#include "observable.h"
 #include "open-files.h"
 #include "port-forwarding.h"
 #include "quark.h"
@@ -1201,6 +1202,8 @@ private:
 
 public:
     std::unique_ptr<libtransmission::Timer> utp_timer;
+
+    libtransmission::SimpleObservable<> blocklist_changed_;
 };
 
 constexpr bool tr_isPriority(tr_priority_t p)

@@ -317,6 +317,8 @@ public:
     tr_swarm(tr_peerMgr* manager_in, tr_torrent* tor_in) noexcept
         : manager{ manager_in }
         , tor{ tor_in }
+        , bad_piece_tag_{ tor_in->got_bad_piece_.observe([this](tr_torrent* /*tor*/, tr_piece_index_t piece)
+                                                         { on_got_bad_piece(piece); }) }
     {
         rebuildWebseeds();
     }
@@ -664,11 +666,35 @@ private:
         }
     }
 
+    void on_got_bad_piece(tr_piece_index_t piece)
+    {
+        auto const byte_count = tor->piece_size(piece);
+
+        for (auto* const peer : peers)
+        {
+            if (peer->blame.test(piece))
+            {
+                tr_logAddTraceSwarm(
+                    this,
+                    fmt::format(
+                        "peer {} contributed to corrupt piece ({}); now has {} strikes",
+                        peer->display_name(),
+                        piece,
+                        peer->strikes + 1));
+                addStrike(peer);
+            }
+        }
+
+        tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
+    }
+
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
 
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = int{ 90 };
+
+    libtransmission::SimpleObservable<tr_torrent*, tr_block_index_t>::Tag const bad_piece_tag_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -683,6 +709,7 @@ struct tr_peerMgr
         , bandwidth_timer_{ session->timerMaker().create([this]() { bandwidthPulse(); }) }
         , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulseMarshall(); }) }
         , refill_upkeep_timer_{ session->timerMaker().create([this]() { refillUpkeep(); }) }
+        , blocklist_tag_{ session->blocklist_changed_.observe([this]() { on_blocklist_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthPeriod);
         rechoke_timer_->start_repeating(RechokePeriod);
@@ -734,9 +761,24 @@ private:
         rechoke_timer_->set_interval(RechokePeriod);
     }
 
+    void on_blocklist_changed() const
+    {
+        /* we cache whether or not a peer is blocklisted...
+           since the blocklist has changed, erase that cached value */
+        for (auto* const tor : session->torrents())
+        {
+            for (auto& [socket_address, atom] : tor->swarm->pool)
+            {
+                atom.setBlocklistedDirty();
+            }
+        }
+    }
+
     std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
     std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
     std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
+
+    libtransmission::SimpleObservable<>::Tag blocklist_tag_;
 
     static auto constexpr BandwidthPeriod = 500ms;
     static auto constexpr RechokePeriod = 10s;
@@ -783,21 +825,6 @@ tr_peerMgr* tr_peerMgrNew(tr_session* session)
 void tr_peerMgrFree(tr_peerMgr* manager)
 {
     delete manager;
-}
-
-// ---
-
-void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
-{
-    /* we cache whether or not a peer is blocklisted...
-       since the blocklist has changed, erase that cached value */
-    for (auto* const tor : mgr->session->torrents())
-    {
-        for (auto& [socket_address, atom] : tor->swarm->pool)
-        {
-            atom.setBlocklistedDirty();
-        }
-    }
 }
 
 // ---
@@ -1204,29 +1231,6 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
 }
 
 // ---
-
-void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index)
-{
-    auto* const swarm = tor->swarm;
-    auto const byte_count = tor->piece_size(piece_index);
-
-    for (auto* const peer : swarm->peers)
-    {
-        if (peer->blame.test(piece_index))
-        {
-            tr_logAddTraceSwarm(
-                swarm,
-                fmt::format(
-                    "peer {} contributed to corrupt piece ({}); now has {} strikes",
-                    peer->display_name(),
-                    piece_index,
-                    peer->strikes + 1));
-            swarm->addStrike(peer);
-        }
-    }
-
-    tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
-}
 
 namespace
 {

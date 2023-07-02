@@ -2338,7 +2338,7 @@ void onPieceFailed(tr_torrent* tor, tr_piece_index_t piece)
     auto const n = tor->piece_size(piece);
     tor->corruptCur += n;
     tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
-    tr_peerMgrGotBadPiece(tor, piece);
+    tor->got_bad_piece_.emit(tor, piece);
     tor->set_has_piece(piece, false);
 }
 } // namespace got_block_helpers
