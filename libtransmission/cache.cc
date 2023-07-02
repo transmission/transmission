@@ -74,20 +74,21 @@ int Cache::write_contiguous(CIter const begin, CIter const end) const
 
     if (end - begin > 1)
     {
-        // Yes, there are.
+        // copy blocks into contiguous memory
         auto const buflen = std::accumulate(
             begin,
             end,
             size_t{},
             [](size_t sum, auto const& block) { return sum + std::size(*block.buf); });
-        buf.reserve(buflen);
+        buf.resize(buflen);
+        auto* walk = std::data(buf);
         for (auto iter = begin; iter != end; ++iter)
         {
             TR_ASSERT(begin->key.first == iter->key.first);
             TR_ASSERT(begin->key.second + std::distance(begin, iter) == iter->key.second);
-            buf.insert(std::end(buf), std::begin(*iter->buf), std::end(*iter->buf));
+            walk = std::copy_n(std::data(*iter->buf), std::size(*iter->buf), walk);
         }
-        TR_ASSERT(std::size(buf) == buflen);
+        TR_ASSERT(std::data(buf) + std::size(buf) == walk);
         out = std::data(buf);
         outlen = std::size(buf);
     }
