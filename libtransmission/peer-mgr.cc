@@ -321,6 +321,7 @@ public:
         tags_.push_back(tor->done_.observe([this](tr_torrent*, bool) { on_torrent_done(); }));
         tags_.push_back(tor->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t p) { on_got_bad_piece(p); }));
         tags_.push_back(tor->piece_completed_.observe([this](tr_torrent*, tr_piece_index_t p) { on_piece_completed(p); }));
+        tags_.push_back(tor->doomed_.observe([this](tr_torrent*) { on_torrent_doomed(); }));
         tags_.push_back(tor->started_.observe([this](tr_torrent*) { on_torrent_started(); }));
         tags_.push_back(tor->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }));
         tags_.push_back(tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }));
@@ -671,6 +672,14 @@ private:
         pool_is_all_seeds_.reset();
     }
 
+    void on_torrent_doomed()
+    {
+        auto const lock = tor->unique_lock();
+        stop();
+        tor->swarm = nullptr;
+        delete this;
+    }
+
     void on_torrent_done()
     {
         std::for_each(std::begin(peers), std::end(peers), [](auto* const peer) { peer->set_interested(false); });
@@ -740,7 +749,7 @@ private:
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = int{ 90 };
 
-    small::max_size_vector<libtransmission::ObserverTag, 6> tags_;
+    small::max_size_vector<libtransmission::ObserverTag, 7> tags_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -1385,16 +1394,6 @@ void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor)
     TR_ASSERT(tor->swarm == nullptr);
 
     tor->swarm = new tr_swarm{ manager, tor };
-}
-
-void tr_peerMgrRemoveTorrent(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
-
-    tor->swarm->stop();
-    delete tor->swarm;
-    tor->swarm = nullptr;
 }
 
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)

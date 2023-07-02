@@ -763,7 +763,7 @@ void freeTorrent(tr_torrent* tor)
 
     tr_session* session = tor->session;
 
-    tr_peerMgrRemoveTorrent(tor);
+    tor->doomed_.emit(tor);
 
     session->announcer_->removeTorrent(tor);
 
