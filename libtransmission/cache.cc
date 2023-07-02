@@ -88,7 +88,7 @@ int Cache::write_contiguous(CIter const begin, CIter const end) const
             TR_ASSERT(begin->key.second + std::distance(begin, iter) == iter->key.second);
             walk = std::copy_n(std::data(*iter->buf), std::size(*iter->buf), walk);
         }
-        TR_ASSERT(walk - std::data(buf) == std::size(buf));
+        TR_ASSERT(std::data(buf) + std::size(buf) == walk);
         out = std::data(buf);
         outlen = std::size(buf);
     }
