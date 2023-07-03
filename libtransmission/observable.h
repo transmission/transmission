@@ -20,6 +20,9 @@
 namespace libtransmission
 {
 
+// An RAII-based subscription to an Observable.
+// Returned by SimpleObservable::observe().
+// Let it go out-of-scope to cancel the subscription.
 class ObserverTag
 {
 public:
