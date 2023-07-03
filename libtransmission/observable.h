@@ -13,6 +13,8 @@
 #include <cstddef> // for size_t
 #include <functional>
 
+#include <fmt/core.h>
+
 #include <small/map.hpp>
 
 #include <libtransmission/tr-assert.h>
@@ -63,7 +65,7 @@ public:
 
     ~SimpleObservable()
     {
-        TR_ASSERT(std::empty(observers_));
+        TR_ASSERT_MSG(std::empty(observers_), fmt::print("observers size {:d}\n", std::size(observers_)));
     }
 
     auto observe(Observer observer)
@@ -88,7 +90,7 @@ private:
     void remove(Key key)
     {
         [[maybe_unused]] auto const n_removed = observers_.erase(key);
-        TR_ASSERT(n_removed == 1U);
+        TR_ASSERT_MSG(n_removed == 1U, fmt::print("n_removed is {:d}\n", n_removed));
     }
 
     static auto inline next_key_ = Key{ 1U };
