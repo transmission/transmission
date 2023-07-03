@@ -930,9 +930,11 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 tr_net_init_mgr::tr_net_init_mgr()
 {
+    // try to init curl with default settings (currently ssl support + win32 sockets)
+    // but if that fails, we need to init win32 sockets as a bare minimum
     if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
     {
-        curl_global_init(CURL_GLOBAL_NOTHING);
+        curl_global_init(CURL_GLOBAL_WIN32);
     }
 }
 
