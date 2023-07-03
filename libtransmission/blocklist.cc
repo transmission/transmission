@@ -313,16 +313,16 @@ void Blocklist::ensureLoaded() const
     }
 
     // get the file's size
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const file_info = tr_sys_path_get_info(bin_file_, 0, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", bin_file_),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
+        error.clear();
     }
     if (!file_info)
     {

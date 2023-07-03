@@ -507,7 +507,7 @@ tr_sys_path_capacity tr_device_info_get_disk_space(struct tr_device_info const& 
 
 } // namespace
 
-std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error** error)
+std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error* error)
 {
     auto const info = tr_sys_path_get_info(path, 0, error);
     if (!info)

@@ -33,7 +33,7 @@ struct Handler
     class Context
     {
     public:
-        Context(char const* stream_begin_in, tr_error** error_in)
+        Context(char const* stream_begin_in, tr_error* error_in)
             : error{ error_in }
             , stream_begin_{ stream_begin_in }
         {
@@ -51,7 +51,7 @@ struct Handler
             token_begin_ = a;
             token_end_ = token_begin_ + len;
         }
-        tr_error** error = nullptr;
+        tr_error* error = nullptr;
 
     private:
         char const* token_begin_ = nullptr;
@@ -215,7 +215,7 @@ struct ParserStack
         return stack[depth].parent_type;
     }
 
-    std::optional<ParentType> pop(tr_error** error)
+    std::optional<ParentType> pop(tr_error* error)
     {
         if (depth == 0)
         {
@@ -234,7 +234,7 @@ struct ParserStack
         return ret;
     }
 
-    bool push(ParentType parent_type, tr_error** error)
+    bool push(ParentType parent_type, tr_error* error)
     {
         if (depth + 1 >= std::size(stack))
         {
@@ -254,7 +254,7 @@ bool parse(
     ParserStack<MaxDepth>& stack,
     Handler& handler,
     char const** setme_end = nullptr,
-    tr_error** error = nullptr)
+    tr_error* error = nullptr)
 {
     stack.clear();
     auto const* const stream_begin = std::data(benc);

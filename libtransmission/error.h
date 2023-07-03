@@ -5,79 +5,128 @@
 
 #pragma once
 
+#include <string>
 #include <string_view>
 
-#include "tr-macros.h"
+#include "libtransmission/tr-assert.h"
 
-/**
- * @addtogroup error Error reporting
- * @{
- */
-
-/** @brief Structure holding error information. */
 struct tr_error
 {
-    /** @brief Error code, platform-specific */
-    int code;
+private:
+    enum class Type
+    {
+        Generic,
+        Errno,
+        SockErrno,
+    };
+
+public:
+    [[nodiscard]] constexpr auto code() const noexcept
+    {
+        return code_;
+    }
+
+    [[nodiscard]] constexpr bool is_set() const noexcept
+    {
+        return code() != 0;
+    }
+
+    [[nodiscard]] constexpr operator bool() const noexcept
+    {
+        return is_set();
+    }
+
+    [[nodiscard]] auto const& message() const
+    {
+        ensure_message();
+        return message_;
+    }
+
+    void clear()
+    {
+        set(0, std::string_view{});
+    }
+
+    void set(int error_code, std::string_view message)
+    {
+        TR_ASSERT(!is_set());
+
+        code_ = error_code;
+        type_ = Type::Generic;
+        message_ = message;
+    }
+
+    void set_from_errno(int error_code)
+    {
+        TR_ASSERT(!is_set());
+
+        type_ = Type::Errno;
+        code_ = error_code;
+        message_.clear();
+    }
+
+    void set_from_sockerrno(int error_code)
+    {
+        TR_ASSERT(!is_set());
+
+        type_ = Type::SockErrno;
+        code_ = error_code;
+        message_.clear();
+    }
+
+    void prefix_message(std::string_view prefix)
+    {
+        ensure_message();
+        message_.insert(0, prefix);
+    }
+
+private:
+    void ensure_message() const;
+
+    Type type_ = Type::Generic;
+
+    int code_ = 0;
+
     /** @brief Error message */
-    char* message;
+    mutable std::string message_;
 };
 
-/**
- * @brief Free memory used by error object.
- *
- * @param[in] error Error object to be freed.
- */
-void tr_error_free(tr_error* error);
+void tr_error_set(tr_error* error, int error_code, std::string_view message)
+{
+    if (error != nullptr)
+    {
+        error->set(error_code, message);
+    }
+}
 
-/**
- * @brief Create and set new error object using literal error message.
- *
- * If passed pointer to error object is `nullptr`, do nothing.
- *
- * @param[in,out] error   Pointer to error object to be set.
- * @param[in]     code    Error code (platform-specific).
- * @param[in]     message Error message.
- */
-void tr_error_set(tr_error** error, int code, std::string_view message);
+void tr_error_set_from_errno(tr_error* error, int error_code)
+{
+    if (error != nullptr)
+    {
+        error->set_from_errno(error_code);
+    }
+}
 
-/**
- * @brief shorthand for `tr_error_set(error, errno, tr_strerror(errno))`
- */
-void tr_error_set_from_errno(tr_error** error, int errnum);
+void tr_error_set_from_sockerrno(tr_error* error, int error_code)
+{
+    if (error != nullptr)
+    {
+        error->set_from_sockerrno(error_code);
+    }
+}
 
-/**
- * @brief Propagate existing error object upwards.
- *
- * If passed pointer to new error object is not `nullptr`, copy old error object
- * to new error object and free old error object. Otherwise, just free old error
- * object.
- *
- * @param[in,out] new_error Pointer to error object to be set.
- * @param[in,out] old_error Error object to be propagated. Cleared on return.
- */
-void tr_error_propagate(tr_error** new_error, tr_error** old_error);
+void tr_error_propagate(tr_error* tgt, tr_error&& src)
+{
+    if (tgt != nullptr)
+    {
+        *tgt = std::move(src);
+    }
+}
 
-/**
- * @brief Clear error object.
- *
- * Free error object being pointed and set pointer to `nullptr`. If passed
- * pointer is `nullptr`, do nothing.
- *
- * @param[in,out] error Pointer to error object to be cleared.
- */
-void tr_error_clear(tr_error** error);
-
-/**
- * @brief Prefix message of existing error object.
- *
- * If passed pointer to error object is not `nullptr`, prefix its message with
- * `printf`-style formatted text. Otherwise, do nothing.
- *
- * @param[in,out] error         Pointer to error object to be set.
- * @param[in]     prefix_format Prefix format string.
- * @param[in]     ...           Format arguments.
- */
-void tr_error_prefix(tr_error** error, char const* prefix);
-
-/** @} */
+void tr_error_prefix_message(tr_error* error, std::string_view prefix)
+{
+    if (error != nullptr)
+    {
+        error->prefix_message(prefix);
+    }
+}

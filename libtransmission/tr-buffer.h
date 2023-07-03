@@ -100,7 +100,7 @@ public:
     }
 
     // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
     {
         n_bytes = std::min(n_bytes, size());
 
@@ -197,7 +197,7 @@ public:
         add(&nport, sizeof(nport));
     }
 
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
     {
         auto const [buf, buflen] = reserve_space(n_bytes);
         auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
