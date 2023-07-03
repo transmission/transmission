@@ -68,7 +68,7 @@ void tr_peer_socket::close()
     handle = {};
 }
 
-size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) const
+size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error* error) const
 {
     if (max == size_t{})
     {
@@ -105,7 +105,7 @@ size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) cons
     return {};
 }
 
-size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool buf_is_empty, tr_error** error) const
+size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool buf_is_empty, tr_error* error) const
 {
     if (max == size_t{})
     {

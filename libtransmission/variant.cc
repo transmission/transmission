@@ -1093,28 +1093,22 @@ std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
 
 int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view filename)
 {
-    auto error_code = int{ 0 };
-    auto const contents = tr_variantToStr(v, fmt);
-
-    tr_error* error = nullptr;
-    tr_file_save(filename, contents, &error);
-    if (error != nullptr)
+    if (auto error = tr_error{}; !tr_file_save(filename, tr_variantToStr(v, fmt), &error) && error)
     {
         tr_logAddError(fmt::format(
             _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        error_code = error->code;
-        tr_error_clear(&error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
+        return error.code();
     }
 
-    return error_code;
+    return 0;
 }
 
 // ---
 
-bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char const** setme_end, tr_error** error)
+bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char const** setme_end, tr_error* error)
 {
     // supported formats: benc, json
     TR_ASSERT((opts & (TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_JSON)) != 0);
@@ -1132,7 +1126,7 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     return success;
 }
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string_view filename, tr_error** error)
+bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string_view filename, tr_error* error)
 {
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);

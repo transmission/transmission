@@ -76,21 +76,21 @@ void tr_locale_set_global(char const* locale_name) noexcept
 
 // ---
 
-bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error)
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error)
 {
     auto const szfilename = tr_pathbuf{ filename };
 
-    /* try to stat the file */
-    tr_error* my_error = nullptr;
+    // try to stat the file
+    auto my_error = tr_error{};
     auto const info = tr_sys_path_get_info(szfilename, 0, &my_error);
-    if (my_error != nullptr)
+    if (my_error)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_propagate(error, &my_error);
+            fmt::arg("error", my_error.message()),
+            fmt::arg("error_code", my_error.code())));
+        tr_error_propagate(error, std::move(my_error));
         return false;
     }
 
@@ -101,16 +101,16 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
         return false;
     }
 
-    /* Load the torrent file into our buffer */
+    // load the torrent file into our buffer
     auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_propagate(error, &my_error);
+            fmt::arg("error", my_error.message()),
+            fmt::arg("error_code", my_error.code())));
+        tr_error_propagate(error, std::move(my_error));
         return false;
     }
 
@@ -120,10 +120,10 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
+            fmt::arg("error", my_error.message()),
+            fmt::arg("error_code", my_error.code())));
         tr_sys_file_close(fd);
-        tr_error_propagate(error, &my_error);
+        tr_error_propagate(error, std::move(my_error));
         return false;
     }
 
@@ -131,7 +131,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     return true;
 }
 
-bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error)
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error)
 {
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
@@ -544,7 +544,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
 // ---
 
-bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
+bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error* error)
 {
     auto const oldpath = tr_pathbuf{ oldpath_in };
     auto const newpath = tr_pathbuf{ newpath_in };
@@ -584,14 +584,13 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
         return false;
     }
 
-    if (tr_error* my_error = nullptr; !tr_sys_path_remove(oldpath, &my_error))
+    if (auto my_error = tr_error{}; !tr_sys_path_remove(oldpath, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't remove '{path}': {error} ({error_code})"),
             fmt::arg("path", oldpath),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_free(my_error);
+            fmt::arg("error", my_error.message()),
+            fmt::arg("error_code", my_error.code())));
     }
 
     return true;

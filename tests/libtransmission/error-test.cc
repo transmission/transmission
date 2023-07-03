@@ -14,40 +14,36 @@ using namespace std::literals;
 
 TEST(Error, errorSet)
 {
-    tr_error* err = nullptr;
+    auto error = tr_error{};
 
-    tr_error_prefix(&err, "error: ");
-    EXPECT_EQ(nullptr, err) << *err;
+    tr_error_prefix(&error, "error: ");
+    EXPECT_FALSE(error.is_set()) << error;
 
-    tr_error_set(&err, 2, "oops"sv);
-    EXPECT_NE(nullptr, err);
-    EXPECT_EQ(2, err->code);
-    EXPECT_STREQ("oops", err->message);
+    tr_error_set(&error, 2, "oops"sv);
+    EXPECT_TRUE(error.is_set());
+    EXPECT_EQ(2, error.code());
+    EXPECT_EQ("oops", error.message());
 
-    tr_error_prefix(&err, "error: ");
-    EXPECT_NE(nullptr, err);
-    EXPECT_EQ(2, err->code);
-    EXPECT_STREQ("error: oops", err->message);
-
-    tr_error_free(err);
+    tr_error_prefix(&error, "error: ");
+    EXPECT_TRUE(error.is_set());
+    EXPECT_EQ(2, error.code());
+    EXPECT_EQ("error: oops", error.message());
 }
 
 TEST(Error, propagate)
 {
-    tr_error* err = nullptr;
-    tr_error* err2 = nullptr;
-    auto constexpr Code = int{ 1 };
+    static auto constexpr Code = int{ 1 };
 
-    tr_error_set(&err, Code, "oops"sv);
-    EXPECT_NE(nullptr, err);
-    EXPECT_EQ(Code, err->code);
-    EXPECT_STREQ("oops", err->message);
+    auto error = tr_error{};
+    auto error2 = tr_error{};
 
-    tr_error_propagate(&err2, &err);
-    EXPECT_NE(nullptr, err2);
-    EXPECT_EQ(Code, err2->code);
-    EXPECT_STREQ("oops", err2->message);
-    EXPECT_EQ(nullptr, err) << *err;
+    tr_error_set(&error, Code, "oops"sv);
+    EXPECT_TRUE(error.is_set());
+    EXPECT_EQ(Code, error.code());
+    EXPECT_EQ("oops", error.message());
 
-    tr_error_clear(&err2);
+    tr_error_propagate(&error2, std::move(error));
+    EXPECT_TRUE(error2.is_set());
+    EXPECT_EQ(Code, error2.code());
+    EXPECT_EQ("oops", error2.message());
 }

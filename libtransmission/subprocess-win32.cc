@@ -35,7 +35,7 @@ enum class tr_app_type
     BATCH
 };
 
-void set_system_error(tr_error** error, DWORD code, std::string_view what)
+void set_system_error(tr_error* error, DWORD code, std::string_view what)
 {
     if (error == nullptr)
     {
@@ -271,7 +271,7 @@ bool tr_spawn_async(
     char const* const* cmd,
     std::map<std::string_view, std::string_view> const& env,
     std::string_view work_dir,
-    tr_error** error)
+    tr_error* error)
 {
     // full_env = current_env + env;
     auto full_env = get_current_env();

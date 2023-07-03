@@ -248,12 +248,9 @@ int tr_main(int argc, char* argv[])
 
         if (!tr_sys_path_exists(sz_download_dir))
         {
-            tr_error* error = nullptr;
-
-            if (!tr_sys_dir_create(sz_download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+            if (auto error = tr_error{}; !tr_sys_dir_create(sz_download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
             {
-                fprintf(stderr, "Unable to create download directory \"%s\": %s\n", sz_download_dir.c_str(), error->message);
-                tr_error_free(error);
+                fmt::print(stderr, "Unable to create download directory \"{}\": {}\n", sz_download_dir, error.message());
                 return EXIT_FAILURE;
             }
         }

@@ -67,16 +67,15 @@ void walkTree(std::string_view const top, std::string_view const subpath, std::s
 
     auto path = tr_pathbuf{ top, '/', subpath };
     tr_sys_path_native_separators(std::data(path));
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const info = tr_sys_path_get_info(path, 0, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Skipping '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
     if (!info)
     {
@@ -144,7 +143,7 @@ bool tr_metainfo_builder::set_piece_size(uint32_t piece_size) noexcept
     return true;
 }
 
-bool tr_metainfo_builder::blocking_make_checksums(tr_error** error)
+bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
 {
     checksum_piece_ = 0;
     cancel_ = false;
@@ -248,7 +247,7 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error** error)
     return true;
 }
 
-std::string tr_metainfo_builder::benc(tr_error** error) const
+std::string tr_metainfo_builder::benc(tr_error* error) const
 {
     TR_ASSERT_MSG(!std::empty(piece_hashes_), "did you forget to call makeChecksums() first?");
 

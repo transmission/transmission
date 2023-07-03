@@ -158,7 +158,7 @@ bool tr_torrent_files::move(
     std::string_view parent_in,
     double volatile* setme_progress,
     std::string_view parent_name,
-    tr_error** error) const
+    tr_error* error) const
 {
     if (setme_progress != nullptr)
     {

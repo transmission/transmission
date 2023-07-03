@@ -51,7 +51,7 @@ struct json_wrapper_data
     std::string_view key;
     std::string keybuf;
     std::string strbuf;
-    tr_error* error;
+    tr_error error;
     std::deque<tr_variant*> stack;
     tr_variant* top;
     int parse_opts;
@@ -372,7 +372,7 @@ void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl
 } // namespace parse_helpers
 } // namespace
 
-bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view json, char const** setme_end, tr_error** error)
+bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view json, char const** setme_end, tr_error* error)
 {
     using namespace parse_helpers;
 
@@ -387,7 +387,7 @@ bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view jso
     jsn->data = &data;
     jsonsl_enable_all_callbacks(jsn);
 
-    data.error = nullptr;
+    data.error.clear();
     data.size = std::size(json);
     data.has_content = false;
     data.key = ""sv;
@@ -400,9 +400,9 @@ bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view jso
     jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(json)), std::size(json));
 
     /* EINVAL if there was no content */
-    if (data.error == nullptr && !data.has_content)
+    if (!data.error && !data.has_content)
     {
-        tr_error_set(&data.error, EINVAL, "No content");
+        data.error.set(EINVAL, "No content");
     }
 
     /* maybe set the end ptr */
@@ -412,10 +412,10 @@ bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view jso
     }
 
     /* cleanup */
-    auto const success = data.error == nullptr;
-    if (data.error != nullptr)
+    auto const success = !data.error;
+    if (data.error)
     {
-        tr_error_propagate(error, &data.error);
+        tr_error_propagate(error, std::move(data.error));
     }
     jsonsl_destroy(jsn);
     return success;

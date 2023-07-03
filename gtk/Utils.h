@@ -155,7 +155,7 @@ void setup_tree_view_button_event_handling(
     std::function<bool(double, double)> const& release_callback);
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error);
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 

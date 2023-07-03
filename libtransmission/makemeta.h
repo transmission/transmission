@@ -18,6 +18,7 @@
 
 #include "announce-list.h"
 #include "block-info.h"
+#include "error.h"
 #include "file.h"
 #include "torrent-files.h"
 #include "utils.h" // for tr_file_save()
@@ -36,14 +37,14 @@ public:
     // - This must be done before calling `benc()` or `save()`.
     // - Runs in a worker thread because it can be time-consuming.
     // - Can be cancelled with `cancelChecksums()` and polled with `checksumStatus()`
-    // - Resolves with a `tr_error*` which is set on failure or nullptr on success.
-    std::future<tr_error*> make_checksums()
+    // - Resolves with a `tr_error` which is set on failure or unset on success.
+    std::future<tr_error> make_checksums()
     {
         return std::async(
             std::launch::async,
             [this]()
             {
-                tr_error* error = nullptr;
+                auto error = tr_error{};
                 blocking_make_checksums(&error);
                 return error;
             });
@@ -63,10 +64,10 @@ public:
     }
 
     // generate the metainfo
-    [[nodiscard]] std::string benc(tr_error** error = nullptr) const;
+    [[nodiscard]] std::string benc(tr_error* error = nullptr) const;
 
     // generate the metainfo and save it to a torrent file
-    bool save(std::string_view filename, tr_error** error = nullptr) const
+    bool save(std::string_view filename, tr_error* error = nullptr) const
     {
         return tr_file_save(filename, benc(error), error);
     }
@@ -191,7 +192,7 @@ public:
     }
 
 private:
-    bool blocking_make_checksums(tr_error** error = nullptr);
+    bool blocking_make_checksums(tr_error* error = nullptr);
 
     std::string top_;
     tr_torrent_files files_;

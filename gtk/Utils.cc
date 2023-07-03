@@ -407,7 +407,7 @@ void setup_tree_view_button_event_handling(
 #endif
 }
 
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
 {
     bool trashed = false;
     bool result = true;
@@ -446,8 +446,11 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
                 fmt::arg("path", filename),
                 fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
                 fmt::arg("error_code", e.code())));
-            tr_error_clear(error);
-            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
+            if (error != nullptr)
+            {
+                error->clear();
+                error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
+            }
             result = false;
         }
     }

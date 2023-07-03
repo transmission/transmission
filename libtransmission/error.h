@@ -74,7 +74,7 @@ public:
         message_.clear();
     }
 
-    void prefix_message(std::string_view prefix)
+    void prefix(std::string_view prefix)
     {
         ensure_message();
         message_.insert(0, prefix);
@@ -91,42 +91,9 @@ private:
     mutable std::string message_;
 };
 
-void tr_error_set(tr_error* error, int error_code, std::string_view message)
-{
-    if (error != nullptr)
-    {
-        error->set(error_code, message);
-    }
-}
-
-void tr_error_set_from_errno(tr_error* error, int error_code)
-{
-    if (error != nullptr)
-    {
-        error->set_from_errno(error_code);
-    }
-}
-
-void tr_error_set_from_sockerrno(tr_error* error, int error_code)
-{
-    if (error != nullptr)
-    {
-        error->set_from_sockerrno(error_code);
-    }
-}
-
-void tr_error_propagate(tr_error* tgt, tr_error&& src)
-{
-    if (tgt != nullptr)
-    {
-        *tgt = std::move(src);
-    }
-}
-
-void tr_error_prefix_message(tr_error* error, std::string_view prefix)
-{
-    if (error != nullptr)
-    {
-        error->prefix_message(prefix);
-    }
-}
+void tr_error_set(tr_error* error, int error_code, std::string_view message);
+void tr_error_set_from_errno(tr_error* error, int error_code);
+void tr_error_set_from_sockerrno(tr_error* error, int error_code);
+void tr_error_propagate(tr_error* tgt, tr_error&& src);
+void tr_error_prefix(tr_error* error, std::string_view prefix);
+[[nodiscard]] bool tr_error_is_set(tr_error const* const error);

@@ -1171,7 +1171,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* e
     {
         if (my_error)
         {
-            tr_error_propagate(error, my_error);
+            tr_error_propagate(error, std::move(my_error));
         }
         else
         {

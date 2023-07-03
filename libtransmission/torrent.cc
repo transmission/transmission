@@ -111,22 +111,19 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
         return false;
     }
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     tr_torrentUseMetainfoFromFile(tor, metainfo, filename, &error);
-
-    if (error != nullptr)
+    if (error)
     {
         tor->set_local_error(fmt::format(
             _("Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"),
             fmt::arg("path", filename),
             fmt::arg("magnet", tor->magnet()),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
-        return false;
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
 
-    return true;
+    return !error.is_set();
 }
 
 // ---
@@ -461,8 +458,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
 
     tr_logAddInfoTor(tor, fmt::format(_("Calling script '{path}'"), fmt::arg("path", script)));
 
-    tr_error* error = nullptr;
-
+    auto error = tr_error{};
     if (!tr_spawn_async(std::data(cmd), env, TR_IF_WIN32("\\", "/"), &error))
     {
         tr_logAddWarnTor(
@@ -470,9 +466,8 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
             fmt::format(
                 _("Couldn't call script '{path}': {error} ({error_code})"),
                 fmt::arg("path", script),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-        tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
     }
 }
 } // namespace script_helpers
@@ -722,7 +717,7 @@ void torrentStartImpl(tr_torrent* const tor)
     tor->started_.emit(tor);
 }
 
-bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error** error)
+bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
     return tr_sys_path_remove(filename, error);
 }
@@ -1121,7 +1116,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (is_new_torrent)
     {
-        tr_error* error = nullptr;
+        auto error = tr_error{};
 
         if (tor->has_metainfo()) // torrent file
         {
@@ -1133,14 +1128,13 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             tr_file_save(filename, magnet_link, &error);
         }
 
-        if (error != nullptr)
+        if (error)
         {
             tor->set_local_error(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_clear(&error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
         }
     }
 
@@ -1240,18 +1234,17 @@ void setLocationInSessionThread(
         tor->session->closeTorrentFiles(tor);
         tor->session->verifyRemove(tor);
 
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         ok = tor->metainfo_.files().move(tor->current_dir(), path, setme_progress, tor->name(), &error);
-        if (error != nullptr)
+        if (error)
         {
             tor->set_local_error(fmt::format(
                 _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
                 fmt::arg("old_path", tor->current_dir()),
                 fmt::arg("path", path),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
             tr_torrentStop(tor);
-            tr_error_clear(&error);
         }
     }
 
@@ -2118,15 +2111,13 @@ bool tr_torrent::set_tracker_list(std::string_view text)
     {
         auto const magnet_file = this->magnet_file();
         auto const magnet_link = this->magnet();
-        tr_error* save_error = nullptr;
-        if (!tr_file_save(magnet_file, magnet_link, &save_error))
+        if (auto save_error = tr_error{}; !tr_file_save(magnet_file, magnet_link, &save_error))
         {
             this->set_local_error(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", magnet_file),
-                fmt::arg("error", save_error->message),
-                fmt::arg("error_code", save_error->code)));
-            tr_error_clear(&save_error);
+                fmt::arg("error", save_error.message()),
+                fmt::arg("error_code", save_error.code())));
         }
     }
 
@@ -2293,9 +2284,7 @@ void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
         {
             auto const& oldpath = found->filename();
             auto const newpath = tr_pathbuf{ found->base(), '/', file_subpath };
-            tr_error* error = nullptr;
-
-            if (!tr_sys_path_rename(oldpath, newpath, &error))
+            if (auto error = tr_error{}; !tr_sys_path_rename(oldpath, newpath, &error))
             {
                 tr_logAddErrorTor(
                     tor,
@@ -2303,9 +2292,8 @@ void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
                         _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
                         fmt::arg("old_path", oldpath),
                         fmt::arg("path", newpath),
-                        fmt::arg("error", error->message),
-                        fmt::arg("error_code", error->code)));
-                tr_error_free(error);
+                        fmt::arg("error", error.message()),
+                        fmt::arg("error_code", error.code())));
             }
         }
     }
@@ -2524,14 +2512,13 @@ int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view
 
         if (!tgt_exists)
         {
-            tr_error* error = nullptr;
+            auto error = tr_error{};
 
             tmp = errno;
 
             if (!tr_sys_path_rename(src, tgt, &error))
             {
-                err = error->code;
-                tr_error_free(error);
+                err = error.code();
             }
 
             errno = tmp;

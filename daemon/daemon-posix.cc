@@ -21,9 +21,10 @@
 
 #include "daemon.h"
 
-static void set_system_error(tr_error** error, int code, std::string_view message)
+static void set_system_error(tr_error* error, int code, std::string_view message)
 {
-    tr_error_set(error, code, fmt::format(FMT_STRING("{:s}: {:s} ({:d}"), message, tr_strerror(code), code));
+    tr_error_set_from_errno(error, code);
+    tr_error_prefix(error, message);
 }
 
 #ifdef HAVE_SYS_SIGNALFD_H
@@ -123,7 +124,7 @@ bool tr_daemon::setup_signals()
 
 #endif /* HAVE_SYS_SIGNALFD_H */
 
-bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error** error)
+bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error* error)
 {
     *exit_code = 1;
 

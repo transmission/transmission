@@ -129,12 +129,11 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
 
 std::string tr_getcwd()
 {
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto cur = tr_sys_dir_get_current(&error);
-    if (error != nullptr)
+    if (error)
     {
-        fprintf(stderr, "getcwd error: \"%s\"", error->message);
-        tr_error_free(error);
+        fmt::print(stderr, "getcwd error: '{:s}'\n", error.message());
     }
     return cur;
 }
@@ -172,12 +171,12 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(options.outfile))
     {
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         auto const base = tr_sys_path_basename(options.infile, &error);
 
         if (std::empty(base))
         {
-            fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
+            fmt::print(stderr, "ERROR: Cannot deduce output path from input path: {:s}\n", error.message());
             return EXIT_FAILURE;
         }
 
@@ -268,17 +267,15 @@ int tr_main(int argc, char* argv[])
 
     fmt::print(" ");
 
-    if (tr_error* error = future.get(); error != nullptr)
+    if (auto const error = future.get(); error)
     {
-        fmt::print("ERROR: {:s} {:d}\n", error->message, error->code);
-        tr_error_free(error);
+        fmt::print("ERROR: {:s} {:d}\n", error.message(), error.code());
         return EXIT_FAILURE;
     }
 
-    if (tr_error* error = nullptr; !builder.save(options.outfile, &error))
+    if (auto error = tr_error{}; !builder.save(options.outfile, &error))
     {
-        fmt::print("ERROR: could not save \"{:s}\": {:s} {:d}\n", options.outfile, error->message, error->code);
-        tr_error_free(error);
+        fmt::print("ERROR: could not save \"{:s}\": {:s} {:d}\n", options.outfile, error.message(), error.code());
         return EXIT_FAILURE;
     }
 

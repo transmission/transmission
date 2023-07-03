@@ -433,13 +433,11 @@ TEST_F(VariantTest, stackSmash)
     // confirm that it fails instead of crashing
     char const* end = nullptr;
     tr_variant val;
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, in, &end, &error);
-    EXPECT_NE(nullptr, error);
-    EXPECT_EQ(E2BIG, error->code);
+    EXPECT_TRUE(error.is_set());
+    EXPECT_EQ(E2BIG, error.code());
     EXPECT_FALSE(ok);
-
-    tr_error_clear(&error);
 }
 
 TEST_F(VariantTest, boolAndIntRecast)

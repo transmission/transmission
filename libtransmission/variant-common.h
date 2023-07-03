@@ -43,6 +43,6 @@ void tr_variantWalk(tr_variant const* top, VariantWalkFuncs const* walk_funcs, v
 /** @brief Private function that's exposed here only for unit tests */
 [[nodiscard]] std::optional<std::string_view> tr_bencParseStr(std::string_view* benc_inout);
 
-bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error);
+bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error* error);
 
-bool tr_variantParseJson(tr_variant& setme, int opts, std::string_view json, char const** setme_end, tr_error** error);
+bool tr_variantParseJson(tr_variant& setme, int opts, std::string_view json, char const** setme_end, tr_error* error);

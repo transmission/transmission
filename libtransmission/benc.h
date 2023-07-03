@@ -258,7 +258,7 @@ bool parse(
 {
     stack.clear();
     auto const* const stream_begin = std::data(benc);
-    auto context = Handler::Context(stream_begin, error);
+    auto context = Handler::Context{ stream_begin, error };
 
     int err = 0;
     for (;;)

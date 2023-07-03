@@ -292,22 +292,20 @@ size_t tr_peerIo::try_write(size_t max)
         return {};
     }
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const n_written = socket_.try_write(buf, max, &error);
     // enable further writes if there's more data to write
-    set_enabled(Dir, !std::empty(buf) && (error == nullptr || canRetryFromError(error->code)));
+    set_enabled(Dir, !std::empty(buf) && (!error || canRetryFromError(error.code())));
 
-    if (error != nullptr)
+    if (error)
     {
-        if (!canRetryFromError(error->code))
+        if (!canRetryFromError(error.code()))
         {
             tr_logAddTraceIo(
                 this,
-                fmt::format("try_write err: wrote:{}, errno:{} ({})", n_written, error->code, error->message));
-            call_error_callback(*error);
+                fmt::format("try_write err: wrote:{}, errno:{} ({})", n_written, error.code(), error.message()));
+            call_error_callback(error);
         }
-
-        tr_error_clear(&error);
     }
     else if (n_written > 0U)
     {
@@ -417,19 +415,17 @@ size_t tr_peerIo::try_read(size_t max)
     }
 
     auto& buf = inbuf_;
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const n_read = socket_.try_read(buf, max, std::empty(buf), &error);
-    set_enabled(Dir, error == nullptr || canRetryFromError(error->code));
+    set_enabled(Dir, !error || canRetryFromError(error.code()));
 
-    if (error != nullptr)
+    if (error)
     {
-        if (!canRetryFromError(error->code))
+        if (!canRetryFromError(error.code()))
         {
-            tr_logAddTraceIo(this, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error->code, error->message));
-            call_error_callback(*error);
+            tr_logAddTraceIo(this, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error.code(), error.message()));
+            call_error_callback(error);
         }
-
-        tr_error_clear(&error);
     }
     else if (!std::empty(buf))
     {
@@ -624,10 +620,9 @@ void tr_peerIo::on_utp_state_change(int state)
     }
     else if (state == UTP_STATE_EOF)
     {
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         tr_error_set_from_errno(&error, ENOTCONN);
-        call_error_callback(*error);
-        tr_error_clear(&error);
+        call_error_callback(error);
     }
     else if (state == UTP_STATE_DESTROYING)
     {
@@ -648,7 +643,7 @@ void tr_peerIo::on_utp_error(int errcode)
         return;
     }
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     switch (errcode)
     {
     case UTP_ECONNREFUSED:
@@ -663,8 +658,7 @@ void tr_peerIo::on_utp_error(int errcode)
     default:
         tr_error_set(&error, errcode, utp_error_code_names[errcode]);
     }
-    call_error_callback(*error);
-    tr_error_clear(&error);
+    call_error_callback(error);
 }
 
 #endif /* #ifdef WITH_UTP */

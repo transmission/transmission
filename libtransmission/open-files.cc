@@ -29,27 +29,27 @@ namespace
     return fd != TR_BAD_SYS_FILE;
 }
 
-bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error** error)
+bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
-    tr_error* my_error = nullptr;
-
     if (length == 0)
     {
         return true;
     }
+
+    auto my_error = tr_error{};
 
     if (tr_sys_file_preallocate(fd, length, TR_SYS_FILE_PREALLOC_SPARSE, &my_error))
     {
         return true;
     }
 
-    tr_logAddDebug(fmt::format("Fast preallocation failed: {} ({})", my_error->message, my_error->code));
+    tr_logAddDebug(fmt::format("Fast preallocation failed: {} ({})", my_error.message(), my_error.code()));
 
-    if (!TR_ERROR_IS_ENOSPC(my_error->code))
+    if (!TR_ERROR_IS_ENOSPC(my_error.code()))
     {
         char const zero = '\0';
 
-        tr_error_clear(&my_error);
+        my_error.clear();
 
         /* fallback: the old-style seek-and-write */
         if (tr_sys_file_write_at(fd, &zero, 1, length - 1, nullptr, &my_error) && tr_sys_file_truncate(fd, length, &my_error))
@@ -57,35 +57,35 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error** error
             return true;
         }
 
-        tr_logAddDebug(fmt::format("Fast prellocation fallback failed: {} ({})", my_error->message, my_error->code));
+        tr_logAddDebug(fmt::format("Fast prellocation fallback failed: {} ({})", my_error.message(), my_error.code()));
     }
 
-    tr_error_propagate(error, &my_error);
+    tr_error_propagate(error, std::move(my_error));
     return false;
 }
 
-bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** error)
+bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
-    tr_error* my_error = nullptr;
-
     if (length == 0)
     {
         return true;
     }
+
+    auto my_error = tr_error{};
 
     if (tr_sys_file_preallocate(fd, length, 0, &my_error))
     {
         return true;
     }
 
-    tr_logAddDebug(fmt::format("Full preallocation failed: {} ({})", my_error->message, my_error->code));
+    tr_logAddDebug(fmt::format("Full preallocation failed: {} ({})", my_error.message(), my_error.code()));
 
-    if (!TR_ERROR_IS_ENOSPC(my_error->code))
+    if (!TR_ERROR_IS_ENOSPC(my_error.code()))
     {
         auto buf = std::array<uint8_t, 4096>{};
         bool success = true;
 
-        tr_error_clear(&my_error);
+        my_error.clear();
 
         /* fallback: the old-fashioned way */
         while (success && length > 0)
@@ -101,10 +101,10 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** error)
             return true;
         }
 
-        tr_logAddDebug(fmt::format("Full preallocation fallback failed: {} ({})", my_error->message, my_error->code));
+        tr_logAddDebug(fmt::format("Full preallocation fallback failed: {} ({})", my_error.message(), my_error.code()));
     }
 
-    tr_error_propagate(error, &my_error);
+    tr_error_propagate(error, std::move(my_error));
     return false;
 }
 
@@ -149,7 +149,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
 
     // create subfolders, if any
     auto const filename = tr_pathbuf{ filename_in };
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     if (writable)
     {
         auto dir = tr_pathbuf{ filename.sv() };
@@ -159,9 +159,8 @@ std::optional<tr_sys_file_t> tr_open_files::get(
             tr_logAddError(fmt::format(
                 _("Couldn't create '{path}': {error} ({error_code})"),
                 fmt::arg("path", dir),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
             return {};
         }
     }
@@ -182,9 +181,8 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         tr_logAddError(fmt::format(
             _("Couldn't open '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
         return {};
     }
 
@@ -211,10 +209,9 @@ std::optional<tr_sys_file_t> tr_open_files::get(
             tr_logAddError(fmt::format(
                 _("Couldn't preallocate '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
             tr_sys_file_close(fd);
-            tr_error_free(error);
             return {};
         }
 
@@ -231,10 +228,9 @@ std::optional<tr_sys_file_t> tr_open_files::get(
         tr_logAddWarn(fmt::format(
             _("Couldn't truncate '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
         tr_sys_file_close(fd);
-        tr_error_free(error);
         return {};
     }
 

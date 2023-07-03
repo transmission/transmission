@@ -46,7 +46,7 @@ struct tr_sys_dir_win32
 static auto constexpr NativeLocalPathPrefix = L"\\\\?\\"sv;
 static auto constexpr NativeUncPathPrefix = L"\\\\?\\UNC\\"sv;
 
-static void set_system_error(tr_error** error, DWORD code)
+static void set_system_error(tr_error* error, DWORD code)
 {
     if (error == nullptr)
     {
@@ -63,7 +63,7 @@ static void set_system_error(tr_error** error, DWORD code)
     }
 }
 
-static void set_system_error_if_file_found(tr_error** error, DWORD code)
+static void set_system_error_if_file_found(tr_error* error, DWORD code)
 {
     if (code != ERROR_FILE_NOT_FOUND && code != ERROR_PATH_NOT_FOUND && code != ERROR_NO_MORE_FILES)
     {
@@ -229,7 +229,7 @@ static std::string native_path_to_path(std::wstring_view wide_path)
     return tr_win32_native_to_utf8(wide_path);
 }
 
-static tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error** error)
+static tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD disposition, DWORD flags, tr_error* error)
 {
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
 
@@ -253,7 +253,7 @@ static tr_sys_file_t open_file(std::string_view path, DWORD access, DWORD dispos
     return ret;
 }
 
-static bool create_dir(std::string_view path, int flags, int /*permissions*/, bool okay_if_exists, tr_error** error)
+static bool create_dir(std::string_view path, int flags, int /*permissions*/, bool okay_if_exists, tr_error* error)
 {
     bool ret;
     DWORD error_code = ERROR_SUCCESS;
@@ -300,9 +300,9 @@ static bool create_dir(std::string_view path, int flags, int /*permissions*/, bo
 
 static void create_temp_path(
     char* path_template,
-    void (*callback)(char const* path, void* param, tr_error** error),
+    void (*callback)(char const* path, void* param, tr_error* error),
     void* callback_param,
-    tr_error** error)
+    tr_error* error)
 {
     TR_ASSERT(path_template != nullptr);
     TR_ASSERT(callback != nullptr);
@@ -347,7 +347,7 @@ static void create_temp_path(
     }
 }
 
-bool tr_sys_path_exists(char const* path, tr_error** error)
+bool tr_sys_path_exists(char const* path, tr_error* error)
 {
     TR_ASSERT(path != nullptr);
 
@@ -385,7 +385,7 @@ bool tr_sys_path_exists(char const* path, tr_error** error)
     return ret;
 }
 
-static std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_error** error)
+static std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handle, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
@@ -403,7 +403,7 @@ static std::optional<tr_sys_path_info> tr_sys_file_get_info_(tr_sys_file_t handl
     return {};
 }
 
-std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error** error)
+std::optional<tr_sys_path_info> tr_sys_path_get_info(std::string_view path, int flags, tr_error* error)
 {
     if (auto const wide_path = path_to_native_path(path); std::empty(wide_path))
     {
@@ -457,7 +457,7 @@ bool tr_sys_path_is_relative(std::string_view path)
     return true;
 }
 
-static std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(char const* path, tr_error** error)
+static std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(char const* path, tr_error* error)
 {
     auto const wpath = path_to_native_path(path);
     if (std::empty(wpath))
@@ -486,7 +486,7 @@ static std::optional<BY_HANDLE_FILE_INFORMATION> get_file_info(char const* path,
     return info;
 }
 
-bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
+bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error* error)
 {
     TR_ASSERT(path1 != nullptr);
     TR_ASSERT(path2 != nullptr);
@@ -507,7 +507,7 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
         fi1->nFileIndexLow == fi2->nFileIndexLow;
 }
 
-std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
+std::string tr_sys_path_resolve(std::string_view path, tr_error* error)
 {
     auto ret = std::string{};
 
@@ -549,7 +549,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
     return {};
 }
 
-std::string_view tr_sys_path_basename(std::string_view path, tr_error** error)
+std::string_view tr_sys_path_basename(std::string_view path, tr_error* error)
 {
     if (std::empty(path))
     {
@@ -705,7 +705,7 @@ std::string_view tr_sys_path_dirname(std::string_view path)
     return path.substr(0, end);
 }
 
-bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
+bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error* error)
 {
     TR_ASSERT(src_path != nullptr);
     TR_ASSERT(dst_path != nullptr);
@@ -746,7 +746,7 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     return ret;
 }
 
-bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** error)
+bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error* error)
 {
     TR_ASSERT(src_path != nullptr);
     TR_ASSERT(dst_path != nullptr);
@@ -770,7 +770,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     return true;
 }
 
-bool tr_sys_path_remove(char const* path, tr_error** error)
+bool tr_sys_path_remove(char const* path, tr_error* error)
 {
     TR_ASSERT(path != nullptr);
 
@@ -816,7 +816,7 @@ char* tr_sys_path_native_separators(char* path)
     return path;
 }
 
-tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
+tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error* error)
 {
     tr_sys_file_t ret = TR_BAD_SYS_FILE;
 
@@ -852,7 +852,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
     return ret;
 }
 
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/, tr_error** error)
+tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/, tr_error* error)
 {
     TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
@@ -910,7 +910,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/,
     return ret;
 }
 
-static void file_open_temp_callback(char const* path, void* param, tr_error** error)
+static void file_open_temp_callback(char const* path, void* param, tr_error* error)
 {
     tr_sys_file_t* result = (tr_sys_file_t*)param;
 
@@ -919,7 +919,7 @@ static void file_open_temp_callback(char const* path, void* param, tr_error** er
     *result = open_file(path, GENERIC_READ | GENERIC_WRITE, CREATE_NEW, FILE_ATTRIBUTE_TEMPORARY, error);
 }
 
-tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
+tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error* error)
 {
     TR_ASSERT(path_template != nullptr);
 
@@ -930,7 +930,7 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
+bool tr_sys_file_close(tr_sys_file_t handle, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
@@ -944,7 +944,7 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error** error)
+bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != nullptr || size == 0);
@@ -981,7 +981,7 @@ bool tr_sys_file_read_at(
     uint64_t size,
     uint64_t offset,
     uint64_t* bytes_read,
-    tr_error** error)
+    tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != nullptr || size == 0);
@@ -1018,7 +1018,7 @@ bool tr_sys_file_read_at(
     return ret;
 }
 
-bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written, tr_error** error)
+bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, uint64_t* bytes_written, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != nullptr || size == 0);
@@ -1055,7 +1055,7 @@ bool tr_sys_file_write_at(
     uint64_t size,
     uint64_t offset,
     uint64_t* bytes_written,
-    tr_error** error)
+    tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(buffer != nullptr || size == 0);
@@ -1092,7 +1092,7 @@ bool tr_sys_file_write_at(
     return ret;
 }
 
-bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
+bool tr_sys_file_flush(tr_sys_file_t handle, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
@@ -1106,7 +1106,7 @@ bool tr_sys_file_flush(tr_sys_file_t handle, tr_error** error)
     return ret;
 }
 
-bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error** error)
+bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
@@ -1121,7 +1121,7 @@ bool tr_sys_file_flush_possible(tr_sys_file_t handle, tr_error** error)
     return type == FILE_TYPE_DISK;
 }
 
-bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
+bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
@@ -1143,7 +1143,7 @@ bool tr_sys_file_advise(
     uint64_t /*offset*/,
     [[maybe_unused]] uint64_t size,
     [[maybe_unused]] tr_sys_file_advice_t advice,
-    tr_error** /*error*/)
+    tr_error* /*error*/)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
@@ -1156,7 +1156,7 @@ bool tr_sys_file_advise(
     return ret;
 }
 
-bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error** error)
+bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
@@ -1174,7 +1174,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
     return tr_sys_file_truncate(handle, size, error);
 }
 
-bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
+bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT((operation & ~(TR_SYS_FILE_LOCK_SH | TR_SYS_FILE_LOCK_EX | TR_SYS_FILE_LOCK_NB | TR_SYS_FILE_LOCK_UN)) == 0);
@@ -1213,7 +1213,7 @@ bool tr_sys_file_lock(tr_sys_file_t handle, int operation, tr_error** error)
     return ret;
 }
 
-std::string tr_sys_dir_get_current(tr_error** error)
+std::string tr_sys_dir_get_current(tr_error* error)
 {
     if (auto const size = GetCurrentDirectoryW(0, nullptr); size != 0)
     {
@@ -1231,12 +1231,12 @@ std::string tr_sys_dir_get_current(tr_error** error)
     return {};
 }
 
-bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** error)
+bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error* error)
 {
     return create_dir(path, flags, permissions, true, error);
 }
 
-static void dir_create_temp_callback(char const* path, void* param, tr_error** error)
+static void dir_create_temp_callback(char const* path, void* param, tr_error* error)
 {
     bool* result = (bool*)param;
 
@@ -1245,7 +1245,7 @@ static void dir_create_temp_callback(char const* path, void* param, tr_error** e
     *result = create_dir(path, 0, 0, false, error);
 }
 
-bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
+bool tr_sys_dir_create_temp(char* path_template, tr_error* error)
 {
     TR_ASSERT(path_template != nullptr);
 
@@ -1256,7 +1256,7 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
     return ret;
 }
 
-tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error** error)
+tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error* error)
 {
     TR_ASSERT(path != nullptr);
 
@@ -1279,7 +1279,7 @@ tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error** error)
     return ret;
 }
 
-char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
+char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 
@@ -1318,7 +1318,7 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     return nullptr;
 }
 
-bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error** error)
+bool tr_sys_dir_close(tr_sys_dir_t handle, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_DIR);
 

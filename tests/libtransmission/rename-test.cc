@@ -68,9 +68,9 @@ protected:
         // create the torrent ctor
         auto const benc = tr_base64_decode(benc_base64);
         EXPECT_LT(0U, std::size(benc));
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
-        EXPECT_EQ(nullptr, error) << *error;
+        EXPECT_FALSE(error.is_set()) << error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent

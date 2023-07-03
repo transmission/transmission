@@ -65,8 +65,8 @@ protected:
 
     static auto testBuilder(tr_metainfo_builder& builder)
     {
-        tr_error* error = builder.make_checksums().get();
-        EXPECT_EQ(error, nullptr) << *error;
+        auto const error = builder.make_checksums().get();
+        EXPECT_FALSE(error.is_set()) << error;
 
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parse_benc(builder.benc()));
@@ -229,7 +229,8 @@ TEST_F(MakemetaTest, announceSingleTracker)
     builder.set_announce_list(std::move(trackers));
 
     // generate the torrent and parse it as a variant
-    EXPECT_EQ(nullptr, builder.make_checksums().get());
+    auto const error = builder.make_checksums().get();
+    EXPECT_FALSE(error.is_set()) << error;
     auto top = tr_variant{};
     auto const benc = builder.benc();
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
@@ -260,7 +261,8 @@ TEST_F(MakemetaTest, announceMultiTracker)
     builder.set_announce_list(std::move(trackers));
 
     // generate the torrent and parse it as a variant
-    EXPECT_EQ(nullptr, builder.make_checksums().get());
+    auto error = builder.make_checksums().get();
+    EXPECT_FALSE(error.is_set());
     auto top = tr_variant{};
     auto const benc = builder.benc();
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));

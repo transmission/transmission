@@ -377,12 +377,7 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error* error = nullptr);
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_read(
-    tr_sys_file_t handle,
-    void* buffer,
-    uint64_t size,
-    uint64_t* bytes_read,
-    tr_error* error = nullptr);
+bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_t* bytes_read, tr_error* error = nullptr);
 
 /**
  * @brief Like `pread()`, except that the position is undefined afterwards.

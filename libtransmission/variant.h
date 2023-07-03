@@ -124,14 +124,14 @@ bool tr_variantFromFile(
     tr_variant* setme,
     tr_variant_parse_opts opts,
     std::string_view filename,
-    struct tr_error** error = nullptr);
+    struct tr_error* error = nullptr);
 
 bool tr_variantFromBuf(
     tr_variant* setme,
     int variant_parse_opts,
     std::string_view buf,
     char const** setme_end = nullptr,
-    tr_error** error = nullptr);
+    tr_error* error = nullptr);
 
 template<typename T>
 bool tr_variantFromBuf(
@@ -139,7 +139,7 @@ bool tr_variantFromBuf(
     int variant_parse_opts,
     T const& buf,
     char const** setme_end = nullptr,
-    tr_error** error = nullptr)
+    tr_error* error = nullptr)
 {
     return tr_variantFromBuf(
         setme,

@@ -260,7 +260,7 @@ private:
 } // namespace parse_helpers
 } // namespace
 
-bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error)
+bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error* error)
 {
     using namespace parse_helpers;
     using Stack = transmission::benc::ParserStack<512>;

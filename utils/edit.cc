@@ -358,16 +358,15 @@ int tr_main(int argc, char* argv[])
 
     for (auto const& filename : options.files)
     {
-        tr_variant top;
         bool changed = false;
-        tr_error* error = nullptr;
 
         fmt::print("{:s}\n", filename);
 
-        if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
+        auto top = tr_variant{};
+
+        if (auto error = tr_error{}; !tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
         {
-            fmt::print("\tError reading file: {:s}\n", error->message);
-            tr_error_free(error);
+            fmt::print("\tError reading file: {:s}\n", error.message());
             continue;
         }
 

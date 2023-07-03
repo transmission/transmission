@@ -48,15 +48,7 @@ std::string tr_torrent_metainfo::fix_webseed_url(tr_torrent_metainfo const& tm, 
     return std::string{ url };
 }
 
-namespace
-{
-auto constexpr MaxBencDepth = 32;
-
-bool tr_error_is_set(tr_error const* const* error)
-{
-    return (error != nullptr) && (*error != nullptr);
-}
-} // namespace
+static auto constexpr MaxBencDepth = 32;
 
 struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
 {
@@ -627,25 +619,24 @@ private:
     static constexpr std::string_view XCrossSeedKey = "x_cross_seed"sv;
 };
 
-bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error** error)
+bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error* error)
 {
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = MetainfoHandler{ *this };
 
-    tr_error* my_error = nullptr;
+    auto my_error = tr_error{};
 
     if (error == nullptr)
     {
         error = &my_error;
     }
+
     auto const ok = transmission::benc::parse(benc, stack, handler, nullptr, error);
 
-    if (tr_error_is_set(error))
+    if (*error)
     {
-        tr_logAddError(fmt::format("{} ({})", (*error)->message, (*error)->code));
+        tr_logAddError(fmt::format("{} ({})", error->message(), error->code()));
     }
-
-    tr_error_clear(&my_error);
 
     if (!ok)
     {
@@ -660,7 +651,7 @@ bool tr_torrent_metainfo::parse_benc(std::string_view benc, tr_error** error)
     return true;
 }
 
-bool tr_torrent_metainfo::parse_torrent_file(std::string_view filename, std::vector<char>* contents, tr_error** error)
+bool tr_torrent_metainfo::parse_torrent_file(std::string_view filename, std::vector<char>* contents, tr_error* error)
 {
     auto local_contents = std::vector<char>{};
 

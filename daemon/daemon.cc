@@ -151,7 +151,7 @@ static auto constexpr Options = std::array<tr_option, 45>{
 
 bool tr_daemon::reopen_log_file(char const* filename)
 {
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     tr_sys_file_t const old_log_file = logfile_;
     tr_sys_file_t const new_log_file = tr_sys_file_open(
         filename,
@@ -161,8 +161,7 @@ bool tr_daemon::reopen_log_file(char const* filename)
 
     if (new_log_file == TR_BAD_SYS_FILE)
     {
-        fprintf(stderr, "Couldn't (re)open log file \"%s\": %s\n", filename, error->message);
-        tr_error_free(error);
+        fmt::print(stderr, "Couldn't (re)open log file '{:s}': {:s}\n", filename, error.message());
         return false;
     }
 
@@ -222,15 +221,14 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
     else // is_magnet
     {
         auto content = std::vector<char>{};
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         if (!tr_file_read(filename, content, &error))
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't read '{path}': {error} ({error_code})"),
                 fmt::arg("path", basename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
             retry = true;
         }
         else
@@ -261,18 +259,16 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
 
         if (test && trash)
         {
-            tr_error* error = nullptr;
-
             tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", basename)));
 
+            auto error = tr_error{};
             if (!tr_sys_path_remove(filename, &error))
             {
                 tr_logAddError(fmt::format(
                     _("Couldn't remove '{path}': {error} ({error_code})"),
                     fmt::arg("path", basename),
-                    fmt::arg("error", error->message),
-                    fmt::arg("error_code", error->code)));
-                tr_error_free(error);
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code())));
             }
         }
         else
@@ -720,7 +716,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     auto const sz_pid_filename = std::string{ sv };
     if (!std::empty(sz_pid_filename))
     {
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         tr_sys_file_t fp = tr_sys_file_open(
             sz_pid_filename.c_str(),
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
@@ -740,9 +736,8 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             tr_logAddError(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", sz_pid_filename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
         }
     }
 
@@ -930,11 +925,10 @@ EXIT_EARLY:
     return false;
 }
 
-void tr_daemon::handle_error(tr_error* error) const
+void tr_daemon::handle_error(tr_error const& error) const
 {
-    auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
+    auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error.message(), error.code());
     printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
-    tr_error_free(error);
 }
 
 int tr_main(int argc, char* argv[])
@@ -943,18 +937,19 @@ int tr_main(int argc, char* argv[])
 
     tr_locale_set_global("");
 
-    int ret;
-    tr_daemon daemon;
-    bool foreground;
-    tr_error* error = nullptr;
-
+    auto daemon = tr_daemon{};
+    auto foreground = bool{};
+    auto ret = int{};
     if (!daemon.init(argc, argv, &foreground, &ret))
     {
         return ret;
     }
+
+    auto error = tr_error{};
     if (!daemon.spawn(foreground, &ret, &error))
     {
         daemon.handle_error(error);
     }
+
     return ret;
 }
