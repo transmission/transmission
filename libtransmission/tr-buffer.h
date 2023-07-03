@@ -115,8 +115,7 @@ public:
             return n_sent;
         }
 
-        auto const err = sockerrno;
-        tr_error_set(error, err, tr_net_strerror(err));
+        tr_error_set_from_sockerrno(error, sockerrno);
         return {};
     }
 
@@ -201,7 +200,6 @@ public:
     {
         auto const [buf, buflen] = reserve_space(n_bytes);
         auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
-        auto const err = sockerrno;
 
         if (n_read > 0)
         {
@@ -217,7 +215,7 @@ public:
         }
         else
         {
-            tr_error_set(error, err, tr_net_strerror(err));
+            tr_error_set_from_sockerrno(error, sockerrno);
         }
 
         return {};
