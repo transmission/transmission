@@ -33,8 +33,16 @@ public:
         ensure_sz();
     }
 
-    tr_strbuf(tr_strbuf const& other) = delete;
-    tr_strbuf& operator=(tr_strbuf const& other) = delete;
+    tr_strbuf(tr_strbuf const& other)
+    {
+        assign(other.sv());
+    }
+
+    tr_strbuf& operator=(tr_strbuf const& other)
+    {
+        assign(other.sv());
+        return *this;
+    }
 
     tr_strbuf(tr_strbuf&& other)
         : buffer_{ std::move(other.buffer_) }
