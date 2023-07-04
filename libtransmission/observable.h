@@ -13,8 +13,6 @@
 #include <cstddef> // for size_t
 #include <functional>
 
-#include <fmt/core.h>
-
 #include <small/map.hpp>
 
 #include <libtransmission/tr-assert.h>
@@ -31,8 +29,20 @@ public:
     using Callback = std::function<void()>;
 
     ObserverTag() = default;
-    ObserverTag(ObserverTag&&) = default;
-    ObserverTag& operator=(ObserverTag&&) = default;
+
+    ObserverTag(ObserverTag&& that)
+    {
+        on_destroy_ = std::move(that.on_destroy_);
+        that.on_destroy_ = nullptr;
+    }
+
+    ObserverTag& operator=(ObserverTag&& that)
+    {
+        on_destroy_ = std::move(that.on_destroy_);
+        that.on_destroy_ = nullptr;
+        return *this;
+    }
+
     ObserverTag(ObserverTag const&) = delete;
     ObserverTag& operator=(ObserverTag const&) = delete;
 
@@ -65,7 +75,7 @@ public:
 
     ~SimpleObservable()
     {
-        TR_ASSERT_MSG(std::empty(observers_), fmt::print("observers size {:d}\n", std::size(observers_)));
+        TR_ASSERT(std::empty(observers_));
     }
 
     auto observe(Observer observer)
@@ -90,11 +100,11 @@ private:
     void remove(Key key)
     {
         [[maybe_unused]] auto const n_removed = observers_.erase(key);
-        TR_ASSERT_MSG(n_removed == 1U, fmt::print("n_removed is {:d}\n", n_removed));
+        TR_ASSERT(n_removed == 1U);
     }
 
     static auto inline next_key_ = Key{ 1U };
-    small::map<Key, Observer, 2> observers_;
+    small::map<Key, Observer, 64U> observers_;
 };
 
 } // namespace libtransmission
