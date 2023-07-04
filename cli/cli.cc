@@ -7,6 +7,7 @@
 #include <cstdlib> /* atoi () */
 #include <string>
 #include <string_view>
+#include <thread>
 
 #include <signal.h>
 
@@ -17,7 +18,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h> /* tr_wait() */
+#include <libtransmission/utils.h> // _()
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
@@ -273,7 +274,7 @@ int tr_main(int argc, char* argv[])
         waitingOnWeb = true;
         while (waitingOnWeb)
         {
-            tr_wait(1s);
+            std::this_thread::sleep_for(1s);
         }
     }
     else
@@ -315,7 +316,7 @@ int tr_main(int argc, char* argv[])
             "Error:",
         };
 
-        tr_wait(200ms);
+        std::this_thread::sleep_for(200ms);
 
         if (gotsig)
         {

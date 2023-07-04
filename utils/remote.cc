@@ -8,7 +8,6 @@
 #include <cctype> /* isspace */
 #include <cinttypes> // PRId64
 #include <cerrno>
-#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring> /* strcmp */
@@ -560,7 +559,7 @@ static int getOptMode(int val)
 
 static std::string getEncodedMetainfo(char const* filename)
 {
-    if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_loadFile(filename, contents))
+    if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_file_read(filename, contents))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
@@ -649,7 +648,7 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
 
     if (arg != nullptr)
     {
-        for (int& day : tr_parseNumberRange(arg))
+        for (int& day : tr_num_parse_range(arg))
         {
             if (day < 0 || day > 7)
             {
@@ -684,7 +683,7 @@ static void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
     }
 
     auto label = std::string_view{};
-    while (tr_strvSep(&comma_delimited_labels, &label, ','))
+    while (tr_strv_sep(&comma_delimited_labels, &label, ','))
     {
         tr_variantListAddStr(labels, label);
     }
@@ -707,7 +706,7 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 
     if (strcmp(arg, "all") != 0)
     {
-        for (auto const& idx : tr_parseNumberRange(arg))
+        for (auto const& idx : tr_num_parse_range(arg))
         {
             tr_variantListAddInt(files, idx);
         }

@@ -197,18 +197,18 @@ char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_variant
     return nullptr;
 }
 
-struct CompareTorrentByQueuePosition
+constexpr struct
 {
     constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
         return a->queuePosition < b->queuePosition;
     }
-};
+} CompareTorrentByQueuePosition{};
 
 char const* torrentStart(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
 {
     auto torrents = getTorrents(session, args_in);
-    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
+    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition);
     for (auto* tor : torrents)
     {
         if (!tor->is_running())
@@ -224,7 +224,7 @@ char const* torrentStart(tr_session* session, tr_variant* args_in, tr_variant* /
 char const* torrentStartNow(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
 {
     auto torrents = getTorrents(session, args_in);
-    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
+    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition);
     for (auto* tor : torrents)
     {
         if (!tor->is_running())
@@ -982,13 +982,13 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             continue;
         }
 
-        label = tr_strvStrip(label);
+        label = tr_strv_strip(label);
         if (std::empty(label))
         {
             return { {}, "labels cannot be empty" };
         }
 
-        if (tr_strvContains(label, ','))
+        if (tr_strv_contains(label, ','))
         {
             return { {}, "labels cannot contain comma (,) character" };
         }
@@ -1398,7 +1398,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     }
     else /* success */
     {
-        bool const is_open = tr_strvStartsWith(body, '1');
+        bool const is_open = tr_strv_starts_with(body, '1');
         tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
         tr_idle_function_done(data, SuccessResult);
     }
@@ -1466,7 +1466,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
     auto const filename = tr_pathbuf{ session->configDir(), "/blocklist.tmp"sv };
-    if (tr_error* error = nullptr; !tr_saveFile(filename, content, &error))
+    if (tr_error* error = nullptr; !tr_file_save(filename, content, &error))
     {
         tr_idle_function_done(
             data,
@@ -1773,7 +1773,7 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
 {
     auto name = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
-    name = tr_strvStrip(name);
+    name = tr_strv_strip(name);
     if (std::empty(name))
     {
         return "No group name given";
@@ -2181,7 +2181,14 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_download_dir_free_space:
-        tr_variantDictAddInt(d, key, tr_dirSpace(s->downloadDir()).free);
+        if (auto const capacity = tr_sys_path_get_capacity(s->downloadDir()); capacity)
+        {
+            tr_variantDictAddInt(d, key, capacity->free);
+        }
+        else
+        {
+            tr_variantDictAddInt(d, key, -1);
+        }
         break;
 
     case TR_KEY_download_queue_enabled:
@@ -2409,15 +2416,16 @@ char const* freeSpace(tr_session* /*session*/, tr_variant* args_in, tr_variant* 
 
     /* get the free space */
     auto const old_errno = errno;
-    errno = 0;
-    auto const dir_space = tr_dirSpace(path);
-    char const* const err = dir_space.free < 0 || dir_space.total < 0 ? tr_strerror(errno) : nullptr;
+    tr_error* error = nullptr;
+    auto const capacity = tr_sys_path_get_capacity(path, &error);
+    char const* const err = error != nullptr ? tr_strerror(error->code) : nullptr;
+    tr_error_clear(&error);
     errno = old_errno;
 
     /* response */
     tr_variantDictAddStr(args_out, TR_KEY_path, path);
-    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, dir_space.free);
-    tr_variantDictAddInt(args_out, TR_KEY_total_size, dir_space.total);
+    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, capacity ? capacity->free : -1);
+    tr_variantDictAddInt(args_out, TR_KEY_total_size, capacity ? capacity->total : -1);
     return err;
 }
 
@@ -2589,7 +2597,7 @@ void tr_rpc_request_exec_json(
  */
 void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 {
-    auto const values = tr_parseNumberRange(str);
+    auto const values = tr_num_parse_range(str);
     auto const value_count = std::size(values);
 
     if (value_count == 0)

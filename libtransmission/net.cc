@@ -8,7 +8,6 @@
 #include <climits>
 #include <cstdint>
 #include <cstring>
-#include <ctime>
 #include <iterator> // std::back_inserter
 #include <string_view>
 #include <utility> // std::pair
@@ -51,7 +50,7 @@ std::string tr_net_strerror(int err)
 
     auto buf = std::array<char, 512>{};
     (void)FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
-    return std::string{ tr_strvStrip(std::data(buf)) };
+    return std::string{ tr_strv_strip(std::data(buf)) };
 
 #else
 
@@ -64,7 +63,7 @@ std::string tr_net_strerror(int err)
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
 {
-    auto const needle = tr_strlower(tr_strvStrip(name));
+    auto const needle = tr_strlower(tr_strv_strip(name));
 
     for (auto const& [value, key] : Names)
     {
@@ -74,7 +73,7 @@ std::string tr_net_strerror(int err)
         }
     }
 
-    if (auto value = tr_parseNum<int>(needle); value)
+    if (auto value = tr_num_parse<int>(needle); value)
     {
         return tr_tos_t(*value);
     }

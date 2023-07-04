@@ -6,7 +6,6 @@
 #undef _GNU_SOURCE
 #define _GNU_SOURCE // NOLINT
 
-#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <climits> /* PATH_MAX */

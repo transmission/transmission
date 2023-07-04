@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <cstdlib> /* exit() */
 #include <cstring>
 #include <string_view>
@@ -73,14 +72,14 @@ void getopts_usage_line(tr_option const* const opt, size_t long_width, size_t sh
     auto len = get_next_line_len(description, d_width);
     fmt::print(FMT_STRING("{:s}\n"), description.substr(0, len));
     description.remove_prefix(len);
-    description = tr_strvStrip(description);
+    description = tr_strv_strip(description);
 
     auto const indent = std::string(d_indent, ' ');
     while ((len = get_next_line_len(description, d_width)) != 0)
     {
         fmt::print(FMT_STRING("{:s}{:s}\n"), indent, description.substr(0, len));
         description.remove_prefix(len);
-        description = tr_strvStrip(description);
+        description = tr_strv_strip(description);
     }
 }
 

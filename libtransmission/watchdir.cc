@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
-#include <set>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 

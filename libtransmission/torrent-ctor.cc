@@ -75,7 +75,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_err
         return false;
     }
 
-    if (!tr_loadFile(filename, ctor->contents, error))
+    if (!tr_file_read(filename, ctor->contents, error))
     {
         return false;
     }
@@ -126,7 +126,7 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_erro
         return false;
     }
 
-    return tr_saveFile(filename, ctor->contents, error);
+    return tr_file_save(filename, ctor->contents, error);
 }
 
 // ---

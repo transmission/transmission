@@ -11,7 +11,6 @@
 #include <cmath>
 #include <cstdint>
 #include <ctime> // time_t
-#include <deque>
 #include <map>
 #include <iterator> // std::back_inserter
 #include <memory>
@@ -1235,7 +1234,7 @@ namespace get_peers_helpers
 {
 
 /* better goes first */
-struct CompareAtomsByUsefulness
+constexpr struct
 {
     [[nodiscard]] constexpr static int compare(peer_atom const& a, peer_atom const& b) noexcept // <=>
     {
@@ -1266,7 +1265,7 @@ struct CompareAtomsByUsefulness
     {
         return compare(*a, *b) < 0;
     }
-};
+} CompareAtomsByUsefulness{};
 
 [[nodiscard]] bool isAtomInteresting(tr_torrent const* tor, peer_atom const& atom)
 {
@@ -1332,7 +1331,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         }
     }
 
-    std::sort(std::begin(atoms), std::end(atoms), CompareAtomsByUsefulness{});
+    std::sort(std::begin(atoms), std::end(atoms), CompareAtomsByUsefulness);
 
     // add the first N of them into our return list
 
@@ -2015,7 +2014,7 @@ void closePeer(tr_peer* peer)
     peer->swarm->removePeer(peer);
 }
 
-struct ComparePeerByActivity
+constexpr struct
 {
     [[nodiscard]] constexpr static int compare(tr_peer const* a, tr_peer const* b) // <=>
     {
@@ -2043,7 +2042,7 @@ struct ComparePeerByActivity
     {
         return compare(a, b) < 0;
     }
-};
+} ComparePeerByActivity{};
 
 [[nodiscard]] auto getPeersToClose(tr_swarm const* const swarm, time_t const now_sec)
 {
@@ -2081,7 +2080,7 @@ void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
 
     // close all but the `max` most active
     auto peers = swarm->peers;
-    std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity{});
+    std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity);
     std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
 }
 
@@ -2105,7 +2104,7 @@ void enforceSessionPeerLimit(tr_session* session)
     TR_ASSERT(tr_peerMsgs::size() == std::size(peers));
     if (std::size(peers) > max)
     {
-        std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity{});
+        std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity);
         std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
     }
 }

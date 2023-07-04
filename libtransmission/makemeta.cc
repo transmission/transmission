@@ -326,7 +326,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     // "There is also a key `length` or a key `files`, but not both or neither.
     // If length is present then the download represents a single file,
     // otherwise it represents a set of files which go in a directory structure."
-    if (file_count() == 1U && !tr_strvContains(path(0), '/'))
+    if (file_count() == 1U && !tr_strv_contains(path(0), '/'))
     {
         tr_variantDictAddInt(info_dict, TR_KEY_length, file_size(0));
     }
@@ -348,7 +348,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
             auto* const path_list = tr_variantDictAddList(file_dict, TR_KEY_path, 0);
             auto token = std::string_view{};
-            while (tr_strvSep(&subpath, &token, '/'))
+            while (tr_strv_sep(&subpath, &token, '/'))
             {
                 tr_variantListAddStr(path_list, token);
             }

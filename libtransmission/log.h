@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <ctime>
 #include <optional>
 #include <string>
@@ -68,8 +68,6 @@ struct tr_log_message
 // ---
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
-
-[[nodiscard]] bool tr_logGetQueueEnabled();
 
 void tr_logSetQueueEnabled(bool is_enabled);
 

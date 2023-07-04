@@ -8,6 +8,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
+#include <ctime>
 #include <memory>
 #include <string_view>
 #include <vector>

@@ -20,7 +20,7 @@
 #include "block-info.h"
 #include "file.h"
 #include "torrent-files.h"
-#include "utils.h" // for tr_saveFile()
+#include "utils.h" // for tr_file_save()
 
 class tr_metainfo_builder
 {
@@ -68,7 +68,7 @@ public:
     // generate the metainfo and save it to a torrent file
     bool save(std::string_view filename, tr_error** error = nullptr) const
     {
-        return tr_saveFile(filename, benc(error), error);
+        return tr_file_save(filename, benc(error), error);
     }
 
     /// setters

@@ -491,12 +491,12 @@ QMenu* MainWindow::createOptionsMenu()
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    std::array<QPair<QAction*, QString>, 4> const stats_modes = {
-        qMakePair(ui_.action_TotalRatio, total_ratio_stats_mode_name_),
-        qMakePair(ui_.action_TotalTransfer, total_transfer_stats_mode_name_),
-        qMakePair(ui_.action_SessionRatio, session_ratio_stats_mode_name_),
-        qMakePair(ui_.action_SessionTransfer, session_transfer_stats_mode_name_)
-    };
+    auto const stats_modes = std::array<std::pair<QAction*, QString>, 4>{ {
+        { ui_.action_TotalRatio, total_ratio_stats_mode_name_ },
+        { ui_.action_TotalTransfer, total_transfer_stats_mode_name_ },
+        { ui_.action_SessionRatio, session_ratio_stats_mode_name_ },
+        { ui_.action_SessionTransfer, session_transfer_stats_mode_name_ },
+    } };
 
     auto* action_group = new QActionGroup(this);
     auto* menu = new QMenu(this);

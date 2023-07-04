@@ -85,7 +85,7 @@ protected:
         {
             EXPECT_TRUE(tr_sys_path_exists(found->filename()));
             auto contents = std::vector<char>{};
-            return tr_loadFile(found->filename(), contents) &&
+            return tr_file_read(found->filename(), contents) &&
                 std::string_view{ std::data(contents), std::size(contents) } == str;
         }
 

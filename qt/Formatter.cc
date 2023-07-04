@@ -10,7 +10,6 @@
 #include "Speed.h"
 
 #include <algorithm>
-#include <array>
 
 Formatter& Formatter::get()
 {

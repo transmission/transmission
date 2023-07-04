@@ -12,7 +12,6 @@
 #include <array>
 #include <chrono>
 #include <cstdint> // uint64_t
-#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>

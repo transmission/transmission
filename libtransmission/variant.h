@@ -7,6 +7,7 @@
 
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <optional>
 #include <string>
 #include <string_view>
 

@@ -137,7 +137,7 @@ std::optional<std::string> tr_announce_list::announce_to_scrape(std::string_view
     }
 
     // some torrents with UDP announce URLs don't have /announce
-    if (tr_strvStartsWith(announce, "udp:"sv))
+    if (tr_strv_starts_with(announce, "udp:"sv))
     {
         return std::string{ announce };
     }
@@ -194,7 +194,7 @@ tr_tracker_tier_t tr_announce_list::get_tier(tr_tracker_tier_t tier, tr_url_pars
         auto const tracker_announce = tracker.announce.sv();
 
         // fast test to avoid tr_urlParse()ing most trackers
-        if (!tr_strvContains(tracker_announce, announce.host))
+        if (!tr_strv_contains(tracker_announce, announce.host))
         {
             return false;
         }
@@ -217,7 +217,7 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
         auto const tracker_announce = tracker.announce.sv();
 
         // fast test to avoid tr_urlParse()ing most trackers
-        if (!tr_strvContains(tracker_announce, announce.host))
+        if (!tr_strv_contains(tracker_announce, announce.host))
         {
             return false;
         }
@@ -275,7 +275,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
 
     // save it
-    return tr_saveFile(torrent_file, contents, error);
+    return tr_file_save(torrent_file, contents, error);
 }
 
 bool tr_announce_list::parse(std::string_view text)
@@ -285,14 +285,14 @@ bool tr_announce_list::parse(std::string_view text)
     auto current_tier = tr_tracker_tier_t{ 0 };
     auto current_tier_size = size_t{ 0 };
     auto line = std::string_view{};
-    while (tr_strvSep(&text, &line, '\n'))
+    while (tr_strv_sep(&text, &line, '\n'))
     {
-        if (tr_strvEndsWith(line, '\r'))
+        if (tr_strv_ends_with(line, '\r'))
         {
             line = line.substr(0, std::size(line) - 1);
         }
 
-        line = tr_strvStrip(line);
+        line = tr_strv_strip(line);
 
         if (std::empty(line))
         {

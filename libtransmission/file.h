@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
 #include <functional>
@@ -118,6 +117,12 @@ struct tr_sys_path_info
     }
 };
 
+struct tr_sys_path_capacity
+{
+    int64_t free = -1;
+    int64_t total = -1;
+};
+
 /**
  * @name Platform-specific wrapper functions
  *
@@ -159,6 +164,15 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
     std::string_view path,
     int flags = 0,
     tr_error** error = nullptr);
+
+/**
+ * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
+ *
+ * @param[in]  path  Path to directory.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
+ */
+[[nodiscard]] std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `access()`.

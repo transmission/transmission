@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <cstdint>
@@ -419,7 +418,7 @@ size_t tr_peerIo::try_read(size_t max)
 
     auto& buf = inbuf_;
     tr_error* error = nullptr;
-    auto const n_read = socket_.try_read(buf, max, &error);
+    auto const n_read = socket_.try_read(buf, max, std::empty(buf), &error);
     set_enabled(Dir, error == nullptr || canRetryFromError(error->code));
 
     if (error != nullptr)

@@ -10,14 +10,15 @@
 
 // --- Basic Types
 
-#include <stdbool.h> /* bool */
-#include <stddef.h> /* size_t */
-#include <stdint.h> /* uintN_t */
-#include <time.h> /* time_t */
+#include <stddef.h> // size_t
+#include <stdint.h> // uintN_t
+#include <time.h> // time_t
 
 #ifdef __cplusplus
 #include <string>
 #include <string_view>
+#else
+#include <stdbool.h> // bool
 #endif
 
 #include "tr-macros.h"
@@ -112,7 +113,7 @@ enum tr_encryption_mode
 [[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
 #endif
 
-/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strv_to_buf()`. */
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
@@ -127,7 +128,7 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
 [[nodiscard]] std::string tr_getDefaultDownloadDir();
 #endif
 
-/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strv_to_buf()`. */
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
@@ -980,7 +981,7 @@ uint64_t tr_torrentTotalSize(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
 #endif
 
-/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
 // --- Torrent speed limits
@@ -1085,7 +1086,7 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 // ---
@@ -1104,7 +1105,7 @@ size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buf
 [[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
@@ -1391,7 +1392,7 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**

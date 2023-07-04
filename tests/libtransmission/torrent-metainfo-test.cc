@@ -207,9 +207,9 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(src_filename.sv(), src_contents, &error));
+    EXPECT_TRUE(tr_file_read(src_filename.sv(), src_contents, &error));
     auto tgt_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(tgt_filename.sv(), tgt_contents, &error));
+    EXPECT_TRUE(tr_file_read(tgt_filename.sv(), tgt_contents, &error));
     EXPECT_EQ(src_contents, tgt_contents);
 
     // cleanup

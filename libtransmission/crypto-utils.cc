@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
-#include <functional>
 #include <iterator>
 #include <random>
 #include <string>
@@ -81,7 +80,7 @@ bool tr_ssha1_test(std::string_view text)
 {
     using namespace ssha1_impl;
 
-    return tr_strvStartsWith(text, SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
+    return tr_strv_starts_with(text, SaltedPrefix) && std::size(text) >= std::size(SaltedPrefix) + DigestStringSize;
 }
 
 bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
@@ -131,7 +130,7 @@ std::string tr_base64_encode(std::string_view input)
         std::data(buf),
         std::data(buf) + len,
         std::back_inserter(str),
-        [](auto ch) { return !tr_strvContains("\r\n"sv, ch); });
+        [](auto ch) { return !tr_strv_contains("\r\n"sv, ch); });
     return str;
 }
 

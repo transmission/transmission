@@ -91,7 +91,7 @@ bool isJunkFile(std::string_view filename)
 
 #ifdef __APPLE__
     // check for resource forks. <http://web.archive.org/web/20101010051608/http://support.apple.com/kb/TA20578>
-    if (tr_strvStartsWith(base, "._"sv))
+    if (tr_strv_starts_with(base, "._"sv))
     {
         return true;
     }
@@ -203,7 +203,7 @@ bool tr_torrent_files::move(
         }
 
         tr_logAddTrace(fmt::format(FMT_STRING("Moving file #{:d} to '{:s}'"), i, old_path, path), parent_name);
-        if (!tr_moveFile(old_path, path, error))
+        if (!tr_file_move(old_path, path, error))
         {
             err = true;
             break;
@@ -264,7 +264,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     {
         if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
         {
-            tr_moveFile(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
+            tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
         }
     }
 
@@ -362,7 +362,7 @@ namespace
     return std::any_of(
         std::begin(ReservedPrefixes),
         std::end(ReservedPrefixes),
-        [in_upper_sv](auto const& prefix) { return tr_strvStartsWith(in_upper_sv, prefix); });
+        [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
@@ -391,10 +391,10 @@ namespace
 void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 {
     // remove leading and trailing spaces
-    in = tr_strvStrip(in);
+    in = tr_strv_strip(in);
 
     // remove trailing periods
-    while (tr_strvEndsWith(in, '.'))
+    while (tr_strv_ends_with(in, '.'))
     {
         in.remove_suffix(1);
     }
@@ -417,7 +417,7 @@ void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 void tr_torrent_files::makeSubpathPortable(std::string_view path, tr_pathbuf& append_me)
 {
     auto segment = std::string_view{};
-    while (tr_strvSep(&path, &segment, '/'))
+    while (tr_strv_sep(&path, &segment, '/'))
     {
         appendSanitizedComponent(segment, append_me);
         append_me.append('/');

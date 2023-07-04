@@ -689,7 +689,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const creator = tr_strvStrip(infos.front().creator != nullptr ? infos.front().creator : "");
+        auto const creator = tr_strv_strip(infos.front().creator != nullptr ? infos.front().creator : "");
         auto const date = infos.front().date_created;
         auto const datestr = get_date_string(date);
         bool const mixed_creator = std::any_of(
