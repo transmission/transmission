@@ -20,13 +20,12 @@
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 
-#include <small/string.hpp>
-
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -139,10 +138,10 @@ void logAddImpl(
             return;
         }
 
-        auto timestr = std::array<char, 64>{};
+        auto timestr = std::array<char, 64U>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
 
-        auto buf = small::basic_string<char, 2048U>{};
+        auto buf = tr_strbuf<char, 2048U>{};
         if (std::empty(name))
         {
             fmt::format_to(std::back_inserter(buf), "[{:s}] {:s}", std::data(timestr), msg);
