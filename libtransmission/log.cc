@@ -20,6 +20,8 @@
 #include <fmt/chrono.h>
 #include <fmt/core.h>
 
+#include <small/string.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/file.h"
@@ -132,7 +134,6 @@ void logAddImpl(
     else
     {
         static auto const fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
-
         if (fp == TR_BAD_SYS_FILE)
         {
             return;
@@ -140,10 +141,17 @@ void logAddImpl(
 
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(
-            fp,
-            !std::empty(name) ? fmt::format(FMT_STRING("[{:s}] {:s}: {:s}"), std::data(timestr), name, msg) :
-                                fmt::format(FMT_STRING("[{:s}] {:s}"), std::data(timestr), msg));
+
+        auto buf = small::basic_string<char, 2048U>{};
+        if (std::empty(name))
+        {
+            fmt::format_to(std::back_inserter(buf), "[{:s}] {:s}", std::data(timestr), msg);
+        }
+        else
+        {
+            fmt::format_to(std::back_inserter(buf), "[{:s}] {:s}: {:s}", std::data(timestr), name, msg);
+        }
+        tr_sys_file_write_line(fp, buf);
         tr_sys_file_flush(fp);
     }
 #endif
