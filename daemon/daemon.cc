@@ -24,8 +24,6 @@
 
 #include <fmt/core.h>
 
-#include <small/string.hpp>
-
 #include "daemon.h"
 
 #include <libtransmission/timer-ev.h>
@@ -313,7 +311,7 @@ static void printMessage(
     std::string_view filename,
     long line)
 {
-    auto out = small::basic_string<char, 2048U>{};
+    auto out = tr_strbuf<char, 2048U>{};
 
     if (std::empty(name))
     {
