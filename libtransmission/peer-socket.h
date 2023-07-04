@@ -32,8 +32,8 @@ public:
     using OutBuf = libtransmission::BufferReader<std::byte>;
 
     tr_peer_socket() = default;
-    tr_peer_socket(tr_session const* session, std::pair<tr_address, tr_port> const& socket_address, tr_socket_t sock);
-    tr_peer_socket(std::pair<tr_address, tr_port> const& socket_address, struct UTPSocket* sock);
+    tr_peer_socket(tr_session const* session, std::pair<tr_address, tr_port> socket_address, tr_socket_t sock);
+    tr_peer_socket(std::pair<tr_address, tr_port> socket_address, struct UTPSocket* sock);
     tr_peer_socket(tr_peer_socket&& s) noexcept
     {
         *this = std::move(s);
@@ -142,7 +142,7 @@ public:
         struct UTPSocket* utp;
     } handle = {};
 
-    [[nodiscard]] static bool limit_reached(tr_session* const session) noexcept;
+    [[nodiscard]] static bool limit_reached(tr_session* session) noexcept;
 
 private:
     enum class Type

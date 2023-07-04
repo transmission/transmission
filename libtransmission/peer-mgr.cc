@@ -144,8 +144,8 @@ private:
  */
 struct peer_atom
 {
-    peer_atom(std::pair<tr_address, tr_port> const& socket_address_in, uint8_t flags_in, uint8_t from)
-        : socket_address{ socket_address_in }
+    peer_atom(std::pair<tr_address, tr_port> socket_address_in, uint8_t flags_in, uint8_t from)
+        : socket_address{ std::move(socket_address_in) }
         , fromFirst{ from }
         , fromBest{ from }
         , flags{ flags_in }
