@@ -311,14 +311,22 @@ static void printMessage(
     std::string_view filename,
     long line)
 {
-    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
-                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
+    auto out = tr_strbuf<char, 2048U>{};
+
+    if (std::empty(name))
+    {
+        fmt::format_to(std::back_inserter(out), "{:s} ({:s}:{:d})", message, filename, line);
+    }
+    else
+    {
+        fmt::format_to(std::back_inserter(out), "{:s} {:s} ({:s}:{:d})", name, message, filename, line);
+    }
 
     if (file != TR_BAD_SYS_FILE)
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, fmt::format(FMT_STRING("[{:s}] {:s} {:s}"), std::data(timestr), levelName(level), out));
+        tr_sys_file_write_line(file, fmt::format("[{:s}] {:s} {:s}", std::data(timestr), levelName(level), std::data(out)));
     }
 
 #ifdef HAVE_SYSLOG
