@@ -61,7 +61,7 @@ void logAddImpl(
     [[maybe_unused]] std::string_view file,
     [[maybe_unused]] long line,
     [[maybe_unused]] tr_log_level level,
-    std::string_view msg,
+    std::string&& msg,
     [[maybe_unused]] std::string_view name)
 {
     if (std::empty(msg))
@@ -110,7 +110,7 @@ void logAddImpl(
         auto* const newmsg = new tr_log_message{};
         newmsg->level = level;
         newmsg->when = tr_time();
-        newmsg->message = msg;
+        newmsg->message = std::move(msg);
         newmsg->file = file;
         newmsg->line = line;
         newmsg->name = name;
@@ -208,7 +208,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     return buf;
 }
 
-void tr_logAddMessage(char const* file, long line, tr_log_level level, std::string_view msg, std::string_view name)
+void tr_logAddMessage(char const* file, long line, tr_log_level level, std::string&& msg, std::string_view name)
 {
     TR_ASSERT(!std::empty(msg));
 
@@ -257,7 +257,7 @@ void tr_logAddMessage(char const* file, long line, tr_log_level level, std::stri
     }
 
     // log the messages
-    logAddImpl(filename, line, level, msg, name);
+    logAddImpl(filename, line, level, std::move(msg), name);
     if (last_one)
     {
         logAddImpl(

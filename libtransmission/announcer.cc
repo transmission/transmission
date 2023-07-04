@@ -771,7 +771,7 @@ void tr_logAddTrace_tier_announce_queue(tr_tier const* tier)
         fmt::format_to(std::back_inserter(buf), FMT_STRING("[{:d}:{:s}]"), i, tr_announce_event_get_string(events[i]));
     }
 
-    tr_logAddTraceTier(tier, buf);
+    tr_logAddTraceTier(tier, std::move(buf));
 }
 
 // higher priorities go to the front of the announce queue
@@ -876,7 +876,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     {
         tr_logAddErrorTier(
             tier,
-            fmt::format(_("Announce error: {error}"), fmt::arg("error", err)).append(fmt::format(" ({})", announce_url)));
+            fmt::format(_("Announce error: {error} ({url})"), fmt::arg("error", err), fmt::arg("url", announce_url)));
     }
     else
     {
@@ -886,12 +886,12 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
             tier,
             fmt::format(
                 tr_ngettext(
-                    "Announce error: {error} (Retrying in {count} second)",
-                    "Announce error: {error} (Retrying in {count} seconds)",
+                    "Announce error: {error} (Retrying in {count} second) ({url})",
+                    "Announce error: {error} (Retrying in {count} seconds) ({url})",
                     interval),
                 fmt::arg("error", err),
-                fmt::arg("count", interval))
-                .append(fmt::format(" ({})", announce_url)));
+                fmt::arg("count", interval),
+                fmt::arg("url", announce_url)));
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
