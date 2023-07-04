@@ -13,6 +13,7 @@
 #include "transmission.h"
 
 #include "announce-list.h"
+#include "crypto-utils.h"
 #include "tr-strbuf.h" // tr_urlbuf
 #include "utils.h" // tr_strv_convert_utf8()
 
@@ -58,12 +59,12 @@ public:
         return announce_list_;
     }
 
-    [[nodiscard]] constexpr std::string const& info_hash_string() const noexcept
+    [[nodiscard]] constexpr auto const& info_hash_string() const noexcept
     {
         return info_hash_str_;
     }
 
-    [[nodiscard]] constexpr std::string const& info_hash2_string() const noexcept
+    [[nodiscard]] constexpr auto const& info_hash2_string() const noexcept
     {
         return info_hash2_str_;
     }
@@ -80,7 +81,7 @@ protected:
     std::vector<std::string> webseed_urls_;
     tr_sha1_digest_t info_hash_ = {};
     tr_sha256_digest_t info_hash2_ = {};
-    std::string info_hash_str_;
-    std::string info_hash2_str_;
+    tr_sha1_string info_hash_str_;
+    tr_sha256_string info_hash2_str_;
     std::string name_;
 };
