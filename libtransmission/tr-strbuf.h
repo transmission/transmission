@@ -11,8 +11,6 @@
 
 #include <fmt/core.h>
 
-#include <small/string.hpp>
-
 /**
  * A memory buffer which uses a builtin array of N bytes, using heap
  * memory only if its string gets too big. Its main use case is building
@@ -318,17 +316,6 @@ struct fmt::formatter<tr_strbuf<Char, N>> : formatter<std::basic_string_view<Cha
     constexpr auto format(tr_strbuf<Char, N> const& strbuf, FormatContext& ctx) const
     {
         return formatter<std::basic_string_view<Char>, Char>::format(strbuf.sv(), ctx);
-    }
-};
-
-template<typename Char, size_t N>
-struct fmt::formatter<small::basic_string<Char, N>> : formatter<std::basic_string_view<Char>, Char>
-{
-    template<typename FormatContext>
-    constexpr auto format(small::basic_string<Char, N> const& strbuf, FormatContext& ctx) const
-    {
-        auto const sv = std::string_view{ std::data(strbuf), std::size(strbuf) };
-        return formatter<std::basic_string_view<Char>, Char>::format(sv, ctx);
     }
 };
 

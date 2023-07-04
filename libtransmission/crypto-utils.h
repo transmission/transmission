@@ -20,8 +20,6 @@
 
 #include "libtransmission/tr-strbuf.h"
 
-#include "small/string.hpp"
-
 /**
  * @addtogroup utils Utilities
  * @{
