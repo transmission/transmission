@@ -13,7 +13,6 @@
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -26,6 +25,8 @@
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
+
+#include <small/map.hpp>
 
 #include "libtransmission/transmission.h"
 
@@ -2248,7 +2249,7 @@ std::string_view tr_torrent::primary_mime_type() const
     // count up how many bytes there are for each mime-type in the torrent
     // NB: get_mime_type_for_filename() always returns the same ptr for a
     // mime_type, so its raw pointer can be used as a key.
-    auto size_per_mime_type = std::unordered_map<std::string_view, size_t>{};
+    auto size_per_mime_type = small::unordered_map<std::string_view, size_t, 256U>{};
     for (tr_file_index_t i = 0, n = this->file_count(); i < n; ++i)
     {
         auto const mime_type = tr_get_mime_type_for_filename(this->file_subpath(i));
