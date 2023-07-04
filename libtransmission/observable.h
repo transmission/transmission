@@ -15,7 +15,7 @@
 
 #include <small/map.hpp>
 
-#include <libtransmission/tr-assert.h>
+#include "tr-assert.h"
 
 namespace libtransmission
 {
