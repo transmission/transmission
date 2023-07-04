@@ -43,7 +43,9 @@ auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissi
 auto constexpr UpkeepInterval = 30min;
 auto constexpr RetryUpkeepInterval = 30s;
 
-bool cache_exists = false;
+// Normally there should only ever be 1 cache instance during the entire program execution
+// This is a counter only to cater for SessionTest.honorsSettings
+std::size_t cache_exists = 0;
 
 } // namespace
 
@@ -128,9 +130,6 @@ tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
     : mediator_{ mediator_in }
     , upkeep_timers_{ mediator_in.timer_maker().create(), mediator_in.timer_maker().create() }
 {
-    // Only 1 cache should exist during the whole lifetime of Transmission
-    TR_ASSERT(!cache_exists);
-
     static_assert(TR_AF_INET == 0);
     static_assert(TR_AF_INET6 == 1);
     static_assert(NUM_TR_AF_INET_TYPES == 2);
@@ -146,7 +145,7 @@ tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
         start_timer(type, UpkeepInterval);
     }
 
-    cache_exists = true;
+    ++cache_exists;
 }
 
 std::unique_ptr<tr_global_ip_cache> tr_global_ip_cache::create(tr_global_ip_cache::Mediator& mediator_in)
@@ -169,7 +168,7 @@ tr_global_ip_cache::~tr_global_ip_cache()
         tr_logAddDebug("Destructed while some global IP queries were pending.");
     }
 
-    cache_exists = false;
+    --cache_exists;
 }
 
 bool tr_global_ip_cache::try_shutdown() noexcept
@@ -245,7 +244,7 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
                                          [this, type](tr_web::FetchResponse const& response)
                                          {
                                              // Check to avoid segfault
-                                             if (cache_exists)
+                                             if (cache_exists != 0)
                                              {
                                                  this->on_response_ip_query(type, response);
                                              }
