@@ -318,14 +318,14 @@ public:
         : manager{ manager_in }
         , tor{ tor_in }
         , tags_{ {
-              tor->done_.observe([this](tr_torrent*, bool) { on_torrent_done(); }),
-              tor->doomed_.observe([this](tr_torrent*) { on_torrent_doomed(); }),
-              tor->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t p) { on_got_bad_piece(p); }),
-              tor->got_metainfo_.observe([this](tr_torrent*) { on_got_metainfo(); }),
-              tor->piece_completed_.observe([this](tr_torrent*, tr_piece_index_t p) { on_piece_completed(p); }),
-              tor->started_.observe([this](tr_torrent*) { on_torrent_started(); }),
-              tor->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }),
-              tor->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }),
+              tor_in->done_.observe([this](tr_torrent*, bool) { on_torrent_done(); }),
+              tor_in->doomed_.observe([this](tr_torrent*) { on_torrent_doomed(); }),
+              tor_in->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t p) { on_got_bad_piece(p); }),
+              tor_in->got_metainfo_.observe([this](tr_torrent*) { on_got_metainfo(); }),
+              tor_in->piece_completed_.observe([this](tr_torrent*, tr_piece_index_t p) { on_piece_completed(p); }),
+              tor_in->started_.observe([this](tr_torrent*) { on_torrent_started(); }),
+              tor_in->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }),
+              tor_in->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }),
           } }
     {
 
