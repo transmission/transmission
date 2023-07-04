@@ -324,9 +324,9 @@ struct tau_tracker
         }
         else if (action == TAU_ACTION_ERROR)
         {
-            std::string const errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
-            logdbg(this->key, errmsg);
+            std::string errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
             this->failAll(true, false, errmsg);
+            logdbg(this->key, std::move(errmsg));
         }
 
         this->upkeep();

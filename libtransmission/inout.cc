@@ -147,13 +147,13 @@ void readOrWriteBytes(
     if (!fd) // couldn't create/open it either
     {
         auto const err = errno;
-        auto const msg = fmt::format(
+        auto msg = fmt::format(
             _("Couldn't get '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
             fmt::arg("error", tr_strerror(err)),
             fmt::arg("error_code", err));
         tr_error_set(error, err, msg);
-        tr_logAddErrorTor(tor, msg);
+        tr_logAddErrorTor(tor, std::move(msg));
         return;
     }
 

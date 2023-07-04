@@ -89,7 +89,7 @@ void tr_logAddMessage(
     char const* source_file,
     long source_line,
     tr_log_level level,
-    std::string_view msg,
+    std::string&& msg,
     std::string_view module_name = {});
 
 #define tr_logAddLevel(level, ...) \
