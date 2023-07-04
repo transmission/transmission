@@ -75,6 +75,7 @@ target_sources(${TR_NAME}
         mime-types.h
         net.cc
         net.h
+        observable.h
         open-files.cc
         open-files.h
         peer-common.h

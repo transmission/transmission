@@ -720,7 +720,7 @@ void torrentStartImpl(tr_torrent* const tor)
     torrentResetTransferStats(tor);
     tor->session->announcer_->startTorrent(tor);
     tor->lpdAnnounceAt = now;
-    tr_peerMgrStartTorrent(tor);
+    tor->started_.emit(tor);
 }
 
 bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error** error)
@@ -763,7 +763,7 @@ void freeTorrent(tr_torrent* tor)
 
     tr_session* session = tor->session;
 
-    tr_peerMgrRemoveTorrent(tor);
+    tor->doomed_.emit(tor);
 
     session->announcer_->removeTorrent(tor);
 
@@ -869,7 +869,7 @@ void torrentStop(tr_torrent* const tor)
 
     tor->session->verifyRemove(tor);
 
-    tr_peerMgrStopTorrent(tor);
+    tor->stopped_.emit(tor);
     tor->session->announcer_->stopTorrent(tor);
 
     tor->session->closeTorrentFiles(tor);
@@ -1174,7 +1174,7 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     metainfo_ = std::move(tm);
 
     torrentInitFromInfoDict(this);
-    tr_peerMgrOnTorrentGotMetainfo(this);
+    got_metainfo_.emit(this);
     session->onMetadataCompleted(this);
     this->set_dirty();
     this->mark_edited();
@@ -1911,16 +1911,12 @@ void tr_torrent::recheck_completeness()
                 this->doneDate = tr_time();
             }
 
-            if (was_leeching && was_running)
-            {
-                /* clear interested flag on all peers */
-                tr_peerMgrClearInterest(this);
-            }
-
             if (this->current_dir() == this->incomplete_dir())
             {
                 this->set_location(this->download_dir(), true, nullptr, nullptr);
             }
+
+            done_.emit(this, recent_change);
         }
 
         this->session->onTorrentCompletenessChanged(this, completeness, was_running);
@@ -2168,7 +2164,7 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
     case tr_tracker_event::Type::Counts:
         if (is_private() && (event->leechers == 0))
         {
-            tr_peerMgrSetSwarmIsAllSeeds(this);
+            swarm_is_all_seeds_.emit(this);
         }
 
         break;
@@ -2318,7 +2314,10 @@ void onFileCompleted(tr_torrent* tor, tr_file_index_t i)
 
 void onPieceCompleted(tr_torrent* tor, tr_piece_index_t piece)
 {
-    tr_peerMgrPieceCompleted(tor, piece);
+    tor->piece_completed_.emit(tor, piece);
+
+    // bookkeeping
+    tor->set_needs_completeness_check();
 
     // if this piece completes any file, invoke the fileCompleted func for it
     auto const span = tor->fpm_.file_span(piece);
@@ -2338,7 +2337,7 @@ void onPieceFailed(tr_torrent* tor, tr_piece_index_t piece)
     auto const n = tor->piece_size(piece);
     tor->corruptCur += n;
     tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
-    tr_peerMgrGotBadPiece(tor, piece);
+    tor->got_bad_piece_.emit(tor, piece);
     tor->set_has_piece(piece, false);
 }
 } // namespace got_block_helpers

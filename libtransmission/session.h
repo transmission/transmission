@@ -38,6 +38,7 @@
 #include "global-ip-cache.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
+#include "observable.h"
 #include "open-files.h"
 #include "port-forwarding.h"
 #include "quark.h"
@@ -1113,6 +1114,10 @@ private:
 
     std::vector<libtransmission::Blocklist> blocklists_;
 
+public:
+    libtransmission::SimpleObservable<> blocklist_changed_;
+
+private:
     /// other fields
 
     // depends-on: session_thread_, settings_.bind_address_ipv4, local_peer_port_, global_ip_cache (via tr_session::bind_address())
@@ -1162,7 +1167,7 @@ public:
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
 private:
-    // depends-on: timer_maker_, top_bandwidth_, utp_context, torrents_, web_
+    // depends-on: timer_maker_, top_bandwidth_, utp_context, torrents_, web_, blocklist_changed_
     std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 
     // depends-on: peer_mgr_, advertised_peer_port_, torrents_

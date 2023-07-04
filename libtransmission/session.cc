@@ -1617,10 +1617,7 @@ void tr_sessionReloadBlocklists(tr_session* session)
 {
     session->blocklists_ = libtransmission::Blocklist::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
 
-    if (session->peer_mgr_)
-    {
-        tr_peerMgrOnBlocklistChanged(session->peer_mgr_.get());
-    }
+    session->blocklist_changed_.emit();
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)

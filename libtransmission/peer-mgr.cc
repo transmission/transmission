@@ -317,7 +317,18 @@ public:
     tr_swarm(tr_peerMgr* manager_in, tr_torrent* tor_in) noexcept
         : manager{ manager_in }
         , tor{ tor_in }
+        , tags_{ {
+              tor_in->done_.observe([this](tr_torrent*, bool) { on_torrent_done(); }),
+              tor_in->doomed_.observe([this](tr_torrent*) { on_torrent_doomed(); }),
+              tor_in->got_bad_piece_.observe([this](tr_torrent*, tr_piece_index_t p) { on_got_bad_piece(p); }),
+              tor_in->got_metainfo_.observe([this](tr_torrent*) { on_got_metainfo(); }),
+              tor_in->piece_completed_.observe([this](tr_torrent*, tr_piece_index_t p) { on_piece_completed(p); }),
+              tor_in->started_.observe([this](tr_torrent*) { on_torrent_started(); }),
+              tor_in->stopped_.observe([this](tr_torrent*) { on_torrent_stopped(); }),
+              tor_in->swarm_is_all_seeds_.observe([this](tr_torrent* /*tor*/) { on_swarm_is_all_seeds(); }),
+          } }
     {
+
         rebuildWebseeds();
     }
 
@@ -471,11 +482,6 @@ public:
         return *pool_is_all_seeds_;
     }
 
-    void markAllSeedsFlagDirty() noexcept
-    {
-        pool_is_all_seeds_.reset();
-    }
-
     [[nodiscard]] peer_atom* get_existing_atom(std::pair<tr_address, tr_port> const& socket_address) noexcept
     {
         auto&& it = pool.find(socket_address);
@@ -509,7 +515,7 @@ public:
             atom->flags |= flags;
         }
 
-        markAllSeedsFlagDirty();
+        mark_all_seeds_flag_dirty();
 
         return atom;
     }
@@ -518,7 +524,7 @@ public:
     {
         tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", atom.display_name()));
         atom.flags |= ADDED_F_SEED_FLAG;
-        markAllSeedsFlagDirty();
+        mark_all_seeds_flag_dirty();
     }
 
     static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs)
@@ -664,11 +670,107 @@ private:
         }
     }
 
+    void mark_all_seeds_flag_dirty() noexcept
+    {
+        pool_is_all_seeds_.reset();
+    }
+
+    void on_torrent_doomed()
+    {
+        auto const lock = tor->unique_lock();
+        stop();
+        tor->swarm = nullptr;
+        delete this;
+    }
+
+    void on_torrent_done()
+    {
+        std::for_each(std::begin(peers), std::end(peers), [](auto* const peer) { peer->set_interested(false); });
+    }
+
+    void on_swarm_is_all_seeds()
+    {
+        auto const lock = tor->unique_lock();
+
+        for (auto& [socket_address, atom] : pool)
+        {
+            mark_atom_as_seed(atom);
+        }
+
+        mark_all_seeds_flag_dirty();
+    }
+
+    void on_piece_completed(tr_piece_index_t piece)
+    {
+        bool piece_came_from_peers = false;
+
+        for (auto* const peer : peers)
+        {
+            // notify the peer that we now have this piece
+            peer->on_piece_completed(piece);
+
+            if (!piece_came_from_peers)
+            {
+                piece_came_from_peers = peer->blame.test(piece);
+            }
+        }
+
+        if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
+        {
+            tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->piece_size(piece));
+        }
+    }
+
+    void on_got_bad_piece(tr_piece_index_t piece)
+    {
+        auto const byte_count = tor->piece_size(piece);
+
+        for (auto* const peer : peers)
+        {
+            if (peer->blame.test(piece))
+            {
+                tr_logAddTraceSwarm(
+                    this,
+                    fmt::format(
+                        "peer {} contributed to corrupt piece ({}); now has {} strikes",
+                        peer->display_name(),
+                        piece,
+                        peer->strikes + 1));
+                addStrike(peer);
+            }
+        }
+
+        tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
+    }
+
+    void on_got_metainfo()
+    {
+        // the webseed list may have changed...
+        rebuildWebseeds();
+
+        // some peer_msgs' progress fields may not be accurate if we
+        // didn't have the metadata before now... so refresh them all...
+        for (auto* peer : peers)
+        {
+            peer->onTorrentGotMetainfo();
+
+            if (peer->isSeed())
+            {
+                mark_atom_as_seed(*peer->atom);
+            }
+        }
+    }
+
+    void on_torrent_started();
+    void on_torrent_stopped();
+
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
 
     // how long we'll let requests we've made linger before we cancel them
     static auto constexpr RequestTtlSecs = int{ 90 };
+
+    std::array<libtransmission::ObserverTag, 8> const tags_;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
@@ -683,6 +785,7 @@ struct tr_peerMgr
         , bandwidth_timer_{ session->timerMaker().create([this]() { bandwidthPulse(); }) }
         , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulseMarshall(); }) }
         , refill_upkeep_timer_{ session->timerMaker().create([this]() { refillUpkeep(); }) }
+        , blocklist_tag_{ session->blocklist_changed_.observe([this]() { on_blocklist_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthPeriod);
         rechoke_timer_->start_repeating(RechokePeriod);
@@ -734,9 +837,24 @@ private:
         rechoke_timer_->set_interval(RechokePeriod);
     }
 
+    void on_blocklist_changed() const
+    {
+        /* we cache whether or not a peer is blocklisted...
+           since the blocklist has changed, erase that cached value */
+        for (auto* const tor : session->torrents())
+        {
+            for (auto& [socket_address, atom] : tor->swarm->pool)
+            {
+                atom.setBlocklistedDirty();
+            }
+        }
+    }
+
     std::unique_ptr<libtransmission::Timer> const bandwidth_timer_;
     std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
     std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
+
+    libtransmission::ObserverTag const blocklist_tag_;
 
     static auto constexpr BandwidthPeriod = 500ms;
     static auto constexpr RechokePeriod = 10s;
@@ -783,21 +901,6 @@ tr_peerMgr* tr_peerMgrNew(tr_session* session)
 void tr_peerMgrFree(tr_peerMgr* manager)
 {
     delete manager;
-}
-
-// ---
-
-void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
-{
-    /* we cache whether or not a peer is blocklisted...
-       since the blocklist has changed, erase that cached value */
-    for (auto* const tor : mgr->session->torrents())
-    {
-        for (auto& [socket_address, atom] : tor->swarm->pool)
-        {
-            atom.setBlocklistedDirty();
-        }
-    }
 }
 
 // ---
@@ -941,30 +1044,6 @@ void tr_peerMgr::refillUpkeep() const
     {
         tor->swarm->cancelOldRequests();
     }
-}
-
-void tr_peerMgrPieceCompleted(tr_torrent* tor, tr_piece_index_t p)
-{
-    bool piece_came_from_peers = false;
-
-    for (auto* const peer : tor->swarm->peers)
-    {
-        // notify the peer that we now have this piece
-        peer->on_piece_completed(p);
-
-        if (!piece_came_from_peers)
-        {
-            piece_came_from_peers = peer->blame.test(p);
-        }
-    }
-
-    if (piece_came_from_peers) /* webseed downloads don't belong in announce totals */
-    {
-        tr_announcerAddBytes(tor, TR_ANN_DOWN, tor->piece_size(p));
-    }
-
-    // bookkeeping
-    tor->set_needs_completeness_check();
 }
 
 namespace
@@ -1122,20 +1201,6 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
 }
 
-void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
-{
-    auto const lock = tor->unique_lock();
-
-    auto* const swarm = tor->swarm;
-
-    for (auto& [socket_address, atom] : swarm->pool)
-    {
-        swarm->mark_atom_as_seed(atom);
-    }
-
-    swarm->markAllSeedsFlagDirty();
-}
-
 size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex)
 {
     size_t n_used = 0;
@@ -1204,29 +1269,6 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
 }
 
 // ---
-
-void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t piece_index)
-{
-    auto* const swarm = tor->swarm;
-    auto const byte_count = tor->piece_size(piece_index);
-
-    for (auto* const peer : swarm->peers)
-    {
-        if (peer->blame.test(piece_index))
-        {
-            tr_logAddTraceSwarm(
-                swarm,
-                fmt::format(
-                    "peer {} contributed to corrupt piece ({}); now has {} strikes",
-                    peer->display_name(),
-                    piece_index,
-                    peer->strikes + 1));
-            swarm->addStrike(peer);
-        }
-    }
-
-    tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byte_count);
-}
 
 namespace
 {
@@ -1354,23 +1396,16 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     return pex;
 }
 
-void tr_peerMgrStartTorrent(tr_torrent* tor)
+void tr_swarm::on_torrent_started()
 {
-    TR_ASSERT(tr_isTorrent(tor));
     auto const lock = tor->unique_lock();
-
-    tr_swarm* const swarm = tor->swarm;
-
-    swarm->is_running = true;
-
-    swarm->manager->rechokeSoon();
+    is_running = true;
+    manager->rechokeSoon();
 }
 
-void tr_peerMgrStopTorrent(tr_torrent* tor)
+void tr_swarm::on_torrent_stopped()
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->swarm->stop();
+    stop();
 }
 
 void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor)
@@ -1380,36 +1415,6 @@ void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor)
     TR_ASSERT(tor->swarm == nullptr);
 
     tor->swarm = new tr_swarm{ manager, tor };
-}
-
-void tr_peerMgrRemoveTorrent(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
-
-    tor->swarm->stop();
-    delete tor->swarm;
-    tor->swarm = nullptr;
-}
-
-void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
-{
-    auto* const swarm = tor->swarm;
-
-    /* the webseed list may have changed... */
-    swarm->rebuildWebseeds();
-
-    /* some peer_msgs' progress fields may not be accurate if we
-       didn't have the metadata before now... so refresh them all... */
-    for (auto* peer : swarm->peers)
-    {
-        peer->onTorrentGotMetainfo();
-
-        if (peer->isSeed())
-        {
-            swarm->mark_atom_as_seed(*peer->atom);
-        }
-    }
 }
 
 int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece)
@@ -1642,15 +1647,6 @@ tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, size_t* setme_count)
 
     *setme_count = n;
     return ret;
-}
-
-void tr_peerMgrClearInterest(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
-
-    auto& peers = tor->swarm->peers;
-    std::for_each(std::begin(peers), std::end(peers), [](auto* const peer) { peer->set_interested(false); });
 }
 
 namespace
