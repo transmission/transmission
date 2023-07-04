@@ -1352,11 +1352,12 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     for (size_t i = 0; i < std::size(atoms) && std::size(pex) < n; ++i)
     {
         auto const* const atom = atoms[i];
+        auto const& [addr, port] = atom->socket_address;
 
-        if (atom->addr().type == address_type)
+        if (addr.type == address_type)
         {
-            TR_ASSERT(atom->addr().is_valid());
-            pex.emplace_back(atom->addr(), atom->port(), atom->flags);
+            TR_ASSERT(addr.is_valid());
+            pex.emplace_back(addr, port, atom->flags);
         }
     }
 
@@ -2455,8 +2456,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     auto peer_io = tr_peerIo::new_outgoing(
         session,
         &session->top_bandwidth_,
-        atom.addr(),
-        atom.port(),
+        atom.socket_address,
         s->tor->info_hash(),
         s->tor->completeness == TR_SEED,
         utp);

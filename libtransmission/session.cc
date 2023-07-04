@@ -377,9 +377,10 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
 
     if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
     {
-        auto const& [addr, port, sock] = *incoming_info;
+        auto const& [socket_address, sock] = *incoming_info;
+        auto const& [addr, port] = socket_address;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.display_name(port)));
-        session->addIncoming(tr_peer_socket{ session, addr, port, sock });
+        session->addIncoming({ session, socket_address, sock });
     }
 }
 

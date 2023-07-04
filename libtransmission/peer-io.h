@@ -62,8 +62,7 @@ public:
     static std::shared_ptr<tr_peerIo> new_outgoing(
         tr_session* session,
         tr_bandwidth* parent,
-        tr_address const& addr,
-        tr_port port,
+        std::pair<tr_address, tr_port> const& socket_address,
         tr_sha1_digest_t const& info_hash,
         bool is_seed,
         bool utp);
