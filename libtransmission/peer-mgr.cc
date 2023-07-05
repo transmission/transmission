@@ -807,7 +807,7 @@ private:
     // Max number of outbound peer connections to initiate.
     // This throttle is an arbitrary number to avoid overloading routers.
     static auto constexpr MaxConnectionsPerSecond = size_t{ 18U };
-    static auto constexpr MaxConnectionsPerPulse = MaxConnectionsPerSecond * BandwidthTimerPeriod / 1s;
+    static auto constexpr MaxConnectionsPerPulse = size_t(MaxConnectionsPerSecond * BandwidthTimerPeriod / 1s);
 
     // Building a peer candidate list is expensive, so cache it across pulses.
     // We want to cache it long enough to avoid excess CPU cycles,
