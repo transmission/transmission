@@ -5,10 +5,11 @@
 
 #include <algorithm>
 #include <array>
-#include <cerrno> /* error codes ERANGE, ... */
+#include <atomic>
+#include <cerrno> // error codes ERANGE, ...
 #include <chrono>
-#include <climits> /* INT_MAX */
 #include <cmath>
+#include <cstddef> // std::byte
 #include <cstdint>
 #include <ctime> // time_t
 #include <map>
@@ -32,6 +33,7 @@
 #include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/handshake.h"
+#include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
@@ -39,11 +41,13 @@
 #include "libtransmission/peer-mgr-wishlist.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-msgs.h"
+#include "libtransmission/quark.h"
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
-#include "libtransmission/torrent.h"
 #include "libtransmission/torrent-magnet.h"
+#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/webseed.h"
@@ -1205,8 +1209,9 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
     else /* we don't have a connection to them yet... */
     {
+        auto sock_addr = tr_socket_address{ socket.socketAddress() };
         manager->incoming_handshakes.try_emplace(
-            socket.socketAddress(),
+            std::move(sock_addr),
             &manager->handshake_mediator_,
             tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),
