@@ -2544,7 +2544,7 @@ void tr_peerMgr::make_new_peer_connections()
 
     // initiate connections to the first N candidates
     auto const n_this_pass = std::min(std::size(peers), MaxConnectionsPerPulse);
-    for (size_t i = 0; i <= n_this_pass; ++i)
+    for (size_t i = 0; i < n_this_pass; ++i)
     {
         auto const& [tor_id, sock_addr] = peers[i];
         auto* const tor = session->torrents().get(tor_id);
