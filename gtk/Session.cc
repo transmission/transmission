@@ -46,7 +46,6 @@
 
 #include <algorithm>
 #include <cinttypes> // PRId64
-#include <cmath> // pow()
 #include <cstring> // strstr
 #include <functional>
 #include <iostream>

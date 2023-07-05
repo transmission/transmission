@@ -352,7 +352,7 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
     {
         if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
         {
-            if (auto d = tr_parseNum<double>(sv); d)
+            if (auto d = tr_num_parse<double>(sv); d)
             {
                 *setme = *d;
                 success = true;
@@ -1099,7 +1099,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view f
     auto const contents = tr_variantToStr(v, fmt);
 
     tr_error* error = nullptr;
-    tr_saveFile(filename, contents, &error);
+    tr_file_save(filename, contents, &error);
     if (error != nullptr)
     {
         tr_logAddError(fmt::format(
@@ -1139,7 +1139,7 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::stri
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
 
-    if (auto buf = std::vector<char>{}; tr_loadFile(filename, buf, error))
+    if (auto buf = std::vector<char>{}; tr_file_read(filename, buf, error))
     {
         return tr_variantFromBuf(setme, opts, buf, nullptr, error);
     }

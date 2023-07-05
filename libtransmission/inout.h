@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint32_t
 
 #include "transmission.h"

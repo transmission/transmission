@@ -5,7 +5,6 @@
 
 #include <algorithm> // std::copy_n()
 #include <cctype>
-#include <chrono>
 #include <cstdio> /* fprintf() */
 #include <iomanip>
 #include <iostream>
@@ -212,7 +211,7 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
         "&compact=1"
         "&supportcrypto=1",
         fmt::arg("url", req.announce_url),
-        fmt::arg("sep", tr_strvContains(req.announce_url.sv(), '?') ? '&' : '?'),
+        fmt::arg("sep", tr_strv_contains(req.announce_url.sv(), '?') ? '&' : '?'),
         fmt::arg("info_hash", std::data(escaped_info_hash)),
         fmt::arg("peer_id", std::string_view{ std::data(req.peer_id), std::size(req.peer_id) }),
         fmt::arg("port", req.port.host()),
@@ -521,7 +520,7 @@ void onScrapeDone(tr_web::FetchResponse const& web_response)
 void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const& req)
 {
     scrape_url = req.scrape_url.sv();
-    char delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
+    char delimiter = tr_strv_contains(scrape_url, '?') ? '&' : '?';
 
     for (int i = 0; i < req.info_hash_count; ++i)
     {

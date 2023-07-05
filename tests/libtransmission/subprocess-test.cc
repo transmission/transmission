@@ -97,7 +97,7 @@ TEST_P(SubprocessTest, SpawnAsyncMissingExec)
 TEST_P(SubprocessTest, SpawnAsyncArgs)
 {
     auto const result_path = buildSandboxPath("result.txt");
-    bool const allow_batch_metachars = TR_IF_WIN32(false, true) || !tr_strvEndsWith(tr_strlower(self_path_), ".cmd"sv);
+    bool const allow_batch_metachars = TR_IF_WIN32(false, true) || !tr_strv_ends_with(tr_strlower(self_path_), ".cmd"sv);
 
     auto const test_arg1 = std::string{ "arg1 " };
     auto const test_arg2 = std::string{ " arg2" };

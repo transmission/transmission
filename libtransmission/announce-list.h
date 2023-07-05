@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <optional>
 #include <string>
 #include <string_view>

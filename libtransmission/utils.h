@@ -59,30 +59,20 @@ void tr_locale_set_global(char const* locale_name) noexcept;
 
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
-/**
- * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
- * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
- */
-[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
 
-bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
+bool tr_file_move(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
 
-bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
 
 template<typename ContiguousRange>
-constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, tr_error** error = nullptr)
+constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error** error = nullptr)
 {
-    return tr_saveFile(filename, std::string_view{ std::data(x), std::size(x) }, error);
+    return tr_file_save(filename, std::string_view{ std::data(x), std::size(x) }, error);
 }
 
 /** @brief return the current date in milliseconds */
 [[nodiscard]] uint64_t tr_time_msec();
-
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
-
-template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* setme_remainder = nullptr);
 
 #ifdef _WIN32
 
@@ -138,38 +128,44 @@ template<typename T>
 
 // --- std::string_view utils
 
+/**
+ * @brief Rich Salz's classic implementation of shell-style pattern matching for `?`, `\`, `[]`, and `*` characters.
+ * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
+ */
+[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
+
 template<typename T>
-[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
+[[nodiscard]] constexpr bool tr_strv_contains(std::string_view sv, T key) noexcept // c++23
 {
     return sv.find(key) != std::string_view::npos;
 }
 
-[[nodiscard]] constexpr bool tr_strvStartsWith(std::string_view sv, char key) // c++20
+[[nodiscard]] constexpr bool tr_strv_starts_with(std::string_view sv, char key) // c++20
 {
     return !std::empty(sv) && sv.front() == key;
 }
 
-[[nodiscard]] constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c++20
+[[nodiscard]] constexpr bool tr_strv_starts_with(std::string_view sv, std::string_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
 }
 
-[[nodiscard]] constexpr bool tr_strvStartsWith(std::wstring_view sv, std::wstring_view key) // c++20
+[[nodiscard]] constexpr bool tr_strv_starts_with(std::wstring_view sv, std::wstring_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
 }
 
-[[nodiscard]] constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
+[[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, std::string_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
 }
 
-[[nodiscard]] constexpr bool tr_strvEndsWith(std::string_view sv, char key) // c++20
+[[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, char key) // c++20
 {
     return !std::empty(sv) && sv.back() == key;
 }
 
-constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
+constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
 {
     auto pos = sv->find(delim);
     auto const ret = sv->substr(0, pos);
@@ -177,18 +173,18 @@ constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
     return ret;
 }
 
-constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char delim)
+constexpr bool tr_strv_sep(std::string_view* sv, std::string_view* token, char delim)
 {
     if (std::empty(*sv))
     {
         return false;
     }
 
-    *token = tr_strvSep(sv, delim);
+    *token = tr_strv_sep(sv, delim);
     return true;
 }
 
-[[nodiscard]] std::string_view tr_strvStrip(std::string_view str);
+[[nodiscard]] std::string_view tr_strv_strip(std::string_view str);
 
 [[nodiscard]] std::string tr_strv_convert_utf8(std::string_view sv);
 
@@ -201,13 +197,15 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
  * - `src` will be copied into `buf` iff `buflen >= std::size(src)`
  * - `buf` will also be zero terminated iff `buflen >= std::size(src) + 1`.
  */
-size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
+size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen);
 
 // ---
 
-/** @brief return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1]
-    @return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1] */
-[[nodiscard]] double tr_getRatio(uint64_t numerator, uint64_t denominator);
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
+
+template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr);
 
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
@@ -216,7 +214,7 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-[[nodiscard]] std::vector<int> tr_parseNumberRange(std::string_view str);
+[[nodiscard]] std::vector<int> tr_num_parse_range(std::string_view str);
 
 /**
  * @brief truncate a double value at a given number of decimal places.
@@ -237,17 +235,13 @@ size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen);
 /* return a percent formatted string of either x.xx, xx.x or xxx */
 [[nodiscard]] std::string tr_strpercent(double x);
 
-/**
- * @param ratio    the ratio to convert to a string
- * @param infinity the string representation of "infinity"
- */
-[[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
+/** @brief return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1]
+    @return `TR_RATIO_NA`, `TR_RATIO_INF`, or a number in [0..1] */
+[[nodiscard]] double tr_getRatio(uint64_t numerator, uint64_t denominator);
 
-/**
- * @brief move a file
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_moveFile(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
+/** @param ratio    the ratio to convert to a string
+    @param infinity the string representation of "infinity" */
+[[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
 
 // ---
 

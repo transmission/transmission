@@ -147,13 +147,13 @@ void readOrWriteBytes(
     if (!fd) // couldn't create/open it either
     {
         auto const err = errno;
-        auto const msg = fmt::format(
+        auto msg = fmt::format(
             _("Couldn't get '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
             fmt::arg("error", tr_strerror(err)),
             fmt::arg("error_code", err));
         tr_error_set(error, err, msg);
-        tr_logAddErrorTor(tor, msg);
+        tr_logAddErrorTor(tor, std::move(msg));
         return;
     }
 
@@ -249,7 +249,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     auto& cache = tor->session->cache;
     auto const [begin_byte, end_byte] = tor->block_info().byte_span_for_piece(piece);
     auto const [begin_block, end_block] = tor->block_span_for_piece(piece);
-    auto n_bytes_checked = size_t{};
+    [[maybe_unused]] auto n_bytes_checked = size_t{};
     for (auto block = begin_block; block < end_block; ++block)
     {
         auto const block_loc = tor->block_loc(block);

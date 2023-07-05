@@ -170,7 +170,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = self.fPath.path;
 
-    auto const is_folder = self.fBuilder->file_count() > 1 || tr_strvContains(self.fBuilder->path(0), '/');
+    auto const is_folder = self.fBuilder->file_count() > 1 || tr_strv_contains(self.fBuilder->path(0), '/');
 
     NSImage* icon = [NSWorkspace.sharedWorkspace
         iconForFileType:is_folder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : self.fPath.pathExtension];

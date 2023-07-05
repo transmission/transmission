@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cerrno>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib> // for abort()
@@ -112,7 +111,7 @@ extern "C"
 class tr_dht_impl final : public tr_dht
 {
 private:
-    using Node = std::pair<tr_address, tr_port>;
+    using Node = tr_socket_address;
     using Nodes = std::deque<Node>;
     using Id = std::array<unsigned char, 20>;
 

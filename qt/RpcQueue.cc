@@ -39,7 +39,7 @@ void RpcQueue::stepFinished()
         }
 
         // run next request, if we have one to run and there was no error (or if we tolerate errors)
-        if ((result.success || tolerate_errors_) && !queue_.isEmpty())
+        if ((result.success || tolerate_errors_) && !std::empty(queue_))
         {
             runNext(future);
             return;
@@ -48,7 +48,7 @@ void RpcQueue::stepFinished()
     else
     {
         assert(!next_error_handler_);
-        assert(queue_.isEmpty());
+        assert(std::empty(queue_));
 
         // one way or another, the last step returned nothing.
         // assume it is OK and ensure that we're not going to give an empty response object to any of the next steps.
@@ -61,9 +61,11 @@ void RpcQueue::stepFinished()
 
 void RpcQueue::runNext(RpcResponseFuture const& response)
 {
-    assert(!queue_.isEmpty());
+    assert(!std::empty(queue_));
 
-    auto next = queue_.dequeue();
+    auto next = std::move(queue_.front());
+    queue_.pop();
+
     next_error_handler_ = next.second;
     future_watcher_.setFuture((next.first)(response));
 }

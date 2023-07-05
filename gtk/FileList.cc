@@ -552,7 +552,7 @@ void FileList::Impl::set_torrent(tr_torrent_id_t torrent_id)
 
                 auto path = std::string_view{ file.name };
                 auto token = std::string_view{};
-                while (tr_strvSep(&path, &token, '/'))
+                while (tr_strv_sep(&path, &token, '/'))
                 {
                     auto*& node = nodes[std::make_pair(parent, token)];
 

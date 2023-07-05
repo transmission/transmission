@@ -12,12 +12,10 @@
 #include <ctime>
 #include <future>
 #include <iterator> // for std::back_inserter
-#include <list>
 #include <memory>
 #include <numeric> // for std::accumulate()
 #include <string>
 #include <string_view>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -379,9 +377,10 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
 
     if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
     {
-        auto const& [addr, port, sock] = *incoming_info;
+        auto const& [socket_address, sock] = *incoming_info;
+        auto const& [addr, port] = socket_address;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.display_name(port)));
-        session->addIncoming(tr_peer_socket{ session, addr, port, sock });
+        session->addIncoming({ session, socket_address, sock });
     }
 }
 
@@ -1358,7 +1357,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     auto n_torrents = size_t{};
     auto const& folder = session->torrentDir();
 
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strvEndsWith(name, ".torrent"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".torrent"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
@@ -1369,11 +1368,11 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     }
 
     auto buf = std::vector<char>{};
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strvEndsWith(name, ".magnet"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".magnet"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
-        if (tr_loadFile(path, buf) &&
+        if (tr_file_read(path, buf) &&
             tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
             tr_torrentNew(ctor, nullptr) != nullptr)
         {
@@ -1619,10 +1618,7 @@ void tr_sessionReloadBlocklists(tr_session* session)
 {
     session->blocklists_ = libtransmission::Blocklist::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
 
-    if (session->peer_mgr_)
-    {
-        tr_peerMgrOnBlocklistChanged(session->peer_mgr_.get());
-    }
+    session->blocklist_changed_.emit();
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)

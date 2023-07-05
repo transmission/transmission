@@ -115,7 +115,7 @@ TEST_F(PlatformTest, webClientDirXdgDataHome)
     auto const expected = tr_pathbuf{ sandboxDir(), "/transmission/public_html"sv };
     auto const index_html = tr_pathbuf{ expected, "/index.html"sv };
     EXPECT_TRUE(tr_sys_dir_create(expected, TR_SYS_DIR_CREATE_PARENTS, 0777));
-    EXPECT_TRUE(tr_saveFile(index_html, "<html></html>"sv));
+    EXPECT_TRUE(tr_file_save(index_html, "<html></html>"sv));
 
     EXPECT_EQ(expected, tr_getWebClientDir(session_));
 

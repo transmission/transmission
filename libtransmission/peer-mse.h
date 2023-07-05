@@ -14,7 +14,6 @@
 #include <algorithm> // for std::copy_n()
 #include <array>
 #include <cstddef> // size_t, std::byte
-#include <memory>
 
 #include "tr-macros.h" // tr_sha1_digest_t
 #include "tr-arc4.h"

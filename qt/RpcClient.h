@@ -9,10 +9,10 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <unordered_map>
 
 #include <QFuture>
 #include <QFutureInterface>
-#include <QHash>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QObject>
@@ -93,7 +93,7 @@ private:
     QString session_id_;
     QUrl url_;
     QNetworkAccessManager* nam_ = {};
-    QHash<int64_t, QFutureInterface<RpcResponse>> local_requests_;
+    std::unordered_map<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     int64_t next_tag_ = {};
     bool const verbose_ = qEnvironmentVariableIsSet("TR_RPC_VERBOSE");
 };

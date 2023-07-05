@@ -491,7 +491,7 @@ void makeUrl(tr_webseed const* const webseed, std::string_view name, OutputIt ou
 
     out = std::copy(std::begin(url), std::end(url), out);
 
-    if (tr_strvEndsWith(url, "/"sv) && !std::empty(name))
+    if (tr_strv_ends_with(url, "/"sv) && !std::empty(name))
     {
         tr_urlPercentEncode(out, name, false);
     }

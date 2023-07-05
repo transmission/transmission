@@ -982,13 +982,13 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             continue;
         }
 
-        label = tr_strvStrip(label);
+        label = tr_strv_strip(label);
         if (std::empty(label))
         {
             return { {}, "labels cannot be empty" };
         }
 
-        if (tr_strvContains(label, ','))
+        if (tr_strv_contains(label, ','))
         {
             return { {}, "labels cannot contain comma (,) character" };
         }
@@ -1398,7 +1398,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     }
     else /* success */
     {
-        bool const is_open = tr_strvStartsWith(body, '1');
+        bool const is_open = tr_strv_starts_with(body, '1');
         tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
         tr_idle_function_done(data, SuccessResult);
     }
@@ -1466,7 +1466,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
     auto const filename = tr_pathbuf{ session->configDir(), "/blocklist.tmp"sv };
-    if (tr_error* error = nullptr; !tr_saveFile(filename, content, &error))
+    if (tr_error* error = nullptr; !tr_file_save(filename, content, &error))
     {
         tr_idle_function_done(
             data,
@@ -1773,7 +1773,7 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
 {
     auto name = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
-    name = tr_strvStrip(name);
+    name = tr_strv_strip(name);
     if (std::empty(name))
     {
         return "No group name given";
@@ -2597,7 +2597,7 @@ void tr_rpc_request_exec_json(
  */
 void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 {
-    auto const values = tr_parseNumberRange(str);
+    auto const values = tr_num_parse_range(str);
     auto const value_count = std::size(values);
 
     if (value_count == 0)

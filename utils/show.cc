@@ -324,7 +324,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
         // build the full scrape URL
         auto scrape_url = tr_urlbuf{ tracker.scrape.sv() };
-        auto delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
+        auto delimiter = tr_strv_contains(scrape_url, '?') ? '&' : '?';
         scrape_url.append(delimiter, "info_hash=");
         tr_urlPercentEncode(std::back_inserter(scrape_url), metainfo.info_hash());
         fmt::print("{:s} ... ", scrape_url);

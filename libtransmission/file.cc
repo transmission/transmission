@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -27,14 +26,8 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_er
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    bool ret = tr_sys_file_write(handle, std::data(buffer), std::size(buffer), nullptr, error);
-
-    if (ret)
-    {
-        ret = tr_sys_file_write(handle, std::data(NativeEol), std::size(NativeEol), nullptr, error);
-    }
-
-    return ret;
+    return tr_sys_file_write(handle, std::data(buffer), std::size(buffer), nullptr, error) &&
+        tr_sys_file_write(handle, std::data(NativeEol), std::size(NativeEol), nullptr, error);
 }
 
 std::vector<std::string> tr_sys_dir_get_files(

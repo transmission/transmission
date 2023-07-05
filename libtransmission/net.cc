@@ -8,7 +8,6 @@
 #include <climits>
 #include <cstdint>
 #include <cstring>
-#include <ctime>
 #include <iterator> // std::back_inserter
 #include <string_view>
 #include <utility> // std::pair
@@ -51,7 +50,7 @@ std::string tr_net_strerror(int err)
 
     auto buf = std::array<char, 512>{};
     (void)FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
-    return std::string{ tr_strvStrip(std::data(buf)) };
+    return std::string{ tr_strv_strip(std::data(buf)) };
 
 #else
 
@@ -64,7 +63,7 @@ std::string tr_net_strerror(int err)
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
 {
-    auto const needle = tr_strlower(tr_strvStrip(name));
+    auto const needle = tr_strlower(tr_strv_strip(name));
 
     for (auto const& [value, key] : Names)
     {
@@ -74,7 +73,7 @@ std::string tr_net_strerror(int err)
         }
     }
 
-    if (auto value = tr_parseNum<int>(needle); value)
+    if (auto value = tr_num_parse<int>(needle); value)
     {
         return tr_tos_t(*value);
     }
@@ -186,8 +185,10 @@ static tr_socket_t createSocket(int domain, int type)
     return sockfd;
 }
 
-tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed)
 {
+    auto const& [addr, port] = socket_address;
+
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
@@ -255,7 +256,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     }
     else
     {
-        ret = tr_peer_socket{ session, addr, port, s };
+        ret = tr_peer_socket{ session, socket_address, s };
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.display_name(port)));
@@ -360,7 +361,7 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
     return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
-std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
+std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
 {
     TR_ASSERT(session != nullptr);
 
@@ -383,7 +384,7 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
         return {};
     }
 
-    return std::make_tuple(addrport->first, addrport->second, sockfd);
+    return std::pair{ *addrport, sockfd };
 }
 
 void tr_net_close_socket(tr_socket_t sockfd)
@@ -597,9 +598,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
         return this->is_ipv4() ? 1 : -1;
     }
 
-    // in_addr_t is by definition uint32_t, so we convert it to int64_t,
-    // the smallest signed integer type that can contain all values of uint32_t.
-    return this->is_ipv4() ? static_cast<int>(int64_t{ ntohl(this->addr.addr4.s_addr) } - ntohl(that.addr.addr4.s_addr)) :
+    return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :
                              memcmp(&this->addr.addr6.s6_addr, &that.addr.addr6.s6_addr, sizeof(this->addr.addr6.s6_addr));
 }
 

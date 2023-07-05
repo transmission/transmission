@@ -6,15 +6,17 @@
 #pragma once
 
 #include <cstdint>
+#include <unordered_map>
 #include <vector>
 
 #include <QCoreApplication>
-#include <QHash>
 #include <QSet>
 #include <QString>
 #include <QVariant>
 
 #include <libtransmission/tr-macros.h>
+
+#include "Utils.h" // for std::hash<QString>
 
 class FileTreeItem
 {
@@ -91,15 +93,15 @@ private:
     void getSubtreeWantedSize(uint64_t& have, uint64_t& total) const;
     double progress() const;
     uint64_t size() const;
-    QHash<QString, int> const& getMyChildRows();
+    std::unordered_map<QString, int> const& getMyChildRows() const;
 
     FileTreeItem* parent_ = {};
-    QHash<QString, int> child_rows_;
+    mutable std::unordered_map<QString, int> child_rows_;
     std::vector<FileTreeItem*> children_;
     QString name_;
     uint64_t const total_size_ = {};
     uint64_t have_size_ = {};
-    int first_unhashed_row_ = {};
+    mutable int first_unhashed_row_ = {};
     int const file_index_ = {};
     int priority_ = {};
     bool is_wanted_ = {};

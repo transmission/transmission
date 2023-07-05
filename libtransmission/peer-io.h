@@ -62,8 +62,7 @@ public:
     static std::shared_ptr<tr_peerIo> new_outgoing(
         tr_session* session,
         tr_bandwidth* parent,
-        tr_address const& addr,
-        tr_port port,
+        tr_socket_address const& socket_address,
         tr_sha1_digest_t const& info_hash,
         bool is_seed,
         bool utp);
@@ -260,7 +259,7 @@ public:
         return socket_.address();
     }
 
-    [[nodiscard]] constexpr auto socket_address() const noexcept
+    [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
         return socket_.socketAddress();
     }

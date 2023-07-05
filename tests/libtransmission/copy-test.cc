@@ -70,7 +70,7 @@ private:
     {
         auto contents1 = std::vector<char>{};
         auto contents2 = std::vector<char>{};
-        return tr_loadFile(filename1, contents1) && tr_loadFile(filename2, contents2) && contents1 == contents2;
+        return tr_file_read(filename1, contents1) && tr_file_read(filename2, contents2) && contents1 == contents2;
     }
 };
 

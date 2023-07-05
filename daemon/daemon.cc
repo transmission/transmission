@@ -198,8 +198,8 @@ static std::string getConfigDir(int argc, char const* const* argv)
 static auto onFileAdded(tr_session const* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
-    auto const is_torrent = tr_strvEndsWith(lowercase, ".torrent"sv);
-    auto const is_magnet = tr_strvEndsWith(lowercase, ".magnet"sv);
+    auto const is_torrent = tr_strv_ends_with(lowercase, ".torrent"sv);
+    auto const is_magnet = tr_strv_ends_with(lowercase, ".magnet"sv);
 
     if (!is_torrent && !is_magnet)
     {
@@ -222,7 +222,7 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
     {
         auto content = std::vector<char>{};
         tr_error* error = nullptr;
-        if (!tr_loadFile(filename, content, &error))
+        if (!tr_file_read(filename, content, &error))
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't read '{path}': {error} ({error_code})"),
@@ -311,14 +311,22 @@ static void printMessage(
     std::string_view filename,
     long line)
 {
-    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
-                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
+    auto out = tr_strbuf<char, 2048U>{};
+
+    if (std::empty(name))
+    {
+        fmt::format_to(std::back_inserter(out), "{:s} ({:s}:{:d})", message, filename, line);
+    }
+    else
+    {
+        fmt::format_to(std::back_inserter(out), "{:s} {:s} ({:s}:{:d})", name, message, filename, line);
+    }
 
     if (file != TR_BAD_SYS_FILE)
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, fmt::format(FMT_STRING("[{:s}] {:s} {:s}"), std::data(timestr), levelName(level), out));
+        tr_sys_file_write_line(file, fmt::format("[{:s}] {:s} {:s}", std::data(timestr), levelName(level), std::data(out)));
     }
 
 #ifdef HAVE_SYSLOG

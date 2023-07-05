@@ -9,7 +9,7 @@
 
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port
-#include "libtransmission/utils.h" // for tr_strvStrip(), tr_strlower()
+#include "libtransmission/utils.h" // for tr_strv_strip(), tr_strlower()
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
@@ -93,7 +93,7 @@ std::optional<tr_encryption_mode> VariantConverter::load<tr_encryption_mode>(tr_
 
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
-        auto const needle = tr_strlower(tr_strvStrip(val));
+        auto const needle = tr_strlower(tr_strv_strip(val));
 
         for (auto const& [key, encryption] : Keys)
         {
@@ -133,7 +133,7 @@ std::optional<tr_log_level> VariantConverter::load<tr_log_level>(tr_variant* src
 
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
-        auto const needle = tr_strlower(tr_strvStrip(val));
+        auto const needle = tr_strlower(tr_strv_strip(val));
 
         for (auto const& [name, log_level] : Keys)
         {
@@ -171,7 +171,7 @@ std::optional<tr_mode_t> VariantConverter::load<tr_mode_t>(tr_variant* src)
 {
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
-        if (auto const mode = tr_parseNum<uint32_t>(val, nullptr, 8); mode)
+        if (auto const mode = tr_num_parse<uint32_t>(val, nullptr, 8); mode)
         {
             return static_cast<tr_mode_t>(*mode);
         }
@@ -219,7 +219,7 @@ std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mod
 
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
-        auto const needle = tr_strlower(tr_strvStrip(val));
+        auto const needle = tr_strlower(tr_strv_strip(val));
 
         for (auto const& [name, value] : Keys)
         {
@@ -321,7 +321,7 @@ std::optional<tr_verify_added_mode> VariantConverter::load<tr_verify_added_mode>
 
     if (auto val = std::string_view{}; tr_variantGetStrView(src, &val))
     {
-        auto const needle = tr_strlower(tr_strvStrip(val));
+        auto const needle = tr_strlower(tr_strv_strip(val));
 
         for (auto const& [name, value] : Keys)
         {
