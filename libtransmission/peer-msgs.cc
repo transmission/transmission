@@ -409,7 +409,7 @@ public:
         }
     }
 
-    [[nodiscard]] std::pair<tr_address, tr_port> socketAddress() const override
+    [[nodiscard]] tr_socket_address socketAddress() const override
     {
         return io->socket_address();
     }

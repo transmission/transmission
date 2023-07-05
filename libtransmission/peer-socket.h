@@ -32,8 +32,8 @@ public:
     using OutBuf = libtransmission::BufferReader<std::byte>;
 
     tr_peer_socket() = default;
-    tr_peer_socket(tr_session const* session, std::pair<tr_address, tr_port> socket_address, tr_socket_t sock);
-    tr_peer_socket(std::pair<tr_address, tr_port> socket_address, struct UTPSocket* sock);
+    tr_peer_socket(tr_session const* session, tr_socket_address socket_address, tr_socket_t sock);
+    tr_peer_socket(tr_socket_address socket_address, struct UTPSocket* sock);
     tr_peer_socket(tr_peer_socket&& s) noexcept
     {
         *this = std::move(s);
@@ -60,7 +60,7 @@ public:
     size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error** error) const;
     size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
 
-    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
+    [[nodiscard]] constexpr auto const& socketAddress() const noexcept
     {
         return socket_address_;
     }
@@ -152,14 +152,11 @@ private:
         UTP
     };
 
-    std::pair<tr_address, tr_port> socket_address_;
+    tr_socket_address socket_address_;
 
     enum Type type_ = Type::None;
 
     static inline std::atomic<size_t> n_open_sockets_ = {};
 };
 
-tr_peer_socket tr_netOpenPeerSocket(
-    tr_session* session,
-    std::pair<tr_address, tr_port> const& socket_address,
-    bool client_is_seed);
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed);

@@ -99,7 +99,7 @@ public:
         return is_active_[direction];
     }
 
-    [[nodiscard]] virtual std::pair<tr_address, tr_port> socketAddress() const = 0;
+    [[nodiscard]] virtual tr_socket_address socketAddress() const = 0;
 
     virtual void cancel_block_request(tr_block_index_t block) = 0;
 

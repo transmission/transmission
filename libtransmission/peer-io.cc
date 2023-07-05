@@ -112,7 +112,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_incoming(tr_session* session, tr_bandw
 std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     tr_session* session,
     tr_bandwidth* parent,
-    std::pair<tr_address, tr_port> const& socket_address,
+    tr_socket_address const& socket_address,
     tr_sha1_digest_t const& info_hash,
     bool is_seed,
     bool utp)
