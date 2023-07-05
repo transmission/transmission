@@ -2062,7 +2062,12 @@ constexpr struct
     {
         return compare(a, b) < 0;
     }
-} ComparePeerByActivity{};
+} ComparePeerByMostActive{};
+
+constexpr auto ComparePeerByLeastActive = [](tr_peer const* a, tr_peer const* b)
+{
+    return ComparePeerByMostActive(b, a);
+};
 
 [[nodiscard]] auto getPeersToClose(tr_swarm const* const swarm, time_t const now_sec)
 {
@@ -2091,15 +2096,21 @@ void closeBadPeers(tr_swarm* s, time_t const now_sec)
 void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
 {
     // do we have too many peers?
-    if (auto const n = swarm->peerCount(); n <= max)
+    auto const n = swarm->peerCount();
+    if (n <= max)
     {
         return;
     }
 
     // close all but the `max` most active
-    auto peers = swarm->peers;
-    std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity);
-    std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
+    auto peers = std::vector<tr_peerMsgs*>{ n - max };
+    std::partial_sort_copy(
+        std::begin(swarm->peers),
+        std::end(swarm->peers),
+        std::begin(peers),
+        std::end(peers),
+        ComparePeerByLeastActive);
+    std::for_each(std::begin(peers), std::end(peers), closePeer);
 }
 
 void enforceSessionPeerLimit(tr_session* session)
@@ -2122,7 +2133,7 @@ void enforceSessionPeerLimit(tr_session* session)
     TR_ASSERT(tr_peerMsgs::size() == std::size(peers));
     if (std::size(peers) > max)
     {
-        std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity);
+        std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByMostActive);
         std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
     }
 }
