@@ -878,12 +878,11 @@ private:
     static auto constexpr RechokePeriod = 10s;
     static auto constexpr RefillUpkeepPeriod = 10s;
 
-    // how frequently to decide which peers live and die
-    static auto constexpr ReconnectPeriodMsec = int{ 500 };
-
     // max number of peers to ask for per second overall.
     // this throttle is to avoid overloading the router
-    static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
+    static auto constexpr MaxConnectionsPerSecond = size_t{ 18 };
+
+    static auto constexpr MaxConnectionsPerPulse = MaxConnectionsPerSecond * 1s / BandwidthPeriod;
 };
 
 // --- tr_peer virtual functions
@@ -2172,8 +2171,7 @@ void tr_peerMgr::reconnectPulse()
     enforceSessionPeerLimit(session);
 
     // try to make new peer connections
-    auto const max_connections_per_pulse = int(MaxConnectionsPerSecond * (ReconnectPeriodMsec / 1000.0));
-    makeNewPeerConnections(max_connections_per_pulse);
+    makeNewPeerConnections(MaxConnectionsPerPulse);
 }
 
 // --- Bandwidth Allocation
@@ -2297,6 +2295,15 @@ namespace connect_helpers
 
 struct peer_candidate
 {
+    peer_candidate() = default;
+
+    peer_candidate(uint64_t score_in, tr_torrent* tor_in, peer_atom* atom_in)
+        : score{ score_in }
+        , tor{ tor_in }
+        , atom{ atom_in }
+    {
+    }
+
     uint64_t score;
     tr_torrent* tor;
     peer_atom* atom;
@@ -2423,7 +2430,7 @@ struct peer_candidate
         {
             if (isPeerCandidate(tor, atom, now))
             {
-                candidates.push_back({ getPeerCandidateScore(tor, atom, salter()), tor, &atom });
+                candidates.emplace_back(getPeerCandidateScore(tor, atom, salter()), tor, &atom);
             }
         }
     }
