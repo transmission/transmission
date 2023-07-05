@@ -2054,7 +2054,12 @@ constexpr struct
     {
         return compare(a, b) < 0;
     }
-} ComparePeerByActivity{};
+} ComparePeerByMostActive{};
+
+constexpr auto ComparePeerByLeastActive = [](tr_peer const* a, tr_peer const* b)
+{
+    return ComparePeerByMostActive(b, a);
+};
 
 [[nodiscard]] auto getPeersToClose(tr_swarm const* const swarm, time_t const now_sec)
 {
@@ -2098,7 +2103,7 @@ void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
         std::end(swarm->peers),
         std::begin(peers),
         std::end(peers),
-        [](auto const& a, auto const& b) { return ComparePeerByActivity(b, a); });
+        ComparePeerByLeastActive);
     std::for_each(std::begin(peers), std::end(peers), closePeer);
 }
 
@@ -2122,7 +2127,7 @@ void enforceSessionPeerLimit(tr_session* session)
     TR_ASSERT(tr_peerMsgs::size() == std::size(peers));
     if (std::size(peers) > max)
     {
-        std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByActivity);
+        std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByMostActive);
         std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
     }
 }
