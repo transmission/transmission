@@ -166,17 +166,17 @@ struct peer_atom
         return (flags & ADDED_F_SEED_FLAG) != 0;
     }
 
-    [[nodiscard]] auto const& addr() const
+    [[nodiscard]] constexpr auto const& addr() const noexcept
     {
         return socket_address.first;
     }
 
-    [[nodiscard]] auto& port()
+    [[nodiscard]] constexpr auto& port() noexcept
     {
         return socket_address.second;
     }
 
-    [[nodiscard]] auto const& port() const
+    [[nodiscard]] constexpr auto const& port() const noexcept
     {
         return socket_address.second;
     }
