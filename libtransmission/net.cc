@@ -185,8 +185,13 @@ static tr_socket_t createSocket(int domain, int type)
     return sockfd;
 }
 
-tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
+tr_peer_socket tr_netOpenPeerSocket(
+    tr_session* session,
+    std::pair<tr_address, tr_port> const& socket_address,
+    bool client_is_seed)
 {
+    auto const& [addr, port] = socket_address;
+
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
@@ -254,7 +259,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     }
     else
     {
-        ret = tr_peer_socket{ session, addr, port, s };
+        ret = tr_peer_socket{ session, socket_address, s };
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.display_name(port)));
@@ -359,7 +364,9 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
     return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
-std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
+std::optional<std::pair<std::pair<tr_address, tr_port>, tr_socket_t>> tr_netAccept(
+    tr_session* session,
+    tr_socket_t listening_sockfd)
 {
     TR_ASSERT(session != nullptr);
 
@@ -382,7 +389,7 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
         return {};
     }
 
-    return std::make_tuple(addrport->first, addrport->second, sockfd);
+    return std::pair{ *addrport, sockfd };
 }
 
 void tr_net_close_socket(tr_socket_t sockfd)

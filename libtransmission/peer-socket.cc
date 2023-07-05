@@ -18,16 +18,15 @@
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
 
-tr_peer_socket::tr_peer_socket(tr_session const* session, tr_address const& address, tr_port port, tr_socket_t sock)
+tr_peer_socket::tr_peer_socket(tr_session const* session, std::pair<tr_address, tr_port> socket_address, tr_socket_t sock)
     : handle{ sock }
-    , address_{ address }
-    , port_{ port }
+    , socket_address_{ std::move(socket_address) }
     , type_{ Type::TCP }
 {
     TR_ASSERT(sock != TR_BAD_SOCKET);
 
     ++n_open_sockets_;
-    session->setSocketTOS(sock, address_.type);
+    session->setSocketTOS(sock, address().type);
 
     if (auto const& algo = session->peerCongestionAlgorithm(); !std::empty(algo))
     {
@@ -37,9 +36,8 @@ tr_peer_socket::tr_peer_socket(tr_session const* session, tr_address const& addr
     tr_logAddTraceIo(this, fmt::format("socket (tcp) is {}", handle.tcp));
 }
 
-tr_peer_socket::tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock)
-    : address_{ address }
-    , port_{ port }
+tr_peer_socket::tr_peer_socket(std::pair<tr_address, tr_port> socket_address, struct UTPSocket* const sock)
+    : socket_address_{ std::move(socket_address) }
     , type_{ Type::UTP }
 {
     TR_ASSERT(sock != nullptr);

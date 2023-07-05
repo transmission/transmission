@@ -319,7 +319,7 @@ struct tr_session;
 
 tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs);
 
-[[nodiscard]] std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(
+[[nodiscard]] std::optional<std::pair<std::pair<tr_address, tr_port>, tr_socket_t>> tr_netAccept(
     tr_session* session,
     tr_socket_t listening_sockfd);
 

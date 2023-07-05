@@ -136,9 +136,8 @@ private:
  */
 struct peer_atom
 {
-    peer_atom(tr_address addr_in, tr_port port_in, uint8_t flags_in, uint8_t from)
-        : addr{ addr_in }
-        , port{ port_in }
+    peer_atom(std::pair<tr_address, tr_port> socket_address_in, uint8_t flags_in, uint8_t from)
+        : socket_address{ std::move(socket_address_in) }
         , fromFirst{ from }
         , fromBest{ from }
         , flags{ flags_in }
@@ -167,9 +166,24 @@ struct peer_atom
         return (flags & ADDED_F_SEED_FLAG) != 0;
     }
 
+    [[nodiscard]] auto const& addr() const
+    {
+        return socket_address.first;
+    }
+
+    [[nodiscard]] auto& port()
+    {
+        return socket_address.second;
+    }
+
+    [[nodiscard]] auto const& port() const
+    {
+        return socket_address.second;
+    }
+
     [[nodiscard]] auto display_name() const
     {
-        return addr.display_name(port);
+        return addr().display_name(port());
     }
 
     [[nodiscard]] bool isBlocklisted(tr_session const* session) const
@@ -179,7 +193,7 @@ struct peer_atom
             return *blocklisted_;
         }
 
-        auto const value = session->addressIsBlocked(addr);
+        auto const value = session->addressIsBlocked(addr());
         blocklisted_ = value;
         return value;
     }
@@ -273,9 +287,7 @@ struct peer_atom
         is_banned_ = true;
     }
 
-    tr_address const addr;
-
-    tr_port port = {};
+    std::pair<tr_address, tr_port> socket_address;
 
     uint16_t num_fails = {};
 
@@ -507,12 +519,10 @@ public:
 
     peer_atom* ensure_atom_exists(std::pair<tr_address, tr_port> const& socket_address, uint8_t const flags, uint8_t const from)
     {
-        auto const& [addr, port] = socket_address;
-
-        TR_ASSERT(addr.is_valid());
+        TR_ASSERT(socket_address.first.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
 
-        auto&& [atom_it, is_new] = pool.try_emplace(socket_address, addr, port, flags, from);
+        auto&& [atom_it, is_new] = pool.try_emplace(socket_address, socket_address, flags, from);
         peer_atom* atom = &atom_it->second;
         if (!is_new)
         {
@@ -596,7 +606,7 @@ public:
         case tr_peer_event::Type::ClientGotPort:
             if (peer->atom != nullptr)
             {
-                peer->atom->port = event.port;
+                peer->atom->port() = event.port;
             }
 
             break;
@@ -1217,7 +1227,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
         if (tr_isPex(pex) && /* safeguard against corrupt data */
             !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers())
         {
-            s->ensure_atom_exists(std::make_pair(pex->addr, pex->port), pex->flags, from);
+            s->ensure_atom_exists({ pex->addr, pex->port }, pex->flags, from);
             ++n_used;
         }
     }
@@ -1389,11 +1399,12 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     for (size_t i = 0; i < std::size(atoms) && std::size(pex) < n; ++i)
     {
         auto const* const atom = atoms[i];
+        auto const& [addr, port] = atom->socket_address;
 
-        if (atom->addr.type == address_type)
+        if (addr.type == address_type)
         {
-            TR_ASSERT(atom->addr.is_valid());
-            pex.emplace_back(atom->addr, atom->port, atom->flags);
+            TR_ASSERT(addr.is_valid());
+            pex.emplace_back(addr, port, atom->flags);
         }
     }
 
@@ -2220,8 +2231,8 @@ void tr_peerMgr::bandwidthPulse()
 
 bool tr_swarm::peer_is_in_use(peer_atom const& atom) const
 {
-    return atom.is_connected || outgoing_handshakes.count(std::make_pair(atom.addr, atom.port)) != 0U ||
-        manager->incoming_handshakes.count(std::make_pair(atom.addr, atom.port)) != 0U;
+    return atom.is_connected || outgoing_handshakes.count(atom.socket_address) != 0U ||
+        manager->incoming_handshakes.count(atom.socket_address) != 0U;
 }
 
 namespace
@@ -2446,8 +2457,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     auto peer_io = tr_peerIo::new_outgoing(
         session,
         &session->top_bandwidth_,
-        atom.addr,
-        atom.port,
+        atom.socket_address,
         s->tor->info_hash(),
         s->tor->completeness == TR_SEED,
         utp);
@@ -2461,7 +2471,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     else
     {
         s->outgoing_handshakes.try_emplace(
-            std::make_pair(atom.addr, atom.port),
+            atom.socket_address,
             &mgr->handshake_mediator_,
             peer_io,
             session->encryptionMode(),
