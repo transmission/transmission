@@ -609,7 +609,7 @@ public:
         return {};
     }
 
-    [[nodiscard]] constexpr auto const& id() const noexcept
+    [[nodiscard]] constexpr auto id() const noexcept
     {
         return unique_id_;
     }

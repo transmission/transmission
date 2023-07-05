@@ -50,14 +50,6 @@
 
 using namespace std::literals;
 
-// use for bitwise operations w/peer_atom.flags2
-static auto constexpr MyflagBanned = int{ 1 };
-
-// use for bitwise operations w/peer_atom.flags2
-// unreachable for now... but not banned.
-// if they try to connect to us it's okay
-static auto constexpr MyflagUnreachable = int{ 2 };
-
 static auto constexpr CancelHistorySec = int{ 60 };
 
 // ---
@@ -192,10 +184,25 @@ struct peer_atom
         return value;
     }
 
+    [[nodiscard]] constexpr auto is_unreachable() const noexcept
+    {
+        return is_unreachable_;
+    }
+
+    constexpr void set_unreachable() noexcept
+    {
+        is_unreachable_ = true;
+    }
+
+    constexpr void set_reachable() noexcept
+    {
+        is_unreachable_ = false;
+    }
+
     [[nodiscard]] constexpr int getReconnectIntervalSecs(time_t const now) const noexcept
     {
         auto sec = int{};
-        bool const unreachable = (this->flags2 & MyflagUnreachable) != 0;
+        auto const unreachable = is_unreachable();
 
         /* if we were recently connected to this peer and transferring piece
          * data, try to reconnect to them sooner rather that later -- we don't
@@ -256,19 +263,14 @@ struct peer_atom
         blocklisted_.reset();
     }
 
-    [[nodiscard]] constexpr std::optional<bool> isReachable() const
+    [[nodiscard]] constexpr auto is_banned() const noexcept
     {
-        if ((flags2 & MyflagUnreachable) != 0)
-        {
-            return false;
-        }
+        return is_banned_;
+    }
 
-        if ((flags & ADDED_F_CONNECTABLE) != 0)
-        {
-            return true;
-        }
-
-        return std::nullopt;
+    constexpr void ban() noexcept
+    {
+        is_banned_ = true;
     }
 
     tr_address const addr;
@@ -292,12 +294,15 @@ struct peer_atom
     bool is_connected = false;
 
 private:
-    mutable std::optional<bool> blocklisted_;
-
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 
     static auto inline n_atoms = std::atomic<size_t>{};
+
+    mutable std::optional<bool> blocklisted_;
+
+    bool is_banned_ = false;
+    bool is_unreachable_ = false; // we tried to connect & failed
 };
 
 using Handshakes = std::map<std::pair<tr_address, tr_port>, tr_handshake>;
@@ -448,7 +453,7 @@ public:
 
         if (++peer->strikes >= MaxBadPiecesPerPeer)
         {
-            peer->atom->flags2 |= MyflagBanned;
+            peer->atom->ban();
             peer->do_purge = true;
             tr_logAddTraceSwarm(this, fmt::format("banning peer {}", peer->display_name()));
         }
@@ -1111,7 +1116,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
                             "marking peer {} as unreachable... num_fails is {}",
                             atom->display_name(),
                             atom->num_fails));
-                    atom->flags2 |= MyflagUnreachable;
+                    atom->set_unreachable();
                 }
             }
         }
@@ -1127,7 +1132,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         if (!result.io->is_incoming())
         {
             atom->flags |= ADDED_F_CONNECTABLE;
-            atom->flags2 &= ~MyflagUnreachable;
+            atom->set_reachable();
         }
 
         /* In principle, this flag specifies whether the peer groks µTP,
@@ -1137,7 +1142,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
             atom->flags |= ADDED_F_UTP_FLAGS;
         }
 
-        if ((atom->flags2 & MyflagBanned) != 0)
+        if (atom->is_banned())
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", atom->display_name()));
         }
@@ -1326,7 +1331,7 @@ constexpr struct
         return false;
     }
 
-    if ((atom.flags2 & MyflagBanned) != 0)
+    if (atom.is_banned())
     {
         return false;
     }
@@ -2227,7 +2232,7 @@ namespace connect_helpers
 [[nodiscard]] bool isPeerCandidate(tr_torrent const* tor, peer_atom const& atom, time_t const now)
 {
     // have we already tried and failed to connect?
-    if (auto const reachable = atom.isReachable(); reachable && !*reachable)
+    if (atom.is_unreachable())
     {
         return false;
     }
@@ -2257,7 +2262,7 @@ namespace connect_helpers
     }
 
     // not if they're banned...
-    if ((atom.flags2 & MyflagBanned) != 0)
+    if (atom.is_banned())
     {
         return false;
     }
@@ -2450,7 +2455,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     if (!peer_io)
     {
         tr_logAddTraceSwarm(s, fmt::format("peerIo not created; marking peer {} as unreachable", atom.display_name()));
-        atom.flags2 |= MyflagUnreachable;
+        atom.set_unreachable();
         ++atom.num_fails;
     }
     else

@@ -123,7 +123,7 @@ public:
         return source_;
     }
 
-    [[nodiscard]] constexpr auto const& is_private() const noexcept
+    [[nodiscard]] constexpr auto is_private() const noexcept
     {
         return is_private_;
     }
