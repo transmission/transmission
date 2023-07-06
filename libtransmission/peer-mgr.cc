@@ -812,7 +812,7 @@ private:
     // Building a peer candidate list is expensive, so cache it across pulses.
     // We want to cache it long enough to avoid excess CPU cycles,
     // but short enough that the data isn't too stale.
-    static auto constexpr OutboundCandidatesListTtl = 2s;
+    static auto constexpr OutboundCandidatesListTtl = BandwidthTimerPeriod * 4U;
 
     // How big the candidate list should be when we create it.
     static auto constexpr OutboundCandidateListCapacity = MaxConnectionsPerPulse * OutboundCandidatesListTtl /
