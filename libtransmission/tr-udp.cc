@@ -4,7 +4,6 @@
 
 #include <array>
 #include <cerrno>
-#include <cstdint>
 #include <cstring> /* memcmp(), memset() */
 
 #include <event2/event.h>

@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <climits> // INT_MAX
 #include <cstdio>
 #include <ctime>
 #include <deque>

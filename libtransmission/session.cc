@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
-#include <climits> /* INT_MAX */
 #include <condition_variable>
 #include <csignal>
 #include <cstdint>
@@ -26,7 +25,6 @@
 
 #include <event2/event.h>
 
-#include <fmt/chrono.h>
 #include <fmt/format.h> // fmt::ptr
 
 #include "libtransmission/transmission.h"
@@ -36,8 +34,6 @@
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error-types.h"
-#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/log.h"

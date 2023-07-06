@@ -24,8 +24,6 @@
 
 #include <fmt/core.h>
 
-#include <libutp/utp.h>
-
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
@@ -36,7 +34,6 @@
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
 
 using namespace std::literals;
 

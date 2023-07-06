@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <climits> // SIZE_MAX
 #include <vector>
 
 #include "libtransmission/transmission.h"

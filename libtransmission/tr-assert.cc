@@ -3,14 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstdio>
-#include <cstdlib>
+#if !defined(NDEBUG) || defined(TR_FORCE_ASSERTIONS)
+
 #include <iostream>
 #include <string_view>
 
 #include "libtransmission/tr-assert.h"
-
-#if !defined(NDEBUG) || defined(TR_FORCE_ASSERTIONS)
 
 [[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message)
 {
