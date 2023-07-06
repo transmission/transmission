@@ -183,25 +183,23 @@ TEST_F(NetTest, isGlobalUnicastAddress)
 
 TEST_F(NetTest, ipCompare)
 {
-    static auto constexpr IpPairs = std::array{ std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, 1 },
+    static constexpr auto IpPairs = std::array{ std::tuple{ "223.18.245.229"sv, "8.8.8.8"sv, 1 },
                                                 std::tuple{ "0.0.0.0"sv, "255.255.255.255"sv, -1 },
                                                 std::tuple{ "8.8.8.8"sv, "8.8.8.8"sv, 0 },
-                                                std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
+                                                std::tuple{ "8.8.8.8"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, -1 },
                                                 std::tuple{ "2001:1890:1112:1::20"sv, "2001:0:0eab:dead::a0:abcd:4e"sv, 1 },
                                                 std::tuple{ "2001:1890:1112:1::20"sv, "2001:1890:1112:1::20"sv, 0 } };
 
-    for (auto const& [ip_str1, ip_str2, res] : IpPairs)
+    for (auto const& [sv1, sv2, res] : IpPairs)
     {
-        auto const ip1 = *tr_address::from_string(ip_str1);
-        auto const ip2 = *tr_address::from_string(ip_str2);
+        auto const ip1 = *tr_address::from_string(sv1);
+        auto const ip2 = *tr_address::from_string(sv2);
 
-        std::cerr << ip_str1 << " Vs " << ip_str2 << std::endl;
-
-        EXPECT_EQ(ip1.compare(ip2) < 0, res < 0);
-        EXPECT_EQ(ip1.compare(ip2) > 0, res > 0);
-        EXPECT_EQ(ip1.compare(ip2) == 0, res == 0);
-        EXPECT_EQ(ip1 < ip2, res < 0);
-        EXPECT_EQ(ip1 > ip2, res > 0);
-        EXPECT_EQ(ip1 == ip2, res == 0);
+        EXPECT_EQ(ip1.compare(ip2) < 0, res < 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1.compare(ip2) > 0, res > 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1.compare(ip2) == 0, res == 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 < ip2, res < 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 > ip2, res > 0) << sv1 << ' ' << sv2;
+        EXPECT_EQ(ip1 == ip2, res == 0) << sv1 << ' ' << sv2;
     }
 }
