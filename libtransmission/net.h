@@ -223,7 +223,7 @@ struct tr_address
     template<typename OutputIt>
     OutputIt to_compact(OutputIt out, tr_port port)
     {
-        return is_ipv4() ? to_compact_4(out, &this->addr.addr4, port) : to_compact_ipv6(out, &this->addr.addr6, port);
+        return is_ipv4() ? to_compact_ipv4(out, &this->addr.addr4, port) : to_compact_ipv6(out, &this->addr.addr6, port);
     }
 
     // compact sockaddr helpers
