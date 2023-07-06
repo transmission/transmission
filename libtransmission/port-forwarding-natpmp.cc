@@ -5,7 +5,6 @@
 
 #include <array>
 #include <cerrno>
-#include <cstdint> // uint32_t
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 

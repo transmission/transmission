@@ -12,7 +12,6 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/error-types.h"
 #include "libtransmission/error.h"
 #include "libtransmission/magnet-metainfo.h"
 #include "libtransmission/session.h"

@@ -7,7 +7,6 @@
 #include <array>
 #include <cerrno> // EINVAL
 #include <climits> /* INT_MAX */
-#include <csignal> /* signal() */
 #include <ctime>
 #include <map>
 #include <sstream>

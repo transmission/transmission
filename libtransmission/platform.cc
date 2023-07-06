@@ -43,7 +43,6 @@
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/session.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

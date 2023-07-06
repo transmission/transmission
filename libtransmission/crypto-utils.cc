@@ -10,7 +10,6 @@
 #include <random>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <vector>
 
 extern "C"
@@ -25,7 +24,6 @@ extern "C"
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

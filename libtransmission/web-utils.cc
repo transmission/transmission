@@ -7,7 +7,6 @@
 #include <array>
 #include <cctype>
 #include <cstdlib> // for strtoul()
-#include <cstddef>
 #include <limits>
 #include <optional>
 #include <string>

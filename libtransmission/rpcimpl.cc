@@ -22,7 +22,6 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announcer.h"
-#include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
@@ -30,7 +29,6 @@
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
-#include "libtransmission/session-id.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"

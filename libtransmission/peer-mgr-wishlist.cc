@@ -14,7 +14,6 @@
 
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
 #include "libtransmission/peer-mgr-wishlist.h"
-#include "libtransmission/tr-assert.h"
 
 namespace
 {
