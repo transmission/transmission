@@ -17,6 +17,7 @@
 #include <memory>
 #include <optional>
 #include <tuple> // std::tie
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -671,7 +672,7 @@ public:
 
     // tr_peers hold pointers to the items in this container,
     // therefore references to elements within cannot invalidate
-    std::map<tr_socket_address, peer_atom> pool;
+    std::unordered_map<tr_socket_address, peer_atom> pool;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
