@@ -272,8 +272,6 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
-        tr_net_init();
-
         int const opt_on = 1;
 
         static_assert(AnnounceScope > 0);

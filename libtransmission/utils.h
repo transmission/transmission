@@ -10,6 +10,7 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
 #include <ctime> // time_t
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -340,4 +341,20 @@ void tr_formatter_get_units(void* dict);
 
 // ---
 
-void tr_net_init();
+class tr_net_init_mgr
+{
+private:
+    tr_net_init_mgr();
+    TR_DISABLE_COPY_MOVE(tr_net_init_mgr)
+
+public:
+    ~tr_net_init_mgr();
+    static std::unique_ptr<tr_net_init_mgr> create();
+
+private:
+    static bool initialised;
+};
+
+/** @brief Initialise libtransmission for each app
+ *  @return A manager object to be kept in scope of main() */
+std::unique_ptr<tr_net_init_mgr> tr_lib_init();

@@ -113,8 +113,6 @@ unsigned long thread_current_id()
 
 void initEvthreadsOnce()
 {
-    tr_net_init();
-
     evthread_lock_callbacks constexpr LockCbs{
         EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
     };
