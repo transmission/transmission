@@ -325,10 +325,16 @@ public:
     std::size_t operator()(tr_socket_address const& socket_address) const noexcept
     {
         auto const& [addr, port] = socket_address;
-        return ip_hash(addr) * port_hash(port);
+        return hash_combine(ip_hash(addr), port_hash(port));
     }
 
 private:
+    // https://stackoverflow.com/a/27952689/11390656
+    [[nodiscard]] static std::size_t hash_combine(std::size_t const& a, std::size_t const& b)
+    {
+        return a ^ (b + 0x9e3779b9U + (a << 6U) + (a >> 2U));
+    }
+
     [[nodiscard]] static std::size_t ip_hash(tr_address const& addr) noexcept
     {
         switch (addr.type)
