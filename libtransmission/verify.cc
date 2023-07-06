@@ -37,24 +37,19 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
     // higher priority comes before lower priority
     auto const pa = tr_torrentGetPriority(torrent);
     auto const pb = tr_torrentGetPriority(that.torrent);
-    if (pa != pb)
+    if (auto const val = tr_compare_3way(pa, pb); val != 0)
     {
-        return pa > pb ? -1 : 1;
+        return -val;
     }
 
     // smaller torrents come before larger ones because they verify faster
-    if (current_size != that.current_size)
+    if (auto const val = tr_compare_3way(current_size, that.current_size); val != 0)
     {
-        return current_size < that.current_size ? -1 : 1;
+        return val;
     }
 
     // tertiary compare just to ensure they don't compare equal
-    if (torrent->id() != that.torrent->id())
-    {
-        return torrent->id() < that.torrent->id() ? -1 : 1;
-    }
-
-    return 0;
+    return tr_compare_3way(torrent->id(), that.torrent->id());
 }
 
 bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& stop_flag)
