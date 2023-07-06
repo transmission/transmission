@@ -1317,22 +1317,17 @@ constexpr struct
 {
     [[nodiscard]] constexpr static int compare(peer_atom const& a, peer_atom const& b) noexcept // <=>
     {
-        if (a.piece_data_time != b.piece_data_time)
+        if (auto const val = tr_compare_3way(a.piece_data_time, b.piece_data_time); val != 0)
         {
-            return a.piece_data_time > b.piece_data_time ? -1 : 1;
+            return -val;
         }
 
-        if (a.fromBest != b.fromBest)
+        if (auto const val = tr_compare_3way(a.fromBest, b.fromBest); val != 0)
         {
-            return a.fromBest < b.fromBest ? -1 : 1;
+            return val;
         }
 
-        if (a.num_fails != b.num_fails)
-        {
-            return a.num_fails < b.num_fails ? -1 : 1;
-        }
-
-        return 0;
+        return tr_compare_3way(a.num_fails, b.num_fails);
     }
 
     [[nodiscard]] constexpr bool operator()(peer_atom const& a, peer_atom const& b) const noexcept
@@ -1775,9 +1770,10 @@ struct ChokeData
 
     [[nodiscard]] constexpr auto compare(ChokeData const& that) const noexcept // <=>
     {
-        if (this->rate != that.rate) // prefer higher overall speeds
+        // prefer higher overall speeds
+        if (auto const val = tr_compare_3way(this->rate, that.rate); val != 0)
         {
-            return this->rate > that.rate ? -1 : 1;
+            return -val;
         }
 
         if (this->was_choked != that.was_choked) // prefer unchoked
@@ -1785,12 +1781,7 @@ struct ChokeData
             return this->was_choked ? 1 : -1;
         }
 
-        if (this->salt != that.salt) // random order
-        {
-            return this->salt < that.salt ? -1 : 1;
-        }
-
-        return 0;
+        return tr_compare_3way(this->salt, that.salt);
     }
 
     [[nodiscard]] constexpr auto operator<(ChokeData const& that) const noexcept
@@ -2058,18 +2049,13 @@ constexpr struct
         }
 
         /* the one to give us data more recently goes first */
-        if (a->atom->piece_data_time != b->atom->piece_data_time)
+        if (auto const val = tr_compare_3way(a->atom->piece_data_time, b->atom->piece_data_time); val != 0)
         {
-            return a->atom->piece_data_time > b->atom->piece_data_time ? -1 : 1;
+            return -val;
         }
 
         /* the one we connected to most recently goes first */
-        if (a->atom->time != b->atom->time)
-        {
-            return a->atom->time > b->atom->time ? -1 : 1;
-        }
-
-        return 0;
+        return -tr_compare_3way(a->atom->time, b->atom->time);
     }
 
     [[nodiscard]] constexpr bool operator()(tr_peer const* a, tr_peer const* b) const // less than
