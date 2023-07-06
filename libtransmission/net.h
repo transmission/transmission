@@ -355,9 +355,9 @@ private:
         return PortHasher(port.host());
     }
 
-    constexpr static std::hash<in_addr_t> IPv4Hasher{};
+    constexpr static std::hash<uint32_t> IPv4Hasher{};
     constexpr static std::hash<std::string_view> IPv6Hasher{};
-    constexpr static std::hash<in_port_t> PortHasher{};
+    constexpr static std::hash<uint16_t> PortHasher{};
 };
 
 // --- Sockets
