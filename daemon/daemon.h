@@ -6,14 +6,15 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
-#include <libtransmission/transmission.h>
+#include <unistd.h>
+
 #include <libtransmission/variant.h>
-#include <libtransmission/error.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/file.h>
-#include <libtransmission/log.h>
+
+struct tr_error;
+struct tr_session;
 
 class tr_daemon
 {
