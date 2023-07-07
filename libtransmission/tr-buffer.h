@@ -15,8 +15,6 @@
 
 #include <small/vector.hpp>
 
-#include <fmt/core.h>
-
 #include "error.h"
 #include "net.h" // tr_socket_t
 #include "utils.h" // for tr_htonll(), tr_ntohll()
