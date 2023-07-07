@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <algorithm> // std::move
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <future>
@@ -14,13 +13,16 @@
 #include <utility> // std::pair
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "block-info.h"
-#include "file.h"
-#include "torrent-files.h"
-#include "utils.h" // for tr_file_save()
+#include "libtransmission/announce-list.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/file.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/utils.h" // for tr_file_save()
+
+struct tr_error;
 
 class tr_metainfo_builder
 {
