@@ -7,6 +7,7 @@
 #include <array>
 #include <bitset>
 #include <cerrno>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <iterator>
@@ -14,6 +15,8 @@
 #include <memory> // std::unique_ptr
 #include <optional>
 #include <queue>
+#include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -22,10 +25,12 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/file.h"
+#include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
+#include "libtransmission/peer-common.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-msgs.h"
@@ -36,10 +41,13 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-dht.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
+
+struct peer_atom;
+struct tr_error;
 
 #ifndef EBADMSG
 #define EBADMSG EINVAL
