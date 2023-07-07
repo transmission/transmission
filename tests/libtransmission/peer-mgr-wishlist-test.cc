@@ -11,6 +11,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/bitfield.h>
 #include <libtransmission/peer-mgr-wishlist.h>
 
 #include "gtest/gtest.h"
