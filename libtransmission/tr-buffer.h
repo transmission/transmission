@@ -7,12 +7,15 @@
 
 #include <algorithm> // for std::copy_n
 #include <cstddef>
+#include <cstring>
 #include <iterator>
 #include <limits>
 #include <string>
 #include <string_view>
 
 #include <small/vector.hpp>
+
+#include <fmt/core.h>
 
 #include "error.h"
 #include "net.h" // tr_socket_t
@@ -264,7 +267,22 @@ public:
 
     virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        buf_.resize(end_pos_ + n_bytes);
+        if (auto const free_at_end = buf_.size() - end_pos_; free_at_end < n_bytes)
+        {
+            if (auto const total_free = begin_pos_ + free_at_end; total_free >= n_bytes)
+            {
+                // move data so that all free space is at the end
+                auto const size = this->size();
+                std::memmove(std::data(buf_), data(), size);
+                begin_pos_ = 0;
+                end_pos_ = size;
+            }
+            else // even `total_free` is not enough, so resize
+            {
+                buf_.resize(end_pos_ + n_bytes);
+            }
+        }
+
         return { buf_.data() + end_pos_, n_bytes };
     }
 
