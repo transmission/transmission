@@ -6,6 +6,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/file.h"
+#include "libtransmission/quark.h"
 #include "libtransmission/stats.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // for tr_getRatio(), tr_time()
