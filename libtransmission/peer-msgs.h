@@ -15,12 +15,14 @@
 #include <memory>
 #include <utility> // for std::pair<>
 
-#include "interned-string.h"
-#include "peer-common.h" // for tr_peer
+#include "libtransmission/transmission.h" // for tr_direction, tr_block_ind...
 
-class tr_peer;
+#include "libtransmission/interned-string.h"
+#include "libtransmission/net.h" // tr_socket_address
+#include "libtransmission/peer-common.h" // for tr_peer
+
+struct peer_atom;
 class tr_peerIo;
-struct tr_address;
 struct tr_torrent;
 
 /**
