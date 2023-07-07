@@ -20,8 +20,6 @@ extern "C"
 
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
