@@ -12,29 +12,22 @@
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint64_t
 #include <string>
-#include <utility>
 #include <vector>
 
-#ifdef _WIN32
-#include <winsock2.h> /* struct in_addr */
-#endif
+#include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
 
-#include "net.h" /* tr_address */
-#include "peer-common.h"
-#include "peer-socket.h"
+#include "libtransmission/net.h" /* tr_address */
 
 /**
  * @addtogroup peers Peers
  * @{
  */
 
-class tr_peerIo;
-class tr_peerMsgs;
-class tr_swarm;
-struct UTPSocket;
-struct peer_atom;
+class tr_peer;
 struct tr_peerMgr;
+class tr_peer_socket;
 struct tr_peer_stat;
+struct tr_session;
 struct tr_torrent;
 
 /* added_f's bitwise-or'ed flags */
