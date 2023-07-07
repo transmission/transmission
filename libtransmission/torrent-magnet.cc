@@ -5,11 +5,11 @@
 
 #include <algorithm>
 #include <climits> /* INT_MAX */
+#include <cstdlib>
 #include <ctime>
 #include <deque>
 #include <fstream>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include <fmt/core.h>
@@ -18,9 +18,8 @@
 
 #include "libtransmission/crypto-utils.h" // for tr_sha1()
 #include "libtransmission/error.h"
-#include "libtransmission/log.h"
-#include "libtransmission/magnet-metainfo.h"
-#include "libtransmission/resume.h"
+#include "libtransmission/file.h"
+#include "libtransmission/quark.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"
