@@ -15,10 +15,11 @@
 #include <optional>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "block-info.h"
-#include "bitfield.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/tr-macros.h"
 
 /**
  * @brief knows which blocks and pieces we have
