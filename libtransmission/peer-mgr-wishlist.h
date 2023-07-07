@@ -12,9 +12,7 @@
 #include <cstddef> // size_t
 #include <vector>
 
-#include "transmission.h"
-
-#include "torrent.h"
+#include "libtransmission/transmission.h"
 
 /**
  * Figures out what blocks we want to request next.
