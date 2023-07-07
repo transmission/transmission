@@ -12,7 +12,7 @@
 #include <ctime> // time_t
 #include <cstdint>
 
-#include <natpmp.h>
+#include "natpmp.h"
 
 #include "libtransmission/transmission.h" // tr_port_forwarding_state
 
