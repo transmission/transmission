@@ -3,10 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/block-info.h"
-#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-assert.h" // TR_ASSERT
 
 void tr_block_info::init_sizes(uint64_t total_size_in, uint32_t piece_size_in) noexcept
 {
