@@ -6,7 +6,8 @@
 #include <array>
 #include <cerrno>
 #include <chrono>
-#include <cstdio>
+#include <cstddef> // size_t
+#include <iterator> // back_insert_iterator, empty
 #include <map>
 #include <mutex>
 #include <string>
@@ -19,8 +20,6 @@
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
