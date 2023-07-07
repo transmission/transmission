@@ -6,20 +6,26 @@
 #include <array>
 #include <cerrno>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // AF_INET
+#endif
+
 #include <event2/util.h> /* evutil_inet_ntop() */
 
 #include <fmt/core.h>
 
 #define ENABLE_STRNATPMPERR
-#include "natpmp.h"
+#include <natpmp.h>
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
+#include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-natpmp.h"
-#include "libtransmission/port-forwarding.h"
 #include "libtransmission/utils.h"
 
 namespace
