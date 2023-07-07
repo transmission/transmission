@@ -9,8 +9,9 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
 #include "libtransmission/completion.h"
-#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 
 uint64_t tr_completion::compute_has_valid() const
