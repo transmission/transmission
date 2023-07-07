@@ -14,10 +14,10 @@
 #include <cstddef> // for size_t
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bitfield.h"
-#include "torrent-metainfo.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 
 struct tr_block_info;
 struct tr_torrent_metainfo;
