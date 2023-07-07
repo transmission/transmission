@@ -5,13 +5,22 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
+#include <initializer_list>
 #include <string_view>
 #include <vector>
 
-#include <fmt/core.h>
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h>
+#include <cerrno>
+#include <netinet/in.h>
+#endif
 
-#include "libtransmission/transmission.h"
+#include <fmt/core.h>
 
 #include "libtransmission/blocklist.h"
 #include "libtransmission/error.h"
