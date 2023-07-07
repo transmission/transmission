@@ -19,18 +19,24 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // socklen_t
+#endif
 
-#include "interned-string.h"
-#include "net.h"
+#include "libtransmission/transmission.h"
 
-class tr_announcer;
+#include "libtransmission/interned-string.h"
+#include "libtransmission/peer-mgr.h"
+
+struct tr_address;
 class tr_announcer_udp;
+struct tr_session;
+struct tr_torrent;
 struct tr_torrent_announcer;
 
 // --- Tracker Publish / Subscribe
-
-struct tr_pex;
 
 /** @brief Notification object to tell listeners about announce or scrape occurrences */
 struct tr_tracker_event
