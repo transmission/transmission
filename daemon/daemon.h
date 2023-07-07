@@ -57,6 +57,7 @@ private:
 
     bool parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);
-    bool setup_signals();
+    bool setup_signals(struct event*& sig_ev);
+    void cleanup_signals(struct event* sig_ev) const;
     void report_status();
 };
