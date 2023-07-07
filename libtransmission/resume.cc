@@ -8,7 +8,7 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h> // fmt::ptr
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 
@@ -919,7 +919,7 @@ void save(tr_torrent* tor)
     auto const resume_file = tor->resume_file();
     if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, resume_file); err != 0)
     {
-        tor->set_local_error(fmt::format(FMT_STRING("Unable to save resume file: {:s}"), tr_strerror(err)));
+        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", tr_strerror(err)));
     }
 
     tr_variantClear(&top);
