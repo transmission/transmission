@@ -4,13 +4,18 @@
 
 #include <array>
 #include <cerrno>
-#include <cstring> /* memcmp(), memset() */
+#include <string>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <netinet/in.h> // IPV6_V6ONLY, IPPROTO_IPV6
+#include <sys/socket.h> // setsockopt, SOL_SOCKET, bind
+#endif
 
 #include <event2/event.h>
 
 #include <fmt/core.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
