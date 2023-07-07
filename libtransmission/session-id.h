@@ -10,7 +10,7 @@
 #include <ctime> // for time_t
 #include <string_view>
 
-#include "file.h" // tr_sys_file_t
+#include "libtransmission/file.h" // tr_sys_file_t
 
 class tr_session_id
 {
