@@ -23,7 +23,6 @@
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/cache.h"
-#include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"

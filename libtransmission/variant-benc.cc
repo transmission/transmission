@@ -18,7 +18,6 @@
 
 #include "libtransmission/benc.h"
 #include "libtransmission/quark.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant-common.h"

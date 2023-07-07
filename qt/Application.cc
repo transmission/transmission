@@ -662,6 +662,8 @@ void Application::onNotificationActionInvoked(quint32 /* notification_id */, QSt
 
 int tr_main(int argc, char** argv)
 {
+    auto const init_mgr = tr_lib_init();
+
     tr_locale_set_global("");
 
     InteropHelper::initialize();

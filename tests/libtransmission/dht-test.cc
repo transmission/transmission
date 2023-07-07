@@ -15,6 +15,7 @@
 
 #include <libtransmission/file.h>
 #include <libtransmission/timer-ev.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/session-thread.h> // for tr_evthread_init();
 
 #include "gtest/gtest.h"
@@ -388,6 +389,8 @@ protected:
     {
         SandboxedTest::SetUp();
 
+        init_mgr_ = tr_lib_init();
+
         tr_session_thread::tr_evthread_init();
         event_base_ = event_base_new();
     }
@@ -401,6 +404,8 @@ protected:
     }
 
     struct event_base* event_base_ = nullptr;
+
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
 
     // Arbitrary values. Several tests requires socket/port values
     // to be provided but they aren't central to the tests, so they're

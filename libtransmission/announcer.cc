@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <array>
-#include <climits> // INT_MAX
 #include <cstdio>
 #include <ctime>
 #include <deque>
@@ -65,35 +64,22 @@ struct StopsCompare
         // primary key: volume of data transferred
         auto const ax = one.up + one.down;
         auto const bx = two.up + two.down;
-        if (ax < bx)
+        if (auto const val = tr_compare_3way(ax, bx); val != 0)
         {
-            return -1;
-        }
-        if (ax > bx)
-        {
-            return 1;
+            return val;
         }
 
         // secondary key: the torrent's info_hash
         for (size_t i = 0, n = sizeof(tr_sha1_digest_t); i < n; ++i)
         {
-            if (one.info_hash[i] != two.info_hash[i])
+            if (auto const val = tr_compare_3way(one.info_hash[i], two.info_hash[i]); val != 0)
             {
-                return one.info_hash[i] < two.info_hash[i] ? -1 : 1;
+                return val;
             }
         }
 
         // tertiary key: the tracker's announce url
-        if (one.announce_url < two.announce_url)
-        {
-            return -1;
-        }
-        if (one.announce_url > two.announce_url)
-        {
-            return 1;
-        }
-
-        return 0;
+        return tr_compare_3way(one.announce_url, two.announce_url);
     }
 
     [[nodiscard]] constexpr auto operator()(tr_announce_request const& one, tr_announce_request const& two) const noexcept
@@ -1479,15 +1465,15 @@ namespace upkeep_helpers
 int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
 {
     /* prefer higher-priority events */
-    if (auto const priority_a = a->announce_event_priority, priority_b = b->announce_event_priority; priority_a != priority_b)
+    if (auto const val = tr_compare_3way(a->announce_event_priority, b->announce_event_priority); val != 0)
     {
-        return priority_a > priority_b ? -1 : 1;
+        return -val;
     }
 
     /* prefer swarms where we might upload */
-    if (auto const leechers_a = a->countDownloaders(), leechers_b = b->countDownloaders(); leechers_a != leechers_b)
+    if (auto const val = tr_compare_3way(a->countDownloaders(), b->countDownloaders()); val != 0)
     {
-        return leechers_a > leechers_b ? -1 : 1;
+        return -val;
     }
 
     /* prefer swarms where we might download */
@@ -1497,17 +1483,18 @@ int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer larger stats, to help ensure stats get recorded when stopping on shutdown */
-    if (auto const xa = a->byteCounts[TR_ANN_UP] + a->byteCounts[TR_ANN_DOWN],
-        xb = b->byteCounts[TR_ANN_UP] + b->byteCounts[TR_ANN_DOWN];
-        xa != xb)
+    if (auto const val = tr_compare_3way(
+            a->byteCounts[TR_ANN_UP] + a->byteCounts[TR_ANN_DOWN],
+            b->byteCounts[TR_ANN_UP] + b->byteCounts[TR_ANN_DOWN]);
+        val != 0)
     {
-        return xa > xb ? -1 : 1;
+        return -val;
     }
 
     // announcements that have been waiting longer go first
-    if (a->announceAt != b->announceAt)
+    if (auto const val = tr_compare_3way(a->announceAt, b->announceAt); val != 0)
     {
-        return a->announceAt < b->announceAt ? -1 : 1;
+        return val;
     }
 
     // the tiers are effectively equal priority, but add an arbitrary

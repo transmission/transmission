@@ -12,7 +12,6 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-strbuf.h"
 
 using namespace std::literals;
 

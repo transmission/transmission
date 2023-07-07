@@ -10,6 +10,7 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
 #include <ctime> // time_t
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -163,6 +164,22 @@ template<typename T>
 [[nodiscard]] constexpr bool tr_strv_ends_with(std::string_view sv, char key) // c++20
 {
     return !std::empty(sv) && sv.back() == key;
+}
+
+template<typename T>
+[[nodiscard]] constexpr int tr_compare_3way(T const& left, T const& right)
+{
+    if (left < right)
+    {
+        return -1;
+    }
+
+    if (right < left)
+    {
+        return 1;
+    }
+
+    return 0;
 }
 
 constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
@@ -340,4 +357,20 @@ void tr_formatter_get_units(void* dict);
 
 // ---
 
-void tr_net_init();
+class tr_net_init_mgr
+{
+private:
+    tr_net_init_mgr();
+    TR_DISABLE_COPY_MOVE(tr_net_init_mgr)
+
+public:
+    ~tr_net_init_mgr();
+    static std::unique_ptr<tr_net_init_mgr> create();
+
+private:
+    static bool initialised;
+};
+
+/** @brief Initialise libtransmission for each app
+ *  @return A manager object to be kept in scope of main() */
+std::unique_ptr<tr_net_init_mgr> tr_lib_init();

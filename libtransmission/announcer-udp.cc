@@ -17,6 +17,8 @@
 #include <ws2tcpip.h>
 #undef gai_strerror
 #define gai_strerror gai_strerrorA
+#else
+#include <netdb.h> // gai_strerror()
 #endif
 
 #include <fmt/core.h>
@@ -29,7 +31,7 @@
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/log.h"
-#include "libtransmission/peer-io.h"
+#include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"

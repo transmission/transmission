@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <memory>
 
 #include <math/wide_integer/uintwide_t.h>
 
