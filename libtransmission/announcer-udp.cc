@@ -4,13 +4,20 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // for std::find_if()
-#include <climits> // for CHAR_BIT
-#include <cstring> // for memset()
+#include <array>
+#include <chrono> // operator""ms, literals
+#include <climits> // CHAR_BIT
+#include <cstddef> // std::byte
+#include <cstdint> // uint32_t, uint64_t
+#include <cstring> // memcpy()
 #include <ctime>
 #include <future>
 #include <list>
 #include <memory>
+#include <optional>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -19,17 +26,18 @@
 #define gai_strerror gai_strerrorA
 #else
 #include <netdb.h> // gai_strerror()
+#include <netinet/in.h> // IPPROTO_UDP, in_addr
+#include <sys/socket.h> // sockaddr_storage, AF_INET
 #endif
 
 #include <fmt/core.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/announcer.h"
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
