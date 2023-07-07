@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono> // operator""ms
 #include <cstdio>
 #include <ctime>
 #include <deque>
@@ -15,6 +16,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <fmt/core.h>
@@ -27,11 +29,13 @@
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/announcer.h"
 #include "libtransmission/crypto-utils.h" /* tr_rand_int() */
+#include "libtransmission/interned-string.h" // tr_interned_string
 #include "libtransmission/log.h"
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_C...
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 
