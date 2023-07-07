@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::min, std::partial_sort
 #include <cstddef>
 #include <set>
 #include <utility>
@@ -14,6 +15,7 @@
 
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
 #include "libtransmission/peer-mgr-wishlist.h"
+#include "libtransmission/utils.h"
 
 namespace
 {
