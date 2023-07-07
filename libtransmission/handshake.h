@@ -19,13 +19,17 @@
 #include <mutex>
 #include <optional>
 #include <string_view>
+#include <utility>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h"
-#include "peer-mse.h" // tr_message_stream_encryption::DH
-#include "peer-io.h"
-#include "timer.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
+#include "libtransmission/peer-io.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_peer_id_t
+
+struct tr_error;
 
 // short-term class which manages the handshake phase of a tr_peerIo
 class tr_handshake
