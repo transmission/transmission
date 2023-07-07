@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <cerrno>
 #include <cstdint> // uint8_t
 #include <iterator> // std::distance(), std::next(), std::prev()
 #include <memory>
@@ -12,6 +13,7 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <small/vector.hpp>
 
 #include "libtransmission/transmission.h"
 
