@@ -14,11 +14,18 @@
 #include <string_view>
 #include <vector>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h>
+#endif
+
 #include <dht/dht.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h" // tr_port
+#include "libtransmission/net.h" // tr_port
+#include "libtransmission/tr-macros.h"
 
 struct tr_pex;
 
