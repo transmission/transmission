@@ -9,6 +9,7 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/torrent-metainfo.h"
