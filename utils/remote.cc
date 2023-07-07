@@ -6,14 +6,17 @@
 #include <array>
 #include <cassert>
 #include <cctype> /* isspace */
-#include <cinttypes> // PRId64
 #include <cerrno>
+#include <cmath> // floor
+#include <cstdint> // int64_t
 #include <cstdio>
 #include <cstdlib>
 #include <cstring> /* strcmp */
+#include <ctime>
 #include <set>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <curl/curl.h>
 
@@ -24,9 +27,9 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h>
-#include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
