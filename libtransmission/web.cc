@@ -33,6 +33,9 @@
 
 #include <fmt/core.h>
 
+#ifdef _WIN32
+#include "libtransmission/crypto-utils.h"
+#endif
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils-ev.h"
