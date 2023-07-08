@@ -2452,7 +2452,7 @@ struct peer_candidate
 
     // put the best candiates at the end of the list
     auto ret = tr_peerMgr::OutboundCandidates{};
-    for (auto it = std::crbegin(candidates); it != std::crend(candidates); ++it)
+    for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
     {
         ret.emplace_back(it->tor->id(), it->atom->socket_address);
     }
