@@ -8,6 +8,7 @@
 #include <csignal>
 #include <string_view>
 
+#include <fcntl.h>
 #include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
 
 #ifdef HAVE_SYS_SIGNALFD_H
