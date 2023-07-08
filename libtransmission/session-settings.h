@@ -8,11 +8,11 @@
 #include <cstddef> // for size_t
 #include <string>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h" // for tr_log_level
-#include "net.h" // for tr_port, tr_tos_t
-#include "quark.h"
+#include "libtransmission/log.h" // for tr_log_level
+#include "libtransmission/net.h" // for tr_port, tr_tos_t
+#include "libtransmission/quark.h"
 
 struct tr_variant;
 

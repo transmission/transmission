@@ -5,15 +5,17 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstdint>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <sstream>
+#include <string>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
 #include <ctime>
-#include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
 #endif

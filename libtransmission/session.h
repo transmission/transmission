@@ -12,6 +12,8 @@
 #define TR_NAME "Transmission"
 
 #include <array>
+#include <atomic>
+#include <chrono>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime> // time_t
@@ -26,51 +28,53 @@
 #include <utility> // for std::pair
 #include <vector>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // socklen_t
+#endif
+
 #include <event2/util.h> // for evutil_socket_t
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "announcer.h"
-#include "bandwidth.h"
-#include "bitfield.h"
-#include "cache.h"
-#include "global-ip-cache.h"
-#include "interned-string.h"
-#include "net.h" // tr_socket_t
-#include "observable.h"
-#include "open-files.h"
-#include "port-forwarding.h"
-#include "quark.h"
-#include "session-alt-speeds.h"
-#include "session-id.h"
-#include "session-settings.h"
-#include "session-thread.h"
-#include "stats.h"
-#include "torrents.h"
-#include "tr-dht.h"
-#include "tr-lpd.h"
-#include "utils-ev.h"
-#include "verify.h"
-#include "web.h"
+#include "libtransmission/announce-list.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/blocklist.h"
+#include "libtransmission/cache.h"
+#include "libtransmission/global-ip-cache.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/net.h" // tr_socket_t
+#include "libtransmission/observable.h"
+#include "libtransmission/open-files.h"
+#include "libtransmission/port-forwarding.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/session-alt-speeds.h"
+#include "libtransmission/session-id.h"
+#include "libtransmission/session-settings.h"
+#include "libtransmission/session-thread.h"
+#include "libtransmission/stats.h"
+#include "libtransmission/torrents.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-dht.h"
+#include "libtransmission/tr-lpd.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/utils-ev.h"
+#include "libtransmission/verify.h"
+#include "libtransmission/web.h"
 
 tr_peer_id_t tr_peerIdInit();
 
-struct event_base;
-
-class tr_lpd;
 class tr_peer_socket;
-class tr_port_forwarding;
+struct tr_pex;
 class tr_rpc_server;
-class tr_session_thread;
-class tr_web;
+struct tr_torrent;
 struct struct_utp_context;
 struct tr_variant;
 
 namespace libtransmission
 {
-class Blocklist;
-class Dns;
 class Timer;
 class TimerMaker;
 } // namespace libtransmission

@@ -9,10 +9,10 @@
 #include <cstdlib> // setenv(), unsetenv()
 #include <cstring>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -20,13 +20,17 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_int()
-#include <libtransmission/platform.h>
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using UtilsTest = ::testing::Test;

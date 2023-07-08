@@ -5,6 +5,8 @@
 
 #include <algorithm> // std::copy_n()
 #include <cctype>
+#include <cstddef> // std::byte, size_t
+#include <cstdint> // int64_t, uint8_t, uint...
 #include <cstdio> /* fprintf() */
 #include <iomanip>
 #include <iostream>
@@ -31,8 +33,11 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
+#include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-strbuf.h" // tr_strbuf, tr_urlbuf
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"

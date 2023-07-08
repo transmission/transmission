@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cerrno> // ECONNREFUSED, ETIMEDOUT
 #include <string_view>
 #include <utility>
 
@@ -15,13 +16,14 @@
 #include "libtransmission/bitfield.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/log.h"
 #include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/utils.h"
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 

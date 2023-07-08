@@ -14,11 +14,10 @@
 #include <algorithm> // for std::copy_n()
 #include <array>
 #include <cstddef> // size_t, std::byte
+#include <cstdint> // uint8_t
 
-#include "tr-macros.h" // tr_sha1_digest_t
-#include "tr-arc4.h"
-
-class tr_arc4;
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
+#include "libtransmission/tr-arc4.h"
 
 // Spec: https://wiki.vuze.com/w/Message_Stream_Encryption
 namespace tr_message_stream_encryption

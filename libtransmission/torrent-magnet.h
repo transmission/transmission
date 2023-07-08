@@ -15,8 +15,7 @@
 #include <optional>
 #include <vector>
 
-#include "transmission.h"
-
+struct tr_error;
 struct tr_torrent;
 struct tr_torrent_metainfo;
 

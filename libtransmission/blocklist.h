@@ -17,8 +17,6 @@
 
 #include "net.h" // for tr_address
 
-struct tr_address;
-
 namespace libtransmission
 {
 

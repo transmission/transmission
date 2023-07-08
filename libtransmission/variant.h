@@ -11,7 +11,7 @@
 #include <string>
 #include <string_view>
 
-#include "quark.h"
+#include "libtransmission/quark.h"
 
 struct tr_error;
 

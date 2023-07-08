@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include "timer.h"
+#include "libtransmission/timer.h"
 
 extern "C"
 {

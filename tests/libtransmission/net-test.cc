@@ -3,17 +3,25 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <array>
 #include <algorithm>
-#include <cstddef>
+#include <array>
+#include <cassert>
+#include <cstddef> // std::byte, size_t
 #include <string_view>
 #include <tuple>
 #include <utility>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <netinet/in.h>
+#include <sys/socket.h>
+#endif
+
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
 
-#include "test-fixtures.h"
+#include "gtest/gtest.h"
 
 using NetTest = ::testing::Test;
 using namespace std::literals;

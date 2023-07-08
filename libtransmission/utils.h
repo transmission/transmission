@@ -17,7 +17,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "tr-macros.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_error;
 

@@ -15,8 +15,6 @@
 #include <string_view>
 #include <utility>
 
-#include <event2/buffer.h>
-
 struct evbuffer;
 
 class tr_web

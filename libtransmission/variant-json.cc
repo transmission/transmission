@@ -3,13 +3,17 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <cerrno> /* EILSEQ, EINVAL */
 #include <cmath> /* fabs() */
+#include <cstddef> // std::byte
+#include <cstdint> // uint16_t
 #include <cstdlib>
 #include <cstring>
 #include <deque>
+#include <iterator> // std::back_inserter
 #include <string>
 #include <string_view>
 #include <utility>
@@ -24,10 +28,7 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
-#include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"

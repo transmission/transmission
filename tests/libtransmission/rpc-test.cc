@@ -3,17 +3,23 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
+#include <iterator> // std::inserter
+#include <set>
+#include <string_view>
+#include <vector>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-#include <algorithm>
-#include <array>
-#include <set>
-#include <string_view>
-#include <vector>
+struct tr_session;
 
 using namespace std::literals;
 

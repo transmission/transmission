@@ -17,8 +17,6 @@
 #include <windows.h>
 #endif
 
-#include "tr-macros.h"
-
 struct tr_error;
 
 /**

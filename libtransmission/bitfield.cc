@@ -3,14 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
-#include <vector>
-
-#include "libtransmission/transmission.h"
+#include <algorithm> // std::copy, std::fill_n, std::min, std::max
+#include <vector> // std::vector
 
 #include "libtransmission/bitfield.h"
-#include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-popcount.h"
+#include "libtransmission/tr-assert.h" // TR_ASSERT, TR_ENABLE_ASSERTS
+#include "libtransmission/tr-popcount.h" // tr_popcnt
 
 // ---
 

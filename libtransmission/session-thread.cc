@@ -22,12 +22,8 @@
 #include <event2/event.h>
 #include <event2/thread.h>
 
-#include "libtransmission/transmission.h"
-
-#include "libtransmission/log.h"
 #include "libtransmission/session-thread.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h" // for tr_net_init()
 #include "libtransmission/utils-ev.h"
 
 using namespace std::literals;

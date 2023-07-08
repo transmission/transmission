@@ -14,9 +14,12 @@
 #include <utility>
 #include <vector>
 
-#ifndef _WIN32
-#include <sys/un.h>
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/un.h>
 #include <unistd.h>
 #endif
 
@@ -46,7 +49,8 @@
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
-#include "libtransmission/web.h"
+
+struct evbuffer;
 
 /* session-id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!

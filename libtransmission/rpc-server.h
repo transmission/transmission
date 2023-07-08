@@ -15,14 +15,15 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h"
-#include "utils-ev.h"
+#include "libtransmission/net.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/utils-ev.h"
 
-struct evhttp;
-struct tr_variant;
 class tr_rpc_address;
+struct tr_session;
+struct tr_variant;
 struct libdeflate_compressor;
 
 namespace libtransmission
@@ -154,7 +155,7 @@ public:
     std::vector<std::string> whitelist_;
     std::string const web_client_dir_;
 
-    std::unique_ptr<class tr_rpc_address> bind_address_;
+    std::unique_ptr<tr_rpc_address> bind_address_;
 
     std::unique_ptr<libtransmission::Timer> start_retry_timer;
     libtransmission::evhelpers::evhttp_unique_ptr httpd;

@@ -4,25 +4,29 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <array>
-#include <cstdlib> // mktemp()
-#include <numeric>
+#include <cstddef> // size_t, std::byte
+#include <cstdint> // uint32_t
+#include <ctime>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
-
-#include <libtransmission/transmission.h>
-
+#include <libtransmission/announce-list.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/makemeta.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/session.h> // TR_NAME
 #include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
+
+struct tr_error;
 
 using namespace std::literals;
 

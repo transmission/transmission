@@ -4,13 +4,19 @@
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
+#include <functional>
 #include <memory>
 #include <utility>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/time.h>
+#endif
+
 #include <event2/event.h>
 
-#include "libtransmission/transmission.h"
-
+#include "libtransmission/timer.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils-ev.h"

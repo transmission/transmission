@@ -3,22 +3,26 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
-
-#include <libtransmission/session-alt-speeds.h>
-#include <libtransmission/session-id.h>
-#include <libtransmission/session.h>
-#include <libtransmission/version.h>
-
-#include "test-fixtures.h"
-
-#include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
+#include <initializer_list>
 #include <memory>
 #include <string>
 #include <string_view>
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/crypto-utils.h>
+#include <libtransmission/quark.h>
+#include <libtransmission/session-id.h>
+#include <libtransmission/session.h>
+#include <libtransmission/variant.h>
+#include <libtransmission/version.h>
+
+#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using namespace std::literals;
 

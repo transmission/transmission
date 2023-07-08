@@ -7,8 +7,6 @@
 #include <event2/event.h>
 #include <event2/http.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/utils-ev.h"
 
 namespace libtransmission::evhelpers

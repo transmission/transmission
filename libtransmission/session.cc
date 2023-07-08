@@ -6,11 +6,12 @@
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <condition_variable>
 #include <csignal>
+#include <cstddef> // size_t
 #include <cstdint>
-#include <cstdlib> // atoi()
 #include <ctime>
 #include <future>
 #include <iterator> // for std::back_inserter
+#include <limits> // std::numeric_limits
 #include <memory>
 #include <numeric> // for std::accumulate()
 #include <string>
@@ -19,42 +20,45 @@
 #include <vector>
 
 #ifndef _WIN32
-#include <sys/types.h> /* umask() */
 #include <sys/stat.h> /* umask() */
 #endif
 
 #include <event2/event.h>
 
-#include <fmt/format.h> // fmt::ptr
+#include <fmt/core.h> // fmt::ptr
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/global-ip-cache.h"
+#include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
-#include "libtransmission/peer-io.h"
 #include "libtransmission/peer-mgr.h"
+#include "libtransmission/peer-socket.h"
 #include "libtransmission/port-forwarding.h"
+#include "libtransmission/quark.h"
 #include "libtransmission/rpc-server.h"
-#include "libtransmission/session-id.h"
 #include "libtransmission/session.h"
+#include "libtransmission/session-alt-speeds.h"
+#include "libtransmission/session-settings.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
-#include "libtransmission/verify.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web.h"
+
+struct tr_ctor;
 
 using namespace std::literals;
 
@@ -245,7 +249,7 @@ bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_add
     // we found a suitable peer, add it to the torrent
     auto pex = tr_pex{ address, port };
     tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, &pex, 1U);
-    tr_logAddDebugTor(tor, fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), address.display_name(port)));
+    tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({:s})", address.display_name(port)));
     return true;
 }
 

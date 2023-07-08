@@ -19,10 +19,10 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
+#include <arpa/inet.h>
 #include <cerrno>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #endif
 
 #ifdef _WIN32

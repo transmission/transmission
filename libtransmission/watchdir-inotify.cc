@@ -4,7 +4,10 @@
 // License text can be found in the licenses/ folder.
 
 #include <cerrno>
+#include <cstdint> // uint32_t
 #include <memory>
+#include <string>
+#include <string_view>
 #include <utility>
 
 #include <unistd.h> /* close() */
@@ -18,8 +21,6 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
@@ -28,6 +29,9 @@
 
 namespace libtransmission
 {
+
+class TimerMaker;
+
 namespace
 {
 class INotifyWatchdir final : public impl::BaseWatchdir
