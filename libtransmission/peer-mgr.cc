@@ -2532,11 +2532,13 @@ void tr_peerMgr::make_new_peer_connections()
     static auto initiate_func = [this](auto const& candidate)
     {
         auto const& [tor_id, sock_addr] = candidate;
-        auto* const tor = session->torrents().get(tor_id);
-        auto* const atom = tor->swarm->get_existing_atom(sock_addr);
-        if (tor != nullptr && atom != nullptr)
+
+        if (auto* const tor = session->torrents().get(tor_id); tor != nullptr)
         {
-            initiateConnection(this, tor->swarm, *atom);
+            if (auto* const atom = tor->swarm->get_existing_atom(sock_addr); atom != nullptr)
+            {
+                initiateConnection(this, tor->swarm, *atom);
+            }
         }
     };
     auto const n_this_pass = std::min(std::size(candidates), MaxConnectionsPerPulse);
