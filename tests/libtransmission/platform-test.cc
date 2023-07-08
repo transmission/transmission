@@ -6,12 +6,16 @@
 #include <cstdlib>
 #include <string_view>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/file.h>
 #include <libtransmission/platform.h>
 #include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
