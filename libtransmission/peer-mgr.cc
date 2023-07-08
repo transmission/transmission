@@ -2450,10 +2450,11 @@ struct peer_candidate
         candidates.resize(max);
     }
 
+    // put the best candiates at the end of the list
     auto ret = tr_peerMgr::OutboundCandidates{};
-    for (auto const& candidate : candidates)
+    for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
     {
-        ret.emplace_back(candidate.tor->id(), candidate.atom->socket_address);
+        ret.emplace_back(it->tor->id(), it->atom->socket_address);
     }
     return ret;
 }
@@ -2521,17 +2522,18 @@ void tr_peerMgr::make_new_peer_connections()
     auto const lock = session->unique_lock();
 
     // get the candidates if we need to
-    auto& peers = outbound_candidates_;
-    if (std::empty(peers))
+    auto& candidates = outbound_candidates_;
+    if (std::empty(candidates))
     {
-        peers = get_peer_candidates(session);
+        candidates = get_peer_candidates(session);
     }
 
-    // initiate connections to the first N candidates
-    auto const n_this_pass = std::min(std::size(peers), MaxConnectionsPerPulse);
-    for (size_t i = 0; i < n_this_pass; ++i)
+    // initiate connections to the last N candidates
+    auto const n_this_pass = std::min(std::size(candidates), MaxConnectionsPerPulse);
+    auto const it_end = std::crbegin(candidates) + n_this_pass;
+    for (auto it = std::crbegin(candidates); it != it_end; ++it)
     {
-        auto const& [tor_id, sock_addr] = peers[i];
+        auto const& [tor_id, sock_addr] = *it;
 
         if (auto* const tor = session->torrents().get(tor_id); tor != nullptr)
         {
@@ -2542,8 +2544,8 @@ void tr_peerMgr::make_new_peer_connections()
         }
     }
 
-    // remove the first N candidates from the list
-    peers.erase(std::begin(peers), std::begin(peers) + n_this_pass);
+    // remove the N candidates that we just consumed
+    candidates.resize(std::size(candidates) - n_this_pass);
 }
 
 // ---
