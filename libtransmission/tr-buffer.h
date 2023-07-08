@@ -270,7 +270,7 @@ public:
             {
                 // move data so that all free space is at the end
                 auto const size = this->size();
-                std::copy_n(data(), n_bytes, std::data(buf_));
+                std::copy_n(data(), size, std::data(buf_));
                 begin_pos_ = 0;
                 end_pos_ = size;
             }
