@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cctype> /* isspace */
@@ -780,7 +781,8 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
     TR_KEY_webseedsSendingToUs
 };
 
-static auto constexpr ListKeys = std::array<tr_quark, 14>{
+static auto constexpr ListKeys = std::array<tr_quark, 15>{
+    TR_KEY_addedDate,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
@@ -1472,7 +1474,30 @@ static void printTorrentList(tr_variant* top)
             "Status",
             "Name");
 
-        for (size_t i = 0, n = tr_variantListSize(list); i < n; ++i)
+        size_t num_torrents = tr_variantListSize(list);
+
+        std::vector<tr_variant*> tptrs;
+        tptrs.reserve(num_torrents);
+
+        for (size_t i = 0; i < num_torrents; ++i)
+        {
+            tr_variant* d = tr_variantListChild(list, i);
+            if (tr_variantDictFindInt(d, TR_KEY_id, nullptr))
+                tptrs.push_back(d);
+        }
+
+        std::sort(
+            tptrs.begin(),
+            tptrs.end(),
+            [](tr_variant* f, tr_variant* s)
+            {
+                int64_t f_time = INT64_MIN, s_time = INT64_MIN;
+                tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time);
+                tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time);
+                return f_time < s_time;
+            });
+
+        for (auto const& d : tptrs)
         {
             int64_t torId;
             int64_t eta;
@@ -1483,7 +1508,6 @@ static void printTorrentList(tr_variant* top)
             int64_t leftUntilDone;
             double ratio;
             auto name = std::string_view{};
-            tr_variant* d = tr_variantListChild(list, i);
 
             if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) && tr_variantDictFindInt(d, TR_KEY_id, &torId) &&
                 tr_variantDictFindInt(d, TR_KEY_leftUntilDone, &leftUntilDone) &&
