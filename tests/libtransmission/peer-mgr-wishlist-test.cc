@@ -3,9 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
+#include <cstddef> // size_t
 #include <map>
-#include <type_traits>
+#include <set>
 
 #define LIBTRANSMISSION_PEER_MODULE
 
