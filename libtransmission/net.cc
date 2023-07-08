@@ -24,8 +24,6 @@
 
 #include <fmt/core.h>
 
-#include <libutp/utp.h>
-
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
@@ -36,7 +34,6 @@
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -593,9 +590,9 @@ std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) con
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
     // IPv6 addresses are always "greater than" IPv4
-    if (this->type != that.type)
+    if (auto const val = tr_compare_3way(this->type, that.type); val != 0)
     {
-        return this->is_ipv4() ? 1 : -1;
+        return val;
     }
 
     return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :

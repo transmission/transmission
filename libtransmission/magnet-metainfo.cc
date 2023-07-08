@@ -18,7 +18,6 @@
 #include "libtransmission/error.h"
 #include "libtransmission/error-types.h"
 #include "libtransmission/magnet-metainfo.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 

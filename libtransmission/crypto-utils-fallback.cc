@@ -7,14 +7,12 @@
    implement missing (or duplicate) functionality without exposing internal
    details in header files. */
 
+#ifdef TR_CRYPTO_X509_FALLBACK
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-macros.h"
-
-// ---
-
-#ifdef TR_CRYPTO_X509_FALLBACK
 
 tr_x509_store_t tr_ssl_get_x509_store(tr_ssl_ctx_t /*handle*/)
 {

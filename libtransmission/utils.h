@@ -166,6 +166,22 @@ template<typename T>
     return !std::empty(sv) && sv.back() == key;
 }
 
+template<typename T>
+[[nodiscard]] constexpr int tr_compare_3way(T const& left, T const& right)
+{
+    if (left < right)
+    {
+        return -1;
+    }
+
+    if (right < left)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 constexpr std::string_view tr_strv_sep(std::string_view* sv, char delim)
 {
     auto pos = sv->find(delim);

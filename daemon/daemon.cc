@@ -687,6 +687,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
+    struct event* sig_ev = nullptr;
     auto watchdir = std::unique_ptr<Watchdir>{};
     char const* const cdir = this->config_dir_.c_str();
 
@@ -695,7 +696,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     /* setup event state */
     ev_base_ = event_base_new();
 
-    if (ev_base_ == nullptr || !setup_signals())
+    if (ev_base_ == nullptr || !setup_signals(sig_ev))
     {
         auto const error_code = errno;
         auto const errmsg = fmt::format(
@@ -703,6 +704,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             fmt::arg("error", tr_strerror(error_code)),
             fmt::arg("error_code", error_code));
         printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
+        cleanup_signals(sig_ev);
         return 1;
     }
 
@@ -854,6 +856,8 @@ CLEANUP:
         event_del(status_ev);
         event_free(status_ev);
     }
+
+    cleanup_signals(sig_ev);
 
     event_base_free(ev_base_);
 

@@ -196,9 +196,13 @@ static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
     update_service_status(SERVICE_STOPPED, NO_ERROR, exit_code, 0, 0);
 }
 
-bool tr_daemon::setup_signals()
+bool tr_daemon::setup_signals([[maybe_unused]] struct event*& sig_ev)
 {
     return true;
+}
+
+void tr_daemon::cleanup_signals([[maybe_unused]] struct event* sig_ev) const
+{
 }
 
 bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error** error)
