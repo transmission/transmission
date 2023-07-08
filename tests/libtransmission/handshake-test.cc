@@ -103,13 +103,6 @@ public:
             return true;
         }
 
-        [[nodiscard]] bool is_peer_known_seed(
-            tr_torrent_id_t /*tor_id*/,
-            std::pair<tr_address, tr_port> const& /*socket_address*/) const override
-        {
-            return false;
-        }
-
         [[nodiscard]] size_t pad(void* setme, [[maybe_unused]] size_t maxlen) const override
         {
             TR_ASSERT(maxlen > 10);

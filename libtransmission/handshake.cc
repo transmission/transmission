@@ -521,16 +521,8 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 
     if (auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash); info)
     {
-        bool const client_is_seed = info->is_done;
-        bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->socket_address());
         tr_logAddTraceHand(this, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
         peer_io->set_torrent_hash(info->info_hash);
-
-        if (client_is_seed && peer_is_seed)
-        {
-            tr_logAddTraceHand(this, "another seed tried to reconnect to us!");
-            return done(false);
-        }
     }
     else
     {
