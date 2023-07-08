@@ -2544,7 +2544,7 @@ void tr_peerMgr::make_new_peer_connections()
         }
     }
 
-    // remove the last N candidates
+    // remove the N candidates that we just consumed
     candidates.resize(std::size(candidates) - n_this_pass);
 }
 
