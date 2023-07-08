@@ -2452,9 +2452,9 @@ struct peer_candidate
     }
 
     auto ret = tr_peerMgr::OutboundCandidates{};
-    for (auto const& candidate : candidates)
+    for (auto it = std::crbegin(candidates); it != std::crend(candidates); ++it)
     {
-        ret.emplace_back(candidate.tor->id(), candidate.atom->socket_address);
+        ret.emplace_back(it->tor->id(), it->atom->socket_address);
     }
     return ret;
 }
@@ -2530,9 +2530,9 @@ void tr_peerMgr::make_new_peer_connections()
 
     // initiate connections to the first N candidates
     auto const n_this_pass = std::min(std::size(peers), MaxConnectionsPerPulse);
-    for (size_t i = 0; i < n_this_pass; ++i)
+    for (auto it = std::crbegin(peers); it != std::crbegin(peers) + n_this_pass; ++it)
     {
-        auto const& [tor_id, sock_addr] = peers[i];
+        auto const& [tor_id, sock_addr] = *it;
         auto* const tor = session->torrents().get(tor_id);
         auto* const atom = tor->swarm->get_existing_atom(sock_addr);
         if (tor != nullptr && atom != nullptr)
@@ -2542,7 +2542,7 @@ void tr_peerMgr::make_new_peer_connections()
     }
 
     // remove the first N candidates from the list
-    peers.erase(std::begin(peers), std::begin(peers) + n_this_pass);
+    peers.resize(std::size(peers) - n_this_pass);
 }
 
 // ---
