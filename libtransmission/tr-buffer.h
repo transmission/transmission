@@ -7,7 +7,6 @@
 
 #include <algorithm> // for std::copy_n
 #include <cstddef>
-#include <cstring>
 #include <iterator>
 #include <limits>
 #include <string>
@@ -271,7 +270,7 @@ public:
             {
                 // move data so that all free space is at the end
                 auto const size = this->size();
-                std::memmove(std::data(buf_), data(), size);
+                std::copy_n(data(), n_bytes, std::data(buf_));
                 begin_pos_ = 0;
                 end_pos_ = size;
             }
