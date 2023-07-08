@@ -2522,27 +2522,28 @@ void tr_peerMgr::make_new_peer_connections()
     auto const lock = session->unique_lock();
 
     // get the candidates if we need to
-    auto& peers = outbound_candidates_;
-    if (std::empty(peers))
+    auto& candidates = outbound_candidates_;
+    if (std::empty(candidates))
     {
-        peers = get_peer_candidates(session);
+        candidates = get_peer_candidates(session);
     }
 
     // initiate connections to the first N candidates
-    auto const n_this_pass = std::min(std::size(peers), MaxConnectionsPerPulse);
-    for (auto it = std::crbegin(peers); it != std::crbegin(peers) + n_this_pass; ++it)
+    static auto initiate_func = [this](auto const& candidate)
     {
-        auto const& [tor_id, sock_addr] = *it;
+        auto const& [tor_id, sock_addr] = candidate;
         auto* const tor = session->torrents().get(tor_id);
         auto* const atom = tor->swarm->get_existing_atom(sock_addr);
         if (tor != nullptr && atom != nullptr)
         {
             initiateConnection(this, tor->swarm, *atom);
         }
-    }
+    };
+    auto const n_this_pass = std::min(std::size(candidates), MaxConnectionsPerPulse);
+    std::for_each(std::crbegin(candidates), std::crbegin(candidates) + n_this_pass, initiate_func);
 
     // remove the first N candidates from the list
-    peers.resize(std::size(peers) - n_this_pass);
+    candidates.resize(std::size(candidates) - n_this_pass);
 }
 
 // ---
