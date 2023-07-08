@@ -17,6 +17,7 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #endif
+
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
 
