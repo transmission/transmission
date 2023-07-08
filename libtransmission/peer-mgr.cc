@@ -111,8 +111,6 @@ public:
         }
     }
 
-    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_socket_address const& socket_address) const override;
-
     [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
     {
         return session_.timerMaker();
@@ -2546,12 +2544,4 @@ void tr_peerMgr::make_new_peer_connections()
 
     // remove the N candidates that we just consumed
     candidates.resize(std::size(candidates) - n_this_pass);
-}
-
-// ---
-
-bool HandshakeMediator::is_peer_known_seed(tr_torrent_id_t tor_id, tr_socket_address const& socket_address) const
-{
-    auto const* const tor = session_.torrents().get(tor_id);
-    return tor != nullptr && tor->swarm != nullptr && tor->swarm->peer_is_a_seed(socket_address);
 }

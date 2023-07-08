@@ -65,8 +65,6 @@ public:
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual bool allows_dht() const = 0;
         [[nodiscard]] virtual bool allows_tcp() const = 0;
-        [[nodiscard]] virtual bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_socket_address const& socket_address)
-            const = 0;
         [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
         [[nodiscard]] virtual DH::private_key_bigend_t private_key() const
         {
