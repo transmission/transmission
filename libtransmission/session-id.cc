@@ -3,17 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <ctime>
 #include <string_view>
 #include <iterator> // for std::back_inserter
 
 #ifndef _WIN32
+#include <cerrno>
 #include <sys/stat.h>
 #endif
 
 #include <fmt/core.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/error-types.h"

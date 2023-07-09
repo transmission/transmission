@@ -3,12 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
+#include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <numeric>
-#include <cstdint>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/bitfield.h>
 #include <libtransmission/block-info.h>
 #include <libtransmission/file-piece-map.h>
 

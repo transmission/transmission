@@ -7,19 +7,25 @@
 #include <array>
 #include <cerrno>
 #include <optional>
+#include <string_view>
+#include <utility> // std::move
 
 #include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/cache.h" /* tr_cacheReadBlock() */
+#include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/inout.h"
 #include "libtransmission/log.h"
+#include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
+#include "libtransmission/tr-strbuf.h" // tr_pathbuf
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
@@ -147,13 +153,13 @@ void readOrWriteBytes(
     if (!fd) // couldn't create/open it either
     {
         auto const err = errno;
-        auto const msg = fmt::format(
+        auto msg = fmt::format(
             _("Couldn't get '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
             fmt::arg("error", tr_strerror(err)),
             fmt::arg("error_code", err));
         tr_error_set(error, err, msg);
-        tr_logAddErrorTor(tor, msg);
+        tr_logAddErrorTor(tor, std::move(msg));
         return;
     }
 
@@ -249,7 +255,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     auto& cache = tor->session->cache;
     auto const [begin_byte, end_byte] = tor->block_info().byte_span_for_piece(piece);
     auto const [begin_block, end_block] = tor->block_span_for_piece(piece);
-    auto n_bytes_checked = size_t{};
+    [[maybe_unused]] auto n_bytes_checked = size_t{};
     for (auto block = begin_block; block < end_block; ++block)
     {
         auto const block_loc = tor->block_loc(block);

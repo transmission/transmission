@@ -3,18 +3,21 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cctype> /* isspace */
-#include <cinttypes> // PRId64
 #include <cerrno>
-#include <cmath>
+#include <cmath> // floor
+#include <cstdint> // int64_t
 #include <cstdio>
 #include <cstdlib>
 #include <cstring> /* strcmp */
+#include <ctime>
 #include <set>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <curl/curl.h>
 
@@ -25,9 +28,9 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h>
-#include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
@@ -560,7 +563,7 @@ static int getOptMode(int val)
 
 static std::string getEncodedMetainfo(char const* filename)
 {
-    if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_loadFile(filename, contents))
+    if (auto contents = std::vector<char>{}; tr_sys_path_exists(filename) && tr_file_read(filename, contents))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
@@ -649,7 +652,7 @@ static void addDays(tr_variant* args, tr_quark const key, char const* arg)
 
     if (arg != nullptr)
     {
-        for (int& day : tr_parseNumberRange(arg))
+        for (int& day : tr_num_parse_range(arg))
         {
             if (day < 0 || day > 7)
             {
@@ -684,7 +687,7 @@ static void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
     }
 
     auto label = std::string_view{};
-    while (tr_strvSep(&comma_delimited_labels, &label, ','))
+    while (tr_strv_sep(&comma_delimited_labels, &label, ','))
     {
         tr_variantListAddStr(labels, label);
     }
@@ -707,7 +710,7 @@ static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 
     if (strcmp(arg, "all") != 0)
     {
-        for (auto const& idx : tr_parseNumberRange(arg))
+        for (auto const& idx : tr_num_parse_range(arg))
         {
             tr_variantListAddInt(files, idx);
         }
@@ -778,7 +781,8 @@ static auto constexpr DetailsKeys = std::array<tr_quark, 52>{
     TR_KEY_webseedsSendingToUs
 };
 
-static auto constexpr ListKeys = std::array<tr_quark, 14>{
+static auto constexpr ListKeys = std::array<tr_quark, 15>{
+    TR_KEY_addedDate,
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
@@ -1470,7 +1474,30 @@ static void printTorrentList(tr_variant* top)
             "Status",
             "Name");
 
-        for (size_t i = 0, n = tr_variantListSize(list); i < n; ++i)
+        size_t num_torrents = tr_variantListSize(list);
+
+        std::vector<tr_variant*> tptrs;
+        tptrs.reserve(num_torrents);
+
+        for (size_t i = 0; i < num_torrents; ++i)
+        {
+            tr_variant* d = tr_variantListChild(list, i);
+            if (tr_variantDictFindInt(d, TR_KEY_id, nullptr))
+                tptrs.push_back(d);
+        }
+
+        std::sort(
+            tptrs.begin(),
+            tptrs.end(),
+            [](tr_variant* f, tr_variant* s)
+            {
+                int64_t f_time = INT64_MIN, s_time = INT64_MIN;
+                tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time);
+                tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time);
+                return f_time < s_time;
+            });
+
+        for (auto const& d : tptrs)
         {
             int64_t torId;
             int64_t eta;
@@ -1481,7 +1508,6 @@ static void printTorrentList(tr_variant* top)
             int64_t leftUntilDone;
             double ratio;
             auto name = std::string_view{};
-            tr_variant* d = tr_variantListChild(list, i);
 
             if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) && tr_variantDictFindInt(d, TR_KEY_id, &torId) &&
                 tr_variantDictFindInt(d, TR_KEY_leftUntilDone, &leftUntilDone) &&
@@ -3291,6 +3317,8 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, i
 
 int tr_main(int argc, char* argv[])
 {
+    auto const init_mgr = tr_lib_init();
+
     tr_locale_set_global("");
 
     auto config = Config{};

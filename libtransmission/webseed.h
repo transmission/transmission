@@ -11,7 +11,9 @@
 
 #include <string_view>
 
-#include "peer-common.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/peer-common.h"
 
 tr_peer* tr_webseedNew(struct tr_torrent* torrent, std::string_view, tr_peer_callback callback, void* callback_data);
 

@@ -7,6 +7,7 @@
 #include <array>
 #include <bitset>
 #include <cerrno>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <iterator>
@@ -14,6 +15,8 @@
 #include <memory> // std::unique_ptr
 #include <optional>
 #include <queue>
+#include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -22,11 +25,12 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
 #include "libtransmission/cache.h"
-#include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/file.h"
+#include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
+#include "libtransmission/peer-common.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-msgs.h"
@@ -37,17 +41,22 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/tr-dht.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
+
+struct peer_atom;
+struct tr_error;
 
 #ifndef EBADMSG
 #define EBADMSG EINVAL
 #endif
 
 using namespace std::literals;
-using MessageBuffer = libtransmission::Buffer;
+
+// initial capacity is big enough to hold a BtPeerMsgs::Piece message
+using MessageBuffer = libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
 using MessageReader = libtransmission::BufferReader<std::byte>;
 using MessageWriter = libtransmission::BufferWriter<std::byte>;
 
@@ -407,12 +416,7 @@ public:
         }
     }
 
-    [[nodiscard]] tr_bandwidth& bandwidth() noexcept override
-    {
-        return io->bandwidth();
-    }
-
-    [[nodiscard]] std::pair<tr_address, tr_port> socketAddress() const override
+    [[nodiscard]] tr_socket_address socketAddress() const override
     {
         return io->socket_address();
     }
@@ -1800,8 +1804,10 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     current_message_len.reset();
     auto const message_type = *current_message_type;
     current_message_type.reset();
+
     auto payload = MessageBuffer{};
-    std::swap(payload, current_payload);
+    payload.add(current_payload);
+    current_payload.clear();
 
     auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, message_type, payload);
     *piece = n_piece_bytes_read;

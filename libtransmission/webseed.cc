@@ -4,6 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <cstdint> // uint64_t, uint32_t
+#include <ctime>
 #include <iterator>
 #include <memory>
 #include <numeric> // std::accumulate()
@@ -13,16 +15,23 @@
 #include <utility>
 #include <vector>
 
+#include <event2/buffer.h>
+
 #include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bandwidth.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
 #include "libtransmission/cache.h"
-#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-common.h"
 #include "libtransmission/peer-mgr.h"
+#include "libtransmission/session.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
@@ -208,11 +217,6 @@ public:
         }
 
         return is_active;
-    }
-
-    [[nodiscard]] tr_bandwidth& bandwidth() noexcept override
-    {
-        return bandwidth_;
     }
 
     [[nodiscard]] TR_CONSTEXPR20 size_t activeReqCount(tr_direction dir) const noexcept override
@@ -496,7 +500,7 @@ void makeUrl(tr_webseed const* const webseed, std::string_view name, OutputIt ou
 
     out = std::copy(std::begin(url), std::end(url), out);
 
-    if (tr_strvEndsWith(url, "/"sv) && !std::empty(name))
+    if (tr_strv_ends_with(url, "/"sv) && !std::empty(name))
     {
         tr_urlPercentEncode(out, name, false);
     }

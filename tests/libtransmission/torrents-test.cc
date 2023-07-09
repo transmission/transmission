@@ -3,17 +3,22 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <ctime> // time, size_t, time_t
+#include <memory>
 #include <set>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/torrent.h>
 #include <libtransmission/torrents.h>
+#include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-strbuf.h>
 
 #include "gtest/gtest.h"
-
 #include "test-fixtures.h"
 
 using namespace std::literals;

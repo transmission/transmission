@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::all_of
-#include <chrono>
 #include <cstddef>
 #include <string_view>
 #include <utility> // std::move
@@ -21,6 +20,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 namespace
@@ -31,17 +31,10 @@ using namespace std::literals;
 static_assert(TR_AF_INET == 0);
 static_assert(TR_AF_INET6 == 1);
 
-auto constexpr protocol_str(tr_address_type type) noexcept
+auto TR_CONSTEXPR23 protocol_str(tr_address_type type) noexcept
 {
-    /* TODO: very slight performance nit
-     * - If upgrading to C++20, change Map to a consteval lambda:
-     *   auto map = []() consteval { return std::array{ "IPv4"sv, "IPv6"sv }; };
-     * - If upgrading to C++23, change Map to static constexpr
-     *
-     * Ref: https://wg21.link/p2647r1
-     */
-    auto constexpr Map = std::array{ "IPv4"sv, "IPv6"sv };
-    return Map[type];
+    static auto TR_CONSTEXPR23 map = std::array{ "IPv4"sv, "IPv6"sv };
+    return map[type];
 }
 
 auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissionbt.com/"sv },
@@ -49,6 +42,10 @@ auto constexpr IPQueryServices = std::array{ std::array{ "https://ip4.transmissi
 
 auto constexpr UpkeepInterval = 30min;
 auto constexpr RetryUpkeepInterval = 30s;
+
+// Normally there should only ever be 1 cache instance during the entire program execution
+// This is a counter only to cater for SessionTest.honorsSettings
+std::size_t cache_exists = 0;
 
 } // namespace
 
@@ -110,9 +107,8 @@ namespace global_source_ip_helpers
 [[nodiscard]] std::optional<tr_address> get_global_source_address(tr_address const& bind_addr, int& err_out) noexcept
 {
     // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    auto const dst_addr = tr_address::from_string(bind_addr.is_ipv4() ? DstIPv4 : DstIPv6);
+    static auto constexpr DstIP = std::array{ "91.121.74.28"sv, "2001:1890:1112:1::20"sv };
+    auto const dst_addr = tr_address::from_string(DstIP[bind_addr.type]);
     auto const dst_port = tr_port::fromHost(6969);
 
     // In order for address selection to work right,
@@ -148,6 +144,8 @@ tr_global_ip_cache::tr_global_ip_cache(Mediator& mediator_in)
         upkeep_timers_[i]->set_callback(cb);
         start_timer(type, UpkeepInterval);
     }
+
+    ++cache_exists;
 }
 
 std::unique_ptr<tr_global_ip_cache> tr_global_ip_cache::create(tr_global_ip_cache::Mediator& mediator_in)
@@ -162,10 +160,15 @@ tr_global_ip_cache::~tr_global_ip_cache()
                                          global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
                                          source_addr_mutex_[TR_AF_INET], source_addr_mutex_[TR_AF_INET6] };
 
-    TR_ASSERT(std::all_of(
-        std::begin(is_updating_),
-        std::end(is_updating_),
-        [](is_updating_t const& v) { return v == is_updating_t::ABORT; }));
+    if (std::all_of(
+            std::begin(is_updating_),
+            std::end(is_updating_),
+            [](is_updating_t const& v) { return v == is_updating_t::ABORT; }))
+    {
+        tr_logAddDebug("Destructed while some global IP queries were pending.");
+    }
+
+    --cache_exists;
 }
 
 bool tr_global_ip_cache::try_shutdown() noexcept
@@ -235,11 +238,19 @@ void tr_global_ip_cache::update_global_addr(tr_address_type type) noexcept
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
     // Update global address
+    static auto constexpr IPProtocolMap = std::array{ tr_web::FetchOptions::IPProtocol::V4,
+                                                      tr_web::FetchOptions::IPProtocol::V6 };
     auto options = tr_web::FetchOptions{ IPQueryServices[type][ix_service_[type]],
                                          [this, type](tr_web::FetchResponse const& response)
-                                         { this->on_response_ip_query(type, response); },
+                                         {
+                                             // Check to avoid segfault
+                                             if (cache_exists != 0)
+                                             {
+                                                 this->on_response_ip_query(type, response);
+                                             }
+                                         },
                                          nullptr };
-    options.ip_proto = type == TR_AF_INET ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
+    options.ip_proto = IPProtocolMap[type];
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
     mediator_.fetch(std::move(options));
@@ -297,7 +308,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     if (response.status == 200 /* HTTP_OK */)
     {
         // Update member
-        if (auto addr = tr_address::from_string(tr_strvStrip(response.body)); addr && set_global_addr(type, *addr))
+        if (auto const addr = tr_address::from_string(tr_strv_strip(response.body)); addr && set_global_addr(type, *addr))
         {
             success = true;
             upkeep_timers_[type]->set_interval(UpkeepInterval);
@@ -311,14 +322,14 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     }
 
     // Try next IP query URL
-    if (!success && ++ix_service_[type] < std::size(IPQueryServices[type]))
-    {
-        update_global_addr(type);
-        return;
-    }
-
     if (!success)
     {
+        if (++ix_service_[type] < std::size(IPQueryServices[type]))
+        {
+            update_global_addr(type);
+            return;
+        }
+
         tr_logAddDebug(fmt::format("Couldn't obtain global {} address", protocol));
         unset_global_addr(type);
         upkeep_timers_[type]->set_interval(RetryUpkeepInterval);

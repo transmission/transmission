@@ -9,11 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstddef>
-#include <cstdint>
-#include <vector>
+#include <cstddef> // size_t
+#include <cstdint> // uint8_t
+#include <vector> // std::vector
 
-#include "tr-macros.h"
+#include "tr-macros.h" // TR_CONSTEXPR20
 
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.

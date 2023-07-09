@@ -5,16 +5,17 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "quark.h"
-#include "interned-string.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_error;
 struct tr_url_parsed_t;

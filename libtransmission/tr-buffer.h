@@ -9,17 +9,13 @@
 #include <cstddef>
 #include <iterator>
 #include <limits>
-#include <memory>
-#include <optional>
 #include <string>
 #include <string_view>
 
-#include <event2/buffer.h>
+#include <small/vector.hpp>
 
 #include "error.h"
 #include "net.h" // tr_socket_t
-#include "tr-assert.h"
-#include "utils-ev.h"
 #include "utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission
@@ -123,6 +119,11 @@ public:
         tr_error_set(error, err, tr_net_strerror(err));
         return {};
     }
+
+    void clear()
+    {
+        drain(size());
+    }
 };
 
 template<typename value_type>
@@ -223,61 +224,74 @@ public:
     }
 };
 
-class Buffer final
-    : public BufferReader<std::byte>
-    , public BufferWriter<std::byte>
+template<size_t N, typename value_type = std::byte, typename GrowthFactor = std::ratio<3, 2>>
+class StackBuffer final
+    : public BufferReader<value_type>
+    , public BufferWriter<value_type>
 {
 public:
-    using value_type = std::byte;
+    StackBuffer() = default;
+    StackBuffer(StackBuffer&&) = delete;
+    StackBuffer(StackBuffer const&) = delete;
+    StackBuffer& operator=(StackBuffer&&) = delete;
+    StackBuffer& operator=(StackBuffer const&) = delete;
 
-    Buffer() = default;
-    Buffer(Buffer&&) = default;
-    Buffer(Buffer const&) = delete;
-    Buffer& operator=(Buffer&&) = default;
-    Buffer& operator=(Buffer const&) = delete;
-
-    template<typename T>
-    explicit Buffer(T const& data)
+    template<typename ContiguousContainer>
+    explicit StackBuffer(ContiguousContainer const& data)
     {
-        add(data);
+        BufferWriter<value_type>::add(data);
     }
 
     [[nodiscard]] size_t size() const noexcept override
     {
-        return evbuffer_get_length(buf_.get());
+        return end_pos_ - begin_pos_;
     }
 
     [[nodiscard]] value_type const* data() const override
     {
-        return reinterpret_cast<value_type const*>(evbuffer_pullup(buf_.get(), -1));
+        return std::data(buf_) + begin_pos_;
     }
 
     void drain(size_t n_bytes) override
     {
-        evbuffer_drain(buf_.get(), n_bytes);
+        begin_pos_ += std::min(n_bytes, size());
+
+        if (begin_pos_ == end_pos_) // empty; reuse the buf
+        {
+            begin_pos_ = end_pos_ = 0U;
+        }
     }
 
-    [[nodiscard]] std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
+    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        auto iov = evbuffer_iovec{};
-        evbuffer_reserve_space(buf_.get(), n_bytes, &iov, 1);
-        TR_ASSERT(iov.iov_len >= n_bytes);
-        reserved_space_ = iov;
-        return { static_cast<value_type*>(iov.iov_base), static_cast<size_t>(iov.iov_len) };
+        if (auto const free_at_end = buf_.size() - end_pos_; free_at_end < n_bytes)
+        {
+            if (auto const total_free = begin_pos_ + free_at_end; total_free >= n_bytes)
+            {
+                // move data so that all free space is at the end
+                auto const size = this->size();
+                std::copy(data(), data() + size, std::data(buf_));
+                begin_pos_ = 0;
+                end_pos_ = size;
+            }
+            else // even `total_free` is not enough, so resize
+            {
+                buf_.resize(end_pos_ + n_bytes);
+            }
+        }
+
+        return { buf_.data() + end_pos_, n_bytes };
     }
 
-    void commit_space(size_t n_bytes) override
+    virtual void commit_space(size_t n_bytes) override
     {
-        TR_ASSERT(reserved_space_);
-        TR_ASSERT(reserved_space_->iov_len >= n_bytes);
-        reserved_space_->iov_len = n_bytes;
-        evbuffer_commit_space(buf_.get(), &*reserved_space_, 1);
-        reserved_space_.reset();
+        end_pos_ += n_bytes;
     }
 
 private:
-    evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
-    std::optional<evbuffer_iovec> reserved_space_;
+    small::vector<value_type, N, std::allocator<value_type>, std::true_type, size_t, GrowthFactor> buf_ = {};
+    size_t begin_pos_ = {};
+    size_t end_pos_ = {};
 };
 
 } // namespace libtransmission

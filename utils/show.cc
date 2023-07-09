@@ -6,11 +6,17 @@
 #include <algorithm>
 #include <array>
 #include <condition_variable>
+#include <cstdint> // int64_t
+#include <cstdio>
+#include <cstdlib>
 #include <ctime>
 #include <chrono>
+#include <iterator> // std::back_inserter
 #include <mutex>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
@@ -19,9 +25,9 @@
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -324,7 +330,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
         // build the full scrape URL
         auto scrape_url = tr_urlbuf{ tracker.scrape.sv() };
-        auto delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
+        auto delimiter = tr_strv_contains(scrape_url, '?') ? '&' : '?';
         scrape_url.append(delimiter, "info_hash=");
         tr_urlPercentEncode(std::back_inserter(scrape_url), metainfo.info_hash());
         fmt::print("{:s} ... ", scrape_url);
@@ -398,6 +404,8 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
 int tr_main(int argc, char* argv[])
 {
+    auto const init_mgr = tr_lib_init();
+
     tr_locale_set_global("");
 
     tr_logSetQueueEnabled(false);

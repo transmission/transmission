@@ -10,6 +10,7 @@
 #endif
 
 #include <atomic>
+#include <cstddef> // size_t
 #include <string>
 #include <string_view>
 #include <utility> // for std::make_pair()
@@ -27,22 +28,22 @@ struct tr_session;
 class tr_peer_socket
 {
 public:
-    using Buffer = libtransmission::Buffer;
+    using InBuf = libtransmission::BufferWriter<std::byte>;
+    using OutBuf = libtransmission::BufferReader<std::byte>;
 
     tr_peer_socket() = default;
-    tr_peer_socket(tr_session const* session, tr_address const& address, tr_port port, tr_socket_t sock);
-    tr_peer_socket(tr_address const& address, tr_port port, struct UTPSocket* const sock);
-    tr_peer_socket(tr_peer_socket&& s)
+    tr_peer_socket(tr_session const* session, tr_socket_address socket_address, tr_socket_t sock);
+    tr_peer_socket(tr_socket_address socket_address, struct UTPSocket* sock);
+    tr_peer_socket(tr_peer_socket&& s) noexcept
     {
         *this = std::move(s);
     }
     tr_peer_socket(tr_peer_socket const&) = delete;
-    tr_peer_socket& operator=(tr_peer_socket&& s)
+    tr_peer_socket& operator=(tr_peer_socket&& s) noexcept
     {
         close();
         handle = s.handle;
-        address_ = s.address_;
-        port_ = s.port_;
+        socket_address_ = s.socket_address_;
         type_ = s.type_;
         // invalidate s.type_, s.handle so s.close() won't break anything
         s.type_ = Type::None;
@@ -56,38 +57,38 @@ public:
     }
     void close();
 
-    size_t try_write(Buffer& buf, size_t max, tr_error** error) const;
-    size_t try_read(Buffer& buf, size_t max, tr_error** error) const;
+    size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error** error) const;
+    size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
 
-    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
+    [[nodiscard]] constexpr auto const& socketAddress() const noexcept
     {
-        return std::make_pair(address_, port_);
+        return socket_address_;
     }
 
     [[nodiscard]] constexpr auto const& address() const noexcept
     {
-        return address_;
+        return socket_address_.first;
     }
 
     [[nodiscard]] constexpr auto const& port() const noexcept
     {
-        return port_;
+        return socket_address_.second;
     }
 
     template<typename OutputIt>
     OutputIt display_name(OutputIt out)
     {
-        return address_.display_name(out, port_);
+        return address().display_name(out, port());
     }
 
     [[nodiscard]] std::string_view display_name(char* out, size_t outlen) const
     {
-        return address_.display_name(out, outlen, port_);
+        return address().display_name(out, outlen, port());
     }
 
     [[nodiscard]] std::string display_name() const
     {
-        return address_.display_name(port_);
+        return address().display_name(port());
     }
 
     [[nodiscard]] constexpr auto is_utp() const noexcept
@@ -141,7 +142,7 @@ public:
         struct UTPSocket* utp;
     } handle = {};
 
-    [[nodiscard]] static bool limit_reached(tr_session* const session) noexcept;
+    [[nodiscard]] static bool limit_reached(tr_session* session) noexcept;
 
 private:
     enum class Type
@@ -151,12 +152,11 @@ private:
         UTP
     };
 
-    tr_address address_;
-    tr_port port_;
+    tr_socket_address socket_address_;
 
     enum Type type_ = Type::None;
 
     static inline std::atomic<size_t> n_open_sockets_ = {};
 };
 
-tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed);
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed);

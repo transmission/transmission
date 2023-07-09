@@ -27,6 +27,7 @@
 #include "crypto-utils.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
+#include "observable.h"
 #include "log.h"
 #include "session.h"
 #include "torrent-metainfo.h"
@@ -608,7 +609,7 @@ public:
         return {};
     }
 
-    [[nodiscard]] constexpr auto const& id() const noexcept
+    [[nodiscard]] constexpr auto id() const noexcept
     {
         return unique_id_;
     }
@@ -819,6 +820,15 @@ public:
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
+
+    libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
+    libtransmission::SimpleObservable<tr_torrent*> doomed_;
+    libtransmission::SimpleObservable<tr_torrent*> got_metainfo_;
+    libtransmission::SimpleObservable<tr_torrent*> started_;
+    libtransmission::SimpleObservable<tr_torrent*> stopped_;
+    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
 
     tr_stat stats = {};
 

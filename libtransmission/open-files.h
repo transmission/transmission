@@ -20,8 +20,6 @@
 #include "file.h" // tr_sys_file_t
 #include "lru-cache.h"
 
-struct tr_session;
-
 // A pool of open files that are cached while reading / writing torrents' data
 class tr_open_files
 {

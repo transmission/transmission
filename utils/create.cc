@@ -4,21 +4,27 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cstdio>
 #include <cstdlib> // for strtoul()
 #include <chrono>
 #include <cstdint> // for uint32_t
 #include <future>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/announce-list.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
 #include <libtransmission/makemeta.h>
+#include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
@@ -43,7 +49,7 @@ auto constexpr Options = std::array<tr_option, 10>{
       { 'c', "comment", "Add a comment", "c", true, "<comment>" },
       { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
       { 'w', "webseed", "Add a webseed URL", "w", true, "<url>" },
-      { 'x', "anonymize", "Omit \"Creation date\" and \"Created by\" info", nullptr, false, nullptr },
+      { 'x', "anonymize", R"(Omit "Creation date" and "Created by" info)", nullptr, false, nullptr },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };

@@ -51,6 +51,7 @@ target_sources(${TR_NAME}
         error.cc
         error.h
         favicon-cache.h
+        file-capacity.cc
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
@@ -74,6 +75,7 @@ target_sources(${TR_NAME}
         mime-types.h
         net.cc
         net.h
+        observable.h
         open-files.cc
         open-files.h
         peer-common.h
@@ -91,8 +93,6 @@ target_sources(${TR_NAME}
         peer-msgs.h
         peer-socket.cc
         peer-socket.h
-        platform-quota.cc
-        platform-quota.h
         platform.cc
         platform.h
         port-forwarding-natpmp.cc

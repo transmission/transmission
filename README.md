@@ -66,7 +66,7 @@ If you're new to building programs from source code, this is typically easier th
     $ make clean
     $ git submodule foreach --recursive git clean -xfd
     $ git pull --rebase --prune
-    $ git submodule update --recursive
+    $ git submodule update --init --recursive
     # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimzed binary with debug information. (preferred)
     # Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
     $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..

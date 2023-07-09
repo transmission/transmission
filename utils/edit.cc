@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cstdio> // stderr
 #include <cstdlib> // EXIT_FAILURE
 #include <string>
 #include <string_view>
@@ -11,10 +12,9 @@
 
 #include <fmt/core.h>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -189,7 +189,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
     tr_variant* announce_list;
     bool changed = false;
 
-    if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && tr_strvContains(sv, oldval))
+    if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && tr_strv_contains(sv, oldval))
     {
         auto const newstr = replaceSubstr(sv, oldval, newval);
         fmt::print("\tReplaced in 'announce': '{:s}' --> '{:s}'\n", sv, newstr);
@@ -209,7 +209,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
 
             while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
             {
-                if (tr_variantGetStrView(node, &sv) && tr_strvContains(sv, oldval))
+                if (tr_variantGetStrView(node, &sv) && tr_strv_contains(sv, oldval))
                 {
                     auto const newstr = replaceSubstr(sv, oldval, newval);
                     fmt::print("\tReplaced in 'announce-list' tier #{:d}: '{:s}' --> '{:s}'\n", tierCount + 1, sv, newstr);

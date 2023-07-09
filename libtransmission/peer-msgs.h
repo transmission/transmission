@@ -9,16 +9,20 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <atomic>
 #include <cstddef> // for size_t
 #include <memory>
 #include <utility> // for std::pair<>
 
-#include "peer-common.h" // for tr_peer
+#include "libtransmission/transmission.h" // for tr_direction, tr_block_ind...
 
-class tr_peer;
+#include "libtransmission/interned-string.h"
+#include "libtransmission/net.h" // tr_socket_address
+#include "libtransmission/peer-common.h" // for tr_peer
+
+struct peer_atom;
 class tr_peerIo;
-struct tr_address;
 struct tr_torrent;
 
 /**
@@ -97,7 +101,7 @@ public:
         return is_active_[direction];
     }
 
-    [[nodiscard]] virtual std::pair<tr_address, tr_port> socketAddress() const = 0;
+    [[nodiscard]] virtual tr_socket_address socketAddress() const = 0;
 
     virtual void cancel_block_request(tr_block_index_t block) = 0;
 

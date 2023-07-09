@@ -12,10 +12,11 @@
 #include <ctime> // time_t
 #include <cstdint>
 
-#include "transmission.h" // tr_port_forwarding_state
-
 #include "natpmp.h"
-#include "net.h" // tr_port
+
+#include "libtransmission/transmission.h" // tr_port_forwarding_state
+
+#include "libtransmission/net.h" // tr_port
 
 class tr_natpmp
 {

@@ -167,7 +167,7 @@ void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse
         fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON));
     }
 
-    local_requests_.insert(tag, promise);
+    local_requests_.try_emplace(tag, promise);
     tr_rpc_request_exec_json(session_, json.get(), localSessionCallback, this);
 }
 
@@ -287,13 +287,15 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
 void RpcClient::localRequestFinished(TrVariantPtr response)
 {
-    int64_t const tag = parseResponseTag(*response);
-    RpcResponse const result = parseResponseData(*response);
-    QFutureInterface<RpcResponse> promise = local_requests_.take(tag);
+    if (auto node = local_requests_.extract(parseResponseTag(*response)); node)
+    {
+        auto const result = parseResponseData(*response);
 
-    promise.setProgressRange(0, 1);
-    promise.setProgressValue(1);
-    promise.reportFinished(&result);
+        auto& promise = node.mapped();
+        promise.setProgressRange(0, 1);
+        promise.setProgressValue(1);
+        promise.reportFinished(&result);
+    }
 }
 
 int64_t RpcClient::parseResponseTag(tr_variant& response) const

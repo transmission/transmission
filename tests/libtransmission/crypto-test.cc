@@ -3,20 +3,19 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
+#include <cassert>
+#include <cstddef> // std::byte, size_t
+#include <cstdint> // uint8_t
 #include <cstring>
 #include <iostream>
-#include <numeric>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_set>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/peer-mse.h>
 #include <libtransmission/crypto-utils.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/utils.h>
 
 #include "crypto-test-ref.h"

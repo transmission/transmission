@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <cerrno> // for ENOENT
 #include <cmath>
+#include <ctime> // time()
 #include <optional>
 #include <set>
 #include <string>
 #include <string_view>
-#include <thread>
 #include <utility>
 #include <vector>
 
@@ -18,13 +18,17 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/makemeta.h"
+#include "libtransmission/quark.h" // TR_KEY_length, TR_KEY_a...
 #include "libtransmission/session.h" // TR_NAME
+#include "libtransmission/torrent-files.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h" // tr_pathbuf
 #include "libtransmission/utils.h" // for _()
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
@@ -326,7 +330,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
     // "There is also a key `length` or a key `files`, but not both or neither.
     // If length is present then the download represents a single file,
     // otherwise it represents a set of files which go in a directory structure."
-    if (file_count() == 1U && !tr_strvContains(path(0), '/'))
+    if (file_count() == 1U && !tr_strv_contains(path(0), '/'))
     {
         tr_variantDictAddInt(info_dict, TR_KEY_length, file_size(0));
     }
@@ -348,7 +352,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
             auto* const path_list = tr_variantDictAddList(file_dict, TR_KEY_path, 0);
             auto token = std::string_view{};
-            while (tr_strvSep(&subpath, &token, '/'))
+            while (tr_strv_sep(&subpath, &token, '/'))
             {
                 tr_variantListAddStr(path_list, token);
             }

@@ -3,16 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstddef> // size_t
 #include <string>
 
-#include <libtransmission/transmission.h>
-
-#include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-magnet.h>
 #include <libtransmission/torrent-metainfo.h>
-#include <libtransmission/torrent.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test

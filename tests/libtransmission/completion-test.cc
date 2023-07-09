@@ -5,11 +5,13 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef> // size_t
 #include <cstdint>
 #include <set>
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/bitfield.h>
 #include <libtransmission/block-info.h>
 #include <libtransmission/crypto-utils.h> // for tr_rand_obj()
 #include <libtransmission/completion.h>

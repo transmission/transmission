@@ -11,9 +11,9 @@
 
 #include <memory> // for std::unique_ptr
 
-#include "transmission.h" // for tr_port_forwarding_state
+#include "libtransmission/transmission.h" // for tr_port_forwarding_state
 
-#include "net.h"
+#include "libtransmission/net.h"
 
 namespace libtransmission
 {

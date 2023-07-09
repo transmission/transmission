@@ -5,11 +5,11 @@
 
 #include <algorithm>
 #include <climits> /* INT_MAX */
+#include <cstdlib>
 #include <ctime>
 #include <deque>
 #include <fstream>
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include <fmt/core.h>
@@ -18,9 +18,8 @@
 
 #include "libtransmission/crypto-utils.h" // for tr_sha1()
 #include "libtransmission/error.h"
-#include "libtransmission/log.h"
-#include "libtransmission/magnet-metainfo.h"
-#include "libtransmission/resume.h"
+#include "libtransmission/file.h"
+#include "libtransmission/quark.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"
@@ -284,7 +283,7 @@ bool use_new_metainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error
     }
 
     // save it
-    if (!tr_saveFile(tor->torrent_file(), benc, error))
+    if (!tr_file_save(tor->torrent_file(), benc, error))
     {
         return false;
     }
@@ -431,5 +430,5 @@ std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_torrentGetMagnetLink(tor), buf, buflen);
+    return tr_strv_to_buf(tr_torrentGetMagnetLink(tor), buf, buflen);
 }

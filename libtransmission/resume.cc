@@ -3,13 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <cstring>
 #include <ctime>
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h> // fmt::ptr
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 
@@ -360,7 +359,7 @@ auto loadName(tr_variant* dict, tr_torrent* tor)
         return ret;
     }
 
-    name = tr_strvStrip(name);
+    name = tr_strv_strip(name);
     if (std::empty(name))
     {
         return ret;
@@ -638,7 +637,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
-    if (!tr_loadFile(filename, buf, &error) ||
+    if (!tr_file_read(filename, buf, &error) ||
         !tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, &error))
     {
         tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, error->message));
@@ -920,7 +919,7 @@ void save(tr_torrent* tor)
     auto const resume_file = tor->resume_file();
     if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, resume_file); err != 0)
     {
-        tor->set_local_error(fmt::format(FMT_STRING("Unable to save resume file: {:s}"), tr_strerror(err)));
+        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", tr_strerror(err)));
     }
 
     tr_variantClear(&top);

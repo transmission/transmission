@@ -3,13 +3,17 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <cerrno> /* EILSEQ, EINVAL */
 #include <cmath> /* fabs() */
+#include <cstddef> // std::byte
+#include <cstdint> // uint16_t
 #include <cstdlib>
 #include <cstring>
 #include <deque>
+#include <iterator> // std::back_inserter
 #include <string>
 #include <string_view>
 #include <utility>
@@ -24,10 +28,7 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
-#include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
@@ -347,7 +348,7 @@ void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl
         if ((state->special_flags & JSONSL_SPECIALf_NUMNOINT) != 0)
         {
             auto sv = std::string_view{ jsn->base + state->pos_begin, jsn->pos - state->pos_begin };
-            tr_variantInitReal(get_node(jsn), tr_parseNum<double>(sv).value_or(0.0));
+            tr_variantInitReal(get_node(jsn), tr_num_parse<double>(sv).value_or(0.0));
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {
@@ -442,7 +443,7 @@ struct JsonWalk
     }
 
     std::deque<ParentState> parents;
-    libtransmission::Buffer out;
+    libtransmission::StackBuffer<1024U * 8U, std::byte> out;
     bool doIndent;
 };
 

@@ -10,6 +10,7 @@
 #endif
 
 #include <array>
+#include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <string>
 
@@ -18,7 +19,6 @@
 #include "bitfield.h"
 #include "block-info.h"
 #include "history.h"
-#include "interned-string.h"
 #include "net.h" // tr_port
 
 /**
@@ -204,8 +204,6 @@ public:
     [[nodiscard]] virtual std::string display_name() const = 0;
 
     [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
-
-    [[nodiscard]] virtual tr_bandwidth& bandwidth() noexcept = 0;
 
     // requests that have been made but haven't been fulfilled yet
     [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;

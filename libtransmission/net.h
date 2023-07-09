@@ -19,10 +19,10 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
+#include <arpa/inet.h>
 #include <cerrno>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #endif
 
 #ifdef _WIN32
@@ -223,7 +223,7 @@ struct tr_address
     template<typename OutputIt>
     OutputIt to_compact(OutputIt out, tr_port port)
     {
-        return is_ipv4() ? to_compact_4(out, &this->addr.addr4, port) : to_compact_ipv6(out, &this->addr.addr6, port);
+        return is_ipv4() ? to_compact_ipv4(out, &this->addr.addr4, port) : to_compact_ipv6(out, &this->addr.addr6, port);
     }
 
     // compact sockaddr helpers
@@ -313,13 +313,15 @@ struct tr_address
     [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
 };
 
+using tr_socket_address = std::pair<tr_address, tr_port>;
+
 // --- Sockets
 
 struct tr_session;
 
 tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs);
 
-[[nodiscard]] std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(
+[[nodiscard]] std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(
     tr_session* session,
     tr_socket_t listening_sockfd);
 

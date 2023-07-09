@@ -5,8 +5,7 @@
 
 #include <algorithm>
 #include <array>
-#include <cerrno>
-#include <chrono>
+#include <cerrno> // ECONNREFUSED, ETIMEDOUT
 #include <string_view>
 #include <utility>
 
@@ -17,13 +16,14 @@
 #include "libtransmission/bitfield.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/log.h"
 #include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/utils.h"
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
@@ -185,7 +185,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
 
     /* now send these: HASH('req1', S), HASH('req2', SKEY) xor HASH('req3', S),
      * ENCRYPT(VC, crypto_provide, len(PadC), PadC, len(IA)), ENCRYPT(IA) */
-    auto outbuf = libtransmission::Buffer{};
+    auto outbuf = libtransmission::StackBuffer<1024U, std::byte>{};
 
     /* HASH('req1', S) */
     outbuf.add(tr_sha1::digest("req1"sv, dh_.secret()));
@@ -521,16 +521,8 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 
     if (auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash); info)
     {
-        bool const client_is_seed = info->is_done;
-        bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->socket_address());
         tr_logAddTraceHand(this, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
         peer_io->set_torrent_hash(info->info_hash);
-
-        if (client_is_seed && peer_is_seed)
-        {
-            tr_logAddTraceHand(this, "another seed tried to reconnect to us!");
-            return done(false);
-        }
     }
     else
     {
@@ -600,7 +592,7 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
     peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
-    auto outbuf = libtransmission::Buffer{};
+    auto outbuf = libtransmission::StackBuffer<1024U, std::byte>{};
 
     // send VC
     tr_logAddTraceHand(this, "sending vc");

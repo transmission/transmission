@@ -4,14 +4,16 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cstddef> // size_t, std::byte
 #include <string_view>
 
 #include "gtest/gtest.h"
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/magnet-metainfo.h>
 #include <libtransmission/crypto-utils.h> // tr_rand_buffer()
+#include <libtransmission/magnet-metainfo.h>
+#include <libtransmission/tr-macros.h>
 
 using namespace std::literals;
 

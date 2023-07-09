@@ -5,10 +5,11 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef> // size_t
+#include <cstdint> // uint8_t
 #include <limits>
 #include <vector>
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/bitfield.h>
 

@@ -4,63 +4,61 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
-#include <climits> /* INT_MAX */
 #include <condition_variable>
 #include <csignal>
+#include <cstddef> // size_t
 #include <cstdint>
-#include <cstdlib> // atoi()
 #include <ctime>
 #include <future>
 #include <iterator> // for std::back_inserter
-#include <list>
+#include <limits> // std::numeric_limits
 #include <memory>
 #include <numeric> // for std::accumulate()
 #include <string>
 #include <string_view>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
 #ifndef _WIN32
-#include <sys/types.h> /* umask() */
 #include <sys/stat.h> /* umask() */
 #endif
 
 #include <event2/event.h>
 
-#include <fmt/chrono.h>
-#include <fmt/format.h> // fmt::ptr
+#include <fmt/core.h> // fmt::ptr
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/announcer.h"
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/blocklist.h"
 #include "libtransmission/cache.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error-types.h"
-#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/global-ip-cache.h"
+#include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
-#include "libtransmission/peer-io.h"
 #include "libtransmission/peer-mgr.h"
+#include "libtransmission/peer-socket.h"
 #include "libtransmission/port-forwarding.h"
+#include "libtransmission/quark.h"
 #include "libtransmission/rpc-server.h"
-#include "libtransmission/session-id.h"
 #include "libtransmission/session.h"
+#include "libtransmission/session-alt-speeds.h"
+#include "libtransmission/session-settings.h"
 #include "libtransmission/timer-ev.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-dht.h"
 #include "libtransmission/tr-lpd.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
-#include "libtransmission/verify.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web.h"
+
+struct tr_ctor;
 
 using namespace std::literals;
 
@@ -251,7 +249,7 @@ bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_add
     // we found a suitable peer, add it to the torrent
     auto pex = tr_pex{ address, port };
     tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, &pex, 1U);
-    tr_logAddDebugTor(tor, fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), address.display_name(port)));
+    tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({:s})", address.display_name(port)));
     return true;
 }
 
@@ -379,9 +377,10 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
 
     if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
     {
-        auto const& [addr, port, sock] = *incoming_info;
+        auto const& [socket_address, sock] = *incoming_info;
+        auto const& [addr, port] = socket_address;
         tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.display_name(port)));
-        session->addIncoming(tr_peer_socket{ session, addr, port, sock });
+        session->addIncoming({ session, socket_address, sock });
     }
 }
 
@@ -1358,7 +1357,7 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     auto n_torrents = size_t{};
     auto const& folder = session->torrentDir();
 
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strvEndsWith(name, ".torrent"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".torrent"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
@@ -1369,11 +1368,11 @@ void session_load_torrents(tr_session* session, tr_ctor* ctor, std::promise<size
     }
 
     auto buf = std::vector<char>{};
-    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strvEndsWith(name, ".magnet"sv); }))
+    for (auto const& name : tr_sys_dir_get_files(folder, [](auto name) { return tr_strv_ends_with(name, ".magnet"sv); }))
     {
         auto const path = tr_pathbuf{ folder, '/', name };
 
-        if (tr_loadFile(path, buf) &&
+        if (tr_file_read(path, buf) &&
             tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr) &&
             tr_torrentNew(ctor, nullptr) != nullptr)
         {
@@ -1619,10 +1618,7 @@ void tr_sessionReloadBlocklists(tr_session* session)
 {
     session->blocklists_ = libtransmission::Blocklist::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
 
-    if (session->peer_mgr_)
-    {
-        tr_peerMgrOnBlocklistChanged(session->peer_mgr_.get());
-    }
+    session->blocklist_changed_.emit();
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)
