@@ -330,7 +330,7 @@ public:
 
 private:
     // https://stackoverflow.com/a/27952689/11390656
-    [[nodiscard]] static std::size_t hash_combine(std::size_t const& a, std::size_t const& b)
+    [[nodiscard]] static constexpr std::size_t hash_combine(std::size_t const& a, std::size_t const& b)
     {
         return a ^ (b + 0x9e3779b9U + (a << 6U) + (a >> 2U));
     }
