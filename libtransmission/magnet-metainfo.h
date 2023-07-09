@@ -10,15 +10,13 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
-
-#include "announce-list.h"
-#include "crypto-utils.h"
-#include "tr-strbuf.h" // tr_urlbuf
-#include "utils.h" // tr_strv_convert_utf8()
+#include "libtransmission/announce-list.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20, tr_sha1_digest_t
+#include "libtransmission/tr-strbuf.h" // tr_urlbuf
+#include "libtransmission/utils.h" // tr_strv_convert_utf8()
 
 struct tr_error;
-struct tr_variant;
 
 class tr_magnet_metainfo
 {

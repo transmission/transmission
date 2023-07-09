@@ -38,6 +38,7 @@
 #include "libtransmission/inout.h" // tr_ioTestPiece()
 #include "libtransmission/log.h"
 #include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/peer-common.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"

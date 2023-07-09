@@ -3,22 +3,28 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <cerrno>
+#include <cstddef> // size_t
+#include <cstdint> // uint32_t, uint64_t
+#include <string>
+#include <string_view>
+#include <vector>
+
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/resume.h>
 #include <libtransmission/torrent.h> // tr_isTorrent()
-#include <libtransmission/tr-assert.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/variant.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-#include <array>
-#include <cerrno>
-#include <cstdio> // fopen()
-#include <string>
-#include <string_view>
+struct tr_ctor;
+struct tr_error;
 
 using namespace std::literals;
 

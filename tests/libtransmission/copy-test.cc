@@ -4,13 +4,18 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <cstdint> // uint64_t
 #include <cstring>
+#include <string_view>
 #include <vector>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test

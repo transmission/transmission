@@ -4,10 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
+#include <string>
+#include <string_view>
+
+#include <fmt/core.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/error-types.h"
 #include "libtransmission/error.h"

@@ -3,6 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <chrono>
+#include <cstddef> // size_t
+
 #include <fmt/chrono.h>
 
 #include "libtransmission/transmission.h"

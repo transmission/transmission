@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::sort
-#include <cstring>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -19,10 +18,7 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
-#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"

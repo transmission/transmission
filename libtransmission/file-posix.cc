@@ -6,24 +6,24 @@
 #undef _GNU_SOURCE
 #define _GNU_SOURCE // NOLINT
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
-#include <cstdio>
+#include <cstdlib> // mkdtemp, mkstemp, realpath
+#include <optional>
 #include <string_view>
 #include <string>
 #include <vector>
 
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
-#include <libgen.h> /* basename(), dirname() */
-#include <sys/file.h> /* flock() */
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
 #ifdef HAVE_XFS_XFS_H
+#include <sys/file.h> /* flock() */
 #include <xfs/xfs.h>
 #endif
 
@@ -56,6 +56,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_UCLIBC_CHECK_VERSION
 #include "libtransmission/tr-strbuf.h"
 
 #ifndef O_LARGEFILE

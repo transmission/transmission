@@ -8,7 +8,10 @@
 #include <cstdio> /* printf */
 #include <cstdlib> /* atoi */
 #include <iostream>
+#include <iterator> /* std::back_inserter */
 #include <memory>
+#include <string_view>
+#include <vector>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -17,6 +20,7 @@
 #ifdef _WIN32
 #include <process.h> /* getpid */
 #else
+#include <sys/time.h> /* timeval */
 #include <unistd.h> /* getpid */
 #endif
 
@@ -24,15 +28,24 @@
 
 #include <fmt/core.h>
 
-#include "daemon.h"
+#include <libtransmission/transmission.h>
 
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
+
+#include "daemon.h"
+
+struct tr_ctor;
+struct tr_session;
+struct tr_torrent;
 
 #ifdef USE_SYSTEMD
 

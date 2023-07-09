@@ -4,14 +4,15 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <limits> // std::numeric_limits
+#include <string_view>
 
 #include <math/wide_integer/uintwide_t.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h" // tr_sha1
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/tr-arc4.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
 using namespace std::literals;
 

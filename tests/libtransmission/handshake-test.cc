@@ -6,17 +6,39 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cerrno>
+#include <cstddef> // size_t, std::byte
+#include <cstdint> // uint8_t
+#include <map>
+#include <memory>
+#include <optional>
 #include <string_view>
+#include <utility>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h>
+#include <unistd.h> // write()
+#endif
 
 #include <event2/util.h>
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/crypto-utils.h> // tr_sha1_to_string, tr_base...
 #include <libtransmission/handshake.h>
+#include <libtransmission/net.h>
 #include <libtransmission/peer-io.h>
+#include <libtransmission/peer-mse.h>
+#include <libtransmission/peer-socket.h>
 #include <libtransmission/session.h> // tr_peerIdInit()
 #include <libtransmission/timer.h>
+#include <libtransmission/tr-assert.h>
+#include <libtransmission/tr-macros.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -79,13 +101,6 @@ public:
         [[nodiscard]] bool allows_tcp() const override
         {
             return true;
-        }
-
-        [[nodiscard]] bool is_peer_known_seed(
-            tr_torrent_id_t /*tor_id*/,
-            std::pair<tr_address, tr_port> const& /*socket_address*/) const override
-        {
-            return false;
         }
 
         [[nodiscard]] size_t pad(void* setme, [[maybe_unused]] size_t maxlen) const override

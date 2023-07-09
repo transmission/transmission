@@ -3,23 +3,27 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::equal
 #include <array>
-#include <cstdlib>
+#include <cstdio>
 #include <set>
+#include <string>
 #include <string_view>
 #include <vector>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/announce-list.h>
 #include <libtransmission/error.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/variant.h>
-
-#include "test-fixtures.h"
+#include <libtransmission/utils.h>
 
 #include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using AnnounceListTest = ::testing::Test;
 using namespace std::literals;

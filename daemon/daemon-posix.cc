@@ -5,19 +5,22 @@
 
 #include <cassert>
 #include <cerrno>
-#include <pthread.h>
+#include <csignal>
+#include <string_view>
+
+#include <fcntl.h>
+#include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
+
 #ifdef HAVE_SYS_SIGNALFD_H
 #include <sys/signalfd.h>
 #endif /* signalfd API */
-#include <event2/event.h>
-#include <csignal>
-#include <cstdlib> /* abort(), daemon(), exit() */
-#include <fcntl.h> /* open() */
-#include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
 
-#include <string_view>
+#include <event2/event.h>
 
 #include <fmt/core.h>
+
+#include <libtransmission/error.h>
+#include <libtransmission/utils.h>
 
 #include "daemon.h"
 

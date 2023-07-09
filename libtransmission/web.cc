@@ -4,9 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#ifdef _WIN32
 #include <array>
+#endif
 #include <atomic>
 #include <condition_variable>
+#include <cstdint> // uint64_t
 #include <list>
 #include <map>
 #include <memory>
@@ -19,17 +22,21 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // setsockopt, SOL_SOCKET, SO_RC...
 #endif
 
 #include <curl/curl.h>
 
+#include <event2/buffer.h>
+
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
+#ifdef _WIN32
 #include "libtransmission/crypto-utils.h"
+#endif
 #include "libtransmission/log.h"
-#include "libtransmission/peer-io.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/utils.h"

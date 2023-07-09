@@ -5,19 +5,19 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint> // uint8_t
 #include <cstring>
 #include <iterator> // back_inserter
-#include <string>
+#include <optional>
 #include <string_view>
 
 #include <fmt/core.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/error-types.h"
 #include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/tr-strbuf.h" // for tr_urlbuf
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 

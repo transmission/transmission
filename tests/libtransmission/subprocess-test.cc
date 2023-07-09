@@ -3,21 +3,23 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
-#include <libtransmission/error.h>
-#include <libtransmission/file.h>
-#include <libtransmission/platform.h>
-#include <libtransmission/subprocess.h>
-
-#include "gtest/internal/gtest-port.h" // GetArgvs()
-
-#include "test-fixtures.h"
-
 #include <array>
+#include <cerrno>
+#include <cstdlib> // setenv
+#include <cstring> // strerror
 #include <fstream>
 #include <map>
 #include <string>
 #include <string_view>
+
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/subprocess.h>
+#include <libtransmission/tr-macros.h>
+#include <libtransmission/utils.h>
+
+#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 #ifdef _WIN32
 #include <windows.h>

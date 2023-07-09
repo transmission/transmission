@@ -16,8 +16,7 @@
 #include <string>
 #include <string_view>
 
-#include "libtransmission/transmission.h" // tr_sha1_digest_t
-
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha256_d...
 #include "libtransmission/tr-strbuf.h"
 
 /**

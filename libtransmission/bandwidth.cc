@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <initializer_list>
 #include <utility> // for std::swap()
 #include <vector>
 

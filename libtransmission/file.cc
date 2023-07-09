@@ -7,9 +7,6 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
-#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/tr-assert.h"
 

@@ -11,6 +11,7 @@
 #include <cstdint> // SIZE_MAX
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
+#include <exception>
 #include <iostream>
 #include <iterator> // for std::back_inserter
 #include <locale>
@@ -18,16 +19,16 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <vector>
 
 #ifdef _WIN32
 #include <windows.h> /* Sleep(), GetEnvironmentVariable() */
+#include <ws2tcpip.h> /* htonl(), ntohl() */
 
 #include <shellapi.h> /* CommandLineToArgv() */
-#endif
-
-#ifndef _WIN32
-#include <sys/stat.h> // mode_t
+#else
+#include <arpa/inet.h>
 #endif
 
 #define UTF_CPP_CPLUSPLUS 201703L
@@ -47,7 +48,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/mime-types.h"
-#include "libtransmission/net.h" // ntohl()
+#include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"

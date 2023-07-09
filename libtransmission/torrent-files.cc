@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::find()
+#include <array>
 #include <cctype>
 #include <functional>
 #include <iterator>
@@ -17,9 +18,10 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/error.h"
+#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

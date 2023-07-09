@@ -4,19 +4,47 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
+#include <cassert>
 #include <chrono>
+#include <cstddef> // size_t, std::byte
+#include <ctime> // time(), time_t
 #include <fstream>
+#include <iterator> // std::back_inserter
+#include <map>
 #include <memory>
+#include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <netdb.h> // addrinfo, freeaddrinfo
+#include <sys/socket.h> // AF_INET, AF_INET6, AF_UN...
+#endif
+
+#include <dht/dht.h> // dht_callback_t
 
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/crypto-utils.h> // tr_rand_obj
 #include <libtransmission/file.h>
-#include <libtransmission/timer-ev.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/net.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/session-thread.h> // for tr_evthread_init();
+#include <libtransmission/timer.h>
+#include <libtransmission/timer-ev.h>
+#include <libtransmission/tr-dht.h>
+#include <libtransmission/tr-macros.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h> // tr_variantDictAddRaw
 
 #include "gtest/gtest.h"
 #include "test-fixtures.h"

@@ -6,11 +6,14 @@
 #include <array>
 #include <cerrno>
 #include <cstdint>
-#include <cstring>
-#include <string>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h> // ntohl, ntohs
+#endif
 
 #include <event2/event.h>
-#include <event2/bufferevent.h>
 
 #include <libutp/utp.h>
 
@@ -18,14 +21,18 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/session.h"
 #include "libtransmission/bandwidth.h"
+#include "libtransmission/block-info.h" // tr_block_info
+#include "libtransmission/error.h" // tr_error_clear, tr_error_s...
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
+#include "libtransmission/peer-socket.h" // tr_peer_socket, tr_netOpen...
+#include "libtransmission/session.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h" // for _()
+
+struct sockaddr;
 
 #ifdef _WIN32
 #undef EAGAIN

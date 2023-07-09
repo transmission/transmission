@@ -10,6 +10,10 @@
 
 #include <fmt/core.h>
 
+#include <libtransmission/error.h>
+#include <libtransmission/log.h>
+#include <libtransmission/utils.h>
+
 #include "daemon.h"
 
 #ifndef SERVICE_ACCEPT_PRESHUTDOWN

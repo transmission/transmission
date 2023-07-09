@@ -6,6 +6,12 @@
 #include <array>
 #include <cerrno>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // AF_INET
+#endif
+
 #include <event2/util.h> /* evutil_inet_ntop() */
 
 #include <fmt/core.h>
@@ -18,8 +24,8 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
+#include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-natpmp.h"
-#include "libtransmission/port-forwarding.h"
 #include "libtransmission/utils.h"
 
 namespace

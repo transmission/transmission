@@ -14,14 +14,14 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
-#include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-natpmp.h"
 #include "libtransmission/port-forwarding-upnp.h"
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/timer.h"
-#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" // for _()
+
+struct tr_upnp;
 
 using namespace std::literals;
 

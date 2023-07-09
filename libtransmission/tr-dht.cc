@@ -3,10 +3,10 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <chrono>
-#include <cstdio>
-#include <cstdlib> // for abort()
-#include <cstring> // for memcpy()
+#include <cstdint> // uint16_t
+#include <cstring> // memcpy()
 #include <ctime>
 #include <deque>
 #include <fstream>
@@ -15,15 +15,14 @@
 #include <sstream>
 #include <string>
 #include <string_view>
-#include <tuple> // for std::tie()
+#include <tuple> // std::tie()
+#include <utility>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #undef gai_strerror
 #define gai_strerror gai_strerrorA
 #else
-#include <sys/time.h> // for `struct timezone`
-#include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netdb.h>
 #include <netinet/in.h> /* sockaddr_in */
@@ -38,6 +37,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_peerMgrCompactToPex()
+#include "libtransmission/quark.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"

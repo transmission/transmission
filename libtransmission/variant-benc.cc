@@ -3,9 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cctype> /* isdigit() */
+#include <cstddef> // size_t, std::byte
+#include <cstdint> // int64_t
 #include <deque>
+#include <string>
 #include <string_view>
 #include <optional>
 
@@ -14,14 +18,14 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/benc.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant-common.h"
 #include "libtransmission/variant.h"
+
+struct tr_error;
 
 using namespace std::literals;
 

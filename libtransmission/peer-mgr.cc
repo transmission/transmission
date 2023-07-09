@@ -29,21 +29,21 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announcer.h"
-#include "libtransmission/bandwidth.h"
-#include "libtransmission/blocklist.h"
-#include "libtransmission/cache.h"
+#include "libtransmission/block-info.h" // tr_block_info
 #include "libtransmission/clients.h"
-#include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
+#include "libtransmission/observable.h"
+#include "libtransmission/peer-common.h"
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-mgr-active-requests.h"
 #include "libtransmission/peer-mgr-wishlist.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-msgs.h"
+#include "libtransmission/peer-socket.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/session.h"
 #include "libtransmission/timer.h"
@@ -51,7 +51,6 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
-#include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/webseed.h"
 
@@ -112,8 +111,6 @@ public:
             tr_peerMgrSetUtpFailed(tor, socket_address, true);
         }
     }
-
-    [[nodiscard]] bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_socket_address const& socket_address) const override;
 
     [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
     {
@@ -2452,10 +2449,11 @@ struct peer_candidate
         candidates.resize(max);
     }
 
+    // put the best candiates at the end of the list
     auto ret = tr_peerMgr::OutboundCandidates{};
-    for (auto const& candidate : candidates)
+    for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
     {
-        ret.emplace_back(candidate.tor->id(), candidate.atom->socket_address);
+        ret.emplace_back(it->tor->id(), it->atom->socket_address);
     }
     return ret;
 }
@@ -2523,33 +2521,28 @@ void tr_peerMgr::make_new_peer_connections()
     auto const lock = session->unique_lock();
 
     // get the candidates if we need to
-    auto& peers = outbound_candidates_;
-    if (std::empty(peers))
+    auto& candidates = outbound_candidates_;
+    if (std::empty(candidates))
     {
-        peers = get_peer_candidates(session);
+        candidates = get_peer_candidates(session);
     }
 
-    // initiate connections to the first N candidates
-    auto const n_this_pass = std::min(std::size(peers), MaxConnectionsPerPulse);
-    for (size_t i = 0; i < n_this_pass; ++i)
+    // initiate connections to the last N candidates
+    auto const n_this_pass = std::min(std::size(candidates), MaxConnectionsPerPulse);
+    auto const it_end = std::crbegin(candidates) + n_this_pass;
+    for (auto it = std::crbegin(candidates); it != it_end; ++it)
     {
-        auto const& [tor_id, sock_addr] = peers[i];
-        auto* const tor = session->torrents().get(tor_id);
-        auto* const atom = tor->swarm->get_existing_atom(sock_addr);
-        if (tor != nullptr && atom != nullptr)
+        auto const& [tor_id, sock_addr] = *it;
+
+        if (auto* const tor = session->torrents().get(tor_id); tor != nullptr)
         {
-            initiateConnection(this, tor->swarm, *atom);
+            if (auto* const atom = tor->swarm->get_existing_atom(sock_addr); atom != nullptr)
+            {
+                initiateConnection(this, tor->swarm, *atom);
+            }
         }
     }
 
-    // remove the first N candidates from the list
-    peers.erase(std::begin(peers), std::begin(peers) + n_this_pass);
-}
-
-// ---
-
-bool HandshakeMediator::is_peer_known_seed(tr_torrent_id_t tor_id, tr_socket_address const& socket_address) const
-{
-    auto const* const tor = session_.torrents().get(tor_id);
-    return tor != nullptr && tor->swarm != nullptr && tor->swarm->peer_is_a_seed(socket_address);
+    // remove the N candidates that we just consumed
+    candidates.resize(std::size(candidates) - n_this_pass);
 }

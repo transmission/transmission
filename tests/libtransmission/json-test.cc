@@ -5,15 +5,15 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
+#include <cstdint> // int64_t
 #include <locale>
 #include <optional>
+#include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>
-#include <tuple>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
-#include <libtransmission/variant-common.h>
 
 #include "gtest/gtest.h"
 
