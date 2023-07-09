@@ -320,7 +320,7 @@ private:
     bool is_unreachable_ = false; // we tried to connect & failed
 };
 
-using Handshakes = std::map<tr_socket_address, tr_handshake>;
+using Handshakes = std::unordered_map<tr_socket_address, tr_handshake>;
 
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
