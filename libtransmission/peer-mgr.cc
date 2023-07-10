@@ -1706,12 +1706,9 @@ void updateInterest(tr_swarm* swarm)
         piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
     }
 
-    if (auto const& peers = swarm->peers; !std::empty(peers))
+    for (auto* const peer : swarm->peers)
     {
-        for (auto* const peer : peers)
-        {
-            peer->set_interested(isPeerInteresting(tor, piece_is_interesting, peer));
-        }
+        peer->set_interested(isPeerInteresting(tor, piece_is_interesting, peer));
     }
 }
 } // namespace update_interest_helpers
