@@ -1698,18 +1698,16 @@ void updateInterest(tr_swarm* swarm)
         return;
     }
 
+    // build a bitfield of interesting pieces...
+    std::vector<bool>::size_type const n = tor->piece_count();
+    auto piece_is_interesting = std::vector<bool>(n); // { n } doesn't work in gcc??
+    for (size_t i = 0; i < n; ++i)
+    {
+        piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
+    }
+
     if (auto const& peers = swarm->peers; !std::empty(peers))
     {
-        auto const n = tor->piece_count();
-
-        // build a bitfield of interesting pieces...
-        auto piece_is_interesting = std::vector<bool>{};
-        piece_is_interesting.resize(n);
-        for (size_t i = 0; i < n; ++i)
-        {
-            piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
-        }
-
         for (auto* const peer : peers)
         {
             peer->set_interested(isPeerInteresting(tor, piece_is_interesting, peer));
