@@ -412,7 +412,7 @@ auto loadFilenames(tr_variant* dict, tr_torrent* tor)
 
 void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
 {
-    if (b.has_none() || (std::empty(b) != 0U))
+    if (b.has_none() || std::empty(b))
     {
         tr_variantInitStr(benc, "none"sv);
     }
