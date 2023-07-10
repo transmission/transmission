@@ -2079,7 +2079,7 @@ void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
     }
 
     // close all but the `max` most active
-    auto peers = std::vector<tr_peerMsgs*>{ n - max };
+    auto peers = std::vector<tr_peerMsgs*>(n - max);
     std::partial_sort_copy(
         std::begin(swarm->peers),
         std::end(swarm->peers),
