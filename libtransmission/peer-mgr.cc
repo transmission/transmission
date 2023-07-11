@@ -17,6 +17,7 @@
 #include <memory>
 #include <optional>
 #include <tuple> // std::tie
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -319,7 +320,7 @@ private:
     bool is_unreachable_ = false; // we tried to connect & failed
 };
 
-using Handshakes = std::map<tr_socket_address, tr_handshake>;
+using Handshakes = std::unordered_map<tr_socket_address, tr_handshake>;
 
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
@@ -670,7 +671,7 @@ public:
 
     // tr_peers hold pointers to the items in this container,
     // therefore references to elements within cannot invalidate
-    std::map<tr_socket_address, peer_atom> pool;
+    std::unordered_map<tr_socket_address, peer_atom> pool;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 

@@ -11,6 +11,7 @@
 #include <algorithm> // for std::copy_n
 #include <array>
 #include <cstddef> // size_t
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -57,6 +58,8 @@ using tr_socket_t = int;
 
 #define sockerrno errno
 #endif
+
+#include "tr-assert.h"
 
 /**
  * Literally just a port number.
@@ -314,6 +317,48 @@ struct tr_address
 };
 
 using tr_socket_address = std::pair<tr_address, tr_port>;
+
+template<>
+class std::hash<tr_socket_address>
+{
+public:
+    std::size_t operator()(tr_socket_address const& socket_address) const noexcept
+    {
+        auto const& [addr, port] = socket_address;
+        return hash_combine(ip_hash(addr), port_hash(port));
+    }
+
+private:
+    // https://stackoverflow.com/a/27952689/11390656
+    [[nodiscard]] static constexpr std::size_t hash_combine(std::size_t const& a, std::size_t const& b)
+    {
+        return a ^ (b + 0x9e3779b9U + (a << 6U) + (a >> 2U));
+    }
+
+    [[nodiscard]] static std::size_t ip_hash(tr_address const& addr) noexcept
+    {
+        switch (addr.type)
+        {
+        case TR_AF_INET:
+            return IPv4Hasher(addr.addr.addr4.s_addr);
+        case TR_AF_INET6:
+            return IPv6Hasher(
+                std::string_view{ reinterpret_cast<char const*>(addr.addr.addr6.s6_addr), sizeof(addr.addr.addr6.s6_addr) });
+        default:
+            TR_ASSERT_MSG(false, "Invalid type");
+            return {};
+        }
+    }
+
+    [[nodiscard]] static std::size_t port_hash(tr_port const& port) noexcept
+    {
+        return PortHasher(port.host());
+    }
+
+    constexpr static std::hash<uint32_t> IPv4Hasher{};
+    constexpr static std::hash<std::string_view> IPv6Hasher{};
+    constexpr static std::hash<uint16_t> PortHasher{};
+};
 
 // --- Sockets
 
