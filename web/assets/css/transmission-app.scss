@@ -3,10 +3,14 @@
 
 // Colors related to torrent status
 $blue-100: #dbedff;
+$blue-200: #5379a9;
 $blue-300: #79b8ff;
+$blue-400: #1847d4;
 $blue-500: #0366d6;
+$green-100: #26a955;
 $green-200: #bef5cb;
 $green-300: #85e89d;
+$green-400: #62be79;
 $green-500: #28a745;
 $green-700: #22863a;
 $grey-200: #e1e4e8;
@@ -23,8 +27,8 @@ $grey-40: #666;
 $nice-grey: #f8f8f8;
 $nice-grey-darker: #f0f0f0;
 $dark-mode-black: #121212;
-$default-accent-color: #fff8c5;
-$default-accent-color-dark: #0c2d6b;
+$default-accent-color: #1847d4;
+$default-accent-color-dark: #1847d4;
 $default-border-dark: #575757;
 $default-border-light: #aeaeae;
 
@@ -75,11 +79,11 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   --color-fg-error: #{$red-500};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
-  --color-progressbar-background-2: #{$grey-500};
+  --color-progressbar-background-2: #{$green-400};
   --color-progressbar-verify: #{$yellow-300};
   --color-progressbar-magnet: #{$yellow-300};
   --color-progressbar-paused: #{$grey-200};
-  --color-progressbar-leech: #{$blue-300};
+  --color-progressbar-leech: #{$blue-200};
   --color-progressbar-queued: #{$blue-100};
 
   color-scheme: light dark;
@@ -104,13 +108,13 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-toolbar-background: #{$grey-800};
     --color-inspector-background: #{$grey-800};
     --color-inspector-tabs: #{$nice-grey};
-    --color-bg-selected: #{$default-accent-color-dark};
+    --color-bg-selected: #{$blue-400};
     --color-bg-tabs: #{$grey-700};
     --color-default-border: #{$default-border-dark};
-    --color-progressbar-seed-1: #{$green-700};
-    --color-progressbar-seed-2: #{$green-500};
+    --color-progressbar-seed-1: #{$green-100};
+    --color-progressbar-seed-2: #{$green-100};
     --color-progressbar-paused: #{$grey-500};
-    --color-progressbar-leech: #{$blue-500};
+    --color-progressbar-leech: #{$blue-200};
     --color-progressbar-seed-paused: #{$grey-500};
 
     .contrast-more {
@@ -136,18 +140,18 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-toolbar-background: #{$black};
       --color-inspector-background: #{$black};
       --color-inspector-tabs: #{$white};
-      --color-bg-selected: #{$blue-500};
+      --color-bg-selected: #{$blue-400};
       --color-bg-tabs: #{$black};
       --color-fg-tabs: #{$white};
       --color-default-border: #{$white};
       --color-progressbar-seed-1: #{$green-700};
       --color-progressbar-seed-2: #{$green-500};
       --color-progressbar-seed-paused: #{$grey-500};
-      --color-progressbar-background-2: #{$grey-500};
+      --color-progressbar-background-2: #{$green-400};
       --color-progressbar-verify: #{$yellow-300};
       --color-progressbar-magnet: #{$yellow-300};
       --color-progressbar-paused: #{$grey-500};
-      --color-progressbar-leech: #{$blue-500};
+      --color-progressbar-leech: #{$blue-200};
       --color-progressbar-queued: #{$blue-100};
     }
   }
@@ -159,7 +163,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-progressbar-verify: #{$yellow-300};
     --color-progressbar-magnet: #{$yellow-300};
     --color-progressbar-paused: #{$grey-200};
-    --color-progressbar-leech: #{$blue-300};
+    --color-progressbar-leech: #{$blue-200};
     --color-progressbar-queued: #{$blue-100};
     --color-bg-hover: #{$nice-grey};
     --color-fg-primary: #404040;
@@ -176,15 +180,15 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-warn: #e4606d5b;
     --color-fg-warn: #cf212e;
     --color-fg-disabled: #{$grey-500};
-    --color-toolbar-background: #{$nice-grey};
+    --color-toolbar-background: #{$green-400};
     --color-inspector-background: #{$white};
     --color-bg-tabs: #{$nice-grey-darker};
     --color-inspector-tabs: #{$nice-grey};
-    --color-bg-selected: #{$default-accent-color};
+    --color-bg-selected: #{$blue-400};
     --color-default-border: #{$default-border-light};
     --color-dialog-border: #{$nice-grey};
-    --color-progressbar-seed-1: #{$green-300};
-    --color-progressbar-seed-2: #{$green-200};
+    --color-progressbar-seed-1: #{$green-100};
+    --color-progressbar-seed-2: #{$green-100};
     --color-progressbar-seed-paused: #{$grey-200};
 
     .contrast-more {
@@ -210,18 +214,18 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-toolbar-background: #{$white};
       --color-inspector-background: #{$white};
       --color-inspector-tabs: #{$black};
-      --color-bg-selected: #{$blue-300};
+      --color-bg-selected: #{$blue-400};
       --color-bg-tabs: #{$white};
       --color-fg-tabs: #{$black};
       --color-default-border: #{$black};
-      --color-progressbar-seed-1: #{$green-700};
-      --color-progressbar-seed-2: #{$green-500};
+      --color-progressbar-seed-1: #{$green-100};
+      --color-progressbar-seed-2: #{$green-100};
       --color-progressbar-seed-paused: #{$grey-500};
-      --color-progressbar-background-2: #{$grey-500};
+      --color-progressbar-background-2: #{$green-400};
       --color-progressbar-verify: #{$yellow-300};
       --color-progressbar-magnet: #{$yellow-300};
       --color-progressbar-paused: #{$grey-500};
-      --color-progressbar-leech: #{$blue-500};
+      --color-progressbar-leech: #{$blue-200};
       --color-progressbar-queued: #{$blue-100};
     }
   }
