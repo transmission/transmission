@@ -1880,8 +1880,8 @@ namespace peer_pulse_helpers
         return {};
     }
 
-    auto const data = tr_torrentGetMetadataPiece(msgs->torrent, *piece);
-    if (!data.has_value())
+    auto data = tr_metadata_piece{};
+    if (!tr_torrentGetMetadataPiece(msgs->torrent, *piece, data))
     {
         // send a reject
         auto tmp = tr_variant{};
@@ -1898,7 +1898,6 @@ namespace peer_pulse_helpers
     }
 
     // send the metadata
-    auto const data_sv = std::string_view{ reinterpret_cast<char const*>(std::data(*data)), std::size(*data) };
     auto tmp = tr_variant{};
     tr_variantInitDict(&tmp, 3);
     tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
@@ -1909,7 +1908,7 @@ namespace peer_pulse_helpers
         BtPeerMsgs::Ltep,
         msgs->ut_metadata_id,
         tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC),
-        data_sv);
+        data);
     tr_variantClear(&tmp);
     return n_bytes_written;
 }
