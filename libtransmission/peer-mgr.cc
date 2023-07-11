@@ -933,7 +933,7 @@ void tr_peerMgrSetUtpFailed(peer_atom* atom, bool failed)
 {
     TR_ASSERT(atom != nullptr);
 
-    atom->utp_failed = false;
+    atom->utp_failed = failed;
 }
 
 /**
