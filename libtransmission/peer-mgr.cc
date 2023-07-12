@@ -241,7 +241,83 @@ struct peer_atom
         is_unreachable_ = false;
     }
 
-    [[nodiscard]] constexpr int getReconnectIntervalSecs(time_t const now) const noexcept
+    void setBlocklistedDirty()
+    {
+        blocklisted_.reset();
+    }
+
+    [[nodiscard]] constexpr auto is_banned() const noexcept
+    {
+        return is_banned_;
+    }
+
+    constexpr void ban() noexcept
+    {
+        is_banned_ = true;
+    }
+
+    [[nodiscard]] constexpr auto last_connection_attempt_succeeded() const noexcept
+    {
+        return last_connection_at_ >= last_connection_attempt_at_;
+    }
+
+    [[nodiscard]] constexpr auto compare_by_connection_time(peer_atom const& that) const noexcept
+    {
+        return tr_compare_3way(last_connection_at_, that.last_connection_at_);
+    }
+
+    [[nodiscard]] constexpr auto connection_attempt_time() const noexcept
+    {
+        return last_connection_attempt_at_;
+    }
+
+    constexpr void set_connection_attempt_time(time_t value) noexcept
+    {
+        last_connection_attempt_at_ = value;
+
+        last_piece_data_time_ = {};
+    }
+
+    constexpr void set_latest_piece_data_time(time_t value) noexcept
+    {
+        last_piece_data_time_ = value;
+    }
+
+    [[nodiscard]] constexpr bool has_transferred_piece_data() const noexcept
+    {
+        return last_piece_data_time_ != time_t{};
+    }
+
+    [[nodiscard]] constexpr auto compare_by_piece_data_time(peer_atom const& that) const noexcept
+    {
+        return tr_compare_3way(last_piece_data_time_, that.last_piece_data_time_);
+    }
+
+    [[nodiscard]] constexpr auto reconnect_interval_has_passed(time_t const now) const noexcept
+    {
+        auto const time_since_last_connection_attempt = now - last_connection_attempt_at_;
+        return time_since_last_connection_attempt >= get_reconnect_interval_secs(now);
+    }
+
+    [[nodiscard]] constexpr std::optional<time_t> idle_secs(time_t now) const noexcept
+    {
+        if (!last_connection_attempt_succeeded())
+            return {};
+
+        return now - std::max(last_piece_data_time_, last_connection_at_);
+    }
+
+    tr_socket_address socket_address;
+
+    uint16_t num_fails = {};
+
+    uint8_t flags = {}; /* these match the added_f flags */
+    uint8_t flags2 = {}; /* flags that aren't defined in added_f */
+
+    bool utp_failed = false; /* We recently failed to connect over µTP */
+
+private:
+    [[nodiscard]] constexpr int get_reconnect_interval_secs(time_t const now) const noexcept
     {
         auto sec = int{};
         auto const unreachable = is_unreachable();
@@ -300,73 +376,6 @@ struct peer_atom
         return sec;
     }
 
-    void setBlocklistedDirty()
-    {
-        blocklisted_.reset();
-    }
-
-    [[nodiscard]] constexpr auto is_banned() const noexcept
-    {
-        return is_banned_;
-    }
-
-    constexpr void ban() noexcept
-    {
-        is_banned_ = true;
-    }
-
-    [[nodiscard]] constexpr auto last_connection_attempt_succeeded() const noexcept
-    {
-        return last_connection_at_ >= last_connection_attempt_at_;
-    }
-
-    [[nodiscard]] constexpr auto connection_attempt_time() const noexcept
-    {
-        return last_connection_attempt_at_;
-    }
-
-    constexpr void set_connection_attempt_time(time_t value) noexcept
-    {
-        last_connection_attempt_at_ = value;
-
-        last_piece_data_time_ = {};
-    }
-
-    constexpr void set_latest_piece_data_time(time_t value) noexcept
-    {
-        last_piece_data_time_ = value;
-    }
-
-    [[nodiscard]] constexpr bool has_transferred_piece_data() const noexcept
-    {
-        return last_piece_data_time_ != time_t{};
-    }
-
-    [[nodiscard]] constexpr auto compare_by_piece_data_time(peer_atom const& that) const noexcept
-    {
-        return tr_compare_3way(last_piece_data_time_, that.last_piece_data_time_);
-    }
-
-    [[nodiscard]] constexpr std::optional<time_t> idle_secs(time_t now) const noexcept
-    {
-        if (!last_connection_attempt_succeeded())
-            return {};
-
-        return now - std::max(last_piece_data_time_, last_connection_at_);
-    }
-
-    tr_socket_address socket_address;
-
-    uint16_t num_fails = {};
-
-    time_t time = {}; /* when the peer's connection status last changed */
-
-    uint8_t flags = {}; /* these match the added_f flags */
-    uint8_t flags2 = {}; /* flags that aren't defined in added_f */
-
-    bool utp_failed = false; /* We recently failed to connect over µTP */
-
-private:
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 
@@ -486,8 +495,6 @@ public:
 
         auto* const atom = peer->atom;
         TR_ASSERT(atom != nullptr);
-
-        atom->time = tr_time();
 
         if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
         {
@@ -1221,7 +1228,6 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
     {
         struct peer_atom* atom = s->ensure_atom_exists(socket_address, 0, TR_PEER_FROM_INCOMING);
 
-        atom->time = tr_time();
         atom->set_connection_attempt_time(tr_time());
 
         if (!result.io->is_incoming())
@@ -2047,7 +2053,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     /* disconnect if we're both seeds and enough time has passed for PEX */
     if (tor->is_done() && peer->isSeed())
     {
-        return !tor->allows_pex() || now - atom->time >= 30;
+        return !tor->allows_pex() || atom->idle_secs(now).value_or(0U) >= 30U;
     }
 
     /* disconnect if it's been too long since piece data has been transferred.
@@ -2117,7 +2123,7 @@ constexpr struct
         }
 
         /* the one we connected to most recently goes first */
-        return -tr_compare_3way(a->atom->time, b->atom->time);
+        return -a->atom->compare_by_connection_time(*b->atom);
     }
 
     [[nodiscard]] constexpr bool operator()(tr_peer const* a, tr_peer const* b) const // less than
@@ -2341,7 +2347,7 @@ namespace connect_helpers
     }
 
     // not if we just tried them already
-    if (now - atom.time < atom.getReconnectIntervalSecs(now))
+    if (!atom.reconnect_interval_has_passed(now))
     {
         return false;
     }
@@ -2573,7 +2579,6 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     }
 
     atom.set_connection_attempt_time(now);
-    atom.time = now;
 }
 } // namespace connect_helpers
 } // namespace
