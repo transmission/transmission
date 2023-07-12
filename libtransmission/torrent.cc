@@ -1886,7 +1886,6 @@ void tr_torrent::recheck_completeness()
     if (new_completeness != completeness)
     {
         bool const recent_change = downloadedCur != 0;
-        bool const was_leeching = !this->is_done();
         bool const was_running = is_running();
 
         if (recent_change)
