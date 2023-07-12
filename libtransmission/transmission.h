@@ -1428,7 +1428,7 @@ enum tr_torrent_activity
     TR_STATUS_SEED_WAIT = 5, /* Queued to seed */
     TR_STATUS_SEED = 6 /* Seeding */
 };
-enum
+enum tr_peer_from : uint8_t
 {
     TR_PEER_FROM_INCOMING = 0, /* connections made to the listening port */
     TR_PEER_FROM_LPD, /* peers found by local announcements */

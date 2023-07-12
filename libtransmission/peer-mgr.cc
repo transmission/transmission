@@ -139,11 +139,11 @@ private:
  */
 struct peer_atom
 {
-    peer_atom(tr_socket_address socket_address_in, uint8_t flags_in, uint8_t from)
+    peer_atom(tr_socket_address socket_address_in, uint8_t flags_in, tr_peer_from from)
         : socket_address{ std::move(socket_address_in) }
-        , fromBest{ from }
         , flags{ flags_in }
         , from_first_{ from }
+        , from_best_{ from }
     {
         ++n_atoms;
     }
@@ -167,6 +167,16 @@ struct peer_atom
     [[nodiscard]] constexpr auto from_first() const noexcept
     {
         return from_first_;
+    }
+
+    [[nodiscard]] constexpr auto from_best() const noexcept
+    {
+        return from_best_;
+    }
+
+    constexpr void found_at(tr_peer_from from) noexcept
+    {
+        from_best_ = std::min(from_best_, from);
     }
 
     [[nodiscard]] constexpr auto isSeed() const noexcept
@@ -315,7 +325,6 @@ struct peer_atom
     time_t lastConnectionAttemptAt = {};
     time_t lastConnectionAt = {};
 
-    uint8_t fromBest; /* the "best" value of where the peer has been found */
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
 
@@ -329,7 +338,9 @@ private:
 
     mutable std::optional<bool> blocklisted_;
 
-    uint8_t const from_first_; // where the peer was first found
+    tr_peer_from const from_first_; // where the peer was first found
+    tr_peer_from from_best_; // the "best" place where this peer was found
+
     bool is_connected_ = false;
     bool is_banned_ = false;
     bool is_unreachable_ = false; // we tried to connect & failed
@@ -535,7 +546,7 @@ public:
         return atom != nullptr && atom->isSeed();
     }
 
-    peer_atom* ensure_atom_exists(tr_socket_address const& socket_address, uint8_t const flags, uint8_t const from)
+    peer_atom* ensure_atom_exists(tr_socket_address const& socket_address, uint8_t const flags, tr_peer_from const from)
     {
         TR_ASSERT(socket_address.first.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
@@ -544,7 +555,7 @@ public:
         peer_atom* atom = &atom_it->second;
         if (!is_new)
         {
-            atom->fromBest = std::min(atom->fromBest, from);
+            atom->found_at(from);
             atom->flags |= flags;
         }
 
@@ -1251,7 +1262,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
 }
 
-size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex)
+size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, size_t n_pex)
 {
     size_t n_used = 0;
     tr_swarm* s = tor->swarm;
@@ -1335,7 +1346,7 @@ constexpr struct
             return -val;
         }
 
-        if (auto const val = tr_compare_3way(a.fromBest, b.fromBest); val != 0)
+        if (auto const val = tr_compare_3way(a.from_best(), b.from_best()); val != 0)
         {
             return val;
         }
@@ -2391,7 +2402,7 @@ struct peer_candidate
 
     /* Prefer peers that we got from more trusted sources.
      * lower `fromBest` values indicate more trusted sources */
-    score = addValToKey(score, 4, atom.fromBest);
+    score = addValToKey(score, 4, atom.from_best());
 
     /* salt */
     score = addValToKey(score, 8, salt);

@@ -170,7 +170,7 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket);
 
-size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
+size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, size_t n_pex);
 
 enum
 {
