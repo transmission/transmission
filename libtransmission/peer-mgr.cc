@@ -104,13 +104,7 @@ public:
         return session_.allowsTCP();
     }
 
-    void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_socket_address const& socket_address) override
-    {
-        if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
-        {
-            tr_peerMgrSetUtpFailed(tor, socket_address, true);
-        }
-    }
+    void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_socket_address const& socket_address) override;
 
     [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
     {
@@ -506,18 +500,6 @@ public:
     {
         auto&& it = pool.find(socket_address);
         return it != pool.end() ? &it->second : nullptr;
-    }
-
-    [[nodiscard]] peer_atom const* get_existing_atom(tr_socket_address const& socket_address) const noexcept
-    {
-        auto const& it = pool.find(socket_address);
-        return it != pool.cend() ? &it->second : nullptr;
-    }
-
-    [[nodiscard]] bool peer_is_a_seed(tr_socket_address const& socket_address) const noexcept
-    {
-        auto const* const atom = get_existing_atom(socket_address);
-        return atom != nullptr && atom->isSeed();
     }
 
     peer_atom* ensure_atom_exists(tr_socket_address const& socket_address, uint8_t const flags, uint8_t const from)
@@ -940,20 +922,18 @@ void tr_peerMgrFree(tr_peerMgr* manager)
 
 // ---
 
-void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_socket_address const& socket_address)
+void tr_peerMgrSetUtpSupported(peer_atom* atom)
 {
-    if (auto* const atom = tor->swarm->get_existing_atom(socket_address); atom != nullptr)
-    {
-        atom->flags |= ADDED_F_UTP_FLAGS;
-    }
+    TR_ASSERT(atom != nullptr);
+
+    atom->flags |= ADDED_F_UTP_FLAGS;
 }
 
-void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_socket_address const& socket_address, bool failed)
+void tr_peerMgrSetUtpFailed(peer_atom* atom, bool failed)
 {
-    if (auto* const atom = tor->swarm->get_existing_atom(socket_address); atom != nullptr)
-    {
-        atom->utp_failed = failed;
-    }
+    TR_ASSERT(atom != nullptr);
+
+    atom->utp_failed = failed;
 }
 
 /**
@@ -1132,9 +1112,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
     {
         if (s != nullptr)
         {
-            struct peer_atom* atom = s->get_existing_atom(socket_address);
-
-            if (atom != nullptr)
+            if (peer_atom* const atom = s->get_existing_atom(socket_address); atom != nullptr)
             {
                 ++atom->num_fails;
 
@@ -2545,4 +2523,15 @@ void tr_peerMgr::make_new_peer_connections()
 
     // remove the N candidates that we just consumed
     candidates.resize(std::size(candidates) - n_this_pass);
+}
+
+void HandshakeMediator::set_utp_failed(tr_sha1_digest_t const& info_hash, tr_socket_address const& socket_address)
+{
+    if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
+    {
+        if (auto* const atom = tor->swarm->get_existing_atom(socket_address); atom != nullptr)
+        {
+            tr_peerMgrSetUtpFailed(atom, true);
+        }
+    }
 }
