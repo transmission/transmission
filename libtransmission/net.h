@@ -344,6 +344,11 @@ struct tr_socket_address
         return address_.display_name(port_);
     }
 
+    [[nodiscard]] auto is_valid() const noexcept
+    {
+        return address_.is_valid();
+    }
+
     [[nodiscard]] int compare(tr_socket_address const& that) const noexcept
     {
         if (auto const val = tr_compare_3way(address_, that.address_); val != 0)

@@ -504,7 +504,7 @@ public:
 
     peer_atom* ensure_atom_exists(tr_socket_address const& socket_address, uint8_t const flags, uint8_t const from)
     {
-        TR_ASSERT(socket_address.first.is_valid());
+        TR_ASSERT(socket_address.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
 
         auto&& [atom_it, is_new] = pool.try_emplace(socket_address, socket_address, flags, from);
