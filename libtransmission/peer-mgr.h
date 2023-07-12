@@ -133,7 +133,7 @@ public:
 
     // ---
 
-    constexpr void set_connectable(bool value = true) noexcept
+    void set_connectable(bool value = true) noexcept
     {
         is_connectable_ = value;
     }
@@ -145,7 +145,7 @@ public:
 
     // ---
 
-    constexpr void set_utp_supported(bool value = true) noexcept
+    void set_utp_supported(bool value = true) noexcept
     {
         is_utp_supported_ = value;
     }
