@@ -513,8 +513,6 @@ constexpr bool tr_isPex(tr_pex const* pex)
 
 void tr_peerMgrFree(tr_peerMgr* manager);
 
-void tr_peerMgrSetUtpSupported(tr_peer_info* peer_info, bool supported);
-
 [[nodiscard]] std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
 
 [[nodiscard]] bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);

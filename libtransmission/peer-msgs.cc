@@ -343,7 +343,7 @@ public:
             pex_timer_->start_repeating(SendPexInterval);
         }
 
-        tr_peerMgrSetUtpSupported(peer_info, io->supports_utp());
+        peer_info->set_utp_supported(io->supports_utp());
 
         if (io->supports_ltep())
         {
@@ -1096,9 +1096,9 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
         if (tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &i))
         {
             // Transmission doesn't support this extension yet.
-            // But its presence does indicate µTP supports, which
-            // we do care about...
-            tr_peerMgrSetUtpSupported(msgs->peer_info, true);
+            // But its presence does indicate µTP supports,
+            // which we do care about...
+            msgs->peer_info->set_utp_supported(true);
         }
     }
 

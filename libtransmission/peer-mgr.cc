@@ -739,13 +739,6 @@ void tr_peerMgrFree(tr_peerMgr* manager)
 
 // ---
 
-void tr_peerMgrSetUtpSupported(tr_peer_info* peer_info, bool supported)
-{
-    TR_ASSERT(peer_info != nullptr);
-
-    peer_info->set_utp_supported(supported);
-}
-
 /**
  * REQUESTS
  *
