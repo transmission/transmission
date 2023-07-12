@@ -160,7 +160,7 @@ tr_global_ip_cache::~tr_global_ip_cache()
                                          global_addr_mutex_[TR_AF_INET], global_addr_mutex_[TR_AF_INET6],
                                          source_addr_mutex_[TR_AF_INET], source_addr_mutex_[TR_AF_INET6] };
 
-    if (std::all_of(
+    if (!std::all_of(
             std::begin(is_updating_),
             std::end(is_updating_),
             [](is_updating_t const& v) { return v == is_updating_t::ABORT; }))
