@@ -232,7 +232,7 @@ public:
         auto const lock = unique_lock();
 
         auto* const peer_info = peer->peer_info;
-        TR_ASSERT(atom != nullptr);
+        TR_ASSERT(peer_info != nullptr);
 
         if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
         {
@@ -321,7 +321,7 @@ public:
 
     tr_peer_info& ensure_info_exists(tr_socket_address const& socket_address, uint8_t const flags, tr_peer_from const from)
     {
-        TR_ASSERT(socket_address.first.is_valid());
+        TR_ASSERT(socket_address.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
 
         auto&& [info_it, is_new] = pool.try_emplace(socket_address, socket_address, flags, from);
@@ -884,7 +884,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     ++swarm->stats.peer_from_count[peer_info->from_first()];
 
     TR_ASSERT(swarm->stats.peer_count == swarm->peerCount());
-    TR_ASSERT(swarm->stats.peer_from_count[atom->fromFirst] <= swarm->stats.peer_count);
+    TR_ASSERT(swarm->stats.peer_from_count[peer_info->from_first()] <= swarm->stats.peer_count);
 }
 
 /* FIXME: this is kind of a mess. */
@@ -1003,9 +1003,9 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
     else /* we don't have a connection to them yet... */
     {
-        auto sock_addr = tr_socket_address{ socket.socketAddress() };
+        auto socket_address = socket.socketAddress();
         manager->incoming_handshakes.try_emplace(
-            std::move(sock_addr),
+            socket_address,
             &manager->handshake_mediator_,
             tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),

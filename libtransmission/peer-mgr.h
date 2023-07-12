@@ -94,12 +94,12 @@ public:
 
     [[nodiscard]] constexpr auto& port() noexcept
     {
-        return socket_address_.second;
+        return socket_address_.port_;
     }
 
     [[nodiscard]] auto display_name() const
     {
-        return addr().display_name(port());
+        return socket_address_.display_name();
     }
 
     // ---
@@ -312,12 +312,12 @@ public:
 private:
     [[nodiscard]] constexpr tr_address const& addr() const noexcept
     {
-        return socket_address_.first;
+        return socket_address_.address();
     }
 
-    [[nodiscard]] constexpr tr_port const& port() const noexcept
+    [[nodiscard]] constexpr auto port() const noexcept
     {
-        return socket_address_.second;
+        return socket_address_.port();
     }
 
     [[nodiscard]] constexpr int get_reconnect_interval_secs(time_t const now) const noexcept
