@@ -362,11 +362,7 @@ public:
                 tor->set_date_active(now);
                 tor->set_dirty();
                 tor->session->add_uploaded(event.length);
-
-                if (auto* const info = peer->peer_info; info != nullptr)
-                {
-                    info->set_latest_piece_data_time(now);
-                }
+                peer->peer_info->set_latest_piece_data_time(now);
 
                 break;
             }
@@ -710,6 +706,10 @@ tr_peer::tr_peer(tr_torrent const* tor, tr_peer_info* peer_info_in)
     , peer_info{ peer_info_in }
     , blame{ tor->block_count() }
 {
+    if (auto* const info = peer_info; info != nullptr)
+    {
+        info->set_connected();
+    }
 }
 
 tr_peer::~tr_peer()
@@ -877,7 +877,6 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     tr_swarm* swarm = tor->swarm;
 
     auto* peer = tr_peerMsgsNew(tor, peer_info, std::move(io), client, &tr_swarm::peerCallbackFunc, swarm);
-    peer_info->set_connected();
 
     swarm->peers.push_back(peer);
 

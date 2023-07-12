@@ -21,6 +21,7 @@
 #include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
 
 #include "libtransmission/net.h" /* tr_address */
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
 
 /**
@@ -52,14 +53,14 @@ enum
 };
 
 /**
- * Peer information that should be kept around even when not connected,
+ * Peer information that should be retained even when not connected,
  * e.g. to help us decide which peers to connect to.
  */
 class tr_peer_info
 {
 public:
-    tr_peer_info(tr_socket_address socket_address_in, uint8_t pex_flags, tr_peer_from from)
-        : socket_address_{ std::move(socket_address_in) }
+    tr_peer_info(tr_socket_address socket_address, uint8_t pex_flags, tr_peer_from from)
+        : socket_address_{ std::move(socket_address) }
         , from_first_{ from }
         , from_best_{ from }
     {
@@ -256,7 +257,7 @@ public:
 
     // ---
 
-    constexpr void on_connection_failed()
+    constexpr void on_connection_failed() noexcept
     {
         if (num_fails_ != std::numeric_limits<decltype(num_fails_)>::max())
         {
@@ -271,7 +272,7 @@ public:
 
     // ---
 
-    constexpr void set_pex_flags(uint8_t pex_flags)
+    constexpr void set_pex_flags(uint8_t pex_flags) noexcept
     {
         if ((pex_flags & ADDED_F_CONNECTABLE) != 0U)
         {
@@ -295,14 +296,14 @@ public:
             ret |= ADDED_F_CONNECTABLE;
         }
 
-        if (is_seed_)
-        {
-            ret |= ADDED_F_SEED_FLAG;
-        }
-
         if (is_utp_supported_ && *is_utp_supported_)
         {
             ret |= ADDED_F_UTP_FLAGS;
+        }
+
+        if (is_seed_)
+        {
+            ret |= ADDED_F_SEED_FLAG;
         }
 
         return ret;
@@ -393,7 +394,7 @@ private:
     std::optional<bool> is_connectable_;
     std::optional<bool> is_utp_supported_;
 
-    tr_peer_from const from_first_; // where the peer was first found
+    tr_peer_from from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
 
     uint8_t num_fails_ = {};
