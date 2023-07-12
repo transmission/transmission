@@ -259,16 +259,16 @@ namespace
 
 Gdk::RGBA const& get_progress_bar_color(Torrent const& torrent)
 {
-    static auto const royalblue_color = Gdk::RGBA("royalblue");
-    static auto const mediumseagreen_color = Gdk::RGBA("mediumseagreen");
+    static auto const blue_triumph_color = Gdk::RGBA("#5379a9");
+    static auto const golf_course_color = Gdk::RGBA("#26a955");
     static auto const silver_color = Gdk::RGBA("silver");
 
     switch (torrent.get_activity())
     {
     case TR_STATUS_DOWNLOAD:
-        return royalblue_color;
+        return blue_triumph_color;
     case TR_STATUS_SEED:
-        return mediumseagreen_color;
+        return golf_course_color;
     default:
         return silver_color;
     }
