@@ -140,13 +140,14 @@ private:
  */
 struct peer_atom
 {
-    peer_atom(tr_socket_address socket_address_in, uint8_t flags_in, tr_peer_from from)
-        : flags{ flags_in }
-        , socket_address_{ std::move(socket_address_in) }
+    peer_atom(tr_socket_address socket_address_in, uint8_t pex_flags, tr_peer_from from)
+        : socket_address_{ std::move(socket_address_in) }
         , from_first_{ from }
         , from_best_{ from }
     {
         ++n_atoms;
+
+        set_pex_flags(pex_flags);
     }
 
     peer_atom(peer_atom&&) = delete;
@@ -165,10 +166,24 @@ struct peer_atom
         return n_atoms.load();
     }
 
+    // ---
+
     [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
         return socket_address_;
     }
+
+    [[nodiscard]] constexpr auto& port() noexcept
+    {
+        return socket_address_.second;
+    }
+
+    [[nodiscard]] auto display_name() const
+    {
+        return addr().display_name(port());
+    }
+
+    // ---
 
     [[nodiscard]] constexpr auto from_first() const noexcept
     {
@@ -185,20 +200,43 @@ struct peer_atom
         from_best_ = std::min(from_best_, from);
     }
 
-    [[nodiscard]] constexpr auto isSeed() const noexcept
+    // ---
+
+    constexpr void set_seed(bool seed = true) noexcept
     {
-        return (flags & ADDED_F_SEED_FLAG) != 0;
+        is_seed_ = seed;
     }
 
-    [[nodiscard]] constexpr auto& port() noexcept
+    [[nodiscard]] constexpr auto is_seed() const noexcept
     {
-        return socket_address_.second;
+        return is_seed_;
     }
 
-    [[nodiscard]] auto display_name() const
+    // ---
+
+    constexpr void set_connectable(bool value = true) noexcept
     {
-        return addr().display_name(port());
+        is_connectable_ = value;
     }
+
+    [[nodiscard]] constexpr auto const& is_connectable() const noexcept
+    {
+        return is_connectable_;
+    }
+
+    // ---
+
+    constexpr void set_utp_supported(bool value = true) noexcept
+    {
+        is_utp_supported_ = value;
+    }
+
+    [[nodiscard]] constexpr auto supports_utp() const noexcept
+    {
+        return is_utp_supported_;
+    }
+
+    // ---
 
     [[nodiscard]] constexpr auto compare_by_connection_time(peer_atom const& that) const noexcept
     {
@@ -215,6 +253,8 @@ struct peer_atom
         return tr_compare_3way(last_piece_data_time_, that.last_piece_data_time_);
     }
 
+    // ---
+
     constexpr auto set_connected(bool value = true) noexcept
     {
         is_connected_ = value;
@@ -224,6 +264,8 @@ struct peer_atom
     {
         return is_connected_;
     }
+
+    // ---
 
     [[nodiscard]] bool isBlocklisted(tr_session const* session) const
     {
@@ -237,24 +279,16 @@ struct peer_atom
         return value;
     }
 
-    [[nodiscard]] constexpr auto is_unreachable() const noexcept
-    {
-        return is_unreachable_;
-    }
-
-    constexpr void set_unreachable() noexcept
-    {
-        is_unreachable_ = true;
-    }
-
-    constexpr void set_reachable() noexcept
-    {
-        is_unreachable_ = false;
-    }
-
     void setBlocklistedDirty()
     {
         blocklisted_.reset();
+    }
+
+    // ---
+
+    constexpr void ban() noexcept
+    {
+        is_banned_ = true;
     }
 
     [[nodiscard]] constexpr auto is_banned() const noexcept
@@ -262,10 +296,7 @@ struct peer_atom
         return is_banned_;
     }
 
-    constexpr void ban() noexcept
-    {
-        is_banned_ = true;
-    }
+    // ---
 
     [[nodiscard]] constexpr auto last_connection_attempt_succeeded() const noexcept
     {
@@ -308,10 +339,14 @@ struct peer_atom
     [[nodiscard]] constexpr std::optional<time_t> idle_secs(time_t now) const noexcept
     {
         if (!last_connection_attempt_succeeded())
+        {
             return {};
+        }
 
         return now - std::max(last_piece_data_time_, last_connection_at_);
     }
+
+    // ---
 
     constexpr void on_connection_failed()
     {
@@ -326,9 +361,44 @@ struct peer_atom
         return num_fails_;
     }
 
-    uint8_t flags = {}; /* these match the added_f flags */
+    // ---
 
-    bool utp_failed = false; /* We recently failed to connect over µTP */
+    constexpr void set_pex_flags(uint8_t pex_flags)
+    {
+        if ((pex_flags & ADDED_F_CONNECTABLE) != 0U)
+        {
+            set_connectable();
+        }
+
+        if ((pex_flags & ADDED_F_UTP_FLAGS) != 0U)
+        {
+            set_utp_supported();
+        }
+
+        is_seed_ = (pex_flags & ADDED_F_SEED_FLAG) != 0U;
+    }
+
+    [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
+    {
+        auto ret = uint8_t{};
+
+        if (is_connectable_ && *is_connectable_)
+        {
+            ret |= ADDED_F_CONNECTABLE;
+        }
+
+        if (is_seed_)
+        {
+            ret |= ADDED_F_SEED_FLAG;
+        }
+
+        if (is_utp_supported_ && *is_utp_supported_)
+        {
+            ret |= ADDED_F_UTP_FLAGS;
+        }
+
+        return ret;
+    }
 
 private:
     [[nodiscard]] constexpr tr_address const& addr() const noexcept
@@ -344,7 +414,7 @@ private:
     [[nodiscard]] constexpr int get_reconnect_interval_secs(time_t const now) const noexcept
     {
         auto sec = int{};
-        auto const unreachable = is_unreachable();
+        auto const unreachable = is_connectable_ && !*is_connectable_;
 
         /* if we were recently connected to this peer and transferring piece
          * data, try to reconnect to them sooner rather that later -- we don't
@@ -412,15 +482,17 @@ private:
     time_t last_piece_data_time_ = {};
 
     mutable std::optional<bool> blocklisted_;
-
-    uint16_t num_fails_ = {};
+    std::optional<bool> is_connectable_;
+    std::optional<bool> is_utp_supported_;
 
     tr_peer_from const from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
 
-    bool is_connected_ = false;
+    uint8_t num_fails_ = {};
+
     bool is_banned_ = false;
-    bool is_unreachable_ = false; // we tried to connect & failed
+    bool is_connected_ = false;
+    bool is_seed_ = false;
 };
 
 using Handshakes = std::unordered_map<tr_socket_address, tr_handshake>;
@@ -597,7 +669,7 @@ public:
             pool_is_all_seeds_ = std::all_of(
                 std::begin(pool),
                 std::end(pool),
-                [](auto const& key_val) { return key_val.second.isSeed(); });
+                [](auto const& key_val) { return key_val.second.is_seed(); });
         }
 
         return *pool_is_all_seeds_;
@@ -618,7 +690,7 @@ public:
     [[nodiscard]] bool peer_is_a_seed(tr_socket_address const& socket_address) const noexcept
     {
         auto const* const atom = get_existing_atom(socket_address);
-        return atom != nullptr && atom->isSeed();
+        return atom != nullptr && atom->is_seed();
     }
 
     peer_atom* ensure_atom_exists(tr_socket_address const& socket_address, uint8_t const flags, tr_peer_from const from)
@@ -631,7 +703,7 @@ public:
         if (!is_new)
         {
             atom->found_at(from);
-            atom->flags |= flags;
+            atom->set_pex_flags(flags);
         }
 
         mark_all_seeds_flag_dirty();
@@ -642,7 +714,7 @@ public:
     void mark_atom_as_seed(peer_atom& atom)
     {
         tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", atom.display_name()));
-        atom.flags |= ADDED_F_SEED_FLAG;
+        atom.set_seed();
         mark_all_seeds_flag_dirty();
     }
 
@@ -1045,7 +1117,7 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_socket_address const& socket_
 {
     if (auto* const atom = tor->swarm->get_existing_atom(socket_address); atom != nullptr)
     {
-        atom->flags |= ADDED_F_UTP_FLAGS;
+        atom->set_utp_supported();
     }
 }
 
@@ -1053,7 +1125,7 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_socket_address const& socket_add
 {
     if (auto* const atom = tor->swarm->get_existing_atom(socket_address); atom != nullptr)
     {
-        atom->utp_failed = failed;
+        atom->set_utp_supported(failed);
     }
 }
 
@@ -1247,7 +1319,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
                             "marking peer {} as unreachable... num_fails is {}",
                             atom->display_name(),
                             atom->connection_failure_count()));
-                    atom->set_unreachable();
+                    atom->set_connectable(false);
                 }
             }
         }
@@ -1260,15 +1332,14 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
         if (!result.io->is_incoming())
         {
-            atom->flags |= ADDED_F_CONNECTABLE;
-            atom->set_reachable();
+            atom->set_connectable();
         }
 
         /* In principle, this flag specifies whether the peer groks µTP,
            not whether it's currently connected over µTP. */
         if (result.io->is_utp())
         {
-            atom->flags |= ADDED_F_UTP_FLAGS;
+            atom->set_utp_supported();
         }
 
         if (atom->is_banned())
@@ -1440,7 +1511,7 @@ constexpr struct
 
 [[nodiscard]] bool isAtomInteresting(tr_torrent const* tor, peer_atom const& atom)
 {
-    if (tor->is_done() && atom.isSeed())
+    if (tor->is_done() && atom.is_seed())
     {
         return false;
     }
@@ -1518,7 +1589,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         if (addr.type == address_type)
         {
             TR_ASSERT(addr.is_valid());
-            pex.emplace_back(addr, port, atom->flags);
+            pex.emplace_back(addr, port, atom->pex_flags());
         }
     }
 
@@ -2341,13 +2412,13 @@ namespace connect_helpers
 [[nodiscard]] bool isPeerCandidate(tr_torrent const* tor, peer_atom const& atom, time_t const now)
 {
     // have we already tried and failed to connect?
-    if (atom.is_unreachable())
+    if (auto const conn = atom.is_connectable(); conn && !*conn)
     {
         return false;
     }
 
     // not if we're both seeds
-    if (tor->is_done() && atom.isSeed())
+    if (tor->is_done() && atom.is_seed())
     {
         return false;
     }
@@ -2449,11 +2520,11 @@ struct peer_candidate
     score = addValToKey(score, 1, i);
 
     /* prefer peers that are known to be connectible */
-    i = (atom.flags & ADDED_F_CONNECTABLE) != 0 ? 0 : 1;
+    i = atom.is_connectable().value_or(false) ? 0 : 1;
     score = addValToKey(score, 1, i);
 
     /* prefer peers that we might be able to upload to */
-    i = (atom.flags & ADDED_F_SEED_FLAG) == 0 ? 0 : 1;
+    i = atom.is_seed() ? 0 : 1;
     score = addValToKey(score, 1, i);
 
     /* Prefer peers that we got from more trusted sources.
@@ -2545,16 +2616,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     using namespace handshake_helpers;
 
     auto const now = tr_time();
-    bool utp = mgr->session->allowsUTP() && !atom.utp_failed;
-
-    if (atom.from_first() == TR_PEER_FROM_PEX)
-    {
-        /* PEX has explicit signalling for µTP support.  If an atom
-           originally came from PEX and doesn't have the µTP flag, skip the
-           µTP connection attempt.  Are we being optimistic here? */
-        utp = utp && (atom.flags & ADDED_F_UTP_FLAGS) != 0;
-    }
-
+    auto const utp = mgr->session->allowsUTP() && atom.supports_utp().value_or(true);
     auto* const session = mgr->session;
 
     if (tr_peer_socket::limit_reached(session) || (!utp && !session->allowsTCP()))
@@ -2577,7 +2639,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     if (!peer_io)
     {
         tr_logAddTraceSwarm(s, fmt::format("peerIo not created; marking peer {} as unreachable", atom.display_name()));
-        atom.set_unreachable();
+        atom.set_connectable(false);
         atom.on_connection_failed();
     }
     else
