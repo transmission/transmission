@@ -315,15 +315,27 @@ struct peer_atom
         is_banned_ = true;
     }
 
+    [[nodiscard]] constexpr auto last_connection_attempt_succeeded() const noexcept
+    {
+        return last_connection_at_ >= last_connection_attempt_at_;
+    }
+
+    [[nodiscard]] constexpr auto connection_attempt_time() const noexcept
+    {
+        return last_connection_attempt_at_;
+    }
+
+    constexpr void set_connection_attempt_time(time_t value) noexcept
+    {
+        last_connection_attempt_at_ = value;
+    }
+
     tr_socket_address socket_address;
 
     uint16_t num_fails = {};
 
     time_t time = {}; /* when the peer's connection status last changed */
     time_t piece_data_time = {};
-
-    time_t lastConnectionAttemptAt = {};
-    time_t lastConnectionAt = {};
 
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
@@ -335,6 +347,9 @@ private:
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 
     static auto inline n_atoms = std::atomic<size_t>{};
+
+    time_t last_connection_attempt_at_ = {};
+    time_t last_connection_at_ = {};
 
     mutable std::optional<bool> blocklisted_;
 
@@ -1183,7 +1198,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
         atom->time = tr_time();
         atom->piece_data_time = 0;
-        atom->lastConnectionAt = tr_time();
+        atom->set_connection_attempt_time(tr_time());
 
         if (!result.io->is_incoming())
         {
@@ -2356,14 +2371,14 @@ struct peer_candidate
 {
     auto i = uint64_t{};
     auto score = uint64_t{};
-    bool const failed = atom.lastConnectionAt < atom.lastConnectionAttemptAt;
+    bool const failed = !atom.last_connection_attempt_succeeded();
 
     /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
     i = failed ? 1 : 0;
     score = addValToKey(score, 1, i);
 
     /* prefer the one we attempted least recently (to cycle through all peers) */
-    i = atom.lastConnectionAttemptAt;
+    i = atom.connection_attempt_time();
     score = addValToKey(score, 32, i);
 
     /* prefer peers belonging to a torrent of a higher priority */
@@ -2534,7 +2549,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
             [mgr](tr_handshake::Result const& result) { return on_handshake_done(mgr, result); });
     }
 
-    atom.lastConnectionAttemptAt = now;
+    atom.set_connection_attempt_time(now);
     atom.time = now;
 }
 } // namespace connect_helpers
