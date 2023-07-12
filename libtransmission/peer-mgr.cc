@@ -141,9 +141,9 @@ struct peer_atom
 {
     peer_atom(tr_socket_address socket_address_in, uint8_t flags_in, uint8_t from)
         : socket_address{ std::move(socket_address_in) }
-        , fromFirst{ from }
         , fromBest{ from }
         , flags{ flags_in }
+        , from_first_{ from }
     {
         ++n_atoms;
     }
@@ -162,6 +162,11 @@ struct peer_atom
     [[nodiscard]] static auto atom_count() noexcept
     {
         return n_atoms.load();
+    }
+
+    [[nodiscard]] constexpr auto from_first() const noexcept
+    {
+        return from_first_;
     }
 
     [[nodiscard]] constexpr auto isSeed() const noexcept
@@ -310,7 +315,6 @@ struct peer_atom
     time_t lastConnectionAttemptAt = {};
     time_t lastConnectionAt = {};
 
-    uint8_t const fromFirst; /* where the peer was first found */
     uint8_t fromBest; /* the "best" value of where the peer has been found */
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
@@ -325,6 +329,7 @@ private:
 
     mutable std::optional<bool> blocklisted_;
 
+    uint8_t const from_first_; // where the peer was first found
     bool is_connected_ = false;
     bool is_banned_ = false;
     bool is_unreachable_ = false; // we tried to connect & failed
@@ -439,7 +444,7 @@ public:
         }
 
         --stats.peer_count;
-        --stats.peer_from_count[atom->fromFirst];
+        --stats.peer_from_count[atom->from_first()];
 
         TR_ASSERT(stats.peer_count == peerCount());
 
@@ -1109,7 +1114,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
     swarm->peers.push_back(peer);
 
     ++swarm->stats.peer_count;
-    ++swarm->stats.peer_from_count[atom->fromFirst];
+    ++swarm->stats.peer_from_count[atom->from_first()];
 
     TR_ASSERT(swarm->stats.peer_count == swarm->peerCount());
     TR_ASSERT(swarm->stats.peer_from_count[atom->fromFirst] <= swarm->stats.peer_count);
@@ -1577,7 +1582,7 @@ namespace peer_stat_helpers
     addr.display_name(stats.addr, sizeof(stats.addr));
     stats.client = peer->user_agent().c_str();
     stats.port = port.host();
-    stats.from = atom->fromFirst;
+    stats.from = atom->from_first();
     stats.progress = peer->percentDone();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
@@ -2475,7 +2480,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     auto const now = tr_time();
     bool utp = mgr->session->allowsUTP() && !atom.utp_failed;
 
-    if (atom.fromFirst == TR_PEER_FROM_PEX)
+    if (atom.from_first() == TR_PEER_FROM_PEX)
     {
         /* PEX has explicit signalling for µTP support.  If an atom
            originally came from PEX and doesn't have the µTP flag, skip the
