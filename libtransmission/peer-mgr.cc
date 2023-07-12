@@ -249,7 +249,7 @@ struct peer_atom
         /* if we were recently connected to this peer and transferring piece
          * data, try to reconnect to them sooner rather that later -- we don't
          * want network troubles to get in the way of a good peer. */
-        if (!unreachable && now - this->piece_data_time <= MinimumReconnectIntervalSecs * 2)
+        if (!unreachable && now - last_piece_data_time_ <= MinimumReconnectIntervalSecs * 2)
         {
             sec = MinimumReconnectIntervalSecs;
         }
@@ -328,6 +328,31 @@ struct peer_atom
     constexpr void set_connection_attempt_time(time_t value) noexcept
     {
         last_connection_attempt_at_ = value;
+
+        last_piece_data_time_ = {};
+    }
+
+    constexpr void set_latest_piece_data_time(time_t value) noexcept
+    {
+        last_piece_data_time_ = value;
+    }
+
+    [[nodiscard]] constexpr bool has_transferred_piece_data() const noexcept
+    {
+        return last_piece_data_time_ != time_t{};
+    }
+
+    [[nodiscard]] constexpr auto compare_by_piece_data_time(peer_atom const& that) const noexcept
+    {
+        return tr_compare_3way(last_piece_data_time_, that.last_piece_data_time_);
+    }
+
+    [[nodiscard]] constexpr std::optional<time_t> idle_secs(time_t now) const noexcept
+    {
+        if (!last_connection_attempt_succeeded())
+            return {};
+
+        return now - std::max(last_piece_data_time_, last_connection_at_);
     }
 
     tr_socket_address socket_address;
@@ -335,7 +360,6 @@ struct peer_atom
     uint16_t num_fails = {};
 
     time_t time = {}; /* when the peer's connection status last changed */
-    time_t piece_data_time = {};
 
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
@@ -350,6 +374,7 @@ private:
 
     time_t last_connection_attempt_at_ = {};
     time_t last_connection_at_ = {};
+    time_t last_piece_data_time_ = {};
 
     mutable std::optional<bool> blocklisted_;
 
@@ -607,7 +632,7 @@ public:
 
                 if (peer->atom != nullptr)
                 {
-                    peer->atom->piece_data_time = now;
+                    peer->atom->set_latest_piece_data_time(now);
                 }
 
                 break;
@@ -625,7 +650,7 @@ public:
 
                 if (peer->atom != nullptr)
                 {
-                    peer->atom->piece_data_time = now;
+                    peer->atom->set_latest_piece_data_time(now);
                 }
 
                 break;
@@ -1197,7 +1222,6 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         struct peer_atom* atom = s->ensure_atom_exists(socket_address, 0, TR_PEER_FROM_INCOMING);
 
         atom->time = tr_time();
-        atom->piece_data_time = 0;
         atom->set_connection_attempt_time(tr_time());
 
         if (!result.io->is_incoming())
@@ -1356,7 +1380,7 @@ constexpr struct
 {
     [[nodiscard]] constexpr static int compare(peer_atom const& a, peer_atom const& b) noexcept // <=>
     {
-        if (auto const val = tr_compare_3way(a.piece_data_time, b.piece_data_time); val != 0)
+        if (auto const val = a.compare_by_piece_data_time(b); val != 0)
         {
             return -val;
         }
@@ -2038,16 +2062,15 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
         auto const lo = MinUploadIdleSecs;
         auto const hi = MaxUploadIdleSecs;
         time_t const limit = hi - (hi - lo) * strictness;
-        time_t const idle_time = now - std::max(atom->time, atom->piece_data_time);
 
-        if (idle_time > limit)
+        if (auto const idle_secs = atom->idle_secs(now); idle_secs && *idle_secs > limit)
         {
             tr_logAddTraceSwarm(
                 s,
                 fmt::format(
                     "purging peer {} because it's been {} secs since we shared anything",
                     peer->display_name(),
-                    idle_time));
+                    *idle_secs));
             return true;
         }
     }
@@ -2063,7 +2086,7 @@ void closePeer(tr_peer* peer)
     /* if we transferred piece data, then they might be good peers,
        so reset their `num_fails' weight to zero. otherwise we connected
        to them fruitlessly, so mark it as another fail */
-    if (auto* const atom = peer->atom; atom->piece_data_time != 0)
+    if (auto* const atom = peer->atom; atom->has_transferred_piece_data())
     {
         tr_logAddTraceSwarm(s, fmt::format("resetting atom {} num_fails to 0", peer->display_name()));
         atom->num_fails = 0;
@@ -2088,7 +2111,7 @@ constexpr struct
         }
 
         /* the one to give us data more recently goes first */
-        if (auto const val = tr_compare_3way(a->atom->piece_data_time, b->atom->piece_data_time); val != 0)
+        if (auto const val = a->atom->compare_by_piece_data_time(*b->atom); val != 0)
         {
             return -val;
         }
