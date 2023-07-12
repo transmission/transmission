@@ -189,6 +189,16 @@ struct peer_atom
         return addr().display_name(port());
     }
 
+    constexpr auto set_connected(bool value = true) noexcept
+    {
+        is_connected_ = value;
+    }
+
+    [[nodiscard]] constexpr auto is_connected() const noexcept
+    {
+        return is_connected_;
+    }
+
     [[nodiscard]] bool isBlocklisted(tr_session const* session) const
     {
         if (blocklisted_)
@@ -306,7 +316,6 @@ struct peer_atom
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
 
     bool utp_failed = false; /* We recently failed to connect over µTP */
-    bool is_connected = false;
 
 private:
     // the minimum we'll wait before attempting to reconnect to a peer
@@ -316,6 +325,7 @@ private:
 
     mutable std::optional<bool> blocklisted_;
 
+    bool is_connected_ = false;
     bool is_banned_ = false;
     bool is_unreachable_ = false; // we tried to connect & failed
 };
@@ -922,7 +932,7 @@ tr_peer::~tr_peer()
 
     if (atom != nullptr)
     {
-        atom->is_connected = false;
+        atom->set_connected(false);
     }
 }
 
@@ -1094,7 +1104,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
     tr_swarm* swarm = tor->swarm;
 
     auto* peer = tr_peerMsgsNew(tor, atom, std::move(io), client, &tr_swarm::peerCallbackFunc, swarm);
-    atom->is_connected = true;
+    atom->set_connected();
 
     swarm->peers.push_back(peer);
 
@@ -1180,7 +1190,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
         {
             /* too many peers already */
         }
-        else if (atom->is_connected)
+        else if (atom->is_connected())
         {
             // we're already connected to this peer; do nothing
         }
@@ -2247,7 +2257,7 @@ void tr_peerMgr::bandwidthPulse()
 
 bool tr_swarm::peer_is_in_use(peer_atom const& atom) const
 {
-    return atom.is_connected || outgoing_handshakes.count(atom.socket_address) != 0U ||
+    return atom.is_connected() || outgoing_handshakes.count(atom.socket_address) != 0U ||
         manager->incoming_handshakes.count(atom.socket_address) != 0U;
 }
 
