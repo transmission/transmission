@@ -90,7 +90,7 @@ namespace global_source_ip_helpers
                     {
                         tr_net_close_socket(sock);
                         errno = save;
-                        return addrport->first;
+                        return addrport->address();
                     }
                 }
             }

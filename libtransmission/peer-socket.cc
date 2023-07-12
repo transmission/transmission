@@ -18,9 +18,9 @@
 #define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->display_name())
 #define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->display_name())
 
-tr_peer_socket::tr_peer_socket(tr_session const* session, tr_socket_address socket_address, tr_socket_t sock)
+tr_peer_socket::tr_peer_socket(tr_session const* session, tr_socket_address const& socket_address, tr_socket_t sock)
     : handle{ sock }
-    , socket_address_{ std::move(socket_address) }
+    , socket_address_{ socket_address }
     , type_{ Type::TCP }
 {
     TR_ASSERT(sock != TR_BAD_SOCKET);
@@ -36,8 +36,8 @@ tr_peer_socket::tr_peer_socket(tr_session const* session, tr_socket_address sock
     tr_logAddTraceIo(this, fmt::format("socket (tcp) is {}", handle.tcp));
 }
 
-tr_peer_socket::tr_peer_socket(tr_socket_address socket_address, struct UTPSocket* const sock)
-    : socket_address_{ std::move(socket_address) }
+tr_peer_socket::tr_peer_socket(tr_socket_address const& socket_address, struct UTPSocket* const sock)
+    : socket_address_{ socket_address }
     , type_{ Type::UTP }
 {
     TR_ASSERT(sock != nullptr);

@@ -116,8 +116,7 @@ public:
             return private_key_;
         }
 
-        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, std::pair<tr_address, tr_port> const& /*socket_address*/)
-            override
+        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, tr_socket_address const& /*socket_address*/) override
         {
         }
 
@@ -161,8 +160,7 @@ public:
     static auto constexpr ReservedBytesNoExtensions = std::array<uint8_t, 8>{ 0, 0, 0, 0, 0, 0, 0, 0 };
     static auto constexpr PlaintextProtocolName = "\023BitTorrent protocol"sv;
 
-    std::pair<tr_address, tr_port> const DefaultPeerSockAddr{ *tr_address::from_string("127.0.0.1"sv),
-                                                              tr_port::fromHost(8080) };
+    tr_socket_address const DefaultPeerSockAddr{ *tr_address::from_string("127.0.0.1"sv), tr_port::fromHost(8080) };
     tr_handshake::Mediator::TorrentInfo const TorrentWeAreSeeding{ tr_sha1::digest("abcde"sv),
                                                                    tr_peerIdInit(),
                                                                    tr_torrent_id_t{ 100 },
@@ -179,7 +177,7 @@ public:
         return std::pair{ tr_peerIo::new_incoming(
                               session,
                               &session->top_bandwidth_,
-                              tr_peer_socket(session, DefaultPeerSockAddr, sockpair[0])),
+                              tr_peer_socket{ session, DefaultPeerSockAddr, sockpair[0] }),
                           sockpair[1] };
     }
 
@@ -188,7 +186,7 @@ public:
         auto sockpair = std::array<evutil_socket_t, 2>{ -1, -1 };
         EXPECT_EQ(0, evutil_socketpair(LOCAL_SOCKETPAIR_AF, SOCK_STREAM, 0, std::data(sockpair))) << tr_strerror(errno);
         auto peer_io = tr_peerIo::create(session, &session->top_bandwidth_, &info_hash, false /*incoming*/, false /*seed*/);
-        peer_io->set_socket(tr_peer_socket(session, DefaultPeerSockAddr, sockpair[0]));
+        peer_io->set_socket(tr_peer_socket{ session, DefaultPeerSockAddr, sockpair[0] });
         return std::pair{ std::move(peer_io), sockpair[1] };
     }
 
