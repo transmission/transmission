@@ -327,7 +327,6 @@ struct peer_atom
     }
 
     uint8_t flags = {}; /* these match the added_f flags */
-    uint8_t flags2 = {}; /* flags that aren't defined in added_f */
 
     bool utp_failed = false; /* We recently failed to connect over µTP */
 
