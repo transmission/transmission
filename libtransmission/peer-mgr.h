@@ -24,8 +24,9 @@
  */
 
 class tr_peer;
-struct tr_peerMgr;
+class tr_peer_info;
 class tr_peer_socket;
+struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_session;
 struct tr_torrent;
@@ -156,9 +157,7 @@ constexpr bool tr_isPex(tr_pex const* pex)
 
 void tr_peerMgrFree(tr_peerMgr* manager);
 
-void tr_peerMgrSetUtpSupported(struct peer_atom* atom);
-
-void tr_peerMgrSetUtpFailed(struct peer_atom*, bool failed);
+void tr_peerMgrSetUtpSupported(tr_peer_info* peer_info, bool supported);
 
 [[nodiscard]] std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
 

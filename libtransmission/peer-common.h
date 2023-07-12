@@ -28,7 +28,7 @@
 
 class tr_peer;
 class tr_swarm;
-struct peer_atom;
+class tr_peer_info;
 struct tr_bandwidth;
 
 // --- Peer Publish / Subscribe
@@ -175,13 +175,13 @@ using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const& event, voi
 /**
  * State information about a connected peer.
  *
- * @see struct peer_atom
+ * @see tr_peer_info
  * @see tr_peerMsgs
  */
 class tr_peer
 {
 public:
-    tr_peer(tr_torrent const* tor, peer_atom* atom = nullptr);
+    tr_peer(tr_torrent const* tor, tr_peer_info* const peer_info = nullptr);
     virtual ~tr_peer();
 
     virtual bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const = 0;
@@ -242,7 +242,7 @@ public:
     /// TODO(ckerr): refactor them out of `tr_peer`
 
     // hook to private peer-mgr information
-    peer_atom* const atom;
+    tr_peer_info* const peer_info;
 
     // whether or not this peer sent us any given block
     tr_bitfield blame;
