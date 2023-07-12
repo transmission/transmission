@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <ctime> // time_t
 #include <iterator> // std::back_inserter
+#include <limits>
 #include <map>
 #include <memory>
 #include <optional>
@@ -140,8 +141,8 @@ private:
 struct peer_atom
 {
     peer_atom(tr_socket_address socket_address_in, uint8_t flags_in, tr_peer_from from)
-        : socket_address{ std::move(socket_address_in) }
-        , flags{ flags_in }
+        : flags{ flags_in }
+        , socket_address_{ std::move(socket_address_in) }
         , from_first_{ from }
         , from_best_{ from }
     {
@@ -164,6 +165,11 @@ struct peer_atom
         return n_atoms.load();
     }
 
+    [[nodiscard]] constexpr auto const& socket_address() const noexcept
+    {
+        return socket_address_;
+    }
+
     [[nodiscard]] constexpr auto from_first() const noexcept
     {
         return from_first_;
@@ -184,24 +190,29 @@ struct peer_atom
         return (flags & ADDED_F_SEED_FLAG) != 0;
     }
 
-    [[nodiscard]] constexpr auto const& addr() const noexcept
-    {
-        return socket_address.first;
-    }
-
     [[nodiscard]] constexpr auto& port() noexcept
     {
-        return socket_address.second;
-    }
-
-    [[nodiscard]] constexpr auto const& port() const noexcept
-    {
-        return socket_address.second;
+        return socket_address_.second;
     }
 
     [[nodiscard]] auto display_name() const
     {
         return addr().display_name(port());
+    }
+
+    [[nodiscard]] constexpr auto compare_by_connection_time(peer_atom const& that) const noexcept
+    {
+        return tr_compare_3way(last_connection_at_, that.last_connection_at_);
+    }
+
+    [[nodiscard]] constexpr auto compare_by_failure_count(peer_atom const& that) const noexcept
+    {
+        return tr_compare_3way(num_fails_, that.num_fails_);
+    }
+
+    [[nodiscard]] constexpr auto compare_by_piece_data_time(peer_atom const& that) const noexcept
+    {
+        return tr_compare_3way(last_piece_data_time_, that.last_piece_data_time_);
     }
 
     constexpr auto set_connected(bool value = true) noexcept
@@ -261,11 +272,6 @@ struct peer_atom
         return last_connection_at_ >= last_connection_attempt_at_;
     }
 
-    [[nodiscard]] constexpr auto compare_by_connection_time(peer_atom const& that) const noexcept
-    {
-        return tr_compare_3way(last_connection_at_, that.last_connection_at_);
-    }
-
     [[nodiscard]] constexpr auto connection_attempt_time() const noexcept
     {
         return last_connection_attempt_at_;
@@ -274,6 +280,11 @@ struct peer_atom
     constexpr void set_connection_attempt_time(time_t value) noexcept
     {
         last_connection_attempt_at_ = value;
+    }
+
+    constexpr void set_connection_time(time_t value) noexcept
+    {
+        last_connection_at_ = value;
 
         last_piece_data_time_ = {};
     }
@@ -286,11 +297,6 @@ struct peer_atom
     [[nodiscard]] constexpr bool has_transferred_piece_data() const noexcept
     {
         return last_piece_data_time_ != time_t{};
-    }
-
-    [[nodiscard]] constexpr auto compare_by_piece_data_time(peer_atom const& that) const noexcept
-    {
-        return tr_compare_3way(last_piece_data_time_, that.last_piece_data_time_);
     }
 
     [[nodiscard]] constexpr auto reconnect_interval_has_passed(time_t const now) const noexcept
@@ -307,9 +313,18 @@ struct peer_atom
         return now - std::max(last_piece_data_time_, last_connection_at_);
     }
 
-    tr_socket_address socket_address;
+    constexpr void on_connection_failed()
+    {
+        if (num_fails_ != std::numeric_limits<decltype(num_fails_)>::max())
+        {
+            ++num_fails_;
+        }
+    }
 
-    uint16_t num_fails = {};
+    [[nodiscard]] constexpr auto connection_failure_count() const noexcept
+    {
+        return num_fails_;
+    }
 
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
@@ -317,6 +332,16 @@ struct peer_atom
     bool utp_failed = false; /* We recently failed to connect over µTP */
 
 private:
+    [[nodiscard]] constexpr tr_address const& addr() const noexcept
+    {
+        return socket_address_.first;
+    }
+
+    [[nodiscard]] constexpr tr_port const& port() const noexcept
+    {
+        return socket_address_.second;
+    }
+
     [[nodiscard]] constexpr int get_reconnect_interval_secs(time_t const now) const noexcept
     {
         auto sec = int{};
@@ -333,7 +358,7 @@ private:
          * and failed to connect to the peer */
         else
         {
-            auto step = this->num_fails;
+            auto step = this->num_fails_;
 
             /* penalize peers that were unreachable the last time we tried */
             if (unreachable)
@@ -379,6 +404,8 @@ private:
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 
+    tr_socket_address socket_address_;
+
     static auto inline n_atoms = std::atomic<size_t>{};
 
     time_t last_connection_attempt_at_ = {};
@@ -386,6 +413,8 @@ private:
     time_t last_piece_data_time_ = {};
 
     mutable std::optional<bool> blocklisted_;
+
+    uint16_t num_fails_ = {};
 
     tr_peer_from const from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
@@ -1209,7 +1238,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
 
             if (atom != nullptr)
             {
-                ++atom->num_fails;
+                atom->on_connection_failed();
 
                 if (!result.read_anything_from_peer)
                 {
@@ -1218,7 +1247,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
                         fmt::format(
                             "marking peer {} as unreachable... num_fails is {}",
                             atom->display_name(),
-                            atom->num_fails));
+                            atom->connection_failure_count()));
                     atom->set_unreachable();
                 }
             }
@@ -1228,7 +1257,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, str
     {
         struct peer_atom* atom = s->ensure_atom_exists(socket_address, 0, TR_PEER_FROM_INCOMING);
 
-        atom->set_connection_attempt_time(tr_time());
+        atom->set_connection_time(tr_time());
 
         if (!result.io->is_incoming())
         {
@@ -1396,7 +1425,7 @@ constexpr struct
             return val;
         }
 
-        return tr_compare_3way(a.num_fails, b.num_fails);
+        return a.compare_by_failure_count(b);
     }
 
     [[nodiscard]] constexpr bool operator()(peer_atom const& a, peer_atom const& b) const noexcept
@@ -1485,7 +1514,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     for (size_t i = 0; i < std::size(atoms) && std::size(pex) < n; ++i)
     {
         auto const* const atom = atoms[i];
-        auto const& [addr, port] = atom->socket_address;
+        auto const& [addr, port] = atom->socket_address();
 
         if (addr.type == address_type)
         {
@@ -2087,23 +2116,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
 void closePeer(tr_peer* peer)
 {
     TR_ASSERT(peer != nullptr);
-    auto const* const s = peer->swarm;
-
-    /* if we transferred piece data, then they might be good peers,
-       so reset their `num_fails' weight to zero. otherwise we connected
-       to them fruitlessly, so mark it as another fail */
-    if (auto* const atom = peer->atom; atom->has_transferred_piece_data())
-    {
-        tr_logAddTraceSwarm(s, fmt::format("resetting atom {} num_fails to 0", peer->display_name()));
-        atom->num_fails = 0;
-    }
-    else
-    {
-        ++atom->num_fails;
-        tr_logAddTraceSwarm(s, fmt::format("incremented atom {} num_fails to {}", peer->display_name(), atom->num_fails));
-    }
-
-    tr_logAddTraceSwarm(s, fmt::format("removing bad peer {}", peer->display_name()));
+    tr_logAddTraceSwarm(peer->swarm, fmt::format("removing bad peer {}", peer->display_name()));
     peer->swarm->removePeer(peer);
 }
 
@@ -2317,8 +2330,8 @@ void tr_peerMgr::bandwidthPulse()
 
 bool tr_swarm::peer_is_in_use(peer_atom const& atom) const
 {
-    return atom.is_connected() || outgoing_handshakes.count(atom.socket_address) != 0U ||
-        manager->incoming_handshakes.count(atom.socket_address) != 0U;
+    return atom.is_connected() || outgoing_handshakes.count(atom.socket_address()) != 0U ||
+        manager->incoming_handshakes.count(atom.socket_address()) != 0U;
 }
 
 namespace
@@ -2523,7 +2536,7 @@ struct peer_candidate
     auto ret = tr_peerMgr::OutboundCandidates{};
     for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
     {
-        ret.emplace_back(it->tor->id(), it->atom->socket_address);
+        ret.emplace_back(it->tor->id(), it->atom->socket_address());
     }
     return ret;
 }
@@ -2557,7 +2570,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     auto peer_io = tr_peerIo::new_outgoing(
         session,
         &session->top_bandwidth_,
-        atom.socket_address,
+        atom.socket_address(),
         s->tor->info_hash(),
         s->tor->completeness == TR_SEED,
         utp);
@@ -2566,12 +2579,12 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     {
         tr_logAddTraceSwarm(s, fmt::format("peerIo not created; marking peer {} as unreachable", atom.display_name()));
         atom.set_unreachable();
-        ++atom.num_fails;
+        atom.on_connection_failed();
     }
     else
     {
         s->outgoing_handshakes.try_emplace(
-            atom.socket_address,
+            atom.socket_address(),
             &mgr->handshake_mediator_,
             peer_io,
             session->encryptionMode(),
