@@ -133,8 +133,8 @@ private:
  */
 struct peer_atom
 {
-    peer_atom(tr_socket_address socket_address_in, uint8_t flags_in, uint8_t from)
-        : socket_address{ std::move(socket_address_in) }
+    peer_atom(tr_socket_address const& socket_address_in, uint8_t flags_in, uint8_t from)
+        : socket_address{ socket_address_in }
         , fromFirst{ from }
         , fromBest{ from }
         , flags{ flags_in }
@@ -165,22 +165,22 @@ struct peer_atom
 
     [[nodiscard]] constexpr auto const& addr() const noexcept
     {
-        return socket_address.first;
+        return socket_address.address();
     }
 
     [[nodiscard]] constexpr auto& port() noexcept
     {
-        return socket_address.second;
+        return socket_address.port_;
     }
 
-    [[nodiscard]] constexpr auto const& port() const noexcept
+    [[nodiscard]] constexpr auto port() const noexcept
     {
-        return socket_address.second;
+        return socket_address.port();
     }
 
     [[nodiscard]] auto display_name() const
     {
-        return addr().display_name(port());
+        return socket_address.display_name();
     }
 
     [[nodiscard]] bool isBlocklisted(tr_session const* session) const
@@ -504,7 +504,7 @@ public:
 
     peer_atom* ensure_atom_exists(tr_socket_address const& socket_address, uint8_t const flags, uint8_t const from)
     {
-        TR_ASSERT(socket_address.first.is_valid());
+        TR_ASSERT(socket_address.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
 
         auto&& [atom_it, is_new] = pool.try_emplace(socket_address, socket_address, flags, from);
@@ -1204,9 +1204,9 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     }
     else /* we don't have a connection to them yet... */
     {
-        auto sock_addr = tr_socket_address{ socket.socketAddress() };
+        auto socket_address = socket.socketAddress();
         manager->incoming_handshakes.try_emplace(
-            std::move(sock_addr),
+            socket_address,
             &manager->handshake_mediator_,
             tr_peerIo::new_incoming(session, &session->top_bandwidth_, std::move(socket)),
             session->encryptionMode(),

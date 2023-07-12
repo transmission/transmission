@@ -59,7 +59,8 @@ using tr_socket_t = int;
 #define sockerrno errno
 #endif
 
-#include "tr-assert.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 /**
  * Literally just a port number.
@@ -144,10 +145,12 @@ enum tr_address_type
     NUM_TR_AF_INET_TYPES
 };
 
+struct tr_socket_address;
+
 struct tr_address
 {
     [[nodiscard]] static std::optional<tr_address> from_string(std::string_view address_sv);
-    [[nodiscard]] static std::optional<std::pair<tr_address, tr_port>> from_sockaddr(struct sockaddr const*);
+    [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(struct sockaddr const*);
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
@@ -316,7 +319,59 @@ struct tr_address
     [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
 };
 
-using tr_socket_address = std::pair<tr_address, tr_port>;
+struct tr_socket_address
+{
+    tr_socket_address() = default;
+
+    tr_socket_address(tr_address const& address, tr_port port)
+        : address_{ address }
+        , port_{ port }
+    {
+    }
+
+    [[nodiscard]] constexpr auto const& address() const noexcept
+    {
+        return address_;
+    }
+
+    [[nodiscard]] constexpr auto port() const noexcept
+    {
+        return port_;
+    }
+
+    [[nodiscard]] auto display_name() const noexcept
+    {
+        return address_.display_name(port_);
+    }
+
+    [[nodiscard]] auto is_valid() const noexcept
+    {
+        return address_.is_valid();
+    }
+
+    [[nodiscard]] int compare(tr_socket_address const& that) const noexcept
+    {
+        if (auto const val = tr_compare_3way(address_, that.address_); val != 0)
+        {
+            return val;
+        }
+
+        return tr_compare_3way(port_, that.port_);
+    }
+
+    [[nodiscard]] auto operator<(tr_socket_address const& that) const noexcept
+    {
+        return compare(that) < 0;
+    }
+
+    [[nodiscard]] auto operator==(tr_socket_address const& that) const noexcept
+    {
+        return compare(that) == 0;
+    }
+
+    tr_address address_;
+    tr_port port_;
+};
 
 template<>
 class std::hash<tr_socket_address>

@@ -383,7 +383,7 @@ protected:
         MockTimerMaker mock_timer_maker_;
     };
 
-    [[nodiscard]] static std::pair<tr_address, tr_port> getSockaddr(std::string_view name, tr_port port)
+    [[nodiscard]] static tr_socket_address getSockaddr(std::string_view name, tr_port port)
     {
         auto hints = addrinfo{};
         hints.ai_socktype = SOCK_DGRAM;
@@ -605,9 +605,9 @@ TEST_F(DhtTest, usesBootstrapFile)
         5s);
     ASSERT_EQ(1U, std::size(pinged));
     auto const actual = pinged.front();
-    EXPECT_EQ(expected.first, actual.address);
-    EXPECT_EQ(expected.second, actual.port);
-    EXPECT_EQ(expected.first.display_name(expected.second), actual.address.display_name(actual.port));
+    EXPECT_EQ(expected.address(), actual.address);
+    EXPECT_EQ(expected.port(), actual.port);
+    EXPECT_EQ(expected.display_name(), actual.address.display_name(actual.port));
 }
 
 TEST_F(DhtTest, pingsAddedNodes)
