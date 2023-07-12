@@ -121,7 +121,7 @@ private:
     tr_session& session_;
 };
 
-bool tr_peer_info::isBlocklisted(tr_session const* session) const
+bool tr_peer_info::is_blocklisted(tr_session const* session) const
 {
     if (blocklisted_)
     {
@@ -688,7 +688,7 @@ private:
         {
             for (auto& [socket_address, atom] : tor->swarm->pool)
             {
-                atom.setBlocklistedDirty();
+                atom.set_blocklisted_dirty();
             }
         }
     }
@@ -1129,7 +1129,7 @@ constexpr struct
         return true;
     }
 
-    if (info.isBlocklisted(tor->session))
+    if (info.is_blocklisted(tor->session))
     {
         return false;
     }
@@ -2043,7 +2043,7 @@ namespace connect_helpers
     }
 
     // not if they're blocklisted
-    if (peer_info.isBlocklisted(tor->session))
+    if (peer_info.is_blocklisted(tor->session))
     {
         return false;
     }

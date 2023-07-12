@@ -185,9 +185,9 @@ public:
 
     // ---
 
-    [[nodiscard]] bool isBlocklisted(tr_session const* session) const;
+    [[nodiscard]] bool is_blocklisted(tr_session const* session) const;
 
-    void setBlocklistedDirty()
+    void set_blocklisted_dirty()
     {
         blocklisted_.reset();
     }
