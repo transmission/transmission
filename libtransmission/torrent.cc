@@ -1886,7 +1886,6 @@ void tr_torrent::recheck_completeness()
     if (new_completeness != completeness)
     {
         bool const recent_change = downloadedCur != 0;
-        bool const was_leeching = !this->is_done();
         bool const was_running = is_running();
 
         if (recent_change)
@@ -1920,13 +1919,6 @@ void tr_torrent::recheck_completeness()
         }
 
         this->session->onTorrentCompletenessChanged(this, completeness, was_running);
-
-        if (this->is_done() && was_leeching && was_running)
-        {
-            /* if completeness was TR_LEECH, the seed limit check
-               will have been skipped in bandwidthPulse */
-            tr_torrentCheckSeedLimit(this);
-        }
 
         this->set_dirty();
 

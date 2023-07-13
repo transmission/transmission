@@ -112,7 +112,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
     return true;
 }
 
-std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece)
+bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_piece& setme)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
@@ -142,16 +142,10 @@ std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent cons
         return {};
     }
 
-    auto buf = std::vector<std::byte>{};
     auto const piece_len = offset_in_info_dict + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE :
                                                                                          info_dict_size - offset_in_info_dict;
-    buf.resize(piece_len);
-    if (!in.read(reinterpret_cast<char*>(std::data(buf)), std::size(buf)))
-    {
-        return {};
-    }
-
-    return buf;
+    setme.resize(piece_len);
+    return !!in.read(reinterpret_cast<char*>(std::data(setme)), std::size(setme));
 }
 
 bool tr_torrentUseMetainfoFromFile(

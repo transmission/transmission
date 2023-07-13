@@ -575,7 +575,7 @@ private:
         {
             if (auto addrport = tr_address::from_sockaddr(infop->ai_addr); addrport)
             {
-                nodes.emplace_back(addrport->first, addrport->second);
+                nodes.emplace_back(*addrport);
             }
         }
 
