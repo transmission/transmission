@@ -103,7 +103,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-tabs: #{$grey-700};
     --color-default-border: #{$default-border-dark};
     --color-progressbar-seed-1: #{$green-100};
-    --color-progressbar-seed-2: #{$green-100};
+    --color-progressbar-seed-2: #{$green-400};
     --color-progressbar-paused: #{$grey-500};
     --color-progressbar-leech: #{$blue-200};
     --color-progressbar-seed-paused: #{$grey-500};
@@ -136,7 +136,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-fg-tabs: #{$white};
       --color-default-border: #{$white};
       --color-progressbar-seed-1: #{$green-100};
-      --color-progressbar-seed-2: #{$green-100};
+      --color-progressbar-seed-2: #{$green-400};
       --color-progressbar-seed-paused: #{$grey-500};
       --color-progressbar-background-2: #{$green-400};
       --color-progressbar-verify: #{$yellow-300};
@@ -150,7 +150,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --progress: 100%;
     --color-fg-error: #{$red-500};
     --color-fg-port-closed: #{$red-500};
-    --color-fg-port-open: #{$green-100};
+    --color-fg-port-open: #{$green-400};
     --color-progressbar-verify: #{$yellow-300};
     --color-progressbar-magnet: #{$yellow-300};
     --color-progressbar-paused: #{$grey-200};
@@ -179,7 +179,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-default-border: #{$default-border-light};
     --color-dialog-border: #{$nice-grey};
     --color-progressbar-seed-1: #{$green-100};
-    --color-progressbar-seed-2: #{$green-100};
+    --color-progressbar-seed-2: #{$green-400};
     --color-progressbar-seed-paused: #{$grey-200};
 
     .contrast-more {
@@ -210,7 +210,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-fg-tabs: #{$black};
       --color-default-border: #{$black};
       --color-progressbar-seed-1: #{$green-100};
-      --color-progressbar-seed-2: #{$green-100};
+      --color-progressbar-seed-2: #{$green-400};
       --color-progressbar-seed-paused: #{$grey-500};
       --color-progressbar-background-2: #{$green-400};
       --color-progressbar-verify: #{$yellow-300};
@@ -405,11 +405,11 @@ $speed-icon-size: 12px;
 
 /// TORRENT CONTAINER
 
-$pauseresume-size-number: 18;
+$pauseresume-size-number: 20;
 $pauseresume-size: $pauseresume-size-number * 1px;
 $progressbar-border: 1;
-$progressbar-height: 14;
-$popup-top: 51px; // TODO: ugly that this is hardcoded
+$progressbar-height: 18;
+$popup-top: 41px; // TODO: ugly that this is hardcoded
 
 .flex {
   flex-grow: 1;
@@ -1008,11 +1008,11 @@ $video-image: '../img/film.svg';
   // TODO: this is (mostly) copied from prefs-dialog.
   // can it be folded into a single set of rules?
 
-  grid-column-gap: 8px;
-  grid-row-gap: 8px;
+  grid-column-gap: 4px;
+  grid-row-gap: 4px;
   grid-template-columns: auto 1fr;
-  margin: 20px;
-  padding: 12px;
+  margin: 10px;
+  padding: 4px;
 
   &:not(.hidden) {
     display: grid;
@@ -1022,10 +1022,10 @@ $video-image: '../img/film.svg';
     font-size: 16px;
     font-weight: bold;
     grid-column: span 2;
-    padding-bottom: 5px;
+    padding-bottom: 4px;
 
     &:not(:first-of-type) {
-      margin-top: 20px;
+      margin-top: 10px;
     }
   }
 
