@@ -311,71 +311,51 @@ private:
         return socket_address_.port();
     }
 
-    [[nodiscard]] constexpr int get_reconnect_interval_secs(time_t const now) const noexcept
+    [[nodiscard]] constexpr time_t get_reconnect_interval_secs(time_t const now) const noexcept
     {
-        auto sec = int{};
+        // if we were recently connected to this peer and transferring piece
+        // data, try to reconnect to them sooner rather that later -- we don't
+        // want network troubles to get in the way of a good peer.
         auto const unreachable = is_connectable_ && !*is_connectable_;
-
-        /* if we were recently connected to this peer and transferring piece
-         * data, try to reconnect to them sooner rather that later -- we don't
-         * want network troubles to get in the way of a good peer. */
         if (!unreachable && now - piece_data_at_ <= MinimumReconnectIntervalSecs * 2)
         {
-            sec = MinimumReconnectIntervalSecs;
+            return MinimumReconnectIntervalSecs;
         }
-        /* otherwise, the interval depends on how many times we've tried
-         * and failed to connect to the peer */
-        else
+
+        // otherwise, the interval depends on how many times we've tried
+        // and failed to connect to the peer. Penalize peers that were
+        // unreachable the last time we tried
+        auto step = this->num_consecutive_fails_;
+        if (unreachable)
         {
-            auto step = this->num_consecutive_fails_;
-
-            /* penalize peers that were unreachable the last time we tried */
-            if (unreachable)
-            {
-                step += 2;
-            }
-
-            switch (step)
-            {
-            case 0:
-                sec = 0;
-                break;
-
-            case 1:
-                sec = 10;
-                break;
-
-            case 2:
-                sec = 60 * 2;
-                break;
-
-            case 3:
-                sec = 60 * 15;
-                break;
-
-            case 4:
-                sec = 60 * 30;
-                break;
-
-            case 5:
-                sec = 60 * 60;
-                break;
-
-            default:
-                sec = 60 * 120;
-                break;
-            }
+            step += 2;
         }
 
-        return sec;
+        switch (step)
+        {
+        case 0:
+            return 0U;
+        case 1:
+            return 10U;
+        case 2:
+            return 60U * 2U;
+        case 3:
+            return 60U * 15U;
+        case 4:
+            return 60U * 30U;
+        case 5:
+            return 60U * 60U;
+        default:
+            return 60U * 120U;
+        }
     }
 
     // the minimum we'll wait before attempting to reconnect to a peer
-    static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
-
-    tr_socket_address socket_address_;
+    static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
 
     static auto inline n_known_peers = std::atomic<size_t>{};
+
+    tr_socket_address socket_address_;
 
     time_t connection_attempted_at_ = {};
     time_t connection_changed_at_ = {};

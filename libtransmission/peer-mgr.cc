@@ -13,7 +13,6 @@
 #include <ctime> // time_t
 #include <iterator> // std::back_inserter
 #include <map>
-#include <memory>
 #include <optional>
 #include <tuple> // std::tie
 #include <unordered_map>

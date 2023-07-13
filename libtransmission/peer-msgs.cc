@@ -343,8 +343,6 @@ public:
             pex_timer_->start_repeating(SendPexInterval);
         }
 
-        peer_info->set_utp_supported(io->supports_utp());
-
         if (io->supports_ltep())
         {
             sendLtepHandshake(this);
