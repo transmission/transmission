@@ -1703,8 +1703,7 @@ void updateInterest(tr_swarm* swarm)
         int const n = tor->piece_count();
 
         // build a bitfield of interesting pieces...
-        auto piece_is_interesting = std::vector<bool>{};
-        piece_is_interesting.resize(n);
+        auto piece_is_interesting = std::vector<bool>(n);
         for (int i = 0; i < n; ++i)
         {
             piece_is_interesting[i] = tor->piece_is_wanted(i) && !tor->has_piece(i);
@@ -2081,7 +2080,7 @@ void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
     }
 
     // close all but the `max` most active
-    auto peers = std::vector<tr_peerMsgs*>{ n - max };
+    auto peers = std::vector<tr_peerMsgs*>(n - max);
     std::partial_sort_copy(
         std::begin(swarm->peers),
         std::end(swarm->peers),
