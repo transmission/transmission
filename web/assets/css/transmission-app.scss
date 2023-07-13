@@ -2,9 +2,9 @@
 @use 'sass:math';
 
 // Colors related to torrent status
-$blue-200: #5379a9;
+$blue-200: #355d8a;
 $blue-400: #1847d4;
-$green-100: #26a955;
+$green-100: #118539;
 $green-400: #62be79;
 $grey-200: #e1e4e8;
 $grey-500: #828282;
@@ -1019,10 +1019,10 @@ $video-image: '../img/film.svg';
   }
 
   .section-label {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     grid-column: span 2;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
 
     &:not(:first-of-type) {
       margin-top: 10px;
