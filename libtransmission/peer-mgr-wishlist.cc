@@ -136,7 +136,7 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
 
     // We usually won't need all the candidates to be sorted until endgame, so don't
     // waste cycles sorting all of them here. partial sort is enough.
-    auto constexpr MaxSortedPieces = size_t{ 30 };
+    static auto constexpr MaxSortedPieces = size_t{ 30 };
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 
