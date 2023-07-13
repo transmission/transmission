@@ -538,7 +538,7 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte 
     return std::make_pair(address, compact);
 }
 
-std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct sockaddr const* from)
+std::optional<tr_socket_address> tr_address::from_sockaddr(struct sockaddr const* from)
 {
     if (from == nullptr)
     {
@@ -551,7 +551,7 @@ std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct s
         auto addr = tr_address{};
         addr.type = TR_AF_INET;
         addr.addr.addr4 = sin->sin_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin->sin_port));
+        return tr_socket_address{ addr, tr_port::fromNetwork(sin->sin_port) };
     }
 
     if (from->sa_family == AF_INET6)
@@ -560,7 +560,7 @@ std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct s
         auto addr = tr_address{};
         addr.type = TR_AF_INET6;
         addr.addr.addr6 = sin6->sin6_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin6->sin6_port));
+        return tr_socket_address{ addr, tr_port::fromNetwork(sin6->sin6_port) };
     }
 
     return {};

@@ -43,8 +43,8 @@ TEST_F(NetTest, conversionsIPv4)
     auto addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss));
     ASSERT_TRUE(addrport.has_value());
     assert(addrport.has_value());
-    EXPECT_EQ(addr, addrport->first);
-    EXPECT_EQ(Port, addrport->second);
+    EXPECT_EQ(addr, addrport->address());
+    EXPECT_EQ(Port, addrport->port());
 }
 
 TEST_F(NetTest, trAddress)

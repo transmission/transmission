@@ -15,6 +15,8 @@
 #include <optional>
 #include <vector>
 
+#include <small/vector.hpp>
+
 struct tr_error;
 struct tr_torrent;
 struct tr_torrent_metainfo;
@@ -22,7 +24,9 @@ struct tr_torrent_metainfo;
 // defined by BEP #9
 inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
 
-std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece);
+using tr_metadata_piece = small::max_size_vector<std::byte, 1024U * 16U>;
+
+bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_piece& setme);
 
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len);
 
