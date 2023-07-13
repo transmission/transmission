@@ -362,6 +362,10 @@ public:
                 tor->set_date_active(now);
                 tor->set_dirty();
                 tor->session->add_uploaded(event.length);
+
+                // this should always be a tr_peerMsgs since it's
+                // impossible to upload piece data to a webseed...
+                TR_ASSERT(peer->peer_info != nullptr);
                 peer->peer_info->set_latest_piece_data_time(now);
 
                 break;
