@@ -157,26 +157,29 @@ public:
 
     // ---
 
-    [[nodiscard]] constexpr auto compare_by_connection_time(tr_peer_info const& that) const noexcept
-    {
-        return tr_compare_3way(last_connection_at_, that.last_connection_at_);
-    }
-
     [[nodiscard]] constexpr auto compare_by_failure_count(tr_peer_info const& that) const noexcept
     {
-        return tr_compare_3way(num_fails_, that.num_fails_);
+        return tr_compare_3way(num_consecutive_fails_, that.num_consecutive_fails_);
     }
 
     [[nodiscard]] constexpr auto compare_by_piece_data_time(tr_peer_info const& that) const noexcept
     {
-        return tr_compare_3way(last_piece_data_time_, that.last_piece_data_time_);
+        return tr_compare_3way(piece_data_at_, that.piece_data_at_);
     }
 
     // ---
 
-    constexpr auto set_connected(bool value = true) noexcept
+    constexpr auto set_connected(time_t now, bool is_connected = true) noexcept
     {
-        is_connected_ = value;
+        connection_changed_at_ = now;
+
+        is_connected_ = is_connected;
+
+        if (is_connected_)
+        {
+            num_consecutive_fails_ = {};
+            piece_data_at_ = {};
+        }
     }
 
     [[nodiscard]] constexpr auto is_connected() const noexcept
@@ -207,67 +210,55 @@ public:
 
     // ---
 
-    [[nodiscard]] constexpr auto last_connection_attempt_succeeded() const noexcept
-    {
-        return last_connection_at_ >= last_connection_attempt_at_;
-    }
-
     [[nodiscard]] constexpr auto connection_attempt_time() const noexcept
     {
-        return last_connection_attempt_at_;
+        return connection_attempted_at_;
     }
 
     constexpr void set_connection_attempt_time(time_t value) noexcept
     {
-        last_connection_attempt_at_ = value;
-    }
-
-    constexpr void set_connection_time(time_t value) noexcept
-    {
-        last_connection_at_ = value;
-
-        last_piece_data_time_ = {};
+        connection_attempted_at_ = value;
     }
 
     constexpr void set_latest_piece_data_time(time_t value) noexcept
     {
-        last_piece_data_time_ = value;
+        piece_data_at_ = value;
     }
 
     [[nodiscard]] constexpr bool has_transferred_piece_data() const noexcept
     {
-        return last_piece_data_time_ != time_t{};
+        return piece_data_at_ != time_t{};
     }
 
     [[nodiscard]] constexpr auto reconnect_interval_has_passed(time_t const now) const noexcept
     {
-        auto const time_since_last_connection_attempt = now - last_connection_attempt_at_;
-        return time_since_last_connection_attempt >= get_reconnect_interval_secs(now);
+        auto const interval = now - std::max(connection_attempted_at_, connection_changed_at_);
+        return interval >= get_reconnect_interval_secs(now);
     }
 
     [[nodiscard]] constexpr std::optional<time_t> idle_secs(time_t now) const noexcept
     {
-        if (!last_connection_attempt_succeeded())
+        if (!is_connected_)
         {
             return {};
         }
 
-        return now - std::max(last_piece_data_time_, last_connection_at_);
+        return now - std::max(piece_data_at_, connection_changed_at_);
     }
 
     // ---
 
     constexpr void on_connection_failed() noexcept
     {
-        if (num_fails_ != std::numeric_limits<decltype(num_fails_)>::max())
+        if (num_consecutive_fails_ != std::numeric_limits<decltype(num_consecutive_fails_)>::max())
         {
-            ++num_fails_;
+            ++num_consecutive_fails_;
         }
     }
 
     [[nodiscard]] constexpr auto connection_failure_count() const noexcept
     {
-        return num_fails_;
+        return num_consecutive_fails_;
     }
 
     // ---
@@ -328,7 +319,7 @@ private:
         /* if we were recently connected to this peer and transferring piece
          * data, try to reconnect to them sooner rather that later -- we don't
          * want network troubles to get in the way of a good peer. */
-        if (!unreachable && now - last_piece_data_time_ <= MinimumReconnectIntervalSecs * 2)
+        if (!unreachable && now - piece_data_at_ <= MinimumReconnectIntervalSecs * 2)
         {
             sec = MinimumReconnectIntervalSecs;
         }
@@ -336,7 +327,7 @@ private:
          * and failed to connect to the peer */
         else
         {
-            auto step = this->num_fails_;
+            auto step = this->num_consecutive_fails_;
 
             /* penalize peers that were unreachable the last time we tried */
             if (unreachable)
@@ -386,9 +377,9 @@ private:
 
     static auto inline n_known_peers = std::atomic<size_t>{};
 
-    time_t last_connection_attempt_at_ = {};
-    time_t last_connection_at_ = {};
-    time_t last_piece_data_time_ = {};
+    time_t connection_attempted_at_ = {};
+    time_t connection_changed_at_ = {};
+    time_t piece_data_at_ = {};
 
     mutable std::optional<bool> blocklisted_;
     std::optional<bool> is_connectable_;
@@ -397,7 +388,7 @@ private:
     tr_peer_from from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
 
-    uint8_t num_fails_ = {};
+    uint8_t num_consecutive_fails_ = {};
 
     bool is_banned_ = false;
     bool is_connected_ = false;

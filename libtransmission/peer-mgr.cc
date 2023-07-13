@@ -712,7 +712,7 @@ tr_peer::tr_peer(tr_torrent const* tor, tr_peer_info* peer_info_in)
 {
     if (auto* const info = peer_info; info != nullptr)
     {
-        info->set_connected();
+        info->set_connected(tr_time());
     }
 }
 
@@ -725,7 +725,7 @@ tr_peer::~tr_peer()
 
     if (auto* const info = peer_info; info != nullptr)
     {
-        info->set_connected(false);
+        info->set_connected(tr_time(), false);
     }
 }
 
@@ -939,15 +939,12 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     {
         auto& info = s->ensure_info_exists(socket_address, 0, TR_PEER_FROM_INCOMING);
 
-        info.set_connection_time(tr_time());
-
         if (!result.io->is_incoming())
         {
             info.set_connectable();
         }
 
-        /* In principle, this flag specifies whether the peer groks µTP,
-           not whether it's currently connected over µTP. */
+        // If we're connected via µTP, then we know the peer supports µTP...
         if (result.io->is_utp())
         {
             info.set_utp_supported();
@@ -959,7 +956,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
         }
         else if (result.io->is_incoming() && s->peerCount() >= s->tor->peer_limit())
         {
-            /* too many peers already */
+            // too many peers already
         }
         else if (info.is_connected())
         {
@@ -1808,14 +1805,7 @@ constexpr struct
             return a->do_purge ? 1 : -1;
         }
 
-        /* the one to give us data more recently goes first */
-        if (auto const val = a->peer_info->compare_by_piece_data_time(*b->peer_info); val != 0)
-        {
-            return -val;
-        }
-
-        /* the one we connected to most recently goes first */
-        return -a->peer_info->compare_by_connection_time(*b->peer_info);
+        return a->peer_info->compare_by_piece_data_time(*b->peer_info);
     }
 
     [[nodiscard]] constexpr bool operator()(tr_peer const* a, tr_peer const* b) const // less than
@@ -2092,10 +2082,9 @@ struct peer_candidate
 {
     auto i = uint64_t{};
     auto score = uint64_t{};
-    bool const failed = !peer_info.last_connection_attempt_succeeded();
 
     /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
-    i = failed ? 1 : 0;
+    i = peer_info.connection_failure_count() != 0U ? 1U : 0U;
     score = addValToKey(score, 1, i);
 
     /* prefer the one we attempted least recently (to cycle through all peers) */
