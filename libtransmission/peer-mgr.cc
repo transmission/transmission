@@ -1804,7 +1804,7 @@ constexpr struct
             return a->do_purge ? 1 : -1;
         }
 
-        return a->peer_info->compare_by_piece_data_time(*b->peer_info);
+        return -a->peer_info->compare_by_piece_data_time(*b->peer_info);
     }
 
     [[nodiscard]] constexpr bool operator()(tr_peer const* a, tr_peer const* b) const // less than
