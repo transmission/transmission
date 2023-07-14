@@ -1788,7 +1788,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     return false;
 }
 
-void closePeer(tr_peer* peer)
+void close_peer(tr_peer* peer)
 {
     TR_ASSERT(peer != nullptr);
     tr_logAddTraceSwarm(peer->swarm, fmt::format("removing bad peer {}", peer->display_name()));
@@ -1818,29 +1818,31 @@ constexpr auto ComparePeerByLeastActive = [](tr_peer const* a, tr_peer const* b)
     return ComparePeerByMostActive(b, a);
 };
 
-[[nodiscard]] auto getPeersToClose(tr_swarm const* const swarm, time_t const now_sec)
+using bad_peers_t = small::vector<tr_peer*, 512U>;
+
+bad_peers_t& get_peers_to_close(tr_swarm const* const swarm, time_t const now_sec, bad_peers_t& bad_peers_buf)
 {
     auto const& peers = swarm->peers;
     auto const peer_count = std::size(peers);
 
-    auto peers_to_close = std::vector<tr_peer*>{};
-    peers_to_close.reserve(peer_count);
+    bad_peers_buf.clear();
+    bad_peers_buf.reserve(peer_count);
     for (auto* peer : swarm->peers)
     {
         if (shouldPeerBeClosed(swarm, peer, peer_count, now_sec))
         {
-            peers_to_close.push_back(peer);
+            bad_peers_buf.emplace_back(peer);
         }
     }
 
-    return peers_to_close;
+    return bad_peers_buf;
 }
 
-void closeBadPeers(tr_swarm* s, time_t const now_sec)
+void close_bad_peers(tr_swarm* s, time_t const now_sec, bad_peers_t& bad_peers_buf)
 {
-    for (auto* peer : getPeersToClose(s, now_sec))
+    for (auto* peer : get_peers_to_close(s, now_sec, bad_peers_buf))
     {
-        closePeer(peer);
+        close_peer(peer);
     }
 }
 
@@ -1861,7 +1863,7 @@ void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
         std::begin(peers),
         std::end(peers),
         ComparePeerByLeastActive);
-    std::for_each(std::begin(peers), std::end(peers), closePeer);
+    std::for_each(std::begin(peers), std::end(peers), close_peer);
 }
 
 void enforceSessionPeerLimit(tr_session* session)
@@ -1885,7 +1887,7 @@ void enforceSessionPeerLimit(tr_session* session)
     if (std::size(peers) > max)
     {
         std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByMostActive);
-        std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
+        std::for_each(std::begin(peers) + max, std::end(peers), close_peer);
     }
 }
 } // namespace disconnect_helpers
@@ -1899,6 +1901,7 @@ void tr_peerMgr::reconnectPulse()
     auto const now_sec = tr_time();
 
     // remove crappy peers
+    auto bad_peers_buf = bad_peers_t{};
     for (auto* const tor : session->torrents())
     {
         auto* const swarm = tor->swarm;
@@ -1909,7 +1912,7 @@ void tr_peerMgr::reconnectPulse()
         }
         else
         {
-            closeBadPeers(swarm, now_sec);
+            close_bad_peers(swarm, now_sec, bad_peers_buf);
         }
     }
 
