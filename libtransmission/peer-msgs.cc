@@ -625,7 +625,6 @@ public:
     bool peerSupportsPex = false;
     bool peerSupportsMetadataXfer = false;
     bool clientSentLtepHandshake = false;
-    bool peerSentLtepHandshake = false;
 
     size_t desired_request_count = 0;
 
@@ -636,7 +635,7 @@ public:
 
     EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
-    size_t metadata_size_hint = 0;
+    int64_t metadata_size_hint = 0;
 
     tr_torrent* const torrent;
 
@@ -679,6 +678,7 @@ public:
 private:
     friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader& payload);
     friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload);
+    friend void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in);
 
     tr_peer_callback const callback_;
     void* const callback_data_;
@@ -938,19 +938,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     bool const allow_metadata_xfer = msgs->torrent->is_public();
 
     /* decide if we want to advertise pex support */
-    auto allow_pex = bool{};
-    if (!msgs->torrent->allows_pex())
-    {
-        allow_pex = false;
-    }
-    else if (msgs->peerSentLtepHandshake)
-    {
-        allow_pex = msgs->peerSupportsPex;
-    }
-    else
-    {
-        allow_pex = true;
-    }
+    bool const allow_pex = msgs->session->allows_pex() && msgs->torrent->allows_pex();
 
     auto val = tr_variant{};
     tr_variantInitDict(&val, 8);
@@ -1045,8 +1033,6 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
 void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
-    msgs->peerSentLtepHandshake = true;
-
     auto const handshake_sv = payload.to_string_view();
 
     auto val = tr_variant{};
@@ -1080,14 +1066,14 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
         if (tr_variantDictFindInt(sub, TR_KEY_ut_pex, &i))
         {
             msgs->peerSupportsPex = i != 0;
-            msgs->ut_pex_id = (uint8_t)i;
+            msgs->ut_pex_id = static_cast<uint8_t>(i);
             logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_pex is {:d}"), static_cast<int>(msgs->ut_pex_id)));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &i))
         {
             msgs->peerSupportsMetadataXfer = i != 0;
-            msgs->ut_metadata_id = (uint8_t)i;
+            msgs->ut_metadata_id = static_cast<uint8_t>(i);
             logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_metadata_id is {:d}"), static_cast<int>(msgs->ut_metadata_id)));
         }
 
@@ -1103,7 +1089,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     /* look for metainfo size (BEP 9) */
     if (tr_variantDictFindInt(&val, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
     {
-        msgs->metadata_size_hint = (size_t)i;
+        msgs->metadata_size_hint = i;
     }
 
     /* look for upload_only (BEP 21) */
@@ -1182,8 +1168,8 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
         /* NOOP */
     }
 
-    if (msg_type == MetadataMsgType::Data && !msgs->torrent->has_metainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
-        piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
+    if (msg_type == MetadataMsgType::Data && total_size == msgs->metadata_size_hint && !msgs->torrent->has_metainfo() &&
+        msg_end - benc_end <= METADATA_PIECE_SIZE && piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
         size_t const piece_len = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
