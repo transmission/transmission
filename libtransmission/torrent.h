@@ -553,7 +553,7 @@ public:
 
     [[nodiscard]] constexpr auto allows_pex() const noexcept
     {
-        return this->is_public() && this->session->allowsPEX();
+        return this->is_public() && this->session->allows_pex();
     }
 
     [[nodiscard]] constexpr auto allows_dht() const noexcept

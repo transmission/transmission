@@ -766,7 +766,7 @@ public:
         return settings_.lpd_enabled;
     }
 
-    [[nodiscard]] constexpr auto allowsPEX() const noexcept
+    [[nodiscard]] constexpr auto allows_pex() const noexcept
     {
         return settings_.pex_enabled;
     }
