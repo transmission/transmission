@@ -1032,8 +1032,6 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
 void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
-    msgs->peerSentLtepHandshake = true;
-
     auto const handshake_sv = payload.to_string_view();
 
     auto val = tr_variant{};
