@@ -462,8 +462,12 @@ $video-image: '../img/film.svg';
   &[data-icon-multifile='true'] {
     -webkit-mask-image: url($mime-icon), url($folder-image);
     mask-image: url($mime-icon), url($folder-image);
-    -webkit-mask-position: top left, bottom right;
-    mask-position: top left, bottom right;
+    -webkit-mask-position:
+      top left,
+      bottom right;
+    mask-position:
+      top left,
+      bottom right;
     -webkit-mask-repeat: no-repeat, no-repeat;
     mask-repeat: no-repeat, no-repeat;
     -webkit-mask-size: 16px, 16px;
@@ -486,7 +490,9 @@ $video-image: '../img/film.svg';
     .icon {
       // color the background svg fill
       background-color: var(--color-fg-primary);
-      background-position: center, top left;
+      background-position:
+        center,
+        top left;
 
       &[data-icon-mime-type='audio'] {
         @include mime-icon($audio-image);
@@ -572,8 +578,12 @@ $video-image: '../img/film.svg';
       .icon {
         flex-shrink: 0;
         height: $icon-size;
-        -webkit-mask-size: $icon-size, $icon-size-num * 0.5px;
-        mask-size: $icon-size, $icon-size-num * 0.5px;
+        -webkit-mask-size:
+          $icon-size,
+          $icon-size-num * 0.5px;
+        mask-size:
+          $icon-size,
+          $icon-size-num * 0.5px;
         width: $icon-size;
 
         &[data-icon-multifile='true'] {
@@ -601,7 +611,9 @@ $video-image: '../img/film.svg';
       padding: 6px 12px;
 
       .icon {
-        background-size: $icon-size, $icon-size-num * 0.5px;
+        background-size:
+          $icon-size,
+          $icon-size-num * 0.5px;
         grid-area: icon;
         height: $icon-size;
         width: $icon-size;
@@ -796,7 +808,9 @@ $video-image: '../img/film.svg';
   $background-color: var(--color-inspector-background);
   background: $background-color;
   bottom: 0;
-  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+  box-shadow:
+    0 3px 6px -4px #0000001f,
+    0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
   position: absolute;
   right: 0;
@@ -1344,7 +1358,9 @@ $video-image: '../img/film.svg';
 .overflow-menu {
   background: var(--color-bg-popup);
   border-radius: 5px;
-  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+  box-shadow:
+    0 3px 6px -4px #0000001f,
+    0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
   min-width: 220px;
@@ -1584,7 +1600,9 @@ dialog {
 }
 
 .dialog-container {
-  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
+  box-shadow:
+    0 3px 6px -4px #0000001f,
+    0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-primary);
   display: block;

@@ -47,7 +47,7 @@ export class OverflowMenu extends EventTarget {
     this.session_manager = session_manager;
     this.session_manager.addEventListener(
       'session-change',
-      this.session_listener
+      this.session_listener,
     );
 
     const { session_properties } = session_manager;
@@ -69,7 +69,7 @@ export class OverflowMenu extends EventTarget {
       this.outside.stop();
       this.session_manager.removeEventListener(
         'session-change',
-        this.session_listener
+        this.session_listener,
       );
       this.action_manager.removeEventListener('change', this.action_listener);
       this.prefs.removeEventListener('change', this.prefs_listener);
