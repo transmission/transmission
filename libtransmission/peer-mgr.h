@@ -275,6 +275,11 @@ public:
             set_utp_supported();
         }
 
+        if ((pex_flags & ADDED_F_ENCRYPTION_FLAG) != 0U)
+        {
+            prefers_encryption_ = true;
+        }
+
         is_seed_ = (pex_flags & ADDED_F_SEED_FLAG) != 0U;
     }
 
@@ -290,6 +295,11 @@ public:
         if (is_utp_supported_ && *is_utp_supported_)
         {
             ret |= ADDED_F_UTP_FLAGS;
+        }
+
+        if (prefers_encryption_ && *prefers_encryption_)
+        {
+            ret |= ADDED_F_ENCRYPTION_FLAG;
         }
 
         if (is_seed_)
@@ -364,6 +374,7 @@ private:
     mutable std::optional<bool> blocklisted_;
     std::optional<bool> is_connectable_;
     std::optional<bool> is_utp_supported_;
+    std::optional<bool> prefers_encryption_;
 
     tr_peer_from from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
