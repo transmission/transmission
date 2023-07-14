@@ -13,11 +13,15 @@
 #include <string>
 
 #ifdef _WIN32
+#include <winsock2.h>
 #include <ws2tcpip.h>
+#include <iphlpapi.h>
 #else
 #include <ctime>
+#include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
+#include <ifaddrs.h>
 #endif
 
 #include <event2/event.h>
@@ -244,6 +248,71 @@ public:
     }
 
 private:
+#ifdef _WIN32
+    void GetIPv4SourceAddress(sockaddr_in *source_addr)
+    {
+        int i;
+        PMIB_IPADDRTABLE pIPAddrTable;
+        DWORD dwSize = 0;
+        DWORD dwRetVal = 0;
+
+        memset(source_addr, 0, sizeof(sockaddr_in));
+        source_addr->sin_addr.s_addr = INADDR_ANY;
+
+        pIPAddrTable = (MIB_IPADDRTABLE *) HeapAlloc(GetProcessHeap(), 0, sizeof (MIB_IPADDRTABLE));
+
+        if (pIPAddrTable) {
+            if (GetIpAddrTable(pIPAddrTable, &dwSize, 0) ==
+                ERROR_INSUFFICIENT_BUFFER) {
+                HeapFree(GetProcessHeap(), 0, pIPAddrTable);
+                pIPAddrTable = (MIB_IPADDRTABLE *) HeapAlloc(GetProcessHeap(), 0, dwSize);
+            }
+            if (pIPAddrTable == NULL) {
+                return;
+            }
+        }
+
+        if ( (dwRetVal = GetIpAddrTable( pIPAddrTable, &dwSize, 0 )) != NO_ERROR ) { 
+            return;
+        }
+
+        for (i =0 ; i < (int) pIPAddrTable->dwNumEntries; i++) {
+            if (!(pIPAddrTable->table[i].wType & MIB_IPADDR_DISCONNECTED) &&
+                !(pIPAddrTable->table[i].wType & MIB_IPADDR_DELETED) &&
+                (pIPAddrTable->table[i].dwAddr != inet_addr("127.0.0.1")))
+            source_addr->sin_addr.s_addr = pIPAddrTable->table[i].dwAddr;
+        }
+
+        if (pIPAddrTable) {
+            HeapFree(GetProcessHeap(), 0, pIPAddrTable);
+            pIPAddrTable = NULL;
+        }
+    }
+#else
+    void GetIPv4SourceAddress(sockaddr_in *source_addr)
+    {
+        struct ifaddrs *ifaddrHead, *ifaddr;
+        sa_family_t family;
+        int n;
+
+        memset(source_addr, 0, sizeof(sockaddr_in));
+        source_addr->sin_addr.s_addr = INADDR_ANY;
+        if (getifaddrs(&ifaddrHead) != 0)
+            return;
+
+        /* iterate through address list */
+        for (ifaddr = ifaddrHead, n = 0; ifaddr != NULL; ifaddr = ifaddr->ifa_next, n++)
+        {
+            family = ifaddr->ifa_addr->sa_family;
+
+            struct sockaddr_in *addr = (struct sockaddr_in *) ifaddr->ifa_addr;
+            if (family == AF_INET)
+                source_addr->sin_addr.s_addr = addr->sin_addr.s_addr;
+        }
+        freeifaddrs(ifaddrHead);
+    }
+#endif
+
     bool init(struct event_base* event_base)
     {
         if (initImpl(event_base))
@@ -319,7 +388,15 @@ private:
             mcast_addr_ = {};
             mcast_addr_.sin_family = AF_INET;
             mcast_addr_.sin_port = McastPort.network();
+#ifdef _WIN32
+            //mcast_addr_.sin_addr.s_addr = inet_addr("192.168.50.112");
+            sockaddr_in source_addr;
+            GetIPv4SourceAddress(&source_addr);
+            mcast_addr_.sin_addr.s_addr = source_addr.sin_addr.s_addr;
+            tr_logAddDebug(fmt::format(FMT_STRING("Source addr: {:s}"), inet_ntoa(source_addr.sin_addr)));
+#else
             mcast_addr_.sin_addr.s_addr = INADDR_ANY;
+#endif
 
             if (bind(mcast_rcv_socket_, reinterpret_cast<sockaddr*>(&mcast_addr_), sizeof(mcast_addr_)) == -1)
             {
@@ -373,6 +450,21 @@ private:
             {
                 return false;
             }
+
+            sockaddr_in source_addr;
+            GetIPv4SourceAddress(&source_addr);
+            tr_logAddDebug(fmt::format(FMT_STRING("Source addr: {:s}"), inet_ntoa(source_addr.sin_addr)));
+
+            if (setsockopt(
+                    mcast_snd_socket_,
+                    IPPROTO_IP,
+                    IP_MULTICAST_IF,
+                    reinterpret_cast<char const*>(&source_addr.sin_addr),
+                    sizeof(source_addr.sin_addr)))
+            {
+                return false;
+            }
+
         }
 
         /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
