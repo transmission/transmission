@@ -635,7 +635,7 @@ public:
 
     EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
-    size_t metadata_size_hint = 0;
+    int64_t metadata_size_hint = 0;
 
     tr_torrent* const torrent;
 
@@ -678,6 +678,7 @@ public:
 private:
     friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader& payload);
     friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload);
+    friend void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in);
 
     tr_peer_callback const callback_;
     void* const callback_data_;
@@ -1088,7 +1089,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     /* look for metainfo size (BEP 9) */
     if (tr_variantDictFindInt(&val, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
     {
-        msgs->metadata_size_hint = (size_t)i;
+        msgs->metadata_size_hint = i;
     }
 
     /* look for upload_only (BEP 21) */
@@ -1167,8 +1168,8 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
         /* NOOP */
     }
 
-    if (msg_type == MetadataMsgType::Data && !msgs->torrent->has_metainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
-        piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
+    if (msg_type == MetadataMsgType::Data && total_size == msgs->metadata_size_hint && !msgs->torrent->has_metainfo() &&
+        msg_end - benc_end <= METADATA_PIECE_SIZE && piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
         size_t const piece_len = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
