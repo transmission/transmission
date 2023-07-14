@@ -284,14 +284,28 @@ public:
     {
         auto ret = pex_flags_;
 
-        if (is_connectable_ && *is_connectable_)
+        if (is_connectable_)
         {
-            ret |= ADDED_F_CONNECTABLE;
+            if (*is_connectable_)
+            {
+                ret |= ADDED_F_CONNECTABLE;
+            }
+            else
+            {
+                ret &= ~ADDED_F_CONNECTABLE;
+            }
         }
 
-        if (is_utp_supported_ && *is_utp_supported_)
+        if (is_utp_supported_)
         {
-            ret |= ADDED_F_UTP_FLAGS;
+            if (*is_utp_supported_)
+            {
+                ret |= ADDED_F_UTP_FLAGS;
+            }
+            else
+            {
+                ret &= ~ADDED_F_UTP_FLAGS;
+            }
         }
 
         if (is_seed_)
