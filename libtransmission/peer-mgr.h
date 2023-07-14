@@ -265,6 +265,8 @@ public:
 
     constexpr void set_pex_flags(uint8_t pex_flags) noexcept
     {
+        pex_flags_ = pex_flags;
+
         if ((pex_flags & ADDED_F_CONNECTABLE) != 0U)
         {
             set_connectable();
@@ -275,17 +277,12 @@ public:
             set_utp_supported();
         }
 
-        if ((pex_flags & ADDED_F_ENCRYPTION_FLAG) != 0U)
-        {
-            prefers_encryption_ = true;
-        }
-
         is_seed_ = (pex_flags & ADDED_F_SEED_FLAG) != 0U;
     }
 
     [[nodiscard]] constexpr uint8_t pex_flags() const noexcept
     {
-        auto ret = uint8_t{};
+        auto ret = pex_flags_;
 
         if (is_connectable_ && *is_connectable_)
         {
@@ -295,11 +292,6 @@ public:
         if (is_utp_supported_ && *is_utp_supported_)
         {
             ret |= ADDED_F_UTP_FLAGS;
-        }
-
-        if (prefers_encryption_ && *prefers_encryption_)
-        {
-            ret |= ADDED_F_ENCRYPTION_FLAG;
         }
 
         if (is_seed_)
@@ -374,12 +366,12 @@ private:
     mutable std::optional<bool> blocklisted_;
     std::optional<bool> is_connectable_;
     std::optional<bool> is_utp_supported_;
-    std::optional<bool> prefers_encryption_;
 
     tr_peer_from from_first_; // where the peer was first found
     tr_peer_from from_best_; // the "best" place where this peer was found
 
     uint8_t num_consecutive_fails_ = {};
+    uint8_t pex_flags_ = {};
 
     bool is_banned_ = false;
     bool is_connected_ = false;
