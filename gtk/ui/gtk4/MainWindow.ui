@@ -59,6 +59,7 @@ horizontal</property>
             <child>
               <object class="GtkButton" id="remove_torrent_button">
                 <property name="focusable">1</property>
+                <property name="tooltip-text" translatable="yes">Remove torrent</property>
                 <property name="action-name">win.remove-torrent</property>
                 <property name="label" translatable="1">Remove torrent</property>
                 <property name="use-underline">1</property>
