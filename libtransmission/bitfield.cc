@@ -391,7 +391,6 @@ void tr_bitfield::set_span(size_t begin, size_t end, bool value)
     unsigned char last_mask = 0xff << ((~end) & 7U);
     if (value)
     {
-
         if (walk == last_byte)
         {
             flags_[walk] |= first_mask & last_mask;
