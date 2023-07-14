@@ -625,7 +625,6 @@ public:
     bool peerSupportsPex = false;
     bool peerSupportsMetadataXfer = false;
     bool clientSentLtepHandshake = false;
-    bool peerSentLtepHandshake = false;
 
     size_t desired_request_count = 0;
 
@@ -1068,14 +1067,14 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
         if (tr_variantDictFindInt(sub, TR_KEY_ut_pex, &i))
         {
             msgs->peerSupportsPex = i != 0;
-            msgs->ut_pex_id = (uint8_t)i;
+            msgs->ut_pex_id = static_cast<uint8_t>(i);
             logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_pex is {:d}"), static_cast<int>(msgs->ut_pex_id)));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &i))
         {
             msgs->peerSupportsMetadataXfer = i != 0;
-            msgs->ut_metadata_id = (uint8_t)i;
+            msgs->ut_metadata_id = static_cast<uint8_t>(i);
             logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_metadata_id is {:d}"), static_cast<int>(msgs->ut_metadata_id)));
         }
 
