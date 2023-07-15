@@ -71,7 +71,7 @@ export class Remote {
             heading: 'Connection failed',
             message:
               'Could not connect to the server. You may need to reload the page to reconnect.',
-          })
+          }),
         );
       });
   }
@@ -160,7 +160,7 @@ export class Remote {
       },
       () => {
         this._controller.refreshTorrents([torrentId]);
-      }
+      },
     );
   }
 
@@ -189,7 +189,7 @@ export class Remote {
       'torrent-stop',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
 
@@ -202,7 +202,7 @@ export class Remote {
         move: true,
       },
       callback,
-      context
+      context,
     );
   }
 
@@ -229,7 +229,7 @@ export class Remote {
       'torrent-verify',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   reannounceTorrents(torrent_ids, callback, context) {
@@ -237,7 +237,7 @@ export class Remote {
       'torrent-reannounce',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   addTorrentByUrl(url, options) {
@@ -279,7 +279,7 @@ export class Remote {
       RPC._QueueMoveTop,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsToBottom(torrent_ids, callback, context) {
@@ -287,7 +287,7 @@ export class Remote {
       RPC._QueueMoveBottom,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsUp(torrent_ids, callback, context) {
@@ -295,7 +295,7 @@ export class Remote {
       RPC._QueueMoveUp,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsDown(torrent_ids, callback, context) {
@@ -303,7 +303,7 @@ export class Remote {
       RPC._QueueMoveDown,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
 }

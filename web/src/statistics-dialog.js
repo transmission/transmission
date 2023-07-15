@@ -55,7 +55,7 @@ export class StatisticsDialog extends EventTarget {
     setTextContent(this.elements.session.ratio, fmt.ratioString(ratio));
     setTextContent(
       this.elements.session.time,
-      fmt.timeInterval(s.secondsActive)
+      fmt.timeInterval(s.secondsActive),
     );
 
     s = stats['cumulative-stats'];
