@@ -1,2 +1,0 @@
-X:/msys64/mingw64/bin/ar.exe qc libwildmat.a CMakeFiles/wildmat.dir/wildmat.c.obj
-X:/msys64/mingw64/bin/ranlib.exe libwildmat.a

@@ -1,1 +1,0 @@
--I"X:/transmission-jr/libtransmission/.." -I"X:/transmission-jr/build-dbg/libtransmission/.." -isystem "X:/transmission-jr/cmake/../third-party/fmt/include" -isystem "X:/transmission-jr/cmake/../third-party/small/include" -isystem "X:/transmission-jr/build-dbg/third-party/libevent.bld/pfx/include"

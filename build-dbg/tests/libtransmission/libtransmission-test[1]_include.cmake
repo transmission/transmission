@@ -1,5 +1,0 @@
-if(EXISTS "X:/transmission-jr/build-dbg/tests/libtransmission/libtransmission-test[1]_tests.cmake")
-  include("X:/transmission-jr/build-dbg/tests/libtransmission/libtransmission-test[1]_tests.cmake")
-else()
-  add_test(libtransmission-test_NOT_BUILT libtransmission-test_NOT_BUILT)
-endif()

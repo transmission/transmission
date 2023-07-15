@@ -1,2 +1,0 @@
-X:/msys64/mingw64/bin/ar.exe qc libgtestall.a "CMakeFiles/gtestall.dir/__/__/third-party/googletest/googletest/src/gtest-all.cc.obj" "CMakeFiles/gtestall.dir/__/__/third-party/googletest/googletest/src/gtest_main.cc.obj"
-X:/msys64/mingw64/bin/ranlib.exe libgtestall.a
