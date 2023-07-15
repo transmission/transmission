@@ -1,0 +1,13 @@
+# Target labels
+ event
+# Source files and their labels
+X:/transmission-jr/build-dbg/CMakeFiles/event
+X:/transmission-jr/build-dbg/CMakeFiles/event.rule
+X:/transmission-jr/build-dbg/CMakeFiles/event-complete.rule
+X:/transmission-jr/build-dbg/third-party/libevent.bld/src/event-stamp/event-build.rule
+X:/transmission-jr/build-dbg/third-party/libevent.bld/src/event-stamp/event-configure.rule
+X:/transmission-jr/build-dbg/third-party/libevent.bld/src/event-stamp/event-download.rule
+X:/transmission-jr/build-dbg/third-party/libevent.bld/src/event-stamp/event-install.rule
+X:/transmission-jr/build-dbg/third-party/libevent.bld/src/event-stamp/event-mkdir.rule
+X:/transmission-jr/build-dbg/third-party/libevent.bld/src/event-stamp/event-patch.rule
+X:/transmission-jr/build-dbg/third-party/libevent.bld/src/event-stamp/event-update.rule

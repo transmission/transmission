@@ -1,0 +1,13 @@
+# Target labels
+ natpmp
+# Source files and their labels
+X:/transmission-jr/build-dbg/CMakeFiles/natpmp
+X:/transmission-jr/build-dbg/CMakeFiles/natpmp.rule
+X:/transmission-jr/build-dbg/CMakeFiles/natpmp-complete.rule
+X:/transmission-jr/build-dbg/third-party/libnatpmp.bld/src/natpmp-stamp/natpmp-build.rule
+X:/transmission-jr/build-dbg/third-party/libnatpmp.bld/src/natpmp-stamp/natpmp-configure.rule
+X:/transmission-jr/build-dbg/third-party/libnatpmp.bld/src/natpmp-stamp/natpmp-download.rule
+X:/transmission-jr/build-dbg/third-party/libnatpmp.bld/src/natpmp-stamp/natpmp-install.rule
+X:/transmission-jr/build-dbg/third-party/libnatpmp.bld/src/natpmp-stamp/natpmp-mkdir.rule
+X:/transmission-jr/build-dbg/third-party/libnatpmp.bld/src/natpmp-stamp/natpmp-patch.rule
+X:/transmission-jr/build-dbg/third-party/libnatpmp.bld/src/natpmp-stamp/natpmp-update.rule

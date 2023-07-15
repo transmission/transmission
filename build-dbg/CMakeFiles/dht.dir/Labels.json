@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "X:/transmission-jr/build-dbg/CMakeFiles/dht"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/CMakeFiles/dht.rule"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/CMakeFiles/dht-complete.rule"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/third-party/dht.bld/src/dht-stamp/dht-build.rule"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/third-party/dht.bld/src/dht-stamp/dht-configure.rule"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/third-party/dht.bld/src/dht-stamp/dht-download.rule"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/third-party/dht.bld/src/dht-stamp/dht-install.rule"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/third-party/dht.bld/src/dht-stamp/dht-mkdir.rule"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/third-party/dht.bld/src/dht-stamp/dht-patch.rule"
+		},
+		{
+			"file" : "X:/transmission-jr/build-dbg/third-party/dht.bld/src/dht-stamp/dht-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"dht"
+		],
+		"name" : "dht"
+	}
+}

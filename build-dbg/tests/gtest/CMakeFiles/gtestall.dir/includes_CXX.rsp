@@ -1,0 +1,1 @@
+-isystem "X:/transmission-jr/third-party/googletest/googletest" -isystem "X:/transmission-jr/third-party/googletest/googletest/include"

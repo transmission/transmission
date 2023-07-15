@@ -1,0 +1,2 @@
+X:/msys64/mingw64/bin/ar.exe qc libjsonsl.a CMakeFiles/jsonsl.dir/jsonsl.c.obj
+X:/msys64/mingw64/bin/ranlib.exe libjsonsl.a

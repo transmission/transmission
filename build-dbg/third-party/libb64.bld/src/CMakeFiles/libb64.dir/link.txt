@@ -1,0 +1,2 @@
+X:/msys64/mingw64/bin/ar.exe qc libb64.a CMakeFiles/libb64.dir/cdecode.c.obj CMakeFiles/libb64.dir/cencode.c.obj
+X:/msys64/mingw64/bin/ranlib.exe libb64.a

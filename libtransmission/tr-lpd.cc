@@ -253,39 +253,29 @@ private:
     {
         int i;
         PMIB_IPADDRTABLE pIPAddrTable;
+        std::vector<std::byte> IPAddrTable_vec;
         DWORD dwSize = 0;
         DWORD dwRetVal = 0;
 
         memset(source_addr, 0, sizeof(sockaddr_in));
         source_addr->sin_addr.s_addr = INADDR_ANY;
 
-        pIPAddrTable = (MIB_IPADDRTABLE *) HeapAlloc(GetProcessHeap(), 0, sizeof (MIB_IPADDRTABLE));
+        IPAddrTable_vec.resize(sizeof (MIB_IPADDRTABLE));
+        pIPAddrTable = PMIB_IPADDRTABLE(&IPAddrTable_vec[0]);
 
-        if (pIPAddrTable) {
-            if (GetIpAddrTable(pIPAddrTable, &dwSize, 0) ==
-                ERROR_INSUFFICIENT_BUFFER) {
-                HeapFree(GetProcessHeap(), 0, pIPAddrTable);
-                pIPAddrTable = (MIB_IPADDRTABLE *) HeapAlloc(GetProcessHeap(), 0, dwSize);
-            }
-            if (pIPAddrTable == NULL) {
-                return;
-            }
+        if (GetIpAddrTable(pIPAddrTable, &dwSize, 0) == ERROR_INSUFFICIENT_BUFFER) {
+            IPAddrTable_vec.resize(dwSize);
+            pIPAddrTable = PMIB_IPADDRTABLE(&IPAddrTable_vec[0]);
         }
 
-        if ( (dwRetVal = GetIpAddrTable( pIPAddrTable, &dwSize, 0 )) != NO_ERROR ) { 
+        if ((dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0 )) != NO_ERROR)
             return;
-        }
 
         for (i =0 ; i < (int) pIPAddrTable->dwNumEntries; i++) {
             if (!(pIPAddrTable->table[i].wType & MIB_IPADDR_DISCONNECTED) &&
                 !(pIPAddrTable->table[i].wType & MIB_IPADDR_DELETED) &&
                 (pIPAddrTable->table[i].dwAddr != inet_addr("127.0.0.1")))
             source_addr->sin_addr.s_addr = pIPAddrTable->table[i].dwAddr;
-        }
-
-        if (pIPAddrTable) {
-            HeapFree(GetProcessHeap(), 0, pIPAddrTable);
-            pIPAddrTable = NULL;
         }
     }
 #else
@@ -389,7 +379,6 @@ private:
             mcast_addr_.sin_family = AF_INET;
             mcast_addr_.sin_port = McastPort.network();
 #ifdef _WIN32
-            //mcast_addr_.sin_addr.s_addr = inet_addr("192.168.50.112");
             sockaddr_in source_addr;
             GetIPv4SourceAddress(&source_addr);
             mcast_addr_.sin_addr.s_addr = source_addr.sin_addr.s_addr;

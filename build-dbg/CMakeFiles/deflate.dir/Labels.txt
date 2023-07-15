@@ -1,0 +1,13 @@
+# Target labels
+ deflate
+# Source files and their labels
+X:/transmission-jr/build-dbg/CMakeFiles/deflate
+X:/transmission-jr/build-dbg/CMakeFiles/deflate.rule
+X:/transmission-jr/build-dbg/CMakeFiles/deflate-complete.rule
+X:/transmission-jr/build-dbg/third-party/libdeflate.bld/src/deflate-stamp/deflate-build.rule
+X:/transmission-jr/build-dbg/third-party/libdeflate.bld/src/deflate-stamp/deflate-configure.rule
+X:/transmission-jr/build-dbg/third-party/libdeflate.bld/src/deflate-stamp/deflate-download.rule
+X:/transmission-jr/build-dbg/third-party/libdeflate.bld/src/deflate-stamp/deflate-install.rule
+X:/transmission-jr/build-dbg/third-party/libdeflate.bld/src/deflate-stamp/deflate-mkdir.rule
+X:/transmission-jr/build-dbg/third-party/libdeflate.bld/src/deflate-stamp/deflate-patch.rule
+X:/transmission-jr/build-dbg/third-party/libdeflate.bld/src/deflate-stamp/deflate-update.rule
