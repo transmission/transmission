@@ -27,14 +27,14 @@ inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
 
 using tr_metadata_piece = small::max_size_vector<std::byte, 1024U * 16U>;
 
-struct metadata_node
-{
-    time_t requested_at = 0U;
-    int piece = 0;
-};
-
 struct tr_incomplete_metadata
 {
+    struct metadata_node
+    {
+        time_t requested_at = 0U;
+        int piece = 0;
+    };
+
     std::vector<char> metadata;
 
     /** sorted from least to most recently requested */

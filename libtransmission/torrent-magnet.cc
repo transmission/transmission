@@ -34,7 +34,7 @@ auto constexpr MinRepeatIntervalSecs = int{ 3 };
 
 auto create_all_needed(int n_pieces)
 {
-    auto ret = std::deque<metadata_node>{};
+    auto ret = std::deque<tr_incomplete_metadata::metadata_node>{};
 
     ret.resize(n_pieces);
 
@@ -141,10 +141,7 @@ bool tr_torrentUseMetainfoFromFile(
     // tor should keep this metainfo
     tor->set_metainfo(*metainfo);
 
-    if (auto& m = tor->incomplete_metadata; m)
-    {
-        m.reset();
-    }
+    tor->incomplete_metadata.reset();
 
     return true;
 }
