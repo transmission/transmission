@@ -242,7 +242,8 @@ public:
     /// TODO(ckerr): refactor them out of `tr_peer`
 
     // hook to private peer-mgr information
-    tr_peer_info* const peer_info;
+    tr_socket_address conn_socket_address;
+    tr_peer_info* peer_info;
 
     // whether or not this peer sent us any given block
     tr_bitfield blame;

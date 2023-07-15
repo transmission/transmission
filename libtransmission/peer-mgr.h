@@ -60,7 +60,7 @@ class tr_peer_info
 {
 public:
     tr_peer_info(tr_socket_address socket_address, uint8_t pex_flags, tr_peer_from from)
-        : socket_address_{ std::move(socket_address) }
+        : listen_socket_address{ std::move(socket_address) }
         , from_first_{ from }
         , from_best_{ from }
     {
@@ -89,17 +89,17 @@ public:
 
     [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
-        return socket_address_;
+        return listen_socket_address;
     }
 
-    [[nodiscard]] constexpr auto& port() noexcept
+    [[nodiscard]] constexpr auto& listen_port() noexcept
     {
-        return socket_address_.port_;
+        return listen_socket_address.port_;
     }
 
     [[nodiscard]] auto display_name() const
     {
-        return socket_address_.display_name();
+        return listen_socket_address.display_name();
     }
 
     // ---
@@ -319,12 +319,12 @@ public:
 private:
     [[nodiscard]] constexpr tr_address const& addr() const noexcept
     {
-        return socket_address_.address();
+        return listen_socket_address.address();
     }
 
     [[nodiscard]] constexpr auto port() const noexcept
     {
-        return socket_address_.port();
+        return listen_socket_address.port();
     }
 
     [[nodiscard]] constexpr time_t get_reconnect_interval_secs(time_t const now) const noexcept
@@ -371,7 +371,7 @@ private:
 
     static auto inline n_known_peers = std::atomic<size_t>{};
 
-    tr_socket_address socket_address_;
+    tr_socket_address listen_socket_address;
 
     time_t connection_attempted_at_ = {};
     time_t connection_changed_at_ = {};

@@ -304,8 +304,8 @@ public:
         if (!pool_is_all_seeds_)
         {
             pool_is_all_seeds_ = std::all_of(
-                std::begin(pool),
-                std::end(pool),
+                std::begin(known_connectable),
+                std::end(known_connectable),
                 [](auto const& key_val) { return key_val.second.is_seed(); });
         }
 
@@ -314,8 +314,8 @@ public:
 
     [[nodiscard]] tr_peer_info* get_existing_peer_info(tr_socket_address const& socket_address) noexcept
     {
-        auto&& it = pool.find(socket_address);
-        return it != pool.end() ? &it->second : nullptr;
+        auto&& it = known_connectable.find(socket_address);
+        return it != known_connectable.end() ? &it->second : nullptr;
     }
 
     tr_peer_info& ensure_info_exists(tr_socket_address const& socket_address, uint8_t const flags, tr_peer_from const from)
@@ -323,7 +323,7 @@ public:
         TR_ASSERT(socket_address.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
 
-        auto&& [info_it, is_new] = pool.try_emplace(socket_address, socket_address, flags, from);
+        auto&& [info_it, is_new] = known_connectable.try_emplace(socket_address, socket_address, flags, from);
         auto& peer_info = info_it->second;
         if (!is_new)
         {
@@ -407,7 +407,7 @@ public:
         case tr_peer_event::Type::ClientGotPort:
             if (auto* const info = peer->peer_info; info != nullptr)
             {
-                info->port() = event.port;
+                info->listen_port() = event.port;
             }
 
             break;
@@ -469,7 +469,7 @@ public:
 
     // tr_peers hold pointers to the items in this container,
     // therefore references to elements within cannot invalidate
-    std::unordered_map<tr_socket_address, tr_peer_info> pool;
+    std::unordered_map<tr_socket_address, tr_peer_info> known_connectable;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
@@ -508,7 +508,7 @@ private:
     {
         auto const lock = tor->unique_lock();
 
-        for (auto& [socket_address, atom] : pool)
+        for (auto& [socket_address, atom] : known_connectable)
         {
             mark_peer_as_seed(atom);
         }
@@ -685,7 +685,7 @@ private:
            since the blocklist has changed, erase that cached value */
         for (auto* const tor : session->torrents())
         {
-            for (auto& [socket_address, atom] : tor->swarm->pool)
+            for (auto& [socket_address, atom] : tor->swarm->known_connectable)
             {
                 atom.set_blocklisted_dirty();
             }
@@ -1022,7 +1022,8 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers())
+            !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers() &&
+            (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0) /* TODO: store non-connectable elsewhere */)
         {
             s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from);
             ++n_used;
@@ -1171,7 +1172,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     }
     else /* TR_PEERS_INTERESTING */
     {
-        for (auto const& [socket_address, peer_info] : s->pool)
+        for (auto const& [socket_address, peer_info] : s->known_connectable)
         {
             if (is_peer_interesting(tor, peer_info))
             {
@@ -2182,7 +2183,7 @@ struct peer_candidate
             continue;
         }
 
-        for (auto& [socket_address, atom] : swarm->pool)
+        for (auto& [socket_address, atom] : swarm->known_connectable)
         {
             if (isPeerCandidate(tor, atom, now))
             {

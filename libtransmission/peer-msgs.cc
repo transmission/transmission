@@ -938,7 +938,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     bool const allow_metadata_xfer = msgs->torrent->is_public();
 
     /* decide if we want to advertise pex support */
-    bool const allow_pex = msgs->session->allows_pex() && msgs->torrent->allows_pex();
+    bool const allow_pex = msgs->torrent->allows_pex();
 
     auto val = tr_variant{};
     tr_variantInitDict(&val, 8);
