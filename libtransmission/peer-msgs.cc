@@ -2029,14 +2029,12 @@ void tr_peerMsgsImpl::sendPex()
     tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
     auto tmpbuf = std::vector<std::byte>{};
-    tmpbuf.reserve(MaxPexAdded * 18);
 
     for (uint8_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
         static auto constexpr AddedMap = std::array{ TR_KEY_added, TR_KEY_added6 };
         static auto constexpr AddedFMap = std::array{ TR_KEY_added_f, TR_KEY_added6_f };
         static auto constexpr DroppedMap = std::array{ TR_KEY_dropped, TR_KEY_dropped6 };
-        static auto constexpr CompactSizeMap = std::array{ 6U, 18U };
         auto const ip_type = static_cast<tr_address_type>(i);
 
         auto& old_pex = pex[i];
@@ -2088,9 +2086,9 @@ void tr_peerMsgsImpl::sendPex()
         {
             // "added"
             tmpbuf.clear();
-            tmpbuf.reserve(std::size(added));
+            tmpbuf.reserve(std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(added), std::size(added), ip_type);
-            TR_ASSERT(std::size(tmpbuf) == std::size(added) * CompactSizeMap[i]);
+            TR_ASSERT(std::size(tmpbuf) == std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_variantDictAddRaw(&val, AddedMap[i], std::data(tmpbuf), std::size(tmpbuf));
 
             // "added.f"
@@ -2110,9 +2108,9 @@ void tr_peerMsgsImpl::sendPex()
         {
             // "dropped"
             tmpbuf.clear();
-            tmpbuf.reserve(std::size(dropped));
+            tmpbuf.reserve(std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped), ip_type);
-            TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * CompactSizeMap[i]);
+            TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_variantDictAddRaw(&val, DroppedMap[i], std::data(tmpbuf), std::size(tmpbuf));
         }
     }
