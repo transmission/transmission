@@ -138,12 +138,14 @@ private:
     uint16_t hport_ = 0;
 };
 
-enum tr_address_type
+enum tr_address_type : uint8_t
 {
     TR_AF_INET,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
 };
+
+std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept;
 
 struct tr_socket_address;
 
