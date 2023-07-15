@@ -17,21 +17,22 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "bandwidth.h"
-#include "bitfield.h"
-#include "block-info.h"
-#include "completion.h"
-#include "crypto-utils.h"
-#include "file-piece-map.h"
-#include "interned-string.h"
-#include "observable.h"
-#include "log.h"
-#include "session.h"
-#include "torrent-metainfo.h"
-#include "tr-macros.h"
+#include "libtransmission/announce-list.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/completion.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file-piece-map.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/observable.h"
+#include "libtransmission/log.h"
+#include "libtransmission/session.h"
+#include "libtransmission/torrent-magnet.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-macros.h"
 
 class tr_swarm;
 struct tr_error;
@@ -863,7 +864,7 @@ public:
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
      * other peers */
-    struct tr_incomplete_metadata* incompleteMetadata = nullptr;
+    std::optional<tr_incomplete_metadata> incomplete_metadata;
 
     time_t lpdAnnounceAt = 0;
 
