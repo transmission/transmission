@@ -82,8 +82,12 @@ public:
         return total_size_;
     }
 
+    [[nodiscard]] constexpr auto isComplete() const noexcept
+    {
+        return have_size_ == totalSize();
+    }
+
     QString path() const;
-    bool isComplete() const;
     int priority() const;
     int isSubtreeWanted() const;
 

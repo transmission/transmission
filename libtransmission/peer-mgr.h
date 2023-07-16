@@ -465,12 +465,7 @@ struct tr_pex
             return i;
         }
 
-        if (port != that.port)
-        {
-            return port < that.port ? -1 : 1;
-        }
-
-        return 0;
+        return tr_compare_3way(port, that.port);
     }
 
     [[nodiscard]] bool operator==(tr_pex const& that) const noexcept
