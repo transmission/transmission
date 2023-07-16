@@ -3,6 +3,7 @@
 
 // Colors related to torrent status
 $blue-200: #357aaa;
+$blue-300: #1653e4;
 $blue-400: #1847d4;
 $green-100: #26aa55;
 $green-200: #118539;
@@ -176,7 +177,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-inspector-background: #{$white};
     --color-bg-tabs: #{$nice-grey-darker};
     --color-inspector-tabs: #{$nice-grey};
-    --color-bg-selected: #{$blue-400};
+    --color-bg-selected: #{$blue-300};
     --color-default-border: #{$default-border-light};
     --color-dialog-border: #{$nice-grey};
     --color-progressbar-seed-1: #{$green-100};
