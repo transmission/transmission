@@ -81,7 +81,7 @@ public:
         user_data_ = user_data;
     }
 
-    void clear_callbacks()
+    constexpr void clear_callbacks()
     {
         set_callbacks(nullptr, nullptr, nullptr, nullptr);
     }
