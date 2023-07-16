@@ -1503,7 +1503,7 @@ int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
 
     // the tiers are effectively equal priority, but add an arbitrary
     // differentiation because ptrArray sorted mode hates equal items.
-    return a < b ? -1 : 1;
+    return tr_compare_3way(a, b);
 }
 
 void tierAnnounce(tr_announcer_impl* announcer, tr_tier* tier)

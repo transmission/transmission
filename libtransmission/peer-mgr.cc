@@ -1180,17 +1180,17 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         }
     }
 
-    std::sort(std::begin(infos), std::end(infos), CompareAtomsByUsefulness);
-
-    // add the first N of them into our return list
+    // add the N most useful peers into our return list
 
     auto const n = std::min(std::size(infos), max_peer_count);
     auto pex = std::vector<tr_pex>{};
     pex.reserve(n);
 
-    for (size_t i = 0; i < std::size(infos) && std::size(pex) < n; ++i)
+    std::partial_sort(std::begin(infos), std::begin(infos) + n, std::end(infos), CompareAtomsByUsefulness);
+    infos.resize(n);
+
+    for (auto const* const info : infos)
     {
-        auto const* const info = infos[i];
         auto const& [addr, port] = info->socket_address();
 
         if (addr.type == address_type)
