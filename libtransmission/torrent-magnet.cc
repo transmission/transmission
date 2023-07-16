@@ -155,8 +155,8 @@ namespace set_metadata_piece_helpers
 [[nodiscard]] constexpr size_t get_piece_length(tr_incomplete_metadata const& m, int piece)
 {
     return piece + 1 == m.piece_count ? // last piece
-        std::size(m.metadata) - (piece * METADATA_PIECE_SIZE) :
-        METADATA_PIECE_SIZE;
+        std::size(m.metadata) - (piece * MetadataPieceSize) :
+        MetadataPieceSize;
 }
 
 void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* top)
