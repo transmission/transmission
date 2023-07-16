@@ -763,7 +763,7 @@ void Torrent::get_item_value(Glib::RefPtr<Glib::ObjectBase const> const& item, i
 
 int Torrent::compare_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs)
 {
-    return gtr_compare_generic(lhs->get_id(), rhs->get_id());
+    return tr_compare_3way(lhs->get_id(), rhs->get_id());
 }
 
 bool Torrent::less_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs)

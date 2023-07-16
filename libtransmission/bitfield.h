@@ -90,7 +90,7 @@ public:
         return bit_count_;
     }
 
-    [[nodiscard]] constexpr size_t empty() const noexcept
+    [[nodiscard]] constexpr bool empty() const noexcept
     {
         return size() == 0;
     }
@@ -127,8 +127,7 @@ private:
             return false;
         }
 
-        bool ret = (flags_[n >> 3U] << (n & 7U) & 0x80) != 0;
-        return ret;
+        return (flags_[n >> 3U] << (n & 7U) & 0x80) != 0;
     }
 
     void ensure_bits_alloced(size_t n);

@@ -21,8 +21,8 @@
 #include "libtransmission/net.h" // tr_socket_address
 #include "libtransmission/peer-common.h" // for tr_peer
 
-struct peer_atom;
 class tr_peerIo;
+class tr_peer_info;
 struct tr_torrent;
 
 /**
@@ -35,12 +35,12 @@ class tr_peerMsgs : public tr_peer
 public:
     tr_peerMsgs(
         tr_torrent const* tor,
-        peer_atom* atom_in,
+        tr_peer_info* peer_info_in,
         tr_interned_string user_agent,
         bool connection_is_encrypted,
         bool connection_is_incoming,
         bool connection_is_utp)
-        : tr_peer{ tor, atom_in }
+        : tr_peer{ tor, peer_info_in }
         , user_agent_{ user_agent }
         , connection_is_encrypted_{ connection_is_encrypted }
         , connection_is_incoming_{ connection_is_incoming }
@@ -173,7 +173,7 @@ private:
 
 tr_peerMsgs* tr_peerMsgsNew(
     tr_torrent* torrent,
-    peer_atom* atom,
+    tr_peer_info* peer_info,
     std::shared_ptr<tr_peerIo> io,
     tr_interned_string user_agent,
     tr_peer_callback callback,
