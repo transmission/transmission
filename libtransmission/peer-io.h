@@ -265,7 +265,7 @@ public:
 
     [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
-        return socket_.socketAddress();
+        return socket_.socket_address();
     }
 
     [[nodiscard]] auto display_name() const

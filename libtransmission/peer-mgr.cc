@@ -59,6 +59,9 @@ static auto constexpr CancelHistorySec = int{ 60 };
 
 // ---
 
+namespace
+{
+
 class HandshakeMediator final : public tr_handshake::Mediator
 {
 private:
@@ -121,6 +124,10 @@ private:
     tr_session& session_;
 };
 
+using Handshakes = std::unordered_map<tr_socket_address, tr_handshake>;
+
+} // anonymous namespace
+
 bool tr_peer_info::is_blocklisted(tr_session const* session) const
 {
     if (blocklisted_)
@@ -133,10 +140,24 @@ bool tr_peer_info::is_blocklisted(tr_session const* session) const
     return value;
 }
 
-using Handshakes = std::unordered_map<tr_socket_address, tr_handshake>;
-
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
 #define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
+
+namespace
+{
+namespace peer_callback_helpers
+{
+
+void on_client_got_piece_data(tr_torrent* const tor, uint32_t const sent_length, time_t const now)
+{
+    tor->downloadedCur += sent_length;
+    tor->set_date_active(now);
+    tor->set_dirty();
+    tor->session->add_downloaded(sent_length);
+}
+
+} // namespace peer_callback_helpers
+} // namespace
 
 /** @brief Opaque, per-torrent data structure for peer connection information */
 class tr_swarm
@@ -227,7 +248,7 @@ public:
         outgoing_handshakes.clear();
     }
 
-    void removePeer(tr_peer* peer)
+    void removePeer(tr_peerMsgs* peer)
     {
         auto const lock = unique_lock();
 
@@ -271,7 +292,7 @@ public:
         return is_endgame_;
     }
 
-    void addStrike(tr_peer* peer) const
+    void addStrike(tr_peerMsgs* peer) const
     {
         tr_logAddTraceSwarm(
             this,
@@ -293,7 +314,7 @@ public:
         webseeds.reserve(n);
         for (size_t i = 0; i < n; ++i)
         {
-            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), &tr_swarm::peerCallbackFunc, this));
+            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
         }
         webseeds.shrink_to_fit();
 
@@ -361,9 +382,37 @@ public:
         mark_all_seeds_flag_dirty();
     }
 
-    static void peerCallbackFunc(tr_peer* peer, tr_peer_event const& event, void* vs)
+    static void peer_callback_webseed(tr_peer* const peer, tr_peer_event const& event, void* const vs)
     {
+        using namespace peer_callback_helpers;
+
         TR_ASSERT(peer != nullptr);
+        auto* s = static_cast<tr_swarm*>(vs);
+        auto const lock = s->unique_lock();
+
+        switch (event.type)
+        {
+        case tr_peer_event::Type::ClientGotPieceData:
+            {
+                auto const now = tr_time();
+                auto* const tor = s->tor;
+
+                on_client_got_piece_data(tor, event.length, now);
+
+                break;
+            }
+
+        default:
+            peer_callback_common(peer, event, s);
+            break;
+        }
+    }
+
+    static void peer_callback_bt(tr_peerMsgs* const msgs, tr_peer_event const& event, void* const vs)
+    {
+        using namespace peer_callback_helpers;
+
+        TR_ASSERT(msgs != nullptr);
         auto* s = static_cast<tr_swarm*>(vs);
         auto const lock = s->unique_lock();
 
@@ -380,31 +429,22 @@ public:
                 tor->set_dirty();
                 tor->session->add_uploaded(event.length);
 
-                // this should always be a tr_peerMsgs since it's
-                // impossible to upload piece data to a webseed...
-                TR_ASSERT(peer->peer_info != nullptr);
-                peer->peer_info->set_latest_piece_data_time(now);
-
-                break;
+                msgs->peer_info->set_latest_piece_data_time(now);
             }
+
+            break;
 
         case tr_peer_event::Type::ClientGotPieceData:
             {
                 auto const now = tr_time();
                 auto* const tor = s->tor;
 
-                tor->downloadedCur += event.length;
-                tor->set_date_active(now);
-                tor->set_dirty();
-                tor->session->add_downloaded(event.length);
+                on_client_got_piece_data(tor, event.length, now);
 
-                if (auto* const info = peer->peer_info; info != nullptr)
-                {
-                    info->set_latest_piece_data_time(now);
-                }
-
-                break;
+                msgs->peer_info->set_latest_piece_data_time(now);
             }
+
+            break;
 
         case tr_peer_event::Type::ClientGotHave:
         case tr_peer_event::Type::ClientGotHaveAll:
@@ -414,18 +454,14 @@ public:
             /* noop */
             break;
 
-        case tr_peer_event::Type::ClientGotRej:
-            s->active_requests.remove(s->tor->piece_loc(event.pieceIndex, event.offset).block, peer);
-            break;
-
         case tr_peer_event::Type::ClientGotChoke:
-            s->active_requests.remove(peer);
+            s->active_requests.remove(msgs);
             break;
 
         case tr_peer_event::Type::ClientGotPort:
-            if (auto nh = peer->swarm->incoming_peer_info.extract(peer->socket_address()); !nh.empty())
+            if (auto nh = msgs->swarm->incoming_peer_info.extract(msgs->socket_address()); !nh.empty())
             {
-                auto* const info = peer->peer_info;
+                auto* const info = msgs->peer_info;
                 TR_ASSERT(info != nullptr);
                 TR_ASSERT(&nh.mapped() == info);
                 TR_ASSERT(info->listen_port().host() == 0U);
@@ -433,7 +469,7 @@ public:
                 nh.key().port_ = event.port;
                 info->listen_port() = event.port;
 
-                peer->swarm->known_connectable.insert(std::move(nh));
+                msgs->swarm->known_connectable.insert(std::move(nh));
             }
 
             break;
@@ -443,32 +479,8 @@ public:
             // not currently supported
             break;
 
-        case tr_peer_event::Type::ClientGotBlock:
-            {
-                auto* const tor = s->tor;
-                auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
-                s->cancelAllRequestsForBlock(loc.block, peer);
-                peer->blocks_sent_to_client.add(tr_time(), 1);
-                tr_torrentGotBlock(tor, loc.block);
-                break;
-            }
-
-        case tr_peer_event::Type::Error:
-            if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
-            {
-                /* some protocol error from the peer */
-                peer->do_purge = true;
-                tr_logAddDebugSwarm(
-                    s,
-                    fmt::format(
-                        "setting {} do_purge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
-                        peer->display_name()));
-            }
-            else
-            {
-                tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(event.err)));
-            }
-
+        default:
+            peer_callback_common(msgs, event, s);
             break;
         }
     }
@@ -622,6 +634,49 @@ private:
     void on_torrent_started();
     void on_torrent_stopped();
 
+    static void peer_callback_common(tr_peer* const peer, tr_peer_event const& event, tr_swarm* const s)
+    {
+        switch (event.type)
+        {
+        case tr_peer_event::Type::ClientGotRej:
+            s->active_requests.remove(s->tor->piece_loc(event.pieceIndex, event.offset).block, peer);
+            break;
+
+        case tr_peer_event::Type::ClientGotBlock:
+            {
+                auto* const tor = s->tor;
+                auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
+                s->cancelAllRequestsForBlock(loc.block, peer);
+                peer->blocks_sent_to_client.add(tr_time(), 1);
+                tr_torrentGotBlock(tor, loc.block);
+            }
+
+            break;
+
+        case tr_peer_event::Type::Error:
+            if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
+            {
+                /* some protocol error from the peer */
+                peer->do_purge = true;
+                tr_logAddDebugSwarm(
+                    s,
+                    fmt::format(
+                        "setting {} do_purge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
+                        peer->display_name()));
+            }
+            else
+            {
+                tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(event.err)));
+            }
+
+            break;
+
+        default:
+            TR_ASSERT_MSG(false, "This should be unreachable code");
+            break;
+        }
+    }
+
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
 
@@ -745,16 +800,11 @@ private:
 
 // --- tr_peer virtual functions
 
-tr_peer::tr_peer(tr_torrent const* tor, tr_peer_info* peer_info_in)
+tr_peer::tr_peer(tr_torrent const* tor)
     : session{ tor->session }
     , swarm{ tor->swarm }
-    , peer_info{ peer_info_in }
     , blame{ tor->block_count() }
 {
-    if (auto* const info = peer_info; info != nullptr)
-    {
-        info->set_connected(tr_time());
-    }
 }
 
 tr_peer::~tr_peer()
@@ -762,11 +812,6 @@ tr_peer::~tr_peer()
     if (swarm != nullptr)
     {
         swarm->active_requests.remove(this);
-    }
-
-    if (auto* const info = peer_info; info != nullptr)
-    {
-        info->set_connected(tr_time(), false);
     }
 }
 
@@ -921,7 +966,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 
     tr_swarm* swarm = tor->swarm;
 
-    auto* peer = tr_peerMsgsNew(tor, peer_info, std::move(io), client, &tr_swarm::peerCallbackFunc, swarm);
+    auto* peer = tr_peerMsgsNew(tor, peer_info, std::move(io), client, &tr_swarm::peer_callback_bt, swarm);
 
     swarm->peers.push_back(peer);
 
@@ -1039,13 +1084,13 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket.display_name()));
         socket.close();
     }
-    else if (manager->incoming_handshakes.count(socket.socketAddress()) != 0U)
+    else if (manager->incoming_handshakes.count(socket.socket_address()) != 0U)
     {
         socket.close();
     }
     else /* we don't have a connection to them yet... */
     {
-        auto socket_address = socket.socketAddress();
+        auto socket_address = socket.socket_address();
         manager->incoming_handshakes.try_emplace(
             socket_address,
             &manager->handshake_mediator_,
@@ -1833,7 +1878,7 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
     return false;
 }
 
-void close_peer(tr_peer* peer)
+void close_peer(tr_peerMsgs* peer)
 {
     TR_ASSERT(peer != nullptr);
     tr_logAddTraceSwarm(peer->swarm, fmt::format("removing bad peer {}", peer->display_name()));
@@ -1842,7 +1887,7 @@ void close_peer(tr_peer* peer)
 
 constexpr struct
 {
-    [[nodiscard]] constexpr static int compare(tr_peer const* a, tr_peer const* b) // <=>
+    [[nodiscard]] constexpr static int compare(tr_peerMsgs const* a, tr_peerMsgs const* b) // <=>
     {
         if (a->do_purge != b->do_purge)
         {
@@ -1852,18 +1897,18 @@ constexpr struct
         return -a->peer_info->compare_by_piece_data_time(*b->peer_info);
     }
 
-    [[nodiscard]] constexpr bool operator()(tr_peer const* a, tr_peer const* b) const // less than
+    [[nodiscard]] constexpr bool operator()(tr_peerMsgs const* a, tr_peerMsgs const* b) const // less than
     {
         return compare(a, b) < 0;
     }
 } ComparePeerByMostActive{};
 
-constexpr auto ComparePeerByLeastActive = [](tr_peer const* a, tr_peer const* b)
+constexpr auto ComparePeerByLeastActive = [](tr_peerMsgs const* a, tr_peerMsgs const* b)
 {
     return ComparePeerByMostActive(b, a);
 };
 
-using bad_peers_t = small::vector<tr_peer*, 512U>;
+using bad_peers_t = small::vector<tr_peerMsgs*, 512U>;
 
 bad_peers_t& get_peers_to_close(tr_swarm const* const swarm, time_t const now_sec, bad_peers_t& bad_peers_buf)
 {
@@ -1921,7 +1966,7 @@ void enforceSessionPeerLimit(tr_session* session)
     }
 
     // Make a list of all the peers.
-    auto peers = std::vector<tr_peer*>{};
+    auto peers = std::vector<tr_peerMsgs*>{};
     peers.reserve(tr_peerMsgs::size());
     for (auto const* const tor : session->torrents())
     {

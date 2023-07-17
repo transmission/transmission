@@ -328,7 +328,7 @@ public:
         tr_peer_info* const peer_info_in,
         std::shared_ptr<tr_peerIo> io_in,
         tr_interned_string client,
-        tr_peer_callback callback,
+        tr_peer_callback_bt callback,
         void* callback_data)
         : tr_peerMsgs{ torrent_in, peer_info_in, client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
         , torrent{ torrent_in }
@@ -375,9 +375,9 @@ public:
         set_active(TR_UP, false);
         set_active(TR_DOWN, false);
 
-        if (this->io)
+        if (io)
         {
-            this->io->clear();
+            io->clear();
         }
     }
 
@@ -680,7 +680,7 @@ private:
     friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload);
     friend void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in);
 
-    tr_peer_callback const callback_;
+    tr_peer_callback_bt const callback_;
     void* const callback_data_;
 
     // seconds between periodic sendPex() calls
@@ -2149,8 +2149,27 @@ void tr_peerMsgsImpl::sendPex()
 
 } // namespace
 
+tr_peerMsgs::tr_peerMsgs(
+    tr_torrent const* tor,
+    tr_peer_info* peer_info_in,
+    tr_interned_string user_agent,
+    bool connection_is_encrypted,
+    bool connection_is_incoming,
+    bool connection_is_utp)
+    : tr_peer{ tor }
+    , peer_info{ peer_info_in }
+    , user_agent_{ user_agent }
+    , connection_is_encrypted_{ connection_is_encrypted }
+    , connection_is_incoming_{ connection_is_incoming }
+    , connection_is_utp_{ connection_is_utp }
+{
+    peer_info->set_connected(tr_time());
+    ++n_peers;
+}
+
 tr_peerMsgs::~tr_peerMsgs()
 {
+    peer_info->set_connected(tr_time(), false);
     [[maybe_unused]] auto const n_prev = n_peers--;
     TR_ASSERT(n_prev > 0U);
 }
@@ -2160,7 +2179,7 @@ tr_peerMsgs* tr_peerMsgsNew(
     tr_peer_info* const peer_info,
     std::shared_ptr<tr_peerIo> io,
     tr_interned_string user_agent,
-    tr_peer_callback callback,
+    tr_peer_callback_bt callback,
     void* callback_data)
 {
     return new tr_peerMsgsImpl(torrent, peer_info, std::move(io), user_agent, callback, callback_data);
