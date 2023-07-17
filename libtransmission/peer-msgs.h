@@ -101,8 +101,6 @@ public:
         return is_active_[direction];
     }
 
-    [[nodiscard]] virtual tr_socket_address socketAddress() const = 0;
-
     virtual void cancel_block_request(tr_block_index_t block) = 0;
 
     virtual void set_choke(bool peer_is_choked) = 0;

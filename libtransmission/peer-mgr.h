@@ -60,12 +60,20 @@ class tr_peer_info
 {
 public:
     tr_peer_info(tr_socket_address socket_address, uint8_t pex_flags, tr_peer_from from)
-        : listen_socket_address{ std::move(socket_address) }
+        : listen_socket_address{ socket_address }
         , from_first_{ from }
         , from_best_{ from }
     {
         ++n_known_peers;
 
+        set_pex_flags(pex_flags);
+    }
+
+    tr_peer_info(tr_address address, uint8_t pex_flags, tr_peer_from from)
+        : listen_socket_address{ address, tr_port{} }
+        , from_first_{ from }
+        , from_best_{ from }
+    {
         set_pex_flags(pex_flags);
     }
 
@@ -92,8 +100,14 @@ public:
         return listen_socket_address;
     }
 
-    [[nodiscard]] constexpr auto& listen_port() noexcept
+    [[nodiscard]] constexpr auto const& address() const noexcept
     {
+        return listen_socket_address.address();
+    }
+
+    [[nodiscard]] auto& listen_port() noexcept
+    {
+        ++n_known_peers;
         return listen_socket_address.port_;
     }
 

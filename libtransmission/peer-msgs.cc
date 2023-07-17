@@ -409,14 +409,14 @@ public:
         }
     }
 
-    [[nodiscard]] tr_socket_address socketAddress() const override
+    [[nodiscard]] tr_socket_address socket_address() const override
     {
         return io->socket_address();
     }
 
     [[nodiscard]] std::string display_name() const override
     {
-        auto const [addr, port] = socketAddress();
+        auto const [addr, port] = socket_address();
         return addr.display_name(port);
     }
 

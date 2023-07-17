@@ -201,6 +201,8 @@ public:
         return has().has_all();
     }
 
+    [[nodiscard]] virtual tr_socket_address socket_address() const = 0;
+
     [[nodiscard]] virtual std::string display_name() const = 0;
 
     [[nodiscard]] virtual tr_bitfield const& has() const noexcept = 0;
@@ -242,7 +244,6 @@ public:
     /// TODO(ckerr): refactor them out of `tr_peer`
 
     // hook to private peer-mgr information
-    tr_socket_address conn_socket_address;
     tr_peer_info* peer_info;
 
     // whether or not this peer sent us any given block
