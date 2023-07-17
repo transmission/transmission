@@ -56,6 +56,12 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
+std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept
+{
+    static auto TR_CONSTEXPR23 map = std::array{ std::string_view{ "IPv4" }, std::string_view{ "IPv6" } };
+    return map[type];
+}
+
 // - TCP Sockets
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
