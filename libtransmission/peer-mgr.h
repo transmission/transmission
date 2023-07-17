@@ -393,6 +393,7 @@ private:
 
     static auto inline n_known_connectable_ = std::atomic<size_t>{};
 
+    // if the port is 0, it SHOULD mean we don't know this peer's listen socket address
     tr_socket_address listen_socket_address_;
 
     time_t connection_attempted_at_ = {};
