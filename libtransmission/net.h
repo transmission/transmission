@@ -346,7 +346,7 @@ struct tr_socket_address
 
     [[nodiscard]] auto is_valid() const noexcept
     {
-        return address_.is_valid();
+        return address_.is_valid() && !port_.empty();
     }
 
     [[nodiscard]] int compare(tr_socket_address const& that) const noexcept

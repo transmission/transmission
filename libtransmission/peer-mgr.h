@@ -105,10 +105,14 @@ public:
         return listen_socket_address.address();
     }
 
-    [[nodiscard]] auto& listen_port() noexcept
+    void set_listen_port(tr_port port_in) noexcept
     {
-        ++n_known_peers;
-        return listen_socket_address.port_;
+        auto& port = listen_socket_address.port_;
+        if (port.empty() && !port_in.empty())
+        {
+            ++n_known_peers;
+        }
+        port = port_in;
     }
 
     [[nodiscard]] auto display_name() const

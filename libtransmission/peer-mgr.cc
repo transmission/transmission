@@ -464,10 +464,9 @@ public:
                 auto* const info = msgs->peer_info;
                 TR_ASSERT(info != nullptr);
                 TR_ASSERT(&nh.mapped() == info);
-                TR_ASSERT(info->listen_port().host() == 0U);
 
                 nh.key().port_ = event.port;
-                info->listen_port() = event.port;
+                info->set_listen_port(event.port);
 
                 msgs->swarm->known_connectable.insert(std::move(nh));
             }
