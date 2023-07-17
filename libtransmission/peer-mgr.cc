@@ -15,7 +15,6 @@
 #include <map>
 #include <optional>
 #include <tuple> // std::tie
-#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -468,7 +467,11 @@ public:
                 nh.key().port_ = event.port;
                 info->set_listen_port(event.port);
 
-                msgs->swarm->known_connectable.insert(std::move(nh));
+                if (auto ret = msgs->swarm->known_connectable.insert(std::move(nh)); !ret.inserted)
+                {
+                    // If this connectable peer is already known, then update its info
+                    s->merge_info(ret.position->second, false, info->pex_flags(), info->from_best());
+                }
             }
 
             break;
@@ -508,8 +511,6 @@ public:
     // therefore references to elements within cannot invalidate
     std::unordered_map<tr_socket_address, tr_peer_info> incoming_peer_info;
     std::unordered_map<tr_socket_address, tr_peer_info> known_connectable;
-    // So that merge_info() works
-    static_assert(std::is_same<decltype(incoming_peer_info), decltype(known_connectable)>::value);
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
@@ -982,7 +983,6 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     TR_ASSERT(result.io != nullptr);
 
     bool const ok = result.is_connected;
-    bool success = false;
 
     auto* const s = manager->get_existing_swarm(result.io->torrent_hash());
 
@@ -1022,12 +1022,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     }
     else /* looking good */
     {
-        auto& info = s->ensure_info_exists(socket_address, 0, TR_PEER_FROM_INCOMING, result.io->is_incoming());
-
-        if (!result.io->is_incoming())
-        {
-            info.set_connectable();
-        }
+        auto& info = s->ensure_info_exists(socket_address, 0, static_cast<tr_peer_from>(0), result.io->is_incoming());
 
         // If we're connected via µTP, then we know the peer supports µTP...
         if (result.io->is_utp())
@@ -1060,11 +1055,11 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
             result.io->set_bandwidth(&s->tor->bandwidth_);
             create_bit_torrent_peer(s->tor, result.io, &info, client);
 
-            success = true;
+            return true;
         }
     }
 
-    return success;
+    return false;
 }
 } // namespace handshake_helpers
 } // namespace
@@ -2090,8 +2085,9 @@ void tr_peerMgr::bandwidthPulse()
 
 bool tr_swarm::peer_is_in_use(tr_peer_info const& peer_info) const
 {
-    return peer_info.is_connected() || outgoing_handshakes.count(peer_info.socket_address()) != 0U ||
-        manager->incoming_handshakes.count(peer_info.socket_address()) != 0U;
+    TR_ASSERT(manager->incoming_handshakes.count(peer_info.socket_address()) == 0U);
+    // TODO(tearfur): We can actually store each outgoing handshake in tr_peer_info objects and do away with the map, right?
+    return peer_info.is_connected() || outgoing_handshakes.count(peer_info.socket_address()) != 0U;
 }
 
 namespace
@@ -2101,10 +2097,11 @@ namespace connect_helpers
 /* is this atom someone that we'd want to initiate a connection to? */
 [[nodiscard]] bool isPeerCandidate(tr_torrent const* tor, tr_peer_info const& peer_info, time_t const now)
 {
-    // have we already tried and failed to connect?
-    if (auto const conn = peer_info.is_connectable(); conn && !*conn)
     {
-        return false;
+        // isPeerCandidate() is supposed to receive only known connectable peers now
+        // keep this check here for now to detect bugs
+        [[maybe_unused]] auto const conn = peer_info.is_connectable();
+        TR_ASSERT(conn && *conn);
     }
 
     // not if we're both seeds
@@ -2238,7 +2235,7 @@ struct peer_candidate
     }
 
     auto candidates = std::vector<peer_candidate>{};
-    candidates.reserve(tr_peer_info::known_peer_count());
+    candidates.reserve(tr_peer_info::known_connectable_count());
 
     /* populate the candidate array */
     auto salter = tr_salt_shaker{};
