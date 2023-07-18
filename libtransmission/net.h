@@ -129,6 +129,8 @@ public:
         hport_ = 0;
     }
 
+    static auto constexpr CompactPortBytes = 2U;
+
 private:
     explicit constexpr tr_port(uint16_t hport) noexcept
         : hport_{ hport }
@@ -138,12 +140,14 @@ private:
     uint16_t hport_ = 0;
 };
 
-enum tr_address_type
+enum tr_address_type : uint8_t
 {
     TR_AF_INET,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
 };
+
+std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept;
 
 struct tr_socket_address;
 
@@ -296,6 +300,8 @@ struct tr_address
         struct in_addr addr4;
     } addr;
 
+    static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
+
     [[nodiscard]] static auto constexpr any_ipv4() noexcept
     {
         return tr_address{ TR_AF_INET, { { { { INADDR_ANY } } } } };
@@ -371,6 +377,9 @@ struct tr_socket_address
 
     tr_address address_;
     tr_port port_;
+
+    static auto constexpr CompactSockAddrBytes = std::array{ tr_address::CompactAddrBytes[0] + tr_port::CompactPortBytes,
+                                                             tr_address::CompactAddrBytes[1] + tr_port::CompactPortBytes };
 };
 
 template<>

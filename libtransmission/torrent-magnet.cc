@@ -65,7 +65,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    int const n = (size <= 0 || size > INT_MAX) ? -1 : div_ceil(size, METADATA_PIECE_SIZE);
+    int const n = (size <= 0 || size > INT_MAX) ? -1 : div_ceil(size, MetadataPieceSize);
     tr_logAddDebugTor(tor, fmt::format("metadata is {} bytes in {} pieces", size, n));
     if (n <= 0)
     {
@@ -97,7 +97,7 @@ bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_pi
         return {};
     }
 
-    auto const n_pieces = std::max(1, div_ceil(tor->info_dict_size(), METADATA_PIECE_SIZE));
+    auto const n_pieces = std::max(1, div_ceil(tor->info_dict_size(), MetadataPieceSize));
     if (piece < 0 || piece >= n_pieces)
     {
         return {};
@@ -111,14 +111,14 @@ bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_pi
 
     auto const info_dict_size = tor->info_dict_size();
     TR_ASSERT(info_dict_size > 0);
-    auto const offset_in_info_dict = static_cast<uint64_t>(piece) * METADATA_PIECE_SIZE;
+    auto const offset_in_info_dict = static_cast<uint64_t>(piece) * MetadataPieceSize;
     if (auto const offset_in_file = tor->info_dict_offset() + offset_in_info_dict; !in.seekg(offset_in_file))
     {
         return {};
     }
 
-    auto const piece_len = offset_in_info_dict + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE :
-                                                                                         info_dict_size - offset_in_info_dict;
+    auto const piece_len = offset_in_info_dict + MetadataPieceSize <= info_dict_size ? MetadataPieceSize :
+                                                                                       info_dict_size - offset_in_info_dict;
     setme.resize(piece_len);
     return !!in.read(reinterpret_cast<char*>(std::data(setme)), std::size(setme));
 }
@@ -155,8 +155,8 @@ namespace set_metadata_piece_helpers
 [[nodiscard]] constexpr size_t get_piece_length(tr_incomplete_metadata const& m, int piece)
 {
     return piece + 1 == m.piece_count ? // last piece
-        std::size(m.metadata) - (piece * METADATA_PIECE_SIZE) :
-        METADATA_PIECE_SIZE;
+        std::size(m.metadata) - (piece * MetadataPieceSize) :
+        MetadataPieceSize;
 }
 
 void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* top)
@@ -346,7 +346,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
         return;
     }
 
-    size_t const offset = piece * METADATA_PIECE_SIZE;
+    size_t const offset = piece * MetadataPieceSize;
     std::copy_n(reinterpret_cast<char const*>(data), len, std::begin(m->metadata) + offset);
 
     needed.erase(iter);

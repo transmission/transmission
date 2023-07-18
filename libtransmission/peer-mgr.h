@@ -435,6 +435,21 @@ struct tr_pex
         return out;
     }
 
+    template<typename OutputIt>
+    static OutputIt to_compact(OutputIt out, tr_pex const* pex, size_t n_pex, tr_address_type type)
+    {
+        switch (type)
+        {
+        case TR_AF_INET:
+            return to_compact_ipv4(out, pex, n_pex);
+        case TR_AF_INET6:
+            return to_compact_ipv6(out, pex, n_pex);
+        default:
+            TR_ASSERT_MSG(false, "invalid type");
+            return out;
+        }
+    }
+
     [[nodiscard]] static std::vector<tr_pex> from_compact_ipv4(
         void const* compact,
         size_t compact_len,
