@@ -715,7 +715,7 @@ private:
 
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
-    std::vector<size_t> sorted;
+    small::vector<size_t, 512> sorted;
 };
 
 class VariantWalker

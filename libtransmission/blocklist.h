@@ -49,7 +49,7 @@ public:
         return is_enabled_;
     }
 
-    void setEnabled(bool is_enabled) noexcept
+    constexpr void setEnabled(bool is_enabled) noexcept
     {
         is_enabled_ = is_enabled;
     }

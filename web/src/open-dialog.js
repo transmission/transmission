@@ -83,7 +83,7 @@ export class OpenDialog extends EventTarget {
               new AlertDialog({
                 heading: `Error adding "${file.name}"`,
                 message: response.result,
-              })
+              }),
             );
           }
         });
@@ -110,7 +110,7 @@ export class OpenDialog extends EventTarget {
             new AlertDialog({
               heading: `Error adding "${url}"`,
               message: payload.result,
-            })
+            }),
           );
         }
       });

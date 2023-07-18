@@ -28,7 +28,7 @@ public:
     static auto constexpr Normal = int{ 1 << 1 };
     static auto constexpr High = int{ 1 << 2 };
 
-    FileTreeItem(QString const& name = QString(), int file_index = -1, uint64_t size = 0)
+    FileTreeItem(QString const& name = QString{}, int file_index = -1, uint64_t size = 0)
         : name_(name)
         , total_size_(size)
         , file_index_(file_index)
@@ -82,8 +82,12 @@ public:
         return total_size_;
     }
 
+    [[nodiscard]] constexpr auto isComplete() const noexcept
+    {
+        return have_size_ == totalSize();
+    }
+
     QString path() const;
-    bool isComplete() const;
     int priority() const;
     int isSubtreeWanted() const;
 

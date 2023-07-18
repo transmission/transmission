@@ -11,6 +11,7 @@
 #include <algorithm> // for std::copy_n
 #include <array>
 #include <cstddef> // size_t
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -57,6 +58,9 @@ using tr_socket_t = int;
 
 #define sockerrno errno
 #endif
+
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 /**
  * Literally just a port number.
@@ -125,6 +129,8 @@ public:
         hport_ = 0;
     }
 
+    static auto constexpr CompactPortBytes = 2U;
+
 private:
     explicit constexpr tr_port(uint16_t hport) noexcept
         : hport_{ hport }
@@ -134,17 +140,21 @@ private:
     uint16_t hport_ = 0;
 };
 
-enum tr_address_type
+enum tr_address_type : uint8_t
 {
     TR_AF_INET,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
 };
 
+std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept;
+
+struct tr_socket_address;
+
 struct tr_address
 {
     [[nodiscard]] static std::optional<tr_address> from_string(std::string_view address_sv);
-    [[nodiscard]] static std::optional<std::pair<tr_address, tr_port>> from_sockaddr(struct sockaddr const*);
+    [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(struct sockaddr const*);
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
@@ -290,6 +300,8 @@ struct tr_address
         struct in_addr addr4;
     } addr;
 
+    static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
+
     [[nodiscard]] static auto constexpr any_ipv4() noexcept
     {
         return tr_address{ TR_AF_INET, { { { { INADDR_ANY } } } } };
@@ -313,7 +325,104 @@ struct tr_address
     [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
 };
 
-using tr_socket_address = std::pair<tr_address, tr_port>;
+struct tr_socket_address
+{
+    tr_socket_address() = default;
+
+    tr_socket_address(tr_address const& address, tr_port port)
+        : address_{ address }
+        , port_{ port }
+    {
+    }
+
+    [[nodiscard]] constexpr auto const& address() const noexcept
+    {
+        return address_;
+    }
+
+    [[nodiscard]] constexpr auto port() const noexcept
+    {
+        return port_;
+    }
+
+    [[nodiscard]] auto display_name() const noexcept
+    {
+        return address_.display_name(port_);
+    }
+
+    [[nodiscard]] auto is_valid() const noexcept
+    {
+        return address_.is_valid();
+    }
+
+    [[nodiscard]] int compare(tr_socket_address const& that) const noexcept
+    {
+        if (auto const val = tr_compare_3way(address_, that.address_); val != 0)
+        {
+            return val;
+        }
+
+        return tr_compare_3way(port_, that.port_);
+    }
+
+    [[nodiscard]] auto operator<(tr_socket_address const& that) const noexcept
+    {
+        return compare(that) < 0;
+    }
+
+    [[nodiscard]] auto operator==(tr_socket_address const& that) const noexcept
+    {
+        return compare(that) == 0;
+    }
+
+    tr_address address_;
+    tr_port port_;
+
+    static auto constexpr CompactSockAddrBytes = std::array{ tr_address::CompactAddrBytes[0] + tr_port::CompactPortBytes,
+                                                             tr_address::CompactAddrBytes[1] + tr_port::CompactPortBytes };
+};
+
+template<>
+class std::hash<tr_socket_address>
+{
+public:
+    std::size_t operator()(tr_socket_address const& socket_address) const noexcept
+    {
+        auto const& [addr, port] = socket_address;
+        return hash_combine(ip_hash(addr), port_hash(port));
+    }
+
+private:
+    // https://stackoverflow.com/a/27952689/11390656
+    [[nodiscard]] static constexpr std::size_t hash_combine(std::size_t const& a, std::size_t const& b)
+    {
+        return a ^ (b + 0x9e3779b9U + (a << 6U) + (a >> 2U));
+    }
+
+    [[nodiscard]] static std::size_t ip_hash(tr_address const& addr) noexcept
+    {
+        switch (addr.type)
+        {
+        case TR_AF_INET:
+            return IPv4Hasher(addr.addr.addr4.s_addr);
+        case TR_AF_INET6:
+            return IPv6Hasher(
+                std::string_view{ reinterpret_cast<char const*>(addr.addr.addr6.s6_addr), sizeof(addr.addr.addr6.s6_addr) });
+        default:
+            TR_ASSERT_MSG(false, "Invalid type");
+            return {};
+        }
+    }
+
+    [[nodiscard]] static std::size_t port_hash(tr_port const& port) noexcept
+    {
+        return PortHasher(port.host());
+    }
+
+    constexpr static std::hash<uint32_t> IPv4Hasher{};
+    constexpr static std::hash<std::string_view> IPv6Hasher{};
+    constexpr static std::hash<uint16_t> PortHasher{};
+};
 
 // --- Sockets
 

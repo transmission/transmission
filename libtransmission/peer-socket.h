@@ -32,8 +32,8 @@ public:
     using OutBuf = libtransmission::BufferReader<std::byte>;
 
     tr_peer_socket() = default;
-    tr_peer_socket(tr_session const* session, tr_socket_address socket_address, tr_socket_t sock);
-    tr_peer_socket(tr_socket_address socket_address, struct UTPSocket* sock);
+    tr_peer_socket(tr_session const* session, tr_socket_address const& socket_address, tr_socket_t sock);
+    tr_peer_socket(tr_socket_address const& socket_address, struct UTPSocket* sock);
     tr_peer_socket(tr_peer_socket&& s) noexcept
     {
         *this = std::move(s);
@@ -67,12 +67,12 @@ public:
 
     [[nodiscard]] constexpr auto const& address() const noexcept
     {
-        return socket_address_.first;
+        return socket_address_.address();
     }
 
-    [[nodiscard]] constexpr auto const& port() const noexcept
+    [[nodiscard]] constexpr auto port() const noexcept
     {
-        return socket_address_.second;
+        return socket_address_.port();
     }
 
     template<typename OutputIt>

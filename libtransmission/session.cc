@@ -1432,7 +1432,7 @@ bool tr_sessionIsPexEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->allowsPEX();
+    return session->allows_pex();
 }
 
 bool tr_sessionIsDHTEnabled(tr_session const* session)

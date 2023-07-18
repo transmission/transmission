@@ -33,24 +33,28 @@ struct Handler
     class Context
     {
     public:
-        Context(char const* stream_begin_in, tr_error** error_in)
+        constexpr Context(char const* stream_begin_in, tr_error** error_in)
             : error{ error_in }
             , stream_begin_{ stream_begin_in }
         {
         }
-        [[nodiscard]] std::pair<long, long> tokenSpan() const
+
+        [[nodiscard]] constexpr std::pair<long, long> tokenSpan() const
         {
-            return std::make_pair(token_begin_ - stream_begin_, token_end_ - stream_begin_);
+            return { token_begin_ - stream_begin_, token_end_ - stream_begin_ };
         }
-        [[nodiscard]] auto raw() const
+
+        [[nodiscard]] constexpr auto raw() const
         {
             return std::string_view{ token_begin_, size_t(token_end_ - token_begin_) };
         }
-        void setTokenSpan(char const* a, size_t len)
+
+        constexpr void setTokenSpan(char const* a, size_t len)
         {
             token_begin_ = a;
             token_end_ = token_begin_ + len;
         }
+
         tr_error** error = nullptr;
 
     private:

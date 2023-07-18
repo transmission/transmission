@@ -46,7 +46,7 @@
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 
-struct peer_atom;
+class tr_peer_info;
 struct tr_error;
 
 #ifndef EBADMSG
@@ -317,20 +317,20 @@ using ReadResult = std::pair<ReadState, size_t /*n_piece_data_bytes_read*/>;
  * stored in tr_peer, where it can be accessed by both peermsgs and
  * the peer manager.
  *
- * @see struct peer_atom
  * @see tr_peer
+ * @see tr_peer_info
  */
 class tr_peerMsgsImpl final : public tr_peerMsgs
 {
 public:
     tr_peerMsgsImpl(
         tr_torrent* torrent_in,
-        peer_atom* atom_in,
+        tr_peer_info* const peer_info_in,
         std::shared_ptr<tr_peerIo> io_in,
         tr_interned_string client,
         tr_peer_callback callback,
         void* callback_data)
-        : tr_peerMsgs{ torrent_in, atom_in, client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
+        : tr_peerMsgs{ torrent_in, peer_info_in, client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
         , torrent{ torrent_in }
         , io{ std::move(io_in) }
         , have_{ torrent_in->piece_count() }
@@ -341,13 +341,6 @@ public:
         {
             pex_timer_ = session->timerMaker().create([this]() { sendPex(); });
             pex_timer_->start_repeating(SendPexInterval);
-        }
-
-        if (io->supports_utp())
-        {
-            auto const& socket_address = socketAddress();
-            tr_peerMgrSetUtpSupported(torrent, socket_address);
-            tr_peerMgrSetUtpFailed(torrent, socket_address, false);
         }
 
         if (io->supports_ltep())
@@ -632,7 +625,6 @@ public:
     bool peerSupportsPex = false;
     bool peerSupportsMetadataXfer = false;
     bool clientSentLtepHandshake = false;
-    bool peerSentLtepHandshake = false;
 
     size_t desired_request_count = 0;
 
@@ -643,7 +635,7 @@ public:
 
     EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
-    size_t metadata_size_hint = 0;
+    int64_t metadata_size_hint = 0;
 
     tr_torrent* const torrent;
 
@@ -661,8 +653,7 @@ public:
 
     std::vector<QueuedPeerRequest> peer_requested_;
 
-    std::vector<tr_pex> pex;
-    std::vector<tr_pex> pex6;
+    std::array<std::vector<tr_pex>, NUM_TR_AF_INET_TYPES> pex;
 
     std::queue<int> peerAskedForMetadata;
 
@@ -686,6 +677,7 @@ public:
 private:
     friend ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader& payload);
     friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload);
+    friend void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in);
 
     tr_peer_callback const callback_;
     void* const callback_data_;
@@ -945,19 +937,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     bool const allow_metadata_xfer = msgs->torrent->is_public();
 
     /* decide if we want to advertise pex support */
-    auto allow_pex = bool{};
-    if (!msgs->torrent->allows_pex())
-    {
-        allow_pex = false;
-    }
-    else if (msgs->peerSentLtepHandshake)
-    {
-        allow_pex = msgs->peerSupportsPex;
-    }
-    else
-    {
-        allow_pex = true;
-    }
+    bool const allow_pex = msgs->session->allows_pex() && msgs->torrent->allows_pex();
 
     auto val = tr_variant{};
     tr_variantInitDict(&val, 8);
@@ -1052,8 +1032,6 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
 void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
-    msgs->peerSentLtepHandshake = true;
-
     auto const handshake_sv = payload.to_string_view();
 
     auto val = tr_variant{};
@@ -1087,29 +1065,30 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
         if (tr_variantDictFindInt(sub, TR_KEY_ut_pex, &i))
         {
             msgs->peerSupportsPex = i != 0;
-            msgs->ut_pex_id = (uint8_t)i;
+            msgs->ut_pex_id = static_cast<uint8_t>(i);
             logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_pex is {:d}"), static_cast<int>(msgs->ut_pex_id)));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &i))
         {
             msgs->peerSupportsMetadataXfer = i != 0;
-            msgs->ut_metadata_id = (uint8_t)i;
+            msgs->ut_metadata_id = static_cast<uint8_t>(i);
             logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_metadata_id is {:d}"), static_cast<int>(msgs->ut_metadata_id)));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &i))
         {
-            /* Mysterious µTorrent extension that we don't grok.  However,
-               it implies support for µTP, so use it to indicate that. */
-            tr_peerMgrSetUtpFailed(msgs->torrent, msgs->socketAddress(), false);
+            // Transmission doesn't support this extension yet.
+            // But its presence does indicate µTP supports,
+            // which we do care about...
+            msgs->peer_info->set_utp_supported(true);
         }
     }
 
     /* look for metainfo size (BEP 9) */
     if (tr_variantDictFindInt(&val, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
     {
-        msgs->metadata_size_hint = (size_t)i;
+        msgs->metadata_size_hint = i;
     }
 
     /* look for upload_only (BEP 21) */
@@ -1188,8 +1167,8 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
         /* NOOP */
     }
 
-    if (msg_type == MetadataMsgType::Data && !msgs->torrent->has_metainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
-        piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
+    if (msg_type == MetadataMsgType::Data && total_size == msgs->metadata_size_hint && !msgs->torrent->has_metainfo() &&
+        msg_end - benc_end <= MetadataPieceSize && piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
     {
         size_t const piece_len = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
@@ -1880,8 +1859,8 @@ namespace peer_pulse_helpers
         return {};
     }
 
-    auto const data = tr_torrentGetMetadataPiece(msgs->torrent, *piece);
-    if (!data.has_value())
+    auto data = tr_metadata_piece{};
+    if (!tr_torrentGetMetadataPiece(msgs->torrent, *piece, data))
     {
         // send a reject
         auto tmp = tr_variant{};
@@ -1898,7 +1877,6 @@ namespace peer_pulse_helpers
     }
 
     // send the metadata
-    auto const data_sv = std::string_view{ reinterpret_cast<char const*>(std::data(*data)), std::size(*data) };
     auto tmp = tr_variant{};
     tr_variantInitDict(&tmp, 3);
     tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
@@ -1909,7 +1887,7 @@ namespace peer_pulse_helpers
         BtPeerMsgs::Ltep,
         msgs->ut_metadata_id,
         tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC),
-        data_sv);
+        data);
     tr_variantClear(&tmp);
     return n_bytes_written;
 }
@@ -2044,123 +2022,97 @@ void tr_peerMsgsImpl::sendPex()
         return;
     }
 
-    auto& old4 = this->pex;
-    auto new4 = tr_peerMgrGetPeers(this->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
-    auto added = std::vector<tr_pex>{};
-    added.reserve(std::size(new4));
-    std::set_difference(std::begin(new4), std::end(new4), std::begin(old4), std::end(old4), std::back_inserter(added));
-    auto dropped = std::vector<tr_pex>{};
-    dropped.reserve(std::size(old4));
-    std::set_difference(std::begin(old4), std::end(old4), std::begin(new4), std::end(new4), std::back_inserter(dropped));
-
-    auto& old6 = this->pex6;
-    auto new6 = tr_peerMgrGetPeers(this->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
-    auto added6 = std::vector<tr_pex>{};
-    added6.reserve(std::size(new6));
-    std::set_difference(std::begin(new6), std::end(new6), std::begin(old6), std::end(old6), std::back_inserter(added6));
-    auto dropped6 = std::vector<tr_pex>{};
-    dropped6.reserve(std::size(old6));
-    std::set_difference(std::begin(old6), std::end(old6), std::begin(new6), std::end(new6), std::back_inserter(dropped6));
-
-    // Some peers give us error messages if we send
-    // more than this many peers in a single pex message.
-    // https://wiki.theory.org/BitTorrentPeerExchangeConventions
     static auto constexpr MaxPexAdded = size_t{ 50 };
-    added.resize(std::min(std::size(added), MaxPexAdded));
-    added6.resize(std::min(std::size(added6), MaxPexAdded));
     static auto constexpr MaxPexDropped = size_t{ 50 };
-    dropped.resize(std::min(std::size(dropped), MaxPexDropped));
-    dropped6.resize(std::min(std::size(dropped6), MaxPexDropped));
 
-    logtrace(
-        this,
-        fmt::format(
-            FMT_STRING("pex: old peer count {:d}+{:d}, new peer count {:d}+{:d}, added {:d}+{:d}, dropped {:d}+{:d}"),
-            std::size(old4),
-            std::size(old6),
-            std::size(new4),
-            std::size(new6),
-            std::size(added),
-            std::size(added6),
-            std::size(dropped),
-            std::size(dropped6)));
-
-    // if there's nothing to send, then we're done
-    if (std::empty(added) && std::empty(dropped) && std::empty(added6) && std::empty(dropped6))
-    {
-        return;
-    }
-
-    // update msgs
-    std::swap(old4, new4);
-    std::swap(old6, new6);
-
-    // build the pex payload
     auto val = tr_variant{};
     tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
     auto tmpbuf = std::vector<std::byte>{};
-    tmpbuf.reserve(MaxPexAdded * 18);
 
-    if (!std::empty(added))
+    for (uint8_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
-        // "added"
-        tmpbuf.clear();
-        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), std::data(added), std::size(added));
-        TR_ASSERT(std::size(tmpbuf) == std::size(added) * 6);
-        tr_variantDictAddRaw(&val, TR_KEY_added, std::data(tmpbuf), std::size(tmpbuf));
+        static auto constexpr AddedMap = std::array{ TR_KEY_added, TR_KEY_added6 };
+        static auto constexpr AddedFMap = std::array{ TR_KEY_added_f, TR_KEY_added6_f };
+        static auto constexpr DroppedMap = std::array{ TR_KEY_dropped, TR_KEY_dropped6 };
+        auto const ip_type = static_cast<tr_address_type>(i);
 
-        // "added.f"
-        // unset each holepunch flag because we don't support it.
-        tmpbuf.resize(std::size(added));
-        auto* begin = std::data(tmpbuf);
-        auto* walk = begin;
-        for (auto const& p : added)
+        auto& old_pex = pex[i];
+        auto new_pex = tr_peerMgrGetPeers(this->torrent, ip_type, TR_PEERS_CONNECTED, MaxPexPeerCount);
+        auto added = std::vector<tr_pex>{};
+        added.reserve(std::size(new_pex));
+        std::set_difference(
+            std::begin(new_pex),
+            std::end(new_pex),
+            std::begin(old_pex),
+            std::end(old_pex),
+            std::back_inserter(added));
+        auto dropped = std::vector<tr_pex>{};
+        dropped.reserve(std::size(old_pex));
+        std::set_difference(
+            std::begin(old_pex),
+            std::end(old_pex),
+            std::begin(new_pex),
+            std::end(new_pex),
+            std::back_inserter(dropped));
+
+        // Some peers give us error messages if we send
+        // more than this many peers in a single pex message.
+        // https://wiki.theory.org/BitTorrentPeerExchangeConventions
+        added.resize(std::min(std::size(added), MaxPexAdded));
+        dropped.resize(std::min(std::size(dropped), MaxPexDropped));
+
+        logtrace(
+            this,
+            fmt::format(
+                FMT_STRING("pex: old {:s} peer count {:d}, new peer count {:d}, added {:d}, dropped {:d}"),
+                tr_ip_protocol_sv(ip_type),
+                std::size(old_pex),
+                std::size(new_pex),
+                std::size(added),
+                std::size(dropped)));
+
+        // if there's nothing to send, then we're done
+        if (std::empty(added) && std::empty(dropped))
         {
-            *walk++ = std::byte{ p.flags } & ~std::byte{ ADDED_F_HOLEPUNCH };
+            continue;
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added));
-        tr_variantDictAddRaw(&val, TR_KEY_added_f, begin, walk - begin);
-    }
+        // update msgs
+        std::swap(old_pex, new_pex);
 
-    if (!std::empty(dropped))
-    {
-        // "dropped"
-        tmpbuf.clear();
-        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
-        TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * 6);
-        tr_variantDictAddRaw(&val, TR_KEY_dropped, std::data(tmpbuf), std::size(tmpbuf));
-    }
-
-    if (!std::empty(added6))
-    {
-        tmpbuf.clear();
-        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), std::data(added6), std::size(added6));
-        TR_ASSERT(std::size(tmpbuf) == std::size(added6) * 18);
-        tr_variantDictAddRaw(&val, TR_KEY_added6, std::data(tmpbuf), std::size(tmpbuf));
-
-        // "added6.f"
-        // unset each holepunch flag because we don't support it.
-        tmpbuf.resize(std::size(added6));
-        auto* begin = std::data(tmpbuf);
-        auto* walk = begin;
-        for (auto const& p : added6)
+        // build the pex payload
+        if (!std::empty(added))
         {
-            *walk++ = std::byte{ p.flags } & ~std::byte{ ADDED_F_HOLEPUNCH };
+            // "added"
+            tmpbuf.clear();
+            tmpbuf.reserve(std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
+            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(added), std::size(added), ip_type);
+            TR_ASSERT(std::size(tmpbuf) == std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
+            tr_variantDictAddRaw(&val, AddedMap[i], std::data(tmpbuf), std::size(tmpbuf));
+
+            // "added.f"
+            tmpbuf.resize(std::size(added));
+            auto* begin = std::data(tmpbuf);
+            auto* walk = begin;
+            for (auto const& p : added)
+            {
+                *walk++ = std::byte{ p.flags };
+            }
+
+            TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added));
+            tr_variantDictAddRaw(&val, AddedFMap[i], begin, walk - begin);
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added6));
-        tr_variantDictAddRaw(&val, TR_KEY_added6_f, begin, walk - begin);
-    }
-
-    if (!std::empty(dropped6))
-    {
-        // "dropped6"
-        tmpbuf.clear();
-        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), std::data(dropped6), std::size(dropped6));
-        TR_ASSERT(std::size(tmpbuf) == std::size(dropped6) * 18);
-        tr_variantDictAddRaw(&val, TR_KEY_dropped6, std::data(tmpbuf), std::size(tmpbuf));
+        if (!std::empty(dropped))
+        {
+            // "dropped"
+            tmpbuf.clear();
+            tmpbuf.reserve(std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
+            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped), ip_type);
+            TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
+            tr_variantDictAddRaw(&val, DroppedMap[i], std::data(tmpbuf), std::size(tmpbuf));
+        }
     }
 
     protocol_send_message(this, BtPeerMsgs::Ltep, this->ut_pex_id, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
@@ -2177,12 +2129,12 @@ tr_peerMsgs::~tr_peerMsgs()
 }
 
 tr_peerMsgs* tr_peerMsgsNew(
-    tr_torrent* torrent,
-    peer_atom* atom,
+    tr_torrent* const torrent,
+    tr_peer_info* const peer_info,
     std::shared_ptr<tr_peerIo> io,
     tr_interned_string user_agent,
     tr_peer_callback callback,
     void* callback_data)
 {
-    return new tr_peerMsgsImpl(torrent, atom, std::move(io), user_agent, callback, callback_data);
+    return new tr_peerMsgsImpl(torrent, peer_info, std::move(io), user_agent, callback, callback_data);
 }
