@@ -7,7 +7,9 @@ $blue-300: #1653e4;
 $blue-400: #1847d4;
 $green-100: #26aa55;
 $green-200: #118539;
+$green-300: #7cef99;
 $green-400: #67c87f;
+$green-500: #34dc70;
 $grey-200: #e1e4e8;
 $grey-500: #828282;
 $grey-700: #373737;
@@ -180,8 +182,8 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-selected: #{$blue-300};
     --color-default-border: #{$default-border-light};
     --color-dialog-border: #{$nice-grey};
-    --color-progressbar-seed-1: #{$green-100};
-    --color-progressbar-seed-2: #{$green-400};
+    --color-progressbar-seed-1: #{$green-500};
+    --color-progressbar-seed-2: #{$green-300};
     --color-progressbar-seed-paused: #{$grey-200};
 
     .contrast-more {
