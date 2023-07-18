@@ -23,9 +23,9 @@ struct tr_torrent;
 struct tr_torrent_metainfo;
 
 // defined by BEP #9
-inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
+inline constexpr int MetadataPieceSize = 1024 * 16;
 
-using tr_metadata_piece = small::max_size_vector<std::byte, 1024U * 16U>;
+using tr_metadata_piece = small::max_size_vector<std::byte, MetadataPieceSize>;
 
 struct tr_incomplete_metadata
 {
