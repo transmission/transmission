@@ -57,8 +57,10 @@ TEST_F(NetTest, compact4)
 {
     static auto constexpr ExpectedReadable = "10.10.10.5"sv;
     static auto constexpr ExpectedPort = tr_port::fromHost(128);
-    static auto constexpr Compact4 = std::array<std::byte, 6U>{ std::byte{ 0x0A }, std::byte{ 0x0A }, std::byte{ 0x0A },
-                                                                std::byte{ 0x05 }, std::byte{ 0x00 }, std::byte{ 0x80 } };
+    static auto constexpr Compact4Bytes = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
+    static auto constexpr Compact4 = std::array<std::byte, Compact4Bytes>{ std::byte{ 0x0A }, std::byte{ 0x0A },
+                                                                           std::byte{ 0x0A }, std::byte{ 0x05 },
+                                                                           std::byte{ 0x00 }, std::byte{ 0x80 } };
 
     /// compact <--> tr_address, port
 
@@ -73,7 +75,7 @@ TEST_F(NetTest, compact4)
     EXPECT_EQ(ExpectedPort, port);
 
     // ...serialize it back again
-    auto compact4 = std::array<std::byte, 6U>{};
+    auto compact4 = std::array<std::byte, Compact4Bytes>{};
     auto out = std::data(compact4);
     out = addr.to_compact_ipv4(out, port);
     EXPECT_EQ(std::size(Compact4), static_cast<size_t>(out - std::data(compact4)));
@@ -90,10 +92,13 @@ TEST_F(NetTest, compact4)
     compact4.fill(std::byte{});
     out = std::data(compact4);
     out = addr.to_compact(out);
-    EXPECT_EQ(std::size(Compact4) - 2U, static_cast<size_t>(out - std::data(compact4)));
-    EXPECT_TRUE(std::equal(std::data(Compact4), std::data(Compact4) + std::size(Compact4) - 2U, std::data(compact4)));
+    EXPECT_EQ(std::size(Compact4) - tr_port::CompactPortBytes, static_cast<size_t>(out - std::data(compact4)));
+    EXPECT_TRUE(std::equal(
+        std::data(Compact4),
+        std::data(Compact4) + std::size(Compact4) - tr_port::CompactPortBytes,
+        std::data(compact4)));
     EXPECT_TRUE(std::all_of(
-        std::begin(compact4) + std::size(Compact4) - 2U,
+        std::begin(compact4) + std::size(Compact4) - tr_port::CompactPortBytes,
         std::end(compact4),
         [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
 
@@ -126,7 +131,8 @@ TEST_F(NetTest, compact6)
 {
     static auto constexpr ExpectedReadable = "1002:1035:4527:3546:7854:1237:3247:3217"sv;
     static auto constexpr ExpectedPort = tr_port::fromHost(6881);
-    static auto constexpr Compact6 = std::array<std::byte, 18U>{
+    static auto constexpr Compact6Bytes = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
+    static auto constexpr Compact6 = std::array<std::byte, Compact6Bytes>{
         std::byte{ 0x10 }, std::byte{ 0x02 }, std::byte{ 0x10 }, std::byte{ 0x35 }, std::byte{ 0x45 }, std::byte{ 0x27 },
         std::byte{ 0x35 }, std::byte{ 0x46 }, std::byte{ 0x78 }, std::byte{ 0x54 }, std::byte{ 0x12 }, std::byte{ 0x37 },
         std::byte{ 0x32 }, std::byte{ 0x47 }, std::byte{ 0x32 }, std::byte{ 0x17 }, std::byte{ 0x1A }, std::byte{ 0xE1 }
@@ -145,7 +151,7 @@ TEST_F(NetTest, compact6)
     EXPECT_EQ(ExpectedPort, port);
 
     // ...serialize it back again
-    auto compact6 = std::array<std::byte, 18U>{};
+    auto compact6 = std::array<std::byte, Compact6Bytes>{};
     auto out = std::data(compact6);
     out = addr.to_compact_ipv6(out, port);
     EXPECT_EQ(std::size(Compact6), static_cast<size_t>(out - std::data(compact6)));
@@ -162,10 +168,13 @@ TEST_F(NetTest, compact6)
     compact6.fill(std::byte{});
     out = std::data(compact6);
     out = addr.to_compact(out);
-    EXPECT_EQ(std::size(Compact6) - 2U, static_cast<size_t>(out - std::data(compact6)));
-    EXPECT_TRUE(std::equal(std::data(Compact6), std::data(Compact6) + std::size(Compact6) - 2U, std::data(compact6)));
+    EXPECT_EQ(std::size(Compact6) - tr_port::CompactPortBytes, static_cast<size_t>(out - std::data(compact6)));
+    EXPECT_TRUE(std::equal(
+        std::data(Compact6),
+        std::data(Compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
+        std::data(compact6)));
     EXPECT_TRUE(std::all_of(
-        std::begin(compact6) + std::size(Compact6) - 2U,
+        std::begin(compact6) + std::size(Compact6) - tr_port::CompactPortBytes,
         std::end(compact6),
         [](std::byte const& byte) { return static_cast<unsigned char>(byte) == 0U; }));
 
