@@ -45,7 +45,7 @@ TrVariantPtr createVariant()
 } // namespace
 
 RpcClient::RpcClient(QObject* parent)
-    : QObject(parent)
+    : QObject{ parent }
 {
     qRegisterMetaType<TrVariantPtr>("TrVariantPtr");
 }
@@ -198,7 +198,7 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
 {
     if (nam_ == nullptr)
     {
-        nam_ = new QNetworkAccessManager();
+        nam_ = new QNetworkAccessManager{};
 
         connect(nam_, &QNetworkAccessManager::finished, this, &RpcClient::networkRequestFinished);
 

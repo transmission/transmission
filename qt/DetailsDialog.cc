@@ -242,10 +242,10 @@ private:
 int DetailsDialog::prev_tab_index_ = 0;
 
 DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , prefs_(prefs)
-    , model_(model)
+    : BaseDialog{ parent }
+    , session_{ session }
+    , prefs_{ prefs }
+    , model_{ model }
 {
     ui_.setupUi(this);
 
@@ -424,17 +424,16 @@ void setIfIdle(QSpinBox* spin, int value)
 void DetailsDialog::refreshUI()
 {
     bool const single = ids_.size() == 1;
-    QString const blank;
-    QFontMetrics const fm(fontMetrics());
-    QList<Torrent const*> torrents;
-    QString string;
-    QString const none = tr("None");
-    QString const mixed = tr("Mixed");
-    QString const unknown = tr("Unknown");
+    auto const blank = QString{};
+    auto const fm = fontMetrics();
+    auto const none = tr("None");
+    auto const mixed = tr("Mixed");
+    auto const unknown = tr("Unknown");
     auto const now = time(nullptr);
     auto const& fmt = Formatter::get();
 
     // build a list of torrents
+    auto torrents = QList<Torrent const*>{};
     for (int const id : ids_)
     {
         Torrent const* tor = model_.getTorrentFromId(id);
@@ -450,6 +449,7 @@ void DetailsDialog::refreshUI()
     ///
 
     // myStateLabel
+    auto string = QString{};
     if (torrents.empty())
     {
         string = none;
@@ -1115,12 +1115,12 @@ void DetailsDialog::refreshUI()
             }
             else // new peer has connected
             {
-                item = new PeerItem(peer);
+                item = new PeerItem{ peer };
                 item->setTextAlignment(COL_UP, Qt::AlignRight | Qt::AlignVCenter);
                 item->setTextAlignment(COL_DOWN, Qt::AlignRight | Qt::AlignVCenter);
                 item->setTextAlignment(COL_PERCENT, Qt::AlignRight | Qt::AlignVCenter);
                 item->setIcon(COL_LOCK, peer.is_encrypted ? icon_encrypted_ : icon_unencrypted_);
-                item->setToolTip(COL_LOCK, peer.is_encrypted ? tr("Encrypted connection") : QString());
+                item->setToolTip(COL_LOCK, peer.is_encrypted ? tr("Encrypted connection") : QString{});
                 item->setText(COL_ADDRESS, peer.address);
                 item->setText(COL_CLIENT, peer.client_name);
                 new_items << item;
@@ -1201,11 +1201,11 @@ void DetailsDialog::refreshUI()
                 code_tip.resize(code_tip.size() - 1); // eat the trailing linefeed
             }
 
-            item->setText(COL_UP, peer.rate_to_peer.isZero() ? QString() : fmt.speedToString(peer.rate_to_peer));
-            item->setText(COL_DOWN, peer.rate_to_client.isZero() ? QString() : fmt.speedToString(peer.rate_to_client));
+            item->setText(COL_UP, peer.rate_to_peer.isZero() ? QString{} : fmt.speedToString(peer.rate_to_peer));
+            item->setText(COL_DOWN, peer.rate_to_client.isZero() ? QString{} : fmt.speedToString(peer.rate_to_client));
             item->setText(
                 COL_PERCENT,
-                peer.progress > 0 ? QStringLiteral("%1%").arg(static_cast<int>(peer.progress * 100.0)) : QString());
+                peer.progress > 0 ? QStringLiteral("%1%").arg(static_cast<int>(peer.progress * 100.0)) : QString{});
             item->setText(COL_STATUS, code);
             item->setToolTip(COL_STATUS, code_tip);
 
@@ -1249,10 +1249,10 @@ void DetailsDialog::setEnabled(bool enabled)
 
 void DetailsDialog::initInfoTab()
 {
-    int const h = QFontMetrics(ui_.commentBrowser->font()).lineSpacing() * 4;
+    int const h = QFontMetrics{ ui_.commentBrowser->font() }.lineSpacing() * 4;
     ui_.commentBrowser->setFixedHeight(h);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.activitySectionLayout);
     cr->addLayout(ui_.detailsSectionLayout);
     cr->update();
@@ -1417,7 +1417,7 @@ void DetailsDialog::onEditTrackersClicked()
         return;
     }
 
-    auto* dialog = new TrackersDialog(tor->trackerList(), this);
+    auto* dialog = new TrackersDialog{ tor->trackerList(), this };
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     connect(dialog, &TrackersDialog::trackerListEdited, this, &DetailsDialog::onTrackerListEdited);
     dialog->open();
@@ -1471,7 +1471,7 @@ void DetailsDialog::initOptionsTab()
     ui_.idleCombo->addItem(tr("Seed regardless of activity"), TR_IDLELIMIT_UNLIMITED);
     ui_.idleCombo->addItem(tr("Stop seeding if idle for:"), TR_IDLELIMIT_SINGLE);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.speedSectionLayout);
     cr->addLayout(ui_.seedingLimitsSectionRatioLayout);
     cr->addLayout(ui_.seedingLimitsSectionIdleLayout);
@@ -1544,7 +1544,7 @@ void DetailsDialog::initTrackerTab()
 
 void DetailsDialog::initPeersTab()
 {
-    ui_.peersView->setHeaderLabels({ QString(), tr("Up"), tr("Down"), tr("%"), tr("Status"), tr("Address"), tr("Client") });
+    ui_.peersView->setHeaderLabels({ QString{}, tr("Up"), tr("Down"), tr("%"), tr("Status"), tr("Address"), tr("Client") });
     ui_.peersView->sortByColumn(COL_ADDRESS, Qt::AscendingOrder);
 
     ui_.peersView->setColumnWidth(COL_LOCK, 20);
