@@ -2,6 +2,7 @@
 @use 'sass:math';
 
 // Colors related to torrent status
+$blue-100: #51b3f7;
 $blue-200: #357aaa;
 $blue-300: #1653e4;
 $blue-400: #1847d4;
@@ -158,7 +159,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-progressbar-verify: #{$yellow-300};
     --color-progressbar-magnet: #{$yellow-300};
     --color-progressbar-paused: #{$grey-200};
-    --color-progressbar-leech: #{$blue-200};
+    --color-progressbar-leech: #{$blue-100};
     --color-progressbar-queued: #{$blue-400};
     --color-bg-hover: #{$nice-grey};
     --color-fg-primary: #404040;
