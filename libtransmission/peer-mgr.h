@@ -63,8 +63,8 @@ public:
         , from_first_{ from }
         , from_best_{ from }
     {
+        TR_ASSERT(!socket_address.port().empty());
         ++n_known_connectable_;
-
         set_pex_flags(pex_flags);
     }
 
