@@ -134,7 +134,7 @@ bool tr_peer_info::is_blocklisted(tr_session const* session) const
         return *blocklisted_;
     }
 
-    auto const value = session->addressIsBlocked(addr());
+    auto const value = session->addressIsBlocked(address());
     blocklisted_ = value;
     return value;
 }
@@ -247,7 +247,7 @@ public:
         outgoing_handshakes.clear();
     }
 
-    void removePeer(tr_peerMsgs* peer)
+    void remove_peer(tr_peerMsgs* peer)
     {
         auto const lock = unique_lock();
 
@@ -264,6 +264,11 @@ public:
 
         TR_ASSERT(stats.peer_count == peerCount());
 
+        if (peer->is_incoming_connection())
+        {
+            incoming_peer_info.erase(peer->socket_address());
+        }
+
         delete peer;
     }
 
@@ -273,7 +278,7 @@ public:
 
         for (auto* peer : tmp)
         {
-            removePeer(peer);
+            remove_peer(peer);
         }
 
         TR_ASSERT(stats.peer_count == 0);
@@ -345,33 +350,19 @@ public:
         tr_peer_from const from,
         bool is_incoming)
     {
-        if (is_incoming)
+        auto&& [it, is_new] = is_incoming ?
+            incoming_peer_info.try_emplace(socket_address, socket_address.address(), flags, from) :
+            known_connectable.try_emplace(socket_address, socket_address, flags, from);
+        auto& peer_info = it->second;
+        if (!is_new)
         {
-            return ensure_info_exists_incoming(socket_address, flags, from);
+            peer_info.found_at(from);
+            peer_info.set_pex_flags(flags);
         }
 
-        return ensure_info_exists_connectable(socket_address, flags, from);
-    }
+        mark_all_seeds_flag_dirty();
 
-    tr_peer_info& ensure_info_exists_connectable(
-        tr_socket_address const& socket_address,
-        uint8_t const flags,
-        tr_peer_from const from)
-    {
-        TR_ASSERT(socket_address.is_valid());
-        TR_ASSERT(from < TR_PEER_FROM__MAX);
-
-        auto&& [info_it, is_new] = known_connectable.try_emplace(socket_address, socket_address, flags, from);
-        return merge_info(info_it->second, is_new, flags, from);
-    }
-
-    tr_peer_info& ensure_info_exists_incoming(
-        tr_socket_address const& socket_address,
-        uint8_t const flags,
-        tr_peer_from const from)
-    {
-        auto&& [info_it, is_new] = incoming_peer_info.try_emplace(socket_address, socket_address.address(), flags, from);
-        return merge_info(info_it->second, is_new, flags, from);
+        return peer_info;
     }
 
     void mark_peer_as_seed(tr_peer_info& peer_info)
@@ -413,6 +404,7 @@ public:
 
         TR_ASSERT(msgs != nullptr);
         auto* s = static_cast<tr_swarm*>(vs);
+        TR_ASSERT(msgs->swarm == s);
         auto const lock = s->unique_lock();
 
         switch (event.type)
@@ -458,20 +450,33 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotPort:
-            if (auto nh = msgs->swarm->incoming_peer_info.extract(msgs->socket_address()); !nh.empty())
+            if (auto nh = s->incoming_peer_info.extract(msgs->socket_address()); !nh.empty())
             {
                 auto* const info = msgs->peer_info;
                 TR_ASSERT(info != nullptr);
                 TR_ASSERT(&nh.mapped() == info);
+                TR_ASSERT(nh.key().address() == info->address());
+
+                // If this peer is unknown to us, then set the listen port and add it to the known connectable collection
+                if (auto nh_old = msgs->swarm->known_connectable.extract({ nh.key().address(), event.port }); nh_old.empty())
+                {
+                    info->set_listen_port(event.port);
+                }
+                else // If we already know about this peer, merge new info into existing info without invalidating references
+                {
+                    TR_ASSERT(nh.key().address() == nh_old.key().address());
+
+                    auto& info_old = nh_old.mapped();
+                    auto& info_new = *info;
+
+                    TR_ASSERT(nh_old.key() == info_old.socket_address());
+
+                    // merge stats from the incoming info object to the connectable info object
+                    info_new.merge_connectable_into_incoming(info_old);
+                }
 
                 nh.key().port_ = event.port;
-                info->set_listen_port(event.port);
-
-                if (auto ret = msgs->swarm->known_connectable.insert(std::move(nh)); !ret.inserted)
-                {
-                    // If this connectable peer is already known, then update its info
-                    s->merge_info(ret.position->second, false, info->pex_flags(), info->from_best());
-                }
+                s->known_connectable.insert(std::move(nh));
             }
 
             break;
@@ -525,19 +530,6 @@ private:
             peer->cancels_sent_to_peer.add(tr_time(), 1);
             msgs->cancel_block_request(block);
         }
-    }
-
-    tr_peer_info& merge_info(tr_peer_info& peer_info, bool is_new, uint8_t const flags, tr_peer_from const from)
-    {
-        if (!is_new)
-        {
-            peer_info.found_at(from);
-            peer_info.set_pex_flags(flags);
-        }
-
-        mark_all_seeds_flag_dirty();
-
-        return peer_info;
     }
 
     void mark_all_seeds_flag_dirty() noexcept
@@ -782,9 +774,12 @@ private:
            since the blocklist has changed, erase that cached value */
         for (auto* const tor : session->torrents())
         {
-            for (auto& [socket_address, atom] : tor->swarm->known_connectable)
+            for (auto& map : { std::ref(tor->swarm->known_connectable), std::ref(tor->swarm->incoming_peer_info) })
             {
-                atom.set_blocklisted_dirty();
+                for (auto& [socket_address, atom] : map.get())
+                {
+                    atom.set_blocklisted_dirty();
+                }
             }
         }
     }
@@ -1022,7 +1017,13 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     }
     else /* looking good */
     {
-        auto& info = s->ensure_info_exists(socket_address, 0, static_cast<tr_peer_from>(0), result.io->is_incoming());
+        auto& info = result.io->is_incoming() ? s->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, true) :
+                                                *s->get_existing_peer_info(socket_address);
+
+        if (!result.io->is_incoming())
+        {
+            info.set_connectable();
+        }
 
         // If we're connected via µTP, then we know the peer supports µTP...
         if (result.io->is_utp())
@@ -1034,7 +1035,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", info.display_name()));
         }
-        else if (result.io->is_incoming() && s->peerCount() >= s->tor->peer_limit())
+        else if (s->peerCount() >= s->tor->peer_limit())
         {
             // too many peers already
         }
@@ -1106,9 +1107,9 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
             !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers() && from != TR_PEER_FROM_INCOMING &&
             (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
         {
-            // We know this peer is connectable (i.e. socket_address is the peer's listening address)
-            // Don't care about non-connectable peers we are not connected to
-            s->ensure_info_exists_connectable({ pex->addr, pex->port }, pex->flags, from);
+            // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
+            // don't care about non-connectable peers that we are not connected to
+            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, true);
             ++n_used;
         }
     }
@@ -1876,7 +1877,7 @@ void close_peer(tr_peerMsgs* peer)
 {
     TR_ASSERT(peer != nullptr);
     tr_logAddTraceSwarm(peer->swarm, fmt::format("removing bad peer {}", peer->display_name()));
-    peer->swarm->removePeer(peer);
+    peer->swarm->remove_peer(peer);
 }
 
 constexpr struct
@@ -2095,13 +2096,12 @@ namespace
 namespace connect_helpers
 {
 /* is this atom someone that we'd want to initiate a connection to? */
-[[nodiscard]] bool isPeerCandidate(tr_torrent const* tor, tr_peer_info const& peer_info, time_t const now)
+[[nodiscard]] bool is_peer_candidate(tr_torrent const* tor, tr_peer_info const& peer_info, time_t const now)
 {
+    // have we already tried and failed to connect?
+    if (auto const conn = peer_info.is_connectable(); conn && !*conn)
     {
-        // isPeerCandidate() is supposed to receive only known connectable peers now
-        // keep this check here for now to detect bugs
-        [[maybe_unused]] auto const conn = peer_info.is_connectable();
-        TR_ASSERT(conn && *conn);
+        return false;
     }
 
     // not if we're both seeds
@@ -2270,7 +2270,7 @@ struct peer_candidate
 
         for (auto& [socket_address, atom] : swarm->known_connectable)
         {
-            if (isPeerCandidate(tor, atom, now))
+            if (is_peer_candidate(tor, atom, now))
             {
                 candidates.emplace_back(getPeerCandidateScore(tor, atom, salter()), tor, &atom);
             }

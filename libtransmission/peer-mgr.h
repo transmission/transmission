@@ -9,7 +9,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <atomic>
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint64_t
 #include <ctime>
@@ -93,7 +92,7 @@ public:
 
     [[nodiscard]] static auto known_connectable_count() noexcept
     {
-        return n_known_connectable_.load();
+        return n_known_connectable_;
     }
 
     // ---
@@ -103,9 +102,14 @@ public:
         return listen_socket_address_;
     }
 
-    [[nodiscard]] constexpr auto const& address() const noexcept
+    [[nodiscard]] constexpr tr_address const& address() const noexcept
     {
         return listen_socket_address_.address();
+    }
+
+    [[nodiscard]] constexpr auto port() const noexcept
+    {
+        return listen_socket_address_.port();
     }
 
     void set_listen_port(tr_port port_in) noexcept
@@ -114,8 +118,8 @@ public:
         if (port.empty() && !port_in.empty())
         {
             ++n_known_connectable_;
-            set_connectable();
         }
+        set_connectable();
         port = port_in;
     }
 
@@ -338,17 +342,43 @@ public:
         return ret;
     }
 
+    // ---
+
+    // only to be used if our peer reported a listening port via ltep handshake
+    void merge_connectable_into_incoming(tr_peer_info const& connectable) noexcept
+    {
+        connection_attempted_at_ = std::max(connection_attempted_at_, connectable.connection_attempted_at_);
+        /* connection_changed_at_ is already the latest */
+        /* piece_data_at_ is already the latest */
+
+        /* no need to merge blocklist since it gets updated elsewhere */
+
+        TR_ASSERT(!is_connectable_);
+        if (auto& conn = connectable.is_connectable(); conn && *conn)
+        {
+            set_connectable();
+        }
+        // rationale for not setting "not connectable" even if the peer was flagged as such:
+        // we thought the peer is not connectable, but here it is connecting to us, and reporting that it is listening
+        // so we better try again for ourselves
+
+        /* is_utp_supported_ is already the latest */
+
+        /* from_first_ is already the latest */
+        found_at(connectable.from_best());
+
+        /* num_consecutive_fails_ is already the latest */
+        /* pex flags are already the latest */
+
+        if (connectable.is_banned())
+        {
+            ban();
+        }
+        /* is_connected_ should already be set */
+        /* is_seed_ should already be the latest */
+    }
+
 private:
-    [[nodiscard]] constexpr tr_address const& addr() const noexcept
-    {
-        return listen_socket_address_.address();
-    }
-
-    [[nodiscard]] constexpr auto port() const noexcept
-    {
-        return listen_socket_address_.port();
-    }
-
     [[nodiscard]] constexpr time_t get_reconnect_interval_secs(time_t const now) const noexcept
     {
         // if we were recently connected to this peer and transferring piece
@@ -391,7 +421,7 @@ private:
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
 
-    static auto inline n_known_connectable_ = std::atomic<size_t>{};
+    static auto inline n_known_connectable_ = size_t{};
 
     // if the port is 0, it SHOULD mean we don't know this peer's listen socket address
     tr_socket_address listen_socket_address_;
