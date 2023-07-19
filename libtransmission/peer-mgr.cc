@@ -325,7 +325,7 @@ public:
         stats.active_webseed_count = 0;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto isAllSeeds() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto is_all_seeds() const noexcept
     {
         if (!pool_is_all_seeds_)
         {
@@ -1009,7 +1009,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     {
         if (s != nullptr)
         {
-            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr)
+            if (auto* const info = s->get_existing_peer_info(socket_address); !result.io->is_incoming() && info != nullptr)
             {
                 info->on_connection_failed();
 
@@ -2263,7 +2263,7 @@ struct peer_candidate
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
         bool const seeding = tor->is_done();
-        if (seeding && swarm->isAllSeeds() && tor->is_private())
+        if (seeding && swarm->is_all_seeds() && tor->is_private())
         {
             continue;
         }
