@@ -462,7 +462,7 @@ public:
                 {
                     info->set_listen_port(event.port);
                 }
-                else // If we already know about this peer, merge new info into existing info without invalidating references
+                else // If we already know about this peer, merge the info objects without invalidating references
                 {
                     TR_ASSERT(nh.key().address() == nh_old.key().address());
 
@@ -471,7 +471,7 @@ public:
 
                     TR_ASSERT(nh_old.key() == info_old.socket_address());
 
-                    // merge stats from the incoming info object to the connectable info object
+                    // merge info from the incoming info object to the connectable info object
                     info_new.merge_connectable_into_incoming(info_old);
                 }
 
