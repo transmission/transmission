@@ -488,6 +488,8 @@ public:
                 // 1. outgoing, where the connectable flag has already been set on handshake done
                 // 2. incoming, and the peer has sent a port handshake before, so the connectable flag will have the
                 //    appropriate value already
+
+                s->known_connectable.insert(std::move(nh));
             }
 
             break;
