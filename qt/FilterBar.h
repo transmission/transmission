@@ -15,7 +15,6 @@
 
 #include <libtransmission/tr-macros.h>
 
-#include "FaviconCache.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 

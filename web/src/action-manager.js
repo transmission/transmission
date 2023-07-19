@@ -9,7 +9,7 @@ export class ActionManager extends EventTarget {
     this.actions = Object.seal({
       'deselect-all': {
         enabled: false,
-        shortcut: 'Control+A',
+        shortcut: 'D',
         text: 'Deselect all',
       },
       'move-bottom': { enabled: false, text: 'Move to the back of the queue' },
@@ -18,13 +18,13 @@ export class ActionManager extends EventTarget {
       'move-up': { enabled: false, text: 'Move up in the queue' },
       'open-torrent': {
         enabled: true,
-        shortcut: 'Alt+O',
+        shortcut: 'O',
         text: 'Open torrent…',
       },
       'pause-all-torrents': { enabled: false, text: 'Pause all' },
       'pause-selected-torrents': {
         enabled: false,
-        shortcut: 'Alt+U',
+        shortcut: 'U',
         text: 'Pause',
       },
       'reannounce-selected-torrents': {
@@ -34,15 +34,19 @@ export class ActionManager extends EventTarget {
       'remove-selected-torrents': { enabled: false, text: 'Remove from list…' },
       'resume-selected-torrents': {
         enabled: false,
-        shortcut: 'Alt+R',
+        shortcut: 'R',
         text: 'Resume',
       },
       'resume-selected-torrents-now': { enabled: false, text: 'Resume now' },
-      'select-all': { enabled: false, shortcut: 'Alt+A', text: 'Select all' },
+      'select-all': {
+        enabled: false,
+        shortcut: 'A',
+        text: 'Select all',
+      },
       'show-about-dialog': { enabled: true, text: 'About' },
       'show-inspector': {
         enabled: false,
-        shortcut: 'Alt+I',
+        shortcut: 'I',
         text: 'Torrent Inspector',
       },
       'show-labels-dialog': {
@@ -51,35 +55,36 @@ export class ActionManager extends EventTarget {
       },
       'show-move-dialog': {
         enabled: false,
-        shortcut: 'Alt+L',
+        shortcut: 'L',
         text: 'Set location…',
       },
       'show-overflow-menu': { enabled: true, text: 'More options…' },
       'show-preferences-dialog': {
         enabled: true,
-        shortcut: 'Alt+P',
+        shortcut: 'P',
         text: 'Edit preferences',
       },
       'show-rename-dialog': {
         enabled: false,
-        shortcut: 'Alt+N',
+        shortcut: 'N',
         text: 'Rename…',
       },
       'show-shortcuts-dialog': { enabled: true, text: 'Keyboard shortcuts' },
       'show-statistics-dialog': {
         enabled: true,
-        shortcut: 'Alt+S',
+        shortcut: 'S',
         text: 'Statistics',
       },
       'start-all-torrents': { enabled: false, text: 'Start all' },
       'toggle-compact-rows': { enabled: true, text: 'Compact rows' },
+      'toggle-contrast': { enabled: true, text: 'High contrast UI' },
       'trash-selected-torrents': {
         enabled: false,
         text: 'Trash data and remove from list…',
       },
       'verify-selected-torrents': {
         enabled: false,
-        shortcut: 'Alt+V',
+        shortcut: 'V',
         text: 'Verify local data',
       },
     });
@@ -107,7 +112,7 @@ export class ActionManager extends EventTarget {
     return new Map(
       Object.entries(this.actions)
         .filter(([, properties]) => properties.shortcut)
-        .map(([name, properties]) => [properties.shortcut, name])
+        .map(([name, properties]) => [properties.shortcut, name]),
     );
   }
 
@@ -141,7 +146,7 @@ export class ActionManager extends EventTarget {
     const selected_paused = selected.filter((tor) => tor.isStopped()).length;
     const selected_active = selected.length - selected_paused;
     const nonselected_paused = nonselected.filter((tor) =>
-      tor.isStopped()
+      tor.isStopped(),
     ).length;
     const nonselected_active = nonselected.length - nonselected_paused;
     const paused = selected_paused + nonselected_paused;

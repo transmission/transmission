@@ -5,8 +5,12 @@
 
 #include <array>
 #include <cerrno>
-#include <cstdint> // uint32_t
-#include <ctime>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // AF_INET
+#endif
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
@@ -17,12 +21,12 @@
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "port-forwarding-natpmp.h"
-#include "port-forwarding.h"
-#include "utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/port-forwarding-natpmp.h"
+#include "libtransmission/utils.h"
 
 namespace
 {

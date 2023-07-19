@@ -3,11 +3,20 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
+#include <memory>
+#include <string_view>
+
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/log.h>
+#include <libtransmission/net.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/session-settings.h>
+#include <libtransmission/variant.h>
 
-#include "test-fixtures.h"
+#include "gtest/gtest.h"
 
 using namespace std::literals;
 

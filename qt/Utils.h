@@ -8,9 +8,9 @@
 #include <cstddef> // size_t
 #include <utility>
 
-#include <QHash>
 #include <QPointer>
 #include <QRect>
+#include <QSpinBox>
 #include <QString>
 
 class QAbstractItemView;
@@ -64,7 +64,7 @@ public:
     {
         if (dialog.isNull())
         {
-            dialog = new DialogT(std::forward<ArgsT>(args)...); // NOLINT clang-analyzer-cplusplus.NewDelete
+            dialog = new DialogT{ std::forward<ArgsT>(args)... }; // NOLINT clang-analyzer-cplusplus.NewDelete
             dialog->setAttribute(Qt::WA_DeleteOnClose);
             dialog->show();
         }
@@ -74,4 +74,6 @@ public:
             dialog->activateWindow();
         }
     }
+
+    static void updateSpinBoxFormat(QSpinBox* spinBox, char const* context, char const* format, QString const& placeholder);
 };

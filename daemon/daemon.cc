@@ -8,7 +8,10 @@
 #include <cstdio> /* printf */
 #include <cstdlib> /* atoi */
 #include <iostream>
+#include <iterator> /* std::back_inserter */
 #include <memory>
+#include <string_view>
+#include <vector>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -17,6 +20,7 @@
 #ifdef _WIN32
 #include <process.h> /* getpid */
 #else
+#include <sys/time.h> /* timeval */
 #include <unistd.h> /* getpid */
 #endif
 
@@ -24,14 +28,24 @@
 
 #include <fmt/core.h>
 
-#include "daemon.h"
+#include <libtransmission/transmission.h>
 
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
+
+#include "daemon.h"
+
+struct tr_ctor;
+struct tr_session;
+struct tr_torrent;
 
 #ifdef USE_SYSTEMD
 
@@ -39,15 +53,9 @@
 
 #else
 
-static void sd_notify(int /*status*/, char const* /*str*/)
-{
-    // no-op
-}
-
-static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
-{
-    // no-op
-}
+// no-op
+#define sd_notify(status, str)
+#define sd_notifyf(status, fmt, ...)
 
 #endif
 
@@ -204,8 +212,8 @@ static std::string getConfigDir(int argc, char const* const* argv)
 static auto onFileAdded(tr_session const* session, std::string_view dirname, std::string_view basename)
 {
     auto const lowercase = tr_strlower(basename);
-    auto const is_torrent = tr_strvEndsWith(lowercase, ".torrent"sv);
-    auto const is_magnet = tr_strvEndsWith(lowercase, ".magnet"sv);
+    auto const is_torrent = tr_strv_ends_with(lowercase, ".torrent"sv);
+    auto const is_magnet = tr_strv_ends_with(lowercase, ".magnet"sv);
 
     if (!is_torrent && !is_magnet)
     {
@@ -228,7 +236,7 @@ static auto onFileAdded(tr_session const* session, std::string_view dirname, std
     {
         auto content = std::vector<char>{};
         tr_error* error = nullptr;
-        if (!tr_loadFile(filename, content, &error))
+        if (!tr_file_read(filename, content, &error))
         {
             tr_logAddWarn(fmt::format(
                 _("Couldn't read '{path}': {error} ({error_code})"),
@@ -317,14 +325,22 @@ static void printMessage(
     std::string_view filename,
     long line)
 {
-    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
-                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
+    auto out = tr_strbuf<char, 2048U>{};
+
+    if (std::empty(name))
+    {
+        fmt::format_to(std::back_inserter(out), "{:s} ({:s}:{:d})", message, filename, line);
+    }
+    else
+    {
+        fmt::format_to(std::back_inserter(out), "{:s} {:s} ({:s}:{:d})", name, message, filename, line);
+    }
 
     if (file != TR_BAD_SYS_FILE)
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, fmt::format(FMT_STRING("[{:s}] {:s} {:s}"), std::data(timestr), levelName(level), out));
+        tr_sys_file_write_line(file, fmt::format("[{:s}] {:s} {:s}", std::data(timestr), levelName(level), std::data(out)));
     }
 
 #ifdef HAVE_SYSLOG
@@ -628,6 +644,12 @@ bool tr_daemon::parse_args(int argc, char const* const* argv, bool* dump_setting
             tr_variantDictAddBool(&settings_, TR_KEY_utp_enabled, false);
             break;
 
+        case TR_OPT_UNK:
+            fprintf(stderr, "Unexpected argument: %s \n", optstr);
+            tr_getopt_usage(MyName, Usage, std::data(Options));
+            *exit_code = 1;
+            return false;
+
         default:
             tr_getopt_usage(MyName, Usage, std::data(Options));
             *exit_code = 0;
@@ -678,18 +700,16 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
+    struct event* sig_ev = nullptr;
     auto watchdir = std::unique_ptr<Watchdir>{};
     char const* const cdir = this->config_dir_.c_str();
 
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
-    /* should go before libevent calls */
-    tr_net_init();
-
     /* setup event state */
     ev_base_ = event_base_new();
 
-    if (ev_base_ == nullptr || setup_signals() == false)
+    if (ev_base_ == nullptr || !setup_signals(sig_ev))
     {
         auto const error_code = errno;
         auto const errmsg = fmt::format(
@@ -697,6 +717,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             fmt::arg("error", tr_strerror(error_code)),
             fmt::arg("error_code", error_code));
         printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
+        cleanup_signals(sig_ev);
         return 1;
     }
 
@@ -771,7 +792,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             };
 
             auto timer_maker = libtransmission::EvTimerMaker{ ev_base_ };
-            watchdir = force_generic ? Watchdir::createGeneric(dir, handler, timer_maker) :
+            watchdir = force_generic ? Watchdir::create_generic(dir, handler, timer_maker) :
                                        Watchdir::create(dir, handler, timer_maker, ev_base_);
         }
     }
@@ -848,6 +869,8 @@ CLEANUP:
         event_del(status_ev);
         event_free(status_ev);
     }
+
+    cleanup_signals(sig_ev);
 
     event_base_free(ev_base_);
 
@@ -933,6 +956,10 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
+    auto const init_mgr = tr_lib_init();
+
+    tr_locale_set_global("");
+
     int ret;
     tr_daemon daemon;
     bool foreground;

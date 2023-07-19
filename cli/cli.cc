@@ -7,17 +7,18 @@
 #include <cstdlib> /* atoi () */
 #include <string>
 #include <string_view>
+#include <thread>
 
 #include <signal.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/utils.h> /* tr_wait() */
+#include <libtransmission/utils.h> // _()
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
@@ -68,7 +69,7 @@ static sig_atomic_t manualUpdate = false;
 
 static char const* torrentPath = nullptr;
 
-static auto constexpr Options = std::array<tr_option, 19>{
+static auto constexpr Options = std::array<tr_option, 20>{
     { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
       { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
@@ -93,6 +94,8 @@ static auto constexpr Options = std::array<tr_option, 19>{
       { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+      { 500, "sequential-download", "Download pieces sequentially", "seq", false, nullptr },
+
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
@@ -197,6 +200,10 @@ static std::string getConfigDir(int argc, char const** argv)
 
 int tr_main(int argc, char* argv[])
 {
+    auto const init_mgr = tr_lib_init();
+
+    tr_locale_set_global("");
+
     tr_variant settings;
 
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
@@ -257,7 +264,8 @@ int tr_main(int argc, char* argv[])
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);
 
-    if (tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr) || tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr))
+    if (tr_sys_path_exists(torrentPath) ? tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr) :
+                                          tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr))
     {
         // all good
     }
@@ -268,7 +276,7 @@ int tr_main(int argc, char* argv[])
         waitingOnWeb = true;
         while (waitingOnWeb)
         {
-            tr_wait(1s);
+            std::this_thread::sleep_for(1s);
         }
     }
     else
@@ -310,7 +318,7 @@ int tr_main(int argc, char* argv[])
             "Error:",
         };
 
-        tr_wait(200ms);
+        std::this_thread::sleep_for(200ms);
 
         if (gotsig)
         {
@@ -443,6 +451,10 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
 
         case 912:
             tr_variantDictAddInt(d, TR_KEY_encryption, TR_CLEAR_PREFERRED);
+            break;
+
+        case 500:
+            tr_variantDictAddBool(d, TR_KEY_sequentialDownload, true);
             break;
 
         case TR_OPT_UNK:

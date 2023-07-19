@@ -8,11 +8,11 @@
 #include <cstddef> // for size_t
 #include <string>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h" // for tr_log_level
-#include "net.h" // for tr_port, tr_tos_t
-#include "quark.h"
+#include "libtransmission/log.h" // for tr_log_level
+#include "libtransmission/net.h" // for tr_port, tr_tos_t
+#include "libtransmission/quark.h"
 
 struct tr_variant;
 
@@ -37,7 +37,6 @@ struct tr_variant;
     V(TR_KEY_lpd_enabled, lpd_enabled, bool, true, "") \
     V(TR_KEY_message_level, log_level, tr_log_level, TR_LOG_INFO, "") \
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "", "") \
-    V(TR_KEY_peer_id_ttl_hours, peer_id_ttl_hours, size_t, 6U, "") \
     V(TR_KEY_peer_limit_global, peer_limit_global, size_t, TR_DEFAULT_PEER_LIMIT_GLOBAL, "") \
     V(TR_KEY_peer_limit_per_torrent, peer_limit_per_torrent, size_t, TR_DEFAULT_PEER_LIMIT_TORRENT, "") \
     V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "The local machine's incoming peer port") \

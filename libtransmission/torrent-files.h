@@ -16,10 +16,11 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "file.h"
-#include "tr-strbuf.h"
+#include "libtransmission/file.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-strbuf.h"
 
 struct tr_error;
 

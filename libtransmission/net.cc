@@ -8,7 +8,6 @@
 #include <climits>
 #include <cstdint>
 #include <cstring>
-#include <ctime>
 #include <iterator> // std::back_inserter
 #include <string_view>
 #include <utility> // std::pair
@@ -25,19 +24,16 @@
 
 #include <fmt/core.h>
 
-#include <libutp/utp.h>
+#include "libtransmission/transmission.h"
 
-#include "transmission.h"
-
-#include "log.h"
-#include "net.h"
-#include "peer-socket.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "tr-macros.h"
-#include "tr-utp.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -51,7 +47,7 @@ std::string tr_net_strerror(int err)
 
     auto buf = std::array<char, 512>{};
     (void)FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
-    return std::string{ tr_strvStrip(std::data(buf)) };
+    return std::string{ tr_strv_strip(std::data(buf)) };
 
 #else
 
@@ -60,11 +56,17 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
+std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept
+{
+    static auto TR_CONSTEXPR23 map = std::array{ std::string_view{ "IPv4" }, std::string_view{ "IPv6" } };
+    return map[type];
+}
+
 // - TCP Sockets
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
 {
-    auto const needle = tr_strlower(tr_strvStrip(name));
+    auto const needle = tr_strlower(tr_strv_strip(name));
 
     for (auto const& [value, key] : Names)
     {
@@ -74,7 +76,7 @@ std::string tr_net_strerror(int err)
         }
     }
 
-    if (auto value = tr_parseNum<int>(needle); value)
+    if (auto value = tr_num_parse<int>(needle); value)
     {
         return tr_tos_t(*value);
     }
@@ -186,8 +188,10 @@ static tr_socket_t createSocket(int domain, int type)
     return sockfd;
 }
 
-tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed)
 {
+    auto const& [addr, port] = socket_address;
+
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
@@ -217,7 +221,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     auto const [sock, addrlen] = addr.to_sockaddr(port);
 
     // set source address
-    auto const [source_addr, is_any] = session->publicAddress(addr.type);
+    auto const source_addr = session->bind_address(addr.type);
     auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
@@ -255,7 +259,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     }
     else
     {
-        ret = tr_peer_socket{ session, addr, port, s };
+        ret = tr_peer_socket{ session, socket_address, s };
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.display_name(port)));
@@ -360,33 +364,7 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
     return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
-bool tr_net_hasIPv6(tr_port port)
-{
-    static bool result = false;
-    static bool already_done = false;
-
-    if (!already_done)
-    {
-        int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv4(), port, true, &err);
-
-        if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
-        {
-            result = true;
-        }
-
-        if (fd != TR_BAD_SOCKET)
-        {
-            tr_net_close_socket(fd);
-        }
-
-        already_done = true;
-    }
-
-    return result;
-}
-
-std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
+std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
 {
     TR_ASSERT(session != nullptr);
 
@@ -409,100 +387,12 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
         return {};
     }
 
-    return std::make_tuple(addrport->first, addrport->second, sockfd);
+    return std::pair{ *addrport, sockfd };
 }
 
 void tr_net_close_socket(tr_socket_t sockfd)
 {
     evutil_closesocket(sockfd);
-}
-
-namespace
-{
-// code in global_ipv6_herlpers is written by Juliusz Chroboczek
-// and is covered under the same license as dht.cc.
-// Please feel free to copy them into your software if it can help
-// unbreaking the double-stack Internet.
-namespace global_ipv6_helpers
-{
-
-// Get the source address used for a given destination address.
-// Since there is no official interface to get this information,
-// we create a connected UDP socket (connected UDP... hmm...)
-// and check its source address.
-//
-// Since it's a UDP socket, this doesn't actually send any packets
-[[nodiscard]] std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port)
-{
-    auto const save = errno;
-
-    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
-    {
-        if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
-        {
-            auto src_ss = sockaddr_storage{};
-            auto src_sslen = socklen_t{ sizeof(src_ss) };
-            if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
-            {
-                if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
-                {
-                    evutil_closesocket(sock);
-                    errno = save;
-                    return addrport->first;
-                }
-            }
-        }
-
-        evutil_closesocket(sock);
-    }
-
-    errno = save;
-    return {};
-}
-
-[[nodiscard]] std::optional<tr_address> global_address(int af)
-{
-    // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6);
-    auto const dst_port = tr_port::fromHost(6969);
-
-    // In order for address selection to work right,
-    // this should be a native IPv6 address, not Teredo or 6to4
-    TR_ASSERT(dst_addr.has_value() && dst_addr->is_global_unicast_address());
-
-    if (dst_addr)
-    {
-        if (auto addr = get_source_address(*dst_addr, dst_port); addr && addr->is_global_unicast_address())
-        {
-            return addr;
-        }
-    }
-
-    return {};
-}
-
-} // namespace global_ipv6_helpers
-} // namespace
-
-/* Return our global IPv6 address, with caching. */
-std::optional<tr_address> tr_globalIPv6()
-{
-    using namespace global_ipv6_helpers;
-
-    // recheck our cached value every half hour
-    static auto constexpr CacheSecs = 1800;
-    static auto cache_val = std::optional<tr_address>{};
-    static auto cache_expires_at = time_t{};
-    if (auto const now = tr_time(); cache_expires_at <= now)
-    {
-        cache_expires_at = now + CacheSecs;
-        cache_val = global_address(AF_INET6);
-    }
-
-    return cache_val;
 }
 
 // ---
@@ -581,13 +471,15 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 
     auto addr = tr_address{};
 
-    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr) == 1)
+    addr.addr.addr4 = {};
+    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr.addr4) == 1)
     {
         addr.type = TR_AF_INET;
         return addr;
     }
 
-    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr) == 1)
+    addr.addr.addr6 = {};
+    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr.addr6) == 1)
     {
         addr.type = TR_AF_INET6;
         return addr;
@@ -652,7 +544,7 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte 
     return std::make_pair(address, compact);
 }
 
-std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct sockaddr const* from)
+std::optional<tr_socket_address> tr_address::from_sockaddr(struct sockaddr const* from)
 {
     if (from == nullptr)
     {
@@ -665,7 +557,7 @@ std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct s
         auto addr = tr_address{};
         addr.type = TR_AF_INET;
         addr.addr.addr4 = sin->sin_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin->sin_port));
+        return tr_socket_address{ addr, tr_port::fromNetwork(sin->sin_port) };
     }
 
     if (from->sa_family == AF_INET6)
@@ -674,7 +566,7 @@ std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct s
         auto addr = tr_address{};
         addr.type = TR_AF_INET6;
         addr.addr.addr6 = sin6->sin6_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin6->sin6_port));
+        return tr_socket_address{ addr, tr_port::fromNetwork(sin6->sin6_port) };
     }
 
     return {};
@@ -704,9 +596,9 @@ std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) con
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
     // IPv6 addresses are always "greater than" IPv4
-    if (this->type != that.type)
+    if (auto const val = tr_compare_3way(this->type, that.type); val != 0)
     {
-        return this->is_ipv4() ? 1 : -1;
+        return val;
     }
 
     return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :
@@ -840,7 +732,7 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
         // TODO: 2000::/3 is commonly used for global unicast but technically
         // other spaces would be allowable too, so we should test those here.
-        // See RFC 4291 in the Section 2.4 lising global unicast as everything
+        // See RFC 4291 in the Section 2.4 listing global unicast as everything
         // that's not link-local, multicast, loopback, or unspecified.
         return (a[0] & 0xE0) == 0x20;
     }

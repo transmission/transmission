@@ -10,14 +10,15 @@
 
 // --- Basic Types
 
-#include <stdbool.h> /* bool */
-#include <stddef.h> /* size_t */
-#include <stdint.h> /* uintN_t */
-#include <time.h> /* time_t */
+#include <stddef.h> // size_t
+#include <stdint.h> // uintN_t
+#include <time.h> // time_t
 
 #ifdef __cplusplus
 #include <string>
 #include <string_view>
+#else
+#include <stdbool.h> // bool
 #endif
 
 #include "tr-macros.h"
@@ -82,8 +83,8 @@ enum tr_encryption_mode
     TR_ENCRYPTION_REQUIRED
 };
 
-#define TR_RATIO_NA -1
-#define TR_RATIO_INF -2
+#define TR_RATIO_NA (-1)
+#define TR_RATIO_INF (-2)
 
 // --- Startup & Shutdown
 
@@ -112,7 +113,7 @@ enum tr_encryption_mode
 [[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
 #endif
 
-/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strv_to_buf()`. */
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
@@ -127,7 +128,7 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
 [[nodiscard]] std::string tr_getDefaultDownloadDir();
 #endif
 
-/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strv_to_buf()`. */
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
@@ -980,7 +981,7 @@ uint64_t tr_torrentTotalSize(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
 #endif
 
-/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
 // --- Torrent speed limits
@@ -1085,7 +1086,7 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 // ---
@@ -1104,7 +1105,7 @@ size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buf
 [[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
@@ -1274,7 +1275,7 @@ struct tr_tracker_view
 {
     char const* announce; // full announce URL
     char const* scrape; // full scrape URL
-    char const* host; // uniquely-identifying tracker name (`${host}:${port}`)
+    char const* host_and_port; // uniquely-identifying tracker name (`${host}:${port}`)
 
     // The tracker site's name. Uses the first label before the public suffix
     // (https://publicsuffix.org/) in the announce URL's host.
@@ -1334,6 +1335,8 @@ struct tr_file_view
     uint64_t have; // the current size of the file, i.e. how much we've downloaded
     uint64_t length; // the total size of the file
     double progress; // have / length
+    tr_piece_index_t beginPiece; // piece index where this file starts
+    tr_piece_index_t endPiece; // piece index where this file ends (exclusive)
     tr_priority_t priority; // the file's priority
     bool wanted; // do we want to download this file?
 };
@@ -1389,7 +1392,7 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
@@ -1425,7 +1428,7 @@ enum tr_torrent_activity
     TR_STATUS_SEED_WAIT = 5, /* Queued to seed */
     TR_STATUS_SEED = 6 /* Seeding */
 };
-enum
+enum tr_peer_from : uint8_t
 {
     TR_PEER_FROM_INCOMING = 0, /* connections made to the listening port */
     TR_PEER_FROM_LPD, /* peers found by local announcements */

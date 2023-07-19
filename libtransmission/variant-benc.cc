@@ -3,26 +3,29 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cctype> /* isdigit() */
+#include <cstddef> // size_t, std::byte
+#include <cstdint> // int64_t
 #include <deque>
+#include <string>
 #include <string_view>
 #include <optional>
 
+#include <fmt/core.h>
 #include <fmt/compile.h>
-#include <fmt/format.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "transmission.h"
+#include "libtransmission/benc.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant-common.h"
+#include "libtransmission/variant.h"
 
-#include "benc.h"
-#include "quark.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
-#include "variant-common.h"
-#include "variant.h"
+struct tr_error;
 
 using namespace std::literals;
 
@@ -50,7 +53,7 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
 
     // find the beginning delimiter
     auto walk = *benc;
-    if (std::size(walk) < 3 || !tr_strvStartsWith(walk, Prefix))
+    if (std::size(walk) < 3 || !tr_strv_starts_with(walk, Prefix))
     {
         return {};
     }
@@ -70,8 +73,8 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
     }
 
     // parse the string and make sure the next char is `Suffix`
-    auto const value = tr_parseNum<int64_t>(walk, &walk);
-    if (!value || !tr_strvStartsWith(walk, Suffix))
+    auto const value = tr_num_parse<int64_t>(walk, &walk);
+    if (!value || !tr_strv_starts_with(walk, Suffix))
     {
         return {};
     }
@@ -103,7 +106,7 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
         return {};
     }
 
-    auto const len = tr_parseNum<size_t>(svtmp, &svtmp);
+    auto const len = tr_num_parse<size_t>(svtmp, &svtmp);
     if (!len || *len >= MaxBencStrLength)
     {
         return {};
@@ -277,34 +280,40 @@ namespace
 {
 namespace to_string_helpers
 {
-using Buffer = libtransmission::Buffer;
+using OutBuf = libtransmission::StackBuffer<1024U * 8U, std::byte>;
 
 void saveIntFunc(tr_variant const* val, void* vout)
 {
-    auto buf = std::array<char, 64>{};
-    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
-    static_cast<Buffer*>(vout)->add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
+    auto out = static_cast<OutBuf*>(vout);
+
+    auto const [buf, buflen] = out->reserve_space(64U);
+    auto* walk = reinterpret_cast<char*>(buf);
+    auto const* const begin = walk;
+    walk = fmt::format_to(walk, FMT_COMPILE("i{:d}e"), val->val.i);
+    out->commit_space(walk - begin);
 }
 
 void saveBoolFunc(tr_variant const* val, void* vout)
 {
-    static_cast<Buffer*>(vout)->add(val->val.b ? "i1e"sv : "i0e"sv);
+    static_cast<OutBuf*>(vout)->add(val->val.b ? "i1e"sv : "i0e"sv);
 }
 
-void saveStringImpl(Buffer* tgt, std::string_view sv)
+void saveStringImpl(OutBuf* out, std::string_view sv)
 {
     // `${sv.size()}:${sv}`
-    auto prefix = std::array<char, 32>{};
-    auto const* const out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
-    tgt->add(std::data(prefix), out - std::data(prefix));
-    tgt->add(sv);
+    auto const [buf, buflen] = out->reserve_space(std::size(sv) + 32U);
+    auto* walk = reinterpret_cast<char*>(buf);
+    auto const* const begin = walk;
+    walk = fmt::format_to(walk, FMT_COMPILE("{:d}:"), std::size(sv));
+    walk = std::copy_n(std::data(sv), std::size(sv), walk);
+    out->commit_space(walk - begin);
 }
 
 void saveStringFunc(tr_variant const* v, void* vout)
 {
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
-    saveStringImpl(static_cast<Buffer*>(vout), sv);
+    saveStringImpl(static_cast<OutBuf*>(vout), sv);
 }
 
 void saveRealFunc(tr_variant const* val, void* vout)
@@ -313,22 +322,22 @@ void saveRealFunc(tr_variant const* val, void* vout)
 
     auto buf = std::array<char, 64>{};
     auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
-    saveStringImpl(static_cast<Buffer*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
+    saveStringImpl(static_cast<OutBuf*>(vout), { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 
 void saveDictBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<Buffer*>(vbuf)->push_back('d');
+    static_cast<OutBuf*>(vbuf)->push_back('d');
 }
 
 void saveListBeginFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<Buffer*>(vbuf)->push_back('l');
+    static_cast<OutBuf*>(vbuf)->push_back('l');
 }
 
 void saveContainerEndFunc(tr_variant const* /*val*/, void* vbuf)
 {
-    static_cast<Buffer*>(vbuf)->push_back('e');
+    static_cast<OutBuf*>(vbuf)->push_back('e');
 }
 
 struct VariantWalkFuncs const walk_funcs = {
@@ -348,7 +357,7 @@ std::string tr_variantToStrBenc(tr_variant const* top)
 {
     using namespace to_string_helpers;
 
-    auto buf = libtransmission::Buffer{};
+    auto buf = OutBuf{};
     tr_variantWalk(top, &walk_funcs, &buf, true);
     return buf.to_string();
 }

@@ -5,13 +5,15 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include <clocale> // setlocale()
+#include <cstdint> // int64_t
+#include <locale>
+#include <optional>
+#include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
-#include <libtransmission/variant-common.h>
 
 #include "gtest/gtest.h"
 
@@ -23,11 +25,26 @@ protected:
     void SetUp() override
     {
         auto const* locale_str = GetParam();
-        if (setlocale(LC_NUMERIC, locale_str) == nullptr)
+        try
+        {
+            old_locale_ = std::locale::global(std::locale{ {}, new std::numpunct_byname<char>{ locale_str } });
+        }
+        catch (std::runtime_error const&)
         {
             GTEST_SKIP();
         }
     }
+
+    void TearDown() override
+    {
+        if (old_locale_)
+        {
+            std::locale::global(*old_locale_);
+        }
+    }
+
+private:
+    std::optional<std::locale> old_locale_;
 };
 
 TEST_P(JSONTest, testElements)
@@ -119,6 +136,27 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
     tr_variantClear(&top);
+}
+
+TEST_P(JSONTest, testUtf16Surrogates)
+{
+    static auto constexpr ThinkingFaceEmojiUtf8 = "\xf0\x9f\xa4\x94"sv;
+    auto top = tr_variant{};
+    tr_variantInitDict(&top, 1);
+    auto const key = tr_quark_new("key"sv);
+    tr_variantDictAddStr(&top, key, ThinkingFaceEmojiUtf8);
+    auto const json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
+    EXPECT_NE(std::string::npos, json.find("ud83e"));
+    EXPECT_NE(std::string::npos, json.find("udd14"));
+    tr_variantClear(&top);
+
+    auto parsed = tr_variant{};
+    EXPECT_TRUE(tr_variantFromBuf(&parsed, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
+    EXPECT_TRUE(tr_variantIsDict(&parsed));
+    auto value = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&parsed, key, &value));
+    EXPECT_EQ(ThinkingFaceEmojiUtf8, value);
+    tr_variantClear(&parsed);
 }
 
 TEST_P(JSONTest, test1)

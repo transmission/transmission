@@ -6,7 +6,8 @@
 #pragma once
 
 #include <chrono>
-#include <cstddef>
+#include <cstddef> // size_t
+#include <ctime> // time_t
 #include <functional>
 #include <memory>
 #include <optional>
@@ -156,7 +157,10 @@ public:
             func(response);
         }
 
-        [[nodiscard]] virtual time_t now() const = 0;
+        [[nodiscard]] virtual time_t now() const
+        {
+            return time(nullptr);
+        }
     };
 
     // Note that tr_web does no management of the `mediator` reference.

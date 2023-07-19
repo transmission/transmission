@@ -3,14 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
+#include <cstddef> // size_t
 #include <map>
-#include <type_traits>
+#include <set>
 
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/bitfield.h>
 #include <libtransmission/peer-mgr-wishlist.h>
 
 #include "gtest/gtest.h"
@@ -28,6 +29,7 @@ protected:
         mutable std::set<tr_piece_index_t> can_request_piece_;
         tr_piece_index_t piece_count_ = 0;
         bool is_endgame_ = false;
+        bool is_sequential_download_ = false;
 
         [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const final
         {
@@ -42,6 +44,11 @@ protected:
         [[nodiscard]] bool isEndgame() const final
         {
             return is_endgame_;
+        }
+
+        [[nodiscard]] bool isSequentialDownload() const final
+        {
+            return is_sequential_download_;
         }
 
         [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const final
@@ -92,7 +99,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatCannotBeRequested)
     }
 
     // we should only get the first piece back
-    auto spans = Wishlist::next(mediator, 1000);
+    auto spans = Wishlist{ mediator }.next(1000);
     ASSERT_EQ(1U, std::size(spans));
     EXPECT_EQ(mediator.block_span_[0].begin, spans[0].begin);
     EXPECT_EQ(mediator.block_span_[0].end, spans[0].end);
@@ -125,11 +132,11 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
 
     // even if we ask wishlist for more blocks than exist,
     // it should omit blocks 1-10 from the return set
-    auto spans = Wishlist::next(mediator, 1000);
+    auto spans = Wishlist{ mediator }.next(1000);
     auto requested = tr_bitfield(250);
     for (auto const& span : spans)
     {
-        requested.setSpan(span.begin, span.end);
+        requested.set_span(span.begin, span.end);
     }
     EXPECT_EQ(240U, requested.count());
     EXPECT_EQ(0U, requested.count(0, 10));
@@ -162,7 +169,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     // but we only ask for 10 blocks,
     // so that's how many we should get back
     auto const n_wanted = 10U;
-    auto const spans = Wishlist::next(mediator, n_wanted);
+    auto const spans = Wishlist{ mediator }.next(n_wanted);
     auto n_got = size_t{};
     for (auto const& span : spans)
     {
@@ -206,7 +213,7 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
     for (int run = 0; run < num_runs; ++run)
     {
         auto const n_wanted = 10U;
-        auto spans = Wishlist::next(mediator, n_wanted);
+        auto spans = Wishlist{ mediator }.next(n_wanted);
         auto n_got = size_t{};
         for (auto const& span : spans)
         {
@@ -252,11 +259,11 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
 
     // even if we ask wishlist to list more blocks than exist,
     // those first 150 should be omitted from the return list
-    auto spans = Wishlist::next(mediator, 1000);
+    auto spans = Wishlist{ mediator }.next(1000);
     auto requested = tr_bitfield(300);
     for (auto const& span : spans)
     {
-        requested.setSpan(span.begin, span.end);
+        requested.set_span(span.begin, span.end);
     }
     EXPECT_EQ(150U, requested.count());
     EXPECT_EQ(0U, requested.count(0, 150));
@@ -265,11 +272,11 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     // BUT during endgame it's OK to request dupes,
     // so then we _should_ see the first 150 in the list
     mediator.is_endgame_ = true;
-    spans = Wishlist::next(mediator, 1000);
+    spans = Wishlist{ mediator }.next(1000);
     requested = tr_bitfield(300);
     for (auto const& span : spans)
     {
-        requested.setSpan(span.begin, span.end);
+        requested.set_span(span.begin, span.end);
     }
     EXPECT_EQ(300U, requested.count());
     EXPECT_EQ(150U, requested.count(0, 150));
@@ -315,11 +322,11 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
     auto const num_runs = 1000;
     for (int run = 0; run < num_runs; ++run)
     {
-        auto const ranges = Wishlist::next(mediator, 10);
+        auto const ranges = Wishlist{ mediator }.next(10);
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
-            requested.setSpan(range.begin, range.end);
+            requested.set_span(range.begin, range.end);
         }
         EXPECT_EQ(10U, requested.count());
         EXPECT_EQ(10U, requested.count(0, 100));
@@ -331,11 +338,11 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
     // those blocks should be next in line.
     for (int run = 0; run < num_runs; ++run)
     {
-        auto const ranges = Wishlist::next(mediator, 20);
+        auto const ranges = Wishlist{ mediator }.next(20);
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
-            requested.setSpan(range.begin, range.end);
+            requested.set_span(range.begin, range.end);
         }
         EXPECT_EQ(20U, requested.count());
         EXPECT_EQ(10U, requested.count(0, 100));

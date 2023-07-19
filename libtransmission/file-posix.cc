@@ -11,20 +11,19 @@
 #include <cerrno>
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
-#include <cstdio>
+#include <cstdlib> // mkdtemp, mkstemp, realpath
+#include <optional>
 #include <string_view>
 #include <string>
 #include <vector>
 
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
-#include <libgen.h> /* basename(), dirname() */
-#include <sys/file.h> /* flock() */
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
 #ifdef HAVE_XFS_XFS_H
+#include <sys/file.h> /* flock() */
 #include <xfs/xfs.h>
 #endif
 
@@ -49,15 +48,16 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_UCLIBC_CHECK_VERSION
+#include "libtransmission/tr-strbuf.h"
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -379,7 +379,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 
     while (file_size > 0U)
     {
-        size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
+        size_t const chunk_size = std::min({ file_size, uint64_t{ SSIZE_MAX }, uint64_t{ INT32_MAX } });
         auto const copied = copy_file_range(in, nullptr, out, nullptr, chunk_size, 0);
 
         TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
@@ -432,7 +432,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
         {
             while (file_size > 0U)
             {
-                size_t const chunk_size = std::min(file_size, uint64_t{ SSIZE_MAX });
+                size_t const chunk_size = std::min({ file_size, uint64_t{ SSIZE_MAX }, uint64_t{ INT32_MAX } });
                 auto const copied = sendfile64(out, in, nullptr, chunk_size);
                 TR_ASSERT(copied == -1 || copied >= 0); /* -1 for error; some non-negative value otherwise. */
 
@@ -556,7 +556,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), static_cast<int>(std_file)));
         tr_error_set_from_errno(error, EINVAL);
     }
 
@@ -1205,11 +1205,9 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
     return ret;
 }
 
-tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
+tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
-    DIR* ret = opendir(path);
+    auto* const ret = opendir(tr_pathbuf{ path });
 
     if (ret == nullptr)
     {

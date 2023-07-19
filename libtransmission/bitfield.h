@@ -9,11 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstddef>
-#include <cstdint>
-#include <vector>
+#include <cstddef> // size_t
+#include <cstdint> // uint8_t
+#include <vector> // std::vector
 
-#include "tr-macros.h"
+#include "tr-macros.h" // TR_CONSTEXPR20
 
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
@@ -41,41 +41,41 @@ class tr_bitfield
 public:
     explicit tr_bitfield(size_t bit_count);
 
-    void setHasAll() noexcept;
-    void setHasNone() noexcept;
+    void set_has_all() noexcept;
+    void set_has_none() noexcept;
 
     // set one or more bits
     void set(size_t nth, bool value = true);
-    void setSpan(size_t begin, size_t end, bool value = true);
+    void set_span(size_t begin, size_t end, bool value = true);
     void unset(size_t bit)
     {
         set(bit, false);
     }
-    void unsetSpan(size_t begin, size_t end)
+    void unset_span(size_t begin, size_t end)
     {
-        setSpan(begin, end, false);
+        set_span(begin, end, false);
     }
-    void setFromBools(bool const* flags, size_t n);
+    void set_from_bools(bool const* flags, size_t n);
 
     // "raw" here is in BEP0003 format: "The first byte of the bitfield
     // corresponds to indices 0 - 7 from high bit to low bit, respectively.
     // The next one 8-15, etc. Spare bits at the end are set to zero."
-    void setRaw(uint8_t const* raw, size_t byte_count);
+    void set_raw(uint8_t const* raw, size_t byte_count);
     [[nodiscard]] std::vector<uint8_t> raw() const;
 
-    [[nodiscard]] constexpr bool hasAll() const noexcept
+    [[nodiscard]] constexpr bool has_all() const noexcept
     {
         return have_all_hint_ || (bit_count_ > 0 && bit_count_ == true_count_);
     }
 
-    [[nodiscard]] constexpr bool hasNone() const noexcept
+    [[nodiscard]] constexpr bool has_none() const noexcept
     {
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
     [[nodiscard]] TR_CONSTEXPR20 bool test(size_t bit) const
     {
-        return hasAll() || (!hasNone() && testFlag(bit));
+        return has_all() || (!has_none() && test_flag(bit));
     }
 
     [[nodiscard]] constexpr size_t count() const noexcept
@@ -90,21 +90,21 @@ public:
         return bit_count_;
     }
 
-    [[nodiscard]] constexpr size_t empty() const noexcept
+    [[nodiscard]] constexpr bool empty() const noexcept
     {
         return size() == 0;
     }
 
-    [[nodiscard]] bool isValid() const;
+    [[nodiscard]] bool is_valid() const;
 
     [[nodiscard]] constexpr auto percent() const noexcept
     {
-        if (hasAll())
+        if (has_all())
         {
             return 1.0F;
         }
 
-        if (hasNone() || empty())
+        if (has_none() || empty())
         {
             return 0.0F;
         }
@@ -114,37 +114,37 @@ public:
 
     tr_bitfield& operator|=(tr_bitfield const& that) noexcept;
     tr_bitfield& operator&=(tr_bitfield const& that) noexcept;
+    [[nodiscard]] bool intersects(tr_bitfield const& that) const noexcept;
 
 private:
-    [[nodiscard]] size_t countFlags() const noexcept;
-    [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
+    [[nodiscard]] size_t count_flags() const noexcept;
+    [[nodiscard]] size_t count_flags(size_t begin, size_t end) const noexcept;
 
-    [[nodiscard]] TR_CONSTEXPR20 bool testFlag(size_t n) const
+    [[nodiscard]] TR_CONSTEXPR20 bool test_flag(size_t n) const
     {
         if (n >> 3U >= std::size(flags_))
         {
             return false;
         }
 
-        bool ret = (flags_[n >> 3U] << (n & 7U) & 0x80) != 0;
-        return ret;
+        return (flags_[n >> 3U] << (n & 7U) & 0x80) != 0;
     }
 
-    void ensureBitsAlloced(size_t n);
-    [[nodiscard]] bool ensureNthBitAlloced(size_t nth);
+    void ensure_bits_alloced(size_t n);
+    [[nodiscard]] bool ensure_nth_bit_alloced(size_t nth);
 
-    void freeArray() noexcept
+    void free_array() noexcept
     {
         // move-assign to ensure the reserve memory is cleared
         flags_ = std::vector<uint8_t>{};
     }
 
-    void incrementTrueCount(size_t inc) noexcept;
-    void decrementTrueCount(size_t dec) noexcept;
-    void setTrueCount(size_t n) noexcept;
-    void rebuildTrueCount() noexcept
+    void increment_true_count(size_t inc) noexcept;
+    void decrement_true_count(size_t dec) noexcept;
+    void set_true_count(size_t n) noexcept;
+    void rebuild_true_count() noexcept
     {
-        setTrueCount(countFlags());
+        set_true_count(count_flags());
     }
 
     std::vector<uint8_t> flags_;

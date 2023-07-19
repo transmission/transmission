@@ -3,12 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <fmt/format.h>
-
-#include "transmission.h"
-
-#include "session-settings.h"
-#include "variant.h"
+#include "libtransmission/session-settings.h"
+#include "libtransmission/variant.h"
 
 void tr_session_settings::load(tr_variant* src)
 {

@@ -4,9 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#ifdef _WIN32
 #include <array>
+#endif
 #include <atomic>
 #include <condition_variable>
+#include <cstdint> // uint64_t
 #include <list>
 #include <map>
 #include <memory>
@@ -19,21 +22,26 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // setsockopt, SOL_SOCKET, SO_RC...
 #endif
 
 #include <curl/curl.h>
 
-#include <fmt/core.h>
-#include <fmt/format.h>
+#include <event2/buffer.h>
 
-#include "crypto-utils.h"
-#include "log.h"
-#include "peer-io.h"
-#include "tr-assert.h"
-#include "utils-ev.h"
-#include "utils.h"
-#include "web.h"
-#include "web-utils.h"
+#include <fmt/core.h>
+
+#ifdef _WIN32
+#include "libtransmission/crypto-utils.h"
+#endif
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils-ev.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -159,8 +167,6 @@ public:
     explicit Impl(Mediator& mediator_in)
         : mediator{ mediator_in }
     {
-        std::call_once(curl_init_flag, curlInit);
-
         if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
         {
             curl_ca_bundle = std::move(bundle);
@@ -351,6 +357,8 @@ public:
                 return;
             }
 
+            impl.paused_easy_handles.erase(easy_);
+
             if (auto const url = tr_urlParse(options.url); url)
             {
                 curl_easy_reset(easy);
@@ -462,7 +470,7 @@ public:
             // again when the transfer is unpaused.
             if (task->impl.mediator.clamp(*tag, bytes_used) < bytes_used)
             {
-                task->impl.paused_easy_handles.emplace(tr_time_msec(), task->easy());
+                task->impl.paused_easy_handles.emplace(task->easy(), tr_time_msec());
                 return CURL_WRITEFUNC_PAUSE;
             }
 
@@ -601,9 +609,9 @@ public:
 
         for (auto it = std::begin(paused); it != std::end(paused);)
         {
-            if (it->first + BandwidthPauseMsec < now)
+            if (it->second + BandwidthPauseMsec < now)
             {
-                curl_easy_pause(it->second, CURLPAUSE_CONT);
+                curl_easy_pause(it->first, CURLPAUSE_CONT);
                 it = paused.erase(it);
             }
             else
@@ -702,7 +710,7 @@ public:
                 ++repeats;
                 if (repeats > 1U)
                 {
-                    tr_wait(100ms);
+                    std::this_thread::sleep_for(100ms);
                 }
             }
             else
@@ -775,19 +783,7 @@ public:
         }
     }
 
-    static inline auto curl_init_flag = std::once_flag{};
-
-    std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
-
-    static void curlInit()
-    {
-        // try to enable ssl for https support;
-        // but if that fails, try a plain vanilla init
-        if (curl_global_init(CURL_GLOBAL_SSL) != CURLE_OK)
-        {
-            curl_global_init(0);
-        }
-    }
+    std::map<CURL*, uint64_t /*tr_time_msec()*/> paused_easy_handles;
 };
 
 tr_web::tr_web(Mediator& mediator)

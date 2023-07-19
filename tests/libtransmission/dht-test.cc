@@ -4,18 +4,47 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
+#include <cassert>
 #include <chrono>
+#include <cstddef> // size_t, std::byte
+#include <ctime> // time(), time_t
 #include <fstream>
+#include <iterator> // std::back_inserter
+#include <map>
 #include <memory>
+#include <string>
+#include <string_view>
 #include <utility>
+#include <vector>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <netdb.h> // addrinfo, freeaddrinfo
+#include <sys/socket.h> // AF_INET, AF_INET6, AF_UN...
+#endif
+
+#include <dht/dht.h> // dht_callback_t
 
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/crypto-utils.h> // tr_rand_obj
 #include <libtransmission/file.h>
-#include <libtransmission/timer-ev.h>
+#include <libtransmission/net.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/session-thread.h> // for tr_evthread_init();
+#include <libtransmission/timer.h>
+#include <libtransmission/timer-ev.h>
+#include <libtransmission/tr-dht.h>
+#include <libtransmission/tr-macros.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h> // tr_variantDictAddRaw
 
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
@@ -254,19 +283,19 @@ protected:
             real_timer_->stop();
         }
 
-        void setCallback(std::function<void()> callback) override
+        void set_callback(std::function<void()> callback) override
         {
-            real_timer_->setCallback(std::move(callback));
+            real_timer_->set_callback(std::move(callback));
         }
 
-        void setRepeating(bool repeating = true) override
+        void set_repeating(bool repeating = true) override
         {
-            real_timer_->setRepeating(repeating);
+            real_timer_->set_repeating(repeating);
         }
 
-        void setInterval(std::chrono::milliseconds /*interval*/) override
+        void set_interval(std::chrono::milliseconds /*interval*/) override
         {
-            real_timer_->setInterval(MockTimerInterval);
+            real_timer_->set_interval(MockTimerInterval);
         }
 
         void start() override
@@ -279,9 +308,9 @@ protected:
             return real_timer_->interval();
         }
 
-        [[nodiscard]] bool isRepeating() const noexcept override
+        [[nodiscard]] bool is_repeating() const noexcept override
         {
-            return real_timer_->isRepeating();
+            return real_timer_->is_repeating();
         }
 
     private:
@@ -313,12 +342,12 @@ protected:
         {
         }
 
-        [[nodiscard]] std::vector<tr_torrent_id_t> torrentsAllowingDHT() const override
+        [[nodiscard]] std::vector<tr_torrent_id_t> torrents_allowing_dht() const override
         {
             return torrents_allowing_dht_;
         }
 
-        [[nodiscard]] tr_sha1_digest_t torrentInfoHash(tr_torrent_id_t id) const override
+        [[nodiscard]] tr_sha1_digest_t torrent_info_hash(tr_torrent_id_t id) const override
         {
             if (auto const iter = info_hashes_.find(id); iter != std::end(info_hashes_))
             {
@@ -328,12 +357,12 @@ protected:
             return {};
         }
 
-        [[nodiscard]] std::string_view configDir() const override
+        [[nodiscard]] std::string_view config_dir() const override
         {
             return config_dir_;
         }
 
-        [[nodiscard]] libtransmission::TimerMaker& timerMaker() override
+        [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
         {
             return mock_timer_maker_;
         }
@@ -343,7 +372,7 @@ protected:
             return mock_dht_;
         }
 
-        void addPex(tr_sha1_digest_t const& /*info_hash*/, tr_pex const* /*pex*/, size_t /*n_pex*/) override
+        void add_pex(tr_sha1_digest_t const& /*info_hash*/, tr_pex const* /*pex*/, size_t /*n_pex*/) override
         {
         }
 
@@ -354,7 +383,7 @@ protected:
         MockTimerMaker mock_timer_maker_;
     };
 
-    [[nodiscard]] static std::pair<tr_address, tr_port> getSockaddr(std::string_view name, tr_port port)
+    [[nodiscard]] static tr_socket_address getSockaddr(std::string_view name, tr_port port)
     {
         auto hints = addrinfo{};
         hints.ai_socktype = SOCK_DGRAM;
@@ -388,6 +417,8 @@ protected:
     {
         SandboxedTest::SetUp();
 
+        init_mgr_ = tr_lib_init();
+
         tr_session_thread::tr_evthread_init();
         event_base_ = event_base_new();
     }
@@ -401,6 +432,8 @@ protected:
     }
 
     struct event_base* event_base_ = nullptr;
+
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
 
     // Arbitrary values. Several tests requires socket/port values
     // to be provided but they aren't central to the tests, so they're
@@ -497,7 +530,7 @@ TEST_F(DhtTest, stopsBootstrappingWhenSwarmHealthIsGoodEnough)
     waitFor(event_base_, MockTimerInterval * 10);
 
     // Confirm that the number of nodes pinged is unchanged,
-    // indicating that boostrapping is done
+    // indicating that bootstrapping is done
     EXPECT_EQ(TurnGoodAfterNthPing, std::size(mock_dht.pinged_));
 }
 
@@ -572,9 +605,9 @@ TEST_F(DhtTest, usesBootstrapFile)
         5s);
     ASSERT_EQ(1U, std::size(pinged));
     auto const actual = pinged.front();
-    EXPECT_EQ(expected.first, actual.address);
-    EXPECT_EQ(expected.second, actual.port);
-    EXPECT_EQ(expected.first.display_name(expected.second), actual.address.display_name(actual.port));
+    EXPECT_EQ(expected.address(), actual.address);
+    EXPECT_EQ(expected.port(), actual.port);
+    EXPECT_EQ(expected.display_name(), actual.address.display_name(actual.port));
 }
 
 TEST_F(DhtTest, pingsAddedNodes)
@@ -589,7 +622,7 @@ TEST_F(DhtTest, pingsAddedNodes)
     EXPECT_TRUE(addr.has_value());
     assert(addr.has_value());
     auto constexpr Port = tr_port::fromHost(128);
-    dht->addNode(*addr, Port);
+    dht->add_node(*addr, Port);
 
     ASSERT_EQ(1U, std::size(mediator.mock_dht_.pinged_));
     EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().address);

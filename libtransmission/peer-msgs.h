@@ -9,20 +9,21 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <atomic>
-#include <cstdint> // int8_t
-#include <cstddef> // size_t
-#include <ctime> // time_t
+#include <cstddef> // for size_t
 #include <memory>
-#include <utility>
+#include <utility> // for std::pair<>
 
-#include "bitfield.h"
-#include "peer-common.h"
-#include "torrent.h"
+#include "libtransmission/transmission.h" // for tr_direction, tr_block_ind...
 
-class tr_peer;
+#include "libtransmission/interned-string.h"
+#include "libtransmission/net.h" // tr_socket_address
+#include "libtransmission/peer-common.h" // for tr_peer
+
 class tr_peerIo;
-struct tr_address;
+class tr_peer_info;
+struct tr_torrent;
 
 /**
  * @addtogroup peers Peers
@@ -32,33 +33,75 @@ struct tr_address;
 class tr_peerMsgs : public tr_peer
 {
 public:
-    tr_peerMsgs(tr_torrent const* tor, peer_atom* atom_in)
-        : tr_peer{ tor, atom_in }
-        , have_{ tor->pieceCount() }
+    tr_peerMsgs(
+        tr_torrent const* tor,
+        tr_peer_info* peer_info_in,
+        tr_interned_string user_agent,
+        bool connection_is_encrypted,
+        bool connection_is_incoming,
+        bool connection_is_utp)
+        : tr_peer{ tor, peer_info_in }
+        , user_agent_{ user_agent }
+        , connection_is_encrypted_{ connection_is_encrypted }
+        , connection_is_incoming_{ connection_is_incoming }
+        , connection_is_utp_{ connection_is_utp }
     {
         ++n_peers;
     }
 
     virtual ~tr_peerMsgs() override;
 
-    [[nodiscard]] static size_t size() noexcept
+    [[nodiscard]] static auto size() noexcept
     {
         return n_peers.load();
     }
 
-    [[nodiscard]] virtual bool is_peer_choked() const noexcept = 0;
-    [[nodiscard]] virtual bool is_peer_interested() const noexcept = 0;
-    [[nodiscard]] virtual bool is_client_choked() const noexcept = 0;
-    [[nodiscard]] virtual bool is_client_interested() const noexcept = 0;
+    [[nodiscard]] constexpr auto client_is_choked() const noexcept
+    {
+        return client_is_choked_;
+    }
 
-    [[nodiscard]] virtual bool is_utp_connection() const noexcept = 0;
-    [[nodiscard]] virtual bool is_encrypted() const = 0;
-    [[nodiscard]] virtual bool is_incoming_connection() const = 0;
+    [[nodiscard]] constexpr auto client_is_interested() const noexcept
+    {
+        return client_is_interested_;
+    }
 
-    [[nodiscard]] virtual bool is_active(tr_direction direction) const = 0;
-    virtual void update_active(tr_direction direction) = 0;
+    [[nodiscard]] constexpr auto peer_is_choked() const noexcept
+    {
+        return peer_is_choked_;
+    }
 
-    [[nodiscard]] virtual std::pair<tr_address, tr_port> socketAddress() const = 0;
+    [[nodiscard]] constexpr auto peer_is_interested() const noexcept
+    {
+        return peer_is_interested_;
+    }
+
+    [[nodiscard]] constexpr auto is_encrypted() const noexcept
+    {
+        return connection_is_encrypted_;
+    }
+
+    [[nodiscard]] constexpr auto is_incoming_connection() const noexcept
+    {
+        return connection_is_incoming_;
+    }
+
+    [[nodiscard]] constexpr auto is_utp_connection() const noexcept
+    {
+        return connection_is_utp_;
+    }
+
+    [[nodiscard]] constexpr auto const& user_agent() const noexcept
+    {
+        return user_agent_;
+    }
+
+    [[nodiscard]] constexpr auto is_active(tr_direction direction) const noexcept
+    {
+        return is_active_[direction];
+    }
+
+    [[nodiscard]] virtual tr_socket_address socketAddress() const = 0;
 
     virtual void cancel_block_request(tr_block_index_t block) = 0;
 
@@ -71,20 +114,68 @@ public:
 
     virtual void on_piece_completed(tr_piece_index_t) = 0;
 
-    /// The client name. This is the app name derived from the `v` string in LTEP's handshake dictionary
-    tr_interned_string client;
-
 protected:
-    tr_bitfield have_;
+    constexpr void set_client_choked(bool val) noexcept
+    {
+        client_is_choked_ = val;
+    }
+
+    constexpr void set_client_interested(bool val) noexcept
+    {
+        client_is_interested_ = val;
+    }
+
+    constexpr void set_peer_choked(bool val) noexcept
+    {
+        peer_is_choked_ = val;
+    }
+
+    constexpr void set_peer_interested(bool val) noexcept
+    {
+        peer_is_interested_ = val;
+    }
+
+    constexpr void set_active(tr_direction direction, bool active) noexcept
+    {
+        is_active_[direction] = active;
+    }
+
+    constexpr void set_user_agent(tr_interned_string val) noexcept
+    {
+        user_agent_ = val;
+    }
 
 private:
     static inline auto n_peers = std::atomic<size_t>{};
+
+    // What software the peer is running.
+    // Derived from the `v` string in LTEP's handshake dictionary, when available.
+    tr_interned_string user_agent_;
+
+    bool const connection_is_encrypted_;
+    bool const connection_is_incoming_;
+    bool const connection_is_utp_;
+
+    std::array<bool, 2> is_active_ = {};
+
+    // whether or not the peer is choking us.
+    bool client_is_choked_ = true;
+
+    // whether or not we've indicated to the peer that we would download from them if unchoked
+    bool client_is_interested_ = false;
+
+    // whether or not we've choked this peer
+    bool peer_is_choked_ = true;
+
+    // whether or not the peer has indicated it will download from us
+    bool peer_is_interested_ = false;
 };
 
 tr_peerMsgs* tr_peerMsgsNew(
     tr_torrent* torrent,
-    peer_atom* atom,
+    tr_peer_info* peer_info,
     std::shared_ptr<tr_peerIo> io,
+    tr_interned_string user_agent,
     tr_peer_callback callback,
     void* callback_data);
 

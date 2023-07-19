@@ -3,21 +3,22 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <set>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "magnet-metainfo.h"
-#include "torrent.h"
-#include "torrents.h"
-#include "tr-assert.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/torrents.h"
+#include "libtransmission/tr-assert.h"
 
 namespace
 {
 
-struct CompareTorrentByHash
+constexpr struct
 {
     bool operator()(tr_sha1_digest_t const& a, tr_sha1_digest_t const& b) const
     {
@@ -26,37 +27,37 @@ struct CompareTorrentByHash
 
     bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
-        return (*this)(a->infoHash(), b->infoHash());
+        return (*this)(a->info_hash(), b->info_hash());
     }
 
     bool operator()(tr_torrent const* a, tr_sha1_digest_t const& b) const
     {
-        return (*this)(a->infoHash(), b);
+        return (*this)(a->info_hash(), b);
     }
 
     bool operator()(tr_sha1_digest_t const& a, tr_torrent const* b) const
     {
-        return (*this)(a, b->infoHash());
+        return (*this)(a, b->info_hash());
     }
-};
+} CompareTorrentByHash{};
 
 } // namespace
 
 tr_torrent* tr_torrents::get(std::string_view magnet_link)
 {
     auto magnet = tr_magnet_metainfo{};
-    return magnet.parseMagnet(magnet_link) ? get(magnet.infoHash()) : nullptr;
+    return magnet.parseMagnet(magnet_link) ? get(magnet.info_hash()) : nullptr;
 }
 
 tr_torrent* tr_torrents::get(tr_sha1_digest_t const& hash)
 {
-    auto [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), hash, CompareTorrentByHash{});
+    auto [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), hash, CompareTorrentByHash);
     return begin == end ? nullptr : *begin;
 }
 
 tr_torrent const* tr_torrents::get(tr_sha1_digest_t const& hash) const
 {
-    auto [begin, end] = std::equal_range(std::cbegin(by_hash_), std::cend(by_hash_), hash, CompareTorrentByHash{});
+    auto [begin, end] = std::equal_range(std::cbegin(by_hash_), std::cend(by_hash_), hash, CompareTorrentByHash);
     return begin == end ? nullptr : *begin;
 }
 
@@ -64,7 +65,7 @@ tr_torrent_id_t tr_torrents::add(tr_torrent* tor)
 {
     auto const id = static_cast<tr_torrent_id_t>(std::size(by_id_));
     by_id_.push_back(tor);
-    by_hash_.insert(std::lower_bound(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{}), tor);
+    by_hash_.insert(std::lower_bound(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash), tor);
     return id;
 }
 
@@ -74,7 +75,7 @@ void tr_torrents::remove(tr_torrent const* tor, time_t current_time)
     TR_ASSERT(get(tor->id()) == tor);
 
     by_id_[tor->id()] = nullptr;
-    auto const [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{});
+    auto const [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash);
     by_hash_.erase(begin, end);
     removed_.emplace_back(tor->id(), current_time);
 }

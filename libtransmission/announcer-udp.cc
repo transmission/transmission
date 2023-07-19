@@ -4,39 +4,47 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // for std::find_if()
-#include <cerrno> // for errno, EAFNOSUPPORT
-#include <climits> // for CHAR_BIT
-#include <cstring> // for memset()
+#include <array>
+#include <chrono> // operator""ms, literals
+#include <climits> // CHAR_BIT
+#include <cstddef> // std::byte
+#include <cstdint> // uint32_t, uint64_t
+#include <cstring> // memcpy()
 #include <ctime>
 #include <future>
 #include <list>
 #include <memory>
+#include <optional>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #undef gai_strerror
 #define gai_strerror gai_strerrorA
+#else
+#include <netdb.h> // gai_strerror()
+#include <netinet/in.h> // IPPROTO_UDP, in_addr
+#include <sys/socket.h> // sockaddr_storage, AF_INET
 #endif
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
-
-#include "announcer.h"
-#include "announcer-common.h"
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "log.h"
-#include "peer-io.h"
-#include "peer-mgr.h" // for tr_pex::fromCompact4()
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/announcer-common.h"
+#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/interned-string.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 #define logwarn(interned, msg) tr_logAddWarn(msg, (interned).sv())
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())
@@ -49,6 +57,9 @@ using namespace std::literals;
 // size defined by bep15
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
+
+using InBuf = libtransmission::BufferReader<std::byte>;
+using PayloadBuffer = libtransmission::StackBuffer<4096, std::byte>;
 
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
@@ -84,7 +95,7 @@ struct tau_scrape_request
         }
 
         // build the payload
-        auto buf = libtransmission::Buffer{};
+        auto buf = PayloadBuffer{};
         buf.add_uint32(TAU_ACTION_SCRAPE);
         buf.add_uint32(transaction_id);
         for (int i = 0; i < in.info_hash_count; ++i)
@@ -115,7 +126,7 @@ struct tau_scrape_request
         requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         response.did_connect = true;
         response.did_timeout = false;
@@ -178,7 +189,7 @@ struct tau_announce_request
         response.info_hash = in.info_hash;
 
         // build the payload
-        auto buf = libtransmission::Buffer{};
+        auto buf = PayloadBuffer{};
         buf.add_uint32(TAU_ACTION_ANNOUNCE);
         buf.add_uint32(transaction_id);
         buf.add(in.info_hash);
@@ -215,7 +226,7 @@ struct tau_announce_request
         this->requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
@@ -228,8 +239,7 @@ struct tau_announce_request
             response.leechers = buf.to_uint32();
             response.seeders = buf.to_uint32();
 
-            auto const [bytes, n_bytes] = buf.pullup();
-            response.pex = tr_pex::from_compact_ipv4(bytes, n_bytes, nullptr, 0);
+            response.pex = tr_pex::from_compact_ipv4(std::data(buf), std::size(buf), nullptr, 0);
             requestFinished();
         }
         else
@@ -311,7 +321,7 @@ struct tau_tracker
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
-    void on_connection_response(tau_action_t action, libtransmission::Buffer& buf)
+    void on_connection_response(tau_action_t action, InBuf& buf)
     {
         this->connecting_at = 0;
         this->connection_transaction_id = 0;
@@ -324,9 +334,9 @@ struct tau_tracker
         }
         else if (action == TAU_ACTION_ERROR)
         {
-            std::string const errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
-            logdbg(this->key, errmsg);
+            std::string errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
             this->failAll(true, false, errmsg);
+            logdbg(this->key, std::move(errmsg));
         }
 
         this->upkeep();
@@ -374,13 +384,12 @@ struct tau_tracker
             this->connection_transaction_id = tau_transaction_new();
             logtrace(this->key, fmt::format("Trying to connect. Transaction ID is {}", this->connection_transaction_id));
 
-            auto buf = libtransmission::Buffer{};
+            auto buf = PayloadBuffer{};
             buf.add_uint64(0x41727101980LL);
             buf.add_uint32(TAU_ACTION_CONNECT);
             buf.add_uint32(this->connection_transaction_id);
 
-            auto const [bytes, n_bytes] = buf.pullup();
-            this->sendto(bytes, n_bytes);
+            this->sendto(std::data(buf), std::size(buf));
         }
 
         if (timeout_reqs)
@@ -463,7 +472,7 @@ private:
     {
         if (this->connecting_at != 0 && this->connecting_at + ConnectionRequestTtl < now)
         {
-            auto empty_buf = libtransmission::Buffer{};
+            auto empty_buf = PayloadBuffer{};
             on_connection_response(TAU_ACTION_ERROR, empty_buf);
         }
 
@@ -536,12 +545,11 @@ private:
     {
         logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
 
-        auto buf = libtransmission::Buffer{};
+        auto buf = PayloadBuffer{};
         buf.add_uint64(this->connection_id);
         buf.add(payload, payload_len);
 
-        auto const [bytes, n_bytes] = buf.pullup();
-        this->sendto(bytes, n_bytes);
+        this->sendto(std::data(buf), std::size(buf));
     }
 
 public:
@@ -588,7 +596,7 @@ public:
         }
 
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
-        auto const addr = mediator_.announceIP();
+        auto const addr = mediator_.announce_ip();
         uint32_t const announce_ip = addr && addr->is_ipv4() ? addr->addr.addr4.s_addr : 0;
         tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
         tracker->upkeep(false);
@@ -616,7 +624,7 @@ public:
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
-    bool handleMessage(uint8_t const* msg, size_t msglen) override
+    bool handle_message(uint8_t const* msg, size_t msglen) override
     {
         if (msglen < sizeof(uint32_t) * 2)
         {
@@ -624,7 +632,7 @@ public:
         }
 
         // extract the action_id and see if it makes sense
-        auto buf = libtransmission::Buffer{};
+        auto buf = PayloadBuffer{};
         buf.add(msg, msglen);
         auto const action_id = static_cast<tau_action_t>(buf.to_uint32());
 

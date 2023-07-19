@@ -5,34 +5,35 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstdint>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <sstream>
+#include <string>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
 #include <ctime>
-#include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
 #include <event2/event.h>
-#include <event2/util.h>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "log.h"
-#include "net.h"
-#include "timer.h"
-#include "tr-assert.h"
-#include "tr-lpd.h"
-#include "utils.h" // for tr_net_init()
-#include "utils-ev.h" // for tr_net_init()
+#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-lpd.h"
+#include "libtransmission/utils.h" // for tr_net_init()
+#include "libtransmission/utils-ev.h" // for tr_net_init()
 
 using namespace std::literals;
 
@@ -125,7 +126,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
     {
         // parse `${major}.${minor}`
         auto walk = announce.substr(pos + std::size(key));
-        if (auto const major = tr_parseNum<int>(walk, &walk); major && tr_strvStartsWith(walk, '.'))
+        if (auto const major = tr_num_parse<int>(walk, &walk); major && tr_strv_starts_with(walk, '.'))
         {
             ret.major = *major;
         }
@@ -135,7 +136,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
         }
 
         walk.remove_prefix(1); // the '.' between major and minor
-        if (auto const minor = tr_parseNum<int>(walk, &walk); minor && tr_strvStartsWith(walk, CrLf))
+        if (auto const minor = tr_num_parse<int>(walk, &walk); minor && tr_strv_starts_with(walk, CrLf))
         {
             ret.minor = *minor;
         }
@@ -149,7 +150,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
     if (auto const pos = announce.find(key); pos != std::string_view::npos)
     {
         auto walk = announce.substr(pos + std::size(key));
-        if (auto const port = tr_parseNum<uint16_t>(walk, &walk); port && tr_strvStartsWith(walk, CrLf))
+        if (auto const port = tr_num_parse<uint16_t>(walk, &walk); port && tr_strv_starts_with(walk, CrLf))
         {
             ret.port = tr_port::fromHost(*port);
         }
@@ -214,9 +215,9 @@ public:
             return;
         }
 
-        announce_timer_->startRepeating(AnnounceInterval);
+        announce_timer_->start_repeating(AnnounceInterval);
         announceUpkeep();
-        dos_timer_->startRepeating(DosInterval);
+        dos_timer_->start_repeating(DosInterval);
         dosUpkeep();
     }
 
@@ -273,8 +274,6 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
-        tr_net_init();
-
         int const opt_on = 1;
 
         static_assert(AnnounceScope > 0);

@@ -9,7 +9,7 @@ import { setTextContent } from './utils.js';
 
 const TorrentRendererHelper = {
   formatDL: (t) => {
-    return `▼${Formatter.speedBps(t.getDownloadSpeed())}`;
+    return `▼ ${Formatter.speedBps(t.getDownloadSpeed())}`;
   },
   formatETA: (t) => {
     const eta = t.getETA();
@@ -25,7 +25,7 @@ const TorrentRendererHelper = {
     return '';
   },
   formatUL: (t) => {
-    return `▲${Formatter.speedBps(t.getUploadSpeed())}`;
+    return `▲ ${Formatter.speedBps(t.getUploadSpeed())}`;
   },
   getProgressInfo: (controller, t) => {
     const status = t.getStatus();
@@ -66,7 +66,7 @@ const TorrentRendererHelper = {
   renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
     progressbar.className = info.classList.join(' ');
-    progressbar.style['background-size'] = `${info.percent}% 100%, 100% 100%`;
+    progressbar.style.setProperty('--progress', `${info.percent.toFixed(2)}%`);
   },
 };
 
@@ -175,7 +175,7 @@ export class TorrentRendererFull {
           Formatter.size(t.getTotalSize()),
           ' (',
           t.getPercentDoneStr(),
-          '%)'
+          '%)',
         );
       }
       // append UL stats: ', uploaded 8.59 GiB (Ratio: 12.3)'
@@ -184,7 +184,7 @@ export class TorrentRendererFull {
         Formatter.size(t.getUploadedEver()),
         ' (Ratio ',
         Formatter.ratioString(t.getUploadRatio()),
-        ')'
+        ')',
       );
     } else {
       // not done yet
@@ -194,7 +194,7 @@ export class TorrentRendererFull {
         Formatter.size(sizeWhenDone),
         ' (',
         t.getPercentDoneStr(),
-        '%)'
+        '%)',
       );
     }
 
@@ -325,7 +325,7 @@ export class TorrentRendererCompact {
     }
     if (t.isSeeding()) {
       return `Ratio: ${Formatter.ratioString(
-        t.getUploadRatio()
+        t.getUploadRatio(),
       )}, ${TorrentRendererHelper.formatUL(t)}`;
     }
     return t.getStateString();

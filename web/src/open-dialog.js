@@ -8,7 +8,7 @@ import { Formatter } from './formatter.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
 export class OpenDialog extends EventTarget {
-  constructor(controller, remote, url = '') {
+  constructor(controller, remote, url = '', files = []) {
     super();
 
     this.controller = controller;
@@ -17,8 +17,11 @@ export class OpenDialog extends EventTarget {
     this.elements = this._create(url);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
-    this._updateFreeSpaceInAddDialog();
     document.body.append(this.elements.root);
+    if (files.length > 0) {
+      this.elements.file_input.files = files;
+    }
+    this._updateFreeSpaceInAddDialog();
     this.elements.url_input.focus();
   }
 
@@ -80,7 +83,7 @@ export class OpenDialog extends EventTarget {
               new AlertDialog({
                 heading: `Error adding "${file.name}"`,
                 message: response.result,
-              })
+              }),
             );
           }
         });
@@ -107,7 +110,7 @@ export class OpenDialog extends EventTarget {
             new AlertDialog({
               heading: `Error adding "${url}"`,
               message: payload.result,
-            })
+            }),
           );
         }
       });

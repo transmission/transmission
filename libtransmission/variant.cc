@@ -4,11 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::sort
-#include <cstring>
-#include <stack>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -17,18 +14,17 @@
 
 #include <fmt/core.h>
 
+#include <small/vector.hpp>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "transmission.h"
-
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "quark.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "variant-common.h"
-#include "variant.h"
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant-common.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -350,7 +346,7 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
     {
         if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
         {
-            if (auto d = tr_parseNum<double>(sv); d)
+            if (auto d = tr_num_parse<double>(sv); d)
             {
                 *setme = *d;
                 success = true;
@@ -640,6 +636,8 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark key)
 class WalkNode
 {
 public:
+    WalkNode() = default;
+
     explicit WalkNode(tr_variant const* v_in)
     {
         assign(v_in);
@@ -683,7 +681,8 @@ protected:
         size_t idx = {};
     };
 
-    void sort(std::vector<ByKey>& sortbuf)
+    template<typename Container>
+    void sort(Container& sortbuf)
     {
         if (!tr_variantIsDict(&v))
         {
@@ -716,7 +715,7 @@ private:
 
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
-    std::vector<size_t> sorted;
+    small::vector<size_t, 512> sorted;
 };
 
 class VariantWalker
@@ -763,8 +762,10 @@ public:
 
 private:
     size_t size = 0;
-    std::vector<WalkNode> stack;
-    std::vector<WalkNode::ByKey> sortbuf;
+
+    static auto constexpr InitialCapacity = size_t{ 32U };
+    small::vector<WalkNode, InitialCapacity> stack;
+    small::vector<WalkNode::ByKey, InitialCapacity> sortbuf;
 };
 
 /**
@@ -1092,7 +1093,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view f
     auto const contents = tr_variantToStr(v, fmt);
 
     tr_error* error = nullptr;
-    tr_saveFile(filename, contents, &error);
+    tr_file_save(filename, contents, &error);
     if (error != nullptr)
     {
         tr_logAddError(fmt::format(
@@ -1132,7 +1133,7 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::stri
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
 
-    if (auto buf = std::vector<char>{}; tr_loadFile(filename, buf, error))
+    if (auto buf = std::vector<char>{}; tr_file_read(filename, buf, error))
     {
         return tr_variantFromBuf(setme, opts, buf, nullptr, error);
     }

@@ -16,12 +16,12 @@ enum
 };
 
 StatsDialog::StatsDialog(Session& session, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
+    : BaseDialog{ parent }
+    , session_{ session }
 {
     ui_.setupUi(this);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.currentSessionSectionLayout);
     cr->addLayout(ui_.totalSectionLayout);
     cr->update();

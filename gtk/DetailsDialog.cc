@@ -6,7 +6,6 @@
 #include "DetailsDialog.h"
 
 #include "Actions.h"
-#include "FaviconCache.h" // gtr_get_favicon()
 #include "FileList.h"
 #include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
@@ -49,7 +48,6 @@
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #include <algorithm>
 #include <array>
@@ -68,6 +66,7 @@
 #include <ws2tcpip.h>
 #else
 #include <arpa/inet.h>
+#include <sys/socket.h>
 #endif
 
 using namespace std::literals;
@@ -691,7 +690,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const creator = tr_strvStrip(infos.front().creator != nullptr ? infos.front().creator : "");
+        auto const creator = tr_strv_strip(infos.front().creator != nullptr ? infos.front().creator : "");
         auto const date = infos.front().date_created;
         auto const datestr = get_date_string(date);
         bool const mixed_creator = std::any_of(
@@ -1966,7 +1965,8 @@ void buildTrackerSummary(
     // hostname
     gstr << text_dir_mark.at(static_cast<int>(direction));
     gstr << (tracker.isBackup ? "<i>" : "<b>");
-    gstr << Glib::Markup::escape_text(!key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host, key) : tracker.host);
+    gstr << Glib::Markup::escape_text(
+        !key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host_and_port, key) : tracker.host_and_port);
     gstr << (tracker.isBackup ? "</i>" : "</b>");
 
     if (!tracker.isBackup)
@@ -2047,16 +2047,16 @@ tr_torrent* DetailsDialog::Impl::tracker_list_get_current_torrent() const
 namespace
 {
 
-void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeRowReference& reference)
+void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const* pixbuf, Gtk::TreeRowReference& reference)
 {
-    if (pixbuf != nullptr)
+    if (pixbuf != nullptr && *pixbuf != nullptr)
     {
         auto const path = reference.get_path();
         auto const model = reference.get_model();
 
         if (auto const iter = model->get_iter(path); iter)
         {
-            (*iter)[tracker_cols.favicon] = pixbuf;
+            (*iter)[tracker_cols.favicon] = *pixbuf;
         }
     }
 }
@@ -2068,7 +2068,6 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     std::ostringstream gstr;
     auto& hash = tracker_hash_;
     auto const& store = tracker_store_;
-    auto* session = core_->get_session();
     bool const showScrape = scrape_check_->get_active();
 
     /* step 1: get all the trackers */
@@ -2105,10 +2104,10 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
 
             auto const p = store->get_path(iter);
             hash.try_emplace(gstr.str(), Gtk::TreeRowReference(store, p));
-            gtr_get_favicon_from_url(
-                session,
+            core_->favicon_cache().load(
                 tracker.announce,
-                [ref = Gtk::TreeRowReference(store, p)](auto const& pixbuf) mutable { favicon_ready_cb(pixbuf, ref); });
+                [ref = Gtk::TreeRowReference(store, p)](auto const* pixbuf_refptr) mutable
+                { favicon_ready_cb(pixbuf_refptr, ref); });
         }
     }
 

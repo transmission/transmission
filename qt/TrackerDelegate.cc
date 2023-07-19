@@ -10,8 +10,8 @@
 #include <QTextDocument>
 
 #include <libtransmission/web-utils.h>
+#include <libtransmission/favicon-cache.h>
 
-#include "FaviconCache.h"
 #include "Formatter.h"
 #include "Torrent.h"
 #include "TrackerDelegate.h"
@@ -58,9 +58,9 @@ ItemLayout::ItemLayout(
     QPoint const& top_left,
     int width)
 {
-    QSize const icon_size = FaviconCache::getIconSize();
+    auto const icon_size = QSize{ FaviconCache<QPixmap>::Width, FaviconCache<QPixmap>::Height };
 
-    QRect base_rect(top_left, QSize(width, 0));
+    QRect base_rect{ top_left, QSize{ width, 0 } };
 
     icon_rect = QStyle::alignedRect(direction, Qt::AlignLeft | Qt::AlignTop, icon_size, base_rect);
     Utils::narrowRect(base_rect, icon_size.width() + Spacing, 0, direction);
@@ -91,7 +91,7 @@ ItemLayout::ItemLayout(
 
 QSize TrackerDelegate::sizeHint(QStyleOptionViewItem const& option, TrackerInfo const& info) const
 {
-    ItemLayout const layout(getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - Margin.width() * 2);
+    ItemLayout const layout{ getText(info), true, option.direction, QPoint(0, 0), option.rect.width() - Margin.width() * 2 };
     return layout.size() + Margin * 2;
 }
 

@@ -3,17 +3,18 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "file.h"
-#include "stats.h"
-#include "tr-strbuf.h"
-#include "utils.h" // for tr_getRatio(), tr_time()
-#include "variant.h"
+#include "libtransmission/file.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/stats.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // for tr_getRatio(), tr_time()
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
-tr_session_stats tr_stats::loadOldStats(std::string_view config_dir)
+tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
 {
     auto ret = tr_session_stats{};
 
@@ -82,7 +83,6 @@ void tr_stats::save() const
 void tr_stats::clear()
 {
     single_ = old_ = Zero;
-    is_dirty_ = true;
     start_time_ = tr_time();
 }
 

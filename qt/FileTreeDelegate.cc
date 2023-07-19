@@ -18,7 +18,7 @@ QSize FileTreeDelegate::sizeHint(QStyleOptionViewItem const& item, QModelIndex c
     {
     case FileTreeModel::COL_PROGRESS:
     case FileTreeModel::COL_WANTED:
-        size = QSize(20, 1);
+        size = QSize{ 20, 1 };
         break;
 
     default:
@@ -50,7 +50,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         p.state = option.state | QStyle::State_Horizontal | QStyle::State_Small;
         p.direction = QApplication::layoutDirection();
         p.rect = option.rect;
-        p.rect.setSize(QSize(option.rect.width() - 4, option.rect.height() - 8));
+        p.rect.setSize(QSize{ option.rect.width() - 4, option.rect.height() - 8 });
         p.rect.moveCenter(option.rect.center());
         p.fontMetrics = QFontMetrics{ QApplication::font() };
         p.minimum = 0;

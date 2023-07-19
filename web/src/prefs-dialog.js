@@ -73,6 +73,7 @@ export class PrefsDialog extends EventTarget {
         return e.checked;
 
       case 'number':
+      case 'select-one':
       case 'text':
       case 'url': {
         const string = e.value;
@@ -116,7 +117,7 @@ export class PrefsDialog extends EventTarget {
 
     for (const [key, value] of Object.entries(o)) {
       for (const element of this.elements.root.querySelectorAll(
-        `[data-key="${key}"]`
+        `[data-key="${key}"]`,
       )) {
         if (key === 'blocklist-size') {
           const n = Formatter.number(value);
@@ -209,7 +210,7 @@ export class PrefsDialog extends EventTarget {
       if (!('unregisterProtocolHandler' in navigator)) {
         button.setAttribute(
           'title',
-          'Your browser does not support removing protocol handlers. This button only allows you to re-register a handler.'
+          'Your browser does not support removing protocol handlers. This button only allows you to re-register a handler.',
         );
       }
     } else {
@@ -219,7 +220,7 @@ export class PrefsDialog extends EventTarget {
         button.setAttribute('disabled', true);
         button.setAttribute(
           'title',
-          'Your browser does not support protocol handlers'
+          'Your browser does not support protocol handlers',
         );
       }
     }
@@ -236,7 +237,7 @@ export class PrefsDialog extends EventTarget {
       navigator.registerProtocolHandler(
         'magnet',
         handlerUrl.toString(),
-        'Transmission Web'
+        'Transmission Web',
       );
       localStorage.setItem('protocol-handler-registered', 'true');
       PrefsDialog._updateProtocolHandlerButton(button);
@@ -266,7 +267,7 @@ export class PrefsDialog extends EventTarget {
 
     let cal = PrefsDialog._createCheckAndLabel(
       'incomplete-dir-div',
-      'Use temporary folder:'
+      'Use temporary folder:',
     );
     cal.check.title =
       'Separate folder to temporarily store downloads until they are complete.';
@@ -289,7 +290,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'suffix-div',
-      `Append "part" to incomplete files' names`
+      `Append "part" to incomplete files' names`,
     );
     cal.check.dataset.key = 'rename-partial-files';
     root.append(cal.root);
@@ -297,7 +298,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'download-queue-div',
-      'Download queue size:'
+      'Download queue size:',
     );
     cal.check.dataset.key = 'download-queue-enabled';
     root.append(cal.root);
@@ -317,7 +318,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'stop-ratio-div',
-      'Stop seeding at ratio:'
+      'Stop seeding at ratio:',
     );
     cal.check.dataset.key = 'seedRatioLimited';
     root.append(cal.root);
@@ -334,7 +335,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'stop-idle-div',
-      'Stop seeding if idle for N mins:'
+      'Stop seeding if idle for N mins:',
     );
     cal.check.dataset.key = 'idle-seeding-limit-enabled';
     root.append(cal.root);
@@ -388,7 +389,7 @@ export class PrefsDialog extends EventTarget {
 
     let cal = PrefsDialog._createCheckAndLabel(
       'upload-speed-div',
-      'Upload (kB/s):'
+      'Upload (kB/s):',
     );
     cal.check.dataset.key = 'speed-limit-up-enabled';
     root.append(cal.root);
@@ -403,7 +404,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'download-speed-div',
-      'Download (kB/s):'
+      'Download (kB/s):',
     );
     cal.check.dataset.key = 'speed-limit-down-enabled';
     root.append(cal.root);
@@ -522,32 +523,28 @@ export class PrefsDialog extends EventTarget {
     label.classList.add('section-label');
     root.append(label);
 
-    let cal = PrefsDialog._createCheckAndLabel(
-      'max-peers-per-torrent-div',
-      'Max peers per torrent:'
-    );
-    root.append(cal.root);
-    const max_peers_per_torrent_check = cal.check;
+    label = document.createElement('label');
+    label.textContent = 'Max peers per torrent:';
+    root.append(label);
 
     let input = document.createElement('input');
     input.type = 'number';
     input.dataset.key = 'peer-limit-per-torrent';
+    input.id = makeUUID();
+    label.setAttribute('for', input.id);
     root.append(input);
-    PrefsDialog._enableIfChecked(input, cal.check);
     const max_peers_per_torrent_input = input;
 
-    cal = PrefsDialog._createCheckAndLabel(
-      'max-peers-overall-div',
-      'Max peers overall:'
-    );
-    root.append(cal.root);
-    const max_peers_overall_check = cal.check;
+    label = document.createElement('label');
+    label.textContent = 'Max peers overall:';
+    root.append(label);
 
     input = document.createElement('input');
     input.type = 'number';
     input.dataset.key = 'peer-limit-global';
+    input.id = makeUUID();
+    label.setAttribute('for', input.id);
     root.append(input);
-    PrefsDialog._enableIfChecked(input, cal.check);
     const max_peers_overall_input = input;
 
     label = document.createElement('div');
@@ -568,9 +565,9 @@ export class PrefsDialog extends EventTarget {
     root.append(select);
     const encryption_select = select;
 
-    cal = PrefsDialog._createCheckAndLabel(
+    let cal = PrefsDialog._createCheckAndLabel(
       'use-pex-div',
-      'Use PEX to find more peers'
+      'Use PEX to find more peers',
     );
     cal.check.title =
       "PEX is a tool for exchanging peer lists with the peers you're connected to.";
@@ -581,7 +578,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'use-dht-div',
-      'Use DHT to find more peers'
+      'Use DHT to find more peers',
     );
     cal.check.title = 'DHT is a tool for finding peers without a tracker.';
     cal.check.dataset.key = 'dht-enabled';
@@ -591,7 +588,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'use-lpd-div',
-      'Use LPD to find more peers'
+      'Use LPD to find more peers',
     );
     cal.check.title = 'LPD is a tool for finding peers on your local network.';
     cal.check.dataset.key = 'lpd-enabled';
@@ -606,7 +603,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'blocklist-enabled-div',
-      'Enable blocklist:'
+      'Enable blocklist:',
     );
     cal.check.dataset.key = 'blocklist-enabled';
     root.append(cal.root);
@@ -641,9 +638,7 @@ export class PrefsDialog extends EventTarget {
       dht_check,
       encryption_select,
       lpd_check,
-      max_peers_overall_check,
       max_peers_overall_input,
-      max_peers_per_torrent_check,
       max_peers_per_torrent_input,
       pex_check,
       root,
@@ -684,7 +679,7 @@ export class PrefsDialog extends EventTarget {
 
     let cal = PrefsDialog._createCheckAndLabel(
       'randomize-port',
-      'Randomize port on launch'
+      'Randomize port on launch',
     );
     cal.check.dataset.key = 'peer-port-random-on-start';
     root.append(cal.root);
@@ -692,7 +687,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'port-forwarding',
-      'Use port forwarding from my router'
+      'Use port forwarding from my router',
     );
     cal.check.dataset.key = 'port-forwarding-enabled';
     root.append(cal.root);
@@ -705,7 +700,7 @@ export class PrefsDialog extends EventTarget {
 
     cal = PrefsDialog._createCheckAndLabel(
       'utp-enabled',
-      'Enable uTP for peer communication'
+      'Enable uTP for peer communication',
     );
     cal.check.dataset.key = 'utp-enabled';
     root.append(cal.root);
@@ -780,13 +775,13 @@ export class PrefsDialog extends EventTarget {
         setTextContent(event_.target, 'Updating blocklist...');
         this.remote.updateBlocklist();
         this._setBlocklistButtonEnabled(false);
-      }
+      },
     );
     this.elements.torrents.register_handler_button.addEventListener(
       'click',
       (event_) => {
         PrefsDialog._toggleProtocolHandler(event_.currentTarget);
-      }
+      },
     );
     this.outside = new OutsideClickListener(this.elements.root);
     this.outside.addEventListener('click', () => this.close());
@@ -810,7 +805,10 @@ export class PrefsDialog extends EventTarget {
               console.trace(`unhandled input: ${element.type}`);
               break;
           }
-        } else if (element.tagName === 'TEXTAREA') {
+        } else if (
+          element.tagName === 'TEXTAREA' ||
+          element.tagName === 'SELECT'
+        ) {
           element.addEventListener('change', on_change);
         }
       }
@@ -831,7 +829,7 @@ export class PrefsDialog extends EventTarget {
       this.outside.stop();
       this.session_manager.removeEventListener(
         'session-change',
-        this.update_soon
+        this.update_soon,
       );
       this.elements.root.remove();
       dispatchEvent(new Event('close'));
