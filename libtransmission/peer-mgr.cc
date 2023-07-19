@@ -1017,6 +1017,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     }
     else /* looking good */
     {
+        // If this is an outgoing connection, then we are sure we already have the peer info object
         auto& info = result.io->is_incoming() ? s->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, true) :
                                                 *s->get_existing_peer_info(socket_address);
 
