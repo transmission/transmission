@@ -2100,7 +2100,6 @@ void tr_peerMgr::bandwidthPulse()
 
 bool tr_swarm::peer_is_in_use(tr_peer_info const& peer_info) const
 {
-    TR_ASSERT(manager->incoming_handshakes.count(peer_info.socket_address()) == 0U);
     // TODO(tearfur): We can actually store each outgoing handshake in tr_peer_info objects and do away with the map, right?
     return peer_info.is_connected() || outgoing_handshakes.count(peer_info.socket_address()) != 0U;
 }
