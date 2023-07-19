@@ -4219,7 +4219,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                           forSegment:ToolbarGroupTagPause];
 
         [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
-        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
+        [segmentedControl setImage:[NSImage systemSymbol:@"play.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
                         forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagResume];
@@ -4275,7 +4275,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                           forSegment:ToolbarGroupTagPause];
 
         [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
-        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"]
+        [segmentedControl setImage:[NSImage systemSymbol:@"play" withFallback:@"ToolbarResumeSelectedTemplate"]
                         forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                           forSegment:ToolbarGroupTagResume];
