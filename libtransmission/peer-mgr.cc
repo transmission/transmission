@@ -2162,10 +2162,10 @@ struct peer_candidate
             continue;
         }
 
-        /* if everyone in the swarm is seeds and pex is disabled because
-         * the torrent is private, then don't initiate connections */
+        /* if everyone in the swarm is seeds and pex is disabled,
+         * then don't initiate connections */
         bool const seeding = tor->is_done();
-        if (seeding && swarm->isAllSeeds() && tor->is_private())
+        if (seeding && swarm->isAllSeeds() && !tor->allows_pex())
         {
             continue;
         }
