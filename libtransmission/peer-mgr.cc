@@ -1203,6 +1203,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         pex.emplace_back(addr, port, info->pex_flags());
     }
 
+    std::sort(std::begin(pex), std::end(pex));
     return pex;
 }
 
