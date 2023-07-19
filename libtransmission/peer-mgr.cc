@@ -450,46 +450,44 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotPort:
+            // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
+            if (auto* const info = msgs->peer_info; info->port().empty())
             {
-                // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-                if (auto* const info = msgs->peer_info; info->port().empty())
+                auto nh = s->incoming_peer_info.extract(msgs->socket_address());
+                TR_ASSERT(!nh.empty());
+                TR_ASSERT(&nh.mapped() == info);
+                TR_ASSERT(nh.key().address() == info->address());
+
+                // If we already know about this peer, merge the info objects without invalidating references
+                if (auto nh_old = s->known_connectable.extract({ nh.key().address(), event.port }); !nh_old.empty())
                 {
-                    auto nh = s->incoming_peer_info.extract(msgs->socket_address());
-                    TR_ASSERT(!nh.empty());
-                    TR_ASSERT(&nh.mapped() == info);
-                    TR_ASSERT(nh.key().address() == info->address());
-
-                    // If we already know about this peer, merge the info objects without invalidating references
-                    if (auto nh_old = s->known_connectable.extract({ nh.key().address(), event.port }); !nh_old.empty())
-                    {
-                        auto& info_old = nh_old.mapped();
-                        TR_ASSERT(nh_old.key() == info_old.socket_address());
-                        info->merge_connectable_into_incoming(info_old);
-                    }
-                    else
-                    {
-                        info->set_connectable();
-                    }
-
-                    info->set_listen_port(event.port);
-                    nh.key().port_ = event.port;
-                    s->known_connectable.insert(std::move(nh));
+                    auto& info_old = nh_old.mapped();
+                    TR_ASSERT(nh_old.key() == info_old.socket_address());
+                    info->merge_connectable_into_incoming(info_old);
                 }
-                else if (info->port() != event.port) // If we got a new listening port from a known connectable peer
+                else
                 {
-                    auto nh = s->known_connectable.extract(info->socket_address());
-                    TR_ASSERT(!nh.empty());
-                    TR_ASSERT(&nh.mapped() == info);
-                    TR_ASSERT(nh.key() == info->socket_address());
-
-                    nh.key().port_ = event.port;
-                    info->set_listen_port(event.port);
-                    // we do not explicitly set the connectable flag here because for the code to reach here,
-                    // this connection is either:
-                    // 1. outgoing, where the connectable flag has already been set on handshake done
-                    // 2. incoming, and the peer has sent a port handshake before, so the connectable flag will have the
-                    //    appropriate value already
+                    info->set_connectable();
                 }
+
+                info->set_listen_port(event.port);
+                nh.key().port_ = event.port;
+                s->known_connectable.insert(std::move(nh));
+            }
+            else if (info->port() != event.port) // If we got a new listening port from a known connectable peer
+            {
+                auto nh = s->known_connectable.extract(info->socket_address());
+                TR_ASSERT(!nh.empty());
+                TR_ASSERT(&nh.mapped() == info);
+                TR_ASSERT(nh.key() == info->socket_address());
+
+                nh.key().port_ = event.port;
+                info->set_listen_port(event.port);
+                // we do not explicitly set the connectable flag here because for the code to reach here,
+                // this connection is either:
+                // 1. outgoing, where the connectable flag has already been set on handshake done
+                // 2. incoming, and the peer has sent a port handshake before, so the connectable flag will have the
+                //    appropriate value already
             }
 
             break;
