@@ -348,9 +348,9 @@ public:
         tr_socket_address const& socket_address,
         uint8_t const flags,
         tr_peer_from const from,
-        bool is_incoming)
+        bool is_connectable)
     {
-        auto&& [it, is_new] = is_incoming ?
+        auto&& [it, is_new] = is_connectable ?
             incoming_peer_info.try_emplace(socket_address, socket_address.address(), flags, from) :
             known_connectable.try_emplace(socket_address, socket_address, flags, from);
         auto& peer_info = it->second;
@@ -459,7 +459,7 @@ public:
                 TR_ASSERT(nh.key().address() == info->address());
 
                 // If we already know about this peer, merge the info objects without invalidating references
-                if (auto nh_old = s->known_connectable.extract({ nh.key().address(), event.port }); !nh_old.empty())
+                if (auto nh_old = s->known_connectable.extract({ info->address(), event.port }); !nh_old.empty())
                 {
                     auto& info_old = nh_old.mapped();
                     TR_ASSERT(nh_old.key() == info_old.socket_address());
@@ -1121,7 +1121,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
         {
             // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
             // don't care about non-connectable peers that we are not connected to
-            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, true);
+            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, false);
             ++n_used;
         }
     }
