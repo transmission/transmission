@@ -190,8 +190,8 @@ bool isValidUtf8(QByteArray const& byteArray)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 
-    auto decoder = QStringDecoder(QStringConverter::Utf8, QStringConverter::Flag::Stateless);
-    auto const text = QString(decoder.decode(byteArray));
+    auto decoder = QStringDecoder{ QStringConverter::Utf8, QStringConverter::Flag::Stateless };
+    auto const text = QString{ decoder.decode(byteArray) };
     return !decoder.hasError() && !text.contains(QChar::ReplacementCharacter);
 
 #else
