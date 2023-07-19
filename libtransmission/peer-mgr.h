@@ -119,7 +119,6 @@ public:
         {
             ++n_known_connectable_;
         }
-        set_connectable();
         port = port_in;
     }
 
