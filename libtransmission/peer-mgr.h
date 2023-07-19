@@ -114,12 +114,15 @@ public:
 
     void set_listen_port(tr_port port_in) noexcept
     {
-        auto& port = listen_socket_address_.port_;
-        if (port.empty() && !port_in.empty())
+        if (!port_in.empty())
         {
-            ++n_known_connectable_;
+            auto& port = listen_socket_address_.port_;
+            if (port.empty()) // increment known connectable peers if we did not know the listening port of this peer before
+            {
+                ++n_known_connectable_;
+            }
+            port = port_in;
         }
-        port = port_in;
     }
 
     [[nodiscard]] auto display_name() const

@@ -1107,7 +1107,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* get peer's listening port */
-    if (tr_variantDictFindInt(&val, TR_KEY_p, &i))
+    if (tr_variantDictFindInt(&val, TR_KEY_p, &i) && i > 0)
     {
         pex.port.setHost(i);
         msgs->publish(tr_peer_event::GotPort(pex.port));
