@@ -351,8 +351,8 @@ public:
         bool is_connectable)
     {
         auto&& [it, is_new] = is_connectable ?
-            incoming_peer_info.try_emplace(socket_address, socket_address.address(), flags, from) :
-            known_connectable.try_emplace(socket_address, socket_address, flags, from);
+            known_connectable.try_emplace(socket_address, socket_address, flags, from) :
+            incoming_peer_info.try_emplace(socket_address, socket_address.address(), flags, from);
         auto& peer_info = it->second;
         if (!is_new)
         {
@@ -1029,7 +1029,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     else /* looking good */
     {
         // If this is an outgoing connection, then we are sure we already have the peer info object
-        auto& info = result.io->is_incoming() ? s->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, true) :
+        auto& info = result.io->is_incoming() ? s->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false) :
                                                 *s->get_existing_peer_info(socket_address);
 
         if (!result.io->is_incoming())
@@ -1121,7 +1121,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
         {
             // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
             // don't care about non-connectable peers that we are not connected to
-            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, false);
+            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, true);
             ++n_used;
         }
     }
