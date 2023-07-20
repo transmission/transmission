@@ -442,15 +442,15 @@ public:
 
         case tr_peer_event::Type::ClientGotPort:
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-            if (auto* const info = msgs->peer_info; info->port().empty())
+            if (auto* const info = msgs->peer_info; std::empty(info->port()))
             {
                 auto nh = s->incoming_peer_info.extract(msgs->socket_address());
-                TR_ASSERT(!nh.empty());
+                TR_ASSERT(!std::empty(nh));
                 TR_ASSERT(&nh.mapped() == info);
                 TR_ASSERT(nh.key().address() == info->address());
 
                 // If we already know about this peer, merge the info objects without invalidating references
-                if (auto nh_old = s->known_connectable.extract({ info->address(), event.port }); !nh_old.empty())
+                if (auto nh_old = s->known_connectable.extract({ info->address(), event.port }); !std::empty(nh_old))
                 {
                     auto& info_old = nh_old.mapped();
                     TR_ASSERT(nh_old.key() == info_old.socket_address());
@@ -469,7 +469,7 @@ public:
             else if (info->port() != event.port)
             {
                 auto nh = s->known_connectable.extract(info->socket_address());
-                TR_ASSERT(!nh.empty());
+                TR_ASSERT(!std::empty(nh));
                 TR_ASSERT(&nh.mapped() == info);
                 TR_ASSERT(nh.key() == info->socket_address());
 

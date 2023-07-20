@@ -63,7 +63,7 @@ public:
         , from_first_{ from }
         , from_best_{ from }
     {
-        TR_ASSERT(!socket_address.port().empty());
+        TR_ASSERT(!std::empty(socket_address.port()));
         ++n_known_connectable_;
         set_pex_flags(pex_flags);
     }
@@ -83,7 +83,7 @@ public:
 
     ~tr_peer_info()
     {
-        if (!listen_socket_address_.port().empty())
+        if (!std::empty(listen_socket_address_.port()))
         {
             [[maybe_unused]] auto const n_prev = n_known_connectable_--;
             TR_ASSERT(n_prev > 0U);
@@ -114,10 +114,10 @@ public:
 
     void set_listen_port(tr_port port_in) noexcept
     {
-        if (!port_in.empty())
+        if (!std::empty(port_in))
         {
             auto& port = listen_socket_address_.port_;
-            if (port.empty()) // increment known connectable peers if we did not know the listening port of this peer before
+            if (std::empty(port)) // increment known connectable peers if we did not know the listening port of this peer before
             {
                 ++n_known_connectable_;
             }
