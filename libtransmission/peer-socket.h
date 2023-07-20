@@ -70,7 +70,7 @@ public:
         return socket_address_.address();
     }
 
-    [[nodiscard]] constexpr auto port() const noexcept
+    [[nodiscard]] constexpr auto& port() const noexcept
     {
         return socket_address_.port();
     }

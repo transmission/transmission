@@ -134,7 +134,7 @@ bool tr_peer_info::is_blocklisted(tr_session const* session) const
         return *blocklisted_;
     }
 
-    auto const value = session->addressIsBlocked(address());
+    auto const value = session->addressIsBlocked(listen_address());
     blocklisted_ = value;
     return value;
 }
@@ -442,18 +442,18 @@ public:
 
         case tr_peer_event::Type::ClientGotPort:
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-            if (auto* const info = msgs->peer_info; std::empty(info->port()))
+            if (auto* const info = msgs->peer_info; std::empty(info->listen_port()))
             {
                 auto nh = s->incoming_peer_info.extract(msgs->socket_address());
                 TR_ASSERT(!std::empty(nh));
                 TR_ASSERT(&nh.mapped() == info);
-                TR_ASSERT(nh.key().address() == info->address());
+                TR_ASSERT(nh.key().address() == info->listen_address());
 
                 // If we already know about this peer, merge the info objects without invalidating references
-                if (auto nh_old = s->known_connectable.extract({ info->address(), event.port }); !std::empty(nh_old))
+                if (auto nh_old = s->known_connectable.extract({ info->listen_address(), event.port }); !std::empty(nh_old))
                 {
                     auto& info_old = nh_old.mapped();
-                    TR_ASSERT(nh_old.key() == info_old.socket_address());
+                    TR_ASSERT(nh_old.key() == info_old.listen_socket_address());
                     info->merge_connectable_into_incoming(info_old);
                 }
                 else
@@ -466,12 +466,12 @@ public:
                 s->known_connectable.insert(std::move(nh));
             }
             // If we got a new listening port from a known connectable peer
-            else if (info->port() != event.port)
+            else if (info->listen_port() != event.port)
             {
-                auto nh = s->known_connectable.extract(info->socket_address());
+                auto nh = s->known_connectable.extract(info->listen_socket_address());
                 TR_ASSERT(!std::empty(nh));
                 TR_ASSERT(&nh.mapped() == info);
-                TR_ASSERT(nh.key() == info->socket_address());
+                TR_ASSERT(nh.key() == info->listen_socket_address());
 
                 info->set_listen_port(event.port);
                 nh.key().port_ = event.port;
@@ -1282,7 +1282,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
     for (auto const* const info : infos)
     {
-        auto const& [addr, port] = info->socket_address();
+        auto const& [addr, port] = info->listen_socket_address();
 
         if (addr.type == address_type)
         {
@@ -2093,7 +2093,7 @@ void tr_peerMgr::bandwidthPulse()
 bool tr_swarm::peer_is_in_use(tr_peer_info const& peer_info) const
 {
     // TODO(tearfur): maybe it's possible to store each handshake in the peer_info objects
-    return peer_info.is_connected() || outgoing_handshakes.count(peer_info.socket_address()) != 0U;
+    return peer_info.is_connected() || outgoing_handshakes.count(peer_info.listen_socket_address()) != 0U;
 }
 
 namespace
@@ -2297,7 +2297,7 @@ struct peer_candidate
     auto ret = tr_peerMgr::OutboundCandidates{};
     for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
     {
-        ret.emplace_back(it->tor->id(), it->peer_info->socket_address());
+        ret.emplace_back(it->tor->id(), it->peer_info->listen_socket_address());
     }
     return ret;
 }
@@ -2322,7 +2322,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     auto peer_io = tr_peerIo::new_outgoing(
         session,
         &session->top_bandwidth_,
-        peer_info.socket_address(),
+        peer_info.listen_socket_address(),
         s->tor->info_hash(),
         s->tor->is_seed(),
         utp);
@@ -2336,7 +2336,7 @@ void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     else
     {
         s->outgoing_handshakes.try_emplace(
-            peer_info.socket_address(),
+            peer_info.listen_socket_address(),
             &mgr->handshake_mediator_,
             peer_io,
             session->encryptionMode(),

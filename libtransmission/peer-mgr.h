@@ -97,17 +97,17 @@ public:
 
     // ---
 
-    [[nodiscard]] constexpr auto const& socket_address() const noexcept
+    [[nodiscard]] constexpr auto const& listen_socket_address() const noexcept
     {
         return listen_socket_address_;
     }
 
-    [[nodiscard]] constexpr tr_address const& address() const noexcept
+    [[nodiscard]] constexpr tr_address const& listen_address() const noexcept
     {
         return listen_socket_address_.address();
     }
 
-    [[nodiscard]] constexpr auto port() const noexcept
+    [[nodiscard]] constexpr auto& listen_port() const noexcept
     {
         return listen_socket_address_.port();
     }
