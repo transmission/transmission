@@ -9,8 +9,6 @@
 #include <string_view>
 #include <vector>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/quark.h"
 
 using namespace std::literals;

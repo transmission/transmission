@@ -5,22 +5,33 @@
 
 #include <chrono>
 #include <memory>
+#include <set>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/time.h> // timeval
+#endif
+
+#include <event2/event.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/file.h>
-#include <libtransmission/net.h>
+#include <libtransmission/timer.h>
+#include <libtransmission/timer-ev.h>
+#include <libtransmission/tr-macros.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/watchdir.h>
 #include <libtransmission/watchdir-base.h>
-#include <libtransmission/timer-ev.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
-
-#include <event2/event.h>
 
 using namespace std::literals;
 
@@ -53,10 +64,13 @@ private:
     std::shared_ptr<struct event_base> ev_base_;
     std::unique_ptr<libtransmission::TimerMaker> timer_maker_;
 
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
+
 protected:
     void SetUp() override
     {
         SandboxedTest::SetUp();
+        init_mgr_ = tr_lib_init();
         ev_base_.reset(event_base_new(), event_base_free);
         timer_maker_ = std::make_unique<libtransmission::EvTimerMaker>(ev_base_.get());
         Watchdir::set_generic_rescan_interval(GenericRescanInterval);

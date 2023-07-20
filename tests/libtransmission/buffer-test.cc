@@ -3,10 +3,17 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstddef> // std::byte
+#include <cstdint> // uint16_t, uint32_t, uint64_t
+#include <memory>
+#include <string_view>
+
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/tr-buffer.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using BufferTest = ::testing::Test;

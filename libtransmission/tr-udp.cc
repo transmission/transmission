@@ -4,14 +4,18 @@
 
 #include <array>
 #include <cerrno>
-#include <cstdint>
-#include <cstring> /* memcmp(), memset() */
+#include <string>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <netinet/in.h> // IPV6_V6ONLY, IPPROTO_IPV6
+#include <sys/socket.h> // setsockopt, SOL_SOCKET, bind
+#endif
 
 #include <event2/event.h>
 
 #include <fmt/core.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -249,7 +253,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         return;
     }
     else if (
-        addrport && addrport->first.is_global_unicast_address() &&
+        addrport && addrport->address().is_global_unicast_address() &&
         !session_.global_source_address(to->sa_family == AF_INET ? TR_AF_INET : TR_AF_INET6))
     {
         // don't try to connect to a global address if we don't have connectivity to public internet

@@ -15,9 +15,10 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "torrent-metainfo.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_torrent;
 struct tr_torrent_metainfo;

@@ -5,15 +5,17 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstdint>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <sstream>
+#include <string>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
 #include <ctime>
-#include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
 #endif
@@ -272,8 +274,6 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
-        tr_net_init();
-
         int const opt_on = 1;
 
         static_assert(AnnounceScope > 0);

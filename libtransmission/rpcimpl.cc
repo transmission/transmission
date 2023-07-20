@@ -6,11 +6,13 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <cstdint>
 #include <ctime>
 #include <iterator>
 #include <memory>
 #include <numeric>
 #include <set>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -22,7 +24,6 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announcer.h"
-#include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
@@ -30,11 +31,9 @@
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
-#include "libtransmission/session-id.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
@@ -2216,7 +2215,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_pex_enabled:
-        tr_variantDictAddBool(d, key, s->allowsPEX());
+        tr_variantDictAddBool(d, key, s->allows_pex());
         break;
 
     case TR_KEY_tcp_enabled:

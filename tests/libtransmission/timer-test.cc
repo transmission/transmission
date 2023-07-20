@@ -3,14 +3,17 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
+#include <chrono>
+#include <cstddef> // size_t
 
+#include <event2/event.h>
+
+#include <libtransmission/timer.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/utils-ev.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
-
-using namespace std::literals;
 
 namespace libtransmission::test
 {

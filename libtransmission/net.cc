@@ -24,8 +24,6 @@
 
 #include <fmt/core.h>
 
-#include <libutp/utp.h>
-
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
@@ -36,7 +34,6 @@
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -57,6 +54,12 @@ std::string tr_net_strerror(int err)
     return std::string{ tr_strerror(err) };
 
 #endif
+}
+
+std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept
+{
+    static auto TR_CONSTEXPR23 map = std::array{ std::string_view{ "IPv4" }, std::string_view{ "IPv6" } };
+    return map[type];
 }
 
 // - TCP Sockets
@@ -185,8 +188,10 @@ static tr_socket_t createSocket(int domain, int type)
     return sockfd;
 }
 
-tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed)
 {
+    auto const& [addr, port] = socket_address;
+
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
@@ -254,7 +259,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     }
     else
     {
-        ret = tr_peer_socket{ session, addr, port, s };
+        ret = tr_peer_socket{ session, socket_address, s };
     }
 
     tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.display_name(port)));
@@ -359,7 +364,7 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
     return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
-std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
+std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
 {
     TR_ASSERT(session != nullptr);
 
@@ -382,7 +387,7 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
         return {};
     }
 
-    return std::make_tuple(addrport->first, addrport->second, sockfd);
+    return std::pair{ *addrport, sockfd };
 }
 
 void tr_net_close_socket(tr_socket_t sockfd)
@@ -539,7 +544,7 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte 
     return std::make_pair(address, compact);
 }
 
-std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct sockaddr const* from)
+std::optional<tr_socket_address> tr_address::from_sockaddr(struct sockaddr const* from)
 {
     if (from == nullptr)
     {
@@ -552,7 +557,7 @@ std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct s
         auto addr = tr_address{};
         addr.type = TR_AF_INET;
         addr.addr.addr4 = sin->sin_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin->sin_port));
+        return tr_socket_address{ addr, tr_port::fromNetwork(sin->sin_port) };
     }
 
     if (from->sa_family == AF_INET6)
@@ -561,7 +566,7 @@ std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct s
         auto addr = tr_address{};
         addr.type = TR_AF_INET6;
         addr.addr.addr6 = sin6->sin6_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin6->sin6_port));
+        return tr_socket_address{ addr, tr_port::fromNetwork(sin6->sin6_port) };
     }
 
     return {};
@@ -591,9 +596,9 @@ std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) con
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
     // IPv6 addresses are always "greater than" IPv4
-    if (this->type != that.type)
+    if (auto const val = tr_compare_3way(this->type, that.type); val != 0)
     {
-        return this->is_ipv4() ? 1 : -1;
+        return val;
     }
 
     return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :

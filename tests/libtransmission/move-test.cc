@@ -3,7 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <iostream>
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -11,11 +11,16 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/block-info.h>
 #include <libtransmission/cache.h> // tr_cacheWriteBlock()
 #include <libtransmission/file.h> // tr_sys_path_*()
+#include <libtransmission/quark.h>
+#include <libtransmission/torrent.h>
+#include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

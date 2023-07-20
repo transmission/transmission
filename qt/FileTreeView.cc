@@ -29,10 +29,10 @@ char const* const PriorityKey = "priority";
 }
 
 FileTreeView::FileTreeView(QWidget* parent, bool is_editable)
-    : QTreeView(parent)
-    , model_(new FileTreeModel(this, is_editable))
-    , proxy_(new QSortFilterProxyModel(this))
-    , delegate_(new FileTreeDelegate(this))
+    : QTreeView{ parent }
+    , model_{ new FileTreeModel(this, is_editable) }
+    , proxy_{ new QSortFilterProxyModel(this) }
+    , delegate_{ new FileTreeDelegate(this) }
 {
     proxy_->setSourceModel(model_);
     proxy_->setSortRole(FileTreeModel::SortRole);
@@ -349,7 +349,7 @@ void FileTreeView::refreshContextMenuActionsSensitivity()
 
 void FileTreeView::initContextMenu()
 {
-    context_menu_ = new QMenu(this);
+    context_menu_ = new QMenu{ this };
 
     check_selected_action_ = context_menu_->addAction(tr("Check Selected"), this, SLOT(checkSelectedItems()));
     uncheck_selected_action_ = context_menu_->addAction(tr("Uncheck Selected"), this, SLOT(uncheckSelectedItems()));

@@ -425,8 +425,3 @@ QString FileTreeItem::path() const
 
     return item_path;
 }
-
-bool FileTreeItem::isComplete() const
-{
-    return have_size_ == totalSize();
-}

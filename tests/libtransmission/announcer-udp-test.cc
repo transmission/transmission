@@ -3,24 +3,44 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cstddef> // std::byte
+#include <cstdint> // uint32_t, uint64_t
 #include <cstring> // for std::memcpy()
+#include <ctime>
 #include <deque>
 #include <memory>
+#include <optional>
+#include <string_view>
+#include <tuple>
+#include <utility>
 #include <vector>
 
-#include <fmt/core.h>
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // socklen_t, sockaddr_st...
+#endif
+
+#include <event2/event.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
-
-#include <libtransmission/transmission.h>
 
 #include <libtransmission/announcer.h>
 #include <libtransmission/announcer-common.h>
 #include <libtransmission/crypto-utils.h> // for tr_rand_obj()
+#include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h> // for tr_pex
+#include <libtransmission/session.h> // tr_peerIdInit
+#include "libtransmission/timer.h"
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-buffer.h>
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_p...
+#include "libtransmission/utils.h"
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -32,9 +52,8 @@ class AnnouncerUdpTest : public ::testing::Test
 private:
     void SetUp() override
     {
-        tr_net_init();
-
         ::testing::Test::SetUp();
+        init_mgr_ = tr_lib_init();
         tr_timeUpdate(time(nullptr));
     }
 
@@ -287,6 +306,8 @@ protected:
         timer->start_repeating(200ms);
         return timer;
     }
+
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
 
     // https://www.bittorrent.org/beps/bep_0015.html
     static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };

@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <cstddef> // size_t
 #include <ctime>
 #include <memory>
 #include <utility>
@@ -19,6 +20,8 @@
 #include "libtransmission/peer-mgr-active-requests.h"
 #include "libtransmission/peer-mgr-wishlist.h"
 #include "libtransmission/tr-assert.h"
+
+class tr_peer;
 
 class ActiveRequests::Impl
 {

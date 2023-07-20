@@ -18,7 +18,7 @@ function main() {
   const transmission = new Transmission(action_manager, notifications, prefs);
 
   const scroll_soon = debounce(() =>
-    transmission.elements.torrent_list.scrollTo(0, 1)
+    transmission.elements.torrent_list.scrollTo(0, 1),
   );
   window.addEventListener('load', scroll_soon);
   window.addEventListener('orientationchange', scroll_soon);

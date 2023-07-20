@@ -3,22 +3,24 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#define LIBTRANSMISSION_VARIANT_MODULE
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cerrno>
+#include <cmath> // lrint()
+#include <cctype> // isspace()
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
+#include <string>
+#include <string_view>
 
-#include <libtransmission/transmission.h>
+#define LIBTRANSMISSION_VARIANT_MODULE
 
 #include <libtransmission/benc.h>
 #include <libtransmission/crypto-utils.h> // tr_rand_buffer(), tr_rand_int()
 #include <libtransmission/error.h>
-#include <libtransmission/variant-common.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/variant.h>
-
-#include <algorithm>
-#include <array>
-#include <cmath> // lrint()
-#include <cctype> // isspace()
-#include <string>
-#include <string_view>
 
 #include "gtest/gtest.h"
 

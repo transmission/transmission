@@ -6,11 +6,14 @@
 #include <array>
 #include <cerrno>
 #include <cstdint>
-#include <cstring>
-#include <string>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h> // ntohl, ntohs
+#endif
 
 #include <event2/event.h>
-#include <event2/bufferevent.h>
 
 #include <libutp/utp.h>
 
@@ -18,14 +21,18 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/session.h"
 #include "libtransmission/bandwidth.h"
+#include "libtransmission/block-info.h" // tr_block_info
+#include "libtransmission/error.h" // tr_error_clear, tr_error_s...
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
+#include "libtransmission/peer-socket.h" // tr_peer_socket, tr_netOpen...
+#include "libtransmission/session.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h" // for _()
+
+struct sockaddr;
 
 #ifdef _WIN32
 #undef EAGAIN
@@ -112,12 +119,13 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_incoming(tr_session* session, tr_bandw
 std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address const& addr,
-    tr_port port,
+    tr_socket_address const& socket_address,
     tr_sha1_digest_t const& info_hash,
     bool is_seed,
     bool utp)
 {
+    auto const& [addr, port] = socket_address;
+
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
     TR_ASSERT(addr.is_valid());
@@ -135,7 +143,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     {
         auto* const sock = utp_create_socket(session->utp_context);
         utp_set_userdata(sock, peer_io.get());
-        peer_io->set_socket(tr_peer_socket{ addr, port, sock });
+        peer_io->set_socket(tr_peer_socket{ socket_address, sock });
 
         auto const [ss, sslen] = addr.to_sockaddr(port);
         if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
@@ -147,7 +155,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 
     if (!peer_io->socket_.is_valid())
     {
-        if (auto sock = tr_netOpenPeerSocket(session, addr, port, is_seed); sock.is_valid())
+        if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
         {
             peer_io->set_socket(std::move(sock));
             return peer_io;
@@ -222,8 +230,7 @@ bool tr_peerIo::reconnect()
         return false;
     }
 
-    auto const [addr, port] = socket_address();
-    socket_ = tr_netOpenPeerSocket(session_, addr, port, is_seed());
+    socket_ = tr_netOpenPeerSocket(session_, socket_address(), is_seed());
 
     if (!socket_.is_tcp())
     {

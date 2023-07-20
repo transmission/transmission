@@ -112,7 +112,7 @@ export class ActionManager extends EventTarget {
     return new Map(
       Object.entries(this.actions)
         .filter(([, properties]) => properties.shortcut)
-        .map(([name, properties]) => [properties.shortcut, name])
+        .map(([name, properties]) => [properties.shortcut, name]),
     );
   }
 
@@ -146,7 +146,7 @@ export class ActionManager extends EventTarget {
     const selected_paused = selected.filter((tor) => tor.isStopped()).length;
     const selected_active = selected.length - selected_paused;
     const nonselected_paused = nonselected.filter((tor) =>
-      tor.isStopped()
+      tor.isStopped(),
     ).length;
     const nonselected_active = nonselected.length - nonselected_paused;
     const paused = selected_paused + nonselected_paused;

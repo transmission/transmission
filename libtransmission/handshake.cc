@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cerrno> // ECONNREFUSED, ETIMEDOUT
 #include <string_view>
 #include <utility>
 
@@ -15,13 +16,14 @@
 #include "libtransmission/bitfield.h"
 #include "libtransmission/clients.h"
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/log.h"
 #include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
-#include "libtransmission/utils.h"
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
@@ -519,16 +521,8 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 
     if (auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash); info)
     {
-        bool const client_is_seed = info->is_done;
-        bool const peer_is_seed = mediator_->is_peer_known_seed(info->id, peer_io->socket_address());
         tr_logAddTraceHand(this, fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", info->id));
         peer_io->set_torrent_hash(info->info_hash);
-
-        if (client_is_seed && peer_is_seed)
-        {
-            tr_logAddTraceHand(this, "another seed tried to reconnect to us!");
-            return done(false);
-        }
     }
     else
     {

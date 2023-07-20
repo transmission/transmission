@@ -5,9 +5,10 @@
 
 #include <array>
 #include <chrono>
-#include <functional>
+#include <cstddef> // size_t
 #include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <utility>
 

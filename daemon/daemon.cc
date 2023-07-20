@@ -8,7 +8,10 @@
 #include <cstdio> /* printf */
 #include <cstdlib> /* atoi */
 #include <iostream>
+#include <iterator> /* std::back_inserter */
 #include <memory>
+#include <string_view>
+#include <vector>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -17,6 +20,7 @@
 #ifdef _WIN32
 #include <process.h> /* getpid */
 #else
+#include <sys/time.h> /* timeval */
 #include <unistd.h> /* getpid */
 #endif
 
@@ -24,14 +28,24 @@
 
 #include <fmt/core.h>
 
-#include "daemon.h"
+#include <libtransmission/transmission.h>
 
+#include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/timer-ev.h>
 #include <libtransmission/tr-getopt.h>
-#include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
+
+#include "daemon.h"
+
+struct tr_ctor;
+struct tr_session;
+struct tr_torrent;
 
 #ifdef USE_SYSTEMD
 
@@ -311,14 +325,22 @@ static void printMessage(
     std::string_view filename,
     long line)
 {
-    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
-                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
+    auto out = tr_strbuf<char, 2048U>{};
+
+    if (std::empty(name))
+    {
+        fmt::format_to(std::back_inserter(out), "{:s} ({:s}:{:d})", message, filename, line);
+    }
+    else
+    {
+        fmt::format_to(std::back_inserter(out), "{:s} {:s} ({:s}:{:d})", name, message, filename, line);
+    }
 
     if (file != TR_BAD_SYS_FILE)
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, fmt::format(FMT_STRING("[{:s}] {:s} {:s}"), std::data(timestr), levelName(level), out));
+        tr_sys_file_write_line(file, fmt::format("[{:s}] {:s} {:s}", std::data(timestr), levelName(level), std::data(out)));
     }
 
 #ifdef HAVE_SYSLOG
@@ -678,18 +700,16 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
+    struct event* sig_ev = nullptr;
     auto watchdir = std::unique_ptr<Watchdir>{};
     char const* const cdir = this->config_dir_.c_str();
 
     sd_notifyf(0, "MAINPID=%d\n", (int)getpid());
 
-    /* should go before libevent calls */
-    tr_net_init();
-
     /* setup event state */
     ev_base_ = event_base_new();
 
-    if (ev_base_ == nullptr || !setup_signals())
+    if (ev_base_ == nullptr || !setup_signals(sig_ev))
     {
         auto const error_code = errno;
         auto const errmsg = fmt::format(
@@ -697,6 +717,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
             fmt::arg("error", tr_strerror(error_code)),
             fmt::arg("error_code", error_code));
         printMessage(logfile_, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
+        cleanup_signals(sig_ev);
         return 1;
     }
 
@@ -849,6 +870,8 @@ CLEANUP:
         event_free(status_ev);
     }
 
+    cleanup_signals(sig_ev);
+
     event_base_free(ev_base_);
 
     tr_sessionSaveSettings(my_session_, cdir, &settings_);
@@ -933,6 +956,8 @@ void tr_daemon::handle_error(tr_error* error) const
 
 int tr_main(int argc, char* argv[])
 {
+    auto const init_mgr = tr_lib_init();
+
     tr_locale_set_global("");
 
     int ret;

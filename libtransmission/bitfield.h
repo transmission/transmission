@@ -9,11 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstddef>
-#include <cstdint>
-#include <vector>
+#include <cstddef> // size_t
+#include <cstdint> // uint8_t
+#include <vector> // std::vector
 
-#include "tr-macros.h"
+#include "tr-macros.h" // TR_CONSTEXPR20
 
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
@@ -90,7 +90,7 @@ public:
         return bit_count_;
     }
 
-    [[nodiscard]] constexpr size_t empty() const noexcept
+    [[nodiscard]] constexpr bool empty() const noexcept
     {
         return size() == 0;
     }
@@ -127,8 +127,7 @@ private:
             return false;
         }
 
-        bool ret = (flags_[n >> 3U] << (n & 7U) & 0x80) != 0;
-        return ret;
+        return (flags_[n >> 3U] << (n & 7U) & 0x80) != 0;
     }
 
     void ensure_bits_alloced(size_t n);

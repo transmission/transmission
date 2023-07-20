@@ -3,15 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
-#include <climits> // SIZE_MAX
-#include <vector>
-
-#include "libtransmission/transmission.h"
+#include <algorithm> // std::copy, std::fill_n, std::min, std::max
+#include <vector> // std::vector
 
 #include "libtransmission/bitfield.h"
-#include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-popcount.h"
+#include "libtransmission/tr-assert.h" // TR_ASSERT, TR_ENABLE_ASSERTS
+#include "libtransmission/tr-popcount.h" // tr_popcnt
 
 // ---
 
@@ -394,7 +391,6 @@ void tr_bitfield::set_span(size_t begin, size_t end, bool value)
     unsigned char last_mask = 0xff << ((~end) & 7U);
     if (value)
     {
-
         if (walk == last_byte)
         {
             flags_[walk] |= first_mask & last_mask;

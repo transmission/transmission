@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <deque>
@@ -17,17 +18,20 @@
 
 #include <event2/util.h> // for evutil_socket_t
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bandwidth.h"
-#include "block-info.h"
-#include "net.h" // tr_address
-#include "peer-mse.h"
-#include "peer-socket.h"
-#include "tr-buffer.h"
-#include "utils-ev.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/net.h" // tr_address
+#include "libtransmission/peer-mse.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_CONSTEXPR20
+#include "libtransmission/utils-ev.h"
 
 struct struct_utp_context;
+struct tr_error;
+struct tr_session;
 
 namespace libtransmission::test
 {
@@ -62,8 +66,7 @@ public:
     static std::shared_ptr<tr_peerIo> new_outgoing(
         tr_session* session,
         tr_bandwidth* parent,
-        tr_address const& addr,
-        tr_port port,
+        tr_socket_address const& socket_address,
         tr_sha1_digest_t const& info_hash,
         bool is_seed,
         bool utp);
@@ -78,7 +81,7 @@ public:
         user_data_ = user_data;
     }
 
-    void clear_callbacks()
+    constexpr void clear_callbacks()
     {
         set_callbacks(nullptr, nullptr, nullptr, nullptr);
     }
@@ -260,7 +263,7 @@ public:
         return socket_.address();
     }
 
-    [[nodiscard]] constexpr auto socket_address() const noexcept
+    [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
         return socket_.socketAddress();
     }

@@ -175,7 +175,7 @@ export class TorrentRendererFull {
           Formatter.size(t.getTotalSize()),
           ' (',
           t.getPercentDoneStr(),
-          '%)'
+          '%)',
         );
       }
       // append UL stats: ', uploaded 8.59 GiB (Ratio: 12.3)'
@@ -184,7 +184,7 @@ export class TorrentRendererFull {
         Formatter.size(t.getUploadedEver()),
         ' (Ratio ',
         Formatter.ratioString(t.getUploadRatio()),
-        ')'
+        ')',
       );
     } else {
       // not done yet
@@ -194,7 +194,7 @@ export class TorrentRendererFull {
         Formatter.size(sizeWhenDone),
         ' (',
         t.getPercentDoneStr(),
-        '%)'
+        '%)',
       );
     }
 
@@ -325,7 +325,7 @@ export class TorrentRendererCompact {
     }
     if (t.isSeeding()) {
       return `Ratio: ${Formatter.ratioString(
-        t.getUploadRatio()
+        t.getUploadRatio(),
       )}, ${TorrentRendererHelper.formatUL(t)}`;
     }
     return t.getStateString();

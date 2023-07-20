@@ -3,18 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstring> // strlen()
-// #include <unistd.h> // sync()
+#include <cstddef>
+#include <string_view>
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/blocklist.h>
-#include <libtransmission/file.h>
 #include <libtransmission/net.h>
-#include <libtransmission/peer-socket.h>
-#include <libtransmission/session.h> // tr_session.tr_session.addressIsBlocked()
+#include <libtransmission/session.h> // tr_session.addressIsBlocked()
 #include <libtransmission/tr-strbuf.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test

@@ -4,13 +4,20 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cassert>
+#include <cstddef> // size_t
+#include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/file.h>
 #include <libtransmission/torrent-files.h>
+#include <libtransmission/tr-strbuf.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;

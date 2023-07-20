@@ -4,11 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::sort
-#include <cstring>
-#include <stack>
 #include <string>
 #include <string_view>
-#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -21,10 +18,7 @@
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
-#include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
@@ -721,7 +715,7 @@ private:
 
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
-    std::vector<size_t> sorted;
+    small::vector<size_t, 512> sorted;
 };
 
 class VariantWalker

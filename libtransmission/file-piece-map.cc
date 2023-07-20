@@ -3,11 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <set>
 #include <vector>
+
+#include <small/set.hpp>
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/torrent-metainfo.h"
@@ -21,7 +23,8 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
     file_pieces_.resize(n_files);
     file_pieces_.shrink_to_fit();
 
-    auto edge_pieces = std::set<tr_piece_index_t>{};
+    auto edge_pieces = small::set<tr_piece_index_t, 1024U>{};
+    edge_pieces.reserve(n_files * 2U);
 
     uint64_t offset = 0;
     for (tr_file_index_t i = 0; i < n_files; ++i)

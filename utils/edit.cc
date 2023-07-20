@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cstdio> // stderr
 #include <cstdlib> // EXIT_FAILURE
 #include <string>
 #include <string_view>
@@ -11,10 +12,9 @@
 
 #include <fmt/core.h>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
