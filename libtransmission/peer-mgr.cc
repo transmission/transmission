@@ -1038,7 +1038,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv4(
     uint8_t const* added_f,
     size_t added_f_len)
 {
-    size_t const n = compact_len / 6;
+    size_t const n = compact_len / tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
     auto const* walk = static_cast<std::byte const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
@@ -1062,7 +1062,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
     uint8_t const* added_f,
     size_t added_f_len)
 {
-    size_t const n = compact_len / 18;
+    size_t const n = compact_len / tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
     auto const* walk = static_cast<std::byte const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 

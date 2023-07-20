@@ -38,46 +38,46 @@ enum
 
 FilterBarComboBox* FilterBar::createActivityCombo()
 {
-    auto* c = new FilterBarComboBox(this);
-    auto* delegate = new FilterBarComboBoxDelegate(this, c);
+    auto* c = new FilterBarComboBox{ this };
+    auto* delegate = new FilterBarComboBoxDelegate{ this, c };
     c->setItemDelegate(delegate);
 
-    auto* model = new QStandardItemModel(this);
+    auto* model = new QStandardItemModel{ this };
 
-    auto* row = new QStandardItem(tr("All"));
+    auto* row = new QStandardItem{ tr("All") };
     row->setData(FilterMode::SHOW_ALL, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    model->appendRow(new QStandardItem); // separator
+    model->appendRow(new QStandardItem{}); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
     auto const& icons = IconCache::get();
 
-    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("system-run")), tr("Active"));
+    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("system-run")), tr("Active") };
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("go-down")), tr("Downloading"));
+    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("go-down")), tr("Downloading") };
     row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("go-up")), tr("Seeding"));
+    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("go-up")), tr("Seeding") };
     row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("media-playback-pause")), tr("Paused"));
+    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("media-playback-pause")), tr("Paused") };
     row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("dialog-ok")), tr("Finished"));
+    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("dialog-ok")), tr("Finished") };
     row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("view-refresh")), tr("Verifying"));
+    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("view-refresh")), tr("Verifying") };
     row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("process-stop")), tr("Error"));
+    row = new QStandardItem{ icons.getThemeIcon(QStringLiteral("process-stop")), tr("Error") };
     row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
     model->appendRow(row);
 
@@ -167,7 +167,7 @@ void FilterBar::refreshTrackers()
     {
         if ((old_it == old_end) || ((new_it != new_end) && (old_it->first > new_it->first)))
         {
-            tracker_model_->insertRow(row, update_tracker_item(new QStandardItem(1), new_it));
+            tracker_model_->insertRow(row, update_tracker_item(new QStandardItem{ 1 }, new_it));
             any_added = true;
             ++new_it;
             ++row;
@@ -196,18 +196,18 @@ void FilterBar::refreshTrackers()
 
 FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
 {
-    auto* c = new FilterBarComboBox(this);
-    auto* delegate = new FilterBarComboBoxDelegate(this, c);
+    auto* c = new FilterBarComboBox{ this };
+    auto* delegate = new FilterBarComboBoxDelegate{ this, c };
     c->setItemDelegate(delegate);
 
-    auto* row = new QStandardItem(tr("All"));
-    row->setData(QString(), TRACKER_ROLE);
+    auto* row = new QStandardItem{ tr("All") };
+    row->setData(QString{}, TRACKER_ROLE);
     int const count = torrents_.rowCount();
     row->setData(count, FilterBarComboBox::CountRole);
     row->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
     model->appendRow(row);
 
-    model->appendRow(new QStandardItem); // separator
+    model->appendRow(new QStandardItem{}); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
     c->setModel(model);
@@ -225,10 +225,10 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     , filter_(filter)
     , is_bootstrapping_(true)
 {
-    auto* h = new QHBoxLayout(this);
+    auto* h = new QHBoxLayout{ this };
     h->setContentsMargins(3, 3, 3, 3);
 
-    count_label_ = new QLabel(tr("Show:"), this);
+    count_label_ = new QLabel{ tr("Show:"), this };
     h->addWidget(count_label_);
 
     h->addWidget(activity_combo_);
@@ -307,7 +307,7 @@ void FilterBar::refreshPref(int key)
 
                 if (!is_bootstrapping)
                 {
-                    prefs_.set(key, QString());
+                    prefs_.set(key, QString{});
                 }
             }
 

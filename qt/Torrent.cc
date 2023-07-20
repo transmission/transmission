@@ -23,8 +23,8 @@
 using ::trqt::variant_helpers::change;
 
 Torrent::Torrent(Prefs const& prefs, int id)
-    : id_(id)
-    , prefs_(prefs)
+    : id_{ id }
+    , prefs_{ prefs }
 {
 }
 

@@ -32,10 +32,10 @@ using ::trqt::variant_helpers::listAdd;
 ***/
 
 OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent)
-    : BaseDialog(parent)
-    , add_(std::move(addme))
-    , session_(session)
-    , is_local_(session_.isLocal())
+    : BaseDialog{ parent }
+    , add_{ std::move(addme) }
+    , session_{ session }
+    , is_local_{ session_.isLocal() }
 {
     ui_.setupUi(this);
 
@@ -65,11 +65,11 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.sourceStack->setFixedHeight(ui_.sourceStack->currentWidget()->sizeHint().height());
     ui_.sourceLabel->setBuddy(ui_.sourceStack->currentWidget());
 
-    QFontMetrics const font_metrics(font());
+    auto const font_metrics = QFontMetrics{ font() };
     int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
-    QString const download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
+    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR));
     ui_.freeSpaceLabel->setSession(session_);
     ui_.freeSpaceLabel->setPath(download_dir);
 

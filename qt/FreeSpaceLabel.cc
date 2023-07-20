@@ -68,7 +68,7 @@ void FreeSpaceLabel::onTimer()
     tr_variantInitDict(&args, 1);
     dictAdd(&args, TR_KEY_path, path_);
 
-    auto* q = new RpcQueue(this);
+    auto* q = new RpcQueue{ this };
 
     q->add([this, &args]() { return session_->exec("free-space", &args); });
 
@@ -82,7 +82,7 @@ void FreeSpaceLabel::onTimer()
             }
             else
             {
-                setText(QString());
+                setText(QString{});
             }
 
             // update the tooltip

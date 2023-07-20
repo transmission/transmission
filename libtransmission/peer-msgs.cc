@@ -653,8 +653,7 @@ public:
 
     std::vector<QueuedPeerRequest> peer_requested_;
 
-    std::vector<tr_pex> pex;
-    std::vector<tr_pex> pex6;
+    std::array<std::vector<tr_pex>, NUM_TR_AF_INET_TYPES> pex;
 
     std::queue<int> peerAskedForMetadata;
 
@@ -1169,7 +1168,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
     }
 
     if (msg_type == MetadataMsgType::Data && total_size == msgs->metadata_size_hint && !msgs->torrent->has_metainfo() &&
-        msg_end - benc_end <= METADATA_PIECE_SIZE && piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
+        msg_end - benc_end <= MetadataPieceSize && piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
     {
         size_t const piece_len = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, piece_len);
@@ -2023,123 +2022,97 @@ void tr_peerMsgsImpl::sendPex()
         return;
     }
 
-    auto& old4 = this->pex;
-    auto new4 = tr_peerMgrGetPeers(this->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
-    auto added = std::vector<tr_pex>{};
-    added.reserve(std::size(new4));
-    std::set_difference(std::begin(new4), std::end(new4), std::begin(old4), std::end(old4), std::back_inserter(added));
-    auto dropped = std::vector<tr_pex>{};
-    dropped.reserve(std::size(old4));
-    std::set_difference(std::begin(old4), std::end(old4), std::begin(new4), std::end(new4), std::back_inserter(dropped));
-
-    auto& old6 = this->pex6;
-    auto new6 = tr_peerMgrGetPeers(this->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
-    auto added6 = std::vector<tr_pex>{};
-    added6.reserve(std::size(new6));
-    std::set_difference(std::begin(new6), std::end(new6), std::begin(old6), std::end(old6), std::back_inserter(added6));
-    auto dropped6 = std::vector<tr_pex>{};
-    dropped6.reserve(std::size(old6));
-    std::set_difference(std::begin(old6), std::end(old6), std::begin(new6), std::end(new6), std::back_inserter(dropped6));
-
-    // Some peers give us error messages if we send
-    // more than this many peers in a single pex message.
-    // https://wiki.theory.org/BitTorrentPeerExchangeConventions
     static auto constexpr MaxPexAdded = size_t{ 50 };
-    added.resize(std::min(std::size(added), MaxPexAdded));
-    added6.resize(std::min(std::size(added6), MaxPexAdded));
     static auto constexpr MaxPexDropped = size_t{ 50 };
-    dropped.resize(std::min(std::size(dropped), MaxPexDropped));
-    dropped6.resize(std::min(std::size(dropped6), MaxPexDropped));
 
-    logtrace(
-        this,
-        fmt::format(
-            FMT_STRING("pex: old peer count {:d}+{:d}, new peer count {:d}+{:d}, added {:d}+{:d}, dropped {:d}+{:d}"),
-            std::size(old4),
-            std::size(old6),
-            std::size(new4),
-            std::size(new6),
-            std::size(added),
-            std::size(added6),
-            std::size(dropped),
-            std::size(dropped6)));
-
-    // if there's nothing to send, then we're done
-    if (std::empty(added) && std::empty(dropped) && std::empty(added6) && std::empty(dropped6))
-    {
-        return;
-    }
-
-    // update msgs
-    std::swap(old4, new4);
-    std::swap(old6, new6);
-
-    // build the pex payload
     auto val = tr_variant{};
     tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
     auto tmpbuf = std::vector<std::byte>{};
-    tmpbuf.reserve(MaxPexAdded * 18);
 
-    if (!std::empty(added))
+    for (uint8_t i = 0; i < NUM_TR_AF_INET_TYPES; ++i)
     {
-        // "added"
-        tmpbuf.clear();
-        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), std::data(added), std::size(added));
-        TR_ASSERT(std::size(tmpbuf) == std::size(added) * 6);
-        tr_variantDictAddRaw(&val, TR_KEY_added, std::data(tmpbuf), std::size(tmpbuf));
+        static auto constexpr AddedMap = std::array{ TR_KEY_added, TR_KEY_added6 };
+        static auto constexpr AddedFMap = std::array{ TR_KEY_added_f, TR_KEY_added6_f };
+        static auto constexpr DroppedMap = std::array{ TR_KEY_dropped, TR_KEY_dropped6 };
+        auto const ip_type = static_cast<tr_address_type>(i);
 
-        // "added.f"
-        // unset each holepunch flag because we don't support it.
-        tmpbuf.resize(std::size(added));
-        auto* begin = std::data(tmpbuf);
-        auto* walk = begin;
-        for (auto const& p : added)
+        auto& old_pex = pex[i];
+        auto new_pex = tr_peerMgrGetPeers(this->torrent, ip_type, TR_PEERS_CONNECTED, MaxPexPeerCount);
+        auto added = std::vector<tr_pex>{};
+        added.reserve(std::size(new_pex));
+        std::set_difference(
+            std::begin(new_pex),
+            std::end(new_pex),
+            std::begin(old_pex),
+            std::end(old_pex),
+            std::back_inserter(added));
+        auto dropped = std::vector<tr_pex>{};
+        dropped.reserve(std::size(old_pex));
+        std::set_difference(
+            std::begin(old_pex),
+            std::end(old_pex),
+            std::begin(new_pex),
+            std::end(new_pex),
+            std::back_inserter(dropped));
+
+        // Some peers give us error messages if we send
+        // more than this many peers in a single pex message.
+        // https://wiki.theory.org/BitTorrentPeerExchangeConventions
+        added.resize(std::min(std::size(added), MaxPexAdded));
+        dropped.resize(std::min(std::size(dropped), MaxPexDropped));
+
+        logtrace(
+            this,
+            fmt::format(
+                FMT_STRING("pex: old {:s} peer count {:d}, new peer count {:d}, added {:d}, dropped {:d}"),
+                tr_ip_protocol_sv(ip_type),
+                std::size(old_pex),
+                std::size(new_pex),
+                std::size(added),
+                std::size(dropped)));
+
+        // if there's nothing to send, then we're done
+        if (std::empty(added) && std::empty(dropped))
         {
-            *walk++ = std::byte{ p.flags } & ~std::byte{ ADDED_F_HOLEPUNCH };
+            continue;
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added));
-        tr_variantDictAddRaw(&val, TR_KEY_added_f, begin, walk - begin);
-    }
+        // update msgs
+        std::swap(old_pex, new_pex);
 
-    if (!std::empty(dropped))
-    {
-        // "dropped"
-        tmpbuf.clear();
-        tr_pex::to_compact_ipv4(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
-        TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * 6);
-        tr_variantDictAddRaw(&val, TR_KEY_dropped, std::data(tmpbuf), std::size(tmpbuf));
-    }
-
-    if (!std::empty(added6))
-    {
-        tmpbuf.clear();
-        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), std::data(added6), std::size(added6));
-        TR_ASSERT(std::size(tmpbuf) == std::size(added6) * 18);
-        tr_variantDictAddRaw(&val, TR_KEY_added6, std::data(tmpbuf), std::size(tmpbuf));
-
-        // "added6.f"
-        // unset each holepunch flag because we don't support it.
-        tmpbuf.resize(std::size(added6));
-        auto* begin = std::data(tmpbuf);
-        auto* walk = begin;
-        for (auto const& p : added6)
+        // build the pex payload
+        if (!std::empty(added))
         {
-            *walk++ = std::byte{ p.flags } & ~std::byte{ ADDED_F_HOLEPUNCH };
+            // "added"
+            tmpbuf.clear();
+            tmpbuf.reserve(std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
+            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(added), std::size(added), ip_type);
+            TR_ASSERT(std::size(tmpbuf) == std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
+            tr_variantDictAddRaw(&val, AddedMap[i], std::data(tmpbuf), std::size(tmpbuf));
+
+            // "added.f"
+            tmpbuf.resize(std::size(added));
+            auto* begin = std::data(tmpbuf);
+            auto* walk = begin;
+            for (auto const& p : added)
+            {
+                *walk++ = std::byte{ p.flags };
+            }
+
+            TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added));
+            tr_variantDictAddRaw(&val, AddedFMap[i], begin, walk - begin);
         }
 
-        TR_ASSERT(static_cast<size_t>(walk - begin) == std::size(added6));
-        tr_variantDictAddRaw(&val, TR_KEY_added6_f, begin, walk - begin);
-    }
-
-    if (!std::empty(dropped6))
-    {
-        // "dropped6"
-        tmpbuf.clear();
-        tr_pex::to_compact_ipv6(std::back_inserter(tmpbuf), std::data(dropped6), std::size(dropped6));
-        TR_ASSERT(std::size(tmpbuf) == std::size(dropped6) * 18);
-        tr_variantDictAddRaw(&val, TR_KEY_dropped6, std::data(tmpbuf), std::size(tmpbuf));
+        if (!std::empty(dropped))
+        {
+            // "dropped"
+            tmpbuf.clear();
+            tmpbuf.reserve(std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
+            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped), ip_type);
+            TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
+            tr_variantDictAddRaw(&val, DroppedMap[i], std::data(tmpbuf), std::size(tmpbuf));
+        }
     }
 
     protocol_send_message(this, BtPeerMsgs::Ltep, this->ut_pex_id, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
