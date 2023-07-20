@@ -346,26 +346,18 @@ public:
 
     tr_peer_info& ensure_info_exists(
         tr_socket_address const& socket_address,
-        bool is_connectable,
-        std::optional<uint8_t> const flags_opt = {},
-        std::optional<tr_peer_from> const from_opt = {})
+        uint8_t const flags,
+        tr_peer_from const from,
+        bool is_connectable)
     {
-        auto const flags = flags_opt ? *flags_opt : uint8_t{};
-        auto const from = from_opt ? *from_opt : tr_peer_from{};
-        auto [it, is_new] = is_connectable ?
+        auto&& [it, is_new] = is_connectable ?
             known_connectable.try_emplace(socket_address, socket_address, flags, from) :
             incoming_peer_info.try_emplace(socket_address, socket_address.address(), flags, from);
         auto& peer_info = it->second;
         if (!is_new)
         {
-            if (flags_opt)
-            {
-                peer_info.set_pex_flags(*flags_opt);
-            }
-            if (from_opt)
-            {
-                peer_info.found_at(*from_opt);
-            }
+            peer_info.found_at(from);
+            peer_info.set_pex_flags(flags);
         }
 
         mark_all_seeds_flag_dirty();
@@ -1030,20 +1022,9 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     }
     else /* looking good */
     {
-        static auto constexpr get_info = [](tr_swarm& s, tr_peerIo const& io) -> tr_peer_info&
-        {
-            auto const& socket_address = io.socket_address();
-            if (io.is_incoming())
-            {
-                if (io.is_utp())
-                {
-                    return s.ensure_info_exists(socket_address, true, {}, TR_PEER_FROM_INCOMING);
-                }
-                return s.ensure_info_exists(socket_address, false, 0U, TR_PEER_FROM_INCOMING);
-            }
-            return *s.get_existing_peer_info(socket_address);
-        };
-        auto& info = get_info(*s, *result.io);
+        // If this is an outgoing connection, then we are sure we already have the peer info object
+        auto& info = result.io->is_incoming() ? s->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false) :
+                                                *s->get_existing_peer_info(socket_address);
 
         if (!result.io->is_incoming())
         {
@@ -1130,11 +1111,11 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
             !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers() && from != TR_PEER_FROM_INCOMING &&
-            (from != TR_PEER_FROM_PEX || (pex->flags & (ADDED_F_CONNECTABLE | ADDED_F_UTP_FLAGS)) != 0))
+            (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
         {
             // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
             // don't care about non-connectable peers that we are not connected to
-            s->ensure_info_exists({ pex->addr, pex->port }, true, pex->flags, from);
+            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, true);
             ++n_used;
         }
     }
