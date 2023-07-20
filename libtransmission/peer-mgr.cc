@@ -383,14 +383,8 @@ public:
         switch (event.type)
         {
         case tr_peer_event::Type::ClientGotPieceData:
-            {
-                auto const now = tr_time();
-                auto* const tor = s->tor;
-
-                on_client_got_piece_data(tor, event.length, now);
-
-                break;
-            }
+            on_client_got_piece_data(s->tor, event.length, tr_time());
+            break;
 
         default:
             peer_callback_common(peer, event, s);
@@ -428,10 +422,7 @@ public:
         case tr_peer_event::Type::ClientGotPieceData:
             {
                 auto const now = tr_time();
-                auto* const tor = s->tor;
-
-                on_client_got_piece_data(tor, event.length, now);
-
+                on_client_got_piece_data(s->tor, event.length, now);
                 msgs->peer_info->set_latest_piece_data_time(now);
             }
 
@@ -474,20 +465,21 @@ public:
                 nh.key().port_ = event.port;
                 s->known_connectable.insert(std::move(nh));
             }
-            else if (info->port() != event.port) // If we got a new listening port from a known connectable peer
+            // If we got a new listening port from a known connectable peer
+            else if (info->port() != event.port)
             {
                 auto nh = s->known_connectable.extract(info->socket_address());
                 TR_ASSERT(!nh.empty());
                 TR_ASSERT(&nh.mapped() == info);
                 TR_ASSERT(nh.key() == info->socket_address());
 
-                nh.key().port_ = event.port;
                 info->set_listen_port(event.port);
+                nh.key().port_ = event.port;
                 // we do not explicitly set the connectable flag here because for the code to reach here,
                 // this connection is either:
-                // 1. outgoing, where the connectable flag has already been set on handshake done
-                // 2. incoming, and the peer has sent a port handshake before, so the connectable flag will have the
-                //    appropriate value already
+                // 1. outgoing, where the connectable flag has already been set on handshake done.
+                // 2. incoming, and the peer has sent a port message before, so the connectable flag will have the
+                //    appropriate value already.
 
                 s->known_connectable.insert(std::move(nh));
             }
@@ -2154,7 +2146,7 @@ struct peer_candidate
 {
     peer_candidate() = default;
 
-    peer_candidate(uint64_t score_in, tr_torrent* tor_in, tr_peer_info* peer_info_in)
+    peer_candidate(uint64_t score_in, tr_torrent const* const tor_in, tr_peer_info const* const peer_info_in)
         : score{ score_in }
         , tor{ tor_in }
         , peer_info{ peer_info_in }
@@ -2162,8 +2154,8 @@ struct peer_candidate
     }
 
     uint64_t score;
-    tr_torrent* tor;
-    tr_peer_info* peer_info;
+    tr_torrent const* tor;
+    tr_peer_info const* peer_info;
 };
 
 [[nodiscard]] bool torrentWasRecentlyStarted(tr_torrent const* tor)
@@ -2281,7 +2273,7 @@ struct peer_candidate
             continue;
         }
 
-        for (auto& [socket_address, atom] : swarm->known_connectable)
+        for (auto const& [socket_address, atom] : swarm->known_connectable)
         {
             if (is_peer_candidate(tor, atom, now))
             {
