@@ -87,7 +87,7 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     }
 
     // if that fails, use our own as the fallback
-    return QIcon{ QStringLiteral("transmission-tray") };
+    return QIcon{ QStringLiteral(":/icons/transmission.svg") };
 }
 
 } // namespace
