@@ -347,7 +347,7 @@ public:
     // ---
 
     // only to be used if our peer reported a listening port via ltep handshake
-    void merge_connectable_into_incoming(tr_peer_info const& connectable) noexcept
+    void merge_connectable_into_incoming(tr_peer_info const& connectable, bool const replace_from_first = false) noexcept
     {
         connection_attempted_at_ = std::max(connection_attempted_at_, connectable.connection_attempted_at_);
         /* connection_changed_at_ is already the latest */
@@ -366,7 +366,10 @@ public:
 
         /* is_utp_supported_ is already the latest */
 
-        /* from_first_ should never modified */
+        if (replace_from_first)
+        {
+            from_first_ = connectable.from_first_;
+        }
         found_at(connectable.from_best());
 
         /* num_consecutive_fails_ is already the latest */

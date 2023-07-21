@@ -516,7 +516,7 @@ public:
                         }
                         else
                         {
-                            info_new.merge_connectable_into_incoming(info_old);
+                            info_new.merge_connectable_into_incoming(info_old, true);
                             std::swap(info_new, info_old);
 
                             s->remove_peer(msgs);
