@@ -1186,13 +1186,20 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers() && from != TR_PEER_FROM_INCOMING &&
-            (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
+            !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers())
         {
-            // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
-            // don't care about non-connectable peers that we are not connected to
-            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, true);
-            ++n_used;
+            if (from != TR_PEER_FROM_INCOMING && (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
+            {
+                // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
+                s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, true);
+                ++n_used;
+            }
+            else if (s->incoming_pool.count({ pex->addr, pex->port }) != 0U)
+            {
+                // update incoming connection info
+                s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, false);
+                ++n_used;
+            }
         }
     }
 
