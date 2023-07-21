@@ -300,6 +300,7 @@ public:
 
         if (was_incoming)
         {
+            TR_ASSERT(std::empty(peer_info->listen_port()));
             incoming_peer_info.erase(socket_address);
         }
     }
@@ -479,6 +480,7 @@ public:
                 TR_ASSERT(info->is_connected());
 
                 auto nh = s->incoming_peer_info.extract(msgs->socket_address());
+                TR_ASSERT(!std::empty(nh));
 
                 // the info pointer is invalid and shouldn't be used from this point on:
                 // https://en.cppreference.com/w/cpp/container/unordered_map/extract
@@ -486,9 +488,9 @@ public:
                 // is owned by a node handle: they become usable if the element is inserted into a container.
 
                 auto& info_new = nh.mapped();
-                TR_ASSERT(!std::empty(nh));
                 TR_ASSERT(info_new.is_connected());
                 TR_ASSERT(nh.key().address() == info_new.listen_address());
+                TR_ASSERT(std::empty(info_new.listen_port()));
 
                 // If we already know about this peer, merge the info objects without invalidating references
                 if (auto nh_old = s->known_connectable.extract({ info_new.listen_address(), event.port }); !std::empty(nh_old))
@@ -516,6 +518,7 @@ public:
 
                             s->remove_peer(msgs);
                             s->known_connectable.insert(std::move(nh_old));
+                            s->mark_all_seeds_flag_dirty();
                             break;
                         }
                     }
@@ -530,6 +533,7 @@ public:
                 info_new.set_listen_port(event.port);
                 nh.key().port_ = event.port;
                 s->known_connectable.insert(std::move(nh));
+                s->mark_all_seeds_flag_dirty();
             }
             // If we got a new listening port from a known connectable peer
             else if (info->listen_port() != event.port)
