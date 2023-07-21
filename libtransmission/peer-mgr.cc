@@ -517,12 +517,14 @@ public:
                             info_new.merge_connectable_into_incoming(info_old, true);
                             std::swap(info_new, info_old);
                             s->remove_peer(msgs);
+                            s->connectable_pool.erase(it_old);
                             s->mark_all_seeds_flag_dirty();
                             break;
                         }
                     }
 
                     info_new.merge_connectable_into_incoming(info_old);
+                    s->connectable_pool.erase(it_old);
                 }
                 else
                 {
@@ -535,7 +537,8 @@ public:
                 TR_ASSERT(!std::empty(nh));
                 TR_ASSERT(nh.key().address() == info_new.listen_address());
                 nh.key().port_ = event.port;
-                s->connectable_pool.insert(std::move(nh));
+                [[maybe_unused]] auto ins_ret = s->connectable_pool.insert(std::move(nh));
+                TR_ASSERT(ins_ret.inserted);
 
                 s->mark_all_seeds_flag_dirty();
             }
