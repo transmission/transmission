@@ -533,11 +533,11 @@ public:
             else if (info->listen_port() != event.port)
             {
                 auto nh = s->known_connectable.extract(info->listen_socket_address());
+                auto& info_ref = nh.mapped();
                 TR_ASSERT(!std::empty(nh));
-                TR_ASSERT(&nh.mapped() == info);
-                TR_ASSERT(nh.key() == info->listen_socket_address());
+                TR_ASSERT(nh.key() == info_ref.listen_socket_address());
 
-                info->set_listen_port(event.port);
+                info_ref.set_listen_port(event.port);
                 nh.key().port_ = event.port;
                 // we do not explicitly set the connectable flag here because for the code to reach here,
                 // this connection is either:
