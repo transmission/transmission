@@ -304,11 +304,7 @@ public:
 
         if (was_incoming)
         {
-            [[maybe_unused]] auto const port_empty = std::empty(peer_info->listen_port());
-            if (incoming_pool.erase(socket_address) != 0U)
-            {
-                TR_ASSERT(port_empty);
-            }
+            incoming_pool.erase(socket_address);
         }
     }
 
@@ -395,6 +391,9 @@ public:
         tr_peer_from const from,
         bool is_connectable)
     {
+        TR_ASSERT(socket_address.is_valid());
+        TR_ASSERT(from < TR_PEER_FROM__MAX);
+
         auto&& [it, is_new] = is_connectable ? connectable_pool.try_emplace(socket_address, socket_address, flags, from) :
                                                incoming_pool.try_emplace(socket_address, socket_address.address(), flags, from);
         auto& peer_info = it->second;
