@@ -192,6 +192,9 @@ void on_client_got_piece_data(tr_torrent* const tor, uint32_t const sent_length,
 class tr_swarm
 {
 public:
+    using Peers = std::vector<tr_peerMsgs*>;
+    using Pool = std::unordered_map<tr_socket_address, tr_peer_info>;
+
     [[nodiscard]] auto unique_lock() const
     {
         return tor->unique_lock();
@@ -277,16 +280,17 @@ public:
         outgoing_handshakes.clear();
     }
 
-    void remove_peer(tr_peerMsgs* peer)
+    void remove_peer(Peers::iterator iter)
     {
         auto const lock = unique_lock();
 
+        auto* const peer = *iter;
         auto* const peer_info = peer->peer_info;
         auto socket_address = peer->socket_address();
         auto const was_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
-        if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
+        if (iter != std::end(peers))
         {
             peers.erase(iter);
         }
@@ -306,6 +310,11 @@ public:
                 TR_ASSERT(port_empty);
             }
         }
+    }
+
+    void remove_peer(tr_peerMsgs* peer)
+    {
+        remove_peer(std::find(std::begin(peers), std::end(peers), peer));
     }
 
     void removeAllPeers()
@@ -481,26 +490,16 @@ public:
             if (auto* const info = msgs->peer_info; std::empty(msgs->peer_info->listen_port()))
             {
                 TR_ASSERT(info->is_connected());
-
-                auto nh = s->incoming_peer_info.extract(msgs->socket_address());
-                TR_ASSERT(!std::empty(nh));
-
-                // the info pointer is invalid and shouldn't be used from this point on:
-                // https://en.cppreference.com/w/cpp/container/unordered_map/extract
-                // Pointers and references to the extracted element remain valid, but cannot be used while element
-                // is owned by a node handle: they become usable if the element is inserted into a container.
-
-                auto& info_new = nh.mapped();
-                TR_ASSERT(info_new.is_connected());
-                TR_ASSERT(nh.key().address() == info_new.listen_address());
-                TR_ASSERT(std::empty(info_new.listen_port()));
+                TR_ASSERT(std::empty(info->listen_port()));
+                auto& info_new = *info;
 
                 // If we already know about this peer, merge the info objects without invalidating references
-                if (auto nh_old = s->known_connectable.extract({ info_new.listen_address(), event.port }); !std::empty(nh_old))
+                if (auto it_old = s->known_connectable.find({ info_new.listen_address(), event.port });
+                    it_old != std::end(s->known_connectable))
                 {
-                    auto& info_old = nh_old.mapped();
-                    TR_ASSERT(nh_old.key() == info_old.listen_socket_address());
-                    TR_ASSERT(nh_old.key().address() == info_new.listen_address());
+                    auto& info_old = it_old->second;
+                    TR_ASSERT(it_old->first == info_old.listen_socket_address());
+                    TR_ASSERT(it_old->first.address() == info_new.listen_address());
 
                     // If there is an existing connection to this peer, keep the better one
                     if (info_old.is_connected())
@@ -512,15 +511,13 @@ public:
                                 std::end(s->peers),
                                 [&info_old](tr_peerMsgs const* const peer) { return peer->peer_info == &info_old; });
                             TR_ASSERT(it != std::end(s->peers));
-                            s->remove_peer(*it);
+                            s->remove_peer(it);
                         }
                         else
                         {
                             info_new.merge_connectable_into_incoming(info_old, true);
                             std::swap(info_new, info_old);
-
                             s->remove_peer(msgs);
-                            s->known_connectable.insert(std::move(nh_old));
                             s->mark_all_seeds_flag_dirty();
                             break;
                         }
@@ -534,8 +531,13 @@ public:
                 }
 
                 info_new.set_listen_port(event.port);
+
+                auto nh = s->incoming_peer_info.extract(msgs->socket_address());
+                TR_ASSERT(!std::empty(nh));
+                TR_ASSERT(nh.key().address() == info_new.listen_address());
                 nh.key().port_ = event.port;
                 s->known_connectable.insert(std::move(nh));
+
                 s->mark_all_seeds_flag_dirty();
             }
             // If we got a new listening port from a known connectable peer
@@ -588,12 +590,12 @@ public:
     std::vector<std::unique_ptr<tr_peer>> webseeds;
 
     // depends-on: active_requests
-    std::vector<tr_peerMsgs*> peers;
+    Peers peers;
 
     // tr_peers hold pointers to the items in these containers,
     // therefore references to elements within cannot invalidate
-    std::unordered_map<tr_socket_address, tr_peer_info> incoming_peer_info;
-    std::unordered_map<tr_socket_address, tr_peer_info> known_connectable;
+    Pool incoming_peer_info;
+    Pool known_connectable;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
