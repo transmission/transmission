@@ -76,9 +76,9 @@ public:
         set_pex_flags(pex_flags);
     }
 
-    tr_peer_info(tr_peer_info&&) = delete;
+    tr_peer_info(tr_peer_info&&) = default;
     tr_peer_info(tr_peer_info const&) = delete;
-    tr_peer_info& operator=(tr_peer_info&&) = delete;
+    tr_peer_info& operator=(tr_peer_info&&) = default;
     tr_peer_info& operator=(tr_peer_info const&) = delete;
 
     ~tr_peer_info()
@@ -102,12 +102,12 @@ public:
         return listen_socket_address_;
     }
 
-    [[nodiscard]] constexpr tr_address const& listen_address() const noexcept
+    [[nodiscard]] constexpr auto const& listen_address() const noexcept
     {
         return listen_socket_address_.address();
     }
 
-    [[nodiscard]] constexpr auto& listen_port() const noexcept
+    [[nodiscard]] constexpr auto const& listen_port() const noexcept
     {
         return listen_socket_address_.port();
     }
@@ -366,7 +366,7 @@ public:
 
         /* is_utp_supported_ is already the latest */
 
-        /* from_first_ is already the latest */
+        /* from_first_ should never modified */
         found_at(connectable.from_best());
 
         /* num_consecutive_fails_ is already the latest */

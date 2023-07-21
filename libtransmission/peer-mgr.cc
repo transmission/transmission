@@ -144,6 +144,36 @@ bool tr_peer_info::is_blocklisted(tr_session const* session) const
 
 namespace
 {
+
+/* better goes first */
+constexpr struct
+{
+    [[nodiscard]] constexpr static int compare(tr_peer_info const& a, tr_peer_info const& b) noexcept // <=>
+    {
+        if (auto const val = a.compare_by_piece_data_time(b); val != 0)
+        {
+            return -val;
+        }
+
+        if (auto const val = tr_compare_3way(a.from_best(), b.from_best()); val != 0)
+        {
+            return val;
+        }
+
+        return a.compare_by_failure_count(b);
+    }
+
+    [[nodiscard]] constexpr bool operator()(tr_peer_info const& a, tr_peer_info const& b) const noexcept
+    {
+        return compare(a, b) < 0;
+    }
+
+    [[nodiscard]] constexpr bool operator()(tr_peer_info const* a, tr_peer_info const* b) const noexcept
+    {
+        return compare(*a, *b) < 0;
+    }
+} CompareAtomsByUsefulness{};
+
 namespace peer_callback_helpers
 {
 
@@ -444,6 +474,8 @@ public:
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
             if (auto* const info = msgs->peer_info; std::empty(info->listen_port()))
             {
+                TR_ASSERT(info->is_connected());
+
                 auto nh = s->incoming_peer_info.extract(msgs->socket_address());
                 TR_ASSERT(!std::empty(nh));
                 TR_ASSERT(&nh.mapped() == info);
@@ -454,6 +486,30 @@ public:
                 {
                     auto& info_old = nh_old.mapped();
                     TR_ASSERT(nh_old.key() == info_old.listen_socket_address());
+
+                    // If there is an existing connection to this peer, keep the better one
+                    if (info_old.is_connected())
+                    {
+                        if (CompareAtomsByUsefulness(*info, info_old))
+                        {
+                            auto it = std::find_if(
+                                std::begin(s->peers),
+                                std::end(s->peers),
+                                [&info_old](tr_peerMsgs const* const peer) { return peer->peer_info == &info_old; });
+                            TR_ASSERT(it != std::end(s->peers));
+                            s->remove_peer(*it);
+                        }
+                        else
+                        {
+                            info->merge_connectable_into_incoming(info_old);
+                            std::swap(*info, info_old);
+
+                            s->remove_peer(msgs);
+                            s->known_connectable.insert(std::move(nh_old));
+                            break;
+                        }
+                    }
+
                     info->merge_connectable_into_incoming(info_old);
                 }
                 else
@@ -1177,35 +1233,6 @@ namespace
 {
 namespace get_peers_helpers
 {
-
-/* better goes first */
-constexpr struct
-{
-    [[nodiscard]] constexpr static int compare(tr_peer_info const& a, tr_peer_info const& b) noexcept // <=>
-    {
-        if (auto const val = a.compare_by_piece_data_time(b); val != 0)
-        {
-            return -val;
-        }
-
-        if (auto const val = tr_compare_3way(a.from_best(), b.from_best()); val != 0)
-        {
-            return val;
-        }
-
-        return a.compare_by_failure_count(b);
-    }
-
-    [[nodiscard]] constexpr bool operator()(tr_peer_info const& a, tr_peer_info const& b) const noexcept
-    {
-        return compare(a, b) < 0;
-    }
-
-    [[nodiscard]] constexpr bool operator()(tr_peer_info const* a, tr_peer_info const* b) const noexcept
-    {
-        return compare(*a, *b) < 0;
-    }
-} CompareAtomsByUsefulness{};
 
 [[nodiscard]] bool is_peer_interesting(tr_torrent const* tor, tr_peer_info const& info)
 {
