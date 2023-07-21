@@ -472,25 +472,33 @@ public:
 
         case tr_peer_event::Type::ClientGotPort:
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-            if (auto* const info = msgs->peer_info; std::empty(info->listen_port()))
+            if (auto* const info = msgs->peer_info; std::empty(msgs->peer_info->listen_port()))
             {
                 TR_ASSERT(info->is_connected());
 
                 auto nh = s->incoming_peer_info.extract(msgs->socket_address());
+
+                // the info pointer is invalid and shouldn't be used from this point on:
+                // https://en.cppreference.com/w/cpp/container/unordered_map/extract
+                // Pointers and references to the extracted element remain valid, but cannot be used while element
+                // is owned by a node handle: they become usable if the element is inserted into a container.
+
+                auto& info_new = nh.mapped();
                 TR_ASSERT(!std::empty(nh));
-                TR_ASSERT(&nh.mapped() == info);
-                TR_ASSERT(nh.key().address() == info->listen_address());
+                TR_ASSERT(info_new.is_connected());
+                TR_ASSERT(nh.key().address() == info_new.listen_address());
 
                 // If we already know about this peer, merge the info objects without invalidating references
-                if (auto nh_old = s->known_connectable.extract({ info->listen_address(), event.port }); !std::empty(nh_old))
+                if (auto nh_old = s->known_connectable.extract({ info_new.listen_address(), event.port }); !std::empty(nh_old))
                 {
                     auto& info_old = nh_old.mapped();
                     TR_ASSERT(nh_old.key() == info_old.listen_socket_address());
+                    TR_ASSERT(nh_old.key().address() == info_new.listen_address());
 
                     // If there is an existing connection to this peer, keep the better one
                     if (info_old.is_connected())
                     {
-                        if (CompareAtomsByUsefulness(*info, info_old))
+                        if (CompareAtomsByUsefulness(info_new, info_old))
                         {
                             auto it = std::find_if(
                                 std::begin(s->peers),
@@ -501,8 +509,8 @@ public:
                         }
                         else
                         {
-                            info->merge_connectable_into_incoming(info_old);
-                            std::swap(*info, info_old);
+                            info_new.merge_connectable_into_incoming(info_old);
+                            std::swap(info_new, info_old);
 
                             s->remove_peer(msgs);
                             s->known_connectable.insert(std::move(nh_old));
@@ -510,14 +518,14 @@ public:
                         }
                     }
 
-                    info->merge_connectable_into_incoming(info_old);
+                    info_new.merge_connectable_into_incoming(info_old);
                 }
                 else
                 {
-                    info->set_connectable();
+                    info_new.set_connectable();
                 }
 
-                info->set_listen_port(event.port);
+                info_new.set_listen_port(event.port);
                 nh.key().port_ = event.port;
                 s->known_connectable.insert(std::move(nh));
             }
@@ -835,9 +843,9 @@ private:
            since the blocklist has changed, erase that cached value */
         for (auto* const tor : session->torrents())
         {
-            for (auto& map : { std::ref(tor->swarm->known_connectable), std::ref(tor->swarm->incoming_peer_info) })
+            for (auto& pool : { std::ref(tor->swarm->known_connectable), std::ref(tor->swarm->incoming_peer_info) })
             {
-                for (auto& [socket_address, atom] : map.get())
+                for (auto& [socket_address, atom] : pool.get())
                 {
                     atom.set_blocklisted_dirty();
                 }
@@ -2329,7 +2337,7 @@ struct peer_candidate
     return ret;
 }
 
-void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
+void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
 {
     using namespace handshake_helpers;
 
@@ -2399,7 +2407,7 @@ void tr_peerMgr::make_new_peer_connections()
         {
             if (auto* const peer_info = tor->swarm->get_existing_peer_info(sock_addr); peer_info != nullptr)
             {
-                initiateConnection(this, tor->swarm, *peer_info);
+                initiate_connection(this, tor->swarm, *peer_info);
             }
         }
     }
