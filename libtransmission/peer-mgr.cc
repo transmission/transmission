@@ -282,6 +282,8 @@ public:
         auto const lock = unique_lock();
 
         auto* const peer_info = peer->peer_info;
+        auto socket_address = peer->socket_address();
+        auto const was_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
         if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
@@ -294,12 +296,12 @@ public:
 
         TR_ASSERT(stats.peer_count == peerCount());
 
-        if (peer->is_incoming_connection())
-        {
-            incoming_peer_info.erase(peer->socket_address());
-        }
-
         delete peer;
+
+        if (was_incoming)
+        {
+            incoming_peer_info.erase(socket_address);
+        }
     }
 
     void removeAllPeers()
