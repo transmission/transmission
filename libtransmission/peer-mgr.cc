@@ -487,7 +487,7 @@ public:
 
         case tr_peer_event::Type::ClientGotPort:
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-            if (auto* const info = msgs->peer_info; std::empty(msgs->peer_info->listen_port()))
+            if (auto* const info = msgs->peer_info; std::empty(info->listen_port()))
             {
                 TR_ASSERT(info->is_connected());
                 TR_ASSERT(std::empty(info->listen_port()));
