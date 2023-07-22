@@ -76,9 +76,9 @@ public:
         set_pex_flags(pex_flags);
     }
 
-    tr_peer_info(tr_peer_info&&) = default;
+    tr_peer_info(tr_peer_info&&) = delete;
     tr_peer_info(tr_peer_info const&) = delete;
-    tr_peer_info& operator=(tr_peer_info&&) = default;
+    tr_peer_info& operator=(tr_peer_info&&) = delete;
     tr_peer_info& operator=(tr_peer_info const&) = delete;
 
     ~tr_peer_info()
@@ -291,9 +291,16 @@ public:
 
     // ---
 
-    constexpr void set_pex_flags(uint8_t pex_flags) noexcept
+    constexpr void set_pex_flags(uint8_t pex_flags, bool merge_unsupported = false) noexcept
     {
-        pex_flags_ = pex_flags;
+        if (merge_unsupported)
+        {
+            pex_flags_ |= pex_flags;
+        }
+        else
+        {
+            pex_flags_ = pex_flags;
+        }
 
         if ((pex_flags & ADDED_F_CONNECTABLE) != 0U)
         {
@@ -346,41 +353,43 @@ public:
 
     // ---
 
-    // only to be used if our peer reported a listening port via ltep handshake
-    void merge_connectable_into_incoming(tr_peer_info& connectable, bool const swap_from_first = false) noexcept
+    // merge a peer info objects into ourself
+    void merge(tr_peer_info const& that) noexcept
     {
-        connection_attempted_at_ = std::max(connection_attempted_at_, connectable.connection_attempted_at_);
-        /* connection_changed_at_ is already the latest */
-        /* piece_data_at_ is already the latest */
+        connection_attempted_at_ = std::max(connection_attempted_at_, that.connection_attempted_at_);
+        connection_changed_at_ = std::max(connection_changed_at_, that.connection_changed_at_);
+        piece_data_at_ = std::max(piece_data_at_, that.piece_data_at_);
 
         /* no need to merge blocklist since it gets updated elsewhere */
 
-        TR_ASSERT(!is_connectable_);
-        if (auto& conn = connectable.is_connectable(); conn && *conn)
         {
-            set_connectable();
-        }
-        // rationale for not setting "not connectable" even if the peer was flagged as such:
-        // we thought the peer is not connectable, but here it is connecting to us, and reporting that it is listening
-        // so we better try again for ourselves
+            auto const conn_this = !is_connectable_ || *is_connectable_;
+            auto const conn_that = !that.is_connectable_ || *that.is_connectable_;
 
-        /* is_utp_supported_ is already the latest */
-
-        if (swap_from_first)
-        {
-            std::swap(from_first_, connectable.from_first_);
+            if (conn_this != conn_that)
+            {
+                is_connectable_.reset();
+            }
+            else
+            {
+                set_connectable(conn_this && conn_that);
+            }
         }
-        found_at(connectable.from_best());
+
+        set_utp_supported(supports_utp() || that.supports_utp());
+
+        /* from_first_ should never be modified */
+        found_at(that.from_best());
 
         /* num_consecutive_fails_ is already the latest */
-        /* pex flags are already the latest */
+        set_pex_flags(that.pex_flags(), true);
 
-        if (connectable.is_banned())
+        if (that.is_banned())
         {
             ban();
         }
         /* is_connected_ should already be set */
-        /* is_seed_ should already be the latest */
+        set_seed(is_seed() || that.is_seed());
     }
 
 private:

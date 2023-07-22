@@ -495,34 +495,32 @@ public:
                 if (auto it_conn = s->connectable_pool.find({ info_inc.listen_address(), event.port });
                     it_conn != std::end(s->connectable_pool))
                 {
-                    auto& ifo_conn = it_conn->second;
-                    TR_ASSERT(it_conn->first == ifo_conn.listen_socket_address());
+                    auto& info_conn = it_conn->second;
+                    TR_ASSERT(it_conn->first == info_conn.listen_socket_address());
                     TR_ASSERT(it_conn->first.address() == info_inc.listen_address());
 
                     // If there is an existing connection to this peer, keep the better one
-                    if (ifo_conn.is_connected())
+                    if (info_conn.is_connected())
                     {
-                        if (CompareAtomsByUsefulness(info_inc, ifo_conn))
+                        if (CompareAtomsByUsefulness(info_inc, info_conn))
                         {
                             auto it = std::find_if(
                                 std::begin(s->peers),
                                 std::end(s->peers),
-                                [&ifo_conn](tr_peerMsgs const* const peer) { return peer->peer_info == &ifo_conn; });
+                                [&info_conn](tr_peerMsgs const* const peer) { return peer->peer_info == &info_conn; });
                             TR_ASSERT(it != std::end(s->peers));
-                            s->remove_peer(it);
+                            (*it)->do_purge = true;
                         }
                         else
                         {
-                            info_inc.merge_connectable_into_incoming(ifo_conn, true);
-                            std::swap(info_inc, ifo_conn);
-                            s->remove_peer(msgs);
-                            s->connectable_pool.erase(it_conn);
+                            info_conn.merge(info_inc);
+                            msgs->do_purge = true;
                             s->mark_all_seeds_flag_dirty();
                             break;
                         }
                     }
 
-                    info_inc.merge_connectable_into_incoming(ifo_conn);
+                    info_inc.merge(info_conn);
                     s->connectable_pool.erase(it_conn);
                 }
                 else
@@ -534,10 +532,10 @@ public:
 
                 auto nh = s->incoming_pool.extract(msgs->socket_address());
                 TR_ASSERT(!std::empty(nh));
-                TR_ASSERT(nh.key().address() == info_inc.listen_address());
+                TR_ASSERT(nh.key().address() == nh.mapped().listen_address());
                 nh.key().port_ = event.port;
-                [[maybe_unused]] auto ins_ret = s->connectable_pool.insert(std::move(nh));
-                TR_ASSERT(ins_ret.inserted);
+                [[maybe_unused]] auto const inserted = s->connectable_pool.insert(std::move(nh)).inserted;
+                TR_ASSERT(inserted);
 
                 s->mark_all_seeds_flag_dirty();
             }
@@ -545,8 +543,8 @@ public:
             else if (info->listen_port() != event.port)
             {
                 auto nh = s->connectable_pool.extract(info->listen_socket_address());
-                auto& info_ref = nh.mapped();
                 TR_ASSERT(!std::empty(nh));
+                auto& info_ref = nh.mapped();
                 TR_ASSERT(nh.key() == info_ref.listen_socket_address());
 
                 info_ref.set_listen_port(event.port);
