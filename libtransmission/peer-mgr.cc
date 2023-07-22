@@ -302,7 +302,14 @@ public:
 
         delete peer;
 
-        temporary_pool.erase(socket_address);
+        if (was_incoming)
+        {
+            [[maybe_unused]] auto const port_empty = std::empty(peer_info->listen_port());
+            if (incoming_pool.erase(socket_address) != 0U)
+            {
+                TR_ASSERT(port_empty);
+            }
+        }
     }
 
     void remove_peer(tr_peerMsgs* peer)
@@ -384,30 +391,13 @@ public:
         tr_socket_address const& socket_address,
         uint8_t const flags,
         tr_peer_from const from,
-        bool const connectable_for_sure)
+        bool is_connectable)
     {
         TR_ASSERT(socket_address.is_valid());
         TR_ASSERT(from < TR_PEER_FROM__MAX);
 
-        // Ensure all keys are unique across both pools
-        static auto emplace_pool = [this](
-                                       tr_socket_address const& socket_address,
-                                       uint8_t const flags,
-                                       tr_peer_from const from,
-                                       bool const connectable_for_sure)
-        {
-            if (connectable_for_sure)
-            {
-                return connectable_pool.try_emplace(socket_address, socket_address, flags, from);
-            }
-            if (auto it = connectable_pool.find(socket_address); it != std::end(connectable_pool))
-            {
-                return std::pair{ it, false };
-            }
-            return temporary_pool.try_emplace(socket_address, socket_address.address(), flags, from);
-        };
-
-        auto&& [it, is_new] = emplace_pool(socket_address, flags, from, connectable_for_sure);
+        auto&& [it, is_new] = is_connectable ? connectable_pool.try_emplace(socket_address, socket_address, flags, from) :
+                                               incoming_pool.try_emplace(socket_address, socket_address.address(), flags, from);
         auto& peer_info = it->second;
         if (!is_new)
         {
@@ -516,14 +506,12 @@ public:
                     {
                         if (CompareAtomsByUsefulness(info_inc, info_conn))
                         {
-                            auto it_peer = std::find_if(
+                            auto it = std::find_if(
                                 std::begin(s->peers),
                                 std::end(s->peers),
                                 [&info_conn](tr_peerMsgs const* const peer) { return peer->peer_info == &info_conn; });
-                            TR_ASSERT(it_peer != std::end(s->peers));
-                            (*it_peer)->do_purge = true;
-
-                            s->temporary_pool.insert(s->connectable_pool.extract(it_conn));
+                            TR_ASSERT(it != std::end(s->peers));
+                            (*it)->do_purge = true;
                         }
                         else
                         {
@@ -535,7 +523,7 @@ public:
                     }
 
                     info_inc.merge(info_conn);
-                    s->connectable_pool.erase(info_conn.listen_socket_address());
+                    s->connectable_pool.erase(it_conn);
                 }
                 else
                 {
@@ -544,7 +532,7 @@ public:
 
                 info_inc.set_listen_port(event.port);
 
-                auto nh = s->temporary_pool.extract(msgs->socket_address());
+                auto nh = s->incoming_pool.extract(msgs->socket_address());
                 TR_ASSERT(!std::empty(nh));
                 TR_ASSERT(nh.key().address() == nh.mapped().listen_address());
                 nh.key().port_ = event.port;
@@ -607,7 +595,7 @@ public:
 
     // tr_peers hold pointers to the items in these containers,
     // therefore references to elements within cannot invalidate
-    Pool temporary_pool;
+    Pool incoming_pool;
     Pool connectable_pool;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
@@ -867,7 +855,7 @@ private:
            since the blocklist has changed, erase that cached value */
         for (auto* const tor : session->torrents())
         {
-            for (auto& pool : { std::ref(tor->swarm->connectable_pool), std::ref(tor->swarm->temporary_pool) })
+            for (auto& pool : { std::ref(tor->swarm->connectable_pool), std::ref(tor->swarm->incoming_pool) })
             {
                 for (auto& [socket_address, atom] : pool.get())
                 {
