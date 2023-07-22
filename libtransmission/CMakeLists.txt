@@ -10,11 +10,11 @@ endif()
 
 check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    add_compile_options(
-        # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
-        $<$<AND:$<BOOL:${APPLE}>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-arc>)
-endif()
+check_cxx_compiler_flag(-fobjc-arc CXX_COMPILER_SUPPORTS_OBJC_ARC)
+
+add_compile_options(
+	# equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
+	$<$<AND:$<BOOL:${APPLE}>,$<BOOL:${CXX_COMPILER_SUPPORTS_OBJC_ARC}>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-arc>)
 
 add_library(${TR_NAME} STATIC)
 
@@ -206,10 +206,10 @@ tr_allow_compile_if(
         watchdir-inotify.cc
     [=[[WITH_KQUEUE]]=]
         watchdir-kqueue.cc
-    [=[[APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"]]=]
+    [=[[APPLE AND CXX_COMPILER_SUPPORTS_OBJC_ARC]]=]
         tr-assert.mm
         utils.mm
-    [=[[NOT (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")]]=]
+    [=[[NOT (APPLE AND CXX_COMPILER_SUPPORTS_OBJC_ARC)]]=]
         tr-assert.cc
     [=[[WIN32]]=]
         file-win32.cc
