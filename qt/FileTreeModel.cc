@@ -20,8 +20,8 @@ class PathIteratorBase
 {
 protected:
     PathIteratorBase(QString const& path, int slash_index)
-        : path_(path)
-        , slash_index_(slash_index)
+        : path_{ path }
+        , slash_index_{ slash_index }
     {
         token_.reserve(path.size() / 2);
     }
@@ -62,7 +62,7 @@ class BackwardPathIterator : public PathIteratorBase
 {
 public:
     explicit BackwardPathIterator(QString const& path)
-        : PathIteratorBase(path, 0)
+        : PathIteratorBase{ path, 0 }
     {
     }
 
@@ -301,7 +301,7 @@ void FileTreeModel::clearSubtree(QModelIndex const& top)
 void FileTreeModel::clear()
 {
     beginResetModel();
-    clearSubtree(QModelIndex());
+    clearSubtree(QModelIndex{});
     root_item_ = std::make_unique<FileTreeItem>();
     endResetModel();
 
@@ -377,11 +377,11 @@ void FileTreeModel::addFile(
 
                 if (!filename_it.hasNext())
                 {
-                    child = new FileTreeItem(token, file_index, total_size);
+                    child = new FileTreeItem{ token, file_index, total_size };
                 }
                 else
                 {
-                    child = new FileTreeItem(token);
+                    child = new FileTreeItem{ token };
                 }
 
                 item->appendChild(child);

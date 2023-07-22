@@ -118,8 +118,9 @@ private:
     QString const fdo_notifications_service_name_ = QStringLiteral("org.freedesktop.Notifications");
     QString const fdo_notifications_path_ = QStringLiteral("/org/freedesktop/Notifications");
     QString const fdo_notifications_interface_name_ = QStringLiteral("org.freedesktop.Notifications");
-    QRegularExpression const start_now_regex_;
 #endif
+
+    QRegularExpression const start_now_regex_{ QStringLiteral(R"rgx(start-now\((\d+)\))rgx") };
 };
 
 #define trApp dynamic_cast<Application*>(Application::instance())

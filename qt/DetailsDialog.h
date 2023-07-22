@@ -46,7 +46,7 @@ public:
     // QWidget
     QSize sizeHint() const override
     {
-        return QSize(440, 460);
+        return QSize{ 440, 460 };
     }
 
 private:

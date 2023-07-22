@@ -88,7 +88,7 @@ private:
 
     [[nodiscard]] QString elidedText(QFont const& font, QString const& text, int width) const
     {
-        return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
+        return QFontMetrics{ font }.elidedText(text, Qt::ElideRight, width);
     }
 };
 
@@ -100,23 +100,23 @@ ItemLayout::ItemLayout(
     Qt::LayoutDirection direction,
     QPoint const& top_left,
     int width)
-    : name_font(base_font)
-    , status_font(base_font)
-    , name_text_(std::move(name_text))
-    , status_text_(std::move(status_text))
+    : name_font{ base_font }
+    , status_font{ base_font }
+    , name_text_{ std::move(name_text) }
+    , status_text_{ std::move(status_text) }
 {
     auto const* style = QApplication::style();
     int const icon_size = style->pixelMetric(QStyle::PM_SmallIconSize);
 
-    auto const name_fm = QFontMetrics(name_font);
+    auto const name_fm = QFontMetrics{ name_font };
     auto const name_size = name_fm.size(0, name_text_);
 
     status_font.setPointSize(static_cast<int>(status_font.pointSize() * 0.85));
-    QFontMetrics const status_fm(status_font);
+    auto const status_fm = QFontMetrics{ status_font };
     QSize const status_size(status_fm.size(0, status_text_));
 
     QStyleOptionProgressBar bar_style;
-    bar_style.rect = QRect(0, 0, BAR_WIDTH, BAR_HEIGHT);
+    bar_style.rect = QRect{ 0, 0, BAR_WIDTH, BAR_HEIGHT };
     bar_style.maximum = 100;
     bar_style.progress = 100;
     bar_style.textVisible = true;
@@ -124,11 +124,10 @@ ItemLayout::ItemLayout(
         bar_style.rect.width() * 2 - style->subElementRect(QStyle::SE_ProgressBarGroove, &bar_style).width(),
         bar_style.rect.height());
 
-    QRect base_rect(
-        top_left,
-        QSize(width, std::max({ icon_size, name_size.height(), status_size.height(), bar_size.height() })));
+    QRect base_rect{ top_left,
+                     QSize{ width, std::max({ icon_size, name_size.height(), status_size.height(), bar_size.height() }) } };
 
-    icon_rect = QStyle::alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter, QSize(icon_size, icon_size), base_rect);
+    icon_rect = QStyle::alignedRect(direction, Qt::AlignLeft | Qt::AlignVCenter, QSize{ icon_size, icon_size }, base_rect);
     emblem_rect = QStyle::alignedRect(
         direction,
         Qt::AlignRight | Qt::AlignBottom,
@@ -139,7 +138,7 @@ ItemLayout::ItemLayout(
     status_rect = QStyle::alignedRect(
         direction,
         Qt::AlignRight | Qt::AlignVCenter,
-        QSize(status_size.width(), base_rect.height()),
+        QSize{ status_size.width(), base_rect.height() },
         base_rect);
     Utils::narrowRect(base_rect, 0, status_rect.width() + GUI_PAD, direction);
     name_rect = base_rect;
@@ -225,7 +224,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     progress_bar_state |= QStyle::State_Small | QStyle::State_Horizontal;
 
     QIcon::Mode const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
-    QIcon const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon();
+    QIcon const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon{};
 
     // layout
     QSize const m(margin(*style));
