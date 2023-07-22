@@ -276,7 +276,7 @@ public:
         auto const lock = unique_lock();
 
         is_running = false;
-        removeAllPeers();
+        remove_all_peers();
         outgoing_handshakes.clear();
     }
 
@@ -317,13 +317,11 @@ public:
         remove_peer(std::find(std::begin(peers), std::end(peers), peer));
     }
 
-    void removeAllPeers()
+    void remove_all_peers()
     {
-        auto tmp = peers;
-
-        for (auto* peer : tmp)
+        for (auto it = std::begin(peers), end = std::end(peers); std::begin(peers) != end; it = std::begin(peers))
         {
-            remove_peer(peer);
+            remove_peer(it);
         }
 
         TR_ASSERT(stats.peer_count == 0);
@@ -2048,7 +2046,7 @@ void tr_peerMgr::reconnectPulse()
 
         if (!swarm->is_running)
         {
-            swarm->removeAllPeers();
+            swarm->remove_all_peers();
         }
         else
         {
