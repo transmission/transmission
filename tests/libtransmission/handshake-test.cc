@@ -116,7 +116,7 @@ public:
             return private_key_;
         }
 
-        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, tr_socket_address const& /*listen_socket_address*/) override
+        void set_utp_failed(tr_sha1_digest_t const& /*info_hash*/, tr_socket_address const& /*socket_address*/) override
         {
         }
 
