@@ -489,52 +489,52 @@ public:
             {
                 TR_ASSERT(info->is_connected());
                 TR_ASSERT(std::empty(info->listen_port()));
-                auto& info_new = *info;
+                auto& info_inc = *info;
 
                 // If we already know about this peer, merge the info objects without invalidating references
-                if (auto it_old = s->connectable_pool.find({ info_new.listen_address(), event.port });
-                    it_old != std::end(s->connectable_pool))
+                if (auto it_conn = s->connectable_pool.find({ info_inc.listen_address(), event.port });
+                    it_conn != std::end(s->connectable_pool))
                 {
-                    auto& info_old = it_old->second;
-                    TR_ASSERT(it_old->first == info_old.listen_socket_address());
-                    TR_ASSERT(it_old->first.address() == info_new.listen_address());
+                    auto& ifo_conn = it_conn->second;
+                    TR_ASSERT(it_conn->first == ifo_conn.listen_socket_address());
+                    TR_ASSERT(it_conn->first.address() == info_inc.listen_address());
 
                     // If there is an existing connection to this peer, keep the better one
-                    if (info_old.is_connected())
+                    if (ifo_conn.is_connected())
                     {
-                        if (CompareAtomsByUsefulness(info_new, info_old))
+                        if (CompareAtomsByUsefulness(info_inc, ifo_conn))
                         {
                             auto it = std::find_if(
                                 std::begin(s->peers),
                                 std::end(s->peers),
-                                [&info_old](tr_peerMsgs const* const peer) { return peer->peer_info == &info_old; });
+                                [&ifo_conn](tr_peerMsgs const* const peer) { return peer->peer_info == &ifo_conn; });
                             TR_ASSERT(it != std::end(s->peers));
                             s->remove_peer(it);
                         }
                         else
                         {
-                            info_new.merge_connectable_into_incoming(info_old, true);
-                            std::swap(info_new, info_old);
+                            info_inc.merge_connectable_into_incoming(ifo_conn, true);
+                            std::swap(info_inc, ifo_conn);
                             s->remove_peer(msgs);
-                            s->connectable_pool.erase(it_old);
+                            s->connectable_pool.erase(it_conn);
                             s->mark_all_seeds_flag_dirty();
                             break;
                         }
                     }
 
-                    info_new.merge_connectable_into_incoming(info_old);
-                    s->connectable_pool.erase(it_old);
+                    info_inc.merge_connectable_into_incoming(ifo_conn);
+                    s->connectable_pool.erase(it_conn);
                 }
                 else
                 {
-                    info_new.set_connectable();
+                    info_inc.set_connectable();
                 }
 
-                info_new.set_listen_port(event.port);
+                info_inc.set_listen_port(event.port);
 
                 auto nh = s->incoming_pool.extract(msgs->socket_address());
                 TR_ASSERT(!std::empty(nh));
-                TR_ASSERT(nh.key().address() == info_new.listen_address());
+                TR_ASSERT(nh.key().address() == info_inc.listen_address());
                 nh.key().port_ = event.port;
                 [[maybe_unused]] auto ins_ret = s->connectable_pool.insert(std::move(nh));
                 TR_ASSERT(ins_ret.inserted);
