@@ -310,6 +310,7 @@ public:
                 TR_ASSERT(port_empty);
             }
         }
+        graveyard_pool.erase(socket_address);
     }
 
     void remove_peer(tr_peerMsgs* peer)
@@ -512,6 +513,9 @@ public:
                                 [&info_conn](tr_peerMsgs const* const peer) { return peer->peer_info == &info_conn; });
                             TR_ASSERT(it != std::end(s->peers));
                             (*it)->do_purge = true;
+
+                            // Note that it_conn is invalid after this point
+                            s->graveyard_pool.insert(s->connectable_pool.extract(it_conn));
                         }
                         else
                         {
@@ -523,7 +527,7 @@ public:
                     }
 
                     info_inc.merge(info_conn);
-                    s->connectable_pool.erase(it_conn);
+                    s->connectable_pool.erase(info_conn.listen_socket_address());
                 }
                 else
                 {
@@ -597,6 +601,7 @@ public:
     // therefore references to elements within cannot invalidate
     Pool incoming_pool;
     Pool connectable_pool;
+    Pool graveyard_pool;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
