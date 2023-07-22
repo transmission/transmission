@@ -304,7 +304,11 @@ public:
 
         if (was_incoming)
         {
-            incoming_pool.erase(socket_address);
+            [[maybe_unused]] auto const port_empty = std::empty(peer_info->listen_port());
+            if (incoming_pool.erase(socket_address) != 0U)
+            {
+                TR_ASSERT(port_empty);
+            }
         }
     }
 
