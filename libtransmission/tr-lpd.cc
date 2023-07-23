@@ -295,7 +295,7 @@ private:
         {
             family = ifaddr->ifa_addr->sa_family;
 
-            struct sockaddr_in *addr = (struct sockaddr_in *) ifaddr->ifa_addr;
+            struct sockaddr_in *addr = reinterpret_cast<sockaddr_in*>(ifaddr->ifa_addr);
             if (family == AF_INET)
                 source_addr->sin_addr.s_addr = addr->sin_addr.s_addr;
         }
