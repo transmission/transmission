@@ -153,8 +153,6 @@ export class Transmission extends EventTarget {
               .getBoundingClientRect();
             movePopup(
               this.popup.root,
-              btnbox.left + btnbox.width,
-              btnbox.top + btnbox.height,
               document.body,
             );
           }
