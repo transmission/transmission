@@ -174,18 +174,6 @@ constexpr struct
     }
 } CompareAtomsByUsefulness{};
 
-namespace peer_callback_helpers
-{
-
-void on_client_got_piece_data(tr_torrent* const tor, uint32_t const sent_length, time_t const now)
-{
-    tor->downloadedCur += sent_length;
-    tor->set_date_active(now);
-    tor->set_dirty();
-    tor->session->add_downloaded(sent_length);
-}
-
-} // namespace peer_callback_helpers
 } // namespace
 
 /** @brief Opaque, per-torrent data structure for peer connection information */
@@ -420,8 +408,6 @@ public:
 
     static void peer_callback_webseed(tr_peer* const peer, tr_peer_event const& event, void* const vs)
     {
-        using namespace peer_callback_helpers;
-
         TR_ASSERT(peer != nullptr);
         auto* s = static_cast<tr_swarm*>(vs);
         auto const lock = s->unique_lock();
@@ -440,8 +426,6 @@ public:
 
     static void peer_callback_bt(tr_peerMsgs* const msgs, tr_peer_event const& event, void* const vs)
     {
-        using namespace peer_callback_helpers;
-
         TR_ASSERT(msgs != nullptr);
         auto* s = static_cast<tr_swarm*>(vs);
         TR_ASSERT(msgs->swarm == s);
@@ -507,27 +491,9 @@ public:
                     TR_ASSERT(it_conn->first.address() == info_inc.listen_address());
 
                     // If there is an existing connection to this peer, keep the better one
-                    if (info_conn.is_connected())
+                    if (info_conn.is_connected() && s->on_got_port_duplicate_connection(msgs, it_conn))
                     {
-                        if (CompareAtomsByUsefulness(info_inc, info_conn))
-                        {
-                            auto it = std::find_if(
-                                std::begin(s->peers),
-                                std::end(s->peers),
-                                [info](tr_peerMsgs const* const peer) { return peer->peer_info == info; });
-                            TR_ASSERT(it != std::end(s->peers));
-                            (*it)->do_purge = true;
-
-                            // Note that it_conn is invalid after this point
-                            s->graveyard_pool.insert(s->connectable_pool.extract(it_conn));
-                        }
-                        else
-                        {
-                            info_conn.merge(info_inc);
-                            msgs->do_purge = true;
-                            s->mark_all_seeds_flag_dirty();
-                            break;
-                        }
+                        break;
                     }
 
                     info_inc.merge(info_conn);
@@ -555,35 +521,16 @@ public:
                 TR_ASSERT(info->is_connected());
                 auto& info_this = *info;
 
-                if (auto it_existing = s->connectable_pool.find({ info_this.listen_address(), event.port });
-                    it_existing != std::end(s->connectable_pool))
+                if (auto it_that = s->connectable_pool.find({ info_this.listen_address(), event.port });
+                    it_that != std::end(s->connectable_pool))
                 {
-                    auto& info_existing = it_existing->second;
-                    TR_ASSERT(it_existing->first == info_existing.listen_socket_address());
-                    TR_ASSERT(it_existing->first.address() == info_this.listen_address());
+                    auto& info_existing = it_that->second;
+                    TR_ASSERT(it_that->first == info_existing.listen_socket_address());
+                    TR_ASSERT(it_that->first.address() == info_this.listen_address());
 
-                    if (info_existing.is_connected())
+                    if (info_existing.is_connected() && s->on_got_port_duplicate_connection(msgs, it_that))
                     {
-                        if (CompareAtomsByUsefulness(info_this, info_existing))
-                        {
-                            auto it = std::find_if(
-                                std::begin(s->peers),
-                                std::end(s->peers),
-                                [info](tr_peerMsgs const* const peer) { return peer->peer_info == info; });
-                            TR_ASSERT(it != std::end(s->peers));
-                            (*it)->do_purge = true;
-
-                            // Note that it_existing is invalid after this point
-                            s->graveyard_pool.insert(s->connectable_pool.extract(it_existing));
-                        }
-                        else
-                        {
-                            info_existing.merge(info_this);
-                            msgs->do_purge = true;
-                            s->graveyard_pool.insert(s->connectable_pool.extract(info_this.listen_socket_address()));
-                            s->mark_all_seeds_flag_dirty();
-                            break;
-                        }
+                        break;
                     }
 
                     info_this.merge(info_existing);
@@ -748,6 +695,8 @@ private:
     void on_torrent_started();
     void on_torrent_stopped();
 
+    // ---
+
     static void peer_callback_common(tr_peer* const peer, tr_peer_event const& event, tr_swarm* const s)
     {
         switch (event.type)
@@ -790,6 +739,45 @@ private:
             break;
         }
     }
+
+    static void on_client_got_piece_data(tr_torrent* const tor, uint32_t const sent_length, time_t const now)
+    {
+        tor->downloadedCur += sent_length;
+        tor->set_date_active(now);
+        tor->set_dirty();
+        tor->session->add_downloaded(sent_length);
+    }
+
+    bool on_got_port_duplicate_connection(tr_peerMsgs* msgs, Pool::iterator& it_that)
+    {
+        auto& info_this = *msgs->peer_info;
+        auto& info_that = it_that->second;
+
+        TR_ASSERT(info_that.is_connected());
+
+        if (CompareAtomsByUsefulness(info_this, info_that))
+        {
+            auto it = std::find_if(
+                std::begin(peers),
+                std::end(peers),
+                [&info_that](tr_peerMsgs const* const peer) { return peer->peer_info == &info_that; });
+            TR_ASSERT(it != std::end(peers));
+            (*it)->do_purge = true;
+
+            // Note that it_existing is invalid after this point
+            graveyard_pool.insert(connectable_pool.extract(it_that));
+            return false;
+        }
+
+        info_that.merge(info_this);
+        msgs->do_purge = true;
+        graveyard_pool.insert(connectable_pool.extract(info_this.listen_socket_address()));
+
+        mark_all_seeds_flag_dirty();
+        return true;
+    }
+
+    // ---
 
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
