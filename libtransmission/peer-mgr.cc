@@ -514,7 +514,7 @@ public:
                             auto it = std::find_if(
                                 std::begin(s->peers),
                                 std::end(s->peers),
-                                [&info_conn](tr_peerMsgs const* const peer) { return peer->peer_info == &info_conn; });
+                                [info](tr_peerMsgs const* const peer) { return peer->peer_info == info; });
                             TR_ASSERT(it != std::end(s->peers));
                             (*it)->do_purge = true;
 
@@ -550,22 +550,54 @@ public:
                 s->mark_all_seeds_flag_dirty();
             }
             // If we got a new listening port from a known connectable peer
-            else if (info->listen_port() != event.port)
+            else if (info->listen_port() != event.port && msgs->is_incoming_connection())
             {
-                auto nh = s->connectable_pool.extract(info->listen_socket_address());
+                TR_ASSERT(info->is_connected());
+                auto& info_this = *info;
+
+                if (auto it_existing = s->connectable_pool.find({ info_this.listen_address(), event.port });
+                    it_existing != std::end(s->connectable_pool))
+                {
+                    auto& info_existing = it_existing->second;
+                    TR_ASSERT(it_existing->first == info_existing.listen_socket_address());
+                    TR_ASSERT(it_existing->first.address() == info_this.listen_address());
+
+                    if (info_existing.is_connected())
+                    {
+                        if (CompareAtomsByUsefulness(info_this, info_existing))
+                        {
+                            auto it = std::find_if(
+                                std::begin(s->peers),
+                                std::end(s->peers),
+                                [info](tr_peerMsgs const* const peer) { return peer->peer_info == info; });
+                            TR_ASSERT(it != std::end(s->peers));
+                            (*it)->do_purge = true;
+
+                            // Note that it_existing is invalid after this point
+                            s->graveyard_pool.insert(s->connectable_pool.extract(it_existing));
+                        }
+                        else
+                        {
+                            info_existing.merge(info_this);
+                            msgs->do_purge = true;
+                            s->graveyard_pool.insert(s->connectable_pool.extract(info_this.listen_socket_address()));
+                            s->mark_all_seeds_flag_dirty();
+                            break;
+                        }
+                    }
+
+                    info_this.merge(info_existing);
+                    s->connectable_pool.erase(info_existing.listen_socket_address());
+                }
+
+                auto nh = s->connectable_pool.extract(info_this.listen_socket_address());
                 TR_ASSERT(!std::empty(nh));
-                auto& info_ref = nh.mapped();
-                TR_ASSERT(nh.key() == info_ref.listen_socket_address());
-
-                info_ref.set_listen_port(event.port);
+                nh.mapped().set_listen_port(event.port);
                 nh.key().port_ = event.port;
-                // we do not explicitly set the connectable flag here because for the code to reach here,
-                // this connection is either:
-                // 1. outgoing, where the connectable flag has already been set on handshake done.
-                // 2. incoming, and the peer has sent a port message before, so the connectable flag will have the
-                //    appropriate value already.
+                [[maybe_unused]] auto const inserted = s->connectable_pool.insert(std::move(nh)).inserted;
+                TR_ASSERT(inserted);
 
-                s->connectable_pool.insert(std::move(nh));
+                s->mark_all_seeds_flag_dirty();
             }
 
             break;
