@@ -322,7 +322,7 @@ public:
     {
         for (auto rit = std::rbegin(peers); rit != std::rend(peers); rit = std::rbegin(peers))
         {
-            remove_peer(rit.base());
+            remove_peer(rit.base() - 1);
         }
 
         TR_ASSERT(stats.peer_count == 0);
