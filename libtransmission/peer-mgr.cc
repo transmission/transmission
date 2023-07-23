@@ -320,9 +320,9 @@ public:
 
     void remove_all_peers()
     {
-        for (auto it = std::begin(peers), end = std::end(peers); std::begin(peers) != end; it = std::begin(peers))
+        for (auto rit = std::rbegin(peers); rit != std::rend(peers); rit = std::rbegin(peers))
         {
-            remove_peer(it);
+            remove_peer(rit.base());
         }
 
         TR_ASSERT(stats.peer_count == 0);
@@ -487,8 +487,12 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotPort:
+            if (std::empty(event.port))
+            {
+                // Do nothing
+            }
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-            if (auto* const info = msgs->peer_info; std::empty(info->listen_port()))
+            else if (auto* const info = msgs->peer_info; std::empty(info->listen_port()))
             {
                 TR_ASSERT(info->is_connected());
                 TR_ASSERT(std::empty(info->listen_port()));
