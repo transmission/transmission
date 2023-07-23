@@ -46,7 +46,6 @@
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 
-class tr_peer_info;
 struct tr_error;
 
 #ifndef EBADMSG

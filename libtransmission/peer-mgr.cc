@@ -12,7 +12,6 @@
 #include <cstdint>
 #include <ctime> // time_t
 #include <iterator> // std::back_inserter
-#include <map>
 #include <optional>
 #include <tuple> // std::tie
 #include <unordered_map>
@@ -476,12 +475,12 @@ public:
                 // Do nothing
             }
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-            else if (auto* const info = msgs->peer_info; std::empty(info->listen_port()))
+            else if (auto const& info = *msgs->peer_info; std::empty(info.listen_port()))
             {
                 s->on_got_port(msgs, event, false);
             }
             // If we got a new listening port from a known connectable peer
-            else if (info->listen_port() != event.port && msgs->is_incoming_connection())
+            else if (info.listen_port() != event.port && msgs->is_incoming_connection())
             {
                 s->on_got_port(msgs, event, true);
             }
@@ -519,7 +518,7 @@ public:
     // depends-on: active_requests
     Peers peers;
 
-    // tr_peers hold pointers to the items in these containers,
+    // tr_peerMsgs hold pointers to the items in these containers,
     // therefore references to elements within cannot invalidate
     Pool incoming_pool;
     Pool connectable_pool;
@@ -1101,7 +1100,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     {
         if (s != nullptr)
         {
-            if (auto* const info = s->get_existing_peer_info(socket_address); !result.io->is_incoming() && info != nullptr)
+            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr)
             {
                 info->on_connection_failed();
 

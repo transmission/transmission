@@ -13,7 +13,6 @@
 #include <atomic>
 #include <cstddef> // for size_t
 #include <memory>
-#include <utility> // for std::pair<>
 
 #include "libtransmission/transmission.h" // for tr_direction, tr_block_ind...
 
@@ -44,7 +43,7 @@ public:
         bool connection_is_incoming,
         bool connection_is_utp);
 
-    virtual ~tr_peerMsgs() override;
+    ~tr_peerMsgs() override;
 
     [[nodiscard]] static auto size() noexcept
     {
