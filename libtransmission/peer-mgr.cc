@@ -524,17 +524,17 @@ public:
                 if (auto it_that = s->connectable_pool.find({ info_this.listen_address(), event.port });
                     it_that != std::end(s->connectable_pool))
                 {
-                    auto& info_existing = it_that->second;
-                    TR_ASSERT(it_that->first == info_existing.listen_socket_address());
+                    auto& info_that = it_that->second;
+                    TR_ASSERT(it_that->first == info_that.listen_socket_address());
                     TR_ASSERT(it_that->first.address() == info_this.listen_address());
 
-                    if (info_existing.is_connected() && s->on_got_port_duplicate_connection(msgs, it_that))
+                    if (info_that.is_connected() && s->on_got_port_duplicate_connection(msgs, it_that))
                     {
                         break;
                     }
 
-                    info_this.merge(info_existing);
-                    s->connectable_pool.erase(info_existing.listen_socket_address());
+                    info_this.merge(info_that);
+                    s->connectable_pool.erase(info_that.listen_socket_address());
                 }
 
                 auto nh = s->connectable_pool.extract(info_this.listen_socket_address());
