@@ -478,73 +478,12 @@ public:
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
             else if (auto* const info = msgs->peer_info; std::empty(info->listen_port()))
             {
-                TR_ASSERT(info->is_connected());
-                TR_ASSERT(std::empty(info->listen_port()));
-                auto& info_inc = *info;
-
-                // If we already know about this peer, merge the info objects without invalidating references
-                if (auto it_conn = s->connectable_pool.find({ info_inc.listen_address(), event.port });
-                    it_conn != std::end(s->connectable_pool))
-                {
-                    auto& info_conn = it_conn->second;
-                    TR_ASSERT(it_conn->first == info_conn.listen_socket_address());
-                    TR_ASSERT(it_conn->first.address() == info_inc.listen_address());
-
-                    // If there is an existing connection to this peer, keep the better one
-                    if (info_conn.is_connected() && s->on_got_port_duplicate_connection(msgs, it_conn))
-                    {
-                        break;
-                    }
-
-                    info_inc.merge(info_conn);
-                    s->connectable_pool.erase(info_conn.listen_socket_address());
-                }
-                else
-                {
-                    info_inc.set_connectable();
-                }
-
-                info_inc.set_listen_port(event.port);
-
-                auto nh = s->incoming_pool.extract(msgs->socket_address());
-                TR_ASSERT(!std::empty(nh));
-                TR_ASSERT(nh.key().address() == nh.mapped().listen_address());
-                nh.key().port_ = event.port;
-                [[maybe_unused]] auto const inserted = s->connectable_pool.insert(std::move(nh)).inserted;
-                TR_ASSERT(inserted);
-
-                s->mark_all_seeds_flag_dirty();
+                s->on_got_port(msgs, event, false);
             }
             // If we got a new listening port from a known connectable peer
             else if (info->listen_port() != event.port && msgs->is_incoming_connection())
             {
-                TR_ASSERT(info->is_connected());
-                auto& info_this = *info;
-
-                if (auto it_that = s->connectable_pool.find({ info_this.listen_address(), event.port });
-                    it_that != std::end(s->connectable_pool))
-                {
-                    auto& info_that = it_that->second;
-                    TR_ASSERT(it_that->first == info_that.listen_socket_address());
-                    TR_ASSERT(it_that->first.address() == info_this.listen_address());
-
-                    if (info_that.is_connected() && s->on_got_port_duplicate_connection(msgs, it_that))
-                    {
-                        break;
-                    }
-
-                    info_this.merge(info_that);
-                    s->connectable_pool.erase(info_that.listen_socket_address());
-                }
-
-                auto nh = s->connectable_pool.extract(info_this.listen_socket_address());
-                TR_ASSERT(!std::empty(nh));
-                nh.mapped().set_listen_port(event.port);
-                nh.key().port_ = event.port;
-                [[maybe_unused]] auto const inserted = s->connectable_pool.insert(std::move(nh)).inserted;
-                TR_ASSERT(inserted);
-
-                s->mark_all_seeds_flag_dirty();
+                s->on_got_port(msgs, event, true);
             }
 
             break;
@@ -748,7 +687,53 @@ private:
         tor->session->add_downloaded(sent_length);
     }
 
-    bool on_got_port_duplicate_connection(tr_peerMsgs* msgs, Pool::iterator& it_that)
+    void on_got_port(tr_peerMsgs* const msgs, tr_peer_event const& event, bool was_connectable)
+    {
+        auto& info_this = *msgs->peer_info;
+        TR_ASSERT(info_this.is_connected());
+        TR_ASSERT(was_connectable != std::empty(info_this.listen_port()));
+
+        // If we already know about this peer, merge the info objects without invalidating references
+        if (auto it_that = connectable_pool.find({ info_this.listen_address(), event.port });
+            it_that != std::end(connectable_pool))
+        {
+            auto& info_that = it_that->second;
+            TR_ASSERT(it_that->first == info_that.listen_socket_address());
+            TR_ASSERT(it_that->first.address() == info_this.listen_address());
+
+            // If there is an existing connection to this peer, keep the better one
+            if (info_that.is_connected() && on_got_port_duplicate_connection(msgs, it_that, was_connectable))
+            {
+                return;
+            }
+
+            info_this.merge(info_that);
+            connectable_pool.erase(info_that.listen_socket_address());
+        }
+        else if (!was_connectable)
+        {
+            info_this.set_connectable();
+        }
+
+        auto nh = (was_connectable ? connectable_pool : incoming_pool).extract(msgs->socket_address());
+        TR_ASSERT(!std::empty(nh));
+        if (was_connectable)
+        {
+            TR_ASSERT(nh.key() == nh.mapped().listen_socket_address());
+        }
+        else
+        {
+            TR_ASSERT(nh.key().address() == nh.mapped().listen_address());
+        }
+        nh.key().port_ = event.port;
+        [[maybe_unused]] auto const inserted = connectable_pool.insert(std::move(nh)).inserted;
+        TR_ASSERT(inserted);
+        info_this.set_listen_port(event.port);
+
+        mark_all_seeds_flag_dirty();
+    }
+
+    bool on_got_port_duplicate_connection(tr_peerMsgs* const msgs, Pool::iterator& it_that, bool was_connectable)
     {
         auto& info_this = *msgs->peer_info;
         auto& info_that = it_that->second;
@@ -764,14 +749,22 @@ private:
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
 
-            // Note that it_existing is invalid after this point
-            graveyard_pool.insert(connectable_pool.extract(it_that));
+            if (was_connectable)
+            {
+                // Note that it_that is invalid after this point
+                graveyard_pool.insert(connectable_pool.extract(it_that));
+            }
+
             return false;
         }
 
         info_that.merge(info_this);
         msgs->do_purge = true;
-        graveyard_pool.insert(connectable_pool.extract(info_this.listen_socket_address()));
+
+        if (was_connectable)
+        {
+            graveyard_pool.insert(connectable_pool.extract(info_this.listen_socket_address()));
+        }
 
         mark_all_seeds_flag_dirty();
         return true;
