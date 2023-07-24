@@ -148,15 +148,6 @@ export class Transmission extends EventTarget {
                 this.action_manager,
               ),
             );
-            const btnbox = document
-              .querySelector('#toolbar-overflow')
-              .getBoundingClientRect();
-            movePopup(
-              this.popup.root,
-              btnbox.left + btnbox.width,
-              btnbox.top + btnbox.height,
-              document.body,
-            );
           }
           break;
         case 'show-preferences-dialog':

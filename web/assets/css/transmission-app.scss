@@ -1320,6 +1320,8 @@ $video-image: '../img/film.svg';
   padding: 10px 5px;
   position: absolute;
   z-index: 9999;
+  overflow: scroll;
+  max-height: 90vh;
 
   .context-menuitem {
     font-size: 13px;
@@ -1332,7 +1334,6 @@ $video-image: '../img/film.svg';
       background-color: var(--color-bg-hover);
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 500;
     }
 
     &:disabled {
@@ -1364,18 +1365,14 @@ $video-image: '../img/film.svg';
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
   min-width: 220px;
-  overflow: auto;
+  overflow: scroll;
   -webkit-overflow-scrolling: touch;
   padding: 10px;
   position: absolute;
-
+  max-height: 80vh;
   right: 20px;
   top: 50px;
   z-index: $z-index-popup;
-
-  @include for-phone-only() {
-    height: 80vh;
-  }
 
   fieldset {
     border: 0;
