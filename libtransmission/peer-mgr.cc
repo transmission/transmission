@@ -699,6 +699,7 @@ private:
             auto& info_that = it_that->second;
             TR_ASSERT(it_that->first == info_that.listen_socket_address());
             TR_ASSERT(it_that->first.address() == info_this.listen_address());
+            TR_ASSERT(it_that->first.port() != info_this.listen_port());
 
             // If there is an existing connection to this peer, keep the better one
             if (info_that.is_connected() && on_got_port_duplicate_connection(msgs, it_that, was_connectable))
@@ -714,7 +715,8 @@ private:
             info_this.set_connectable();
         }
 
-        auto nh = (was_connectable ? connectable_pool : incoming_pool).extract(msgs->socket_address());
+        auto nh = was_connectable ? connectable_pool.extract(info_this.listen_socket_address()) :
+                                    incoming_pool.extract(msgs->socket_address());
         TR_ASSERT(!std::empty(nh));
         if (was_connectable)
         {
