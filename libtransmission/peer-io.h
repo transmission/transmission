@@ -31,7 +31,6 @@
 
 struct struct_utp_context;
 struct tr_error;
-struct tr_session;
 
 namespace libtransmission::test
 {

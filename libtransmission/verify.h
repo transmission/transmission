@@ -19,7 +19,6 @@
 #include <set>
 #include <thread>
 
-struct tr_session;
 struct tr_torrent;
 
 class tr_verify_worker

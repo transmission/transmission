@@ -22,7 +22,6 @@
 #include "libtransmission/utils-ev.h"
 
 class tr_rpc_address;
-struct tr_session;
 struct tr_variant;
 struct libdeflate_compressor;
 

@@ -23,7 +23,6 @@
 #include "tr-buffer.h"
 
 struct UTPSocket;
-struct tr_session;
 
 class tr_peer_socket
 {
