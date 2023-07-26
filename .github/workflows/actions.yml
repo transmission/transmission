@@ -289,7 +289,7 @@ jobs:
     needs: [ what-to-make ]
     runs-on: ubuntu-22.04
     container:
-      image: radupopescu/musl-builder
+      image: alpine:latest
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
       - name: Show Configuration
