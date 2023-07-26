@@ -33,7 +33,6 @@
 struct tr_address;
 class tr_announcer_udp;
 struct tr_session;
-struct tr_torrent;
 struct tr_torrent_announcer;
 
 // --- Tracker Publish / Subscribe

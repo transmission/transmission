@@ -166,7 +166,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
 class tr_webseed final : public tr_peer
 {
 public:
-    tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback callback_in, void* callback_data_in)
+    tr_webseed(tr_torrent* tor, std::string_view url, tr_peer_callback callback_in, void* callback_data_in)
         : tr_peer{ tor }
         , torrent_id{ tr_torrentId(tor) }
         , base_url{ url }

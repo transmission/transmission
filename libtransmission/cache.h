@@ -22,7 +22,6 @@
 #include "block-info.h"
 
 class tr_torrents;
-struct tr_torrent;
 
 class Cache
 {

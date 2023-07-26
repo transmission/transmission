@@ -39,7 +39,6 @@ struct tr_error;
 struct tr_magnet_info;
 struct tr_metainfo_parsed;
 struct tr_session;
-struct tr_torrent;
 struct tr_torrent_announcer;
 
 // --- Package-visible

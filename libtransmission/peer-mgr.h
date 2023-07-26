@@ -34,7 +34,6 @@ class tr_peer_socket;
 struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_session;
-struct tr_torrent;
 
 /* added_f's bitwise-or'ed flags */
 enum
@@ -536,7 +535,7 @@ enum
     uint8_t peer_list_mode,
     size_t max_peer_count);
 
-void tr_peerMgrAddTorrent(tr_peerMgr* manager, struct tr_torrent* tor);
+void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor);
 
 // return the number of connected peers that have `piece`, or -1 if we already have it
 [[nodiscard]] int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece);

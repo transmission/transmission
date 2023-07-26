@@ -69,7 +69,6 @@ tr_peer_id_t tr_peerIdInit();
 class tr_peer_socket;
 struct tr_pex;
 class tr_rpc_server;
-struct tr_torrent;
 struct struct_utp_context;
 struct tr_variant;
 

@@ -407,7 +407,7 @@ enum tr_rpc_callback_status
 using tr_rpc_func = tr_rpc_callback_status (*)( //
     tr_session* session,
     tr_rpc_callback_type type,
-    struct tr_torrent* tor_or_null,
+    tr_torrent* tor_or_null,
     void* user_data);
 
 /**

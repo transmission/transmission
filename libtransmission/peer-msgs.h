@@ -23,7 +23,6 @@
 
 class tr_peerIo;
 class tr_peer_info;
-struct tr_torrent;
 
 /**
  * @addtogroup peers Peers
