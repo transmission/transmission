@@ -303,7 +303,7 @@ size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) co
 
     return byte_count;
 }
-
+// FIXME(tearfur): trigger CI again
 void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count, bool is_piece_data, uint64_t now)
 {
     TR_ASSERT(tr_isDirection(dir));
