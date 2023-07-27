@@ -48,13 +48,13 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
 
 /// MIXINS
 
-@mixin for-phone-only {
+@mixin viewport599 {
   @media (max-width: 599px) {
     @content;
   }
 }
 
-@mixin for-tablet-portrait-up {
+@mixin viewport600 {
   @media (min-width: 600px) {
     @content;
   }
@@ -364,23 +364,18 @@ $toolbar-height: $toolbar-height-number * 1px;
 /// FILTERBAR
 
 .mainwin-filterbar {
+  white-space: pre;
   align-items: center;
   background: var(--color-toolbar-background);
   border-bottom: 1px solid var(--color-default-border);
   display: flex;
   flex-direction: row;
   height: 30px;
-  width: 100%;
 
-  @include for-phone-only {
-    padding: 5px 0px;
-
+  @include viewport599 {
+    padding-left: 5px;
     :not(select):not(input):not(option) {
       display: none;
-    }
-
-    #torrent-search {
-      padding: 5px;
     }
   }
 
@@ -388,6 +383,11 @@ $toolbar-height: $toolbar-height-number * 1px;
     margin-right: 5px;
     padding: 0 5px;
   }
+}
+
+#torrent-search {
+  width: 100%;
+  max-width: 160px;
 }
 
 $speed-icon-size: 12px;
@@ -781,7 +781,7 @@ $video-image: '../img/film.svg';
 
 /// PREFERENCES DIALOG
 
-@include for-phone-only {
+@include viewport599 {
   input[type='checkbox'] {
     height: 20px;
     width: 20px;
@@ -790,10 +790,10 @@ $video-image: '../img/film.svg';
 
 #inspector,
 #prefs-dialog {
-  @include for-phone-only {
+  @include viewport599 {
     left: 0;
   }
-  @include for-tablet-portrait-up {
+  @include viewport600 {
     border-left: 1px solid var(--color-default-border);
     width: 570px;
   }
@@ -958,10 +958,10 @@ $video-image: '../img/film.svg';
   right: 0;
   top: $popup-top;
   z-index: $z-index-popup;
-  @include for-phone-only {
+  @include viewport599 {
     left: 0;
   }
-  @include for-tablet-portrait-up {
+  @include viewport600 {
     width: 550px;
   }
 }
@@ -988,10 +988,10 @@ $video-image: '../img/film.svg';
   flex: 1;
   overflow-x: hidden;
   overflow-y: auto;
-  @include for-phone-only {
+  @include viewport599 {
     padding: 0 8px 20px;
   }
-  @include for-tablet-portrait-up {
+  @include viewport600 {
     padding: 0 20px 20px;
   }
 }
@@ -1248,10 +1248,10 @@ $video-image: '../img/film.svg';
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @include for-phone-only {
+    @include viewport599 {
       display: none;
     }
-    @include for-tablet-portrait-up {
+    @include viewport600 {
       width: 25%;
     }
   }
@@ -1392,7 +1392,7 @@ $video-image: '../img/film.svg';
     padding: 3px 0;
 
     // hide the fullscreen button unless we're on mobile
-    @include for-tablet-portrait-up {
+    @include viewport600 {
       &.display-fullscreen-row {
         display: none;
       }
@@ -1503,7 +1503,7 @@ $dialog-padding-number: 20;
 $dialog-logo-padding-number: math.div($dialog-padding-number * 2, 3);
 $logo-size: 64px;
 
-@include for-phone-only {
+@include viewport599 {
   .dialog-buttons {
     padding-top: $dialog-logo-padding-number * 1px;
   }
@@ -1525,7 +1525,7 @@ $logo-size: 64px;
     flex-direction: column;
   }
 }
-@include for-tablet-portrait-up {
+@include viewport600 {
   .dialog-container {
     min-width: 400px;
     position: absolute;
@@ -1597,7 +1597,7 @@ dialog {
   padding: 0;
   z-index: $z-index-popup;
 
-  @include for-tablet-portrait-up() {
+  @include viewport600 {
     border: 0;
     border-radius: 8px;
     max-width: 50%;
@@ -1711,10 +1711,10 @@ dialog {
     grid-template-columns: auto 1fr;
     margin-top: 4px;
 
-    @include for-phone-only {
+    @include viewport599 {
       margin: 4px 0 16px;
     }
-    @include for-tablet-portrait-up {
+    @include viewport600 {
       margin: 4px 16px 16px;
     }
 
