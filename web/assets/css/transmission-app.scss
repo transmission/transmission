@@ -373,7 +373,7 @@ $toolbar-height: $toolbar-height-number * 1px;
   width: 100%;
 
   @include for-phone-only {
-    padding: 5px 10px;
+    padding: 5px 0px;
 
     :not(select):not(input):not(option) {
       display: none;
