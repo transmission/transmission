@@ -782,11 +782,6 @@ $video-image: '../img/film.svg';
 /// PREFERENCES DIALOG
 
 @include for-phone-only {
-  html,
-  body {
-    overflow: hidden;
-  }
-
   input[type='checkbox'] {
     height: 20px;
     width: 20px;
