@@ -363,6 +363,12 @@ private:
                 return false;
             }
 
+            if (auto [ss, sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr(tr_port{});
+                bind(mcast_snd_socket_, reinterpret_cast<sockaddr*>(&ss), sslen) == -1)
+            {
+                return false;
+            }
+
             /* configure outbound multicast TTL */
             if (setsockopt(
                     mcast_snd_socket_,
