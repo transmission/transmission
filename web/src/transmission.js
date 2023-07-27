@@ -148,15 +148,6 @@ export class Transmission extends EventTarget {
                 this.action_manager,
               ),
             );
-            const btnbox = document
-              .querySelector('#toolbar-overflow')
-              .getBoundingClientRect();
-            movePopup(
-              this.popup.root,
-              btnbox.left + btnbox.width,
-              btnbox.top + btnbox.height,
-              document.body,
-            );
           }
           break;
         case 'show-preferences-dialog':
@@ -236,12 +227,13 @@ export class Transmission extends EventTarget {
 
       const popup = new ContextMenu(this.action_manager);
       this.setCurrentPopup(popup);
-      movePopup(
-        popup.root,
-        event_.x,
-        event_.y,
-        document.querySelector('#torrent-container'),
-      );
+
+      let boundingElement = document.querySelector('#torrent-container');
+      let bounds = boundingElement.getBoundingClientRect();
+      let x = Math.min(event_.x, bounds.x + bounds.width - popup.root.clientWidth);
+      let y = Math.min(event_.y, bounds.y + bounds.height - popup.root.clientHeight);
+      popup.root.style.left = `${x>0?x:0}px`;
+      popup.root.style.top = `${y>0?y:0}px`;
       event_.preventDefault();
     });
 
