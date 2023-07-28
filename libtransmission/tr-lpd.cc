@@ -9,7 +9,6 @@
 #include <functional>
 #include <memory>
 #include <optional>
-#include <sstream>
 #include <string>
 
 #ifdef _WIN32
@@ -81,28 +80,29 @@ auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destinati
  * multiple infohashes the packet length should not exceed 1400
  * bytes to avoid MTU/fragmentation problems.
  */
-auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::string_view const* info_hash_strings, size_t n_strings)
+auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::vector<std::string_view> const& info_hash_strings)
 {
-    static auto constexpr Major = 1;
-    static auto constexpr Minor = 1;
-    static auto constexpr CrLf = "\r\n"sv;
+    auto ret = fmt::format(
+        "BT-SEARCH * HTTP/1.1\r\n"
+        "Host: {:s}:{:d}\r\n"
+        "Port: {:d}\r\n",
+        McastGroup,
+        McastPort.host(),
+        port.host());
 
-    auto ostr = std::ostringstream{};
-    ostr << "BT-SEARCH * HTTP/" << Major << '.' << Minor << CrLf //
-         << "Host: " << McastGroup << ':' << McastPort.host() << CrLf //
-         << "Port: " << port.host() << CrLf;
-    for (size_t i = 0; i < n_strings; ++i)
+    for (auto const& info_hash : info_hash_strings)
     {
-        ostr << "Infohash: " << tr_strupper(info_hash_strings[i]) << CrLf;
+        ret += fmt::format("Infohash: {:s}\r\n", tr_strupper(info_hash));
     }
 
     if (!std::empty(cookie))
     {
-        ostr << "cookie: " << cookie << CrLf;
+        ret += fmt::format("cookie: {:s}\r\n", cookie);
     }
 
-    ostr << CrLf << CrLf;
-    return ostr.str();
+    ret += "\r\n\r\n";
+
+    return ret;
 }
 
 struct ParsedAnnounce
@@ -501,8 +501,8 @@ private:
             });
 
         // cram in as many as will fit in a message
-        auto const baseline_size = std::size(makeAnnounceMsg(cookie_, mediator_.port(), nullptr, 0));
-        auto const size_with_one = std::size(makeAnnounceMsg(cookie_, mediator_.port(), &torrents.front().info_hash_str, 1));
+        auto const baseline_size = std::size(makeAnnounceMsg(cookie_, mediator_.port(), {}));
+        auto const size_with_one = std::size(makeAnnounceMsg(cookie_, mediator_.port(), { torrents.front().info_hash_str }));
         auto const size_per_hash = size_with_one - baseline_size;
         auto const max_torrents_per_announce = (MaxDatagramLength - baseline_size) / size_per_hash;
         auto info_hash_strings = std::vector<std::string_view>{};
@@ -513,7 +513,7 @@ private:
             std::begin(info_hash_strings),
             [](auto const& tor) { return tor.info_hash_str; });
 
-        if (!sendAnnounce(std::data(info_hash_strings), std::size(info_hash_strings)))
+        if (!sendAnnounce(info_hash_strings))
         {
             return;
         }
@@ -547,9 +547,9 @@ private:
      * matter). A listening client on the same network might react by adding us to his
      * peer pool for torrent t.
      */
-    bool sendAnnounce(std::string_view const* info_hash_strings, size_t n_strings)
+    bool sendAnnounce(std::vector<std::string_view> const& info_hash_strings)
     {
-        auto const announce = makeAnnounceMsg(cookie_, mediator_.port(), info_hash_strings, n_strings);
+        auto const announce = makeAnnounceMsg(cookie_, mediator_.port(), info_hash_strings);
         TR_ASSERT(std::size(announce) <= MaxDatagramLength);
         auto const res = sendto(
             mcast_snd_socket_,
