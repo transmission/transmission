@@ -28,7 +28,6 @@ import {
   deepEqual,
   setEnabled,
   setTextContent,
-  movePopup,
 } from './utils.js';
 
 export class Transmission extends EventTarget {
