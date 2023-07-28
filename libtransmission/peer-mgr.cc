@@ -480,7 +480,7 @@ public:
                 s->on_got_port(msgs, event, false);
             }
             // If we got a new listening port from a known connectable peer
-            else if (info.listen_port() != event.port && msgs->is_incoming_connection())
+            else if (info.listen_port() != event.port)
             {
                 s->on_got_port(msgs, event, true);
             }
