@@ -715,7 +715,7 @@ private:
 
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
-    small::vector<size_t, 512> sorted;
+    small::vector<size_t, 128U> sorted;
 };
 
 class VariantWalker
@@ -763,7 +763,7 @@ public:
 private:
     size_t size = 0;
 
-    static auto constexpr InitialCapacity = size_t{ 32U };
+    static auto constexpr InitialCapacity = size_t{ 24U };
     small::vector<WalkNode, InitialCapacity> stack;
     small::vector<WalkNode::ByKey, InitialCapacity> sortbuf;
 };
