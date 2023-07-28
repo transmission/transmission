@@ -277,7 +277,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -559,7 +559,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
