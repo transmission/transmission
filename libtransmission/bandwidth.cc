@@ -277,8 +277,8 @@ size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) co
                 now = tr_time_msec();
             }
 
-            auto const current = this->get_raw_speed_bytes_per_second(now, TR_DOWN);
-            auto const desired = this->get_desired_speed_bytes_per_second(TR_DOWN);
+            auto const current = this->get_raw_speed_bytes_per_second(now, dir);
+            auto const desired = this->get_desired_speed_bytes_per_second(dir);
             auto const r = desired >= 1 ? static_cast<double>(current) / desired : 0.0;
 
             if (r > 1.0)
