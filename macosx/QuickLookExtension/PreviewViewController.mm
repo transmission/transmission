@@ -40,7 +40,7 @@
     //try to parse the torrent file
     auto metainfo = tr_torrent_metainfo{};
     tr_error* error = nullptr;
-    if (!metainfo.parseTorrentFile(url.path.UTF8String, nullptr, &error))
+    if (!metainfo.parse_torrent_file(url.path.UTF8String, nullptr, &error))
     {
         NSError* err = nil;
         if (error != nullptr)
@@ -55,10 +55,10 @@
     NSString* name = @(metainfo.name().c_str());
     self.nameField.stringValue = name;
 
-    NSString* fileSizeString = [NSString stringForFileSize:metainfo.totalSize()];
+    NSString* fileSizeString = [NSString stringForFileSize:metainfo.total_size()];
     self.totalSizeField.stringValue = fileSizeString;
 
-    auto const& announce_list = metainfo.announceList();
+    auto const& announce_list = metainfo.announce_list();
     if (!std::empty(announce_list))
     {
         NSMutableString* listSection = [NSMutableString stringWithString:@"Trackers:\n"];
@@ -75,7 +75,7 @@
     auto const& files_list = metainfo.files();
     if (!std::empty(files_list))
     {
-        auto const n_files = metainfo.fileCount();
+        auto const n_files = metainfo.file_count();
         auto const is_multifile = n_files > 1;
 
         if (is_multifile)
