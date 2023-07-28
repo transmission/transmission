@@ -31,75 +31,6 @@ struct tr_error;
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */
-struct tr_variant_string
-{
-    void set_shallow(std::string_view val)
-    {
-        clear();
-
-        type_ = Type::View;
-        str_.str = std::data(val);
-        len_ = std::size(val);
-    }
-
-    void set(std::string_view val)
-    {
-        clear();
-
-        len_ = std::size(val);
-
-        if (len_ < sizeof(str_.buf))
-        {
-            type_ = Type::Buf;
-            std::copy_n(std::data(val), len_, str_.buf);
-            str_.buf[len_] = '\0';
-        }
-        else
-        {
-            char* const newstr = new char[len_ + 1];
-            std::copy_n(std::data(val), len_, newstr);
-            newstr[len_] = '\0';
-
-            type_ = Type::Heap;
-            str_.str = newstr;
-        }
-    }
-
-    [[nodiscard]] constexpr std::string_view get() const noexcept
-    {
-        return { type_ == Type::Buf ? str_.buf : str_.str, len_ };
-    }
-
-    void clear()
-    {
-        if (type_ == Type::Heap)
-        {
-            delete[] str_.str;
-        }
-
-        *this = {};
-    }
-
-private:
-    enum class Type
-    {
-        Heap,
-        Buf,
-        View
-    };
-
-    Type type_ = Type::View;
-    size_t len_ = 0U;
-    union
-    {
-        char buf[16];
-        char const* str;
-    } str_ = {};
-};
-
-/* these are PRIVATE IMPLEMENTATION details that should not be touched.
- * I'll probably change them just to break your code! HA HA HA!
- * it's included in the header for inlining and composition */
 enum
 {
     TR_VARIANT_TYPE_INT = 1,
@@ -115,6 +46,74 @@ enum
  * it's included in the header for inlining and composition */
 struct tr_variant
 {
+private:
+    struct tr_variant_string
+    {
+        void set_shallow(std::string_view newval)
+        {
+            clear();
+
+            type_ = Type::View;
+            str_.str = std::data(newval);
+            len_ = std::size(newval);
+        }
+
+        void set(std::string_view newval)
+        {
+            clear();
+
+            len_ = std::size(newval);
+
+            if (len_ < sizeof(str_.buf))
+            {
+                type_ = Type::Buf;
+                std::copy_n(std::data(newval), len_, str_.buf);
+                str_.buf[len_] = '\0';
+            }
+            else
+            {
+                char* const newstr = new char[len_ + 1];
+                std::copy_n(std::data(newval), len_, newstr);
+                newstr[len_] = '\0';
+
+                type_ = Type::Heap;
+                str_.str = newstr;
+            }
+        }
+
+        [[nodiscard]] constexpr std::string_view get() const noexcept
+        {
+            return { type_ == Type::Buf ? str_.buf : str_.str, len_ };
+        }
+
+        void clear()
+        {
+            if (type_ == Type::Heap)
+            {
+                delete[] str_.str;
+            }
+
+            *this = {};
+        }
+
+    private:
+        enum class Type
+        {
+            Heap,
+            Buf,
+            View
+        };
+
+        Type type_ = Type::View;
+        size_t len_ = 0U;
+        union
+        {
+            char buf[16];
+            char const* str;
+        } str_ = {};
+    };
+
+public:
     char type = '\0';
 
     tr_quark key = TR_KEY_NONE;
