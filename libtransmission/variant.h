@@ -47,7 +47,7 @@ enum
 struct tr_variant
 {
 private:
-    struct tr_variant_string
+    struct String
     {
         void set_shallow(std::string_view newval)
         {
@@ -126,7 +126,7 @@ public:
 
         int64_t i;
 
-        struct tr_variant_string s;
+        String s;
 
         struct
         {
