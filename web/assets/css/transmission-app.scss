@@ -1381,10 +1381,10 @@ $video-image: '../img/film.svg';
     0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
-  padding: 0px 30px 0px 10px;
+  padding: 10px;
   position: absolute;
 
-  right: 0px;
+  right: 20px;
   top: 50px;
   z-index: $z-index-popup;
 
