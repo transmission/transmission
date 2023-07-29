@@ -4204,15 +4204,21 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         GroupToolbarItem* groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier:ident];
 
-        NSToolbarItem* itemResume = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierResumeAll];
         NSToolbarItem* itemPause = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierPauseAll];
+        NSToolbarItem* itemResume = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierResumeAll];
 
         NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
         segmentedControl.segmentStyle = NSSegmentStyleTexturedRounded;
         segmentedControl.trackingMode = NSSegmentSwitchTrackingMomentary;
         segmentedControl.segmentCount = 2;
 
-                [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
+        [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
+        [segmentedControl setImage:[NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
+                        forSegment:ToolbarGroupTagPause];
+        [segmentedControl setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip")
+                          forSegment:ToolbarGroupTagPause];
+
+        [segmentedControl setTag:ToolbarGroupTagResume forSegment:ToolbarGroupTagResume];
         [segmentedControl setImage:[NSImage systemSymbol:@"play.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
                         forSegment:ToolbarGroupTagResume];
         [segmentedControl setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
@@ -4220,22 +4226,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         if ([toolbar isKindOfClass:Toolbar.class] && ((Toolbar*)toolbar).isRunningCustomizationPalette)
         {
             // On macOS 13.2, the palette autolayout will hang unless the segmentedControl width is longer than the groupItem paletteLabel (matters especially in Russian and French).
-            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagResume];
             [segmentedControl setWidth:64 forSegment:ToolbarGroupTagPause];
+            [segmentedControl setWidth:64 forSegment:ToolbarGroupTagResume];
         }
-        
-        [segmentedControl setTag:ToolbarGroupTagPause forSegment:ToolbarGroupTagPause];
-        [segmentedControl setImage:[NSImage systemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
-                        forSegment:ToolbarGroupTagPause];
-        [segmentedControl setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip")
-                          forSegment:ToolbarGroupTagPause];
-
-
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
-        groupItem.paletteLabel = NSLocalizedString(@"Resume All / Pause All", "All toolbar item -> palette label");
+        groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
         groupItem.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
-        groupItem.subitems = @[ itemResume, itemPause ];
+        groupItem.subitems = @[ itemPause, itemResume ];
         groupItem.view = segmentedControl;
         groupItem.target = self;
         groupItem.action = @selector(allToolbarClicked:);
@@ -4252,8 +4250,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         }
 
         [groupItem createMenu:@[
-            NSLocalizedString(@"Resume All", "All toolbar item -> label"),
-            NSLocalizedString(@"Pause All", "All toolbar item -> label")
+            NSLocalizedString(@"Pause All", "All toolbar item -> label"),
+            NSLocalizedString(@"Resume All", "All toolbar item -> label")
         ]];
 
         return groupItem;
@@ -4262,8 +4260,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
     {
         GroupToolbarItem* groupItem = [[GroupToolbarItem alloc] initWithItemIdentifier:ident];
 
-        NSToolbarItem* itemResume = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierResumeSelected];
         NSToolbarItem* itemPause = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierPauseSelected];
+        NSToolbarItem* itemResume = [self standardToolbarButtonWithIdentifier:ToolbarItemIdentifierResumeSelected];
 
         NSSegmentedControl* segmentedControl = [[NSSegmentedControl alloc] initWithFrame:NSZeroRect];
         segmentedControl.segmentStyle = NSSegmentStyleTexturedRounded;
