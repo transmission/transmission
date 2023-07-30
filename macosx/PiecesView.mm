@@ -157,7 +157,7 @@ typedef struct PieceInfo
     [self.torrent getAmountFinished:info.complete size:numCells];
 
     // compute bounds and color of each cell
-    int const across = (int)ceil(sqrt(numCells));
+    int const across = static_cast<int>(ceil(sqrt(numCells)));
     CGFloat const fullWidth = self.bounds.size.width;
     NSInteger const cellWidth = (NSInteger)((fullWidth - (across + 1) * kBetweenPadding) / across);
     NSInteger const extraBorder = (NSInteger)((fullWidth - ((cellWidth + kBetweenPadding) * across + kBetweenPadding)) / 2);
