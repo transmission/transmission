@@ -107,7 +107,7 @@ public:
         return listen_socket_address_.address();
     }
 
-    [[nodiscard]] constexpr auto const& listen_port() const noexcept
+    [[nodiscard]] constexpr auto listen_port() const noexcept
     {
         return listen_socket_address_.port();
     }
