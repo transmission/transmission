@@ -273,7 +273,7 @@ public:
 
         auto* const peer = *iter;
         auto* const peer_info = peer->peer_info;
-        auto socket_address = peer->socket_address();
+        auto const socket_address = peer->socket_address();
         auto const was_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
