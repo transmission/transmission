@@ -34,8 +34,6 @@ $z-index-popup: 2;
 
 // ICONS -- see assets/img/README.md for sources and license details
 // Are you a designer? New icon PRs welcomed!
-$image-alt-speed-disabled: '../img/modern-tortoise.png';
-$image-alt-speed-enabled: '../img/modern-tortoise-blue.png';
 $image-baseline: '../img/horizontal-rule.svg';
 $image-chevron-dn: '../img/chevron-down.svg';
 $image-chevron-up: '../img/chevron-up.svg';
@@ -354,10 +352,14 @@ $toolbar-height: $toolbar-height-number * 1px;
     width: 36px;
   }
 
-  &.alt-speed-enabled {
-    background-image: url($image-alt-speed-enabled);
-    background-position: bottom left;
-    background-size: 20px;
+  &.alt-speed-enabled::before {
+    content: '🐢';
+    position: absolute;
+    top: 24px;
+    right: 44px;
+    display: inline-block;
+    font-size: 20px;
+    transform: scale(-1, 1);
   }
 }
 
@@ -847,12 +849,15 @@ $video-image: '../img/film.svg';
     }
   }
 
+  .alt-speed-section-label::before {
+    content: '🐢';
+    display: inline-block;
+    font-size: 20px;
+    transform: scale(-1, 1);
+  }
+
   .alt-speed-section-label {
-    background: transparent url($image-alt-speed-enabled) no-repeat;
-    background-position: left;
-    background-position-y: 4px;
-    background-size: 20px;
-    padding-left: 22px;
+    text-indent: 5px;
   }
 
   :disabled,
@@ -1489,28 +1494,25 @@ $video-image: '../img/film.svg';
       grid-template-areas:
         'check   lb'
         'turtle  values';
-      grid-template-columns: 22px 1fr;
-      margin-bottom: 4px;
     }
 
     #alt-speed-check {
       grid-area: check;
 
-      &:checked ~ #alt-speed-image {
-        background-image: url($image-alt-speed-enabled);
-        background-position: left;
-        background-size: 22px;
+      &:checked ~ #alt-speed-icon::before {
+        filter: none;
       }
 
-      &:not(:checked) ~ #alt-speed-image {
-        background-image: url($image-alt-speed-disabled);
-        background-size: 22px;
+      &:not(:checked) ~ #alt-speed-icon::before {
+        filter: grayscale(100%);
       }
     }
 
-    #alt-speed-image {
-      background-position: center;
-      background-repeat: no-repeat;
+    #alt-speed-icon::before {
+      content: '🐢';
+      font-size: 20px;
+      transform: scale(-1, 1);
+      line-height: 10px;
       grid-area: turtle;
     }
 
