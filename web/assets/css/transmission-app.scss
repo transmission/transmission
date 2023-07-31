@@ -1381,6 +1381,8 @@ $video-image: '../img/film.svg';
     0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 10px;
   position: absolute;
 
