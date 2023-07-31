@@ -435,7 +435,7 @@ export class OverflowMenu extends EventTarget {
     elements.alt_speed_check = check;
 
     label = document.createElement('label');
-    label.id = 'alt-speed-image';
+    label.id = 'alt-speed-icon';
     label.setAttribute('for', check.id);
     div.append(label);
 
@@ -489,6 +489,7 @@ export class OverflowMenu extends EventTarget {
 
     let e = document.createElement('a');
     e.href = 'https://transmissionbt.com/';
+    e.target = '_blank';
     e.tabindex = '0';
     e.textContent = 'Homepage';
     let li = document.createElement('li');
@@ -497,6 +498,7 @@ export class OverflowMenu extends EventTarget {
 
     e = document.createElement('a');
     e.href = 'https://transmissionbt.com/donate/';
+    e.target = '_blank';
     e.tabindex = '0';
     e.textContent = 'Tip Jar';
     li = document.createElement('li');
@@ -505,6 +507,7 @@ export class OverflowMenu extends EventTarget {
 
     e = document.createElement('a');
     e.href = 'https://github.com/transmission/transmission/';
+    e.target = '_blank';
     e.tabindex = '0';
     e.textContent = 'Source Code';
     li = document.createElement('li');
