@@ -1385,6 +1385,10 @@ $video-image: '../img/film.svg';
   top: 50px;
   z-index: $z-index-popup;
 
+  @include for-phone-only {
+    height: 80vh;
+  }
+
   fieldset {
     border: 0;
     display: block;
