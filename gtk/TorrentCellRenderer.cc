@@ -41,6 +41,8 @@
 
 /* #define TEST_RTL */
 
+using namespace std::string_literals;
+
 /***
 ****
 ***/
@@ -116,7 +118,7 @@ private:
         Gtk::Widget& widget,
         Gdk::Rectangle const& area,
         Gtk::CellRendererState flags,
-        Gdk::RGBA const& color);
+        std::optional<Gdk::RGBA> const& color);
 
     static void set_icon(Gtk::CellRendererPixbuf& renderer, Glib::RefPtr<Gio::Icon> const& icon, IconSize icon_size);
     static void adjust_progress_bar_hue(
@@ -257,21 +259,49 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
 namespace
 {
 
-Gdk::RGBA const& get_progress_bar_color(Torrent const& torrent)
+void set_error_color(
+    Gtk::CellRendererText& text_renderer,
+    Torrent const& torrent,
+    Gtk::Widget& widget,
+    Gtk::CellRendererState flags)
 {
-    static auto const steelblue_color = Gdk::RGBA("steelblue");
-    static auto const forestgreen_color = Gdk::RGBA("forestgreen");
-    static auto const silver_color = Gdk::RGBA("silver");
+    static auto const error_color_name = Glib::ustring("tr_error_color"s);
 
+    auto color = Gdk::RGBA();
+    if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{} &&
+        widget.get_style_context()->lookup_color(error_color_name, color))
+    {
+        text_renderer.property_foreground_rgba() = color;
+    }
+    else
+    {
+        text_renderer.property_foreground_set() = false;
+    }
+}
+
+std::optional<Gdk::RGBA> get_progress_bar_color(Torrent const& torrent, Gtk::Widget const& widget)
+{
+    static auto const down_color_name = Glib::ustring("tr_transfer_down_color"s);
+    static auto const up_color_name = Glib::ustring("tr_transfer_up_color"s);
+    static auto const idle_color_name = Glib::ustring("tr_transfer_idle_color"s);
+
+    auto const* color_name = &idle_color_name;
     switch (torrent.get_activity())
     {
     case TR_STATUS_DOWNLOAD:
-        return steelblue_color;
+        color_name = &down_color_name;
+        break;
+
     case TR_STATUS_SEED:
-        return forestgreen_color;
+        color_name = &up_color_name;
+        break;
+
     default:
-        return silver_color;
+        break;
     }
+
+    auto color = Gdk::RGBA();
+    return widget.get_style_context()->lookup_color(*color_name, color) ? std::make_optional(color) : std::nullopt;
 }
 
 Cairo::RefPtr<Cairo::Surface> get_mask_surface(Cairo::RefPtr<Cairo::Surface> const& surface, Gdk::Rectangle const& area)
@@ -324,8 +354,14 @@ void TorrentCellRenderer::Impl::render_progress_bar(
     Gtk::Widget& widget,
     Gdk::Rectangle const& area,
     Gtk::CellRendererState flags,
-    Gdk::RGBA const& color)
+    std::optional<Gdk::RGBA> const& color)
 {
+    if (!color.has_value())
+    {
+        render_impl(*progress_renderer_, snapshot, widget, area, area, flags);
+        return;
+    }
+
     auto const context = IF_GTKMM4(snapshot->append_cairo(area), snapshot);
 
     auto const temp_area = Gdk::Rectangle(0, 0, area.get_width(), area.get_height());
@@ -352,7 +388,7 @@ void TorrentCellRenderer::Impl::render_progress_bar(
 #endif
     }
 
-    adjust_progress_bar_hue(temp_context, color, temp_area);
+    adjust_progress_bar_hue(temp_context, color.value(), temp_area);
 
     context->set_source(temp_context->get_target(), area.get_x(), area.get_y());
     context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
@@ -374,18 +410,11 @@ void TorrentCellRenderer::Impl::render_compact(
     auto const percent_done = torrent.get_percent_done().to_int();
     bool const sensitive = torrent.get_sensitive();
 
-    if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
-    {
-        text_renderer_->property_foreground() = "red";
-    }
-    else
-    {
-        text_renderer_->property_foreground_set() = false;
-    }
+    set_error_color(*text_renderer_, torrent, widget, flags);
 
     auto const icon = torrent.get_icon();
     auto const name = torrent.get_name();
-    auto const& progress_color = get_progress_bar_color(torrent);
+    auto const progress_color = get_progress_bar_color(torrent, widget);
     auto const gstr_stat = torrent.get_short_status_text();
     renderer_.get_padding(xpad, ypad);
 
@@ -468,18 +497,11 @@ void TorrentCellRenderer::Impl::render_full(
     auto const percent_done = torrent.get_percent_done().to_int();
     bool const sensitive = torrent.get_sensitive();
 
-    if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
-    {
-        text_renderer_->property_foreground() = "red";
-    }
-    else
-    {
-        text_renderer_->property_foreground_set() = false;
-    }
+    set_error_color(*text_renderer_, torrent, widget, flags);
 
     auto const icon = torrent.get_icon();
     auto const name = torrent.get_name();
-    auto const& progress_color = get_progress_bar_color(torrent);
+    auto const progress_color = get_progress_bar_color(torrent, widget);
     auto const gstr_prog = torrent.get_long_progress_text();
     auto const gstr_stat = torrent.get_long_status_text();
     renderer_.get_padding(xpad, ypad);
