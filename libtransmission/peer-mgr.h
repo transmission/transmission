@@ -353,9 +353,12 @@ public:
 
     // ---
 
-    // merge a peer info objects into ourself
+    // merge two peer info objects that supposedly describes the same peer
     void merge(tr_peer_info const& that) noexcept
     {
+        TR_ASSERT(is_connectable_.value_or(true) || !is_connected());
+        TR_ASSERT(that.is_connectable_.value_or(true) || !that.is_connected());
+
         connection_attempted_at_ = std::max(connection_attempted_at_, that.connection_attempted_at_);
         connection_changed_at_ = std::max(connection_changed_at_, that.connection_changed_at_);
         piece_data_at_ = std::max(piece_data_at_, that.piece_data_at_);
@@ -366,13 +369,18 @@ public:
             auto const conn_this = is_connectable_.value_or(true);
             auto const conn_that = that.is_connectable_.value_or(true);
 
-            if (conn_this != conn_that)
+            if ((!is_connectable_ && !is_connected() && !conn_that) ||
+                (!that.is_connectable_ && !that.is_connected() && !conn_this))
+            {
+                set_connectable(false);
+            }
+            else if ((!is_connectable_ && !that.is_connectable_) || conn_this != conn_that)
             {
                 is_connectable_.reset();
             }
             else
             {
-                set_connectable(conn_this && conn_that);
+                set_connectable(conn_this || conn_that);
             }
         }
 
