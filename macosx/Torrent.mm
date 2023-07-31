@@ -509,7 +509,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         return;
     }
 
-    volatile int status;
+    int volatile status;
     tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, NULL, &status);
 
     while (status == TR_LOC_MOVING) //block while moving (for now)
