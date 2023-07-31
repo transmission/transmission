@@ -223,18 +223,18 @@ void MainWindow::Impl::init_view(Gtk::TreeView* view, Glib::RefPtr<FilterBar::Mo
 #if !GTKMM_CHECK_VERSION(4, 0, 0)
     view->signal_popup_menu().connect_notify([this]() { on_popup_menu(0, 0); });
 #endif
-    setup_tree_view_button_event_handling(
+    setup_item_view_button_event_handling(
         *view,
         [this, view](guint /*button*/, TrGdkModifierType /*state*/, double view_x, double view_y, bool context_menu_requested)
         {
-            return on_tree_view_button_pressed(
+            return on_item_view_button_pressed(
                 *view,
                 view_x,
                 view_y,
                 context_menu_requested,
                 sigc::mem_fun(*this, &Impl::on_popup_menu));
         },
-        [view](double view_x, double view_y) { return on_tree_view_button_released(*view, view_x, view_y); });
+        [view](double view_x, double view_y) { return on_item_view_button_released(*view, view_x, view_y); });
     view->signal_row_activated().connect([](auto const& /*path*/, auto* /*column*/)
                                          { gtr_action_activate("show-torrent-properties"); });
 

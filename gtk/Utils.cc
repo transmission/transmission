@@ -297,7 +297,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
-bool on_tree_view_button_pressed(
+bool on_item_view_button_pressed(
     Gtk::TreeView& view,
     double event_x,
     double event_y,
@@ -328,7 +328,7 @@ bool on_tree_view_button_pressed(
 
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-bool on_tree_view_button_released(Gtk::TreeView& view, double event_x, double event_y)
+bool on_item_view_button_released(Gtk::TreeView& view, double event_x, double event_y)
 {
     if (Gtk::TreeModel::Path path; !view.get_path_at_pos(static_cast<int>(event_x), static_cast<int>(event_y), path))
     {
@@ -338,7 +338,7 @@ bool on_tree_view_button_released(Gtk::TreeView& view, double event_x, double ev
     return false;
 }
 
-void setup_tree_view_button_event_handling(
+void setup_item_view_button_event_handling(
     Gtk::TreeView& view,
     std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
     std::function<bool(double, double)> const& release_callback)
