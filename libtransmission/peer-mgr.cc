@@ -1952,7 +1952,6 @@ auto constexpr MaxUploadIdleSecs = time_t{ 60 * 5 };
 void close_peer(tr_peerMsgs* peer)
 {
     TR_ASSERT(peer != nullptr);
-    tr_logAddTraceSwarm(peer->swarm, fmt::format("removing bad peer {}", peer->display_name()));
     peer->swarm->remove_peer(peer);
 }
 
@@ -2003,6 +2002,7 @@ void close_bad_peers(tr_swarm* s, time_t const now_sec, bad_peers_t& bad_peers_b
 {
     for (auto* peer : get_peers_to_close(s, now_sec, bad_peers_buf))
     {
+        tr_logAddTraceSwarm(peer->swarm, fmt::format("removing bad peer {}", peer->display_name()));
         close_peer(peer);
     }
 }
