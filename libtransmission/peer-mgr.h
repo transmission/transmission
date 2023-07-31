@@ -363,8 +363,8 @@ public:
         /* no need to merge blocklist since it gets updated elsewhere */
 
         {
-            auto const conn_this = !is_connectable_ || *is_connectable_;
-            auto const conn_that = !that.is_connectable_ || *that.is_connectable_;
+            auto const conn_this = is_connectable_.value_or(true);
+            auto const conn_that = that.is_connectable_.value_or(true);
 
             if (conn_this != conn_that)
             {
