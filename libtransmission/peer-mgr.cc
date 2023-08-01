@@ -267,22 +267,50 @@ public:
         outgoing_handshakes.clear();
     }
 
-    void remove_peer(tr_peerMsgs* peer)
+    void remove_peer(Peers::iterator iter)
     {
-        if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
+        auto const lock = unique_lock();
+
+        auto* const peer = *iter;
+        auto* const peer_info = peer->peer_info;
+        auto const socket_address = peer->socket_address();
+        auto const was_incoming = peer->is_incoming_connection();
+        TR_ASSERT(peer_info != nullptr);
+
+        if (iter != std::end(peers))
         {
             peers.erase(iter);
-            close_peer(peer);
         }
+
+        --stats.peer_count;
+        --stats.peer_from_count[peer_info->from_first()];
+
+        TR_ASSERT(stats.peer_count == peerCount());
+
+        delete peer;
+
+        if (was_incoming)
+        {
+            [[maybe_unused]] auto const port_empty = std::empty(peer_info->listen_port());
+            if (incoming_pool.erase(socket_address) != 0U)
+            {
+                TR_ASSERT(port_empty);
+            }
+        }
+        graveyard_pool.erase(socket_address);
+    }
+
+    void remove_peer(tr_peerMsgs* peer)
+    {
+        remove_peer(std::find(std::begin(peers), std::end(peers), peer));
     }
 
     void remove_all_peers()
     {
-        for (auto* peer : peers)
+        for (auto rit = std::rbegin(peers); rit != std::rend(peers); rit = std::rbegin(peers))
         {
-            close_peer(peer);
+            remove_peer(rit.base() - 1);
         }
-        peers.clear();
 
         TR_ASSERT(stats.peer_count == 0);
     }
@@ -509,33 +537,6 @@ private:
             peer->cancels_sent_to_peer.add(tr_time(), 1);
             msgs->cancel_block_request(block);
         }
-    }
-
-    void close_peer(tr_peerMsgs* peer)
-    {
-        auto const lock = unique_lock();
-
-        auto* const peer_info = peer->peer_info;
-        auto const socket_address = peer->socket_address();
-        auto const was_incoming = peer->is_incoming_connection();
-        TR_ASSERT(peer_info != nullptr);
-
-        --stats.peer_count;
-        --stats.peer_from_count[peer_info->from_first()];
-
-        TR_ASSERT(stats.peer_count == peerCount());
-
-        delete peer;
-
-        if (was_incoming)
-        {
-            [[maybe_unused]] auto const port_empty = std::empty(peer_info->listen_port());
-            if (incoming_pool.erase(socket_address) != 0U)
-            {
-                TR_ASSERT(port_empty);
-            }
-        }
-        graveyard_pool.erase(socket_address);
     }
 
     void mark_all_seeds_flag_dirty() noexcept
