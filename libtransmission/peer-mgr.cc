@@ -276,15 +276,14 @@ public:
         auto const was_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
-        if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
-        {
-            peers.erase(iter);
-        }
-
         --stats.peer_count;
         --stats.peer_from_count[peer_info->from_first()];
 
-        TR_ASSERT(stats.peer_count == peerCount());
+        if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
+        {
+            peers.erase(iter);
+            TR_ASSERT(stats.peer_count == peerCount());
+        }
 
         delete peer;
 
