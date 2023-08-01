@@ -158,7 +158,7 @@ public:
             return unix_addr_.to_string();
         }
 
-        if (port.empty())
+        if (std::empty(port))
         {
             return { inet_addr_.display_name() };
         }
