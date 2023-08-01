@@ -33,7 +33,9 @@ static CGFloat const kPriorityIconWidth = 12.0;
             self.fTorrentPriorityView.image = priorityImage;
             self.fStackView.spacing = 4;
             self.fTorrentPriorityViewWidthConstraint.constant = kPriorityIconWidth;
-        } else {
+        }
+        else
+        {
             self.fTorrentPriorityView.image = nil;
             self.fStackView.spacing = 0;
             self.fTorrentPriorityViewWidthConstraint.constant = 0;
