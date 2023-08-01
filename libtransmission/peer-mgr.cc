@@ -267,17 +267,16 @@ public:
         outgoing_handshakes.clear();
     }
 
-    void remove_peer(Peers::iterator iter)
+    void remove_peer(tr_peerMsgs* peer)
     {
         auto const lock = unique_lock();
 
-        auto* const peer = *iter;
         auto* const peer_info = peer->peer_info;
         auto const socket_address = peer->socket_address();
         auto const was_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
-        if (iter != std::end(peers))
+        if (auto iter = std::find(std::begin(peers), std::end(peers), peer); iter != std::end(peers))
         {
             peers.erase(iter);
         }
@@ -300,16 +299,13 @@ public:
         graveyard_pool.erase(socket_address);
     }
 
-    void remove_peer(tr_peerMsgs* peer)
-    {
-        remove_peer(std::find(std::begin(peers), std::end(peers), peer));
-    }
-
     void remove_all_peers()
     {
-        for (auto rit = std::rbegin(peers); rit != std::rend(peers); rit = std::rbegin(peers))
+        auto tmp = Peers{};
+        std::swap(tmp, peers);
+        for (auto* peer : tmp)
         {
-            remove_peer(rit.base() - 1);
+            remove_peer(peer);
         }
 
         TR_ASSERT(stats.peer_count == 0);
