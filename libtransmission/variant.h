@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <optional>
@@ -27,28 +28,6 @@ struct tr_error;
  * @{
  */
 
-enum tr_string_type
-{
-    TR_STRING_TYPE_QUARK,
-    TR_STRING_TYPE_HEAP,
-    TR_STRING_TYPE_BUF,
-    TR_STRING_TYPE_VIEW
-};
-
-/* these are PRIVATE IMPLEMENTATION details that should not be touched.
- * I'll probably change them just to break your code! HA HA HA!
- * it's included in the header for inlining and composition */
-struct tr_variant_string
-{
-    tr_string_type type;
-    size_t len;
-    union
-    {
-        char buf[16];
-        char const* str;
-    } str;
-};
-
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */
@@ -67,6 +46,74 @@ enum
  * it's included in the header for inlining and composition */
 struct tr_variant
 {
+private:
+    struct String
+    {
+        void set_shallow(std::string_view newval)
+        {
+            clear();
+
+            type_ = Type::View;
+            str_.str = std::data(newval);
+            len_ = std::size(newval);
+        }
+
+        void set(std::string_view newval)
+        {
+            clear();
+
+            len_ = std::size(newval);
+
+            if (len_ < sizeof(str_.buf))
+            {
+                type_ = Type::Buf;
+                std::copy_n(std::data(newval), len_, str_.buf);
+                str_.buf[len_] = '\0';
+            }
+            else
+            {
+                char* const newstr = new char[len_ + 1];
+                std::copy_n(std::data(newval), len_, newstr);
+                newstr[len_] = '\0';
+
+                type_ = Type::Heap;
+                str_.str = newstr;
+            }
+        }
+
+        [[nodiscard]] constexpr std::string_view get() const noexcept
+        {
+            return { type_ == Type::Buf ? str_.buf : str_.str, len_ };
+        }
+
+        void clear()
+        {
+            if (type_ == Type::Heap)
+            {
+                delete[] str_.str;
+            }
+
+            *this = {};
+        }
+
+    private:
+        enum class Type
+        {
+            Heap,
+            Buf,
+            View
+        };
+
+        Type type_ = Type::View;
+        size_t len_ = 0U;
+        union
+        {
+            char buf[16];
+            char const* str;
+        } str_ = {};
+    };
+
+public:
     char type = '\0';
 
     tr_quark key = TR_KEY_NONE;
@@ -79,7 +126,7 @@ struct tr_variant
 
         int64_t i;
 
-        struct tr_variant_string s;
+        String s;
 
         struct
         {
@@ -171,19 +218,12 @@ bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 void tr_variantInitStr(tr_variant* initme, std::string_view value);
 void tr_variantInitQuark(tr_variant* initme, tr_quark value);
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len);
+void tr_variantInitStrView(tr_variant* initme, std::string_view val);
 
 constexpr void tr_variantInit(tr_variant* initme, char type)
 {
     initme->val = {};
     initme->type = type;
-}
-
-constexpr void tr_variantInitStrView(tr_variant* initme, std::string_view in)
-{
-    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    initme->val.s.type = TR_STRING_TYPE_VIEW;
-    initme->val.s.len = std::size(in);
-    initme->val.s.str.str = std::data(in);
 }
 
 bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);

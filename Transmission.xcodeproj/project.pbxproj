@@ -652,7 +652,6 @@
 		4521532D29AF9D61009331B0 /* TorrentCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TorrentCell.mm; sourceTree = "<group>"; };
 		4534164029B0EA8500F544C9 /* SmallTorrentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmallTorrentCell.h; sourceTree = "<group>"; };
 		4534164129B0EA8600F544C9 /* SmallTorrentCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SmallTorrentCell.mm; sourceTree = "<group>"; };
-		45489C4529AE70F00098A812 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		45489C4729AE79FC0098A812 /* TorrentCellActionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TorrentCellActionButton.h; sourceTree = "<group>"; };
 		45489C4A29AF10D00098A812 /* TorrentCellRevealButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TorrentCellRevealButton.h; sourceTree = "<group>"; };
 		45489C4B29AF10D10098A812 /* TorrentCellControlButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TorrentCellControlButton.h; sourceTree = "<group>"; };
