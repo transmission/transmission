@@ -39,6 +39,41 @@ ninja -C build transmission-gtk
 ## On Unix ##
 ### Prerequisites ###
 
+#### Debian 12 / Bookworm ####
+On Debian, you can build transmission with a few dependencies on top of a base installation.
+
+For building transmission-daemon you will need basic dependencies:
+```console
+$ sudo apt install build-essential cmake git libcurl4-openssl-dev libssl-dev
+```
+These packages are not mandatory for a working binary. Transmission brings its own libraries if they aren't installed.
+```console
+$ sudo apt install libb64-dev libdeflate-dev libevent-dev libminiupnpc-dev libnatpmp-dev libpsl-dev libsystemd-dev
+```
+
+You likely want to install transmission as a native GUI application.
+There are two options, GTK and QT. Both of them have 2 versions.
+
+GTK 3 client:
+```console
+$ sudo apt install gettext libgtkmm-3.0-dev
+```
+GTK 4 client:
+```console
+$ sudo apt install gettext libgtkmm-4.0-dev
+```
+
+QT5 client:
+```console
+$ sudo apt install libqt5svg5-dev qttools5-dev
+```
+QT6 client:
+```console
+$ sudo apt install qt6-svg-dev qt6-tools-dev
+```
+
+Then you can begin [building.](#building-transmission-from-git-first-time)
+
 #### Debian 11 / Bullseye ####
 On Debian, you can build transmission with a few dependencies on top of a base installation.
 
