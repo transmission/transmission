@@ -52,7 +52,7 @@ $ sudo apt install libb64-dev libdeflate-dev libevent-dev libminiupnpc-dev libna
 ```
 
 You likely want to install transmission as a native GUI application.
-There are two options, GTK and QT. Both of them have 2 versions.
+There are two options, GTK and Qt. Both of them have 2 versions.
 
 GTK 3 client:
 ```console
@@ -63,11 +63,11 @@ GTK 4 client:
 $ sudo apt install gettext libgtkmm-4.0-dev
 ```
 
-QT5 client:
+Qt5 client:
 ```console
 $ sudo apt install libqt5svg5-dev qttools5-dev
 ```
-QT6 client:
+Qt6 client:
 ```console
 $ sudo apt install qt6-svg-dev qt6-tools-dev
 ```
@@ -81,13 +81,13 @@ For building transmission-daemon you will need basic dependencies
 ```console
 $ sudo apt install git build-essential cmake libcurl4-openssl-dev libssl-dev python3
 ```
-You likely want to install transmission as a native GUI application. There are two options, GTK and QT.
+You likely want to install transmission as a native GUI application. There are two options, GTK and Qt.
 
 For GTK 3 client, two additional packages are required
 ```console
 $ sudo apt install libgtkmm-3.0-dev gettext
 ```
-For QT client, one additional package is needed on top of basic dependencies
+For Qt client, one additional package is needed on top of basic dependencies
 ```console
 $ sudo apt install qttools5-dev
 ```
