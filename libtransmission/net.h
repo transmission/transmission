@@ -389,12 +389,12 @@ public:
     std::size_t operator()(tr_socket_address const& socket_address) const noexcept
     {
         auto const& [addr, port] = socket_address;
-        return hash_combine(ip_hash(addr), port_hash(port));
+        return hash_combine(ip_hash(addr), PortHasher(port.host()));
     }
 
 private:
     // https://stackoverflow.com/a/27952689/11390656
-    [[nodiscard]] static constexpr std::size_t hash_combine(std::size_t const& a, std::size_t const& b)
+    [[nodiscard]] static constexpr std::size_t hash_combine(std::size_t const a, std::size_t const b)
     {
         return a ^ (b + 0x9e3779b9U + (a << 6U) + (a >> 2U));
     }
@@ -412,11 +412,6 @@ private:
             TR_ASSERT_MSG(false, "Invalid type");
             return {};
         }
-    }
-
-    [[nodiscard]] static std::size_t port_hash(tr_port const& port) noexcept
-    {
-        return PortHasher(port.host());
     }
 
     constexpr static std::hash<uint32_t> IPv4Hasher{};

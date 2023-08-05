@@ -69,7 +69,7 @@ namespace global_source_ip_helpers
     auto const save = errno;
 
     auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    auto const [bind_ss, bind_sslen] = bind_addr.to_sockaddr(tr_port::fromHost(0));
+    auto const [bind_ss, bind_sslen] = bind_addr.to_sockaddr(tr_port{});
     if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == 0)
