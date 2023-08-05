@@ -114,11 +114,6 @@ public:
         return hport_ == that.hport_;
     }
 
-    [[nodiscard]] constexpr auto operator!=(tr_port const& that) const noexcept
-    {
-        return hport_ != that.hport_;
-    }
-
     [[nodiscard]] constexpr auto empty() const noexcept
     {
         return hport_ == 0;
