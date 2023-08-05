@@ -296,6 +296,7 @@ struct tr_address
     } addr;
 
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
+    static_assert(std::size(CompactAddrBytes) == NUM_TR_AF_INET_TYPES);
 
     [[nodiscard]] static auto constexpr any_ipv4() noexcept
     {
@@ -375,6 +376,7 @@ struct tr_socket_address
 
     static auto constexpr CompactSockAddrBytes = std::array{ tr_address::CompactAddrBytes[0] + tr_port::CompactPortBytes,
                                                              tr_address::CompactAddrBytes[1] + tr_port::CompactPortBytes };
+    static_assert(std::size(CompactSockAddrBytes) == NUM_TR_AF_INET_TYPES);
 };
 
 template<>
