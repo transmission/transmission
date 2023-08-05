@@ -114,6 +114,12 @@ public:
         return hport_ == that.hport_;
     }
 
+    // Can be removed once we use C++20
+    [[nodiscard]] constexpr auto operator!=(tr_port const& that) const noexcept
+    {
+        return hport_ != that.hport_;
+    }
+
     [[nodiscard]] constexpr auto empty() const noexcept
     {
         return hport_ == 0;
