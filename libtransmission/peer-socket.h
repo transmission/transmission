@@ -75,20 +75,9 @@ public:
         return socket_address_.port();
     }
 
-    template<typename OutputIt>
-    OutputIt display_name(OutputIt out)
-    {
-        return address().display_name(out, port());
-    }
-
-    [[nodiscard]] std::string_view display_name(char* out, size_t outlen) const
-    {
-        return address().display_name(out, outlen, port());
-    }
-
     [[nodiscard]] std::string display_name() const
     {
-        return address().display_name(port());
+        return socket_address_.display_name();
     }
 
     [[nodiscard]] constexpr auto is_utp() const noexcept

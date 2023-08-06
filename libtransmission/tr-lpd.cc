@@ -446,8 +446,7 @@ private:
             return;
         }
 
-        auto peer_addr = tr_address{};
-        peer_addr.addr.addr4 = foreign_addr.sin_addr;
+        auto [peer_addr, compact] = tr_address::from_compact_ipv4(reinterpret_cast<std::byte*>(&foreign_addr.sin_addr));
         for (auto const& hash_string : parsed->info_hash_strings)
         {
             if (!mediator_.onPeerFound(hash_string, peer_addr, parsed->port))

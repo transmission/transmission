@@ -262,7 +262,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         ret = tr_peer_socket{ session, socket_address, s };
     }
 
-    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.display_name(port)));
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, socket_address.display_name()));
 
     return ret;
 }
@@ -521,7 +521,7 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte 
     std::copy_n(compact, Addr4Len, reinterpret_cast<std::byte*>(&address.addr));
     compact += Addr4Len;
 
-    return std::make_pair(address, compact);
+    return { address, compact };
 }
 
 std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte const* compact) noexcept
@@ -533,7 +533,7 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte 
     std::copy_n(compact, Addr6Len, reinterpret_cast<std::byte*>(&address.addr.addr6.s6_addr));
     compact += Addr6Len;
 
-    return std::make_pair(address, compact);
+    return { address, compact };
 }
 
 std::optional<tr_socket_address> tr_address::from_sockaddr(struct sockaddr const* from)

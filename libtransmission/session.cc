@@ -247,9 +247,10 @@ bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_add
     }
 
     // we found a suitable peer, add it to the torrent
-    auto pex = tr_pex{ address, port };
+    auto const socket_address = tr_socket_address{ address, port };
+    auto const pex = tr_pex{ socket_address };
     tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, &pex, 1U);
-    tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({:s})", address.display_name(port)));
+    tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({:s})", socket_address.display_name()));
     return true;
 }
 

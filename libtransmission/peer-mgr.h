@@ -515,58 +515,26 @@ struct tr_pex
 {
     tr_pex() = default;
 
-    tr_pex(tr_address addr_in, tr_port port_in, uint8_t flags_in = {})
-        : addr{ addr_in }
-        , port{ port_in }
+    tr_pex(tr_socket_address socket_address_in, uint8_t flags_in = {})
+        : socket_address{ socket_address_in }
         , flags{ flags_in }
     {
     }
 
     template<typename OutputIt>
-    OutputIt to_compact_ipv4(OutputIt out) const
+    OutputIt to_compact(OutputIt out) const
     {
-        return this->addr.to_compact_ipv4(out, this->port);
-    }
-
-    template<typename OutputIt>
-    OutputIt to_compact_ipv6(OutputIt out) const
-    {
-        return this->addr.to_compact_ipv6(out, this->port);
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, tr_pex const* pex, size_t n_pex)
-    {
-        for (size_t i = 0; i < n_pex; ++i)
-        {
-            out = pex[i].to_compact_ipv4(out);
-        }
-        return out;
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, tr_pex const* pex, size_t n_pex)
-    {
-        for (size_t i = 0; i < n_pex; ++i)
-        {
-            out = pex[i].to_compact_ipv6(out);
-        }
-        return out;
+        return socket_address.to_compact(out);
     }
 
     template<typename OutputIt>
     static OutputIt to_compact(OutputIt out, tr_pex const* pex, size_t n_pex, tr_address_type type)
     {
-        switch (type)
+        for (size_t i = 0; i < n_pex; ++i)
         {
-        case TR_AF_INET:
-            return to_compact_ipv4(out, pex, n_pex);
-        case TR_AF_INET6:
-            return to_compact_ipv6(out, pex, n_pex);
-        default:
-            TR_ASSERT_MSG(false, "invalid type");
-            return out;
+            out = pex[i].to_compact(out);
         }
+        return out;
     }
 
     [[nodiscard]] static std::vector<tr_pex> from_compact_ipv4(
@@ -581,25 +549,14 @@ struct tr_pex
         uint8_t const* added_f,
         size_t added_f_len);
 
-    template<typename OutputIt>
-    [[nodiscard]] OutputIt display_name(OutputIt out) const
-    {
-        return addr.display_name(out, port);
-    }
-
     [[nodiscard]] std::string display_name() const
     {
-        return addr.display_name(port);
+        return socket_address.display_name();
     }
 
     [[nodiscard]] int compare(tr_pex const& that) const noexcept // <=>
     {
-        if (auto const i = addr.compare(that.addr); i != 0)
-        {
-            return i;
-        }
-
-        return tr_compare_3way(port, that.port);
+        return socket_address.compare(that.socket_address);
     }
 
     [[nodiscard]] bool operator==(tr_pex const& that) const noexcept
@@ -614,17 +571,17 @@ struct tr_pex
 
     [[nodiscard]] bool is_valid_for_peers() const noexcept
     {
-        return addr.is_valid_for_peers(port);
+        return socket_address.is_valid_for_peers();
     }
 
-    tr_address addr = {};
-    tr_port port = {}; /* this field is in network byte order */
+    tr_socket_address socket_address;
+
     uint8_t flags = 0;
 };
 
 constexpr bool tr_isPex(tr_pex const* pex)
 {
-    return pex != nullptr && pex->addr.is_valid();
+    return pex != nullptr && pex->socket_address.is_valid();
 }
 
 [[nodiscard]] tr_peerMgr* tr_peerMgrNew(tr_session* session);
