@@ -131,7 +131,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
-    if (!addr.is_valid_for_peers(port))
+    if (!socket_address.is_valid_for_peers())
     {
         return {};
     }

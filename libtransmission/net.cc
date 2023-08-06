@@ -195,7 +195,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !addr.is_valid_for_peers(port))
+    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid_for_peers())
     {
         return {};
     }
@@ -402,14 +402,14 @@ namespace
 namespace is_valid_for_peers_helpers
 {
 
-[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const* addr)
+[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const& addr)
 {
-    return addr->is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
+    return addr.is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr.addr6);
 }
 
-[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const* addr)
+[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const& addr)
 {
-    return addr->is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
+    return addr.is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr.addr6);
 }
 
 /* isMartianAddr was written by Juliusz Chroboczek,
@@ -440,14 +440,6 @@ namespace is_valid_for_peers_helpers
 
 } // namespace is_valid_for_peers_helpers
 } // namespace
-
-bool tr_address::is_valid_for_peers(tr_port port) const noexcept
-{
-    using namespace is_valid_for_peers_helpers;
-
-    return is_valid() && !std::empty(port) && !is_ipv6_link_local_address(this) && !is_ipv4_mapped_address(this) &&
-        !is_martian_addr(*this);
-}
 
 // --- tr_port
 
@@ -738,4 +730,12 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
     }
 
     return false;
+}
+
+bool tr_socket_address::is_valid_for_peers() const noexcept
+{
+    using namespace is_valid_for_peers_helpers;
+
+    return is_valid() && !std::empty(port_) && !is_ipv6_link_local_address(address_) && !is_ipv4_mapped_address(address_) &&
+        !is_martian_addr(address_);
 }

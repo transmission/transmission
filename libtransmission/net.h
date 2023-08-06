@@ -323,8 +323,6 @@ struct tr_address
     {
         return *this == (is_ipv4() ? any_ipv4() : any_ipv6());
     }
-
-    [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
 };
 
 struct tr_socket_address
@@ -376,6 +374,8 @@ struct tr_socket_address
     {
         return compare(that) == 0;
     }
+
+    [[nodiscard]] bool is_valid_for_peers() const noexcept;
 
     tr_address address_;
     tr_port port_;
