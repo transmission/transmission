@@ -291,16 +291,9 @@ public:
 
     // ---
 
-    constexpr void set_pex_flags(uint8_t pex_flags, bool merge_unsupported = false) noexcept
+    constexpr void set_pex_flags(uint8_t pex_flags) noexcept
     {
-        if (merge_unsupported)
-        {
-            pex_flags_ |= pex_flags;
-        }
-        else
-        {
-            pex_flags_ = pex_flags;
-        }
+        pex_flags_ = pex_flags;
 
         if ((pex_flags & ADDED_F_CONNECTABLE) != 0U)
         {
@@ -434,7 +427,7 @@ public:
         found_at(that.from_best());
 
         /* num_consecutive_fails_ is already the latest */
-        set_pex_flags(that.pex_flags(), true);
+        pex_flags_ |= that.pex_flags_;
 
         if (that.is_banned())
         {
