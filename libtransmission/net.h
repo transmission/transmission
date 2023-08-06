@@ -312,6 +312,22 @@ struct tr_socket_address
 
     // --- compact addr + port -- very common format used for peer exchange, dht, tracker announce responses
 
+    [[nodiscard]] static std::pair<tr_socket_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept
+    {
+        auto socket_address = tr_socket_address{};
+        std::tie(socket_address.address_, compact) = tr_address::from_compact_ipv4(compact);
+        std::tie(socket_address.port_, compact) = tr_port::fromCompact(compact);
+        return { socket_address, compact };
+    }
+
+    [[nodiscard]] static std::pair<tr_socket_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept
+    {
+        auto socket_address = tr_socket_address{};
+        std::tie(socket_address.address_, compact) = tr_address::from_compact_ipv6(compact);
+        std::tie(socket_address.port_, compact) = tr_port::fromCompact(compact);
+        return { socket_address, compact };
+    }
+
     template<typename OutputIt>
     static OutputIt to_compact(OutputIt out, tr_address const& addr, tr_port const port)
     {
@@ -332,9 +348,9 @@ struct tr_socket_address
     template<typename OutputIt>
     static OutputIt to_compact(OutputIt out, sockaddr const* saddr)
     {
-        if (auto sockaddr = from_sockaddr(saddr); sockaddr)
+        if (auto socket_address = from_sockaddr(saddr); socket_address)
         {
-            return sockaddr->to_compact(out);
+            return socket_address->to_compact(out);
         }
 
         return out;
@@ -349,7 +365,7 @@ struct tr_socket_address
     // --- sockaddr helpers
 
     [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const*);
-    [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address addr, tr_port port) noexcept;
+    [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address const& addr, tr_port port) noexcept;
 
     [[nodiscard]] std::pair<sockaddr_storage, socklen_t> to_sockaddr() const noexcept
     {

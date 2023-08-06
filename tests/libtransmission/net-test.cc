@@ -28,15 +28,15 @@ using namespace std::literals;
 
 TEST_F(NetTest, conversionsIPv4)
 {
-    auto constexpr Port = tr_port::fromHost(80);
-    auto constexpr AddrStr = "127.0.0.1"sv;
+    static auto constexpr Port = tr_port::fromHost(80);
+    static auto constexpr AddrStr = "127.0.0.1"sv;
 
     auto addr = tr_address::from_string(AddrStr);
     EXPECT_TRUE(addr.has_value());
     assert(addr.has_value());
     EXPECT_EQ(AddrStr, addr->display_name());
 
-    auto [ss, sslen] = addr->to_sockaddr(Port);
+    auto [ss, sslen] = tr_socket_address::to_sockaddr(*addr, Port);
     EXPECT_EQ(AF_INET, ss.ss_family);
     EXPECT_EQ(Port.network(), reinterpret_cast<sockaddr_in const*>(&ss)->sin_port);
 
@@ -64,11 +64,8 @@ TEST_F(NetTest, compact4)
     /// compact <--> tr_address, port
 
     // extract the address and port from a compact stream...
-    auto in = std::data(Compact4);
-    auto addr = tr_address{};
-    auto port = tr_port{};
-    std::tie(addr, in) = tr_address::from_compact_ipv4(in);
-    std::tie(port, in) = tr_port::fromCompact(in);
+    auto [socket_address, in] = tr_socket_address::from_compact_ipv4(std::data(Compact4));
+    auto const& [addr, port] = socket_address;
     EXPECT_EQ(std::data(Compact4) + std::size(Compact4), in);
     EXPECT_EQ(ExpectedReadable, addr.display_name());
     EXPECT_EQ(ExpectedPort, port);
@@ -76,14 +73,7 @@ TEST_F(NetTest, compact4)
     // ...serialize it back again
     auto compact4 = std::array<std::byte, Compact4Bytes>{};
     auto out = std::data(compact4);
-    out = addr.to_compact_ipv4(out, port);
-    EXPECT_EQ(std::size(Compact4), static_cast<size_t>(out - std::data(compact4)));
-    EXPECT_EQ(Compact4, compact4);
-
-    // ...serialize it back another way
-    compact4.fill(std::byte{});
-    out = std::data(compact4);
-    out = addr.to_compact(out, port);
+    out = socket_address.to_compact(out);
     EXPECT_EQ(std::size(Compact4), static_cast<size_t>(out - std::data(compact4)));
     EXPECT_EQ(Compact4, compact4);
 
@@ -103,10 +93,10 @@ TEST_F(NetTest, compact4)
 
     /// sockaddr --> compact
 
-    auto [ss, sslen] = addr.to_sockaddr(port);
+    auto [ss, sslen] = socket_address.to_sockaddr();
     compact4.fill(std::byte{});
     out = std::data(compact4);
-    out = tr_address::to_compact(out, &ss);
+    out = tr_socket_address::to_compact(out, &ss);
     EXPECT_EQ(out, std::data(compact4) + std::size(compact4));
     EXPECT_EQ(Compact4, compact4);
 
@@ -115,13 +105,13 @@ TEST_F(NetTest, compact4)
     // extract them into a tr_pex struct...
     auto const pex = tr_pex::from_compact_ipv4(std::data(compact4), std::size(compact4), nullptr, 0U);
     ASSERT_EQ(1U, std::size(pex));
-    EXPECT_EQ(addr, pex.front().addr);
-    EXPECT_EQ(port, pex.front().port);
+    EXPECT_EQ(addr, pex.front().socket_address.address());
+    EXPECT_EQ(port, pex.front().socket_address.port());
 
     // ...serialize that back again too
     std::fill(std::begin(compact4), std::end(compact4), std::byte{});
     out = std::data(compact4);
-    out = tr_pex::to_compact_ipv4(out, std::data(pex), std::size(pex));
+    out = tr_pex::to_compact(out, std::data(pex), std::size(pex));
     EXPECT_EQ(std::data(compact4) + std::size(compact4), out);
     EXPECT_EQ(Compact4, compact4);
 }
@@ -140,11 +130,8 @@ TEST_F(NetTest, compact6)
     /// compact <--> tr_address, tr_port
 
     // extract the address and port from a compact stream...
-    auto in = std::data(Compact6);
-    auto addr = tr_address{};
-    auto port = tr_port{};
-    std::tie(addr, in) = tr_address::from_compact_ipv6(in);
-    std::tie(port, in) = tr_port::fromCompact(in);
+    auto [socket_address, in] = tr_socket_address::from_compact_ipv6(std::data(Compact6));
+    auto const& [addr, port] = socket_address;
     EXPECT_EQ(std::data(Compact6) + std::size(Compact6), in);
     EXPECT_EQ(ExpectedReadable, addr.display_name());
     EXPECT_EQ(ExpectedPort, port);
@@ -152,14 +139,7 @@ TEST_F(NetTest, compact6)
     // ...serialize it back again
     auto compact6 = std::array<std::byte, Compact6Bytes>{};
     auto out = std::data(compact6);
-    out = addr.to_compact_ipv6(out, port);
-    EXPECT_EQ(std::size(Compact6), static_cast<size_t>(out - std::data(compact6)));
-    EXPECT_EQ(Compact6, compact6);
-
-    // ...serialize it back another way
-    compact6.fill(std::byte{});
-    out = std::data(compact6);
-    out = addr.to_compact(out, port);
+    out = socket_address.to_compact(out);
     EXPECT_EQ(std::size(Compact6), static_cast<size_t>(out - std::data(compact6)));
     EXPECT_EQ(Compact6, compact6);
 
@@ -179,10 +159,10 @@ TEST_F(NetTest, compact6)
 
     /// sockaddr --> compact
 
-    auto [ss, sslen] = addr.to_sockaddr(port);
+    auto [ss, sslen] = socket_address.to_sockaddr();
     compact6.fill(std::byte{});
     out = std::data(compact6);
-    out = tr_address::to_compact(out, &ss);
+    out = tr_socket_address::to_compact(out, &ss);
     EXPECT_EQ(out, std::data(compact6) + std::size(compact6));
     EXPECT_EQ(Compact6, compact6);
 
@@ -191,13 +171,13 @@ TEST_F(NetTest, compact6)
     // extract them into a tr_pex struct...
     auto const pex = tr_pex::from_compact_ipv6(std::data(compact6), std::size(compact6), nullptr, 0U);
     ASSERT_EQ(1U, std::size(pex));
-    EXPECT_EQ(addr, pex.front().addr);
-    EXPECT_EQ(port, pex.front().port);
+    EXPECT_EQ(addr, pex.front().socket_address.address());
+    EXPECT_EQ(port, pex.front().socket_address.port());
 
     // ...serialize that back again too
     std::fill(std::begin(compact6), std::end(compact6), std::byte{});
     out = std::data(compact6);
-    out = tr_pex::to_compact_ipv6(out, std::data(pex), std::size(pex));
+    out = tr_pex::to_compact(out, std::data(pex), std::size(pex));
     EXPECT_EQ(std::data(compact6) + std::size(compact6), out);
     EXPECT_EQ(Compact6, compact6);
 }

@@ -382,7 +382,7 @@ private:
         {
             // paper over a bug in some DHT implementation that gives port 1.
             // Xref: https://github.com/transmission/transmission/issues/527
-            return candidate.port == tr_port::fromHost(1);
+            return candidate.socket_address.port_ == tr_port::fromHost(1);
         };
 
         pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));
@@ -573,7 +573,7 @@ private:
 
         for (auto* infop = info; infop != nullptr; infop = infop->ai_next)
         {
-            if (auto addrport = tr_address::from_sockaddr(infop->ai_addr); addrport)
+            if (auto addrport = tr_socket_address::from_sockaddr(infop->ai_addr); addrport)
             {
                 nodes.emplace_back(*addrport);
             }

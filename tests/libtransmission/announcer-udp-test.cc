@@ -68,7 +68,7 @@ protected:
 
         void sendto(void const* buf, size_t buflen, sockaddr const* sa, socklen_t salen) override
         {
-            auto target = tr_address::from_sockaddr(sa);
+            auto target = tr_socket_address::from_sockaddr(sa);
             ASSERT_TRUE(target);
             sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
         }

@@ -155,7 +155,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
         auto const addr = session_.bind_address(TR_AF_INET);
-        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
+        auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
         if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
@@ -189,7 +189,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
         auto const addr = session_.bind_address(TR_AF_INET6);
-        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
+        auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
         if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
@@ -242,7 +242,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
-    auto const addrport = tr_address::from_sockaddr(to);
+    auto const addrport = tr_socket_address::from_sockaddr(to);
     if (to->sa_family != AF_INET && to->sa_family != AF_INET6)
     {
         errno = EAFNOSUPPORT;

@@ -1045,6 +1045,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     /* does the peer prefer encrypted connections? */
     auto i = int64_t{};
     auto pex = tr_pex{};
+    auto& [addr, port] = pex.socket_address;
     if (tr_variantDictFindInt(&val, TR_KEY_e, &i))
     {
         msgs->encryption_preference = i != 0 ? EncryptionPreference::Yes : EncryptionPreference::No;
@@ -1108,24 +1109,24 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     /* get peer's listening port */
     if (tr_variantDictFindInt(&val, TR_KEY_p, &i) && i > 0)
     {
-        pex.port.setHost(i);
-        msgs->publish(tr_peer_event::GotPort(pex.port));
+        port.setHost(i);
+        msgs->publish(tr_peer_event::GotPort(port));
         logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), i));
     }
 
-    uint8_t const* addr = nullptr;
+    std::byte const* addr_compact = nullptr;
     auto addr_len = size_t{};
-    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) && addr_len == 4)
+    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr_compact, &addr_len) &&
+        addr_len == tr_address::CompactAddrBytes[TR_AF_INET])
     {
-        pex.addr.type = TR_AF_INET;
-        memcpy(&pex.addr.addr.addr4, addr, 4);
+        std::tie(addr, std::ignore) = tr_address::from_compact_ipv4(addr_compact);
         tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
-    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) && addr_len == 16)
+    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr_compact, &addr_len) &&
+        addr_len == tr_address::CompactAddrBytes[TR_AF_INET6])
     {
-        pex.addr.type = TR_AF_INET6;
-        memcpy(&pex.addr.addr.addr6, addr, 16);
+        std::tie(addr, std::ignore) = tr_address::from_compact_ipv6(addr_compact);
         tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
@@ -2086,7 +2087,7 @@ void tr_peerMsgsImpl::sendPex()
             // "added"
             tmpbuf.clear();
             tmpbuf.reserve(std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
-            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(added), std::size(added), ip_type);
+            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(added), std::size(added));
             TR_ASSERT(std::size(tmpbuf) == std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_variantDictAddRaw(&val, AddedMap[i], std::data(tmpbuf), std::size(tmpbuf));
 
@@ -2108,7 +2109,7 @@ void tr_peerMsgsImpl::sendPex()
             // "dropped"
             tmpbuf.clear();
             tmpbuf.reserve(std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
-            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped), ip_type);
+            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
             TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_variantDictAddRaw(&val, DroppedMap[i], std::data(tmpbuf), std::size(tmpbuf));
         }

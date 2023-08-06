@@ -68,8 +68,8 @@ namespace global_source_ip_helpers
 
     auto const save = errno;
 
-    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    auto const [bind_ss, bind_sslen] = bind_addr.to_sockaddr({});
+    auto const [dst_ss, dst_sslen] = tr_socket_address::to_sockaddr(dst_addr, dst_port);
+    auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(bind_addr, {});
     if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == 0)

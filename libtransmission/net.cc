@@ -218,11 +218,11 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         }
     }
 
-    auto const [sock, addrlen] = addr.to_sockaddr(port);
+    auto const [sock, addrlen] = socket_address.to_sockaddr();
 
     // set source address
     auto const source_addr = session->bind_address(addr.type);
-    auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
+    auto const [source_sock, sourcelen] = tr_socket_address::to_sockaddr(source_addr, {});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
     {
@@ -304,7 +304,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
 #endif
 
-    auto const [sock, addrlen] = addr.to_sockaddr(port);
+    auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
     if (bind(fd, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1)
     {
@@ -513,7 +513,7 @@ template char* tr_address::display_name<char*>(char*, tr_port) const;
 
 std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte const* compact) noexcept
 {
-    static auto constexpr Addr4Len = size_t{ 4 };
+    static auto constexpr Addr4Len = tr_address::CompactAddrBytes[TR_AF_INET];
 
     auto address = tr_address{};
     static_assert(sizeof(address.addr.addr4) == Addr4Len);
@@ -526,7 +526,7 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte 
 
 std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte const* compact) noexcept
 {
-    static auto constexpr Addr6Len = size_t{ 16 };
+    static auto constexpr Addr6Len = tr_address::CompactAddrBytes[TR_AF_INET6];
 
     auto address = tr_address{};
     address.type = TR_AF_INET6;
@@ -714,7 +714,7 @@ std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockadd
     return {};
 }
 
-std::pair<sockaddr_storage, socklen_t> tr_socket_address::to_sockaddr(tr_address addr, tr_port port) noexcept
+std::pair<sockaddr_storage, socklen_t> tr_socket_address::to_sockaddr(tr_address const& addr, tr_port port) noexcept
 {
     auto ss = sockaddr_storage{};
 

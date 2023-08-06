@@ -84,20 +84,18 @@ protected:
 
         std::array<char, IdLength> const id_ = tr_rand_obj<std::array<char, IdLength>>();
 
-        std::vector<std::pair<tr_address, tr_port>> ipv4_nodes_ = {
-            std::make_pair(*tr_address::from_string("10.10.10.1"), tr_port::fromHost(128)),
-            std::make_pair(*tr_address::from_string("10.10.10.2"), tr_port::fromHost(129)),
-            std::make_pair(*tr_address::from_string("10.10.10.3"), tr_port::fromHost(130)),
-            std::make_pair(*tr_address::from_string("10.10.10.4"), tr_port::fromHost(131)),
-            std::make_pair(*tr_address::from_string("10.10.10.5"), tr_port::fromHost(132))
-        };
+        std::vector<tr_socket_address> ipv4_nodes_ = { { *tr_address::from_string("10.10.10.1"), tr_port::fromHost(128) },
+                                                       { *tr_address::from_string("10.10.10.2"), tr_port::fromHost(129) },
+                                                       { *tr_address::from_string("10.10.10.3"), tr_port::fromHost(130) },
+                                                       { *tr_address::from_string("10.10.10.4"), tr_port::fromHost(131) },
+                                                       { *tr_address::from_string("10.10.10.5"), tr_port::fromHost(132) } };
 
-        std::vector<std::pair<tr_address, tr_port>> ipv6_nodes_ = {
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3217"), tr_port::fromHost(6881)),
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3218"), tr_port::fromHost(6882)),
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3219"), tr_port::fromHost(6883)),
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3220"), tr_port::fromHost(6884)),
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::fromHost(6885))
+        std::vector<tr_socket_address> ipv6_nodes_ = {
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3217"), tr_port::fromHost(6881) },
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3218"), tr_port::fromHost(6882) },
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3219"), tr_port::fromHost(6883) },
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3220"), tr_port::fromHost(6884) },
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::fromHost(6885) }
         };
 
         [[nodiscard]] auto nodesString() const
@@ -129,15 +127,15 @@ protected:
             tr_variantInitDict(&dict, 3U);
             tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(id_), std::size(id_));
             auto compact = std::vector<std::byte>{};
-            for (auto const& [addr, port] : ipv4_nodes_)
+            for (auto const& socket_address : ipv4_nodes_)
             {
-                addr.to_compact_ipv4(std::back_inserter(compact), port);
+                socket_address.to_compact(std::back_inserter(compact));
             }
             tr_variantDictAddRaw(&dict, TR_KEY_nodes, std::data(compact), std::size(compact));
             compact.clear();
-            for (auto const& [addr, port] : ipv6_nodes_)
+            for (auto const& socket_address : ipv6_nodes_)
             {
-                addr.to_compact_ipv6(std::back_inserter(compact), port);
+                socket_address.to_compact(std::back_inserter(compact));
             }
             tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
             tr_variantToFile(&dict, TR_VARIANT_FMT_BENC, dat_file);
@@ -194,7 +192,7 @@ protected:
 
         int ping_node(struct sockaddr const* sa, int /*salen*/) override
         {
-            auto addrport = tr_address::from_sockaddr(sa);
+            auto addrport = tr_socket_address::from_sockaddr(sa);
             assert(addrport);
             auto const [addr, port] = *addrport;
             pinged_.push_back(Pinged{ addr, port, tr_time() });
@@ -403,7 +401,7 @@ protected:
             return {};
         }
 
-        auto opt = tr_address::from_sockaddr(info->ai_addr);
+        auto opt = tr_socket_address::from_sockaddr(info->ai_addr);
         freeaddrinfo(info);
         if (opt)
         {

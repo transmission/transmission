@@ -433,7 +433,7 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
         // otherwise, use any_ipv6 (::).
         auto const source_addr = global_source_address(type);
         auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
-                                                                                            tr_address::any_ipv6();
+                                                                                            tr_address::any(TR_AF_INET6);
         return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
