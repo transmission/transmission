@@ -160,9 +160,9 @@ public:
 
         if (std::empty(port))
         {
-            return { inet_addr_.display_name() };
+            return inet_addr_.display_name();
         }
-        return { inet_addr_.display_name(port) };
+        return tr_socket_address::display_name(inet_addr_, port);
     }
 
 private:

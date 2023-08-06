@@ -162,7 +162,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", addr.display_name(udp_port_)),
+                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
@@ -170,7 +170,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo(fmt::format("Bound UDP IPv4 address {:s}", addr.display_name(udp_port_)));
+            tr_logAddInfo(fmt::format("Bound UDP IPv4 address {:s}", tr_socket_address::display_name(addr, udp_port_)));
             session_.setSocketTOS(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
@@ -196,7 +196,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv6 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", addr.display_name(udp_port_)),
+                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
@@ -204,7 +204,7 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo(fmt::format("Bound UDP IPv6 address {:s}", addr.display_name(udp_port_)));
+            tr_logAddInfo(fmt::format("Bound UDP IPv6 address {:s}", tr_socket_address::display_name(addr, udp_port_)));
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
@@ -254,7 +254,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     }
     else if (
         addrport && addrport->address().is_global_unicast_address() &&
-        !session_.global_source_address(to->sa_family == AF_INET ? TR_AF_INET : TR_AF_INET6))
+        !session_.global_source_address(tr_af_to_ip_protocol(to->sa_family)))
     {
         // don't try to connect to a global address if we don't have connectivity to public internet
         return;
@@ -267,8 +267,7 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
     auto display_name = std::string{};
     if (addrport)
     {
-        auto const& [addr, port] = *addrport;
-        display_name = addr.display_name(port);
+        display_name = addrport->display_name();
     }
 
     tr_logAddWarn(fmt::format(

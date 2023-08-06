@@ -415,8 +415,7 @@ public:
 
     [[nodiscard]] std::string display_name() const override
     {
-        auto const [addr, port] = socket_address();
-        return addr.display_name(port);
+        return socket_address().display_name();
     }
 
     [[nodiscard]] tr_bitfield const& has() const noexcept override
@@ -991,7 +990,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         auto const begin = std::data(buf);
         auto const end = msgs->io->address().to_compact(begin);
         auto const len = end - begin;
-        TR_ASSERT(len == 4 || len == 16);
+        TR_ASSERT(len == tr_address::CompactAddrBytes[0] || len == tr_address::CompactAddrBytes[1]);
         tr_variantDictAddRaw(&val, TR_KEY_yourip, begin, len);
     }
 
@@ -2066,7 +2065,7 @@ void tr_peerMsgsImpl::sendPex()
             this,
             fmt::format(
                 FMT_STRING("pex: old {:s} peer count {:d}, new peer count {:d}, added {:d}, dropped {:d}"),
-                tr_ip_protocol_sv(ip_type),
+                IpProtocolToSv[ip_type],
                 std::size(old_pex),
                 std::size(new_pex),
                 std::size(added),

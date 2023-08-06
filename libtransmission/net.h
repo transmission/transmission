@@ -148,7 +148,25 @@ enum tr_address_type : uint8_t
     NUM_TR_AF_INET_TYPES
 };
 
-std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept;
+auto constexpr inline IpProtocolToSv = std::array{ std::string_view{ "IPv4" }, std::string_view{ "IPv6" } };
+static_assert(std::size(IpProtocolToSv) == NUM_TR_AF_INET_TYPES);
+
+auto constexpr inline IpProtocolToAf = std::array{ AF_INET, AF_INET6 };
+static_assert(std::size(IpProtocolToAf) == NUM_TR_AF_INET_TYPES);
+
+constexpr auto tr_af_to_ip_protocol(int af)
+{
+    switch (af)
+    {
+    case AF_INET:
+        return TR_AF_INET;
+    case AF_INET6:
+        return TR_AF_INET6;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return NUM_TR_AF_INET_TYPES;
+    }
+}
 
 struct tr_socket_address;
 
@@ -159,10 +177,8 @@ struct tr_address
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
     // write the text form of the address, e.g. inet_ntop()
-    template<typename OutputIt>
-    OutputIt display_name(OutputIt out, tr_port port = {}) const;
-    std::string_view display_name(char* out, size_t outlen, tr_port port = {}) const;
-    [[nodiscard]] std::string display_name(tr_port port = {}) const;
+    std::string_view display_name(char* out, size_t outlen) const;
+    [[nodiscard]] std::string display_name() const;
 
     ///
 
@@ -290,9 +306,10 @@ struct tr_socket_address
         return port_;
     }
 
+    [[nodiscard]] static std::string display_name(tr_address const& address, tr_port port) noexcept;
     [[nodiscard]] auto display_name() const noexcept
     {
-        return address_.display_name(port_);
+        return display_name(address_, port_);
     }
 
     [[nodiscard]] auto is_valid() const noexcept

@@ -56,12 +56,6 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
-std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept
-{
-    static auto TR_CONSTEXPR23 map = std::array{ std::string_view{ "IPv4" }, std::string_view{ "IPv6" } };
-    return map[type];
-}
-
 // - TCP Sockets
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
@@ -200,8 +194,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         return {};
     }
 
-    static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(Domains[addr.type], SOCK_STREAM);
+    auto const s = createSocket(IpProtocolToAf[addr.type], SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
@@ -271,9 +264,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 {
     TR_ASSERT(addr.is_valid());
 
-    static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-
-    auto const fd = socket(Domains[addr.type], SOCK_STREAM, 0);
+    auto const fd = socket(IpProtocolToAf[addr.type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *err_out = sockerrno;
@@ -480,35 +471,16 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
     return {};
 }
 
-std::string_view tr_address::display_name(char* out, size_t outlen, tr_port port) const
+std::string_view tr_address::display_name(char* out, size_t outlen) const
 {
-    if (std::empty(port))
-    {
-        return is_ipv4() ? evutil_inet_ntop(AF_INET, &addr, out, outlen) : evutil_inet_ntop(AF_INET6, &addr, out, outlen);
-    }
+    TR_ASSERT(is_valid());
+    return evutil_inet_ntop(IpProtocolToAf[type], &addr, out, outlen);
+}
 
+[[nodiscard]] std::string tr_address::display_name() const
+{
     auto buf = std::array<char, INET6_ADDRSTRLEN>{};
-    auto const addr_sv = display_name(std::data(buf), std::size(buf));
-    auto const [end, size] = fmt::format_to_n(out, outlen - 1, FMT_STRING("[{:s}]:{:d}"), addr_sv, port.host());
-    return { out, size };
-}
-
-template<typename OutputIt>
-OutputIt tr_address::display_name(OutputIt out, tr_port port) const
-{
-    auto addrbuf = std::array<char, TR_ADDRSTRLEN + 16>{};
-    auto const addr_sv = display_name(std::data(addrbuf), std::size(addrbuf), port);
-    return std::copy(std::begin(addr_sv), std::end(addr_sv), out);
-}
-
-template char* tr_address::display_name<char*>(char*, tr_port) const;
-
-[[nodiscard]] std::string tr_address::display_name(tr_port port) const
-{
-    auto buf = std::string{};
-    buf.reserve(INET6_ADDRSTRLEN + 16);
-    this->display_name(std::back_inserter(buf), port);
-    return buf;
+    return std::string{ display_name(std::data(buf), std::size(buf)) };
 }
 
 std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte const* compact) noexcept
@@ -684,6 +656,11 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 }
 
 // --- tr_socket_addrses
+
+std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
+{
+    return fmt::format("[{:s}]:{:d}", address.display_name(), port.host());
+}
 
 std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockaddr const* from)
 {

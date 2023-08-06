@@ -101,14 +101,14 @@ protected:
         [[nodiscard]] auto nodesString() const
         {
             auto str = std::string{};
-            for (auto const& [addr, port] : ipv4_nodes_)
+            for (auto const& socket_address : ipv4_nodes_)
             {
-                str += addr.display_name(port);
+                str += socket_address.display_name();
                 str += ',';
             }
-            for (auto const& [addr, port] : ipv6_nodes_)
+            for (auto const& socket_address : ipv6_nodes_)
             {
-                str += addr.display_name(port);
+                str += socket_address.display_name();
                 str += ',';
             }
             return str;
@@ -194,8 +194,7 @@ protected:
         {
             auto addrport = tr_socket_address::from_sockaddr(sa);
             assert(addrport);
-            auto const [addr, port] = *addrport;
-            pinged_.push_back(Pinged{ addr, port, tr_time() });
+            pinged_.push_back(Pinged{ *addrport, tr_time() });
             return 0;
         }
 
@@ -249,8 +248,7 @@ protected:
 
         struct Pinged
         {
-            tr_address address;
-            tr_port port;
+            tr_socket_address addrport;
             time_t timestamp;
         };
 
@@ -487,9 +485,9 @@ TEST_F(DhtTest, loadsStateFromStateFile)
     auto const n_expected_nodes = std::size(state_file.ipv4_nodes_) + std::size(state_file.ipv6_nodes_);
     waitFor(event_base_, [&pinged, n_expected_nodes]() { return std::size(pinged) >= n_expected_nodes; });
     auto actual_nodes_str = std::string{};
-    for (auto const& [addr, port, timestamp] : pinged)
+    for (auto const& [addrport, timestamp] : pinged)
     {
-        actual_nodes_str += addr.display_name(port);
+        actual_nodes_str += addrport.display_name();
         actual_nodes_str += ',';
     }
 
@@ -602,10 +600,10 @@ TEST_F(DhtTest, usesBootstrapFile)
         [&pinged]() { return !std::empty(pinged); },
         5s);
     ASSERT_EQ(1U, std::size(pinged));
-    auto const actual = pinged.front();
-    EXPECT_EQ(expected.address(), actual.address);
-    EXPECT_EQ(expected.port(), actual.port);
-    EXPECT_EQ(expected.display_name(), actual.address.display_name(actual.port));
+    auto const [actual_addrport, time] = pinged.front();
+    EXPECT_EQ(expected.address(), actual_addrport.address());
+    EXPECT_EQ(expected.port(), actual_addrport.port());
+    EXPECT_EQ(expected.display_name(), actual_addrport.display_name());
 }
 
 TEST_F(DhtTest, pingsAddedNodes)
@@ -623,8 +621,8 @@ TEST_F(DhtTest, pingsAddedNodes)
     dht->add_node(*addr, Port);
 
     ASSERT_EQ(1U, std::size(mediator.mock_dht_.pinged_));
-    EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().address);
-    EXPECT_EQ(Port, mediator.mock_dht_.pinged_.front().port);
+    EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().addrport.address());
+    EXPECT_EQ(Port, mediator.mock_dht_.pinged_.front().addrport.port());
 }
 
 TEST_F(DhtTest, announcesTorrents)
