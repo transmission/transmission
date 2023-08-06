@@ -383,7 +383,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "port"sv)
             {
-                pex_.socket_address.port_.setHost(static_cast<uint16_t>(value));
+                pex_.socket_address.port_.set_host(static_cast<uint16_t>(value));
             }
             else
             {

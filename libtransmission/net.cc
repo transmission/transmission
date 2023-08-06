@@ -434,7 +434,7 @@ namespace is_valid_for_peers_helpers
 
 // --- tr_port
 
-std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compact) noexcept
+std::pair<tr_port, std::byte const*> tr_port::from_compact(std::byte const* compact) noexcept
 {
     static auto constexpr PortLen = size_t{ 2 };
 
@@ -443,7 +443,7 @@ std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compa
     std::copy_n(compact, PortLen, reinterpret_cast<std::byte*>(&nport));
     compact += PortLen;
 
-    return std::make_pair(tr_port::fromNetwork(nport), compact);
+    return std::make_pair(tr_port::from_network(nport), compact);
 }
 
 // --- tr_address
@@ -675,7 +675,7 @@ std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockadd
         auto addr = tr_address{};
         addr.type = TR_AF_INET;
         addr.addr.addr4 = sin->sin_addr;
-        return tr_socket_address{ addr, tr_port::fromNetwork(sin->sin_port) };
+        return tr_socket_address{ addr, tr_port::from_network(sin->sin_port) };
     }
 
     if (from->sa_family == AF_INET6)
@@ -684,7 +684,7 @@ std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockadd
         auto addr = tr_address{};
         addr.type = TR_AF_INET6;
         addr.addr.addr6 = sin6->sin6_addr;
-        return tr_socket_address{ addr, tr_port::fromNetwork(sin6->sin6_port) };
+        return tr_socket_address{ addr, tr_port::from_network(sin6->sin6_port) };
     }
 
     TR_ASSERT_MSG(false, "invalid address family");

@@ -28,7 +28,7 @@ using namespace std::literals;
 
 TEST_F(NetTest, conversionsIPv4)
 {
-    static auto constexpr Port = tr_port::fromHost(80);
+    static auto constexpr Port = tr_port::from_host(80);
     static auto constexpr AddrStr = "127.0.0.1"sv;
 
     auto addr = tr_address::from_string(AddrStr);
@@ -55,7 +55,7 @@ TEST_F(NetTest, trAddress)
 TEST_F(NetTest, compact4)
 {
     static auto constexpr ExpectedReadable = "10.10.10.5"sv;
-    static auto constexpr ExpectedPort = tr_port::fromHost(128);
+    static auto constexpr ExpectedPort = tr_port::from_host(128);
     static auto constexpr Compact4Bytes = tr_socket_address::CompactSockAddrBytes[TR_AF_INET];
     static auto constexpr Compact4 = std::array<std::byte, Compact4Bytes>{ std::byte{ 0x0A }, std::byte{ 0x0A },
                                                                            std::byte{ 0x0A }, std::byte{ 0x05 },
@@ -119,7 +119,7 @@ TEST_F(NetTest, compact4)
 TEST_F(NetTest, compact6)
 {
     static auto constexpr ExpectedReadable = "1002:1035:4527:3546:7854:1237:3247:3217"sv;
-    static auto constexpr ExpectedPort = tr_port::fromHost(6881);
+    static auto constexpr ExpectedPort = tr_port::from_host(6881);
     static auto constexpr Compact6Bytes = tr_socket_address::CompactSockAddrBytes[TR_AF_INET6];
     static auto constexpr Compact6 = std::array<std::byte, Compact6Bytes>{
         std::byte{ 0x10 }, std::byte{ 0x02 }, std::byte{ 0x10 }, std::byte{ 0x35 }, std::byte{ 0x45 }, std::byte{ 0x27 },

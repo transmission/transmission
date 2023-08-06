@@ -1108,7 +1108,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     /* get peer's listening port */
     if (tr_variantDictFindInt(&val, TR_KEY_p, &i) && i > 0)
     {
-        port.setHost(i);
+        port.set_host(i);
         msgs->publish(tr_peer_event::GotPort(port));
         logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), i));
     }
@@ -1535,7 +1535,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
             logtrace(msgs, "Got a BtPeerMsgs::Port");
 
             auto const hport = payload.to_uint16();
-            if (auto const dht_port = tr_port::fromHost(hport); !std::empty(dht_port))
+            if (auto const dht_port = tr_port::from_host(hport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
                 msgs->session->addDhtNode(msgs->io->address(), msgs->dht_port);

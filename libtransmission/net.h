@@ -72,12 +72,12 @@ class tr_port
 public:
     tr_port() noexcept = default;
 
-    [[nodiscard]] constexpr static tr_port fromHost(uint16_t hport) noexcept
+    [[nodiscard]] constexpr static tr_port from_host(uint16_t hport) noexcept
     {
         return tr_port{ hport };
     }
 
-    [[nodiscard]] static tr_port fromNetwork(uint16_t nport) noexcept
+    [[nodiscard]] static tr_port from_network(uint16_t nport) noexcept
     {
         return tr_port{ ntohs(nport) };
     }
@@ -92,17 +92,17 @@ public:
         return htons(hport_);
     }
 
-    constexpr void setHost(uint16_t hport) noexcept
+    constexpr void set_host(uint16_t hport) noexcept
     {
         hport_ = hport;
     }
 
-    void setNetwork(uint16_t nport) noexcept
+    void set_network(uint16_t nport) noexcept
     {
         hport_ = ntohs(nport);
     }
 
-    [[nodiscard]] static std::pair<tr_port, std::byte const*> fromCompact(std::byte const* compact) noexcept;
+    [[nodiscard]] static std::pair<tr_port, std::byte const*> from_compact(std::byte const* compact) noexcept;
 
     [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
     {
@@ -167,8 +167,6 @@ constexpr auto tr_af_to_ip_protocol(int af)
         return NUM_TR_AF_INET_TYPES;
     }
 }
-
-struct tr_socket_address;
 
 struct tr_address
 {
@@ -333,7 +331,7 @@ struct tr_socket_address
     {
         auto socket_address = tr_socket_address{};
         std::tie(socket_address.address_, compact) = tr_address::from_compact_ipv4(compact);
-        std::tie(socket_address.port_, compact) = tr_port::fromCompact(compact);
+        std::tie(socket_address.port_, compact) = tr_port::from_compact(compact);
         return { socket_address, compact };
     }
 
@@ -341,7 +339,7 @@ struct tr_socket_address
     {
         auto socket_address = tr_socket_address{};
         std::tie(socket_address.address_, compact) = tr_address::from_compact_ipv6(compact);
-        std::tie(socket_address.port_, compact) = tr_port::fromCompact(compact);
+        std::tie(socket_address.port_, compact) = tr_port::from_compact(compact);
         return { socket_address, compact };
     }
 

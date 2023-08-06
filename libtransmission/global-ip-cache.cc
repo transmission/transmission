@@ -103,7 +103,7 @@ namespace global_source_ip_helpers
     // Pick some destination address to pretend to send a packet to
     static auto constexpr DstIP = std::array{ "91.121.74.28"sv, "2001:1890:1112:1::20"sv };
     auto const dst_addr = tr_address::from_string(DstIP[bind_addr.type]);
-    auto const dst_port = tr_port::fromHost(6969);
+    auto const dst_port = tr_port::from_host(6969);
 
     // In order for address selection to work right,
     // this should be a global unicast address, not Teredo or 6to4

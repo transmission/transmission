@@ -59,7 +59,7 @@ auto makeCookie()
 }
 
 constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
-auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
+auto constexpr McastPort = tr_port::from_host(6771); /**<LPD source and destination UPD port */
 
 /*
  * A LSD announce is formatted as follows:
@@ -152,7 +152,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
         auto walk = announce.substr(pos + std::size(key));
         if (auto const port = tr_num_parse<uint16_t>(walk, &walk); port && tr_strv_starts_with(walk, CrLf))
         {
-            ret.port = tr_port::fromHost(*port);
+            ret.port = tr_port::from_host(*port);
         }
         else
         {

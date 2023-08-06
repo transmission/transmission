@@ -143,7 +143,7 @@ public:
             std::tie(id_, bootstrap_queue_) = load_state(state_filename_);
         }
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
-        get_nodes_from_name("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_queue_);
+        get_nodes_from_name("dht.transmissionbt.com", tr_port::from_host(6881), bootstrap_queue_);
         bootstrap_timer_->start_single_shot(100ms);
 
         mediator_.api().init(udp4_socket_, udp6_socket_, std::data(id_), nullptr);
@@ -382,7 +382,7 @@ private:
         {
             // paper over a bug in some DHT implementation that gives port 1.
             // Xref: https://github.com/transmission/transmission/issues/527
-            return candidate.socket_address.port_ == tr_port::fromHost(1);
+            return candidate.socket_address.port_ == tr_port::from_host(1);
         };
 
         pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));
@@ -490,7 +490,7 @@ private:
                     auto addr = tr_address{};
                     auto port = tr_port{};
                     std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
-                    std::tie(port, walk) = tr_port::fromCompact(walk);
+                    std::tie(port, walk) = tr_port::from_compact(walk);
                     nodes.emplace_back(addr, port);
                 }
             }
@@ -504,7 +504,7 @@ private:
                     auto addr = tr_address{};
                     auto port = tr_port{};
                     std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
-                    std::tie(port, walk) = tr_port::fromCompact(walk);
+                    std::tie(port, walk) = tr_port::from_compact(walk);
                     nodes.emplace_back(addr, port);
                 }
             }
@@ -543,7 +543,7 @@ private:
             }
             else
             {
-                get_nodes_from_name(addrstr.c_str(), tr_port::fromHost(hport), nodes);
+                get_nodes_from_name(addrstr.c_str(), tr_port::from_host(hport), nodes);
             }
         }
     }

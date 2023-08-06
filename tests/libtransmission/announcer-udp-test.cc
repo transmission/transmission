@@ -589,14 +589,14 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     static auto constexpr Leechers = uint32_t{ 10 };
     static auto constexpr Seeders = uint32_t{ 20 };
     auto const addresses = std::array<tr_socket_address, 3>{ {
-        { tr_address::from_string("10.10.10.5").value_or(tr_address{}), tr_port::fromHost(128) },
-        { tr_address::from_string("192.168.1.2").value_or(tr_address{}), tr_port::fromHost(2021) },
-        { tr_address::from_string("192.168.1.3").value_or(tr_address{}), tr_port::fromHost(2022) },
+        { tr_address::from_string("10.10.10.5").value_or(tr_address{}), tr_port::from_host(128) },
+        { tr_address::from_string("192.168.1.2").value_or(tr_address{}), tr_port::from_host(2021) },
+        { tr_address::from_string("192.168.1.3").value_or(tr_address{}), tr_port::from_host(2022) },
     } };
 
     auto request = tr_announce_request{};
     request.event = TR_ANNOUNCE_EVENT_STARTED;
-    request.port = tr_port::fromHost(80);
+    request.port = tr_port::from_host(80);
     request.key = 0xCAFE;
     request.numwant = 20;
     request.up = 1;
