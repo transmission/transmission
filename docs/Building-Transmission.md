@@ -52,15 +52,11 @@ $ sudo apt install libb64-dev libdeflate-dev libevent-dev libminiupnpc-dev libna
 ```
 
 You likely want to install transmission as a native GUI application.
-There are two options, GTK and Qt. Both of them have 2 versions.
+There are two options, GTK and Qt.
 
 GTK 3 client:
 ```console
 $ sudo apt install gettext libgtkmm-3.0-dev
-```
-GTK 4 client:
-```console
-$ sudo apt install gettext libgtkmm-4.0-dev
 ```
 
 Qt5 client:
