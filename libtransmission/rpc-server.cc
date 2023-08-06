@@ -119,7 +119,7 @@ class tr_rpc_address
 {
 public:
     tr_rpc_address()
-        : inet_addr_(tr_address::any_ipv4())
+        : inet_addr_(tr_address::any(TR_AF_INET))
     {
     }
 

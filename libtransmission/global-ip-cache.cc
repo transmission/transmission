@@ -80,7 +80,7 @@ namespace global_source_ip_helpers
                 auto src_sslen = socklen_t{ sizeof(src_ss) };
                 if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
                 {
-                    if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
+                    if (auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
                     {
                         tr_net_close_socket(sock);
                         errno = save;
@@ -192,7 +192,7 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
         {
             return *addr;
         }
-        return type == TR_AF_INET ? tr_address::any_ipv4() : tr_address::any_ipv6();
+        return tr_address::any(type);
     }
 
     TR_ASSERT_MSG(false, "invalid type");

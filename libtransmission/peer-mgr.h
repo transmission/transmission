@@ -528,7 +528,7 @@ struct tr_pex
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact(OutputIt out, tr_pex const* pex, size_t n_pex, tr_address_type type)
+    static OutputIt to_compact(OutputIt out, tr_pex const* pex, size_t n_pex)
     {
         for (size_t i = 0; i < n_pex; ++i)
         {

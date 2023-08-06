@@ -40,17 +40,16 @@ TEST_F(NetTest, conversionsIPv4)
     EXPECT_EQ(AF_INET, ss.ss_family);
     EXPECT_EQ(Port.network(), reinterpret_cast<sockaddr_in const*>(&ss)->sin_port);
 
-    auto addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss));
+    auto addrport = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr const*>(&ss));
     ASSERT_TRUE(addrport.has_value());
-    assert(addrport.has_value());
     EXPECT_EQ(addr, addrport->address());
     EXPECT_EQ(Port, addrport->port());
 }
 
 TEST_F(NetTest, trAddress)
 {
-    EXPECT_EQ("0.0.0.0", tr_address::any_ipv4().display_name());
-    EXPECT_EQ("::", tr_address::any_ipv6().display_name());
+    EXPECT_EQ("0.0.0.0", tr_address::any(TR_AF_INET).display_name());
+    EXPECT_EQ("::", tr_address::any(TR_AF_INET6).display_name());
 }
 
 TEST_F(NetTest, compact4)

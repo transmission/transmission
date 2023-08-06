@@ -380,7 +380,7 @@ std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session
     // get the address and port,
     // make the socket unblocking,
     // and confirm we don't have too many peers
-    auto const addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
+    auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
     if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || tr_peer_socket::limit_reached(session))
     {
         tr_net_close_socket(sockfd);
@@ -536,55 +536,6 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte 
     return { address, compact };
 }
 
-std::optional<tr_socket_address> tr_address::from_sockaddr(struct sockaddr const* from)
-{
-    if (from == nullptr)
-    {
-        return {};
-    }
-
-    if (from->sa_family == AF_INET)
-    {
-        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
-        auto addr = tr_address{};
-        addr.type = TR_AF_INET;
-        addr.addr.addr4 = sin->sin_addr;
-        return tr_socket_address{ addr, tr_port::fromNetwork(sin->sin_port) };
-    }
-
-    if (from->sa_family == AF_INET6)
-    {
-        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
-        auto addr = tr_address{};
-        addr.type = TR_AF_INET6;
-        addr.addr.addr6 = sin6->sin6_addr;
-        return tr_socket_address{ addr, tr_port::fromNetwork(sin6->sin6_port) };
-    }
-
-    return {};
-}
-
-std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) const noexcept
-{
-    auto ss = sockaddr_storage{};
-
-    if (is_ipv4())
-    {
-        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
-        ss4->sin_addr = addr.addr4;
-        ss4->sin_family = AF_INET;
-        ss4->sin_port = port.network();
-        return { ss, sizeof(sockaddr_in) };
-    }
-
-    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
-    ss6->sin6_addr = addr.addr6;
-    ss6->sin6_family = AF_INET6;
-    ss6->sin6_flowinfo = 0;
-    ss6->sin6_port = port.network();
-    return { ss, sizeof(sockaddr_in6) };
-}
-
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
     // IPv6 addresses are always "greater than" IPv4
@@ -730,6 +681,58 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
     }
 
     return false;
+}
+
+// --- tr_socket_addrses
+
+std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockaddr const* from)
+{
+    if (from == nullptr)
+    {
+        return {};
+    }
+
+    if (from->sa_family == AF_INET)
+    {
+        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET;
+        addr.addr.addr4 = sin->sin_addr;
+        return tr_socket_address{ addr, tr_port::fromNetwork(sin->sin_port) };
+    }
+
+    if (from->sa_family == AF_INET6)
+    {
+        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET6;
+        addr.addr.addr6 = sin6->sin6_addr;
+        return tr_socket_address{ addr, tr_port::fromNetwork(sin6->sin6_port) };
+    }
+
+    TR_ASSERT_MSG(false, "invalid address family");
+    return {};
+}
+
+std::pair<sockaddr_storage, socklen_t> tr_socket_address::to_sockaddr(tr_address addr, tr_port port) noexcept
+{
+    auto ss = sockaddr_storage{};
+
+    if (addr.is_ipv4())
+    {
+        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
+        ss4->sin_addr = addr.addr.addr4;
+        ss4->sin_family = AF_INET;
+        ss4->sin_port = port.network();
+        return { ss, sizeof(sockaddr_in) };
+    }
+
+    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
+    ss6->sin6_addr = addr.addr.addr6;
+    ss6->sin6_family = AF_INET6;
+    ss6->sin6_flowinfo = 0;
+    ss6->sin6_port = port.network();
+    return { ss, sizeof(sockaddr_in6) };
 }
 
 bool tr_socket_address::is_valid_for_peers() const noexcept
