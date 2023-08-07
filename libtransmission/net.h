@@ -315,6 +315,8 @@ struct tr_socket_address
         return address_.is_valid();
     }
 
+    [[nodiscard]] bool is_valid_for_peers() const noexcept;
+
     [[nodiscard]] int compare(tr_socket_address const& that) const noexcept
     {
         if (auto const val = tr_compare_3way(address_, that.address_); val != 0)
@@ -398,8 +400,6 @@ struct tr_socket_address
     {
         return compare(that) == 0;
     }
-
-    [[nodiscard]] bool is_valid_for_peers() const noexcept;
 
     tr_address address_;
     tr_port port_;

@@ -662,6 +662,14 @@ std::string tr_socket_address::display_name(tr_address const& address, tr_port p
     return fmt::format("[{:s}]:{:d}", address.display_name(), port.host());
 }
 
+bool tr_socket_address::is_valid_for_peers() const noexcept
+{
+    using namespace is_valid_for_peers_helpers;
+
+    return is_valid() && !std::empty(port_) && !is_ipv6_link_local_address(address_) && !is_ipv4_mapped_address(address_) &&
+        !is_martian_addr(address_);
+}
+
 std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockaddr const* from)
 {
     if (from == nullptr)
@@ -710,12 +718,4 @@ std::pair<sockaddr_storage, socklen_t> tr_socket_address::to_sockaddr(tr_address
     ss6->sin6_flowinfo = 0;
     ss6->sin6_port = port.network();
     return { ss, sizeof(sockaddr_in6) };
-}
-
-bool tr_socket_address::is_valid_for_peers() const noexcept
-{
-    using namespace is_valid_for_peers_helpers;
-
-    return is_valid() && !std::empty(port_) && !is_ipv6_link_local_address(address_) && !is_ipv4_mapped_address(address_) &&
-        !is_martian_addr(address_);
 }
