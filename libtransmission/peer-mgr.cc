@@ -1097,7 +1097,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     {
         if (s != nullptr)
         {
-            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr && !info->is_connected())
+            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr)
             {
                 info->on_connection_failed();
 
