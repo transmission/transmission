@@ -472,7 +472,11 @@ public:
             // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
             else if (auto const& info = *msgs->peer_info; std::empty(info.listen_port()))
             {
-                s->on_got_port(msgs, event, false);
+                if (s->on_got_port(msgs, event, false))
+                {
+                    // https://github.com/transmission/transmission/issues/5869#issuecomment-1674434709
+                    s->outgoing_handshakes.erase(info.listen_socket_address());
+                }
             }
             // If we got a new listening port from a known connectable peer
             else if (info.listen_port() != event.port)
@@ -681,7 +685,7 @@ private:
         tor->session->add_downloaded(sent_length);
     }
 
-    void on_got_port(tr_peerMsgs* const msgs, tr_peer_event const& event, bool was_connectable)
+    bool on_got_port(tr_peerMsgs* const msgs, tr_peer_event const& event, bool was_connectable)
     {
         auto& info_this = *msgs->peer_info;
         TR_ASSERT(info_this.is_connected());
@@ -699,7 +703,7 @@ private:
             // If there is an existing connection to this peer, keep the better one
             if (info_that.is_connected() && on_got_port_duplicate_connection(msgs, it_that, was_connectable))
             {
-                return;
+                return false;
             }
 
             info_this.merge(info_that);
@@ -727,6 +731,7 @@ private:
         info_this.set_listen_port(event.port);
 
         mark_all_seeds_flag_dirty();
+        return true;
     }
 
     bool on_got_port_duplicate_connection(tr_peerMsgs* const msgs, Pool::iterator& it_that, bool was_connectable)
