@@ -310,15 +310,13 @@ $toolbar-height: $toolbar-height-number * 1px;
     user-select: none;
     width: $toolbar-height;
 
-    svg {
-      stroke: var(--color-fg-primary); // ios only? idk yet
-    }
-
     &:disabled {
       cursor: default;
-      // opacity: 0.25;
       svg {
         stroke: var(--color-fg-disabled);
+      }
+      svg g path {
+        fill: var(--color-fg-disabled);
       }
     }
   }
@@ -337,12 +335,6 @@ $toolbar-height: $toolbar-height-number * 1px;
 
 .toolbar-icon {
   stroke: var(--color-fg-primary);
-}
-
-#toolbar-inspector {
-  svg {
-    color: var(--color-fg-primary);
-  }
 }
 
 #toolbar-overflow {
