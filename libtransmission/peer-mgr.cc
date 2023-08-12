@@ -474,6 +474,7 @@ public:
             {
                 if (s->on_got_port(msgs, event, false))
                 {
+                    // Abort any outgoing handshakes with this peer
                     // https://github.com/transmission/transmission/issues/5869#issuecomment-1674434709
                     s->outgoing_handshakes.erase(info.listen_socket_address());
                 }
@@ -1077,7 +1078,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 }
 
 /* FIXME: this is kind of a mess. */
-[[nodiscard]] bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& result)
+[[nodiscard]] bool on_handshake_done(tr_peerMgr* const manager, tr_handshake::Result const& result)
 {
     TR_ASSERT(result.io != nullptr);
 
