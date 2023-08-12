@@ -465,24 +465,28 @@ public:
             break;
 
         case tr_peer_event::Type::ClientGotPort:
-            if (std::empty(event.port))
+            if (!std::empty(event.port))
             {
-                // Do nothing
-            }
-            // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
-            else if (auto const& info = *msgs->peer_info; std::empty(info.listen_port()))
-            {
-                if (s->on_got_port(msgs, event, false))
+                auto const& info = *msgs->peer_info;
+                auto result = false;
+
+                // If we don't know the listening port of this peer (i.e. incoming connection and first time ClientGotPort)
+                if (std::empty(info.listen_port()))
+                {
+                    result = s->on_got_port(msgs, event, false);
+                }
+                // If we got a new listening port from a known connectable peer
+                else if (info.listen_port() != event.port)
+                {
+                    result = s->on_got_port(msgs, event, true);
+                }
+
+                if (result)
                 {
                     // Abort any outgoing handshakes with this peer
                     // https://github.com/transmission/transmission/issues/5869#issuecomment-1674434709
-                    s->outgoing_handshakes.erase(info.listen_socket_address());
+                    s->outgoing_handshakes.erase({ info.listen_address(), event.port });
                 }
-            }
-            // If we got a new listening port from a known connectable peer
-            else if (info.listen_port() != event.port)
-            {
-                s->on_got_port(msgs, event, true);
             }
 
             break;
