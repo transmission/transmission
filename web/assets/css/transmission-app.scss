@@ -310,11 +310,21 @@ $toolbar-height: $toolbar-height-number * 1px;
     user-select: none;
     width: $toolbar-height;
 
+    svg {
+      stroke: var(--color-fg-primary);
+    }
+
+    svg g path {
+      fill: var(--color-fg-primary);
+    }
+
     &:disabled {
       cursor: default;
+
       svg {
         stroke: var(--color-fg-disabled);
       }
+
       svg g path {
         fill: var(--color-fg-disabled);
       }
