@@ -5,7 +5,7 @@ Transmission is a fast, easy, and free BitTorrent client. It comes in several fl
   * GTK+ and Qt GUI applications for Linux, BSD, etc.
   * A Qt-based Windows-compatible GUI application
   * A headless daemon for servers and routers
-  * A web UI for remote controlling any of the above
+  * A web UI for remote controlling any of the above - this is available via http://127.0.0.1:9091 by default
   
 Visit https://transmissionbt.com/ for more information.
 
