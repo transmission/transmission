@@ -541,7 +541,7 @@ Session::Impl::Impl(Session& core, tr_session* session)
     , session_{ session }
 {
     raw_model_ = Gio::ListStore<Torrent>::create();
-    signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_.get(), &TorrentSorter::update)));
+    signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_, &TorrentSorter::update)));
     sorted_model_ = SortListModel<Torrent>::create(gtr_ptr_static_cast<Gio::ListModel>(raw_model_), sorter_);
 
     /* init from prefs & listen to pref changes */
