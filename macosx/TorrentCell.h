@@ -14,7 +14,11 @@
 @property(nonatomic) IBOutlet NSImageView* fIconView;
 @property(nonatomic) IBOutlet NSImageView* fGroupIndicatorView;
 
+@property(nonatomic) IBOutlet NSStackView* fStackView;
 @property(nonatomic) IBOutlet NSTextField* fTorrentTitleField;
+@property(nonatomic) IBOutlet NSImageView* fTorrentPriorityView;
+@property(nonatomic) IBOutlet NSLayoutConstraint* fTorrentPriorityViewWidthConstraint;
+
 @property(nonatomic) IBOutlet NSTextField* fTorrentProgressField;
 @property(nonatomic) IBOutlet NSTextField* fTorrentStatusField;
 
