@@ -486,7 +486,7 @@ public:
                 {
                     // Abort any outgoing handshakes with this peer
                     // https://github.com/transmission/transmission/issues/5869#issuecomment-1674434709
-                    s->outgoing_handshakes.erase({ info.listen_address(), event.port });
+                    s->outgoing_handshakes.erase(info.listen_socket_address());
                 }
             }
 
