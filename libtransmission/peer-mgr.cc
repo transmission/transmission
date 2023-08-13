@@ -273,6 +273,7 @@ public:
 
         auto* const peer_info = peer->peer_info;
         auto const socket_address = peer->socket_address();
+        auto const listen_socket_address = peer_info->listen_socket_address();
         auto const was_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
@@ -295,7 +296,7 @@ public:
                 TR_ASSERT(port_empty);
             }
         }
-        graveyard_pool.erase(socket_address);
+        graveyard_pool.erase(listen_socket_address);
     }
 
     void remove_all_peers()
