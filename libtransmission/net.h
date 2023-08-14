@@ -148,25 +148,9 @@ enum tr_address_type : uint8_t
     NUM_TR_AF_INET_TYPES
 };
 
-auto constexpr inline IpProtocolToSv = std::array{ std::string_view{ "IPv4" }, std::string_view{ "IPv6" } };
-static_assert(std::size(IpProtocolToSv) == NUM_TR_AF_INET_TYPES);
-
-auto constexpr inline IpProtocolToAf = std::array{ AF_INET, AF_INET6 };
-static_assert(std::size(IpProtocolToAf) == NUM_TR_AF_INET_TYPES);
-
-constexpr auto tr_af_to_ip_protocol(int af)
-{
-    switch (af)
-    {
-    case AF_INET:
-        return TR_AF_INET;
-    case AF_INET6:
-        return TR_AF_INET6;
-    default:
-        TR_ASSERT_MSG(false, "invalid address family");
-        return NUM_TR_AF_INET_TYPES;
-    }
-}
+std::string_view tr_ip_protocol_to_sv(tr_address_type type);
+int tr_ip_protocol_to_af(tr_address_type type);
+tr_address_type tr_af_to_ip_protocol(int af);
 
 struct tr_address
 {

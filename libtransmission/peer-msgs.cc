@@ -2065,7 +2065,7 @@ void tr_peerMsgsImpl::sendPex()
             this,
             fmt::format(
                 FMT_STRING("pex: old {:s} peer count {:d}, new peer count {:d}, added {:d}, dropped {:d}"),
-                IpProtocolToSv[ip_type],
+                tr_ip_protocol_to_sv(ip_type),
                 std::size(old_pex),
                 std::size(new_pex),
                 std::size(added),

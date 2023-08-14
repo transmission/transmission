@@ -56,6 +56,50 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
+std::string_view tr_ip_protocol_to_sv(tr_address_type type)
+{
+    using namespace std::literals;
+
+    switch (type)
+    {
+    case TR_AF_INET:
+        return "IPv4"sv;
+    case TR_AF_INET6:
+        return "IPv6"sv;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return {};
+    }
+}
+
+int tr_ip_protocol_to_af(tr_address_type type)
+{
+    switch (type)
+    {
+    case TR_AF_INET:
+        return AF_INET;
+    case TR_AF_INET6:
+        return AF_INET6;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return {};
+    }
+}
+
+tr_address_type tr_af_to_ip_protocol(int af)
+{
+    switch (af)
+    {
+    case AF_INET:
+        return TR_AF_INET;
+    case AF_INET6:
+        return TR_AF_INET6;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return NUM_TR_AF_INET_TYPES;
+    }
+}
+
 // - TCP Sockets
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
@@ -194,7 +238,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         return {};
     }
 
-    auto const s = createSocket(IpProtocolToAf[addr.type], SOCK_STREAM);
+    auto const s = createSocket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
@@ -264,7 +308,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 {
     TR_ASSERT(addr.is_valid());
 
-    auto const fd = socket(IpProtocolToAf[addr.type], SOCK_STREAM, 0);
+    auto const fd = socket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *err_out = sockerrno;
@@ -474,7 +518,7 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 std::string_view tr_address::display_name(char* out, size_t outlen) const
 {
     TR_ASSERT(is_valid());
-    return evutil_inet_ntop(IpProtocolToAf[type], &addr, out, outlen);
+    return evutil_inet_ntop(tr_ip_protocol_to_af(type), &addr, out, outlen);
 }
 
 [[nodiscard]] std::string tr_address::display_name() const

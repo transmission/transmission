@@ -262,7 +262,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
     }
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
-    auto const protocol = IpProtocolToSv[type];
+    auto const protocol = tr_ip_protocol_to_sv(type);
 
     auto err = int{ 0 };
     auto const& source_addr = get_global_source_address(bind_addr(type), err);
@@ -296,7 +296,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
 
-    auto const protocol = IpProtocolToSv[type];
+    auto const protocol = tr_ip_protocol_to_sv(type);
     auto success = false;
 
     if (response.status == 200 /* HTTP_OK */)
@@ -337,7 +337,7 @@ void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
 {
     auto const lock = std::lock_guard{ global_addr_mutex_[type] };
     global_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} global address cache", IpProtocolToSv[type]));
+    tr_logAddTrace(fmt::format("Unset {} global address cache", tr_ip_protocol_to_sv(type)));
 }
 
 void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
@@ -351,7 +351,7 @@ void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 {
     auto const lock = std::lock_guard{ source_addr_mutex_[type] };
     source_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} source address cache", IpProtocolToSv[type]));
+    tr_logAddTrace(fmt::format("Unset {} source address cache", tr_ip_protocol_to_sv(type)));
 
     // No public internet connectivity means no global IP address
     unset_global_addr(type);
