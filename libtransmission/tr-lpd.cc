@@ -371,7 +371,7 @@ private:
                 return false;
             }
 
-            if (auto [ss, sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr({});
+            if (auto [ss, sslen] = tr_socket_address::to_sockaddr(mediator_.bind_address(TR_AF_INET), {});
                 bind(mcast_snd_socket_, reinterpret_cast<sockaddr*>(&ss), sslen) == -1)
             {
                 return false;
