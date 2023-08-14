@@ -14,12 +14,12 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <string>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bitfield.h"
-#include "block-info.h"
-#include "history.h"
-#include "net.h" // tr_port
+#include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/history.h"
+#include "libtransmission/net.h" // tr_port
 
 /**
  * @addtogroup peers Peers
@@ -28,7 +28,6 @@
 
 class tr_peer;
 class tr_swarm;
-class tr_peer_info;
 struct tr_bandwidth;
 
 // --- Peer Publish / Subscribe
@@ -38,19 +37,20 @@ class tr_peer_event
 public:
     enum class Type
     {
-        ClientGotBlock,
+        // Unless otherwise specified, all events are for BT peers only
+        ClientGotBlock, // applies to webseed too
         ClientGotChoke,
-        ClientGotPieceData,
+        ClientGotPieceData, // applies to webseed too
         ClientGotAllowedFast,
         ClientGotSuggest,
         ClientGotPort,
-        ClientGotRej,
+        ClientGotRej, // applies to webseed too
         ClientGotBitfield,
         ClientGotHave,
         ClientGotHaveAll,
         ClientGotHaveNone,
         ClientSentPieceData,
-        Error
+        Error // generic
     };
 
     Type type = Type::Error;
@@ -170,7 +170,7 @@ public:
     }
 };
 
-using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const& event, void* client_data);
+using tr_peer_callback_generic = void (*)(tr_peer* peer, tr_peer_event const& event, void* client_data);
 
 /**
  * State information about a connected peer.
@@ -181,7 +181,7 @@ using tr_peer_callback = void (*)(tr_peer* peer, tr_peer_event const& event, voi
 class tr_peer
 {
 public:
-    tr_peer(tr_torrent const* tor, tr_peer_info* const peer_info = nullptr);
+    tr_peer(tr_torrent const* tor);
     virtual ~tr_peer();
 
     virtual bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const = 0;
@@ -240,9 +240,6 @@ public:
 
     /// The following fields are only to be used in peer-mgr.cc.
     /// TODO(ckerr): refactor them out of `tr_peer`
-
-    // hook to private peer-mgr information
-    tr_peer_info* const peer_info;
 
     // whether or not this peer sent us any given block
     tr_bitfield blame;

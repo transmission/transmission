@@ -60,7 +60,7 @@ public:
     size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error** error) const;
     size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
 
-    [[nodiscard]] constexpr auto const& socketAddress() const noexcept
+    [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
         return socket_address_;
     }
