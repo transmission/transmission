@@ -252,7 +252,6 @@ struct tr_address
         case TR_AF_INET6:
             return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
         default:
-            TR_ASSERT_MSG(false, "invalid address type");
             return tr_address{};
         }
     }
