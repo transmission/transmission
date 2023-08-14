@@ -13,7 +13,6 @@
 #include <atomic>
 #include <cstddef> // for size_t
 #include <memory>
-#include <utility> // for std::pair<>
 
 #include "libtransmission/transmission.h" // for tr_direction, tr_block_ind...
 
@@ -22,6 +21,7 @@
 #include "libtransmission/peer-common.h" // for tr_peer
 
 class tr_peerIo;
+class tr_peerMsgs;
 class tr_peer_info;
 struct tr_torrent;
 
@@ -29,6 +29,8 @@ struct tr_torrent;
  * @addtogroup peers Peers
  * @{
  */
+
+using tr_peer_callback_bt = void (*)(tr_peerMsgs* peer, tr_peer_event const& event, void* client_data);
 
 class tr_peerMsgs : public tr_peer
 {
@@ -39,17 +41,9 @@ public:
         tr_interned_string user_agent,
         bool connection_is_encrypted,
         bool connection_is_incoming,
-        bool connection_is_utp)
-        : tr_peer{ tor, peer_info_in }
-        , user_agent_{ user_agent }
-        , connection_is_encrypted_{ connection_is_encrypted }
-        , connection_is_incoming_{ connection_is_incoming }
-        , connection_is_utp_{ connection_is_utp }
-    {
-        ++n_peers;
-    }
+        bool connection_is_utp);
 
-    virtual ~tr_peerMsgs() override;
+    ~tr_peerMsgs() override;
 
     [[nodiscard]] static auto size() noexcept
     {
@@ -101,7 +95,7 @@ public:
         return is_active_[direction];
     }
 
-    [[nodiscard]] virtual tr_socket_address socketAddress() const = 0;
+    [[nodiscard]] virtual tr_socket_address socket_address() const = 0;
 
     virtual void cancel_block_request(tr_block_index_t block) = 0;
 
@@ -145,6 +139,10 @@ protected:
         user_agent_ = val;
     }
 
+public:
+    // TODO(tearfur): change this to reference
+    tr_peer_info* const peer_info;
+
 private:
     static inline auto n_peers = std::atomic<size_t>{};
 
@@ -176,7 +174,7 @@ tr_peerMsgs* tr_peerMsgsNew(
     tr_peer_info* peer_info,
     std::shared_ptr<tr_peerIo> io,
     tr_interned_string user_agent,
-    tr_peer_callback callback,
+    tr_peer_callback_bt callback,
     void* callback_data);
 
 /* @} */

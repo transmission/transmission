@@ -23,6 +23,11 @@ public:
         return raw_value_ / 100;
     }
 
+    [[nodiscard]] constexpr float to_fraction() const noexcept
+    {
+        return raw_value_ / 10000.F;
+    }
+
     [[nodiscard]] std::string to_string() const;
 
     constexpr bool operator==(Percents const& rhs) const noexcept

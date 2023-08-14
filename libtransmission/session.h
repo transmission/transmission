@@ -257,6 +257,11 @@ private:
         {
         }
 
+        [[nodiscard]] tr_address bind_address(tr_address_type type) const override
+        {
+            return session_.bind_address(type);
+        }
+
         [[nodiscard]] tr_port port() const override
         {
             return session_.advertisedPeerPort();

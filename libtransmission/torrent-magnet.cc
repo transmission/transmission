@@ -220,6 +220,7 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
 bool use_new_metainfo(tr_torrent* tor, tr_error** error)
 {
     auto const& m = tor->incomplete_metadata;
+    TR_ASSERT(m);
 
     // test the info_dict checksum
     if (tr_sha1::digest(m->metadata) != tor->info_hash())
@@ -268,6 +269,7 @@ void on_have_all_metainfo(tr_torrent* tor)
 {
     tr_error* error = nullptr;
     auto& m = tor->incomplete_metadata;
+    TR_ASSERT(m);
     if (use_new_metainfo(tor, &error))
     {
         m.reset();
@@ -386,9 +388,15 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
         return 1.0;
     }
 
-    auto const& m = tor->incomplete_metadata;
-    auto const& n = m->piece_count;
-    return !m || n == 0 ? 0.0 : (n - std::size(m->pieces_needed)) / static_cast<double>(n);
+    if (auto const& m = tor->incomplete_metadata; m)
+    {
+        if (auto const& n = m->piece_count; n != 0)
+        {
+            return (n - std::size(m->pieces_needed)) / static_cast<double>(n);
+        }
+    }
+
+    return 0.0;
 }
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)

@@ -37,88 +37,6 @@ constexpr bool tr_variantIsContainer(tr_variant const* v)
 
 // ---
 
-auto constexpr StringInit = tr_variant_string{
-    TR_STRING_TYPE_QUARK,
-    0,
-    {},
-};
-
-void tr_variant_string_clear(struct tr_variant_string* str)
-{
-    if (str->type == TR_STRING_TYPE_HEAP)
-    {
-        delete[] const_cast<char*>(str->str.str);
-    }
-
-    *str = StringInit;
-}
-
-/* returns a const pointer to the variant's string */
-constexpr char const* tr_variant_string_get_string(struct tr_variant_string const* str)
-{
-    switch (str->type)
-    {
-    case TR_STRING_TYPE_BUF:
-        return str->str.buf;
-
-    case TR_STRING_TYPE_HEAP:
-    case TR_STRING_TYPE_QUARK:
-    case TR_STRING_TYPE_VIEW:
-        return str->str.str;
-
-    default:
-        return nullptr;
-    }
-}
-
-void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark quark)
-{
-    tr_variant_string_clear(str);
-
-    str->type = TR_STRING_TYPE_QUARK;
-    auto const sv = tr_quark_get_string_view(quark);
-    str->str.str = std::data(sv);
-    str->len = std::size(sv);
-}
-
-void tr_variant_string_set_string(struct tr_variant_string* str, std::string_view in)
-{
-    tr_variant_string_clear(str);
-
-    auto const* const bytes = std::data(in);
-    auto const len = std::size(in);
-
-    if (len < sizeof(str->str.buf))
-    {
-        str->type = TR_STRING_TYPE_BUF;
-        if (len > 0)
-        {
-            std::copy_n(bytes, len, str->str.buf);
-        }
-
-        str->str.buf[len] = '\0';
-        str->len = len;
-    }
-    else
-    {
-        auto* tmp = new char[len + 1];
-        std::copy_n(bytes, len, tmp);
-        tmp[len] = '\0';
-        str->type = TR_STRING_TYPE_HEAP;
-        str->str.str = tmp;
-        str->len = len;
-    }
-}
-
-// ---
-
-constexpr char const* getStr(tr_variant const* v)
-{
-    TR_ASSERT(tr_variantIsString(v));
-
-    return tr_variant_string_get_string(&v->val.s);
-}
-
 constexpr int dictIndexOf(tr_variant const* dict, tr_quark key)
 {
     if (tr_variantIsDict(dict))
@@ -178,7 +96,7 @@ tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark key, int type)
         }
         else if (child->type == TR_VARIANT_TYPE_STR)
         {
-            tr_variant_string_clear(&child->val.s);
+            child->val.s.clear();
         }
     }
 
@@ -262,36 +180,32 @@ bool tr_variantGetStrView(tr_variant const* v, std::string_view* setme)
         return false;
     }
 
-    char const* const str = tr_variant_string_get_string(&v->val.s);
-    size_t const len = v->val.s.len;
-    *setme = std::string_view{ str, len };
+    *setme = v->val.s.get();
     return true;
 }
 
 bool tr_variantGetRaw(tr_variant const* v, std::byte const** setme_raw, size_t* setme_len)
 {
-    bool const success = tr_variantIsString(v);
-
-    if (success)
+    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
     {
-        *setme_raw = reinterpret_cast<std::byte const*>(getStr(v));
-        *setme_len = v->val.s.len;
+        *setme_raw = reinterpret_cast<std::byte const*>(std::data(sv));
+        *setme_len = std::size(sv);
+        return true;
     }
 
-    return success;
+    return false;
 }
 
 bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* setme_len)
 {
-    bool const success = tr_variantIsString(v);
-
-    if (success)
+    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
     {
-        *setme_raw = reinterpret_cast<uint8_t const*>(getStr(v));
-        *setme_len = v->val.s.len;
+        *setme_raw = reinterpret_cast<uint8_t const*>(std::data(sv));
+        *setme_len = std::size(sv);
+        return true;
     }
 
-    return success;
+    return false;
 }
 
 bool tr_variantGetBool(tr_variant const* v, bool* setme)
@@ -405,22 +319,28 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark key, std::byte const** set
 
 // ---
 
+void tr_variantInitStrView(tr_variant* initme, std::string_view val)
+{
+    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
+    initme->val.s.set_shallow(val);
+}
+
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string(&initme->val.s, { static_cast<char const*>(value), value_len });
+    initme->val.s.set({ static_cast<char const*>(value), value_len });
 }
 
 void tr_variantInitQuark(tr_variant* initme, tr_quark value)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_quark(&initme->val.s, value);
+    initme->val.s.set_shallow(tr_quark_get_string_view(value));
 }
 
 void tr_variantInitStr(tr_variant* initme, std::string_view value)
 {
     tr_variantInit(initme, TR_VARIANT_TYPE_STR);
-    tr_variant_string_set_string(&initme->val.s, value);
+    initme->val.s.set(value);
 }
 
 void tr_variantInitList(tr_variant* initme, size_t reserve_count)
@@ -715,7 +635,7 @@ private:
 
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
-    small::vector<size_t, 512> sorted;
+    small::vector<size_t, 128U> sorted;
 };
 
 class VariantWalker
@@ -763,7 +683,7 @@ public:
 private:
     size_t size = 0;
 
-    static auto constexpr InitialCapacity = size_t{ 32U };
+    static auto constexpr InitialCapacity = size_t{ 24U };
     small::vector<WalkNode, InitialCapacity> stack;
     small::vector<WalkNode::ByKey, InitialCapacity> sortbuf;
 };
@@ -877,7 +797,7 @@ void freeDummyFunc(tr_variant const* /*v*/, void* /*buf*/)
 
 void freeStringFunc(tr_variant const* v, void* /*user_data*/)
 {
-    tr_variant_string_clear(&const_cast<tr_variant*>(v)->val.s);
+    const_cast<tr_variant*>(v)->val.s.clear();
 }
 
 void freeContainerEndFunc(tr_variant const* v, void* /*user_data*/)
