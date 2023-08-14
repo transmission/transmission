@@ -1321,7 +1321,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         infos.reserve(std::size(peers));
         for (auto const* peer : peers)
         {
-            if (peer->socketAddress().address().type == address_type)
+            if (peer->socket_address().address().type == address_type)
             {
                 infos.emplace_back(peer->peer_info);
             }
@@ -1333,7 +1333,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
         infos.reserve(std::size(pool));
         for (auto const& [socket_address, peer_info] : pool)
         {
-            TR_ASSERT(socket_address == peer_info.socket_address());
+            TR_ASSERT(socket_address == peer_info.listen_socket_address());
             if (socket_address.address().type == address_type && is_peer_interesting(tor, peer_info))
             {
                 infos.emplace_back(&peer_info);
