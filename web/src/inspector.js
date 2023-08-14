@@ -753,7 +753,7 @@ export class Inspector extends EventTarget {
         rows.push(title);
       }
 
-      for (const [index, tracker] of tor.getTrackers().entries()) {
+      for (const tracker of tor.getTrackers().entries()) {
         const announceState = Inspector.getAnnounceState(tracker);
         const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
         const lastScrapeStatusHash = Inspector.lastScrapeStatus(tracker);
