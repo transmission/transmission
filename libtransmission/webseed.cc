@@ -166,7 +166,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
 class tr_webseed final : public tr_peer
 {
 public:
-    tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback callback_in, void* callback_data_in)
+    tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback_webseed callback_in, void* callback_data_in)
         : tr_peer{ tor }
         , torrent_id{ tr_torrentId(tor) }
         , base_url{ url }
@@ -314,7 +314,7 @@ public:
 
     tr_torrent_id_t const torrent_id;
     std::string const base_url;
-    tr_peer_callback const callback;
+    tr_peer_callback_webseed const callback;
     void* const callback_data;
 
     ConnectionLimiter connection_limiter;
@@ -538,7 +538,7 @@ void task_request_next_chunk(tr_webseed_task* task)
 
 // ---
 
-tr_peer* tr_webseedNew(tr_torrent* torrent, std::string_view url, tr_peer_callback callback, void* callback_data)
+tr_peer* tr_webseedNew(tr_torrent* torrent, std::string_view url, tr_peer_callback_webseed callback, void* callback_data)
 {
     return new tr_webseed(torrent, url, callback, callback_data);
 }

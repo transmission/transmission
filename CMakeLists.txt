@@ -38,7 +38,8 @@ set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
-set(GTKMM_MINIMUM 3.24.0)
+set(GTKMM3_MINIMUM 3.24.0)
+set(GTKMM4_MINIMUM 4.11.1)
 set(OPENSSL_MINIMUM 0.9.7)
 set(MBEDTLS_MINIMUM 1.3)
 set(NPM_MINIMUM 8.1.307) # Node.js 14
@@ -297,7 +298,7 @@ if(ENABLE_GTK)
 
     if(USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 4)
         pkg_check_modules(GTK4
-            gtkmm-4.0>=${GTKMM_MINIMUM}
+            gtkmm-4.0>=${GTKMM4_MINIMUM}
             glibmm-2.68>=${GLIBMM_MINIMUM}
             giomm-2.68>=${GIOMM_MINIMUM})
         set(GTK_VERSION 4)
@@ -306,7 +307,7 @@ if(ENABLE_GTK)
 
     if(NOT GTK_FOUND AND (USE_GTK_VERSION STREQUAL "AUTO" OR USE_GTK_VERSION EQUAL 3))
         pkg_check_modules(GTK3
-            gtkmm-3.0>=${GTKMM_MINIMUM}
+            gtkmm-3.0>=${GTKMM3_MINIMUM}
             glibmm-2.4>=${GLIBMM_MINIMUM}
             giomm-2.4>=${GIOMM_MINIMUM})
         set(GTK_VERSION 3)

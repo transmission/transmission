@@ -209,7 +209,7 @@ protected:
             return 0;
         }
 
-        int init(int dht_socket, int dht_socket6, unsigned const char* id, unsigned const char* /*v*/) override
+        int init(int dht_socket, int dht_socket6, unsigned char const* id, unsigned char const* /*v*/) override
         {
             inited_ = true;
             dht_socket_ = dht_socket;

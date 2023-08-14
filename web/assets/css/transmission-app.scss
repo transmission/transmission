@@ -390,22 +390,30 @@ $toolbar-height: $toolbar-height-number * 1px;
   }
 }
 
-$speed-icon-size: 12px;
+$speed-icon-size: 20px;
 
 .speed-up-icon {
-  background-image: url($image-chevron-up);
-  background-repeat: no-repeat;
-  background-size: $speed-icon-size $speed-icon-size;
-  height: $speed-icon-size;
-  width: $speed-icon-size;
+  fill: var(--color-fg-primary);
+  margin: 0 auto;
+
+  svg {
+    width: $speed-icon-size;
+  }
 }
 
 .speed-dn-icon {
-  background-image: url($image-chevron-dn);
-  background-repeat: no-repeat;
-  background-size: $speed-icon-size $speed-icon-size;
-  height: $speed-icon-size;
-  width: $speed-icon-size;
+  fill: var(--color-fg-primary);
+  margin: 0 auto;
+
+  svg {
+    width: $speed-icon-size;
+  }
+}
+
+#speed-dn-label,
+#speed-up-label {
+  width: 70px;
+  text-align: right;
 }
 
 /// TORRENT CONTAINER
@@ -1238,6 +1246,10 @@ $video-image: '../img/film.svg';
 
   .percent-done {
     width: 10%;
+
+    @include for-phone-only {
+      width: 12%;
+    }
   }
 
   .speed-down,
@@ -1247,17 +1259,21 @@ $video-image: '../img/film.svg';
 
   .peer-address {
     width: 25%;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+
+    @include for-phone-only {
+      text-align: left;
+      width: 20%;
+    }
   }
 
   .peer-app-name {
     overflow-x: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    @include for-phone-only {
-      display: none;
-    }
     @include for-tablet-portrait-up {
-      width: 25%;
+      width: 20%;
     }
   }
 
@@ -1539,7 +1555,7 @@ $logo-size: 64px;
 }
 @include for-tablet-portrait-up {
   .dialog-container {
-    min-width: 400px;
+    min-width: 500px;
     position: absolute;
     top: $popup-top * 2;
   }
@@ -1681,6 +1697,11 @@ dialog {
 
   #auto-start-label {
     margin-left: 5px;
+  }
+
+  input[type='file'] {
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
