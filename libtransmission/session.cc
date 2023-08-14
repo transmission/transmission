@@ -642,7 +642,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
-    setSettings(client_settings, true);
+    setSettings(&settings, true);
 
     tr_utpInit(this);
 
