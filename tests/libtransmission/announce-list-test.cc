@@ -272,6 +272,18 @@ TEST_F(AnnounceListTest, canReplace)
     EXPECT_EQ(Announce2, announce_list.at(0).announce.sv());
 }
 
+TEST_F(AnnounceListTest, canReplaceWithDiffQuery)
+{
+    auto constexpr Tier = tr_tracker_tier_t{ 1 };
+    auto constexpr Announce1 = "https://www.example.com/1/announce"sv;
+    auto constexpr Announce2 = "https://www.example.com/2/announce?pass=1999"sv;
+
+    auto announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Announce1, Tier));
+    EXPECT_TRUE(announce_list.replace(announce_list.at(0).id, Announce2));
+    EXPECT_EQ(Announce2, announce_list.at(0).announce.sv());
+}
+
 TEST_F(AnnounceListTest, canNotReplaceInvalidId)
 {
     auto constexpr Tier = tr_tracker_tier_t{ 1 };

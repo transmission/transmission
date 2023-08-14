@@ -86,6 +86,7 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     tracker.id = nextUniqueId();
     tracker.host = fmt::format(FMT_STRING("{:s}:{:d}"), announce->host, announce->port);
     tracker.sitename = announce->sitename;
+    tracker.query = announce->query;
 
     if (auto const scrape_str = announceToScrape(announce_url_sv); scrape_str)
     {
@@ -224,7 +225,8 @@ bool tr_announce_list::canAdd(tr_url_parsed_t const& announce)
 
         auto const tracker_parsed = tr_urlParse(tracker_announce);
         return tracker_parsed->scheme == announce.scheme && tracker_parsed->host == announce.host &&
-            tracker_parsed->port == announce.port && tracker_parsed->path == announce.path;
+            tracker_parsed->port == announce.port && tracker_parsed->path == announce.path &&
+            tracker_parsed->query == announce.query;
     };
     return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
 }
