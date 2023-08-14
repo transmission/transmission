@@ -926,7 +926,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
         {
             tr_variant* t = nullptr;
 
-            // if types differ, ensure that target will overwrite source
+            // if types differ, ensure that source will overwrite target
             auto const* const target_child = tr_variantDictFind(target, key);
             if ((target_child != nullptr) && !tr_variantIsType(target_child, child->type))
             {
