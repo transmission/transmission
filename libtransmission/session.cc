@@ -299,7 +299,7 @@ std::optional<std::string_view> tr_session::WebMediator::userAgent() const
     return TR_NAME "/" SHORT_VERSION_STRING;
 }
 
-std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
+std::optional<std::string> tr_session::WebMediator::bind_address_V4() const
 {
     if (auto const addr = session_->bind_address(TR_AF_INET); !addr.is_any())
     {
@@ -309,7 +309,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddressV4() const
     return std::nullopt;
 }
 
-std::optional<std::string> tr_session::WebMediator::publicAddressV6() const
+std::optional<std::string> tr_session::WebMediator::bind_address_V6() const
 {
     if (auto const addr = session_->bind_address(TR_AF_INET6); !addr.is_any())
     {
