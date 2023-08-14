@@ -26,7 +26,7 @@ private:
 
 public:
     using value_type = Char;
-    using const_reference = const Char&;
+    using const_reference = Char const&;
 
     tr_strbuf()
     {
