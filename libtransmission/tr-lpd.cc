@@ -100,9 +100,7 @@ auto makeAnnounceMsg(std::string_view cookie, tr_port port, std::vector<std::str
         ret += fmt::format("cookie: {:s}\r\n", cookie);
     }
 
-    ret += "\r\n\r\n";
-
-    return ret;
+    return ret + "\r\n\r\n";
 }
 
 struct ParsedAnnounce
@@ -359,6 +357,22 @@ private:
             }
 
             if (evutil_make_socket_nonblocking(mcast_snd_socket_) == -1)
+            {
+                return false;
+            }
+
+            if (setsockopt(
+                    mcast_snd_socket_,
+                    SOL_SOCKET,
+                    SO_REUSEADDR,
+                    reinterpret_cast<char const*>(&opt_on),
+                    sizeof(opt_on)) == -1)
+            {
+                return false;
+            }
+
+            if (auto [ss, sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr({});
+                bind(mcast_snd_socket_, reinterpret_cast<sockaddr*>(&ss), sslen) == -1)
             {
                 return false;
             }

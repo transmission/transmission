@@ -1310,26 +1310,31 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
     tr_swarm const* s = tor->swarm;
 
-    // build a list of atoms
+    // build a list of peer info objects
 
     auto infos = std::vector<tr_peer_info const*>{};
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
         auto const& peers = s->peers;
         infos.reserve(std::size(peers));
-        std::transform(
-            std::begin(peers),
-            std::end(peers),
-            std::back_inserter(infos),
-            [](auto const* peer) { return peer->peer_info; });
+        for (auto const* peer : peers)
+        {
+            if (peer->socket_address().address().type == address_type)
+            {
+                infos.emplace_back(peer->peer_info);
+            }
+        }
     }
     else /* TR_PEERS_INTERESTING */
     {
-        for (auto const& [socket_address, peer_info] : s->connectable_pool)
+        auto const& pool = s->connectable_pool;
+        infos.reserve(std::size(pool));
+        for (auto const& [socket_address, peer_info] : pool)
         {
-            if (is_peer_interesting(tor, peer_info))
+            TR_ASSERT(socket_address == peer_info.listen_socket_address());
+            if (socket_address.address().type == address_type && is_peer_interesting(tor, peer_info))
             {
-                infos.push_back(&peer_info);
+                infos.emplace_back(&peer_info);
             }
         }
     }
@@ -1346,12 +1351,11 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     for (auto const* const info : infos)
     {
         auto const& socket_address = info->listen_socket_address();
+        auto const& addr = socket_address.address();
 
-        if (socket_address.address().type == address_type)
-        {
-            TR_ASSERT(socket_address.is_valid());
-            pex.emplace_back(socket_address, info->pex_flags());
-        }
+        TR_ASSERT(addr.is_valid());
+        TR_ASSERT(addr.type == address_type);
+        pex.emplace_back(socket_address, info->pex_flags());
     }
 
     std::sort(std::begin(pex), std::end(pex));

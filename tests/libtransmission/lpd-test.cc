@@ -40,6 +40,11 @@ public:
     {
     }
 
+    [[nodiscard]] tr_address bind_address(tr_address_type /* type */) const override
+    {
+        return {};
+    }
+
     [[nodiscard]] tr_port port() const override
     {
         return port_;
