@@ -7,6 +7,9 @@
 #import "ProgressGradients.h"
 #import "TorrentTableView.h"
 #import "Torrent.h"
+#import "NSImageAdditions.h"
+
+static CGFloat const kPriorityIconWidth = 12.0;
 
 @interface SmallTorrentCell ()
 @property(nonatomic) NSTrackingArea* fTrackingArea;
@@ -24,6 +27,24 @@
         Torrent* torrent = (Torrent*)self.objectValue;
 
         [progressBar drawBarInRect:barRect forTableView:self.fTorrentTableView withTorrent:torrent];
+
+        // set priority icon
+        if (torrent.priority != TR_PRI_NORMAL)
+        {
+            NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor : NSColor.labelColor;
+            NSImage* priorityImage = [[NSImage imageNamed:(torrent.priority == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")]
+                imageWithColor:priorityColor];
+
+            self.fTorrentPriorityView.image = priorityImage;
+            self.fStackView.spacing = 4;
+            self.fTorrentPriorityViewWidthConstraint.constant = kPriorityIconWidth;
+        }
+        else
+        {
+            self.fTorrentPriorityView.image = nil;
+            self.fStackView.spacing = 0;
+            self.fTorrentPriorityViewWidthConstraint.constant = 0;
+        }
     }
 
     [super drawRect:dirtyRect];
