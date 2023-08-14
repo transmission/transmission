@@ -24,7 +24,7 @@ const TorrentRendererHelper = {
     for (let l=0;l<labels.length;l++){
       let d = document.createElement('span');
       d.classList.add("torrent-label");
-      d.innerText = labels[l];
+      d.textContent = labels[l];
       label.appendChild(d);
     }
   },
