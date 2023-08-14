@@ -273,6 +273,7 @@ public:
 
         auto* const peer_info = peer->peer_info;
         auto const socket_address = peer->socket_address();
+        auto const listen_socket_address = peer_info->listen_socket_address();
         auto const was_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
@@ -295,7 +296,7 @@ public:
                 TR_ASSERT(port_empty);
             }
         }
-        graveyard_pool.erase(socket_address);
+        graveyard_pool.erase(listen_socket_address);
     }
 
     void remove_all_peers()
@@ -1072,7 +1073,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 }
 
 /* FIXME: this is kind of a mess. */
-[[nodiscard]] bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& result)
+[[nodiscard]] bool on_handshake_done(tr_peerMgr* const manager, tr_handshake::Result const& result)
 {
     TR_ASSERT(result.io != nullptr);
 
@@ -1097,7 +1098,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     {
         if (s != nullptr)
         {
-            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr)
+            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr && !info->is_connected())
             {
                 info->on_connection_failed();
 
