@@ -444,7 +444,7 @@ bool FilterBar::Impl::activity_filter_model_update()
         for (auto i = 0U, count = torrents_model->get_n_items(); i < count; ++i)
         {
             auto const torrent = gtr_ptr_dynamic_cast<Torrent>(torrents_model->get_object(i));
-            if (torrent != nullptr && TorrentFilter::match_activity(*torrent.get(), static_cast<ActivityType>(type)))
+            if (torrent != nullptr && TorrentFilter::match_activity(*torrent, static_cast<ActivityType>(type)))
             {
                 ++hits;
             }

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">horizontal</property>
+        <property name="spacing">6</property>
+        <binding name="sensitive">
+          <lookup name="sensitive" type="gtkmm__CustomObject_7Torrent">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+        <binding name="css-classes">
+          <closure type="GStrv" function="gtr_strv_join">
+            <lookup name="css-classes" type="gtkmm__CustomObject_7Torrent">
+              <lookup name="item">GtkListItem</lookup>
+            </lookup>
+            <constant type="GStrv">tr-list-item&#xA;tr-full</constant>
+          </closure>
+        </binding>
+        <child>
+          <object class="GtkImage">
+            <property name="pixel-size">32</property>
+            <property name="valign">0.5</property>
+            <property name="vexpand">1</property>
+            <binding name="gicon">
+              <lookup name="icon" type="gtkmm__CustomObject_7Torrent">
+                <lookup name="item">GtkListItem</lookup>
+              </lookup>
+            </binding>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">vertical</property>
+            <property name="hexpand">1</property>
+            <property name="spacing">3</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="ellipsize">end</property>
+                <property name="valign">0.5</property>
+                <property name="xalign">0</property>
+                <binding name="label">
+                  <lookup name="name" type="gtkmm__CustomObject_7Torrent">
+                    <lookup name="item">GtkListItem</lookup>
+                  </lookup>
+                </binding>
+                <attributes>
+                  <attribute name="weight" value="bold"></attribute>
+                </attributes>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="ellipsize">end</property>
+                <property name="valign">0.5</property>
+                <property name="xalign">0</property>
+                <binding name="label">
+                  <lookup name="long-progress" type="gtkmm__CustomObject_7Torrent">
+                    <lookup name="item">GtkListItem</lookup>
+                  </lookup>
+                </binding>
+                <style>
+                  <class name="tr-small"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkProgressBar">
+                <property name="valign">0.5</property>
+                <binding name="fraction">
+                  <lookup name="percent-done" type="gtkmm__CustomObject_7Torrent">
+                    <lookup name="item">GtkListItem</lookup>
+                  </lookup>
+                </binding>
+                <style>
+                  <class name="tr-status"/>
+                </style>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="ellipsize">end</property>
+                <property name="valign">0.5</property>
+                <property name="xalign">0</property>
+                <binding name="label">
+                  <lookup name="long-status" type="gtkmm__CustomObject_7Torrent">
+                    <lookup name="item">GtkListItem</lookup>
+                  </lookup>
+                </binding>
+                <style>
+                  <class name="tr-small"/>
+                </style>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>
