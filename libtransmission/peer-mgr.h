@@ -64,7 +64,7 @@ public:
         , from_best_{ from }
     {
         TR_ASSERT(!std::empty(socket_address.port()));
-        ++n_known_connectable_;
+        ++n_known_connectable;
         set_pex_flags(pex_flags);
     }
 
@@ -85,14 +85,14 @@ public:
     {
         if (!std::empty(listen_socket_address_.port()))
         {
-            [[maybe_unused]] auto const n_prev = n_known_connectable_--;
+            [[maybe_unused]] auto const n_prev = n_known_connectable--;
             TR_ASSERT(n_prev > 0U);
         }
     }
 
     [[nodiscard]] static auto known_connectable_count() noexcept
     {
-        return n_known_connectable_;
+        return n_known_connectable;
     }
 
     // ---
@@ -119,7 +119,7 @@ public:
             auto& port = listen_socket_address_.port_;
             if (std::empty(port)) // increment known connectable peers if we did not know the listening port of this peer before
             {
-                ++n_known_connectable_;
+                ++n_known_connectable;
             }
             port = port_in;
         }
@@ -480,7 +480,7 @@ private:
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
 
-    static auto inline n_known_connectable_ = size_t{};
+    static auto inline n_known_connectable = size_t{};
 
     // if the port is 0, it SHOULD mean we don't know this peer's listen socket address
     tr_socket_address listen_socket_address_;
