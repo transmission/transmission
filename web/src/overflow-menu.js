@@ -473,15 +473,12 @@ export class OverflowMenu extends EventTarget {
     options = document.createElement('div');
     section.append(options);
 
-    for (const action_name of [
-      'show-statistics-dialog',
-      'show-about-dialog',
-    ]) {
+    for (const action_name of ['show-statistics-dialog', 'show-about-dialog']) {
       const text = this.action_manager.text(action_name);
       actions[action_name] = make_button(options, text, action_name, on_click);
     }
 
-    let e = document.createElement('a');
+    const e = document.createElement('a');
     e.href = 'https://transmissionbt.com/donate.html';
     e.target = '_blank';
     e.textContent = 'Donate';
