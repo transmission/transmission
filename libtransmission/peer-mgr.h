@@ -508,7 +508,7 @@ struct tr_pex
 {
     tr_pex() = default;
 
-    tr_pex(tr_socket_address socket_address_in, uint8_t flags_in = {})
+    explicit tr_pex(tr_socket_address socket_address_in, uint8_t flags_in = {})
         : socket_address{ socket_address_in }
         , flags{ flags_in }
     {
