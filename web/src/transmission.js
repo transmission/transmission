@@ -23,12 +23,7 @@ import {
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import {
-  debounce,
-  deepEqual,
-  setEnabled,
-  setTextContent,
-} from './utils.js';
+import { debounce, deepEqual, setEnabled, setTextContent } from './utils.js';
 
 export class Transmission extends EventTarget {
   constructor(action_manager, notifications, prefs) {
@@ -227,12 +222,18 @@ export class Transmission extends EventTarget {
       const popup = new ContextMenu(this.action_manager);
       this.setCurrentPopup(popup);
 
-      let boundingElement = document.querySelector('#torrent-container');
-      let bounds = boundingElement.getBoundingClientRect();
-      let x = Math.min(event_.x, bounds.x + bounds.width - popup.root.clientWidth);
-      let y = Math.min(event_.y, bounds.y + bounds.height - popup.root.clientHeight);
-      popup.root.style.left = `${x>0?x:0}px`;
-      popup.root.style.top = `${y>0?y:0}px`;
+      const boundingElement = document.querySelector('#torrent-container');
+      const bounds = boundingElement.getBoundingClientRect();
+      const x = Math.min(
+        event_.x,
+        bounds.x + bounds.width - popup.root.clientWidth,
+      );
+      const y = Math.min(
+        event_.y,
+        bounds.y + bounds.height - popup.root.clientHeight,
+      );
+      popup.root.style.left = `${x > 0 ? x : 0}px`;
+      popup.root.style.top = `${y > 0 ? y : 0}px`;
       event_.preventDefault();
     });
 
