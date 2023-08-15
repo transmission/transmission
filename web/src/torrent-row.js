@@ -21,9 +21,9 @@ const TorrentRendererHelper = {
   formatLabels: (t, label) => {
     const labels = t.getLabels();
     label.innerHTML = '';
-    for (const label_ of labels){
+    for (const label_ of labels) {
       const s = document.createElement('span');
-      s.classList.add("torrent-label");
+      s.classList.add('torrent-label');
       s.textContent = label_;
       label.append(s);
     }
