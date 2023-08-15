@@ -19,13 +19,13 @@ const TorrentRendererHelper = {
     return `ETA: ${Formatter.timeInterval(eta)}`;
   },
   formatLabels: (t, label) => {
-    let labels = t.getLabels();
+    const labels = t.getLabels();
     label.innerHTML = '';
-    for (let l=0;l<labels.length;l++){
-      let d = document.createElement('span');
-      d.classList.add("torrent-label");
-      d.textContent = labels[l];
-      label.appendChild(d);
+    for (const label_ of labels){
+      const s = document.createElement('span');
+      s.classList.add("torrent-label");
+      s.textContent = label_;
+      label.append(s);
     }
   },
   formatUL: (t) => {
