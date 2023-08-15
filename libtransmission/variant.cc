@@ -789,17 +789,17 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
 
 void tr_variantClear(tr_variant* clearme)
 {
-    tr_variant_serde::WalkFuncs cleanup_funcs = { [](tr_variant const&, int64_t, void*) {},
-                                                  [](tr_variant const&, bool, void*) {},
-                                                  [](tr_variant const&, double, void*) {},
-                                                  [](tr_variant const& var, std::string_view, void*)
-                                                  { const_cast<tr_variant&>(var).val.s.clear(); },
-                                                  [](tr_variant const&, void*) {},
-                                                  [](tr_variant const&, void*) {},
-                                                  [](tr_variant const& var, void*)
-                                                  {
-                                                      delete[] var.val.l.vals;
-                                                  } };
+    // clang-format off
+    tr_variant_serde::WalkFuncs cleanup_funcs = {
+        [](tr_variant const&, int64_t, void*) {},
+        [](tr_variant const&, bool, void*) {},
+        [](tr_variant const&, double, void*) {},
+        [](tr_variant const& var, std::string_view, void*){ const_cast<tr_variant&>(var).val.s.clear(); },
+        [](tr_variant const&, void*) {},
+        [](tr_variant const&, void*) {},
+        [](tr_variant const& var, void*) { delete[] var.val.l.vals; }
+    };
+    // clang-format on
 
     if (!tr_variantIsEmpty(clearme))
     {
