@@ -273,6 +273,7 @@ public:
 
         auto* const peer_info = peer->peer_info;
         auto const socket_address = peer->socket_address();
+        auto const listen_socket_address = peer_info->listen_socket_address();
         auto const was_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
@@ -295,7 +296,7 @@ public:
                 TR_ASSERT(port_empty);
             }
         }
-        graveyard_pool.erase(socket_address);
+        graveyard_pool.erase(listen_socket_address);
     }
 
     void remove_all_peers()
@@ -1072,7 +1073,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 }
 
 /* FIXME: this is kind of a mess. */
-[[nodiscard]] bool on_handshake_done(tr_peerMgr* manager, tr_handshake::Result const& result)
+[[nodiscard]] bool on_handshake_done(tr_peerMgr* const manager, tr_handshake::Result const& result)
 {
     TR_ASSERT(result.io != nullptr);
 
@@ -1097,7 +1098,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     {
         if (s != nullptr)
         {
-            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr)
+            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr && !info->is_connected())
             {
                 info->on_connection_failed();
 
@@ -1312,26 +1313,31 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
     tr_swarm const* s = tor->swarm;
 
-    // build a list of atoms
+    // build a list of peer info objects
 
     auto infos = std::vector<tr_peer_info const*>{};
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
         auto const& peers = s->peers;
         infos.reserve(std::size(peers));
-        std::transform(
-            std::begin(peers),
-            std::end(peers),
-            std::back_inserter(infos),
-            [](auto const* peer) { return peer->peer_info; });
+        for (auto const* peer : peers)
+        {
+            if (peer->socket_address().address().type == address_type)
+            {
+                infos.emplace_back(peer->peer_info);
+            }
+        }
     }
     else /* TR_PEERS_INTERESTING */
     {
-        for (auto const& [socket_address, peer_info] : s->connectable_pool)
+        auto const& pool = s->connectable_pool;
+        infos.reserve(std::size(pool));
+        for (auto const& [socket_address, peer_info] : pool)
         {
-            if (is_peer_interesting(tor, peer_info))
+            TR_ASSERT(socket_address == peer_info.listen_socket_address());
+            if (socket_address.address().type == address_type && is_peer_interesting(tor, peer_info))
             {
-                infos.push_back(&peer_info);
+                infos.emplace_back(&peer_info);
             }
         }
     }
@@ -1349,11 +1355,9 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     {
         auto const& [addr, port] = info->listen_socket_address();
 
-        if (addr.type == address_type)
-        {
-            TR_ASSERT(addr.is_valid());
-            pex.emplace_back(addr, port, info->pex_flags());
-        }
+        TR_ASSERT(addr.is_valid());
+        TR_ASSERT(addr.type == address_type);
+        pex.emplace_back(addr, port, info->pex_flags());
     }
 
     std::sort(std::begin(pex), std::end(pex));
@@ -2318,10 +2322,10 @@ struct peer_candidate
             continue;
         }
 
-        /* if everyone in the swarm is seeds and pex is disabled because
-         * the torrent is private, then don't initiate connections */
+        /* if everyone in the swarm is seeds and pex is disabled,
+         * then don't initiate connections */
         bool const seeding = tor->is_done();
-        if (seeding && swarm->is_all_seeds() && tor->is_private())
+        if (seeding && swarm->is_all_seeds() && !tor->allows_pex())
         {
             continue;
         }

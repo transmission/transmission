@@ -1743,10 +1743,10 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
     webseed_store_ = Gtk::ListStore::create(webseed_cols);
     auto* v = gtr_get_widget<Gtk::TreeView>(builder, "webseeds_view");
     v->set_model(webseed_store_);
-    setup_tree_view_button_event_handling(
+    setup_item_view_button_event_handling(
         *v,
         {},
-        [v](double view_x, double view_y) { return on_tree_view_button_released(*v, view_x, view_y); });
+        [v](double view_x, double view_y) { return on_item_view_button_released(*v, view_x, view_y); });
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
@@ -1775,10 +1775,10 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
     peer_view_->set_model(m);
     peer_view_->set_has_tooltip(true);
     peer_view_->signal_query_tooltip().connect(sigc::mem_fun(*this, &Impl::onPeerViewQueryTooltip), false);
-    setup_tree_view_button_event_handling(
+    setup_item_view_button_event_handling(
         *peer_view_,
         {},
-        [this](double view_x, double view_y) { return on_tree_view_button_released(*peer_view_, view_x, view_y); });
+        [this](double view_x, double view_y) { return on_item_view_button_released(*peer_view_, view_x, view_y); });
 
     setPeerViewColumns(peer_view_);
 
@@ -2449,11 +2449,11 @@ void DetailsDialog::Impl::tracker_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     trackers_filtered_->set_visible_func(sigc::mem_fun(*this, &Impl::trackerVisibleFunc));
 
     tracker_view_->set_model(trackers_filtered_);
-    setup_tree_view_button_event_handling(
+    setup_item_view_button_event_handling(
         *tracker_view_,
         [this](guint /*button*/, TrGdkModifierType /*state*/, double view_x, double view_y, bool context_menu_requested)
-        { return on_tree_view_button_pressed(*tracker_view_, view_x, view_y, context_menu_requested); },
-        [this](double view_x, double view_y) { return on_tree_view_button_released(*tracker_view_, view_x, view_y); });
+        { return on_item_view_button_pressed(*tracker_view_, view_x, view_y, context_menu_requested); },
+        [this](double view_x, double view_y) { return on_item_view_button_released(*tracker_view_, view_x, view_y); });
 
     auto sel = tracker_view_->get_selection();
     sel->signal_changed().connect(sigc::mem_fun(*this, &Impl::on_tracker_list_selection_changed));
