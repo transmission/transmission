@@ -1033,9 +1033,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
     auto const handshake_sv = payload.to_string_view();
 
-    auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
-    auto var = serde.parse(handshake_sv);
+    auto var = tr_variant_serde::benc().inplace().parse(handshake_sv);
     if (!var || !tr_variantIsDict(&*var))
     {
         logtrace(msgs, "GET  extended-handshake, couldn't get dictionary");
@@ -1150,8 +1148,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
     auto const* const msg_end = std::data(tmp) + std::size(tmp);
 
     auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
-    if (auto var = serde.parse(tmp); var)
+    if (auto var = serde.inplace().parse(tmp); var)
     {
         (void)tr_variantDictFindInt(&*var, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&*var, TR_KEY_piece, &piece);
@@ -1205,9 +1202,7 @@ void parseUtPex(tr_peerMsgsImpl* msgs, MessageReader& payload)
         return;
     }
 
-    auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
-    if (auto var = serde.parse(payload.to_string_view()); var)
+    if (auto var = tr_variant_serde::benc().inplace().parse(payload.to_string_view()); var)
     {
         uint8_t const* added = nullptr;
         auto added_len = size_t{};

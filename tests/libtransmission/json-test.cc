@@ -59,9 +59,7 @@ TEST_P(JSONTest, testElements)
         "  \"null\": null }"
     };
 
-    auto serde = tr_variant_serde::json();
-    serde.use_input_inplace();
-    auto top = serde.parse(in).value_or(tr_variant{});
+    auto top = tr_variant_serde::json().inplace().parse(in).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};
@@ -100,7 +98,7 @@ TEST_P(JSONTest, testUtf8)
     tr_quark const key = tr_quark_new("key"sv);
 
     auto serde = tr_variant_serde::json();
-    serde.use_input_inplace();
+    serde.inplace();
     auto top = serde.parse(in).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
@@ -149,8 +147,7 @@ TEST_P(JSONTest, testUtf16Surrogates)
     tr_variantDictAddStr(&top, key, ThinkingFaceEmojiUtf8);
 
     auto serde = tr_variant_serde::json();
-    serde.compact_ = true;
-    auto const json = serde.to_string(top);
+    auto const json = serde.compact().to_string(top);
     EXPECT_NE(std::string::npos, json.find("ud83e"));
     EXPECT_NE(std::string::npos, json.find("udd14"));
     tr_variantClear(&top);
@@ -214,9 +211,7 @@ TEST_P(JSONTest, test1)
 TEST_P(JSONTest, test2)
 {
     static auto constexpr Input = " "sv;
-    auto serde = tr_variant_serde::json();
-    serde.use_input_inplace();
-    auto top = serde.parse(Input);
+    auto top = tr_variant_serde::json().inplace().parse(Input);
     EXPECT_FALSE(top.has_value());
 }
 
@@ -229,9 +224,7 @@ TEST_P(JSONTest, test3)
         "  \"id\": 25,"
         "  \"leftUntilDone\": 2275655680 }"sv;
 
-    auto serde = tr_variant_serde::json();
-    serde.use_input_inplace();
-    auto top = serde.parse(Input).value_or(tr_variant{});
+    auto top = tr_variant_serde::json().inplace().parse(Input).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};
@@ -245,9 +238,7 @@ TEST_P(JSONTest, unescape)
 {
     static auto constexpr Input = R"({ "string-1": "\/usr\/lib" })"sv;
 
-    auto serde = tr_variant_serde::json();
-    serde.use_input_inplace();
-    auto top = serde.parse(Input).value_or(tr_variant{});
+    auto top = tr_variant_serde::json().inplace().parse(Input).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};

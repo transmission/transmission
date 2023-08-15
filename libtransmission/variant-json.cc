@@ -517,7 +517,7 @@ void jsonPopParent(struct JsonWalk* data)
     data->parents.pop_back();
 }
 
-void jsonIntFunc(tr_variant const& /*var*/, int64_t val, void* vdata)
+void jsonIntFunc(tr_variant const& /*var*/, int64_t const val, void* vdata)
 {
     auto buf = std::array<char, 64>{};
     auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val);
@@ -526,14 +526,14 @@ void jsonIntFunc(tr_variant const& /*var*/, int64_t val, void* vdata)
     jsonChildFunc(data);
 }
 
-void jsonBoolFunc(tr_variant const& /*var*/, bool val, void* vdata)
+void jsonBoolFunc(tr_variant const& /*var*/, bool const val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
     data->out.add(val ? "true"sv : "false"sv);
     jsonChildFunc(data);
 }
 
-void jsonRealFunc(tr_variant const& /*var*/, double val, void* vdata)
+void jsonRealFunc(tr_variant const& /*var*/, double const val, void* vdata)
 {
     auto* const data = static_cast<struct JsonWalk*>(vdata);
 
@@ -705,7 +705,7 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
 {
     using namespace to_string_helpers;
 
-    static auto constexpr walk_funcs = WalkFuncs{
+    static auto constexpr Funcs = WalkFuncs{
         jsonIntFunc, //
         jsonBoolFunc, //
         jsonRealFunc, //
@@ -716,7 +716,7 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
     };
 
     auto data = JsonWalk{ !compact_ };
-    walk(var, walk_funcs, &data, true);
+    walk(var, Funcs, &data, true);
 
     auto& buf = data.out;
     if (!std::empty(buf))

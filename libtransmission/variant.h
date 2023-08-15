@@ -297,22 +297,34 @@ class tr_variant_serde
 public:
     ~tr_variant_serde();
 
-    static tr_variant_serde benc()
+    static tr_variant_serde benc() noexcept
     {
         return tr_variant_serde{ Type::Benc };
     }
 
-    static tr_variant_serde json()
+    static tr_variant_serde json() noexcept
     {
         return tr_variant_serde{ Type::Json };
     }
 
-    // ---
+    // Serialize data as compactly as possible, e.g.
+    // omit pretty-printing JSON whitespace
+    constexpr tr_variant_serde& compact() noexcept
+    {
+        compact_ = true;
+        return *this;
+    }
 
-    constexpr void use_input_inplace() noexcept
+    // When set, assumes that the `input` passed to parse() is valid
+    // for the lifespan of the variant and we can use string_views of
+    // `input` instead of cloning new strings.
+    constexpr tr_variant_serde& inplace() noexcept
     {
         parse_inplace_ = true;
+        return *this;
     }
+
+    // ---
 
     [[nodiscard]] std::optional<tr_variant> parse(std::string_view input);
 
@@ -336,10 +348,6 @@ public:
     bool to_file(tr_variant const& var, std::string_view filename);
 
     // ---
-
-    // Make serialized data as compact as possible,
-    // e.g. omit any pretty-printing whitespace from JSON.
-    bool compact_ = false;
 
     // Tracks errors when parsing / saving
     tr_error* error_ = nullptr;
@@ -373,15 +381,14 @@ private:
     [[nodiscard]] std::optional<tr_variant> parse_benc(std::string_view input);
 
     [[nodiscard]] std::string to_json_string(tr_variant const& var) const;
-    [[nodiscard]] std::string to_benc_string(tr_variant const& var) const;
+    [[nodiscard]] static std::string to_benc_string(tr_variant const& var);
 
     static void walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts);
 
     Type type_;
 
-    // When set, assumes that the `input` passed to parse() is valid
-    // for the lifespan of the variant and we can use string_views of
-    // `input` instead of cloning new strings.
+    bool compact_ = false;
+
     bool parse_inplace_ = false;
 
     // This is set to the first unparsed character after `parse()`.

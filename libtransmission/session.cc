@@ -117,7 +117,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     tr_variantClear(&*groups_var);
 }
 
-int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
+void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
     auto const& groups = session->bandwidthGroups();
 
@@ -138,9 +138,8 @@ int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
     }
 
     auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
-    auto const ret = tr_variant_serde::json().to_file(groups_dict, filename);
+    tr_variant_serde::json().to_file(groups_dict, filename);
     tr_variantClear(&groups_dict);
-    return ret;
 }
 
 } // namespace bandwidth_group_helpers

@@ -288,7 +288,7 @@ namespace to_string_helpers
 {
 using OutBuf = libtransmission::StackBuffer<1024U * 8U, std::byte>;
 
-void saveIntFunc(tr_variant const& /*var*/, int64_t val, void* vout)
+void saveIntFunc(tr_variant const& /*var*/, int64_t const val, void* vout)
 {
     auto out = static_cast<OutBuf*>(vout);
 
@@ -299,7 +299,7 @@ void saveIntFunc(tr_variant const& /*var*/, int64_t val, void* vout)
     out->commit_space(walk - begin);
 }
 
-void saveBoolFunc(tr_variant const& /*var*/, bool val, void* vout)
+void saveBoolFunc(tr_variant const& /*var*/, bool const val, void* vout)
 {
     static_cast<OutBuf*>(vout)->add(val ? "i1e"sv : "i0e"sv);
 }
@@ -315,12 +315,12 @@ void saveStringImpl(OutBuf* out, std::string_view sv)
     out->commit_space(walk - begin);
 }
 
-void saveStringFunc(tr_variant const& /*var*/, std::string_view val, void* vout)
+void saveStringFunc(tr_variant const& /*var*/, std::string_view const val, void* vout)
 {
     saveStringImpl(static_cast<OutBuf*>(vout), val);
 }
 
-void saveRealFunc(tr_variant const& /*val*/, double val, void* vout)
+void saveRealFunc(tr_variant const& /*val*/, double const val, void* vout)
 {
     // the benc spec doesn't handle floats; save it as a string.
     auto buf = std::array<char, 64>{};
@@ -346,11 +346,11 @@ void saveContainerEndFunc(tr_variant const& /*val*/, void* vbuf)
 } // namespace to_string_helpers
 } // namespace
 
-std::string tr_variant_serde::to_benc_string(tr_variant const& var) const
+std::string tr_variant_serde::to_benc_string(tr_variant const& var)
 {
     using namespace to_string_helpers;
 
-    static auto constexpr walk_funcs = WalkFuncs{
+    static auto constexpr Funcs = WalkFuncs{
         saveIntFunc, //
         saveBoolFunc, //
         saveRealFunc, //
@@ -361,6 +361,6 @@ std::string tr_variant_serde::to_benc_string(tr_variant const& var) const
     };
 
     auto buf = OutBuf{};
-    walk(var, walk_funcs, &buf, true);
+    walk(var, Funcs, &buf, true);
     return buf.to_string();
 }

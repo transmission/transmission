@@ -229,8 +229,7 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
     }
 
     // checksum passed; now try to parse it as benc
-    auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
+    auto serde = tr_variant_serde::benc().inplace();
     auto info_dict_v = serde.parse(m->metadata);
     if (!info_dict_v)
     {

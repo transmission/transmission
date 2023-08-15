@@ -218,7 +218,7 @@ TEST_F(VariantTest, str)
 TEST_F(VariantTest, parse)
 {
     auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
+    serde.inplace();
 
     auto benc = "i64e"sv;
     auto var = serde.parse(benc).value_or(tr_variant{});
@@ -281,10 +281,11 @@ TEST_F(VariantTest, bencParseAndReencode)
         { " "sv, false },
     } };
 
+    auto serde = tr_variant_serde::benc();
+    serde.inplace();
+
     for (auto const& test : Tests)
     {
-        auto serde = tr_variant_serde::benc();
-        serde.use_input_inplace();
         auto var = serde.parse(test.benc);
 
         EXPECT_EQ(test.is_good, var.has_value());
@@ -303,8 +304,7 @@ TEST_F(VariantTest, bencSortWhenSerializing)
     static auto constexpr ExpectedOut = "lld1:ai64e1:bi32eeee"sv;
 
     auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
-    auto var = serde.parse(In);
+    auto var = serde.inplace().parse(In);
     EXPECT_TRUE(var.has_value());
     EXPECT_EQ(std::data(In) + std::size(In), serde.end());
     EXPECT_EQ(ExpectedOut, serde.to_string(*var));
@@ -318,8 +318,7 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
     static auto constexpr ExpectedOut = "le"sv;
 
     auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
-    auto var = serde.parse(In);
+    auto var = serde.inplace().parse(In);
     EXPECT_TRUE(var.has_value());
     EXPECT_EQ(std::data(In) + std::size(ExpectedOut), serde.end());
     EXPECT_EQ(ExpectedOut, serde.to_string(*var));
@@ -332,8 +331,7 @@ TEST_F(VariantTest, bencMalformedNoEnding)
     static auto constexpr In = "l1:a1:b1:c"sv;
 
     auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
-    auto const var = serde.parse(In);
+    auto const var = serde.inplace().parse(In);
     EXPECT_FALSE(var.has_value());
 }
 
@@ -342,8 +340,7 @@ TEST_F(VariantTest, bencMalformedIncompleteString)
     static auto constexpr In = "1:"sv;
 
     auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
-    auto const var = serde.parse(In);
+    auto const var = serde.inplace().parse(In);
     EXPECT_FALSE(var.has_value());
 }
 
@@ -366,8 +363,8 @@ TEST_F(VariantTest, bencToJson)
 
     auto benc_serde = tr_variant_serde::benc();
     auto json_serde = tr_variant_serde::json();
-    benc_serde.use_input_inplace();
-    json_serde.compact_ = true;
+    benc_serde.inplace();
+    json_serde.compact();
 
     for (auto const& test : Tests)
     {
@@ -441,8 +438,7 @@ TEST_F(VariantTest, stackSmash)
 
     // confirm that it fails instead of crashing
     auto serde = tr_variant_serde::benc();
-    serde.use_input_inplace();
-    auto var = serde.parse(in);
+    auto var = serde.inplace().parse(in);
     EXPECT_FALSE(var.has_value());
     EXPECT_NE(nullptr, serde.error_);
     EXPECT_EQ(E2BIG, serde.error_ != nullptr ? serde.error_->code : 0);
@@ -552,11 +548,7 @@ TEST_F(VariantTest, dictFindType)
 TEST_F(VariantTest, variantFromBufFuzz)
 {
     auto benc_serde = tr_variant_serde::json();
-    benc_serde.use_input_inplace();
-
     auto json_serde = tr_variant_serde::json();
-    json_serde.use_input_inplace();
-
     auto buf = std::vector<char>{};
 
     for (size_t i = 0; i < 100000; ++i)
@@ -564,12 +556,12 @@ TEST_F(VariantTest, variantFromBufFuzz)
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
 
-        if (auto var = benc_serde.parse(buf); var)
+        if (auto var = benc_serde.inplace().parse(buf); var)
         {
             tr_variantClear(&*var);
         }
 
-        if (auto var = json_serde.parse(buf); var)
+        if (auto var = json_serde.inplace().parse(buf); var)
         {
             tr_variantClear(&*var);
         }

@@ -2149,7 +2149,6 @@ static void filterIds(tr_variant* top, Config& config)
 }
 static int processResponse(char const* rpcurl, std::string_view response, Config& config)
 {
-    auto top = tr_variant{};
     auto status = int{ EXIT_SUCCESS };
 
     if (config.debug)
@@ -2163,7 +2162,7 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
         return status;
     }
 
-    if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
+    if (auto top = tr_variant_serde::json().inplace().parse(response); !top)
     {
         tr_logAddWarn(fmt::format("Unable to parse response '{}'", response));
         status |= EXIT_FAILURE;
@@ -2173,7 +2172,7 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
         int64_t tag = -1;
         auto sv = std::string_view{};
 
-        if (tr_variantDictFindStrView(&top, TR_KEY_result, &sv))
+        if (tr_variantDictFindStrView(&*top, TR_KEY_result, &sv))
         {
             if (sv != "success"sv)
             {
@@ -2182,60 +2181,60 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
             }
             else
             {
-                tr_variantDictFindInt(&top, TR_KEY_tag, &tag);
+                tr_variantDictFindInt(&*top, TR_KEY_tag, &tag);
 
                 switch (tag)
                 {
                 case TAG_SESSION:
-                    printSession(&top);
+                    printSession(&*top);
                     break;
 
                 case TAG_STATS:
-                    printSessionStats(&top);
+                    printSessionStats(&*top);
                     break;
 
                 case TAG_DETAILS:
-                    printDetails(&top);
+                    printDetails(&*top);
                     break;
 
                 case TAG_FILES:
-                    printFileList(&top);
+                    printFileList(&*top);
                     break;
 
                 case TAG_LIST:
-                    printTorrentList(&top);
+                    printTorrentList(&*top);
                     break;
 
                 case TAG_PEERS:
-                    printPeers(&top);
+                    printPeers(&*top);
                     break;
 
                 case TAG_PIECES:
-                    printPieces(&top);
+                    printPieces(&*top);
                     break;
 
                 case TAG_PORTTEST:
-                    printPortTest(&top);
+                    printPortTest(&*top);
                     break;
 
                 case TAG_TRACKERS:
-                    printTrackers(&top);
+                    printTrackers(&*top);
                     break;
 
                 case TAG_GROUPS:
-                    printGroups(&top);
+                    printGroups(&*top);
                     break;
 
                 case TAG_FILTER:
-                    filterIds(&top, config);
+                    filterIds(&*top, config);
                     break;
 
                 case TAG_TORRENT_ADD:
                     {
                         int64_t i;
-                        tr_variant* b = &top;
+                        tr_variant* b = nullptr;
 
-                        if (tr_variantDictFindDict(&top, Arguments, &b) &&
+                        if (tr_variantDictFindDict(&*top, Arguments, &b) &&
                             tr_variantDictFindDict(b, TR_KEY_torrent_added, &b) && tr_variantDictFindInt(b, TR_KEY_id, &i))
                         {
                             config.torrent_ids = std::to_string(i);
@@ -2244,7 +2243,7 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
                     }
 
                 default:
-                    if (!tr_variantDictFindStrView(&top, TR_KEY_result, &sv))
+                    if (!tr_variantDictFindStrView(&*top, TR_KEY_result, &sv))
                     {
                         status |= EXIT_FAILURE;
                     }
@@ -2258,14 +2257,14 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
                         }
                     }
                 }
-
-                tr_variantClear(&top);
             }
         }
         else
         {
             status |= EXIT_FAILURE;
         }
+
+        tr_variantClear(&*top);
     }
 
     return status;
@@ -2339,8 +2338,7 @@ static void tr_curl_easy_cleanup(CURL* curl)
 
 static int flush(char const* rpcurl, tr_variant* benc, Config& config)
 {
-    int status = EXIT_SUCCESS;
-    auto const json = tr_variantToStr(benc, TR_VARIANT_FMT_JSON_LEAN);
+    auto const json = tr_variant_serde::json().compact().to_string(*benc);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
     auto const rpcurl_http = fmt::format(FMT_STRING("{:s}://{:s}"), scheme, rpcurl);
 
@@ -2355,6 +2353,7 @@ static int flush(char const* rpcurl, tr_variant* benc, Config& config)
         fmt::print(stderr, "posting:\n--------\n{:s}\n--------\n", json);
     }
 
+    auto status = EXIT_SUCCESS;
     if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
     {
         tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
