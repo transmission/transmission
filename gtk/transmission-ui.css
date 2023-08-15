@@ -1,7 +1,7 @@
-@define-color tr_transfer_down_color steelblue;
-@define-color tr_transfer_up_color forestgreen;
-@define-color tr_transfer_idle_color silver;
-@define-color tr_error_color red;
+@define-color tr_transfer_down_color #5379a9;
+@define-color tr_transfer_up_color #26a955;
+@define-color tr_transfer_idle_color #636363;
+@define-color tr_error_color #ff453a;
 
 .tr-workarea.frame {
     border-left-width: 0;
