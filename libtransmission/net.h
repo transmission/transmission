@@ -416,8 +416,7 @@ private:
         case TR_AF_INET:
             return IPv4Hasher(addr.addr.addr4.s_addr);
         case TR_AF_INET6:
-            return IPv6Hasher(
-                std::string_view{ reinterpret_cast<char const*>(addr.addr.addr6.s6_addr), sizeof(addr.addr.addr6.s6_addr) });
+            return IPv6Hasher({ reinterpret_cast<char const*>(addr.addr.addr6.s6_addr), sizeof(addr.addr.addr6.s6_addr) });
         default:
             TR_ASSERT_MSG(false, "Invalid type");
             return {};
