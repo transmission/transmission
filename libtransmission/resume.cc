@@ -619,10 +619,8 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
 // ---
 
-auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
+tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
 {
-    auto fields_loaded = tr_resume::fields_t{};
-
     TR_ASSERT(tr_isTorrent(tor));
     auto const was_dirty = tor->is_dirty();
 
@@ -631,33 +629,30 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
     auto const filename = tor->resume_file();
     if (!tr_sys_path_exists(filename))
     {
-        return fields_loaded;
+        return {};
     }
 
-    auto buf = std::vector<char>{};
-    tr_error* error = nullptr;
-    auto top = tr_variant{};
-    if (!tr_file_read(filename, buf, &error) ||
-        !tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, &error))
+    auto serde = tr_variant_serde::benc();
+    auto top = serde.parse_file(filename);
+    if (!top)
     {
-        tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, error->message));
-        tr_error_clear(&error);
-        return fields_loaded;
+        tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, serde.error_->message));
+        return {};
     }
 
     tr_logAddDebugTor(tor, fmt::format("Read resume file '{}'", filename));
-
+    auto fields_loaded = tr_resume::fields_t{};
     auto i = int64_t{};
     auto sv = std::string_view{};
 
-    if ((fields_to_load & tr_resume::Corrupt) != 0 && tr_variantDictFindInt(&top, TR_KEY_corrupt, &i))
+    if ((fields_to_load & tr_resume::Corrupt) != 0 && tr_variantDictFindInt(&*top, TR_KEY_corrupt, &i))
     {
         tor->corruptPrev = i;
         fields_loaded |= tr_resume::Corrupt;
     }
 
     if ((fields_to_load & (tr_resume::Progress | tr_resume::DownloadDir)) != 0 &&
-        tr_variantDictFindStrView(&top, TR_KEY_destination, &sv) && !std::empty(sv))
+        tr_variantDictFindStrView(&*top, TR_KEY_destination, &sv) && !std::empty(sv))
     {
         bool const is_current_dir = tor->current_dir() == tor->download_dir();
         tor->download_dir_ = sv;
@@ -670,7 +665,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
     }
 
     if ((fields_to_load & (tr_resume::Progress | tr_resume::IncompleteDir)) != 0 &&
-        tr_variantDictFindStrView(&top, TR_KEY_incomplete_dir, &sv) && !std::empty(sv))
+        tr_variantDictFindStrView(&*top, TR_KEY_incomplete_dir, &sv) && !std::empty(sv))
     {
         bool const is_current_dir = tor->current_dir() == tor->incomplete_dir();
         tor->incomplete_dir_ = sv;
@@ -682,61 +677,61 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
         fields_loaded |= tr_resume::IncompleteDir;
     }
 
-    if ((fields_to_load & tr_resume::Downloaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloaded, &i))
+    if ((fields_to_load & tr_resume::Downloaded) != 0 && tr_variantDictFindInt(&*top, TR_KEY_downloaded, &i))
     {
         tor->downloadedPrev = i;
         fields_loaded |= tr_resume::Downloaded;
     }
 
-    if ((fields_to_load & tr_resume::Uploaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_uploaded, &i))
+    if ((fields_to_load & tr_resume::Uploaded) != 0 && tr_variantDictFindInt(&*top, TR_KEY_uploaded, &i))
     {
         tor->uploadedPrev = i;
         fields_loaded |= tr_resume::Uploaded;
     }
 
-    if ((fields_to_load & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
+    if ((fields_to_load & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&*top, TR_KEY_max_peers, &i))
     {
         tor->max_connected_peers_ = static_cast<uint16_t>(i);
         fields_loaded |= tr_resume::MaxPeers;
     }
 
-    if (auto val = bool{}; (fields_to_load & tr_resume::Run) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &val))
+    if (auto val = bool{}; (fields_to_load & tr_resume::Run) != 0 && tr_variantDictFindBool(&*top, TR_KEY_paused, &val))
     {
         tor->start_when_stable = !val;
         fields_loaded |= tr_resume::Run;
     }
 
-    if ((fields_to_load & tr_resume::AddedDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_added_date, &i))
+    if ((fields_to_load & tr_resume::AddedDate) != 0 && tr_variantDictFindInt(&*top, TR_KEY_added_date, &i))
     {
         tor->addedDate = i;
         fields_loaded |= tr_resume::AddedDate;
     }
 
-    if ((fields_to_load & tr_resume::DoneDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_done_date, &i))
+    if ((fields_to_load & tr_resume::DoneDate) != 0 && tr_variantDictFindInt(&*top, TR_KEY_done_date, &i))
     {
         tor->doneDate = i;
         fields_loaded |= tr_resume::DoneDate;
     }
 
-    if ((fields_to_load & tr_resume::ActivityDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_activity_date, &i))
+    if ((fields_to_load & tr_resume::ActivityDate) != 0 && tr_variantDictFindInt(&*top, TR_KEY_activity_date, &i))
     {
         tor->set_date_active(i);
         fields_loaded |= tr_resume::ActivityDate;
     }
 
-    if ((fields_to_load & tr_resume::TimeSeeding) != 0 && tr_variantDictFindInt(&top, TR_KEY_seeding_time_seconds, &i))
+    if ((fields_to_load & tr_resume::TimeSeeding) != 0 && tr_variantDictFindInt(&*top, TR_KEY_seeding_time_seconds, &i))
     {
         tor->seconds_seeding_before_current_start_ = i;
         fields_loaded |= tr_resume::TimeSeeding;
     }
 
-    if ((fields_to_load & tr_resume::TimeDownloading) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloading_time_seconds, &i))
+    if ((fields_to_load & tr_resume::TimeDownloading) != 0 && tr_variantDictFindInt(&*top, TR_KEY_downloading_time_seconds, &i))
     {
         tor->seconds_downloading_before_current_start_ = i;
         fields_loaded |= tr_resume::TimeDownloading;
     }
 
-    if ((fields_to_load & tr_resume::BandwidthPriority) != 0 && tr_variantDictFindInt(&top, TR_KEY_bandwidth_priority, &i) &&
+    if ((fields_to_load & tr_resume::BandwidthPriority) != 0 && tr_variantDictFindInt(&*top, TR_KEY_bandwidth_priority, &i) &&
         tr_isPriority(i))
     {
         tr_torrentSetPriority(tor, i);
@@ -745,7 +740,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
 
     if ((fields_to_load & tr_resume::Peers) != 0)
     {
-        fields_loaded |= loadPeers(&top, tor);
+        fields_loaded |= loadPeers(&*top, tor);
     }
 
     // Note: loadFilenames() must come before loadProgress()
@@ -753,7 +748,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
     // will know where to look
     if ((fields_to_load & tr_resume::Filenames) != 0)
     {
-        fields_loaded |= loadFilenames(&top, tor);
+        fields_loaded |= loadFilenames(&*top, tor);
     }
 
     // Note: loadProgress should come before loadFilePriorities()
@@ -761,47 +756,47 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
     // seed or a partial seed.
     if ((fields_to_load & tr_resume::Progress) != 0)
     {
-        fields_loaded |= loadProgress(&top, tor);
+        fields_loaded |= loadProgress(&*top, tor);
     }
 
     if (!tor->is_done() && (fields_to_load & tr_resume::FilePriorities) != 0)
     {
-        fields_loaded |= loadFilePriorities(&top, tor);
+        fields_loaded |= loadFilePriorities(&*top, tor);
     }
 
     if ((fields_to_load & tr_resume::Dnd) != 0)
     {
-        fields_loaded |= loadDND(&top, tor);
+        fields_loaded |= loadDND(&*top, tor);
     }
 
     if ((fields_to_load & tr_resume::Speedlimit) != 0)
     {
-        fields_loaded |= loadSpeedLimits(&top, tor);
+        fields_loaded |= loadSpeedLimits(&*top, tor);
     }
 
     if ((fields_to_load & tr_resume::Ratiolimit) != 0)
     {
-        fields_loaded |= loadRatioLimits(&top, tor);
+        fields_loaded |= loadRatioLimits(&*top, tor);
     }
 
     if ((fields_to_load & tr_resume::Idlelimit) != 0)
     {
-        fields_loaded |= loadIdleLimits(&top, tor);
+        fields_loaded |= loadIdleLimits(&*top, tor);
     }
 
     if ((fields_to_load & tr_resume::Name) != 0)
     {
-        fields_loaded |= loadName(&top, tor);
+        fields_loaded |= loadName(&*top, tor);
     }
 
     if ((fields_to_load & tr_resume::Labels) != 0)
     {
-        fields_loaded |= loadLabels(&top, tor);
+        fields_loaded |= loadLabels(&*top, tor);
     }
 
     if ((fields_to_load & tr_resume::Group) != 0)
     {
-        fields_loaded |= loadGroup(&top, tor);
+        fields_loaded |= loadGroup(&*top, tor);
     }
 
     /* loading the resume file triggers of a lot of changes,
@@ -809,7 +804,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
      * same resume information... */
     tor->set_dirty(was_dirty);
 
-    tr_variantClear(&top);
+    tr_variantClear(&*top);
     return fields_loaded;
 }
 
@@ -916,11 +911,7 @@ void save(tr_torrent* tor)
     saveLabels(&top, tor);
     saveGroup(&top, tor);
 
-    auto const resume_file = tor->resume_file();
-    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, resume_file); err != 0)
-    {
-        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", tr_strerror(err)));
-    }
+    tr_variant_serde::benc().to_file(top, tor->resume_file());
 
     tr_variantClear(&top);
 }

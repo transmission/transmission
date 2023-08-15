@@ -351,7 +351,9 @@ void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_
 {
     auto* data = static_cast<struct rpc_response_data*>(user_data);
 
-    auto* const response = make_response(data->req, data->server, tr_variantToStr(content, TR_VARIANT_FMT_JSON_LEAN));
+    auto serde = tr_variant_serde::json();
+    serde.compact_ = true;
+    auto* const response = make_response(data->req, data->server, serde.to_string(*content));
     evhttp_add_header(data->req->output_headers, "Content-Type", "application/json; charset=UTF-8");
     evhttp_send_reply(data->req, HTTP_OK, "OK", response);
     evbuffer_free(response);
@@ -361,18 +363,15 @@ void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_
 
 void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
-    auto top = tr_variant{};
-    auto const have_content = tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json);
+    auto serde = tr_variant_serde::json();
+    serde.use_input_inplace();
+    auto top = serde.parse(json);
 
-    tr_rpc_request_exec_json(
-        server->session,
-        have_content ? &top : nullptr,
-        rpc_response_func,
-        new rpc_response_data{ req, server });
+    tr_rpc_request_exec_json(server->session, top ? &*top : nullptr, rpc_response_func, new rpc_response_data{ req, server });
 
-    if (have_content)
+    if (top)
     {
-        tr_variantClear(&top);
+        tr_variantClear(&*top);
     }
 }
 

@@ -12,6 +12,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
+#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/utils.h"
@@ -236,24 +237,26 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
 bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
 {
     // load the torrent file
-    auto metainfo = tr_variant{};
-    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, torrent_file, error))
+    auto serde = tr_variant_serde::benc();
+    auto metainfo = serde.parse_file(torrent_file);
+    if (!metainfo)
     {
+        tr_error_propagate(error, &serde.error_);
         return false;
     }
 
     // remove the old fields
-    tr_variantDictRemove(&metainfo, TR_KEY_announce);
-    tr_variantDictRemove(&metainfo, TR_KEY_announce_list);
+    tr_variantDictRemove(&*metainfo, TR_KEY_announce);
+    tr_variantDictRemove(&*metainfo, TR_KEY_announce_list);
 
     // add the new fields
     if (this->size() == 1)
     {
-        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce.quark());
+        tr_variantDictAddQuark(&*metainfo, TR_KEY_announce, at(0).announce.quark());
     }
     else if (this->size() > 1)
     {
-        tr_variant* tier_list = tr_variantDictAddList(&metainfo, TR_KEY_announce_list, 0);
+        tr_variant* tier_list = tr_variantDictAddList(&*metainfo, TR_KEY_announce_list, 0);
 
         auto current_tier = std::optional<tr_tracker_tier_t>{};
         tr_variant* tracker_list = nullptr;
@@ -270,10 +273,15 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
         }
     }
 
+    auto const contents = serde.to_string(*metainfo);
+    tr_variantClear(&*metainfo);
+
     // confirm that it's good by parsing it back again
-    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
-    tr_variantClear(&metainfo);
-    if (auto tm = tr_torrent_metainfo{}; !tm.parse_benc(contents, error))
+    if (auto tmp = serde.parse(contents); tmp)
+    {
+        tr_variantClear(&*tmp);
+    }
+    else
     {
         return false;
     }
