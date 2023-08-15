@@ -269,7 +269,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
     if (source_addr)
     {
         set_source_addr(*source_addr);
-        tr_logAddInfo(fmt::format(
+        tr_logAddDebug(fmt::format(
             _("Successfully updated source {protocol} address to {ip}"),
             fmt::arg("protocol", protocol),
             fmt::arg("ip", source_addr->display_name())));
@@ -307,7 +307,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
             success = true;
             upkeep_timers_[type]->set_interval(UpkeepInterval);
 
-            tr_logAddInfo(fmt::format(
+            tr_logAddDebug(fmt::format(
                 _("Successfully updated global {type} address to {ip} using {url}"),
                 fmt::arg("type", protocol),
                 fmt::arg("ip", addr->display_name()),
