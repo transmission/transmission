@@ -461,11 +461,11 @@ $video-image: '../img/film.svg';
   text-align: left;
   width: 100%;
 
-  .torrent:nth-child(even){
+  .torrent:nth-child(even) {
     background-color: var(--color-bg-even);
   }
 
-  .torrent:nth-child(odd){
+  .torrent:nth-child(odd) {
     background-color: var(--color-bg-odd);
   }
 
@@ -544,8 +544,8 @@ $video-image: '../img/film.svg';
     }
 
     .torrent-label {
-      padding: 0px 8px;
-      margin: 0px 2px;
+      padding: 0 8px;
+      margin: 0 2px;
       border-radius: 1em;
       border: 1px solid var(--color-default-border);
     }
@@ -1085,12 +1085,12 @@ $video-image: '../img/film.svg';
   margin: 0;
   padding: 0;
 
-  .inspector-torrent-file-list-entry:nth-child(even){
-    background-color: var(--color-bg-even)
+  .inspector-torrent-file-list-entry:nth-child(even) {
+    background-color: var(--color-bg-even);
   }
 
-  .inspector-torrent-file-list-entry:nth-child(odd){
-    background-color: var(--color-bg-odd)
+  .inspector-torrent-file-list-entry:nth-child(odd) {
+    background-color: var(--color-bg-odd);
   }
 
   .inspector-torrent-file-list-entry {
@@ -1161,12 +1161,12 @@ $video-image: '../img/film.svg';
     margin-top: 8px;
   }
 
-  .tier-list-row:nth-child(even){
-    background-color: var(--color-bg-even)
+  .tier-list-row:nth-child(even) {
+    background-color: var(--color-bg-even);
   }
 
-  .tier-list-row:nth-child(odd){
-    background-color: var(--color-bg-odd)
+  .tier-list-row:nth-child(odd) {
+    background-color: var(--color-bg-odd);
   }
 
   .tier-list-torrent {
