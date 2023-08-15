@@ -236,8 +236,8 @@ private:
         }
 
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
-        [[nodiscard]] std::optional<std::string> publicAddressV4() const override;
-        [[nodiscard]] std::optional<std::string> publicAddressV6() const override;
+        [[nodiscard]] std::optional<std::string> bind_address_V4() const override;
+        [[nodiscard]] std::optional<std::string> bind_address_V6() const override;
         [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] size_t clamp(int torrent_id, size_t byte_count) const override;
         [[nodiscard]] time_t now() const override;
