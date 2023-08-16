@@ -177,7 +177,7 @@ TEST_P(JSONTest, test1)
         "}\n"sv;
 
     auto serde = tr_variant_serde::json();
-    auto top = serde.parse(Input).value_or(tr_variant{});
+    auto top = serde.inplace().parse(Input).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};
