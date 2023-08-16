@@ -912,7 +912,11 @@ void save(tr_torrent* tor)
     saveLabels(&top, tor);
     saveGroup(&top, tor);
 
-    tr_variant_serde::benc().to_file(top, tor->resume_file());
+    auto serde = tr_variant_serde::benc();
+    if (!serde.to_file(top, tor->resume_file()))
+    {
+        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
+    }
 
     tr_variantClear(&top);
 }
