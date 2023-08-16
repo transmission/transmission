@@ -361,13 +361,13 @@ void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_
 
 void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
-    auto top = tr_variant_serde::json().inplace().parse(json);
+    auto otop = tr_variant_serde::json().inplace().parse(json);
 
-    tr_rpc_request_exec_json(server->session, top ? &*top : nullptr, rpc_response_func, new rpc_response_data{ req, server });
+    tr_rpc_request_exec_json(server->session, otop ? &*otop : nullptr, rpc_response_func, new rpc_response_data{ req, server });
 
-    if (top)
+    if (otop)
     {
-        tr_variantClear(&*top);
+        tr_variantClear(&*otop);
     }
 }
 

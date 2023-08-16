@@ -471,17 +471,18 @@ private:
 
         auto nodes = Nodes{};
 
-        if (auto top = tr_variant_serde::benc().parse_file(filename); top)
+        if (auto otop = tr_variant_serde::benc().parse_file(filename); otop)
         {
-            if (auto sv = std::string_view{};
-                tr_variantDictFindStrView(&*top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
+            auto& top = *otop;
+
+            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
             {
                 std::copy(std::begin(sv), std::end(sv), std::begin(id));
             }
 
             size_t raw_len = 0U;
             std::byte const* raw = nullptr;
-            if (tr_variantDictFindRaw(&*top, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
+            if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
             {
                 auto* walk = raw;
                 auto const* const end = raw + raw_len;
@@ -495,7 +496,7 @@ private:
                 }
             }
 
-            if (tr_variantDictFindRaw(&*top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
+            if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
             {
                 auto* walk = raw;
                 auto const* const end = raw + raw_len;
@@ -509,7 +510,7 @@ private:
                 }
             }
 
-            tr_variantClear(&*top);
+            tr_variantClear(&top);
         }
 
         return std::make_pair(id, nodes);
