@@ -1757,20 +1757,17 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
         return READ_LATER;
     }
 
-    // The incoming message is now complete. Reset the peerMsgs' incoming
-    // field so it's ready to receive the next message, then process the
-    // current one with `process_peer_message()`.
+    // The incoming message is now complete. After processing the message
+    // with `process_peer_message()`, reset the peerMsgs' incoming
+    // field so it's ready to receive the next message.
+
+    auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, *current_message_type, current_payload);
+    *piece = n_piece_bytes_read;
 
     current_message_len.reset();
-    auto const message_type = *current_message_type;
     current_message_type.reset();
-
-    auto payload = MessageBuffer{};
-    payload.add(current_payload);
     current_payload.clear();
 
-    auto const [read_state, n_piece_bytes_read] = process_peer_message(msgs, message_type, payload);
-    *piece = n_piece_bytes_read;
     return read_state;
 }
 
