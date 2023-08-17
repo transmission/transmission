@@ -339,9 +339,6 @@ private:
             }
         }
 
-        /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
-         * any announcement received during the initial interval will be discarded. */
-
         event_.reset(event_new(event_base, mcast_socket_, EV_READ | EV_PERSIST, event_callback, this));
         event_add(event_.get(), nullptr);
 
