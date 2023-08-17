@@ -138,7 +138,7 @@ protected:
                 socket_address.to_compact(std::back_inserter(compact));
             }
             tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
-            tr_variantToFile(&dict, TR_VARIANT_FMT_BENC, dat_file);
+            tr_variant_serde::benc().to_file(dict, dat_file);
             tr_variantClear(&dict);
         }
     };

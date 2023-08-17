@@ -12,6 +12,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
+#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/utils.h"
@@ -236,11 +237,14 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
 bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
 {
     // load the torrent file
-    auto metainfo = tr_variant{};
-    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, torrent_file, error))
+    auto serde = tr_variant_serde::benc();
+    auto ometainfo = serde.parse_file(torrent_file);
+    if (!ometainfo)
     {
+        tr_error_propagate(error, &serde.error_);
         return false;
     }
+    auto& metainfo = *ometainfo;
 
     // remove the old fields
     tr_variantDictRemove(&metainfo, TR_KEY_announce);
@@ -271,9 +275,13 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
 
     // confirm that it's good by parsing it back again
-    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
+    auto const contents = serde.to_string(metainfo);
     tr_variantClear(&metainfo);
-    if (auto tm = tr_torrent_metainfo{}; !tm.parse_benc(contents, error))
+    if (auto tmp = serde.parse(contents); tmp)
+    {
+        tr_variantClear(&*tmp);
+    }
+    else
     {
         return false;
     }

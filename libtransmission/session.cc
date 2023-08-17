@@ -71,9 +71,13 @@ auto constexpr BandwidthGroupsFilename = "bandwidth-groups.json"sv;
 void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
     auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
-    auto groups_dict = tr_variant{};
-    if (!tr_sys_path_exists(filename) || !tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) ||
-        !tr_variantIsDict(&groups_dict))
+    if (!tr_sys_path_exists(filename))
+    {
+        return;
+    }
+
+    auto groups_var = tr_variant_serde::json().parse_file(filename);
+    if (!groups_var)
     {
         return;
     }
@@ -81,7 +85,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     auto idx = size_t{ 0 };
     auto key = tr_quark{};
     tr_variant* dict = nullptr;
-    while (tr_variantDictChild(&groups_dict, idx, &key, &dict))
+    while (tr_variantDictChild(&*groups_var, idx, &key, &dict))
     {
         ++idx;
 
@@ -110,10 +114,10 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
             group.honor_parent_limits(TR_DOWN, honors);
         }
     }
-    tr_variantClear(&groups_dict);
+    tr_variantClear(&*groups_var);
 }
 
-int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
+void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
     auto const& groups = session->bandwidthGroups();
 
@@ -134,9 +138,8 @@ int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
     }
 
     auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
-    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
+    tr_variant_serde::json().to_file(groups_dict, filename);
     tr_variantClear(&groups_dict);
-    return ret;
 }
 
 } // namespace bandwidth_group_helpers
@@ -502,10 +505,10 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     {
         success = true;
     }
-    else if (auto file_settings = tr_variant{}; tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, filename))
+    else if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        tr_variantMergeDicts(dict, &file_settings);
-        tr_variantClear(&file_settings);
+        tr_variantMergeDicts(dict, &*file_settings);
+        tr_variantClear(&*file_settings);
         success = true;
     }
     else
@@ -529,10 +532,10 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     tr_variantInitDict(&settings, 0);
 
     /* the existing file settings are the fallback values */
-    if (auto file_settings = tr_variant{}; tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, filename))
+    if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        tr_variantMergeDicts(&settings, &file_settings);
-        tr_variantClear(&file_settings);
+        tr_variantMergeDicts(&settings, &*file_settings);
+        tr_variantClear(&*file_settings);
     }
 
     /* the client's settings override the file settings */
@@ -548,7 +551,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     }
 
     /* save the result */
-    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename);
+    tr_variant_serde::json().to_file(settings, filename);
 
     /* cleanup */
     tr_variantClear(&settings);

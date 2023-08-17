@@ -137,7 +137,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
         request_ = request;
     }
 
-    auto const json_data = QByteArray::fromStdString(tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN));
+    auto const json_data = QByteArray::fromStdString(tr_variant_serde::json().compact().to_string(*json));
     QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
     reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
@@ -164,7 +164,7 @@ void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse
 {
     if (verbose_)
     {
-        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON));
+        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*json));
     }
 
     local_requests_.try_emplace(tag, promise);
@@ -216,7 +216,7 @@ void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* 
 
     if (self->verbose_)
     {
-        fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variantToStr(response, TR_VARIANT_FMT_JSON));
+        fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*response));
     }
 
     TrVariantPtr const json = createVariant();
@@ -272,12 +272,15 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
     else
     {
-        auto const json_data = reply->readAll().trimmed();
+        auto const json_data = reply->readAll().trimmed().toStdString();
         auto const json = createVariant();
-        RpcResponse result;
-        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_data))
+        auto result = RpcResponse{};
+
+        if (auto top = tr_variant_serde::json().parse(json_data); top)
         {
+            std::swap(*json, *top);
             result = parseResponseData(*json);
+            tr_variantClear(&*top);
         }
 
         promise.setProgressValue(1);

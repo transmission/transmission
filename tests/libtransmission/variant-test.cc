@@ -217,49 +217,48 @@ TEST_F(VariantTest, str)
 
 TEST_F(VariantTest, parse)
 {
+    auto serde = tr_variant_serde::benc();
+    serde.inplace();
+
     auto benc = "i64e"sv;
+    auto var = serde.parse(benc).value_or(tr_variant{});
     auto i = int64_t{};
-    auto val = tr_variant{};
-    char const* end = nullptr;
-    auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
-    EXPECT_TRUE(ok);
-    EXPECT_TRUE(tr_variantGetInt(&val, &i));
-    EXPECT_EQ(int64_t(64), i);
-    EXPECT_EQ(std::data(benc) + std::size(benc), end);
-    tr_variantClear(&val);
+    EXPECT_TRUE(tr_variantGetInt(&var, &i));
+    EXPECT_EQ(64, i);
+    EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
+    tr_variantClear(&var);
 
     benc = "li64ei32ei16ee"sv;
-    ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
-    EXPECT_TRUE(ok);
-    EXPECT_EQ(std::data(benc) + std::size(benc), end);
-    EXPECT_EQ(size_t{ 3 }, tr_variantListSize(&val));
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&val, 0), &i));
+    var = serde.parse(benc).value_or(tr_variant{});
+    EXPECT_TRUE(tr_variantIsList(&var));
+    EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
+    EXPECT_EQ(3, tr_variantListSize(&var));
+    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&var, 0), &i));
     EXPECT_EQ(64, i);
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&val, 1), &i));
+    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&var, 1), &i));
     EXPECT_EQ(32, i);
-    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&val, 2), &i));
+    EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&var, 2), &i));
     EXPECT_EQ(16, i);
-    EXPECT_EQ(benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-
-    tr_variantClear(&val);
-    end = nullptr;
+    EXPECT_EQ(benc, serde.to_string(var));
+    tr_variantClear(&var);
 
     benc = "lllee"sv;
-    ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
-    EXPECT_FALSE(ok);
-    EXPECT_EQ(nullptr, end);
+    var = serde.parse(benc).value_or(tr_variant{});
+    EXPECT_TRUE(tr_variantIsEmpty(&var));
+    EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
+    tr_variantClear(&var);
 
     benc = "le"sv;
-    EXPECT_TRUE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end));
-    EXPECT_EQ(std::data(benc) + std::size(benc), end);
-    EXPECT_EQ(benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-    tr_variantClear(&val);
+    var = serde.parse(benc).value_or(tr_variant{});
+    EXPECT_TRUE(tr_variantIsList(&var));
+    EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
+    EXPECT_EQ(benc, serde.to_string(var));
+    tr_variantClear(&var);
 
     benc = "d20:"sv;
-    end = nullptr;
-    ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
-    EXPECT_FALSE(ok);
-    EXPECT_EQ(nullptr, end);
+    var = serde.parse(benc).value_or(tr_variant{});
+    EXPECT_TRUE(tr_variantIsEmpty(&var));
+    EXPECT_EQ(std::data(benc) + 1U, serde.end());
 }
 
 TEST_F(VariantTest, bencParseAndReencode)
@@ -282,64 +281,67 @@ TEST_F(VariantTest, bencParseAndReencode)
         { " "sv, false },
     } };
 
+    auto serde = tr_variant_serde::benc();
+    serde.inplace();
+
     for (auto const& test : Tests)
     {
-        tr_variant val;
-        char const* end = nullptr;
-        auto const is_good = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, test.benc, &end);
+        auto var = serde.parse(test.benc);
 
-        EXPECT_EQ(test.is_good, is_good);
-        if (is_good)
+        EXPECT_EQ(test.is_good, var.has_value());
+        if (var)
         {
-            EXPECT_EQ(test.benc.data() + test.benc.size(), end);
-            EXPECT_EQ(test.benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-            tr_variantClear(&val);
+            EXPECT_EQ(test.benc.data() + test.benc.size(), serde.end());
+            EXPECT_EQ(test.benc, serde.to_string(*var));
+            tr_variantClear(&*var);
         }
     }
 }
 
 TEST_F(VariantTest, bencSortWhenSerializing)
 {
-    auto constexpr In = "lld1:bi32e1:ai64eeee"sv;
-    auto constexpr ExpectedOut = "lld1:ai64e1:bi32eeee"sv;
+    static auto constexpr In = "lld1:bi32e1:ai64eeee"sv;
+    static auto constexpr ExpectedOut = "lld1:ai64e1:bi32eeee"sv;
 
-    tr_variant val;
-    char const* end = nullptr;
-    auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
-    EXPECT_TRUE(ok);
-    EXPECT_EQ(std::data(In) + std::size(In), end);
-    EXPECT_EQ(ExpectedOut, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
+    auto serde = tr_variant_serde::benc();
+    auto var = serde.inplace().parse(In);
+    EXPECT_TRUE(var.has_value());
+    EXPECT_EQ(std::data(In) + std::size(In), serde.end());
+    EXPECT_EQ(ExpectedOut, serde.to_string(*var));
 
-    tr_variantClear(&val);
+    tr_variantClear(&*var);
 }
 
 TEST_F(VariantTest, bencMalformedTooManyEndings)
 {
-    auto constexpr In = "leee"sv;
-    auto constexpr ExpectedOut = "le"sv;
+    static auto constexpr In = "leee"sv;
+    static auto constexpr ExpectedOut = "le"sv;
 
-    tr_variant val;
-    char const* end = nullptr;
-    auto const ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In, &end);
-    EXPECT_TRUE(ok);
-    EXPECT_EQ(std::data(In) + std::size(ExpectedOut), end);
-    EXPECT_EQ(ExpectedOut, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
+    auto serde = tr_variant_serde::benc();
+    auto var = serde.inplace().parse(In);
+    EXPECT_TRUE(var.has_value());
+    EXPECT_EQ(std::data(In) + std::size(ExpectedOut), serde.end());
+    EXPECT_EQ(ExpectedOut, serde.to_string(*var));
 
-    tr_variantClear(&val);
+    tr_variantClear(&*var);
 }
 
 TEST_F(VariantTest, bencMalformedNoEnding)
 {
-    auto constexpr In = "l1:a1:b1:c"sv;
-    tr_variant val;
-    EXPECT_FALSE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In));
+    static auto constexpr In = "l1:a1:b1:c"sv;
+
+    auto serde = tr_variant_serde::benc();
+    auto const var = serde.inplace().parse(In);
+    EXPECT_FALSE(var.has_value());
 }
 
 TEST_F(VariantTest, bencMalformedIncompleteString)
 {
-    auto constexpr In = "1:"sv;
-    tr_variant val;
-    EXPECT_FALSE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, In));
+    static auto constexpr In = "1:"sv;
+
+    auto serde = tr_variant_serde::benc();
+    auto const var = serde.inplace().parse(In);
+    EXPECT_FALSE(var.has_value());
 }
 
 TEST_F(VariantTest, bencToJson)
@@ -359,13 +361,15 @@ TEST_F(VariantTest, bencToJson)
             R"({"args":{"status":[],"status2":[]},"result":"success"})"sv } }
     };
 
+    auto benc_serde = tr_variant_serde::benc();
+    auto json_serde = tr_variant_serde::json();
+    benc_serde.inplace();
+    json_serde.compact();
+
     for (auto const& test : Tests)
     {
-        tr_variant top;
-        tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, test.benc);
-
-        auto const str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
-        EXPECT_EQ(test.expected, stripWhitespace(str));
+        auto top = benc_serde.parse(test.benc).value_or(tr_variant{});
+        EXPECT_EQ(test.expected, stripWhitespace(json_serde.to_string(top)));
         tr_variantClear(&top);
     }
 }
@@ -433,15 +437,11 @@ TEST_F(VariantTest, stackSmash)
     std::string const in = std::string(Depth, 'l') + std::string(Depth, 'e');
 
     // confirm that it fails instead of crashing
-    char const* end = nullptr;
-    tr_variant val;
-    tr_error* error = nullptr;
-    auto ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, in, &end, &error);
-    EXPECT_NE(nullptr, error);
-    EXPECT_EQ(E2BIG, error->code);
-    EXPECT_FALSE(ok);
-
-    tr_error_clear(&error);
+    auto serde = tr_variant_serde::benc();
+    auto var = serde.inplace().parse(in);
+    EXPECT_FALSE(var.has_value());
+    EXPECT_NE(nullptr, serde.error_);
+    EXPECT_EQ(E2BIG, serde.error_ != nullptr ? serde.error_->code : 0);
 }
 
 TEST_F(VariantTest, boolAndIntRecast)
@@ -547,24 +547,23 @@ TEST_F(VariantTest, dictFindType)
 
 TEST_F(VariantTest, variantFromBufFuzz)
 {
+    auto benc_serde = tr_variant_serde::json();
+    auto json_serde = tr_variant_serde::json();
     auto buf = std::vector<char>{};
 
     for (size_t i = 0; i < 100000; ++i)
     {
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
-        if (auto top = tr_variant{};
-            tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, buf, nullptr, nullptr))
+        if (auto var = benc_serde.inplace().parse(buf); var)
         {
-            tr_variantClear(&top);
+            tr_variantClear(&*var);
         }
 
-        if (auto top = tr_variant{};
-            tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, nullptr))
+        if (auto var = json_serde.inplace().parse(buf); var)
         {
-            tr_variantClear(&top);
+            tr_variantClear(&*var);
         }
     }
 }
