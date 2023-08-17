@@ -39,6 +39,7 @@ export class Inspector extends EventTarget {
     this.file_torrent = null;
     this.file_torrent_n = null;
     this.file_rows = null;
+    this.elements.dismiss.addEventListener('click', () => this.close());
     this.outside = new OutsideClickListener(this.elements.root);
     this.outside.addEventListener('click', () => this.close());
     Object.seal(this);
