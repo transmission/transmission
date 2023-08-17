@@ -93,8 +93,8 @@ export function createTextualTabsContainer(id, tabs, callback) {
   pages.children[0].classList.remove('hidden');
 
   return {
-    dismiss,
     buttons: button_array,
+    dismiss,
     root,
   };
 }
