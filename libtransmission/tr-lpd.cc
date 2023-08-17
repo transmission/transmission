@@ -6,6 +6,7 @@
 #include <array>
 #include <chrono>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -299,25 +300,22 @@ private:
             }
 #endif
 
-            auto [ss, sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr(McastPort);
+            auto const [bind_ss, bind_sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr(McastPort);
 
-            if (bind(mcast_socket_, reinterpret_cast<sockaddr const*>(&ss), sslen) == -1)
+            if (bind(mcast_socket_, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == -1)
             {
                 return false;
             }
 
-            mcast_addr_ = {};
-            mcast_addr_.sin_family = AF_INET;
-            mcast_addr_.sin_port = McastPort.network();
-            if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
-            {
-                return false;
-            }
+            auto const mcast_addr = tr_address::from_string(McastGroup);
+            TR_ASSERT(mcast_addr);
+            auto const [mcast_ss, mcast_sslen] = mcast_addr->to_sockaddr(McastPort);
+            std::memcpy(&mcast_addr_, &mcast_ss, mcast_sslen);
 
             /* we want to join that LPD multicast group */
             ip_mreq mcast_req = {};
             mcast_req.imr_multiaddr = mcast_addr_.sin_addr;
-            mcast_req.imr_interface = reinterpret_cast<sockaddr_in*>(&ss)->sin_addr;
+            mcast_req.imr_interface = reinterpret_cast<sockaddr_in const*>(&bind_ss)->sin_addr;
 
             if (setsockopt(
                     mcast_socket_,
