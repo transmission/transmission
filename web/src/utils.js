@@ -58,14 +58,14 @@ export function createTextualTabsContainer(id, tabs, callback) {
   root.id = id;
   root.classList.add('tabs-container');
 
+  const buttons = document.createElement('div');
+  buttons.classList.add('tabs-buttons');
+  root.append(buttons);
+
   const dismiss = document.createElement('button');
   dismiss.classList.add('tabs-container-close');
   dismiss.innerHTML = '&times;';
   root.append(dismiss);
-
-  const buttons = document.createElement('div');
-  buttons.classList.add('tabs-buttons');
-  root.append(buttons);
 
   const pages = document.createElement('div');
   pages.classList.add('tabs-pages');
