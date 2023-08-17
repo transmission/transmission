@@ -168,7 +168,6 @@
 		A25964A6106D73A800453B31 /* announcer.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25964A4106D73A800453B31 /* announcer.cc */; };
 		A25964A7106D73A800453B31 /* announcer.h in Headers */ = {isa = PBXBuildFile; fileRef = A25964A5106D73A800453B31 /* announcer.h */; };
 		A25BFD69167BED3B0039D1AA /* variant-benc.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD63167BED3B0039D1AA /* variant-benc.cc */; };
-		A25BFD6A167BED3B0039D1AA /* variant-common.h in Headers */ = {isa = PBXBuildFile; fileRef = A25BFD64167BED3B0039D1AA /* variant-common.h */; };
 		A25BFD6B167BED3B0039D1AA /* variant-json.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD65167BED3B0039D1AA /* variant-json.cc */; };
 		A25BFD6D167BED3B0039D1AA /* variant.cc in Sources */ = {isa = PBXBuildFile; fileRef = A25BFD67167BED3B0039D1AA /* variant.cc */; };
 		A25BFD6E167BED3B0039D1AA /* variant.h in Headers */ = {isa = PBXBuildFile; fileRef = A25BFD68167BED3B0039D1AA /* variant.h */; };
@@ -927,7 +926,6 @@
 		A25964A4106D73A800453B31 /* announcer.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = announcer.cc; sourceTree = "<group>"; };
 		A25964A5106D73A800453B31 /* announcer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = announcer.h; sourceTree = "<group>"; };
 		A25BFD63167BED3B0039D1AA /* variant-benc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-benc.cc"; sourceTree = "<group>"; };
-		A25BFD64167BED3B0039D1AA /* variant-common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "variant-common.h"; sourceTree = "<group>"; };
 		A25BFD65167BED3B0039D1AA /* variant-json.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "variant-json.cc"; sourceTree = "<group>"; };
 		A25BFD67167BED3B0039D1AA /* variant.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = variant.cc; sourceTree = "<group>"; };
 		A25BFD68167BED3B0039D1AA /* variant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = variant.h; sourceTree = "<group>"; };
@@ -1825,7 +1823,6 @@
 				BEFC1DF10C07861A00B0BB3C /* utils.h */,
 				C843FC8329C51B9400491854 /* utils.mm */,
 				A25BFD63167BED3B0039D1AA /* variant-benc.cc */,
-				A25BFD64167BED3B0039D1AA /* variant-common.h */,
 				A25BFD65167BED3B0039D1AA /* variant-json.cc */,
 				A25BFD67167BED3B0039D1AA /* variant.cc */,
 				A25BFD68167BED3B0039D1AA /* variant.h */,
@@ -2334,7 +2331,6 @@
 				A23F29A1132A447400E9A83B /* announcer-common.h in Headers */,
 				A2EE726F14DCCC950093C99A /* port-forwarding-natpmp.h in Headers */,
 				A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */,
-				A25BFD6A167BED3B0039D1AA /* variant-common.h in Headers */,
 				A25BFD6E167BED3B0039D1AA /* variant.h in Headers */,
 				A2EA52321686AC0D00180493 /* quark.h in Headers */,
 				A2AF23C916B44FA0003BC59E /* log.h in Headers */,

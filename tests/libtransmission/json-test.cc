@@ -59,8 +59,7 @@ TEST_P(JSONTest, testElements)
         "  \"null\": null }"
     };
 
-    tr_variant top;
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
+    auto top = tr_variant_serde::json().inplace().parse(in).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};
@@ -95,18 +94,19 @@ TEST_P(JSONTest, testElements)
 TEST_P(JSONTest, testUtf8)
 {
     auto in = "{ \"key\": \"Letöltések\" }"sv;
-    tr_variant top;
     auto sv = std::string_view{};
     tr_quark const key = tr_quark_new("key"sv);
 
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
+    auto serde = tr_variant_serde::json();
+    serde.inplace();
+    auto top = serde.parse(in).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
     tr_variantClear(&top);
 
     in = R"({ "key": "\u005C" })"sv;
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
+    top = serde.parse(in).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("\\"sv, sv);
@@ -121,17 +121,17 @@ TEST_P(JSONTest, testUtf8)
      * 6. Confirm that the result is UTF-8.
      */
     in = R"({ "key": "Let\u00f6lt\u00e9sek" })"sv;
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
+    top = serde.parse(in).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
-    auto json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON);
+    auto json = serde.to_string(top);
     tr_variantClear(&top);
 
     EXPECT_FALSE(std::empty(json));
     EXPECT_NE(std::string::npos, json.find("\\u00f6"));
     EXPECT_NE(std::string::npos, json.find("\\u00e9"));
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
+    top = serde.parse(json).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
@@ -145,13 +145,14 @@ TEST_P(JSONTest, testUtf16Surrogates)
     tr_variantInitDict(&top, 1);
     auto const key = tr_quark_new("key"sv);
     tr_variantDictAddStr(&top, key, ThinkingFaceEmojiUtf8);
-    auto const json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
+
+    auto serde = tr_variant_serde::json();
+    auto const json = serde.compact().to_string(top);
     EXPECT_NE(std::string::npos, json.find("ud83e"));
     EXPECT_NE(std::string::npos, json.find("udd14"));
     tr_variantClear(&top);
 
-    auto parsed = tr_variant{};
-    EXPECT_TRUE(tr_variantFromBuf(&parsed, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
+    auto parsed = serde.parse(json).value_or(tr_variant{});
     EXPECT_TRUE(tr_variantIsDict(&parsed));
     auto value = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&parsed, key, &value));
@@ -161,7 +162,7 @@ TEST_P(JSONTest, testUtf16Surrogates)
 
 TEST_P(JSONTest, test1)
 {
-    auto const in = std::string{
+    static auto constexpr Input =
         "{\n"
         "    \"headers\": {\n"
         "        \"type\": \"request\",\n"
@@ -173,15 +174,14 @@ TEST_P(JSONTest, test1)
         "            \"ids\": [ 7, 10 ]\n"
         "        }\n"
         "    }\n"
-        "}\n"
-    };
+        "}\n"sv;
 
-    tr_variant top;
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
+    auto serde = tr_variant_serde::json();
+    auto top = serde.inplace().parse(Input).value_or(tr_variant{});
+    EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};
     auto i = int64_t{};
-    EXPECT_TRUE(tr_variantIsDict(&top));
     auto* headers = tr_variantDictFind(&top, tr_quark_new("headers"sv));
     EXPECT_NE(nullptr, headers);
     EXPECT_TRUE(tr_variantIsDict(headers));
@@ -210,25 +210,22 @@ TEST_P(JSONTest, test1)
 
 TEST_P(JSONTest, test2)
 {
-    tr_variant top;
-    auto const in = std::string{ " " };
-
-    top.type = 0;
-    EXPECT_FALSE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
-    EXPECT_FALSE(tr_variantIsDict(&top));
+    static auto constexpr Input = " "sv;
+    auto top = tr_variant_serde::json().inplace().parse(Input);
+    EXPECT_FALSE(top.has_value());
 }
 
 TEST_P(JSONTest, test3)
 {
-    auto const
-        in = "{ \"error\": 2,"
-             "  \"errorString\": \"torrent not registered with this tracker 6UHsVW'*C\","
-             "  \"eta\": 262792,"
-             "  \"id\": 25,"
-             "  \"leftUntilDone\": 2275655680 }"sv;
+    static auto constexpr Input =
+        "{ \"error\": 2,"
+        "  \"errorString\": \"torrent not registered with this tracker 6UHsVW'*C\","
+        "  \"eta\": 262792,"
+        "  \"id\": 25,"
+        "  \"leftUntilDone\": 2275655680 }"sv;
 
-    tr_variant top;
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
+    auto top = tr_variant_serde::json().inplace().parse(Input).value_or(tr_variant{});
+    EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&top, TR_KEY_errorString, &sv));
@@ -239,14 +236,14 @@ TEST_P(JSONTest, test3)
 
 TEST_P(JSONTest, unescape)
 {
-    tr_variant top;
-    auto const in = std::string{ R"({ "string-1": "\/usr\/lib" })" };
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
+    static auto constexpr Input = R"({ "string-1": "\/usr\/lib" })"sv;
+
+    auto top = tr_variant_serde::json().inplace().parse(Input).value_or(tr_variant{});
+    EXPECT_TRUE(tr_variantIsDict(&top));
 
     auto sv = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&top, tr_quark_new("string-1"sv), &sv));
     EXPECT_EQ("/usr/lib"sv, sv);
-
     tr_variantClear(&top);
 }
 

@@ -33,7 +33,6 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant-common.h"
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
@@ -55,7 +54,7 @@ struct json_wrapper_data
     tr_error* error;
     std::deque<tr_variant*> stack;
     tr_variant* top;
-    int parse_opts;
+    bool inplace = false;
 
     /* A very common pattern is for a container's children to be similar,
      * e.g. they may all be objects with the same set of keys. So when
@@ -317,7 +316,7 @@ void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl
     if (state->type == JSONSL_T_STRING)
     {
         auto const [str, inplace] = extract_string(jsn, state, data->strbuf);
-        if (inplace && ((data->parse_opts & TR_VARIANT_PARSE_INPLACE) != 0))
+        if (inplace && data->inplace)
         {
             tr_variantInitStrView(get_node(jsn), str);
         }
@@ -373,53 +372,55 @@ void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl
 } // namespace parse_helpers
 } // namespace
 
-bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view json, char const** setme_end, tr_error** error)
+std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 {
     using namespace parse_helpers;
 
-    TR_ASSERT((parse_opts & TR_VARIANT_PARSE_JSON) != 0);
+    auto top = tr_variant{};
 
     auto data = json_wrapper_data{};
+    data.error = nullptr;
+    data.size = std::size(input);
+    data.has_content = false;
+    data.key = ""sv;
+    data.inplace = parse_inplace_;
+    data.preallocGuess = {};
+    data.stack = {};
+    data.top = &top;
 
-    jsonsl_t jsn = jsonsl_new(MaxDepth);
+    auto jsn = jsonsl_new(MaxDepth);
     jsn->action_callback_PUSH = action_callback_PUSH;
     jsn->action_callback_POP = action_callback_POP;
     jsn->error_callback = error_callback;
     jsn->data = &data;
     jsonsl_enable_all_callbacks(jsn);
 
-    data.error = nullptr;
-    data.size = std::size(json);
-    data.has_content = false;
-    data.key = ""sv;
-    data.parse_opts = parse_opts;
-    data.preallocGuess = {};
-    data.stack = {};
-    data.top = &setme;
+    // parse it
+    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(input)), std::size(input));
 
-    /* parse it */
-    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(json)), std::size(json));
-
-    /* EINVAL if there was no content */
+    // EINVAL if there was no content
     if (data.error == nullptr && !data.has_content)
     {
         tr_error_set(&data.error, EINVAL, "No content");
     }
 
-    /* maybe set the end ptr */
-    if (setme_end != nullptr)
-    {
-        *setme_end = std::data(json) + jsn->pos;
-    }
+    end_ = std::data(input) + jsn->pos;
 
-    /* cleanup */
-    auto const success = data.error == nullptr;
     if (data.error != nullptr)
     {
-        tr_error_propagate(error, &data.error);
+        tr_error_propagate(&error_, &data.error);
     }
+
+    // cleanup
     jsonsl_destroy(jsn);
-    return success;
+
+    if (error_ == nullptr)
+    {
+        return top;
+    }
+
+    tr_variantClear(&top);
+    return {};
 }
 
 // ---
@@ -430,9 +431,10 @@ namespace to_string_helpers
 {
 struct ParentState
 {
-    int variantType;
-    int childIndex;
-    int childCount;
+    bool is_map = false;
+    bool is_list = false;
+    size_t child_index;
+    size_t child_count;
 };
 
 struct JsonWalk
@@ -465,54 +467,49 @@ void jsonIndent(struct JsonWalk* data)
 
 void jsonChildFunc(struct JsonWalk* data)
 {
-    if (!std::empty(data->parents))
+    if (std::empty(data->parents))
     {
-        auto& pstate = data->parents.back();
+        return;
+    }
 
-        switch (pstate.variantType)
+    auto& parent_state = data->parents.back();
+
+    if (parent_state.is_map)
+    {
+        int const i = parent_state.child_index;
+        ++parent_state.child_index;
+
+        if (i % 2 == 0)
         {
-        case TR_VARIANT_TYPE_DICT:
-            {
-                int const i = pstate.childIndex;
-                ++pstate.childIndex;
-
-                if (i % 2 == 0)
-                {
-                    data->out.add(data->doIndent ? ": "sv : ":"sv);
-                }
-                else
-                {
-                    bool const is_last = pstate.childIndex == pstate.childCount;
-                    if (!is_last)
-                    {
-                        data->out.push_back(',');
-                        jsonIndent(data);
-                    }
-                }
-
-                break;
-            }
-
-        case TR_VARIANT_TYPE_LIST:
-            ++pstate.childIndex;
-            if (bool const is_last = pstate.childIndex == pstate.childCount; !is_last)
+            data->out.add(data->doIndent ? ": "sv : ":"sv);
+        }
+        else
+        {
+            bool const is_last = parent_state.child_index == parent_state.child_count;
+            if (!is_last)
             {
                 data->out.push_back(',');
                 jsonIndent(data);
             }
-
-            break;
-
-        default:
-            break;
+        }
+    }
+    else if (parent_state.is_list)
+    {
+        ++parent_state.child_index;
+        if (bool const is_last = parent_state.child_index == parent_state.child_count; !is_last)
+        {
+            data->out.push_back(',');
+            jsonIndent(data);
         }
     }
 }
 
-void jsonPushParent(struct JsonWalk* data, tr_variant const* v)
+void jsonPushParent(struct JsonWalk* data, tr_variant const& v)
 {
-    int const n_children = tr_variantIsDict(v) ? v->val.l.count * 2 : v->val.l.count;
-    data->parents.push_back({ v->type, 0, n_children });
+    auto const is_dict = tr_variantIsDict(&v);
+    auto const is_list = tr_variantIsList(&v);
+    auto const n_children = is_dict ? v.val.l.count * 2U : v.val.l.count;
+    data->parents.push_back({ is_dict, is_list, 0, n_children });
 }
 
 void jsonPopParent(struct JsonWalk* data)
@@ -520,32 +517,23 @@ void jsonPopParent(struct JsonWalk* data)
     data->parents.pop_back();
 }
 
-void jsonIntFunc(tr_variant const* val, void* vdata)
+void jsonIntFunc(tr_variant const& /*var*/, int64_t const val, void* vdata)
 {
     auto buf = std::array<char, 64>{};
-    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
+    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val);
     auto* const data = static_cast<JsonWalk*>(vdata);
     data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
     jsonChildFunc(data);
 }
 
-void jsonBoolFunc(tr_variant const* val, void* vdata)
+void jsonBoolFunc(tr_variant const& /*var*/, bool const val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
-
-    if (val->val.b)
-    {
-        data->out.add("true"sv);
-    }
-    else
-    {
-        data->out.add("false"sv);
-    }
-
+    data->out.add(val ? "true"sv : "false"sv);
     jsonChildFunc(data);
 }
 
-void jsonRealFunc(tr_variant const* val, void* vdata)
+void jsonRealFunc(tr_variant const& /*var*/, double const val, void* vdata)
 {
     auto* const data = static_cast<struct JsonWalk*>(vdata);
 
@@ -553,13 +541,13 @@ void jsonRealFunc(tr_variant const* val, void* vdata)
     auto* walk = reinterpret_cast<char*>(buf);
     auto const* const begin = walk;
 
-    if (fabs(val->val.d - (int)val->val.d) < 0.00001)
+    if (fabs(val - (int)val) < 0.00001)
     {
-        walk = fmt::format_to(walk, FMT_COMPILE("{:.0f}"), val->val.d);
+        walk = fmt::format_to(walk, FMT_COMPILE("{:.0f}"), val);
     }
     else
     {
-        walk = fmt::format_to(walk, FMT_COMPILE("{:.4f}"), val->val.d);
+        walk = fmt::format_to(walk, FMT_COMPILE("{:.4f}"), val);
     }
 
     data->out.commit_space(walk - begin);
@@ -586,12 +574,9 @@ void jsonRealFunc(tr_variant const* val, void* vdata)
     return buf;
 }
 
-void jsonStringFunc(tr_variant const* val, void* vdata)
+void jsonStringFunc(tr_variant const& /*var*/, std::string_view sv, void* vdata)
 {
     auto* const data = static_cast<struct JsonWalk*>(vdata);
-
-    auto sv = std::string_view{};
-    (void)!tr_variantGetStrView(val, &sv);
 
     auto& out = data->out;
     auto const [buf, buflen] = out.reserve_space(std::size(sv) * 6 + 2);
@@ -667,34 +652,33 @@ void jsonStringFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-void jsonDictBeginFunc(tr_variant const* val, void* vdata)
+void jsonDictBeginFunc(tr_variant const& var, void* vdata)
 {
     auto* const data = static_cast<struct JsonWalk*>(vdata);
 
-    jsonPushParent(data, val);
+    jsonPushParent(data, var);
     data->out.push_back('{');
 
-    if (val->val.l.count != 0)
+    if (var.val.l.count != 0U)
     {
         jsonIndent(data);
     }
 }
 
-void jsonListBeginFunc(tr_variant const* val, void* vdata)
+void jsonListBeginFunc(tr_variant const& var, void* vdata)
 {
-    size_t const n_children = tr_variantListSize(val);
     auto* const data = static_cast<struct JsonWalk*>(vdata);
 
-    jsonPushParent(data, val);
+    jsonPushParent(data, var);
     data->out.push_back('[');
 
-    if (n_children != 0)
+    if (var.val.l.count != 0U)
     {
         jsonIndent(data);
     }
 }
 
-void jsonContainerEndFunc(tr_variant const* val, void* vdata)
+void jsonContainerEndFunc(tr_variant const& var, void* vdata)
 {
     auto* const data = static_cast<struct JsonWalk*>(vdata);
 
@@ -702,7 +686,7 @@ void jsonContainerEndFunc(tr_variant const* val, void* vdata)
 
     jsonIndent(data);
 
-    if (tr_variantIsDict(val))
+    if (tr_variantIsDict(&var))
     {
         data->out.push_back('}');
     }
@@ -714,26 +698,25 @@ void jsonContainerEndFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-struct VariantWalkFuncs const walk_funcs = {
-    jsonIntFunc, //
-    jsonBoolFunc, //
-    jsonRealFunc, //
-    jsonStringFunc, //
-    jsonDictBeginFunc, //
-    jsonListBeginFunc, //
-    jsonContainerEndFunc, //
-};
-
 } // namespace to_string_helpers
 } // namespace
 
-std::string tr_variantToStrJson(tr_variant const* top, bool lean)
+std::string tr_variant_serde::to_json_string(tr_variant const& var) const
 {
     using namespace to_string_helpers;
 
-    auto data = JsonWalk{ !lean };
+    static auto constexpr Funcs = WalkFuncs{
+        jsonIntFunc, //
+        jsonBoolFunc, //
+        jsonRealFunc, //
+        jsonStringFunc, //
+        jsonDictBeginFunc, //
+        jsonListBeginFunc, //
+        jsonContainerEndFunc, //
+    };
 
-    tr_variantWalk(top, &walk_funcs, &data, true);
+    auto data = JsonWalk{ !compact_ };
+    walk(var, Funcs, &data, true);
 
     auto& buf = data.out;
     if (!std::empty(buf))

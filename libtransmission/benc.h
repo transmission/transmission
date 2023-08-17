@@ -384,6 +384,11 @@ bool parse(
         }
     }
 
+    if (setme_end != nullptr)
+    {
+        *setme_end = std::data(benc);
+    }
+
     if (err != 0)
     {
         errno = err;
@@ -404,11 +409,6 @@ bool parse(
         tr_error_set(error, err, "no bencoded data to parse");
         errno = err;
         return false;
-    }
-
-    if (setme_end != nullptr)
-    {
-        *setme_end = std::data(benc);
     }
 
     return true;
