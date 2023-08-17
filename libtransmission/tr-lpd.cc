@@ -378,8 +378,8 @@ private:
             reinterpret_cast<sockaddr*>(&foreign_addr),
             &addr_len);
 
-        // If we couldn't read it or it was too big, discard it
-        if (res < 1 || static_cast<size_t>(res) > MaxDatagramLength)
+        // If we couldn't read it, discard it
+        if (res < 1)
         {
             return;
         }
@@ -413,7 +413,7 @@ private:
         {
             if (!mediator_.onPeerFound(hash_string, peer_addr, parsed->port))
             {
-                tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hash_string));
+                tr_logAddDebug(fmt::format("Cannot serve torrent #{:s}", hash_string));
             }
         }
     }
@@ -432,7 +432,7 @@ private:
         auto const needs_announce = [&now](auto& info)
         {
             return info.allows_lpd && (info.activity == TR_STATUS_DOWNLOAD || info.activity == TR_STATUS_SEED) &&
-                (info.announce_after < now);
+                info.announce_after < now;
         };
         torrents.erase(
             std::remove_if(std::begin(torrents), std::end(torrents), std::not_fn(needs_announce)),
@@ -444,22 +444,20 @@ private:
         }
 
         // prioritize the remaining torrents
-        std::sort(
-            std::begin(torrents),
-            std::end(torrents),
-            [](auto const& a, auto const& b)
+        static auto constexpr TorrentComparator = [](auto const& a, auto const& b)
+        {
+            if (a.activity != b.activity)
             {
-                if (a.activity != b.activity)
-                {
-                    return a.activity < b.activity;
-                }
+                return a.activity < b.activity;
+            }
 
-                if (a.announce_after != b.announce_after)
-                {
-                    return a.announce_after < b.announce_after;
-                }
-                return false;
-            });
+            if (a.announce_after != b.announce_after)
+            {
+                return a.announce_after < b.announce_after;
+            }
+            return false;
+        };
+        std::sort(std::begin(torrents), std::end(torrents), TorrentComparator);
 
         // cram in as many as will fit in a message
         auto const baseline_size = std::size(makeAnnounceMsg(cookie_, mediator_.port(), {}));
