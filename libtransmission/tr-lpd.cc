@@ -228,14 +228,9 @@ public:
     {
         event_.reset();
 
-        if (mcast_rcv_socket_ != TR_BAD_SOCKET)
+        if (mcast_socket_ != TR_BAD_SOCKET)
         {
-            evutil_closesocket(mcast_rcv_socket_);
-        }
-
-        if (mcast_snd_socket_ != TR_BAD_SOCKET)
-        {
-            evutil_closesocket(mcast_snd_socket_);
+            evutil_closesocket(mcast_socket_);
         }
 
         tr_logAddTrace("Done uninitialising Local Peer Discovery");
@@ -250,10 +245,8 @@ private:
         }
 
         auto const err = sockerrno;
-        evutil_closesocket(mcast_rcv_socket_);
-        evutil_closesocket(mcast_snd_socket_);
-        mcast_rcv_socket_ = TR_BAD_SOCKET;
-        mcast_snd_socket_ = TR_BAD_SOCKET;
+        evutil_closesocket(mcast_socket_);
+        mcast_socket_ = TR_BAD_SOCKET;
         tr_logAddWarn(fmt::format(
             _("Couldn't initialize LPD: {error} ({error_code})"),
             fmt::arg("error", tr_strerror(err)),
@@ -272,118 +265,77 @@ private:
      */
     bool initImpl(struct event_base* event_base)
     {
-        int const opt_on = 1;
+        auto const opt_on = int{ 1 };
 
         static_assert(AnnounceScope > 0);
 
         tr_logAddDebug("Initialising Local Peer Discovery");
 
-        /* setup datagram socket (receive) */
+        /* setup datagram socket */
         {
-            mcast_rcv_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
+            mcast_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
 
-            if (mcast_rcv_socket_ == TR_BAD_SOCKET)
+            if (mcast_socket_ == TR_BAD_SOCKET)
             {
                 return false;
             }
 
-            if (evutil_make_socket_nonblocking(mcast_rcv_socket_) == -1)
+            if (evutil_make_socket_nonblocking(mcast_socket_) == -1)
             {
                 return false;
             }
 
-            if (setsockopt(
-                    mcast_rcv_socket_,
-                    SOL_SOCKET,
-                    SO_REUSEADDR,
-                    reinterpret_cast<char const*>(&opt_on),
-                    sizeof(opt_on)) == -1)
+            if (setsockopt(mcast_socket_, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) ==
+                -1)
             {
                 return false;
             }
 
 #if HAVE_SO_REUSEPORT
-            if (setsockopt(
-                    mcast_rcv_socket_,
-                    SOL_SOCKET,
-                    SO_REUSEPORT,
-                    reinterpret_cast<char const*>(&opt_on),
-                    sizeof(opt_on)) == -1)
+            if (setsockopt(mcast_socket_, SOL_SOCKET, SO_REUSEPORT, reinterpret_cast<char const*>(&opt_on), sizeof(opt_on)) ==
+                -1)
             {
                 return false;
             }
 #endif
 
-            mcast_addr_ = {};
-            mcast_addr_.sin_family = AF_INET;
-            mcast_addr_.sin_port = McastPort.network();
-            mcast_addr_.sin_addr.s_addr = INADDR_ANY;
+            auto [ss, sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr(McastPort);
 
-            if (bind(mcast_rcv_socket_, reinterpret_cast<sockaddr*>(&mcast_addr_), sizeof(mcast_addr_)) == -1)
+            if (bind(mcast_socket_, reinterpret_cast<sockaddr const*>(&ss), sslen) == -1)
             {
                 return false;
             }
 
+            mcast_addr_ = {};
+            mcast_addr_.sin_family = AF_INET;
+            mcast_addr_.sin_port = McastPort.network();
             if (evutil_inet_pton(mcast_addr_.sin_family, McastGroup, &mcast_addr_.sin_addr) == -1)
             {
                 return false;
             }
 
             /* we want to join that LPD multicast group */
-            struct ip_mreq mcast_req = {};
+            ip_mreq mcast_req = {};
             mcast_req.imr_multiaddr = mcast_addr_.sin_addr;
-            mcast_req.imr_interface.s_addr = INADDR_ANY;
+            mcast_req.imr_interface = reinterpret_cast<sockaddr_in*>(&ss)->sin_addr;
 
             if (setsockopt(
-                    mcast_rcv_socket_,
+                    mcast_socket_,
                     IPPROTO_IP,
                     IP_ADD_MEMBERSHIP,
                     reinterpret_cast<char const*>(&mcast_req),
-                    sizeof(struct ip_mreq)) == -1)
-            {
-                return false;
-            }
-        }
-
-        /* setup datagram socket (send) */
-        {
-            unsigned char const scope = AnnounceScope;
-
-            mcast_snd_socket_ = socket(PF_INET, SOCK_DGRAM, 0);
-
-            if (mcast_snd_socket_ == TR_BAD_SOCKET)
-            {
-                return false;
-            }
-
-            if (evutil_make_socket_nonblocking(mcast_snd_socket_) == -1)
-            {
-                return false;
-            }
-
-            if (setsockopt(
-                    mcast_snd_socket_,
-                    SOL_SOCKET,
-                    SO_REUSEADDR,
-                    reinterpret_cast<char const*>(&opt_on),
-                    sizeof(opt_on)) == -1)
-            {
-                return false;
-            }
-
-            if (auto [ss, sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr({});
-                bind(mcast_snd_socket_, reinterpret_cast<sockaddr*>(&ss), sslen) == -1)
+                    sizeof(mcast_req)) == -1)
             {
                 return false;
             }
 
             /* configure outbound multicast TTL */
             if (setsockopt(
-                    mcast_snd_socket_,
+                    mcast_socket_,
                     IPPROTO_IP,
                     IP_MULTICAST_TTL,
-                    reinterpret_cast<char const*>(&scope),
-                    sizeof(scope)) == -1)
+                    reinterpret_cast<char const*>(&AnnounceScope),
+                    sizeof(AnnounceScope)) == -1)
             {
                 return false;
             }
@@ -392,7 +344,7 @@ private:
         /* Note: lpd_unsolicitedMsgCounter remains 0 until the first timeout event, thus
          * any announcement received during the initial interval will be discarded. */
 
-        event_.reset(event_new(event_base, mcast_rcv_socket_, EV_READ | EV_PERSIST, event_callback, this));
+        event_.reset(event_new(event_base, mcast_socket_, EV_READ | EV_PERSIST, event_callback, this));
         event_add(event_.get(), nullptr);
 
         tr_logAddDebug("Local Peer Discovery initialised");
@@ -424,7 +376,7 @@ private:
         auto addr_len = socklen_t{ sizeof(foreign_addr) };
         auto foreign_msg = std::array<char, MaxDatagramLength>{};
         auto const res = recvfrom(
-            mcast_rcv_socket_,
+            mcast_socket_,
             std::data(foreign_msg),
             MaxDatagramLength,
             0,
@@ -566,7 +518,7 @@ private:
         auto const announce = makeAnnounceMsg(cookie_, mediator_.port(), info_hash_strings);
         TR_ASSERT(std::size(announce) <= MaxDatagramLength);
         auto const res = sendto(
-            mcast_snd_socket_,
+            mcast_socket_,
             std::data(announce),
             std::size(announce),
             0,
@@ -578,8 +530,7 @@ private:
 
     std::string const cookie_ = makeCookie();
     Mediator& mediator_;
-    tr_socket_t mcast_rcv_socket_ = TR_BAD_SOCKET; /**<separate multicast receive socket */
-    tr_socket_t mcast_snd_socket_ = TR_BAD_SOCKET; /**<and multicast send socket */
+    tr_socket_t mcast_socket_ = TR_BAD_SOCKET; /**multicast socket */
     libtransmission::evhelpers::event_unique_ptr event_;
 
     static auto constexpr MaxDatagramLength = size_t{ 1400 };
