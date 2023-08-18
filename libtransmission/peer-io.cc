@@ -131,7 +131,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
-    if (!addr.is_valid_for_peers(port))
+    if (!socket_address.is_valid_for_peers())
     {
         return {};
     }
@@ -145,7 +145,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         utp_set_userdata(sock, peer_io.get());
         peer_io->set_socket(tr_peer_socket{ socket_address, sock });
 
-        auto const [ss, sslen] = addr.to_sockaddr(port);
+        auto const [ss, sslen] = socket_address.to_sockaddr();
         if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
         {
             return peer_io;

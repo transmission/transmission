@@ -481,15 +481,14 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
             tr_variantInitDict(&tmp, 100);
             tr_sessionGetSettings(session, &tmp);
 
+            auto const serde = tr_variant_serde::benc();
             for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
             {
                 bool changed = true;
 
                 if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval != nullptr)
                 {
-                    auto const a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC);
-                    auto const b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC);
-                    changed = a != b;
+                    changed = serde.to_string(*oldval) != serde.to_string(*newval);
                 }
 
                 if (changed)

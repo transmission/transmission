@@ -60,7 +60,7 @@ auto makeCookie()
 }
 
 constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
-auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
+auto constexpr McastPort = tr_port::from_host(6771); /**<LPD source and destination UPD port */
 
 /*
  * A LSD announce is formatted as follows:
@@ -151,7 +151,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
         auto walk = announce.substr(pos + std::size(key));
         if (auto const port = tr_num_parse<uint16_t>(walk, &walk); port && tr_strv_starts_with(walk, CrLf))
         {
-            ret.port = tr_port::fromHost(*port);
+            ret.port = tr_port::from_host(*port);
         }
         else
         {
@@ -300,7 +300,7 @@ private:
             }
 #endif
 
-            auto const [bind_ss, bind_sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr(McastPort);
+            auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(mediator_.bind_address(TR_AF_INET), McastPort);
 
             if (bind(mcast_socket_, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == -1)
             {
@@ -309,7 +309,7 @@ private:
 
             auto const mcast_addr = tr_address::from_string(McastGroup);
             TR_ASSERT(mcast_addr);
-            auto const [mcast_ss, mcast_sslen] = mcast_addr->to_sockaddr(McastPort);
+            auto const [mcast_ss, mcast_sslen] = tr_socket_address::to_sockaddr(*mcast_addr, McastPort);
             std::memcpy(&mcast_addr_, &mcast_ss, mcast_sslen);
 
             /* we want to join that LPD multicast group */
@@ -407,8 +407,7 @@ private:
             return;
         }
 
-        auto peer_addr = tr_address{};
-        peer_addr.addr.addr4 = foreign_addr.sin_addr;
+        auto [peer_addr, compact] = tr_address::from_compact_ipv4(reinterpret_cast<std::byte*>(&foreign_addr.sin_addr));
         for (auto const& hash_string : parsed->info_hash_strings)
         {
             if (!mediator_.onPeerFound(hash_string, peer_addr, parsed->port))

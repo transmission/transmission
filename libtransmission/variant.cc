@@ -23,7 +23,6 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/variant-common.h"
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
@@ -693,10 +692,10 @@ private:
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted data. (#667)
  */
-void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walk_funcs, void* user_data, bool sort_dicts)
+void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts)
 {
     auto stack = VariantWalker{};
-    stack.emplace(top, sort_dicts);
+    stack.emplace(&top, sort_dicts);
 
     while (!stack.empty())
     {
@@ -717,16 +716,17 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walk_f
             {
                 if (tr_variantIsDict(&node.v))
                 {
+                    auto const keystr = tr_quark_get_string_view(v->key);
                     auto tmp = tr_variant{};
                     tr_variantInitQuark(&tmp, v->key);
-                    walk_funcs->stringFunc(&tmp, user_data);
+                    walk_funcs.string_func(tmp, keystr, user_data);
                 }
             }
             else // finished with this node
             {
                 if (tr_variantIsContainer(&node.v))
                 {
-                    walk_funcs->containerEndFunc(&node.v, user_data);
+                    walk_funcs.container_end_func(node.v, user_data);
                 }
 
                 stack.pop();
@@ -739,25 +739,25 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walk_f
             switch (v->type)
             {
             case TR_VARIANT_TYPE_INT:
-                walk_funcs->intFunc(v, user_data);
+                walk_funcs.int_func(*v, v->val.i, user_data);
                 break;
 
             case TR_VARIANT_TYPE_BOOL:
-                walk_funcs->boolFunc(v, user_data);
+                walk_funcs.bool_func(*v, v->val.b, user_data);
                 break;
 
             case TR_VARIANT_TYPE_REAL:
-                walk_funcs->realFunc(v, user_data);
+                walk_funcs.double_func(*v, v->val.d, user_data);
                 break;
 
             case TR_VARIANT_TYPE_STR:
-                walk_funcs->stringFunc(v, user_data);
+                walk_funcs.string_func(*v, v->val.s.get(), user_data);
                 break;
 
             case TR_VARIANT_TYPE_LIST:
                 if (v == &node.v)
                 {
-                    walk_funcs->listBeginFunc(v, user_data);
+                    walk_funcs.list_begin_func(*v, user_data);
                 }
                 else
                 {
@@ -768,7 +768,7 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walk_f
             case TR_VARIANT_TYPE_DICT:
                 if (v == &node.v)
                 {
-                    walk_funcs->dictBeginFunc(v, user_data);
+                    walk_funcs.dict_begin_func(*v, user_data);
                 }
                 else
                 {
@@ -787,43 +787,23 @@ void tr_variantWalk(tr_variant const* top, struct VariantWalkFuncs const* walk_f
 
 // ---
 
-namespace
-{
-namespace clear_helpers
-{
-void freeDummyFunc(tr_variant const* /*v*/, void* /*buf*/)
-{
-}
-
-void freeStringFunc(tr_variant const* v, void* /*user_data*/)
-{
-    const_cast<tr_variant*>(v)->val.s.clear();
-}
-
-void freeContainerEndFunc(tr_variant const* v, void* /*user_data*/)
-{
-    delete[] v->val.l.vals;
-}
-
-VariantWalkFuncs constexpr FreeWalkFuncs = {
-    freeDummyFunc, //
-    freeDummyFunc, //
-    freeDummyFunc, //
-    freeStringFunc, //
-    freeDummyFunc, //
-    freeDummyFunc, //
-    freeContainerEndFunc, //
-};
-} // namespace clear_helpers
-} // namespace
-
 void tr_variantClear(tr_variant* clearme)
 {
-    using namespace clear_helpers;
+    // clang-format off
+    tr_variant_serde::WalkFuncs cleanup_funcs = {
+        [](tr_variant const&, int64_t, void*) {},
+        [](tr_variant const&, bool, void*) {},
+        [](tr_variant const&, double, void*) {},
+        [](tr_variant const& var, std::string_view, void*){ const_cast<tr_variant&>(var).val.s.clear(); },
+        [](tr_variant const&, void*) {},
+        [](tr_variant const&, void*) {},
+        [](tr_variant const& var, void*) { delete[] var.val.l.vals; }
+    };
+    // clang-format on
 
     if (!tr_variantIsEmpty(clearme))
     {
-        tr_variantWalk(clearme, &FreeWalkFuncs, nullptr, false);
+        tr_variant_serde::walk(*clearme, cleanup_funcs, nullptr, false);
     }
 
     *clearme = {};
@@ -992,71 +972,48 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 
 // ---
 
-std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
+tr_variant_serde::~tr_variant_serde()
 {
-    switch (fmt)
-    {
-    case TR_VARIANT_FMT_JSON:
-        return tr_variantToStrJson(v, false);
-
-    case TR_VARIANT_FMT_JSON_LEAN:
-        return tr_variantToStrJson(v, true);
-
-    default: // TR_VARIANT_FMT_BENC:
-        return tr_variantToStrBenc(v);
-    }
+    tr_error_clear(&error_);
 }
 
-int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view filename)
+std::optional<tr_variant> tr_variant_serde::parse(std::string_view input)
 {
-    auto error_code = int{ 0 };
-    auto const contents = tr_variantToStr(v, fmt);
+    tr_error_clear(&error_);
+    return type_ == Type::Json ? parse_json(input) : parse_benc(input);
+}
 
-    tr_error* error = nullptr;
-    tr_file_save(filename, contents, &error);
-    if (error != nullptr)
+[[nodiscard]] std::optional<tr_variant> tr_variant_serde::parse_file(std::string_view filename)
+{
+    TR_ASSERT_MSG(!parse_inplace_, "not supported in from_file()");
+    parse_inplace_ = false;
+
+    if (auto buf = std::vector<char>{}; tr_file_read(filename, buf, &error_))
+    {
+        return parse(buf);
+    }
+
+    return {};
+}
+
+std::string tr_variant_serde::to_string(tr_variant const& var) const
+{
+    return type_ == Type::Json ? to_json_string(var) : to_benc_string(var);
+}
+
+bool tr_variant_serde::to_file(tr_variant const& var, std::string_view filename)
+{
+    tr_file_save(filename, to_string(var), &error_);
+
+    if (error_ != nullptr)
     {
         tr_logAddError(fmt::format(
             _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        error_code = error->code;
-        tr_error_clear(&error);
+            fmt::arg("error", error_->message),
+            fmt::arg("error_code", error_->code)));
+        return false;
     }
 
-    return error_code;
-}
-
-// ---
-
-bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char const** setme_end, tr_error** error)
-{
-    // supported formats: benc, json
-    TR_ASSERT((opts & (TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_JSON)) != 0);
-
-    *setme = {};
-
-    auto const success = ((opts & TR_VARIANT_PARSE_BENC) != 0) ? tr_variantParseBenc(*setme, opts, buf, setme_end, error) :
-                                                                 tr_variantParseJson(*setme, opts, buf, setme_end, error);
-
-    if (!success)
-    {
-        tr_variantClear(setme);
-    }
-
-    return success;
-}
-
-bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string_view filename, tr_error** error)
-{
-    // can't do inplace when this function is allocating & freeing the memory...
-    TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
-
-    if (auto buf = std::vector<char>{}; tr_file_read(filename, buf, error))
-    {
-        return tr_variantFromBuf(setme, opts, buf, nullptr, error);
-    }
-
-    return false;
+    return true;
 }

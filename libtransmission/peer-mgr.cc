@@ -1205,12 +1205,12 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers() && from != TR_PEER_FROM_INCOMING &&
-            (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
+            !s->manager->session->addressIsBlocked(pex->socket_address.address()) && pex->is_valid_for_peers() &&
+            from != TR_PEER_FROM_INCOMING && (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
         {
             // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
             // don't care about non-connectable peers that we are not connected to
-            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, true);
+            s->ensure_info_exists(pex->socket_address, pex->flags, from, true);
             ++n_used;
         }
     }
@@ -1230,8 +1230,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv4(
 
     for (size_t i = 0; i < n; ++i)
     {
-        std::tie(pex[i].addr, walk) = tr_address::from_compact_ipv4(walk);
-        std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
+        std::tie(pex[i].socket_address, walk) = tr_socket_address::from_compact_ipv4(walk);
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1254,8 +1253,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
 
     for (size_t i = 0; i < n; ++i)
     {
-        std::tie(pex[i].addr, walk) = tr_address::from_compact_ipv6(walk);
-        std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
+        std::tie(pex[i].socket_address, walk) = tr_socket_address::from_compact_ipv6(walk);
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1353,11 +1351,12 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
     for (auto const* const info : infos)
     {
-        auto const& [addr, port] = info->listen_socket_address();
+        auto const& socket_address = info->listen_socket_address();
+        auto const& addr = socket_address.address();
 
         TR_ASSERT(addr.is_valid());
         TR_ASSERT(addr.type == address_type);
-        pex.emplace_back(addr, port, info->pex_flags());
+        pex.emplace_back(socket_address, info->pex_flags());
     }
 
     std::sort(std::begin(pex), std::end(pex));

@@ -71,9 +71,13 @@ auto constexpr BandwidthGroupsFilename = "bandwidth-groups.json"sv;
 void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
     auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
-    auto groups_dict = tr_variant{};
-    if (!tr_sys_path_exists(filename) || !tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) ||
-        !tr_variantIsDict(&groups_dict))
+    if (!tr_sys_path_exists(filename))
+    {
+        return;
+    }
+
+    auto groups_var = tr_variant_serde::json().parse_file(filename);
+    if (!groups_var)
     {
         return;
     }
@@ -81,7 +85,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     auto idx = size_t{ 0 };
     auto key = tr_quark{};
     tr_variant* dict = nullptr;
-    while (tr_variantDictChild(&groups_dict, idx, &key, &dict))
+    while (tr_variantDictChild(&*groups_var, idx, &key, &dict))
     {
         ++idx;
 
@@ -110,10 +114,10 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
             group.honor_parent_limits(TR_DOWN, honors);
         }
     }
-    tr_variantClear(&groups_dict);
+    tr_variantClear(&*groups_var);
 }
 
-int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
+void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
     auto const& groups = session->bandwidthGroups();
 
@@ -134,9 +138,8 @@ int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
     }
 
     auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
-    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
+    tr_variant_serde::json().to_file(groups_dict, filename);
     tr_variantClear(&groups_dict);
-    return ret;
 }
 
 } // namespace bandwidth_group_helpers
@@ -160,7 +163,7 @@ tr_port tr_session::randomPort() const
     auto const lower = std::min(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const upper = std::max(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const range = upper - lower;
-    return tr_port::fromHost(lower + tr_rand_int(range + 1U));
+    return tr_port::from_host(lower + tr_rand_int(range + 1U));
 }
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
@@ -247,9 +250,10 @@ bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_add
     }
 
     // we found a suitable peer, add it to the torrent
-    auto pex = tr_pex{ address, port };
+    auto const socket_address = tr_socket_address{ address, port };
+    auto const pex = tr_pex{ socket_address };
     tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, &pex, 1U);
-    tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({:s})", address.display_name(port)));
+    tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({:s})", socket_address.display_name()));
     return true;
 }
 
@@ -378,8 +382,7 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
     {
         auto const& [socket_address, sock] = *incoming_info;
-        auto const& [addr, port] = socket_address;
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.display_name(port)));
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, socket_address.display_name()));
         session->addIncoming({ session, socket_address, sock });
     }
 }
@@ -400,8 +403,9 @@ tr_session::BoundSocket::BoundSocket(
         return;
     }
 
-    tr_logAddInfo(
-        fmt::format(_("Listening to incoming peer connections on {hostport}"), fmt::arg("hostport", addr.display_name(port))));
+    tr_logAddInfo(fmt::format(
+        _("Listening to incoming peer connections on {hostport}"),
+        fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
     event_add(ev_.get(), nullptr);
 }
 
@@ -432,7 +436,7 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
         // otherwise, use any_ipv6 (::).
         auto const source_addr = global_source_address(type);
         auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
-                                                                                            tr_address::any_ipv6();
+                                                                                            tr_address::any(TR_AF_INET6);
         return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
@@ -501,10 +505,10 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     {
         success = true;
     }
-    else if (auto file_settings = tr_variant{}; tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, filename))
+    else if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        tr_variantMergeDicts(dict, &file_settings);
-        tr_variantClear(&file_settings);
+        tr_variantMergeDicts(dict, &*file_settings);
+        tr_variantClear(&*file_settings);
         success = true;
     }
     else
@@ -528,10 +532,10 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     tr_variantInitDict(&settings, 0);
 
     /* the existing file settings are the fallback values */
-    if (auto file_settings = tr_variant{}; tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, filename))
+    if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        tr_variantMergeDicts(&settings, &file_settings);
-        tr_variantClear(&file_settings);
+        tr_variantMergeDicts(&settings, &*file_settings);
+        tr_variantClear(&*file_settings);
     }
 
     /* the client's settings override the file settings */
@@ -547,7 +551,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     }
 
     /* save the result */
-    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename);
+    tr_variant_serde::json().to_file(settings, filename);
 
     /* cleanup */
     tr_variantClear(&settings);
@@ -887,7 +891,7 @@ void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
     TR_ASSERT(session != nullptr);
 
-    if (auto const port = tr_port::fromHost(hport); port != session->localPeerPort())
+    if (auto const port = tr_port::from_host(hport); port != session->localPeerPort())
     {
         session->runInSessionThread(
             [session, port]()
@@ -1732,7 +1736,7 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t hport)
 
     if (session->rpc_server_)
     {
-        session->rpc_server_->set_port(tr_port::fromHost(hport));
+        session->rpc_server_->set_port(tr_port::from_host(hport));
     }
 }
 
