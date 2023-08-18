@@ -1741,16 +1741,13 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 
     // read <payload>
     auto& current_payload = msgs->incoming.payload;
-    auto const full_payload_len = *current_message_len - sizeof(uint8_t /*message_type*/);
+    auto const full_payload_len = *current_message_len - sizeof(*current_message_type);
     auto n_left = full_payload_len - std::size(current_payload);
-    while (n_left > 0U && io->read_buffer_size() > 0U)
-    {
-        auto [buf, n_this_pass] = current_payload.reserve_space(std::min(n_left, io->read_buffer_size()));
-        io->read_bytes(buf, n_this_pass);
-        current_payload.commit_space(n_this_pass);
-        n_left -= n_this_pass;
-        logtrace(msgs, fmt::format("read {:d} payload bytes; {:d} left to go", n_this_pass, n_left));
-    }
+    auto const [buf, n_this_pass] = current_payload.reserve_space(std::min(n_left, io->read_buffer_size()));
+    io->read_bytes(buf, n_this_pass);
+    current_payload.commit_space(n_this_pass);
+    n_left -= n_this_pass;
+    logtrace(msgs, fmt::format("read {:d} payload bytes; {:d} left to go", n_this_pass, n_left));
 
     if (n_left > 0U)
     {
