@@ -15,15 +15,6 @@
 
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
-/** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
-bool tr_addressIsIP(char const* address);
-
-/** @brief return true if the url is a http or https or UDP url that Transmission understands */
-bool tr_urlIsValidTracker(std::string_view url);
-
-/** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
-bool tr_urlIsValid(std::string_view url);
-
 struct tr_url_parsed_t
 {
     // http://example.com:80/over/there?name=ferret#nose
@@ -37,7 +28,24 @@ struct tr_url_parsed_t
     std::string_view fragment; // "nose"
     std::string_view full; // "http://example.com:80/over/there?name=ferret#nose"
     uint16_t port = 0;
+
+    constexpr bool operator==(tr_url_parsed_t const& that) const noexcept
+    {
+        // authority and full is just a combination of some/all of the elements compared below
+        // so they are not compared
+        return scheme == that.scheme && host == that.host && sitename == that.sitename && path == that.path &&
+            query == that.query && fragment == that.fragment && port == that.port;
+    }
 };
+
+/** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
+bool tr_addressIsIP(char const* address);
+
+/** @brief return true if the url is a http or https or UDP url that Transmission understands */
+bool tr_urlIsValidTracker(std::string_view url);
+
+/** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
+bool tr_urlIsValid(std::string_view url);
 
 [[nodiscard]] std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
 

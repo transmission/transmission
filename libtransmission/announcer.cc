@@ -260,9 +260,9 @@ std::unique_ptr<tr_announcer> tr_announcer::create(
 struct tr_tracker
 {
     explicit tr_tracker(tr_announcer_impl* announcer, tr_announce_list::tracker_info const& info)
-        : host_and_port{ info.host_and_port }
+        : host_and_port{ fmt::format(FMT_STRING("{:s}:{:d}"), info.parsed_url.host, info.parsed_url.port) }
         , announce_url{ info.announce }
-        , sitename{ info.sitename }
+        , sitename{ info.parsed_url.sitename }
         , scrape_info{ std::empty(info.scrape) ? nullptr : announcer->scrape_info(info.scrape) }
         , id{ info.id }
     {

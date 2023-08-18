@@ -350,7 +350,7 @@ void addTrackers(tr_torrent const* tor, tr_variant* trackers)
         tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce.quark());
         tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
         tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape.quark());
-        tr_variantDictAddStrView(d, TR_KEY_sitename, tracker.sitename);
+        tr_variantDictAddStrView(d, TR_KEY_sitename, tracker.parsed_url.sitename);
         tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
     }
 }
