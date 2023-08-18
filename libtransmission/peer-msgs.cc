@@ -1744,6 +1744,7 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     auto const full_payload_len = *current_message_len - sizeof(*current_message_type);
     auto n_left = full_payload_len - std::size(current_payload);
     auto const [buf, n_this_pass] = current_payload.reserve_space(std::min(n_left, io->read_buffer_size()));
+    TR_ASSERT(n_this_pass > 0U);
     io->read_bytes(buf, n_this_pass);
     current_payload.commit_space(n_this_pass);
     n_left -= n_this_pass;
