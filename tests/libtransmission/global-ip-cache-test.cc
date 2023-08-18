@@ -187,9 +187,7 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv4)
                      << "3. You don't have IPv4 connectivity to public internet";
     }
     EXPECT_TRUE(addr->is_ipv4());
-    EXPECT_EQ(
-        global_ip_cache_->global_source_addr(TR_AF_INET)->display_name(),
-        global_ip_cache_->global_source_addr_str(TR_AF_INET));
+    EXPECT_EQ(addr->display_name(), global_ip_cache_->global_source_addr_str(TR_AF_INET));
 }
 
 TEST_F(GlobalIPCacheTest, globalSourceIPv6)
@@ -214,9 +212,7 @@ TEST_F(GlobalIPCacheTest, globalSourceIPv6)
                      << "3. You don't have IPv6 connectivity to public internet";
     }
     EXPECT_TRUE(addr->is_ipv6());
-    EXPECT_EQ(
-        global_ip_cache_->global_source_addr(TR_AF_INET6)->display_name(),
-        global_ip_cache_->global_source_addr_str(TR_AF_INET6));
+    EXPECT_EQ(addr->display_name(), global_ip_cache_->global_source_addr_str(TR_AF_INET6));
 }
 
 TEST_F(GlobalIPCacheTest, onResponseIPQuery)
