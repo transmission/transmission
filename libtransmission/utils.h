@@ -114,7 +114,7 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 template<typename T>
 [[nodiscard]] std::string tr_strlower(T in)
 {
-    auto out = std::string{ in };
+    auto out = std::string{ std::move(in) };
     std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::tolower(ch); });
     return out;
 }
@@ -122,7 +122,7 @@ template<typename T>
 template<typename T>
 [[nodiscard]] std::string tr_strupper(T in)
 {
-    auto out = std::string{ in };
+    auto out = std::string{ std::move(in) };
     std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::toupper(ch); });
     return out;
 }
