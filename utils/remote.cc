@@ -1492,8 +1492,8 @@ static void printTorrentList(tr_variant* top)
             [](tr_variant* f, tr_variant* s)
             {
                 int64_t f_time = INT64_MIN, s_time = INT64_MIN;
-                tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time);
-                tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time);
+                (void)tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time);
+                (void)tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time);
                 return f_time < s_time;
             });
 
