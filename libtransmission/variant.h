@@ -28,19 +28,6 @@ struct tr_error;
  * @{
  */
 
-/* these are PRIVATE IMPLEMENTATION details that should not be touched.
- * I'll probably change them just to break your code! HA HA HA!
- * it's included in the header for inlining and composition */
-enum
-{
-    TR_VARIANT_TYPE_INT = 1,
-    TR_VARIANT_TYPE_STR = 2,
-    TR_VARIANT_TYPE_LIST = 4,
-    TR_VARIANT_TYPE_DICT = 8,
-    TR_VARIANT_TYPE_BOOL = 16,
-    TR_VARIANT_TYPE_REAL = 32
-};
-
 /* These are PRIVATE IMPLEMENTATION details that should not be touched.
  * I'll probably change them just to break your code! HA HA HA!
  * it's included in the header for inlining and composition */
@@ -114,7 +101,18 @@ private:
     };
 
 public:
-    char type = '\0';
+    enum class Type
+    {
+        None,
+        Bool,
+        Int,
+        Double,
+        String,
+        Vector,
+        Map
+    };
+
+    Type type = Type::None;
 
     tr_quark key = TR_KEY_NONE;
 
@@ -147,21 +145,21 @@ public:
  */
 void tr_variantClear(tr_variant* clearme);
 
-[[nodiscard]] constexpr bool tr_variantIsType(tr_variant const* b, int type)
+[[nodiscard]] constexpr bool tr_variantIsType(tr_variant const* const var, tr_variant::Type type)
 {
-    return b != nullptr && b->type == type;
+    return var != nullptr && var->type == type;
 }
 
-[[nodiscard]] constexpr bool tr_variantIsEmpty(tr_variant const* b)
+[[nodiscard]] constexpr bool tr_variantIsEmpty(tr_variant const* const var)
 {
-    return b == nullptr || b->type == '\0';
+    return tr_variantIsType(var, tr_variant::Type::None);
 }
 
 // --- Strings
 
-[[nodiscard]] constexpr bool tr_variantIsString(tr_variant const* b)
+[[nodiscard]] constexpr bool tr_variantIsString(tr_variant const* const var)
 {
-    return b != nullptr && b->type == TR_VARIANT_TYPE_STR;
+    return tr_variantIsType(var, tr_variant::Type::String);
 }
 
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
@@ -171,7 +169,7 @@ void tr_variantInitQuark(tr_variant* initme, tr_quark value);
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len);
 void tr_variantInitStrView(tr_variant* initme, std::string_view val);
 
-constexpr void tr_variantInit(tr_variant* initme, char type)
+constexpr void tr_variantInit(tr_variant* initme, tr_variant::Type type)
 {
     initme->val = {};
     initme->type = type;
@@ -182,54 +180,54 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
 
 // --- Real Numbers
 
-[[nodiscard]] constexpr bool tr_variantIsReal(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsReal(tr_variant const* const var)
 {
-    return v != nullptr && v->type == TR_VARIANT_TYPE_REAL;
+    return tr_variantIsType(var, tr_variant::Type::Double);
 }
 
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
 constexpr void tr_variantInitReal(tr_variant* initme, double value)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_REAL);
+    tr_variantInit(initme, tr_variant::Type::Double);
     initme->val.d = value;
 }
 
 // --- Booleans
 
-[[nodiscard]] constexpr bool tr_variantIsBool(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsBool(tr_variant const* const var)
 {
-    return v != nullptr && v->type == TR_VARIANT_TYPE_BOOL;
+    return tr_variantIsType(var, tr_variant::Type::Bool);
 }
 
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
 constexpr void tr_variantInitBool(tr_variant* initme, bool value)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_BOOL);
+    tr_variantInit(initme, tr_variant::Type::Bool);
     initme->val.b = value;
 }
 
 // --- Ints
 
-[[nodiscard]] constexpr bool tr_variantIsInt(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsInt(tr_variant const* const var)
 {
-    return v != nullptr && v->type == TR_VARIANT_TYPE_INT;
+    return tr_variantIsType(var, tr_variant::Type::Int);
 }
 
 bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 
 constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_INT);
+    tr_variantInit(initme, tr_variant::Type::Int);
     initme->val.i = value;
 }
 
 // --- Lists
 
-[[nodiscard]] constexpr bool tr_variantIsList(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsList(tr_variant const* const var)
 {
-    return v != nullptr && v->type == TR_VARIANT_TYPE_LIST;
+    return tr_variantIsType(var, tr_variant::Type::Vector);
 }
 
 void tr_variantInitList(tr_variant* initme, size_t reserve_count);
@@ -256,9 +254,9 @@ bool tr_variantListRemove(tr_variant* list, size_t pos);
 
 // --- Dictionaries
 
-[[nodiscard]] constexpr bool tr_variantIsDict(tr_variant const* v)
+[[nodiscard]] constexpr bool tr_variantIsDict(tr_variant const* const var)
 {
-    return v != nullptr && v->type == TR_VARIANT_TYPE_DICT;
+    return tr_variantIsType(var, tr_variant::Type::Map);
 }
 
 void tr_variantInitDict(tr_variant* initme, size_t reserve_count);

@@ -52,7 +52,7 @@ constexpr int dictIndexOf(tr_variant const* dict, tr_quark key)
     return -1;
 }
 
-bool dictFindType(tr_variant* dict, tr_quark key, int type, tr_variant** setme)
+bool dictFindType(tr_variant* dict, tr_quark key, tr_variant::Type type, tr_variant** setme)
 {
     *setme = tr_variantDictFind(dict, key);
     return tr_variantIsType(*setme, type);
@@ -82,7 +82,7 @@ tr_variant* containerReserve(tr_variant* v, size_t count)
     return v->val.l.vals + v->val.l.count;
 }
 
-tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark key, int type)
+tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark key, tr_variant::Type type)
 {
     /* see if it already exists, and if so, try to reuse it */
     tr_variant* child = tr_variantDictFind(dict, key);
@@ -93,7 +93,7 @@ tr_variant* dictFindOrAdd(tr_variant* dict, tr_quark key, int type)
             tr_variantDictRemove(dict, key);
             child = nullptr;
         }
-        else if (child->type == TR_VARIANT_TYPE_STR)
+        else if (child->type == tr_variant::Type::String)
         {
             child->val.s.clear();
         }
@@ -296,12 +296,12 @@ bool tr_variantDictFindStrView(tr_variant* dict, tr_quark key, std::string_view*
 
 bool tr_variantDictFindList(tr_variant* dict, tr_quark key, tr_variant** setme)
 {
-    return dictFindType(dict, key, TR_VARIANT_TYPE_LIST, setme);
+    return dictFindType(dict, key, tr_variant::Type::Vector, setme);
 }
 
 bool tr_variantDictFindDict(tr_variant* dict, tr_quark key, tr_variant** setme)
 {
-    return dictFindType(dict, key, TR_VARIANT_TYPE_DICT, setme);
+    return dictFindType(dict, key, tr_variant::Type::Map, setme);
 }
 
 bool tr_variantDictFindRaw(tr_variant* dict, tr_quark key, uint8_t const** setme_raw, size_t* setme_len)
@@ -320,31 +320,31 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark key, std::byte const** set
 
 void tr_variantInitStrView(tr_variant* initme, std::string_view val)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
+    tr_variantInit(initme, tr_variant::Type::String);
     initme->val.s.set_shallow(val);
 }
 
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
+    tr_variantInit(initme, tr_variant::Type::String);
     initme->val.s.set({ static_cast<char const*>(value), value_len });
 }
 
 void tr_variantInitQuark(tr_variant* initme, tr_quark value)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
+    tr_variantInit(initme, tr_variant::Type::String);
     initme->val.s.set_shallow(tr_quark_get_string_view(value));
 }
 
 void tr_variantInitStr(tr_variant* initme, std::string_view value)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_STR);
+    tr_variantInit(initme, tr_variant::Type::String);
     initme->val.s.set(value);
 }
 
 void tr_variantInitList(tr_variant* initme, size_t reserve_count)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_LIST);
+    tr_variantInit(initme, tr_variant::Type::Vector);
     tr_variantListReserve(initme, reserve_count);
 }
 
@@ -357,7 +357,7 @@ void tr_variantListReserve(tr_variant* list, size_t count)
 
 void tr_variantInitDict(tr_variant* initme, size_t reserve_count)
 {
-    tr_variantInit(initme, TR_VARIANT_TYPE_DICT);
+    tr_variantInit(initme, tr_variant::Type::Map);
     tr_variantDictReserve(initme, reserve_count);
 }
 
@@ -375,7 +375,7 @@ tr_variant* tr_variantListAdd(tr_variant* list)
     tr_variant* child = containerReserve(list, 1);
     ++list->val.l.count;
     child->key = 0;
-    tr_variantInit(child, TR_VARIANT_TYPE_INT);
+    tr_variantInit(child, tr_variant::Type::Int);
 
     return child;
 }
@@ -450,56 +450,56 @@ tr_variant* tr_variantDictAdd(tr_variant* dict, tr_quark key)
     tr_variant* val = containerReserve(dict, 1);
     ++dict->val.l.count;
     val->key = key;
-    tr_variantInit(val, TR_VARIANT_TYPE_INT);
+    tr_variantInit(val, tr_variant::Type::Int);
 
     return val;
 }
 
 tr_variant* tr_variantDictAddInt(tr_variant* dict, tr_quark key, int64_t val)
 {
-    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_INT);
+    tr_variant* child = dictFindOrAdd(dict, key, tr_variant::Type::Int);
     tr_variantInitInt(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddBool(tr_variant* dict, tr_quark key, bool val)
 {
-    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_BOOL);
+    tr_variant* child = dictFindOrAdd(dict, key, tr_variant::Type::Bool);
     tr_variantInitBool(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddReal(tr_variant* dict, tr_quark key, double val)
 {
-    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_REAL);
+    tr_variant* child = dictFindOrAdd(dict, key, tr_variant::Type::Double);
     tr_variantInitReal(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddQuark(tr_variant* dict, tr_quark key, tr_quark const val)
 {
-    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
+    tr_variant* child = dictFindOrAdd(dict, key, tr_variant::Type::String);
     tr_variantInitQuark(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark key, std::string_view val)
 {
-    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
+    tr_variant* child = dictFindOrAdd(dict, key, tr_variant::Type::String);
     tr_variantInitStr(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddStrView(tr_variant* dict, tr_quark key, std::string_view val)
 {
-    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
+    tr_variant* child = dictFindOrAdd(dict, key, tr_variant::Type::String);
     tr_variantInitStrView(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddRaw(tr_variant* dict, tr_quark key, void const* value, size_t len)
 {
-    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
+    tr_variant* child = dictFindOrAdd(dict, key, tr_variant::Type::String);
     tr_variantInitRaw(child, value, len);
     return child;
 }
@@ -738,23 +738,23 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
         {
             switch (v->type)
             {
-            case TR_VARIANT_TYPE_INT:
+            case tr_variant::Type::Int:
                 walk_funcs.int_func(*v, v->val.i, user_data);
                 break;
 
-            case TR_VARIANT_TYPE_BOOL:
+            case tr_variant::Type::Bool:
                 walk_funcs.bool_func(*v, v->val.b, user_data);
                 break;
 
-            case TR_VARIANT_TYPE_REAL:
+            case tr_variant::Type::Double:
                 walk_funcs.double_func(*v, v->val.d, user_data);
                 break;
 
-            case TR_VARIANT_TYPE_STR:
+            case tr_variant::Type::String:
                 walk_funcs.string_func(*v, v->val.s.get(), user_data);
                 break;
 
-            case TR_VARIANT_TYPE_LIST:
+            case tr_variant::Type::Vector:
                 if (v == &node.v)
                 {
                     walk_funcs.list_begin_func(*v, user_data);
@@ -765,7 +765,7 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
                 }
                 break;
 
-            case TR_VARIANT_TYPE_DICT:
+            case tr_variant::Type::Map:
                 if (v == &node.v)
                 {
                     walk_funcs.dict_begin_func(*v, user_data);
