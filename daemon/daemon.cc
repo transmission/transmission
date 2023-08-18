@@ -935,8 +935,7 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
 
     if (dumpSettings)
     {
-        auto const str = tr_variantToStr(&settings_, TR_VARIANT_FMT_JSON);
-        fprintf(stderr, "%s", str.c_str());
+        fmt::print("{:s}\n", tr_variant_serde::json().to_string(settings_));
         goto EXIT_EARLY;
     }
 

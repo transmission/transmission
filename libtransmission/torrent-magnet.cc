@@ -229,19 +229,21 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
     }
 
     // checksum passed; now try to parse it as benc
-    auto info_dict_v = tr_variant{};
-    if (!tr_variantFromBuf(&info_dict_v, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, m->metadata, nullptr, error))
+    auto serde = tr_variant_serde::benc().inplace();
+    auto info_dict_v = serde.parse(m->metadata);
+    if (!info_dict_v)
     {
+        tr_error_propagate(error, &serde.error_);
         return false;
     }
 
     // yay we have an info dict. Let's make a torrent file
     auto top_v = tr_variant{};
     build_metainfo_except_info_dict(tor->metainfo_, &top_v);
-    tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &info_dict_v);
-    auto const benc = tr_variantToStr(&top_v, TR_VARIANT_FMT_BENC);
+    tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &*info_dict_v);
+    auto const benc = serde.to_string(top_v);
     tr_variantClear(&top_v);
-    tr_variantClear(&info_dict_v);
+    tr_variantClear(&*info_dict_v);
 
     // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};
