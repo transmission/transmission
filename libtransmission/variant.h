@@ -112,6 +112,11 @@ public:
         Map
     };
 
+    [[nodiscard]] constexpr auto has_value() const noexcept
+    {
+        return type == Type::None;
+    }
+
     Type type = Type::None;
 
     tr_quark key = TR_KEY_NONE;
@@ -138,7 +143,7 @@ public:
 /**
  * @brief Clear the variant to an empty state.
  *
- * `tr_variantIsEmpty()` will return true after this is called.
+ * `tr_variant::has_value()` will return false after this is called.
  *
  * The variant itself is not freed, but any memory used by
  * its *value* -- e.g. a string or child variants -- is freed.
@@ -148,11 +153,6 @@ void tr_variantClear(tr_variant* clearme);
 [[nodiscard]] constexpr bool tr_variantIsType(tr_variant const* const var, tr_variant::Type type)
 {
     return var != nullptr && var->type == type;
-}
-
-[[nodiscard]] constexpr bool tr_variantIsEmpty(tr_variant const* const var)
-{
-    return tr_variantIsType(var, tr_variant::Type::None);
 }
 
 // --- Strings

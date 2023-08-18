@@ -787,7 +787,7 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
 
 // ---
 
-void tr_variantClear(tr_variant* clearme)
+void tr_variantClear(tr_variant* const clearme)
 {
     // clang-format off
     tr_variant_serde::WalkFuncs cleanup_funcs = {
@@ -801,7 +801,7 @@ void tr_variantClear(tr_variant* clearme)
     };
     // clang-format on
 
-    if (!tr_variantIsEmpty(clearme))
+    if (clearme != nullptr && clearme->has_value())
     {
         tr_variant_serde::walk(*clearme, cleanup_funcs, nullptr, false);
     }

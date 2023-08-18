@@ -244,7 +244,7 @@ TEST_F(VariantTest, parse)
 
     benc = "lllee"sv;
     var = serde.parse(benc).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsEmpty(&var));
+    EXPECT_FALSE(var.has_value());
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
     tr_variantClear(&var);
 
@@ -257,7 +257,7 @@ TEST_F(VariantTest, parse)
 
     benc = "d20:"sv;
     var = serde.parse(benc).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsEmpty(&var));
+    EXPECT_FALSE(var.has_value());
     EXPECT_EQ(std::data(benc) + 1U, serde.end());
 }
 
