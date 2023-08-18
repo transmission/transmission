@@ -8,9 +8,12 @@
 #include <algorithm>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <map>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <vector>
 
 #include "libtransmission/quark.h"
 
@@ -114,22 +117,50 @@ public:
 
     [[nodiscard]] constexpr auto has_value() const noexcept
     {
-        return type == Type::None;
+        return type != Type::None;
     }
 
-    [[nodiscard]] constexpr auto is_bool() const noexcept
-    {
-        return type == Type::Bool;
-    }
+    using Vector = std::vector<tr_variant>;
+    using Map = std::map<tr_quark, tr_variant>;
 
-    [[nodiscard]] constexpr auto is_int() const noexcept
+    template<typename Val>
+    [[nodiscard]] constexpr bool holds_alternative() const noexcept
     {
-        return type == Type::Int;
-    }
+        static_assert(
+            std::is_same_v<Val, bool> || std::is_same_v<Val, int64_t> || std::is_same_v<Val, double> ||
+            std::is_same_v<Val, std::string_view> || std::is_same_v<Val, Vector> || std::is_same_v<Val, Map>);
 
-    [[nodiscard]] constexpr bool is_double() const noexcept
-    {
-        return type == Type::Double;
+        if constexpr (std::is_same_v<Val, bool>)
+        {
+            return type == Type::Bool;
+        }
+
+        if constexpr (std::is_same_v<Val, int64_t>)
+        {
+            return type == Type::Int;
+        }
+
+        if constexpr (std::is_same_v<Val, double>)
+        {
+            return type == Type::Double;
+        }
+
+        if constexpr (std::is_same_v<Val, std::string_view>)
+        {
+            return type == Type::String;
+        }
+
+        if constexpr (std::is_same_v<Val, Vector>)
+        {
+            return type == Type::Vector;
+        }
+
+        if constexpr (std::is_same_v<Val, Map>)
+        {
+            return type == Type::Map;
+        }
+
+        return false;
     }
 
     Type type = Type::None;
@@ -171,11 +202,6 @@ void tr_variantClear(tr_variant* clearme);
 }
 
 // --- Strings
-
-[[nodiscard]] constexpr bool tr_variantIsString(tr_variant const* const var)
-{
-    return tr_variantIsType(var, tr_variant::Type::String);
-}
 
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
@@ -225,11 +251,6 @@ constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
 
 // --- Lists
 
-[[nodiscard]] constexpr bool tr_variantIsList(tr_variant const* const var)
-{
-    return tr_variantIsType(var, tr_variant::Type::Vector);
-}
-
 void tr_variantInitList(tr_variant* initme, size_t reserve_count);
 void tr_variantListReserve(tr_variant* list, size_t reserve_count);
 
@@ -247,17 +268,12 @@ tr_variant* tr_variantListChild(tr_variant* list, size_t pos);
 
 bool tr_variantListRemove(tr_variant* list, size_t pos);
 
-[[nodiscard]] constexpr size_t tr_variantListSize(tr_variant const* list)
+[[nodiscard]] constexpr size_t tr_variantListSize(tr_variant const* const var)
 {
-    return tr_variantIsList(list) ? list->val.l.count : 0;
+    return var != nullptr && var->holds_alternative<tr_variant::Vector>() ? var->val.l.count : 0;
 }
 
 // --- Dictionaries
-
-[[nodiscard]] constexpr bool tr_variantIsDict(tr_variant const* const var)
-{
-    return tr_variantIsType(var, tr_variant::Type::Map);
-}
 
 void tr_variantInitDict(tr_variant* initme, size_t reserve_count);
 void tr_variantDictReserve(tr_variant* dict, size_t reserve_count);
