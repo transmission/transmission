@@ -235,7 +235,7 @@ TEST_F(SettingsTest, canLoadPort)
 
     auto settings = tr_session_settings{};
     auto const default_value = settings.peer_port;
-    auto constexpr ExpectedValue = tr_port::fromHost(8080);
+    auto constexpr ExpectedValue = tr_port::from_host(8080);
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};
@@ -252,7 +252,7 @@ TEST_F(SettingsTest, canSavePort)
 
     auto settings = tr_session_settings{};
     auto const default_value = settings.peer_port;
-    auto constexpr ExpectedValue = tr_port::fromHost(8080);
+    auto constexpr ExpectedValue = tr_port::from_host(8080);
     ASSERT_NE(ExpectedValue, default_value);
 
     auto dict = tr_variant{};

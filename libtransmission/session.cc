@@ -163,7 +163,7 @@ tr_port tr_session::randomPort() const
     auto const lower = std::min(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const upper = std::max(settings_.peer_port_random_low.host(), settings_.peer_port_random_high.host());
     auto const range = upper - lower;
-    return tr_port::fromHost(lower + tr_rand_int(range + 1U));
+    return tr_port::from_host(lower + tr_rand_int(range + 1U));
 }
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
@@ -250,9 +250,10 @@ bool tr_session::LpdMediator::onPeerFound(std::string_view info_hash_str, tr_add
     }
 
     // we found a suitable peer, add it to the torrent
-    auto pex = tr_pex{ address, port };
+    auto const socket_address = tr_socket_address{ address, port };
+    auto const pex = tr_pex{ socket_address };
     tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, &pex, 1U);
-    tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({:s})", address.display_name(port)));
+    tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({:s})", socket_address.display_name()));
     return true;
 }
 
@@ -381,8 +382,7 @@ void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
     if (auto const incoming_info = tr_netAccept(session, fd); incoming_info)
     {
         auto const& [socket_address, sock] = *incoming_info;
-        auto const& [addr, port] = socket_address;
-        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, addr.display_name(port)));
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", sock, socket_address.display_name()));
         session->addIncoming({ session, socket_address, sock });
     }
 }
@@ -403,8 +403,9 @@ tr_session::BoundSocket::BoundSocket(
         return;
     }
 
-    tr_logAddInfo(
-        fmt::format(_("Listening to incoming peer connections on {hostport}"), fmt::arg("hostport", addr.display_name(port))));
+    tr_logAddInfo(fmt::format(
+        _("Listening to incoming peer connections on {hostport}"),
+        fmt::arg("hostport", tr_socket_address::display_name(addr, port))));
     event_add(ev_.get(), nullptr);
 }
 
@@ -435,7 +436,7 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
         // otherwise, use any_ipv6 (::).
         auto const source_addr = global_source_address(type);
         auto const default_addr = source_addr && source_addr->is_global_unicast_address() ? *source_addr :
-                                                                                            tr_address::any_ipv6();
+                                                                                            tr_address::any(TR_AF_INET6);
         return tr_address::from_string(settings_.bind_address_ipv6).value_or(default_addr);
     }
 
@@ -890,7 +891,7 @@ void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
     TR_ASSERT(session != nullptr);
 
-    if (auto const port = tr_port::fromHost(hport); port != session->localPeerPort())
+    if (auto const port = tr_port::from_host(hport); port != session->localPeerPort())
     {
         session->runInSessionThread(
             [session, port]()
@@ -1735,7 +1736,7 @@ void tr_sessionSetRPCPort(tr_session* session, uint16_t hport)
 
     if (session->rpc_server_)
     {
-        session->rpc_server_->set_port(tr_port::fromHost(hport));
+        session->rpc_server_->set_port(tr_port::from_host(hport));
     }
 }
 

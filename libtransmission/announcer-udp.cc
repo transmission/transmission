@@ -717,7 +717,7 @@ private:
         }
 
         // we don't have it -- build a new one
-        trackers_.emplace_back(mediator_, key, tr_interned_string(parsed->host), tr_port::fromHost(parsed->port));
+        trackers_.emplace_back(mediator_, key, tr_interned_string(parsed->host), tr_port::from_host(parsed->port));
         auto* const tracker = &trackers_.back();
         logtrace(tracker->key, "New tau_tracker created");
         return tracker;

@@ -59,7 +59,7 @@ auto makeCookie()
 }
 
 constexpr char const* const McastGroup = "239.192.152.143"; /**<LPD multicast group */
-auto constexpr McastPort = tr_port::fromHost(6771); /**<LPD source and destination UPD port */
+auto constexpr McastPort = tr_port::from_host(6771); /**<LPD source and destination UPD port */
 
 /*
  * A LSD announce is formatted as follows:
@@ -150,7 +150,7 @@ std::optional<ParsedAnnounce> parseAnnounceMsg(std::string_view announce)
         auto walk = announce.substr(pos + std::size(key));
         if (auto const port = tr_num_parse<uint16_t>(walk, &walk); port && tr_strv_starts_with(walk, CrLf))
         {
-            ret.port = tr_port::fromHost(*port);
+            ret.port = tr_port::from_host(*port);
         }
         else
         {
@@ -371,7 +371,7 @@ private:
                 return false;
             }
 
-            if (auto [ss, sslen] = mediator_.bind_address(TR_AF_INET).to_sockaddr({});
+            if (auto [ss, sslen] = tr_socket_address::to_sockaddr(mediator_.bind_address(TR_AF_INET), {});
                 bind(mcast_snd_socket_, reinterpret_cast<sockaddr*>(&ss), sslen) == -1)
             {
                 return false;
@@ -460,8 +460,7 @@ private:
             return;
         }
 
-        auto peer_addr = tr_address{};
-        peer_addr.addr.addr4 = foreign_addr.sin_addr;
+        auto [peer_addr, compact] = tr_address::from_compact_ipv4(reinterpret_cast<std::byte*>(&foreign_addr.sin_addr));
         for (auto const& hash_string : parsed->info_hash_strings)
         {
             if (!mediator_.onPeerFound(hash_string, peer_addr, parsed->port))

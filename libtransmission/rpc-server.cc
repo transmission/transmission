@@ -119,7 +119,7 @@ class tr_rpc_address
 {
 public:
     tr_rpc_address()
-        : inet_addr_(tr_address::any_ipv4())
+        : inet_addr_(tr_address::any(TR_AF_INET))
     {
     }
 
@@ -160,9 +160,9 @@ public:
 
         if (std::empty(port))
         {
-            return { inet_addr_.display_name() };
+            return inet_addr_.display_name();
         }
-        return { inet_addr_.display_name(port) };
+        return tr_socket_address::display_name(inet_addr_, port);
     }
 
 private:
