@@ -348,8 +348,9 @@ bool Application::Impl::refresh_actions()
         gtr_action_set_sensitive("open-torrent-folder", sel_counts.total_count == 1);
         gtr_action_set_sensitive("copy-magnet-link-to-clipboard", sel_counts.total_count == 1);
 
-        bool const can_update = wind_->for_each_selected_torrent_until(
-            [](auto const& torrent) { return tr_torrentCanManualUpdate(&torrent->get_underlying()); });
+        bool const can_update = wind_ != nullptr &&
+            wind_->for_each_selected_torrent_until([](auto const& torrent)
+                                                   { return tr_torrentCanManualUpdate(&torrent->get_underlying()); });
         gtr_action_set_sensitive("torrent-reannounce", can_update);
     }
 
