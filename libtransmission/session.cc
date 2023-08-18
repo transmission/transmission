@@ -371,6 +371,28 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 
 // ---
 
+char const* tr_sessionGetGlobalIpv4Address(tr_session const* session)
+{
+    return session->global_address_str(TR_AF_INET).c_str();
+}
+
+char const* tr_sessionGetGlobalIpv6Address(tr_session const* session)
+{
+    return session->global_address_str(TR_AF_INET6).c_str();
+}
+
+char const* tr_sessionGetGlobalSourceIpv4Address(tr_session const* session)
+{
+    return session->global_source_address_str(TR_AF_INET).c_str();
+}
+
+char const* tr_sessionGetGlobalSourceIpv6Address(tr_session const* session)
+{
+    return session->global_source_address_str(TR_AF_INET6).c_str();
+}
+
+// ---
+
 void tr_session::onIncomingPeerConnection(tr_socket_t fd, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);

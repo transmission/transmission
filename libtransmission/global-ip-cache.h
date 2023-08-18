@@ -76,11 +76,15 @@ public:
         return global_addr_[type];
     }
 
+    [[nodiscard]] std::string const& global_addr_str(tr_address_type type) const noexcept;
+
     [[nodiscard]] std::optional<tr_address> global_source_addr(tr_address_type type) const noexcept
     {
         auto const lock = std::shared_lock{ source_addr_mutex_[type] };
         return source_addr_[type];
     }
+
+    [[nodiscard]] std::string const& global_source_addr_str(tr_address_type type) const noexcept;
 
     [[nodiscard]] tr_address bind_addr(tr_address_type type) const noexcept;
 
@@ -129,12 +133,16 @@ private:
     };
     array_ip_t<is_updating_t> is_updating_ = {};
 
+    // These IP addresses may be accessed by other threads via the C API
     // Never directly read/write IP addresses for the sake of being thread safe
     // Use global_*_addr() for read, and set_*_addr()/unset_*_addr() for write instead
     mutable array_ip_t<std::shared_mutex> global_addr_mutex_;
     array_ip_t<std::optional<tr_address>> global_addr_;
     mutable array_ip_t<std::shared_mutex> source_addr_mutex_;
     array_ip_t<std::optional<tr_address>> source_addr_;
+
+    mutable array_ip_t<std::string> global_addr_str_;
+    mutable array_ip_t<std::string> source_addr_str_;
 
     // Keep the timer at the bottom of the class definition so that it will be destructed first
     // We don't want it to trigger after the IP addresses have been destroyed

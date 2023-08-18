@@ -835,6 +835,12 @@ public:
         return global_ip_cache_->global_addr(type);
     }
 
+    [[nodiscard]] std::string const& global_address_str(tr_address_type type) const noexcept
+    {
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        return global_ip_cache_->global_addr_str(type);
+    }
+
     bool set_global_address(tr_address const& addr) noexcept
     {
         return global_ip_cache_->set_global_addr(addr.type, addr);
@@ -844,6 +850,12 @@ public:
     {
         TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
         return global_ip_cache_->global_source_addr(type);
+    }
+
+    [[nodiscard]] std::string const& global_source_address_str(tr_address_type type) const noexcept
+    {
+        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        return global_ip_cache_->global_source_addr_str(type);
     }
 
     [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept

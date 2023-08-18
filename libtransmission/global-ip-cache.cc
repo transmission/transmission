@@ -184,6 +184,32 @@ bool tr_global_ip_cache::try_shutdown() noexcept
     return true;
 }
 
+std::string const& tr_global_ip_cache::global_addr_str(tr_address_type type) const noexcept
+{
+    if (auto addr = global_addr(type); addr)
+    {
+        global_addr_str_[type] = addr->display_name();
+    }
+    else
+    {
+        global_addr_str_[type].clear();
+    }
+    return global_addr_str_[type];
+}
+
+std::string const& tr_global_ip_cache::global_source_addr_str(tr_address_type type) const noexcept
+{
+    if (auto addr = global_source_addr(type); addr)
+    {
+        source_addr_str_[type] = addr->display_name();
+    }
+    else
+    {
+        source_addr_str_[type].clear();
+    }
+    return source_addr_str_[type];
+}
+
 tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 {
     if (type == TR_AF_INET || type == TR_AF_INET6)

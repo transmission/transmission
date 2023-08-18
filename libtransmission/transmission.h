@@ -466,6 +466,20 @@ void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
 
+// --- Global IP addresses
+
+/** @brief Get the string form of our current global IPv4 address */
+char const* tr_sessionGetGlobalIpv4Address(tr_session const* session);
+
+/** @brief Get the string form of our current global IPv6 address */
+char const* tr_sessionGetGlobalIpv6Address(tr_session const* session);
+
+/** @brief Get the string form of our current source IPv4 address used for the Internet */
+char const* tr_sessionGetGlobalSourceIpv4Address(tr_session const* session);
+
+/** @brief Get the string form of our current source IPv6 address used for the Internet */
+char const* tr_sessionGetGlobalSourceIpv6Address(tr_session const* session);
+
 // --- Incoming Peer Connections Port
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session);
