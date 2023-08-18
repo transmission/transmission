@@ -35,7 +35,7 @@ TEST_F(RpcTest, list)
     tr_variant top;
 
     tr_rpc_parse_list_str(&top, "12"sv);
-    EXPECT_TRUE(tr_variantIsInt(&top));
+    EXPECT_TRUE(top.is_int());
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
     tr_variantClear(&top);

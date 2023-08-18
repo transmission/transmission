@@ -122,6 +122,11 @@ public:
         return type == Type::Bool;
     }
 
+    [[nodiscard]] constexpr auto is_int() const noexcept
+    {
+        return type == Type::Int;
+    }
+
     Type type = Type::None;
 
     tr_quark key = TR_KEY_NONE;
@@ -209,11 +214,6 @@ constexpr void tr_variantInitBool(tr_variant* initme, bool value)
 }
 
 // --- Ints
-
-[[nodiscard]] constexpr bool tr_variantIsInt(tr_variant const* const var)
-{
-    return tr_variantIsType(var, tr_variant::Type::Int);
-}
 
 bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
 

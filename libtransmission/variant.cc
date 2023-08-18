@@ -149,7 +149,7 @@ bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 {
     bool success = false;
 
-    if (tr_variantIsInt(var))
+    if (var != nullptr && var->is_int())
     {
         if (setme != nullptr)
         {
@@ -215,7 +215,7 @@ bool tr_variantGetBool(tr_variant const* const var, bool* setme)
         return true;
     }
 
-    if (tr_variantIsInt(var) && (var->val.i == 0 || var->val.i == 1))
+    if (var != nullptr && var->is_int() && (var->val.i == 0 || var->val.i == 1))
     {
         *setme = var->val.i != 0;
         return true;
@@ -239,25 +239,25 @@ bool tr_variantGetBool(tr_variant const* const var, bool* setme)
     return false;
 }
 
-bool tr_variantGetReal(tr_variant const* v, double* setme)
+bool tr_variantGetReal(tr_variant const* const var, double* setme)
 {
     bool success = false;
 
-    if (tr_variantIsReal(v))
+    if (tr_variantIsReal(var))
     {
-        *setme = v->val.d;
+        *setme = var->val.d;
         success = true;
     }
 
-    if (!success && tr_variantIsInt(v))
+    if (!success && var != nullptr && var->is_int())
     {
-        *setme = (double)v->val.i;
+        *setme = static_cast<double>(var->val.i);
         success = true;
     }
 
-    if (!success && tr_variantIsString(v))
+    if (!success && tr_variantIsString(var))
     {
-        if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
+        if (auto sv = std::string_view{}; tr_variantGetStrView(var, &sv))
         {
             if (auto d = tr_num_parse<double>(sv); d)
             {
@@ -853,7 +853,7 @@ void tr_variantListCopy(tr_variant* target, tr_variant const* src)
             tr_variantGetReal(child, &val);
             tr_variantListAddReal(target, val);
         }
-        else if (tr_variantIsInt(child))
+        else if (child->is_int())
         {
             auto val = int64_t{};
             tr_variantGetInt(child, &val);
@@ -925,7 +925,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
                 tr_variantGetReal(child, &val);
                 tr_variantDictAddReal(target, key, val);
             }
-            else if (tr_variantIsInt(child))
+            else if (child->is_int())
             {
                 auto val = int64_t{};
                 tr_variantGetInt(child, &val);
