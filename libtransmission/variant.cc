@@ -243,7 +243,7 @@ bool tr_variantGetReal(tr_variant const* const var, double* setme)
 {
     bool success = false;
 
-    if (tr_variantIsReal(var))
+    if (var != nullptr && var->is_double())
     {
         *setme = var->val.d;
         success = true;
@@ -847,7 +847,7 @@ void tr_variantListCopy(tr_variant* target, tr_variant const* src)
             tr_variantGetBool(child, &val);
             tr_variantListAddBool(target, val);
         }
-        else if (tr_variantIsReal(child))
+        else if (child->is_double())
         {
             auto val = double{};
             tr_variantGetReal(child, &val);
@@ -919,7 +919,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
                 tr_variantGetBool(child, &val);
                 tr_variantDictAddBool(target, key, val);
             }
-            else if (tr_variantIsReal(child))
+            else if (child->is_double())
             {
                 auto val = double{};
                 tr_variantGetReal(child, &val);

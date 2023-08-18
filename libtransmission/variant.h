@@ -127,6 +127,11 @@ public:
         return type == Type::Int;
     }
 
+    [[nodiscard]] constexpr bool is_double() const noexcept
+    {
+        return type == Type::Double;
+    }
+
     Type type = Type::None;
 
     tr_quark key = TR_KEY_NONE;
@@ -189,11 +194,6 @@ bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, si
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
 
 // --- Real Numbers
-
-[[nodiscard]] constexpr bool tr_variantIsReal(tr_variant const* const var)
-{
-    return tr_variantIsType(var, tr_variant::Type::Double);
-}
 
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
