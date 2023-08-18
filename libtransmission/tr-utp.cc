@@ -91,7 +91,7 @@ void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 
     utp_getpeername(utp_sock, from, &fromlen);
 
-    if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
+    if (auto addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
     {
         session->addIncoming({ *addrport, utp_sock });
     }

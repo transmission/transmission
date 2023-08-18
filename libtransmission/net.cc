@@ -56,10 +56,48 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
-std::string_view tr_ip_protocol_sv(tr_address_type type) noexcept
+std::string_view tr_ip_protocol_to_sv(tr_address_type type)
 {
-    static auto TR_CONSTEXPR23 map = std::array{ std::string_view{ "IPv4" }, std::string_view{ "IPv6" } };
-    return map[type];
+    using namespace std::literals;
+
+    switch (type)
+    {
+    case TR_AF_INET:
+        return "IPv4"sv;
+    case TR_AF_INET6:
+        return "IPv6"sv;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return {};
+    }
+}
+
+int tr_ip_protocol_to_af(tr_address_type type)
+{
+    switch (type)
+    {
+    case TR_AF_INET:
+        return AF_INET;
+    case TR_AF_INET6:
+        return AF_INET6;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return {};
+    }
+}
+
+tr_address_type tr_af_to_ip_protocol(int af)
+{
+    switch (af)
+    {
+    case AF_INET:
+        return TR_AF_INET;
+    case AF_INET6:
+        return TR_AF_INET6;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return NUM_TR_AF_INET_TYPES;
+    }
 }
 
 // - TCP Sockets
@@ -195,13 +233,12 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !addr.is_valid_for_peers(port))
+    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid_for_peers())
     {
         return {};
     }
 
-    static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(Domains[addr.type], SOCK_STREAM);
+    auto const s = createSocket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
@@ -218,11 +255,11 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         }
     }
 
-    auto const [sock, addrlen] = addr.to_sockaddr(port);
+    auto const [sock, addrlen] = socket_address.to_sockaddr();
 
     // set source address
     auto const source_addr = session->bind_address(addr.type);
-    auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
+    auto const [source_sock, sourcelen] = tr_socket_address::to_sockaddr(source_addr, {});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
     {
@@ -262,7 +299,7 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const
         ret = tr_peer_socket{ session, socket_address, s };
     }
 
-    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.display_name(port)));
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, socket_address.display_name()));
 
     return ret;
 }
@@ -271,9 +308,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 {
     TR_ASSERT(addr.is_valid());
 
-    static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-
-    auto const fd = socket(Domains[addr.type], SOCK_STREAM, 0);
+    auto const fd = socket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *err_out = sockerrno;
@@ -304,7 +339,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
 #endif
 
-    auto const [sock, addrlen] = addr.to_sockaddr(port);
+    auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
     if (bind(fd, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1)
     {
@@ -380,7 +415,7 @@ std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session
     // get the address and port,
     // make the socket unblocking,
     // and confirm we don't have too many peers
-    auto const addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
+    auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
     if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || tr_peer_socket::limit_reached(session))
     {
         tr_net_close_socket(sockfd);
@@ -402,14 +437,14 @@ namespace
 namespace is_valid_for_peers_helpers
 {
 
-[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const* addr)
+[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const& addr)
 {
-    return addr->is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
+    return addr.is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr.addr6);
 }
 
-[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const* addr)
+[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const& addr)
 {
-    return addr->is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
+    return addr.is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr.addr6);
 }
 
 /* isMartianAddr was written by Juliusz Chroboczek,
@@ -441,17 +476,9 @@ namespace is_valid_for_peers_helpers
 } // namespace is_valid_for_peers_helpers
 } // namespace
 
-bool tr_address::is_valid_for_peers(tr_port port) const noexcept
-{
-    using namespace is_valid_for_peers_helpers;
-
-    return is_valid() && !std::empty(port) && !is_ipv6_link_local_address(this) && !is_ipv4_mapped_address(this) &&
-        !is_martian_addr(*this);
-}
-
 // --- tr_port
 
-std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compact) noexcept
+std::pair<tr_port, std::byte const*> tr_port::from_compact(std::byte const* compact) noexcept
 {
     static auto constexpr PortLen = size_t{ 2 };
 
@@ -460,7 +487,7 @@ std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compa
     std::copy_n(compact, PortLen, reinterpret_cast<std::byte*>(&nport));
     compact += PortLen;
 
-    return std::make_pair(tr_port::fromNetwork(nport), compact);
+    return std::make_pair(tr_port::from_network(nport), compact);
 }
 
 // --- tr_address
@@ -488,40 +515,21 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
     return {};
 }
 
-std::string_view tr_address::display_name(char* out, size_t outlen, tr_port port) const
+std::string_view tr_address::display_name(char* out, size_t outlen) const
 {
-    if (std::empty(port))
-    {
-        return is_ipv4() ? evutil_inet_ntop(AF_INET, &addr, out, outlen) : evutil_inet_ntop(AF_INET6, &addr, out, outlen);
-    }
+    TR_ASSERT(is_valid());
+    return evutil_inet_ntop(tr_ip_protocol_to_af(type), &addr, out, outlen);
+}
 
+[[nodiscard]] std::string tr_address::display_name() const
+{
     auto buf = std::array<char, INET6_ADDRSTRLEN>{};
-    auto const addr_sv = display_name(std::data(buf), std::size(buf));
-    auto const [end, size] = fmt::format_to_n(out, outlen - 1, FMT_STRING("[{:s}]:{:d}"), addr_sv, port.host());
-    return { out, size };
-}
-
-template<typename OutputIt>
-OutputIt tr_address::display_name(OutputIt out, tr_port port) const
-{
-    auto addrbuf = std::array<char, TR_ADDRSTRLEN + 16>{};
-    auto const addr_sv = display_name(std::data(addrbuf), std::size(addrbuf), port);
-    return std::copy(std::begin(addr_sv), std::end(addr_sv), out);
-}
-
-template char* tr_address::display_name<char*>(char*, tr_port) const;
-
-[[nodiscard]] std::string tr_address::display_name(tr_port port) const
-{
-    auto buf = std::string{};
-    buf.reserve(INET6_ADDRSTRLEN + 16);
-    this->display_name(std::back_inserter(buf), port);
-    return buf;
+    return std::string{ display_name(std::data(buf), std::size(buf)) };
 }
 
 std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte const* compact) noexcept
 {
-    static auto constexpr Addr4Len = size_t{ 4 };
+    static auto constexpr Addr4Len = tr_address::CompactAddrBytes[TR_AF_INET];
 
     auto address = tr_address{};
     static_assert(sizeof(address.addr.addr4) == Addr4Len);
@@ -529,68 +537,19 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte 
     std::copy_n(compact, Addr4Len, reinterpret_cast<std::byte*>(&address.addr));
     compact += Addr4Len;
 
-    return std::make_pair(address, compact);
+    return { address, compact };
 }
 
 std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte const* compact) noexcept
 {
-    static auto constexpr Addr6Len = size_t{ 16 };
+    static auto constexpr Addr6Len = tr_address::CompactAddrBytes[TR_AF_INET6];
 
     auto address = tr_address{};
     address.type = TR_AF_INET6;
     std::copy_n(compact, Addr6Len, reinterpret_cast<std::byte*>(&address.addr.addr6.s6_addr));
     compact += Addr6Len;
 
-    return std::make_pair(address, compact);
-}
-
-std::optional<tr_socket_address> tr_address::from_sockaddr(struct sockaddr const* from)
-{
-    if (from == nullptr)
-    {
-        return {};
-    }
-
-    if (from->sa_family == AF_INET)
-    {
-        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
-        auto addr = tr_address{};
-        addr.type = TR_AF_INET;
-        addr.addr.addr4 = sin->sin_addr;
-        return tr_socket_address{ addr, tr_port::fromNetwork(sin->sin_port) };
-    }
-
-    if (from->sa_family == AF_INET6)
-    {
-        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
-        auto addr = tr_address{};
-        addr.type = TR_AF_INET6;
-        addr.addr.addr6 = sin6->sin6_addr;
-        return tr_socket_address{ addr, tr_port::fromNetwork(sin6->sin6_port) };
-    }
-
-    return {};
-}
-
-std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) const noexcept
-{
-    auto ss = sockaddr_storage{};
-
-    if (is_ipv4())
-    {
-        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
-        ss4->sin_addr = addr.addr4;
-        ss4->sin_family = AF_INET;
-        ss4->sin_port = port.network();
-        return { ss, sizeof(sockaddr_in) };
-    }
-
-    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
-    ss6->sin6_addr = addr.addr6;
-    ss6->sin6_family = AF_INET6;
-    ss6->sin6_flowinfo = 0;
-    ss6->sin6_port = port.network();
-    return { ss, sizeof(sockaddr_in6) };
+    return { address, compact };
 }
 
 int tr_address::compare(tr_address const& that) const noexcept // <=>
@@ -738,4 +697,69 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
     }
 
     return false;
+}
+
+// --- tr_socket_addrses
+
+std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
+{
+    return fmt::format("[{:s}]:{:d}", address.display_name(), port.host());
+}
+
+bool tr_socket_address::is_valid_for_peers() const noexcept
+{
+    using namespace is_valid_for_peers_helpers;
+
+    return is_valid() && !std::empty(port_) && !is_ipv6_link_local_address(address_) && !is_ipv4_mapped_address(address_) &&
+        !is_martian_addr(address_);
+}
+
+std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockaddr const* from)
+{
+    if (from == nullptr)
+    {
+        return {};
+    }
+
+    if (from->sa_family == AF_INET)
+    {
+        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET;
+        addr.addr.addr4 = sin->sin_addr;
+        return tr_socket_address{ addr, tr_port::from_network(sin->sin_port) };
+    }
+
+    if (from->sa_family == AF_INET6)
+    {
+        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET6;
+        addr.addr.addr6 = sin6->sin6_addr;
+        return tr_socket_address{ addr, tr_port::from_network(sin6->sin6_port) };
+    }
+
+    TR_ASSERT_MSG(false, "invalid address family");
+    return {};
+}
+
+std::pair<sockaddr_storage, socklen_t> tr_socket_address::to_sockaddr(tr_address const& addr, tr_port port) noexcept
+{
+    auto ss = sockaddr_storage{};
+
+    if (addr.is_ipv4())
+    {
+        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
+        ss4->sin_addr = addr.addr.addr4;
+        ss4->sin_family = AF_INET;
+        ss4->sin_port = port.network();
+        return { ss, sizeof(sockaddr_in) };
+    }
+
+    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
+    ss6->sin6_addr = addr.addr.addr6;
+    ss6->sin6_family = AF_INET6;
+    ss6->sin6_flowinfo = 0;
+    ss6->sin6_port = port.network();
+    return { ss, sizeof(sockaddr_in6) };
 }
