@@ -117,6 +117,11 @@ public:
         return type == Type::None;
     }
 
+    [[nodiscard]] constexpr auto is_bool() const noexcept
+    {
+        return type == Type::Bool;
+    }
+
     Type type = Type::None;
 
     tr_quark key = TR_KEY_NONE;
@@ -194,11 +199,6 @@ constexpr void tr_variantInitReal(tr_variant* initme, double value)
 }
 
 // --- Booleans
-
-[[nodiscard]] constexpr bool tr_variantIsBool(tr_variant const* const var)
-{
-    return tr_variantIsType(var, tr_variant::Type::Bool);
-}
 
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 

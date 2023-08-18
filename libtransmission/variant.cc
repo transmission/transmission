@@ -145,25 +145,25 @@ bool tr_variantListRemove(tr_variant* list, size_t pos)
     return true;
 }
 
-bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
+bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 {
     bool success = false;
 
-    if (tr_variantIsInt(v))
+    if (tr_variantIsInt(var))
     {
         if (setme != nullptr)
         {
-            *setme = v->val.i;
+            *setme = var->val.i;
         }
 
         success = true;
     }
 
-    if (!success && tr_variantIsBool(v))
+    if (!success && var != nullptr && var->is_bool())
     {
         if (setme != nullptr)
         {
-            *setme = v->val.b ? 1 : 0;
+            *setme = var->val.b ? 1 : 0;
         }
 
         success = true;
@@ -207,21 +207,21 @@ bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* se
     return false;
 }
 
-bool tr_variantGetBool(tr_variant const* v, bool* setme)
+bool tr_variantGetBool(tr_variant const* const var, bool* setme)
 {
-    if (tr_variantIsBool(v))
+    if (var != nullptr && var->is_bool())
     {
-        *setme = v->val.b;
+        *setme = var->val.b;
         return true;
     }
 
-    if (tr_variantIsInt(v) && (v->val.i == 0 || v->val.i == 1))
+    if (tr_variantIsInt(var) && (var->val.i == 0 || var->val.i == 1))
     {
-        *setme = v->val.i != 0;
+        *setme = var->val.i != 0;
         return true;
     }
 
-    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
+    if (auto sv = std::string_view{}; tr_variantGetStrView(var, &sv))
     {
         if (sv == "true"sv)
         {
@@ -841,7 +841,7 @@ void tr_variantListCopy(tr_variant* target, tr_variant const* src)
             break;
         }
 
-        if (tr_variantIsBool(child))
+        if (child->is_bool())
         {
             auto val = bool{};
             tr_variantGetBool(child, &val);
@@ -913,7 +913,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
                 tr_variantDictRemove(target, key);
             }
 
-            if (tr_variantIsBool(child))
+            if (child->is_bool())
             {
                 auto val = bool{};
                 tr_variantGetBool(child, &val);
