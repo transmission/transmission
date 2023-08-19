@@ -539,12 +539,12 @@ export class Inspector extends EventTarget {
       const get = (t) => t.getDateAdded();
       const first = get(torrents[0]);
       string = torrents.every((t) => get(t) === first)
-        ? new Date(first * 1000).toLocaleString(undefined, {
+        ? new Date(first * 1000).toLocaleString(navigator.language, {
           day: '2-digit',
-          weekday: 'short',
           month: 'short',
-          year: 'numeric',
+          weekday: 'short',
           hour: '2-digit',
+          year: 'numeric',
           hour12: false,
           minute: '2-digit',
           second: '2-digit',
