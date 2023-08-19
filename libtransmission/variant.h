@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "libtransmission/quark.h"
+#include "libtransmission/tr-assert.h"
 
 struct tr_error;
 
@@ -115,13 +116,34 @@ public:
         Map
     };
 
+    using Vector = std::vector<tr_variant>;
+    using Map = std::map<tr_quark, tr_variant>;
+
+    tr_variant() noexcept = default;
+
+    tr_variant(tr_variant const&) = delete;
+
+    tr_variant(tr_variant&& that) noexcept
+    {
+        *this = std::move(that);
+    }
+
+    ~tr_variant();
+
+    tr_variant& operator=(tr_variant const&) = delete;
+
+    tr_variant& operator=(tr_variant&& that) noexcept
+    {
+        std::swap(key, that.key);
+        std::swap(type, that.type);
+        std::swap(val, that.val);
+        return *this;
+    }
+
     [[nodiscard]] constexpr auto has_value() const noexcept
     {
         return type != Type::None;
     }
-
-    using Vector = std::vector<tr_variant>;
-    using Map = std::map<tr_quark, tr_variant>;
 
     template<typename Val>
     [[nodiscard]] constexpr bool holds_alternative() const noexcept
@@ -163,6 +185,11 @@ public:
         return false;
     }
 
+    void clear()
+    {
+        *this = tr_variant{};
+    }
+
     Type type = Type::None;
 
     tr_quark key = TR_KEY_NONE;
@@ -184,17 +211,11 @@ public:
             struct tr_variant* vals;
         } l;
     } val = {};
-};
 
-/**
- * @brief Clear the variant to an empty state.
- *
- * `tr_variant::has_value()` will return false after this is called.
- *
- * The variant itself is not freed, but any memory used by
- * its *value* -- e.g. a string or child variants -- is freed.
- */
-void tr_variantClear(tr_variant* clearme);
+private:
+    friend bool tr_variantListRemove(tr_variant* const var, size_t pos);
+    friend bool tr_variantDictRemove(tr_variant* const var, tr_quark key);
+};
 
 [[nodiscard]] constexpr bool tr_variantIsType(tr_variant const* const var, tr_variant::Type type)
 {
@@ -288,7 +309,6 @@ tr_variant* tr_variantDictAddStrView(tr_variant* var, tr_quark key, std::string_
 tr_variant* tr_variantDictAddQuark(tr_variant* var, tr_quark key, tr_quark val);
 tr_variant* tr_variantDictAddList(tr_variant* var, tr_quark key, size_t reserve_count);
 tr_variant* tr_variantDictAddDict(tr_variant* var, tr_quark key, size_t reserve_count);
-tr_variant* tr_variantDictSteal(tr_variant* var, tr_quark key, tr_variant* value);
 tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t len);
 
 bool tr_variantDictChild(tr_variant* var, size_t pos, tr_quark* setme_key, tr_variant** setme_value);
@@ -367,7 +387,7 @@ public:
     tr_error* error_ = nullptr;
 
 private:
-    friend void tr_variantClear(tr_variant* clearme);
+    friend tr_variant;
 
     enum class Type
     {

@@ -242,8 +242,6 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
     build_metainfo_except_info_dict(tor->metainfo_, &top_v);
     tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &*info_dict_v);
     auto const benc = serde.to_string(top_v);
-    tr_variantClear(&top_v);
-    tr_variantClear(&*info_dict_v);
 
     // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};

@@ -257,7 +257,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
     else if (this->size() > 1)
     {
-        tr_variant* tier_list = tr_variantDictAddList(&metainfo, TR_KEY_announce_list, 0);
+        auto* const tier_list = tr_variantDictAddList(&metainfo, TR_KEY_announce_list, 0);
 
         auto current_tier = std::optional<tr_tracker_tier_t>{};
         tr_variant* tracker_list = nullptr;
@@ -276,12 +276,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
 
     // confirm that it's good by parsing it back again
     auto const contents = serde.to_string(metainfo);
-    tr_variantClear(&metainfo);
-    if (auto tmp = serde.parse(contents); tmp)
-    {
-        tr_variantClear(&*tmp);
-    }
-    else
+    if (!serde.parse(contents).has_value())
     {
         return false;
     }

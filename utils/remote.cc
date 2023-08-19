@@ -2264,8 +2264,6 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
         {
             status |= EXIT_FAILURE;
         }
-
-        tr_variantClear(&top);
     }
 
     return status;
@@ -2399,7 +2397,7 @@ static int flush(char const* rpcurl, tr_variant* benc, Config& config)
         tr_curl_easy_cleanup(curl);
     }
 
-    tr_variantClear(benc);
+    benc->clear();
 
     return status;
 }

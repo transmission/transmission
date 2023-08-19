@@ -29,27 +29,29 @@ using namespace std::literals;
 
 namespace
 {
-constexpr bool tr_variantIsContainer(tr_variant const* const var)
+constexpr bool variant_is_container(tr_variant const* const var)
 {
     return var != nullptr && (var->holds_alternative<tr_variant::Vector>() || var->holds_alternative<tr_variant::Map>());
 }
 
 // ---
 
-constexpr int dictIndexOf(tr_variant const* const var, tr_quark key)
+constexpr std::optional<size_t> dict_index_of(tr_variant const* const var, tr_quark const key)
 {
-    if (var != nullptr && var->holds_alternative<tr_variant::Map>())
+    if (var == nullptr || !var->holds_alternative<tr_variant::Map>())
     {
-        for (size_t i = 0; i < var->val.l.count; ++i)
+        return {};
+    }
+
+    for (size_t idx = 0; idx < var->val.l.count; ++idx)
+    {
+        if (var->val.l.vals[idx].key == key)
         {
-            if (var->val.l.vals[i].key == key)
-            {
-                return (int)i;
-            }
+            return idx;
         }
     }
 
-    return -1;
+    return {};
 }
 
 bool dictFindType(tr_variant* const var, tr_quark key, tr_variant::Type type, tr_variant** setme)
@@ -58,63 +60,71 @@ bool dictFindType(tr_variant* const var, tr_quark key, tr_variant::Type type, tr
     return tr_variantIsType(*setme, type);
 }
 
-tr_variant* containerReserve(tr_variant* v, size_t count)
+tr_variant* containerReserve(tr_variant* var, size_t count)
 {
-    TR_ASSERT(tr_variantIsContainer(v));
+    TR_ASSERT(variant_is_container(var));
+    auto& container = var->val.l;
 
-    if (size_t const needed = v->val.l.count + count; needed > v->val.l.alloc)
+    if (size_t const needed = container.count + count; needed > container.alloc)
     {
-        /* scale the alloc size in powers-of-2 */
-        size_t n = v->val.l.alloc != 0 ? v->val.l.alloc : 8;
-
+        // scale the alloc size in powers-of-2
+        auto n = container.alloc != 0 ? container.alloc : 8U;
         while (n < needed)
         {
             n *= 2U;
         }
 
         auto* vals = new tr_variant[n];
-        std::copy_n(v->val.l.vals, v->val.l.count, vals);
-        delete[] v->val.l.vals;
-        v->val.l.vals = vals;
-        v->val.l.alloc = n;
+        std::move(container.vals, container.vals + container.count, vals);
+        delete[] container.vals;
+        container.vals = vals;
+        container.alloc = n;
     }
 
-    return v->val.l.vals + v->val.l.count;
+    return container.vals + container.count;
 }
 
-tr_variant* dictFindOrAdd(tr_variant* const var, tr_quark key, tr_variant::Type type)
+bool variant_remove_child(tr_variant* const var, size_t idx)
 {
-    /* see if it already exists, and if so, try to reuse it */
-    tr_variant* child = tr_variantDictFind(var, key);
-    if (child != nullptr)
+    if (!variant_is_container(var))
     {
-        if (!tr_variantIsType(child, type))
-        {
-            tr_variantDictRemove(var, key);
-            child = nullptr;
-        }
-        else if (child->holds_alternative<std::string_view>())
-        {
-            child->val.s.clear();
-        }
+        return false;
     }
 
-    /* if it doesn't exist, create it */
-    if (child == nullptr)
+    auto& container = var->val.l;
+    if (idx >= container.count)
     {
-        child = tr_variantDictAdd(var, key);
+        return false;
     }
 
-    return child;
+    std::move(container.vals + idx + 1, container.vals + container.count, container.vals + idx);
+    --container.count;
+    // container.vals[container.count--] = {};
+    return true;
 }
 
 } // namespace
 
+tr_variant::~tr_variant()
+{
+    if (type == Type::Vector || type == Type::Map)
+    {
+        delete[] val.l.vals;
+        val.l.vals = nullptr;
+        val.l.count = {};
+    }
+    else if (type == Type::String)
+    {
+        val.s.clear();
+    }
+
+    type = Type::None;
+}
+
 tr_variant* tr_variantDictFind(tr_variant* const var, tr_quark key)
 {
-    auto const i = dictIndexOf(var, key);
-
-    return i < 0 ? nullptr : var->val.l.vals + i;
+    auto const idx = dict_index_of(var, key);
+    return idx.has_value() ? var->val.l.vals + *idx : nullptr;
 }
 
 tr_variant* tr_variantListChild(tr_variant* const var, size_t pos)
@@ -129,20 +139,7 @@ tr_variant* tr_variantListChild(tr_variant* const var, size_t pos)
 
 bool tr_variantListRemove(tr_variant* const var, size_t pos)
 {
-    if (var == nullptr || !var->holds_alternative<tr_variant::Vector>() || pos >= var->val.l.count)
-    {
-        return false;
-    }
-
-    auto& vals = var->val.l.vals;
-    auto& count = var->val.l.count;
-
-    tr_variantClear(&vals[pos]);
-    std::move(vals + pos + 1, vals + count, vals + pos);
-    --count;
-    vals[count] = {};
-
-    return true;
+    return variant_remove_child(var, pos);
 }
 
 bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
@@ -382,8 +379,7 @@ tr_variant* tr_variantListAdd(tr_variant* const var)
 
     auto* const child = containerReserve(var, 1);
     ++var->val.l.count;
-    child->key = 0;
-    tr_variantInit(child, tr_variant::Type::Int);
+    *child = tr_variant{};
 
     return child;
 }
@@ -456,59 +452,66 @@ tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
     TR_ASSERT(var != nullptr);
     TR_ASSERT(var->holds_alternative<tr_variant::Map>());
 
-    auto* const val = containerReserve(var, 1);
+    auto* const child = containerReserve(var, 1);
     ++var->val.l.count;
-    val->key = key;
-    tr_variantInit(val, tr_variant::Type::Int);
+    *child = tr_variant{};
+    child->key = key;
 
-    return val;
+    return child;
 }
 
 tr_variant* tr_variantDictAddInt(tr_variant* const var, tr_quark key, int64_t val)
 {
-    auto* const child = dictFindOrAdd(var, key, tr_variant::Type::Int);
+    tr_variantDictRemove(var, key);
+    auto* const child = tr_variantDictAdd(var, key);
     tr_variantInitInt(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddBool(tr_variant* const var, tr_quark key, bool val)
 {
-    auto* const child = dictFindOrAdd(var, key, tr_variant::Type::Bool);
+    tr_variantDictRemove(var, key);
+    auto* const child = tr_variantDictAdd(var, key);
     tr_variantInitBool(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark key, double val)
 {
-    auto* const child = dictFindOrAdd(var, key, tr_variant::Type::Double);
+    tr_variantDictRemove(var, key);
+    auto* const child = tr_variantDictAdd(var, key);
     tr_variantInitReal(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddQuark(tr_variant* const var, tr_quark key, tr_quark const val)
 {
-    auto* const child = dictFindOrAdd(var, key, tr_variant::Type::String);
+    tr_variantDictRemove(var, key);
+    auto* const child = tr_variantDictAdd(var, key);
     tr_variantInitQuark(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark key, std::string_view val)
 {
-    auto* const child = dictFindOrAdd(var, key, tr_variant::Type::String);
+    tr_variantDictRemove(var, key);
+    auto* const child = tr_variantDictAdd(var, key);
     tr_variantInitStr(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark key, std::string_view val)
 {
-    auto* const child = dictFindOrAdd(var, key, tr_variant::Type::String);
+    tr_variantDictRemove(var, key);
+    auto* const child = tr_variantDictAdd(var, key);
     tr_variantInitStrView(child, val);
     return child;
 }
 
 tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark key, void const* value, size_t len)
 {
-    auto* const child = dictFindOrAdd(var, key, tr_variant::Type::String);
+    tr_variantDictRemove(var, key);
+    auto* const child = tr_variantDictAdd(var, key);
     tr_variantInitRaw(child, value, len);
     return child;
 }
@@ -527,36 +530,10 @@ tr_variant* tr_variantDictAddDict(tr_variant* const var, tr_quark key, size_t re
     return child;
 }
 
-tr_variant* tr_variantDictSteal(tr_variant* const var, tr_quark key, tr_variant* value)
-{
-    tr_variant* const child = tr_variantDictAdd(var, key);
-    *child = *value;
-    child->key = key;
-    tr_variantInit(value, value->type);
-    return child;
-}
-
 bool tr_variantDictRemove(tr_variant* const var, tr_quark key)
 {
-    bool removed = false;
-
-    if (int const i = dictIndexOf(var, key); i >= 0)
-    {
-        int const last = (int)var->val.l.count - 1;
-
-        tr_variantClear(&var->val.l.vals[i]);
-
-        if (i != last)
-        {
-            var->val.l.vals[i] = var->val.l.vals[last];
-        }
-
-        --var->val.l.count;
-
-        removed = true;
-    }
-
-    return removed;
+    auto const idx = dict_index_of(var, key);
+    return idx.has_value() && variant_remove_child(var, *idx);
 }
 
 // --- BENC WALKING
@@ -566,40 +543,54 @@ class WalkNode
 public:
     WalkNode() = default;
 
-    explicit WalkNode(tr_variant const* v_in)
+    explicit WalkNode(tr_variant const* const var)
+        : var_{ var }
     {
-        assign(v_in);
     }
 
-    tr_variant const* nextChild()
+    tr_variant const* next_child()
     {
-        if (!tr_variantIsContainer(&v) || (child_index >= v.val.l.count))
+        if (!variant_is_container(var_) || (child_index_ >= var_->val.l.count))
         {
             return nullptr;
         }
 
-        auto idx = child_index++;
+        auto idx = child_index_++;
         if (!sorted.empty())
         {
             idx = sorted[idx];
         }
 
-        return v.val.l.vals + idx;
+        return var_->val.l.vals + idx;
     }
 
-    bool is_visited = false;
+    [[nodiscard]] constexpr auto is_visited() const noexcept
+    {
+        return is_visited_;
+    }
 
-    // shallow bitwise copy of the variant passed to the constructor
-    tr_variant v = {};
+    constexpr void set_visited() noexcept
+    {
+        is_visited_ = true;
+    }
+
+    tr_variant const* current() const noexcept
+    {
+        return var_;
+    }
 
 protected:
     friend class VariantWalker;
 
+    tr_variant const* var_;
+
+    bool is_visited_ = false;
+
     void assign(tr_variant const* v_in)
     {
-        is_visited = false;
-        v = *v_in;
-        child_index = 0;
+        var_ = v_in;
+        is_visited_ = false;
+        child_index_ = 0;
         sorted.clear();
     }
 
@@ -612,13 +603,13 @@ protected:
     template<typename Container>
     void sort(Container& sortbuf)
     {
-        if (!v.holds_alternative<tr_variant::Map>())
+        if (var_ == nullptr || !var_->holds_alternative<tr_variant::Map>())
         {
             return;
         }
 
-        auto const n = v.val.l.count;
-        auto const* children = v.val.l.vals;
+        auto const n = var_->val.l.count;
+        auto const* children = var_->val.l.vals;
 
         sortbuf.resize(n);
         for (size_t i = 0; i < n; ++i)
@@ -639,7 +630,7 @@ protected:
 
 private:
     // When walking `v`'s children, this is the index of the next child
-    size_t child_index = 0;
+    size_t child_index_ = 0;
 
     // When `v` is a dict, this is its children's indices sorted by key.
     // Bencoded dicts must be sorted, so this is useful when writing benc.
@@ -651,49 +642,35 @@ class VariantWalker
 public:
     void emplace(tr_variant const* v_in, bool sort_dicts)
     {
-        if (size == std::size(stack))
-        {
-            stack.emplace_back(v_in);
-        }
-        else
-        {
-            stack[size].assign(v_in);
-        }
-
-        ++size;
+        stack_.emplace_back(v_in);
 
         if (sort_dicts)
         {
-            top().sort(sortbuf);
+            top().sort(sortbuf_);
         }
     }
 
     void pop()
     {
-        TR_ASSERT(size > 0);
-        if (size > 0)
-        {
-            --size;
-        }
+        TR_ASSERT(!std::empty(stack_));
+        stack_.resize(std::size(stack_) - 1U);
     }
 
-    [[nodiscard]] bool empty() const
+    [[nodiscard]] bool empty() const noexcept
     {
-        return size == 0;
+        return std::empty(stack_);
     }
 
     WalkNode& top()
     {
-        TR_ASSERT(size > 0);
-        return stack[size - 1];
+        TR_ASSERT(!std::empty(stack_));
+        return stack_.back();
     }
 
 private:
-    size_t size = 0;
-
     static auto constexpr InitialCapacity = size_t{ 24U };
-    small::vector<WalkNode, InitialCapacity> stack;
-    small::vector<WalkNode::ByKey, InitialCapacity> sortbuf;
+    small::vector<WalkNode, InitialCapacity> stack_;
+    small::vector<WalkNode::ByKey, InitialCapacity> sortbuf_;
 };
 
 /**
@@ -711,19 +688,18 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
         auto& node = stack.top();
         tr_variant const* v = nullptr;
 
-        if (!node.is_visited)
+        if (!node.is_visited())
         {
-            v = &node.v;
-
-            node.is_visited = true;
+            v = node.current();
+            node.set_visited();
         }
         else
         {
-            v = node.nextChild();
+            v = node.next_child();
 
             if (v != nullptr)
             {
-                if (node.v.holds_alternative<tr_variant::Map>())
+                if (node.current()->holds_alternative<tr_variant::Map>())
                 {
                     auto const keystr = tr_quark_get_string_view(v->key);
                     auto tmp = tr_variant{};
@@ -733,9 +709,9 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
             }
             else // finished with this node
             {
-                if (tr_variantIsContainer(&node.v))
+                if (variant_is_container(node.current()))
                 {
-                    walk_funcs.container_end_func(node.v, user_data);
+                    walk_funcs.container_end_func(*node.current(), user_data);
                 }
 
                 stack.pop();
@@ -764,7 +740,7 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
                 break;
 
             case tr_variant::Type::Vector:
-                if (v == &node.v)
+                if (v == node.current())
                 {
                     walk_funcs.list_begin_func(*v, user_data);
                 }
@@ -775,7 +751,7 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
                 break;
 
             case tr_variant::Type::Map:
-                if (v == &node.v)
+                if (v == node.current())
                 {
                     walk_funcs.dict_begin_func(*v, user_data);
                 }
@@ -791,30 +767,6 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
                 break;
             }
         }
-    }
-}
-
-// ---
-
-void tr_variantClear(tr_variant* const clearme)
-{
-    // clang-format off
-    constexpr tr_variant_serde::WalkFuncs CleanupFuncs = {
-        [](tr_variant const&, int64_t, void*) {},
-        [](tr_variant const&, bool, void*) {},
-        [](tr_variant const&, double, void*) {},
-        [](tr_variant const& var, std::string_view, void*){ const_cast<tr_variant&>(var).val.s.clear(); },
-        [](tr_variant const&, void*) {},
-        [](tr_variant const&, void*) {},
-        [](tr_variant const& var, void*) { delete[] var.val.l.vals; }
-    };
-    // clang-format on
-
-    if (clearme != nullptr && clearme->has_value())
-    {
-        tr_variant_serde::walk(*clearme, CleanupFuncs, nullptr, false);
-
-        *clearme = {};
     }
 }
 

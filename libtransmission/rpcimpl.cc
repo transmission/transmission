@@ -78,7 +78,6 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
 
     (*data->callback)(data->session, &data->response, data->callback_user_data);
 
-    tr_variantClear(&data->response);
     delete data;
 }
 
@@ -2535,8 +2534,6 @@ void tr_rpc_request_exec_json(
         }
 
         (*callback)(session, &response, callback_user_data);
-
-        tr_variantClear(&response);
     }
     else if (method->immediate)
     {
@@ -2558,8 +2555,6 @@ void tr_rpc_request_exec_json(
         }
 
         (*callback)(session, &response, callback_user_data);
-
-        tr_variantClear(&response);
     }
     else
     {

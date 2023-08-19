@@ -805,7 +805,6 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
      * same resume information... */
     tor->set_dirty(was_dirty);
 
-    tr_variantClear(&top);
     return fields_loaded;
 }
 
@@ -917,8 +916,6 @@ void save(tr_torrent* tor)
     {
         tor->set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
     }
-
-    tr_variantClear(&top);
 }
 
 } // namespace tr_resume

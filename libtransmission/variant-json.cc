@@ -419,7 +419,6 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
         return top;
     }
 
-    tr_variantClear(&top);
     return {};
 }
 

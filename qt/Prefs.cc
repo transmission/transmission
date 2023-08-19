@@ -227,7 +227,7 @@ Prefs::Prefs(QString config_dir)
     // when the application exits.
     temporary_prefs_ << FILTER_TEXT;
 
-    tr_variant top;
+    auto top = tr_variant{};
     tr_variantInitDict(&top, 0);
     initDefaults(&top);
     tr_sessionLoadSettings(&top, config_dir_.toUtf8().constData(), nullptr);
@@ -318,14 +318,12 @@ Prefs::Prefs(QString config_dir)
             break;
         }
     }
-
-    tr_variantClear(&top);
 }
 
 Prefs::~Prefs()
 {
     // make a dict from settings.json
-    tr_variant current_settings;
+    auto current_settings = tr_variant{};
     tr_variantInitDict(&current_settings, PREFS_COUNT);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
@@ -411,15 +409,11 @@ Prefs::~Prefs()
     {
         auto empty_dict = tr_variant{};
         tr_variantInitDict(&empty_dict, PREFS_COUNT);
-        settings = empty_dict;
+        settings = std::move(empty_dict);
     }
 
     tr_variantMergeDicts(&*settings, &current_settings);
     serde.to_file(*settings, filename);
-    tr_variantClear(&*settings);
-
-    // cleanup
-    tr_variantClear(&current_settings);
 }
 
 /**

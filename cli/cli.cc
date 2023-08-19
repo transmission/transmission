@@ -204,7 +204,7 @@ int tr_main(int argc, char* argv[])
 
     tr_locale_set_global("");
 
-    tr_variant settings;
+    auto settings = tr_variant{};
 
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
@@ -360,7 +360,6 @@ int tr_main(int argc, char* argv[])
     tr_sessionSaveSettings(h, config_dir.c_str(), &settings);
 
     printf("\n");
-    tr_variantClear(&settings);
     tr_sessionClose(h);
     return EXIT_SUCCESS;
 }

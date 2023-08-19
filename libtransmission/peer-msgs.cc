@@ -1023,9 +1023,6 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     }
 
     protocol_send_message(msgs, BtPeerMsgs::Ltep, LtepMessages::Handshake, tr_variant_serde::benc().to_string(val));
-
-    /* cleanup */
-    tr_variantClear(&val);
 }
 
 void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
@@ -1134,8 +1131,6 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     {
         msgs->reqq = i;
     }
-
-    tr_variantClear(&*var);
 }
 
 void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
@@ -1153,7 +1148,6 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
         (void)tr_variantDictFindInt(&*var, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&*var, TR_KEY_piece, &piece);
         (void)tr_variantDictFindInt(&*var, TR_KEY_total_size, &total_size);
-        tr_variantClear(&*var);
     }
 
     logtrace(
@@ -1189,7 +1183,6 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
             tr_variantDictAddInt(&v, TR_KEY_msg_type, MetadataMsgType::Reject);
             tr_variantDictAddInt(&v, TR_KEY_piece, piece);
             protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, serde.to_string(v));
-            tr_variantClear(&v);
         }
     }
 }
@@ -1235,8 +1228,6 @@ void parseUtPex(tr_peerMsgsImpl* msgs, MessageReader& payload)
             pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
             tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
-
-        tr_variantClear(&*var);
     }
 }
 
@@ -1812,7 +1803,6 @@ void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Request);
         tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
         protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp));
-        tr_variantClear(&tmp);
     }
 }
 
@@ -1865,13 +1855,7 @@ namespace peer_pulse_helpers
         tr_variantInitDict(&tmp, 2);
         tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Reject);
         tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
-        auto const n_bytes_written = protocol_send_message(
-            msgs,
-            BtPeerMsgs::Ltep,
-            msgs->ut_metadata_id,
-            tr_variant_serde::benc().to_string(tmp));
-        tr_variantClear(&tmp);
-        return n_bytes_written;
+        return protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp));
     }
 
     // send the metadata
@@ -1880,14 +1864,7 @@ namespace peer_pulse_helpers
     tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
     tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
     tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->info_dict_size());
-    auto const n_bytes_written = protocol_send_message(
-        msgs,
-        BtPeerMsgs::Ltep,
-        msgs->ut_metadata_id,
-        tr_variant_serde::benc().to_string(tmp),
-        data);
-    tr_variantClear(&tmp);
-    return n_bytes_written;
+    return protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp), data);
 }
 
 [[nodiscard]] size_t add_next_piece(tr_peerMsgsImpl* msgs, uint64_t now)
@@ -2114,8 +2091,6 @@ void tr_peerMsgsImpl::sendPex()
     }
 
     protocol_send_message(this, BtPeerMsgs::Ltep, this->ut_pex_id, tr_variant_serde::benc().to_string(val));
-
-    tr_variantClear(&val);
 }
 
 } // namespace

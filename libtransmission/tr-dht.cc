@@ -425,7 +425,7 @@ private:
         auto const n = mediator_.api().get_nodes(std::data(sins4), &num4, std::data(sins6), &num6);
         tr_logAddTrace(fmt::format("Saving {} ({} + {}) nodes", n, num4, num6));
 
-        tr_variant benc;
+        auto benc = tr_variant{};
         tr_variantInitDict(&benc, 3);
         tr_variantDictAddRaw(&benc, TR_KEY_id, std::data(id_), std::size(id_));
 
@@ -460,7 +460,6 @@ private:
         }
 
         tr_variant_serde::benc().to_file(benc, state_filename_);
-        tr_variantClear(&benc);
     }
 
     [[nodiscard]] static std::pair<Id, Nodes> load_state(std::string_view filename)
@@ -509,8 +508,6 @@ private:
                     nodes.emplace_back(addr, port);
                 }
             }
-
-            tr_variantClear(&top);
         }
 
         return std::make_pair(id, nodes);

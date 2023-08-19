@@ -431,7 +431,7 @@ void DetailsDialog::Impl::refreshOptions(std::vector<tr_torrent*> const& torrent
 
 void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
 {
-    tr_variant top;
+    auto top = tr_variant{};
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
@@ -445,12 +445,11 @@ void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
     }
 
     core_->exec(&top);
-    tr_variantClear(&top);
 }
 
 void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
 {
-    tr_variant top;
+    auto top = tr_variant{};
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
@@ -464,12 +463,11 @@ void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
     }
 
     core_->exec(&top);
-    tr_variantClear(&top);
 }
 
 void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
 {
-    tr_variant top;
+    auto top = tr_variant{};
 
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
@@ -483,7 +481,6 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
     }
 
     core_->exec(&top);
-    tr_variantClear(&top);
 }
 
 void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*builder*/)
@@ -2374,7 +2371,7 @@ void AddTrackerDialog::on_response(int response)
         {
             if (tr_urlIsValidTracker(url.c_str()))
             {
-                tr_variant top;
+                auto top = tr_variant{};
 
                 tr_variantInitDict(&top, 2);
                 tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
@@ -2385,8 +2382,6 @@ void AddTrackerDialog::on_response(int response)
 
                 core_->exec(&top);
                 parent_.refresh();
-
-                tr_variantClear(&top);
             }
             else
             {
@@ -2423,7 +2418,7 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
     {
         auto const torrent_id = iter->get_value(tracker_cols.torrent_id);
         auto const tracker_id = iter->get_value(tracker_cols.tracker_id);
-        tr_variant top;
+        auto top = tr_variant{};
 
         tr_variantInitDict(&top, 2);
         tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-set"sv);
@@ -2434,8 +2429,6 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
 
         core_->exec(&top);
         refresh();
-
-        tr_variantClear(&top);
     }
 }
 

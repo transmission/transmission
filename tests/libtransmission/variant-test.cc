@@ -226,7 +226,7 @@ TEST_F(VariantTest, parse)
     EXPECT_TRUE(tr_variantGetInt(&var, &i));
     EXPECT_EQ(64, i);
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
-    tr_variantClear(&var);
+    var.clear();
 
     benc = "li64ei32ei16ee"sv;
     var = serde.parse(benc).value_or(tr_variant{});
@@ -240,20 +240,20 @@ TEST_F(VariantTest, parse)
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&var, 2), &i));
     EXPECT_EQ(16, i);
     EXPECT_EQ(benc, serde.to_string(var));
-    tr_variantClear(&var);
+    var.clear();
 
     benc = "lllee"sv;
     var = serde.parse(benc).value_or(tr_variant{});
     EXPECT_FALSE(var.has_value());
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
-    tr_variantClear(&var);
+    var.clear();
 
     benc = "le"sv;
     var = serde.parse(benc).value_or(tr_variant{});
     EXPECT_TRUE(var.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
     EXPECT_EQ(benc, serde.to_string(var));
-    tr_variantClear(&var);
+    var.clear();
 
     benc = "d20:"sv;
     var = serde.parse(benc).value_or(tr_variant{});
@@ -287,13 +287,11 @@ TEST_F(VariantTest, bencParseAndReencode)
     for (auto const& test : Tests)
     {
         auto var = serde.parse(test.benc);
-
         EXPECT_EQ(test.is_good, var.has_value());
         if (var)
         {
             EXPECT_EQ(test.benc.data() + test.benc.size(), serde.end());
             EXPECT_EQ(test.benc, serde.to_string(*var));
-            tr_variantClear(&*var);
         }
     }
 }
@@ -308,8 +306,6 @@ TEST_F(VariantTest, bencSortWhenSerializing)
     EXPECT_TRUE(var.has_value());
     EXPECT_EQ(std::data(In) + std::size(In), serde.end());
     EXPECT_EQ(ExpectedOut, serde.to_string(*var));
-
-    tr_variantClear(&*var);
 }
 
 TEST_F(VariantTest, bencMalformedTooManyEndings)
@@ -322,8 +318,6 @@ TEST_F(VariantTest, bencMalformedTooManyEndings)
     EXPECT_TRUE(var.has_value());
     EXPECT_EQ(std::data(In) + std::size(ExpectedOut), serde.end());
     EXPECT_EQ(ExpectedOut, serde.to_string(*var));
-
-    tr_variantClear(&*var);
 }
 
 TEST_F(VariantTest, bencMalformedNoEnding)
@@ -370,7 +364,6 @@ TEST_F(VariantTest, bencToJson)
     {
         auto top = benc_serde.parse(test.benc).value_or(tr_variant{});
         EXPECT_EQ(test.expected, stripWhitespace(json_serde.to_string(top)));
-        tr_variantClear(&top);
     }
 }
 
@@ -425,9 +418,6 @@ TEST_F(VariantTest, merge)
     EXPECT_EQ("127.0.0.1"sv, sv);
     EXPECT_TRUE(tr_variantDictFindStrView(&dest, s8, &sv));
     EXPECT_EQ("ghi"sv, sv);
-
-    tr_variantClear(&dest);
-    tr_variantClear(&src);
 }
 
 TEST_F(VariantTest, stackSmash)
@@ -479,8 +469,6 @@ TEST_F(VariantTest, boolAndIntRecast)
     EXPECT_NE(0, i);
     EXPECT_TRUE(tr_variantDictFindInt(&top, key4, &i));
     EXPECT_NE(0, i);
-
-    tr_variantClear(&top);
 }
 
 TEST_F(VariantTest, dictFindType)
@@ -541,8 +529,6 @@ TEST_F(VariantTest, dictFindType)
     EXPECT_FALSE(tr_variantDictFindInt(&top, key_str, &i));
     EXPECT_TRUE(tr_variantDictFindInt(&top, key_int, &i));
     EXPECT_EQ(ExpectedInt, i);
-
-    tr_variantClear(&top);
 }
 
 TEST_F(VariantTest, variantFromBufFuzz)
@@ -556,14 +542,30 @@ TEST_F(VariantTest, variantFromBufFuzz)
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
 
-        if (auto var = benc_serde.inplace().parse(buf); var)
-        {
-            tr_variantClear(&*var);
-        }
-
-        if (auto var = json_serde.inplace().parse(buf); var)
-        {
-            tr_variantClear(&*var);
-        }
+        (void)benc_serde.inplace().parse(buf);
+        (void)json_serde.inplace().parse(buf);
     }
+}
+
+TEST_F(VariantTest, mapRemove)
+{
+    auto const key_0 = tr_quark_new("0"sv);
+    auto const key_1 = tr_quark_new("1"sv);
+    auto const key_2 = tr_quark_new("2"sv);
+    auto const key_3 = tr_quark_new("3"sv);
+
+    auto var = tr_variant{};
+    tr_variantInitDict(&var, 0);
+    tr_variantDictAddInt(&var, key_0, 0);
+    tr_variantDictAddInt(&var, key_1, 1);
+    tr_variantDictAddInt(&var, key_2, 2);
+
+    auto* list = tr_variantDictAddList(&var, key_3, 3);
+    tr_variantListAddInt(list, 0);
+    tr_variantListAddInt(list, 1);
+    tr_variantListAddInt(list, 2);
+    tr_variantListAddInt(list, 3);
+
+    tr_variantListRemove(list, 0);
+    tr_variantDictRemove(&var, key_1);
 }

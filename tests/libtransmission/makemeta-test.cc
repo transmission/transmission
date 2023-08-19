@@ -244,8 +244,6 @@ TEST_F(MakemetaTest, announceSingleTracker)
 
     // confirm there's not an "announce-list" entry
     EXPECT_EQ(nullptr, tr_variantDictFind(&*top, TR_KEY_announce_list));
-
-    tr_variantClear(&*top);
 }
 
 TEST_F(MakemetaTest, announceMultiTracker)
@@ -277,8 +275,6 @@ TEST_F(MakemetaTest, announceMultiTracker)
     EXPECT_TRUE(tr_variantDictFindList(&*top, TR_KEY_announce_list, &announce_list_variant));
     EXPECT_NE(nullptr, announce_list_variant);
     EXPECT_EQ(std::size(builder.announce_list()), tr_variantListSize(announce_list_variant));
-
-    tr_variantClear(&*top);
 }
 
 TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)
