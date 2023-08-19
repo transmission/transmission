@@ -145,7 +145,7 @@ export const Formatter = {
 
     const minutes = Math.floor((seconds % 3600) / 60);
     if (hours.length > 0 || minutes) {
-      return `${days}${hours}` + this.countString('minute', 'minutes', minutes);
+      return `${days}${hours}${this.countString('minute', 'minutes', minutes)}`;
     }
 
     seconds = Math.floor(seconds % 60);
