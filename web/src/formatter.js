@@ -134,19 +134,17 @@ export const Formatter = {
   },
 
   timeInterval(seconds) {
-    const days = Math.floor(seconds / 86_400);
-    if (days) {
-      return this.countString('day', 'days', days);
-    }
+    let days = Math.floor(seconds / 86_400);
+    days = days ? this.countString('day', 'days', days) + ', ' : '';
 
-    const hours = Math.floor((seconds % 86_400) / 3600);
-    if (hours) {
-      return this.countString('hour', 'hours', hours);
-    }
+    let hours = Math.floor((seconds % 86_400) / 3600);
+    hours = (days.length || hours)
+      ? this.countString('hour', 'hours', hours) + ' and '
+      : '';
 
     const minutes = Math.floor((seconds % 3600) / 60);
-    if (minutes) {
-      return this.countString('minute', 'minutes', minutes);
+    if (hours.length || minutes) {
+      return `${days}${hours}` + this.countString('minute', 'minutes', minutes);
     }
 
     seconds = Math.floor(seconds % 60);
