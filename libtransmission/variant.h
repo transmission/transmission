@@ -241,7 +241,7 @@ constexpr void tr_variantInitBool(tr_variant* initme, bool value)
 
 // --- Ints
 
-bool tr_variantGetInt(tr_variant const* val, int64_t* setme);
+bool tr_variantGetInt(tr_variant const* var, int64_t* setme);
 
 constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
 {
@@ -252,21 +252,21 @@ constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
 // --- Lists
 
 void tr_variantInitList(tr_variant* initme, size_t reserve_count);
-void tr_variantListReserve(tr_variant* list, size_t reserve_count);
+void tr_variantListReserve(tr_variant* var, size_t reserve_count);
 
-tr_variant* tr_variantListAdd(tr_variant* list);
-tr_variant* tr_variantListAddBool(tr_variant* list, bool value);
-tr_variant* tr_variantListAddInt(tr_variant* list, int64_t value);
-tr_variant* tr_variantListAddReal(tr_variant* list, double value);
-tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view value);
-tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view value);
-tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark value);
-tr_variant* tr_variantListAddRaw(tr_variant* list, void const* value, size_t value_len);
-tr_variant* tr_variantListAddList(tr_variant* list, size_t reserve_count);
-tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count);
-tr_variant* tr_variantListChild(tr_variant* list, size_t pos);
+tr_variant* tr_variantListAdd(tr_variant* var);
+tr_variant* tr_variantListAddBool(tr_variant* var, bool value);
+tr_variant* tr_variantListAddInt(tr_variant* var, int64_t value);
+tr_variant* tr_variantListAddReal(tr_variant* var, double value);
+tr_variant* tr_variantListAddStr(tr_variant* var, std::string_view value);
+tr_variant* tr_variantListAddStrView(tr_variant* var, std::string_view value);
+tr_variant* tr_variantListAddQuark(tr_variant* var, tr_quark value);
+tr_variant* tr_variantListAddRaw(tr_variant* var, void const* value, size_t value_len);
+tr_variant* tr_variantListAddList(tr_variant* var, size_t reserve_count);
+tr_variant* tr_variantListAddDict(tr_variant* var, size_t reserve_count);
+tr_variant* tr_variantListChild(tr_variant* var, size_t pos);
 
-bool tr_variantListRemove(tr_variant* list, size_t pos);
+bool tr_variantListRemove(tr_variant* var, size_t pos);
 
 [[nodiscard]] constexpr size_t tr_variantListSize(tr_variant const* const var)
 {
@@ -276,34 +276,34 @@ bool tr_variantListRemove(tr_variant* list, size_t pos);
 // --- Dictionaries
 
 void tr_variantInitDict(tr_variant* initme, size_t reserve_count);
-void tr_variantDictReserve(tr_variant* dict, size_t reserve_count);
-bool tr_variantDictRemove(tr_variant* dict, tr_quark key);
+void tr_variantDictReserve(tr_variant* var, size_t reserve_count);
+bool tr_variantDictRemove(tr_variant* var, tr_quark key);
 
-tr_variant* tr_variantDictAdd(tr_variant* dict, tr_quark key);
-tr_variant* tr_variantDictAddReal(tr_variant* dict, tr_quark key, double value);
-tr_variant* tr_variantDictAddInt(tr_variant* dict, tr_quark key, int64_t value);
-tr_variant* tr_variantDictAddBool(tr_variant* dict, tr_quark key, bool value);
-tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark key, std::string_view value);
-tr_variant* tr_variantDictAddStrView(tr_variant* dict, tr_quark key, std::string_view value);
-tr_variant* tr_variantDictAddQuark(tr_variant* dict, tr_quark key, tr_quark val);
-tr_variant* tr_variantDictAddList(tr_variant* dict, tr_quark key, size_t reserve_count);
-tr_variant* tr_variantDictAddDict(tr_variant* dict, tr_quark key, size_t reserve_count);
-tr_variant* tr_variantDictSteal(tr_variant* dict, tr_quark key, tr_variant* value);
-tr_variant* tr_variantDictAddRaw(tr_variant* dict, tr_quark key, void const* value, size_t len);
+tr_variant* tr_variantDictAdd(tr_variant* var, tr_quark key);
+tr_variant* tr_variantDictAddReal(tr_variant* var, tr_quark key, double value);
+tr_variant* tr_variantDictAddInt(tr_variant* var, tr_quark key, int64_t value);
+tr_variant* tr_variantDictAddBool(tr_variant* var, tr_quark key, bool value);
+tr_variant* tr_variantDictAddStr(tr_variant* var, tr_quark key, std::string_view value);
+tr_variant* tr_variantDictAddStrView(tr_variant* var, tr_quark key, std::string_view value);
+tr_variant* tr_variantDictAddQuark(tr_variant* var, tr_quark key, tr_quark val);
+tr_variant* tr_variantDictAddList(tr_variant* var, tr_quark key, size_t reserve_count);
+tr_variant* tr_variantDictAddDict(tr_variant* var, tr_quark key, size_t reserve_count);
+tr_variant* tr_variantDictSteal(tr_variant* var, tr_quark key, tr_variant* value);
+tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t len);
 
-bool tr_variantDictChild(tr_variant* dict, size_t pos, tr_quark* setme_key, tr_variant** setme_value);
-tr_variant* tr_variantDictFind(tr_variant* dict, tr_quark key);
-bool tr_variantDictFindList(tr_variant* dict, tr_quark key, tr_variant** setme);
-bool tr_variantDictFindDict(tr_variant* dict, tr_quark key, tr_variant** setme_value);
-bool tr_variantDictFindInt(tr_variant* dict, tr_quark key, int64_t* setme);
-bool tr_variantDictFindReal(tr_variant* dict, tr_quark key, double* setme);
-bool tr_variantDictFindBool(tr_variant* dict, tr_quark key, bool* setme);
-bool tr_variantDictFindStrView(tr_variant* dict, tr_quark key, std::string_view* setme);
-bool tr_variantDictFindRaw(tr_variant* dict, tr_quark key, uint8_t const** setme_raw, size_t* setme_len);
-bool tr_variantDictFindRaw(tr_variant* dict, tr_quark key, std::byte const** setme_raw, size_t* setme_len);
+bool tr_variantDictChild(tr_variant* var, size_t pos, tr_quark* setme_key, tr_variant** setme_value);
+tr_variant* tr_variantDictFind(tr_variant* var, tr_quark key);
+bool tr_variantDictFindList(tr_variant* var, tr_quark key, tr_variant** setme);
+bool tr_variantDictFindDict(tr_variant* var, tr_quark key, tr_variant** setme_value);
+bool tr_variantDictFindInt(tr_variant* var, tr_quark key, int64_t* setme);
+bool tr_variantDictFindReal(tr_variant* var, tr_quark key, double* setme);
+bool tr_variantDictFindBool(tr_variant* var, tr_quark key, bool* setme);
+bool tr_variantDictFindStrView(tr_variant* var, tr_quark key, std::string_view* setme);
+bool tr_variantDictFindRaw(tr_variant* var, tr_quark key, uint8_t const** setme_raw, size_t* setme_len);
+bool tr_variantDictFindRaw(tr_variant* var, tr_quark key, std::byte const** setme_raw, size_t* setme_len);
 
 /* this is only quasi-supported. don't rely on it too heavily outside of libT */
-void tr_variantMergeDicts(tr_variant* dict_target, tr_variant const* dict_source);
+void tr_variantMergeDicts(tr_variant* tgt, tr_variant const* src);
 
 // tr_variant serializer / deserializer
 class tr_variant_serde
