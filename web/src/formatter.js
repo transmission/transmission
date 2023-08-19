@@ -135,12 +135,12 @@ export const Formatter = {
 
   timeInterval(seconds) {
     let days = Math.floor(seconds / 86_400);
-    days = days ? `${this.countString('day', 'days', days)}, ` : '';
+    days = days ? this.countString('day, ', 'days, ', days) : '';
 
     let hours = Math.floor((seconds % 86_400) / 3600);
     hours =
       days.length > 0 || hours
-        ? `${this.countString('hour', 'hours', hours)} and `
+        ? this.countString('hour and ', 'hours and ', hours)
         : '';
 
     const minutes = Math.floor((seconds % 3600) / 60);
