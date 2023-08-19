@@ -540,14 +540,14 @@ export class Inspector extends EventTarget {
       const first = get(torrents[0]);
       string = torrents.every((t) => get(t) === first)
         ? new Date(first * 1000).toLocaleString(navigator.language, {
-          second: '2-digit',
-          minute: '2-digit',
-          hour: '2-digit',
           day: '2-digit',
+          hour: '2-digit',
+          hour12: false,
+          minute: '2-digit',
+          second: '2-digit',
           month: 'short',
           weekday: 'short',
           year: 'numeric',
-          hour12: false,
           timeZoneName: 'short',
           })
         : mixed;
