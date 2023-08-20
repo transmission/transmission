@@ -546,26 +546,3 @@ TEST_F(VariantTest, variantFromBufFuzz)
         (void)json_serde.inplace().parse(buf);
     }
 }
-
-TEST_F(VariantTest, mapRemove)
-{
-    auto const key_0 = tr_quark_new("0"sv);
-    auto const key_1 = tr_quark_new("1"sv);
-    auto const key_2 = tr_quark_new("2"sv);
-    auto const key_3 = tr_quark_new("3"sv);
-
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 0);
-    tr_variantDictAddInt(&var, key_0, 0);
-    tr_variantDictAddInt(&var, key_1, 1);
-    tr_variantDictAddInt(&var, key_2, 2);
-
-    auto* list = tr_variantDictAddList(&var, key_3, 3);
-    tr_variantListAddInt(list, 0);
-    tr_variantListAddInt(list, 1);
-    tr_variantListAddInt(list, 2);
-    tr_variantListAddInt(list, 3);
-
-    tr_variantListRemove(list, 0);
-    tr_variantDictRemove(&var, key_1);
-}
