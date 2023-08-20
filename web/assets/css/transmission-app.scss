@@ -529,7 +529,7 @@ $video-image: '../img/film.svg';
 
       &.compact {
         font-size: 1em;
-        font-weight: normal;
+        font-weight: bold;
       }
 
       &:not(.paused) {
@@ -548,7 +548,7 @@ $video-image: '../img/film.svg';
 
       &.compact {
         flex: 1;
-        font-size: small;
+        font-size: 0.875em;
       }
     }
 
@@ -560,7 +560,8 @@ $video-image: '../img/film.svg';
     .torrent-progress-details,
     .torrent-peer-details {
       color: var(--color-fg-primary);
-      font-size: small;
+      font-size: 0.875em;
+      font-weight: normal;
     }
 
     &.compact {
@@ -697,7 +698,7 @@ $video-image: '../img/film.svg';
     }
 
     &.compact {
-      min-width: 250px;
+      min-width: 192px;
       width: 10vw;
     }
 
