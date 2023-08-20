@@ -1029,12 +1029,13 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
     auto const handshake_sv = payload.to_string_view();
 
-    auto var = tr_variant_serde::benc().inplace().parse(handshake_sv);
-    if (!var || !var->holds_alternative<tr_variant::Map>())
+    auto ovar = tr_variant_serde::benc().inplace().parse(handshake_sv);
+    if (!ovar || tr_variantIsDict(&*ovar))
     {
         logtrace(msgs, "GET  extended-handshake, couldn't get dictionary");
         return;
     }
+    auto& var = *ovar;
 
     logtrace(msgs, fmt::format(FMT_STRING("here is the base64-encoded handshake: [{:s}]"), tr_base64_encode(handshake_sv)));
 
@@ -1042,7 +1043,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     auto i = int64_t{};
     auto pex = tr_pex{};
     auto& [addr, port] = pex.socket_address;
-    if (tr_variantDictFindInt(&*var, TR_KEY_e, &i))
+    if (tr_variantDictFindInt(&var, TR_KEY_e, &i))
     {
         msgs->encryption_preference = i != 0 ? EncryptionPreference::Yes : EncryptionPreference::No;
 
@@ -1056,7 +1057,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     msgs->peerSupportsPex = false;
     msgs->peerSupportsMetadataXfer = false;
 
-    if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
+    if (tr_variant* sub = nullptr; tr_variantDictFindDict(&var, TR_KEY_m, &sub))
     {
         if (tr_variantDictFindInt(sub, TR_KEY_ut_pex, &i))
         {
@@ -1082,13 +1083,13 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* look for metainfo size (BEP 9) */
-    if (tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
+    if (tr_variantDictFindInt(&var, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
     {
         msgs->metadata_size_hint = i;
     }
 
     /* look for upload_only (BEP 21) */
-    if (tr_variantDictFindInt(&*var, TR_KEY_upload_only, &i))
+    if (tr_variantDictFindInt(&var, TR_KEY_upload_only, &i))
     {
         pex.flags |= ADDED_F_SEED_FLAG;
     }
@@ -1097,13 +1098,13 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
     // peer id encoding.
-    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_v, &sv))
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&var, TR_KEY_v, &sv))
     {
         msgs->set_user_agent(tr_interned_string{ sv });
     }
 
     /* get peer's listening port */
-    if (tr_variantDictFindInt(&*var, TR_KEY_p, &i) && i > 0)
+    if (tr_variantDictFindInt(&var, TR_KEY_p, &i) && i > 0)
     {
         port.set_host(i);
         msgs->publish(tr_peer_event::GotPort(port));
@@ -1112,14 +1113,14 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 
     std::byte const* addr_compact = nullptr;
     auto addr_len = size_t{};
-    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&*var, TR_KEY_ipv4, &addr_compact, &addr_len) &&
+    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&var, TR_KEY_ipv4, &addr_compact, &addr_len) &&
         addr_len == tr_address::CompactAddrBytes[TR_AF_INET])
     {
         std::tie(addr, std::ignore) = tr_address::from_compact_ipv4(addr_compact);
         tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
-    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&*var, TR_KEY_ipv6, &addr_compact, &addr_len) &&
+    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&var, TR_KEY_ipv6, &addr_compact, &addr_len) &&
         addr_len == tr_address::CompactAddrBytes[TR_AF_INET6])
     {
         std::tie(addr, std::ignore) = tr_address::from_compact_ipv6(addr_compact);
@@ -1127,7 +1128,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* get peer's maximum request queue size */
-    if (tr_variantDictFindInt(&*var, TR_KEY_reqq, &i))
+    if (tr_variantDictFindInt(&var, TR_KEY_reqq, &i))
     {
         msgs->reqq = i;
     }

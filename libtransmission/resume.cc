@@ -528,13 +528,13 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
                 auto* const b = tr_variantListChild(l, fi);
                 auto time_checked = time_t{};
 
-                if (b != nullptr && b->holds_alternative<int64_t>())
+                if (tr_variantIsInt(b))
                 {
                     auto t = int64_t{};
                     tr_variantGetInt(b, &t);
                     time_checked = time_t(t);
                 }
-                else if (b != nullptr && b->holds_alternative<tr_variant::Vector>())
+                else if (tr_variantIsList(b))
                 {
                     auto offset = int64_t{};
                     tr_variantGetInt(tr_variantListChild(b, 0), &offset);

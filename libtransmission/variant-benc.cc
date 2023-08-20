@@ -247,11 +247,11 @@ private:
         {
             node = top_;
         }
-        else if (auto* const parent = stack_.back(); parent->holds_alternative<tr_variant::Vector>())
+        else if (auto* const parent = stack_.back(); tr_variantIsList(parent))
         {
             node = tr_variantListAdd(parent);
         }
-        else if (key_ && parent->holds_alternative<tr_variant::Map>())
+        else if (key_ && tr_variantIsDict(parent))
         {
             node = tr_variantDictAdd(parent, *key_);
             key_.reset();

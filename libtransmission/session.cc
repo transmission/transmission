@@ -485,7 +485,7 @@ bool tr_sessionLoadSettings(tr_variant* settings_in, char const* config_dir, cha
 {
     using namespace settings_helpers;
 
-    TR_ASSERT(settings_in != nullptr && settings_in->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(tr_variantIsDict(settings_in));
 
     // first, start with the libtransmission default settings
     auto settings = tr_variant{};
@@ -525,7 +525,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(client_settings != nullptr && client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(tr_variantIsDict(client_settings));
 
     auto settings = tr_variant{};
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
@@ -570,7 +570,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(client_settings != nullptr && client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(tr_variantIsDict(client_settings));
 
     tr_timeUpdate(time(nullptr));
 
@@ -622,7 +622,7 @@ void tr_session::initImpl(init_data& data)
     TR_ASSERT(am_in_session_thread());
 
     auto* const client_settings = data.client_settings;
-    TR_ASSERT(client_settings != nullptr && client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(tr_variantIsDict(client_settings));
 
     tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
 
@@ -658,7 +658,7 @@ void tr_session::initImpl(init_data& data)
 void tr_session::setSettings(tr_variant* settings_dict, bool force)
 {
     TR_ASSERT(am_in_session_thread());
-    TR_ASSERT(settings_dict != nullptr && settings_dict->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(tr_variantIsDict(settings_dict));
 
     // load the session settings
     auto new_settings = tr_session_settings{};

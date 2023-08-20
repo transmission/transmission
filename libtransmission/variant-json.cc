@@ -74,11 +74,11 @@ tr_variant* get_node(struct jsonsl_st* jsn)
     {
         node = data->top;
     }
-    else if (parent->holds_alternative<tr_variant::Vector>())
+    else if (tr_variantIsList(parent))
     {
         node = tr_variantListAdd(parent);
     }
-    else if (parent->holds_alternative<tr_variant::Map>() && !std::empty(data->key))
+    else if (tr_variantIsDict(parent) && !std::empty(data->key))
     {
         node = tr_variantDictAdd(parent, tr_quark_new(data->key));
         data->key = ""sv;
@@ -503,11 +503,11 @@ void jsonChildFunc(struct JsonWalk* data)
     }
 }
 
-void jsonPushParent(struct JsonWalk* data, tr_variant const& v)
+void jsonPushParent(struct JsonWalk* data, tr_variant const& var)
 {
-    auto const is_dict = v.holds_alternative<tr_variant::Map>();
-    auto const is_list = v.holds_alternative<tr_variant::Vector>();
-    auto const n_children = is_dict ? v.val.l.count * 2U : v.val.l.count;
+    auto const is_dict = tr_variantIsDict(&var);
+    auto const is_list = tr_variantIsList(&var);
+    auto const n_children = var.val.l.count * (is_dict ? 2U : 1U);
     data->parents.push_back({ is_dict, is_list, 0, n_children });
 }
 
@@ -685,7 +685,7 @@ void jsonContainerEndFunc(tr_variant const& var, void* vdata)
 
     jsonIndent(data);
 
-    if (var.holds_alternative<tr_variant::Map>())
+    if (tr_variantIsDict(&var))
     {
         data->out.push_back('}');
     }

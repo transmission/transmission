@@ -163,8 +163,8 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
     };
 
     // build a list of the property keys
-    tr_variant* const first_child = tr_variantListChild(torrent_list, 0);
-    bool const table = first_child != nullptr && first_child->holds_alternative<tr_variant::Vector>();
+    auto* const first_child = tr_variantListChild(torrent_list, 0);
+    bool const table = tr_variantIsList(first_child);
     std::vector<tr_quark> keys;
     if (table)
     {

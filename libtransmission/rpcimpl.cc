@@ -1741,7 +1741,7 @@ char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, s
         for (size_t i = 0; i < names_count; ++i)
         {
             auto const* const v = tr_variantListChild(names_list, i);
-            if (std::string_view l; v != nullptr && v->holds_alternative<std::string_view>() && tr_variantGetStrView(v, &l))
+            if (std::string_view l; v != nullptr && tr_variantGetStrView(v, &l))
             {
                 names.insert(l);
             }
