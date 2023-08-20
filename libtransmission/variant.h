@@ -147,55 +147,6 @@ public:
  */
 void tr_variantClear(tr_variant* clearme);
 
-// --- Serialization / Deserialization
-
-enum tr_variant_fmt
-{
-    TR_VARIANT_FMT_BENC,
-    TR_VARIANT_FMT_JSON,
-    TR_VARIANT_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
-};
-
-int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, std::string_view filename);
-
-[[nodiscard]] std::string tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt);
-
-enum tr_variant_parse_opts
-{
-    TR_VARIANT_PARSE_BENC = (1 << 0),
-    TR_VARIANT_PARSE_JSON = (1 << 1),
-    TR_VARIANT_PARSE_INPLACE = (1 << 2)
-};
-
-bool tr_variantFromFile(
-    tr_variant* setme,
-    tr_variant_parse_opts opts,
-    std::string_view filename,
-    struct tr_error** error = nullptr);
-
-bool tr_variantFromBuf(
-    tr_variant* setme,
-    int variant_parse_opts,
-    std::string_view buf,
-    char const** setme_end = nullptr,
-    tr_error** error = nullptr);
-
-template<typename T>
-bool tr_variantFromBuf(
-    tr_variant* setme,
-    int variant_parse_opts,
-    T const& buf,
-    char const** setme_end = nullptr,
-    tr_error** error = nullptr)
-{
-    return tr_variantFromBuf(
-        setme,
-        variant_parse_opts,
-        std::string_view{ std::data(buf), static_cast<size_t>(std::size(buf)) },
-        setme_end,
-        error);
-}
-
 [[nodiscard]] constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
     return b != nullptr && b->type == type;
@@ -339,6 +290,110 @@ bool tr_variantDictFindRaw(tr_variant* dict, tr_quark key, std::byte const** set
 
 /* this is only quasi-supported. don't rely on it too heavily outside of libT */
 void tr_variantMergeDicts(tr_variant* dict_target, tr_variant const* dict_source);
+
+// tr_variant serializer / deserializer
+class tr_variant_serde
+{
+public:
+    ~tr_variant_serde();
+
+    static tr_variant_serde benc() noexcept
+    {
+        return tr_variant_serde{ Type::Benc };
+    }
+
+    static tr_variant_serde json() noexcept
+    {
+        return tr_variant_serde{ Type::Json };
+    }
+
+    // Serialize data as compactly as possible, e.g.
+    // omit pretty-printing JSON whitespace
+    constexpr tr_variant_serde& compact() noexcept
+    {
+        compact_ = true;
+        return *this;
+    }
+
+    // When set, assumes that the `input` passed to parse() is valid
+    // for the lifespan of the variant and we can use string_views of
+    // `input` instead of cloning new strings.
+    constexpr tr_variant_serde& inplace() noexcept
+    {
+        parse_inplace_ = true;
+        return *this;
+    }
+
+    // ---
+
+    [[nodiscard]] std::optional<tr_variant> parse(std::string_view input);
+
+    template<typename CharSpan>
+    [[nodiscard]] std::optional<tr_variant> parse(CharSpan const& input)
+    {
+        return parse(std::string_view{ std::data(input), std::size(input) });
+    }
+
+    [[nodiscard]] std::optional<tr_variant> parse_file(std::string_view filename);
+
+    [[nodiscard]] constexpr char const* end() const noexcept
+    {
+        return end_;
+    }
+
+    // ---
+
+    [[nodiscard]] std::string to_string(tr_variant const& var) const;
+
+    bool to_file(tr_variant const& var, std::string_view filename);
+
+    // ---
+
+    // Tracks errors when parsing / saving
+    tr_error* error_ = nullptr;
+
+private:
+    friend void tr_variantClear(tr_variant* clearme);
+
+    enum class Type
+    {
+        Benc,
+        Json
+    };
+
+    struct WalkFuncs
+    {
+        void (*int_func)(tr_variant const& var, int64_t val, void* user_data);
+        void (*bool_func)(tr_variant const& var, bool val, void* user_data);
+        void (*double_func)(tr_variant const& var, double val, void* user_data);
+        void (*string_func)(tr_variant const& var, std::string_view val, void* user_data);
+        void (*dict_begin_func)(tr_variant const& var, void* user_data);
+        void (*list_begin_func)(tr_variant const& var, void* user_data);
+        void (*container_end_func)(tr_variant const& var, void* user_data);
+    };
+
+    tr_variant_serde(Type type)
+        : type_{ type }
+    {
+    }
+
+    [[nodiscard]] std::optional<tr_variant> parse_json(std::string_view input);
+    [[nodiscard]] std::optional<tr_variant> parse_benc(std::string_view input);
+
+    [[nodiscard]] std::string to_json_string(tr_variant const& var) const;
+    [[nodiscard]] static std::string to_benc_string(tr_variant const& var);
+
+    static void walk(tr_variant const& top, WalkFuncs const& walk_funcs, void* user_data, bool sort_dicts);
+
+    Type type_;
+
+    bool compact_ = false;
+
+    bool parse_inplace_ = false;
+
+    // This is set to the first unparsed character after `parse()`.
+    char const* end_ = nullptr;
+};
 
 namespace libtransmission
 {

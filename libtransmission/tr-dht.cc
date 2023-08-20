@@ -143,7 +143,7 @@ public:
             std::tie(id_, bootstrap_queue_) = load_state(state_filename_);
         }
         get_nodes_from_bootstrap_file(tr_pathbuf{ mediator_.config_dir(), "/dht.bootstrap"sv }, bootstrap_queue_);
-        get_nodes_from_name("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_queue_);
+        get_nodes_from_name("dht.transmissionbt.com", tr_port::from_host(6881), bootstrap_queue_);
         bootstrap_timer_->start_single_shot(100ms);
 
         mediator_.api().init(udp4_socket_, udp6_socket_, std::data(id_), nullptr);
@@ -382,7 +382,7 @@ private:
         {
             // paper over a bug in some DHT implementation that gives port 1.
             // Xref: https://github.com/transmission/transmission/issues/527
-            return candidate.port == tr_port::fromHost(1);
+            return candidate.socket_address.port_ == tr_port::from_host(1);
         };
 
         pex.erase(std::remove_if(std::begin(pex), std::end(pex), IsBadPex), std::end(pex));
@@ -459,7 +459,7 @@ private:
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, std::data(compact6), out6 - std::data(compact6));
         }
 
-        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, state_filename_);
+        tr_variant_serde::benc().to_file(benc, state_filename_);
         tr_variantClear(&benc);
     }
 
@@ -471,17 +471,18 @@ private:
 
         auto nodes = Nodes{};
 
-        if (auto dict = tr_variant{}; tr_variantFromFile(&dict, TR_VARIANT_PARSE_BENC, filename))
+        if (auto otop = tr_variant_serde::benc().parse_file(filename); otop)
         {
-            if (auto sv = std::string_view{};
-                tr_variantDictFindStrView(&dict, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
+            auto& top = *otop;
+
+            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_id, &sv) && std::size(sv) == std::size(id))
             {
                 std::copy(std::begin(sv), std::end(sv), std::begin(id));
             }
 
             size_t raw_len = 0U;
             std::byte const* raw = nullptr;
-            if (tr_variantDictFindRaw(&dict, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
+            if (tr_variantDictFindRaw(&top, TR_KEY_nodes, &raw, &raw_len) && raw_len % 6 == 0)
             {
                 auto* walk = raw;
                 auto const* const end = raw + raw_len;
@@ -490,12 +491,12 @@ private:
                     auto addr = tr_address{};
                     auto port = tr_port{};
                     std::tie(addr, walk) = tr_address::from_compact_ipv4(walk);
-                    std::tie(port, walk) = tr_port::fromCompact(walk);
+                    std::tie(port, walk) = tr_port::from_compact(walk);
                     nodes.emplace_back(addr, port);
                 }
             }
 
-            if (tr_variantDictFindRaw(&dict, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
+            if (tr_variantDictFindRaw(&top, TR_KEY_nodes6, &raw, &raw_len) && raw_len % 18 == 0)
             {
                 auto* walk = raw;
                 auto const* const end = raw + raw_len;
@@ -504,12 +505,12 @@ private:
                     auto addr = tr_address{};
                     auto port = tr_port{};
                     std::tie(addr, walk) = tr_address::from_compact_ipv6(walk);
-                    std::tie(port, walk) = tr_port::fromCompact(walk);
+                    std::tie(port, walk) = tr_port::from_compact(walk);
                     nodes.emplace_back(addr, port);
                 }
             }
 
-            tr_variantClear(&dict);
+            tr_variantClear(&top);
         }
 
         return std::make_pair(id, nodes);
@@ -543,7 +544,7 @@ private:
             }
             else
             {
-                get_nodes_from_name(addrstr.c_str(), tr_port::fromHost(hport), nodes);
+                get_nodes_from_name(addrstr.c_str(), tr_port::from_host(hport), nodes);
             }
         }
     }
@@ -573,7 +574,7 @@ private:
 
         for (auto* infop = info; infop != nullptr; infop = infop->ai_next)
         {
-            if (auto addrport = tr_address::from_sockaddr(infop->ai_addr); addrport)
+            if (auto addrport = tr_socket_address::from_sockaddr(infop->ai_addr); addrport)
             {
                 nodes.emplace_back(*addrport);
             }

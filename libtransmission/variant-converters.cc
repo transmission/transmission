@@ -206,7 +206,7 @@ std::optional<tr_port> VariantConverter::load<tr_port>(tr_variant* src)
 {
     if (auto val = int64_t{}; tr_variantGetInt(src, &val))
     {
-        return tr_port::fromHost(val);
+        return tr_port::from_host(val);
     }
 
     return {};

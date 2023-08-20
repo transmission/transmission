@@ -377,7 +377,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
         tr_variantDictAddStr(info_dict, TR_KEY_source, source_);
     }
 
-    auto ret = tr_variantToStr(&top, TR_VARIANT_FMT_BENC);
+    auto ret = tr_variant_serde::benc().to_string(top);
     tr_variantClear(&top);
     return ret;
 }

@@ -119,7 +119,7 @@ class tr_rpc_address
 {
 public:
     tr_rpc_address()
-        : inet_addr_(tr_address::any_ipv4())
+        : inet_addr_(tr_address::any(TR_AF_INET))
     {
     }
 
@@ -160,9 +160,9 @@ public:
 
         if (std::empty(port))
         {
-            return { inet_addr_.display_name() };
+            return inet_addr_.display_name();
         }
-        return { inet_addr_.display_name(port) };
+        return tr_socket_address::display_name(inet_addr_, port);
     }
 
 private:
@@ -351,7 +351,7 @@ void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_
 {
     auto* data = static_cast<struct rpc_response_data*>(user_data);
 
-    auto* const response = make_response(data->req, data->server, tr_variantToStr(content, TR_VARIANT_FMT_JSON_LEAN));
+    auto* const response = make_response(data->req, data->server, tr_variant_serde::json().compact().to_string(*content));
     evhttp_add_header(data->req->output_headers, "Content-Type", "application/json; charset=UTF-8");
     evhttp_send_reply(data->req, HTTP_OK, "OK", response);
     evbuffer_free(response);
@@ -361,18 +361,13 @@ void rpc_response_func(tr_session* /*session*/, tr_variant* content, void* user_
 
 void handle_rpc_from_json(struct evhttp_request* req, tr_rpc_server* server, std::string_view json)
 {
-    auto top = tr_variant{};
-    auto const have_content = tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json);
+    auto otop = tr_variant_serde::json().inplace().parse(json);
 
-    tr_rpc_request_exec_json(
-        server->session,
-        have_content ? &top : nullptr,
-        rpc_response_func,
-        new rpc_response_data{ req, server });
+    tr_rpc_request_exec_json(server->session, otop ? &*otop : nullptr, rpc_response_func, new rpc_response_data{ req, server });
 
-    if (have_content)
+    if (otop)
     {
-        tr_variantClear(&top);
+        tr_variantClear(&*otop);
     }
 }
 

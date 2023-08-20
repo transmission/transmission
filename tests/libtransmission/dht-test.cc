@@ -84,33 +84,31 @@ protected:
 
         std::array<char, IdLength> const id_ = tr_rand_obj<std::array<char, IdLength>>();
 
-        std::vector<std::pair<tr_address, tr_port>> ipv4_nodes_ = {
-            std::make_pair(*tr_address::from_string("10.10.10.1"), tr_port::fromHost(128)),
-            std::make_pair(*tr_address::from_string("10.10.10.2"), tr_port::fromHost(129)),
-            std::make_pair(*tr_address::from_string("10.10.10.3"), tr_port::fromHost(130)),
-            std::make_pair(*tr_address::from_string("10.10.10.4"), tr_port::fromHost(131)),
-            std::make_pair(*tr_address::from_string("10.10.10.5"), tr_port::fromHost(132))
-        };
+        std::vector<tr_socket_address> ipv4_nodes_ = { { *tr_address::from_string("10.10.10.1"), tr_port::from_host(128) },
+                                                       { *tr_address::from_string("10.10.10.2"), tr_port::from_host(129) },
+                                                       { *tr_address::from_string("10.10.10.3"), tr_port::from_host(130) },
+                                                       { *tr_address::from_string("10.10.10.4"), tr_port::from_host(131) },
+                                                       { *tr_address::from_string("10.10.10.5"), tr_port::from_host(132) } };
 
-        std::vector<std::pair<tr_address, tr_port>> ipv6_nodes_ = {
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3217"), tr_port::fromHost(6881)),
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3218"), tr_port::fromHost(6882)),
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3219"), tr_port::fromHost(6883)),
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3220"), tr_port::fromHost(6884)),
-            std::make_pair(*tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::fromHost(6885))
+        std::vector<tr_socket_address> ipv6_nodes_ = {
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3217"), tr_port::from_host(6881) },
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3218"), tr_port::from_host(6882) },
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3219"), tr_port::from_host(6883) },
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3220"), tr_port::from_host(6884) },
+            { *tr_address::from_string("1002:1035:4527:3546:7854:1237:3247:3221"), tr_port::from_host(6885) }
         };
 
         [[nodiscard]] auto nodesString() const
         {
             auto str = std::string{};
-            for (auto const& [addr, port] : ipv4_nodes_)
+            for (auto const& socket_address : ipv4_nodes_)
             {
-                str += addr.display_name(port);
+                str += socket_address.display_name();
                 str += ',';
             }
-            for (auto const& [addr, port] : ipv6_nodes_)
+            for (auto const& socket_address : ipv6_nodes_)
             {
-                str += addr.display_name(port);
+                str += socket_address.display_name();
                 str += ',';
             }
             return str;
@@ -129,18 +127,18 @@ protected:
             tr_variantInitDict(&dict, 3U);
             tr_variantDictAddRaw(&dict, TR_KEY_id, std::data(id_), std::size(id_));
             auto compact = std::vector<std::byte>{};
-            for (auto const& [addr, port] : ipv4_nodes_)
+            for (auto const& socket_address : ipv4_nodes_)
             {
-                addr.to_compact_ipv4(std::back_inserter(compact), port);
+                socket_address.to_compact(std::back_inserter(compact));
             }
             tr_variantDictAddRaw(&dict, TR_KEY_nodes, std::data(compact), std::size(compact));
             compact.clear();
-            for (auto const& [addr, port] : ipv6_nodes_)
+            for (auto const& socket_address : ipv6_nodes_)
             {
-                addr.to_compact_ipv6(std::back_inserter(compact), port);
+                socket_address.to_compact(std::back_inserter(compact));
             }
             tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
-            tr_variantToFile(&dict, TR_VARIANT_FMT_BENC, dat_file);
+            tr_variant_serde::benc().to_file(dict, dat_file);
             tr_variantClear(&dict);
         }
     };
@@ -194,10 +192,9 @@ protected:
 
         int ping_node(struct sockaddr const* sa, int /*salen*/) override
         {
-            auto addrport = tr_address::from_sockaddr(sa);
+            auto addrport = tr_socket_address::from_sockaddr(sa);
             assert(addrport);
-            auto const [addr, port] = *addrport;
-            pinged_.push_back(Pinged{ addr, port, tr_time() });
+            pinged_.push_back(Pinged{ *addrport, tr_time() });
             return 0;
         }
 
@@ -205,7 +202,7 @@ protected:
         {
             auto info_hash = tr_sha1_digest_t{};
             std::copy_n(reinterpret_cast<std::byte const*>(id), std::size(info_hash), std::data(info_hash));
-            searched_.push_back(Searched{ info_hash, tr_port::fromHost(port), af });
+            searched_.push_back(Searched{ info_hash, tr_port::from_host(port), af });
             return 0;
         }
 
@@ -251,8 +248,7 @@ protected:
 
         struct Pinged
         {
-            tr_address address;
-            tr_port port;
+            tr_socket_address addrport;
             time_t timestamp;
         };
 
@@ -403,7 +399,7 @@ protected:
             return {};
         }
 
-        auto opt = tr_address::from_sockaddr(info->ai_addr);
+        auto opt = tr_socket_address::from_sockaddr(info->ai_addr);
         freeaddrinfo(info);
         if (opt)
         {
@@ -440,7 +436,7 @@ protected:
     // declared here with "Arbitrary" in the name to make that clear.
     static auto constexpr ArbitrarySock4 = tr_socket_t{ 404 };
     static auto constexpr ArbitrarySock6 = tr_socket_t{ 418 };
-    static auto constexpr ArbitraryPeerPort = tr_port::fromHost(909);
+    static auto constexpr ArbitraryPeerPort = tr_port::from_host(909);
 };
 
 TEST_F(DhtTest, initsWithCorrectSockets)
@@ -489,9 +485,9 @@ TEST_F(DhtTest, loadsStateFromStateFile)
     auto const n_expected_nodes = std::size(state_file.ipv4_nodes_) + std::size(state_file.ipv6_nodes_);
     waitFor(event_base_, [&pinged, n_expected_nodes]() { return std::size(pinged) >= n_expected_nodes; });
     auto actual_nodes_str = std::string{};
-    for (auto const& [addr, port, timestamp] : pinged)
+    for (auto const& [addrport, timestamp] : pinged)
     {
-        actual_nodes_str += addr.display_name(port);
+        actual_nodes_str += addrport.display_name();
         actual_nodes_str += ',';
     }
 
@@ -582,7 +578,7 @@ TEST_F(DhtTest, usesBootstrapFile)
     // This a file with each line holding `${host} ${port}`
     // which tr-dht will try to ping as nodes
     static auto constexpr BootstrapNodeName = "example.com"sv;
-    static auto constexpr BootstrapNodePort = tr_port::fromHost(8080);
+    static auto constexpr BootstrapNodePort = tr_port::from_host(8080);
     if (auto ofs = std::ofstream{ tr_pathbuf{ sandboxDir(), "/dht.bootstrap" } }; ofs)
     {
         ofs << BootstrapNodeName << ' ' << BootstrapNodePort.host() << std::endl;
@@ -604,10 +600,10 @@ TEST_F(DhtTest, usesBootstrapFile)
         [&pinged]() { return !std::empty(pinged); },
         5s);
     ASSERT_EQ(1U, std::size(pinged));
-    auto const actual = pinged.front();
-    EXPECT_EQ(expected.address(), actual.address);
-    EXPECT_EQ(expected.port(), actual.port);
-    EXPECT_EQ(expected.display_name(), actual.address.display_name(actual.port));
+    auto const [actual_addrport, time] = pinged.front();
+    EXPECT_EQ(expected.address(), actual_addrport.address());
+    EXPECT_EQ(expected.port(), actual_addrport.port());
+    EXPECT_EQ(expected.display_name(), actual_addrport.display_name());
 }
 
 TEST_F(DhtTest, pingsAddedNodes)
@@ -621,18 +617,18 @@ TEST_F(DhtTest, pingsAddedNodes)
     auto const addr = tr_address::from_string("10.10.10.1");
     EXPECT_TRUE(addr.has_value());
     assert(addr.has_value());
-    auto constexpr Port = tr_port::fromHost(128);
+    auto constexpr Port = tr_port::from_host(128);
     dht->add_node(*addr, Port);
 
     ASSERT_EQ(1U, std::size(mediator.mock_dht_.pinged_));
-    EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().address);
-    EXPECT_EQ(Port, mediator.mock_dht_.pinged_.front().port);
+    EXPECT_EQ(addr, mediator.mock_dht_.pinged_.front().addrport.address());
+    EXPECT_EQ(Port, mediator.mock_dht_.pinged_.front().addrport.port());
 }
 
 TEST_F(DhtTest, announcesTorrents)
 {
     auto constexpr Id = tr_torrent_id_t{ 1 };
-    auto constexpr PeerPort = tr_port::fromHost(999);
+    auto constexpr PeerPort = tr_port::from_host(999);
     auto const info_hash = tr_rand_obj<tr_sha1_digest_t>();
 
     tr_timeUpdate(time(nullptr));

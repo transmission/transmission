@@ -2149,7 +2149,6 @@ static void filterIds(tr_variant* top, Config& config)
 }
 static int processResponse(char const* rpcurl, std::string_view response, Config& config)
 {
-    auto top = tr_variant{};
     auto status = int{ EXIT_SUCCESS };
 
     if (config.debug)
@@ -2163,13 +2162,14 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
         return status;
     }
 
-    if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
+    if (auto otop = tr_variant_serde::json().inplace().parse(response); !otop)
     {
         tr_logAddWarn(fmt::format("Unable to parse response '{}'", response));
         status |= EXIT_FAILURE;
     }
     else
     {
+        auto& top = *otop;
         int64_t tag = -1;
         auto sv = std::string_view{};
 
@@ -2258,14 +2258,14 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
                         }
                     }
                 }
-
-                tr_variantClear(&top);
             }
         }
         else
         {
             status |= EXIT_FAILURE;
         }
+
+        tr_variantClear(&top);
     }
 
     return status;
@@ -2339,8 +2339,7 @@ static void tr_curl_easy_cleanup(CURL* curl)
 
 static int flush(char const* rpcurl, tr_variant* benc, Config& config)
 {
-    int status = EXIT_SUCCESS;
-    auto const json = tr_variantToStr(benc, TR_VARIANT_FMT_JSON_LEAN);
+    auto const json = tr_variant_serde::json().compact().to_string(*benc);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
     auto const rpcurl_http = fmt::format(FMT_STRING("{:s}://{:s}"), scheme, rpcurl);
 
@@ -2355,6 +2354,7 @@ static int flush(char const* rpcurl, tr_variant* benc, Config& config)
         fmt::print(stderr, "posting:\n--------\n{:s}\n--------\n", json);
     }
 
+    auto status = EXIT_SUCCESS;
     if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
     {
         tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
