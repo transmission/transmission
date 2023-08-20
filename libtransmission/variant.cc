@@ -571,7 +571,7 @@ public:
         is_visited_ = true;
     }
 
-    tr_variant const* current() const noexcept
+    [[nodiscard]] tr_variant const* current() const noexcept
     {
         return var_;
     }
@@ -579,7 +579,7 @@ public:
 protected:
     friend class VariantWalker;
 
-    tr_variant const* var_;
+    tr_variant const* var_ = nullptr;
 
     bool is_visited_ = false;
 
