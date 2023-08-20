@@ -525,7 +525,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
         {
             for (tr_file_index_t fi = 0; fi < n_files; ++fi)
             {
-                auto* const b = tr_variantListChild(l, fi);
+                tr_variant* const b = tr_variantListChild(l, fi);
                 auto time_checked = time_t{};
 
                 if (tr_variantIsInt(b))

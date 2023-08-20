@@ -503,11 +503,11 @@ void jsonChildFunc(struct JsonWalk* data)
     }
 }
 
-void jsonPushParent(struct JsonWalk* data, tr_variant const& var)
+void jsonPushParent(struct JsonWalk* data, tr_variant const& v)
 {
-    auto const is_dict = tr_variantIsDict(&var);
-    auto const is_list = tr_variantIsList(&var);
-    auto const n_children = var.val.l.count * (is_dict ? 2U : 1U);
+    auto const is_dict = tr_variantIsDict(&v);
+    auto const is_list = tr_variantIsList(&v);
+    auto const n_children = is_dict ? v.val.l.count * 2U : v.val.l.count;
     data->parents.push_back({ is_dict, is_list, 0, n_children });
 }
 

@@ -247,7 +247,7 @@ private:
         {
             node = top_;
         }
-        else if (auto* const parent = stack_.back(); tr_variantIsList(parent))
+        else if (auto* parent = stack_.back(); tr_variantIsList(parent))
         {
             node = tr_variantListAdd(parent);
         }

@@ -961,7 +961,7 @@ void Session::update()
 
 void Session::start_now(tr_torrent_id_t id)
 {
-    auto top = tr_variant{};
+    tr_variant top;
     tr_variantInitDict(&top, 2);
     tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-start-now");
 
@@ -1230,7 +1230,7 @@ void Session::port_test()
     auto const tag = nextTag;
     ++nextTag;
 
-    auto request = tr_variant{};
+    tr_variant request;
     tr_variantInitDict(&request, 2);
     tr_variantDictAddStrView(&request, TR_KEY_method, "port-test");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);
@@ -1261,7 +1261,7 @@ void Session::blocklist_update()
     auto const tag = nextTag;
     ++nextTag;
 
-    auto request = tr_variant{};
+    tr_variant request;
     tr_variantInitDict(&request, 2);
     tr_variantDictAddStrView(&request, TR_KEY_method, "blocklist-update");
     tr_variantDictAddInt(&request, TR_KEY_tag, tag);

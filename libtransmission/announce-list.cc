@@ -257,7 +257,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
     else if (this->size() > 1)
     {
-        auto* const tier_list = tr_variantDictAddList(&metainfo, TR_KEY_announce_list, 0);
+        tr_variant* tier_list = tr_variantDictAddList(&metainfo, TR_KEY_announce_list, 0);
 
         auto current_tier = std::optional<tr_tracker_tier_t>{};
         tr_variant* tracker_list = nullptr;

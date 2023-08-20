@@ -227,7 +227,7 @@ Prefs::Prefs(QString config_dir)
     // when the application exits.
     temporary_prefs_ << FILTER_TEXT;
 
-    auto top = tr_variant{};
+    tr_variant top;
     tr_variantInitDict(&top, 0);
     initDefaults(&top);
     tr_sessionLoadSettings(&top, config_dir_.toUtf8().constData(), nullptr);
@@ -323,7 +323,7 @@ Prefs::Prefs(QString config_dir)
 Prefs::~Prefs()
 {
     // make a dict from settings.json
-    auto current_settings = tr_variant{};
+    tr_variant current_settings;
     tr_variantInitDict(&current_settings, PREFS_COUNT);
 
     for (int i = 0; i < PREFS_COUNT; ++i)

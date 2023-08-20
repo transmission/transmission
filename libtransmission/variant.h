@@ -11,7 +11,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #include "libtransmission/quark.h"
 
@@ -182,7 +181,7 @@ public:
 
 [[nodiscard]] constexpr bool tr_variantIsEmpty(tr_variant const* const var)
 {
-    return var != nullptr && var->type == tr_variant::Type::None;
+    return var == nullptr || var->type == tr_variant::Type::None;
 }
 
 // --- Strings

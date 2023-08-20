@@ -527,13 +527,13 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 
     TR_ASSERT(tr_variantIsDict(client_settings));
 
-    auto settings = tr_variant{};
+    tr_variant settings;
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
 
     tr_variantInitDict(&settings, 0);
 
     /* the existing file settings are the fallback values */
-    if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+    if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
         tr_variantMergeDicts(&settings, &*file_settings);
     }

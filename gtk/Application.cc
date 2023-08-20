@@ -1434,7 +1434,7 @@ void Application::Impl::show_about_dialog()
 
 bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method)
 {
-    auto top = tr_variant{};
+    tr_variant top;
     bool invoked = false;
     auto* session = core_->get_session();
 
@@ -1464,7 +1464,7 @@ void Application::Impl::remove_selected(bool delete_files)
 void Application::Impl::start_all_torrents()
 {
     auto* session = core_->get_session();
-    auto request = tr_variant{};
+    tr_variant request;
 
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-start"sv);
@@ -1474,7 +1474,7 @@ void Application::Impl::start_all_torrents()
 void Application::Impl::pause_all_torrents()
 {
     auto* session = core_->get_session();
-    auto request = tr_variant{};
+    tr_variant request;
 
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-stop"sv);
