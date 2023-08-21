@@ -54,6 +54,9 @@ export class Transmission extends EventTarget {
       200,
     );
 
+    this.isTouch = 'ontouchstart' in window ? true : false;
+    this.busyclick = false;
+
     // listen to actions
     // TODO: consider adding a mutator listener here to see dynamic additions
     for (const element of document.querySelectorAll(`button[data-action]`)) {
@@ -208,9 +211,11 @@ export class Transmission extends EventTarget {
       torrent_list: document.querySelector('#torrent-list'),
     };
 
-    this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
-      // ensure the clicked row is selected
-      let row_element = event.target;
+    const rightc = (event_) => {
+      if (this.isTouch && event_.touches.length > 1) return;
+
+      // if not already, highlight the torrent
+      let row_element = event_.target;
       while (row_element && !row_element.classList.contains('torrent')) {
         row_element = row_element.parentNode;
       }
@@ -219,23 +224,39 @@ export class Transmission extends EventTarget {
         this._setSelectedRow(row);
       }
 
+      // open context menu
       const popup = new ContextMenu(this.action_manager);
       this.setCurrentPopup(popup);
 
       const boundingElement = document.querySelector('#torrent-container');
       const bounds = boundingElement.getBoundingClientRect();
       const x = Math.min(
-        event_.x,
+        (this.isTouch ? event_.touches[0].clientX : event_.x),
         bounds.x + bounds.width - popup.root.clientWidth,
       );
       const y = Math.min(
-        event_.y,
+        (this.isTouch ? event_.touches[0].clientY : event_.y),
         bounds.y + bounds.height - popup.root.clientHeight,
       );
       popup.root.style.left = `${x > 0 ? x : 0}px`;
       popup.root.style.top = `${y > 0 ? y : 0}px`;
       event_.preventDefault();
-    });
+    }
+
+    if (this.isTouch) {
+      this.elements.torrent_list.addEventListener('touchstart', (e) => {
+        if (this.busyclick) {
+          clearTimeout(this.busyclick);
+          this.busyclick = false;
+        } else {
+          this.busyclick = setTimeout(rightc.bind(this), 500, e)
+        }
+      });
+      this.elements.torrent_list.addEventListener('touchend', () => {clearTimeout(this.busyclick);this.busyclick = false});
+      this.elements.torrent_list.addEventListener('touchmove', () => {clearTimeout(this.busyclick);this.busyclick = false});
+    } else {
+      this.elements.torrent_list.addEventListener('contextmenu', rightc.bind(this));
+    }
 
     // Get preferences & torrents from the daemon
     this.loadDaemonPrefs();
@@ -747,7 +768,6 @@ TODO: fix this when notifications get fixed
     // which deselects all on click
     event_.stopPropagation();
 
-    // TODO: long-click should raise inspector
     if (event_.shiftKey) {
       this._selectRange(row);
       // Need to deselect any selected text
