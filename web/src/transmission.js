@@ -471,7 +471,7 @@ export class Transmission extends EventTarget {
     const { ctrlKey, keyCode, metaKey, shiftKey, target } = event_;
 
     // look for a shortcut
-    const is_input_focused = target.matches('input');
+    const is_input_focused = ['INPUT', 'TEXTAREA'].includes(target.tagName);
     if (!is_input_focused) {
       const shortcut = Transmission._createKeyShortcutFromKeyboardEvent(event_);
       const action = this.action_manager.getActionForShortcut(shortcut);
