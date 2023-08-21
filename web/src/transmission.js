@@ -212,7 +212,9 @@ export class Transmission extends EventTarget {
     };
 
     const rightc = (event_) => {
-      if (this.isTouch && event_.touches.length > 1) return;
+      if (this.isTouch && event_.touches.length > 1) {
+        return;
+      }
 
       // if not already, highlight the torrent
       let row_element = event_.target;
@@ -231,17 +233,17 @@ export class Transmission extends EventTarget {
       const boundingElement = document.querySelector('#torrent-container');
       const bounds = boundingElement.getBoundingClientRect();
       const x = Math.min(
-        (this.isTouch ? event_.touches[0].clientX : event_.x),
+        this.isTouch ? event_.touches[0].clientX : event_.x,
         bounds.x + bounds.width - popup.root.clientWidth,
       );
       const y = Math.min(
-        (this.isTouch ? event_.touches[0].clientY : event_.y),
+        this.isTouch ? event_.touches[0].clientY : event_.y,
         bounds.y + bounds.height - popup.root.clientHeight,
       );
       popup.root.style.left = `${x > 0 ? x : 0}px`;
       popup.root.style.top = `${y > 0 ? y : 0}px`;
       event_.preventDefault();
-    }
+    };
 
     if (this.isTouch) {
       this.elements.torrent_list.addEventListener('touchstart', (event_) => {
@@ -249,13 +251,20 @@ export class Transmission extends EventTarget {
           clearTimeout(this.busyclick);
           this.busyclick = false;
         } else {
-          this.busyclick = setTimeout(rightc.bind(this), 500, event_)
+          this.busyclick = setTimeout(rightc.bind(this), 500, event_);
         }
       });
-      this.elements.torrent_list.addEventListener('touchend', () => {clearTimeout(this.busyclick);this.busyclick = false});
-      this.elements.torrent_list.addEventListener('touchmove', () => {clearTimeout(this.busyclick);this.busyclick = false});
+      this.elements.torrent_list.addEventListener('touchend', () => {
+        clearTimeout(this.busyclick);this.busyclick = false;
+      });
+      this.elements.torrent_list.addEventListener('touchmove', () => {
+        clearTimeout(this.busyclick);this.busyclick = false;
+      });
     } else {
-      this.elements.torrent_list.addEventListener('contextmenu', rightc.bind(this));
+      this.elements.torrent_list.addEventListener(
+        'contextmenu',
+        rightc.bind(this),
+      );
     }
 
     // Get preferences & torrents from the daemon
