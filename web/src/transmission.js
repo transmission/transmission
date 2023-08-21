@@ -255,10 +255,12 @@ export class Transmission extends EventTarget {
         }
       });
       this.elements.torrent_list.addEventListener('touchend', () => {
-        clearTimeout(this.busyclick);this.busyclick = false;
+        clearTimeout(this.busyclick);
+        this.busyclick = false;
       });
       this.elements.torrent_list.addEventListener('touchmove', () => {
-        clearTimeout(this.busyclick);this.busyclick = false;
+        clearTimeout(this.busyclick);
+        this.busyclick = false;
       });
     } else {
       this.elements.torrent_list.addEventListener(
