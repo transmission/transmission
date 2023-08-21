@@ -268,35 +268,6 @@ export function addCheckedClass(element, b) {
   element.classList.toggle('checked', b);
 }
 
-function getBestMenuPos(r, bounds) {
-  let { x, y } = r;
-  const { width, height } = r;
-
-  if (x > bounds.x + bounds.width - width && x - width >= bounds.x) {
-    x -= width;
-  } else {
-    x = Math.min(x, bounds.x + bounds.width - width);
-  }
-
-  if (y > bounds.y + bounds.height - height && y - height >= bounds.y) {
-    y -= height;
-  } else {
-    y = Math.min(y, bounds.y + bounds.height - height);
-  }
-
-  return new DOMRect(x, y, width, height);
-}
-
-export function movePopup(popup, x, y, boundingElement) {
-  const initial_pos = new DOMRect(x, y, popup.clientWidth, popup.clientHeight);
-  const clamped_pos = getBestMenuPos(
-    initial_pos,
-    boundingElement.getBoundingClientRect()
-  );
-  popup.style.left = `${clamped_pos.left}px`;
-  popup.style.top = `${clamped_pos.top}px`;
-}
-
 export class OutsideClickListener extends EventTarget {
   constructor(element) {
     super();

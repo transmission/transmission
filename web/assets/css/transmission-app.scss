@@ -342,7 +342,6 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   left: 0;
   margin: 0;
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 0;
   right: 0;
 }
@@ -1273,13 +1272,12 @@ $video-image: '../img/film.svg';
   box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014,
     0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
-  min-width: 220px;
+  margin: 6px;
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 10px;
   position: absolute;
 
-  right: 20px;
+  right: 0;
   top: 50px;
   z-index: $z-index-popup;
 
