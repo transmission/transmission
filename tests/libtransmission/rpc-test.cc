@@ -35,13 +35,13 @@ TEST_F(RpcTest, list)
     tr_variant top;
 
     tr_rpc_parse_list_str(&top, "12"sv);
-    EXPECT_TRUE(tr_variantIsInt(&top));
+    EXPECT_TRUE(top.holds_alternative<int64_t>());
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
     top.clear();
 
     tr_rpc_parse_list_str(&top, "6,7"sv);
-    EXPECT_TRUE(tr_variantIsList(&top));
+    EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(2U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(6, i);
@@ -50,13 +50,13 @@ TEST_F(RpcTest, list)
     top.clear();
 
     tr_rpc_parse_list_str(&top, "asdf"sv);
-    EXPECT_TRUE(tr_variantIsString(&top));
+    EXPECT_TRUE(top.holds_alternative<std::string_view>());
     EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
     EXPECT_EQ("asdf"sv, sv);
     top.clear();
 
     tr_rpc_parse_list_str(&top, "1,3-5"sv);
-    EXPECT_TRUE(tr_variantIsList(&top));
+    EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(4U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(1, i);
@@ -88,7 +88,7 @@ TEST_F(RpcTest, sessionGet)
     tr_variant response;
     tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
 
-    EXPECT_TRUE(tr_variantIsDict(&response));
+    EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
     tr_variant* args = nullptr;
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 

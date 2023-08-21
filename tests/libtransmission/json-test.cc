@@ -60,7 +60,7 @@ TEST_P(JSONTest, testElements)
     };
 
     auto var = tr_variant_serde::json().inplace().parse(in).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
 
     auto sv = std::string_view{};
     auto key = tr_quark_new("string"sv);
@@ -98,14 +98,14 @@ TEST_P(JSONTest, testUtf8)
     auto serde = tr_variant_serde::json();
     serde.inplace();
     auto var = serde.parse(in).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
     EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
     var.clear();
 
     in = R"({ "key": "\u005C" })"sv;
     var = serde.parse(in).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
     EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
     EXPECT_EQ("\\"sv, sv);
     var.clear();
@@ -120,7 +120,7 @@ TEST_P(JSONTest, testUtf8)
      */
     in = R"({ "key": "Let\u00f6lt\u00e9sek" })"sv;
     var = serde.parse(in).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
     EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
     auto json = serde.to_string(var);
@@ -130,7 +130,7 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_NE(std::string::npos, json.find("\\u00f6"));
     EXPECT_NE(std::string::npos, json.find("\\u00e9"));
     var = serde.parse(json).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
     EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
 }
@@ -149,7 +149,7 @@ TEST_P(JSONTest, testUtf16Surrogates)
     EXPECT_NE(std::string::npos, json.find("udd14"));
 
     auto parsed = serde.parse(json).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&parsed));
+    EXPECT_TRUE(parsed.holds_alternative<tr_variant::Map>());
     auto value = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&parsed, key, &value));
     EXPECT_EQ(ThinkingFaceEmojiUtf8, value);
@@ -173,13 +173,13 @@ TEST_P(JSONTest, test1)
 
     auto serde = tr_variant_serde::json();
     auto var = serde.inplace().parse(Input).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
 
     auto sv = std::string_view{};
     auto i = int64_t{};
     auto* headers = tr_variantDictFind(&var, tr_quark_new("headers"sv));
     EXPECT_NE(nullptr, headers);
-    EXPECT_TRUE(tr_variantIsDict(headers));
+    EXPECT_TRUE(headers->holds_alternative<tr_variant::Map>());
     EXPECT_TRUE(tr_variantDictFindStrView(headers, tr_quark_new("type"sv), &sv));
     EXPECT_EQ("request"sv, sv);
     EXPECT_TRUE(tr_variantDictFindInt(headers, TR_KEY_tag, &i));
@@ -190,10 +190,10 @@ TEST_P(JSONTest, test1)
     EXPECT_EQ("torrent-info"sv, sv);
     auto* args = tr_variantDictFind(body, tr_quark_new("arguments"sv));
     EXPECT_NE(nullptr, args);
-    EXPECT_TRUE(tr_variantIsDict(args));
+    EXPECT_TRUE(args->holds_alternative<tr_variant::Map>());
     auto* ids = tr_variantDictFind(args, TR_KEY_ids);
-    EXPECT_NE(nullptr, ids);
-    EXPECT_TRUE(tr_variantIsList(ids));
+    ASSERT_NE(nullptr, ids);
+    EXPECT_TRUE(ids->holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(2U, tr_variantListSize(ids));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(ids, 0), &i));
     EXPECT_EQ(7, i);
@@ -218,7 +218,7 @@ TEST_P(JSONTest, test3)
         "  \"leftUntilDone\": 2275655680 }"sv;
 
     auto var = tr_variant_serde::json().inplace().parse(Input).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
 
     auto sv = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&var, TR_KEY_errorString, &sv));
@@ -230,7 +230,7 @@ TEST_P(JSONTest, unescape)
     static auto constexpr Input = R"({ "string-1": "\/usr\/lib" })"sv;
 
     auto var = tr_variant_serde::json().inplace().parse(Input).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsDict(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
 
     auto sv = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&var, tr_quark_new("string-1"sv), &sv));

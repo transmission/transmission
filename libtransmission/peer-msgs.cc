@@ -1030,7 +1030,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     auto const handshake_sv = payload.to_string_view();
 
     auto var = tr_variant_serde::benc().inplace().parse(handshake_sv);
-    if (!var || !tr_variantIsDict(&*var))
+    if (!var || !var->holds_alternative<tr_variant::Map>())
     {
         logtrace(msgs, "GET  extended-handshake, couldn't get dictionary");
         return;
