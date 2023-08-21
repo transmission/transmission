@@ -273,7 +273,7 @@ std::optional<tr_variant> tr_variant_serde::parse_benc(std::string_view input)
     auto handler = MyHandler{ &top, parse_inplace_ };
     if (transmission::benc::parse(input, stack, handler, &end_, &error_) && std::empty(stack))
     {
-        return top;
+        return std::optional<tr_variant>{ std::move(top) };
     }
 
     return {};
