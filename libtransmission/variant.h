@@ -8,42 +8,24 @@
 #include <algorithm>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
+#include <map>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <vector>
 
 #include "libtransmission/quark.h"
 
 struct tr_error;
 
 /**
- * @addtogroup tr_variant Variant
+ * A variant that holds typical benc/json types: bool, int, double, string,
+ * vectors of variants, and maps of string-to-variant.
+ * Useful when serializing / deserializing benc/json data.
  *
- * An object that acts like a union for
- * integers, strings, lists, dictionaries, booleans, and floating-point numbers.
- * The structure is named `tr_variant` due to the historical reason that it was
- * originally tightly coupled with bencoded data. It currently supports
- * being parsed from, and serialized to, both bencoded notation and json notation.
- *
- * @{
+ * @see tr_variant_serde
  */
-
-/* these are PRIVATE IMPLEMENTATION details that should not be touched.
- * I'll probably change them just to break your code! HA HA HA!
- * it's included in the header for inlining and composition */
-enum
-{
-    TR_VARIANT_TYPE_INT = 1,
-    TR_VARIANT_TYPE_STR = 2,
-    TR_VARIANT_TYPE_LIST = 4,
-    TR_VARIANT_TYPE_DICT = 8,
-    TR_VARIANT_TYPE_BOOL = 16,
-    TR_VARIANT_TYPE_REAL = 32
-};
-
-/* These are PRIVATE IMPLEMENTATION details that should not be touched.
- * I'll probably change them just to break your code! HA HA HA!
- * it's included in the header for inlining and composition */
 struct tr_variant
 {
 private:
@@ -125,6 +107,9 @@ public:
         Map
     };
 
+    using Vector = std::vector<tr_variant>;
+    using Map = std::map<tr_quark, tr_variant>;
+
     tr_variant() noexcept = default;
 
     tr_variant(tr_variant const&) = delete;
@@ -144,6 +129,51 @@ public:
         std::swap(type, that.type);
         std::swap(val, that.val);
         return *this;
+    }
+
+    [[nodiscard]] constexpr auto has_value() const noexcept
+    {
+        return type != Type::None;
+    }
+
+    template<typename Val>
+    [[nodiscard]] constexpr bool holds_alternative() const noexcept
+    {
+        static_assert(
+            std::is_same_v<Val, bool> || std::is_same_v<Val, int64_t> || std::is_same_v<Val, double> ||
+            std::is_same_v<Val, std::string_view> || std::is_same_v<Val, Vector> || std::is_same_v<Val, Map>);
+
+        if constexpr (std::is_same_v<Val, bool>)
+        {
+            return type == Type::Bool;
+        }
+
+        if constexpr (std::is_same_v<Val, int64_t>)
+        {
+            return type == Type::Int;
+        }
+
+        if constexpr (std::is_same_v<Val, double>)
+        {
+            return type == Type::Double;
+        }
+
+        if constexpr (std::is_same_v<Val, std::string_view>)
+        {
+            return type == Type::String;
+        }
+
+        if constexpr (std::is_same_v<Val, Vector>)
+        {
+            return type == Type::Vector;
+        }
+
+        if constexpr (std::is_same_v<Val, Map>)
+        {
+            return type == Type::Map;
+        }
+
+        return false;
     }
 
     void clear()
@@ -174,22 +204,7 @@ public:
     } val = {};
 };
 
-[[nodiscard]] constexpr bool tr_variantIsType(tr_variant const* const var, tr_variant::Type type)
-{
-    return var != nullptr && var->type == type;
-}
-
-[[nodiscard]] constexpr bool tr_variantIsEmpty(tr_variant const* const var)
-{
-    return var == nullptr || var->type == tr_variant::Type::None;
-}
-
 // --- Strings
-
-[[nodiscard]] constexpr bool tr_variantIsString(tr_variant const* const var)
-{
-    return var != nullptr && var->type == tr_variant::Type::String;
-}
 
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
@@ -209,11 +224,6 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
 
 // --- Real Numbers
 
-[[nodiscard]] constexpr bool tr_variantIsReal(tr_variant const* const var)
-{
-    return var != nullptr && var->type == tr_variant::Type::Double;
-}
-
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
 constexpr void tr_variantInitReal(tr_variant* initme, double value)
@@ -223,11 +233,6 @@ constexpr void tr_variantInitReal(tr_variant* initme, double value)
 }
 
 // --- Booleans
-
-[[nodiscard]] constexpr bool tr_variantIsBool(tr_variant const* const var)
-{
-    return var != nullptr && var->type == tr_variant::Type::Bool;
-}
 
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
@@ -239,11 +244,6 @@ constexpr void tr_variantInitBool(tr_variant* initme, bool value)
 
 // --- Ints
 
-[[nodiscard]] constexpr bool tr_variantIsInt(tr_variant const* const var)
-{
-    return var != nullptr && var->type == tr_variant::Type::Int;
-}
-
 bool tr_variantGetInt(tr_variant const* var, int64_t* setme);
 
 constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
@@ -253,11 +253,6 @@ constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
 }
 
 // --- Lists
-
-[[nodiscard]] constexpr bool tr_variantIsList(tr_variant const* const var)
-{
-    return var != nullptr && var->type == tr_variant::Type::Vector;
-}
 
 void tr_variantInitList(tr_variant* initme, size_t reserve_count);
 void tr_variantListReserve(tr_variant* var, size_t reserve_count);
@@ -278,15 +273,10 @@ bool tr_variantListRemove(tr_variant* var, size_t pos);
 
 [[nodiscard]] constexpr size_t tr_variantListSize(tr_variant const* const var)
 {
-    return tr_variantIsList(var) ? var->val.l.count : 0;
+    return var != nullptr && var->holds_alternative<tr_variant::Vector>() ? var->val.l.count : 0;
 }
 
 // --- Dictionaries
-
-[[nodiscard]] constexpr bool tr_variantIsDict(tr_variant const* const var)
-{
-    return var != nullptr && var->type == tr_variant::Type::Map;
-}
 
 void tr_variantInitDict(tr_variant* initme, size_t reserve_count);
 void tr_variantDictReserve(tr_variant* var, size_t reserve_count);
@@ -317,7 +307,11 @@ bool tr_variantDictFindRaw(tr_variant* var, tr_quark key, std::byte const** setm
 /* this is only quasi-supported. don't rely on it too heavily outside of libT */
 void tr_variantMergeDicts(tr_variant* tgt, tr_variant const* src);
 
-// tr_variant serializer / deserializer
+/**
+ * Helper class for serializing and deserializing benc/json data.
+ *
+ * @see tr_variant
+ */
 class tr_variant_serde
 {
 public:

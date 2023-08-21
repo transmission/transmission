@@ -31,14 +31,14 @@ namespace
 {
 constexpr bool variant_is_container(tr_variant const* const var)
 {
-    return tr_variantIsList(var) || tr_variantIsDict(var);
+    return var != nullptr && (var->holds_alternative<tr_variant::Vector>() || var->holds_alternative<tr_variant::Map>());
 }
 
 // ---
 
 constexpr std::optional<size_t> dict_index_of(tr_variant const* const var, tr_quark const key)
 {
-    if (!tr_variantIsDict(var))
+    if (var == nullptr || !var->holds_alternative<tr_variant::Map>())
     {
         return {};
     }
@@ -56,8 +56,9 @@ constexpr std::optional<size_t> dict_index_of(tr_variant const* const var, tr_qu
 
 bool dictFindType(tr_variant* const var, tr_quark key, tr_variant::Type type, tr_variant** setme)
 {
-    *setme = tr_variantDictFind(var, key);
-    return tr_variantIsType(*setme, type);
+    auto* const res = tr_variantDictFind(var, key);
+    *setme = res;
+    return res != nullptr && res->type == type;
 }
 
 tr_variant* containerReserve(tr_variant* var, size_t count)
@@ -129,9 +130,12 @@ tr_variant* tr_variantDictFind(tr_variant* const var, tr_quark key)
 
 tr_variant* tr_variantListChild(tr_variant* const var, size_t pos)
 {
-    if (tr_variantIsList(var) && pos < var->val.l.count)
+    if (var != nullptr && var->holds_alternative<tr_variant::Vector>())
     {
-        return var->val.l.vals + pos;
+        if (auto& container = var->val.l; pos < container.count)
+        {
+            return container.vals + pos;
+        }
     }
 
     return {};
@@ -149,7 +153,7 @@ bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
         return false;
     }
 
-    if (tr_variantIsInt(var))
+    if (var->holds_alternative<int64_t>())
     {
         if (setme != nullptr)
         {
@@ -159,7 +163,7 @@ bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
         return true;
     }
 
-    if (tr_variantIsBool(var))
+    if (var->holds_alternative<bool>())
     {
         if (setme != nullptr)
         {
@@ -174,7 +178,7 @@ bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 
 bool tr_variantGetStrView(tr_variant const* const var, std::string_view* setme)
 {
-    if (tr_variantIsString(var))
+    if (var != nullptr && var->holds_alternative<std::string_view>())
     {
         *setme = var->val.s.get();
         return true;
@@ -214,13 +218,13 @@ bool tr_variantGetBool(tr_variant const* const var, bool* setme)
         return false;
     }
 
-    if (tr_variantIsBool(var))
+    if (var->holds_alternative<bool>())
     {
         *setme = var->val.b;
         return true;
     }
 
-    if (tr_variantIsInt(var) && (var->val.i == 0 || var->val.i == 1))
+    if (var->holds_alternative<int64_t>() && (var->val.i == 0 || var->val.i == 1))
     {
         *setme = var->val.i != 0;
         return true;
@@ -251,19 +255,19 @@ bool tr_variantGetReal(tr_variant const* const var, double* setme)
         return false;
     }
 
-    if (tr_variantIsReal(var))
+    if (var->holds_alternative<double>())
     {
         *setme = var->val.d;
         return true;
     }
 
-    if (tr_variantIsInt(var))
+    if (var->holds_alternative<int64_t>())
     {
         *setme = static_cast<double>(var->val.i);
         return true;
     }
 
-    if (tr_variantIsString(var))
+    if (var->holds_alternative<std::string_view>())
     {
         if (auto val = tr_num_parse<double>(var->val.s.get()); val)
         {
@@ -353,7 +357,8 @@ void tr_variantInitList(tr_variant* initme, size_t reserve_count)
 
 void tr_variantListReserve(tr_variant* const var, size_t count)
 {
-    TR_ASSERT(tr_variantIsList(var));
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Vector>());
 
     containerReserve(var, count);
 }
@@ -366,14 +371,16 @@ void tr_variantInitDict(tr_variant* initme, size_t reserve_count)
 
 void tr_variantDictReserve(tr_variant* const var, size_t reserve_count)
 {
-    TR_ASSERT(tr_variantIsDict(var));
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Map>());
 
     containerReserve(var, reserve_count);
 }
 
 tr_variant* tr_variantListAdd(tr_variant* const var)
 {
-    TR_ASSERT(tr_variantIsList(var));
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Vector>());
 
     auto* const child = containerReserve(var, 1);
     ++var->val.l.count;
@@ -447,7 +454,8 @@ tr_variant* tr_variantListAddDict(tr_variant* const var, size_t reserve_count)
 
 tr_variant* tr_variantDictAdd(tr_variant* const var, tr_quark key)
 {
-    TR_ASSERT(tr_variantIsDict(var));
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Map>());
 
     auto* const child = containerReserve(var, 1);
     ++var->val.l.count;
@@ -600,7 +608,7 @@ protected:
     template<typename Container>
     void sort(Container& sortbuf)
     {
-        if (!tr_variantIsDict(var_))
+        if (var_ == nullptr || !var_->holds_alternative<tr_variant::Map>())
         {
             return;
         }
@@ -696,7 +704,7 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
 
             if (v != nullptr)
             {
-                if (tr_variantIsDict(node.current()))
+                if (node.current()->holds_alternative<tr_variant::Map>())
                 {
                     auto const keystr = tr_quark_get_string_view(v->key);
                     auto tmp = tr_variant{};
@@ -771,15 +779,19 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
 
 bool tr_variantDictChild(tr_variant* const var, size_t pos, tr_quark* key, tr_variant** setme_value)
 {
-    TR_ASSERT(tr_variantIsDict(var));
+    TR_ASSERT(var != nullptr);
+    TR_ASSERT(var->holds_alternative<tr_variant::Map>());
 
     bool success = false;
 
-    if (tr_variantIsDict(var) && pos < var->val.l.count)
+    if (var != nullptr && var->holds_alternative<tr_variant::Map>())
     {
-        *key = var->val.l.vals[pos].key;
-        *setme_value = var->val.l.vals + pos;
-        success = true;
+        if (auto& container = var->val.l; pos < container.count)
+        {
+            *key = container.vals[pos].key;
+            *setme_value = container.vals + pos;
+            success = true;
+        }
     }
 
     return success;
@@ -799,35 +811,35 @@ void tr_variantListCopy(tr_variant* target, tr_variant const* src)
             break;
         }
 
-        if (tr_variantIsBool(child))
+        if (child->holds_alternative<bool>())
         {
             auto val = bool{};
             tr_variantGetBool(child, &val);
             tr_variantListAddBool(target, val);
         }
-        else if (tr_variantIsReal(child))
+        else if (child->holds_alternative<double>())
         {
             auto val = double{};
             tr_variantGetReal(child, &val);
             tr_variantListAddReal(target, val);
         }
-        else if (tr_variantIsInt(child))
+        else if (child->holds_alternative<int64_t>())
         {
             auto val = int64_t{};
             tr_variantGetInt(child, &val);
             tr_variantListAddInt(target, val);
         }
-        else if (tr_variantIsString(child))
+        else if (child->holds_alternative<std::string_view>())
         {
             auto val = std::string_view{};
             (void)tr_variantGetStrView(child, &val);
             tr_variantListAddRaw(target, std::data(val), std::size(val));
         }
-        else if (tr_variantIsDict(child))
+        else if (child->holds_alternative<tr_variant::Map>())
         {
             tr_variantMergeDicts(tr_variantListAddDict(target, 0), child);
         }
-        else if (tr_variantIsList(child))
+        else if (child->holds_alternative<tr_variant::Vector>())
         {
             tr_variantListCopy(tr_variantListAddList(target, 0), child);
         }
@@ -840,7 +852,7 @@ void tr_variantListCopy(tr_variant* target, tr_variant const* src)
 
 constexpr size_t tr_variantDictSize(tr_variant const* const var)
 {
-    return tr_variantIsDict(var) ? var->val.l.count : 0U;
+    return var != nullptr && var->holds_alternative<tr_variant::Map>() ? var->val.l.count : 0U;
 }
 } // namespace merge_helpers
 } // namespace
@@ -849,8 +861,10 @@ void tr_variantMergeDicts(tr_variant* const tgt, tr_variant const* const src)
 {
     using namespace merge_helpers;
 
-    TR_ASSERT(tr_variantIsDict(tgt));
-    TR_ASSERT(tr_variantIsDict(src));
+    TR_ASSERT(tgt != nullptr);
+    TR_ASSERT(tgt->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(src != nullptr);
+    TR_ASSERT(src->holds_alternative<tr_variant::Map>());
 
     size_t const source_count = tr_variantDictSize(src);
 
@@ -866,47 +880,47 @@ void tr_variantMergeDicts(tr_variant* const tgt, tr_variant const* const src)
 
             // if types differ, ensure that target will overwrite source
             auto const* const target_child = tr_variantDictFind(tgt, key);
-            if ((target_child != nullptr) && !tr_variantIsType(target_child, child->type))
+            if ((target_child != nullptr) && child->type != target_child->type)
             {
                 tr_variantDictRemove(tgt, key);
             }
 
-            if (tr_variantIsBool(child))
+            if (child->holds_alternative<bool>())
             {
                 auto val = bool{};
                 tr_variantGetBool(child, &val);
                 tr_variantDictAddBool(tgt, key, val);
             }
-            else if (tr_variantIsReal(child))
+            else if (child->holds_alternative<double>())
             {
                 auto val = double{};
                 tr_variantGetReal(child, &val);
                 tr_variantDictAddReal(tgt, key, val);
             }
-            else if (tr_variantIsInt(child))
+            else if (child->holds_alternative<int64_t>())
             {
                 auto val = int64_t{};
                 tr_variantGetInt(child, &val);
                 tr_variantDictAddInt(tgt, key, val);
             }
-            else if (tr_variantIsString(child))
+            else if (child->holds_alternative<std::string_view>())
             {
                 auto val = std::string_view{};
                 (void)tr_variantGetStrView(child, &val);
                 tr_variantDictAddRaw(tgt, key, std::data(val), std::size(val));
             }
-            else if (tr_variantIsDict(child) && tr_variantDictFindDict(tgt, key, &t))
+            else if (child->holds_alternative<tr_variant::Map>() && tr_variantDictFindDict(tgt, key, &t))
             {
                 tr_variantMergeDicts(t, child);
             }
-            else if (tr_variantIsList(child))
+            else if (child->holds_alternative<tr_variant::Vector>())
             {
                 if (tr_variantDictFind(tgt, key) == nullptr)
                 {
                     tr_variantListCopy(tr_variantDictAddList(tgt, key, tr_variantListSize(child)), child);
                 }
             }
-            else if (tr_variantIsDict(child))
+            else if (child->holds_alternative<tr_variant::Map>())
             {
                 tr_variant* target_dict = tr_variantDictFind(tgt, key);
 
@@ -915,7 +929,7 @@ void tr_variantMergeDicts(tr_variant* const tgt, tr_variant const* const src)
                     target_dict = tr_variantDictAddDict(tgt, key, tr_variantDictSize(child));
                 }
 
-                if (tr_variantIsDict(target_dict))
+                if (target_dict->holds_alternative<tr_variant::Map>())
                 {
                     tr_variantMergeDicts(target_dict, child);
                 }

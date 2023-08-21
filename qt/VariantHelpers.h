@@ -105,7 +105,7 @@ auto getValue(tr_variant const* var)
 {
     std::optional<C> ret;
 
-    if (tr_variantIsList(var))
+    if (var != nullptr && var->holds_alternative<tr_variant::Vector>())
     {
         auto list = C{};
 

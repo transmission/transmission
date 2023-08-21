@@ -230,7 +230,7 @@ TEST_F(VariantTest, parse)
 
     benc = "li64ei32ei16ee"sv;
     var = serde.parse(benc).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsList(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
     EXPECT_EQ(3, tr_variantListSize(&var));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&var, 0), &i));
@@ -244,20 +244,20 @@ TEST_F(VariantTest, parse)
 
     benc = "lllee"sv;
     var = serde.parse(benc).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsEmpty(&var));
+    EXPECT_FALSE(var.has_value());
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
     var.clear();
 
     benc = "le"sv;
     var = serde.parse(benc).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsList(&var));
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(std::data(benc) + std::size(benc), serde.end());
     EXPECT_EQ(benc, serde.to_string(var));
     var.clear();
 
     benc = "d20:"sv;
     var = serde.parse(benc).value_or(tr_variant{});
-    EXPECT_TRUE(tr_variantIsEmpty(&var));
+    EXPECT_FALSE(var.has_value());
     EXPECT_EQ(std::data(benc) + 1U, serde.end());
 }
 
