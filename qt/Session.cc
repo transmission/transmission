@@ -360,7 +360,6 @@ void Session::start()
         tr_variantInitDict(&settings, 0);
         tr_sessionLoadSettings(&settings, config_dir_.toUtf8().constData(), "qt");
         session_ = tr_sessionInit(config_dir_.toUtf8().constData(), true, &settings);
-        tr_variantClear(&settings);
 
         rpc_.start(session_);
 

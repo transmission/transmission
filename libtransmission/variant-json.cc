@@ -416,10 +416,9 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 
     if (error_ == nullptr)
     {
-        return top;
+        return std::move(top);
     }
 
-    tr_variantClear(&top);
     return {};
 }
 

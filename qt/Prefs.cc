@@ -318,8 +318,6 @@ Prefs::Prefs(QString config_dir)
             break;
         }
     }
-
-    tr_variantClear(&top);
 }
 
 Prefs::~Prefs()
@@ -411,15 +409,11 @@ Prefs::~Prefs()
     {
         auto empty_dict = tr_variant{};
         tr_variantInitDict(&empty_dict, PREFS_COUNT);
-        settings = empty_dict;
+        settings = std::move(empty_dict);
     }
 
     tr_variantMergeDicts(&*settings, &current_settings);
     serde.to_file(*settings, filename);
-    tr_variantClear(&*settings);
-
-    // cleanup
-    tr_variantClear(&current_settings);
 }
 
 /**

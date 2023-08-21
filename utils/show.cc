@@ -392,8 +392,6 @@ void doScrape(tr_torrent_metainfo const& metainfo)
             }
         }
 
-        tr_variantClear(&top);
-
         if (!matched)
         {
             fmt::print("no match\n");

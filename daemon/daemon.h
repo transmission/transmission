@@ -31,7 +31,6 @@ public:
             close(sigfd_);
         }
 #endif /* signalfd API */
-        tr_variantClear(&settings_);
     }
 
     bool spawn(bool foreground, int* exit_code, tr_error** error);

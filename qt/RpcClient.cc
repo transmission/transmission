@@ -34,12 +34,7 @@ char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutu
 
 TrVariantPtr createVariant()
 {
-    return { new tr_variant{},
-             [](tr_variant* var)
-             {
-                 tr_variantClear(var);
-                 delete var;
-             } };
+    return std::make_shared<tr_variant>();
 }
 
 } // namespace
@@ -106,9 +101,16 @@ RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
     tr_variantInitDict(json.get(), 3);
     dictAdd(json.get(), TR_KEY_method, method);
 
-    if (args != nullptr)
+    if (args != nullptr) // if args were passed in, use them
     {
-        tr_variantDictSteal(json.get(), TR_KEY_arguments, args);
+        auto* child = tr_variantDictFind(json.get(), TR_KEY_arguments);
+
+        if (child == nullptr)
+        {
+            child = tr_variantDictAddDict(json.get(), TR_KEY_arguments, 0);
+        }
+
+        std::swap(*child, *args);
     }
 
     return sendRequest(json);
@@ -220,7 +222,7 @@ void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* 
     }
 
     TrVariantPtr const json = createVariant();
-    *json = *response;
+    std::swap(*json, *response);
 
     variantInit(response, false);
 
@@ -280,7 +282,6 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
         {
             std::swap(*json, *top);
             result = parseResponseData(*json);
-            tr_variantClear(&*top);
         }
 
         promise.setProgressValue(1);
@@ -319,7 +320,7 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
     if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
     {
         ret.args = createVariant();
-        *ret.args = *args;
+        std::swap(*ret.args, *args);
         variantInit(args, false);
     }
 

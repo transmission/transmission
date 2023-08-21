@@ -273,10 +273,9 @@ std::optional<tr_variant> tr_variant_serde::parse_benc(std::string_view input)
     auto handler = MyHandler{ &top, parse_inplace_ };
     if (transmission::benc::parse(input, stack, handler, &end_, &error_) && std::empty(stack))
     {
-        return top;
+        return std::optional<tr_variant>{ std::move(top) };
     }
 
-    tr_variantClear(&top);
     return {};
 }
 
@@ -308,11 +307,9 @@ void saveStringImpl(OutBuf* out, std::string_view sv)
 {
     // `${sv.size()}:${sv}`
     auto const [buf, buflen] = out->reserve_space(std::size(sv) + 32U);
-    auto* walk = reinterpret_cast<char*>(buf);
-    auto const* const begin = walk;
-    walk = fmt::format_to(walk, FMT_COMPILE("{:d}:"), std::size(sv));
-    walk = std::copy_n(std::data(sv), std::size(sv), walk);
-    out->commit_space(walk - begin);
+    auto* begin = reinterpret_cast<char*>(buf);
+    auto* const end = fmt::format_to(begin, FMT_COMPILE("{:d}:{:s}"), std::size(sv), sv);
+    out->commit_space(end - begin);
 }
 
 void saveStringFunc(tr_variant const& /*var*/, std::string_view const val, void* vout)

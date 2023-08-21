@@ -2264,8 +2264,6 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
         {
             status |= EXIT_FAILURE;
         }
-
-        tr_variantClear(&top);
     }
 
     return status;
@@ -2399,33 +2397,33 @@ static int flush(char const* rpcurl, tr_variant* benc, Config& config)
         tr_curl_easy_cleanup(curl);
     }
 
-    tr_variantClear(benc);
+    benc->clear();
 
     return status;
 }
 
-static tr_variant* ensure_sset(tr_variant* sset)
+static tr_variant* ensure_sset(tr_variant& sset)
 {
-    if (!tr_variantIsEmpty(sset))
+    if (!tr_variantIsEmpty(&sset))
     {
-        return tr_variantDictFind(sset, Arguments);
+        return tr_variantDictFind(&sset, Arguments);
     }
 
-    tr_variantInitDict(sset, 3);
-    tr_variantDictAddStrView(sset, TR_KEY_method, "session-set"sv);
-    return tr_variantDictAddDict(sset, Arguments, 0);
+    tr_variantInitDict(&sset, 3);
+    tr_variantDictAddStrView(&sset, TR_KEY_method, "session-set"sv);
+    return tr_variantDictAddDict(&sset, Arguments, 0);
 }
 
-static tr_variant* ensure_tset(tr_variant* tset)
+static tr_variant* ensure_tset(tr_variant& tset)
 {
-    if (!tr_variantIsEmpty(tset))
+    if (!tr_variantIsEmpty(&tset))
     {
-        return tr_variantDictFind(tset, Arguments);
+        return tr_variantDictFind(&tset, Arguments);
     }
 
-    tr_variantInitDict(tset, 3);
-    tr_variantDictAddStrView(tset, TR_KEY_method, "torrent-set"sv);
-    return tr_variantDictAddDict(tset, Arguments, 1);
+    tr_variantInitDict(&tset, 3);
+    tr_variantDictAddStrView(&tset, TR_KEY_method, "torrent-set"sv);
+    return tr_variantDictAddDict(&tset, Arguments, 1);
 }
 
 static int processArgs(char const* rpcurl, int argc, char const* const* argv, Config& config)
@@ -2652,7 +2650,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
         }
         else if (stepMode == MODE_SESSION_SET)
         {
-            tr_variant* args = ensure_sset(&sset);
+            tr_variant* args = ensure_sset(sset);
 
             switch (c)
             {
@@ -2820,11 +2818,11 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
             if (!std::empty(config.torrent_ids))
             {
-                targs = ensure_tset(&tset);
+                targs = ensure_tset(tset);
             }
             else
             {
-                sargs = ensure_sset(&sset);
+                sargs = ensure_sset(sset);
             }
 
             switch (c)
@@ -2900,7 +2898,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
         }
         else if (stepMode == MODE_TORRENT_SET)
         {
-            tr_variant* args = ensure_tset(&tset);
+            tr_variant* args = ensure_tset(tset);
 
             switch (c)
             {
@@ -2951,7 +2949,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
             }
             else
             {
-                args = ensure_tset(&tset);
+                args = ensure_tset(tset);
             }
 
             switch (c)
@@ -3083,7 +3081,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
             case 'w':
                 {
-                    auto* args = !tr_variantIsEmpty(&tadd) ? tr_variantDictFind(&tadd, TR_KEY_arguments) : ensure_sset(&sset);
+                    auto* args = !tr_variantIsEmpty(&tadd) ? tr_variantDictFind(&tadd, TR_KEY_arguments) : ensure_sset(sset);
                     tr_variantDictAddStr(args, TR_KEY_download_dir, optarg);
                     break;
                 }
