@@ -244,12 +244,12 @@ export class Transmission extends EventTarget {
     }
 
     if (this.isTouch) {
-      this.elements.torrent_list.addEventListener('touchstart', (e) => {
+      this.elements.torrent_list.addEventListener('touchstart', (event_) => {
         if (this.busyclick) {
           clearTimeout(this.busyclick);
           this.busyclick = false;
         } else {
-          this.busyclick = setTimeout(rightc.bind(this), 500, e)
+          this.busyclick = setTimeout(rightc.bind(this), 500, event_)
         }
       });
       this.elements.torrent_list.addEventListener('touchend', () => {clearTimeout(this.busyclick);this.busyclick = false});
