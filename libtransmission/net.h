@@ -243,7 +243,7 @@ struct tr_address
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
     static_assert(std::size(CompactAddrBytes) == NUM_TR_AF_INET_TYPES);
 
-    [[nodiscard]] static auto constexpr any(tr_address_type type) noexcept
+    [[nodiscard]] static auto any(tr_address_type type) noexcept
     {
         switch (type)
         {
@@ -252,6 +252,7 @@ struct tr_address
         case TR_AF_INET6:
             return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
         default:
+            TR_ASSERT_MSG(false, "invalid type");
             return tr_address{};
         }
     }
@@ -263,7 +264,7 @@ struct tr_address
 
     [[nodiscard]] auto is_any() const noexcept
     {
-        return *this == any(type);
+        return is_valid() ? *this == any(type) : false;
     }
 };
 
