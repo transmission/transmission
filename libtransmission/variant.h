@@ -5,15 +5,15 @@
 
 #pragma once
 
-#include <algorithm>
+#include <algorithm> // std::move()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <map>
 #include <optional>
 #include <string>
 #include <string_view>
-#include <utility> // std::as_const, std::pair
 #include <type_traits> // std::is_same_v
+#include <utility> // std::as_const, std::pair
 #include <variant>
 #include <vector>
 
@@ -22,8 +22,8 @@
 struct tr_error;
 
 /**
- * A variant that holds typical benc/json types: bool, int, double, string,
- * vectors of variants, and maps of string-to-variant.
+ * A variant that holds typical benc/json types: bool, int,
+ * double, string, vectors of variants, and maps of variants.
  * Useful when serializing / deserializing benc/json data.
  *
  * @see tr_variant_serde
@@ -42,30 +42,20 @@ public:
         MapIndex = 6
     };
 
-    using String = std::pair<std::string, std::string_view>;
     using Vector = std::vector<tr_variant>;
     using Map = std::map<tr_quark, tr_variant>;
 
-    tr_variant() noexcept = default;
+    constexpr tr_variant() noexcept = default;
+    tr_variant(tr_variant const&) = delete;
+    tr_variant(tr_variant&& that) noexcept = default;
+    tr_variant& operator=(tr_variant const&) = delete;
+    tr_variant& operator=(tr_variant&& that) noexcept = default;
 
     template<typename Val>
     explicit tr_variant(Val value)
     {
         *this = std::move(value);
     }
-
-    tr_variant(tr_variant const&) = delete;
-
-    tr_variant(tr_variant&& that) noexcept
-    {
-        *this = std::move(that);
-    }
-
-    ~tr_variant() = default;
-
-    tr_variant& operator=(tr_variant const&) = delete;
-
-    tr_variant& operator=(tr_variant&& that) noexcept = default;
 
     template<typename Val>
     tr_variant& operator=(Val value)
@@ -131,10 +121,12 @@ public:
 
     void clear()
     {
-        *this = tr_variant{};
+        val_.emplace<std::monostate>();
     }
 
 private:
+    using String = std::pair<std::string, std::string_view>;
+
     std::variant<std::monostate, bool, int64_t, double, String, Vector, Map> val_;
 };
 
