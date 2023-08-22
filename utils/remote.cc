@@ -1492,8 +1492,8 @@ static void printTorrentList(tr_variant* top)
             [](tr_variant* f, tr_variant* s)
             {
                 int64_t f_time = INT64_MIN, s_time = INT64_MIN;
-                tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time);
-                tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time);
+                (void)tr_variantDictFindInt(f, TR_KEY_addedDate, &f_time);
+                (void)tr_variantDictFindInt(s, TR_KEY_addedDate, &s_time);
                 return f_time < s_time;
             });
 
@@ -2170,10 +2170,8 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
     else
     {
         auto& top = *otop;
-        int64_t tag = -1;
-        auto sv = std::string_view{};
 
-        if (tr_variantDictFindStrView(&top, TR_KEY_result, &sv))
+        if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_result, &sv))
         {
             if (sv != "success"sv)
             {
@@ -2182,7 +2180,8 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
             }
             else
             {
-                tr_variantDictFindInt(&top, TR_KEY_tag, &tag);
+                int64_t tag = -1;
+                (void)tr_variantDictFindInt(&top, TR_KEY_tag, &tag);
 
                 switch (tag)
                 {

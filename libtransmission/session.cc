@@ -93,17 +93,25 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         auto& group = session->getBandwidthGroup(name);
 
         auto limits = tr_bandwidth_limits{};
-        tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &limits.up_limited);
-        tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &limits.down_limited);
 
-        if (auto limit = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &limit))
+        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &val))
         {
-            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+            limits.up_limited = val;
         }
 
-        if (auto limit = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &limit))
+        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &val))
         {
-            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+            limits.down_limited = val;
+        }
+
+        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
+        {
+            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
+        }
+
+        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &val))
+        {
+            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
         }
 
         group.set_limits(&limits);
