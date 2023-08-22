@@ -12,7 +12,9 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // std::pair
 #include <type_traits>
+#include <variant>
 #include <vector>
 
 #include "libtransmission/quark.h"
@@ -28,89 +30,29 @@ struct tr_error;
  */
 struct tr_variant
 {
-private:
-    struct String
-    {
-        void set_shallow(std::string_view newval)
-        {
-            clear();
-
-            type_ = Type::View;
-            str_.str = std::data(newval);
-            len_ = std::size(newval);
-        }
-
-        void set(std::string_view newval)
-        {
-            clear();
-
-            len_ = std::size(newval);
-
-            if (len_ < sizeof(str_.buf))
-            {
-                type_ = Type::Buf;
-                std::copy_n(std::data(newval), len_, str_.buf);
-                str_.buf[len_] = '\0';
-            }
-            else
-            {
-                char* const newstr = new char[len_ + 1];
-                std::copy_n(std::data(newval), len_, newstr);
-                newstr[len_] = '\0';
-
-                type_ = Type::Heap;
-                str_.str = newstr;
-            }
-        }
-
-        [[nodiscard]] constexpr std::string_view get() const noexcept
-        {
-            return { type_ == Type::Buf ? str_.buf : str_.str, len_ };
-        }
-
-        void clear()
-        {
-            if (type_ == Type::Heap)
-            {
-                delete[] str_.str;
-            }
-
-            *this = {};
-        }
-
-    private:
-        enum class Type
-        {
-            Heap,
-            Buf,
-            View
-        };
-
-        Type type_ = Type::View;
-        size_t len_ = 0U;
-        union
-        {
-            char buf[16];
-            char const* str;
-        } str_ = {};
-    };
-
 public:
-    enum class Type
+    enum Type
     {
-        None,
-        Bool,
-        Int,
-        Double,
-        String,
-        Vector,
-        Map
+        NoneIndex = 0,
+        BoolIndex = 1,
+        IntIndex = 2,
+        DoubleIndex = 3,
+        StringIndex = 4,
+        VectorIndex = 5,
+        MapIndex = 6
     };
 
+    using String = std::pair<std::string, std::string_view>;
     using Vector = std::vector<tr_variant>;
     using Map = std::map<tr_quark, tr_variant>;
 
     tr_variant() noexcept = default;
+
+    template<typename Val>
+    explicit tr_variant(Val value)
+    {
+        *this = std::move(value);
+    }
 
     tr_variant(tr_variant const&) = delete;
 
@@ -119,61 +61,84 @@ public:
         *this = std::move(that);
     }
 
-    ~tr_variant();
+    ~tr_variant() = default;
 
     tr_variant& operator=(tr_variant const&) = delete;
 
     tr_variant& operator=(tr_variant&& that) noexcept
     {
-        std::swap(key, that.key);
-        std::swap(type, that.type);
         std::swap(val, that.val);
         return *this;
     }
 
+    template<typename Val>
+    tr_variant& operator=(Val value)
+    {
+        val = std::move(value);
+        return *this;
+    }
+
+    tr_variant& operator=(std::string_view value)
+    {
+        auto& item = val.emplace<String>(std::string{ value }, std::string_view{});
+        item.second = item.first; // ensure the view points to the string we own
+        return *this;
+    }
+
+    void set_unmanaged_string(std::string_view value)
+    {
+        val.emplace<String>(std::string{}, value);
+    }
+
+    [[nodiscard]] constexpr auto index() const noexcept
+    {
+        return val.index();
+    }
+
     [[nodiscard]] constexpr auto has_value() const noexcept
     {
-        return type != Type::None;
+        return index() != NoneIndex;
+    }
+
+    template<typename Val>
+    [[nodiscard]] constexpr auto* get_if() noexcept
+    {
+        if constexpr (std::is_same_v<Val, std::string_view>)
+        {
+            auto const* const str = std::get_if<String>(&val);
+            return str != nullptr ? &str->second : nullptr;
+        }
+        else
+        {
+            return std::get_if<Val>(&val);
+        }
+    }
+
+    template<typename Val>
+    [[nodiscard]] constexpr auto const* get_if() const noexcept
+    {
+        if constexpr (std::is_same_v<Val, std::string_view>)
+        {
+            auto const* const str = std::get_if<String>(&val);
+            return str != nullptr ? &str->second : nullptr;
+        }
+        else
+        {
+            return std::get_if<Val>(&val);
+        }
     }
 
     template<typename Val>
     [[nodiscard]] constexpr bool holds_alternative() const noexcept
     {
-        static_assert(
-            std::is_same_v<Val, bool> || std::is_same_v<Val, int64_t> || std::is_same_v<Val, double> ||
-            std::is_same_v<Val, std::string_view> || std::is_same_v<Val, Vector> || std::is_same_v<Val, Map>);
-
-        if constexpr (std::is_same_v<Val, bool>)
-        {
-            return type == Type::Bool;
-        }
-
-        if constexpr (std::is_same_v<Val, int64_t>)
-        {
-            return type == Type::Int;
-        }
-
-        if constexpr (std::is_same_v<Val, double>)
-        {
-            return type == Type::Double;
-        }
-
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            return type == Type::String;
+            return std::holds_alternative<String>(val);
         }
-
-        if constexpr (std::is_same_v<Val, Vector>)
+        else
         {
-            return type == Type::Vector;
+            return std::holds_alternative<Val>(val);
         }
-
-        if constexpr (std::is_same_v<Val, Map>)
-        {
-            return type == Type::Map;
-        }
-
-        return false;
     }
 
     void clear()
@@ -181,27 +146,7 @@ public:
         *this = tr_variant{};
     }
 
-    Type type = Type::None;
-
-    tr_quark key = TR_KEY_NONE;
-
-    union
-    {
-        bool b;
-
-        double d;
-
-        int64_t i;
-
-        String s;
-
-        struct
-        {
-            size_t alloc;
-            size_t count;
-            struct tr_variant* vals;
-        } l;
-    } val = {};
+    std::variant<std::monostate, bool, int64_t, double, String, Vector, Map> val;
 };
 
 // --- Strings
@@ -213,12 +158,6 @@ void tr_variantInitQuark(tr_variant* initme, tr_quark value);
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len);
 void tr_variantInitStrView(tr_variant* initme, std::string_view val);
 
-constexpr void tr_variantInit(tr_variant* initme, tr_variant::Type type)
-{
-    initme->val = {};
-    initme->type = type;
-}
-
 bool tr_variantGetRaw(tr_variant const* variant, std::byte const** setme_raw, size_t* setme_len);
 bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size_t* setme_len);
 
@@ -226,31 +165,19 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
 
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
-constexpr void tr_variantInitReal(tr_variant* initme, double value)
-{
-    tr_variantInit(initme, tr_variant::Type::Double);
-    initme->val.d = value;
-}
+void tr_variantInitReal(tr_variant* initme, double value);
 
 // --- Booleans
 
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
-constexpr void tr_variantInitBool(tr_variant* initme, bool value)
-{
-    tr_variantInit(initme, tr_variant::Type::Bool);
-    initme->val.b = value;
-}
+void tr_variantInitBool(tr_variant* initme, bool value);
 
 // --- Ints
 
 bool tr_variantGetInt(tr_variant const* var, int64_t* setme);
 
-constexpr void tr_variantInitInt(tr_variant* initme, int64_t value)
-{
-    tr_variantInit(initme, tr_variant::Type::Int);
-    initme->val.i = value;
-}
+void tr_variantInitInt(tr_variant* initme, int64_t value);
 
 // --- Lists
 
@@ -273,7 +200,15 @@ bool tr_variantListRemove(tr_variant* var, size_t pos);
 
 [[nodiscard]] constexpr size_t tr_variantListSize(tr_variant const* const var)
 {
-    return var != nullptr && var->holds_alternative<tr_variant::Vector>() ? var->val.l.count : 0;
+    if (var != nullptr)
+    {
+        if (auto const* const vec = var->get_if<tr_variant::Vector>(); vec != nullptr)
+        {
+            return std::size(*vec);
+        }
+    }
+
+    return {};
 }
 
 // --- Dictionaries
