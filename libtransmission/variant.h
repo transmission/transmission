@@ -12,8 +12,8 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <utility> // std::pair
-#include <type_traits>
+#include <utility> // std::as_const, std::pair
+#include <type_traits> // std::is_same_v
 #include <variant>
 #include <vector>
 
@@ -65,34 +65,30 @@ public:
 
     tr_variant& operator=(tr_variant const&) = delete;
 
-    tr_variant& operator=(tr_variant&& that) noexcept
-    {
-        std::swap(val, that.val);
-        return *this;
-    }
+    tr_variant& operator=(tr_variant&& that) noexcept = default;
 
     template<typename Val>
     tr_variant& operator=(Val value)
     {
-        val = std::move(value);
+        val_ = std::move(value);
         return *this;
     }
 
     tr_variant& operator=(std::string_view value)
     {
-        auto& item = val.emplace<String>(std::string{ value }, std::string_view{});
+        auto& item = val_.emplace<String>(std::string{ value }, std::string_view{});
         item.second = item.first; // ensure the view points to the string we own
         return *this;
     }
 
     void set_unmanaged_string(std::string_view value)
     {
-        val.emplace<String>(std::string{}, value);
+        val_.emplace<String>(std::string{}, value);
     }
 
     [[nodiscard]] constexpr auto index() const noexcept
     {
-        return val.index();
+        return val_.index();
     }
 
     [[nodiscard]] constexpr auto has_value() const noexcept
@@ -101,31 +97,23 @@ public:
     }
 
     template<typename Val>
-    [[nodiscard]] constexpr auto* get_if() noexcept
-    {
-        if constexpr (std::is_same_v<Val, std::string_view>)
-        {
-            auto const* const str = std::get_if<String>(&val);
-            return str != nullptr ? &str->second : nullptr;
-        }
-        else
-        {
-            return std::get_if<Val>(&val);
-        }
-    }
-
-    template<typename Val>
     [[nodiscard]] constexpr auto const* get_if() const noexcept
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            auto const* const str = std::get_if<String>(&val);
+            auto const* const str = std::get_if<String>(&val_);
             return str != nullptr ? &str->second : nullptr;
         }
         else
         {
-            return std::get_if<Val>(&val);
+            return std::get_if<Val>(&val_);
         }
+    }
+
+    template<typename Val>
+    [[nodiscard]] constexpr auto* get_if() noexcept
+    {
+        return const_cast<Val*>(std::as_const(*this).get_if<Val>());
     }
 
     template<typename Val>
@@ -133,11 +121,11 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            return std::holds_alternative<String>(val);
+            return std::holds_alternative<String>(val_);
         }
         else
         {
-            return std::holds_alternative<Val>(val);
+            return std::holds_alternative<Val>(val_);
         }
     }
 
@@ -146,7 +134,8 @@ public:
         *this = tr_variant{};
     }
 
-    std::variant<std::monostate, bool, int64_t, double, String, Vector, Map> val;
+private:
+    std::variant<std::monostate, bool, int64_t, double, String, Vector, Map> val_;
 };
 
 // --- Strings

@@ -273,17 +273,17 @@ bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, std::byte const*
 
 void tr_variantInitReal(tr_variant* initme, double value)
 {
-    initme->val = value;
+    *initme = value;
 }
 
 void tr_variantInitBool(tr_variant* initme, bool value)
 {
-    initme->val = value;
+    *initme = value;
 }
 
 void tr_variantInitInt(tr_variant* initme, int64_t value)
 {
-    initme->val = value;
+    *initme = value;
 }
 
 void tr_variantInitStrView(tr_variant* initme, std::string_view val)
