@@ -34,6 +34,16 @@ constexpr bool variant_is_container(tr_variant const* const var)
     return var != nullptr && (var->holds_alternative<tr_variant::Vector>() || var->holds_alternative<tr_variant::Map>());
 }
 
+constexpr int variant_index(tr_variant const* const var)
+{
+    if (var != nullptr)
+    {
+        return var->index();
+    }
+
+    return tr_variant::NoneIndex;
+}
+
 } // namespace
 
 tr_variant* tr_variantDictFind(tr_variant* const var, tr_quark key)
@@ -75,48 +85,32 @@ bool tr_variantListRemove(tr_variant* const var, size_t pos)
 
 bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
 {
-    if (var == nullptr)
+    switch (variant_index(var))
     {
+    case tr_variant::IntIndex:
+        *setme = *var->get_if<int64_t>();
+        return true;
+
+    case tr_variant::BoolIndex:
+        *setme = *var->get_if<bool>() ? 1 : 0;
+        return true;
+
+    default:
         return false;
     }
-
-    if (auto const* const val = var->get_if<int64_t>(); val != nullptr)
-    {
-        if (setme != nullptr)
-        {
-            *setme = *val;
-        }
-
-        return true;
-    }
-
-    if (auto const* const val = var->get_if<bool>(); val != nullptr)
-    {
-        if (setme != nullptr)
-        {
-            *setme = *val ? 1 : 0;
-        }
-
-        return true;
-    }
-
-    return false;
 }
 
 bool tr_variantGetStrView(tr_variant const* const var, std::string_view* setme)
 {
-    if (var == nullptr)
+    switch (variant_index(var))
     {
+    case tr_variant::StringIndex:
+        *setme = *var->get_if<std::string_view>();
+        return true;
+
+    default:
         return false;
     }
-
-    if (auto const* const val = var->get_if<std::string_view>(); val != nullptr)
-    {
-        *setme = *val;
-        return true;
-    }
-
-    return false;
 }
 
 bool tr_variantGetRaw(tr_variant const* v, std::byte const** setme_raw, size_t* setme_len)
@@ -145,36 +139,35 @@ bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* se
 
 bool tr_variantGetBool(tr_variant const* const var, bool* setme)
 {
-    if (var == nullptr)
+    switch (variant_index(var))
     {
-        return false;
-    }
-
-    if (auto const* const val = var->get_if<bool>(); val != nullptr)
-    {
-        *setme = *val;
+    case tr_variant::BoolIndex:
+        *setme = *var->get_if<bool>();
         return true;
-    }
 
-    if (auto const* const val = var->get_if<int64_t>(); val != nullptr && (*val == 0 || *val == 1))
-    {
-        *setme = *val != 0;
-        return true;
-    }
+    case tr_variant::IntIndex:
+        if (auto const val = *var->get_if<int64_t>(); val == 0 || val == 1)
+        {
+            *setme = val != 0;
+            return true;
+        };
+        break;
 
-    if (auto const* const val = var->get_if<std::string_view>(); val != nullptr)
-    {
-        if (*val == "true"sv)
+    case tr_variant::StringIndex:
+        if (auto const val = *var->get_if<std::string_view>(); val == "true"sv)
         {
             *setme = true;
             return true;
         }
-
-        if (*val == "false"sv)
+        else if (val == "false"sv)
         {
             *setme = false;
             return true;
         }
+        break;
+
+    default:
+        break;
     }
 
     return false;
@@ -182,33 +175,27 @@ bool tr_variantGetBool(tr_variant const* const var, bool* setme)
 
 bool tr_variantGetReal(tr_variant const* const var, double* setme)
 {
-    if (var == nullptr)
+    switch (variant_index(var))
     {
-        return false;
-    }
-
-    if (auto const* const val = var->get_if<double>(); val != nullptr)
-    {
-        *setme = *val;
+    case tr_variant::DoubleIndex:
+        *setme = *var->get_if<double>();
         return true;
-    }
 
-    if (auto const* const val = var->get_if<int64_t>(); val != nullptr)
-    {
-        *setme = static_cast<double>(*val);
+    case tr_variant::IntIndex:
+        *setme = static_cast<double>(*var->get_if<int64_t>());
         return true;
-    }
 
-    if (auto const* const val = var->get_if<std::string_view>(); val != nullptr)
-    {
-        if (auto dval = tr_num_parse<double>(*val); dval)
+    case tr_variant::StringIndex:
+        if (auto const val = tr_num_parse<double>(*var->get_if<std::string_view>()); val)
         {
-            *setme = *dval;
+            *setme = *val;
             return true;
         }
-    }
+        [[fallthrough]];
 
-    return false;
+    default:
+        return false;
+    }
 }
 
 bool tr_variantDictFindInt(tr_variant* const var, tr_quark key, int64_t* setme)
@@ -711,12 +698,7 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
             }
         }
 
-        if (v == nullptr)
-        {
-            continue;
-        }
-
-        switch (v->index())
+        switch (variant_index(v))
         {
         case tr_variant::BoolIndex:
             walk_funcs.bool_func(*v, *v->get_if<bool>(), user_data);
@@ -757,8 +739,6 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
             break;
 
         default: // NoneIndex:
-            /* did caller give us an uninitialized val? */
-            tr_logAddError(_("Invalid metadata"));
             break;
         }
     }
