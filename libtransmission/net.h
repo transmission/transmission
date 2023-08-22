@@ -257,9 +257,14 @@ struct tr_address
         }
     }
 
-    [[nodiscard]] constexpr auto is_valid() const noexcept
+    [[nodiscard]] static constexpr auto is_valid(tr_address_type type) noexcept
     {
         return type == TR_AF_INET || type == TR_AF_INET6;
+    }
+
+    [[nodiscard]] constexpr auto is_valid() const noexcept
+    {
+        return is_valid(type);
     }
 
     [[nodiscard]] auto is_any() const noexcept
