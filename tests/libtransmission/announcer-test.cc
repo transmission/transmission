@@ -68,7 +68,10 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
             "8:interval" "i1803e"
             "12:min interval" "i1800e"
             "5:peers"
-            "6:\x7F\x00\x00\x01\xfc\x27"
+            "18:"
+                "\x08\x08\x04\x04\xfc\x27" // 8.8.4.4:64551
+                "\x00\x00\x00\x00\xfc\x27" // 0.0.0.0:64551
+                "\x08\x08\x04\x04\x00\x00" // 8.8.4.4:0
         "e"sv;
     // clang-format on
 
@@ -86,7 +89,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[127.0.0.1]:64551"sv, response.pex[0].display_name());
+        EXPECT_EQ("[8.8.4.4]:64551"sv, response.pex[0].display_name());
     }
 }
 
@@ -106,6 +109,16 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexList)
                     "7:peer id" "20:-TR300Z-0123456789AB"
                     "2:ip" "7:8.8.4.4"
                     "4:port" "i53e"
+                "e"
+                "d"
+                    "7:peer id" "20:-TR300Z-0123456789AC"
+                    "2:ip" "7:0.0.0.0"
+                    "4:port" "i6881e"
+                "e"
+                "d"
+                    "7:peer id" "20:-TR300Z-0123456789AB"
+                    "2:ip" "7:8.8.4.4"
+                    "4:port" "i0e"
                 "e"
             "e"
         "e"sv;
