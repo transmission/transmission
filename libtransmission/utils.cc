@@ -274,7 +274,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 
 // ---
 
-#ifndef __APPLE__
+#if !(defined(__APPLE__) && defined(__clang__))
 
 std::string tr_strv_convert_utf8(std::string_view sv)
 {

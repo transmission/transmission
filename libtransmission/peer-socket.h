@@ -60,7 +60,7 @@ public:
     size_t try_read(InBuf& buf, size_t max, bool buf_is_empty, tr_error** error) const;
     size_t try_write(OutBuf& buf, size_t max, tr_error** error) const;
 
-    [[nodiscard]] constexpr auto const& socketAddress() const noexcept
+    [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
         return socket_address_;
     }
@@ -75,20 +75,9 @@ public:
         return socket_address_.port();
     }
 
-    template<typename OutputIt>
-    OutputIt display_name(OutputIt out)
-    {
-        return address().display_name(out, port());
-    }
-
-    [[nodiscard]] std::string_view display_name(char* out, size_t outlen) const
-    {
-        return address().display_name(out, outlen, port());
-    }
-
     [[nodiscard]] std::string display_name() const
     {
-        return address().display_name(port());
+        return socket_address_.display_name();
     }
 
     [[nodiscard]] constexpr auto is_utp() const noexcept

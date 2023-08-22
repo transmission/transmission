@@ -155,7 +155,6 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
  *     tr_sessionGetDefaultSettings(&settings);
  *     if (tr_variantDictFindInt(&settings, TR_PREFS_KEY_PEER_PORT, &i))
  *         fprintf(stderr, "the default peer port is %d\n", (int)i);
- *     tr_variantClear(&settings);
  * @endcode
  *
  * @param setme_dictionary pointer to a tr_variant dictionary
@@ -190,7 +189,7 @@ void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_d
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_dir, char const* app_name);
+bool tr_sessionLoadSettings(tr_variant* settings, char const* config_dir, char const* app_name);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -218,8 +217,6 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct 
  *     tr_sessionGetDefaultSettings(&settings);
  *     configDir = tr_getDefaultConfigDir("Transmission");
  *     session = tr_sessionInit(configDir, true, &settings);
- *
- *     tr_variantClear(&settings);
  * @endcode
  *
  * @param config_dir where Transmission will look for resume files, blocklists, etc.

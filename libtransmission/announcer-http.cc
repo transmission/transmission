@@ -383,7 +383,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "port"sv)
             {
-                pex_.port.setHost(static_cast<uint16_t>(value));
+                pex_.socket_address.port_.set_host(static_cast<uint16_t>(value));
             }
             else
             {
@@ -419,7 +419,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 if (auto const addr = tr_address::from_string(value); addr)
                 {
-                    pex_.addr = *addr;
+                    pex_.socket_address.address_ = *addr;
                 }
             }
             else if (key == "peer id")

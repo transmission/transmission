@@ -123,13 +123,13 @@ public:
         }
 
         // Return IPv4 user public address string, or nullopt to not use one
-        [[nodiscard]] virtual std::optional<std::string> publicAddressV4() const
+        [[nodiscard]] virtual std::optional<std::string> bind_address_V4() const
         {
             return std::nullopt;
         }
 
         // Return IPv6 user public address string, or nullopt to not use one
-        [[nodiscard]] virtual std::optional<std::string> publicAddressV6() const
+        [[nodiscard]] virtual std::optional<std::string> bind_address_V6() const
         {
             return std::nullopt;
         }

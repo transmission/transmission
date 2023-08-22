@@ -9,7 +9,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <atomic>
 #include <cstddef> // size_t
 #include <cstdint> // uint8_t, uint64_t
 #include <ctime>
@@ -60,12 +59,20 @@ class tr_peer_info
 {
 public:
     tr_peer_info(tr_socket_address socket_address, uint8_t pex_flags, tr_peer_from from)
-        : socket_address_{ std::move(socket_address) }
+        : listen_socket_address_{ socket_address }
         , from_first_{ from }
         , from_best_{ from }
     {
-        ++n_known_peers;
+        TR_ASSERT(!std::empty(socket_address.port()));
+        ++n_known_connectable;
+        set_pex_flags(pex_flags);
+    }
 
+    tr_peer_info(tr_address address, uint8_t pex_flags, tr_peer_from from)
+        : listen_socket_address_{ address, tr_port{} }
+        , from_first_{ from }
+        , from_best_{ from }
+    {
         set_pex_flags(pex_flags);
     }
 
@@ -76,30 +83,51 @@ public:
 
     ~tr_peer_info()
     {
-        [[maybe_unused]] auto const n_prev = n_known_peers--;
-        TR_ASSERT(n_prev > 0U);
+        if (!std::empty(listen_socket_address_.port()))
+        {
+            [[maybe_unused]] auto const n_prev = n_known_connectable--;
+            TR_ASSERT(n_prev > 0U);
+        }
     }
 
-    [[nodiscard]] static auto known_peer_count() noexcept
+    [[nodiscard]] static auto known_connectable_count() noexcept
     {
-        return n_known_peers.load();
+        return n_known_connectable;
     }
 
     // ---
 
-    [[nodiscard]] constexpr auto const& socket_address() const noexcept
+    [[nodiscard]] constexpr auto const& listen_socket_address() const noexcept
     {
-        return socket_address_;
+        return listen_socket_address_;
     }
 
-    [[nodiscard]] constexpr auto& port() noexcept
+    [[nodiscard]] constexpr auto const& listen_address() const noexcept
     {
-        return socket_address_.port_;
+        return listen_socket_address_.address();
+    }
+
+    [[nodiscard]] constexpr auto listen_port() const noexcept
+    {
+        return listen_socket_address_.port();
+    }
+
+    void set_listen_port(tr_port port_in) noexcept
+    {
+        if (!std::empty(port_in))
+        {
+            auto& port = listen_socket_address_.port_;
+            if (std::empty(port)) // increment known connectable peers if we did not know the listening port of this peer before
+            {
+                ++n_known_connectable;
+            }
+            port = port_in;
+        }
     }
 
     [[nodiscard]] auto display_name() const
     {
-        return socket_address_.display_name();
+        return listen_socket_address_.display_name();
     }
 
     // ---
@@ -316,17 +344,100 @@ public:
         return ret;
     }
 
+    // ---
+
+    // merge two peer info objects that supposedly describes the same peer
+    void merge(tr_peer_info const& that) noexcept
+    {
+        TR_ASSERT(is_connectable_.value_or(true) || !is_connected());
+        TR_ASSERT(that.is_connectable_.value_or(true) || !that.is_connected());
+
+        connection_attempted_at_ = std::max(connection_attempted_at_, that.connection_attempted_at_);
+        connection_changed_at_ = std::max(connection_changed_at_, that.connection_changed_at_);
+        piece_data_at_ = std::max(piece_data_at_, that.piece_data_at_);
+
+        /* no need to merge blocklist since it gets updated elsewhere */
+
+        {
+            // This part is frankly convoluted and confusing, but the idea is:
+            // 1. If the two peer info objects agree that this peer is connectable/non-connectable,
+            //    then the answer is straightforward: We keep the agreed value.
+            // 2. If the two peer info objects disagrees as to whether this peer is connectable,
+            //    then we reset the flag to an empty value, so that we can try for ourselves when
+            //    initiating outgoing connections.
+            // 3. If one object has knowledge and the other doesn't, then we take the word of the
+            //    peer info object with knowledge with one exception:
+            //    - If the object with knowledge says the peer is not connectable, but we are
+            //      currently connected to the peer, then we give it the benefit of the doubt.
+            //      The connectable flag will be reset to an empty value.
+            // 4. In case both objects have no knowledge about whether this peer is connectable,
+            //    we shall not make any assumptions: We keep the flag empty.
+            //
+            // Truth table:
+            //   +-----------------+---------------+----------------------+--------------------+---------+
+            //   | is_connectable_ | is_connected_ | that.is_connectable_ | that.is_connected_ | Result  |
+            //   +=================+===============+======================+====================+=========+
+            //   | T               | T             | T                    | T                  | T       |
+            //   | T               | T             | T                    | F                  | T       |
+            //   | T               | T             | F                    | F                  | ?       |
+            //   | T               | T             | ?                    | T                  | T       |
+            //   | T               | T             | ?                    | F                  | T       |
+            //   | T               | F             | T                    | T                  | T       |
+            //   | T               | F             | T                    | F                  | T       |
+            //   | T               | F             | F                    | F                  | ?       |
+            //   | T               | F             | ?                    | T                  | T       |
+            //   | T               | F             | ?                    | F                  | T       |
+            //   | F               | F             | T                    | T                  | ?       |
+            //   | F               | F             | T                    | F                  | ?       |
+            //   | F               | F             | F                    | F                  | F       |
+            //   | F               | F             | ?                    | T                  | ?       |
+            //   | F               | F             | ?                    | F                  | F       |
+            //   | ?               | T             | T                    | T                  | T       |
+            //   | ?               | T             | T                    | F                  | T       |
+            //   | ?               | T             | F                    | F                  | ?       |
+            //   | ?               | T             | ?                    | T                  | ?       |
+            //   | ?               | T             | ?                    | F                  | ?       |
+            //   | ?               | F             | T                    | T                  | T       |
+            //   | ?               | F             | T                    | F                  | T       |
+            //   | ?               | F             | F                    | F                  | F       |
+            //   | ?               | F             | ?                    | T                  | ?       |
+            //   | ?               | F             | ?                    | F                  | ?       |
+            //   | N/A             | N/A           | F                    | T                  | Invalid |
+            //   | F               | T             | N/A                  | N/A                | Invalid |
+            //   +-----------------+---------------+----------------------+--------------------+---------+
+
+            auto const conn_this = is_connectable_ && *is_connectable_;
+            auto const conn_that = that.is_connectable_ && *that.is_connectable_;
+
+            if ((!is_connectable_ && !that.is_connectable_) ||
+                is_connectable_.value_or(conn_that || is_connected()) !=
+                    that.is_connectable_.value_or(conn_this || that.is_connected()))
+            {
+                is_connectable_.reset();
+            }
+            else
+            {
+                set_connectable(conn_this || conn_that);
+            }
+        }
+
+        set_utp_supported(supports_utp() || that.supports_utp());
+
+        /* from_first_ should never be modified */
+        found_at(that.from_best());
+
+        /* num_consecutive_fails_ is already the latest */
+        pex_flags_ |= that.pex_flags_;
+
+        if (that.is_banned())
+        {
+            ban();
+        }
+        /* is_connected_ should already be set */
+        set_seed(is_seed() || that.is_seed());
+    }
+
 private:
-    [[nodiscard]] constexpr tr_address const& addr() const noexcept
-    {
-        return socket_address_.address();
-    }
-
-    [[nodiscard]] constexpr auto port() const noexcept
-    {
-        return socket_address_.port();
-    }
-
     [[nodiscard]] constexpr time_t get_reconnect_interval_secs(time_t const now) const noexcept
     {
         // if we were recently connected to this peer and transferring piece
@@ -369,9 +480,10 @@ private:
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
 
-    static auto inline n_known_peers = std::atomic<size_t>{};
+    static auto inline n_known_connectable = size_t{};
 
-    tr_socket_address socket_address_;
+    // if the port is 0, it SHOULD mean we don't know this peer's listen socket address
+    tr_socket_address listen_socket_address_;
 
     time_t connection_attempted_at_ = {};
     time_t connection_changed_at_ = {};
@@ -396,58 +508,26 @@ struct tr_pex
 {
     tr_pex() = default;
 
-    tr_pex(tr_address addr_in, tr_port port_in, uint8_t flags_in = {})
-        : addr{ addr_in }
-        , port{ port_in }
+    explicit tr_pex(tr_socket_address socket_address_in, uint8_t flags_in = {})
+        : socket_address{ socket_address_in }
         , flags{ flags_in }
     {
     }
 
     template<typename OutputIt>
-    OutputIt to_compact_ipv4(OutputIt out) const
+    OutputIt to_compact(OutputIt out) const
     {
-        return this->addr.to_compact_ipv4(out, this->port);
+        return socket_address.to_compact(out);
     }
 
     template<typename OutputIt>
-    OutputIt to_compact_ipv6(OutputIt out) const
-    {
-        return this->addr.to_compact_ipv6(out, this->port);
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, tr_pex const* pex, size_t n_pex)
+    static OutputIt to_compact(OutputIt out, tr_pex const* pex, size_t n_pex)
     {
         for (size_t i = 0; i < n_pex; ++i)
         {
-            out = pex[i].to_compact_ipv4(out);
+            out = pex[i].to_compact(out);
         }
         return out;
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, tr_pex const* pex, size_t n_pex)
-    {
-        for (size_t i = 0; i < n_pex; ++i)
-        {
-            out = pex[i].to_compact_ipv6(out);
-        }
-        return out;
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact(OutputIt out, tr_pex const* pex, size_t n_pex, tr_address_type type)
-    {
-        switch (type)
-        {
-        case TR_AF_INET:
-            return to_compact_ipv4(out, pex, n_pex);
-        case TR_AF_INET6:
-            return to_compact_ipv6(out, pex, n_pex);
-        default:
-            TR_ASSERT_MSG(false, "invalid type");
-            return out;
-        }
     }
 
     [[nodiscard]] static std::vector<tr_pex> from_compact_ipv4(
@@ -462,25 +542,14 @@ struct tr_pex
         uint8_t const* added_f,
         size_t added_f_len);
 
-    template<typename OutputIt>
-    [[nodiscard]] OutputIt display_name(OutputIt out) const
-    {
-        return addr.display_name(out, port);
-    }
-
     [[nodiscard]] std::string display_name() const
     {
-        return addr.display_name(port);
+        return socket_address.display_name();
     }
 
     [[nodiscard]] int compare(tr_pex const& that) const noexcept // <=>
     {
-        if (auto const i = addr.compare(that.addr); i != 0)
-        {
-            return i;
-        }
-
-        return tr_compare_3way(port, that.port);
+        return socket_address.compare(that.socket_address);
     }
 
     [[nodiscard]] bool operator==(tr_pex const& that) const noexcept
@@ -495,17 +564,17 @@ struct tr_pex
 
     [[nodiscard]] bool is_valid_for_peers() const noexcept
     {
-        return addr.is_valid_for_peers(port);
+        return socket_address.is_valid_for_peers();
     }
 
-    tr_address addr = {};
-    tr_port port = {}; /* this field is in network byte order */
+    tr_socket_address socket_address;
+
     uint8_t flags = 0;
 };
 
 constexpr bool tr_isPex(tr_pex const* pex)
 {
-    return pex != nullptr && pex->addr.is_valid();
+    return pex != nullptr && pex->socket_address.is_valid();
 }
 
 [[nodiscard]] tr_peerMgr* tr_peerMgrNew(tr_session* session);
