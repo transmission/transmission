@@ -275,7 +275,7 @@ void tr_variantInitInt(tr_variant* initme, int64_t value)
 
 void tr_variantInitStrView(tr_variant* initme, std::string_view val)
 {
-    initme->set_unmanaged_string(val);
+    *initme = tr_variant::unmanaged_string(val);
 }
 
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len)
@@ -364,7 +364,7 @@ tr_variant* tr_variantListAddStr(tr_variant* const var, std::string_view value)
 tr_variant* tr_variantListAddStrView(tr_variant* const var, std::string_view value)
 {
     auto* const child = tr_variantListAdd(var);
-    child->set_unmanaged_string(value);
+    *child = tr_variant::unmanaged_string(value);
     return child;
 }
 

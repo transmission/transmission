@@ -64,16 +64,22 @@ public:
         return *this;
     }
 
-    tr_variant& operator=(std::string_view value)
+    tr_variant& operator=(std::string&& value)
     {
-        auto& item = val_.emplace<String>(std::string{ value }, std::string_view{});
-        item.second = item.first; // ensure the view points to the string we own
+        val_.emplace<StringContainer>(std::move(value));
         return *this;
     }
 
-    void set_unmanaged_string(std::string_view value)
+    tr_variant& operator=(std::string const& value)
     {
-        val_.emplace<String>(std::string{}, value);
+        val_.emplace<StringContainer>(std::string(value));
+        return *this;
+    }
+
+    tr_variant& operator=(std::string_view value)
+    {
+        val_.emplace<StringContainer>(std::string(value));
+        return *this;
     }
 
     [[nodiscard]] constexpr auto index() const noexcept
@@ -91,8 +97,8 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            auto const* const str = std::get_if<String>(&val_);
-            return str != nullptr ? &str->second : nullptr;
+            auto const* const str = std::get_if<StringContainer>(&val_);
+            return str != nullptr ? &str->sv_ : nullptr;
         }
         else
         {
@@ -106,12 +112,19 @@ public:
         return const_cast<Val*>(std::as_const(*this).get_if<Val>());
     }
 
+    [[nodiscard]] static tr_variant unmanaged_string(std::string_view val)
+    {
+        auto ret = tr_variant{};
+        ret.val_.emplace<StringContainer>().set_unmanaged(val);
+        return ret;
+    }
+
     template<typename Val>
     [[nodiscard]] constexpr bool holds_alternative() const noexcept
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            return std::holds_alternative<String>(val_);
+            return std::holds_alternative<StringContainer>(val_);
         }
         else
         {
@@ -125,9 +138,53 @@ public:
     }
 
 private:
-    using String = std::pair<std::string, std::string_view>;
+    // Helper class that always has a valid std::string_view so that get_if()
+    // can return its address. If an unmanaged string, only the view is used.
+    // If it's managing a string, the container's view points to its string.
+    class StringContainer
+    {
+    public:
+        StringContainer() = default;
 
-    std::variant<std::monostate, bool, int64_t, double, String, Vector, Map> val_;
+        explicit StringContainer(std::string&& str)
+        {
+            str_ = std::move(str);
+            sv_ = str_;
+        }
+
+        explicit StringContainer(StringContainer&& that)
+        {
+            *this = std::move(that);
+        }
+
+        void set_unmanaged(std::string_view sv)
+        {
+            str_.clear();
+            sv_ = sv;
+        }
+
+        StringContainer& operator=(StringContainer&& that)
+        {
+            if (std::data(that.sv_) == std::data(that.str_))
+            {
+                std::swap(str_, that.str_);
+                sv_ = str_;
+            }
+            else
+            {
+                sv_ = that.sv_;
+            }
+
+            return *this;
+        }
+
+        std::string_view sv_;
+
+    private:
+        std::string str_;
+    };
+
+    std::variant<std::monostate, bool, int64_t, double, StringContainer, Vector, Map> val_;
 };
 
 // --- Strings
