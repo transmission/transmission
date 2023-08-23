@@ -2,6 +2,7 @@
 
 This is a bugfix-only release. Everyone's feedback on 4.0.x has been very helpful -- thanks for all the suggestions, bug reports, and pull requests!
 
+
 ## What's New in 4.0.4
 
 ### All Platforms
@@ -26,11 +27,18 @@ This is a bugfix-only release. Everyone's feedback on 4.0.x has been very helpfu
 * Fixed torrent name rendering when showing magnet links in compact view. ([#5491](https://github.com/transmission/transmission/pull/5491))
 * Fixed bug that broke the "Move torrent file to trash" setting. ([#5505](https://github.com/transmission/transmission/pull/5505))
 * Fixed Qt 6.4 deprecation warning. ([#5552](https://github.com/transmission/transmission/pull/5552))
+* Fixed poor resolution of Qt application icon. ([#5570](https://github.com/transmission/transmission/pull/5570))
+
+### GTK Client
+
+* Fixed missing 'Remove torrent' tooltip. ([#5777](https://github.com/transmission/transmission/pull/5777))
 
 ### Web Client
 
 * Don't show `null` as a tier name in the inspector's tier list. ([#5462](https://github.com/transmission/transmission/pull/5462))
+* Fixed truncated play / pause icons. ([#5771](https://github.com/transmission/transmission/pull/5771))
 * Fixed overflow when rendering peer lists and made speed indicators honor `prefers-color-scheme` media queries. ([#5814](https://github.com/transmission/transmission/pull/5814))
+* Made the main menu accessible even on smaller displays. ([#5827](https://github.com/transmission/transmission/pull/5827))
 
 ### transmission-cli
 
@@ -82,13 +90,24 @@ Last but certainly not least, a big ***Thank You*** to these people who contribu
 
 * @dmantipov ([Dmitry Antipov](https://github.com/dmantipov)):
   * Fixed Qt 6.4 deprecation warning. ([#5552](https://github.com/transmission/transmission/pull/5552))
+* @GaryElshaw ([Gary Elshaw](https://github.com/GaryElshaw)):
+  * Fixed poor resolution of Qt application icon. ([#5570](https://github.com/transmission/transmission/pull/5570))
 * @sfan5:
   * Code review. ([#5505](https://github.com/transmission/transmission/pull/5505))
+
+### Contributions to GTK Client:
+
+* @GaryElshaw ([Gary Elshaw](https://github.com/GaryElshaw)):
+  * Fixed missing 'Remove torrent' tooltip. ([#5777](https://github.com/transmission/transmission/pull/5777))
 
 ### Contributions to Web Client:
 
 * @dareiff ([Derek Reiff](https://github.com/dareiff)):
   * Fixed overflow when rendering peer lists and made speed indicators honor `prefers-color-scheme` media queries. ([#5814](https://github.com/transmission/transmission/pull/5814))
+* @GaryElshaw ([Gary Elshaw](https://github.com/GaryElshaw)):
+  * Fixed truncated play / pause icons. ([#5771](https://github.com/transmission/transmission/pull/5771))
+* @Rukario:
+  * Made the main menu accessible even on smaller displays. ([#5827](https://github.com/transmission/transmission/pull/5827))
 
 ### Contributions to transmission-remote:
 
