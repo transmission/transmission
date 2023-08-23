@@ -66,19 +66,19 @@ public:
 
     tr_variant& operator=(std::string&& value)
     {
-        val_.emplace<StringContainer>(std::move(value));
+        val_.emplace<StringHolder>(std::move(value));
         return *this;
     }
 
     tr_variant& operator=(std::string const& value)
     {
-        val_.emplace<StringContainer>(std::string(value));
+        val_.emplace<StringHolder>(std::string(value));
         return *this;
     }
 
     tr_variant& operator=(std::string_view value)
     {
-        val_.emplace<StringContainer>(std::string(value));
+        val_.emplace<StringHolder>(std::string(value));
         return *this;
     }
 
@@ -93,11 +93,11 @@ public:
     }
 
     template<typename Val>
-    [[nodiscard]] constexpr auto const* get_if() const noexcept
+    [[nodiscard]] constexpr auto* get_if() noexcept
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            auto const* const str = std::get_if<StringContainer>(&val_);
+            auto const* const str = std::get_if<StringHolder>(&val_);
             return str != nullptr ? &str->sv_ : nullptr;
         }
         else
@@ -107,15 +107,35 @@ public:
     }
 
     template<typename Val>
-    [[nodiscard]] constexpr auto* get_if() noexcept
+    [[nodiscard]] constexpr auto const* get_if() const noexcept
     {
-        return const_cast<Val*>(std::as_const(*this).get_if<Val>());
+        return const_cast<tr_variant*>(this)->get_if<Val>();
+    }
+
+    template<size_t Index>
+    [[nodiscard]] auto* get_if() noexcept
+    {
+        if constexpr (Index == StringIndex)
+        {
+            auto const* const str = std::get_if<StringIndex>(&val_);
+            return str != nullptr ? &str->sv_ : nullptr;
+        }
+        else
+        {
+            return std::get_if<Index>(&val_);
+        }
+    }
+
+    template<size_t Index>
+    [[nodiscard]] constexpr auto const* get_if() const noexcept
+    {
+        return const_cast<tr_variant*>(this)->get_if<Index>();
     }
 
     [[nodiscard]] static tr_variant unmanaged_string(std::string_view val)
     {
         auto ret = tr_variant{};
-        ret.val_.emplace<StringContainer>().set_unmanaged(val);
+        ret.val_.emplace<StringHolder>().set_unmanaged(val);
         return ret;
     }
 
@@ -124,7 +144,7 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            return std::holds_alternative<StringContainer>(val_);
+            return std::holds_alternative<StringHolder>(val_);
         }
         else
         {
@@ -137,54 +157,46 @@ public:
         val_.emplace<std::monostate>();
     }
 
+    void merge(tr_variant const& that)
+    {
+        std::visit(Merge{ *this }, that.val_);
+    }
+
 private:
-    // Helper class that always has a valid std::string_view so that get_if()
-    // can return its address. If an unmanaged string, only the view is used.
-    // If it's managing a string, the container's view points to its string.
-    class StringContainer
+    // Holds a string_view to either an unmanaged/external string or to
+    // one owned by the class. If the string is unmanaged, only sv_ is used.
+    // If we own the string, then sv_ points to the managed str_.
+    class StringHolder
     {
     public:
-        StringContainer() = default;
-
-        explicit StringContainer(std::string&& str) noexcept
-        {
-            str_ = std::move(str);
-            sv_ = str_;
-        }
-
-        explicit StringContainer(StringContainer&& that) noexcept
-        {
-            *this = std::move(that);
-        }
-
-        void set_unmanaged(std::string_view sv)
-        {
-            str_.clear();
-            sv_ = sv;
-        }
-
-        StringContainer& operator=(StringContainer&& that) noexcept
-        {
-            if (std::data(that.sv_) == std::data(that.str_))
-            {
-                std::swap(str_, that.str_);
-                sv_ = str_;
-            }
-            else
-            {
-                sv_ = that.sv_;
-            }
-
-            return *this;
-        }
-
+        StringHolder() = default;
+        explicit StringHolder(std::string&& str) noexcept;
+        explicit StringHolder(StringHolder&& that) noexcept;
+        void set_unmanaged(std::string_view sv);
+        StringHolder& operator=(StringHolder&& that) noexcept;
         std::string_view sv_;
 
     private:
         std::string str_;
     };
 
-    std::variant<std::monostate, bool, int64_t, double, StringContainer, Vector, Map> val_;
+    class Merge
+    {
+    public:
+        explicit Merge(tr_variant& tgt);
+        void operator()(std::monostate const& src);
+        void operator()(bool const& src);
+        void operator()(int64_t const& src);
+        void operator()(double const& src);
+        void operator()(tr_variant::StringHolder const& src);
+        void operator()(tr_variant::Vector const& src);
+        void operator()(tr_variant::Map const& src);
+
+    private:
+        tr_variant& tgt_;
+    };
+
+    std::variant<std::monostate, bool, int64_t, double, StringHolder, Vector, Map> val_;
 };
 
 // --- Strings
