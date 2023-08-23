@@ -395,11 +395,6 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
         bool String(std::string_view value, Context const& /*context*/) override
         {
-            static constexpr auto PexIsNotValid = [](tr_pex const& pex)
-            {
-                return !pex.is_valid_for_peers();
-            };
-
             if (auto const key = currentKey(); key == "failure reason"sv)
             {
                 response_.errmsg = value;
@@ -414,15 +409,11 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "peers"sv)
             {
-                auto& pex = response_.pex;
-                pex = tr_pex::from_compact_ipv4(std::data(value), std::size(value), nullptr, 0);
-                pex.erase(std::remove_if(std::begin(pex), std::end(pex), PexIsNotValid), std::end(pex));
+                response_.pex = tr_pex::from_compact_ipv4(std::data(value), std::size(value), nullptr, 0);
             }
             else if (key == "peers6"sv)
             {
-                auto& pex6 = response_.pex6;
-                pex6 = tr_pex::from_compact_ipv6(std::data(value), std::size(value), nullptr, 0);
-                pex6.erase(std::remove_if(std::begin(pex6), std::end(pex6), PexIsNotValid), std::end(pex6));
+                response_.pex6 = tr_pex::from_compact_ipv6(std::data(value), std::size(value), nullptr, 0);
             }
             else if (key == "ip")
             {
