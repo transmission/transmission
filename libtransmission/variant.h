@@ -146,13 +146,13 @@ private:
     public:
         StringContainer() = default;
 
-        explicit StringContainer(std::string&& str)
+        explicit StringContainer(std::string&& str) noexcept
         {
             str_ = std::move(str);
             sv_ = str_;
         }
 
-        explicit StringContainer(StringContainer&& that)
+        explicit StringContainer(StringContainer&& that) noexcept
         {
             *this = std::move(that);
         }
@@ -163,7 +163,7 @@ private:
             sv_ = sv;
         }
 
-        StringContainer& operator=(StringContainer&& that)
+        StringContainer& operator=(StringContainer&& that) noexcept
         {
             if (std::data(that.sv_) == std::data(that.str_))
             {

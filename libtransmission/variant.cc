@@ -44,6 +44,62 @@ constexpr int variant_index(tr_variant const* const var)
     return tr_variant::NoneIndex;
 }
 
+void variant_merge(tr_variant& tgt, tr_variant const& src)
+{
+    switch (src.index())
+    {
+    case tr_variant::BoolIndex:
+        tgt = *src.get_if<bool>();
+        break;
+
+    case tr_variant::IntIndex:
+        tgt = *src.get_if<int64_t>();
+        break;
+
+    case tr_variant::DoubleIndex:
+        tgt = *src.get_if<double>();
+        break;
+
+    case tr_variant::StringIndex:
+        tgt = *src.get_if<std::string_view>();
+        break;
+
+    case tr_variant::VectorIndex:
+        {
+            auto const& src_vec = *src.get_if<tr_variant::Vector>();
+            auto const n_items = std::size(src_vec);
+            auto tgt_vec = tr_variant::Vector{};
+            tgt_vec.resize(n_items);
+            for (size_t i = 0; i < n_items; ++i)
+            {
+                variant_merge(tgt_vec[i], src_vec[i]);
+            }
+            tgt = std::move(tgt_vec);
+        }
+        break;
+
+    case tr_variant::MapIndex:
+        {
+            auto const& src_map = *src.get_if<tr_variant::Map>();
+            auto* tgt_map = tgt.get_if<tr_variant::Map>();
+
+            if (tgt_map == nullptr)
+            {
+                tgt = tr_variant::Map{};
+                tgt_map = tgt.get_if<tr_variant::Map>();
+            }
+
+            for (auto const& [key, val] : src_map)
+            {
+                variant_merge((*tgt_map)[key], val);
+            }
+        }
+        break;
+
+    default:
+        break;
+    }
+}
 } // namespace
 
 tr_variant* tr_variantDictFind(tr_variant* const var, tr_quark key)
@@ -763,154 +819,11 @@ bool tr_variantDictChild(tr_variant* const var, size_t pos, tr_quark* key, tr_va
     return false;
 }
 
-namespace
-{
-namespace merge_helpers
-{
-void tr_variantListCopy(tr_variant* target, tr_variant const* src)
-{
-    for (size_t i = 0;; ++i)
-    {
-        auto const* const child = tr_variantListChild(const_cast<tr_variant*>(src), i);
-        if (child == nullptr)
-        {
-            break;
-        }
-
-        if (child->holds_alternative<bool>())
-        {
-            auto val = bool{};
-            tr_variantGetBool(child, &val);
-            tr_variantListAddBool(target, val);
-        }
-        else if (child->holds_alternative<double>())
-        {
-            auto val = double{};
-            tr_variantGetReal(child, &val);
-            tr_variantListAddReal(target, val);
-        }
-        else if (child->holds_alternative<int64_t>())
-        {
-            auto val = int64_t{};
-            tr_variantGetInt(child, &val);
-            tr_variantListAddInt(target, val);
-        }
-        else if (child->holds_alternative<std::string_view>())
-        {
-            auto val = std::string_view{};
-            (void)tr_variantGetStrView(child, &val);
-            tr_variantListAddRaw(target, std::data(val), std::size(val));
-        }
-        else if (child->holds_alternative<tr_variant::Map>())
-        {
-            tr_variantMergeDicts(tr_variantListAddDict(target, 0), child);
-        }
-        else if (child->holds_alternative<tr_variant::Vector>())
-        {
-            tr_variantListCopy(tr_variantListAddList(target, 0), child);
-        }
-        else
-        {
-            tr_logAddWarn("tr_variantListCopy skipping item");
-        }
-    }
-}
-
-constexpr size_t tr_variantDictSize(tr_variant const* const var)
-{
-    if (auto* const map = var != nullptr ? var->get_if<tr_variant::Map>() : nullptr; map != nullptr)
-    {
-        return std::size(*map);
-    }
-
-    return {};
-}
-} // namespace merge_helpers
-} // namespace
-
 void tr_variantMergeDicts(tr_variant* const tgt, tr_variant const* const src)
 {
-    using namespace merge_helpers;
-
     TR_ASSERT(tgt != nullptr);
-    TR_ASSERT(tgt->holds_alternative<tr_variant::Map>());
     TR_ASSERT(src != nullptr);
-    TR_ASSERT(src->holds_alternative<tr_variant::Map>());
-
-    size_t const source_count = tr_variantDictSize(src);
-
-    tr_variantDictReserve(tgt, source_count + tr_variantDictSize(tgt));
-
-    for (size_t i = 0; i < source_count; ++i)
-    {
-        auto key = tr_quark{};
-        tr_variant* child = nullptr;
-        if (tr_variantDictChild(const_cast<tr_variant*>(src), i, &key, &child))
-        {
-            tr_variant* t = nullptr;
-
-            // if types differ, ensure that target will overwrite source
-            auto const* const target_child = tr_variantDictFind(tgt, key);
-            if ((target_child != nullptr) && child->index() != target_child->index())
-            {
-                tr_variantDictRemove(tgt, key);
-            }
-
-            if (child->holds_alternative<bool>())
-            {
-                auto val = bool{};
-                tr_variantGetBool(child, &val);
-                tr_variantDictAddBool(tgt, key, val);
-            }
-            else if (child->holds_alternative<double>())
-            {
-                auto val = double{};
-                tr_variantGetReal(child, &val);
-                tr_variantDictAddReal(tgt, key, val);
-            }
-            else if (child->holds_alternative<int64_t>())
-            {
-                auto val = int64_t{};
-                tr_variantGetInt(child, &val);
-                tr_variantDictAddInt(tgt, key, val);
-            }
-            else if (child->holds_alternative<std::string_view>())
-            {
-                auto val = std::string_view{};
-                (void)tr_variantGetStrView(child, &val);
-                tr_variantDictAddRaw(tgt, key, std::data(val), std::size(val));
-            }
-            else if (child->holds_alternative<tr_variant::Map>() && tr_variantDictFindDict(tgt, key, &t))
-            {
-                tr_variantMergeDicts(t, child);
-            }
-            else if (child->holds_alternative<tr_variant::Vector>())
-            {
-                if (tr_variantDictFind(tgt, key) == nullptr)
-                {
-                    tr_variantListCopy(tr_variantDictAddList(tgt, key, tr_variantListSize(child)), child);
-                }
-            }
-            else if (child->holds_alternative<tr_variant::Map>())
-            {
-                tr_variant* target_dict = tr_variantDictFind(tgt, key);
-
-                if (target_dict == nullptr)
-                {
-                    target_dict = tr_variantDictAddDict(tgt, key, tr_variantDictSize(child));
-                }
-
-                if (target_dict->holds_alternative<tr_variant::Map>())
-                {
-                    tr_variantMergeDicts(target_dict, child);
-                }
-            }
-            else
-            {
-                tr_logAddDebug(fmt::format("tr_variantMergeDicts skipping '{}'", tr_quark_get_string_view(key)));
-            }
-        }
-    }
+    variant_merge(*tgt, *src);
 }
 
 // ---
