@@ -377,9 +377,7 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
         tr_variantDictAddStr(info_dict, TR_KEY_source, source_);
     }
 
-    auto ret = tr_variant_serde::benc().to_string(top);
-    tr_variantClear(&top);
-    return ret;
+    return tr_variant_serde::benc().to_string(top);
 }
 
 uint32_t tr_metainfo_builder::default_piece_size(uint64_t total_size) noexcept

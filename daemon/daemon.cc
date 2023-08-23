@@ -684,7 +684,6 @@ void tr_daemon::reconfigure(void)
         tr_variantDictAddBool(&newsettings, TR_KEY_rpc_enabled, true);
         tr_sessionLoadSettings(&newsettings, configDir, MyName);
         tr_sessionSet(my_session_, &newsettings);
-        tr_variantClear(&newsettings);
         tr_sessionReloadBlocklists(my_session_);
     }
 }
@@ -942,7 +941,6 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     return true;
 
 EXIT_EARLY:
-    tr_variantClear(&settings_);
     return false;
 }
 

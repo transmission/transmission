@@ -213,7 +213,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
                 {
                     auto const newstr = replaceSubstr(sv, oldval, newval);
                     fmt::print("\tReplaced in 'announce-list' tier #{:d}: '{:s}' --> '{:s}'\n", tierCount + 1, sv, newstr);
-                    tr_variantClear(node);
+                    node->clear();
                     tr_variantInitStr(node, newstr);
                     changed = true;
                 }
@@ -396,8 +396,6 @@ int tr_main(int argc, char* argv[])
             ++changedCount;
             serde.to_file(top, filename);
         }
-
-        tr_variantClear(&top);
     }
 
     fmt::print("Changed {:d} files\n", changedCount);

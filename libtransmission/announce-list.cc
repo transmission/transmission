@@ -276,12 +276,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
 
     // confirm that it's good by parsing it back again
     auto const contents = serde.to_string(metainfo);
-    tr_variantClear(&metainfo);
-    if (auto tmp = serde.parse(contents); tmp)
-    {
-        tr_variantClear(&*tmp);
-    }
-    else
+    if (!serde.parse(contents).has_value())
     {
         return false;
     }

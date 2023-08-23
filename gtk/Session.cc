@@ -57,30 +57,6 @@
 
 using namespace std::literals;
 
-namespace
-{
-
-class TrVariantDeleter
-{
-public:
-    void operator()(tr_variant* ptr) const
-    {
-        tr_variantClear(ptr);
-        std::default_delete<tr_variant>()(ptr);
-    }
-};
-
-using TrVariantPtr = std::unique_ptr<tr_variant, TrVariantDeleter>;
-
-TrVariantPtr create_variant(tr_variant& other)
-{
-    auto result = TrVariantPtr(new tr_variant(other));
-    tr_variantInitBool(&other, false);
-    return result;
-}
-
-} // namespace
-
 class Session::Impl
 {
 public:
@@ -993,7 +969,6 @@ void Session::start_now(tr_torrent_id_t id)
     auto* ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
     exec(&top);
-    tr_variantClear(&top);
 }
 
 void Session::Impl::update()
@@ -1214,8 +1189,11 @@ bool core_read_rpc_response_idle(tr_variant& response)
 
 void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
 {
-    Glib::signal_idle().connect([owned_response = std::shared_ptr(create_variant(*response))]() mutable
-                                { return core_read_rpc_response_idle(*owned_response); });
+    auto owned_response = std::make_shared<tr_variant>();
+    tr_variantInitBool(owned_response.get(), false);
+    std::swap(*owned_response, *response);
+
+    Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });
 }
 
 } // namespace
@@ -1272,7 +1250,6 @@ void Session::port_test()
 
             impl_->signal_port_tested().emit(is_open);
         });
-    tr_variantClear(&request);
 }
 
 /***
@@ -1309,7 +1286,6 @@ void Session::blocklist_update()
 
             impl_->signal_blocklist_updated().emit(ruleCount >= 0);
         });
-    tr_variantClear(&request);
 }
 
 /***

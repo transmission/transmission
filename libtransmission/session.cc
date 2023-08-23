@@ -93,17 +93,25 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         auto& group = session->getBandwidthGroup(name);
 
         auto limits = tr_bandwidth_limits{};
-        tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &limits.up_limited);
-        tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &limits.down_limited);
 
-        if (auto limit = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &limit))
+        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &val))
         {
-            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+            limits.up_limited = val;
         }
 
-        if (auto limit = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &limit))
+        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &val))
         {
-            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+            limits.down_limited = val;
+        }
+
+        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
+        {
+            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
+        }
+
+        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &val))
+        {
+            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
         }
 
         group.set_limits(&limits);
@@ -114,7 +122,6 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
             group.honor_parent_limits(TR_DOWN, honors);
         }
     }
-    tr_variantClear(&*groups_var);
 }
 
 void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
@@ -139,7 +146,6 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 
     auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
     tr_variant_serde::json().to_file(groups_dict, filename);
-    tr_variantClear(&groups_dict);
 }
 
 } // namespace bandwidth_group_helpers
@@ -483,21 +489,22 @@ void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictiona
     tr_variantDictAddInt(setme_dictionary, TR_KEY_message_level, tr_logGetLevel());
 }
 
-bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* app_name)
+bool tr_sessionLoadSettings(tr_variant* settings_in, char const* config_dir, char const* app_name)
 {
     using namespace settings_helpers;
 
-    TR_ASSERT(tr_variantIsDict(dict));
+    TR_ASSERT(settings_in != nullptr);
+    TR_ASSERT(settings_in->holds_alternative<tr_variant::Map>());
 
-    /* initializing the defaults: caller may have passed in some app-level defaults.
-     * preserve those and use the session defaults to fill in any missing gaps. */
-    auto old_dict = *dict;
-    tr_variantInitDict(dict, 0);
-    tr_sessionGetDefaultSettings(dict);
-    tr_variantMergeDicts(dict, &old_dict);
-    tr_variantClear(&old_dict);
+    // first, start with the libtransmission default settings
+    auto settings = tr_variant{};
+    tr_variantInitDict(&settings, 0);
+    tr_sessionGetDefaultSettings(&settings);
 
-    /* file settings override the defaults */
+    // now use the app default settings passed in
+    tr_variantMergeDicts(&settings, settings_in);
+
+    // now use a settings file to override all the defaults
     auto success = bool{};
     auto filename = tr_pathbuf{};
     get_settings_filename(filename, config_dir, app_name);
@@ -507,8 +514,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     }
     else if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        tr_variantMergeDicts(dict, &*file_settings);
-        tr_variantClear(&*file_settings);
+        tr_variantMergeDicts(&settings, &*file_settings);
         success = true;
     }
     else
@@ -516,7 +522,11 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
         success = false;
     }
 
-    /* cleanup */
+    if (success)
+    {
+        std::swap(*settings_in, settings);
+    }
+
     return success;
 }
 
@@ -524,7 +534,8 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(tr_variantIsDict(client_settings));
+    TR_ASSERT(client_settings != nullptr);
+    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
 
     tr_variant settings;
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
@@ -532,10 +543,9 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     tr_variantInitDict(&settings, 0);
 
     /* the existing file settings are the fallback values */
-    if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+    if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
         tr_variantMergeDicts(&settings, &*file_settings);
-        tr_variantClear(&*file_settings);
     }
 
     /* the client's settings override the file settings */
@@ -547,14 +557,10 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
         tr_variantInitDict(&session_settings, 0);
         tr_sessionGetSettings(session, &session_settings);
         tr_variantMergeDicts(&settings, &session_settings);
-        tr_variantClear(&session_settings);
     }
 
     /* save the result */
     tr_variant_serde::json().to_file(settings, filename);
-
-    /* cleanup */
-    tr_variantClear(&settings);
 
     /* Write bandwidth groups limits to file  */
     bandwidthGroupWrite(session, config_dir);
@@ -574,7 +580,8 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(tr_variantIsDict(client_settings));
+    TR_ASSERT(client_settings != nullptr);
+    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
 
     tr_timeUpdate(time(nullptr));
 
@@ -626,7 +633,8 @@ void tr_session::initImpl(init_data& data)
     TR_ASSERT(am_in_session_thread());
 
     auto* const client_settings = data.client_settings;
-    TR_ASSERT(tr_variantIsDict(client_settings));
+    TR_ASSERT(client_settings != nullptr);
+    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
 
     tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
 
@@ -656,14 +664,14 @@ void tr_session::initImpl(init_data& data)
     tr_utpInit(this);
 
     /* cleanup */
-    tr_variantClear(&settings);
     data.done_cv.notify_one();
 }
 
 void tr_session::setSettings(tr_variant* settings_dict, bool force)
 {
     TR_ASSERT(am_in_session_thread());
-    TR_ASSERT(tr_variantIsDict(settings_dict));
+    TR_ASSERT(settings_dict != nullptr);
+    TR_ASSERT(settings_dict->holds_alternative<tr_variant::Map>());
 
     // load the session settings
     auto new_settings = tr_session_settings{};

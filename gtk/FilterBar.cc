@@ -302,7 +302,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
             auto path = tracker_model_->get_path(add);
             core_->favicon_cache().load(
                 site.announce_url,
-                [this, path](auto const* pixbuf) { favicon_ready_cb(pixbuf, path); });
+                [this, path = std::move(path)](auto const* pixbuf) { favicon_ready_cb(pixbuf, path); });
             ++i;
         }
         else // update row

@@ -460,7 +460,6 @@ private:
         }
 
         tr_variant_serde::benc().to_file(benc, state_filename_);
-        tr_variantClear(&benc);
     }
 
     [[nodiscard]] static std::pair<Id, Nodes> load_state(std::string_view filename)
@@ -509,8 +508,6 @@ private:
                     nodes.emplace_back(addr, port);
                 }
             }
-
-            tr_variantClear(&top);
         }
 
         return std::make_pair(id, nodes);
