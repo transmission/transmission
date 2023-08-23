@@ -206,7 +206,7 @@ bool tr_variantGetBool(tr_variant const* const var, bool* setme)
         {
             *setme = val != 0;
             return true;
-        };
+        }
         break;
 
     case tr_variant::StringIndex:
