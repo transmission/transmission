@@ -322,6 +322,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 {
     verboseLog("Announce response:", TR_DOWN, benc);
 
+    // the validity of the peers will be checked by tr_peerMgrAddPex()
     struct AnnounceHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
     {
         using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
@@ -350,11 +351,8 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
             BasicHandler::EndDict(context);
 
-            if (pex_.is_valid_for_peers())
-            {
-                response_.pex.push_back(pex_);
-                pex_ = {};
-            }
+            response_.pex.push_back(pex_);
+            pex_ = {};
 
             return true;
         }
