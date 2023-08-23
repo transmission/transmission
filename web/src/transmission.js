@@ -257,7 +257,11 @@ export class Transmission extends EventTarget {
       this.elements.torrent_list.addEventListener('touchend', () => {
         clearTimeout(this.busyclick);
         this.busyclick = false;
-        setTimeout(() => {if (this.popup) {this.popup.root.style.pointerEvents = 'auto'}}, 1);
+        setTimeout(() => {
+          if (this.popup) {
+            this.popup.root.style.pointerEvents = 'auto';
+          }
+        }, 1);
       });
       this.elements.torrent_list.addEventListener('touchmove', () => {
         clearTimeout(this.busyclick);
@@ -269,7 +273,9 @@ export class Transmission extends EventTarget {
     } else {
       this.elements.torrent_list.addEventListener('contextmenu', (event_) => {
         rightc(event_);
-        if (this.popup) {this.popup.root.style.pointerEvents = 'auto'};
+        if (this.popup) {
+          this.popup.root.style.pointerEvents = 'auto';
+        }
       });
     }
 
@@ -1053,7 +1059,9 @@ TODO: fix this when notifications get fixed
         const e = row.getElement();
         e.row = row;
         dirty_rows.push(row);
-        e.addEventListener('click', (e_) => {this._onRowClicked(e_)});
+        e.addEventListener('click', (e_) => {
+          this._onRowClicked(e_);
+        });
       }
     }
 
