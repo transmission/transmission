@@ -128,12 +128,11 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     bool utp)
 {
     using preferred_key_t = std::underlying_type_t<tr_preferred_transport>;
-    auto const& [addr, port] = socket_address;
     auto const preferred = session->preferred_transport();
 
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(addr.is_valid());
+    TR_ASSERT(socket_address.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
     if (!socket_address.is_valid_for_peers())
