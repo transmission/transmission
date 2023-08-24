@@ -173,7 +173,8 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 
     for (std::underlying_type_t<tr_preferred_transport> i = 0; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
     {
-        if (func[(i + session->preferred_transport()) % TR_NUM_PREFERRED_TRANSPORT]())
+        static_assert(TR_NUM_PREFERRED_TRANSPORT == 2U);
+        if (func[(i + session->preferred_transport()) & 1u]())
         {
             return peer_io;
         }
