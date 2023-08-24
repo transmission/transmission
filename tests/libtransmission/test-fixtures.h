@@ -515,12 +515,7 @@ protected:
         {
             auto* settings = new tr_variant{};
             tr_variantInitDict(settings, 10);
-            auto constexpr deleter = [](tr_variant* v)
-            {
-                tr_variantClear(v);
-                delete v;
-            };
-            settings_.reset(settings, deleter);
+            settings_.reset(settings);
         }
 
         return settings_.get();

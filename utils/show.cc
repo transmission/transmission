@@ -359,12 +359,13 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         }
 
         // print it out
-        auto top = tr_variant{};
-        if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, response.body))
+        auto otop = tr_variant_serde::benc().inplace().parse(response.body);
+        if (!!otop)
         {
             fmt::print("error parsing scrape response\n");
             continue;
         }
+        auto& top = *otop;
 
         bool matched = false;
         if (tr_variant* files = nullptr; tr_variantDictFindDict(&top, TR_KEY_files, &files))
@@ -390,8 +391,6 @@ void doScrape(tr_torrent_metainfo const& metainfo)
                 ++child_pos;
             }
         }
-
-        tr_variantClear(&top);
 
         if (!matched)
         {
