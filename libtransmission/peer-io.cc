@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <cstdint>
+#include <type_traits>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -137,27 +138,44 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     }
 
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
-
+    auto func = std::array<std::function<bool()>, 2>{
+        [&]()
+        {
 #ifdef WITH_UTP
-    if (utp)
-    {
-        auto* const sock = utp_create_socket(session->utp_context);
-        utp_set_userdata(sock, peer_io.get());
-        peer_io->set_socket(tr_peer_socket{ socket_address, sock });
+            if (utp)
+            {
+                auto* const sock = utp_create_socket(session->utp_context);
+                utp_set_userdata(sock, peer_io.get());
+                peer_io->set_socket(tr_peer_socket{ socket_address, sock });
 
-        auto const [ss, sslen] = socket_address.to_sockaddr();
-        if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
-        {
-            return peer_io;
-        }
-    }
+                auto const [ss, sslen] = socket_address.to_sockaddr();
+                if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
+                {
+                    return true;
+                }
+            }
 #endif
-
-    if (!peer_io->socket_.is_valid())
-    {
-        if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
+            return false;
+        },
+        [&]()
         {
-            peer_io->set_socket(std::move(sock));
+            if (!peer_io->socket_.is_valid())
+            {
+                if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
+                {
+                    peer_io->set_socket(std::move(sock));
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
+
+    using iter_t = std::underlying_type_t<tr_preferred_transport>;
+    for (iter_t i = 0; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
+    {
+        if (func[(i + session->preferred_transport()) % TR_NUM_PREFERRED_TRANSPORT]())
+        {
             return peer_io;
         }
     }
