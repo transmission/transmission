@@ -138,7 +138,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     }
 
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
-    auto func = std::array<std::function<bool()>, 2>{
+    auto func = std::array<std::function<bool()>, TR_NUM_PREFERRED_TRANSPORT>{
         [&]()
         {
 #ifdef WITH_UTP
@@ -171,8 +171,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
         }
     };
 
-    using iter_t = std::underlying_type_t<tr_preferred_transport>;
-    for (iter_t i = 0; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
+    for (std::underlying_type_t<tr_preferred_transport> i = 0; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
     {
         if (func[(i + session->preferred_transport()) % TR_NUM_PREFERRED_TRANSPORT]())
         {
