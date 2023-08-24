@@ -20,6 +20,8 @@
 
 #include <fmt/core.h>
 
+#include <small/map.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bandwidth.h"
@@ -125,7 +127,9 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     bool is_seed,
     bool utp)
 {
+    using preferred_key_t = std::underlying_type_t<tr_preferred_transport>;
     auto const& [addr, port] = socket_address;
+    auto const preferred = session->preferred_transport();
 
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
@@ -138,43 +142,48 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     }
 
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
-    auto func = std::array<std::function<bool()>, TR_NUM_PREFERRED_TRANSPORT>{
-        [&]()
-        {
+    auto const func = small::max_size_map<preferred_key_t, std::function<bool()>, TR_NUM_PREFERRED_TRANSPORT>{
+        { TR_PREFER_UTP,
+          [&]()
+          {
 #ifdef WITH_UTP
-            if (utp)
-            {
-                auto* const sock = utp_create_socket(session->utp_context);
-                utp_set_userdata(sock, peer_io.get());
-                peer_io->set_socket(tr_peer_socket{ socket_address, sock });
+              if (utp)
+              {
+                  auto* const sock = utp_create_socket(session->utp_context);
+                  utp_set_userdata(sock, peer_io.get());
+                  peer_io->set_socket(tr_peer_socket{ socket_address, sock });
 
-                auto const [ss, sslen] = socket_address.to_sockaddr();
-                if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
-                {
-                    return true;
-                }
-            }
+                  auto const [ss, sslen] = socket_address.to_sockaddr();
+                  if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
+                  {
+                      return true;
+                  }
+              }
 #endif
-            return false;
-        },
-        [&]()
-        {
-            if (!peer_io->socket_.is_valid())
-            {
-                if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
-                {
-                    peer_io->set_socket(std::move(sock));
-                    return true;
-                }
-            }
-            return false;
-        }
+              return false;
+          } },
+        { TR_PREFER_TCP,
+          [&]()
+          {
+              if (!peer_io->socket_.is_valid())
+              {
+                  if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
+                  {
+                      peer_io->set_socket(std::move(sock));
+                      return true;
+                  }
+              }
+              return false;
+          } }
     };
 
-    for (std::underlying_type_t<tr_preferred_transport> i = 0; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
+    if (func[preferred]())
     {
-        static_assert(TR_NUM_PREFERRED_TRANSPORT == 2U);
-        if (func[(i + session->preferred_transport()) & 1u]())
+        return peer_io;
+    }
+    for (preferred_key_t i = 0U; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
+    {
+        if (i != preferred && func[i]())
         {
             return peer_io;
         }

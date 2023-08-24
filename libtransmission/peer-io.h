@@ -47,6 +47,7 @@ enum ReadState
 
 enum tr_preferred_transport : uint8_t
 {
+    // More preferred transports goes on top
     TR_PREFER_UTP,
     TR_PREFER_TCP,
     TR_NUM_PREFERRED_TRANSPORT
