@@ -55,8 +55,10 @@ auto constexpr VerifyModeKeys = std::array<std::pair<std::string_view, tr_verify
 } };
 
 auto constexpr PreferredTransportKeys = std::
-    array<std::pair<std::string_view, tr_preferred_transport>, TR_NUM_PREFERRED_TRANSPORT>{ { { "utp", TR_PREFER_UTP },
-                                                                                              { "tcp", TR_PREFER_TCP } } };
+    array<std::pair<std::string_view, tr_preferred_transport>, TR_NUM_PREFERRED_TRANSPORT>{ {
+        { "utp", TR_PREFER_UTP },
+        { "tcp", TR_PREFER_TCP },
+    } };
 } // namespace
 
 namespace libtransmission
