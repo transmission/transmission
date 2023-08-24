@@ -177,13 +177,13 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
           } }
     };
 
-    if (func[preferred]())
+    if (func.at(preferred)())
     {
         return peer_io;
     }
     for (preferred_key_t i = 0U; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
     {
-        if (i != preferred && func[i]())
+        if (i != preferred && func.at(i)())
         {
             return peer_io;
         }
