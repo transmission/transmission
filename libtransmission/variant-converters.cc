@@ -302,7 +302,13 @@ std::optional<tr_preferred_transport> VariantConverter::load<tr_preferred_transp
 template<>
 void VariantConverter::save<tr_preferred_transport>(tr_variant* tgt, tr_preferred_transport const& val)
 {
-    tr_variantInitInt(tgt, val);
+    static constexpr auto Keys = PreferredTransportKeys;
+
+    if (auto iter = std::find_if(std::begin(Keys), std::end(Keys), [val](auto const& ele) { return ele.second == val; });
+        iter != std::end(Keys))
+    {
+        tr_variantInitStrView(tgt, iter->first);
+    }
 }
 
 // ---
