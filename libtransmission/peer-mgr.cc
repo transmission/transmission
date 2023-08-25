@@ -746,11 +746,8 @@ private:
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
 
-            if (was_connectable)
-            {
-                // Note that it_that is invalid after this point
-                graveyard_pool.insert(connectable_pool.extract(it_that));
-            }
+            // Note that it_that is invalid after this point
+            graveyard_pool.insert(connectable_pool.extract(it_that));
 
             return false;
         }
