@@ -471,7 +471,7 @@ TEST_F(SettingsTest, canSavePreferredTransport)
     tr_variantInitDict(&var, 100);
     settings.preferred_transport = ExpectedValue;
     settings.save(&var);
-    auto val = int64_t{};
-    EXPECT_TRUE(tr_variantDictFindInt(&var, Key, &val));
-    EXPECT_EQ(ExpectedValue, val);
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
+    EXPECT_EQ("tcp", val);
 }
