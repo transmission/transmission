@@ -3,15 +3,17 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <cstdint>
-#include <cstring>
-#include <string>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <arpa/inet.h> // ntohl, ntohs
+#endif
 
 #include <event2/event.h>
-#include <event2/bufferevent.h>
 
 #include <libutp/utp.h>
 
@@ -19,14 +21,18 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/session.h"
 #include "libtransmission/bandwidth.h"
+#include "libtransmission/block-info.h" // tr_block_info
+#include "libtransmission/error.h" // tr_error_clear, tr_error_s...
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
+#include "libtransmission/peer-socket.h" // tr_peer_socket, tr_netOpen...
+#include "libtransmission/session.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h" // for _()
+
+struct sockaddr;
 
 #ifdef _WIN32
 #undef EAGAIN
@@ -113,18 +119,19 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_incoming(tr_session* session, tr_bandw
 std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     tr_session* session,
     tr_bandwidth* parent,
-    tr_address const& addr,
-    tr_port port,
+    tr_socket_address const& socket_address,
     tr_sha1_digest_t const& info_hash,
     bool is_seed,
     bool utp)
 {
+    auto const& [addr, port] = socket_address;
+
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
-    if (!addr.is_valid_for_peers(port))
+    if (!socket_address.is_valid_for_peers())
     {
         return {};
     }
@@ -136,9 +143,9 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     {
         auto* const sock = utp_create_socket(session->utp_context);
         utp_set_userdata(sock, peer_io.get());
-        peer_io->set_socket(tr_peer_socket{ addr, port, sock });
+        peer_io->set_socket(tr_peer_socket{ socket_address, sock });
 
-        auto const [ss, sslen] = addr.to_sockaddr(port);
+        auto const [ss, sslen] = socket_address.to_sockaddr();
         if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
         {
             return peer_io;
@@ -148,7 +155,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
 
     if (!peer_io->socket_.is_valid())
     {
-        if (auto sock = tr_netOpenPeerSocket(session, addr, port, is_seed); sock.is_valid())
+        if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
         {
             peer_io->set_socket(std::move(sock));
             return peer_io;
@@ -178,8 +185,8 @@ void tr_peerIo::set_socket(tr_peer_socket socket_in)
 
     if (socket_.is_tcp())
     {
-        event_read_.reset(event_new(session_->eventBase(), socket_.handle.tcp, EV_READ, &tr_peerIo::event_read_cb, this));
-        event_write_.reset(event_new(session_->eventBase(), socket_.handle.tcp, EV_WRITE, &tr_peerIo::event_write_cb, this));
+        event_read_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_READ, &tr_peerIo::event_read_cb, this));
+        event_write_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_WRITE, &tr_peerIo::event_write_cb, this));
     }
 #ifdef WITH_UTP
     else if (socket_.is_utp())
@@ -223,16 +230,15 @@ bool tr_peerIo::reconnect()
         return false;
     }
 
-    auto const [addr, port] = socket_address();
-    socket_ = tr_netOpenPeerSocket(session_, addr, port, is_seed());
+    socket_ = tr_netOpenPeerSocket(session_, socket_address(), is_seed());
 
     if (!socket_.is_tcp())
     {
         return false;
     }
 
-    this->event_read_.reset(event_new(session_->eventBase(), socket_.handle.tcp, EV_READ, event_read_cb, this));
-    this->event_write_.reset(event_new(session_->eventBase(), socket_.handle.tcp, EV_WRITE, event_write_cb, this));
+    this->event_read_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_READ, event_read_cb, this));
+    this->event_write_.reset(event_new(session_->event_base(), socket_.handle.tcp, EV_WRITE, event_write_cb, this));
 
     event_enable(pending_events);
 
@@ -419,7 +425,7 @@ size_t tr_peerIo::try_read(size_t max)
 
     auto& buf = inbuf_;
     tr_error* error = nullptr;
-    auto const n_read = socket_.try_read(buf, max, &error);
+    auto const n_read = socket_.try_read(buf, max, std::empty(buf), &error);
     set_enabled(Dir, error == nullptr || canRetryFromError(error->code));
 
     if (error != nullptr)
@@ -575,43 +581,7 @@ size_t tr_peerIo::get_write_buffer_space(uint64_t now) const noexcept
     return desired_len > current_len ? desired_len - current_len : 0U;
 }
 
-void tr_peerIo::write(libtransmission::Buffer& buf, bool is_piece_data)
-{
-    auto [bytes, len] = buf.pullup();
-    encrypt(len, bytes);
-    outbuf_info_.emplace_back(std::size(buf), is_piece_data);
-    outbuf_.add(buf);
-    buf.clear();
-}
-
-void tr_peerIo::write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
-{
-    auto const old_size = std::size(outbuf_);
-
-    outbuf_.reserve(old_size + n_bytes);
-    outbuf_.add(bytes, n_bytes);
-
-    for (auto iter = std::begin(outbuf_) + old_size, end = std::end(outbuf_); iter != end; ++iter)
-    {
-        encrypt(1, &*iter);
-    }
-
-    outbuf_info_.emplace_back(n_bytes, is_piece_data);
-}
-
 // ---
-
-void tr_peerIo::read_bytes(void* bytes, size_t byte_count)
-{
-    TR_ASSERT(read_buffer_size() >= byte_count);
-
-    inbuf_.to_buf(bytes, byte_count);
-
-    if (is_encrypted())
-    {
-        decrypt(byte_count, bytes);
-    }
-}
 
 void tr_peerIo::read_uint16(uint16_t* setme)
 {

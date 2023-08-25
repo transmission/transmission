@@ -19,13 +19,17 @@
 #include <mutex>
 #include <optional>
 #include <string_view>
+#include <utility>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h"
-#include "peer-mse.h" // tr_message_stream_encryption::DH
-#include "peer-io.h"
-#include "timer.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
+#include "libtransmission/peer-io.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_peer_id_t
+
+struct tr_error;
 
 // short-term class which manages the handshake phase of a tr_peerIo
 class tr_handshake
@@ -61,14 +65,13 @@ public:
         [[nodiscard]] virtual libtransmission::TimerMaker& timer_maker() = 0;
         [[nodiscard]] virtual bool allows_dht() const = 0;
         [[nodiscard]] virtual bool allows_tcp() const = 0;
-        [[nodiscard]] virtual bool is_peer_known_seed(tr_torrent_id_t tor_id, tr_address const& addr) const = 0;
         [[nodiscard]] virtual size_t pad(void* setme, size_t max_bytes) const = 0;
         [[nodiscard]] virtual DH::private_key_bigend_t private_key() const
         {
             return DH::randomPrivateKey();
         }
 
-        virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_address const&) = 0;
+        virtual void set_utp_failed(tr_sha1_digest_t const& info_hash, tr_socket_address const& socket_address) = 0;
     };
 
     tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc on_done);
@@ -248,6 +251,11 @@ private:
     // https://wiki.vuze.com/w/Message_Stream_Encryption
     using vc_t = std::array<std::byte, 8>;
     static auto constexpr VC = vc_t{};
+
+    // Used when resynchronizing in read_vc(). This value is cached to avoid
+    // the cost of recomputing it. MSE spec: "Since the length of [PadB is]
+    // unknown, A will be able to resynchronize on ENCRYPT(VC)".
+    std::optional<vc_t> encrypted_vc_;
 
     ///
 

@@ -50,6 +50,9 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 
 int main(int argc, char** argv)
 {
+    /* init libtransmission */
+    auto const init_mgr = tr_lib_init();
+
     /* init i18n */
     tr_locale_set_global("");
     bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);

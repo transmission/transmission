@@ -3,15 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <memory>
 #include <utility>
 #include <vector>
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
 #include "libtransmission/completion.h"
-#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 
 uint64_t tr_completion::compute_has_valid() const

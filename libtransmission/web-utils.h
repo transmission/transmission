@@ -13,7 +13,7 @@
 
 #include <fmt/core.h>
 
-#include "tr-macros.h" // tr_sha1_digest_t
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
 /** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
 bool tr_addressIsIP(char const* address);

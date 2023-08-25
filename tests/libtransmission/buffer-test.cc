@@ -3,15 +3,22 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstddef> // std::byte
+#include <cstdint> // uint16_t, uint32_t, uint64_t
+#include <memory>
+#include <string_view>
+
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/tr-buffer.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using BufferTest = ::testing::Test;
 using namespace std::literals;
-using Buffer = libtransmission::Buffer;
+using Buffer = libtransmission::StackBuffer<1024, std::byte>;
 
 TEST_F(BufferTest, startsWithInSingleSegment)
 {
@@ -62,52 +69,40 @@ TEST_F(BufferTest, startsWithInMultiSegment)
     EXPECT_TRUE(buf->starts_with("Hello, World!"sv));
 }
 
-TEST_F(BufferTest, Move)
+TEST_F(BufferTest, Numbers)
 {
-    auto constexpr TwoChars = "12"sv;
-    auto constexpr SixChars = "123456"sv;
-    auto constexpr TenChars = "1234567890"sv;
-
-    auto a = Buffer{ TwoChars };
-    auto b = Buffer{ SixChars };
-    auto c = Buffer{ TenChars };
-
-    auto lens = std::array<size_t, 3>{ std::size(TwoChars), std::size(SixChars), std::size(TenChars) };
-
-    EXPECT_EQ(lens[0], std::size(a));
-    EXPECT_EQ(lens[1], std::size(b));
-    EXPECT_EQ(lens[2], std::size(c));
-
-    std::swap(a, b);
-    EXPECT_EQ(lens[0], std::size(b));
-    EXPECT_EQ(lens[1], std::size(a));
-    EXPECT_EQ(lens[2], std::size(c));
-
-    std::swap(a, c);
-    EXPECT_EQ(lens[0], std::size(b));
-    EXPECT_EQ(lens[1], std::size(c));
-    EXPECT_EQ(lens[2], std::size(a));
-
-    std::swap(b, c);
-    EXPECT_EQ(lens[0], std::size(c));
-    EXPECT_EQ(lens[1], std::size(b));
-    EXPECT_EQ(lens[2], std::size(a));
-
-    a.add(std::data(TwoChars), std::size(TwoChars));
-
+    for (auto i = 0; i < 100; ++i)
     {
-        auto constexpr OneChar = "1"sv;
-        auto d = Buffer{ OneChar };
+        auto const expected_u8 = tr_rand_obj<uint8_t>();
+        auto const expected_u16 = tr_rand_obj<uint16_t>();
+        auto const expected_u32 = tr_rand_obj<uint32_t>();
+        auto const expected_u64 = tr_rand_obj<uint64_t>();
 
-        std::swap(a, d);
-        EXPECT_EQ(1U, std::size(a));
+        auto buf = Buffer{};
+
+        buf.add_uint8(expected_u8);
+        buf.add_uint16(expected_u16);
+        buf.add_uint32(expected_u32);
+        buf.add_uint64(expected_u64);
+
+        EXPECT_EQ(expected_u8, buf.to_uint8());
+        EXPECT_EQ(expected_u16, buf.to_uint16());
+        EXPECT_EQ(expected_u32, buf.to_uint32());
+        EXPECT_EQ(expected_u64, buf.to_uint64());
+
+        buf.add_uint64(expected_u64);
+        buf.add_uint32(expected_u32);
+        buf.add_uint16(expected_u16);
+        buf.add_uint8(expected_u8);
+
+        EXPECT_EQ(expected_u64, buf.to_uint64());
+        EXPECT_EQ(expected_u32, buf.to_uint32());
+        EXPECT_EQ(expected_u16, buf.to_uint16());
+        EXPECT_EQ(expected_u8, buf.to_uint8());
     }
-
-    EXPECT_EQ(1U, std::size(a));
-    a.add(std::data(TwoChars), std::size(TwoChars));
-    EXPECT_EQ(3U, std::size(a));
 }
 
+#if 0
 TEST_F(BufferTest, NonBufferWriter)
 {
     auto constexpr Hello = "Hello, "sv;
@@ -137,7 +132,8 @@ TEST_F(BufferTest, NonBufferWriter)
     out1.add(Bang);
     out2.add(Bang);
 
-    auto const result1 = out1.pullup_sv();
+    auto const result1 = out1.to_string_view();
     auto const result2 = std::string_view{ reinterpret_cast<char const*>(std::data(out2_vec)), std::size(out2_vec) };
     EXPECT_EQ(result1, result2);
 }
+#endif

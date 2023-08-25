@@ -7,8 +7,7 @@
 
 #include <string_view>
 
-#include "transmission.h"
-
+struct tr_session;
 struct tr_variant;
 
 using tr_rpc_response_func = void (*)(tr_session* session, tr_variant* response, void* user_data);

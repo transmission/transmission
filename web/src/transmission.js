@@ -23,13 +23,7 @@ import {
   TorrentRendererCompact,
   TorrentRendererFull,
 } from './torrent-row.js';
-import {
-  debounce,
-  deepEqual,
-  setEnabled,
-  setTextContent,
-  movePopup,
-} from './utils.js';
+import { debounce, deepEqual, setEnabled, setTextContent } from './utils.js';
 
 export class Transmission extends EventTarget {
   constructor(action_manager, notifications, prefs) {
@@ -42,7 +36,7 @@ export class Transmission extends EventTarget {
     this.remote = new Remote(this);
 
     this.addEventListener('torrent-selection-changed', (event_) =>
-      this.action_manager.update(event_)
+      this.action_manager.update(event_),
     );
 
     // Initialize the implementation fields
@@ -57,7 +51,7 @@ export class Transmission extends EventTarget {
     this.boundPopupCloseListener = this.popupCloseListener.bind(this);
     this.dispatchSelectionChangedSoon = debounce(
       () => this._dispatchSelectionChanged(),
-      200
+      200,
     );
 
     // listen to actions
@@ -74,13 +68,13 @@ export class Transmission extends EventTarget {
       .querySelector('#filter-tracker')
       .addEventListener('change', (event_) => {
         this.setFilterTracker(
-          event_.target.value === 'all' ? null : event_.target.value
+          event_.target.value === 'all' ? null : event_.target.value,
         );
       });
 
     this.action_manager.addEventListener('change', (event_) => {
       for (const element of document.querySelectorAll(
-        `[data-action="${event_.action}"]`
+        `[data-action="${event_.action}"]`,
       )) {
         setEnabled(element, event_.enabled);
       }
@@ -145,17 +139,8 @@ export class Transmission extends EventTarget {
                 this,
                 this.prefs,
                 this.remote,
-                this.action_manager
-              )
-            );
-            const btnbox = document
-              .querySelector('#toolbar-overflow')
-              .getBoundingClientRect();
-            movePopup(
-              this.popup.root,
-              btnbox.left + btnbox.width,
-              btnbox.top + btnbox.height,
-              document.body
+                this.action_manager,
+              ),
             );
           }
           break;
@@ -236,12 +221,19 @@ export class Transmission extends EventTarget {
 
       const popup = new ContextMenu(this.action_manager);
       this.setCurrentPopup(popup);
-      movePopup(
-        popup.root,
+
+      const boundingElement = document.querySelector('#torrent-container');
+      const bounds = boundingElement.getBoundingClientRect();
+      const x = Math.min(
         event_.x,
-        event_.y,
-        document.querySelector('#torrent-container')
+        bounds.x + bounds.width - popup.root.clientWidth,
       );
+      const y = Math.min(
+        event_.y,
+        bounds.y + bounds.height - popup.root.clientHeight,
+      );
+      popup.root.style.left = `${x > 0 ? x : 0}px`;
+      popup.root.style.top = `${y > 0 ? y : 0}px`;
       event_.preventDefault();
     });
 
@@ -254,7 +246,7 @@ export class Transmission extends EventTarget {
     // this.updateButtonsSoon();
 
     this.prefs.addEventListener('change', ({ key, value }) =>
-      this._onPrefChanged(key, value)
+      this._onPrefChanged(key, value),
     );
     for (const [key, value] of this.prefs.entries()) {
       this._onPrefChanged(key, value);
@@ -264,7 +256,7 @@ export class Transmission extends EventTarget {
   _openTorrentFromUrl() {
     setTimeout(() => {
       const addTorrent = new URLSearchParams(window.location.search).get(
-        'addtorrent'
+        'addtorrent',
       );
       if (addTorrent) {
         this.setCurrentPopup(new OpenDialog(this, this.remote, addTorrent));
@@ -414,7 +406,7 @@ export class Transmission extends EventTarget {
 
   _indexOfLastTorrent() {
     return this._rows.findIndex(
-      (row) => row.getTorrentId() === this._last_torrent_clicked
+      (row) => row.getTorrentId() === this._last_torrent_clicked,
     );
   }
 
@@ -479,7 +471,7 @@ export class Transmission extends EventTarget {
     const { ctrlKey, keyCode, metaKey, shiftKey, target } = event_;
 
     // look for a shortcut
-    const is_input_focused = target.matches('input');
+    const is_input_focused = ['INPUT', 'TEXTAREA'].includes(target.tagName);
     if (!is_input_focused) {
       const shortcut = Transmission._createKeyShortcutFromKeyboardEvent(event_);
       const action = this.action_manager.getActionForShortcut(shortcut);
@@ -632,7 +624,7 @@ export class Transmission extends EventTarget {
         const msec = 8000;
         this.sessionInterval = setInterval(
           this.loadDaemonPrefs.bind(this),
-          msec
+          msec,
         );
       }
     }
@@ -795,7 +787,7 @@ TODO: fix this when notifications get fixed
     const torrents = this.getSelectedTorrents();
     if (torrents.length > 0) {
       this.setCurrentPopup(
-        new RemoveDialog({ remote: this.remote, torrents, trash })
+        new RemoveDialog({ remote: this.remote, torrents, trash }),
       );
     }
   }
@@ -809,14 +801,14 @@ TODO: fix this when notifications get fixed
       Transmission._getTorrentIds(torrents),
       force,
       this.refreshTorrents,
-      this
+      this,
     );
   }
   _verifyTorrents(torrents) {
     this.remote.verifyTorrents(
       Transmission._getTorrentIds(torrents),
       this.refreshTorrents,
-      this
+      this,
     );
   }
 
@@ -824,7 +816,7 @@ TODO: fix this when notifications get fixed
     this.remote.reannounceTorrents(
       Transmission._getTorrentIds(torrents),
       this.refreshTorrents,
-      this
+      this,
     );
   }
 
@@ -832,7 +824,7 @@ TODO: fix this when notifications get fixed
     this.remote.stopTorrents(
       Transmission._getTorrentIds(torrents),
       this.refreshTorrents,
-      this
+      this,
     );
   }
   changeFileCommand(torrentId, rowIndices, command) {
@@ -844,28 +836,28 @@ TODO: fix this when notifications get fixed
     this.remote.moveTorrentsToTop(
       this._getSelectedTorrentIds(),
       this.refreshTorrents,
-      this
+      this,
     );
   }
   _moveUp() {
     this.remote.moveTorrentsUp(
       this._getSelectedTorrentIds(),
       this.refreshTorrents,
-      this
+      this,
     );
   }
   _moveDown() {
     this.remote.moveTorrentsDown(
       this._getSelectedTorrentIds(),
       this.refreshTorrents,
-      this
+      this,
     );
   }
   _moveBottom() {
     this.remote.moveTorrentsToBottom(
       this._getSelectedTorrentIds(),
       this.refreshTorrents,
-      this
+      this,
     );
   }
 
@@ -888,11 +880,11 @@ TODO: fix this when notifications get fixed
 
     const u = torrents.reduce(
       (accumulator, tor) => accumulator + tor.getUploadSpeed(),
-      0
+      0,
     );
     const d = torrents.reduce(
       (accumulator, tor) => accumulator + tor.getDownloadSpeed(),
-      0
+      0,
     );
     const string = fmt.countString('Transfer', 'Transfers', this._rows.length);
 
@@ -943,7 +935,7 @@ TODO: fix this when notifications get fixed
     Torrent.sortTorrents(
       torrents,
       this.prefs.sort_mode,
-      this.prefs.sort_direction
+      this.prefs.sort_direction,
     );
     for (const [index, tor] of torrents.entries()) {
       rows[index] = id2row[tor.getId()];
@@ -971,7 +963,7 @@ TODO: fix this when notifications get fixed
     const countSelectedRows = () =>
       [...list.children].reduce(
         (n, e) => (n + e.classList.contains('selected') ? 1 : 0),
-        0
+        0,
       );
     const old_row_count = countRows();
     const old_sel_count = countSelectedRows();
@@ -1029,7 +1021,7 @@ TODO: fix this when notifications get fixed
         dirty_rows.push(row);
         e.addEventListener('click', this._onRowClicked.bind(this));
         e.addEventListener('dblclick', () =>
-          this.action_manager.click('show-inspector')
+          this.action_manager.click('show-inspector'),
         );
       }
     }
@@ -1056,7 +1048,7 @@ TODO: fix this when notifications get fixed
           clean_rows[ci].getTorrent(),
           dirty_rows[di].getTorrent(),
           sort_mode,
-          sort_direction
+          sort_direction,
         );
         push_clean = c < 0;
       }

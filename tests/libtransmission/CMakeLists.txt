@@ -22,6 +22,7 @@ target_sources(libtransmission-test
         file-piece-map-test.cc
         file-test.cc
         getopt-test.cc
+        global-ip-cache-test.cc
         handshake-test.cc
         history-test.cc
         json-test.cc
@@ -51,6 +52,7 @@ target_sources(libtransmission-test
         torrent-magnet-test.cc
         torrent-metainfo-test.cc
         torrents-test.cc
+        tr-peer-info-test.cc
         utils-test.cc
         variant-test.cc
         watchdir-test.cc

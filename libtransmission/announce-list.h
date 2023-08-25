@@ -5,16 +5,17 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "quark.h"
-#include "interned-string.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_error;
 struct tr_url_parsed_t;
@@ -26,8 +27,9 @@ public:
     {
         tr_interned_string announce;
         tr_interned_string scrape;
-        tr_interned_string host; // 'example.org:80'
+        tr_interned_string host_and_port; // 'example.org:80'
         tr_interned_string sitename; // 'example'
+        tr_interned_string query; // 'name=ferret'
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
@@ -121,18 +123,18 @@ public:
      * - Blank line denotes a new tier
      */
     bool parse(std::string_view text);
-    [[nodiscard]] std::string toString() const;
+    [[nodiscard]] std::string to_string() const;
 
     bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
 
-    [[nodiscard]] static std::optional<std::string> announceToScrape(std::string_view announce);
-    [[nodiscard]] static tr_quark announceToScrape(tr_quark announce);
+    [[nodiscard]] static std::optional<std::string> announce_to_scrape(std::string_view announce);
+    [[nodiscard]] static tr_quark announce_to_scrape(tr_quark announce);
 
 private:
-    [[nodiscard]] tr_tracker_tier_t getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
+    [[nodiscard]] tr_tracker_tier_t get_tier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
 
-    bool canAdd(tr_url_parsed_t const& announce);
-    static tr_tracker_id_t nextUniqueId();
+    [[nodiscard]] bool can_add(tr_url_parsed_t const& announce) const noexcept;
+    static tr_tracker_id_t next_unique_id();
     trackers_t::iterator find(std::string_view announce);
     trackers_t::iterator find(tr_tracker_id_t id);
 

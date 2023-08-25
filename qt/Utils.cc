@@ -82,7 +82,7 @@ int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
     option.font = view->font();
 
     return view->style()
-        ->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view)
+        ->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize{ QWIDGETSIZE_MAX, QWIDGETSIZE_MAX }, view)
         .width();
 }
 
@@ -93,7 +93,7 @@ int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
     option.text = text;
     option.sortIndicator = view->isSortIndicatorShown() ? QStyleOptionHeader::SortDown : QStyleOptionHeader::None;
 
-    return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize(), view).width();
+    return view->style()->sizeFromContents(QStyle::CT_HeaderSection, &option, QSize{}, view).width();
 }
 
 QColor Utils::getFadedColor(QColor const& color)

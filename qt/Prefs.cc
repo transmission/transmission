@@ -190,8 +190,8 @@ bool isValidUtf8(QByteArray const& byteArray)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 
-    auto decoder = QStringDecoder(QStringConverter::Utf8, QStringConverter::Flag::Stateless);
-    auto const text = QString(decoder.decode(byteArray));
+    auto decoder = QStringDecoder{ QStringConverter::Utf8, QStringConverter::Flag::Stateless };
+    auto const text = QString{ decoder.decode(byteArray) };
     return !decoder.hasError() && !text.contains(QChar::ReplacementCharacter);
 
 #else
@@ -318,8 +318,6 @@ Prefs::Prefs(QString config_dir)
             break;
         }
     }
-
-    tr_variantClear(&top);
 }
 
 Prefs::~Prefs()
@@ -403,20 +401,19 @@ Prefs::~Prefs()
     }
 
     // update settings.json with our settings
-    tr_variant file_settings;
-    QFile const file(QDir(config_dir_).absoluteFilePath(QStringLiteral("settings.json")));
-
-    if (!tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, file.fileName().toStdString(), nullptr))
+    auto serde = tr_variant_serde::json();
+    auto const file = QFile{ QDir{ config_dir_ }.absoluteFilePath(QStringLiteral("settings.json")) };
+    auto const filename = file.fileName().toStdString();
+    auto settings = serde.parse_file(filename);
+    if (!settings)
     {
-        tr_variantInitDict(&file_settings, PREFS_COUNT);
+        auto empty_dict = tr_variant{};
+        tr_variantInitDict(&empty_dict, PREFS_COUNT);
+        settings = std::move(empty_dict);
     }
 
-    tr_variantMergeDicts(&file_settings, &current_settings);
-    tr_variantToFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toStdString());
-    tr_variantClear(&file_settings);
-
-    // cleanup
-    tr_variantClear(&current_settings);
+    tr_variantMergeDicts(&*settings, &current_settings);
+    serde.to_file(*settings, filename);
 }
 
 /**

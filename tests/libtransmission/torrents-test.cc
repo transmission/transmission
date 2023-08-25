@@ -3,16 +3,23 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <ctime> // time, size_t, time_t
+#include <memory>
 #include <set>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/torrent.h>
 #include <libtransmission/torrents.h>
+#include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-strbuf.h>
 
 #include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using namespace std::literals;
 
@@ -127,4 +134,14 @@ TEST_F(TorrentsTest, removedSince)
     EXPECT_EQ(remove, torrents.removedSince(200));
     remove = { torrents_v[0]->id(), torrents_v[1]->id(), torrents_v[2]->id(), torrents_v[3]->id() };
     EXPECT_EQ(remove, torrents.removedSince(50));
+}
+
+using TorrentsPieceSpanTest = libtransmission::test::SessionTest;
+
+TEST_F(TorrentsPieceSpanTest, exposesFilePieceSpan)
+{
+    auto tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    auto file_view = tr_torrentFile(tor, 0);
+    EXPECT_EQ(file_view.beginPiece, 0);
+    EXPECT_EQ(file_view.endPiece, 32);
 }

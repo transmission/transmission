@@ -6,11 +6,13 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <cstdint>
 #include <ctime>
 #include <iterator>
 #include <memory>
 #include <numeric>
 #include <set>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -22,7 +24,6 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announcer.h"
-#include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
@@ -30,11 +31,9 @@
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
-#include "libtransmission/session-id.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
@@ -79,7 +78,6 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
 
     (*data->callback)(data->session, &data->response, data->callback_user_data);
 
-    tr_variantClear(&data->response);
     delete data;
 }
 
@@ -197,18 +195,18 @@ char const* queueMoveBottom(tr_session* session, tr_variant* args_in, tr_variant
     return nullptr;
 }
 
-struct CompareTorrentByQueuePosition
+constexpr struct
 {
     constexpr bool operator()(tr_torrent const* a, tr_torrent const* b) const
     {
         return a->queuePosition < b->queuePosition;
     }
-};
+} CompareTorrentByQueuePosition{};
 
 char const* torrentStart(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
 {
     auto torrents = getTorrents(session, args_in);
-    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
+    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition);
     for (auto* tor : torrents)
     {
         if (!tor->is_running())
@@ -224,7 +222,7 @@ char const* torrentStart(tr_session* session, tr_variant* args_in, tr_variant* /
 char const* torrentStartNow(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
 {
     auto torrents = getTorrents(session, args_in);
-    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition{});
+    std::sort(std::begin(torrents), std::end(torrents), CompareTorrentByQueuePosition);
     for (auto* tor : torrents)
     {
         if (!tor->is_running())
@@ -326,8 +324,10 @@ void addFiles(tr_torrent const* tor, tr_variant* list)
     for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
     {
         auto const file = tr_torrentFile(tor, i);
-        tr_variant* d = tr_variantListAddDict(list, 3);
+        tr_variant* d = tr_variantListAddDict(list, 5);
+        tr_variantDictAddInt(d, TR_KEY_beginPiece, file.beginPiece);
         tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
+        tr_variantDictAddInt(d, TR_KEY_endPiece, file.endPiece);
         tr_variantDictAddInt(d, TR_KEY_length, file.length);
         tr_variantDictAddStr(d, TR_KEY_name, file.name);
     }
@@ -362,7 +362,7 @@ void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
     tr_variantDictAddInt(d, TR_KEY_downloadCount, tracker.downloadCount);
     tr_variantDictAddBool(d, TR_KEY_hasAnnounced, tracker.hasAnnounced);
     tr_variantDictAddBool(d, TR_KEY_hasScraped, tracker.hasScraped);
-    tr_variantDictAddStr(d, TR_KEY_host, tracker.host);
+    tr_variantDictAddStr(d, TR_KEY_host, tracker.host_and_port);
     tr_variantDictAddStr(d, TR_KEY_sitename, tracker.sitename);
     tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
     tr_variantDictAddBool(d, TR_KEY_isBackup, tracker.isBackup);
@@ -980,13 +980,13 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             continue;
         }
 
-        label = tr_strvStrip(label);
+        label = tr_strv_strip(label);
         if (std::empty(label))
         {
             return { {}, "labels cannot be empty" };
         }
 
-        if (tr_strvContains(label, ','))
+        if (tr_strv_contains(label, ','))
         {
             return { {}, "labels cannot contain comma (,) character" };
         }
@@ -1396,7 +1396,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     }
     else /* success */
     {
-        bool const is_open = tr_strvStartsWith(body, '1');
+        bool const is_open = tr_strv_starts_with(body, '1');
         tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
         tr_idle_function_done(data, SuccessResult);
     }
@@ -1464,7 +1464,7 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
     auto const filename = tr_pathbuf{ session->configDir(), "/blocklist.tmp"sv };
-    if (tr_error* error = nullptr; !tr_saveFile(filename, content, &error))
+    if (tr_error* error = nullptr; !tr_file_save(filename, content, &error))
     {
         tr_idle_function_done(
             data,
@@ -1741,7 +1741,7 @@ char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, s
         for (size_t i = 0; i < names_count; ++i)
         {
             auto const* const v = tr_variantListChild(names_list, i);
-            if (std::string_view l; tr_variantIsString(v) && tr_variantGetStrView(v, &l))
+            if (std::string_view l; v != nullptr && tr_variantGetStrView(v, &l))
             {
                 names.insert(l);
             }
@@ -1771,7 +1771,7 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
 {
     auto name = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
-    name = tr_strvStrip(name);
+    name = tr_strv_strip(name);
     if (std::empty(name))
     {
         return "No group name given";
@@ -2179,7 +2179,14 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_download_dir_free_space:
-        tr_variantDictAddInt(d, key, tr_dirSpace(s->downloadDir()).free);
+        if (auto const capacity = tr_sys_path_get_capacity(s->downloadDir()); capacity)
+        {
+            tr_variantDictAddInt(d, key, capacity->free);
+        }
+        else
+        {
+            tr_variantDictAddInt(d, key, -1);
+        }
         break;
 
     case TR_KEY_download_queue_enabled:
@@ -2207,7 +2214,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_pex_enabled:
-        tr_variantDictAddBool(d, key, s->allowsPEX());
+        tr_variantDictAddBool(d, key, s->allows_pex());
         break;
 
     case TR_KEY_tcp_enabled:
@@ -2407,15 +2414,16 @@ char const* freeSpace(tr_session* /*session*/, tr_variant* args_in, tr_variant* 
 
     /* get the free space */
     auto const old_errno = errno;
-    errno = 0;
-    auto const dir_space = tr_dirSpace(path);
-    char const* const err = dir_space.free < 0 || dir_space.total < 0 ? tr_strerror(errno) : nullptr;
+    tr_error* error = nullptr;
+    auto const capacity = tr_sys_path_get_capacity(path, &error);
+    char const* const err = error != nullptr ? tr_strerror(error->code) : nullptr;
+    tr_error_clear(&error);
     errno = old_errno;
 
     /* response */
     tr_variantDictAddStr(args_out, TR_KEY_path, path);
-    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, dir_space.free);
-    tr_variantDictAddInt(args_out, TR_KEY_total_size, dir_space.total);
+    tr_variantDictAddInt(args_out, TR_KEY_size_bytes, capacity ? capacity->free : -1);
+    tr_variantDictAddInt(args_out, TR_KEY_total_size, capacity ? capacity->total : -1);
     return err;
 }
 
@@ -2526,8 +2534,6 @@ void tr_rpc_request_exec_json(
         }
 
         (*callback)(session, &response, callback_user_data);
-
-        tr_variantClear(&response);
     }
     else if (method->immediate)
     {
@@ -2549,8 +2555,6 @@ void tr_rpc_request_exec_json(
         }
 
         (*callback)(session, &response, callback_user_data);
-
-        tr_variantClear(&response);
     }
     else
     {
@@ -2587,7 +2591,7 @@ void tr_rpc_request_exec_json(
  */
 void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 {
-    auto const values = tr_parseNumberRange(str);
+    auto const values = tr_num_parse_range(str);
     auto const value_count = std::size(values);
 
     if (value_count == 0)

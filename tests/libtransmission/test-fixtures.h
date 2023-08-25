@@ -89,7 +89,7 @@ inline bool waitFor(std::function<bool()> const& test, std::chrono::milliseconds
             return false;
         }
 
-        tr_wait(10ms);
+        std::this_thread::sleep_for(10ms);
     }
 }
 
@@ -494,7 +494,7 @@ protected:
     void blockingTorrentVerify(tr_torrent* tor)
     {
         EXPECT_NE(nullptr, tor->session);
-        EXPECT_FALSE(tor->session->amInSessionThread());
+        EXPECT_FALSE(tor->session->am_in_session_thread());
 
         auto verified_lock = std::unique_lock(verified_mutex_);
 
@@ -515,12 +515,7 @@ protected:
         {
             auto* settings = new tr_variant{};
             tr_variantInitDict(settings, 10);
-            auto constexpr deleter = [](tr_variant* v)
-            {
-                tr_variantClear(v);
-                delete v;
-            };
-            settings_.reset(settings, deleter);
+            settings_.reset(settings);
         }
 
         return settings_.get();
@@ -530,6 +525,8 @@ protected:
     {
         SandboxedTest::SetUp();
 
+        init_mgr_ = tr_lib_init();
+
         auto callback = [this](tr_torrent* tor, bool /*aborted*/)
         {
             auto verified_lock = std::scoped_lock(verified_mutex_);
@@ -538,7 +535,7 @@ protected:
         };
 
         session_ = sessionInit(settings());
-        session_->verifier_->addCallback(callback);
+        session_->verifier_->add_callback(callback);
     }
 
     virtual void TearDown() override
@@ -554,6 +551,8 @@ private:
     std::mutex verified_mutex_;
     std::condition_variable verified_cv_;
     std::vector<tr_torrent*> verified_;
+
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
 };
 
 } // namespace test

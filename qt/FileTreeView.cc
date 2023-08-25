@@ -5,10 +5,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <queue>
 
 #include <QHeaderView>
 #include <QMenu>
-#include <QQueue>
 #include <QResizeEvent>
 #include <QSortFilterProxyModel>
 
@@ -29,10 +29,10 @@ char const* const PriorityKey = "priority";
 }
 
 FileTreeView::FileTreeView(QWidget* parent, bool is_editable)
-    : QTreeView(parent)
-    , model_(new FileTreeModel(this, is_editable))
-    , proxy_(new QSortFilterProxyModel(this))
-    , delegate_(new FileTreeDelegate(this))
+    : QTreeView{ parent }
+    , model_{ new FileTreeModel(this, is_editable) }
+    , proxy_{ new QSortFilterProxyModel(this) }
+    , delegate_{ new FileTreeDelegate(this) }
 {
     proxy_->setSourceModel(model_);
     proxy_->setSortRole(FileTreeModel::SortRole);
@@ -263,13 +263,14 @@ void FileTreeView::onlyCheckSelectedItems()
         }
     }
 
-    QQueue<QModelIndex> parents_queue;
-    parents_queue.enqueue(root_index);
+    auto parents_queue = std::queue<QModelIndex>{};
+    parents_queue.emplace(root_index);
     QModelIndexList unwanted_indices;
 
-    while (!parents_queue.isEmpty())
+    while (!std::empty(parents_queue))
     {
-        QModelIndex const parent_index = parents_queue.dequeue();
+        auto const parent_index = parents_queue.front();
+        parents_queue.pop();
 
         if (std::binary_search(wanted_indices.begin(), wanted_indices.end(), parent_index))
         {
@@ -299,7 +300,7 @@ void FileTreeView::onlyCheckSelectedItems()
             }
             else
             {
-                parents_queue.enqueue(child_index);
+                parents_queue.emplace(child_index);
             }
         }
     }
@@ -348,7 +349,7 @@ void FileTreeView::refreshContextMenuActionsSensitivity()
 
 void FileTreeView::initContextMenu()
 {
-    context_menu_ = new QMenu(this);
+    context_menu_ = new QMenu{ this };
 
     check_selected_action_ = context_menu_->addAction(tr("Check Selected"), this, SLOT(checkSelectedItems()));
     uncheck_selected_action_ = context_menu_->addAction(tr("Uncheck Selected"), this, SLOT(uncheckSelectedItems()));
