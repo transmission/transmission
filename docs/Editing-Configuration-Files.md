@@ -92,7 +92,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **tcp-enabled:** Boolean (default = true) Optionally disable TCP connection to other peers. Never disable TCP when you also disable µTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds. Unless you have a good reason, you should not set this to false.
  * **torrent-added-verify-mode:** String ("fast", "full", default: "fast") Whether newly-added torrents' local data should be fully verified when added, or wait and verify them on-demand later. See [#2626](https://github.com/transmission/transmission/pull/2626) for more discussion.
  * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol)
- * **preferred-transport:** Number (0 = Prefer µTP, 1 = Prefer TCP; default = 0) Choose your preferred transport protocol (has no effect if one of them is disabled).
+ * **preferred-transport:** String ("utp" = Prefer µTP, "tcp" = Prefer TCP; default = "utp") Choose your preferred transport protocol (has no effect if one of them is disabled).
 
 #### Peers
  * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections. When no valid IPv4 address is provided, Transmission will bind to "0.0.0.0".
