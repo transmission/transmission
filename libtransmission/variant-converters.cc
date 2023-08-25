@@ -262,13 +262,7 @@ std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mod
 template<>
 void VariantConverter::save<tr_preallocation_mode>(tr_variant* tgt, tr_preallocation_mode const& val)
 {
-    static constexpr auto Keys = PreallocationKeys;
-
-    if (auto iter = std::find_if(std::begin(Keys), std::end(Keys), [val](auto const& ele) { return ele.second == val; });
-        iter != std::end(Keys))
-    {
-        tr_variantInitStrView(tgt, iter->first);
-    }
+    tr_variantInitInt(tgt, val);
 }
 
 // ---
