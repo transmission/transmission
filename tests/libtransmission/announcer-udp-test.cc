@@ -68,7 +68,7 @@ protected:
 
         void sendto(void const* buf, size_t buflen, sockaddr const* sa, socklen_t salen) override
         {
-            auto target = tr_address::from_sockaddr(sa);
+            auto target = tr_socket_address::from_sockaddr(sa);
             ASSERT_TRUE(target);
             sent_.emplace_back(static_cast<char const*>(buf), buflen, sa, salen);
         }
@@ -588,15 +588,15 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     static auto constexpr Interval = uint32_t{ 3600 };
     static auto constexpr Leechers = uint32_t{ 10 };
     static auto constexpr Seeders = uint32_t{ 20 };
-    auto const addresses = std::array<std::pair<tr_address, tr_port>, 3>{
-        std::make_pair(tr_address::from_string("10.10.10.5").value_or(tr_address{}), tr_port::fromHost(128)),
-        std::make_pair(tr_address::from_string("192.168.1.2").value_or(tr_address{}), tr_port::fromHost(2021)),
-        std::make_pair(tr_address::from_string("192.168.1.3").value_or(tr_address{}), tr_port::fromHost(2022)),
-    };
+    auto const addresses = std::array<tr_socket_address, 3>{ {
+        { tr_address::from_string("10.10.10.5").value_or(tr_address{}), tr_port::from_host(128) },
+        { tr_address::from_string("192.168.1.2").value_or(tr_address{}), tr_port::from_host(2021) },
+        { tr_address::from_string("192.168.1.3").value_or(tr_address{}), tr_port::from_host(2022) },
+    } };
 
     auto request = tr_announce_request{};
     request.event = TR_ANNOUNCE_EVENT_STARTED;
-    request.port = tr_port::fromHost(80);
+    request.port = tr_port::from_host(80);
     request.key = 0xCAFE;
     request.numwant = 20;
     request.up = 1;
@@ -617,9 +617,7 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     expected_response.seeders = Seeders;
     expected_response.leechers = Leechers;
     expected_response.downloads = -1; // not specified in UDP announce
-    expected_response.pex = std::vector<tr_pex>{ tr_pex{ addresses[0].first, addresses[0].second },
-                                                 tr_pex{ addresses[1].first, addresses[1].second },
-                                                 tr_pex{ addresses[2].first, addresses[2].second } };
+    expected_response.pex = std::vector<tr_pex>{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } };
     expected_response.pex6 = {};
     expected_response.errmsg = {};
     expected_response.warning = {};

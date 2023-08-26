@@ -51,6 +51,7 @@ export class ActionManager extends EventTarget {
       },
       'show-labels-dialog': {
         enabled: false,
+        shortcut: 'K',
         text: 'Edit Labels…',
       },
       'show-move-dialog': {

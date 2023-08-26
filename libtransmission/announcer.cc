@@ -713,7 +713,7 @@ tr_torrent_announcer* tr_announcer_impl::addTorrent(tr_torrent* tor, tr_tracker_
     TR_ASSERT(tr_isTorrent(tor));
 
     auto* ta = new tr_torrent_announcer{ this, tor };
-    ta->callback = callback;
+    ta->callback = std::move(callback);
     return ta;
 }
 

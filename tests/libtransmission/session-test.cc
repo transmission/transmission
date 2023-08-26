@@ -294,8 +294,6 @@ TEST_F(SessionTest, getDefaultSettingsIncludesSubmodules)
         EXPECT_TRUE(tr_variantDictFindBool(&settings, key, &flag));
         EXPECT_FALSE(flag);
     }
-
-    tr_variantClear(&settings);
 }
 
 TEST_F(SessionTest, honorsSettings)
@@ -316,7 +314,6 @@ TEST_F(SessionTest, honorsSettings)
         tr_variantDictAddBool(&settings, key, true);
     }
     auto* session = tr_sessionInit(sandboxDir().data(), false, &settings);
-    tr_variantClear(&settings);
 
     // confirm that these settings were enabled
     EXPECT_TRUE(session->isPortRandom());
@@ -347,7 +344,6 @@ TEST_F(SessionTest, savesSettings)
         EXPECT_TRUE(tr_variantDictFindBool(&settings, key, &flag));
         EXPECT_TRUE(flag);
     }
-    tr_variantClear(&settings);
 }
 
 } // namespace libtransmission::test
