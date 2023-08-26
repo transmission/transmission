@@ -68,8 +68,8 @@ namespace global_source_ip_helpers
 
     auto const save = errno;
 
-    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    auto const [bind_ss, bind_sslen] = bind_addr.to_sockaddr(tr_port{});
+    auto const [dst_ss, dst_sslen] = tr_socket_address::to_sockaddr(dst_addr, dst_port);
+    auto const [bind_ss, bind_sslen] = tr_socket_address::to_sockaddr(bind_addr, {});
     if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         if (bind(sock, reinterpret_cast<sockaddr const*>(&bind_ss), bind_sslen) == 0)
@@ -80,7 +80,7 @@ namespace global_source_ip_helpers
                 auto src_sslen = socklen_t{ sizeof(src_ss) };
                 if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
                 {
-                    if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
+                    if (auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
                     {
                         tr_net_close_socket(sock);
                         errno = save;
@@ -103,7 +103,7 @@ namespace global_source_ip_helpers
     // Pick some destination address to pretend to send a packet to
     static auto constexpr DstIP = std::array{ "91.121.74.28"sv, "2001:1890:1112:1::20"sv };
     auto const dst_addr = tr_address::from_string(DstIP[bind_addr.type]);
-    auto const dst_port = tr_port::fromHost(6969);
+    auto const dst_port = tr_port::from_host(6969);
 
     // In order for address selection to work right,
     // this should be a global unicast address, not Teredo or 6to4
@@ -192,7 +192,7 @@ tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
         {
             return *addr;
         }
-        return type == TR_AF_INET ? tr_address::any_ipv4() : tr_address::any_ipv6();
+        return tr_address::any(type);
     }
 
     TR_ASSERT_MSG(false, "invalid type");
@@ -262,7 +262,7 @@ void tr_global_ip_cache::update_source_addr(tr_address_type type) noexcept
     }
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
 
-    auto const protocol = tr_ip_protocol_sv(type);
+    auto const protocol = tr_ip_protocol_to_sv(type);
 
     auto err = int{ 0 };
     auto const& source_addr = get_global_source_address(bind_addr(type), err);
@@ -296,7 +296,7 @@ void tr_global_ip_cache::on_response_ip_query(tr_address_type type, tr_web::Fetc
     TR_ASSERT(is_updating_[type] == is_updating_t::YES);
     TR_ASSERT(ix_service_[type] < std::size(IPQueryServices[type]));
 
-    auto const protocol = tr_ip_protocol_sv(type);
+    auto const protocol = tr_ip_protocol_to_sv(type);
     auto success = false;
 
     if (response.status == 200 /* HTTP_OK */)
@@ -337,7 +337,7 @@ void tr_global_ip_cache::unset_global_addr(tr_address_type type) noexcept
 {
     auto const lock = std::lock_guard{ global_addr_mutex_[type] };
     global_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} global address cache", tr_ip_protocol_sv(type)));
+    tr_logAddTrace(fmt::format("Unset {} global address cache", tr_ip_protocol_to_sv(type)));
 }
 
 void tr_global_ip_cache::set_source_addr(tr_address const& addr) noexcept
@@ -351,7 +351,7 @@ void tr_global_ip_cache::unset_addr(tr_address_type type) noexcept
 {
     auto const lock = std::lock_guard{ source_addr_mutex_[type] };
     source_addr_[type].reset();
-    tr_logAddTrace(fmt::format("Unset {} source address cache", tr_ip_protocol_sv(type)));
+    tr_logAddTrace(fmt::format("Unset {} source address cache", tr_ip_protocol_to_sv(type)));
 
     // No public internet connectivity means no global IP address
     unset_global_addr(type);

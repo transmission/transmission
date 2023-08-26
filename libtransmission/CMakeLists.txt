@@ -159,7 +159,6 @@ target_sources(${TR_NAME}
         utils.h
         utils.mm
         variant-benc.cc
-        variant-common.h
         variant-converters.cc
         variant-json.cc
         variant.cc

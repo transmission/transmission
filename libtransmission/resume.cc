@@ -528,13 +528,13 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
                 tr_variant* const b = tr_variantListChild(l, fi);
                 auto time_checked = time_t{};
 
-                if (tr_variantIsInt(b))
+                if (b != nullptr && b->holds_alternative<int64_t>())
                 {
                     auto t = int64_t{};
                     tr_variantGetInt(b, &t);
                     time_checked = time_t(t);
                 }
-                else if (tr_variantIsList(b))
+                else if (b != nullptr && b->holds_alternative<tr_variant::Vector>())
                 {
                     auto offset = int64_t{};
                     tr_variantGetInt(tr_variantListChild(b, 0), &offset);
@@ -619,10 +619,8 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
 // ---
 
-auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
+tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
 {
-    auto fields_loaded = tr_resume::fields_t{};
-
     TR_ASSERT(tr_isTorrent(tor));
     auto const was_dirty = tor->is_dirty();
 
@@ -631,22 +629,20 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
     auto const filename = tor->resume_file();
     if (!tr_sys_path_exists(filename))
     {
-        return fields_loaded;
+        return {};
     }
 
-    auto buf = std::vector<char>{};
-    tr_error* error = nullptr;
-    auto top = tr_variant{};
-    if (!tr_file_read(filename, buf, &error) ||
-        !tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, buf, nullptr, &error))
+    auto serde = tr_variant_serde::benc();
+    auto otop = serde.parse_file(filename);
+    if (!otop)
     {
-        tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, error->message));
-        tr_error_clear(&error);
-        return fields_loaded;
+        tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, serde.error_->message));
+        return {};
     }
+    auto& top = *otop;
 
     tr_logAddDebugTor(tor, fmt::format("Read resume file '{}'", filename));
-
+    auto fields_loaded = tr_resume::fields_t{};
     auto i = int64_t{};
     auto sv = std::string_view{};
 
@@ -809,7 +805,6 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
      * same resume information... */
     tor->set_dirty(was_dirty);
 
-    tr_variantClear(&top);
     return fields_loaded;
 }
 
@@ -916,13 +911,11 @@ void save(tr_torrent* tor)
     saveLabels(&top, tor);
     saveGroup(&top, tor);
 
-    auto const resume_file = tor->resume_file();
-    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, resume_file); err != 0)
+    auto serde = tr_variant_serde::benc();
+    if (!serde.to_file(top, tor->resume_file()))
     {
-        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", tr_strerror(err)));
+        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
     }
-
-    tr_variantClear(&top);
 }
 
 } // namespace tr_resume

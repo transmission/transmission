@@ -684,7 +684,6 @@ void tr_daemon::reconfigure(void)
         tr_variantDictAddBool(&newsettings, TR_KEY_rpc_enabled, true);
         tr_sessionLoadSettings(&newsettings, configDir, MyName);
         tr_sessionSet(my_session_, &newsettings);
-        tr_variantClear(&newsettings);
         tr_sessionReloadBlocklists(my_session_);
     }
 }
@@ -935,15 +934,13 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
 
     if (dumpSettings)
     {
-        auto const str = tr_variantToStr(&settings_, TR_VARIANT_FMT_JSON);
-        fprintf(stderr, "%s", str.c_str());
+        fmt::print("{:s}\n", tr_variant_serde::json().to_string(settings_));
         goto EXIT_EARLY;
     }
 
     return true;
 
 EXIT_EARLY:
-    tr_variantClear(&settings_);
     return false;
 }
 

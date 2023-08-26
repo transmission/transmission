@@ -213,7 +213,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
                 {
                     auto const newstr = replaceSubstr(sv, oldval, newval);
                     fmt::print("\tReplaced in 'announce-list' tier #{:d}: '{:s}' --> '{:s}'\n", tierCount + 1, sv, newstr);
-                    tr_variantClear(node);
+                    node->clear();
                     tr_variantInitStr(node, newstr);
                     changed = true;
                 }
@@ -356,20 +356,20 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    auto serde = tr_variant_serde::benc();
     for (auto const& filename : options.files)
     {
-        tr_variant top;
         bool changed = false;
-        tr_error* error = nullptr;
 
         fmt::print("{:s}\n", filename);
 
-        if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
+        auto otop = serde.parse_file(filename);
+        if (!otop)
         {
-            fmt::print("\tError reading file: {:s}\n", error->message);
-            tr_error_free(error);
+            fmt::print("\tError reading file: {:s}\n", serde.error_->message);
             continue;
         }
+        auto& top = *otop;
 
         if (options.deleteme != nullptr)
         {
@@ -394,10 +394,8 @@ int tr_main(int argc, char* argv[])
         if (changed)
         {
             ++changedCount;
-            tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename);
+            serde.to_file(top, filename);
         }
-
-        tr_variantClear(&top);
     }
 
     fmt::print("Changed {:d} files\n", changedCount);
