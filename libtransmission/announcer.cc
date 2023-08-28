@@ -1360,10 +1360,7 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
                 tracker->consecutive_failures = 0;
             }
 
-            if (row.seeders >= 0 && row.leechers >= 0 && row.downloads >= 0)
-            {
-                publishPeerCounts(tier, row.seeders, row.leechers);
-            }
+            publishPeerCounts(tier, row.seeders, row.leechers);
         }
     }
 
