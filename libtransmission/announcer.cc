@@ -1016,7 +1016,7 @@ void tr_announcer_impl::onAnnounceDone(
     {
         auto const is_stopped = event == TR_ANNOUNCE_EVENT_STOPPED;
         auto leechers = int{};
-        auto scrape_fields = int{};
+        auto scrape_fields = uint8_t{};
         auto seeders = int{};
 
         publishErrorClear(tier);
@@ -1091,7 +1091,7 @@ void tr_announcer_impl::onAnnounceDone(
 
         /* if the tracker included scrape fields in its announce response,
            then a separate scrape isn't needed */
-        if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == nullptr))
+        if (scrape_fields >= 3U || (scrape_fields >= 1U && tracker->scrape_info == nullptr))
         {
             tr_logAddTraceTier(
                 tier,
