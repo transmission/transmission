@@ -60,9 +60,9 @@ struct tr_tracker_event
     // for Peers events
     std::vector<tr_pex> pex;
 
-    // for Peers and Counts events
-    int leechers;
-    int seeders;
+    // for Peers and Counts events (-1 means unset)
+    int leechers = -1;
+    int seeders = -1;
 };
 
 using tr_tracker_callback = std::function<void(tr_torrent&, tr_tracker_event const*)>;

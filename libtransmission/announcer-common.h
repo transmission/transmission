@@ -117,13 +117,13 @@ struct tr_announce_response
      * transmission treats this as the min interval for manual announces */
     int min_interval = 0;
 
-    /* how many peers are seeding this torrent */
+    /* how many peers are seeding this torrent (-1 means unset) */
     int seeders = -1;
 
-    /* how many peers are downloading this torrent */
+    /* how many peers are downloading this torrent (-1 means unset) */
     int leechers = -1;
 
-    /* how many times this torrent has been downloaded */
+    /* how many times this torrent has been downloaded (-1 means unset) */
     int downloads = -1;
 
     /* IPv4 peers that we acquired from the tracker */

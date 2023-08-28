@@ -367,6 +367,7 @@ struct tr_tracker
     tr_tracker_id_t const id;
 
 private:
+    // -1 means the value is unknown to us
     int seeder_count_ = -1;
     int leecher_count_ = -1;
     int download_count_ = -1;
