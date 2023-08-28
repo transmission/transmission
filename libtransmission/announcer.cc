@@ -295,6 +295,66 @@ struct tr_tracker
         }
     }
 
+    [[nodiscard]] constexpr auto seeder_count() const noexcept
+    {
+        return seeder_count_;
+    }
+
+    constexpr bool set_seeder_count(int const seeder_count_in) noexcept
+    {
+        if (seeder_count_in >= 0)
+        {
+            seeder_count_ = seeder_count_in;
+            return true;
+        }
+        return false;
+    }
+
+    [[nodiscard]] constexpr auto leecher_count() const noexcept
+    {
+        return leecher_count_;
+    }
+
+    constexpr bool set_leecher_count(int const leecher_count_in) noexcept
+    {
+        if (leecher_count_in >= 0)
+        {
+            leecher_count_ = leecher_count_in;
+            return true;
+        }
+        return false;
+    }
+
+    [[nodiscard]] constexpr auto download_count() const noexcept
+    {
+        return download_count_;
+    }
+
+    constexpr bool set_download_count(int const download_count_in) noexcept
+    {
+        if (download_count_in >= 0)
+        {
+            download_count_ = download_count_in;
+            return true;
+        }
+        return false;
+    }
+
+    [[nodiscard]] constexpr auto downloader_count() const noexcept
+    {
+        return downloader_count_;
+    }
+
+    constexpr bool set_downloader_count(int const downloader_count_in) noexcept
+    {
+        if (downloader_count_in >= 0)
+        {
+            downloader_count_ = downloader_count_in;
+            return true;
+        }
+        return false;
+    }
+
     tr_interned_string const host_and_port;
     tr_interned_string const announce_url;
     std::string_view const sitename;
@@ -302,14 +362,15 @@ struct tr_tracker
 
     std::string tracker_id;
 
-    int seeder_count = -1;
-    int leecher_count = -1;
-    int download_count = -1;
-    int downloader_count = -1;
-
     int consecutive_failures = 0;
 
     tr_tracker_id_t const id;
+
+private:
+    int seeder_count_ = -1;
+    int leecher_count_ = -1;
+    int download_count_ = -1;
+    int downloader_count_ = -1;
 };
 
 // format: `${host}:${port}`
@@ -378,7 +439,7 @@ struct tr_tier
     {
         auto const* const tracker = currentTracker();
 
-        return tracker == nullptr ? 0 : tracker->downloader_count + tracker->leecher_count;
+        return tracker == nullptr ? 0 : tracker->downloader_count() + tracker->leecher_count();
     }
 
     tr_tracker* useNextTracker()
@@ -1024,21 +1085,18 @@ void tr_announcer_impl::onAnnounceDone(
         {
             tracker->consecutive_failures = 0;
 
-            if (response.seeders >= 0)
+            if (tracker->set_seeder_count(response.seeders))
             {
-                tracker->seeder_count = response.seeders;
                 ++scrape_fields;
             }
 
-            if (response.leechers >= 0)
+            if (tracker->set_leecher_count(response.leechers))
             {
-                tracker->leecher_count = response.leechers;
                 ++scrape_fields;
             }
 
-            if (response.downloads >= 0)
+            if (tracker->set_download_count(response.downloads))
             {
-                tracker->download_count = response.downloads;
                 ++scrape_fields;
             }
 
@@ -1341,22 +1399,11 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
 
             if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
             {
-                if (row.seeders >= 0)
-                {
-                    tracker->seeder_count = row.seeders;
-                }
+                tracker->set_seeder_count(row.seeders);
+                tracker->set_leecher_count(row.leechers);
+                tracker->set_download_count(row.downloads);
+                tracker->set_downloader_count(row.downloaders);
 
-                if (row.leechers >= 0)
-                {
-                    tracker->leecher_count = row.leechers;
-                }
-
-                if (row.downloads >= 0)
-                {
-                    tracker->download_count = row.downloads;
-                }
-
-                tracker->downloader_count = row.downloaders;
                 tracker->consecutive_failures = 0;
             }
 
@@ -1611,9 +1658,9 @@ namespace tracker_view_helpers
     view.tier = tier_index;
     view.isBackup = &tracker != tier.currentTracker();
     view.lastScrapeStartTime = tier.lastScrapeStartTime;
-    view.seederCount = tracker.seeder_count;
-    view.leecherCount = tracker.leecher_count;
-    view.downloadCount = tracker.download_count;
+    view.seederCount = tracker.seeder_count();
+    view.leecherCount = tracker.leecher_count();
+    view.downloadCount = tracker.download_count();
 
     if (view.isBackup)
     {
@@ -1752,10 +1799,10 @@ void tr_announcer_impl::resetTorrent(tr_torrent* tor)
                 tr_tracker const* old_tracker = nullptr;
                 if (older->findTracker(new_tracker.announce_url, &old_tier, &old_tracker))
                 {
-                    new_tracker.seeder_count = old_tracker->seeder_count;
-                    new_tracker.leecher_count = old_tracker->leecher_count;
-                    new_tracker.download_count = old_tracker->download_count;
-                    new_tracker.downloader_count = old_tracker->downloader_count;
+                    new_tracker.set_seeder_count(old_tracker->seeder_count());
+                    new_tracker.set_leecher_count(old_tracker->leecher_count());
+                    new_tracker.set_download_count(old_tracker->download_count());
+                    new_tracker.set_downloader_count(old_tracker->downloader_count());
 
                     new_tier.announce_events = old_tier->announce_events;
                     new_tier.announce_event_priority = old_tier->announce_event_priority;
