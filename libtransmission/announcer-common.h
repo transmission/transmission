@@ -95,7 +95,7 @@ struct tr_announce_request
     tr_sha1_digest_t info_hash;
 
     /* the name to use when deep logging is enabled */
-    char log_name[128];
+    std::string log_name;
 };
 
 struct tr_announce_response
@@ -169,7 +169,7 @@ struct tr_scrape_request
     tr_interned_string scrape_url;
 
     /* the name to use when deep logging is enabled */
-    char log_name[128];
+    std::string log_name;
 
     /* info hashes of the torrents to scrape */
     std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;

@@ -424,17 +424,9 @@ struct tr_tier
 
     [[nodiscard]] std::string buildLogName() const
     {
-        auto buf = std::array<char, 512>{};
-        buildLogName(std::data(buf), std::size(buf));
-        return std::string{ std::data(buf) };
-    }
-
-    void buildLogName(char* buf, size_t buflen) const
-    {
-        auto const* const torrent_name = tr_torrentName(tor);
         auto const* const current_tracker = currentTracker();
         auto const host_and_port_sv = current_tracker == nullptr ? "?"sv : current_tracker->host_and_port.sv();
-        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s} at {:s}"), torrent_name, host_and_port_sv).out = '\0';
+        return fmt::format("{:s} at {:s}", tor->name(), host_and_port_sv);
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -909,7 +901,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     req.numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req.key = tor->announce_key();
     req.partial_seed = tor->is_partial_seed();
-    tier->buildLogName(req.log_name, sizeof(req.log_name));
+    req.log_name = tier->buildLogName();
     return req;
 }
 
@@ -1438,7 +1430,7 @@ void multiscrape(tr_announcer_impl* announcer, std::vector<tr_tier*> const& tier
         {
             auto* const req = &requests[request_count];
             req->scrape_url = scrape_info->scrape_url;
-            tier->buildLogName(req->log_name, sizeof(req->log_name));
+            req->log_name = tier->buildLogName();
 
             req->info_hash[req->info_hash_count] = tier->tor->info_hash();
             ++req->info_hash_count;
