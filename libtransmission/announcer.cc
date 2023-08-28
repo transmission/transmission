@@ -742,6 +742,8 @@ void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pe
     {
         auto e = tr_tracker_event{};
         e.type = tr_tracker_event::Type::Peers;
+        e.seeders = seeders;
+        e.leechers = leechers;
         e.pex = pex;
         tr_logAddDebugTier(
             tier,
