@@ -1015,9 +1015,7 @@ void tr_announcer_impl::onAnnounceDone(
     else
     {
         auto const is_stopped = event == TR_ANNOUNCE_EVENT_STOPPED;
-        auto leechers = int{};
         auto scrape_fields = uint8_t{};
-        auto seeders = int{};
 
         publishErrorClear(tier);
 
@@ -1028,13 +1026,13 @@ void tr_announcer_impl::onAnnounceDone(
 
             if (response.seeders >= 0)
             {
-                tracker->seeder_count = seeders = response.seeders;
+                tracker->seeder_count = response.seeders;
                 ++scrape_fields;
             }
 
             if (response.leechers >= 0)
             {
-                tracker->leecher_count = leechers = response.leechers;
+                tracker->leecher_count = response.leechers;
                 ++scrape_fields;
             }
 
@@ -1073,19 +1071,15 @@ void tr_announcer_impl::onAnnounceDone(
 
         if (!std::empty(response.pex))
         {
-            publishPeersPex(tier, seeders, leechers, response.pex);
+            publishPeersPex(tier, response.seeders, response.leechers, response.pex);
         }
 
         if (!std::empty(response.pex6))
         {
-            publishPeersPex(tier, seeders, leechers, response.pex6);
+            publishPeersPex(tier, response.seeders, response.leechers, response.pex6);
         }
 
-        /* Only publish leechers if it was actually returned during the announce */
-        if (response.leechers >= 0)
-        {
-            publishPeerCounts(tier, seeders, leechers);
-        }
+        publishPeerCounts(tier, response.seeders, response.leechers);
 
         tier->isRunning = is_running_on_success;
 
