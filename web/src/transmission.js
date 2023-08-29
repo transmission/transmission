@@ -826,7 +826,11 @@ TODO: fix this when notifications get fixed
   _stopTorrents(torrents) {
     this.remote.stopTorrents(
       Transmission._getTorrentIds(torrents),
-      () => {setTimeout(() => {this.refreshTorrents();}, 500)},
+      () => {
+        setTimeout(() => {
+          this.refreshTorrents();
+        }, 500);
+      },
       this,
     );
   }
