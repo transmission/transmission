@@ -7,7 +7,6 @@ import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
 import {
-  OutsideClickListener,
   Utils,
   createTextualTabsContainer,
   setTextContent,
