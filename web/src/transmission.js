@@ -45,6 +45,7 @@ export class Transmission extends EventTarget {
     this._rows = [];
     this.dirtyTorrents = new Set();
 
+    this.changeStatus = false;
     this.refilterSoon = debounce(() => this._refilter(false));
     this.refilterAllSoon = debounce(() => this._refilter(true));
 
@@ -638,7 +639,10 @@ export class Transmission extends EventTarget {
   }
 
   _onTorrentChanged(event_) {
-    this._dispatchSelectionChanged();
+    if (this.changeStatus) {
+      this._dispatchSelectionChanged();
+      this.changeStatus = false;
+    }
 
     // update our dirty fields
     const tor = event_.currentTarget;
@@ -800,6 +804,7 @@ TODO: fix this when notifications get fixed
   }
 
   _startTorrents(torrents, force) {
+    this.changeStatus = true;
     this.remote.startTorrents(
       Transmission._getTorrentIds(torrents),
       force,
@@ -824,6 +829,7 @@ TODO: fix this when notifications get fixed
   }
 
   _stopTorrents(torrents) {
+    this.changeStatus = true;
     this.remote.stopTorrents(
       Transmission._getTorrentIds(torrents),
       () => {
