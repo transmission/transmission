@@ -6,11 +6,7 @@
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import {
-  Utils,
-  createTextualTabsContainer,
-  setTextContent,
-} from './utils.js';
+import { Utils, createTextualTabsContainer, setTextContent } from './utils.js';
 
 const peer_column_classes = [
   'encryption',
