@@ -190,22 +190,22 @@ export class Transmission extends EventTarget {
       this.refilterAllSoon();
     });
 
+    //if (!isMobileDevice) {
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
     e = document.querySelector('#torrent-container');
-    e.addEventListener('click', (e_) => {
-      if (e_.target === e_.currentTarget) {
+    e.addEventListener('click', () => {
+      if (this.popup && this.popup.name !== 'inspector') {
         this.setCurrentPopup(null);
+      } else {
         this._deselectAll();
       }
     });
-    e.addEventListener('dblclick', () =>
-      this.action_manager.click('show-inspector'),
-    );
     e.addEventListener('dragenter', Transmission._dragenter);
     e.addEventListener('dragover', Transmission._dragenter);
     e.addEventListener('drop', this._drop.bind(this));
     this._setupSearchBox();
+    //}
 
     this.elements = {
       torrent_list: document.querySelector('#torrent-list'),
@@ -768,6 +768,7 @@ TODO: fix this when notifications get fixed
 
     if (this.popup && this.popup.name !== 'inspector') {
       this.setCurrentPopup(null);
+      return;
     }
 
     // handle the per-row pause/resume button
@@ -1059,9 +1060,10 @@ TODO: fix this when notifications get fixed
         const e = row.getElement();
         e.row = row;
         dirty_rows.push(row);
-        e.addEventListener('click', (e_) => {
-          this._onRowClicked(e_);
-        });
+        e.addEventListener('click', this._onRowClicked.bind(this));
+        e.addEventListener('dblclick', () =>
+          this.action_manager.click('show-inspector'),
+        );
       }
     }
 
