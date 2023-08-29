@@ -962,6 +962,16 @@ $video-image: '../img/film.svg';
   }
 }
 
+.tabs-container-close {
+  font-size: 150%;
+  cursor: pointer;
+  background: var(--color-bg-primary);
+  border: 0;
+  color: var(--color-fg-primary);
+  position: absolute;
+  padding: 10px 16px;
+}
+
 .tabs-buttons {
   align-self: center;
   background-color: var(--color-bg-tabs);
