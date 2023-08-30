@@ -180,9 +180,6 @@ struct tau_announce_request
         // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
         static_assert(sizeof(tr_announce_request::key) * CHAR_BIT == 32);
 
-        response.seeders = -1;
-        response.leechers = -1;
-        response.downloads = -1;
         response.info_hash = in.info_hash;
 
         // build the payload

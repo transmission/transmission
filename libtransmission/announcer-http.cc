@@ -607,19 +607,19 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         {
             if (auto const key = currentKey(); row_ && key == "complete"sv)
             {
-                response_.rows[*row_].seeders = static_cast<int>(value);
+                response_.rows[*row_].seeders = value;
             }
             else if (row_ && key == "downloaded"sv)
             {
-                response_.rows[*row_].downloads = static_cast<int>(value);
+                response_.rows[*row_].downloads = value;
             }
             else if (row_ && key == "incomplete"sv)
             {
-                response_.rows[*row_].leechers = static_cast<int>(value);
+                response_.rows[*row_].leechers = value;
             }
             else if (row_ && key == "downloaders"sv)
             {
-                response_.rows[*row_].downloaders = static_cast<int>(value);
+                response_.rows[*row_].downloaders = value;
             }
             else if (key == "min_request_interval"sv)
             {
