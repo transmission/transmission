@@ -130,13 +130,8 @@ struct tau_scrape_request
 
         if (action == TAU_ACTION_SCRAPE)
         {
-            for (int i = 0; i < response.row_count; ++i)
+            for (int i = 0; i < response.row_count && std::size(buf) >= sizeof(uint32_t) * 3U; ++i)
             {
-                if (std::size(buf) < sizeof(uint32_t) * 3)
-                {
-                    break;
-                }
-
                 auto& row = response.rows[i];
                 row.seeders = buf.to_uint32();
                 row.downloads = buf.to_uint32();
