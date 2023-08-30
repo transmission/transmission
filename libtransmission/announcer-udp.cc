@@ -88,9 +88,6 @@ struct tau_scrape_request
         this->response.row_count = in.info_hash_count;
         for (int i = 0; i < this->response.row_count; ++i)
         {
-            this->response.rows[i].seeders = -1;
-            this->response.rows[i].leechers = -1;
-            this->response.rows[i].downloads = -1;
             this->response.rows[i].info_hash = in.info_hash[i];
         }
 
@@ -657,11 +654,11 @@ public:
             // is it a response to one of this tracker's announces?
             if (auto& reqs = tracker.announces; !std::empty(reqs))
             {
-                auto it = std::find_if(
-                    std::begin(reqs),
-                    std::end(reqs),
-                    [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                if (it != std::end(reqs))
+                if (auto it = std::find_if(
+                        std::begin(reqs),
+                        std::end(reqs),
+                        [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
+                    it != std::end(reqs))
                 {
                     logtrace(tracker.key, fmt::format("{} is an announce request!", transaction_id));
                     auto req = *it;
@@ -674,11 +671,11 @@ public:
             // is it a response to one of this tracker's scrapes?
             if (auto& reqs = tracker.scrapes; !std::empty(reqs))
             {
-                auto it = std::find_if(
-                    std::begin(reqs),
-                    std::end(reqs),
-                    [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                if (it != std::end(reqs))
+                if (auto it = std::find_if(
+                        std::begin(reqs),
+                        std::end(reqs),
+                        [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
+                    it != std::end(reqs))
                 {
                     logtrace(tracker.key, fmt::format("{} is a scrape request!", transaction_id));
                     auto req = *it;

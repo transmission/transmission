@@ -371,15 +371,15 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "complete"sv)
             {
-                response_.seeders = static_cast<int>(value);
+                response_.seeders = value;
             }
             else if (key == "incomplete"sv)
             {
-                response_.leechers = static_cast<int>(value);
+                response_.leechers = value;
             }
             else if (key == "downloaded"sv)
             {
-                response_.downloads = static_cast<int>(value);
+                response_.downloads = value;
             }
             else if (key == "port"sv)
             {
@@ -548,9 +548,6 @@ void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& 
     for (int i = 0; i < response.row_count; ++i)
     {
         response.rows[i].info_hash = request.info_hash[i];
-        response.rows[i].seeders = -1;
-        response.rows[i].leechers = -1;
-        response.rows[i].downloads = -1;
     }
 
     auto scrape_url = tr_pathbuf{};

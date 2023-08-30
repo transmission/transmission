@@ -117,14 +117,14 @@ struct tr_announce_response
      * transmission treats this as the min interval for manual announces */
     int min_interval = 0;
 
-    /* how many peers are seeding this torrent (-1 means unset) */
-    int seeders = -1;
+    /* how many peers are seeding this torrent */
+    std::optional<int64_t> seeders;
 
-    /* how many peers are downloading this torrent (-1 means unset) */
-    int leechers = -1;
+    /* how many peers are downloading this torrent */
+    std::optional<int64_t> leechers;
 
-    /* how many times this torrent has been downloaded (-1 means unset) */
-    int downloads = -1;
+    /* how many times this torrent has been downloaded */
+    std::optional<int64_t> downloads;
 
     /* IPv4 peers that we acquired from the tracker */
     std::vector<tr_pex> pex;
@@ -184,18 +184,18 @@ struct tr_scrape_response_row
     tr_sha1_digest_t info_hash;
 
     /* how many peers are seeding this torrent */
-    int seeders = 0;
+    std::optional<int64_t> seeders;
 
     /* how many peers are downloading this torrent */
-    int leechers = 0;
+    std::optional<int64_t> leechers;
 
     /* how many times this torrent has been downloaded */
-    int downloads = 0;
+    std::optional<int64_t> downloads;
 
     /* the number of active downloaders in the swarm.
      * this is a BEP 21 extension that some trackers won't support.
      * http://www.bittorrent.org/beps/bep_0021.html#tracker-scrapes  */
-    int downloaders = 0;
+    std::optional<int64_t> downloaders;
 };
 
 struct tr_scrape_response

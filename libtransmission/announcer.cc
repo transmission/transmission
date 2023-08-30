@@ -300,11 +300,11 @@ struct tr_tracker
         return seeder_count_;
     }
 
-    constexpr bool set_seeder_count(int const seeder_count_in) noexcept
+    constexpr bool set_seeder_count(std::optional<int64_t> seeder_count_in) noexcept
     {
         if (seeder_count_in >= 0)
         {
-            seeder_count_ = seeder_count_in;
+            seeder_count_ = std::move(seeder_count_in);
             return true;
         }
         return false;
@@ -315,11 +315,11 @@ struct tr_tracker
         return leecher_count_;
     }
 
-    constexpr bool set_leecher_count(int const leecher_count_in) noexcept
+    constexpr bool set_leecher_count(std::optional<int64_t> leecher_count_in) noexcept
     {
         if (leecher_count_in >= 0)
         {
-            leecher_count_ = leecher_count_in;
+            leecher_count_ = std::move(leecher_count_in);
             return true;
         }
         return false;
@@ -330,11 +330,11 @@ struct tr_tracker
         return download_count_;
     }
 
-    constexpr bool set_download_count(int const download_count_in) noexcept
+    constexpr bool set_download_count(std::optional<int64_t> download_count_in) noexcept
     {
         if (download_count_in >= 0)
         {
-            download_count_ = download_count_in;
+            download_count_ = std::move(download_count_in);
             return true;
         }
         return false;
@@ -345,11 +345,11 @@ struct tr_tracker
         return downloader_count_;
     }
 
-    constexpr bool set_downloader_count(int const downloader_count_in) noexcept
+    constexpr bool set_downloader_count(std::optional<int64_t> downloader_count_in) noexcept
     {
         if (downloader_count_in >= 0)
         {
-            downloader_count_ = downloader_count_in;
+            downloader_count_ = std::move(downloader_count_in);
             return true;
         }
         return false;
@@ -367,11 +367,10 @@ struct tr_tracker
     tr_tracker_id_t const id;
 
 private:
-    // -1 means the value is unknown to us
-    int seeder_count_ = -1;
-    int leecher_count_ = -1;
-    int download_count_ = -1;
-    int downloader_count_ = -1;
+    std::optional<int64_t> seeder_count_;
+    std::optional<int64_t> leecher_count_;
+    std::optional<int64_t> download_count_;
+    std::optional<int64_t> downloader_count_;
 };
 
 // format: `${host}:${port}`
@@ -440,7 +439,7 @@ struct tr_tier
     {
         auto const* const tracker = currentTracker();
 
-        return tracker == nullptr ? 0 : tracker->downloader_count() + tracker->leecher_count();
+        return tracker == nullptr ? 0 : tracker->downloader_count().value_or(-1) + tracker->leecher_count().value_or(-1);
     }
 
     tr_tracker* useNextTracker()
@@ -723,36 +722,30 @@ void publishError(tr_tier* tier, std::string_view msg)
     publishMessage(tier, msg, tr_tracker_event::Type::Error);
 }
 
-void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
+void publishPeerCounts(tr_tier* tier, std::optional<int64_t> seeders, std::optional<int64_t> leechers)
 {
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
         auto e = tr_tracker_event{};
         e.type = tr_tracker_event::Type::Counts;
-        e.seeders = seeders;
-        e.leechers = leechers;
-        tr_logAddDebugTier(tier, fmt::format("peer counts: {} seeders, {} leechers.", seeders, leechers));
+        e.seeders = std::move(seeders);
+        e.leechers = std::move(leechers);
+        tr_logAddDebugTier(
+            tier,
+            fmt::format("peer counts: {} seeders, {} leechers.", seeders.value_or(-1), leechers.value_or(-1)));
 
         tier->tor->torrent_announcer->callback(*tier->tor, &e);
     }
 }
 
-void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pex> const& pex)
+void publishPeersPex(tr_tier* tier, std::vector<tr_pex> const& pex)
 {
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
         auto e = tr_tracker_event{};
         e.type = tr_tracker_event::Type::Peers;
-        e.seeders = seeders;
-        e.leechers = leechers;
         e.pex = pex;
-        tr_logAddDebugTier(
-            tier,
-            fmt::format(
-                "tracker knows of {} seeders and {} leechers and gave a list of {} peers.",
-                seeders,
-                leechers,
-                std::size(pex)));
+        tr_logAddDebugTier(tier, fmt::format("tracker gave a list of {} peers.", std::size(pex)));
 
         tier->tor->torrent_announcer->callback(*tier->tor, &e);
     }
@@ -1031,9 +1024,9 @@ void tr_announcer_impl::onAnnounceDone(
             "warn:{}",
             response.did_connect,
             response.did_timeout,
-            response.seeders,
-            response.leechers,
-            response.downloads,
+            response.seeders.value_or(-1),
+            response.leechers.value_or(-1),
+            response.downloads.value_or(-1),
             response.interval,
             response.min_interval,
             (!std::empty(response.tracker_id) ? response.tracker_id.c_str() : "none"),
@@ -1130,12 +1123,12 @@ void tr_announcer_impl::onAnnounceDone(
 
         if (!std::empty(response.pex))
         {
-            publishPeersPex(tier, response.seeders, response.leechers, response.pex);
+            publishPeersPex(tier, response.pex);
         }
 
         if (!std::empty(response.pex6))
         {
-            publishPeersPex(tier, response.seeders, response.leechers, response.pex6);
+            publishPeersPex(tier, response.pex6);
         }
 
         publishPeerCounts(tier, response.seeders, response.leechers);
@@ -1367,10 +1360,10 @@ void tr_announcer_impl::onScrapeDone(tr_scrape_response const& response)
                 response.scrape_url.sv(),
                 response.did_connect,
                 response.did_timeout,
-                row.seeders,
-                row.leechers,
-                row.downloads,
-                row.downloaders,
+                row.seeders.value_or(-1),
+                row.leechers.value_or(-1),
+                row.downloads.value_or(-1),
+                row.downloaders.value_or(-1),
                 response.min_request_interval,
                 std::empty(response.errmsg) ? "none"sv : response.errmsg));
 
@@ -1659,9 +1652,9 @@ namespace tracker_view_helpers
     view.tier = tier_index;
     view.isBackup = &tracker != tier.currentTracker();
     view.lastScrapeStartTime = tier.lastScrapeStartTime;
-    view.seederCount = tracker.seeder_count();
-    view.leecherCount = tracker.leecher_count();
-    view.downloadCount = tracker.download_count();
+    view.seederCount = tracker.seeder_count().value_or(-1);
+    view.leecherCount = tracker.leecher_count().value_or(-1);
+    view.downloadCount = tracker.download_count().value_or(-1);
 
     if (view.isBackup)
     {
