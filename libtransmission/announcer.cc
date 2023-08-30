@@ -304,7 +304,7 @@ struct tr_tracker
     {
         if (seeder_count_in >= 0)
         {
-            seeder_count_ = std::move(seeder_count_in);
+            seeder_count_ = seeder_count_in;
             return true;
         }
         return false;
@@ -319,7 +319,7 @@ struct tr_tracker
     {
         if (leecher_count_in >= 0)
         {
-            leecher_count_ = std::move(leecher_count_in);
+            leecher_count_ = leecher_count_in;
             return true;
         }
         return false;
@@ -334,7 +334,7 @@ struct tr_tracker
     {
         if (download_count_in >= 0)
         {
-            download_count_ = std::move(download_count_in);
+            download_count_ = download_count_in;
             return true;
         }
         return false;
@@ -349,7 +349,7 @@ struct tr_tracker
     {
         if (downloader_count_in >= 0)
         {
-            downloader_count_ = std::move(downloader_count_in);
+            downloader_count_ = downloader_count_in;
             return true;
         }
         return false;
@@ -728,8 +728,8 @@ void publishPeerCounts(tr_tier* tier, std::optional<int64_t> seeders, std::optio
     {
         auto e = tr_tracker_event{};
         e.type = tr_tracker_event::Type::Counts;
-        e.seeders = std::move(seeders);
-        e.leechers = std::move(leechers);
+        e.seeders = seeders;
+        e.leechers = leechers;
         tr_logAddDebugTier(
             tier,
             fmt::format("peer counts: {} seeders, {} leechers.", seeders.value_or(-1), leechers.value_or(-1)));
