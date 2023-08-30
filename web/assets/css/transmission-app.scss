@@ -200,7 +200,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   }
 }
 
-/* If browser can support using 'system colors' (i.e. way to inherit browser colors), use these variables instead */
+/* If browser can support using 'system color' keywords (i.e. way to inherit browser colors), use these variables instead */
 @supports (background-color: Canvas) {
   :root {
     .contrast-less {
