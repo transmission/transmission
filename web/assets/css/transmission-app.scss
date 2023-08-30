@@ -81,21 +81,18 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   --color-progressbar-paused: #{$grey-200};
   --color-progressbar-leech: #{$blue-200};
   --color-progressbar-queued: #{$blue-400};
-  --color-bg-odd: Canvas;
   --color-bg-even: #{$default-tinted};
   --color-toolbar-background: #{$default-tinted};
-  --color-inspector-background: Canvas;
-  --color-bg-primary: Canvas;
-  --color-bg-popup: Canvas;
   --color-bg-tabs: #{$default-tinted};
 
   color-scheme: light dark;
 
   @media (prefers-color-scheme: dark) {
+    --color-bg-odd: #{$black};
+    --color-bg-primary: #{$black};
+    --color-bg-popup: #{$black};
     --color-bg-hover: #{$grey-40};
     --color-fg-primary: #{$dark-mode-white};
-    --color-bg-primary-hover: #{$grey-700};
-    --color-bg-menu: #{$grey-800};
     --color-fg-secondary: #{$nice-grey};
     --color-fg-on-popup: #{$nice-grey};
     --color-fg-disabled: #808088;
@@ -118,22 +115,16 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-fg-port-open: #{$green-100};
       --color-bg-hover: #{$grey-40};
       --color-fg-primary: #{$white};
-      --color-bg-primary: #{$black};
-      --color-bg-primary-hover: #{$black};
-      --color-bg-odd: #{$black};
       --color-bg-even: #{$black};
-      --color-bg-menu: #{$black};
       --color-fg-secondary: #{$white};
       --color-fg-on-popup: #{$white};
       --color-fg-disabled: #{$white};
-      --color-bg-popup: #{$black};
       --color-bg-warn: #cf6679;
       --color-fg-warn: #{$black};
       --color-border: #{$white};
       --color-border-selected: #{$white};
       --color-fg-tertiary: #{$white};
       --color-toolbar-background: #{$black};
-      --color-inspector-background: #{$black};
       --color-bg-selected: #{$blue-300};
       --color-bg-tabs: #{$black};
       --color-fg-tabs: #{$white};
@@ -150,7 +141,9 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     }
   }
   @media (prefers-color-scheme: light) {
-    --progress: 100%;
+    --color-bg-odd: #{$white};
+    --color-bg-primary: #{$white};
+    --color-bg-popup: #{$white};
     --color-fg-error: #{$red-500};
     --color-fg-port-closed: #{$red-500};
     --color-fg-port-open: #{$green-400};
@@ -161,7 +154,6 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-progressbar-queued: #{$blue-400};
     --color-bg-hover: #{$nice-grey};
     --color-fg-primary: #404040;
-    --color-bg-menu: #{$nice-grey};
     --color-fg-on-popup: #{$grey-900};
     --color-fg-secondary: #{$grey-500};
     --color-border: #{$grey-500};
@@ -183,22 +175,16 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-fg-port-open: #{$green-400};
       --color-bg-hover: #{$grey-40};
       --color-fg-primary: #{$black};
-      --color-bg-primary: #{$white};
-      --color-bg-primary-hover: #{$white};
-      --color-bg-odd: #{$white};
       --color-bg-even: #{$white};
-      --color-bg-menu: #{$white};
       --color-fg-secondary: #{$black};
       --color-fg-on-popup: #{$black};
       --color-fg-disabled: #{$black};
-      --color-bg-popup: #{$white};
       --color-bg-warn: #cf6679;
       --color-fg-warn: #{$white};
       --color-border: #{$black};
       --color-border-selected: #{$black};
       --color-fg-tertiary: #{$black};
       --color-toolbar-background: #{$white};
-      --color-inspector-background: #{$white};
       --color-bg-selected: #{$blue-300};
       --color-bg-tabs: #{$white};
       --color-fg-tabs: #{$black};
@@ -212,6 +198,17 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-progressbar-paused: #{$grey-500};
       --color-progressbar-leech: #{$blue-200};
       --color-progressbar-queued: #{$blue-400};
+    }
+  }
+}
+
+/* If browser can support using 'system colors' (i.e. way to inherit browser colors), use these variables instead */
+@supports (background-color: Canvas) {
+  :root {
+    .contrast-less {
+      --color-bg-odd: Canvas;
+      --color-bg-primary: Canvas;
+      --color-bg-popup: Canvas;
     }
   }
 }
@@ -794,7 +791,7 @@ $video-image: '../img/film.svg';
 }
 
 #prefs-dialog {
-  $background-color: var(--color-inspector-background);
+  $background-color: var(--color-bg-primary);
   background: $background-color;
   bottom: 0;
   box-shadow:
@@ -944,7 +941,7 @@ $video-image: '../img/film.svg';
 
 .tabs-container {
   align-items: stretch;
-  background: var(--color-inspector-background);
+  background: var(--color-bg-primary);
   bottom: 0;
   display: flex;
   flex-direction: column;
