@@ -56,7 +56,7 @@ export class PrefsDialog extends EventTarget {
   _onPortChecked(response) {
     const element =
       this.elements.network.port_status_label[response.arguments['ipProtocol']];
-    const is_open = response.arguments['port-is-open'];
+    const is_open = response.arguments['port-is-open'] || false;
     element.dataset.open = is_open;
     setTextContent(element, is_open ? 'Open' : 'Closed');
   }
