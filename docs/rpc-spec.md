@@ -669,7 +669,7 @@ Request arguments:
 
 `ipProtocol` indicates the IP protocol version to be used to check the port status.
 Set to `0` to *only* check for IPv4 port status, set to `1` to *only* check for IPv6 port status,
-or omit it to check if the port is open on *any* of the IP protocols.
+or omit it to check if the port is open on *any* of the IP protocol versions.
 
 Response arguments:
 | Key | Value Type | Description
