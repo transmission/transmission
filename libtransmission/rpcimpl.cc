@@ -1402,11 +1402,19 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     }
 }
 
-char const* portTest(tr_session* session, tr_variant* /*args_in*/, tr_variant* /*args_out*/, struct tr_rpc_idle_data* idle_data)
+char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, struct tr_rpc_idle_data* idle_data)
 {
     auto const port = session->advertisedPeerPort();
     auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
-    session->fetch({ url, onPortTested, idle_data });
+
+    auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
+    auto arg = int64_t{};
+    if (tr_variantDictFindInt(args_in, TR_KEY_ip_protocol, &arg))
+    {
+        options.ip_proto = arg == 0 ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
+        tr_variantDictAddInt(idle_data->args_out, TR_KEY_ip_protocol, arg != 0);
+    }
+    session->fetch(std::move(options));
     return nullptr;
 }
 
