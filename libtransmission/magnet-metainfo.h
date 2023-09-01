@@ -5,19 +5,17 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
-
-#include "announce-list.h"
-#include "tr-strbuf.h" // tr_urlbuf
-#include "utils.h" // tr_strv_convert_utf8()
+#include "libtransmission/announce-list.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20, tr_sha1_digest_t
+#include "libtransmission/utils.h" // tr_strv_convert_utf8()
 
 struct tr_error;
-struct tr_variant;
 
 class tr_magnet_metainfo
 {
@@ -26,7 +24,7 @@ class tr_magnet_metainfo
 public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
 
-    [[nodiscard]] tr_urlbuf magnet() const;
+    [[nodiscard]] std::string magnet() const;
 
     [[nodiscard]] constexpr auto const& info_hash() const noexcept
     {
@@ -58,12 +56,12 @@ public:
         return announce_list_;
     }
 
-    [[nodiscard]] constexpr std::string const& info_hash_string() const noexcept
+    [[nodiscard]] constexpr auto const& info_hash_string() const noexcept
     {
         return info_hash_str_;
     }
 
-    [[nodiscard]] constexpr std::string const& info_hash2_string() const noexcept
+    [[nodiscard]] constexpr auto const& info_hash2_string() const noexcept
     {
         return info_hash2_str_;
     }
@@ -80,7 +78,7 @@ protected:
     std::vector<std::string> webseed_urls_;
     tr_sha1_digest_t info_hash_ = {};
     tr_sha256_digest_t info_hash2_ = {};
-    std::string info_hash_str_;
-    std::string info_hash2_str_;
+    tr_sha1_string info_hash_str_;
+    tr_sha256_string info_hash2_str_;
     std::string name_;
 };

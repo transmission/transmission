@@ -7,7 +7,6 @@
 #include <ctime>
 #include <mutex>
 #include <optional>
-#include <set>
 #include <thread>
 #include <vector>
 
@@ -21,7 +20,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h" // tr_time(), tr_wait()
+#include "libtransmission/utils.h" // tr_time()
 #include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;
@@ -38,24 +37,19 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
     // higher priority comes before lower priority
     auto const pa = tr_torrentGetPriority(torrent);
     auto const pb = tr_torrentGetPriority(that.torrent);
-    if (pa != pb)
+    if (auto const val = tr_compare_3way(pa, pb); val != 0)
     {
-        return pa > pb ? -1 : 1;
+        return -val;
     }
 
     // smaller torrents come before larger ones because they verify faster
-    if (current_size != that.current_size)
+    if (auto const val = tr_compare_3way(current_size, that.current_size); val != 0)
     {
-        return current_size < that.current_size ? -1 : 1;
+        return val;
     }
 
     // tertiary compare just to ensure they don't compare equal
-    if (torrent->id() != that.torrent->id())
-    {
-        return torrent->id() < that.torrent->id() ? -1 : 1;
-    }
-
-    return 0;
+    return tr_compare_3way(torrent->id(), that.torrent->id());
 }
 
 bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& stop_flag)
@@ -135,7 +129,7 @@ bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& 
             if (auto const now = tr_time(); last_slept_at != now)
             {
                 last_slept_at = now;
-                tr_wait(SleepPerSecondDuringVerify);
+                std::this_thread::sleep_for(SleepPerSecondDuringVerify);
             }
 
             sha->clear();
@@ -277,6 +271,6 @@ tr_verify_worker::~tr_verify_worker()
 
     while (verify_thread_id_.has_value())
     {
-        tr_wait(20ms);
+        std::this_thread::sleep_for(20ms);
     }
 }

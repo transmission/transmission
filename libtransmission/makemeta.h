@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <algorithm> // std::move
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <future>
@@ -14,13 +13,16 @@
 #include <utility> // std::pair
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "block-info.h"
-#include "file.h"
-#include "torrent-files.h"
-#include "utils.h" // for tr_saveFile()
+#include "libtransmission/announce-list.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/file.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/utils.h" // for tr_file_save()
+
+struct tr_error;
 
 class tr_metainfo_builder
 {
@@ -68,7 +70,7 @@ public:
     // generate the metainfo and save it to a torrent file
     bool save(std::string_view filename, tr_error** error = nullptr) const
     {
-        return tr_saveFile(filename, benc(error), error);
+        return tr_file_save(filename, benc(error), error);
     }
 
     /// setters
@@ -133,7 +135,7 @@ public:
         return files_.fileSize(i);
     }
 
-    [[nodiscard]] constexpr auto const& is_private() const noexcept
+    [[nodiscard]] constexpr auto is_private() const noexcept
     {
         return is_private_;
     }
@@ -180,44 +182,7 @@ public:
 
     ///
 
-    [[nodiscard]] constexpr static uint32_t default_piece_size(uint64_t total_size) noexcept
-    {
-        uint32_t const KiB = 1024;
-        uint32_t const MiB = 1048576;
-        uint32_t const GiB = 1073741824;
-
-        if (total_size >= 2 * GiB)
-        {
-            return 2 * MiB;
-        }
-
-        if (total_size >= 1 * GiB)
-        {
-            return 1 * MiB;
-        }
-
-        if (total_size >= 512 * MiB)
-        {
-            return 512 * KiB;
-        }
-
-        if (total_size >= 350 * MiB)
-        {
-            return 256 * KiB;
-        }
-
-        if (total_size >= 150 * MiB)
-        {
-            return 128 * KiB;
-        }
-
-        if (total_size >= 50 * MiB)
-        {
-            return 64 * KiB;
-        }
-
-        return 32 * KiB; /* less than 50 meg */
-    }
+    [[nodiscard]] static uint32_t default_piece_size(uint64_t total_size) noexcept;
 
     [[nodiscard]] constexpr static bool is_legal_piece_size(uint32_t x)
     {

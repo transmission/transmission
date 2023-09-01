@@ -8,11 +8,11 @@
 #include <cstddef> // for size_t
 #include <string>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h" // for tr_log_level
-#include "net.h" // for tr_port, tr_tos_t
-#include "quark.h"
+#include "libtransmission/log.h" // for tr_log_level
+#include "libtransmission/net.h" // for tr_port, tr_tos_t
+#include "libtransmission/quark.h"
 
 struct tr_variant;
 
@@ -39,9 +39,13 @@ struct tr_variant;
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "", "") \
     V(TR_KEY_peer_limit_global, peer_limit_global, size_t, TR_DEFAULT_PEER_LIMIT_GLOBAL, "") \
     V(TR_KEY_peer_limit_per_torrent, peer_limit_per_torrent, size_t, TR_DEFAULT_PEER_LIMIT_TORRENT, "") \
-    V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "The local machine's incoming peer port") \
-    V(TR_KEY_peer_port_random_high, peer_port_random_high, tr_port, tr_port::fromHost(65535), "") \
-    V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::fromHost(49152), "") \
+    V(TR_KEY_peer_port, \
+      peer_port, \
+      tr_port, \
+      tr_port::from_host(TR_DEFAULT_PEER_PORT), \
+      "The local machine's incoming peer port") \
+    V(TR_KEY_peer_port_random_high, peer_port_random_high, tr_port, tr_port::from_host(65535), "") \
+    V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::from_host(49152), "") \
     V(TR_KEY_peer_port_random_on_start, peer_port_random_on_start, bool, false, "") \
     V(TR_KEY_peer_socket_tos, peer_socket_tos, tr_tos_t, 0x04, "") \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true, "") \

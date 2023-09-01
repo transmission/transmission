@@ -12,18 +12,17 @@
 #include <array>
 #include <chrono>
 #include <cstdint> // uint64_t
-#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "interned-string.h"
-#include "net.h"
-#include "peer-mgr.h" // tr_pex
+#include "libtransmission/announcer.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-mgr.h" // tr_pex
 
 struct tr_url_parsed_t;
 

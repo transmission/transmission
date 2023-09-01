@@ -3,18 +3,23 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <chrono>
+#include <ctime>
 #include <set>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/transmission.h> // tr_torrent_activity
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj()
+#include <libtransmission/net.h>
 #include <libtransmission/session.h>
 #include <libtransmission/tr-lpd.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -33,6 +38,11 @@ public:
     explicit MyMediator(tr_session& session)
         : session_{ session }
     {
+    }
+
+    [[nodiscard]] tr_address bind_address(tr_address_type /* type */) const override
+    {
+        return {};
     }
 
     [[nodiscard]] tr_port port() const override
@@ -74,7 +84,7 @@ public:
     }
 
     tr_session& session_;
-    tr_port port_ = tr_port::fromHost(51413);
+    tr_port port_ = tr_port::from_host(51413);
     bool allows_lpd_ = true;
     std::vector<TorrentInfo> torrents_;
     std::set<std::string> found_;

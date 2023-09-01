@@ -65,6 +65,7 @@
               <object class="GtkToolButton" id="remove_torrent_button">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">Remove torrent</property>
                 <property name="action-name">win.remove-torrent</property>
                 <property name="label" translatable="yes">Remove torrent</property>
                 <property name="use-underline">True</property>

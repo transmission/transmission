@@ -3,14 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <libtransmission/transmission.h>
+#include <cassert>
+#include <cstddef> // size_t
+#include <string>
+#include <string_view>
+
 #include <libtransmission/quark.h>
 
 #include "gtest/gtest.h"
-
-#include <cstring>
-#include <string>
-#include <string_view>
 
 class QuarkTest : public ::testing::Test
 {

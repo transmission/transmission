@@ -63,11 +63,11 @@ MakeProgressDialog::MakeProgressDialog(
     std::future<tr_error*> future,
     QString outfile,
     QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , builder_(builder)
-    , future_(std::move(future))
-    , outfile_(std::move(outfile))
+    : BaseDialog{ parent }
+    , session_{ session }
+    , builder_{ builder }
+    , future_{ std::move(future) }
+    , outfile_{ std::move(outfile) }
 {
     ui_.setupUi(this);
 
@@ -193,7 +193,7 @@ void MakeDialog::makeTorrent()
     builder_->set_private(ui_.privateCheck->isChecked());
 
     // pop up the dialog
-    auto* dialog = new MakeProgressDialog(session_, *builder_, builder_->make_checksums(), outfile, this);
+    auto* dialog = new MakeProgressDialog{ session_, *builder_, builder_->make_checksums(), outfile, this };
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
@@ -242,7 +242,7 @@ MakeDialog::MakeDialog(Session& session, QWidget* parent)
     ui_.sourceFolderButton->setMode(PathButton::DirectoryMode);
     ui_.sourceFileButton->setMode(PathButton::FileMode);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.filesSectionLayout);
     cr->addLayout(ui_.propertiesSectionLayout);
     cr->update();
@@ -277,8 +277,8 @@ void MakeDialog::dragEnterEvent(QDragEnterEvent* event)
 
 void MakeDialog::dropEvent(QDropEvent* event)
 {
-    QString const filename = event->mimeData()->urls().front().path();
-    QFileInfo const file_info(filename);
+    auto const filename = event->mimeData()->urls().front().path();
+    auto const file_info = QFileInfo{ filename };
 
     if (file_info.exists())
     {

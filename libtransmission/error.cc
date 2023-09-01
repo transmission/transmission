@@ -8,11 +8,8 @@
 
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 namespace

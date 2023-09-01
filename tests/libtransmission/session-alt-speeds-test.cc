@@ -3,17 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <chrono>
 #include <ctime>
 #include <vector>
 
-#include <fmt/chrono.h>
-
 #include <libtransmission/transmission.h>
 #include <libtransmission/session.h>
-#include <libtransmission/session-id.h>
-#include <libtransmission/version.h>
+#include <libtransmission/session-alt-speeds.h>
 
-#include "test-fixtures.h"
+#include "gtest/gtest.h"
 
 using namespace std::literals;
 

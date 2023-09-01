@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <array>
 #include <cerrno> // for EINVAL
 #include <string>
 #include <string_view>
@@ -16,16 +15,13 @@
 
 #include "libtransmission/benc.h"
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error-types.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
-#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -42,7 +38,7 @@ using namespace std::literals;
  */
 std::string tr_torrent_metainfo::fix_webseed_url(tr_torrent_metainfo const& tm, std::string_view url)
 {
-    url = tr_strvStrip(url);
+    url = tr_strv_strip(url);
 
     if (tm.file_count() > 1U && !std::empty(url) && url.back() != '/')
     {
@@ -351,7 +347,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(EncodingKey))
         {
-            encoding_ = tr_strvStrip(value);
+            encoding_ = tr_strv_strip(value);
         }
         else if (pathIs(UrlListKey))
         {
@@ -673,10 +669,10 @@ bool tr_torrent_metainfo::parse_torrent_file(std::string_view filename, std::vec
         contents = &local_contents;
     }
 
-    return tr_loadFile(filename, *contents, error) && parse_benc({ std::data(*contents), std::size(*contents) }, error);
+    return tr_file_read(filename, *contents, error) && parse_benc({ std::data(*contents), std::size(*contents) }, error);
 }
 
-tr_pathbuf tr_torrent_metainfo::make_filename(
+std::string tr_torrent_metainfo::make_filename(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
@@ -685,8 +681,17 @@ tr_pathbuf tr_torrent_metainfo::make_filename(
 {
     // `${dirname}/${name}.${info_hash}${suffix}`
     // `${dirname}/${info_hash}${suffix}`
-    return format == BasenameFormat::Hash ? tr_pathbuf{ dirname, '/', info_hash_string, suffix } :
-                                            tr_pathbuf{ dirname, '/', name, '.', info_hash_string.substr(0, 16), suffix };
+    auto filename = tr_pathbuf{ dirname, '/' };
+    if (format == BasenameFormat::Hash)
+    {
+        filename.append(info_hash_string);
+    }
+    else
+    {
+        filename.append(name, '.', info_hash_string.substr(0, 16));
+    }
+    filename.append(suffix);
+    return std::string{ filename.sv() };
 }
 
 bool tr_torrent_metainfo::migrate_file(

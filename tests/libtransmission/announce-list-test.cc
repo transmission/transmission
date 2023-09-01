@@ -3,23 +3,27 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::equal
 #include <array>
-#include <cstdlib>
+#include <cstdio>
 #include <set>
+#include <string>
 #include <string_view>
 #include <vector>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/announce-list.h>
 #include <libtransmission/error.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
-#include <libtransmission/variant.h>
-
-#include "test-fixtures.h"
+#include <libtransmission/utils.h>
 
 #include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using AnnounceListTest = ::testing::Test;
 using namespace std::literals;
@@ -272,6 +276,18 @@ TEST_F(AnnounceListTest, canReplace)
     EXPECT_EQ(Announce2, announce_list.at(0).announce.sv());
 }
 
+TEST_F(AnnounceListTest, canReplaceWithDiffQuery)
+{
+    auto constexpr Tier = tr_tracker_tier_t{ 1 };
+    auto constexpr Announce1 = "https://www.example.com/1/announce"sv;
+    auto constexpr Announce2 = "https://www.example.com/2/announce?pass=1999"sv;
+
+    auto announce_list = tr_announce_list{};
+    EXPECT_TRUE(announce_list.add(Announce1, Tier));
+    EXPECT_TRUE(announce_list.replace(announce_list.at(0).id, Announce2));
+    EXPECT_EQ(Announce2, announce_list.at(0).announce.sv());
+}
+
 TEST_F(AnnounceListTest, canNotReplaceInvalidId)
 {
     auto constexpr Tier = tr_tracker_tier_t{ 1 };
@@ -321,7 +337,7 @@ TEST_F(AnnounceListTest, announceToScrape)
         { "udp://www.example.com:999/"sv, "udp://www.example.com:999/"sv },
     } };
 
-    for (auto const test : Tests)
+    for (auto const& test : Tests)
     {
         auto const scrape = tr_announce_list::announce_to_scrape(tr_quark_new(test.announce));
         EXPECT_EQ(tr_quark_new(test.expected_scrape), scrape);
@@ -342,9 +358,9 @@ TEST_F(AnnounceListTest, save)
     auto original_content = std::vector<char>{};
     auto const test_file = tr_pathbuf{ ::testing::TempDir(), "transmission-announce-list-test.torrent"sv };
     tr_error* error = nullptr;
-    EXPECT_TRUE(tr_loadFile(OriginalFile, original_content, &error));
+    EXPECT_TRUE(tr_file_read(OriginalFile, original_content, &error));
     EXPECT_EQ(nullptr, error) << *error;
-    EXPECT_TRUE(tr_saveFile(test_file.sv(), original_content, &error));
+    EXPECT_TRUE(tr_file_save(test_file.sv(), original_content, &error));
     EXPECT_EQ(nullptr, error) << *error;
 
     // make an announce_list for it

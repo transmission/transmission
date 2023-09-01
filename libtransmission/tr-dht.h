@@ -8,15 +8,24 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
+#include <ctime>
 #include <memory>
 #include <string_view>
 #include <vector>
 
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h>
+#endif
+
 #include <dht/dht.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h" // tr_port
+#include "libtransmission/net.h" // tr_port
+#include "libtransmission/tr-macros.h"
 
 struct tr_pex;
 
@@ -66,7 +75,7 @@ public:
             return ::dht_search(id, port, af, callback, closure);
         }
 
-        virtual int init(int s, int s6, unsigned const char* id, unsigned const char* v)
+        virtual int init(int s, int s6, unsigned char const* id, unsigned char const* v)
         {
             return ::dht_init(s, s6, id, v);
         }

@@ -17,20 +17,22 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "bandwidth.h"
-#include "bitfield.h"
-#include "block-info.h"
-#include "completion.h"
-#include "crypto-utils.h"
-#include "file-piece-map.h"
-#include "interned-string.h"
-#include "log.h"
-#include "session.h"
-#include "torrent-metainfo.h"
-#include "tr-macros.h"
+#include "libtransmission/announce-list.h"
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/completion.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file-piece-map.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/observable.h"
+#include "libtransmission/log.h"
+#include "libtransmission/session.h"
+#include "libtransmission/torrent-magnet.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-macros.h"
 
 class tr_swarm;
 struct tr_error;
@@ -552,7 +554,7 @@ public:
 
     [[nodiscard]] constexpr auto allows_pex() const noexcept
     {
-        return this->is_public() && this->session->allowsPEX();
+        return this->is_public() && this->session->allows_pex();
     }
 
     [[nodiscard]] constexpr auto allows_dht() const noexcept
@@ -608,7 +610,7 @@ public:
         return {};
     }
 
-    [[nodiscard]] constexpr auto const& id() const noexcept
+    [[nodiscard]] constexpr auto id() const noexcept
     {
         return unique_id_;
     }
@@ -820,6 +822,15 @@ public:
 
     tr_bandwidth bandwidth_;
 
+    libtransmission::SimpleObservable<tr_torrent*, bool /*because_downloaded_last_piece*/> done_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> got_bad_piece_;
+    libtransmission::SimpleObservable<tr_torrent*, tr_piece_index_t> piece_completed_;
+    libtransmission::SimpleObservable<tr_torrent*> doomed_;
+    libtransmission::SimpleObservable<tr_torrent*> got_metainfo_;
+    libtransmission::SimpleObservable<tr_torrent*> started_;
+    libtransmission::SimpleObservable<tr_torrent*> stopped_;
+    libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
+
     tr_stat stats = {};
 
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
@@ -853,7 +864,7 @@ public:
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
      * other peers */
-    struct tr_incomplete_metadata* incompleteMetadata = nullptr;
+    std::optional<tr_incomplete_metadata> incomplete_metadata;
 
     time_t lpdAnnounceAt = 0;
 

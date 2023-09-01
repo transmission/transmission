@@ -22,7 +22,7 @@
 ***/
 
 WatchDir::WatchDir(TorrentModel const& model)
-    : model_(model)
+    : model_{ model }
 {
 }
 
@@ -76,7 +76,7 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
 
 void WatchDir::watcherActivated(QString const& path)
 {
-    QDir const dir(path);
+    auto const dir = QDir{ path };
 
     // get the list of files currently in the watch directory
     QSet<QString> files;
@@ -108,7 +108,7 @@ void WatchDir::watcherActivated(QString const& path)
             case AddResult::Error:
                 {
                     // give the torrent a few seconds to finish downloading
-                    auto* t = new QTimer(this);
+                    auto* t = new QTimer{ this };
                     t->setObjectName(dir.absoluteFilePath(name));
                     t->setSingleShot(true);
                     connect(t, &QTimer::timeout, this, &WatchDir::onTimeout);

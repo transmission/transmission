@@ -89,7 +89,7 @@ inline bool waitFor(std::function<bool()> const& test, std::chrono::milliseconds
             return false;
         }
 
-        tr_wait(10ms);
+        std::this_thread::sleep_for(10ms);
     }
 }
 
@@ -515,12 +515,7 @@ protected:
         {
             auto* settings = new tr_variant{};
             tr_variantInitDict(settings, 10);
-            auto constexpr deleter = [](tr_variant* v)
-            {
-                tr_variantClear(v);
-                delete v;
-            };
-            settings_.reset(settings, deleter);
+            settings_.reset(settings);
         }
 
         return settings_.get();
@@ -529,6 +524,8 @@ protected:
     virtual void SetUp() override
     {
         SandboxedTest::SetUp();
+
+        init_mgr_ = tr_lib_init();
 
         auto callback = [this](tr_torrent* tor, bool /*aborted*/)
         {
@@ -554,6 +551,8 @@ private:
     std::mutex verified_mutex_;
     std::condition_variable verified_cv_;
     std::vector<tr_torrent*> verified_;
+
+    std::unique_ptr<tr_net_init_mgr> init_mgr_;
 };
 
 } // namespace test

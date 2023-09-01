@@ -16,7 +16,6 @@
 #include "block-info.h"
 #include "magnet-metainfo.h"
 #include "torrent-files.h"
-#include "tr-strbuf.h"
 
 struct tr_error;
 
@@ -123,7 +122,7 @@ public:
         return source_;
     }
 
-    [[nodiscard]] constexpr auto const& is_private() const noexcept
+    [[nodiscard]] constexpr auto is_private() const noexcept
     {
         return is_private_;
     }
@@ -205,7 +204,7 @@ private:
         NameAndPartialHash
     };
 
-    [[nodiscard]] static tr_pathbuf make_filename(
+    [[nodiscard]] static std::string make_filename(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,

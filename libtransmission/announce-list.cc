@@ -7,9 +7,12 @@
 #include <string>
 #include <string_view>
 
+#include <fmt/core.h>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
+#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/utils.h"
@@ -86,6 +89,7 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     tracker.id = next_unique_id();
     tracker.host_and_port = fmt::format(FMT_STRING("{:s}:{:d}"), announce->host, announce->port);
     tracker.sitename = announce->sitename;
+    tracker.query = announce->query;
 
     if (auto const scrape_str = announce_to_scrape(announce_url_sv); scrape_str)
     {
@@ -137,7 +141,7 @@ std::optional<std::string> tr_announce_list::announce_to_scrape(std::string_view
     }
 
     // some torrents with UDP announce URLs don't have /announce
-    if (tr_strvStartsWith(announce, "udp:"sv))
+    if (tr_strv_starts_with(announce, "udp:"sv))
     {
         return std::string{ announce };
     }
@@ -194,7 +198,7 @@ tr_tracker_tier_t tr_announce_list::get_tier(tr_tracker_tier_t tier, tr_url_pars
         auto const tracker_announce = tracker.announce.sv();
 
         // fast test to avoid tr_urlParse()ing most trackers
-        if (!tr_strvContains(tracker_announce, announce.host))
+        if (!tr_strv_contains(tracker_announce, announce.host))
         {
             return false;
         }
@@ -217,14 +221,15 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
         auto const tracker_announce = tracker.announce.sv();
 
         // fast test to avoid tr_urlParse()ing most trackers
-        if (!tr_strvContains(tracker_announce, announce.host))
+        if (!tr_strv_contains(tracker_announce, announce.host))
         {
             return false;
         }
 
         auto const tracker_parsed = tr_urlParse(tracker_announce);
         return tracker_parsed->scheme == announce.scheme && tracker_parsed->host == announce.host &&
-            tracker_parsed->port == announce.port && tracker_parsed->path == announce.path;
+            tracker_parsed->port == announce.port && tracker_parsed->path == announce.path &&
+            tracker_parsed->query == announce.query;
     };
     return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
 }
@@ -232,11 +237,14 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
 bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
 {
     // load the torrent file
-    auto metainfo = tr_variant{};
-    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, torrent_file, error))
+    auto serde = tr_variant_serde::benc();
+    auto ometainfo = serde.parse_file(torrent_file);
+    if (!ometainfo)
     {
+        tr_error_propagate(error, &serde.error_);
         return false;
     }
+    auto& metainfo = *ometainfo;
 
     // remove the old fields
     tr_variantDictRemove(&metainfo, TR_KEY_announce);
@@ -267,15 +275,14 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
 
     // confirm that it's good by parsing it back again
-    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
-    tr_variantClear(&metainfo);
-    if (auto tm = tr_torrent_metainfo{}; !tm.parse_benc(contents, error))
+    auto const contents = serde.to_string(metainfo);
+    if (!serde.parse(contents).has_value())
     {
         return false;
     }
 
     // save it
-    return tr_saveFile(torrent_file, contents, error);
+    return tr_file_save(torrent_file, contents, error);
 }
 
 bool tr_announce_list::parse(std::string_view text)
@@ -285,14 +292,14 @@ bool tr_announce_list::parse(std::string_view text)
     auto current_tier = tr_tracker_tier_t{ 0 };
     auto current_tier_size = size_t{ 0 };
     auto line = std::string_view{};
-    while (tr_strvSep(&text, &line, '\n'))
+    while (tr_strv_sep(&text, &line, '\n'))
     {
-        if (tr_strvEndsWith(line, '\r'))
+        if (tr_strv_ends_with(line, '\r'))
         {
             line = line.substr(0, std::size(line) - 1);
         }
 
-        line = tr_strvStrip(line);
+        line = tr_strv_strip(line);
 
         if (std::empty(line))
         {

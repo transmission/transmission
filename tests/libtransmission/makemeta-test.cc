@@ -4,25 +4,29 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <array>
-#include <cstdlib> // mktemp()
-#include <numeric>
+#include <cstddef> // size_t, std::byte
+#include <cstdint> // uint32_t
+#include <ctime>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include <fmt/core.h>
-
-#include <libtransmission/transmission.h>
-
+#include <libtransmission/announce-list.h>
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/makemeta.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/session.h> // TR_NAME
 #include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
+#include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
+
+struct tr_error;
 
 using namespace std::literals;
 
@@ -179,7 +183,7 @@ TEST_F(MakemetaTest, anonymizeFalse)
     auto builder = tr_metainfo_builder{ filename };
     builder.set_anonymize(false);
     auto const metainfo = testBuilder(builder);
-    EXPECT_TRUE(tr_strvContains(metainfo.creator(), TR_NAME)) << metainfo.creator();
+    EXPECT_TRUE(tr_strv_contains(metainfo.creator(), TR_NAME)) << metainfo.creator();
     auto const now = time(nullptr);
     EXPECT_LE(metainfo.date_created(), now);
     EXPECT_LE(now - 60, metainfo.date_created());
@@ -230,19 +234,16 @@ TEST_F(MakemetaTest, announceSingleTracker)
 
     // generate the torrent and parse it as a variant
     EXPECT_EQ(nullptr, builder.make_checksums().get());
-    auto top = tr_variant{};
-    auto const benc = builder.benc();
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
+    auto top = tr_variant_serde::benc().parse(builder.benc());
+    EXPECT_TRUE(top.has_value());
 
     // confirm there's an "announce" entry
     auto single_announce = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&top, TR_KEY_announce, &single_announce));
+    EXPECT_TRUE(tr_variantDictFindStrView(&*top, TR_KEY_announce, &single_announce));
     EXPECT_EQ(SingleAnnounce, single_announce);
 
     // confirm there's not an "announce-list" entry
-    EXPECT_EQ(nullptr, tr_variantDictFind(&top, TR_KEY_announce_list));
-
-    tr_variantClear(&top);
+    EXPECT_EQ(nullptr, tr_variantDictFind(&*top, TR_KEY_announce_list));
 }
 
 TEST_F(MakemetaTest, announceMultiTracker)
@@ -261,22 +262,19 @@ TEST_F(MakemetaTest, announceMultiTracker)
 
     // generate the torrent and parse it as a variant
     EXPECT_EQ(nullptr, builder.make_checksums().get());
-    auto top = tr_variant{};
-    auto const benc = builder.benc();
-    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc));
+    auto top = tr_variant_serde::benc().parse(builder.benc());
+    EXPECT_TRUE(top.has_value());
 
     // confirm there's an "announce" entry
     auto single_announce = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&top, TR_KEY_announce, &single_announce));
+    EXPECT_TRUE(tr_variantDictFindStrView(&*top, TR_KEY_announce, &single_announce));
     EXPECT_EQ(builder.announce_list().at(0).announce.sv(), single_announce);
 
     // confirm there's an "announce-list" entry
     tr_variant* announce_list_variant = nullptr;
-    EXPECT_TRUE(tr_variantDictFindList(&top, TR_KEY_announce_list, &announce_list_variant));
+    EXPECT_TRUE(tr_variantDictFindList(&*top, TR_KEY_announce_list, &announce_list_variant));
     EXPECT_NE(nullptr, announce_list_variant);
     EXPECT_EQ(std::size(builder.announce_list()), tr_variantListSize(announce_list_variant));
-
-    tr_variantClear(&top);
 }
 
 TEST_F(MakemetaTest, privateAndSourceHasDifferentInfoHash)

@@ -3,7 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <iostream>
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -11,11 +11,16 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/block-info.h>
 #include <libtransmission/cache.h> // tr_cacheWriteBlock()
 #include <libtransmission/file.h> // tr_sys_path_*()
+#include <libtransmission/quark.h>
+#include <libtransmission/torrent.h>
+#include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -76,7 +81,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        std::unique_ptr<std::vector<uint8_t>> buf = {};
+        std::unique_ptr<Cache::BlockData> buf = {};
         bool done = {};
     };
 
@@ -97,7 +102,8 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
         for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {
-            data.buf = std::make_unique<std::vector<uint8_t>>(tr_block_info::BlockSize, '\0');
+            data.buf = std::make_unique<Cache::BlockData>(tr_block_info::BlockSize);
+            std::fill_n(std::data(*data.buf), tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
             session_->runInSessionThread(test_incomplete_dir_threadfunc, &data);

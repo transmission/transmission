@@ -14,9 +14,9 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h" // for tr_address, tr_port
+#include "libtransmission/net.h" // for tr_address, tr_port
 
 struct event_base;
 
@@ -40,6 +40,8 @@ public:
         };
 
         virtual ~Mediator() = default;
+
+        [[nodiscard]] virtual tr_address bind_address(tr_address_type type) const = 0;
 
         [[nodiscard]] virtual tr_port port() const = 0;
 

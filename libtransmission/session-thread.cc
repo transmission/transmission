@@ -22,12 +22,8 @@
 #include <event2/event.h>
 #include <event2/thread.h>
 
-#include "libtransmission/transmission.h"
-
-#include "libtransmission/log.h"
 #include "libtransmission/session-thread.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h" // for tr_net_init()
 #include "libtransmission/utils-ev.h"
 
 using namespace std::literals;
@@ -113,8 +109,6 @@ unsigned long thread_current_id()
 
 void initEvthreadsOnce()
 {
-    tr_net_init();
-
     evthread_lock_callbacks constexpr LockCbs{
         EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE, lock_alloc, lock_free, lock_lock, lock_unlock
     };

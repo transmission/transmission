@@ -5,16 +5,17 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "quark.h"
-#include "interned-string.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_error;
 struct tr_url_parsed_t;
@@ -28,6 +29,7 @@ public:
         tr_interned_string scrape;
         tr_interned_string host_and_port; // 'example.org:80'
         tr_interned_string sitename; // 'example'
+        tr_interned_string query; // 'name=ferret'
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 

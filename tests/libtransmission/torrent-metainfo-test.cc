@@ -4,17 +4,23 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cerrno>
+#include <cstddef> // size_t
 #include <string_view>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -39,7 +45,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
     EXPECT_EQ(0U, metainfo.file_count()); // because it's a magnet link
     EXPECT_EQ(2U, std::size(metainfo.announce_list()));
-    EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
+    EXPECT_EQ(MagnetLink, metainfo.magnet());
 }
 
 #define BEFORE_PATH \
@@ -207,9 +213,9 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(src_filename.sv(), src_contents, &error));
+    EXPECT_TRUE(tr_file_read(src_filename.sv(), src_contents, &error));
     auto tgt_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(tgt_filename.sv(), tgt_contents, &error));
+    EXPECT_TRUE(tr_file_read(tgt_filename.sv(), tgt_contents, &error));
     EXPECT_EQ(src_contents, tgt_contents);
 
     // cleanup

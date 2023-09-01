@@ -12,7 +12,7 @@ check_symbol_exists(SO_REUSEPORT "sys/types.h;sys/socket.h" HAVE_SO_REUSEPORT)
 
 add_compile_options(
     # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
-    $<$<AND:$<BOOL:${APPLE}>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-arc>)
+    $<$<AND:$<BOOL:${APPLE}>,$<CXX_COMPILER_ID:AppleClang,Clang>,$<COMPILE_LANGUAGE:C,CXX>>:-fobjc-arc>)
 
 add_library(${TR_NAME} STATIC)
 
@@ -51,6 +51,7 @@ target_sources(${TR_NAME}
         error.cc
         error.h
         favicon-cache.h
+        file-capacity.cc
         file-piece-map.cc
         file-piece-map.h
         file-posix.cc
@@ -74,6 +75,7 @@ target_sources(${TR_NAME}
         mime-types.h
         net.cc
         net.h
+        observable.h
         open-files.cc
         open-files.h
         peer-common.h
@@ -91,8 +93,6 @@ target_sources(${TR_NAME}
         peer-msgs.h
         peer-socket.cc
         peer-socket.h
-        platform-quota.cc
-        platform-quota.h
         platform.cc
         platform.h
         port-forwarding-natpmp.cc
@@ -159,7 +159,6 @@ target_sources(${TR_NAME}
         utils.h
         utils.mm
         variant-benc.cc
-        variant-common.h
         variant-converters.cc
         variant-json.cc
         variant.cc
@@ -204,10 +203,10 @@ tr_allow_compile_if(
         watchdir-inotify.cc
     [=[[WITH_KQUEUE]]=]
         watchdir-kqueue.cc
-    [=[[APPLE]]=]
+    [=[[APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang"]]=]
         tr-assert.mm
         utils.mm
-    [=[[NOT APPLE]]=]
+    [=[[NOT (APPLE AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")]]=]
         tr-assert.cc
     [=[[WIN32]]=]
         file-win32.cc
@@ -297,6 +296,7 @@ target_link_libraries(${TR_NAME}
         "$<$<BOOL:${APPLE}>:-framework Foundation>"
     PUBLIC
         fmt::fmt-header-only
+        small::small
         libevent::event)
 
 if(INSTALL_LIB)

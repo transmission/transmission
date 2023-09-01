@@ -11,20 +11,19 @@
 #include <cerrno>
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
-#include <cstdio>
+#include <cstdlib> // mkdtemp, mkstemp, realpath
+#include <optional>
 #include <string_view>
 #include <string>
 #include <vector>
 
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
-#include <libgen.h> /* basename(), dirname() */
-#include <sys/file.h> /* flock() */
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
 #ifdef HAVE_XFS_XFS_H
+#include <sys/file.h> /* flock() */
 #include <xfs/xfs.h>
 #endif
 
@@ -57,6 +56,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_UCLIBC_CHECK_VERSION
 #include "libtransmission/tr-strbuf.h"
 
 #ifndef O_LARGEFILE
@@ -556,7 +556,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), static_cast<int>(std_file)));
         tr_error_set_from_errno(error, EINVAL);
     }
 
