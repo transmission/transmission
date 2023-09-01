@@ -616,7 +616,7 @@ $video-image: '../img/film.svg';
         grid-area: name;
 
         &.paused {
-          color: var(--color-fg-disabled);
+          color: var(--color-fg-primary);
         }
       }
 
