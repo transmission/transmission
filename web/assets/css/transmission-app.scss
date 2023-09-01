@@ -613,7 +613,8 @@ $video-image: '../img/film.svg';
 
       .torrent-name {
         color: var(--color-fg-primary);
-        grid-area: name;  
+        grid-area: name;
+
       }
 
       .torrent-labels {
@@ -949,16 +950,6 @@ $video-image: '../img/film.svg';
   @include for-tablet-portrait-up {
     width: 550px;
   }
-}
-
-.tabs-container-close {
-  font-size: 150%;
-  cursor: pointer;
-  background: var(--color-bg-primary);
-  border: 0;
-  color: var(--color-fg-primary);
-  position: absolute;
-  padding: 10px 16px;
 }
 
 .tabs-buttons {
