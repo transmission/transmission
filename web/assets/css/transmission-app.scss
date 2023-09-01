@@ -614,10 +614,7 @@ $video-image: '../img/film.svg';
       .torrent-name {
         color: var(--color-fg-primary);
         grid-area: name;
-
-        &.paused {
-          color: var(--color-fg-primary);
-        }
+        
       }
 
       .torrent-labels {
