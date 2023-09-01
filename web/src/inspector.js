@@ -6,12 +6,7 @@
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import {
-  OutsideClickListener,
-  Utils,
-  createTextualTabsContainer,
-  setTextContent,
-} from './utils.js';
+import { Utils, createTextualTabsContainer, setTextContent } from './utils.js';
 
 const peer_column_classes = [
   'encryption',
@@ -39,8 +34,7 @@ export class Inspector extends EventTarget {
     this.file_torrent = null;
     this.file_torrent_n = null;
     this.file_rows = null;
-    this.outside = new OutsideClickListener(this.elements.root);
-    this.outside.addEventListener('click', () => this.close());
+    this.elements.dismiss.addEventListener('click', () => this.close());
     Object.seal(this);
 
     controller.addEventListener(
@@ -54,7 +48,6 @@ export class Inspector extends EventTarget {
 
   close() {
     if (!this.closed) {
-      this.outside.stop();
       clearInterval(this.interval);
       this._setTorrents([]);
       this.elements.root.remove();
