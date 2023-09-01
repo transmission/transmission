@@ -2,10 +2,10 @@ name: Sanity
 on:
   push:
     branches:
-      - 'main'
+      - '4.0.x'
   pull_request:
     branches:
-      - 'main'
+      - '4.0.x'
 env:
   GTEST_OUTPUT: xml:./
 jobs:
@@ -29,7 +29,7 @@ jobs:
         id: check-main-push
         run: |
           set -x
-          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = 'main' ]; then
+          if [ "$GITHUB_EVENT_NAME" = 'push' ] && [ "$GITHUB_REF_NAME" = '4.0.x' ]; then
             echo is-main-push=1 >> "$GITHUB_OUTPUT"
           else
             echo is-main-push=0 >> "$GITHUB_OUTPUT"
@@ -46,7 +46,7 @@ jobs:
         run: |
           set +e
           cd src
-          MERGE_BASE=`git merge-base origin/main HEAD`
+          MERGE_BASE=`git merge-base origin/4.0.x HEAD`
           function get_changes() { # name, paths...
             local name="$1"
             shift
