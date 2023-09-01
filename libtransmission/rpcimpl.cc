@@ -78,7 +78,6 @@ void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view resul
 
     (*data->callback)(data->session, &data->response, data->callback_user_data);
 
-    tr_variantClear(&data->response);
     delete data;
 }
 
@@ -1742,7 +1741,7 @@ char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, s
         for (size_t i = 0; i < names_count; ++i)
         {
             auto const* const v = tr_variantListChild(names_list, i);
-            if (std::string_view l; tr_variantIsString(v) && tr_variantGetStrView(v, &l))
+            if (std::string_view l; v != nullptr && tr_variantGetStrView(v, &l))
             {
                 names.insert(l);
             }
@@ -2535,8 +2534,6 @@ void tr_rpc_request_exec_json(
         }
 
         (*callback)(session, &response, callback_user_data);
-
-        tr_variantClear(&response);
     }
     else if (method->immediate)
     {
@@ -2558,8 +2555,6 @@ void tr_rpc_request_exec_json(
         }
 
         (*callback)(session, &response, callback_user_data);
-
-        tr_variantClear(&response);
     }
     else
     {
