@@ -88,9 +88,6 @@ struct tau_scrape_request
         this->response.row_count = in.info_hash_count;
         for (int i = 0; i < this->response.row_count; ++i)
         {
-            this->response.rows[i].seeders = -1;
-            this->response.rows[i].leechers = -1;
-            this->response.rows[i].downloads = -1;
             this->response.rows[i].info_hash = in.info_hash[i];
         }
 
@@ -133,13 +130,8 @@ struct tau_scrape_request
 
         if (action == TAU_ACTION_SCRAPE)
         {
-            for (int i = 0; i < response.row_count; ++i)
+            for (int i = 0; i < response.row_count && std::size(buf) >= sizeof(uint32_t) * 3U; ++i)
             {
-                if (std::size(buf) < sizeof(uint32_t) * 3)
-                {
-                    break;
-                }
-
                 auto& row = response.rows[i];
                 row.seeders = buf.to_uint32();
                 row.downloads = buf.to_uint32();
@@ -183,9 +175,6 @@ struct tau_announce_request
         // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
         static_assert(sizeof(tr_announce_request::key) * CHAR_BIT == 32);
 
-        response.seeders = -1;
-        response.leechers = -1;
-        response.downloads = -1;
         response.info_hash = in.info_hash;
 
         // build the payload
@@ -657,11 +646,11 @@ public:
             // is it a response to one of this tracker's announces?
             if (auto& reqs = tracker.announces; !std::empty(reqs))
             {
-                auto it = std::find_if(
-                    std::begin(reqs),
-                    std::end(reqs),
-                    [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                if (it != std::end(reqs))
+                if (auto it = std::find_if(
+                        std::begin(reqs),
+                        std::end(reqs),
+                        [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
+                    it != std::end(reqs))
                 {
                     logtrace(tracker.key, fmt::format("{} is an announce request!", transaction_id));
                     auto req = *it;
@@ -674,11 +663,11 @@ public:
             // is it a response to one of this tracker's scrapes?
             if (auto& reqs = tracker.scrapes; !std::empty(reqs))
             {
-                auto it = std::find_if(
-                    std::begin(reqs),
-                    std::end(reqs),
-                    [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                if (it != std::end(reqs))
+                if (auto it = std::find_if(
+                        std::begin(reqs),
+                        std::end(reqs),
+                        [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
+                    it != std::end(reqs))
                 {
                     logtrace(tracker.key, fmt::format("{} is a scrape request!", transaction_id));
                     auto req = *it;
