@@ -129,7 +129,7 @@ typedef struct PieceInfo
     self.image = [[NSImage alloc] initWithSize:self.bounds.size];
 
     [self clearView];
-    self.needsDisplay = YES;
+    [self setNeedsDisplay];
 }
 
 - (void)clearView
@@ -196,7 +196,7 @@ typedef struct PieceInfo
             NSRectFillListWithColors(cFillRects, cFillColors, numCells);
             return YES;
         }];
-        self.needsDisplay = YES;
+        [self setNeedsDisplay];
     }
 
     // save the current state so we can compare it later
