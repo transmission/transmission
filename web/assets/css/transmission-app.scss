@@ -360,7 +360,7 @@ $toolbar-height: $toolbar-height-number * 1px;
 /// FILTERBAR
 
 .mainwin-filterbar {
-  white-space: pre;
+  white-space: nowrap;
   align-items: center;
   background: var(--color-toolbar-background);
   border-bottom: 1px solid var(--color-default-border);
