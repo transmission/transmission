@@ -55,8 +55,6 @@ tr_session_stats tr_stats::load_old_stats(std::string_view config_dir)
                 *tgt = val;
             }
         }
-
-        tr_variantClear(&*stats);
     }
 
     return ret;
@@ -73,7 +71,6 @@ void tr_stats::save() const
     tr_variantDictAddInt(&top, TR_KEY_session_count, saveme.sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, saveme.uploadedBytes);
     tr_variant_serde::json().to_file(top, tr_pathbuf{ config_dir_, "/stats.json"sv });
-    tr_variantClear(&top);
 }
 
 void tr_stats::clear()

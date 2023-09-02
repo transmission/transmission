@@ -348,8 +348,9 @@ bool Application::Impl::refresh_actions()
         gtr_action_set_sensitive("open-torrent-folder", sel_counts.total_count == 1);
         gtr_action_set_sensitive("copy-magnet-link-to-clipboard", sel_counts.total_count == 1);
 
-        bool const can_update = wind_->for_each_selected_torrent_until(
-            [](auto const& torrent) { return tr_torrentCanManualUpdate(&torrent->get_underlying()); });
+        bool const can_update = wind_ != nullptr &&
+            wind_->for_each_selected_torrent_until([](auto const& torrent)
+                                                   { return tr_torrentCanManualUpdate(&torrent->get_underlying()); });
         gtr_action_set_sensitive("torrent-reannounce", can_update);
     }
 
@@ -503,8 +504,6 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
             {
                 core_->signal_prefs_changed().emit(changed_key);
             }
-
-            tr_variantClear(&tmp);
             break;
         }
 
@@ -1452,7 +1451,6 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
         invoked = true;
     }
 
-    tr_variantClear(&top);
     return invoked;
 }
 
@@ -1472,7 +1470,6 @@ void Application::Impl::start_all_torrents()
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-start"sv);
     tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
-    tr_variantClear(&request);
 }
 
 void Application::Impl::pause_all_torrents()
@@ -1483,7 +1480,6 @@ void Application::Impl::pause_all_torrents()
     tr_variantInitDict(&request, 1);
     tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-stop"sv);
     tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
-    tr_variantClear(&request);
 }
 
 void Application::Impl::copy_magnet_link_to_clipboard(Glib::RefPtr<Torrent> const& torrent) const

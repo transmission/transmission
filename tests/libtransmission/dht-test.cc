@@ -139,7 +139,6 @@ protected:
             }
             tr_variantDictAddRaw(&dict, TR_KEY_nodes6, std::data(compact), std::size(compact));
             tr_variant_serde::benc().to_file(dict, dat_file);
-            tr_variantClear(&dict);
         }
     };
 

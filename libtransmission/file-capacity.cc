@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <cerrno>
 #include <string>
 #include <string_view>
@@ -364,12 +365,12 @@ extern "C"
     int64_t const freespace = limit - spaceused;
 
 #ifdef __APPLE__
-    disk_space.free = freespace < 0 ? 0 : freespace;
-    disk_space.total = limit < 0 ? 0 : limit;
+    disk_space.free = std::max(int64_t{ 0 }, freespace);
+    disk_space.total = std::max(int64_t{ 0 }, limit);
     return disk_space;
 #else
-    disk_space.free = freespace < 0 ? 0 : (freespace * 1024);
-    disk_space.total = limit < 0 ? 0 : (limit * 1024);
+    disk_space.free = std::max(int64_t{ 0 }, freespace * 1024);
+    disk_space.total = std::max(int64_t{ 0 }, limit * 1024);
     return disk_space;
 #endif
 }

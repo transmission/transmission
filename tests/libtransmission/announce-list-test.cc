@@ -337,7 +337,7 @@ TEST_F(AnnounceListTest, announceToScrape)
         { "udp://www.example.com:999/"sv, "udp://www.example.com:999/"sv },
     } };
 
-    for (auto const test : Tests)
+    for (auto const& test : Tests)
     {
         auto const scrape = tr_announce_list::announce_to_scrape(tr_quark_new(test.announce));
         EXPECT_EQ(tr_quark_new(test.expected_scrape), scrape);

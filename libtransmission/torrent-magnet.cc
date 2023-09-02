@@ -130,7 +130,7 @@ bool tr_torrentUseMetainfoFromFile(
     tr_error** error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, tor->torrent_file(), error))
+    if (!tr_sys_path_copy(filename_in, tor->torrent_file().c_str(), error))
     {
         return false;
     }
@@ -242,8 +242,6 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
     build_metainfo_except_info_dict(tor->metainfo_, &top_v);
     tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &*info_dict_v);
     auto const benc = serde.to_string(top_v);
-    tr_variantClear(&top_v);
-    tr_variantClear(&*info_dict_v);
 
     // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};
@@ -403,7 +401,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return std::string{ tor->metainfo_.magnet().sv() };
+    return tor->metainfo_.magnet();
 }
 
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)
