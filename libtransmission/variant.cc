@@ -169,11 +169,17 @@ bool tr_variantGetInt(tr_variant const* const var, int64_t* setme)
     switch (variant_index(var))
     {
     case tr_variant::IntIndex:
-        *setme = *var->get_if<tr_variant::IntIndex>();
+        if (setme != nullptr)
+        {
+            *setme = *var->get_if<tr_variant::IntIndex>();
+        }
         return true;
 
     case tr_variant::BoolIndex:
-        *setme = *var->get_if<tr_variant::BoolIndex>() ? 1 : 0;
+        if (setme != nullptr)
+        {
+            *setme = *var->get_if<tr_variant::BoolIndex>() ? 1 : 0;
+        }
         return true;
 
     default:

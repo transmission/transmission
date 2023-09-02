@@ -242,40 +242,18 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
         BOOL const error = torrent.anyErrorOrWarning;
 
+        TorrentCell* torrentCell;
         if (minimal)
         {
-            SmallTorrentCell* smallCell = [outlineView makeViewWithIdentifier:@"SmallTorrentCell" owner:self];
-            smallCell.fTorrentTableView = self;
+            torrentCell = [outlineView makeViewWithIdentifier:@"SmallTorrentCell" owner:self];
 
-            //set this so that we can draw bar in smallCell drawRect
-            smallCell.objectValue = torrent;
+            // set torrent icon or error badge
+            torrentCell.fIconView.image = error ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
 
-            smallCell.fTorrentTitleField.stringValue = torrent.name;
-
-            //set torrent icon
-            smallCell.fIconView.image = error ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
-
-            smallCell.fTorrentStatusField.stringValue = [self.fDefaults boolForKey:@"DisplaySmallStatusRegular"] ?
+            // set torrent status
+            torrentCell.fTorrentStatusField.stringValue = [self.fDefaults boolForKey:@"DisplaySmallStatusRegular"] ?
                 torrent.shortStatusString :
                 torrent.remainingTimeString;
-            ;
-            smallCell.fActionButton.action = @selector(displayTorrentActionPopover:);
-
-            NSInteger const groupValue = torrent.groupValue;
-            NSImage* groupImage;
-            if (groupValue != -1)
-            {
-                if (![self.fDefaults boolForKey:@"SortByGroup"])
-                {
-                    NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
-                    groupImage = [NSImage discIconWithColor:groupColor insetFactor:0];
-                }
-            }
-
-            smallCell.fGroupIndicatorView.image = groupImage;
-
-            smallCell.fControlButton.action = @selector(toggleControlForTorrent:);
-            smallCell.fRevealButton.action = @selector(revealTorrentFile:);
 
             if (self.fHoverEventDict)
             {
@@ -284,49 +262,35 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
                 if (row == hoverRow)
                 {
-                    smallCell.fTorrentStatusField.hidden = YES;
-                    smallCell.fControlButton.hidden = NO;
-                    smallCell.fRevealButton.hidden = NO;
+                    torrentCell.fTorrentStatusField.hidden = YES;
+                    torrentCell.fControlButton.hidden = NO;
+                    torrentCell.fRevealButton.hidden = NO;
                 }
             }
             else
             {
-                smallCell.fTorrentStatusField.hidden = NO;
-                smallCell.fControlButton.hidden = YES;
-                smallCell.fRevealButton.hidden = YES;
+                torrentCell.fTorrentStatusField.hidden = NO;
+                torrentCell.fControlButton.hidden = YES;
+                torrentCell.fRevealButton.hidden = YES;
             }
-
-            //redraw buttons
-            [smallCell.fControlButton display];
-            [smallCell.fRevealButton display];
-
-            return smallCell;
         }
         else
         {
-            TorrentCell* torrentCell = [outlineView makeViewWithIdentifier:@"TorrentCell" owner:self];
-            torrentCell.fTorrentTableView = self;
-
-            //set this so that we can draw bar in torrentCell drawRect
-            torrentCell.objectValue = torrent;
-
-            torrentCell.fTorrentTitleField.stringValue = torrent.name;
+            torrentCell = [outlineView makeViewWithIdentifier:@"TorrentCell" owner:self];
             torrentCell.fTorrentProgressField.stringValue = torrent.progressString;
 
-            //set torrent icon
+            // set torrent icon and error badge
             NSImage* fileImage = torrent.icon;
-
-            //error badge
             if (error)
             {
                 NSRect frame = torrentCell.fIconView.frame;
                 NSImage* resultImage = [[NSImage alloc] initWithSize:NSMakeSize(frame.size.height, frame.size.width)];
                 [resultImage lockFocus];
 
-                //draw fileImage
+                // draw fileImage
                 [fileImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 
-                //overlay error badge
+                // overlay error badge
                 NSImage* errorImage = [NSImage imageNamed:NSImageNameCaution];
                 NSRect const errorRect = NSMakeRect(frame.origin.x, 0, kErrorImageSize, kErrorImageSize);
                 [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
@@ -342,6 +306,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
                 torrentCell.fIconView.image = fileImage;
             }
 
+            // set torrent status
             NSString* status;
             if (self.fHoverEventDict)
             {
@@ -353,31 +318,39 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
                     status = self.fHoverEventDict[@"string"];
                 }
             }
-            torrentCell.fTorrentStatusField.stringValue = status ? status : torrent.statusString;
-            torrentCell.fActionButton.action = @selector(displayTorrentActionPopover:);
-
-            NSInteger const groupValue = torrent.groupValue;
-            NSImage* groupImage;
-            if (groupValue != -1)
-            {
-                if (![self.fDefaults boolForKey:@"SortByGroup"])
-                {
-                    NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
-                    groupImage = [NSImage discIconWithColor:groupColor insetFactor:0];
-                }
-            }
-
-            torrentCell.fGroupIndicatorView.image = groupImage;
-
-            torrentCell.fControlButton.action = @selector(toggleControlForTorrent:);
-            torrentCell.fRevealButton.action = @selector(revealTorrentFile:);
-
-            //redraw buttons
-            [torrentCell.fControlButton display];
-            [torrentCell.fRevealButton display];
-
-            return torrentCell;
+            torrentCell.fTorrentStatusField.stringValue = status ?: torrent.statusString;
         }
+
+        torrentCell.fTorrentTableView = self;
+
+        // set this so that we can draw bar in torrentCell drawRect
+        torrentCell.objectValue = torrent;
+
+        torrentCell.fTorrentTitleField.stringValue = torrent.name;
+
+        torrentCell.fActionButton.action = @selector(displayTorrentActionPopover:);
+
+        NSInteger const groupValue = torrent.groupValue;
+        NSImage* groupImage;
+        if (groupValue != -1)
+        {
+            if (![self.fDefaults boolForKey:@"SortByGroup"])
+            {
+                NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
+                groupImage = [NSImage discIconWithColor:groupColor insetFactor:0];
+            }
+        }
+
+        torrentCell.fGroupIndicatorView.image = groupImage;
+
+        torrentCell.fControlButton.action = @selector(toggleControlForTorrent:);
+        torrentCell.fRevealButton.action = @selector(revealTorrentFile:);
+
+        // redraw buttons
+        [torrentCell.fControlButton display];
+        [torrentCell.fRevealButton display];
+
+        return torrentCell;
     }
     else
     {
