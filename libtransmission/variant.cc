@@ -380,13 +380,6 @@ void tr_variantInitStr(tr_variant* initme, std::string_view value)
     *initme = value;
 }
 
-void tr_variantInitList(tr_variant* initme, size_t reserve_count)
-{
-    auto vec = tr_variant::Vector{};
-    vec.reserve(reserve_count);
-    *initme = std::move(vec);
-}
-
 void tr_variantListReserve(tr_variant* const var, size_t count)
 {
     TR_ASSERT(var != nullptr);
@@ -550,7 +543,7 @@ tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark key, void const
 tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark key, size_t reserve_count)
 {
     auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitList(child, reserve_count);
+    *child = tr_variant::make_vector(reserve_count);
     return child;
 }
 

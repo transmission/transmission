@@ -266,7 +266,6 @@ void tr_variantInitInt(tr_variant* initme, int64_t value);
 
 // --- Lists
 
-void tr_variantInitList(tr_variant* initme, size_t reserve_count);
 void tr_variantListReserve(tr_variant* var, size_t reserve_count);
 
 tr_variant* tr_variantListAdd(tr_variant* var);

@@ -222,7 +222,7 @@ struct MyHandler : public transmission::benc::Handler
             return false;
         }
 
-        tr_variantInitList(variant, 0);
+        *variant = tr_variant::make_vector();
         stack_.push_back(variant);
         return true;
     }
