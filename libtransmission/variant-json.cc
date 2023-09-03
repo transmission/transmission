@@ -141,7 +141,7 @@ void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsons
         }
         else
         {
-            tr_variantInitDict(node, n);
+            *node = tr_variant::make_map(n);
         }
     }
 }

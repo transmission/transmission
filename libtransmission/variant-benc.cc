@@ -191,7 +191,7 @@ struct MyHandler : public transmission::benc::Handler
             return false;
         }
 
-        tr_variantInitDict(variant, 0);
+        *variant = tr_variant::make_map();
         stack_.push_back(variant);
         return true;
     }

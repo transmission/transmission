@@ -78,14 +78,14 @@ public:
         *this = std::move(value);
     }
 
-    [[nodiscard]] auto make_map(size_t /*n_reserve*/ = 0U)
+    [[nodiscard]] static auto make_map(size_t /*n_reserve*/ = 0U)
     {
         auto ret = tr_variant{};
         ret.val_.emplace<Map>();
         return ret;
     }
 
-    [[nodiscard]] auto make_vector(size_t n_reserve = 0U)
+    [[nodiscard]] static auto make_vector(size_t n_reserve = 0U)
     {
         auto ret = tr_variant{};
         ret.val_.emplace<Vector>().reserve(n_reserve);
@@ -298,7 +298,6 @@ bool tr_variantListRemove(tr_variant* var, size_t pos);
 
 // --- Dictionaries
 
-void tr_variantInitDict(tr_variant* initme, size_t reserve_count);
 void tr_variantDictReserve(tr_variant* var, size_t reserve_count);
 bool tr_variantDictRemove(tr_variant* var, tr_quark key);
 

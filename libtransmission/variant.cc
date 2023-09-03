@@ -398,11 +398,6 @@ void tr_variantListReserve(tr_variant* const var, size_t count)
     }
 }
 
-void tr_variantInitDict(tr_variant* initme, size_t /*reserve_count*/)
-{
-    *initme = tr_variant::Map{};
-}
-
 void tr_variantDictReserve(tr_variant* const /*var*/, size_t /*reserve_count*/)
 {
 }
@@ -479,7 +474,7 @@ tr_variant* tr_variantListAddList(tr_variant* const var, size_t reserve_count)
 tr_variant* tr_variantListAddDict(tr_variant* const var, size_t reserve_count)
 {
     auto* const child = tr_variantListAdd(var);
-    tr_variantInitDict(child, reserve_count);
+    *child = tr_variant::make_map(reserve_count);
     return child;
 }
 
@@ -562,7 +557,7 @@ tr_variant* tr_variantDictAddList(tr_variant* const var, tr_quark key, size_t re
 tr_variant* tr_variantDictAddDict(tr_variant* const var, tr_quark key, size_t reserve_count)
 {
     auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitDict(child, reserve_count);
+    *child = tr_variant::make_map(reserve_count);
     return child;
 }
 

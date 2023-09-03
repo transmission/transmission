@@ -689,7 +689,7 @@ void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant*
 
     case TR_KEY_peersFrom:
         {
-            tr_variantInitDict(initme, 7);
+            *initme = tr_variant::make_map(7U);
             auto const* f = st->peersFrom;
             tr_variantDictAddInt(initme, TR_KEY_fromCache, f[TR_PEER_FROM_RESUME]);
             tr_variantDictAddInt(initme, TR_KEY_fromDht, f[TR_PEER_FROM_DHT]);
@@ -884,7 +884,7 @@ void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quar
     }
     else
     {
-        tr_variantInitDict(entry, field_count);
+        *entry = tr_variant::make_map(field_count);
     }
 
     if (field_count > 0)
@@ -2523,8 +2523,7 @@ void tr_rpc_request_exec_json(
     /* if we couldn't figure out which method to use, return an error */
     if (result != nullptr)
     {
-        auto response = tr_variant{};
-        tr_variantInitDict(&response, 3);
+        auto response = tr_variant::make_map(3U);
         tr_variantDictAddDict(&response, TR_KEY_arguments, 0);
         tr_variantDictAddStr(&response, TR_KEY_result, result);
 
@@ -2537,8 +2536,7 @@ void tr_rpc_request_exec_json(
     }
     else if (method->immediate)
     {
-        auto response = tr_variant{};
-        tr_variantInitDict(&response, 3);
+        auto response = tr_variant::make_map(3U);
         tr_variant* const args_out = tr_variantDictAddDict(&response, TR_KEY_arguments, 0);
         result = (*method->func)(session, args_in, args_out, nullptr);
 
@@ -2560,7 +2558,7 @@ void tr_rpc_request_exec_json(
     {
         auto* const data = new tr_rpc_idle_data{};
         data->session = session;
-        tr_variantInitDict(&data->response, 3);
+        data->response = tr_variant::make_map(3U);
 
         if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
