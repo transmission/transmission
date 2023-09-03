@@ -166,7 +166,7 @@ public:
             curl_ca_bundle = std::move(bundle);
         }
 
-        shareEverything();
+        share_setopt();
 
         if (curl_ssl_verify)
         {
@@ -757,24 +757,23 @@ public:
         return curlsh_.get();
     }
 
-    void shareEverything()
+    void share_setopt()
     {
-        // Tell curl to share whatever it can.
-        // https://curl.se/libcurl/c/CURLSHOPT_SHARE.html
-        //
-        // The user's system probably has a different version of curl than
-        // we're compiling with; so instead of listing fields by name, just
-        // loop until curl says we've exhausted the list.
+        // Do *not* share HSTS cache
+        // https://github.com/transmission/transmission/issues/5199
 
         auto* const sh = shared();
-        for (long type = CURL_LOCK_DATA_COOKIE;; ++type)
-        {
-            if (curl_share_setopt(sh, CURLSHOPT_SHARE, type) != CURLSHE_OK)
-            {
-                tr_logAddDebug(fmt::format("CURLOPT_SHARE ended at {}", type));
-                return;
-            }
-        }
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
+#if LIBCURL_VERSION_NUM >= 0x071700 /* 7.23.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
+#endif
+#if LIBCURL_VERSION_NUM >= 0x073900 /* 7.57.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);
+#endif
+#if LIBCURL_VERSION_NUM >= 0x073D00 /* 7.61.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_PSL);
+#endif
     }
 
     static inline auto curl_init_flag = std::once_flag{};
