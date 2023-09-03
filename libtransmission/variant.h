@@ -42,8 +42,29 @@ public:
         MapIndex = 6
     };
 
+    class Map : public std::map<tr_quark, tr_variant>
+    {
+    public:
+        template<typename Val>
+        [[nodiscard]] Val const* find_if(tr_quark key) const noexcept
+        {
+            auto const iter = find(key);
+            return iter != end() ? iter->second.get_if<Val>() : nullptr;
+        }
+
+        template<typename Val>
+        [[nodiscard]] std::optional<Val> get_if(tr_quark key) const noexcept
+        {
+            if (auto const* const val = find_if<Val>(key); val != nullptr)
+            {
+                return *val;
+            }
+
+            return std::nullopt;
+        }
+    };
+
     using Vector = std::vector<tr_variant>;
-    using Map = std::map<tr_quark, tr_variant>;
 
     constexpr tr_variant() noexcept = default;
     tr_variant(tr_variant const&) = delete;
@@ -55,6 +76,20 @@ public:
     explicit tr_variant(Val value)
     {
         *this = std::move(value);
+    }
+
+    [[nodiscard]] auto make_map(size_t /*n_reserve*/ = 0U)
+    {
+        auto ret = tr_variant{};
+        ret.val_.emplace<Map>();
+        return ret;
+    }
+
+    [[nodiscard]] auto make_vector(size_t n_reserve = 0U)
+    {
+        auto ret = tr_variant{};
+        ret.val_.emplace<Vector>().reserve(n_reserve);
+        return ret;
     }
 
     template<typename Val>
