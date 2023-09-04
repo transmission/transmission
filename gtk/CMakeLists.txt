@@ -219,7 +219,8 @@ install(
 set(PUBLIC_ICONS
     hicolor_apps_scalable_transmission.svg
     hicolor_apps_scalable_transmission-devel.svg
-    hicolor_apps_symbolic_transmission-symbolic.svg)
+    hicolor_apps_symbolic_transmission-symbolic.svg
+    transmission-tray-icon.svg)
 
 set(ICON_NAME_REGEX "^([^_]+)_([^_]+)_([^_]+)_(.+)$")
 foreach(ICON ${PUBLIC_ICONS})
