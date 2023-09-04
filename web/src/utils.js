@@ -62,6 +62,11 @@ export function createTextualTabsContainer(id, tabs, callback) {
   buttons.classList.add('tabs-buttons');
   root.append(buttons);
 
+  const dismiss = document.createElement('button');
+  dismiss.classList.add('tabs-container-close');
+  dismiss.innerHTML = '&times;';
+  root.append(dismiss);
+
   const pages = document.createElement('div');
   pages.classList.add('tabs-pages');
   root.append(pages);
@@ -89,6 +94,7 @@ export function createTextualTabsContainer(id, tabs, callback) {
 
   return {
     buttons: button_array,
+    dismiss,
     root,
   };
 }

@@ -50,6 +50,10 @@ export class PrefsDialog extends EventTarget {
   }
 
   _onPortChecked(response) {
+    if (this.closed) {
+      return;
+    }
+
     const element = this.elements.network.port_status_label;
     const is_open = response.arguments['port-is-open'];
     element.dataset.open = is_open;
@@ -783,6 +787,7 @@ export class PrefsDialog extends EventTarget {
         PrefsDialog._toggleProtocolHandler(event_.currentTarget);
       },
     );
+    this.elements.dismiss.addEventListener('click', () => this.close());
     this.outside = new OutsideClickListener(this.elements.root);
     this.outside.addEventListener('click', () => this.close());
 

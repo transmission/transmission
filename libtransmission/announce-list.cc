@@ -87,7 +87,7 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     tracker.announce = announce_url_sv;
     tracker.tier = get_tier(tier, *announce);
     tracker.id = next_unique_id();
-    tracker.host_and_port = fmt::format(FMT_STRING("{:s}:{:d}"), announce->host, announce->port);
+    tracker.host_and_port = fmt::format("{:s}:{:d}", announce->host, announce->port);
     tracker.sitename = announce->sitename;
     tracker.query = announce->query;
 

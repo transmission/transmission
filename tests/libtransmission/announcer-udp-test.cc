@@ -162,7 +162,7 @@ protected:
         response.rows[0].seeders = 1;
         response.rows[0].leechers = 2;
         response.rows[0].downloads = 3;
-        response.rows[0].downloaders = 0;
+        response.rows[0].downloaders = std::nullopt;
         response.scrape_url = DefaultScrapeUrl;
         response.min_request_interval = 0;
 
@@ -353,9 +353,9 @@ TEST_F(AnnouncerUdpTest, canScrape)
     auto buf = MessageBuffer{};
     buf.add_uint32(ScrapeAction);
     buf.add_uint32(scrape_transaction_id);
-    buf.add_uint32(expected_response.rows[0].seeders);
-    buf.add_uint32(expected_response.rows[0].downloads);
-    buf.add_uint32(expected_response.rows[0].leechers);
+    buf.add_uint32(expected_response.rows[0].seeders.value_or(-1));
+    buf.add_uint32(expected_response.rows[0].downloads.value_or(-1));
+    buf.add_uint32(expected_response.rows[0].leechers.value_or(-1));
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
     buf.to_buf(std::data(arr), response_size);
@@ -408,8 +408,8 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     expected_response.did_connect = true;
     expected_response.did_timeout = false;
     expected_response.row_count = 2;
-    expected_response.rows[0] = { tr_rand_obj<tr_sha1_digest_t>(), 1, 2, 3, 0 };
-    expected_response.rows[1] = { tr_rand_obj<tr_sha1_digest_t>(), 4, 5, 6, 0 };
+    expected_response.rows[0] = { tr_rand_obj<tr_sha1_digest_t>(), 1, 2, 3, std::nullopt };
+    expected_response.rows[1] = { tr_rand_obj<tr_sha1_digest_t>(), 4, 5, 6, std::nullopt };
     expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
 
@@ -432,9 +432,9 @@ TEST_F(AnnouncerUdpTest, canMultiScrape)
     buf.add_uint32(scrape_transaction_id);
     for (int i = 0; i < expected_response.row_count; ++i)
     {
-        buf.add_uint32(expected_response.rows[i].seeders);
-        buf.add_uint32(expected_response.rows[i].downloads);
-        buf.add_uint32(expected_response.rows[i].leechers);
+        buf.add_uint32(expected_response.rows[i].seeders.value_or(-1));
+        buf.add_uint32(expected_response.rows[i].downloads.value_or(-1));
+        buf.add_uint32(expected_response.rows[i].leechers.value_or(-1));
     }
     auto response_size = std::size(buf);
     auto arr = std::array<uint8_t, 256>{};
@@ -455,10 +455,10 @@ TEST_F(AnnouncerUdpTest, canHandleScrapeError)
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
     expected_response.rows[0].info_hash = tr_rand_obj<tr_sha1_digest_t>();
-    expected_response.rows[0].seeders = -1;
-    expected_response.rows[0].leechers = -1;
-    expected_response.rows[0].downloads = -1;
-    expected_response.rows[0].downloaders = 0;
+    expected_response.rows[0].seeders = std::nullopt;
+    expected_response.rows[0].leechers = std::nullopt;
+    expected_response.rows[0].downloads = std::nullopt;
+    expected_response.rows[0].downloaders = std::nullopt;
     expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unrecognized info-hash";
@@ -505,10 +505,10 @@ TEST_F(AnnouncerUdpTest, canHandleConnectError)
     expected_response.did_timeout = false;
     expected_response.row_count = 1;
     expected_response.rows[0].info_hash = tr_rand_obj<tr_sha1_digest_t>();
-    expected_response.rows[0].seeders = -1; // -1 here & on next lines means error
-    expected_response.rows[0].leechers = -1;
-    expected_response.rows[0].downloads = -1;
-    expected_response.rows[0].downloaders = 0;
+    expected_response.rows[0].seeders = std::nullopt; // empty optional here & on next lines means error
+    expected_response.rows[0].leechers = std::nullopt;
+    expected_response.rows[0].downloads = std::nullopt;
+    expected_response.rows[0].downloaders = std::nullopt;
     expected_response.scrape_url = DefaultScrapeUrl;
     expected_response.min_request_interval = 0;
     expected_response.errmsg = "Unable to Connect";
@@ -616,7 +616,7 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     expected_response.min_interval = 0; // not specified in UDP announce
     expected_response.seeders = Seeders;
     expected_response.leechers = Leechers;
-    expected_response.downloads = -1; // not specified in UDP announce
+    expected_response.downloads = std::nullopt; // not specified in UDP announce
     expected_response.pex = std::vector<tr_pex>{ tr_pex{ addresses[0] }, tr_pex{ addresses[1] }, tr_pex{ addresses[2] } };
     expected_response.pex6 = {};
     expected_response.errmsg = {};
@@ -646,8 +646,8 @@ TEST_F(AnnouncerUdpTest, canAnnounce)
     buf.add_uint32(AnnounceAction);
     buf.add_uint32(udp_ann_req.transaction_id);
     buf.add_uint32(expected_response.interval);
-    buf.add_uint32(expected_response.leechers);
-    buf.add_uint32(expected_response.seeders);
+    buf.add_uint32(expected_response.leechers.value_or(-1));
+    buf.add_uint32(expected_response.seeders.value_or(-1));
     for (auto const& [addr, port] : addresses)
     {
         // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
