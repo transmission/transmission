@@ -951,15 +951,14 @@ public:
 
     static void create()
     {
-        // NOLINT(exit-time-destructors)
         if (!instance)
         {
             instance = std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
         }
-        // NOLINTEND
     }
 
 private:
+    // NOLINTNEXTLINE(clang-diagnostic-exit-time-destructors)
     static inline std::unique_ptr<tr_net_init_mgr> instance{};
 };
 
