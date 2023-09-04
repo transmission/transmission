@@ -53,7 +53,7 @@ private:
     void SetUp() override
     {
         ::testing::Test::SetUp();
-        init_mgr_ = tr_lib_init();
+        tr_lib_init();
         tr_timeUpdate(time(nullptr));
     }
 
@@ -306,8 +306,6 @@ protected:
         timer->start_repeating(200ms);
         return timer;
     }
-
-    std::unique_ptr<tr_net_init_mgr> init_mgr_;
 
     // https://www.bittorrent.org/beps/bep_0015.html
     static auto constexpr ProtocolId = uint64_t{ 0x41727101980ULL };
