@@ -474,16 +474,16 @@ void get_settings_filename(tr_pathbuf& setme, char const* config_dir, char const
 
 void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
 {
-    tr_session_settings{}.save(setme_dictionary);
-    tr_rpc_server::default_settings(setme_dictionary);
-    tr_session_alt_speeds::default_settings(setme_dictionary);
+    setme_dictionary->merge(tr_session_settings::default_settings());
+    setme_dictionary->merge(tr_rpc_server::default_settings());
+    setme_dictionary->merge(tr_session_alt_speeds::default_settings());
 }
 
 void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
 {
-    session->settings_.save(setme_dictionary);
-    session->alt_speeds_.save(setme_dictionary);
-    session->rpc_server_->save(setme_dictionary);
+    setme_dictionary->merge(session->settings_.settings());
+    setme_dictionary->merge(session->alt_speeds_.settings());
+    setme_dictionary->merge(session->rpc_server_->settings());
 
     tr_variantDictRemove(setme_dictionary, TR_KEY_message_level);
     tr_variantDictAddInt(setme_dictionary, TR_KEY_message_level, tr_logGetLevel());
@@ -592,7 +592,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     }
 
     /* initialize the bare skeleton of the session object */
-    auto* const session = new tr_session{ config_dir };
+    auto* const session = new tr_session{ config_dir, tr_variant::make_map() };
     bandwidthGroupRead(session, config_dir);
 
     auto data = tr_session::init_data{};
@@ -675,12 +675,12 @@ void tr_session::setSettings(tr_variant* settings_dict, bool force)
 
     // load the session settings
     auto new_settings = tr_session_settings{};
-    new_settings.load(settings_dict);
+    new_settings.load(*settings_dict);
     setSettings(std::move(new_settings), force);
 
     // delegate loading out the other settings
-    alt_speeds_.load(settings_dict);
-    rpc_server_->load(settings_dict);
+    alt_speeds_.load(*settings_dict);
+    rpc_server_->load(*settings_dict);
 }
 
 void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
@@ -2139,7 +2139,7 @@ auto makeBlocklistDir(std::string_view config_dir)
 
 } // namespace
 
-tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
+tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_dict)
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }

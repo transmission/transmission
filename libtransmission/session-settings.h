@@ -82,13 +82,14 @@ struct tr_session_settings
 {
     tr_session_settings() = default;
 
-    explicit tr_session_settings(tr_variant* src)
+    explicit tr_session_settings(tr_variant const& src)
     {
         load(src);
     }
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
 #define V(key, name, type, default_value, comment) type name = type{ default_value };
     SESSION_SETTINGS_FIELDS(V)

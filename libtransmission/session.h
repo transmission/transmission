@@ -352,7 +352,7 @@ private:
     };
 
 public:
-    explicit tr_session(std::string_view config_dir, tr_variant* settings_dict = nullptr);
+    explicit tr_session(std::string_view config_dir, tr_variant const& settings_dict);
 
     [[nodiscard]] std::string_view sessionId() const noexcept
     {
