@@ -69,6 +69,7 @@
 #include <iterator> // std::back_inserter
 #include <map>
 #include <memory>
+#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -473,34 +474,33 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
 
     case TR_RPC_SESSION_CHANGED:
         {
-            tr_variant tmp;
-            tr_variant* newval = nullptr;
-            tr_variant* oldvals = gtr_pref_get_all();
-            tr_quark key = TR_KEY_NONE;
-            std::vector<tr_quark> changed_keys;
             auto const* const session = core_->get_session();
-            tr_variantInitDict(&tmp, 100);
-            tr_sessionGetSettings(session, &tmp);
+            auto const newvals = tr_sessionGetSettings(session);
 
+            // determine which settings changed
+            auto changed_keys = std::set<tr_quark>{};
+            auto* const oldvals = gtr_pref_get_all();
             auto const serde = tr_variant_serde::benc();
-            for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
+            for (auto const& [key, newval] : *newvals.get_if<tr_variant::Map>())
             {
                 bool changed = true;
 
                 if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval != nullptr)
                 {
-                    changed = serde.to_string(*oldval) != serde.to_string(*newval);
+                    changed = serde.to_string(*oldval) != serde.to_string(newval);
                 }
 
                 if (changed)
                 {
-                    changed_keys.push_back(key);
+                    changed_keys.emplace(key);
                 }
             }
 
-            tr_sessionGetSettings(session, oldvals);
+            // update our settings
+            oldvals->merge(newvals);
 
-            for (auto const changed_key : changed_keys)
+            // emit change notifications
+            for (auto const& changed_key : changed_keys)
             {
                 core_->signal_prefs_changed().emit(changed_key);
             }

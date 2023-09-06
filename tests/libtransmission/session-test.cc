@@ -331,9 +331,7 @@ TEST_F(SessionTest, savesSettings)
     tr_sessionSetRPCEnabled(session_, true);
 
     // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetSettings(session_, &settings);
+    auto settings = tr_sessionGetSettings(session_);
     for (auto const& key : { TR_KEY_peer_port_random_on_start, TR_KEY_alt_speed_time_enabled, TR_KEY_rpc_enabled })
     {
         auto flag = bool{};

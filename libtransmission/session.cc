@@ -481,14 +481,17 @@ tr_variant tr_sessionGetDefaultSettings()
     return ret;
 }
 
-void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
+tr_variant tr_sessionGetSettings(tr_session const* session)
 {
-    setme_dictionary->merge(session->settings_.settings());
-    setme_dictionary->merge(session->alt_speeds_.settings());
-    setme_dictionary->merge(session->rpc_server_->settings());
+    auto settings = tr_variant::make_map();
+    settings.merge(session->settings_.settings());
+    settings.merge(session->alt_speeds_.settings());
+    settings.merge(session->rpc_server_->settings());
 
-    tr_variantDictRemove(setme_dictionary, TR_KEY_message_level);
-    tr_variantDictAddInt(setme_dictionary, TR_KEY_message_level, tr_logGetLevel());
+    tr_variantDictRemove(&settings, TR_KEY_message_level);
+    tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
+
+    return settings;
 }
 
 bool tr_sessionLoadSettings(tr_variant* settings_in, char const* config_dir, char const* app_name)
@@ -552,12 +555,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     tr_variantMergeDicts(&settings, client_settings);
 
     /* the session's true values override the file & client settings */
-    {
-        auto session_settings = tr_variant{};
-        tr_variantInitDict(&session_settings, 0);
-        tr_sessionGetSettings(session, &session_settings);
-        tr_variantMergeDicts(&settings, &session_settings);
-    }
+    settings.merge(tr_sessionGetSettings(session));
 
     /* save the result */
     tr_variant_serde::json().to_file(settings, filename);

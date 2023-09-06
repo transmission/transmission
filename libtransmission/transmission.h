@@ -155,7 +155,7 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
  *         fprintf(stderr, "the default peer port is %d\n", (int)i);
  * @endcode
  *
- * @param setme_dictionary pointer to a tr_variant dictionary
+ * @return a variant map of the default settinggs
  * @see `tr_sessionLoadSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_getDefaultConfigDir()`
@@ -167,11 +167,11 @@ tr_variant tr_sessionGetDefaultSettings();
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param session          the session to query
- * @param setme_dictionary the dictionary to populate
+ * @return a variant map of the session's current settings
+ * @param session the session to query
  * @see `tr_sessionGetDefaultSettings()`
  */
-void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_dictionary);
+tr_variant tr_sessionGetSettings(tr_session const* session);
 
 /**
  * Load settings from the configuration directory's settings.json file,
