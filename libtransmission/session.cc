@@ -472,11 +472,13 @@ void get_settings_filename(tr_pathbuf& setme, char const* config_dir, char const
 } // namespace settings_helpers
 } // namespace
 
-void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
+tr_variant tr_sessionGetDefaultSettings()
 {
-    setme_dictionary->merge(tr_session_settings::default_settings());
-    setme_dictionary->merge(tr_rpc_server::default_settings());
-    setme_dictionary->merge(tr_session_alt_speeds::default_settings());
+    auto ret = tr_variant::make_map();
+    ret.merge(tr_session_settings::default_settings());
+    ret.merge(tr_rpc_server::default_settings());
+    ret.merge(tr_session_alt_speeds::default_settings());
+    return ret;
 }
 
 void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
@@ -497,9 +499,7 @@ bool tr_sessionLoadSettings(tr_variant* settings_in, char const* config_dir, cha
     TR_ASSERT(settings_in->holds_alternative<tr_variant::Map>());
 
     // first, start with the libtransmission default settings
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
+    auto settings = tr_sessionGetDefaultSettings();
 
     // now use the app default settings passed in
     tr_variantMergeDicts(&settings, settings_in);
@@ -638,9 +638,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
 
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
+    auto settings = tr_sessionGetDefaultSettings();
     tr_variantMergeDicts(&settings, client_settings);
 
 #ifndef _WIN32

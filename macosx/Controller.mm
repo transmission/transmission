@@ -417,9 +417,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //upgrading from versions < 2.40: clear recent items
         [NSDocumentController.sharedDocumentController clearRecentDocuments:nil];
 
-        tr_variant settings;
-        tr_variantInitDict(&settings, 41);
-        tr_sessionGetDefaultSettings(&settings);
+        auto settings = tr_sessionGetDefaultSettings();
 
         BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
         if (!usesSpeedLimitSched)
