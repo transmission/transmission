@@ -1647,7 +1647,7 @@ void onVerifyDoneThreadFunc(tr_torrent* const tor)
     }
 }
 
-void verifyTorrent(tr_torrent* const tor)
+void verifyTorrent(tr_torrent* const tor, bool force)
 {
     TR_ASSERT(tor->session->am_in_session_thread());
     auto const lock = tor->unique_lock();
@@ -1670,7 +1670,7 @@ void verifyTorrent(tr_torrent* const tor)
         torrentStop(tor);
     }
 
-    if (!setLocalErrorIfFilesDisappeared(tor))
+    if (force || !setLocalErrorIfFilesDisappeared(tor))
     {
         tor->session->verifyAdd(tor);
     }
@@ -1690,11 +1690,11 @@ void tr_torrentOnVerifyDone(tr_torrent* tor, bool aborted)
     tor->session->runInSessionThread(onVerifyDoneThreadFunc, tor);
 }
 
-void tr_torrentVerify(tr_torrent* tor)
+void tr_torrentVerify(tr_torrent* tor, bool force)
 {
     using namespace verify_helpers;
 
-    tor->session->runInSessionThread(verifyTorrent, tor);
+    tor->session->runInSessionThread(verifyTorrent, tor, force);
 }
 
 void tr_torrent::set_verify_state(tr_verify_state state)
