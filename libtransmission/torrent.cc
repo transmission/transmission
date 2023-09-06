@@ -1895,8 +1895,8 @@ void tr_torrent::recheck_completeness()
                 this,
                 fmt::format(
                     "State changed from {} to {}",
-                    get_completion_string(this->completeness),
-                    get_completion_string(completeness)));
+                    get_completion_string(completeness),
+                    get_completion_string(new_completeness)));
         }
 
         this->completeness = new_completeness;
