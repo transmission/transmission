@@ -642,11 +642,11 @@ A stats object contains:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| uploadedBytes    | number     | tr_session_stats
-| downloadedBytes  | number     | tr_session_stats
-| filesAdded       | number     | tr_session_stats
-| sessionCount     | number     | tr_session_stats
-| secondsActive    | number     | tr_session_stats
+| `uploadedBytes`    | number     | tr_session_stats
+| `downloadedBytes`  | number     | tr_session_stats
+| `filesAdded`       | number     | tr_session_stats
+| `sessionCount`     | number     | tr_session_stats
+| `secondsActive`    | number     | tr_session_stats
 
 ### 4.3 Blocklist
 Method name: `blocklist-update`
@@ -665,17 +665,18 @@ Request arguments:
 
 | Key | Value Type | Description
 | :-- | :-- | :--
-| ipProtocol | number | see below
+| `ipProtocol` | number | see below
 
 `ipProtocol` indicates the IP protocol version to be used to check the port status.
 Set to `0` to *only* check for IPv4 port status, set to `1` to *only* check for IPv6 port status,
 or omit it to check if the port is open on *any* of the IP protocol versions.
 
 Response arguments:
+
 | Key | Value Type | Description
 | :-- | :-- | :--
-| port-is-open | boolean | whether the port is open
-| ipProtocol | number | mirrors the description of request argument `IpProtocol`
+| `port-is-open` | boolean | true if port is open, false if port is closed
+| `ipProtocol` | number | mirrors the description of request argument `IpProtocol`
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
