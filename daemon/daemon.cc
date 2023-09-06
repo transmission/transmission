@@ -669,7 +669,6 @@ void tr_daemon::reconfigure(void)
     }
     else
     {
-        tr_variant newsettings;
         char const* configDir;
 
         /* reopen the logfile to allow for log rotation */
@@ -680,9 +679,11 @@ void tr_daemon::reconfigure(void)
 
         configDir = tr_sessionGetConfigDir(my_session_);
         tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", configDir)));
-        tr_variantInitDict(&newsettings, 0);
+
+        auto newsettings = tr_variant::make_map();
         tr_variantDictAddBool(&newsettings, TR_KEY_rpc_enabled, true);
-        tr_sessionLoadSettings(&newsettings, configDir, MyName);
+        newsettings.merge(tr_sessionLoadSettings(configDir, MyName));
+
         tr_sessionSet(my_session_, &newsettings);
         tr_sessionReloadBlocklists(my_session_);
     }
@@ -905,9 +906,9 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
-    tr_variantInitDict(&settings_, 0);
+    settings_ = tr_variant::make_map();
     tr_variantDictAddBool(&settings_, TR_KEY_rpc_enabled, true);
-    bool const loaded = tr_sessionLoadSettings(&settings_, config_dir_.c_str(), MyName);
+    settings_.merge(tr_sessionLoadSettings(config_dir_.c_str(), MyName));
 
     bool dumpSettings;
 
@@ -923,13 +924,6 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     {
         logfile_ = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
         logfile_flush_ = tr_sys_file_flush_possible(logfile_);
-    }
-
-    if (!loaded)
-    {
-        printMessage(logfile_, TR_LOG_ERROR, MyName, "Error loading config file -- exiting.", __FILE__, __LINE__);
-        *ret = 1;
-        goto EXIT_EARLY;
     }
 
     if (dumpSettings)

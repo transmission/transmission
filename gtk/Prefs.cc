@@ -31,55 +31,61 @@ void gtr_pref_init(std::string_view config_dir)
 ****
 ***/
 
+[[nodiscard]] static std::string get_default_download_dir()
+{
+    if (auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DOWNLOAD)); !std::empty(dir))
+    {
+        return dir;
+    }
+
+    if (auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP)); !std::empty(dir))
+    {
+        return dir;
+    }
+
+    return tr_getDefaultDownloadDir();
+}
+
 /**
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-static void tr_prefs_init_defaults(tr_variant* d)
+[[nodiscard]] static tr_variant get_default_app_settings()
 {
-    auto dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DOWNLOAD));
+    auto const dir = get_default_download_dir();
 
-    if (dir.empty())
-    {
-        dir = Glib::get_user_special_dir(TR_GLIB_USER_DIRECTORY(DESKTOP));
-    }
-
-    if (dir.empty())
-    {
-        dir = tr_getDefaultDownloadDir();
-    }
-
-    tr_variantDictReserve(d, 31);
-    tr_variantDictAddStr(d, TR_KEY_watch_dir, dir);
-    tr_variantDictAddBool(d, TR_KEY_watch_dir_enabled, false);
-    tr_variantDictAddBool(d, TR_KEY_user_has_given_informed_consent, false);
-    tr_variantDictAddBool(d, TR_KEY_inhibit_desktop_hibernation, false);
-    tr_variantDictAddBool(d, TR_KEY_blocklist_updates_enabled, true);
-    tr_variantDictAddStr(d, TR_KEY_open_dialog_dir, Glib::get_home_dir());
-    tr_variantDictAddBool(d, TR_KEY_show_toolbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_filterbar, true);
-    tr_variantDictAddBool(d, TR_KEY_show_statusbar, true);
-    tr_variantDictAddBool(d, TR_KEY_trash_can_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_show_notification_area_icon, false);
-    tr_variantDictAddBool(d, TR_KEY_show_tracker_scrapes, false);
-    tr_variantDictAddBool(d, TR_KEY_show_extra_peer_details, false);
-    tr_variantDictAddBool(d, TR_KEY_show_backup_trackers, false);
-    tr_variantDictAddStr(d, TR_KEY_statusbar_stats, "total-ratio"sv);
-    tr_variantDictAddBool(d, TR_KEY_torrent_added_notification_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_torrent_complete_notification_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_torrent_complete_sound_enabled, true);
-    tr_variantDictAddBool(d, TR_KEY_show_options_window, true);
-    tr_variantDictAddBool(d, TR_KEY_main_window_is_maximized, false);
-    tr_variantDictAddInt(d, TR_KEY_main_window_height, 500);
-    tr_variantDictAddInt(d, TR_KEY_main_window_width, 300);
-    tr_variantDictAddInt(d, TR_KEY_main_window_x, 50);
-    tr_variantDictAddInt(d, TR_KEY_main_window_y, 50);
-    tr_variantDictAddInt(d, TR_KEY_details_window_height, 500);
-    tr_variantDictAddInt(d, TR_KEY_details_window_width, 700);
-    tr_variantDictAddStr(d, TR_KEY_download_dir, dir);
-    tr_variantDictAddStr(d, TR_KEY_sort_mode, "sort-by-name"sv);
-    tr_variantDictAddBool(d, TR_KEY_sort_reversed, false);
-    tr_variantDictAddBool(d, TR_KEY_compact_view, false);
+    auto map = tr_variant::Map{};
+    map.try_emplace(TR_KEY_blocklist_updates_enabled, true);
+    map.try_emplace(TR_KEY_compact_view, false);
+    map.try_emplace(TR_KEY_details_window_height, 500);
+    map.try_emplace(TR_KEY_details_window_width, 700);
+    map.try_emplace(TR_KEY_download_dir, dir);
+    map.try_emplace(TR_KEY_inhibit_desktop_hibernation, false);
+    map.try_emplace(TR_KEY_main_window_height, 500);
+    map.try_emplace(TR_KEY_main_window_is_maximized, false);
+    map.try_emplace(TR_KEY_main_window_width, 300);
+    map.try_emplace(TR_KEY_main_window_x, 50);
+    map.try_emplace(TR_KEY_main_window_y, 50);
+    map.try_emplace(TR_KEY_open_dialog_dir, Glib::get_home_dir());
+    map.try_emplace(TR_KEY_show_backup_trackers, false);
+    map.try_emplace(TR_KEY_show_extra_peer_details, false);
+    map.try_emplace(TR_KEY_show_filterbar, true);
+    map.try_emplace(TR_KEY_show_notification_area_icon, false);
+    map.try_emplace(TR_KEY_show_options_window, true);
+    map.try_emplace(TR_KEY_show_statusbar, true);
+    map.try_emplace(TR_KEY_show_toolbar, true);
+    map.try_emplace(TR_KEY_show_tracker_scrapes, false);
+    map.try_emplace(TR_KEY_sort_mode, "sort-by-name"sv);
+    map.try_emplace(TR_KEY_sort_reversed, false);
+    map.try_emplace(TR_KEY_statusbar_stats, "total-ratio"sv);
+    map.try_emplace(TR_KEY_torrent_added_notification_enabled, true);
+    map.try_emplace(TR_KEY_torrent_complete_notification_enabled, true);
+    map.try_emplace(TR_KEY_torrent_complete_sound_enabled, true);
+    map.try_emplace(TR_KEY_trash_can_enabled, true);
+    map.try_emplace(TR_KEY_user_has_given_informed_consent, false);
+    map.try_emplace(TR_KEY_watch_dir, dir);
+    map.try_emplace(TR_KEY_watch_dir_enabled, false);
+    return map;
 }
 
 static void ensure_sound_cmd_is_a_list(tr_variant* dict)
@@ -102,16 +108,13 @@ static void ensure_sound_cmd_is_a_list(tr_variant* dict)
 
 static tr_variant* getPrefs()
 {
-    static tr_variant settings;
-    static bool loaded = false;
+    static auto settings = tr_variant{};
 
-    if (!loaded)
+    if (!settings.has_value())
     {
-        tr_variantInitDict(&settings, 0);
-        tr_prefs_init_defaults(&settings);
-        tr_sessionLoadSettings(&settings, gl_confdir.c_str(), nullptr);
+        settings = get_default_app_settings();
+        settings.merge(tr_sessionLoadSettings(gl_confdir.c_str(), nullptr));
         ensure_sound_cmd_is_a_list(&settings);
-        loaded = true;
     }
 
     return &settings;

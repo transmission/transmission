@@ -91,7 +91,7 @@ public:
 
     tr_variant& operator=(uint64_t value)
     {
-        *this = static_cast<int64_t>(value); // sketchy af
+        *this = static_cast<int64_t>(value); // hmmm
         return *this;
     }
 

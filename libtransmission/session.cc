@@ -452,26 +452,6 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 
 // ---
 
-namespace
-{
-namespace settings_helpers
-{
-
-void get_settings_filename(tr_pathbuf& setme, char const* config_dir, char const* appname)
-{
-    if (!tr_str_is_empty(config_dir))
-    {
-        setme.assign(std::string_view{ config_dir }, "/settings.json"sv);
-        return;
-    }
-
-    auto const default_config_dir = tr_getDefaultConfigDir(appname);
-    setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
-}
-
-} // namespace settings_helpers
-} // namespace
-
 tr_variant tr_sessionGetDefaultSettings()
 {
     auto ret = tr_variant::make_map();
@@ -494,43 +474,23 @@ tr_variant tr_sessionGetSettings(tr_session const* session)
     return settings;
 }
 
-bool tr_sessionLoadSettings(tr_variant* settings_in, char const* config_dir, char const* app_name)
+tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name)
 {
-    using namespace settings_helpers;
-
-    TR_ASSERT(settings_in != nullptr);
-    TR_ASSERT(settings_in->holds_alternative<tr_variant::Map>());
-
-    // first, start with the libtransmission default settings
     auto settings = tr_sessionGetDefaultSettings();
 
-    // now use the app default settings passed in
-    tr_variantMergeDicts(&settings, settings_in);
-
-    // now use a settings file to override all the defaults
-    auto success = bool{};
-    auto filename = tr_pathbuf{};
-    get_settings_filename(filename, config_dir, app_name);
-    if (!tr_sys_path_exists(filename))
+    // if a settings file exists, use it to override the defaults
+    if (auto const filename = fmt::format(
+            "{:s}/settings.json",
+            config_dir != nullptr ? config_dir : tr_getDefaultConfigDir(app_name));
+        tr_sys_path_exists(filename))
     {
-        success = true;
-    }
-    else if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
-    {
-        tr_variantMergeDicts(&settings, &*file_settings);
-        success = true;
-    }
-    else
-    {
-        success = false;
+        if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+        {
+            settings.merge(*file_settings);
+        }
     }
 
-    if (success)
-    {
-        std::swap(*settings_in, settings);
-    }
-
-    return success;
+    return settings;
 }
 
 void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const* client_settings)
