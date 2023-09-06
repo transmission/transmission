@@ -632,7 +632,6 @@ $video-image: '../img/film.svg';
     &:not(.selected) .paused {
       color: var(--color-fg-disabled);
     }
-      }
 
       .torrent-labels {
         grid-area: labels;
