@@ -921,7 +921,7 @@ tr_variant tr_rpc_server::settings() const
     settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
     RPC_SETTINGS_FIELDS(V)
 #undef V
-    return settings;
+    return tr_variant{ std::move(settings) };
 }
 
 tr_variant tr_rpc_server::default_settings()
@@ -931,7 +931,7 @@ tr_variant tr_rpc_server::default_settings()
     settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(default_value));
     RPC_SETTINGS_FIELDS(V)
 #undef V
-    return settings;
+    return tr_variant{ std::move(settings) };
 }
 
 tr_rpc_server::~tr_rpc_server()

@@ -33,7 +33,7 @@ tr_variant tr_session_settings::settings() const
     map.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
     SESSION_SETTINGS_FIELDS(V)
 #undef V
-    return map;
+    return tr_variant{ std::move(map) };
 }
 
 tr_variant tr_session_settings::default_settings()

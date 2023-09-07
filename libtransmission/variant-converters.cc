@@ -129,7 +129,7 @@ std::optional<tr_encryption_mode> VariantConverter::load<tr_encryption_mode>(tr_
 template<>
 tr_variant VariantConverter::save<tr_encryption_mode>(tr_encryption_mode const& val)
 {
-    return uint64_t{ val };
+    return static_cast<int64_t>(val);
 }
 
 // ---
@@ -169,7 +169,7 @@ std::optional<tr_log_level> VariantConverter::load<tr_log_level>(tr_variant cons
 template<>
 tr_variant VariantConverter::save<tr_log_level>(tr_log_level const& val)
 {
-    return static_cast<int>(val);
+    return static_cast<int64_t>(val);
 }
 
 // ---
@@ -215,7 +215,7 @@ std::optional<tr_port> VariantConverter::load<tr_port>(tr_variant const& src)
 template<>
 tr_variant VariantConverter::save<tr_port>(tr_port const& val)
 {
-    return uint64_t{ val.host() };
+    return int64_t{ val.host() };
 }
 
 // ---

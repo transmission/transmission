@@ -44,7 +44,7 @@ tr_variant tr_session_alt_speeds::settings() const
     settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
     ALT_SPEEDS_FIELDS(V)
 #undef V
-    return settings;
+    return tr_variant{ std::move(settings) };
 }
 
 tr_variant tr_session_alt_speeds::default_settings()
@@ -54,7 +54,7 @@ tr_variant tr_session_alt_speeds::default_settings()
     settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(static_cast<type>(default_value)));
     ALT_SPEEDS_FIELDS(V)
 #undef V
-    return settings;
+    return tr_variant{ std::move(settings) };
 }
 
 // --- minutes
