@@ -611,27 +611,29 @@ $video-image: '../img/film.svg';
         width: $icon-size;
       }
 
-	   .torrent-name {
-      	font-weight: bold;
-      	margin-bottom: 2px;
-      	margin-top: 2px;
-      	overflow: hidden;
-      	text-overflow: ellipsis;
-      	white-space: nowrap;
+      .torrent-name {
+        font-weight: bold;
+        margin-bottom: 2px;
+        margin-top: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
       &.compact {
-       font-size: 1em;
-       font-weight: normal;
+        font-size: 1em;
+        font-weight: normal;
       }
     }
 
-      &.selected {
-       color: var(--color-fg-primary);
+    &.selected {
+      color: var(--color-fg-primary);
     }
 
-      &:not(.selected) .paused {
-       color: var(--color-fg-disabled);
+    &:not(.selected) .paused {
+      color: var(--color-fg-disabled);
     }
+
+      }
 
       .torrent-labels {
         grid-area: labels;
