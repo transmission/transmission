@@ -89,6 +89,12 @@ public:
         return *this;
     }
 
+    tr_variant& operator=(int value)
+    {
+        *this = static_cast<int64_t>(value);
+        return *this;
+    }
+
     tr_variant& operator=(uint64_t value)
     {
         *this = static_cast<int64_t>(value); // hmmm
