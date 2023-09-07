@@ -519,11 +519,15 @@ $video-image: '../img/film.svg';
         font-size: 1em;
         font-weight: normal;
       }
+    }
 
-      &:not(.paused) {
+      &.selected {
         color: var(--color-fg-primary);
       }
-    }
+    
+      &:not(selected) .paused {
+        color: var(--color-fg-disabled);
+      }
 
     .torrent-labels {
       font-size: x-small;
