@@ -365,7 +365,7 @@ tr_variant VariantConverter::save<tr_verify_added_mode>(tr_verify_added_mode con
         }
     }
 
-    return static_cast<int>(val);
+    return static_cast<int64_t>(val);
 }
 
 } // namespace libtransmission

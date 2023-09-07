@@ -479,13 +479,13 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
 
             // determine which settings changed
             auto changed_keys = std::set<tr_quark>{};
-            auto* const oldvals = gtr_pref_get_all();
+            auto& oldvals = gtr_pref_get_all();
             auto const serde = tr_variant_serde::benc();
             for (auto const& [key, newval] : *newvals.get_if<tr_variant::Map>())
             {
                 bool changed = true;
 
-                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval != nullptr)
+                if (tr_variant const* oldval = tr_variantDictFind(&oldvals, key); oldval != nullptr)
                 {
                     changed = serde.to_string(*oldval) != serde.to_string(newval);
                 }
@@ -497,7 +497,7 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
             }
 
             // update our settings
-            oldvals->merge(newvals);
+            oldvals.merge(newvals);
 
             // emit change notifications
             for (auto const& changed_key : changed_keys)
@@ -604,7 +604,7 @@ void Application::Impl::on_startup()
     }
 
     /* initialize the libtransmission session */
-    session = tr_sessionInit(config_dir_.c_str(), true, gtr_pref_get_all());
+    session = tr_sessionInit(config_dir_.c_str(), true, &gtr_pref_get_all());
 
     gtr_pref_flag_set(TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(session));
     gtr_pref_int_set(TR_KEY_peer_port, tr_sessionGetPeerPort(session));

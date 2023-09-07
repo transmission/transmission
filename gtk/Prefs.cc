@@ -85,7 +85,7 @@ void gtr_pref_init(std::string_view config_dir)
     map.try_emplace(TR_KEY_user_has_given_informed_consent, false);
     map.try_emplace(TR_KEY_watch_dir, dir);
     map.try_emplace(TR_KEY_watch_dir_enabled, false);
-    return map;
+    return tr_variant{ std::move(map) };
 }
 
 static void ensure_sound_cmd_is_a_list(tr_variant* dict)
@@ -106,7 +106,7 @@ static void ensure_sound_cmd_is_a_list(tr_variant* dict)
     tr_variantListAddStr(list, "transmission torrent downloaded"sv);
 }
 
-static tr_variant* getPrefs()
+static tr_variant& getPrefs()
 {
     static auto settings = tr_variant{};
 
@@ -117,14 +117,14 @@ static tr_variant* getPrefs()
         ensure_sound_cmd_is_a_list(&settings);
     }
 
-    return &settings;
+    return settings;
 }
 
 /***
 ****
 ***/
 
-tr_variant* gtr_pref_get_all()
+tr_variant& gtr_pref_get_all()
 {
     return getPrefs();
 }
@@ -133,24 +133,24 @@ int64_t gtr_pref_int_get(tr_quark const key)
 {
     int64_t i = 0;
 
-    return tr_variantDictFindInt(getPrefs(), key, &i) ? i : 0;
+    return tr_variantDictFindInt(&getPrefs(), key, &i) ? i : 0;
 }
 
 void gtr_pref_int_set(tr_quark const key, int64_t value)
 {
-    tr_variantDictAddInt(getPrefs(), key, value);
+    tr_variantDictAddInt(&getPrefs(), key, value);
 }
 
 double gtr_pref_double_get(tr_quark const key)
 {
     double d = 0;
 
-    return tr_variantDictFindReal(getPrefs(), key, &d) ? d : 0.0;
+    return tr_variantDictFindReal(&getPrefs(), key, &d) ? d : 0.0;
 }
 
 void gtr_pref_double_set(tr_quark const key, double value)
 {
-    tr_variantDictAddReal(getPrefs(), key, value);
+    tr_variantDictAddReal(&getPrefs(), key, value);
 }
 
 /***
@@ -161,12 +161,12 @@ bool gtr_pref_flag_get(tr_quark const key)
 {
     bool boolVal = false;
 
-    return tr_variantDictFindBool(getPrefs(), key, &boolVal) ? boolVal : false;
+    return tr_variantDictFindBool(&getPrefs(), key, &boolVal) ? boolVal : false;
 }
 
 void gtr_pref_flag_set(tr_quark const key, bool value)
 {
-    tr_variantDictAddBool(getPrefs(), key, value);
+    tr_variantDictAddBool(&getPrefs(), key, value);
 }
 
 /***
@@ -177,7 +177,7 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 {
     std::vector<std::string> ret;
 
-    if (tr_variant* list = nullptr; tr_variantDictFindList(getPrefs(), key, &list))
+    if (tr_variant* list = nullptr; tr_variantDictFindList(&getPrefs(), key, &list))
     {
         size_t const n = tr_variantListSize(list);
         ret.reserve(n);
@@ -198,13 +198,13 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 std::string gtr_pref_string_get(tr_quark const key)
 {
     auto sv = std::string_view{};
-    (void)tr_variantDictFindStrView(getPrefs(), key, &sv);
+    (void)tr_variantDictFindStrView(&getPrefs(), key, &sv);
     return std::string{ sv };
 }
 
 void gtr_pref_string_set(tr_quark const key, std::string_view value)
 {
-    tr_variantDictAddStr(getPrefs(), key, value);
+    tr_variantDictAddStr(&getPrefs(), key, value);
 }
 
 /***
@@ -213,5 +213,5 @@ void gtr_pref_string_set(tr_quark const key, std::string_view value)
 
 void gtr_pref_save(tr_session* session)
 {
-    tr_sessionSaveSettings(session, gl_confdir.c_str(), getPrefs());
+    tr_sessionSaveSettings(session, gl_confdir.c_str(), &getPrefs());
 }
