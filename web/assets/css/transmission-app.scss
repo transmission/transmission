@@ -619,9 +619,9 @@ $video-image: '../img/film.svg';
       text-overflow: ellipsis;
       white-space: nowrap;
 
-      &.compact {
-        font-size: 1em;
-        font-weight: normal;
+       &.compact {
+         font-size: 1em;
+         font-weight: normal;
       }
     }
 
