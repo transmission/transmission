@@ -174,7 +174,10 @@ export class Transmission extends EventTarget {
           this._removeSelectedTorrents(true);
           break;
         case 'verify-selected-torrents':
-          this._verifyTorrents(this.getSelectedTorrents());
+          this._verifyTorrents(this.getSelectedTorrents(), false);
+          break;
+        case 'verify-selected-torrents-force':
+          this._verifyTorrents(this.getSelectedTorrents(), true);
           break;
         default:
           console.warn(`unhandled action: ${event_.action}`);
@@ -853,9 +856,10 @@ TODO: fix this when notifications get fixed
       this,
     );
   }
-  _verifyTorrents(torrents) {
+  _verifyTorrents(torrents, force) {
     this.remote.verifyTorrents(
       Transmission._getTorrentIds(torrents),
+      force,
       this.refreshTorrents,
       this,
     );
