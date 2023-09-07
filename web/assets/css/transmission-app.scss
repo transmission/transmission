@@ -619,17 +619,17 @@ $video-image: '../img/film.svg';
         text-overflow: ellipsis;
         white-space: nowrap;
 
-        &.compact {
+      &.compact {
           font-size: 1em;
           font-weight: normal;
         }
       }
 
-        &.selected {
+      &.selected {
           color: var(--color-fg-primary);
       }
 
-        &:not(.selected) .paused {
+      &:not(.selected) .paused {
           color: var(--color-fg-disabled);
         }
       }
