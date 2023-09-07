@@ -611,7 +611,7 @@ $video-image: '../img/film.svg';
         width: $icon-size;
       }
 
-	  .torrent-name {
+	   .torrent-name {
       	font-weight: bold;
       	margin-bottom: 2px;
       	margin-top: 2px;
@@ -632,7 +632,6 @@ $video-image: '../img/film.svg';
       &:not(.selected) .paused {
        color: var(--color-fg-disabled);
     }
-
 
       .torrent-labels {
         grid-area: labels;
