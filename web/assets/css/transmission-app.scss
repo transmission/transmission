@@ -519,10 +519,14 @@ $video-image: '../img/film.svg';
         font-size: 1em;
         font-weight: normal;
       }
+    }
 
-      &:not(.paused) {
-        color: var(--color-fg-primary);
-      }
+    &.selected {
+      color: var(--color-fg-primary);
+    }
+
+    &:not(.selected) .paused {
+      color: var(--color-fg-disabled);
     }
 
     .torrent-labels {
@@ -612,26 +616,7 @@ $video-image: '../img/film.svg';
       }
 
       .torrent-name {
-        font-weight: bold;
-        margin-bottom: 2px;
-        margin-top: 2px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-
-        &.compact {
-          font-size: 1em;
-          font-weight: normal;
-        }
-      }
-
-        &.selected {
-          color: var(--color-fg-primary);
-      }
-
-        &:not(.selected) .paused {
-          color: var(--color-fg-disabled);
-        }
+        grid-area: name;
       }
 
       .torrent-labels {
@@ -747,12 +732,12 @@ $video-image: '../img/film.svg';
 
     &.seed:not(.paused) {
       background: linear-gradient(
-          to right,
-          var(--color-progressbar-seed-1) 0,
-          var(--color-progressbar-seed-1) var(--progress, 30%),
-          var(--color-progressbar-seed-2) var(--progress, 30%)
-        ),
-        no-repeat;
+        to right,
+        var(--color-progressbar-seed-1) 0,
+        var(--color-progressbar-seed-1) var(--progress, 30%),
+        var(--color-progressbar-seed-2) var(--progress, 30%)
+      ),
+      no-repeat;
     }
 
     &.seed.queued {
@@ -761,22 +746,22 @@ $video-image: '../img/film.svg';
 
     &.verify {
       background: linear-gradient(
-          to right,
-          var(--color-progressbar-verify) 0,
-          var(--color-progressbar-verify) var(--progress, 30%),
-          transparent var(--progress, 30%)
-        ),
-        no-repeat;
+        to right,
+        var(--color-progressbar-verify) 0,
+        var(--color-progressbar-verify) var(--progress, 30%),
+        transparent var(--progress, 30%)
+      ),
+      no-repeat;
     }
 
     &.paused {
       background: linear-gradient(
-          to right,
-          var(--color-progressbar-paused) 0,
-          var(--color-progressbar-paused) var(--progress, 30%),
-          transparent var(--progress, 30%)
-        ),
-        no-repeat;
+        to right,
+        var(--color-progressbar-paused) 0,
+        var(--color-progressbar-paused) var(--progress, 30%),
+        transparent var(--progress, 30%)
+      ),
+      no-repeat;
     }
   }
 }
