@@ -619,10 +619,11 @@ $video-image: '../img/film.svg';
       text-overflow: ellipsis;
       white-space: nowrap;
 
-    &.compact {
-      font-size: 1em;
-      font-weight: normal;
+      &.compact {
+        font-size: 1em;
+        font-weight: normal;
       }
+    }
 
     &.selected {
       color: var(--color-fg-primary);
@@ -631,6 +632,7 @@ $video-image: '../img/film.svg';
     &:not(.selected) .paused {
       color: var(--color-fg-disabled);
     }
+      }
 
       .torrent-labels {
         grid-area: labels;
@@ -777,7 +779,7 @@ $video-image: '../img/film.svg';
         no-repeat;
     }
   }
-}
+
 
 /// PREFERENCES DIALOG
 
