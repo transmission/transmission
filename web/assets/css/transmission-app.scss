@@ -619,7 +619,7 @@ $video-image: '../img/film.svg';
         text-overflow: ellipsis;
         white-space: nowrap;
 
-      &.compact {
+        &.compact {
           font-size: 1em;
           font-weight: normal;
         }
@@ -779,7 +779,7 @@ $video-image: '../img/film.svg';
         no-repeat;
     }
   }
-
+}
 
 /// PREFERENCES DIALOG
 
