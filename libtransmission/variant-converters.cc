@@ -255,7 +255,7 @@ std::optional<tr_preallocation_mode> VariantConverter::load<tr_preallocation_mod
 template<>
 tr_variant VariantConverter::save<tr_preallocation_mode>(tr_preallocation_mode const& val)
 {
-    return static_cast<int>(val);
+    return int64_t{ val };
 }
 
 // ---
