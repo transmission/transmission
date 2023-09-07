@@ -481,18 +481,21 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torren
             auto changed_keys = std::set<tr_quark>{};
             auto& oldvals = gtr_pref_get_all();
             auto const serde = tr_variant_serde::benc();
-            for (auto const& [key, newval] : *newvals.get_if<tr_variant::Map>())
+            if (auto const* const newvals_map = newvals.get_if<tr_variant::Map>(); newvals_map != nullptr)
             {
-                bool changed = true;
-
-                if (tr_variant const* oldval = tr_variantDictFind(&oldvals, key); oldval != nullptr)
+                for (auto const& [key, newval] : *newvals_map)
                 {
-                    changed = serde.to_string(*oldval) != serde.to_string(newval);
-                }
+                    bool changed = true;
 
-                if (changed)
-                {
-                    changed_keys.emplace(key);
+                    if (tr_variant const* oldval = tr_variantDictFind(&oldvals, key); oldval != nullptr)
+                    {
+                        changed = serde.to_string(*oldval) != serde.to_string(newval);
+                    }
+
+                    if (changed)
+                    {
+                        changed_keys.emplace(key);
+                    }
                 }
             }
 
