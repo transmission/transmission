@@ -625,11 +625,11 @@ $video-image: '../img/film.svg';
         }
       }
 
-      &.selected {
+        &.selected {
           color: var(--color-fg-primary);
       }
 
-      &:not(.selected) .paused {
+        &:not(.selected) .paused {
           color: var(--color-fg-disabled);
         }
       }
