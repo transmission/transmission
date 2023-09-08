@@ -198,7 +198,7 @@ private:
         int type;
     };
 
-    void initDefaults(tr_variant*) const;
+    [[nodiscard]] static tr_variant get_default_app_settings();
 
     void set(int key, char const* value) = delete;
 
