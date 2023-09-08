@@ -352,7 +352,7 @@ private:
     };
 
 public:
-    explicit tr_session(std::string_view config_dir, tr_variant* settings_dict = nullptr);
+    explicit tr_session(std::string_view config_dir, tr_variant const& settings_dict);
 
     [[nodiscard]] std::string_view sessionId() const noexcept
     {
@@ -998,7 +998,7 @@ private:
     friend uint16_t tr_sessionGetRPCPort(tr_session const* session);
     friend uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
     friend void tr_sessionClose(tr_session* session, size_t timeout_secs);
-    friend void tr_sessionGetSettings(tr_session const* s, tr_variant* setme_dictionary);
+    friend tr_variant tr_sessionGetSettings(tr_session const* s);
     friend void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
     friend void tr_sessionReloadBlocklists(tr_session* session);
     friend void tr_sessionSet(tr_session* session, tr_variant* settings);

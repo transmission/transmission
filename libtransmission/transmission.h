@@ -148,32 +148,30 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
  *
  * Example:
  * @code
- *     tr_variant settings;
  *     int64_t i;
  *
- *     tr_variantInitDict(&settings, 0);
- *     tr_sessionGetDefaultSettings(&settings);
+ *     auto settings = tr_sessionGetDefaultSettings();
  *     if (tr_variantDictFindInt(&settings, TR_PREFS_KEY_PEER_PORT, &i))
  *         fprintf(stderr, "the default peer port is %d\n", (int)i);
  * @endcode
  *
- * @param setme_dictionary pointer to a tr_variant dictionary
+ * @return a variant map of the default settinggs
  * @see `tr_sessionLoadSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_getDefaultConfigDir()`
  */
-void tr_sessionGetDefaultSettings(struct tr_variant* setme_dictionary);
+tr_variant tr_sessionGetDefaultSettings();
 
 /**
  * Add the session's current configuration settings to the benc dictionary.
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param session          the session to query
- * @param setme_dictionary the dictionary to populate
+ * @return a variant map of the session's current settings
+ * @param session the session to query
  * @see `tr_sessionGetDefaultSettings()`
  */
-void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_dictionary);
+tr_variant tr_sessionGetSettings(tr_session const* session);
 
 /**
  * Load settings from the configuration directory's settings.json file,
@@ -181,15 +179,14 @@ void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_d
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param dictionary pointer to an uninitialized tr_variant
  * @param config_dir the configuration directory to find settings.json
  * @param app_name if config_dir is empty, app_name is used to find the default dir.
- * @return success true if the settings were loaded, false otherwise
+ * @return the loaded settings
  * @see `tr_sessionGetDefaultSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-bool tr_sessionLoadSettings(tr_variant* settings, char const* config_dir, char const* app_name);
+tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -209,14 +206,9 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct 
  *
  * For example, this will instantiate a session with all the default values:
  * @code
- *     tr_variant settings;
- *     tr_session* session;
- *     char const* configDir;
- *
- *     tr_variantInitDict(&settings, 0);
- *     tr_sessionGetDefaultSettings(&settings);
- *     configDir = tr_getDefaultConfigDir("Transmission");
- *     session = tr_sessionInit(configDir, true, &settings);
+ *     auto settings = tr_sessionGetDefaultSettings();
+ *     char const* const configDir = tr_getDefaultConfigDir("Transmission");
+ *     tr_session* const session = tr_sessionInit(configDir, true, &settings);
  * @endcode
  *
  * @param config_dir where Transmission will look for resume files, blocklists, etc.
