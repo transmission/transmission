@@ -727,7 +727,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
     case TR_KEY_source: return tor.source();
     case TR_KEY_startDate: return st.startDate;
-    case TR_KEY_status: return st.activity;
+    case TR_KEY_status: return static_cast<int64_t>(st.activity);
     case TR_KEY_torrentFile: return tor.torrent_file();
     case TR_KEY_totalSize: return tor.total_size();
     case TR_KEY_trackerList: return tor.tracker_list();
