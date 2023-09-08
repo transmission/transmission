@@ -665,7 +665,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_activityDate: return st.activityDate;
     case TR_KEY_addedDate: return st.addedDate;
     case TR_KEY_availability: return make_piece_availability_vec(tor);
-    case TR_KEY_bandwidthPriority: return tor.get_priority();
+    case TR_KEY_bandwidthPriority: return static_cast<int64_t>(tor.get_priority());
     case TR_KEY_comment: return tor.comment();
     case TR_KEY_corruptEver: return st.corruptEver;
     case TR_KEY_creator: return tor.creator();
@@ -677,12 +677,12 @@ namespace make_torrent_field_helpers
     case TR_KEY_downloadLimited: return tor.uses_speed_limit(TR_DOWN);
     case TR_KEY_downloadedEver: return st.downloadedEver;
     case TR_KEY_editDate: return st.editDate;
-    case TR_KEY_error: return st.error;
+    case TR_KEY_error: return static_cast<int64_t>(st.error);
     case TR_KEY_errorString: return st.errorString;
     case TR_KEY_eta: return st.eta;
     case TR_KEY_etaIdle: return st.etaIdle;
     case TR_KEY_fileStats: return make_file_stats_vec(tor);
-    case TR_KEY_file_count: return tor.file_count();
+    case TR_KEY_file_count: return static_cast<int64_t>(tor.file_count());
     case TR_KEY_files: return make_file_vec(tor);
     case TR_KEY_group: return tor.bandwidth_group().sv();
     case TR_KEY_hashString: return tor.info_hash_string().sv();
@@ -697,7 +697,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_leftUntilDone: return st.leftUntilDone;
     case TR_KEY_magnetLink: return tor.metainfo_.magnet();
     case TR_KEY_manualAnnounceTime: return tr_announcerNextManualAnnounce(&tor);
-    case TR_KEY_maxConnectedPeers: return tor.peer_limit();
+    case TR_KEY_maxConnectedPeers: return static_cast<int64_t>(tor.peer_limit());
     case TR_KEY_metadataPercentComplete: return st.metadataPercentComplete;
     case TR_KEY_name: return tor.name();
     case TR_KEY_peer_limit: return tor.peer_limit();
@@ -708,7 +708,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_peersSendingToUs: return st.peersSendingToUs;
     case TR_KEY_percentComplete: return st.percentComplete;
     case TR_KEY_percentDone: return st.percentDone;
-    case TR_KEY_pieceCount: return tor.piece_count();
+    case TR_KEY_pieceCount: return static_cast<int64_t>(tor.piece_count());
     case TR_KEY_pieceSize: return tor.piece_size();
     case TR_KEY_pieces: return make_piece_bitfield(tor);
     case TR_KEY_primary_mime_type: return tor.primary_mime_type();
@@ -1992,7 +1992,7 @@ char const* sessionStats(
     case TR_KEY_alt_speed_down: return static_cast<int64_t>(tr_sessionGetAltSpeed_KBps(&session, TR_DOWN));
     case TR_KEY_alt_speed_enabled: return tr_sessionUsesAltSpeed(&session);
     case TR_KEY_alt_speed_time_begin: return tr_sessionGetAltSpeedBegin(&session);
-    case TR_KEY_alt_speed_time_day: return tr_sessionGetAltSpeedDay(&session);
+    case TR_KEY_alt_speed_time_day: return static_cast<int64_t>(tr_sessionGetAltSpeedDay(&session));
     case TR_KEY_alt_speed_time_enabled: return tr_sessionUsesAltSpeedTime(&session);
     case TR_KEY_alt_speed_time_end: return tr_sessionGetAltSpeedEnd(&session);
     case TR_KEY_alt_speed_up: return static_cast<int64_t>(tr_sessionGetAltSpeed_KBps(&session, TR_UP));
