@@ -248,13 +248,25 @@ public:
 
     tr_variant& operator=(std::string const& value)
     {
-        *this = std::string{ value };
+        val_.emplace<StringHolder>(std::string{value});
         return *this;
     }
 
     tr_variant& operator=(char const* const value)
     {
-        *this = std::string{ value != nullptr ? value : "" };
+        val_.emplace<StringHolder>(std::string{ value != nullptr ? value : "" });
+        return *this;
+    }
+
+    tr_variant& operator=(int value)
+    {
+        *this = static_cast<int64_t>(value);
+        return *this;
+    }
+
+    tr_variant& operator=(uint64_t value)
+    {
+        *this = static_cast<int64_t>(value); // hmmm
         return *this;
     }
 

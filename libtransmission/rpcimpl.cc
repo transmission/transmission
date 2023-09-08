@@ -718,7 +718,7 @@ void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quar
 
     if (field_count > 0)
     {
-        tr_stat const* const st = tr_torrentStat(tor);
+        auto const* const st = tr_torrentStat(tor);
 
         for (size_t i = 0; i < field_count; ++i)
         {
@@ -1595,21 +1595,23 @@ char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, s
         }
     }
 
-    auto* const list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
+    auto groups_vec = tr_variant::Vector{};
     for (auto const& [name, group] : s->bandwidthGroups())
     {
-        if (names.empty() || names.count(name.sv()) > 0)
+        if (names.empty() || names.count(name.sv()) > 0U)
         {
-            tr_variant* dict = tr_variantListAddDict(list, 5);
-            auto limits = group->get_limits();
-            tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
-            tr_variantDictAddStr(dict, TR_KEY_name, name);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit_KBps);
-            tr_variantDictAddBool(dict, TR_KEY_speed_limit_down_enabled, limits.down_limited);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit_KBps);
-            tr_variantDictAddBool(dict, TR_KEY_speed_limit_up_enabled, limits.up_limited);
+            auto const limits = group->get_limits();
+            auto group_map = tr_variant::Map{};
+            group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+            group_map.try_emplace(TR_KEY_name, name.sv());
+            group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit_KBps);
+            group_map.try_emplace(TR_KEY_speed_limit_down_enabled, limits.down_limited);
+            group_map.try_emplace(TR_KEY_speed_limit_up, limits.up_limit_KBps);
+            group_map.try_emplace(TR_KEY_speed_limit_up_enabled, limits.up_limited);
+            groups_vec.emplace_back(std::move(group_map));
         }
     }
+    *tr_variantDictAdd(args_out, TR_KEY_group) = std::move(groups_vec);
 
     return nullptr;
 }
