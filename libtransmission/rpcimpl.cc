@@ -673,7 +673,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_desiredAvailable: return st.desiredAvailable;
     case TR_KEY_doneDate: return st.doneDate;
     case TR_KEY_downloadDir: return tor.download_dir().sv();
-    case TR_KEY_downloadLimit: return tr_torrentGetSpeedLimit_KBps(&tor, TR_DOWN);
+    case TR_KEY_downloadLimit: return static_cast<int64_t>(tr_torrentGetSpeedLimit_KBps(&tor, TR_DOWN));
     case TR_KEY_downloadLimited: return tor.uses_speed_limit(TR_DOWN);
     case TR_KEY_downloadedEver: return st.downloadedEver;
     case TR_KEY_editDate: return st.editDate;
@@ -733,7 +733,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_trackerList: return tor.tracker_list();
     case TR_KEY_trackerStats: return make_tracker_stats_vec(tor);
     case TR_KEY_trackers: return make_tracker_vec(tor);
-    case TR_KEY_uploadLimit: return tr_torrentGetSpeedLimit_KBps(&tor, TR_UP);
+    case TR_KEY_uploadLimit: return static_cast<int64_t>(tr_torrentGetSpeedLimit_KBps(&tor, TR_UP));
     case TR_KEY_uploadLimited: return tor.uses_speed_limit(TR_UP);
     case TR_KEY_uploadRatio: return st.ratio;
     case TR_KEY_uploadedEver: return st.uploadedEver;
@@ -1989,13 +1989,13 @@ char const* sessionStats(
     // clang-format off
     switch (key)
     {
-    case TR_KEY_alt_speed_down: return tr_sessionGetAltSpeed_KBps(&session, TR_DOWN);
+    case TR_KEY_alt_speed_down: return static_cast<int64_t>(tr_sessionGetAltSpeed_KBps(&session, TR_DOWN));
     case TR_KEY_alt_speed_enabled: return tr_sessionUsesAltSpeed(&session);
     case TR_KEY_alt_speed_time_begin: return tr_sessionGetAltSpeedBegin(&session);
     case TR_KEY_alt_speed_time_day: return tr_sessionGetAltSpeedDay(&session);
     case TR_KEY_alt_speed_time_enabled: return tr_sessionUsesAltSpeedTime(&session);
     case TR_KEY_alt_speed_time_end: return tr_sessionGetAltSpeedEnd(&session);
-    case TR_KEY_alt_speed_up: return tr_sessionGetAltSpeed_KBps(&session, TR_UP);
+    case TR_KEY_alt_speed_up: return static_cast<int64_t>(tr_sessionGetAltSpeed_KBps(&session, TR_UP));
     case TR_KEY_anti_brute_force_enabled: return tr_sessionGetAntiBruteForceEnabled(&session);
     case TR_KEY_anti_brute_force_threshold: return tr_sessionGetAntiBruteForceThreshold(&session);
     case TR_KEY_blocklist_enabled: return session.blocklist_enabled();
@@ -2038,9 +2038,9 @@ char const* sessionStats(
     case TR_KEY_seed_queue_enabled: return session.queueEnabled(TR_UP);
     case TR_KEY_seed_queue_size: return session.queueSize(TR_UP);
     case TR_KEY_session_id: return session.sessionId();
-    case TR_KEY_speed_limit_down: return tr_sessionGetSpeedLimit_KBps(&session, TR_DOWN);
+    case TR_KEY_speed_limit_down: return static_cast<int64_t>(tr_sessionGetSpeedLimit_KBps(&session, TR_DOWN));
     case TR_KEY_speed_limit_down_enabled: return session.isSpeedLimited(TR_DOWN);
-    case TR_KEY_speed_limit_up: return tr_sessionGetSpeedLimit_KBps(&session, TR_UP);
+    case TR_KEY_speed_limit_up: return static_cast<int64_t>(tr_sessionGetSpeedLimit_KBps(&session, TR_UP));
     case TR_KEY_speed_limit_up_enabled: return session.isSpeedLimited(TR_UP);
     case TR_KEY_start_added_torrents: return !session.shouldPauseAddedTorrents();
     case TR_KEY_tcp_enabled: return session.allowsTCP();
