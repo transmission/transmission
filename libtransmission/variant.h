@@ -248,7 +248,7 @@ public:
 
     tr_variant& operator=(std::string const& value)
     {
-        val_.emplace<StringHolder>(std::string{value});
+        val_.emplace<StringHolder>(std::string{ value });
         return *this;
     }
 

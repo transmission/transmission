@@ -878,25 +878,25 @@ tr_variant tr_formatter_get_units()
 {
     using namespace formatter_impl;
 
-    auto const make_units_vec = [](formatter_units const& units)
+    auto const units_to_vec = [](auto const& units)
     {
-        auto units_vec = tr_variant::Vector{};
-        units_vec.reserve(std::size(units));
+        auto vec = tr_variant::Vector{};
+        vec.reserve(std::size(units));
         std::transform(
             std::begin(units),
             std::end(units),
-            std::back_inserter(units_vec),
-            [](auto const& unit) { return std::data(unit.name); });
-        return units_vec;
+            std::back_inserter(vec),
+            [](auto const& item) { return std::data(item.name); });
+        return tr_variant{ std::move(vec) };
     };
 
-    auto units_map = tr_variant::Map{ 6U };
+    auto units_map = tr_variant::Map{};
     units_map.try_emplace(TR_KEY_memory_bytes, mem_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(mem_units));
+    units_map.try_emplace(TR_KEY_memory_units, units_to_vec(mem_units));
     units_map.try_emplace(TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_size_units, make_units_vec(size_units));
+    units_map.try_emplace(TR_KEY_size_units, units_to_vec(size_units));
     units_map.try_emplace(TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(speed_units));
+    units_map.try_emplace(TR_KEY_speed_units, units_to_vec(speed_units));
     return tr_variant{ std::move(units_map) };
 }
 
