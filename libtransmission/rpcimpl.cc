@@ -700,7 +700,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_maxConnectedPeers: return static_cast<int64_t>(tor.peer_limit());
     case TR_KEY_metadataPercentComplete: return st.metadataPercentComplete;
     case TR_KEY_name: return tor.name();
-    case TR_KEY_peer_limit: return tor.peer_limit();
+    case TR_KEY_peer_limit: return static_cast<int64_t>(tor.peer_limit());
     case TR_KEY_peers: return make_peer_vec(tor);
     case TR_KEY_peersConnected: return st.peersConnected;
     case TR_KEY_peersFrom: return make_peer_counts_map(st);
@@ -709,7 +709,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_percentComplete: return st.percentComplete;
     case TR_KEY_percentDone: return st.percentDone;
     case TR_KEY_pieceCount: return static_cast<int64_t>(tor.piece_count());
-    case TR_KEY_pieceSize: return tor.piece_size();
+    case TR_KEY_pieceSize: return static_cast<int64_t>(tor.piece_size());
     case TR_KEY_pieces: return make_piece_bitfield(tor);
     case TR_KEY_primary_mime_type: return tor.primary_mime_type();
     case TR_KEY_priorities: return make_file_priorities_vec(tor);
