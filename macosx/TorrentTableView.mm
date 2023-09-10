@@ -127,7 +127,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 {
     NSArray<Torrent*>* selectedTorrents = self.selectedTorrents;
     [super reloadData];
-    [self restoreSelectedTorrents:selectedTorrents];
+    self.selectedTorrents = selectedTorrents;
 }
 
 - (void)reloadVisibleRows
@@ -558,7 +558,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     return torrents;
 }
 
-- (void)restoreSelectedTorrents:(NSArray<Torrent*>*)selectedTorrents
+- (void)setSelectedTorrents:(NSArray<Torrent*>*)selectedTorrents
 {
     NSMutableIndexSet* selectedIndexes = [NSMutableIndexSet new];
     for (Torrent* i in selectedTorrents)

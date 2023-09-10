@@ -3237,6 +3237,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //set all groups as expanded
         [self.fTableView removeAllCollapsedGroups];
 
+        // we need to remember selected values
+        NSArray<Torrent*>* selectedTorrents = self.fTableView.selectedTorrents;
+
         beganUpdates = YES;
         [self.fTableView beginUpdates];
 
@@ -3280,6 +3283,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             for (TorrentGroup* group in self.fDisplayedTorrents)
                 [self.fTableView expandItem:group];
         }
+
+        self.fTableView.selectedTorrents = selectedTorrents;
     }
 
     //sort the torrents (won't sort the groups, though)
