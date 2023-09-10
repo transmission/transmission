@@ -890,7 +890,7 @@ tr_variant tr_formatter_get_units()
         return tr_variant{ std::move(vec) };
     };
 
-    auto units_map = tr_variant::Map{};
+    auto units_map = tr_variant::Map{ 6U };
     units_map.try_emplace(TR_KEY_memory_bytes, mem_units[TR_FMT_KB].value);
     units_map.try_emplace(TR_KEY_memory_units, units_to_vec(mem_units));
     units_map.try_emplace(TR_KEY_size_bytes, size_units[TR_FMT_KB].value);

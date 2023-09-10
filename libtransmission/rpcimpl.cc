@@ -75,7 +75,7 @@ auto constexpr SuccessResult = "success"sv;
 void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view result)
 {
     // build the response
-    auto response_map = tr_variant::Map{};
+    auto response_map = tr_variant::Map{ 3U };
     response_map.try_emplace(TR_KEY_arguments, std::move(data->args_out));
     response_map.try_emplace(TR_KEY_result, result);
     if (data->tag)
@@ -530,15 +530,15 @@ namespace make_torrent_field_helpers
 [[nodiscard]] auto make_peer_counts_map(tr_stat const& st)
 {
     auto const& from = st.peersFrom;
-    auto from_map = tr_variant::Map{ 7U };
-    from_map.try_emplace(TR_KEY_fromCache, from[TR_PEER_FROM_RESUME]);
-    from_map.try_emplace(TR_KEY_fromDht, from[TR_PEER_FROM_DHT]);
-    from_map.try_emplace(TR_KEY_fromIncoming, from[TR_PEER_FROM_INCOMING]);
-    from_map.try_emplace(TR_KEY_fromLpd, from[TR_PEER_FROM_LPD]);
-    from_map.try_emplace(TR_KEY_fromLtep, from[TR_PEER_FROM_LTEP]);
-    from_map.try_emplace(TR_KEY_fromPex, from[TR_PEER_FROM_PEX]);
-    from_map.try_emplace(TR_KEY_fromTracker, from[TR_PEER_FROM_TRACKER]);
-    return tr_variant{ std::move(from_map) };
+    auto peer_counts_map = tr_variant::Map{ 7U };
+    peer_counts_map.try_emplace(TR_KEY_fromCache, from[TR_PEER_FROM_RESUME]);
+    peer_counts_map.try_emplace(TR_KEY_fromDht, from[TR_PEER_FROM_DHT]);
+    peer_counts_map.try_emplace(TR_KEY_fromIncoming, from[TR_PEER_FROM_INCOMING]);
+    peer_counts_map.try_emplace(TR_KEY_fromLpd, from[TR_PEER_FROM_LPD]);
+    peer_counts_map.try_emplace(TR_KEY_fromLtep, from[TR_PEER_FROM_LTEP]);
+    peer_counts_map.try_emplace(TR_KEY_fromPex, from[TR_PEER_FROM_PEX]);
+    peer_counts_map.try_emplace(TR_KEY_fromTracker, from[TR_PEER_FROM_TRACKER]);
+    return tr_variant{ std::move(peer_counts_map) };
 }
 
 [[nodiscard]] auto make_piece_availability_vec(tr_torrent const& tor)
@@ -748,7 +748,7 @@ namespace make_torrent_field_helpers
 [[nodiscard]] auto make_torrent_info_map(tr_torrent* const tor, tr_quark const* const fields, size_t const field_count)
 {
     auto const* const st = tr_torrentStat(tor);
-    auto info_map = tr_variant::Map{};
+    auto info_map = tr_variant::Map{ field_count };
     for (size_t i = 0; i < field_count; ++i)
     {
         info_map.try_emplace(fields[i], make_torrent_field(*tor, *st, fields[i]));
@@ -1609,7 +1609,7 @@ void add_strings_from_var(std::set<std::string_view>& strings, tr_variant const&
         if (names.empty() || names.count(name.sv()) > 0U)
         {
             auto const limits = group->get_limits();
-            auto group_map = tr_variant::Map{};
+            auto group_map = tr_variant::Map{ 6U };
             group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
             group_map.try_emplace(TR_KEY_name, name.sv());
             group_map.try_emplace(TR_KEY_speed_limit_down, limits.down_limit_KBps);
@@ -1942,7 +1942,7 @@ char const* sessionStats(
 {
     auto const make_stats_map = [](auto const& stats)
     {
-        auto stats_map = tr_variant::Map{};
+        auto stats_map = tr_variant::Map{ 5U };
         stats_map.try_emplace(TR_KEY_downloadedBytes, stats.downloadedBytes);
         stats_map.try_emplace(TR_KEY_filesAdded, stats.filesAdded);
         stats_map.try_emplace(TR_KEY_secondsActive, stats.secondsActive);
@@ -1958,6 +1958,7 @@ char const* sessionStats(
         std::end(torrents),
         [](auto const* tor) { return tor->is_running(); });
 
+    args_out.reserve(std::size(args_out) + 7U);
     args_out.try_emplace(TR_KEY_activeTorrentCount, n_running);
     args_out.try_emplace(TR_KEY_cumulative_stats, make_stats_map(session->stats().cumulative()));
     args_out.try_emplace(TR_KEY_current_stats, make_stats_map(session->stats().current()));
@@ -2239,7 +2240,7 @@ void tr_rpc_request_exec_json(
 
     if (method == nullptr) // return an error if we couldn't figure out what to do
     {
-        auto response = tr_variant::Map{};
+        auto response = tr_variant::Map{ 3U };
         response.try_emplace(TR_KEY_arguments, 0);
         response.try_emplace(TR_KEY_result, "no method name");
         if (tag.has_value())
@@ -2257,7 +2258,7 @@ void tr_rpc_request_exec_json(
         auto args_out = tr_variant::Map{};
         char const* const result = (*method->func)(session, *args_in, args_out, nullptr);
 
-        auto response = tr_variant::Map{};
+        auto response = tr_variant::Map{ 3U };
         response.try_emplace(TR_KEY_arguments, std::move(args_out));
         response.try_emplace(TR_KEY_result, result != nullptr ? result : "success");
         if (tag.has_value())
