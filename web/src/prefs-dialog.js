@@ -112,7 +112,7 @@ export class PrefsDialog extends EventTarget {
   }
 
   // update the dialog's controls
-  _update(o) {
+  _update(o, ui_only) {
     if (!o) {
       return;
     }
@@ -133,7 +133,9 @@ export class PrefsDialog extends EventTarget {
             case 'radio':
               if (element.checked !== value) {
                 element.checked = value;
-                element.dispatchEvent(new Event('change'));
+                if (!ui_only) {
+                  element.dispatchEvent(new Event('change'));
+                }
               }
               break;
             case 'text':
@@ -150,13 +152,17 @@ export class PrefsDialog extends EventTarget {
                 element !== document.activeElement
               ) {
                 element.value = value;
-                element.dispatchEvent(new Event('change'));
+                if (!ui_only) {
+                  element.dispatchEvent(new Event('change'));
+                }
               }
               break;
             case 'select-one':
               if (element.value !== value) {
                 element.value = value;
-                element.dispatchEvent(new Event('change'));
+                if (!ui_only) {
+                  element.dispatchEvent(new Event('change'));
+                }
               }
               break;
             default:
@@ -770,7 +776,7 @@ export class PrefsDialog extends EventTarget {
     this.session_manager = session_manager;
     this.remote = remote;
     this.update_soon = () =>
-      this._update(this.session_manager.session_properties);
+      this._update(this.session_manager.session_properties, false);
 
     this.elements = PrefsDialog._create();
     this.elements.peers.blocklist_update_button.addEventListener(
@@ -824,7 +830,8 @@ export class PrefsDialog extends EventTarget {
     walk(this.elements.torrents);
 
     this.session_manager.addEventListener('session-change', this.update_soon);
-    this.update_soon();
+    this._update(this.session_manager.session_properties, true);
+    this._checkPort();
 
     document.body.append(this.elements.root);
   }
