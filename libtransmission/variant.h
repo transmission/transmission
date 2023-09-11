@@ -223,6 +223,7 @@ public:
         {
             val_.emplace<StringHolder>(std::string{ value });
         }
+
         // note: std::is_integral_v<bool> is true, so this check
         // must come first to prevent bools from being stored as ints
         else if constexpr (std::is_same_v<Val, bool>)
