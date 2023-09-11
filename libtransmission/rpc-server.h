@@ -50,7 +50,7 @@ class Timer;
 class tr_rpc_server
 {
 public:
-    tr_rpc_server(tr_session* session, tr_variant* settings);
+    tr_rpc_server(tr_session* session, tr_variant const& settings);
     ~tr_rpc_server();
 
     tr_rpc_server(tr_rpc_server&) = delete;
@@ -58,9 +58,9 @@ public:
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
-    static void default_settings(tr_variant* tgt);
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
     [[nodiscard]] constexpr tr_port port() const noexcept
     {
