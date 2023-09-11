@@ -125,7 +125,6 @@ export class PrefsDialog extends EventTarget {
       for (const element of this.elements.root.querySelectorAll(
         `[data-key="${key}"]`,
       )) {
-        this._onMaybePortChanged(key);
         if (key === 'blocklist-size') {
           const n = Formatter.number(value);
           element.innerHTML = `Blocklist has <span class="blocklist-size-number">${n}</span> rules`;
@@ -145,6 +144,10 @@ export class PrefsDialog extends EventTarget {
               // don't change the text if the user's editing it.
               // it's very annoying when that happens!
               if (element !== document.activeElement) {
+                // eslint-disable-next-line eqeqeq
+                if (element.value != value) {
+                  this._onMaybePortChanged(key);
+                }
                 element.value = value;
               }
               break;
@@ -819,7 +822,6 @@ export class PrefsDialog extends EventTarget {
       this.update_from_session,
     );
     this.update_from_session();
-    this._checkPort();
 
     document.body.append(this.elements.root);
   }
