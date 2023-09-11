@@ -95,6 +95,12 @@ export class PrefsDialog extends EventTarget {
     }
   }
 
+  _onMaybePortChanged(key) {
+    if (key === 'peer-port' || key === 'port-forwarding-enabled') {
+      this._checkPort();
+    }
+  }
+
   // this callback is for controls whose changes can be applied
   // immediately, like checkboxs, radioboxes, and selects
   _onControlChanged(event_) {
@@ -102,9 +108,7 @@ export class PrefsDialog extends EventTarget {
     this.remote.savePrefs({
       [key]: PrefsDialog._getValue(event_.target),
     });
-    if (key === 'peer-port' || key === 'port-forwarding-enabled') {
-      this._checkPort();
-    }
+    this._onMaybePortChanged(key);
   }
 
   _onDialogClosed() {
@@ -121,6 +125,7 @@ export class PrefsDialog extends EventTarget {
       for (const element of this.elements.root.querySelectorAll(
         `[data-key="${key}"]`,
       )) {
+        this._onMaybePortChanged(key);
         if (key === 'blocklist-size') {
           const n = Formatter.number(value);
           element.innerHTML = `Blocklist has <span class="blocklist-size-number">${n}</span> rules`;
