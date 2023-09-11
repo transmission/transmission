@@ -125,8 +125,9 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 //make sure we don't lose selection on manual reloads
 - (void)reloadData
 {
+    NSArray<Torrent*>* selectedTorrents = self.selectedTorrents;
     [super reloadData];
-    [self restoreSelectionIndexes];
+    self.selectedTorrents = selectedTorrents;
 }
 
 - (void)reloadVisibleRows
@@ -185,8 +186,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             }
         }
     }];
-
-    [self restoreSelectionIndexes];
 }
 
 - (BOOL)isGroupCollapsed:(NSInteger)value
@@ -559,6 +558,16 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     return torrents;
 }
 
+- (void)setSelectedTorrents:(NSArray<Torrent*>*)selectedTorrents
+{
+    NSMutableIndexSet* selectedIndexes = [NSMutableIndexSet new];
+    for (Torrent* i in selectedTorrents)
+    {
+        [selectedIndexes addIndex:[self rowForItem:i]];
+    }
+    [self selectRowIndexes:selectedIndexes byExtendingSelection:NO];
+}
+
 - (NSMenu*)menuForEvent:(NSEvent*)event
 {
     NSInteger row = [self rowAtPoint:[self convertPoint:event.locationInWindow fromView:nil]];
@@ -575,11 +584,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
         [self deselectAll:self];
         return self.fContextNoRow;
     }
-}
-
-- (void)restoreSelectionIndexes
-{
-    [self selectRowIndexes:self.fSelectedRowIndexes byExtendingSelection:NO];
 }
 
 //make sure that the pause buttons become orange when holding down the option key

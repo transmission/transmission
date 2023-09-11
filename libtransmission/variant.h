@@ -51,8 +51,15 @@ public:
     tr_variant& operator=(tr_variant const&) = delete;
     tr_variant& operator=(tr_variant&& that) noexcept = default;
 
+    [[nodiscard]] static auto make_map() noexcept
+    {
+        auto ret = tr_variant{};
+        ret.val_.emplace<Map>();
+        return ret;
+    }
+
     template<typename Val>
-    explicit tr_variant(Val value)
+    tr_variant(Val value)
     {
         *this = std::move(value);
     }
@@ -79,6 +86,18 @@ public:
     tr_variant& operator=(std::string_view value)
     {
         val_.emplace<StringHolder>(std::string(value));
+        return *this;
+    }
+
+    tr_variant& operator=(int value)
+    {
+        *this = static_cast<int64_t>(value);
+        return *this;
+    }
+
+    tr_variant& operator=(uint64_t value)
+    {
+        *this = static_cast<int64_t>(value); // hmmm
         return *this;
     }
 
@@ -407,10 +426,10 @@ struct VariantConverter
 {
 public:
     template<typename T>
-    static std::optional<T> load(tr_variant* src);
+    static std::optional<T> load(tr_variant const& src);
 
     template<typename T>
-    static void save(tr_variant* tgt, T const& val);
+    static tr_variant save(T const& val);
 };
 
 } // namespace libtransmission
