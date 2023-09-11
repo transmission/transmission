@@ -702,7 +702,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_name: return tor.name();
     case TR_KEY_peer_limit: return static_cast<int64_t>(tor.peer_limit());
     case TR_KEY_peers: return make_peer_vec(tor);
-    case TR_KEY_peersConnected: return st.peersConnected;
+    case TR_KEY_peersConnected: return static_cast<int64_t>(st.peersConnected);
     case TR_KEY_peersFrom: return make_peer_counts_map(st);
     case TR_KEY_peersGettingFromUs: return st.peersGettingFromUs;
     case TR_KEY_peersSendingToUs: return st.peersSendingToUs;
@@ -713,7 +713,7 @@ namespace make_torrent_field_helpers
     case TR_KEY_pieces: return make_piece_bitfield(tor);
     case TR_KEY_primary_mime_type: return tor.primary_mime_type();
     case TR_KEY_priorities: return make_file_priorities_vec(tor);
-    case TR_KEY_queuePosition: return st.queuePosition;
+    case TR_KEY_queuePosition: return static_cast<int64_t>(st.queuePosition);
     case TR_KEY_rateDownload: return tr_toSpeedBytes(st.pieceDownloadSpeed_KBps);
     case TR_KEY_rateUpload: return tr_toSpeedBytes(st.pieceUploadSpeed_KBps);
     case TR_KEY_recheckProgress: return st.recheckProgress;
