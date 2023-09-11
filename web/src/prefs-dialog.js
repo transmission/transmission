@@ -116,7 +116,7 @@ export class PrefsDialog extends EventTarget {
   }
 
   // update the dialog's controls
-  _update_fields() {
+  _update() {
     this._setBlocklistButtonEnabled(true);
 
     for (const [key, value] of Object.entries(
@@ -761,7 +761,7 @@ export class PrefsDialog extends EventTarget {
     this.closed = false;
     this.session_manager = session_manager;
     this.remote = remote;
-    this.update_fields = () => this._update_fields();
+    this.update_from_session = () => this._update();
 
     this.elements = PrefsDialog._create();
     this.elements.peers.blocklist_update_button.addEventListener(
@@ -814,8 +814,11 @@ export class PrefsDialog extends EventTarget {
     walk(this.elements.speed);
     walk(this.elements.torrents);
 
-    this.session_manager.addEventListener('session-change', this.update_fields);
-    this.update_fields();
+    this.session_manager.addEventListener(
+      'session-change',
+      this.update_from_session,
+    );
+    this.update_from_session();
     this._checkPort();
 
     document.body.append(this.elements.root);
@@ -826,7 +829,7 @@ export class PrefsDialog extends EventTarget {
       this.outside.stop();
       this.session_manager.removeEventListener(
         'session-change',
-        this.update_fields,
+        this.update_from_session,
       );
       this.elements.root.remove();
       dispatchEvent(new Event('close'));
