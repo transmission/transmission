@@ -154,7 +154,8 @@ export class PrefsDialog extends EventTarget {
               }
               break;
             case 'select-one':
-              if (element.value !== value) {
+              // eslint-disable-next-line eqeqeq
+              if (element.value != value) {
                 element.value = value;
                 element.dispatchEvent(new Event('change'));
               }
