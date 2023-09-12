@@ -150,7 +150,7 @@ export const Formatter = {
       buffer.push(this.countString('minute', 'minutes', minutes));
       buffer = buffer.slice(0, granular_depth);
       return buffer.length > 1
-        ? `${buffer.slice(0, buffer.length-1).join(', ')} and ${buffer.slice(buffer.length-1)}`
+        ? `${buffer.slice(0, -1).join(', ')} and ${buffer.slice(-1)}`
         : buffer[0];
     }
 
