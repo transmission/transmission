@@ -133,7 +133,7 @@ export const Formatter = {
     return ['E2BIG', 'NaN'].some((badStr) => str.includes(badStr)) ? `…` : str;
   },
 
-  timeInterval(seconds, granular_depth=3) {
+  timeInterval(seconds, granular_depth = 3) {
     const days = Math.floor(seconds / 86_400);
     let buffer = [];
     if (days) {
@@ -149,7 +149,9 @@ export const Formatter = {
     if (days || hours || minutes) {
       buffer.push(this.countString('minute', 'minutes', minutes));
       buffer = buffer.slice(0, granular_depth);
-      return buffer.length > 1 ? `${buffer.slice(0, buffer.length-1).join(', ')} and ${buffer.slice(buffer.length-1)}` : buffer[0];
+      return buffer.length > 1
+        ? `${buffer.slice(0, buffer.length-1).join(', ')} and ${buffer.slice(buffer.length-1)}`
+        : buffer[0];
     }
 
     return this.countString('second', 'seconds', Math.floor(seconds % 60));
