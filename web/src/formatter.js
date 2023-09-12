@@ -133,23 +133,26 @@ export const Formatter = {
     return ['E2BIG', 'NaN'].some((badStr) => str.includes(badStr)) ? `…` : str;
   },
 
-  timeInterval(seconds) {
-    let days = Math.floor(seconds / 86_400);
-    days = days ? this.countString('day, ', 'days, ', days) : '';
-
-    let hours = Math.floor((seconds % 86_400) / 3600);
-    hours =
-      days.length > 0 || hours
-        ? this.countString('hour and ', 'hours and ', hours)
-        : '';
-
-    const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours.length > 0 || minutes) {
-      return `${days}${hours}${this.countString('minute', 'minutes', minutes)}`;
+  timeInterval(seconds, granular_depth=3) {
+    const days = Math.floor(seconds / 86_400);
+    let buffer = [];
+    if (days) {
+      buffer.push(this.countString('day', 'days', days));
     }
 
-    seconds = Math.floor(seconds % 60);
-    return this.countString('second', 'seconds', seconds);
+    const hours = Math.floor((seconds % 86_400) / 3600);
+    if (days || hours) {
+      buffer.push(this.countString('hour', 'hours', hours));
+    }
+
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (days || hours || minutes) {
+      buffer.push(this.countString('minute', 'minutes', minutes));
+      buffer = buffer.slice(0, granular_depth);
+      return buffer.length > 1 ? `${buffer.slice(0, buffer.length-1).join(', ')} and ${buffer.slice(buffer.length-1)}` : buffer[0];
+    }
+
+    return this.countString('second', 'seconds', Math.floor(seconds % 60));
   },
 
   timestamp(seconds) {
