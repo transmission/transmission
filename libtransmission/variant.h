@@ -12,12 +12,12 @@
 #include <string>
 #include <string_view>
 #include <type_traits> // std::is_same_v
-#include <utility> // std::as_const, std::pair
+#include <utility> // std::pair
 #include <variant>
 #include <vector>
 
 #include "libtransmission/quark.h"
-#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 
 struct tr_error;
 
@@ -44,12 +44,42 @@ public:
 
     using Vector = std::vector<tr_variant>;
 
-    class Map : public std::vector<std::pair<tr_quark, tr_variant>>
+    class Map
     {
     public:
         Map(size_t const n_reserve = 0U)
         {
-            reserve(n_reserve);
+            vec_.reserve(n_reserve);
+        }
+
+        [[nodiscard]] TR_CONSTEXPR20 auto begin() noexcept
+        {
+            return std::begin(vec_);
+        }
+
+        [[nodiscard]] TR_CONSTEXPR20 auto begin() const noexcept
+        {
+            return std::cbegin(vec_);
+        }
+
+        [[nodiscard]] TR_CONSTEXPR20 auto cbegin() const noexcept
+        {
+            return std::cbegin(vec_);
+        }
+
+        [[nodiscard]] TR_CONSTEXPR20 auto end() noexcept
+        {
+            return std::end(vec_);
+        }
+
+        [[nodiscard]] TR_CONSTEXPR20 auto end() const noexcept
+        {
+            return std::cend(vec_);
+        }
+
+        [[nodiscard]] TR_CONSTEXPR20 auto cend() const noexcept
+        {
+            return std::cend(vec_);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) noexcept
@@ -59,19 +89,29 @@ public:
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) const noexcept
         {
-            return std::find_if(cbegin(), cend(), [key](auto const& item) { return item.first == key; });
+            return std::find_if(begin(), end(), [key](auto const& item) { return item.first == key; });
         }
 
-        [[nodiscard]] TR_CONSTEXPR20 auto contains(tr_quark const key) const noexcept
+        [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
         {
-            return find(key) != end();
+            return std::size(vec_);
+        }
+
+        [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
+        {
+            return std::empty(vec_);
+        }
+
+        void reserve(size_t new_cap)
+        {
+            vec_.reserve(new_cap);
         }
 
         auto erase(tr_quark const key)
         {
             if (auto iter = find(key); iter != end())
             {
-                std::vector<std::pair<tr_quark, tr_variant>>::erase(iter);
+                vec_.erase(iter);
                 return 1U;
             }
 
@@ -85,7 +125,7 @@ public:
                 return iter->second;
             }
 
-            return emplace_back(key, tr_variant{}).second;
+            return vec_.emplace_back(key, tr_variant{}).second;
         }
 
         template<typename Val>
@@ -96,7 +136,7 @@ public:
                 return { iter->second, false };
             }
 
-            return { emplace_back(key, tr_variant{ std::move(val) }).second, true };
+            return { vec_.emplace_back(key, tr_variant{ std::move(val) }).second, true };
         }
 
         // --- custom functions
@@ -118,6 +158,10 @@ public:
 
             return {};
         }
+
+    private:
+        using Vector = std::vector<std::pair<tr_quark, tr_variant>>;
+        Vector vec_;
     };
 
     constexpr tr_variant() noexcept = default;
