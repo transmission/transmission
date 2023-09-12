@@ -9,7 +9,7 @@ export class ForceVerifyDialog extends EventTarget {
   constructor(options) {
     super();
 
-    // options: remote, torrents, callback, context
+    // options: remote, torrents, callback, controller
     this.options = options;
     this.elements = ForceVerifyDialog._create(options);
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
@@ -34,13 +34,13 @@ export class ForceVerifyDialog extends EventTarget {
   }
 
   _onConfirm() {
-    const { remote, torrents, callback, context } = this.options;
+    const { remote, torrents, callback, controller } = this.options;
     if (torrents.length > 0) {
       remote.verifyTorrents(
         torrents.map((t) => t.getId()),
         true,
         callback,
-        context,
+        controller,
       );
     }
 

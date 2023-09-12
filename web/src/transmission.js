@@ -4,6 +4,7 @@
 
 import { AboutDialog } from './about-dialog.js';
 import { ContextMenu } from './context-menu.js';
+import { ForceVerifyDialog } from './force-verify-dialog';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
 import { MoveDialog } from './move-dialog.js';
@@ -857,12 +858,23 @@ TODO: fix this when notifications get fixed
     );
   }
   _verifyTorrents(torrents, force) {
-    this.remote.verifyTorrents(
-      Transmission._getTorrentIds(torrents),
-      force,
-      this.refreshTorrents,
-      this,
-    );
+    if (force) {
+      this.setCurrentPopup(
+        new ForceVerifyDialog({
+          callback: this.refreshTorrents,
+          controller: this,
+          remote: this.remote,
+          torrents,
+        }),
+      );
+    } else {
+      this.remote.verifyTorrents(
+        Transmission._getTorrentIds(torrents),
+        force,
+        this.refreshTorrents,
+        this,
+      );
+    }
   }
 
   _reannounceTorrents(torrents) {
