@@ -13,7 +13,6 @@
 #include "libtransmission/announce-list.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20, tr_sha1_digest_t
-#include "libtransmission/tr-strbuf.h" // tr_urlbuf
 #include "libtransmission/utils.h" // tr_strv_convert_utf8()
 
 struct tr_error;
@@ -25,7 +24,7 @@ class tr_magnet_metainfo
 public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
 
-    [[nodiscard]] tr_urlbuf magnet() const;
+    [[nodiscard]] std::string magnet() const;
 
     [[nodiscard]] constexpr auto const& info_hash() const noexcept
     {

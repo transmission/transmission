@@ -54,9 +54,9 @@ public:
     {
     }
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
-    static void default_settings(tr_variant* tgt);
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
     [[nodiscard]] constexpr bool is_active() const noexcept
     {

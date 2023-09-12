@@ -39,6 +39,21 @@ using namespace std::literals;
 
 namespace
 {
+[[nodiscard]] constexpr size_t variant_size(tr_variant const& var) noexcept
+{
+    switch (var.index())
+    {
+    case tr_variant::MapIndex:
+        return std::size(*var.get_if<tr_variant::Map>());
+
+    case tr_variant::VectorIndex:
+        return std::size(*var.get_if<tr_variant::Vector>());
+
+    default:
+        return {};
+    }
+}
+
 namespace parse_helpers
 {
 /* arbitrary value... this is much deeper than our code goes */
@@ -339,7 +354,7 @@ void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl
         data->stack.pop_back();
         if (depth < MaxDepth)
         {
-            data->preallocGuess[depth] = v->val.l.count;
+            data->preallocGuess[depth] = variant_size(*v);
         }
     }
     else if (state->type == JSONSL_T_SPECIAL)
@@ -507,7 +522,7 @@ void jsonPushParent(struct JsonWalk* data, tr_variant const& v)
 {
     auto const is_dict = v.holds_alternative<tr_variant::Map>();
     auto const is_list = v.holds_alternative<tr_variant::Vector>();
-    auto const n_children = is_dict ? v.val.l.count * 2U : v.val.l.count;
+    auto const n_children = variant_size(v) * (is_dict ? 2U : 1U);
     data->parents.push_back({ is_dict, is_list, 0, n_children });
 }
 
@@ -658,7 +673,7 @@ void jsonDictBeginFunc(tr_variant const& var, void* vdata)
     jsonPushParent(data, var);
     data->out.push_back('{');
 
-    if (var.val.l.count != 0U)
+    if (variant_size(var) != 0U)
     {
         jsonIndent(data);
     }
@@ -671,7 +686,7 @@ void jsonListBeginFunc(tr_variant const& var, void* vdata)
     jsonPushParent(data, var);
     data->out.push_back('[');
 
-    if (var.val.l.count != 0U)
+    if (variant_size(var) != 0U)
     {
         jsonIndent(data);
     }

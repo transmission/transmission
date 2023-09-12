@@ -12,15 +12,15 @@ static CGFloat const kPriorityIconWidth = 12.0;
 
 @implementation TorrentCell
 
-//draw progress bar
 - (void)drawRect:(NSRect)dirtyRect
 {
     if (self.fTorrentTableView)
     {
-        NSRect barRect = self.fTorrentProgressBarView.frame;
-        ProgressBarView* progressBar = [[ProgressBarView alloc] init];
         Torrent* torrent = (Torrent*)self.objectValue;
 
+        // draw progress bar
+        NSRect barRect = self.fTorrentProgressBarView.frame;
+        ProgressBarView* progressBar = [[ProgressBarView alloc] init];
         [progressBar drawBarInRect:barRect forTableView:self.fTorrentTableView withTorrent:torrent];
 
         // set priority icon
@@ -45,7 +45,7 @@ static CGFloat const kPriorityIconWidth = 12.0;
     [super drawRect:dirtyRect];
 }
 
-//otherwise progress bar is inverted
+// otherwise progress bar is inverted
 - (BOOL)isFlipped
 {
     return YES;

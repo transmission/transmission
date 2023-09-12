@@ -452,82 +452,45 @@ tr_address tr_session::bind_address(tr_address_type type) const noexcept
 
 // ---
 
-namespace
+tr_variant tr_sessionGetDefaultSettings()
 {
-namespace settings_helpers
-{
-
-void get_settings_filename(tr_pathbuf& setme, char const* config_dir, char const* appname)
-{
-    if (!tr_str_is_empty(config_dir))
-    {
-        setme.assign(std::string_view{ config_dir }, "/settings.json"sv);
-        return;
-    }
-
-    auto const default_config_dir = tr_getDefaultConfigDir(appname);
-    setme.assign(std::string_view{ default_config_dir }, "/settings.json"sv);
+    auto ret = tr_variant::make_map();
+    ret.merge(tr_session_settings::default_settings());
+    ret.merge(tr_rpc_server::default_settings());
+    ret.merge(tr_session_alt_speeds::default_settings());
+    return ret;
 }
 
-} // namespace settings_helpers
-} // namespace
-
-void tr_sessionGetDefaultSettings(tr_variant* setme_dictionary)
+tr_variant tr_sessionGetSettings(tr_session const* session)
 {
-    tr_session_settings{}.save(setme_dictionary);
-    tr_rpc_server::default_settings(setme_dictionary);
-    tr_session_alt_speeds::default_settings(setme_dictionary);
+    auto settings = tr_variant::make_map();
+    settings.merge(session->settings_.settings());
+    settings.merge(session->alt_speeds_.settings());
+    settings.merge(session->rpc_server_->settings());
+
+    tr_variantDictRemove(&settings, TR_KEY_message_level);
+    tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
+
+    return settings;
 }
 
-void tr_sessionGetSettings(tr_session const* session, tr_variant* setme_dictionary)
+tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name)
 {
-    session->settings_.save(setme_dictionary);
-    session->alt_speeds_.save(setme_dictionary);
-    session->rpc_server_->save(setme_dictionary);
+    auto settings = tr_sessionGetDefaultSettings();
 
-    tr_variantDictRemove(setme_dictionary, TR_KEY_message_level);
-    tr_variantDictAddInt(setme_dictionary, TR_KEY_message_level, tr_logGetLevel());
-}
-
-bool tr_sessionLoadSettings(tr_variant* settings_in, char const* config_dir, char const* app_name)
-{
-    using namespace settings_helpers;
-
-    TR_ASSERT(settings_in != nullptr);
-    TR_ASSERT(settings_in->holds_alternative<tr_variant::Map>());
-
-    // first, start with the libtransmission default settings
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
-
-    // now use the app default settings passed in
-    tr_variantMergeDicts(&settings, settings_in);
-
-    // now use a settings file to override all the defaults
-    auto success = bool{};
-    auto filename = tr_pathbuf{};
-    get_settings_filename(filename, config_dir, app_name);
-    if (!tr_sys_path_exists(filename))
+    // if a settings file exists, use it to override the defaults
+    if (auto const filename = fmt::format(
+            "{:s}/settings.json",
+            config_dir != nullptr ? config_dir : tr_getDefaultConfigDir(app_name));
+        tr_sys_path_exists(filename))
     {
-        success = true;
-    }
-    else if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
-    {
-        tr_variantMergeDicts(&settings, &*file_settings);
-        success = true;
-    }
-    else
-    {
-        success = false;
+        if (auto file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
+        {
+            settings.merge(*file_settings);
+        }
     }
 
-    if (success)
-    {
-        std::swap(*settings_in, settings);
-    }
-
-    return success;
+    return settings;
 }
 
 void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const* client_settings)
@@ -552,12 +515,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     tr_variantMergeDicts(&settings, client_settings);
 
     /* the session's true values override the file & client settings */
-    {
-        auto session_settings = tr_variant{};
-        tr_variantInitDict(&session_settings, 0);
-        tr_sessionGetSettings(session, &session_settings);
-        tr_variantMergeDicts(&settings, &session_settings);
-    }
+    settings.merge(tr_sessionGetSettings(session));
 
     /* save the result */
     tr_variant_serde::json().to_file(settings, filename);
@@ -592,7 +550,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     }
 
     /* initialize the bare skeleton of the session object */
-    auto* const session = new tr_session{ config_dir };
+    auto* const session = new tr_session{ config_dir, tr_variant::make_map() };
     bandwidthGroupRead(session, config_dir);
 
     auto data = tr_session::init_data{};
@@ -638,9 +596,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
 
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
+    auto settings = tr_sessionGetDefaultSettings();
     tr_variantMergeDicts(&settings, client_settings);
 
 #ifndef _WIN32
@@ -675,12 +631,12 @@ void tr_session::setSettings(tr_variant* settings_dict, bool force)
 
     // load the session settings
     auto new_settings = tr_session_settings{};
-    new_settings.load(settings_dict);
+    new_settings.load(*settings_dict);
     setSettings(std::move(new_settings), force);
 
     // delegate loading out the other settings
-    alt_speeds_.load(settings_dict);
-    rpc_server_->load(settings_dict);
+    alt_speeds_.load(*settings_dict);
+    rpc_server_->load(*settings_dict);
 }
 
 void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
@@ -2139,7 +2095,7 @@ auto makeBlocklistDir(std::string_view config_dir)
 
 } // namespace
 
-tr_session::tr_session(std::string_view config_dir, tr_variant* settings_dict)
+tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_dict)
     : config_dir_{ config_dir }
     , resume_dir_{ makeResumeDir(config_dir) }
     , torrent_dir_{ makeTorrentDir(config_dir) }
