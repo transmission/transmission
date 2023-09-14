@@ -313,6 +313,39 @@ tr_variant VariantConverter::save<tr_preferred_transport>(tr_preferred_transport
     return static_cast<int64_t>(val);
 }
 
+template<>
+std::optional<tr_preferred_transport_vec> VariantConverter::load<tr_preferred_transport_vec>(tr_variant const& src)
+{
+    if (auto const vec = src.get_if<tr_variant::Vector>(); vec != nullptr)
+    {
+        auto ret = tr_preferred_transport_vec{};
+        for (auto const& var : *vec)
+        {
+            if (auto const val = load<tr_preferred_transport>(var); val)
+            {
+                ret.emplace_back(*val);
+            }
+        }
+
+        return ret;
+    }
+
+    return {};
+}
+
+template<>
+tr_variant VariantConverter::save<tr_preferred_transport_vec>(tr_preferred_transport_vec const& val)
+{
+    auto ret = tr_variant::Vector{};
+    ret.reserve(std::size(val));
+    for (auto transport : val)
+    {
+        ret.emplace_back(save(transport));
+    }
+
+    return ret;
+}
+
 // ---
 
 template<>

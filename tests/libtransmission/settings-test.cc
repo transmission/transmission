@@ -415,40 +415,61 @@ TEST_F(SettingsTest, canSaveVerify)
 TEST_F(SettingsTest, canLoadPreferredTransport)
 {
     static auto constexpr Key = TR_KEY_preferred_transport;
-    auto constexpr ExpectedValue = TR_PREFER_TCP;
+    auto const expected_value = tr_preferred_transport_vec{ TR_PREFER_TCP };
 
     auto settings = std::make_unique<tr_session_settings>();
     auto const default_value = settings->preferred_transport;
-    ASSERT_NE(ExpectedValue, default_value);
+    ASSERT_NE(expected_value, default_value);
 
     auto var = tr_variant{};
-    tr_variantInitDict(&var, 1);
-    tr_variantDictAddInt(&var, Key, ExpectedValue);
-    settings->load(&var);
-    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
-    var.clear();
+    tr_variantInitDict(&var, 1U);
+
+    auto* list = tr_variantDictAddList(&var, Key, 2U);
+    tr_variantListAddStrView(list, "utp"sv);
+    tr_variantListAddStrView(list, "tcp"sv);
+    settings->load(var);
+    EXPECT_EQ(default_value, settings->preferred_transport);
+    list->clear();
 
     settings = std::make_unique<tr_session_settings>();
-    tr_variantInitDict(&var, 1);
-    tr_variantDictAddStrView(&var, Key, "tcp");
-    settings->load(&var);
-    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+    tr_variantInitList(list, 1U);
+    tr_variantListAddStrView(list, "tcp"sv);
+    settings->load(var);
+    EXPECT_EQ(expected_value, settings->preferred_transport);
 }
 
 TEST_F(SettingsTest, canSavePreferredTransport)
 {
     static auto constexpr Key = TR_KEY_preferred_transport;
-    static auto constexpr ExpectedValue = TR_PREFER_TCP;
+    auto const expected_value = tr_preferred_transport_vec{ TR_PREFER_TCP };
 
     auto settings = tr_session_settings{};
     auto const default_value = settings.preferred_transport;
-    ASSERT_NE(ExpectedValue, default_value);
+    ASSERT_NE(expected_value, default_value);
 
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 100);
-    settings.preferred_transport = ExpectedValue;
-    settings.save(&var);
-    auto val = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
-    EXPECT_EQ("tcp", val);
+    auto var = settings.settings();
+    tr_variant* list = nullptr;
+    tr_variant* var_str = nullptr;
+    auto strv = std::string_view{};
+
+    ASSERT_TRUE(tr_variantDictFindList(&var, Key, &list));
+    ASSERT_EQ(tr_variantListSize(list), 2U);
+    var_str = tr_variantListChild(list, 0U);
+    ASSERT_TRUE(var_str != nullptr && var_str->holds_alternative<std::string_view>());
+    tr_variantGetStrView(var_str, &strv);
+    EXPECT_EQ(strv, "utp"sv);
+    var_str = tr_variantListChild(list, 1U);
+    ASSERT_TRUE(var_str != nullptr && var_str->holds_alternative<std::string_view>());
+    tr_variantGetStrView(var_str, &strv);
+    EXPECT_EQ(strv, "tcp"sv);
+    var.clear();
+
+    settings.preferred_transport = expected_value;
+    var = settings.settings();
+    ASSERT_TRUE(tr_variantDictFindList(&var, Key, &list));
+    ASSERT_EQ(tr_variantListSize(list), 1U);
+    var_str = tr_variantListChild(list, 0U);
+    ASSERT_TRUE(var_str != nullptr && var_str->holds_alternative<std::string_view>());
+    tr_variantGetStrView(var_str, &strv);
+    EXPECT_EQ(strv, "tcp"sv);
 }
