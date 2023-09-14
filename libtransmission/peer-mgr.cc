@@ -746,11 +746,8 @@ private:
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
 
-            if (was_connectable)
-            {
-                // Note that it_that is invalid after this point
-                graveyard_pool.insert(connectable_pool.extract(it_that));
-            }
+            // Note that it_that is invalid after this point
+            graveyard_pool.insert(connectable_pool.extract(it_that));
 
             return false;
         }
@@ -2361,7 +2358,7 @@ struct peer_candidate
         candidates.resize(max);
     }
 
-    // put the best candiates at the end of the list
+    // put the best candidates at the end of the list
     auto ret = tr_peerMgr::OutboundCandidates{};
     for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
     {

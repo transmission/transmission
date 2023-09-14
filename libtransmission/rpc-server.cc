@@ -840,7 +840,7 @@ void tr_rpc_server::set_anti_brute_force_enabled(bool enabled) noexcept
 
 // --- LIFECYCLE
 
-tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
+tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant const& settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
     , web_client_dir_{ tr_getWebClientDir(session_in) }
     , bind_address_(std::make_unique<class tr_rpc_address>())
@@ -849,18 +849,22 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     load(settings);
 }
 
-void tr_rpc_server::load(tr_variant* src)
+void tr_rpc_server::load(tr_variant const& src)
 {
+    auto const* const src_map = src.get_if<tr_variant::Map>();
+    if (src_map != nullptr)
+    {
 #define V(key, field, type, default_value, comment) \
-    if (auto* const child = tr_variantDictFind(src, key); child != nullptr) \
+    if (auto const iter = src_map->find(key); iter != std::end(*src_map)) \
     { \
-        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(child); val) \
+        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(iter->second); val) \
         { \
             this->field = *val; \
         } \
     }
-    RPC_SETTINGS_FIELDS(V)
+        RPC_SETTINGS_FIELDS(V)
 #undef V
+    }
 
     if (!tr_strv_ends_with(url_, '/'))
     {
@@ -910,23 +914,24 @@ void tr_rpc_server::load(tr_variant* src)
     }
 }
 
-void tr_rpc_server::save(tr_variant* tgt) const
+tr_variant tr_rpc_server::settings() const
 {
+    auto settings = tr_variant::Map{};
 #define V(key, field, type, default_value, comment) \
-    tr_variantDictRemove(tgt, key); \
-    libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), field);
+    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
     RPC_SETTINGS_FIELDS(V)
 #undef V
+    return tr_variant{ std::move(settings) };
 }
 
-void tr_rpc_server::default_settings(tr_variant* tgt){
+tr_variant tr_rpc_server::default_settings()
+{
+    auto settings = tr_variant::Map{};
 #define V(key, field, type, default_value, comment) \
-    { \
-        tr_variantDictRemove(tgt, key); \
-        libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), default_value); \
-    }
+    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(default_value));
     RPC_SETTINGS_FIELDS(V)
 #undef V
+    return tr_variant{ std::move(settings) };
 }
 
 tr_rpc_server::~tr_rpc_server()

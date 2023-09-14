@@ -12,8 +12,6 @@ $green-400: #67c87f;
 $green-500: #34dc70;
 $grey-200: #e1e4e8;
 $grey-500: #828282;
-$grey-700: #373737;
-$grey-800: #292929;
 $grey-900: #191919;
 $red-500: #d73a49;
 $white: #fff;
@@ -22,11 +20,11 @@ $dark-mode-white: #c9d1d9;
 $yellow-300: #ffea7f;
 $grey-40: #666;
 $nice-grey: #f8f8f8;
-$nice-grey-darker: #f0f0f0;
 $dark-mode-black: #121212;
 $default-accent-color-dark: #0c2d6b;
 $default-border-dark: #575757;
 $default-border-light: #aeaeae;
+$default-tinted: rgba(128, 128, 144, 0.125);
 
 // Z-INDEX ENUM
 // $z-index-progressbar: 1;
@@ -81,31 +79,27 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   --color-progressbar-paused: #{$grey-200};
   --color-progressbar-leech: #{$blue-200};
   --color-progressbar-queued: #{$blue-400};
+  --color-bg-even: #{$default-tinted};
+  --color-toolbar-background: #{$default-tinted};
+  --color-bg-tabs: #{$default-tinted};
 
   color-scheme: light dark;
 
   @media (prefers-color-scheme: dark) {
+    --color-bg-odd: #{$black};
+    --color-bg-primary: #{$black};
+    --color-bg-popup: #{$black};
     --color-bg-hover: #{$grey-40};
     --color-fg-primary: #{$dark-mode-white};
-    --color-bg-primary: #{$grey-800};
-    --color-bg-primary-hover: #{$grey-700};
-    --color-bg-odd: #{$grey-900};
-    --color-bg-even: #{$grey-800};
-    --color-bg-menu: #{$grey-800};
     --color-fg-secondary: #{$nice-grey};
     --color-fg-on-popup: #{$nice-grey};
     --color-fg-disabled: #{$dark-mode-white};
-    --color-bg-popup: #{$grey-800};
     --color-bg-warn: #cf6679;
     --color-fg-warn: #{$dark-mode-black};
     --color-border: #{$dark-mode-white};
     --color-border-selected: #{$grey-500};
     --color-fg-tertiary: #{$grey-500};
-    --color-toolbar-background: #{$grey-800};
-    --color-inspector-background: #{$grey-800};
-    --color-inspector-tabs: #{$nice-grey};
     --color-bg-selected: #{$default-accent-color-dark};
-    --color-bg-tabs: #{$grey-700};
     --color-default-border: #{$default-border-dark};
     --color-progressbar-seed-1: #{$green-100};
     --color-progressbar-seed-2: #{$green-400};
@@ -119,23 +113,16 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-fg-port-open: #{$green-100};
       --color-bg-hover: #{$grey-40};
       --color-fg-primary: #{$white};
-      --color-bg-primary: #{$black};
-      --color-bg-primary-hover: #{$black};
-      --color-bg-odd: #{$black};
       --color-bg-even: #{$black};
-      --color-bg-menu: #{$black};
       --color-fg-secondary: #{$white};
       --color-fg-on-popup: #{$white};
       --color-fg-disabled: #{$white};
-      --color-bg-popup: #{$black};
       --color-bg-warn: #cf6679;
       --color-fg-warn: #{$black};
       --color-border: #{$white};
       --color-border-selected: #{$white};
       --color-fg-tertiary: #{$white};
       --color-toolbar-background: #{$black};
-      --color-inspector-background: #{$black};
-      --color-inspector-tabs: #{$white};
       --color-bg-selected: #{$blue-300};
       --color-bg-tabs: #{$black};
       --color-fg-tabs: #{$white};
@@ -152,7 +139,9 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     }
   }
   @media (prefers-color-scheme: light) {
-    --progress: 100%;
+    --color-bg-odd: #{$white};
+    --color-bg-primary: #{$white};
+    --color-bg-popup: #{$white};
     --color-fg-error: #{$red-500};
     --color-fg-port-closed: #{$red-500};
     --color-fg-port-open: #{$green-400};
@@ -163,12 +152,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-progressbar-queued: #{$blue-400};
     --color-bg-hover: #{$nice-grey};
     --color-fg-primary: #404040;
-    --color-bg-primary: #{$white};
-    --color-bg-even: #{$white};
-    --color-bg-odd: #{$nice-grey};
-    --color-bg-menu: #{$nice-grey};
     --color-fg-on-popup: #{$grey-900};
-    --color-bg-popup: #{$white};
     --color-fg-secondary: #{$grey-500};
     --color-border: #{$grey-500};
     --color-border-selected: #d0d7de;
@@ -176,10 +160,6 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-bg-warn: #e4606d5b;
     --color-fg-warn: #cf212e;
     --color-fg-disabled: #{$grey-500};
-    --color-toolbar-background: #{$nice-grey};
-    --color-inspector-background: #{$white};
-    --color-bg-tabs: #{$nice-grey-darker};
-    --color-inspector-tabs: #{$nice-grey};
     --color-bg-selected: #{$blue-300};
     --color-default-border: #{$default-border-light};
     --color-dialog-border: #{$nice-grey};
@@ -193,23 +173,16 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
       --color-fg-port-open: #{$green-400};
       --color-bg-hover: #{$grey-40};
       --color-fg-primary: #{$black};
-      --color-bg-primary: #{$white};
-      --color-bg-primary-hover: #{$white};
-      --color-bg-odd: #{$white};
       --color-bg-even: #{$white};
-      --color-bg-menu: #{$white};
       --color-fg-secondary: #{$black};
       --color-fg-on-popup: #{$black};
       --color-fg-disabled: #{$black};
-      --color-bg-popup: #{$white};
       --color-bg-warn: #cf6679;
       --color-fg-warn: #{$white};
       --color-border: #{$black};
       --color-border-selected: #{$black};
       --color-fg-tertiary: #{$black};
       --color-toolbar-background: #{$white};
-      --color-inspector-background: #{$white};
-      --color-inspector-tabs: #{$black};
       --color-bg-selected: #{$blue-300};
       --color-bg-tabs: #{$white};
       --color-fg-tabs: #{$black};
@@ -227,8 +200,20 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   }
 }
 
+/* If browser can support using 'system color' keywords (i.e. way to inherit browser colors), use these variables instead */
+@supports (background-color: Canvas) {
+  :root {
+    .contrast-less {
+      --color-bg-odd: Canvas;
+      --color-bg-primary: Canvas;
+      --color-bg-popup: Canvas;
+    }
+  }
+}
+
 html,
 body {
+  background-color: var(--color-bg-primary);
   color: var(--color-fg-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
     Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
@@ -248,14 +233,6 @@ a {
 
 .hidden {
   display: none;
-}
-
-.even {
-  background-color: var(--color-bg-even);
-}
-
-.odd {
-  background-color: var(--color-bg-odd);
 }
 
 .mainwin {
@@ -479,6 +456,14 @@ $video-image: '../img/film.svg';
   text-align: left;
   width: 100%;
 
+  .torrent:nth-child(even) {
+    background-color: var(--color-bg-even);
+  }
+
+  .torrent:nth-child(odd) {
+    background-color: var(--color-bg-odd);
+  }
+
   .torrent {
     border-bottom: 1px solid var(--color-default-border);
     user-select: none;
@@ -545,11 +530,19 @@ $video-image: '../img/film.svg';
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      padding: 1px 0;
 
       &.compact {
         flex: 1;
         font-size: x-small;
       }
+    }
+
+    .torrent-label {
+      padding: 0 8px;
+      margin: 0 2px;
+      border-radius: 1em;
+      border: 1px solid var(--color-default-border);
     }
 
     .torrent-progress-details.error,
@@ -600,9 +593,9 @@ $video-image: '../img/film.svg';
       grid-column-gap: 12px;
       grid-template-areas:
         'icon name labels'
-        'icon peers peers'
+        'icon progress-text progress-text'
         'icon progressbar progressbar'
-        'icon progress-text progress-text';
+        'icon peers peers';
       grid-template-columns: $icon-size auto 1fr;
       padding: 6px 12px;
 
@@ -796,7 +789,7 @@ $video-image: '../img/film.svg';
 }
 
 #prefs-dialog {
-  $background-color: var(--color-inspector-background);
+  $background-color: var(--color-bg-primary);
   background: $background-color;
   bottom: 0;
   box-shadow:
@@ -946,7 +939,7 @@ $video-image: '../img/film.svg';
 
 .tabs-container {
   align-items: stretch;
-  background: var(--color-inspector-background);
+  background: var(--color-bg-primary);
   bottom: 0;
   display: flex;
   flex-direction: column;
@@ -1003,7 +996,7 @@ $video-image: '../img/film.svg';
 }
 
 .tabs-button {
-  background-color: var(--color-bg-tabs);
+  background: none;
   border: 1px solid transparent;
   font-size: 14px;
   padding: 3px 8px;
@@ -1011,9 +1004,9 @@ $video-image: '../img/film.svg';
   &:active,
   &:checked,
   &.selected {
-    background-color: var(--color-bg-even);
+    background-color: var(--color-bg-odd);
     border: 1px solid var(--color-fg-primary);
-    border-radius: 6px;
+    border-radius: 5px;
   }
 }
 
@@ -1087,6 +1080,14 @@ $video-image: '../img/film.svg';
   margin: 0;
   padding: 0;
 
+  .inspector-torrent-file-list-entry:nth-child(even) {
+    background-color: var(--color-bg-even);
+  }
+
+  .inspector-torrent-file-list-entry:nth-child(odd) {
+    background-color: var(--color-bg-odd);
+  }
+
   .inspector-torrent-file-list-entry {
     display: grid;
     grid-column-gap: 5px;
@@ -1153,6 +1154,14 @@ $video-image: '../img/film.svg';
     grid-column-gap: 8px;
     grid-row-gap: 4px;
     margin-top: 8px;
+  }
+
+  .tier-list-row:nth-child(even) {
+    background-color: var(--color-bg-even);
+  }
+
+  .tier-list-row:nth-child(odd) {
+    background-color: var(--color-bg-odd);
   }
 
   .tier-list-torrent {
@@ -1279,10 +1288,6 @@ $video-image: '../img/film.svg';
 /// FILE PRIORITY BUTTONS
 
 .file-priority-radiobox {
-  $size-number: 20;
-  $size: $size-number * 1px;
-  $halfsize: math.floor(math.div($size-number, 2)) * 1px;
-
   grid-area: priority;
 
   > * {
@@ -1290,12 +1295,13 @@ $video-image: '../img/film.svg';
     background-color: var(--color-border-selected);
     background-position: center;
     background-repeat: no-repeat;
-    background-size: $halfsize, $size;
+    background-size: 10px, 20px;
     border: 1px solid var(--color-border);
-    height: $size;
+    border-radius: 0;
+    height: 20px;
     margin: 0;
     padding: 0;
-    width: $size;
+    width: 20px;
   }
 
   > .low {

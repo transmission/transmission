@@ -1180,6 +1180,7 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     this->mark_edited();
 
     on_metainfo_completed(this);
+    this->on_announce_list_changed();
 }
 
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
