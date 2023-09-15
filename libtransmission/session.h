@@ -783,7 +783,7 @@ public:
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
-    [[nodiscard]] auto const& preferred_transport() const noexcept
+    [[nodiscard]] constexpr auto preferred_transport() const noexcept
     {
         return settings_.preferred_transport;
     }

@@ -77,11 +77,7 @@ struct tr_variant;
     V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
-    V(TR_KEY_preferred_transport, \
-      preferred_transport, \
-      tr_preferred_transport_vec, \
-      (tr_preferred_transport_vec{ TR_PREFER_UTP, TR_PREFER_TCP }), \
-      "") \
+    V(TR_KEY_preferred_transport, preferred_transport, tr_preferred_transport, TR_PREFER_UTP, "") \
     V(TR_KEY_torrent_added_verify_mode, torrent_added_verify_mode, tr_verify_added_mode, TR_VERIFY_ADDED_FAST, "")
 
 struct tr_session_settings

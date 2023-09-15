@@ -18,8 +18,6 @@
 
 #include <event2/util.h> // for evutil_socket_t
 
-#include <small/vector.hpp>
-
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/bandwidth.h"
@@ -54,8 +52,6 @@ enum tr_preferred_transport : uint8_t
     TR_PREFER_TCP,
     TR_NUM_PREFERRED_TRANSPORT
 };
-
-using tr_preferred_transport_vec = small::max_size_vector<tr_preferred_transport, 2U>;
 
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 {

@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <cstdint>
+#include <type_traits>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -126,7 +127,8 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     bool is_seed,
     bool utp)
 {
-    auto const& preferred_transport = session->preferred_transport();
+    using preferred_key_t = std::underlying_type_t<tr_preferred_transport>;
+    auto const preferred = session->preferred_transport();
 
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
@@ -139,7 +141,7 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     }
 
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
-    auto const func = small::max_size_map<tr_preferred_transport, std::function<bool()>, TR_NUM_PREFERRED_TRANSPORT>{
+    auto const func = small::max_size_map<preferred_key_t, std::function<bool()>, TR_NUM_PREFERRED_TRANSPORT>{
         { TR_PREFER_UTP,
           [&]()
           {
@@ -174,9 +176,13 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
           } }
     };
 
-    for (auto const transport : preferred_transport)
+    if (func.at(preferred)())
     {
-        if (func.at(transport)())
+        return peer_io;
+    }
+    for (preferred_key_t i = 0U; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
+    {
+        if (i != preferred && func.at(i)())
         {
             return peer_io;
         }
