@@ -743,8 +743,6 @@ export class Inspector extends EventTarget {
         rows.push(title);
       }
 
-      const group = document.createElement('div');
-      group.classList.add('tier-list-group');
       for (const tracker of tor.getTrackers()) {
         const announceState = Inspector.getAnnounceState(tracker);
         const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
@@ -807,9 +805,8 @@ export class Inspector extends EventTarget {
         );
         tier_div.append(element);
 
-        group.append(tier_div);
+        rows.push(tier_div);
       }
-      rows.push(group);
     }
 
     // TODO: modify instead of rebuilding wholesale?

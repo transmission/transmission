@@ -1156,11 +1156,11 @@ $video-image: '../img/film.svg';
     padding: 8px 12px;
   }
 
-  .tier-list-row:nth-child(even) {
+  .tier-list-row:nth-child(even of .tier-list-row) {
     background-color: var(--color-bg-even);
   }
 
-  .tier-list-row:nth-child(odd) {
+  .tier-list-row:nth-child(odd of .tier-list-row) {
     background-color: var(--color-bg-odd);
   }
 
