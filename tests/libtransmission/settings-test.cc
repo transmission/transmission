@@ -424,14 +424,14 @@ TEST_F(SettingsTest, canLoadPreferredTransport)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 1);
     tr_variantDictAddInt(&var, Key, ExpectedValue);
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->preferred_transport);
     var.clear();
 
     settings = std::make_unique<tr_session_settings>();
     tr_variantInitDict(&var, 1);
     tr_variantDictAddStrView(&var, Key, "tcp");
-    settings->load(&var);
+    settings->load(var);
     EXPECT_EQ(ExpectedValue, settings->preferred_transport);
 }
 
@@ -447,7 +447,7 @@ TEST_F(SettingsTest, canSavePreferredTransport)
     auto var = tr_variant{};
     tr_variantInitDict(&var, 100);
     settings.preferred_transport = ExpectedValue;
-    settings.save(&var);
+    var = settings.settings();
     auto val = std::string_view{};
     EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
     EXPECT_EQ("tcp", val);
