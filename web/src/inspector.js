@@ -735,10 +735,6 @@ export class Inspector extends EventTarget {
 
     const rows = [];
     for (const tor of torrents) {
-      const group = document.createElement('div');
-      group.classList.add('inspector-group');
-      rows.push(group);
-
       // if >1 torrent to be shown, give a title
       if (torrents.length > 1) {
         const title = document.createElement('div');
@@ -747,6 +743,8 @@ export class Inspector extends EventTarget {
         rows.push(title);
       }
 
+      const group = document.createElement('div');
+      group.classList.add('tier-list-group');
       for (const tracker of tor.getTrackers()) {
         const announceState = Inspector.getAnnounceState(tracker);
         const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
@@ -809,8 +807,9 @@ export class Inspector extends EventTarget {
         );
         tier_div.append(element);
 
-        rows.push(tier_div);
+        group.append(tier_div);
       }
+      rows.push(group);
     }
 
     // TODO: modify instead of rebuilding wholesale?
