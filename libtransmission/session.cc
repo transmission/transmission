@@ -76,50 +76,55 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         return;
     }
 
-    auto groups_var = tr_variant_serde::json().parse_file(filename);
+    auto const groups_var = tr_variant_serde::json().parse_file(filename);
     if (!groups_var)
     {
         return;
     }
 
-    auto idx = size_t{ 0 };
-    auto key = tr_quark{};
-    tr_variant* dict = nullptr;
-    while (tr_variantDictChild(&*groups_var, idx, &key, &dict))
+    auto const* const groups_map = groups_var->get_if<tr_variant::Map>();
+    if (groups_map == nullptr)
     {
-        ++idx;
+        return;
+    }
 
-        auto name = tr_interned_string(key);
-        auto& group = session->getBandwidthGroup(name);
+    for (auto const& [key, group_var] : *groups_map)
+    {
+        auto const* const group_map = group_var.get_if<tr_variant::Map>();
+        if (group_map == nullptr)
+        {
+            continue;
+        }
 
+        auto& group = session->getBandwidthGroup(tr_interned_string{ key });
         auto limits = tr_bandwidth_limits{};
 
-        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &val))
+        if (auto const* val = group_map->find_if<bool>(TR_KEY_uploadLimited); val != nullptr)
         {
-            limits.up_limited = val;
+            limits.up_limited = *val;
         }
 
-        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &val))
+        if (auto const* val = group_map->find_if<bool>(TR_KEY_downloadLimited); val != nullptr)
         {
-            limits.down_limited = val;
+            limits.down_limited = *val;
         }
 
-        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
+        if (auto const* val = group_map->find_if<int64_t>(TR_KEY_uploadLimit); val != nullptr)
         {
-            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
+            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
         }
 
-        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &val))
+        if (auto const* val = group_map->find_if<int64_t>(TR_KEY_downloadLimit); val != nullptr)
         {
-            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
+            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
         }
 
         group.set_limits(&limits);
 
-        if (auto honors = bool{}; tr_variantDictFindBool(dict, TR_KEY_honorsSessionLimits, &honors))
+        if (auto const* val = group_map->find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
         {
-            group.honor_parent_limits(TR_UP, honors);
-            group.honor_parent_limits(TR_DOWN, honors);
+            group.honor_parent_limits(TR_UP, *val);
+            group.honor_parent_limits(TR_DOWN, *val);
         }
     }
 }
@@ -127,27 +132,24 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
     auto const& groups = session->bandwidthGroups();
-
-    auto groups_dict = tr_variant{};
-    tr_variantInitDict(&groups_dict, std::size(groups));
-
+    auto groups_map = tr_variant::Map{ std::size(groups) };
     for (auto const& [name, group] : groups)
     {
         auto const limits = group->get_limits();
-
-        auto* const dict = tr_variantDictAddDict(&groups_dict, name.quark(), 5);
-        tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
-        tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
-        tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
-        tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
-        tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
-        tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+        auto group_map = tr_variant::Map{ 6U };
+        group_map.try_emplace(TR_KEY_downloadLimit, limits.down_limit_KBps);
+        group_map.try_emplace(TR_KEY_downloadLimited, limits.down_limited);
+        group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+        group_map.try_emplace(TR_KEY_name, name.sv());
+        group_map.try_emplace(TR_KEY_uploadLimit, limits.up_limit_KBps);
+        group_map.try_emplace(TR_KEY_uploadLimited, limits.up_limited);
+        groups_map.try_emplace(name.quark(), std::move(group_map));
     }
 
-    auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
-    tr_variant_serde::json().to_file(groups_dict, filename);
+    tr_variant_serde::json().to_file(
+        tr_variant{ std::move(groups_map) },
+        tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
-
 } // namespace bandwidth_group_helpers
 
 void update_bandwidth(tr_session* session, tr_direction dir)
@@ -467,10 +469,7 @@ tr_variant tr_sessionGetSettings(tr_session const* session)
     settings.merge(session->settings_.settings());
     settings.merge(session->alt_speeds_.settings());
     settings.merge(session->rpc_server_->settings());
-
-    tr_variantDictRemove(&settings, TR_KEY_message_level);
-    tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
-
+    (*settings.get_if<tr_variant::Map>())[TR_KEY_message_level] = tr_logGetLevel();
     return settings;
 }
 
