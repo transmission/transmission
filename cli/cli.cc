@@ -256,7 +256,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    auto* const h = tr_sessionInit(config_dir.c_str(), false, &settings);
+    auto* const h = tr_sessionInit(config_dir.c_str(), false, settings);
     auto* const ctor = tr_ctorNew(h);
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);

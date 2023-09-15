@@ -319,9 +319,10 @@ public:
         val_.emplace<std::monostate>();
     }
 
-    void merge(tr_variant const& that)
+    tr_variant& merge(tr_variant const& that)
     {
         std::visit(Merge{ *this }, that.val_);
+        return *this;
     }
 
 private:

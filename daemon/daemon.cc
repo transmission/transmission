@@ -684,7 +684,7 @@ void tr_daemon::reconfigure(void)
         tr_variantDictAddBool(&newsettings, TR_KEY_rpc_enabled, true);
         newsettings.merge(tr_sessionLoadSettings(configDir, MyName));
 
-        tr_sessionSet(my_session_, &newsettings);
+        tr_sessionSet(my_session_, newsettings);
         tr_sessionReloadBlocklists(my_session_);
     }
 }
@@ -725,7 +725,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
-    session = tr_sessionInit(cdir, true, &settings_);
+    session = tr_sessionInit(cdir, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", cdir)));
     tr_sessionSaveSettings(session, cdir, &settings_);

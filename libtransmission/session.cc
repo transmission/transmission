@@ -500,27 +500,28 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     TR_ASSERT(client_settings != nullptr);
     TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
 
-    tr_variant settings;
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
 
-    tr_variantInitDict(&settings, 0);
-
-    /* the existing file settings are the fallback values */
+    // from highest to lowest precedence:
+    // - actual values
+    // - client settings
+    // - previous session's settings stored in settings.json
+    // - built-in defaults
+    auto settings = tr_sessionGetDefaultSettings();
     if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        tr_variantMergeDicts(&settings, &*file_settings);
+        settings.merge(*file_settings);
     }
-
-    /* the client's settings override the file settings */
-    tr_variantMergeDicts(&settings, client_settings);
-
-    /* the session's true values override the file & client settings */
+    if (client_settings != nullptr)
+    {
+        settings.merge(*client_settings);
+    }
     settings.merge(tr_sessionGetSettings(session));
 
-    /* save the result */
+    // save 'em
     tr_variant_serde::json().to_file(settings, filename);
 
-    /* Write bandwidth groups limits to file  */
+    // write bandwidth groups limits to file
     bandwidthGroupWrite(session, config_dir);
 }
 
@@ -528,37 +529,51 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 
 struct tr_session::init_data
 {
+    init_data(bool message_queuing_enabled_in, std::string_view config_dir_in, tr_variant const& settings_in)
+        : message_queuing_enabled{ message_queuing_enabled_in }
+        , config_dir{ config_dir_in }
+        , settings{ settings_in }
+    {
+    }
+
     bool message_queuing_enabled;
     std::string_view config_dir;
-    tr_variant* client_settings;
+    tr_variant const& settings;
+
     std::condition_variable_any done_cv;
 };
 
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings)
+tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(config_dir != nullptr);
+    TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
     tr_timeUpdate(time(nullptr));
 
-    // nice to start logging at the very beginning
-    if (auto val = int64_t{}; tr_variantDictFindInt(client_settings, TR_KEY_message_level, &val))
+    // settings order of precedence from highest to lowest:
+    // - client settings
+    // - previous session's values in settings.json
+    // - hardcoded defaults
+    auto settings = tr_sessionLoadSettings(config_dir, nullptr);
+    settings.merge(client_settings);
+
+    // if logging is desired, start it now before doing more work
+    if (auto const* settings_map = client_settings.get_if<tr_variant::Map>(); settings_map != nullptr)
     {
-        tr_logSetLevel(static_cast<tr_log_level>(val));
+        if (auto const* val = settings_map->find_if<bool>(TR_KEY_message_level); val != nullptr)
+        {
+            tr_logSetLevel(static_cast<tr_log_level>(*val));
+        }
     }
 
-    /* initialize the bare skeleton of the session object */
+    // initialize the bare skeleton of the session object
     auto* const session = new tr_session{ config_dir, tr_variant::make_map() };
     bandwidthGroupRead(session, config_dir);
 
-    auto data = tr_session::init_data{};
-    data.config_dir = config_dir;
-    data.message_queuing_enabled = message_queueing_enabled;
-    data.client_settings = client_settings;
-
     // run initImpl() in the libtransmission thread
+    auto data = tr_session::init_data{ message_queueing_enabled, config_dir, settings };
     auto lock = session->unique_lock();
     session->runInSessionThread([&session, &data]() { session->initImpl(data); });
     data.done_cv.wait(lock); // wait for the session to be ready
@@ -590,14 +605,10 @@ void tr_session::initImpl(init_data& data)
     auto lock = unique_lock();
     TR_ASSERT(am_in_session_thread());
 
-    auto* const client_settings = data.client_settings;
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    auto const& settings = data.settings;
+    TR_ASSERT(settings.holds_alternative<tr_variant::Map>());
 
     tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
-
-    auto settings = tr_sessionGetDefaultSettings();
-    tr_variantMergeDicts(&settings, client_settings);
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
@@ -610,7 +621,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
-    setSettings(client_settings, true);
+    setSettings(settings, true);
 
     if (this->allowsLPD())
     {
@@ -623,20 +634,16 @@ void tr_session::initImpl(init_data& data)
     data.done_cv.notify_one();
 }
 
-void tr_session::setSettings(tr_variant* settings_dict, bool force)
+void tr_session::setSettings(tr_variant const& settings, bool force)
 {
     TR_ASSERT(am_in_session_thread());
-    TR_ASSERT(settings_dict != nullptr);
-    TR_ASSERT(settings_dict->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(settings.holds_alternative<tr_variant::Map>());
 
-    // load the session settings
-    auto new_settings = tr_session_settings{};
-    new_settings.load(*settings_dict);
-    setSettings(std::move(new_settings), force);
+    setSettings(tr_session_settings{ settings }, force);
 
     // delegate loading out the other settings
-    alt_speeds_.load(*settings_dict);
-    rpc_server_->load(*settings_dict);
+    alt_speeds_.load(settings);
+    rpc_server_->load(settings);
 }
 
 void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
@@ -766,7 +773,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     update_bandwidth(this, TR_DOWN);
 }
 
-void tr_sessionSet(tr_session* session, tr_variant* settings)
+void tr_sessionSet(tr_session* session, tr_variant const& settings)
 {
     // do the work in the session thread
     auto done_promise = std::promise<void>{};
