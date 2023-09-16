@@ -711,7 +711,7 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
     walk(var, Funcs, &data, true);
 
     auto& buf = data.out;
-    if (!std::empty(buf))
+    if (!compact_ && !std::empty(buf))
     {
         buf.push_back('\n');
     }
