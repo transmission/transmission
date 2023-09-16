@@ -131,6 +131,20 @@ TEST_P(JSONTest, testUtf8)
     tr_variantDictAddStr(&var, key, "Дыскаграфія"sv);
     json = serde.to_string(var);
     EXPECT_EQ(R"({"key":"Дыскаграфія"})"sv, json);
+    var = serde.parse(json).value_or(tr_variant{});
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
+    EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
+    EXPECT_EQ("Дыскаграфія"sv, sv);
+
+    var.clear();
+    tr_variantInitDict(&var, 1U);
+    tr_variantDictAddStr(&var, key, "\xf0\x9f\xa4\x94"sv);
+    json = serde.to_string(var);
+    EXPECT_EQ("{\"key\":\"\xf0\x9f\xa4\x94\"}"sv, json);
+    var = serde.parse(json).value_or(tr_variant{});
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
+    EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
+    EXPECT_EQ("\xf0\x9f\xa4\x94"sv, sv);
 }
 
 TEST_P(JSONTest, test1)
