@@ -142,7 +142,7 @@ public:
         // --- custom functions
 
         template<typename Type>
-        [[nodiscard]] TR_CONSTEXPR20 auto TR_CONSTEXPR20 find_if(tr_quark const key) const noexcept
+        [[nodiscard]] TR_CONSTEXPR20 auto find_if(tr_quark const key) const noexcept
         {
             auto const iter = find(key);
             return iter != end() ? iter->second.get_if<Type>() : nullptr;
@@ -319,9 +319,10 @@ public:
         val_.emplace<std::monostate>();
     }
 
-    void merge(tr_variant const& that)
+    tr_variant& merge(tr_variant const& that)
     {
         std::visit(Merge{ *this }, that.val_);
+        return *this;
     }
 
 private:

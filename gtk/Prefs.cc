@@ -213,5 +213,5 @@ void gtr_pref_string_set(tr_quark const key, std::string_view value)
 
 void gtr_pref_save(tr_session* session)
 {
-    tr_sessionSaveSettings(session, gl_confdir.c_str(), &getPrefs());
+    tr_sessionSaveSettings(session, gl_confdir.c_str(), getPrefs());
 }

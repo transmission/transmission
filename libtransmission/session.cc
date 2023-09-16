@@ -76,50 +76,55 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         return;
     }
 
-    auto groups_var = tr_variant_serde::json().parse_file(filename);
+    auto const groups_var = tr_variant_serde::json().parse_file(filename);
     if (!groups_var)
     {
         return;
     }
 
-    auto idx = size_t{ 0 };
-    auto key = tr_quark{};
-    tr_variant* dict = nullptr;
-    while (tr_variantDictChild(&*groups_var, idx, &key, &dict))
+    auto const* const groups_map = groups_var->get_if<tr_variant::Map>();
+    if (groups_map == nullptr)
     {
-        ++idx;
+        return;
+    }
 
-        auto name = tr_interned_string(key);
-        auto& group = session->getBandwidthGroup(name);
+    for (auto const& [key, group_var] : *groups_map)
+    {
+        auto const* const group_map = group_var.get_if<tr_variant::Map>();
+        if (group_map == nullptr)
+        {
+            continue;
+        }
 
+        auto& group = session->getBandwidthGroup(tr_interned_string{ key });
         auto limits = tr_bandwidth_limits{};
 
-        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &val))
+        if (auto const* val = group_map->find_if<bool>(TR_KEY_uploadLimited); val != nullptr)
         {
-            limits.up_limited = val;
+            limits.up_limited = *val;
         }
 
-        if (auto val = bool{}; tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &val))
+        if (auto const* val = group_map->find_if<bool>(TR_KEY_downloadLimited); val != nullptr)
         {
-            limits.down_limited = val;
+            limits.down_limited = *val;
         }
 
-        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
+        if (auto const* val = group_map->find_if<int64_t>(TR_KEY_uploadLimit); val != nullptr)
         {
-            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
+            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
         }
 
-        if (auto val = int64_t{}; tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &val))
+        if (auto const* val = group_map->find_if<int64_t>(TR_KEY_downloadLimit); val != nullptr)
         {
-            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(val);
+            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
         }
 
         group.set_limits(&limits);
 
-        if (auto honors = bool{}; tr_variantDictFindBool(dict, TR_KEY_honorsSessionLimits, &honors))
+        if (auto const* val = group_map->find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
         {
-            group.honor_parent_limits(TR_UP, honors);
-            group.honor_parent_limits(TR_DOWN, honors);
+            group.honor_parent_limits(TR_UP, *val);
+            group.honor_parent_limits(TR_DOWN, *val);
         }
     }
 }
@@ -127,27 +132,24 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
     auto const& groups = session->bandwidthGroups();
-
-    auto groups_dict = tr_variant{};
-    tr_variantInitDict(&groups_dict, std::size(groups));
-
+    auto groups_map = tr_variant::Map{ std::size(groups) };
     for (auto const& [name, group] : groups)
     {
         auto const limits = group->get_limits();
-
-        auto* const dict = tr_variantDictAddDict(&groups_dict, name.quark(), 5);
-        tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
-        tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
-        tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
-        tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
-        tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
-        tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+        auto group_map = tr_variant::Map{ 6U };
+        group_map.try_emplace(TR_KEY_downloadLimit, limits.down_limit_KBps);
+        group_map.try_emplace(TR_KEY_downloadLimited, limits.down_limited);
+        group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
+        group_map.try_emplace(TR_KEY_name, name.sv());
+        group_map.try_emplace(TR_KEY_uploadLimit, limits.up_limit_KBps);
+        group_map.try_emplace(TR_KEY_uploadLimited, limits.up_limited);
+        groups_map.try_emplace(name.quark(), std::move(group_map));
     }
 
-    auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
-    tr_variant_serde::json().to_file(groups_dict, filename);
+    tr_variant_serde::json().to_file(
+        tr_variant{ std::move(groups_map) },
+        tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
-
 } // namespace bandwidth_group_helpers
 
 void update_bandwidth(tr_session* session, tr_direction dir)
@@ -467,10 +469,7 @@ tr_variant tr_sessionGetSettings(tr_session const* session)
     settings.merge(session->settings_.settings());
     settings.merge(session->alt_speeds_.settings());
     settings.merge(session->rpc_server_->settings());
-
-    tr_variantDictRemove(&settings, TR_KEY_message_level);
-    tr_variantDictAddInt(&settings, TR_KEY_message_level, tr_logGetLevel());
-
+    (*settings.get_if<tr_variant::Map>())[TR_KEY_message_level] = tr_logGetLevel();
     return settings;
 }
 
@@ -493,34 +492,31 @@ tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name)
     return settings;
 }
 
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const* client_settings)
+void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
-    tr_variant settings;
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
 
-    tr_variantInitDict(&settings, 0);
-
-    /* the existing file settings are the fallback values */
+    // from highest to lowest precedence:
+    // - actual values
+    // - client settings
+    // - previous session's settings stored in settings.json
+    // - built-in defaults
+    auto settings = tr_sessionGetDefaultSettings();
     if (auto const file_settings = tr_variant_serde::json().parse_file(filename); file_settings)
     {
-        tr_variantMergeDicts(&settings, &*file_settings);
+        settings.merge(*file_settings);
     }
-
-    /* the client's settings override the file settings */
-    tr_variantMergeDicts(&settings, client_settings);
-
-    /* the session's true values override the file & client settings */
+    settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
-    /* save the result */
+    // save 'em
     tr_variant_serde::json().to_file(settings, filename);
 
-    /* Write bandwidth groups limits to file  */
+    // write bandwidth groups limits to file
     bandwidthGroupWrite(session, config_dir);
 }
 
@@ -528,37 +524,51 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 
 struct tr_session::init_data
 {
+    init_data(bool message_queuing_enabled_in, std::string_view config_dir_in, tr_variant const& settings_in)
+        : message_queuing_enabled{ message_queuing_enabled_in }
+        , config_dir{ config_dir_in }
+        , settings{ settings_in }
+    {
+    }
+
     bool message_queuing_enabled;
     std::string_view config_dir;
-    tr_variant* client_settings;
+    tr_variant const& settings;
+
     std::condition_variable_any done_cv;
 };
 
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant* client_settings)
+tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(config_dir != nullptr);
+    TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
     tr_timeUpdate(time(nullptr));
 
-    // nice to start logging at the very beginning
-    if (auto val = int64_t{}; tr_variantDictFindInt(client_settings, TR_KEY_message_level, &val))
+    // settings order of precedence from highest to lowest:
+    // - client settings
+    // - previous session's values in settings.json
+    // - hardcoded defaults
+    auto settings = tr_sessionLoadSettings(config_dir, nullptr);
+    settings.merge(client_settings);
+
+    // if logging is desired, start it now before doing more work
+    if (auto const* settings_map = client_settings.get_if<tr_variant::Map>(); settings_map != nullptr)
     {
-        tr_logSetLevel(static_cast<tr_log_level>(val));
+        if (auto const* val = settings_map->find_if<bool>(TR_KEY_message_level); val != nullptr)
+        {
+            tr_logSetLevel(static_cast<tr_log_level>(*val));
+        }
     }
 
-    /* initialize the bare skeleton of the session object */
+    // initialize the bare skeleton of the session object
     auto* const session = new tr_session{ config_dir, tr_variant::make_map() };
     bandwidthGroupRead(session, config_dir);
 
-    auto data = tr_session::init_data{};
-    data.config_dir = config_dir;
-    data.message_queuing_enabled = message_queueing_enabled;
-    data.client_settings = client_settings;
-
     // run initImpl() in the libtransmission thread
+    auto data = tr_session::init_data{ message_queueing_enabled, config_dir, settings };
     auto lock = session->unique_lock();
     session->runInSessionThread([&session, &data]() { session->initImpl(data); });
     data.done_cv.wait(lock); // wait for the session to be ready
@@ -590,14 +600,10 @@ void tr_session::initImpl(init_data& data)
     auto lock = unique_lock();
     TR_ASSERT(am_in_session_thread());
 
-    auto* const client_settings = data.client_settings;
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    auto const& settings = data.settings;
+    TR_ASSERT(settings.holds_alternative<tr_variant::Map>());
 
     tr_logAddTrace(fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&top_bandwidth_)));
-
-    auto settings = tr_sessionGetDefaultSettings();
-    tr_variantMergeDicts(&settings, client_settings);
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
@@ -610,7 +616,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
-    setSettings(client_settings, true);
+    setSettings(settings, true);
 
     if (this->allowsLPD())
     {
@@ -623,20 +629,16 @@ void tr_session::initImpl(init_data& data)
     data.done_cv.notify_one();
 }
 
-void tr_session::setSettings(tr_variant* settings_dict, bool force)
+void tr_session::setSettings(tr_variant const& settings, bool force)
 {
     TR_ASSERT(am_in_session_thread());
-    TR_ASSERT(settings_dict != nullptr);
-    TR_ASSERT(settings_dict->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(settings.holds_alternative<tr_variant::Map>());
 
-    // load the session settings
-    auto new_settings = tr_session_settings{};
-    new_settings.load(*settings_dict);
-    setSettings(std::move(new_settings), force);
+    setSettings(tr_session_settings{ settings }, force);
 
     // delegate loading out the other settings
-    alt_speeds_.load(*settings_dict);
-    rpc_server_->load(*settings_dict);
+    alt_speeds_.load(settings);
+    rpc_server_->load(settings);
 }
 
 void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
@@ -766,7 +768,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     update_bandwidth(this, TR_DOWN);
 }
 
-void tr_sessionSet(tr_session* session, tr_variant* settings)
+void tr_sessionSet(tr_session* session, tr_variant const& settings)
 {
     // do the work in the session thread
     auto done_promise = std::promise<void>{};
