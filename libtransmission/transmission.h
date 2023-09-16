@@ -199,7 +199,7 @@ tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name);
  * @param client_settings the dictionary to save
  * @see `tr_sessionLoadSettings()`
  */
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct tr_variant const* client_settings);
+void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings);
 
 /**
  * @brief Initialize a libtransmission session.

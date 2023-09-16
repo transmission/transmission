@@ -492,12 +492,11 @@ tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name)
     return settings;
 }
 
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const* client_settings)
+void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings)
 {
     using namespace bandwidth_group_helpers;
 
-    TR_ASSERT(client_settings != nullptr);
-    TR_ASSERT(client_settings->holds_alternative<tr_variant::Map>());
+    TR_ASSERT(client_settings.holds_alternative<tr_variant::Map>());
 
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
 
@@ -511,10 +510,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     {
         settings.merge(*file_settings);
     }
-    if (client_settings != nullptr)
-    {
-        settings.merge(*client_settings);
-    }
+    settings.merge(client_settings);
     settings.merge(tr_sessionGetSettings(session));
 
     // save 'em

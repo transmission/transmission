@@ -354,7 +354,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    tr_sessionSaveSettings(h, config_dir.c_str(), &settings);
+    tr_sessionSaveSettings(h, config_dir.c_str(), settings);
 
     printf("\n");
     tr_sessionClose(h);

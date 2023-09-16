@@ -857,7 +857,8 @@ tr_variant tr_formatter_get_units()
 
     auto const make_units_vec = [](formatter_units const& units)
     {
-        auto units_vec = tr_variant::Vector{ std::size(units) };
+        auto units_vec = tr_variant::Vector{};
+        units_vec.reserve(std::size(units));
         std::transform(
             std::begin(units),
             std::end(units),

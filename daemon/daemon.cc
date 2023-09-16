@@ -728,7 +728,7 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     session = tr_sessionInit(cdir, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", cdir)));
-    tr_sessionSaveSettings(session, cdir, &settings_);
+    tr_sessionSaveSettings(session, cdir, settings_);
 
     auto sv = std::string_view{};
     (void)tr_variantDictFindStrView(&settings_, key_pidfile_, &sv);
@@ -874,7 +874,7 @@ CLEANUP:
 
     event_base_free(ev_base_);
 
-    tr_sessionSaveSettings(my_session_, cdir, &settings_);
+    tr_sessionSaveSettings(my_session_, cdir, settings_);
     tr_sessionClose(my_session_);
     pumpLogMessages(logfile_, logfile_flush_);
     printf(" done.\n");
