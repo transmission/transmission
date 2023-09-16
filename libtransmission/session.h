@@ -783,6 +783,11 @@ public:
 
     [[nodiscard]] bool allowsUTP() const noexcept;
 
+    [[nodiscard]] constexpr auto preferred_transport() const noexcept
+    {
+        return settings_.preferred_transport;
+    }
+
     [[nodiscard]] constexpr auto allowsPrefetch() const noexcept
     {
         return settings_.is_prefetch_enabled;
