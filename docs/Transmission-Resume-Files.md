@@ -41,3 +41,15 @@ The file contains the following **per-torrent** properties:
 <table>
 <tr><td>Maximum number of remembered peers</td><td><tt>MAX_REMEMBERED_PEERS</tt></td><td>200</td></tr>
 </table>
+
+## Editing
+
+It is difficult to edit the resume file directly by hand. It is easier to call the APIs, for example through the RPC.
+
+The following is an example of resume file, showing the difficulty of editing resume files directly. Some contents are desensitized, such as destination path, torrent name and torrent file names.
+
+```
+d13:activity-datei1694873715e10:added-datei1680497929e18:bandwidth-priorityi0e7:corrupti1048576e11:destination37:(...Path...)3:dndli0ei0ei0ee9:done-datei1684980406e10:downloadedi4121462414e24:downloading-time-secondsi384773e5:filesl67:(...Filename...)83:(...Filename...)83:(...Filename...)e5:group0:10:idle-limitd10:idle-limiti30e9:idle-modei0ee6:labelsle9:max-peersi50e4:name58:(...Torrent Name...)s6:pausedi0e6:peers24800:(...Binary...)
+```
+
+It is observable that there numerous magical slots in some properties. For example, `i1694873715e10` in `activity-date`, `i0ei0ei0ee9` in `dndl` and `i1684980406e10` in `done-date`. These magical slots makes it difficult to edit the resume file by hand.
