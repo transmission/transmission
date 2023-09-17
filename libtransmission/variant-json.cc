@@ -589,14 +589,14 @@ void jsonStringFunc(tr_variant const& /*var*/, std::string_view sv, void* vdata)
     {
         switch (utf8_sv.front())
         {
-        case '\\':
-            *walk++ = '\\';
-            *walk++ = '\\';
-            break;
-
         case '"':
             *walk++ = '\\';
             *walk++ = '"';
+            break;
+
+        case '\\':
+            *walk++ = '\\';
+            *walk++ = '\\';
             break;
 
         case '\b':
