@@ -24,7 +24,7 @@ typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
     TrackerSegmentTagRemove = 1,
 };
 
-@interface CreatorWindowController ()
+@interface CreatorWindowController ()<NSWindowRestoration>
 
 @property(nonatomic) IBOutlet NSImageView* fIconView;
 @property(nonatomic) IBOutlet NSTextField* fNameField;
