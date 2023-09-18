@@ -27,7 +27,7 @@ export class RenameDialog extends EventTarget {
 
     this.torrents = torrents;
     this.elements = RenameDialog._create(
-      this.action_input_value === null ? 'Rename' : 'Confirm' ,
+      this.action_input_value === null ? 'Rename' : 'Confirm',
     );
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
@@ -54,7 +54,7 @@ export class RenameDialog extends EventTarget {
   _onDismiss() {
     if (this.action_input_value === null) {
       this.close();
-    } else  {
+    } else {
       this.controller.action_manager.click('show-inspector');
     }
   }
