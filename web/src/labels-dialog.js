@@ -6,11 +6,12 @@
 import { createDialogContainer } from './utils.js';
 
 export class LabelsDialog extends EventTarget {
-  constructor(controller, remote) {
+  constructor(controller, remote, action_input_value) {
     super();
 
     this.controller = controller;
     this.remote = remote;
+    this.action_input_value = action_input_value;
     this.elements = {};
     this.torrents = [];
 
@@ -26,10 +27,15 @@ export class LabelsDialog extends EventTarget {
     const [first] = torrents;
 
     this.torrents = torrents;
-    this.elements = LabelsDialog._create();
+    this.elements = LabelsDialog._create(this.action_input_value
+        ? 'Confirm'
+        : 'Save'
+    );
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
-    this.elements.entry.value = first.getLabels().join(', ');
+    this.elements.entry.value = this.action_input_value
+      ? this.action_input_value
+      : first.getLabels().join(', ');
     document.body.append(this.elements.root);
 
     this.elements.entry.focus();
@@ -44,7 +50,9 @@ export class LabelsDialog extends EventTarget {
   }
 
   _onDismiss() {
-    this.close();
+    this.action_input_value
+      ? this.controller.action_manager.click('show-inspector')
+      : this.close();
   }
 
   _onConfirm() {
@@ -63,14 +71,15 @@ export class LabelsDialog extends EventTarget {
         }
       }
     });
-    this.close();
+
+    this._onDismiss();
   }
 
-  static _create() {
+  static _create(confirm_text) {
     const elements = createDialogContainer('labels-dialog');
     elements.root.setAttribute('aria-label', 'Edit Labels');
     elements.heading.textContent = 'Edit Labels:';
-    elements.confirm.textContent = 'Save';
+    elements.confirm.textContent = confirm_text;
 
     const label = document.createElement('label');
     label.setAttribute('for', 'torrent-labels');
