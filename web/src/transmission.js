@@ -31,7 +31,7 @@ export class Transmission extends EventTarget {
 
     // Initialize the helper classes
     this.action_manager = action_manager;
-    this.action_input_value = false;
+    this.action_input_value = null;
     this.notifications = notifications;
     this.prefs = prefs;
     this.remote = new Remote(this);
@@ -177,7 +177,7 @@ export class Transmission extends EventTarget {
         default:
           console.warn(`unhandled action: ${event_.action}`);
       }
-      this.action_input_value = false;
+      this.action_input_value = null;
     });
 
     // listen to filter changes
