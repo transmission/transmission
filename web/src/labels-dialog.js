@@ -27,10 +27,10 @@ export class LabelsDialog extends EventTarget {
     const [first] = torrents;
 
     this.torrents = torrents;
-    const confirm_text = this.action_input_value !== null
-      ? 'Confirm'
-      : 'Save'
-    this.elements = LabelsDialog._create(confirm_text);
+    this.elements = LabelsDialog._create(this.action_input_value !== null
+        ? 'Confirm'
+        : 'Save'
+    );
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this.elements.entry.value = this.action_input_value !== null
@@ -50,9 +50,11 @@ export class LabelsDialog extends EventTarget {
   }
 
   _onDismiss() {
-    this.action_input_value !== null
-      ? this.controller.action_manager.click('show-inspector')
-      : this.close();
+    if (this.action_input_value !== null) {
+      this.controller.action_manager.click('show-inspector');
+    } else {
+      this.close();
+    }
   }
 
   _onConfirm() {
