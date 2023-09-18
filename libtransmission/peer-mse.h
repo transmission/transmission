@@ -84,6 +84,11 @@ public:
         process(buf_in, buf_len, buf_out, dec_active_, dec_key_);
     }
 
+    constexpr void decrypt_skip(size_t len) noexcept
+    {
+        skip(len, dec_active_, dec_key_);
+    }
+
     void encrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
 
     template<typename T>
@@ -108,6 +113,14 @@ private:
         else
         {
             std::copy_n(buf_in, buf_len, buf_out);
+        }
+    }
+
+    static constexpr void skip(size_t len, bool active, tr_arc4& arc4)
+    {
+        if (active)
+        {
+            arc4.discard(len);
         }
     }
 

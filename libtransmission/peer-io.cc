@@ -599,14 +599,7 @@ void tr_peerIo::read_uint32(uint32_t* setme)
 
 void tr_peerIo::read_buffer_drain(size_t byte_count)
 {
-    auto buf = std::array<char, 4096>{};
-
-    while (byte_count > 0)
-    {
-        auto const this_pass = std::min(byte_count, std::size(buf));
-        read_bytes(std::data(buf), this_pass);
-        byte_count -= this_pass;
-    }
+    filter_.decrypt_skip(byte_count);
 }
 
 // --- UTP
