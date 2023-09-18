@@ -217,8 +217,8 @@ private:
     static auto constexpr DhtFlag = size_t{ 63U };
 
     // Next comes the 20 byte sha1 info_hash and the 20-byte peer_id
-    static auto constexpr HandshakeSize = sizeof(HandshakeName) + HandshakeFlagsBytes + sizeof(tr_sha1_digest_t) +
-        sizeof(tr_peer_id_t);
+    static auto constexpr HandshakeSize = std::size(HandshakeName) + HandshakeFlagsBytes + std::tuple_size_v<tr_sha1_digest_t> +
+        std::tuple_size_v<tr_peer_id_t>;
     static_assert(HandshakeSize == 68);
 
     // Length of handhshake up through the info_hash. From theory.org:
@@ -226,7 +226,8 @@ private:
     // > the recipient must respond as soon as it sees the info_hash part
     // > of the handshake (the peer id will presumably be sent after the
     // > recipient sends its own handshake).
-    static auto constexpr IncomingHandshakeLen = sizeof(HandshakeName) + HandshakeFlagsBytes + sizeof(tr_sha1_digest_t);
+    static auto constexpr IncomingHandshakeLen = std::size(HandshakeName) + HandshakeFlagsBytes +
+        std::tuple_size_v<tr_sha1_digest_t>;
     static_assert(IncomingHandshakeLen == 48);
 
     // MSE constants.

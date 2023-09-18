@@ -498,7 +498,7 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
     auto obfuscated_hash = tr_sha1_digest_t{};
-    size_t const needlen = sizeof(obfuscated_hash) + /* HASH('req2', SKEY) xor HASH('req3', S) */
+    size_t const needlen = std::size(obfuscated_hash) + /* HASH('req2', SKEY) xor HASH('req3', S) */
         std::size(VC) + sizeof(crypto_provide) + sizeof(padc_len);
 
     if (peer_io->read_buffer_size() < needlen)
