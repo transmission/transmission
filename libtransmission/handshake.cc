@@ -269,7 +269,7 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
             return READ_NOW;
         }
 
-        peer_io->read_buffer_discard(1);
+        peer_io->read_buffer_discard(1U);
     }
 
     tr_logAddTraceHand(this, "couldn't find ENCRYPT(VC)");
@@ -492,7 +492,6 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
 ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 {
     /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
-
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
     auto obfuscated_hash = tr_sha1_digest_t{};
@@ -529,7 +528,6 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
     }
 
     /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
-
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readCryptoProvide requires an info_hash");
     peer_io->decrypt_init(peer_io->is_incoming(), dh_, info_hash);
@@ -586,7 +584,6 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     }
 
     // B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
-
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
     peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
