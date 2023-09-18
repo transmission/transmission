@@ -12,6 +12,7 @@
 
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port, tr_tos_t
+#include "libtransmission/peer-io.h" // tr_preferred_transport
 #include "libtransmission/quark.h"
 
 struct tr_variant;
@@ -76,19 +77,21 @@ struct tr_variant;
     V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
+    V(TR_KEY_preferred_transport, preferred_transport, tr_preferred_transport, TR_PREFER_UTP, "") \
     V(TR_KEY_torrent_added_verify_mode, torrent_added_verify_mode, tr_verify_added_mode, TR_VERIFY_ADDED_FAST, "")
 
 struct tr_session_settings
 {
     tr_session_settings() = default;
 
-    explicit tr_session_settings(tr_variant* src)
+    explicit tr_session_settings(tr_variant const& src)
     {
         load(src);
     }
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
 #define V(key, name, type, default_value, comment) type name = type{ default_value };
     SESSION_SETTINGS_FIELDS(V)
