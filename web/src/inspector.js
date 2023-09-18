@@ -81,21 +81,20 @@ export class Inspector extends EventTarget {
       root.append(lhs);
 
       if (action) {
-        const rhs = document.createElement("input");
-        rhs.setAttribute("type", "text");
-        rhs.addEventListener("keydown", (k) => {
-          if (k.keyCode === 13) {
+        const rhs = document.createElement('input');
+        rhs.setAttribute('type', 'text');
+        rhs.addEventListener('keydown', (k) => {
+          if (k.key === 'Enter') {
             controller.action_input_value = rhs.value;
             controller.action_manager.click(action);
           }
         });
         root.append(rhs);
         return rhs;
-      } else {
-        const rhs = document.createElement('span');
-        root.append(rhs);
-        return rhs;
       }
+      const rhs = document.createElement('span');
+      root.append(rhs);
+      return rhs;
     };
 
     append_section_title('Torrent');
@@ -309,7 +308,7 @@ export class Inspector extends EventTarget {
     string = null;
     action = false;
     placeholder = none;
-    if (torrents.length >= 1) {
+    if (torrents.length > 0) {
       const get = (t) => t.getDownloadDir();
       const first = get(torrents[0]);
       if (torrents.every((t) => get(t) === first)) {
