@@ -29,14 +29,13 @@ export class MoveDialog extends EventTarget {
     default_path = default_path || torrents[0].getDownloadDir();
 
     this.torrents = torrents;
-    this.elements = MoveDialog._create(this.action_input_value !== null
-        ? 'Confirm'
-        : 'Apply');
+    this.elements = MoveDialog._create(
+      this.action_input_value === null ? 'Apply' : 'Confirm',
+    );
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
-    this.elements.entry.value = this.action_input_value !== null
-      ? this.action_input_value
-      : default_path;
+    this.elements.entry.value =
+      this.action_input_value === null ? default_path : this.action_input_value;
     document.body.append(this.elements.root);
 
     this.elements.entry.focus();
@@ -54,10 +53,10 @@ export class MoveDialog extends EventTarget {
   }
 
   _onDismiss() {
-    if (this.action_input_value !== null) {
-      this.controller.action_manager.click('show-inspector');
-    } else {
+    if (this.action_input_value === null) {
       this.close();
+    } else {
+      this.controller.action_manager.click('show-inspector');
     }
   }
 
