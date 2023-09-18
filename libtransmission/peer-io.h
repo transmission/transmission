@@ -120,7 +120,7 @@ public:
         return inbuf_.starts_with(t);
     }
 
-    void read_buffer_drain(size_t byte_count);
+    void read_buffer_discard(size_t n_bytes);
 
     void read_bytes(void* bytes, size_t n_bytes)
     {

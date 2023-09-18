@@ -213,12 +213,12 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
             // We already know it's a match; now we just need to
             // consume it from the read buffer.
             peer_io->decrypt_init(peer_io->is_incoming(), dh_, info_hash);
-            peer_io->read_bytes(std::data(*encrypted_vc_), std::size(*encrypted_vc_));
+            peer_io->read_buffer_discard(std::size(*encrypted_vc_));
             set_state(tr_handshake::State::AwaitingCryptoSelect);
             return READ_NOW;
         }
 
-        peer_io->read_buffer_drain(1);
+        peer_io->read_buffer_discard(1U);
     }
 
     tr_logAddTraceHand(this, "couldn't find ENCRYPT(VC)");
@@ -266,7 +266,7 @@ ReadState tr_handshake::read_pad_d(tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    peer_io->read_buffer_drain(needlen);
+    peer_io->read_buffer_discard(needlen);
 
     set_state(tr_handshake::State::AwaitingHandshake);
     return READ_NOW;
@@ -439,12 +439,12 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
         if (peer_io->read_buffer_starts_with(needle))
         {
             tr_logAddTraceHand(this, "found it... setting state to AwaitingCryptoProvide");
-            peer_io->read_buffer_drain(std::size(needle));
+            peer_io->read_buffer_discard(std::size(needle));
             set_state(State::AwaitingCryptoProvide);
             return READ_NOW;
         }
 
-        peer_io->read_buffer_drain(1U);
+        peer_io->read_buffer_discard(1U);
     }
 
     tr_logAddTraceHand(this, "couldn't find HASH('req1', S)");
@@ -527,7 +527,7 @@ ReadState tr_handshake::read_pad_c(tr_peerIo* peer_io)
     }
 
     // read the throwaway padc
-    peer_io->read_buffer_drain(pad_c_len_);
+    peer_io->read_buffer_discard(pad_c_len_);
 
     /* read ia_len */
     uint16_t ia_len = 0;
