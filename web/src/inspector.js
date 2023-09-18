@@ -285,7 +285,9 @@ export class Inspector extends EventTarget {
       string = torrents[0].getName();
       action = true;
     }
-    e.info.name.value = string;
+    if (e.info.name !== document.activeElement) {
+      e.info.name.value = string;
+    }
     e.info.name.placeholder = placeholder;
     e.info.name.disabled = !action;
 
@@ -297,7 +299,9 @@ export class Inspector extends EventTarget {
       string = torrents[0].getLabels().join(', ');
       action = true;
     }
-    e.info.labels.value = string;
+    if (e.info.labels !== document.activeElement) {
+      e.info.labels.value = string;
+    }
     e.info.labels.placeholder = none;
     e.info.labels.disabled = !action;
 
@@ -315,7 +319,9 @@ export class Inspector extends EventTarget {
         placeholder = mixed;
       }
     }
-    e.info.location.value = string;
+    if (e.info.location !== document.activeElement) {
+      e.info.location.value = string;
+    }
     e.info.location.placeholder = placeholder;
     e.info.location.disabled = !action;
 
