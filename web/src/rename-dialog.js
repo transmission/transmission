@@ -26,15 +26,15 @@ export class RenameDialog extends EventTarget {
     }
 
     this.torrents = torrents;
-    this.elements = RenameDialog._create(this.action_input_value !== null
-      ? 'Confirm'
-      : 'Rename'
+    this.elements = RenameDialog._create(
+      this.action_input_value === null ? 'Rename' : 'Confirm' ,
     );
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
-    this.elements.entry.value = this.action_input_value !== null
-      ? this.action_input_value
-      : torrents[0].getName();
+    this.elements.entry.value =
+      this.action_input_value === null
+        ? torrents[0].getName()
+        : this.action_input_value;
     document.body.append(this.elements.root);
 
     this.elements.entry.focus();
@@ -52,10 +52,10 @@ export class RenameDialog extends EventTarget {
   }
 
   _onDismiss() {
-    if (this.action_input_value !== null) {
-      this.controller.action_manager.click('show-inspector');
-    } else  {
+    if (this.action_input_value === null) {
       this.close();
+    } else  {
+      this.controller.action_manager.click('show-inspector');
     }
   }
 
