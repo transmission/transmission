@@ -31,6 +31,7 @@ export class Transmission extends EventTarget {
 
     // Initialize the helper classes
     this.action_manager = action_manager;
+    this.action_input_value = null;
     this.notifications = notifications;
     this.prefs = prefs;
     this.remote = new Remote(this);
@@ -127,7 +128,7 @@ export class Transmission extends EventTarget {
           }
           break;
         case 'show-move-dialog':
-          this.setCurrentPopup(new MoveDialog(this, this.remote));
+          this.setCurrentPopup(new MoveDialog(this, this.remote, this.action_input_value));
           break;
         case 'show-overflow-menu':
           if (this.popup instanceof OverflowMenu) {
@@ -153,10 +154,10 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new StatisticsDialog(this.remote));
           break;
         case 'show-rename-dialog':
-          this.setCurrentPopup(new RenameDialog(this, this.remote));
+          this.setCurrentPopup(new RenameDialog(this, this.remote, this.action_input_value));
           break;
         case 'show-labels-dialog':
-          this.setCurrentPopup(new LabelsDialog(this, this.remote));
+          this.setCurrentPopup(new LabelsDialog(this, this.remote, this.action_input_value));
           break;
         case 'start-all-torrents':
           this._startTorrents(this._getAllTorrents());
@@ -176,6 +177,7 @@ export class Transmission extends EventTarget {
         default:
           console.warn(`unhandled action: ${event_.action}`);
       }
+      this.action_input_value = null;
     });
 
     // listen to filter changes
