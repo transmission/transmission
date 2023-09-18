@@ -80,9 +80,8 @@ export class Inspector extends EventTarget {
       setTextContent(lhs, text);
       root.append(lhs);
 
-      let rhs;
       if (action) {
-        rhs = document.createElement("input");
+        const rhs = document.createElement("input");
         rhs.setAttribute("type", "text");
         rhs.addEventListener("keydown", (k) => {
           if (k.keyCode === 13) {
@@ -90,12 +89,13 @@ export class Inspector extends EventTarget {
             controller.action_manager.click(action);
           }
         });
+        root.append(rhs);
+        return rhs;
       } else {
-        rhs = document.createElement('span');
+        const rhs = document.createElement('span');
+        root.append(rhs);
+        return rhs;
       }
-
-      root.append(rhs);
-      return rhs;
     };
 
     append_section_title('Torrent');
