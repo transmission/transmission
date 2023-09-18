@@ -292,10 +292,25 @@ public:
     {
         filter_.decrypt_init(is_incoming, dh, info_hash);
     }
+    constexpr void decrypt_deactivate(size_t decrypt_len = 0U) noexcept
+    {
+        // optionally decrypt remaining data in the read buffer so that
+        // they can be read normally later on
+        auto const n_bytes = std::min(decrypt_len, std::size(inbuf_));
+        filter_.decrypt(std::data(inbuf_), n_bytes, std::data(inbuf_));
+        filter_.decrypt_deactivate();
+    }
 
     void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
         filter_.encrypt_init(is_incoming, dh, info_hash);
+    }
+    constexpr void encrypt_deactivate() noexcept
+    {
+        // unlike the read buffer, we don't need to decrypt anything in
+        // the write buffer since we control whether we add data before
+        // or after we deactivate encryption
+        filter_.encrypt_deactivate();
     }
 
     ///

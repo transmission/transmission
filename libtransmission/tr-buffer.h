@@ -28,7 +28,7 @@ public:
     virtual ~BufferReader() = default;
     virtual void drain(size_t n_bytes) = 0;
     [[nodiscard]] virtual size_t size() const noexcept = 0;
-    [[nodiscard]] virtual value_type const* data() const = 0;
+    [[nodiscard]] virtual value_type const* data() const noexcept = 0;
 
     [[nodiscard]] auto empty() const noexcept
     {
@@ -247,7 +247,12 @@ public:
         return end_pos_ - begin_pos_;
     }
 
-    [[nodiscard]] value_type const* data() const override
+    [[nodiscard]] value_type const* data() const noexcept override
+    {
+        return std::data(buf_) + begin_pos_;
+    }
+
+    [[nodiscard]] value_type* data() noexcept
     {
         return std::data(buf_) + begin_pos_;
     }

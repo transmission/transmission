@@ -77,6 +77,10 @@ class Filter
 {
 public:
     void decrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    constexpr void decrypt_deactivate() noexcept
+    {
+        dec_active_ = false;
+    }
 
     template<typename T>
     constexpr void decrypt(T const* buf_in, size_t buf_len, T* buf_out) noexcept
@@ -90,6 +94,10 @@ public:
     }
 
     void encrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
+    constexpr void encrypt_deactivate() noexcept
+    {
+        enc_active_ = false;
+    }
 
     template<typename T>
     constexpr void encrypt(T const* buf_in, size_t buf_len, T* buf_out) noexcept
