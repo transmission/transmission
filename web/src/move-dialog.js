@@ -8,11 +8,12 @@ let default_path = '';
 import { createDialogContainer } from './utils.js';
 
 export class MoveDialog extends EventTarget {
-  constructor(controller, remote) {
+  constructor(controller, remote, action_input_value) {
     super();
 
     this.controller = controller;
     this.remote = remote;
+    this.action_input_value = action_input_value;
     this.elements = {};
     this.torrents = [];
 
@@ -28,10 +29,15 @@ export class MoveDialog extends EventTarget {
     default_path = default_path || torrents[0].getDownloadDir();
 
     this.torrents = torrents;
-    this.elements = MoveDialog._create();
+    this.elements = MoveDialog._create(this.action_input_value
+        ? 'Confirm'
+        : 'Apply'
+    );
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
-    this.elements.entry.value = default_path;
+    this.elements.entry.value = this.action_input_value
+      ? this.action_input_value
+      : default_path;
     document.body.append(this.elements.root);
 
     this.elements.entry.focus();
@@ -49,7 +55,9 @@ export class MoveDialog extends EventTarget {
   }
 
   _onDismiss() {
-    this.close();
+    this.action_input_value
+      ? this.controller.action_manager.click('show-inspector')
+      : this.close();
   }
 
   _onConfirm() {
@@ -57,14 +65,15 @@ export class MoveDialog extends EventTarget {
     const path = this.elements.entry.value.trim();
     default_path = path;
     this.remote.moveTorrents(ids, path);
-    this.close();
+
+    this._onDismiss();
   }
 
-  static _create() {
+  static _create(confirm_text) {
     const elements = createDialogContainer('move-dialog');
     elements.root.setAttribute('aria-label', 'Move Torrent');
     elements.heading.textContent = 'Set Torrent Location';
-    confirm.textContent = 'Apply';
+    elements.confirm.textContent = confirm_text;
 
     const label = document.createElement('label');
     label.setAttribute('for', 'torrent-path');
