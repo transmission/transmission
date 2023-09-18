@@ -195,9 +195,8 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
         auto filter = tr_message_stream_encryption::Filter{};
         filter.encrypt_init(true, dh_, info_hash);
 
-        auto needle = decltype(VC){};
-        filter.encrypt(std::data(VC), std::size(VC), std::data(needle));
-        encrypted_vc_ = needle;
+        encrypted_vc_.emplace();
+        filter.encrypt(std::data(VC), std::size(VC), std::data(*encrypted_vc_));
     }
 
     for (; pad_b_recv_len_ < PadbMaxlen; ++pad_b_recv_len_)
