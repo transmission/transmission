@@ -197,13 +197,12 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     {
         auto const req2 = tr_sha1::digest("req2"sv, info_hash);
         auto const req3 = tr_sha1::digest("req3"sv, dh_.secret());
-        auto x_or = tr_sha1_digest_t{};
-        for (size_t i = 0, n = std::size(x_or); i < n; ++i)
+        auto [x_or, n_x_or] = outbuf.reserve_space(std::tuple_size_v<tr_sha1_digest_t>);
+        for (size_t i = 0; i < n_x_or; ++i)
         {
             x_or[i] = req2[i] ^ req3[i];
         }
-
-        outbuf.add(x_or);
+        outbuf.commit_space(n_x_or);
     }
 
     /* ENCRYPT(VC, crypto_provide, len(PadC), PadC
