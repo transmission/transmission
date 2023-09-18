@@ -128,7 +128,9 @@ export class Transmission extends EventTarget {
           }
           break;
         case 'show-move-dialog':
-          this.setCurrentPopup(new MoveDialog(this, this.remote, this.action_input_value));
+          this.setCurrentPopup(
+            new MoveDialog(this, this.remote, this.action_input_value),
+          );
           break;
         case 'show-overflow-menu':
           if (this.popup instanceof OverflowMenu) {
@@ -154,10 +156,14 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new StatisticsDialog(this.remote));
           break;
         case 'show-rename-dialog':
-          this.setCurrentPopup(new RenameDialog(this, this.remote, this.action_input_value));
+          this.setCurrentPopup(
+            new RenameDialog(this, this.remote, this.action_input_value),
+          );
           break;
         case 'show-labels-dialog':
-          this.setCurrentPopup(new LabelsDialog(this, this.remote, this.action_input_value));
+          this.setCurrentPopup(
+            new LabelsDialog(this, this.remote, this.action_input_value),
+          );
           break;
         case 'start-all-torrents':
           this._startTorrents(this._getAllTorrents());
