@@ -27,13 +27,13 @@ export class LabelsDialog extends EventTarget {
     const [first] = torrents;
 
     this.torrents = torrents;
-    this.elements = LabelsDialog._create(this.action_input_value !== null
+    this.elements = LabelsDialog._create(this.action_input_value !== false
         ? 'Confirm'
         : 'Save'
     );
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
-    this.elements.entry.value = this.action_input_value !== null
+    this.elements.entry.value = this.action_input_value !== false
       ? this.action_input_value
       : first.getLabels().join(', ');
     document.body.append(this.elements.root);
@@ -50,7 +50,7 @@ export class LabelsDialog extends EventTarget {
   }
 
   _onDismiss() {
-    this.action_input_value !== null
+    this.action_input_value !== false
       ? this.controller.action_manager.click('show-inspector')
       : this.close();
   }
