@@ -538,6 +538,11 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 
     auto vc_in = vc_t{};
     peer_io->read_bytes(std::data(vc_in), std::size(vc_in));
+    if (vc_in != VC)
+    {
+        tr_logAddTraceHand(this, "incoming VC is not all 0...");
+        return done(false);
+    }
 
     peer_io->read_uint32(&crypto_provide);
     crypto_provide_ = crypto_provide;
