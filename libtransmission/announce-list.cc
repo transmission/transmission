@@ -12,6 +12,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
+#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/utils.h"
@@ -86,8 +87,9 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     tracker.announce = announce_url_sv;
     tracker.tier = get_tier(tier, *announce);
     tracker.id = next_unique_id();
-    tracker.host_and_port = fmt::format(FMT_STRING("{:s}:{:d}"), announce->host, announce->port);
+    tracker.host_and_port = fmt::format("{:s}:{:d}", announce->host, announce->port);
     tracker.sitename = announce->sitename;
+    tracker.query = announce->query;
 
     if (auto const scrape_str = announce_to_scrape(announce_url_sv); scrape_str)
     {
@@ -226,7 +228,8 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
 
         auto const tracker_parsed = tr_urlParse(tracker_announce);
         return tracker_parsed->scheme == announce.scheme && tracker_parsed->host == announce.host &&
-            tracker_parsed->port == announce.port && tracker_parsed->path == announce.path;
+            tracker_parsed->port == announce.port && tracker_parsed->path == announce.path &&
+            tracker_parsed->query == announce.query;
     };
     return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
 }
@@ -234,11 +237,14 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
 bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
 {
     // load the torrent file
-    auto metainfo = tr_variant{};
-    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, torrent_file, error))
+    auto serde = tr_variant_serde::benc();
+    auto ometainfo = serde.parse_file(torrent_file);
+    if (!ometainfo)
     {
+        tr_error_propagate(error, &serde.error_);
         return false;
     }
+    auto& metainfo = *ometainfo;
 
     // remove the old fields
     tr_variantDictRemove(&metainfo, TR_KEY_announce);
@@ -269,9 +275,8 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
 
     // confirm that it's good by parsing it back again
-    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
-    tr_variantClear(&metainfo);
-    if (auto tm = tr_torrent_metainfo{}; !tm.parse_benc(contents, error))
+    auto const contents = serde.to_string(metainfo);
+    if (!serde.parse(contents).has_value())
     {
         return false;
     }

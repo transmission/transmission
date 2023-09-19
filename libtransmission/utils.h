@@ -114,7 +114,7 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 template<typename T>
 [[nodiscard]] std::string tr_strlower(T in)
 {
-    auto out = std::string{ in };
+    auto out = std::string{ std::move(in) };
     std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::tolower(ch); });
     return out;
 }
@@ -122,7 +122,7 @@ template<typename T>
 template<typename T>
 [[nodiscard]] std::string tr_strupper(T in)
 {
-    auto out = std::string{ in };
+    auto out = std::string{ std::move(in) };
     std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::toupper(ch); });
     return out;
 }
@@ -325,7 +325,7 @@ extern uint64_t tr_size_K; /* unused? */
 /** @brief Format a file size from bytes into a user-readable string. */
 [[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
 
-void tr_formatter_get_units(void* dict);
+struct tr_variant tr_formatter_get_units();
 
 [[nodiscard]] static inline size_t tr_toSpeedBytes(size_t KBps)
 {

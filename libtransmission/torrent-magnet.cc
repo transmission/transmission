@@ -130,7 +130,7 @@ bool tr_torrentUseMetainfoFromFile(
     tr_error** error)
 {
     // add .torrent file
-    if (!tr_sys_path_copy(filename_in, tor->torrent_file(), error))
+    if (!tr_sys_path_copy(filename_in, tor->torrent_file().c_str(), error))
     {
         return false;
     }
@@ -220,6 +220,7 @@ void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* 
 bool use_new_metainfo(tr_torrent* tor, tr_error** error)
 {
     auto const& m = tor->incomplete_metadata;
+    TR_ASSERT(m);
 
     // test the info_dict checksum
     if (tr_sha1::digest(m->metadata) != tor->info_hash())
@@ -228,19 +229,19 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
     }
 
     // checksum passed; now try to parse it as benc
-    auto info_dict_v = tr_variant{};
-    if (!tr_variantFromBuf(&info_dict_v, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, m->metadata, nullptr, error))
+    auto serde = tr_variant_serde::benc().inplace();
+    auto info_dict_v = serde.parse(m->metadata);
+    if (!info_dict_v)
     {
+        tr_error_propagate(error, &serde.error_);
         return false;
     }
 
     // yay we have an info dict. Let's make a torrent file
     auto top_v = tr_variant{};
     build_metainfo_except_info_dict(tor->metainfo_, &top_v);
-    tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &info_dict_v);
-    auto const benc = tr_variantToStr(&top_v, TR_VARIANT_FMT_BENC);
-    tr_variantClear(&top_v);
-    tr_variantClear(&info_dict_v);
+    tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &*info_dict_v);
+    auto const benc = serde.to_string(top_v);
 
     // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};
@@ -268,6 +269,7 @@ void on_have_all_metainfo(tr_torrent* tor)
 {
     tr_error* error = nullptr;
     auto& m = tor->incomplete_metadata;
+    TR_ASSERT(m);
     if (use_new_metainfo(tor, &error))
     {
         m.reset();
@@ -386,14 +388,20 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
         return 1.0;
     }
 
-    auto const& m = tor->incomplete_metadata;
-    auto const& n = m->piece_count;
-    return !m || n == 0 ? 0.0 : (n - std::size(m->pieces_needed)) / static_cast<double>(n);
+    if (auto const& m = tor->incomplete_metadata; m)
+    {
+        if (auto const& n = m->piece_count; n != 0)
+        {
+            return (n - std::size(m->pieces_needed)) / static_cast<double>(n);
+        }
+    }
+
+    return 0.0;
 }
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return std::string{ tor->metainfo_.magnet().sv() };
+    return tor->metainfo_.magnet();
 }
 
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)

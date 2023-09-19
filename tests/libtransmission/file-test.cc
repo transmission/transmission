@@ -266,7 +266,7 @@ TEST_F(FileTest, getInfo)
     {
         // Can't get info of non-existent file/directory
         info = tr_sys_path_get_info(path1, 0, &err);
-        ASSERT_FALSE(info.has_value());
+        EXPECT_FALSE(info.has_value());
         EXPECT_NE(nullptr, err);
         tr_error_clear(&err);
 

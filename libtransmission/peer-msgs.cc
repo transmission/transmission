@@ -46,7 +46,6 @@
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 
-class tr_peer_info;
 struct tr_error;
 
 #ifndef EBADMSG
@@ -328,7 +327,7 @@ public:
         tr_peer_info* const peer_info_in,
         std::shared_ptr<tr_peerIo> io_in,
         tr_interned_string client,
-        tr_peer_callback callback,
+        tr_peer_callback_bt callback,
         void* callback_data)
         : tr_peerMsgs{ torrent_in, peer_info_in, client, io_in->is_encrypted(), io_in->is_incoming(), io_in->is_utp() }
         , torrent{ torrent_in }
@@ -375,9 +374,9 @@ public:
         set_active(TR_UP, false);
         set_active(TR_DOWN, false);
 
-        if (this->io)
+        if (io)
         {
-            this->io->clear();
+            io->clear();
         }
     }
 
@@ -409,15 +408,14 @@ public:
         }
     }
 
-    [[nodiscard]] tr_socket_address socketAddress() const override
+    [[nodiscard]] tr_socket_address socket_address() const override
     {
         return io->socket_address();
     }
 
     [[nodiscard]] std::string display_name() const override
     {
-        auto const [addr, port] = socketAddress();
-        return addr.display_name(port);
+        return socket_address().display_name();
     }
 
     [[nodiscard]] tr_bitfield const& has() const noexcept override
@@ -679,7 +677,7 @@ private:
     friend void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload);
     friend void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in);
 
-    tr_peer_callback const callback_;
+    tr_peer_callback_bt const callback_;
     void* const callback_data_;
 
     // seconds between periodic sendPex() calls
@@ -937,7 +935,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     bool const allow_metadata_xfer = msgs->torrent->is_public();
 
     /* decide if we want to advertise pex support */
-    bool const allow_pex = msgs->session->allows_pex() && msgs->torrent->allows_pex();
+    bool const allow_pex = msgs->torrent->allows_pex();
 
     auto val = tr_variant{};
     tr_variantInitDict(&val, 8);
@@ -992,7 +990,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         auto const begin = std::data(buf);
         auto const end = msgs->io->address().to_compact(begin);
         auto const len = end - begin;
-        TR_ASSERT(len == 4 || len == 16);
+        TR_ASSERT(len == tr_address::CompactAddrBytes[0] || len == tr_address::CompactAddrBytes[1]);
         tr_variantDictAddRaw(&val, TR_KEY_yourip, begin, len);
     }
 
@@ -1024,18 +1022,15 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         }
     }
 
-    protocol_send_message(msgs, BtPeerMsgs::Ltep, LtepMessages::Handshake, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-
-    /* cleanup */
-    tr_variantClear(&val);
+    protocol_send_message(msgs, BtPeerMsgs::Ltep, LtepMessages::Handshake, tr_variant_serde::benc().to_string(val));
 }
 
 void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
 {
     auto const handshake_sv = payload.to_string_view();
 
-    auto val = tr_variant{};
-    if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, handshake_sv) || !tr_variantIsDict(&val))
+    auto var = tr_variant_serde::benc().inplace().parse(handshake_sv);
+    if (!var || !var->holds_alternative<tr_variant::Map>())
     {
         logtrace(msgs, "GET  extended-handshake, couldn't get dictionary");
         return;
@@ -1046,7 +1041,8 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     /* does the peer prefer encrypted connections? */
     auto i = int64_t{};
     auto pex = tr_pex{};
-    if (tr_variantDictFindInt(&val, TR_KEY_e, &i))
+    auto& [addr, port] = pex.socket_address;
+    if (tr_variantDictFindInt(&*var, TR_KEY_e, &i))
     {
         msgs->encryption_preference = i != 0 ? EncryptionPreference::Yes : EncryptionPreference::No;
 
@@ -1060,7 +1056,7 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     msgs->peerSupportsPex = false;
     msgs->peerSupportsMetadataXfer = false;
 
-    if (tr_variant* sub = nullptr; tr_variantDictFindDict(&val, TR_KEY_m, &sub))
+    if (tr_variant* sub = nullptr; tr_variantDictFindDict(&*var, TR_KEY_m, &sub))
     {
         if (tr_variantDictFindInt(sub, TR_KEY_ut_pex, &i))
         {
@@ -1086,13 +1082,13 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     }
 
     /* look for metainfo size (BEP 9) */
-    if (tr_variantDictFindInt(&val, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
+    if (tr_variantDictFindInt(&*var, TR_KEY_metadata_size, &i) && tr_torrentSetMetadataSizeHint(msgs->torrent, i))
     {
         msgs->metadata_size_hint = i;
     }
 
     /* look for upload_only (BEP 21) */
-    if (tr_variantDictFindInt(&val, TR_KEY_upload_only, &i))
+    if (tr_variantDictFindInt(&*var, TR_KEY_upload_only, &i))
     {
         pex.flags |= ADDED_F_SEED_FLAG;
     }
@@ -1101,42 +1097,40 @@ void parseLtepHandshake(tr_peerMsgsImpl* msgs, MessageReader& payload)
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
     // peer id encoding.
-    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&val, TR_KEY_v, &sv))
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&*var, TR_KEY_v, &sv))
     {
         msgs->set_user_agent(tr_interned_string{ sv });
     }
 
     /* get peer's listening port */
-    if (tr_variantDictFindInt(&val, TR_KEY_p, &i))
+    if (tr_variantDictFindInt(&*var, TR_KEY_p, &i) && i > 0)
     {
-        pex.port.setHost(i);
-        msgs->publish(tr_peer_event::GotPort(pex.port));
+        port.set_host(i);
+        msgs->publish(tr_peer_event::GotPort(port));
         logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), i));
     }
 
-    uint8_t const* addr = nullptr;
+    std::byte const* addr_compact = nullptr;
     auto addr_len = size_t{};
-    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) && addr_len == 4)
+    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&*var, TR_KEY_ipv4, &addr_compact, &addr_len) &&
+        addr_len == tr_address::CompactAddrBytes[TR_AF_INET])
     {
-        pex.addr.type = TR_AF_INET;
-        memcpy(&pex.addr.addr.addr4, addr, 4);
+        std::tie(addr, std::ignore) = tr_address::from_compact_ipv4(addr_compact);
         tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
-    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) && addr_len == 16)
+    if (msgs->io->is_incoming() && tr_variantDictFindRaw(&*var, TR_KEY_ipv6, &addr_compact, &addr_len) &&
+        addr_len == tr_address::CompactAddrBytes[TR_AF_INET6])
     {
-        pex.addr.type = TR_AF_INET6;
-        memcpy(&pex.addr.addr.addr6, addr, 16);
+        std::tie(addr, std::ignore) = tr_address::from_compact_ipv6(addr_compact);
         tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
     /* get peer's maximum request queue size */
-    if (tr_variantDictFindInt(&val, TR_KEY_reqq, &i))
+    if (tr_variantDictFindInt(&*var, TR_KEY_reqq, &i))
     {
         msgs->reqq = i;
     }
-
-    tr_variantClear(&val);
 }
 
 void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
@@ -1148,14 +1142,12 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
     auto const tmp = payload_in.to_string_view();
     auto const* const msg_end = std::data(tmp) + std::size(tmp);
 
-    auto dict = tr_variant{};
-    char const* benc_end = nullptr;
-    if (tr_variantFromBuf(&dict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp, &benc_end))
+    auto serde = tr_variant_serde::benc();
+    if (auto var = serde.inplace().parse(tmp); var)
     {
-        (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
-        (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
-        (void)tr_variantDictFindInt(&dict, TR_KEY_total_size, &total_size);
-        tr_variantClear(&dict);
+        (void)tr_variantDictFindInt(&*var, TR_KEY_msg_type, &msg_type);
+        (void)tr_variantDictFindInt(&*var, TR_KEY_piece, &piece);
+        (void)tr_variantDictFindInt(&*var, TR_KEY_total_size, &total_size);
     }
 
     logtrace(
@@ -1166,6 +1158,8 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
     {
         /* NOOP */
     }
+
+    auto const* const benc_end = serde.end();
 
     if (msg_type == MetadataMsgType::Data && total_size == msgs->metadata_size_hint && !msgs->torrent->has_metainfo() &&
         msg_end - benc_end <= MetadataPieceSize && piece * MetadataPieceSize + (msg_end - benc_end) <= total_size)
@@ -1188,8 +1182,7 @@ void parseUtMetadata(tr_peerMsgsImpl* msgs, MessageReader& payload_in)
             tr_variantInitDict(&v, 2);
             tr_variantDictAddInt(&v, TR_KEY_msg_type, MetadataMsgType::Reject);
             tr_variantDictAddInt(&v, TR_KEY_piece, piece);
-            protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variantToStr(&v, TR_VARIANT_FMT_BENC));
-            tr_variantClear(&v);
+            protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, serde.to_string(v));
         }
     }
 }
@@ -1202,17 +1195,15 @@ void parseUtPex(tr_peerMsgsImpl* msgs, MessageReader& payload)
         return;
     }
 
-    auto const tmp = payload.to_string_view();
-
-    if (tr_variant val; tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, tmp))
+    if (auto var = tr_variant_serde::benc().inplace().parse(payload.to_string_view()); var)
     {
         uint8_t const* added = nullptr;
         auto added_len = size_t{};
-        if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
+        if (tr_variantDictFindRaw(&*var, TR_KEY_added, &added, &added_len))
         {
             uint8_t const* added_f = nullptr;
             auto added_f_len = size_t{};
-            if (!tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len))
+            if (!tr_variantDictFindRaw(&*var, TR_KEY_added_f, &added_f, &added_f_len))
             {
                 added_f_len = 0;
                 added_f = nullptr;
@@ -1223,11 +1214,11 @@ void parseUtPex(tr_peerMsgsImpl* msgs, MessageReader& payload)
             tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
 
-        if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
+        if (tr_variantDictFindRaw(&*var, TR_KEY_added6, &added, &added_len))
         {
             uint8_t const* added_f = nullptr;
             auto added_f_len = size_t{};
-            if (!tr_variantDictFindRaw(&val, TR_KEY_added6_f, &added_f, &added_f_len))
+            if (!tr_variantDictFindRaw(&*var, TR_KEY_added6_f, &added_f, &added_f_len))
             {
                 added_f_len = 0;
                 added_f = nullptr;
@@ -1237,8 +1228,6 @@ void parseUtPex(tr_peerMsgsImpl* msgs, MessageReader& payload)
             pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
             tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
-
-        tr_variantClear(&val);
     }
 }
 
@@ -1536,7 +1525,7 @@ ReadResult process_peer_message(tr_peerMsgsImpl* msgs, uint8_t id, MessageReader
             logtrace(msgs, "Got a BtPeerMsgs::Port");
 
             auto const hport = payload.to_uint16();
-            if (auto const dht_port = tr_port::fromHost(hport); !std::empty(dht_port))
+            if (auto const dht_port = tr_port::from_host(hport); !std::empty(dht_port))
             {
                 msgs->dht_port = dht_port;
                 msgs->session->addDhtNode(msgs->io->address(), msgs->dht_port);
@@ -1813,8 +1802,7 @@ void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         tr_variantInitDict(&tmp, 3);
         tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Request);
         tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
-        protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC));
-        tr_variantClear(&tmp);
+        protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp));
     }
 }
 
@@ -1867,13 +1855,7 @@ namespace peer_pulse_helpers
         tr_variantInitDict(&tmp, 2);
         tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Reject);
         tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
-        auto const n_bytes_written = protocol_send_message(
-            msgs,
-            BtPeerMsgs::Ltep,
-            msgs->ut_metadata_id,
-            tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC));
-        tr_variantClear(&tmp);
-        return n_bytes_written;
+        return protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp));
     }
 
     // send the metadata
@@ -1882,14 +1864,7 @@ namespace peer_pulse_helpers
     tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
     tr_variantDictAddInt(&tmp, TR_KEY_piece, *piece);
     tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->info_dict_size());
-    auto const n_bytes_written = protocol_send_message(
-        msgs,
-        BtPeerMsgs::Ltep,
-        msgs->ut_metadata_id,
-        tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC),
-        data);
-    tr_variantClear(&tmp);
-    return n_bytes_written;
+    return protocol_send_message(msgs, BtPeerMsgs::Ltep, msgs->ut_metadata_id, tr_variant_serde::benc().to_string(tmp), data);
 }
 
 [[nodiscard]] size_t add_next_piece(tr_peerMsgsImpl* msgs, uint64_t now)
@@ -2066,7 +2041,7 @@ void tr_peerMsgsImpl::sendPex()
             this,
             fmt::format(
                 FMT_STRING("pex: old {:s} peer count {:d}, new peer count {:d}, added {:d}, dropped {:d}"),
-                tr_ip_protocol_sv(ip_type),
+                tr_ip_protocol_to_sv(ip_type),
                 std::size(old_pex),
                 std::size(new_pex),
                 std::size(added),
@@ -2087,7 +2062,7 @@ void tr_peerMsgsImpl::sendPex()
             // "added"
             tmpbuf.clear();
             tmpbuf.reserve(std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
-            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(added), std::size(added), ip_type);
+            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(added), std::size(added));
             TR_ASSERT(std::size(tmpbuf) == std::size(added) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_variantDictAddRaw(&val, AddedMap[i], std::data(tmpbuf), std::size(tmpbuf));
 
@@ -2109,21 +2084,38 @@ void tr_peerMsgsImpl::sendPex()
             // "dropped"
             tmpbuf.clear();
             tmpbuf.reserve(std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
-            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped), ip_type);
+            tr_pex::to_compact(std::back_inserter(tmpbuf), std::data(dropped), std::size(dropped));
             TR_ASSERT(std::size(tmpbuf) == std::size(dropped) * tr_socket_address::CompactSockAddrBytes[i]);
             tr_variantDictAddRaw(&val, DroppedMap[i], std::data(tmpbuf), std::size(tmpbuf));
         }
     }
 
-    protocol_send_message(this, BtPeerMsgs::Ltep, this->ut_pex_id, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
-
-    tr_variantClear(&val);
+    protocol_send_message(this, BtPeerMsgs::Ltep, this->ut_pex_id, tr_variant_serde::benc().to_string(val));
 }
 
 } // namespace
 
+tr_peerMsgs::tr_peerMsgs(
+    tr_torrent const* tor,
+    tr_peer_info* peer_info_in,
+    tr_interned_string user_agent,
+    bool connection_is_encrypted,
+    bool connection_is_incoming,
+    bool connection_is_utp)
+    : tr_peer{ tor }
+    , peer_info{ peer_info_in }
+    , user_agent_{ user_agent }
+    , connection_is_encrypted_{ connection_is_encrypted }
+    , connection_is_incoming_{ connection_is_incoming }
+    , connection_is_utp_{ connection_is_utp }
+{
+    peer_info->set_connected(tr_time());
+    ++n_peers;
+}
+
 tr_peerMsgs::~tr_peerMsgs()
 {
+    peer_info->set_connected(tr_time(), false);
     [[maybe_unused]] auto const n_prev = n_peers--;
     TR_ASSERT(n_prev > 0U);
 }
@@ -2133,7 +2125,7 @@ tr_peerMsgs* tr_peerMsgsNew(
     tr_peer_info* const peer_info,
     std::shared_ptr<tr_peerIo> io,
     tr_interned_string user_agent,
-    tr_peer_callback callback,
+    tr_peer_callback_bt callback,
     void* callback_data)
 {
     return new tr_peerMsgsImpl(torrent, peer_info, std::move(io), user_agent, callback, callback_data);

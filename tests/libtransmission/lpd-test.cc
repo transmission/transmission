@@ -40,6 +40,11 @@ public:
     {
     }
 
+    [[nodiscard]] tr_address bind_address(tr_address_type /* type */) const override
+    {
+        return {};
+    }
+
     [[nodiscard]] tr_port port() const override
     {
         return port_;
@@ -79,7 +84,7 @@ public:
     }
 
     tr_session& session_;
-    tr_port port_ = tr_port::fromHost(51413);
+    tr_port port_ = tr_port::from_host(51413);
     bool allows_lpd_ = true;
     std::vector<TorrentInfo> torrents_;
     std::set<std::string> found_;

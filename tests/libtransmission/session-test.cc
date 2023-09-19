@@ -282,9 +282,7 @@ TEST_F(SessionTest, sessionId)
 
 TEST_F(SessionTest, getDefaultSettingsIncludesSubmodules)
 {
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
+    auto settings = tr_sessionGetDefaultSettings();
 
     // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
     // These are all `false` by default
@@ -294,8 +292,6 @@ TEST_F(SessionTest, getDefaultSettingsIncludesSubmodules)
         EXPECT_TRUE(tr_variantDictFindBool(&settings, key, &flag));
         EXPECT_FALSE(flag);
     }
-
-    tr_variantClear(&settings);
 }
 
 TEST_F(SessionTest, honorsSettings)
@@ -307,16 +303,13 @@ TEST_F(SessionTest, honorsSettings)
 
     // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
     // These are all `false` by default
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetDefaultSettings(&settings);
+    auto settings = tr_sessionGetDefaultSettings();
     for (auto const& key : { TR_KEY_peer_port_random_on_start, TR_KEY_alt_speed_time_enabled, TR_KEY_rpc_enabled })
     {
         tr_variantDictRemove(&settings, key);
         tr_variantDictAddBool(&settings, key, true);
     }
-    auto* session = tr_sessionInit(sandboxDir().data(), false, &settings);
-    tr_variantClear(&settings);
+    auto* session = tr_sessionInit(sandboxDir().data(), false, settings);
 
     // confirm that these settings were enabled
     EXPECT_TRUE(session->isPortRandom());
@@ -338,16 +331,13 @@ TEST_F(SessionTest, savesSettings)
     tr_sessionSetRPCEnabled(session_, true);
 
     // Choose a setting from each of [tr_session, tr_session_alt_speeds, tr_rpc_server] to test all of them.
-    auto settings = tr_variant{};
-    tr_variantInitDict(&settings, 0);
-    tr_sessionGetSettings(session_, &settings);
+    auto settings = tr_sessionGetSettings(session_);
     for (auto const& key : { TR_KEY_peer_port_random_on_start, TR_KEY_alt_speed_time_enabled, TR_KEY_rpc_enabled })
     {
         auto flag = bool{};
         EXPECT_TRUE(tr_variantDictFindBool(&settings, key, &flag));
         EXPECT_TRUE(flag);
     }
-    tr_variantClear(&settings);
 }
 
 } // namespace libtransmission::test

@@ -417,9 +417,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //upgrading from versions < 2.40: clear recent items
         [NSDocumentController.sharedDocumentController clearRecentDocuments:nil];
 
-        tr_variant settings;
-        tr_variantInitDict(&settings, 41);
-        tr_sessionGetDefaultSettings(&settings);
+        auto settings = tr_sessionGetDefaultSettings();
 
         BOOL const usesSpeedLimitSched = [_fDefaults boolForKey:@"SpeedLimitAuto"];
         if (!usesSpeedLimitSched)
@@ -546,8 +544,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         tr_formatter_mem_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
 
         auto const default_config_dir = tr_getDefaultConfigDir("Transmission");
-        _fLib = tr_sessionInit(default_config_dir.c_str(), YES, &settings);
-        tr_variantClear(&settings);
+        _fLib = tr_sessionInit(default_config_dir.c_str(), YES, settings);
         _fConfigDirectory = @(default_config_dir.c_str());
 
         tr_sessionSetIdleLimitHitCallback(_fLib, onIdleLimitHit, (__bridge void*)(self));
@@ -3240,6 +3237,9 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         //set all groups as expanded
         [self.fTableView removeAllCollapsedGroups];
 
+        // we need to remember selected values
+        NSArray<Torrent*>* selectedTorrents = self.fTableView.selectedTorrents;
+
         beganUpdates = YES;
         [self.fTableView beginUpdates];
 
@@ -3283,6 +3283,8 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             for (TorrentGroup* group in self.fDisplayedTorrents)
                 [self.fTableView expandItem:group];
         }
+
+        self.fTableView.selectedTorrents = selectedTorrents;
     }
 
     //sort the torrents (won't sort the groups, though)

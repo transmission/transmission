@@ -14,28 +14,7 @@
 
 @implementation SmallTorrentCell
 
-//draw progress bar
-- (void)drawRect:(NSRect)dirtyRect
-{
-    if (self.fTorrentTableView)
-    {
-        NSRect barRect = self.fTorrentProgressBarView.frame;
-        ProgressBarView* progressBar = [[ProgressBarView alloc] init];
-        Torrent* torrent = (Torrent*)self.objectValue;
-
-        [progressBar drawBarInRect:barRect forTableView:self.fTorrentTableView withTorrent:torrent];
-    }
-
-    [super drawRect:dirtyRect];
-}
-
-//otherwise progress bar is inverted
-- (BOOL)isFlipped
-{
-    return YES;
-}
-
-//show fControlButton and fRevealButton
+// show fControlButton and fRevealButton
 - (void)mouseEntered:(NSEvent*)event
 {
     [super mouseEntered:event];

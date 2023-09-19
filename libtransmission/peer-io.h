@@ -45,6 +45,14 @@ enum ReadState
     READ_ERR
 };
 
+enum tr_preferred_transport : uint8_t
+{
+    // More preferred transports goes on top
+    TR_PREFER_UTP,
+    TR_PREFER_TCP,
+    TR_NUM_PREFERRED_TRANSPORT
+};
+
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
 {
     using DH = tr_message_stream_encryption::DH;
@@ -265,7 +273,7 @@ public:
 
     [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
-        return socket_.socketAddress();
+        return socket_.socket_address();
     }
 
     [[nodiscard]] auto display_name() const
