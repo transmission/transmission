@@ -87,9 +87,11 @@ private:
 
     enum class State
     {
-        // incoming
+        // incoming and outgoing
         AwaitingHandshake,
         AwaitingPeerId,
+
+        // incoming
         AwaitingYa,
         AwaitingPadA,
         AwaitingCryptoProvide,
@@ -136,11 +138,6 @@ private:
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
         peer_id_ = id;
-    }
-
-    constexpr void set_have_read_anything_from_peer(bool val) noexcept
-    {
-        have_read_anything_from_peer_ = val;
     }
 
     ReadState done(bool is_connected)

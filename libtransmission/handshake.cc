@@ -162,22 +162,24 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    bool const is_encrypted = !peer_io->read_buffer_starts_with(HandshakeName);
-    auto peer_public_key = DH::key_bigend_t{};
-    if (is_encrypted && (peer_io->read_buffer_size() < std::size(peer_public_key)))
-    {
-        return READ_LATER;
-    }
-
-    tr_logAddTraceHand(this, is_encrypted ? "got an encrypted handshake" : "got a plain handshake");
-
-    if (!is_encrypted)
+    // Jump to plain handshake if the peer sent a plain handshake
+    if (peer_io->read_buffer_starts_with(HandshakeName))
     {
         set_state(tr_handshake::State::AwaitingHandshake);
         return READ_NOW;
     }
 
-    set_have_read_anything_from_peer(true);
+    auto peer_public_key = DH::key_bigend_t{};
+    if (peer_io->read_buffer_size() < std::size(peer_public_key))
+    {
+        return READ_LATER;
+    }
+
+    tr_logAddTraceHand(
+        this,
+        fmt::format("in read_yb... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
+
+    have_read_anything_from_peer_ = true;
 
     // get the peer's public key
     peer_io->read_bytes(std::data(peer_public_key), std::size(peer_public_key));
@@ -338,24 +340,21 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
         return READ_LATER;
     }
 
-    set_have_read_anything_from_peer(true);
+    have_read_anything_from_peer_ = true;
 
     if (peer_io->read_buffer_starts_with(HandshakeName)) // unencrypted
     {
+        tr_logAddTraceHand(this, "got a plain handshake");
         if (encryption_mode_ == TR_ENCRYPTION_REQUIRED)
         {
             tr_logAddTraceHand(this, "peer is unencrypted, and we're disallowing that");
             return done(false);
         }
     }
-    else // either encrypted or corrupt
+    else
     {
-        if (is_incoming())
-        {
-            tr_logAddTraceHand(this, "I think peer is sending us an encrypted handshake...");
-            set_state(tr_handshake::State::AwaitingYa);
-            return READ_NOW;
-        }
+        tr_logAddTraceHand(this, "peer is encrypted, and we're disallowing that");
+        return done(false);
     }
 
     auto name = decltype(HandshakeName){};
@@ -441,15 +440,34 @@ ReadState tr_handshake::read_peer_id(tr_peerIo* peer_io)
 
 ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
 {
+    if (peer_io->read_buffer_size() < std::size(HandshakeName))
+    {
+        return READ_LATER;
+    }
+
+    // Jump to plain handshake if the peer sent a plain handshake
+    if (peer_io->read_buffer_starts_with(HandshakeName))
+    {
+        set_state(tr_handshake::State::AwaitingHandshake);
+        return READ_NOW;
+    }
+
     auto peer_public_key = DH::key_bigend_t{};
+    if (peer_io->read_buffer_size() < std::size(peer_public_key))
+    {
+        return READ_LATER;
+    }
+
     tr_logAddTraceHand(
         this,
-        fmt::format("in readYa... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
+        fmt::format("in read_ya... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
 
     if (peer_io->read_buffer_size() < std::size(peer_public_key))
     {
         return READ_LATER;
     }
+
+    have_read_anything_from_peer_ = true;
 
     /* read the incoming peer's public key */
     peer_io->read_bytes(std::data(peer_public_key), std::size(peer_public_key));
@@ -905,7 +923,7 @@ tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_i
 
     if (is_incoming())
     {
-        set_state(State::AwaitingHandshake);
+        set_state(State::AwaitingYa);
     }
     else if (encryption_mode_ != TR_CLEAR_PREFERRED)
     {
