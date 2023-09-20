@@ -262,7 +262,7 @@ public:
         }
     }
 
-    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
+    std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
         if (auto const free_at_end = buf_.size() - end_pos_; free_at_end < n_bytes)
         {
@@ -283,7 +283,7 @@ public:
         return { buf_.data() + end_pos_, n_bytes };
     }
 
-    virtual void commit_space(size_t n_bytes) override
+    void commit_space(size_t n_bytes) override
     {
         end_pos_ += n_bytes;
     }
