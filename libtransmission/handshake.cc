@@ -604,15 +604,13 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
 {
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    bool ready_for_more = true;
-
     /* no piece data in handshake */
     *piece = 0;
 
     tr_logAddTraceHand(handshake, fmt::format("handling canRead; state is [{}]", handshake->state_string()));
 
     ReadState ret = READ_NOW;
-    while (ready_for_more)
+    while (ret == READ_NOW)
     {
         switch (handshake->state())
         {
@@ -661,31 +659,11 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
             break;
 
         default:
-#ifdef TR_ENABLE_ASSERTS
             TR_ASSERT_MSG(
                 false,
                 fmt::format(FMT_STRING("unhandled handshake state {:d}"), static_cast<int>(handshake->state())));
-#else
             ret = READ_ERR;
             break;
-#endif
-        }
-
-        if (ret != READ_NOW)
-        {
-            ready_for_more = false;
-        }
-        else if (handshake->is_state(State::AwaitingPadC))
-        {
-            ready_for_more = peer_io->read_buffer_size() >= handshake->pad_c_len_;
-        }
-        else if (handshake->is_state(State::AwaitingPadD))
-        {
-            ready_for_more = peer_io->read_buffer_size() >= handshake->pad_d_len_;
-        }
-        else if (handshake->is_state(State::AwaitingIa))
-        {
-            ready_for_more = peer_io->read_buffer_size() >= handshake->ia_len_;
         }
     }
 
