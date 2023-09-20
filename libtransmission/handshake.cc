@@ -529,8 +529,7 @@ ReadState tr_handshake::read_pad_c(tr_peerIo* peer_io)
     }
 
     // read the throwaway padc
-    auto pad_c = std::array<char, PadcMaxlen>{};
-    peer_io->read_bytes(std::data(pad_c), pad_c_len_);
+    peer_io->read_buffer_drain(pad_c_len_);
 
     /* read ia_len */
     uint16_t ia_len = 0;
