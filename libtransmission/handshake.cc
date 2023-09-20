@@ -25,7 +25,8 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
 
-#define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
+#define tr_logAddTraceHand(handshake, msg) \
+    tr_logAddTrace(msg, fmt::format("handshake {}", (handshake)->peer_io_->display_name()))
 
 using namespace std::literals;
 using DH = tr_message_stream_encryption::DH;
