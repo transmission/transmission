@@ -161,6 +161,18 @@ private:
 
     [[nodiscard]] uint32_t crypto_provide() const noexcept;
 
+    bool send_handshake(tr_peerIo* io)
+    {
+        auto msg = std::array<uint8_t, HandshakeSize>{};
+        if (!build_handshake_message(io, std::data(msg)))
+        {
+            return false;
+        }
+        io->write_bytes(std::data(msg), std::size(msg), false);
+        have_sent_bittorrent_handshake_ = true;
+        return true;
+    }
+
     template<size_t PadMax>
     void send_public_key_and_pad(tr_peerIo* io)
     {

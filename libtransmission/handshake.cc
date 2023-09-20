@@ -352,14 +352,10 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
     if (!have_sent_bittorrent_handshake_)
     {
         tr_logAddTraceHand(this, "sending handshake in reply");
-        auto msg = std::array<uint8_t, HandshakeSize>{};
-        if (!build_handshake_message(peer_io, std::data(msg)))
+        if (!send_handshake(peer_io))
         {
             return done(false);
         }
-
-        peer_io->write_bytes(std::data(msg), std::size(msg), false);
-        have_sent_bittorrent_handshake_ = true;
     }
 
     set_state(State::AwaitingPeerId);
@@ -710,11 +706,8 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 
         if (handshake->mediator_->allows_tcp() && io->reconnect())
         {
-            auto msg = std::array<uint8_t, HandshakeSize>{};
-            handshake->build_handshake_message(io, std::data(msg));
-            handshake->have_sent_bittorrent_handshake_ = true;
+            handshake->send_handshake(io);
             handshake->set_state(State::AwaitingHandshake);
-            io->write_bytes(std::data(msg), std::size(msg), false);
             return;
         }
     }
@@ -725,12 +718,9 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
     if ((handshake->is_state(State::AwaitingYb) || handshake->is_state(State::AwaitingVc)) &&
         handshake->encryption_mode_ != TR_ENCRYPTION_REQUIRED && handshake->mediator_->allows_tcp() && io->reconnect())
     {
-        auto msg = std::array<uint8_t, HandshakeSize>{};
         tr_logAddTraceHand(handshake, "handshake failed, trying plaintext...");
-        handshake->build_handshake_message(io, std::data(msg));
-        handshake->have_sent_bittorrent_handshake_ = true;
+        handshake->send_handshake(io);
         handshake->set_state(State::AwaitingHandshake);
-        io->write_bytes(std::data(msg), std::size(msg), false);
         return;
     }
 
@@ -836,11 +826,7 @@ tr_handshake::tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_i
     }
     else
     {
-        auto msg = std::array<uint8_t, HandshakeSize>{};
-        build_handshake_message(peer_io_.get(), std::data(msg));
-
-        have_sent_bittorrent_handshake_ = true;
+        send_handshake(peer_io_.get());
         set_state(State::AwaitingHandshake);
-        peer_io_->write_bytes(std::data(msg), std::size(msg), false);
     }
 }
