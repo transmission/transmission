@@ -454,11 +454,9 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
 ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 {
     /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
-    uint16_t padc_len = 0;
-    uint32_t crypto_provide = 0;
     auto obfuscated_hash = tr_sha1_digest_t{};
     size_t const needlen = std::size(obfuscated_hash) + /* HASH('req2', SKEY) xor HASH('req3', S) */
-        std::size(VC) + sizeof(crypto_provide) + sizeof(padc_len);
+        std::size(VC) + sizeof(crypto_provide_) + sizeof(pad_c_len_);
 
     if (peer_io->read_buffer_size() < needlen)
     {
@@ -502,26 +500,24 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
         return done(false);
     }
 
-    peer_io->read_uint32(&crypto_provide);
-    crypto_provide_ = crypto_provide;
-    tr_logAddTraceHand(this, fmt::format("crypto_provide is {}", crypto_provide));
+    peer_io->read_uint32(&crypto_provide_);
+    tr_logAddTraceHand(this, fmt::format("crypto_provide is {}", crypto_provide_));
 
-    peer_io->read_uint16(&padc_len);
-    tr_logAddTraceHand(this, fmt::format("padc is {}", padc_len));
-    if (padc_len > PadcMaxlen)
+    peer_io->read_uint16(&pad_c_len_);
+    tr_logAddTraceHand(this, fmt::format("padc is {}", pad_c_len_));
+    if (pad_c_len_ > PadcMaxlen)
     {
         tr_logAddTraceHand(this, "peer's PadC is too big");
         return done(false);
     }
 
-    pad_c_len_ = padc_len;
     set_state(State::AwaitingPadC);
     return READ_NOW;
 }
 
 ReadState tr_handshake::read_pad_c(tr_peerIo* peer_io)
 {
-    if (auto const needlen = pad_c_len_ + sizeof(uint16_t); peer_io->read_buffer_size() < needlen)
+    if (auto const needlen = pad_c_len_ + sizeof(ia_len_); peer_io->read_buffer_size() < needlen)
     {
         return READ_LATER;
     }
@@ -530,10 +526,8 @@ ReadState tr_handshake::read_pad_c(tr_peerIo* peer_io)
     peer_io->read_buffer_discard(pad_c_len_);
 
     /* read ia_len */
-    uint16_t ia_len = 0;
-    peer_io->read_uint16(&ia_len);
-    tr_logAddTraceHand(this, fmt::format("ia_len is {}", ia_len));
-    ia_len_ = ia_len;
+    peer_io->read_uint16(&ia_len_);
+    tr_logAddTraceHand(this, fmt::format("ia_len is {}", ia_len_));
     set_state(State::AwaitingIa);
     return READ_NOW;
 }
@@ -550,7 +544,6 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     }
 
     // B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
-
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
     peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
