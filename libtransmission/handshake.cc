@@ -268,6 +268,13 @@ ReadState tr_handshake::read_pad_d(tr_peerIo* peer_io)
 
     peer_io->read_buffer_discard(needlen);
 
+    /* maybe de-encrypt our connection */
+    if (crypto_provide_ == CryptoProvidePlaintext)
+    {
+        peer_io->encrypt_deactivate();
+        peer_io->decrypt_deactivate();
+    }
+
     set_state(tr_handshake::State::AwaitingHandshake);
     return READ_NOW;
 }
@@ -581,6 +588,10 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     {
         peer_io->write(outbuf, false);
         TR_ASSERT(std::empty(outbuf));
+
+        // All future communications will use ENCRYPT2()
+        peer_io->encrypt_deactivate();
+        peer_io->decrypt_deactivate(ia_len_);
     }
 
     tr_logAddTraceHand(this, "sending handshake");
