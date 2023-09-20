@@ -60,59 +60,6 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
     return true;
 }
 
-tr_handshake::ParseResult tr_handshake::parse_handshake(tr_peerIo* peer_io)
-{
-    tr_logAddTraceHand(this, fmt::format("payload: need {}, got {}", HandshakeSize, peer_io->read_buffer_size()));
-
-    if (peer_io->read_buffer_size() < HandshakeSize)
-    {
-        return ParseResult::EncryptionWrong;
-    }
-
-    /* confirm the protocol */
-    auto name = decltype(HandshakeName){};
-    peer_io->read_bytes(std::data(name), std::size(name));
-    if (name != HandshakeName)
-    {
-        return ParseResult::EncryptionWrong;
-    }
-
-    /* read the reserved bytes */
-    auto flags = tr_bitfield{ HandshakeFlagsBits };
-    auto reserved = std::array<uint8_t, HandshakeFlagsBytes>{};
-    peer_io->read_bytes(std::data(reserved), std::size(reserved));
-    flags.set_raw(std::data(reserved), std::size(reserved));
-    peer_io->set_supports_dht(flags.test(DhtFlag));
-    peer_io->set_supports_ltep(flags.test(LtepFlag));
-    peer_io->set_supports_fext(flags.test(FextFlag));
-
-    // torrent hash
-    auto info_hash = tr_sha1_digest_t{};
-    peer_io->read_bytes(std::data(info_hash), std::size(info_hash));
-    if (info_hash == tr_sha1_digest_t{} || info_hash != peer_io->torrent_hash())
-    {
-        tr_logAddTraceHand(this, "peer returned the wrong hash. wtf?");
-        return ParseResult::BadTorrent;
-    }
-
-    // peer_id
-    auto peer_id = tr_peer_id_t{};
-    peer_io->read_bytes(std::data(peer_id), std::size(peer_id));
-    set_peer_id(peer_id);
-
-    /* peer id */
-    auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
-    tr_logAddTraceHand(this, fmt::format("peer-id is '{}'", peer_id_sv));
-
-    if (auto const info = mediator_->torrent(info_hash); info && info->client_peer_id == peer_id)
-    {
-        tr_logAddTraceHand(this, "streuth!  we've connected to ourselves.");
-        return ParseResult::PeerIsSelf;
-    }
-
-    return ParseResult::Ok;
-}
-
 // --- Outgoing Connections
 
 // 1 A->B: our public key (Ya) and some padding (PadA)
@@ -350,6 +297,11 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
             tr_logAddTraceHand(this, "peer is unencrypted, and we're disallowing that");
             return done(false);
         }
+        if (crypto_select_ == CryptoProvideCrypto)
+        {
+            tr_logAddTraceHand(this, "peer is unencrypted, and that does not agree with our handshake");
+            return done(false);
+        }
     }
     else
     {
@@ -453,15 +405,9 @@ ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
     }
 
     auto peer_public_key = DH::key_bigend_t{};
-    if (peer_io->read_buffer_size() < std::size(peer_public_key))
-    {
-        return READ_LATER;
-    }
-
     tr_logAddTraceHand(
         this,
         fmt::format("in read_ya... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
-
     if (peer_io->read_buffer_size() < std::size(peer_public_key))
     {
         return READ_LATER;
@@ -496,7 +442,7 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
 
         if (peer_io->read_buffer_starts_with(needle))
         {
-            tr_logAddTraceHand(this, "found it... looking setting to awaiting_crypto_provide");
+            tr_logAddTraceHand(this, "found it... setting state to AwaitingCryptoProvide");
             peer_io->read_buffer_drain(std::size(needle));
             set_state(State::AwaitingCryptoProvide);
             return READ_NOW;
@@ -665,27 +611,6 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-ReadState tr_handshake::read_payload_stream(tr_peerIo* peer_io)
-{
-    static auto constexpr Needlen = HandshakeSize;
-    tr_logAddTraceHand(this, fmt::format("reading payload stream... have {}, need {}", peer_io->read_buffer_size(), Needlen));
-    if (peer_io->read_buffer_size() < Needlen)
-    {
-        return READ_LATER;
-    }
-
-    /* parse the handshake ... */
-    auto const i = parse_handshake(peer_io);
-    tr_logAddTraceHand(this, fmt::format("parseHandshake returned {}", static_cast<int>(i)));
-    if (i != ParseResult::Ok)
-    {
-        return done(false);
-    }
-
-    /* we've completed the BT handshake... pass the work on to peer-msgs */
-    return done(true);
-}
-
 // ---
 
 ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece)
@@ -730,10 +655,6 @@ ReadState tr_handshake::can_read(tr_peerIo* peer_io, void* vhandshake, size_t* p
 
         case State::AwaitingIa:
             ret = handshake->read_ia(peer_io);
-            break;
-
-        case State::AwaitingPayloadStream:
-            ret = handshake->read_payload_stream(peer_io);
             break;
 
         case State::AwaitingYb:
@@ -871,8 +792,6 @@ std::string_view tr_handshake::state_string(State state) noexcept
         return "awaiting pad c";
     case State::AwaitingIa:
         return "awaiting ia";
-    case State::AwaitingPayloadStream:
-        return "awaiting payload stream";
 
     // outgoing
     case State::AwaitingYb:

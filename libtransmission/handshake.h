@@ -77,14 +77,6 @@ public:
     tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc on_done);
 
 private:
-    enum class ParseResult
-    {
-        Ok,
-        EncryptionWrong,
-        BadTorrent,
-        PeerIsSelf,
-    };
-
     enum class State
     {
         // incoming and outgoing
@@ -97,7 +89,6 @@ private:
         AwaitingCryptoProvide,
         AwaitingPadC,
         AwaitingIa,
-        AwaitingPayloadStream,
 
         // outgoing
         AwaitingYb,
@@ -125,15 +116,12 @@ private:
     ReadState read_pad_a(tr_peerIo*);
     ReadState read_pad_c(tr_peerIo*);
     ReadState read_pad_d(tr_peerIo*);
-    ReadState read_payload_stream(tr_peerIo*);
     ReadState read_peer_id(tr_peerIo*);
     ReadState read_vc(tr_peerIo*);
     ReadState read_ya(tr_peerIo*);
     ReadState read_yb(tr_peerIo*);
 
     void send_ya(tr_peerIo*);
-
-    ParseResult parse_handshake(tr_peerIo* peer_io);
 
     void set_peer_id(tr_peer_id_t const& id) noexcept
     {
