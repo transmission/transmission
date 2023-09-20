@@ -546,16 +546,18 @@ ReadState tr_handshake::read_ia(tr_peerIo* peer_io)
     // B->A: ENCRYPT(VC, crypto_select, len(padD), padD), ENCRYPT2(Payload Stream)
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readIA requires an info_hash");
+
+    uint32_t const crypto_select = get_crypto_select(encryption_mode_, crypto_provide_);
+
+    static auto constexpr BufSize = std::size(VC) + sizeof(crypto_select) + sizeof(uint16_t) + HandshakeSize;
+    auto outbuf = libtransmission::StackBuffer<BufSize, std::byte>{};
     peer_io->encrypt_init(peer_io->is_incoming(), dh_, info_hash);
-    auto outbuf = libtransmission::StackBuffer<1024U, std::byte>{};
 
     // send VC
     tr_logAddTraceHand(this, "sending vc");
     outbuf.add(VC);
 
     /* send crypto_select */
-    uint32_t const crypto_select = get_crypto_select(encryption_mode_, crypto_provide_);
-
     if (crypto_select != 0)
     {
         tr_logAddTraceHand(this, fmt::format("selecting crypto mode '{}'", crypto_select));
