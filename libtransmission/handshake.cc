@@ -117,13 +117,13 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     }
 
     auto peer_public_key = DH::key_bigend_t{};
+    tr_logAddTraceHand(
+        this,
+        fmt::format("in read_yb... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
     if (peer_io->read_buffer_size() < std::size(peer_public_key))
     {
         return READ_LATER;
     }
-    tr_logAddTraceHand(
-        this,
-        fmt::format("in read_yb... need {}, have {}", std::size(peer_public_key), peer_io->read_buffer_size()));
 
     have_read_anything_from_peer_ = true;
 
@@ -276,7 +276,7 @@ ReadState tr_handshake::read_pad_d(tr_peerIo* peer_io)
     return READ_NOW;
 }
 
-// --- Incoming Connections
+// --- Incoming and Outgoing Connections
 
 ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
 {
@@ -388,6 +388,8 @@ ReadState tr_handshake::read_peer_id(tr_peerIo* peer_io)
 
     return done(!connected_to_self);
 }
+
+// --- Incoming Connections
 
 ReadState tr_handshake::read_ya(tr_peerIo* peer_io)
 {

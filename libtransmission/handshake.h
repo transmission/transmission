@@ -77,7 +77,7 @@ public:
     tr_handshake(Mediator* mediator, std::shared_ptr<tr_peerIo> peer_io, tr_encryption_mode mode_in, DoneFunc on_done);
 
 private:
-    enum class State
+    enum class State : uint8_t
     {
         // incoming and outgoing
         AwaitingHandshake,
