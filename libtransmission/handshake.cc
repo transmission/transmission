@@ -449,7 +449,7 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
         peer_io->read_buffer_drain(1U);
     }
 
-    tr_logAddTraceHand(this, "couldn't find HASH('req', S)");
+    tr_logAddTraceHand(this, "couldn't find HASH('req1', S)");
     return done(false);
 }
 
