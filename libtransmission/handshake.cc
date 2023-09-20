@@ -201,7 +201,7 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
         encrypted_vc_ = needle;
     }
 
-    for (size_t i = 0; i < PadbMaxlen; ++i)
+    for (; pad_b_recv_len_ < PadbMaxlen; ++pad_b_recv_len_)
     {
         if (peer_io->read_buffer_size() < std::size(*encrypted_vc_))
         {
@@ -248,15 +248,13 @@ ReadState tr_handshake::read_crypto_select(tr_peerIo* peer_io)
     uint16_t pad_d_len = 0;
     peer_io->read_uint16(&pad_d_len);
     tr_logAddTraceHand(this, fmt::format("pad_d_len is {}", pad_d_len));
-
-    if (pad_d_len > 512)
+    if (pad_d_len > PaddMaxlen)
     {
         tr_logAddTraceHand(this, "encryption handshake: pad_d_len is too long");
         return done(false);
     }
 
     pad_d_len_ = pad_d_len;
-
     set_state(tr_handshake::State::AwaitingPadD);
     return READ_NOW;
 }
@@ -432,7 +430,7 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
     // find the end of PadA by looking for HASH('req1', S)
     auto const needle = tr_sha1::digest("req1"sv, dh_.secret());
 
-    for (size_t i = 0; i < PadaMaxlen; ++i)
+    for (; pad_a_recv_len_ <= PadaMaxlen; ++pad_a_recv_len_)
     {
         if (peer_io->read_buffer_size() < std::size(needle))
         {

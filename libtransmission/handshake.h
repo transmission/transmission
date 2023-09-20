@@ -227,9 +227,10 @@ private:
     // http://wiki.vuze.com/w/Message_Stream_Encryption
     // > PadA, PadB: Random data with a random length of 0 to 512 bytes each
     // > PadC, PadD: Arbitrary data with a length of 0 to 512 bytes
-    static auto constexpr PadaMaxlen = int{ 512 };
-    static auto constexpr PadbMaxlen = int{ 512 };
-    static auto constexpr PadcMaxlen = int{ 512 };
+    static auto constexpr PadaMaxlen = uint16_t{ 512U };
+    static auto constexpr PadbMaxlen = uint16_t{ 512U };
+    static auto constexpr PadcMaxlen = uint16_t{ 512U };
+    static auto constexpr PaddMaxlen = uint16_t{ 512U };
 
     // "VC is a verification constant that is used to verify whether the
     // other side knows S and SKEY and thus defeats replay attacks of the
@@ -313,6 +314,9 @@ private:
     uint16_t pad_c_len_ = {};
     uint16_t pad_d_len_ = {};
     uint16_t ia_len_ = {};
+
+    uint16_t pad_a_recv_len_ = {};
+    uint16_t pad_b_recv_len_ = {};
 
     bool have_read_anything_from_peer_ = false;
 
