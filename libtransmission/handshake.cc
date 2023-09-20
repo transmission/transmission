@@ -202,7 +202,7 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
         filter.encrypt(std::data(VC), std::size(VC), std::data(*encrypted_vc_));
     }
 
-    for (; pad_b_recv_len_ < PadbMaxlen; ++pad_b_recv_len_)
+    for (; pad_b_recv_len_ <= PadbMaxlen; ++pad_b_recv_len_)
     {
         if (peer_io->read_buffer_size() < std::size(*encrypted_vc_))
         {
