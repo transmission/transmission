@@ -329,7 +329,7 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
     auto hash = tr_sha1_digest_t{};
     peer_io->read_bytes(std::data(hash), std::size(hash));
 
-    if (is_incoming() && peer_io->torrent_hash() == tr_sha1_digest_t{}) // incoming and plain handshake
+    if (is_incoming() && peer_io->torrent_hash() == tr_sha1_digest_t{}) // incoming plain handshake
     {
         if (!mediator_->torrent(hash))
         {
