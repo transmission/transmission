@@ -290,7 +290,11 @@ ReadState tr_handshake::read_handshake(tr_peerIo* peer_io)
 
     have_read_anything_from_peer_ = true;
 
-    if (peer_io->read_buffer_starts_with(HandshakeName)) // unencrypted
+    if (ia_len_ > 0)
+    {
+        // do nothing, the check below won't work correctly
+    }
+    else if (peer_io->read_buffer_starts_with(HandshakeName)) // unencrypted
     {
         if (encryption_mode_ == TR_ENCRYPTION_REQUIRED)
         {
