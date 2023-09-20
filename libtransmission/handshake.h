@@ -220,8 +220,8 @@ private:
     // > crypto_provide and crypto_select are a 32bit bitfields.
     // > As of now 0x01 means plaintext, 0x02 means RC4. (see Functions)
     // > The remaining bits are reserved for future use.
-    static auto constexpr CryptoProvidePlaintext = size_t{ 0x01 };
-    static auto constexpr CryptoProvideCrypto = size_t{ 0x02 };
+    static auto constexpr CryptoProvidePlaintext = uint32_t{ 0x01 };
+    static auto constexpr CryptoProvideCrypto = uint32_t{ 0x02 };
 
     // MSE constants.
     // http://wiki.vuze.com/w/Message_Stream_Encryption
@@ -266,13 +266,13 @@ private:
         return DH{ mediator->private_key() };
     }
 
-    static void add_dh(DH&& dh)
+    static void add_dh(DH dh)
     {
         auto lock = std::unique_lock(dh_pool_mutex_);
 
         if (dh_pool_size_ < std::size(dh_pool_))
         {
-            dh_pool_[dh_pool_size_] = std::move(dh);
+            dh_pool_[dh_pool_size_] = dh;
             ++dh_pool_size_;
         }
     }
@@ -288,12 +288,12 @@ private:
 
         auto dh = DH{};
         std::swap(dh_, dh);
-        add_dh(std::move(dh));
+        add_dh(dh);
     }
 
     ///
 
-    DH dh_ = {};
+    DH dh_{};
 
     DoneFunc on_done_;
 

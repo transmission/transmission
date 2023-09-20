@@ -33,7 +33,7 @@ public:
     // MSE spec: "Minimum length [for the private key] is 128 bit.
     // Anything beyond 180 bit is not believed to add any further
     // security and only increases the necessary calculation time.
-    // You should use a length of 160bits whenever possible[.]
+    // You should use a length of 160bits whenever possible[.]"
     static auto constexpr PrivateKeySize = size_t{ 20 };
 
     // MSE spec: "P, S [the shared secret], Ya and Yb
