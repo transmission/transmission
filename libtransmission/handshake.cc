@@ -456,7 +456,6 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
 ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
 {
     /* HASH('req2', SKEY) xor HASH('req3', S), ENCRYPT(VC, crypto_provide, len(PadC)) */
-
     uint16_t padc_len = 0;
     uint32_t crypto_provide = 0;
     auto obfuscated_hash = tr_sha1_digest_t{};
@@ -472,13 +471,13 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
      * we can get the first half of that (the obfuscatedTorrentHash)
      * by building the latter and xor'ing it with what the peer sent us */
     tr_logAddTraceHand(this, "reading obfuscated torrent hash...");
-    auto req2 = tr_sha1_digest_t{};
-    peer_io->read_bytes(std::data(req2), std::size(req2));
+    auto x_or = tr_sha1_digest_t{};
+    peer_io->read_bytes(std::data(x_or), std::size(x_or));
 
     auto const req3 = tr_sha1::digest("req3"sv, dh_.secret());
     for (size_t i = 0; i < std::size(obfuscated_hash); ++i)
     {
-        obfuscated_hash[i] = req2[i] ^ req3[i];
+        obfuscated_hash[i] = x_or[i] ^ req3[i];
     }
 
     if (auto const info = mediator_->torrent_from_obfuscated(obfuscated_hash); info)
@@ -493,7 +492,6 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
     }
 
     /* next part: ENCRYPT(VC, crypto_provide, len(PadC), */
-
     auto const& info_hash = peer_io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "readCryptoProvide requires an info_hash");
     peer_io->decrypt_init(peer_io->is_incoming(), dh_, info_hash);
@@ -502,7 +500,7 @@ ReadState tr_handshake::read_crypto_provide(tr_peerIo* peer_io)
     peer_io->read_bytes(std::data(vc_in), std::size(vc_in));
     if (vc_in != VC)
     {
-        tr_logAddTraceHand(this, "incoming VC is not all 0...");
+        tr_logAddTraceHand(this, "VC from peer is not all 0...");
         return done(false);
     }
 
