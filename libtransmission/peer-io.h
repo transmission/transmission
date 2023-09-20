@@ -307,9 +307,9 @@ public:
     }
     constexpr void encrypt_deactivate() noexcept
     {
-        // unlike the read buffer, we don't need to decrypt anything in
-        // the write buffer since we control whether we add data before
-        // or after we deactivate encryption
+        // unlike the read buffer, we don't need deactivation
+        // since we control whether we add data before or after
+        // calling encrypt_deactivate()
         filter_.encrypt_deactivate();
     }
 
