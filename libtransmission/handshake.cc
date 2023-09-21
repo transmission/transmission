@@ -106,10 +106,9 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     outbuf.add_uint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
-    if (auto msg = libtransmission::StackBuffer<HandshakeSize, std::byte>{}; build_handshake_message(peer_io, msg))
+    outbuf.add_uint16(HandshakeSize);
+    if (build_handshake_message(peer_io, outbuf))
     {
-        outbuf.add_uint16(std::size(msg));
-        outbuf.add(msg);
         have_sent_bittorrent_handshake_ = true;
     }
     else
@@ -697,6 +696,7 @@ bool tr_handshake::send_handshake(tr_peerIo* io)
     {
         return false;
     }
+    TR_ASSERT(std::size(msg) == HandshakeSize);
     io->write(msg, false);
     have_sent_bittorrent_handshake_ = true;
     return true;

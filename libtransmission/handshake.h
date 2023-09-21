@@ -206,7 +206,7 @@ private:
     // Next comes the 20 byte sha1 info_hash and the 20-byte peer_id
     static auto constexpr HandshakeSize = std::size(HandshakeName) + HandshakeFlagsBytes + std::tuple_size_v<tr_sha1_digest_t> +
         std::tuple_size_v<tr_peer_id_t>;
-    static_assert(HandshakeSize == 68);
+    static_assert(HandshakeSize == 68U);
 
     // Length of handhshake up through the info_hash. From theory.org:
     // > The recipient may wait for the initiator's handshake... however,
@@ -215,7 +215,7 @@ private:
     // > recipient sends its own handshake).
     static auto constexpr IncomingHandshakeLen = std::size(HandshakeName) + HandshakeFlagsBytes +
         std::tuple_size_v<tr_sha1_digest_t>;
-    static_assert(IncomingHandshakeLen == 48);
+    static_assert(IncomingHandshakeLen == 48U);
 
     // MSE constants.
     // http://wiki.vuze.com/w/Message_Stream_Encryption
