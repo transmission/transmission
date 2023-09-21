@@ -45,14 +45,11 @@ export class Transmission extends EventTarget {
     this._rows = [];
     this.dirtyTorrents = new Set();
 
+    this.changeStatus = false;
     this.refilterSoon = debounce(() => this._refilter(false));
     this.refilterAllSoon = debounce(() => this._refilter(true));
 
     this.boundPopupCloseListener = this.popupCloseListener.bind(this);
-    this.dispatchSelectionChangedSoon = debounce(
-      () => this._dispatchSelectionChanged(),
-      200,
-    );
 
     // listen to actions
     // TODO: consider adding a mutator listener here to see dynamic additions
@@ -125,7 +122,9 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new AboutDialog(this.version_info));
           break;
         case 'show-inspector':
-          this.setCurrentPopup(new Inspector(this));
+          if (!this.popup || this.popup.name !== 'inspector') {
+            this.setCurrentPopup(new Inspector(this));
+          }
           break;
         case 'show-move-dialog':
           this.setCurrentPopup(new MoveDialog(this, this.remote));
@@ -187,22 +186,26 @@ export class Transmission extends EventTarget {
       this.refilterAllSoon();
     });
 
-    //if (!isMobileDevice) {
     document.addEventListener('keydown', this._keyDown.bind(this));
     document.addEventListener('keyup', this._keyUp.bind(this));
     e = document.querySelector('#torrent-container');
-    e.addEventListener('click', () => {
+    e.addEventListener('click', (e_) => {
       if (this.popup && this.popup.name !== 'inspector') {
         this.setCurrentPopup(null);
-      } else {
+      }
+      if (e_.target === e_.currentTarget) {
         this._deselectAll();
+      }
+    });
+    e.addEventListener('dblclick', () => {
+      if (!this.popup || this.popup.name !== 'inspector') {
+        this.action_manager.click('show-inspector');
       }
     });
     e.addEventListener('dragenter', Transmission._dragenter);
     e.addEventListener('dragover', Transmission._dragenter);
     e.addEventListener('drop', this._drop.bind(this));
     this._setupSearchBox();
-    //}
 
     this.elements = {
       torrent_list: document.querySelector('#torrent-list'),
@@ -376,31 +379,31 @@ export class Transmission extends EventTarget {
     for (const e of this.elements.torrent_list.children) {
       e.classList.toggle('selected', e === e_sel);
     }
-    this.dispatchSelectionChangedSoon();
+    this._dispatchSelectionChanged();
   }
 
   _selectRow(row) {
     row.getElement().classList.add('selected');
-    this.dispatchSelectionChangedSoon();
+    this._dispatchSelectionChanged();
   }
 
   _deselectRow(row) {
     row.getElement().classList.remove('selected');
-    this.dispatchSelectionChangedSoon();
+    this._dispatchSelectionChanged();
   }
 
   _selectAll() {
     for (const e of this.elements.torrent_list.children) {
       e.classList.add('selected');
     }
-    this.dispatchSelectionChangedSoon();
+    this._dispatchSelectionChanged();
   }
 
   _deselectAll() {
     for (const e of this.elements.torrent_list.children) {
       e.classList.remove('selected');
     }
-    this.dispatchSelectionChangedSoon();
+    this._dispatchSelectionChanged();
     delete this._last_torrent_clicked;
   }
 
@@ -426,7 +429,7 @@ export class Transmission extends EventTarget {
       }
     }
 
-    this.dispatchSelectionChangedSoon();
+    this._dispatchSelectionChanged();
   }
 
   _dispatchSelectionChanged() {
@@ -636,6 +639,11 @@ export class Transmission extends EventTarget {
   }
 
   _onTorrentChanged(event_) {
+    if (this.changeStatus) {
+      this._dispatchSelectionChanged();
+      this.changeStatus = false;
+    }
+
     // update our dirty fields
     const tor = event_.currentTarget;
     this.dirtyTorrents.add(tor.getId());
@@ -726,7 +734,6 @@ TODO: fix this when notifications get fixed
 
     if (this.popup && this.popup.name !== 'inspector') {
       this.setCurrentPopup(null);
-      return;
     }
 
     // handle the per-row pause/resume button
@@ -797,6 +804,7 @@ TODO: fix this when notifications get fixed
   }
 
   _startTorrents(torrents, force) {
+    this.changeStatus = true;
     this.remote.startTorrents(
       Transmission._getTorrentIds(torrents),
       force,
@@ -821,9 +829,14 @@ TODO: fix this when notifications get fixed
   }
 
   _stopTorrents(torrents) {
+    this.changeStatus = true;
     this.remote.stopTorrents(
       Transmission._getTorrentIds(torrents),
-      this.refreshTorrents,
+      () => {
+        setTimeout(() => {
+          this.refreshTorrents();
+        }, 500);
+      },
       this,
     );
   }
@@ -1020,9 +1033,6 @@ TODO: fix this when notifications get fixed
         e.row = row;
         dirty_rows.push(row);
         e.addEventListener('click', this._onRowClicked.bind(this));
-        e.addEventListener('dblclick', () =>
-          this.action_manager.click('show-inspector'),
-        );
       }
     }
 
@@ -1086,7 +1096,7 @@ TODO: fix this when notifications get fixed
       old_sel_count !== countSelectedRows() ||
       old_row_count !== countRows()
     ) {
-      this.dispatchSelectionChangedSoon();
+      this._dispatchSelectionChanged();
     }
   }
 

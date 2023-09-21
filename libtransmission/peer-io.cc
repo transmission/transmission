@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <cstdint>
+#include <type_traits>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -18,6 +19,8 @@
 #include <libutp/utp.h>
 
 #include <fmt/core.h>
+
+#include <small/map.hpp>
 
 #include "libtransmission/transmission.h"
 
@@ -124,11 +127,12 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     bool is_seed,
     bool utp)
 {
-    auto const& [addr, port] = socket_address;
+    using preferred_key_t = std::underlying_type_t<tr_preferred_transport>;
+    auto const preferred = session->preferred_transport();
 
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
     TR_ASSERT(session != nullptr);
-    TR_ASSERT(addr.is_valid());
+    TR_ASSERT(socket_address.is_valid());
     TR_ASSERT(utp || session->allowsTCP());
 
     if (!socket_address.is_valid_for_peers())
@@ -137,27 +141,49 @@ std::shared_ptr<tr_peerIo> tr_peerIo::new_outgoing(
     }
 
     auto peer_io = tr_peerIo::create(session, parent, &info_hash, false, is_seed);
-
+    auto const func = small::max_size_map<preferred_key_t, std::function<bool()>, TR_NUM_PREFERRED_TRANSPORT>{
+        { TR_PREFER_UTP,
+          [&]()
+          {
 #ifdef WITH_UTP
-    if (utp)
-    {
-        auto* const sock = utp_create_socket(session->utp_context);
-        utp_set_userdata(sock, peer_io.get());
-        peer_io->set_socket(tr_peer_socket{ socket_address, sock });
+              if (utp)
+              {
+                  auto* const sock = utp_create_socket(session->utp_context);
+                  utp_set_userdata(sock, peer_io.get());
+                  peer_io->set_socket(tr_peer_socket{ socket_address, sock });
 
-        auto const [ss, sslen] = socket_address.to_sockaddr();
-        if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
-        {
-            return peer_io;
-        }
-    }
+                  auto const [ss, sslen] = socket_address.to_sockaddr();
+                  if (utp_connect(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) == 0)
+                  {
+                      return true;
+                  }
+              }
 #endif
+              return false;
+          } },
+        { TR_PREFER_TCP,
+          [&]()
+          {
+              if (!peer_io->socket_.is_valid())
+              {
+                  if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
+                  {
+                      peer_io->set_socket(std::move(sock));
+                      return true;
+                  }
+              }
+              return false;
+          } }
+    };
 
-    if (!peer_io->socket_.is_valid())
+    if (func.at(preferred)())
     {
-        if (auto sock = tr_netOpenPeerSocket(session, socket_address, is_seed); sock.is_valid())
+        return peer_io;
+    }
+    for (preferred_key_t i = 0U; i < TR_NUM_PREFERRED_TRANSPORT; ++i)
+    {
+        if (i != preferred && func.at(i)())
         {
-            peer_io->set_socket(std::move(sock));
             return peer_io;
         }
     }

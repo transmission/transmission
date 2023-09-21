@@ -2350,7 +2350,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_units:
-        tr_formatter_get_units(tr_variantDictAddDict(d, key, 0));
+        *tr_variantDictAdd(d, key) = tr_formatter_get_units();
         break;
 
     case TR_KEY_version:

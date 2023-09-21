@@ -6,12 +6,7 @@
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
-import {
-  OutsideClickListener,
-  Utils,
-  createTextualTabsContainer,
-  setTextContent,
-} from './utils.js';
+import { Utils, createTextualTabsContainer, setTextContent } from './utils.js';
 
 const peer_column_classes = [
   'encryption',
@@ -39,8 +34,7 @@ export class Inspector extends EventTarget {
     this.file_torrent = null;
     this.file_torrent_n = null;
     this.file_rows = null;
-    this.outside = new OutsideClickListener(this.elements.root);
-    this.outside.addEventListener('click', () => this.close());
+    this.elements.dismiss.addEventListener('click', () => this.close());
     Object.seal(this);
 
     controller.addEventListener(
@@ -54,7 +48,6 @@ export class Inspector extends EventTarget {
 
   close() {
     if (!this.closed) {
-      this.outside.stop();
       clearInterval(this.interval);
       this._setTorrents([]);
       this.elements.root.remove();
@@ -760,13 +753,13 @@ export class Inspector extends EventTarget {
         rows.push(title);
       }
 
-      for (const [index, tracker] of tor.getTrackers().entries()) {
+      for (const tracker of tor.getTrackers()) {
         const announceState = Inspector.getAnnounceState(tracker);
         const lastAnnounceStatusHash = Inspector.lastAnnounceStatus(tracker);
         const lastScrapeStatusHash = Inspector.lastScrapeStatus(tracker);
 
         const tier_div = document.createElement('div');
-        tier_div.classList.add('tier-list-row', index % 2 ? 'odd' : 'even');
+        tier_div.classList.add('tier-list-row');
 
         let element = document.createElement('div');
         const site = Inspector._getOrigin(tracker);
@@ -920,14 +913,8 @@ export class Inspector extends EventTarget {
     return tree;
   }
 
-  addNodeToView(tor, parent, sub, index) {
-    const row = new FileRow(
-      tor,
-      sub.depth,
-      sub.name,
-      sub.file_indices,
-      index % 2,
-    );
+  addNodeToView(tor, parent, sub) {
+    const row = new FileRow(tor, sub.depth, sub.name, sub.file_indices);
     row.addEventListener('wantedToggled', this._onFileWantedToggled.bind(this));
     row.addEventListener(
       'priorityToggled',
@@ -937,16 +924,15 @@ export class Inspector extends EventTarget {
     parent.append(row.getElement());
   }
 
-  addSubtreeToView(tor, parent, sub, index) {
+  addSubtreeToView(tor, parent, sub) {
     if (sub.parent) {
-      this.addNodeToView(tor, parent, sub, index++);
+      this.addNodeToView(tor, parent, sub);
     }
     if (sub.children) {
       for (const value of Object.values(sub.children)) {
-        index = this.addSubtreeToView(tor, parent, value, index);
+        this.addSubtreeToView(tor, parent, value);
       }
     }
-    return index;
   }
 
   _updateFiles() {
@@ -969,7 +955,7 @@ export class Inspector extends EventTarget {
       this.file_rows = [];
       const fragment = document.createDocumentFragment();
       const tree = Inspector.createFileTreeModel(tor);
-      this.addSubtreeToView(tor, fragment, tree, 0);
+      this.addSubtreeToView(tor, fragment, tree);
       list.append(fragment);
     } else {
       // ...refresh the already-existing file list
