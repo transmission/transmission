@@ -225,9 +225,12 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
 
     for (; pad_b_recv_len_ <= PadbMaxlen; ++pad_b_recv_len_)
     {
-        if (peer_io->read_buffer_size() < std::size(*encrypted_vc_))
+        static auto constexpr Needlen = std::size(VC);
+        if (peer_io->read_buffer_size() < Needlen)
         {
-            tr_logAddTraceHand(this, "not enough bytes... returning read_more");
+            tr_logAddTraceHand(
+                this,
+                fmt::format("in read_vc... need {}, read {}, have {}", Needlen, pad_b_recv_len_, peer_io->read_buffer_size()));
             return READ_LATER;
         }
 
@@ -237,7 +240,7 @@ ReadState tr_handshake::read_vc(tr_peerIo* peer_io)
             // We already know it's a match; now we just need to
             // consume it from the read buffer.
             peer_io->decrypt_init(peer_io->is_incoming(), dh_, info_hash);
-            peer_io->read_buffer_discard(std::size(*encrypted_vc_));
+            peer_io->read_buffer_discard(Needlen);
             set_state(tr_handshake::State::AwaitingCryptoSelect);
             return READ_NOW;
         }
@@ -458,16 +461,23 @@ ReadState tr_handshake::read_pad_a(tr_peerIo* peer_io)
 
     for (; pad_a_recv_len_ <= PadaMaxlen; ++pad_a_recv_len_)
     {
-        if (peer_io->read_buffer_size() < std::size(needle))
+        static auto constexpr Needlen = std::size(needle);
+        if (peer_io->read_buffer_size() < Needlen)
         {
-            tr_logAddTraceHand(this, "PadA: not enough bytes... returning read_more");
+            tr_logAddTraceHand(
+                this,
+                fmt::format(
+                    "in read_pad_a... need {}, read {}, have {}",
+                    Needlen,
+                    pad_a_recv_len_,
+                    peer_io->read_buffer_size()));
             return READ_LATER;
         }
 
         if (peer_io->read_buffer_starts_with(needle))
         {
             tr_logAddTraceHand(this, "found HASH('req1', S)!");
-            peer_io->read_buffer_discard(std::size(needle));
+            peer_io->read_buffer_discard(Needlen);
             set_state(State::AwaitingCryptoProvide);
             return READ_NOW;
         }
