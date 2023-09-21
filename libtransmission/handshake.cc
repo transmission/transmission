@@ -31,7 +31,7 @@
 using namespace std::literals;
 using DH = tr_message_stream_encryption::DH;
 
-bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
+bool tr_handshake::build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const
 {
     auto const& info_hash = io->torrent_hash();
     TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "build_handshake_message requires an info_hash");
@@ -51,13 +51,23 @@ bool tr_handshake::build_handshake_message(tr_peerIo* io, uint8_t* buf) const
     }
     auto const flag_bytes = flags.raw();
 
-    [[maybe_unused]] auto* walk = buf;
-    walk = std::copy_n(reinterpret_cast<uint8_t const*>(std::data(HandshakeName)), std::size(HandshakeName), walk);
-    walk = std::copy(std::begin(flag_bytes), std::end(flag_bytes), walk);
-    walk = std::copy_n(reinterpret_cast<char const*>(std::data(info_hash)), std::size(info_hash), walk);
-    walk = std::copy(std::begin(info->client_peer_id), std::end(info->client_peer_id), walk);
-    TR_ASSERT(walk - buf == HandshakeSize);
+    buf.add(HandshakeName);
+    buf.add(flag_bytes);
+    buf.add(info_hash);
+    buf.add(info->client_peer_id);
 
+    return true;
+}
+
+bool tr_handshake::send_handshake(tr_peerIo* io)
+{
+    auto msg = libtransmission::StackBuffer<HandshakeSize, std::byte>{};
+    if (!build_handshake_message(io, msg))
+    {
+        return false;
+    }
+    io->write(msg, false);
+    have_sent_bittorrent_handshake_ = true;
     return true;
 }
 
@@ -743,18 +753,6 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 }
 
 // ---
-
-bool tr_handshake::send_handshake(tr_peerIo* io)
-{
-    auto msg = std::array<uint8_t, HandshakeSize>{};
-    if (!build_handshake_message(io, std::data(msg)))
-    {
-        return false;
-    }
-    io->write_bytes(std::data(msg), std::size(msg), false);
-    have_sent_bittorrent_handshake_ = true;
-    return true;
-}
 
 bool tr_handshake::fire_done(bool is_connected)
 {

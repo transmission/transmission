@@ -107,7 +107,9 @@ private:
 
     static void on_error(tr_peerIo* io, tr_error const&, void* vhandshake);
 
-    bool build_handshake_message(tr_peerIo* io, uint8_t* buf) const;
+    bool build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const;
+
+    bool send_handshake(tr_peerIo* io);
 
     ReadState read_crypto_provide(tr_peerIo*);
     ReadState read_crypto_select(tr_peerIo*);
@@ -160,8 +162,6 @@ private:
     }
 
     [[nodiscard]] uint32_t crypto_provide() const noexcept;
-
-    bool send_handshake(tr_peerIo* io);
 
     template<size_t PadMax>
     void send_public_key_and_pad(tr_peerIo* io)
