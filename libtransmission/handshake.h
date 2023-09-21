@@ -99,18 +99,6 @@ private:
 
     ///
 
-    [[nodiscard]] static std::string_view state_string(State state) noexcept;
-
-    [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
-
-    static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
-
-    static void on_error(tr_peerIo* io, tr_error const&, void* vhandshake);
-
-    bool build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const;
-
-    bool send_handshake(tr_peerIo* io);
-
     ReadState read_crypto_provide(tr_peerIo*);
     ReadState read_crypto_select(tr_peerIo*);
     ReadState read_handshake(tr_peerIo*);
@@ -156,12 +144,20 @@ private:
         state_ = state;
     }
 
+    [[nodiscard]] static std::string_view state_string(State state) noexcept;
+
     [[nodiscard]] std::string_view state_string() const noexcept
     {
         return state_string(state_);
     }
 
-    [[nodiscard]] uint32_t crypto_provide() const noexcept;
+    static ReadState can_read(tr_peerIo* peer_io, void* vhandshake, size_t* piece);
+
+    static void on_error(tr_peerIo* io, tr_error const&, void* vhandshake);
+
+    bool build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const;
+
+    bool send_handshake(tr_peerIo* io);
 
     template<size_t PadMax>
     void send_public_key_and_pad(tr_peerIo* io)
@@ -174,6 +170,10 @@ private:
         walk += mediator_->pad(walk, PadMax);
         io->write_bytes(data, walk - data, false);
     }
+
+    [[nodiscard]] uint32_t crypto_provide() const noexcept;
+
+    [[nodiscard]] static uint32_t get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept;
 
     bool fire_done(bool is_connected);
 

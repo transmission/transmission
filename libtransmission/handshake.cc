@@ -31,98 +31,6 @@
 using namespace std::literals;
 using DH = tr_message_stream_encryption::DH;
 
-bool tr_handshake::build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const
-{
-    auto const& info_hash = io->torrent_hash();
-    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "build_handshake_message requires an info_hash");
-
-    auto const info = mediator_->torrent(info_hash);
-    if (!info)
-    {
-        return false;
-    }
-
-    auto flags = tr_bitfield{ HandshakeFlagsBits };
-    flags.set(LtepFlag);
-    flags.set(FextFlag);
-    if (mediator_->allows_dht())
-    {
-        flags.set(DhtFlag);
-    }
-    auto const flag_bytes = flags.raw();
-
-    buf.add(HandshakeName);
-    buf.add(flag_bytes);
-    buf.add(info_hash);
-    buf.add(info->client_peer_id);
-
-    return true;
-}
-
-bool tr_handshake::send_handshake(tr_peerIo* io)
-{
-    auto msg = libtransmission::StackBuffer<HandshakeSize, std::byte>{};
-    if (!build_handshake_message(io, msg))
-    {
-        return false;
-    }
-    io->write(msg, false);
-    have_sent_bittorrent_handshake_ = true;
-    return true;
-}
-
-uint32_t tr_handshake::crypto_provide() const noexcept
-{
-    auto provide = uint32_t{};
-
-    switch (encryption_mode_)
-    {
-    case TR_ENCRYPTION_REQUIRED:
-    case TR_ENCRYPTION_PREFERRED:
-        provide |= CryptoProvideCrypto;
-        break;
-
-    case TR_CLEAR_PREFERRED:
-        provide |= CryptoProvideCrypto | CryptoProvidePlaintext;
-        break;
-    }
-
-    return provide;
-}
-
-[[nodiscard]] uint32_t tr_handshake::get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept
-{
-    auto choices = std::array<uint32_t, 2>{};
-    int n_choices = 0;
-
-    switch (encryption_mode)
-    {
-    case TR_ENCRYPTION_REQUIRED:
-        choices[n_choices++] = CryptoProvideCrypto;
-        break;
-
-    case TR_ENCRYPTION_PREFERRED:
-        choices[n_choices++] = CryptoProvideCrypto;
-        choices[n_choices++] = CryptoProvidePlaintext;
-        break;
-
-    case TR_CLEAR_PREFERRED:
-        choices[n_choices++] = CryptoProvidePlaintext;
-        choices[n_choices++] = CryptoProvideCrypto;
-        break;
-    }
-
-    for (auto const& choice : choices)
-    {
-        if ((crypto_provide & choice) != 0)
-        {
-            return choice;
-        }
-    }
-
-    return 0;
-}
-
 // --- Outgoing Connections
 
 // 1 A->B: our public key (Ya) and some padding (PadA)
@@ -753,6 +661,98 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
 }
 
 // ---
+
+bool tr_handshake::build_handshake_message(tr_peerIo* io, libtransmission::BufferWriter<std::byte>& buf) const
+{
+    auto const& info_hash = io->torrent_hash();
+    TR_ASSERT_MSG(info_hash != tr_sha1_digest_t{}, "build_handshake_message requires an info_hash");
+
+    auto const info = mediator_->torrent(info_hash);
+    if (!info)
+    {
+        return false;
+    }
+
+    auto flags = tr_bitfield{ HandshakeFlagsBits };
+    flags.set(LtepFlag);
+    flags.set(FextFlag);
+    if (mediator_->allows_dht())
+    {
+        flags.set(DhtFlag);
+    }
+    auto const flag_bytes = flags.raw();
+
+    buf.add(HandshakeName);
+    buf.add(flag_bytes);
+    buf.add(info_hash);
+    buf.add(info->client_peer_id);
+
+    return true;
+}
+
+bool tr_handshake::send_handshake(tr_peerIo* io)
+{
+    auto msg = libtransmission::StackBuffer<HandshakeSize, std::byte>{};
+    if (!build_handshake_message(io, msg))
+    {
+        return false;
+    }
+    io->write(msg, false);
+    have_sent_bittorrent_handshake_ = true;
+    return true;
+}
+
+uint32_t tr_handshake::crypto_provide() const noexcept
+{
+    auto provide = uint32_t{};
+
+    switch (encryption_mode_)
+    {
+    case TR_ENCRYPTION_REQUIRED:
+    case TR_ENCRYPTION_PREFERRED:
+        provide |= CryptoProvideCrypto;
+        break;
+
+    case TR_CLEAR_PREFERRED:
+        provide |= CryptoProvideCrypto | CryptoProvidePlaintext;
+        break;
+    }
+
+    return provide;
+}
+
+[[nodiscard]] uint32_t tr_handshake::get_crypto_select(tr_encryption_mode encryption_mode, uint32_t crypto_provide) noexcept
+{
+    auto choices = std::array<uint32_t, 2>{};
+    int n_choices = 0;
+
+    switch (encryption_mode)
+    {
+    case TR_ENCRYPTION_REQUIRED:
+        choices[n_choices++] = CryptoProvideCrypto;
+        break;
+
+    case TR_ENCRYPTION_PREFERRED:
+        choices[n_choices++] = CryptoProvideCrypto;
+        choices[n_choices++] = CryptoProvidePlaintext;
+        break;
+
+    case TR_CLEAR_PREFERRED:
+        choices[n_choices++] = CryptoProvidePlaintext;
+        choices[n_choices++] = CryptoProvideCrypto;
+        break;
+    }
+
+    for (auto const& choice : choices)
+    {
+        if ((crypto_provide & choice) != 0)
+        {
+            return choice;
+        }
+    }
+
+    return 0;
+}
 
 bool tr_handshake::fire_done(bool is_connected)
 {
