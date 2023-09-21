@@ -106,7 +106,7 @@ ReadState tr_handshake::read_yb(tr_peerIo* peer_io)
     outbuf.add_uint16(0);
 
     /* ENCRYPT len(IA)), ENCRYPT(IA) */
-    if (auto msg = std::array<uint8_t, HandshakeSize>{}; build_handshake_message(peer_io, std::data(msg)))
+    if (auto msg = libtransmission::StackBuffer<HandshakeSize, std::byte>{}; build_handshake_message(peer_io, msg))
     {
         outbuf.add_uint16(std::size(msg));
         outbuf.add(msg);
