@@ -77,7 +77,7 @@ class Filter
 {
 public:
     void decrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    constexpr void decrypt_deactivate() noexcept
+    constexpr void decrypt_disable() noexcept
     {
         dec_active_ = false;
     }
@@ -94,7 +94,7 @@ public:
     }
 
     void encrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
-    constexpr void encrypt_deactivate() noexcept
+    constexpr void encrypt_disable() noexcept
     {
         enc_active_ = false;
     }
