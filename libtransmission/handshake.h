@@ -249,19 +249,19 @@ private:
     ///
 
     static constexpr auto DhPoolMaxSize = size_t{ 32 };
-    static inline auto dh_pool_size_ = size_t{};
-    static inline auto dh_pool_ = std::array<tr_message_stream_encryption::DH, DhPoolMaxSize>{};
-    static inline auto dh_pool_mutex_ = std::mutex{};
+    static inline auto dh_pool_size = size_t{};
+    static inline auto dh_pool = std::array<tr_message_stream_encryption::DH, DhPoolMaxSize>{};
+    static inline auto dh_pool_mutex = std::mutex{};
 
     [[nodiscard]] static DH get_dh(Mediator* mediator)
     {
-        auto lock = std::unique_lock(dh_pool_mutex_);
+        auto lock = std::unique_lock(dh_pool_mutex);
 
-        if (dh_pool_size_ > 0U)
+        if (dh_pool_size > 0U)
         {
             auto dh = DH{};
-            std::swap(dh, dh_pool_[dh_pool_size_ - 1U]);
-            --dh_pool_size_;
+            std::swap(dh, dh_pool[dh_pool_size - 1U]);
+            --dh_pool_size;
             return dh;
         }
 
@@ -270,12 +270,12 @@ private:
 
     static void add_dh(DH dh)
     {
-        auto lock = std::unique_lock(dh_pool_mutex_);
+        auto lock = std::unique_lock(dh_pool_mutex);
 
-        if (dh_pool_size_ < std::size(dh_pool_))
+        if (dh_pool_size < std::size(dh_pool))
         {
-            dh_pool_[dh_pool_size_] = dh;
-            ++dh_pool_size_;
+            dh_pool[dh_pool_size] = dh;
+            ++dh_pool_size;
         }
     }
 
