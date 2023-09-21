@@ -623,13 +623,6 @@ void tr_peerIo::read_uint32(uint32_t* setme)
     *setme = ntohl(tmp);
 }
 
-void tr_peerIo::read_buffer_discard(size_t n_bytes)
-{
-    n_bytes = std::min(n_bytes, std::size(inbuf_));
-    filter_.decrypt_skip(n_bytes);
-    inbuf_.drain(n_bytes);
-}
-
 // --- UTP
 
 #ifdef WITH_UTP

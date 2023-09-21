@@ -120,7 +120,12 @@ public:
         return inbuf_.starts_with(t);
     }
 
-    void read_buffer_discard(size_t n_bytes);
+    void read_buffer_discard(size_t n_bytes)
+    {
+        n_bytes = std::min(n_bytes, std::size(inbuf_));
+        filter_.decrypt_skip(n_bytes);
+        inbuf_.drain(n_bytes);
+    }
 
     void read_bytes(void* bytes, size_t n_bytes)
     {
@@ -292,10 +297,11 @@ public:
     {
         filter_.decrypt_init(is_incoming, dh, info_hash);
     }
+
     constexpr void decrypt_deactivate(size_t decrypt_len = 0U) noexcept
     {
-        // optionally decrypt remaining data in the read buffer so that
-        // they can be read normally later on
+        // optionally decrypt remaining data in the read buffer in-place,
+        // so that they can be read normally later on
         auto const n_bytes = std::min(decrypt_len, std::size(inbuf_));
         filter_.decrypt(std::data(inbuf_), n_bytes, std::data(inbuf_));
         filter_.decrypt_deactivate();
@@ -305,6 +311,7 @@ public:
     {
         filter_.encrypt_init(is_incoming, dh, info_hash);
     }
+
     constexpr void encrypt_deactivate() noexcept
     {
         // unlike the read buffer, we don't need deactivation
