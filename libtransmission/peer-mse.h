@@ -118,7 +118,7 @@ private:
         {
             arc4.process(reinterpret_cast<uint8_t const*>(buf_in), buf_len, reinterpret_cast<uint8_t*>(buf_out));
         }
-        else
+        else if (buf_in != buf_out)
         {
             std::copy_n(buf_in, buf_len, buf_out);
         }
