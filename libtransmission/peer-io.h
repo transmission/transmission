@@ -292,7 +292,7 @@ public:
         filter_.decrypt_init(is_incoming, dh, info_hash);
     }
 
-    constexpr void decrypt_disable(std::optional<size_t> decrypt_len = {}) noexcept
+    constexpr void decrypt_disable(size_t decrypt_len = 0U) noexcept
     {
         // optionally decrypt decrypt_len more bytes before disabling decryption
         decrypt_remain_len_ = decrypt_len;
