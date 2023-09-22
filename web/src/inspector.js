@@ -551,7 +551,10 @@ export class Inspector extends EventTarget {
     string = string || none;
     if (string.startsWith('https://') || string.startsWith('http://')) {
       string = encodeURI(string);
-      e.info.comment.innerHTML = `<a href="${string}" target="_blank" >${string}</a>`;
+      Utils.setInnerHTML(
+        e.info.comment,
+        `<a href="${string}" target="_blank" >${string}</a>`,
+      );
     } else {
       setTextContent(e.info.comment, string);
     }
@@ -605,7 +608,10 @@ export class Inspector extends EventTarget {
       setTextContent(e.info.magnetLink, mixed);
     } else {
       const link = torrents[0].getMagnetLink();
-      e.info.magnetLink.innerHTML = `<a class="inspector-info-magnet" href="${link}"><button></button></a>`;
+      Utils.setInnerHTML(
+        e.info.magnetLink,
+        `<a class="inspector-info-magnet" href="${link}"><button></button></a>`,
+      );
     }
   }
 
