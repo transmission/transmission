@@ -312,11 +312,13 @@ ReadState tr_handshake::read_peer_id(tr_peerIo* peer_io)
 {
     // read the peer_id
     auto peer_id = tr_peer_id_t{};
-    if (peer_io->read_buffer_size() < std::size(peer_id))
+    static auto constexpr Needlen = std::size(peer_id);
+    tr_logAddTraceHand(this, fmt::format("read_peer_id: need {}, got {}", Needlen, peer_io->read_buffer_size()));
+    if (peer_io->read_buffer_size() < Needlen)
     {
         return READ_LATER;
     }
-    peer_io->read_bytes(std::data(peer_id), std::size(peer_id));
+    peer_io->read_bytes(std::data(peer_id), Needlen);
     set_peer_id(peer_id);
 
     auto client = std::array<char, 128>{};
