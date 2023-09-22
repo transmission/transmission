@@ -651,8 +651,10 @@ private:
             break;
 
         case tr_peer_event::Type::Error:
-            if (event.err == ERANGE || event.err == EMSGSIZE || event.err == ENOTCONN)
+            switch (event.err)
             {
+            case ERANGE:
+            case EMSGSIZE:
                 /* some protocol error from the peer */
                 peer->do_purge = true;
                 tr_logAddDebugSwarm(
@@ -662,10 +664,15 @@ private:
                         peer->display_name(),
                         event.err,
                         tr_strerror(event.err)));
-            }
-            else
-            {
+                break;
+
+            case ENOTCONN:
+                tr_logAddTraceSwarm(s, fmt::format("peer {} disconnected with us", peer->display_name()));
+                break;
+
+            default:
                 tr_logAddDebugSwarm(s, fmt::format("unhandled error: ({}) {}", event.err, tr_strerror(event.err)));
+                break;
             }
 
             break;
