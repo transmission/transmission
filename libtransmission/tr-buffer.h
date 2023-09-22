@@ -252,11 +252,6 @@ public:
         return std::data(buf_) + begin_pos_;
     }
 
-    [[nodiscard]] value_type* data() noexcept
-    {
-        return std::data(buf_) + begin_pos_;
-    }
-
     void drain(size_t n_bytes) override
     {
         begin_pos_ += std::min(n_bytes, size());

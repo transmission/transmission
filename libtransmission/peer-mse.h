@@ -88,11 +88,6 @@ public:
         process(buf_in, buf_len, buf_out, dec_active_, dec_key_);
     }
 
-    constexpr void decrypt_skip(size_t len) noexcept
-    {
-        skip(len, dec_active_, dec_key_);
-    }
-
     void encrypt_init(bool is_incoming, DH const&, tr_sha1_digest_t const& info_hash);
     constexpr void encrypt_disable() noexcept
     {
@@ -114,7 +109,11 @@ private:
     template<typename T>
     static constexpr void process(T const* buf_in, size_t buf_len, T* buf_out, bool active, tr_arc4& arc4) noexcept
     {
-        if (active)
+        if (buf_in == nullptr || buf_out == nullptr)
+        {
+            skip(buf_len, active, arc4);
+        }
+        else if (active)
         {
             arc4.process(reinterpret_cast<uint8_t const*>(buf_in), buf_len, reinterpret_cast<uint8_t*>(buf_out));
         }
