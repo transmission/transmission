@@ -39,7 +39,7 @@ ninja -C build transmission-gtk
 ## On Unix ##
 ### Prerequisites ###
 
-#### Debian 11 / Bullseye ####
+#### Debian 12 / Bookworm ####
 On Debian, you can build transmission with a few dependencies on top of a base installation.
 
 For building transmission-daemon you will need basic dependencies
