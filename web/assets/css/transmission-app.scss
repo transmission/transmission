@@ -728,11 +728,7 @@ $video-image: '../img/film.svg';
       background-color: var(--color-progressbar-seed-paused);
     }
 
-    &.seed {
-      background-color: var(--color-progressbar-seed-1);
-    }
-
-    &.seed.full:not(.paused) {
+    &.seed:not(.paused) {
       background: linear-gradient(
           to right,
           var(--color-progressbar-seed-1) 0,
