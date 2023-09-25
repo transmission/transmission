@@ -136,6 +136,7 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
     EXPECT_EQ("Дыскаграфія"sv, sv);
 
+    // Thinking emoji 🤔
     var.clear();
     tr_variantInitDict(&var, 1U);
     tr_variantDictAddStr(&var, key, "\xf0\x9f\xa4\x94"sv);
