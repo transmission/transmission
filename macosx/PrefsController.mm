@@ -491,7 +491,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     case PORT_STATUS_CHECKING:
         break;
     default:
-        NSAssert(NO, @"Port checker returned invalid status: %d", self.fPortChecker.status);
+        NSAssert(NO, @"Port checker returned invalid status: %lu", self.fPortChecker.status);
         break;
     }
     self.fPortChecker = nil;
