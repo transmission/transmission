@@ -677,9 +677,11 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         setDefaultTrackers(val);
     }
 
+    bool utp_changed = false;
     if (auto const& val = new_settings.utp_enabled; force || val != old_settings.utp_enabled)
     {
         tr_sessionSetUTPEnabled(this, val);
+        utp_changed = true;
     }
 
     useBlocklist(new_settings.blocklist_enabled);
@@ -729,7 +731,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 
     bool const dht_changed = new_settings.dht_enabled != old_settings.dht_enabled;
 
-    if (!udp_core_ || force || port_changed || dht_changed)
+    if (!udp_core_ || force || port_changed || utp_changed)
     {
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
     }
