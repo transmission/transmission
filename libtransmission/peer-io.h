@@ -295,7 +295,7 @@ public:
     constexpr void decrypt_disable(size_t decrypt_len = 0U) noexcept
     {
         // optionally decrypt decrypt_len more bytes before disabling decryption
-        decrypt_remain_len_ = decrypt_len;
+        decrypt_remain_len_ = std::make_optional(decrypt_len);
     }
 
     void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
