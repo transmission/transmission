@@ -729,8 +729,6 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         port_forwarding_->local_port_changed();
     }
 
-    bool const dht_changed = new_settings.dht_enabled != old_settings.dht_enabled;
-
     if (!udp_core_ || force || port_changed || utp_changed)
     {
         udp_core_ = std::make_unique<tr_session::tr_udp_core>(*this, udpPort());
@@ -750,11 +748,11 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         }
     }
 
-    if (!allowsDHT())
+    if (!new_settings.dht_enabled)
     {
         dht_.reset();
     }
-    else if (force || !dht_ || port_changed || addr_changed || dht_changed)
+    else if (force || !dht_ || port_changed || addr_changed || new_settings.dht_enabled != old_settings.dht_enabled)
     {
         dht_ = tr_dht::create(dht_mediator_, localPeerPort(), udp_core_->socket4(), udp_core_->socket6());
     }
