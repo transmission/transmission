@@ -667,7 +667,6 @@ private:
                 break;
 
             case ENOTCONN:
-                peer->do_purge = true;
                 tr_logAddTraceSwarm(s, fmt::format("peer {} disconnected with us", peer->display_name()));
                 break;
 
