@@ -64,6 +64,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   display: inline-block;
   padding: 3px;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 /// GLOBAL
@@ -279,6 +280,7 @@ $toolbar-height: $toolbar-height-number * 1px;
     height: $toolbar-height;
     margin-right: 6px;
     user-select: none;
+    -webkit-user-select: none;
     width: $toolbar-height;
 
     svg {
@@ -455,6 +457,8 @@ $video-image: '../img/film.svg';
   padding: 0;
   text-align: left;
   width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
 
   .torrent:nth-child(even) {
     background-color: var(--color-bg-even);
@@ -466,7 +470,6 @@ $video-image: '../img/film.svg';
 
   .torrent {
     border-bottom: 1px solid var(--color-default-border);
-    user-select: none;
 
     .icon {
       // color the background svg fill
@@ -894,6 +897,7 @@ $video-image: '../img/film.svg';
 #prefs-dialog.ui-tabs .ui-tabs-panel {
   padding: 0;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .prefs-section {
@@ -1331,6 +1335,8 @@ $video-image: '../img/film.svg';
   padding: 10px 5px;
   position: absolute;
   z-index: 9999;
+  user-select: none;
+  -webkit-user-select: none;
 
   .context-menuitem {
     font-size: 13px;
