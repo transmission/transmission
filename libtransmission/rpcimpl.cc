@@ -903,7 +903,6 @@ void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quar
 char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
 {
     auto const torrents = getTorrents(session, args_in);
-    tr_variant* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
 
     auto sv = std::string_view{};
     auto const format = tr_variantDictFindStrView(args_in, TR_KEY_format, &sv) && sv == "table"sv ? TrFormat::Table :
@@ -944,6 +943,8 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
                 keys.emplace_back(*key);
             }
         }
+
+        auto* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1U);
 
         if (format == TrFormat::Table)
         {

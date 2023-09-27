@@ -120,14 +120,12 @@ public:
         return inbuf_.starts_with(t);
     }
 
-    void read_buffer_drain(size_t byte_count);
-
-    void read_bytes(void* bytes, size_t n_bytes)
+    void read_buffer_discard(size_t n_bytes)
     {
-        n_bytes = std::min(n_bytes, std::size(inbuf_));
-        filter_.decrypt(std::data(inbuf_), n_bytes, reinterpret_cast<std::byte*>(bytes));
-        inbuf_.drain(n_bytes);
+        read_bytes(nullptr, n_bytes);
     }
+
+    void read_bytes(void* bytes, size_t n_bytes);
 
     void read_uint8(uint8_t* setme)
     {
@@ -290,12 +288,27 @@ public:
 
     void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
+        decrypt_remain_len_.reset();
         filter_.decrypt_init(is_incoming, dh, info_hash);
+    }
+
+    TR_CONSTEXPR20 void decrypt_disable(size_t decrypt_len = 0U) noexcept
+    {
+        // optionally decrypt decrypt_len more bytes before disabling decryption
+        decrypt_remain_len_ = decrypt_len;
     }
 
     void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
         filter_.encrypt_init(is_incoming, dh, info_hash);
+    }
+
+    constexpr void encrypt_disable() noexcept
+    {
+        // unlike the read buffer, we don't need to "encrypt xxx
+        // more bytes before disabling encryption" since we control
+        // whether we add data before or after calling encrypt_disable()
+        filter_.encrypt_disable();
     }
 
     ///
@@ -354,6 +367,7 @@ private:
         bool is_seed);
 
     Filter filter_;
+    std::optional<size_t> decrypt_remain_len_;
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
 

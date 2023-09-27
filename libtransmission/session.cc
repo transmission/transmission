@@ -618,11 +618,6 @@ void tr_session::initImpl(init_data& data)
 
     setSettings(settings, true);
 
-    if (this->allowsLPD())
-    {
-        this->lpd_ = tr_lpd::create(lpd_mediator_, event_base());
-    }
-
     tr_utpInit(this);
 
     /* cleanup */
