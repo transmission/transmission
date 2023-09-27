@@ -10,7 +10,7 @@ export class AboutDialog extends EventTarget {
     super();
 
     this.elements = AboutDialog._create(version_info);
-    this.elements.dismiss.addEventListener('click', () => this._onDismiss());
+    this.elements.dismiss.addEventListener('click', () => this.close());
     document.body.append(this.elements.root);
     this.elements.dismiss.focus();
   }
@@ -19,10 +19,6 @@ export class AboutDialog extends EventTarget {
     this.elements.root.remove();
     this.dispatchEvent(new Event('close'));
     delete this.elements;
-  }
-
-  _onDismiss() {
-    this.close();
   }
 
   static _create(version_info) {
@@ -46,6 +42,12 @@ export class AboutDialog extends EventTarget {
     elements.workarea.append(e);
     e = document.createElement('div');
     e.textContent = 'Copyright © The Transmission Project';
+    elements.workarea.append(e);
+
+    e = document.createElement('a');
+    e.href = 'https://transmissionbt.com/';
+    e.target = '_blank';
+    e.textContent = 'https://transmissionbt.com/';
     elements.workarea.append(e);
 
     elements.confirm.remove();

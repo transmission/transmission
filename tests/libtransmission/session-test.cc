@@ -309,7 +309,7 @@ TEST_F(SessionTest, honorsSettings)
         tr_variantDictRemove(&settings, key);
         tr_variantDictAddBool(&settings, key, true);
     }
-    auto* session = tr_sessionInit(sandboxDir().data(), false, &settings);
+    auto* session = tr_sessionInit(sandboxDir().data(), false, settings);
 
     // confirm that these settings were enabled
     EXPECT_TRUE(session->isPortRandom());
