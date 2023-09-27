@@ -388,7 +388,7 @@ private:
             tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
         }
 
-        return tr_sessionInit(sandboxDir().data(), !verbose, settings);
+        return tr_sessionInit(sandboxDir().data(), !verbose, *settings);
     }
 
     void sessionClose(tr_session* session)

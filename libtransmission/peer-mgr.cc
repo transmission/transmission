@@ -1349,7 +1349,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
     for (auto const* const info : infos)
     {
         auto const& socket_address = info->listen_socket_address();
-        auto const& addr = socket_address.address();
+        [[maybe_unused]] auto const& addr = socket_address.address();
 
         TR_ASSERT(addr.is_valid());
         TR_ASSERT(addr.type == address_type);

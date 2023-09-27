@@ -28,7 +28,7 @@ public:
     virtual ~BufferReader() = default;
     virtual void drain(size_t n_bytes) = 0;
     [[nodiscard]] virtual size_t size() const noexcept = 0;
-    [[nodiscard]] virtual value_type const* data() const = 0;
+    [[nodiscard]] virtual value_type const* data() const noexcept = 0;
 
     [[nodiscard]] auto empty() const noexcept
     {
@@ -247,7 +247,7 @@ public:
         return end_pos_ - begin_pos_;
     }
 
-    [[nodiscard]] value_type const* data() const override
+    [[nodiscard]] value_type const* data() const noexcept override
     {
         return std::data(buf_) + begin_pos_;
     }
@@ -262,7 +262,7 @@ public:
         }
     }
 
-    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
+    std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
         if (auto const free_at_end = buf_.size() - end_pos_; free_at_end < n_bytes)
         {
@@ -283,7 +283,7 @@ public:
         return { buf_.data() + end_pos_, n_bytes };
     }
 
-    virtual void commit_space(size_t n_bytes) override
+    void commit_space(size_t n_bytes) override
     {
         end_pos_ += n_bytes;
     }

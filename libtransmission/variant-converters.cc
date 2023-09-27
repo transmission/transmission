@@ -17,6 +17,7 @@
 
 #include "libtransmission/log.h" // for tr_log_level
 #include "libtransmission/net.h" // for tr_port
+#include "libtransmission/peer-io.h" // tr_preferred_transport
 #include "libtransmission/utils.h" // for tr_strv_strip(), tr_strlower()
 #include "libtransmission/variant.h"
 
@@ -52,6 +53,12 @@ auto constexpr VerifyModeKeys = std::array<std::pair<std::string_view, tr_verify
     { "fast", TR_VERIFY_ADDED_FAST },
     { "full", TR_VERIFY_ADDED_FULL },
 } };
+
+auto constexpr PreferredTransportKeys = std::
+    array<std::pair<std::string_view, tr_preferred_transport>, TR_NUM_PREFERRED_TRANSPORT>{ {
+        { "utp", TR_PREFER_UTP },
+        { "tcp", TR_PREFER_TCP },
+    } };
 } // namespace
 
 namespace libtransmission
@@ -256,6 +263,54 @@ template<>
 tr_variant VariantConverter::save<tr_preallocation_mode>(tr_preallocation_mode const& val)
 {
     return int64_t{ val };
+}
+
+// ---
+
+template<>
+std::optional<tr_preferred_transport> VariantConverter::load<tr_preferred_transport>(tr_variant const& src)
+{
+    static constexpr auto Keys = PreferredTransportKeys;
+
+    if (auto const* val = src.get_if<std::string_view>(); val != nullptr)
+    {
+        auto const needle = tr_strlower(tr_strv_strip(*val));
+
+        for (auto const& [name, value] : Keys)
+        {
+            if (name == needle)
+            {
+                return value;
+            }
+        }
+    }
+
+    if (auto const* val = src.get_if<int64_t>(); val != nullptr)
+    {
+        for (auto const& [name, value] : Keys)
+        {
+            if (value == *val)
+            {
+                return value;
+            }
+        }
+    }
+
+    return {};
+}
+
+template<>
+tr_variant VariantConverter::save<tr_preferred_transport>(tr_preferred_transport const& val)
+{
+    for (auto const& [key, value] : PreferredTransportKeys)
+    {
+        if (value == val)
+        {
+            return key;
+        }
+    }
+
+    return static_cast<int64_t>(val);
 }
 
 // ---

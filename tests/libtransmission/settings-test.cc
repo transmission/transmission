@@ -411,3 +411,44 @@ TEST_F(SettingsTest, canSaveVerify)
     EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
     EXPECT_EQ("full", val);
 }
+
+TEST_F(SettingsTest, canLoadPreferredTransport)
+{
+    static auto constexpr Key = TR_KEY_preferred_transport;
+    auto constexpr ExpectedValue = TR_PREFER_TCP;
+
+    auto settings = std::make_unique<tr_session_settings>();
+    auto const default_value = settings->preferred_transport;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto var = tr_variant{};
+    tr_variantInitDict(&var, 1);
+    tr_variantDictAddInt(&var, Key, ExpectedValue);
+    settings->load(var);
+    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+    var.clear();
+
+    settings = std::make_unique<tr_session_settings>();
+    tr_variantInitDict(&var, 1);
+    tr_variantDictAddStrView(&var, Key, "tcp");
+    settings->load(var);
+    EXPECT_EQ(ExpectedValue, settings->preferred_transport);
+}
+
+TEST_F(SettingsTest, canSavePreferredTransport)
+{
+    static auto constexpr Key = TR_KEY_preferred_transport;
+    static auto constexpr ExpectedValue = TR_PREFER_TCP;
+
+    auto settings = tr_session_settings{};
+    auto const default_value = settings.preferred_transport;
+    ASSERT_NE(ExpectedValue, default_value);
+
+    auto var = tr_variant{};
+    tr_variantInitDict(&var, 100);
+    settings.preferred_transport = ExpectedValue;
+    var = settings.settings();
+    auto val = std::string_view{};
+    EXPECT_TRUE(tr_variantDictFindStrView(&var, Key, &val));
+    EXPECT_EQ("tcp", val);
+}
