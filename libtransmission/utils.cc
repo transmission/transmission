@@ -545,11 +545,13 @@ std::string tr_strratio(double ratio, char const* infinity)
 
 // ---
 
-bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
+namespace
 {
-    auto const oldpath = tr_pathbuf{ oldpath_in };
-    auto const newpath = tr_pathbuf{ newpath_in };
+namespace tr_file_move_impl
+{
 
+bool pathChecks(std::string_view& oldpath, std::string_view& newpath, tr_error** error)
+{
     // make sure the old file exists
     auto const info = tr_sys_path_get_info(oldpath, 0, error);
     if (!info)
@@ -564,13 +566,49 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
     }
 
     // ensure the target directory exists
-    auto newdir = tr_pathbuf{ newpath.sv() };
+    auto newdir = tr_pathbuf{ newpath };
     newdir.popdir();
     if (!tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
         tr_error_prefix(error, "Unable to create directory for new file: ");
         return false;
     }
+
+    return true;
+}
+
+} // namespace tr_file_move_impl
+} // namespace
+
+bool tr_file_move_strict(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
+{
+    if (!tr_file_move_impl::pathChecks(oldpath_in, newpath_in, error))
+    {
+        return false;
+    }
+
+    auto const oldpath = tr_pathbuf{ oldpath_in };
+    auto const newpath = tr_pathbuf{ newpath_in };
+
+    /* do the actual moving */
+    if (!tr_sys_path_rename(oldpath, newpath, error))
+    {
+        tr_error_prefix(error, "Unable to move file: ");
+        return false;
+    }
+
+    return true;
+}
+
+bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
+{
+    if (!tr_file_move_impl::pathChecks(oldpath_in, newpath_in, error))
+    {
+        return false;
+    }
+
+    auto const oldpath = tr_pathbuf{ oldpath_in };
+    auto const newpath = tr_pathbuf{ newpath_in };
 
     /* they might be on the same filesystem... */
     if (tr_sys_path_rename(oldpath, newpath))

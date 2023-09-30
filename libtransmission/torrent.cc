@@ -732,6 +732,7 @@ void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc
 {
     auto const lock = tor->unique_lock();
 
+    bool ok = true;
     if (delete_flag && tor->has_metainfo())
     {
         // ensure the files are all closed and idle before moving
@@ -747,10 +748,27 @@ void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc
         {
             delete_func(filename, user_data, nullptr);
         };
-        tor->metainfo_.files().remove(tor->current_dir(), tor->name(), delete_func_wrapper);
+
+        tr_error* error = nullptr;
+        tor->metainfo_.files().remove(tor->current_dir(), tor->name(), delete_func_wrapper, &error);
+        if (error != nullptr)
+        {
+            ok = false;
+            tor->is_deleting_ = false;
+
+            tor->set_local_error(fmt::format(
+                _("Couldn't remove all torrent files: {error} ({error_code})"),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_torrentStop(tor);
+            tr_error_clear(&error);
+        }
     }
 
-    tr_torrentFreeInSessionThread(tor);
+    if (ok)
+    {
+        tr_torrentFreeInSessionThread(tor);
+    }
 }
 
 void freeTorrent(tr_torrent* tor)

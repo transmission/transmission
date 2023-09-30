@@ -62,6 +62,14 @@ void tr_locale_set_global(char const* locale_name) noexcept;
 
 bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
 
+/**
+ * Tries to move a file by renaming, but never by copying.
+ */
+bool tr_file_move_strict(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error = nullptr);
+
+/**
+ * Tries to move a file by renaming, and if that fails, by copying.
+ */
 bool tr_file_move(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
 
 bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error = nullptr);

@@ -246,7 +246,11 @@ bool tr_torrent_files::move(
  * 2. If there are nontorrent files, don't delete them...
  * 3. ...unless the other files are "junk", such as .DS_Store
  */
-void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func) const
+void tr_torrent_files::remove(
+    std::string_view parent_in,
+    std::string_view tmpdir_prefix,
+    FileFunc const& func,
+    tr_error** error) const
 {
     auto const parent = tr_pathbuf{ parent_in };
 
@@ -256,17 +260,52 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
         return;
     }
 
-    // make a tmpdir
+    // try to make a tmpdir
     auto tmpdir = tr_pathbuf{ parent, '/', tmpdir_prefix, "__XXXXXX"sv };
-    tr_sys_dir_create_temp(std::data(tmpdir));
+    if (!tr_sys_dir_create_temp(std::data(tmpdir), error))
+    {
+        return;
+    }
 
     // move the local data to the tmpdir
-    auto const paths = std::array<std::string_view, 1>{ parent.sv() };
-    for (tr_file_index_t idx = 0, n_files = fileCount(); idx < n_files; ++idx)
     {
-        if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
+        struct moved_file
         {
-            tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
+            tr_pathbuf from;
+            tr_pathbuf to;
+        };
+        std::vector<moved_file> moved_files;
+        bool successfully_moved = true;
+
+        auto const paths = std::array<std::string_view, 1>{ parent.sv() };
+        for (tr_file_index_t idx = 0, n_files = fileCount(); idx < n_files; ++idx)
+        {
+            if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
+            {
+                moved_file f{ .from = found->filename(), .to = tr_pathbuf{ tmpdir, '/', found->subpath() } };
+
+                // if moving the file fails, stop
+                if (!tr_file_move_strict(f.from, f.to, error))
+                {
+                    successfully_moved = false;
+                    break;
+                }
+
+                moved_files.push_back(f);
+            }
+        }
+
+        // if moving failed for some file, rollback
+        if (!successfully_moved)
+        {
+            for (auto const& m : moved_files)
+            {
+                // if rollback fails, I don't know what to do...
+                tr_file_move_strict(m.to, m.from);
+            }
+            // remove tmp directories
+            depthFirstWalk(tmpdir, [](char const* f) { tr_sys_path_remove(f); });
+            return;
         }
     }
 
