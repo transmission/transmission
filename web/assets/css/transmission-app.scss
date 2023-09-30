@@ -525,7 +525,7 @@ $video-image: '../img/film.svg';
       color: var(--color-fg-primary);
     }
 
-    &:not(.selected) .paused {
+    &.paused:not(.selected) {
       color: var(--color-fg-disabled);
     }
 
