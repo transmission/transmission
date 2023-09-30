@@ -41,7 +41,7 @@ static char const* const kRPCKeychainName = "Remote";
 
 static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
-@interface PrefsController ()
+@interface PrefsController ()<NSWindowRestoration>
 
 @property(nonatomic, readonly) tr_session* fHandle;
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
