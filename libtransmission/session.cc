@@ -677,12 +677,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
         setDefaultTrackers(val);
     }
 
-    bool utp_changed = false;
-    if (auto const& val = new_settings.utp_enabled; force || val != old_settings.utp_enabled)
-    {
-        tr_sessionSetUTPEnabled(this, val);
-        utp_changed = true;
-    }
+    bool const utp_changed = new_settings.utp_enabled != old_settings.utp_enabled;
 
     useBlocklist(new_settings.blocklist_enabled);
 
@@ -1450,7 +1445,13 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
         return;
     }
 
-    session->settings_.utp_enabled = enabled;
+    session->runInSessionThread(
+        [session, enabled]()
+        {
+            auto settings = session->settings_;
+            settings.utp_enabled = enabled;
+            session->setSettings(std::move(settings), false);
+        });
 }
 
 void tr_sessionSetLPDEnabled(tr_session* session, bool enabled)
