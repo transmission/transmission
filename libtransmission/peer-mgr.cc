@@ -658,12 +658,14 @@ private:
                 tr_logAddDebugSwarm(
                     s,
                     fmt::format(
-                        "setting {} do_purge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
-                        peer->display_name()));
+                        "setting {} do_purge flag because we got [({}) {}]",
+                        peer->display_name(),
+                        event.err,
+                        tr_strerror(event.err)));
             }
             else
             {
-                tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(event.err)));
+                tr_logAddDebugSwarm(s, fmt::format("unhandled error: ({}) {}", event.err, tr_strerror(event.err)));
             }
 
             break;
