@@ -3,6 +3,10 @@ if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS MACOS_SUPPORT_MINIMUM)
     message(FATAL_ERROR "Targeting macOS versions before ${MACOS_SUPPORT_MINIMUM} is not supported for the macOS project, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
 endif()
 
+# Swift support
+cmake_minimum_required(VERSION 3.15.1 FATAL_ERROR)
+enable_language(Swift)
+
 find_program(ACTOOL_EXECUTABLE actool REQUIRED)
 find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
 
@@ -187,6 +191,7 @@ target_sources(${TR_NAME}-mac
         TrackerNode.mm
         TrackerTableView.h
         TrackerTableView.mm
+        Transmission-Bridging-Header.h
         URLSheetWindowController.h
         URLSheetWindowController.mm
         WebSeedTableView.h
@@ -414,14 +419,7 @@ target_link_libraries(${TR_NAME}-mac
         ${TR_NAME}
         fmt::fmt-header-only
         vdkqueue
-        ${SPARKLE_FRAMEWORK}
-        "-framework AppKit"
-        "-framework Carbon"
-        "-framework Foundation"
-        "-framework IOKit"
-        "-framework Quartz"
-        "-framework Security"
-        "-weak_framework UserNotifications")
+        ${SPARKLE_FRAMEWORK})
 
 if(NOT CMAKE_GENERATOR STREQUAL Xcode)
     add_custom_command(
@@ -436,7 +434,11 @@ set_target_properties(
         INSTALL_RPATH "@executable_path;@executable_path/../Frameworks"
         MACOSX_BUNDLE_GUI_IDENTIFIER "org.m0k.transmission"
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
-        OUTPUT_NAME ${MAC_BUNDLE_NAME})
+        OUTPUT_NAME ${MAC_BUNDLE_NAME}
+        XCODE_ATTRIBUTE_CLANG_ENABLE_MODULES YES
+        XCODE_ATTRIBUTE_OTHER_SWIFT_FLAGS ""
+        XCODE_ATTRIBUTE_SWIFT_OBJC_BRIDGING_HEADER "macosx/Transmission-Bridging-Header.h"
+        XCODE_ATTRIBUTE_SWIFT_VERSION "5.0")
 
 install(
     TARGETS ${TR_NAME}-mac
