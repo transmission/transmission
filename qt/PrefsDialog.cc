@@ -259,7 +259,7 @@ void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
     // We don't want to change the preference every time there's a keystroke
     // in a QPlainTextEdit, so instead of connecting to the textChanged signal,
     // only update the pref when the text changed AND focus was lost.
-    char const constexpr* const StartValue = "StartValue";
+    char constexpr const* const StartValue = "StartValue";
 
     if (auto* const edit = qobject_cast<QPlainTextEdit*>(cur); isDescendantOf(edit, this))
     {
