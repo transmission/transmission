@@ -347,48 +347,35 @@ class SessionTest : public SandboxedTest
 private:
     std::shared_ptr<tr_variant> settings_;
 
-    tr_session* sessionInit(tr_variant* settings)
+    tr_session* sessionInit(tr_variant& settings)
     {
         ensureFormattersInited();
 
+        auto* const settings_map = settings.get_if<tr_variant::Map>();
+        EXPECT_NE(settings_map, nullptr);
+
         // download dir
-        auto sv = "Downloads"sv;
-        auto q = TR_KEY_download_dir;
-        (void)tr_variantDictFindStrView(settings, q, &sv);
-        auto const download_dir = tr_pathbuf{ sandboxDir(), '/', sv };
+        auto key = TR_KEY_download_dir;
+        auto val = settings_map->value_if<std::string_view>(key).value_or("Downloads"sv);
+        auto const download_dir = tr_pathbuf{ sandboxDir(), '/', val };
         tr_sys_dir_create(download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700);
-        tr_variantDictAddStr(settings, q, download_dir);
+        (*settings_map)[key] = download_dir.sv();
 
         // incomplete dir
-        sv = "Incomplete"sv;
-        q = TR_KEY_incomplete_dir;
-        (void)tr_variantDictFindStrView(settings, q, &sv);
-        tr_variantDictAddStr(settings, q, tr_pathbuf{ sandboxDir(), '/', sv });
+        key = TR_KEY_incomplete_dir;
+        val = settings_map->value_if<std::string_view>(key).value_or("Incomplete"sv);
+        auto const incomplete_dir = tr_pathbuf{ sandboxDir(), '/', val };
+        (*settings_map)[key] = incomplete_dir.sv();
 
         // blocklists
         tr_sys_dir_create(tr_pathbuf{ sandboxDir(), "/blocklists" }, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
         // fill in any missing settings
+        settings_map->try_emplace(TR_KEY_port_forwarding_enabled, false);
+        settings_map->try_emplace(TR_KEY_dht_enabled, false);
+        settings_map->try_emplace(TR_KEY_message_level, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
 
-        q = TR_KEY_port_forwarding_enabled;
-        if (tr_variantDictFind(settings, q) == nullptr)
-        {
-            tr_variantDictAddBool(settings, q, false);
-        }
-
-        q = TR_KEY_dht_enabled;
-        if (tr_variantDictFind(settings, q) == nullptr)
-        {
-            tr_variantDictAddBool(settings, q, false);
-        }
-
-        q = TR_KEY_message_level;
-        if (tr_variantDictFind(settings, q) == nullptr)
-        {
-            tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
-        }
-
-        return tr_sessionInit(sandboxDir().data(), !verbose, *settings);
+        return tr_sessionInit(sandboxDir().data(), !verbose, settings);
     }
 
     void sessionClose(tr_session* session)
@@ -534,7 +521,7 @@ protected:
             verified_cv_.notify_one();
         };
 
-        session_ = sessionInit(settings());
+        session_ = sessionInit(*settings());
         session_->verifier_->add_callback(callback);
     }
 
