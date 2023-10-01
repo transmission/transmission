@@ -38,41 +38,31 @@ add_executable(${TR_NAME}-mac MACOSX_BUNDLE)
 
 target_sources(${TR_NAME}-mac
     PRIVATE
-        AboutWindowController.h
-        AboutWindowController.mm
+        AboutWindowController.swift
         AddMagnetWindowController.h
         AddMagnetWindowController.mm
         AddWindowController.h
         AddWindowController.mm
+        Array+Additions.swift
         Badger.h
         Badger.mm
-        BadgeView.h
-        BadgeView.mm
-        BlocklistDownloader.h
-        BlocklistDownloader.mm
-        BlocklistDownloaderViewController.h
-        BlocklistDownloaderViewController.mm
-        BlocklistScheduler.h
-        BlocklistScheduler.mm
-        BonjourController.h
-        BonjourController.mm
-        ButtonToolbarItem.h
-        ButtonToolbarItem.mm
+        BadgeView.swift
+        BlocklistDownloader.swift
+        BlocklistDownloaderViewController.swift
+        BlocklistScheduler.swift
+        BonjourController.swift
+        ButtonToolbarItem.swift
         CocoaCompatibility.h
-        ColorTextField.h
-        ColorTextField.mm
+        Collection+Additions.swift
+        ColorTextField.swift
         Controller.h
         Controller.mm
         CreatorWindowController.h
         CreatorWindowController.mm
-        DragOverlayView.h
-        DragOverlayView.mm
-        DragOverlayWindow.h
-        DragOverlayWindow.mm
-        ExpandedPathToIconTransformer.h
-        ExpandedPathToIconTransformer.mm
-        ExpandedPathToPathTransformer.h
-        ExpandedPathToPathTransformer.mm
+        DragOverlayView.swift
+        DragOverlayWindow.swift
+        ExpandedPathToIconTransformer.swift
+        ExpandedPathToPathTransformer.swift
         FileListNode.h
         FileListNode.mm
         FileNameCell.h
@@ -85,24 +75,17 @@ target_sources(${TR_NAME}-mac
         FilePriorityCell.mm
         FileRenameSheetController.h
         FileRenameSheetController.mm
-        FilterBarController.h
-        FilterBarController.mm
-        FilterBarView.h
-        FilterBarView.mm
-        FilterButton.h
-        FilterButton.mm
-        GlobalOptionsPopoverViewController.h
-        GlobalOptionsPopoverViewController.mm
+        FilterBarController.swift
+        FilterBarView.swift
+        FilterButton.swift
+        GlobalOptionsPopoverViewController.swift
         GroupCell.h
         GroupCell.mm
-        GroupPopUpButtonCell.h
-        GroupPopUpButtonCell.mm
+        GroupPopUpButtonCell.swift
         GroupsController.h
         GroupsController.mm
-        GroupsPrefsController.h
-        GroupsPrefsController.mm
-        GroupToolbarItem.h
-        GroupToolbarItem.mm
+        GroupsPrefsController.swift
+        GroupToolbarItem.swift
         InfoActivityViewController.h
         InfoActivityViewController.mm
         InfoFileViewController.h
@@ -113,28 +96,20 @@ target_sources(${TR_NAME}-mac
         InfoOptionsViewController.mm
         InfoPeersViewController.h
         InfoPeersViewController.mm
-        InfoTextField.h
-        InfoTextField.mm
+        InfoTextField.swift
         InfoTrackersViewController.h
         InfoTrackersViewController.mm
         InfoViewController.h
         InfoWindowController.h
         InfoWindowController.mm
         main.mm
-        MessageWindowController.h
-        MessageWindowController.mm
-        NSApplicationAdditions.h
-        NSApplicationAdditions.mm
-        NSDataAdditions.h
-        NSDataAdditions.mm
-        NSImageAdditions.h
-        NSImageAdditions.mm
-        NSKeyedUnarchiverAdditions.h
-        NSKeyedUnarchiverAdditions.mm
-        NSMutableArrayAdditions.h
-        NSMutableArrayAdditions.mm
+        MessageWindowController.swift
+        NSApplication+Additions.swift
+        NSImage+Additions.swift
+        NSKeyedUnarchiver+Additions.swift
+        NSMutableArray+Additions.swift
+        NSString+Additions.swift
         NSStringAdditions.h
-        NSStringAdditions.mm
         objc.h
         objc_log.h
         objc_log.mm
@@ -142,43 +117,30 @@ target_sources(${TR_NAME}-mac
         objc_torrent-metainfo.mm
         objc_transmission.h
         objc_transmission.mm
-        PeerProgressIndicatorCell.h
-        PeerProgressIndicatorCell.mm
-        PeerTableView.h
-        PeerTableView.mm
+        PeerProgressIndicatorCell.swift
+        PeerTableView.swift
         PiecesView.h
         PiecesView.mm
-        PortChecker.h
-        PortChecker.mm
-        PredicateEditorRowTemplateAny.h
-        PredicateEditorRowTemplateAny.mm
-        PrefsController.h
-        PrefsController.mm
-        PrefsWindow.h
-        PrefsWindow.mm
-        PriorityPopUpButtonCell.h
-        PriorityPopUpButtonCell.mm
+        PortChecker.swift
+        PredicateEditorRowTemplateAny.swift
+        PrefsController.swift
+        PrefsWindow.swift
+        PriorityPopUpButtonCell.swift
         ProgressBarView.h
         ProgressBarView.mm
-        ProgressGradients.h
-        ProgressGradients.mm
-        ShareToolbarItem.h
-        ShareToolbarItem.mm
+        ProgressGradients.swift
+        ShareToolbarItem.swift
         ShareTorrentFileHelper.h
         ShareTorrentFileHelper.mm
         SmallTorrentCell.h
         SmallTorrentCell.mm
         SparkleProxy.mm
-        StatsWindowController.h
-        StatsWindowController.mm
-        StatusBarController.h
-        StatusBarController.mm
-        StatusBarView.h
-        StatusBarView.mm
+        StatsWindowController.swift
+        StatusBarController.swift
+        StatusBarView.swift
         SwiftShims.h
         SwiftShims.m
-        Toolbar.h
-        Toolbar.mm
+        Toolbar.swift
         Torrent.h
         Torrent.mm
         TorrentCell.h
@@ -203,10 +165,9 @@ target_sources(${TR_NAME}-mac
         Transmission+CXX.h
         Transmission+CXX.mm
         Transmission-Bridging-Header.h
-        URLSheetWindowController.h
-        URLSheetWindowController.mm
-        WebSeedTableView.h
-        WebSeedTableView.mm)
+        URLSheetWindowController.swift
+        WebSeed.swift
+        WebSeedTableView.swift)
 
 set(XIB_FILES
     AboutWindow.xib

@@ -4,8 +4,7 @@ add_library(${TR_NAME}-mac-ql MODULE)
 
 target_sources(${TR_NAME}-mac-ql
     PRIVATE
-        ../NSDataAdditions.mm
-        ../NSStringAdditions.mm
+        ../NSString+Additions.swift
         ../objc.h
         ../objc_transmission.h
         ../objc_transmission.mm
