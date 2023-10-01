@@ -1,4 +1,3 @@
-# minimum macOS target support
 if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS MACOS_SUPPORT_MINIMUM)
     message(FATAL_ERROR "Targeting macOS versions before ${MACOS_SUPPORT_MINIMUM} is not supported for the macOS project, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
 endif()
@@ -36,6 +35,12 @@ add_subdirectory(QuickLookPlugin)
 add_subdirectory(VDKQueue)
 
 add_executable(${TR_NAME}-mac MACOSX_BUNDLE)
+
+target_compile_options(${TR_NAME}-mac
+    PRIVATE
+        # equivalent of XCODE_ATTRIBUTE_SWIFT_OBJC_BRIDGING_HEADER "macosx/Transmission-Bridging-Header.h"
+        $<$<COMPILE_LANGUAGE:Swift>:-import-objc-header>
+        $<$<COMPILE_LANGUAGE:Swift>:${CMAKE_CURRENT_SOURCE_DIR}/Transmission-Bridging-Header.h>)
 
 target_sources(${TR_NAME}-mac
     PRIVATE
@@ -435,9 +440,9 @@ set_target_properties(
         MACOSX_BUNDLE_GUI_IDENTIFIER "org.m0k.transmission"
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
         OUTPUT_NAME ${MAC_BUNDLE_NAME}
-        XCODE_ATTRIBUTE_CLANG_ENABLE_MODULES YES
-        XCODE_ATTRIBUTE_OTHER_SWIFT_FLAGS ""
-        XCODE_ATTRIBUTE_SWIFT_OBJC_BRIDGING_HEADER "macosx/Transmission-Bridging-Header.h"
+
+        # Ninja|Xcode compatibility
+        Swift_LANGUAGE_VERSION "5"
         XCODE_ATTRIBUTE_SWIFT_VERSION "5.0")
 
 install(
