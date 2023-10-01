@@ -19,4 +19,4 @@ void tr_rpc_request_exec_json(
     tr_rpc_response_func callback,
     void* callback_user_data);
 
-void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str);
+tr_variant tr_rpc_parse_list_str(std::string_view str);

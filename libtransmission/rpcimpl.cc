@@ -2590,26 +2590,23 @@ void tr_rpc_request_exec_json(
  * - values that are all-digits or commas are number lists
  * - all other values are strings
  */
-void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
+tr_variant tr_rpc_parse_list_str(std::string_view str)
 {
     auto const values = tr_num_parse_range(str);
-    auto const value_count = std::size(values);
+    auto const n_values = std::size(values);
 
-    if (value_count == 0)
+    if (n_values == 0)
     {
-        tr_variantInitStr(setme, str);
+        return { str };
     }
-    else if (value_count == 1)
-    {
-        tr_variantInitInt(setme, values[0]);
-    }
-    else
-    {
-        tr_variantInitList(setme, value_count);
 
-        for (auto const& value : values)
-        {
-            tr_variantListAddInt(setme, value);
-        }
+    if (n_values == 1)
+    {
+        return { values[0] };
     }
+
+    auto num_vec = tr_variant::Vector{};
+    num_vec.reserve(n_values);
+    std::copy_n(std::cbegin(values), n_values, std::back_inserter(num_vec));
+    return { std::move(num_vec) };
 }
