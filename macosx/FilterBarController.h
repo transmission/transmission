@@ -18,7 +18,7 @@ typedef NSString* FilterSearchType NS_TYPED_EXTENSIBLE_ENUM;
 extern FilterSearchType const FilterSearchTypeName;
 extern FilterSearchType const FilterSearchTypeTracker;
 
-extern const NSInteger kGroupFilterAllTag;
+extern NSInteger const kGroupFilterAllTag;
 
 @interface FilterBarController : NSViewController
 

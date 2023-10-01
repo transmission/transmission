@@ -313,22 +313,22 @@ private:
 inline void ensureFormattersInited()
 {
     static constexpr int MEM_K = 1024;
-    static char const constexpr* const MEM_K_STR = "KiB";
-    static char const constexpr* const MEM_M_STR = "MiB";
-    static char const constexpr* const MEM_G_STR = "GiB";
-    static char const constexpr* const MEM_T_STR = "TiB";
+    static char constexpr const* const MEM_K_STR = "KiB";
+    static char constexpr const* const MEM_M_STR = "MiB";
+    static char constexpr const* const MEM_G_STR = "GiB";
+    static char constexpr const* const MEM_T_STR = "TiB";
 
     static constexpr int DISK_K = 1000;
-    static char const constexpr* const DISK_K_STR = "kB";
-    static char const constexpr* const DISK_M_STR = "MB";
-    static char const constexpr* const DISK_G_STR = "GB";
-    static char const constexpr* const DISK_T_STR = "TB";
+    static char constexpr const* const DISK_K_STR = "kB";
+    static char constexpr const* const DISK_M_STR = "MB";
+    static char constexpr const* const DISK_G_STR = "GB";
+    static char constexpr const* const DISK_T_STR = "TB";
 
     static constexpr int SPEED_K = 1000;
-    static char const constexpr* const SPEED_K_STR = "kB/s";
-    static char const constexpr* const SPEED_M_STR = "MB/s";
-    static char const constexpr* const SPEED_G_STR = "GB/s";
-    static char const constexpr* const SPEED_T_STR = "TB/s";
+    static char constexpr const* const SPEED_K_STR = "kB/s";
+    static char constexpr const* const SPEED_M_STR = "MB/s";
+    static char constexpr const* const SPEED_G_STR = "GB/s";
+    static char constexpr const* const SPEED_T_STR = "TB/s";
 
     static std::once_flag flag;
 
