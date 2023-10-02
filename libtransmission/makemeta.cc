@@ -335,6 +335,8 @@ std::string tr_metainfo_builder::benc(tr_error** error) const
 
             file_vec.emplace_back(std::move(file_map));
         }
+
+        info_dict.try_emplace(TR_KEY_files, std::move(file_vec));
     }
 
     if (!std::empty(base))
