@@ -2409,6 +2409,10 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
             recheck_completeness();
         }
     }
+    else if (error == TR_STAT_LOCAL_ERROR && !setLocalErrorIfFilesDisappeared(this))
+    {
+        tr_torrentClearError(this);
+    }
 }
 
 // decide whether we should be looking for files in downloadDir or incompleteDir
