@@ -1441,12 +1441,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     auto const now = tr_time_msec();
     auto const now_sec = tr_time();
 
-    auto swarm_stats = tr_swarm_stats{};
-
-    if (tor->swarm != nullptr)
-    {
-        swarm_stats = tr_swarmGetStats(tor->swarm);
-    }
+    auto const swarm_stats = tor->swarm != nullptr ? tr_swarmGetStats(tor->swarm) : tr_swarm_stats{};
 
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
