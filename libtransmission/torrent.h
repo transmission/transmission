@@ -726,14 +726,57 @@ public:
         return max_connected_peers_;
     }
 
-    constexpr void set_ratio_mode(tr_ratiolimit mode) noexcept
+    // --- seed ratio
+
+    constexpr void set_seed_ratio_mode(tr_ratiolimit mode) noexcept
     {
-        if (ratioLimitMode != mode)
+        if (mode == TR_RATIOLIMIT_GLOBAL || mode == TR_RATIOLIMIT_SINGLE || mode == TR_RATIOLIMIT_UNLIMITED)
         {
-            ratioLimitMode = mode;
+            if (seed_ratio_mode_ != mode)
+            {
+                seed_ratio_mode_ = mode;
+                set_dirty();
+            }
+        }
+    }
+
+    [[nodiscard]] constexpr auto seed_ratio_mode() const noexcept
+    {
+        return seed_ratio_mode_;
+    }
+
+    constexpr void set_seed_ratio(double desired_ratio)
+    {
+        if (static_cast<int>(seed_ratio_ * 100.0) != static_cast<int>(desired_ratio * 100.0))
+        {
+            seed_ratio_ = desired_ratio;
             set_dirty();
         }
     }
+
+    [[nodiscard]] auto seed_ratio() const noexcept
+    {
+        return seed_ratio_;
+    }
+
+    [[nodiscard]] constexpr std::optional<double> effective_seed_ratio() const noexcept
+    {
+        auto const mode = seed_ratio_mode();
+
+        if (mode == TR_RATIOLIMIT_SINGLE)
+        {
+            return seed_ratio_;
+        }
+
+        if (mode == TR_RATIOLIMIT_GLOBAL)
+        {
+            return session->desiredRatio();
+        }
+
+        return {};
+    }
+
+    // ---
 
     constexpr void set_idle_limit(uint16_t idle_minutes) noexcept
     {
@@ -910,9 +953,6 @@ public:
 
     tr_completeness completeness = TR_LEECH;
 
-    float desiredRatio = 0.0F;
-    tr_ratiolimit ratioLimitMode = TR_RATIOLIMIT_GLOBAL;
-
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
@@ -975,11 +1015,14 @@ private:
 
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
 
-    float verify_progress_ = -1;
+    float verify_progress_ = -1.0F;
+    float seed_ratio_ = 0.0F;
 
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
 
     tr_interned_string bandwidth_group_;
+
+    tr_ratiolimit seed_ratio_mode_ = TR_RATIOLIMIT_GLOBAL;
 
     bool needs_completeness_check_ = true;
 

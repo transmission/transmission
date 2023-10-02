@@ -174,11 +174,11 @@ bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_left, ui
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (auto seed_ratio = double{}; tr_torrentGetSeedRatio(tor, &seed_ratio))
+    if (auto const seed_ratio = tor->effective_seed_ratio(); seed_ratio)
     {
         auto const uploaded = tor->uploadedCur + tor->uploadedPrev;
         auto const baseline = tor->size_when_done();
-        auto const goal = baseline * seed_ratio;
+        auto const goal = baseline * *seed_ratio;
 
         if (setme_left != nullptr)
         {
@@ -252,74 +252,46 @@ bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
 
 // --- Download Ratio
 
-void tr_torrentSetRatioMode(tr_torrent* tor, tr_ratiolimit mode)
+void tr_torrentSetRatioMode(tr_torrent* const tor, tr_ratiolimit mode)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(mode == TR_RATIOLIMIT_GLOBAL || mode == TR_RATIOLIMIT_SINGLE || mode == TR_RATIOLIMIT_UNLIMITED);
 
-    tor->set_ratio_mode(mode);
+    tor->set_seed_ratio_mode(mode);
 }
 
-tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor)
+tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->ratioLimitMode;
+    return tor->seed_ratio_mode();
 }
 
-void tr_torrentSetRatioLimit(tr_torrent* tor, double desired_ratio)
+void tr_torrentSetRatioLimit(tr_torrent* const tor, double desired_ratio)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if ((int)(desired_ratio * 100.0) != (int)(tor->desiredRatio * 100.0))
+    tor->set_seed_ratio(desired_ratio);
+}
+
+double tr_torrentGetRatioLimit(tr_torrent const* const tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    return tor->seed_ratio();
+}
+
+bool tr_torrentGetSeedRatio(tr_torrent const* const tor, double* ratio)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    auto const val = tor->effective_seed_ratio();
+
+    if (ratio != nullptr && val)
     {
-        tor->desiredRatio = desired_ratio;
-
-        tor->set_dirty();
-    }
-}
-
-double tr_torrentGetRatioLimit(tr_torrent const* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    return tor->desiredRatio;
-}
-
-bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
-{
-    auto is_limited = bool{};
-
-    TR_ASSERT(tr_isTorrent(tor));
-
-    switch (tr_torrentGetRatioMode(tor))
-    {
-    case TR_RATIOLIMIT_SINGLE:
-        is_limited = true;
-
-        if (ratio != nullptr)
-        {
-            *ratio = tr_torrentGetRatioLimit(tor);
-        }
-
-        break;
-
-    case TR_RATIOLIMIT_GLOBAL:
-        is_limited = tor->session->isRatioLimited();
-
-        if (is_limited && ratio != nullptr)
-        {
-            *ratio = tor->session->desiredRatio();
-        }
-
-        break;
-
-    default: /* TR_RATIOLIMIT_UNLIMITED */
-        is_limited = false;
-        break;
+        *ratio = *val;
     }
 
-    return is_limited;
+    return val.has_value();
 }
 
 // ---
@@ -845,7 +817,7 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     if (tr_torrentIsSeedRatioDone(tor))
     {
         tr_logAddInfoTor(tor, _("Restarted manually -- disabling its seed ratio"));
-        tor->set_ratio_mode(TR_RATIOLIMIT_UNLIMITED);
+        tor->set_seed_ratio_mode(TR_RATIOLIMIT_UNLIMITED);
     }
 
     tor->is_running_ = true;
@@ -1093,8 +1065,8 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if ((loaded & tr_resume::Ratiolimit) == 0)
     {
-        tor->set_ratio_mode(TR_RATIOLIMIT_GLOBAL);
-        tr_torrentSetRatioLimit(tor, tor->session->desiredRatio());
+        tor->set_seed_ratio_mode(TR_RATIOLIMIT_GLOBAL);
+        tor->set_seed_ratio(tor->session->desiredRatio());
     }
 
     if ((loaded & tr_resume::Idlelimit) == 0)
