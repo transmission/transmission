@@ -972,6 +972,13 @@ public:
     bool start_when_stable = false;
 
 private:
+    friend double tr_torrentGetRatioLimit(tr_torrent const* tor);
+
+    [[nodiscard]] constexpr double seed_ratio() const noexcept
+    {
+        return seed_ratio_;
+    }
+
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
         if (uses_speed_limit(direction) && speed_limit_bps(direction) <= 0)
