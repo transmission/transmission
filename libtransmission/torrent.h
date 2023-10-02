@@ -875,8 +875,6 @@ public:
     time_t editDate = 0;
     time_t startDate = 0;
 
-    time_t lastStatTime = 0;
-
     time_t seconds_downloading_before_current_start_ = 0;
     time_t seconds_seeding_before_current_start_ = 0;
 
