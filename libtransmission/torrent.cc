@@ -296,72 +296,32 @@ bool tr_torrentGetSeedRatio(tr_torrent const* const tor, double* ratio)
 
 // ---
 
-void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode)
+void tr_torrentSetIdleMode(tr_torrent* const tor, tr_idlelimit mode)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(mode == TR_IDLELIMIT_GLOBAL || mode == TR_IDLELIMIT_SINGLE || mode == TR_IDLELIMIT_UNLIMITED);
 
-    if (tor->idle_limit_mode_ != mode)
-    {
-        tor->idle_limit_mode_ = mode;
-
-        tor->set_dirty();
-    }
+    tor->set_idle_limit_mode(mode);
 }
 
-tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* tor)
+tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->idle_limit_mode();
 }
 
-void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes)
+void tr_torrentSetIdleLimit(tr_torrent* const tor, uint16_t idle_minutes)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    tor->set_idle_limit(idle_minutes);
+    tor->set_idle_limit_minutes(idle_minutes);
 }
 
-uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor)
+uint16_t tr_torrentGetIdleLimit(tr_torrent const* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->idle_limit_minutes();
-}
-
-bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idle_minutes)
-{
-    auto is_limited = bool{};
-
-    switch (tor->idle_limit_mode())
-    {
-    case TR_IDLELIMIT_SINGLE:
-        is_limited = true;
-
-        if (idle_minutes != nullptr)
-        {
-            *idle_minutes = tor->idle_limit_minutes();
-        }
-
-        break;
-
-    case TR_IDLELIMIT_GLOBAL:
-        is_limited = tor->session->isIdleLimited();
-
-        if (is_limited && idle_minutes != nullptr)
-        {
-            *idle_minutes = tor->session->idleLimitMinutes();
-        }
-
-        break;
-
-    default: /* TR_IDLELIMIT_UNLIMITED */
-        is_limited = false;
-        break;
-    }
-
-    return is_limited;
 }
 
 namespace
@@ -470,11 +430,10 @@ namespace
 {
 namespace seed_limit_helpers
 {
-bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
+bool torrent_is_seed_idle_limit_done(tr_torrent const& tor, time_t now)
 {
-    auto idle_minutes = uint16_t{};
-    return tr_torrentGetSeedIdle(tor, &idle_minutes) &&
-        difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idle_minutes * 60U;
+    auto const secs_left = tor.idle_seconds_left(now);
+    return secs_left && *secs_left == 0U;
 }
 } // namespace seed_limit_helpers
 } // namespace
@@ -498,7 +457,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         tor->session->onRatioLimitHit(tor);
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
-    else if (tr_torrentIsSeedIdleLimitDone(tor))
+    else if (torrent_is_seed_idle_limit_done(*tor, tr_time()))
     {
         tr_logAddInfoTor(tor, _("Seeding idle limit reached; pausing torrent"));
 
@@ -1071,8 +1030,8 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if ((loaded & tr_resume::Idlelimit) == 0)
     {
-        tr_torrentSetIdleMode(tor, TR_IDLELIMIT_GLOBAL);
-        tor->set_idle_limit(tor->session->idleLimitMinutes());
+        tor->set_idle_limit_mode(TR_IDLELIMIT_GLOBAL);
+        tor->set_idle_limit_minutes(tor->session->idleLimitMinutes());
     }
 
     auto has_local_data = std::optional<bool>{};
@@ -1469,6 +1428,8 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     auto seed_ratio_bytes_goal = uint64_t{};
     bool const seed_ratio_applies = tr_torrentGetSeedRatioBytes(tor, &seed_ratio_bytes_left, &seed_ratio_bytes_goal);
 
+    s->eta = TR_ETA_NOT_AVAIL;
+    s->etaIdle = TR_ETA_NOT_AVAIL;
     switch (s->activity)
     {
     /* etaSpeed exists because if we use the piece speed directly,
@@ -1525,11 +1486,12 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
             }
         }
 
+        if (tor->etaSpeed_Bps < 1U)
         {
-            auto seed_idle_minutes = uint16_t{};
-            s->etaIdle = tor->etaSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seed_idle_minutes) ?
-                seed_idle_minutes * 60 - s->idleSecs :
-                TR_ETA_NOT_AVAIL;
+            if (auto const secs_left = tor->idle_seconds_left(now); secs_left)
+            {
+                s->etaIdle = *secs_left;
+            }
         }
 
         break;

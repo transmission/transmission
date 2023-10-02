@@ -1075,12 +1075,12 @@ char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
         {
-            tor->set_idle_limit(static_cast<uint16_t>(tmp));
+            tor->set_idle_limit_minutes(static_cast<uint16_t>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
         {
-            tr_torrentSetIdleMode(tor, (tr_idlelimit)tmp);
+            tor->set_idle_limit_mode(static_cast<tr_idlelimit>(tmp));
         }
 
         if (tr_variantDictFindReal(args_in, TR_KEY_seedRatioLimit, &d))

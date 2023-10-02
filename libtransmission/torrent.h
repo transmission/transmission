@@ -711,9 +711,37 @@ public:
         return bandwidth_group_;
     }
 
+    [[nodiscard]] constexpr auto peer_limit() const noexcept
+    {
+        return max_connected_peers_;
+    }
+
+    // --- idleness
+
+    constexpr void set_idle_limit_mode(tr_idlelimit mode) noexcept
+    {
+        if (mode == TR_IDLELIMIT_GLOBAL || mode == TR_IDLELIMIT_SINGLE || mode == TR_IDLELIMIT_UNLIMITED)
+        {
+            if (idle_limit_mode_ != mode)
+            {
+                idle_limit_mode_ = mode;
+                set_dirty();
+            }
+        }
+    }
+
     [[nodiscard]] constexpr auto idle_limit_mode() const noexcept
     {
         return idle_limit_mode_;
+    }
+
+    constexpr void set_idle_limit_minutes(uint16_t idle_minutes) noexcept
+    {
+        if ((idle_limit_minutes_ != idle_minutes) && (idle_minutes > 0))
+        {
+            idle_limit_minutes_ = idle_minutes;
+            set_dirty();
+        }
     }
 
     [[nodiscard]] constexpr auto idle_limit_minutes() const noexcept
@@ -721,9 +749,22 @@ public:
         return idle_limit_minutes_;
     }
 
-    [[nodiscard]] constexpr auto peer_limit() const noexcept
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
     {
-        return max_connected_peers_;
+        auto const idle_limit_minutes = effective_idle_limit_minutes();
+        if (!idle_limit_minutes)
+        {
+            return {};
+        }
+
+        auto const idle_seconds = this->idle_seconds(now);
+        if (!idle_seconds)
+        {
+            return {};
+        }
+
+        auto const idle_limit_seconds = size_t{ *idle_limit_minutes } * 60U;
+        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : 0U;
     }
 
     // --- seed ratio
@@ -777,15 +818,6 @@ public:
     }
 
     // ---
-
-    constexpr void set_idle_limit(uint16_t idle_minutes) noexcept
-    {
-        if ((idle_limit_minutes_ != idle_minutes) && (idle_minutes > 0))
-        {
-            idle_limit_minutes_ = idle_minutes;
-            set_dirty();
-        }
-    }
 
     [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
     {
@@ -953,11 +985,7 @@ public:
 
     tr_completeness completeness = TR_LEECH;
 
-    tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
-
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
-
-    uint16_t idle_limit_minutes_ = 0;
 
     bool finished_seeding_by_idle_ = false;
 
@@ -972,11 +1000,36 @@ public:
     bool start_when_stable = false;
 
 private:
-    friend double tr_torrentGetRatioLimit(tr_torrent const* tor);
-
-    [[nodiscard]] constexpr double seed_ratio() const noexcept
+    [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
     {
-        return seed_ratio_;
+        auto const mode = idle_limit_mode();
+
+        if (mode == TR_IDLELIMIT_SINGLE)
+        {
+            return idle_limit_minutes();
+        }
+
+        if (mode == TR_IDLELIMIT_GLOBAL && session->isIdleLimited())
+        {
+            return session->idleLimitMinutes();
+        }
+
+        return {};
+    }
+
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
+    {
+        auto const activity = this->activity();
+
+        if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
+        {
+            if (auto const latest = std::max(startDate, activityDate); latest != 0 && now >= latest)
+            {
+                return now - latest;
+            }
+        }
+
+        return {};
     }
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
@@ -1025,11 +1078,15 @@ private:
     float verify_progress_ = -1.0F;
     float seed_ratio_ = 0.0F;
 
+    uint16_t idle_limit_minutes_ = 0;
+
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
 
     tr_interned_string bandwidth_group_;
 
     tr_ratiolimit seed_ratio_mode_ = TR_RATIOLIMIT_GLOBAL;
+
+    tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
     bool needs_completeness_check_ = true;
 

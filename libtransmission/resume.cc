@@ -328,12 +328,12 @@ auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
     {
         if (auto imin = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_limit, &imin))
         {
-            tor->set_idle_limit(imin);
+            tor->set_idle_limit_minutes(imin);
         }
 
         if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))
         {
-            tr_torrentSetIdleMode(tor, tr_idlelimit(i));
+            tor->set_idle_limit_mode(static_cast<tr_idlelimit>(i));
         }
 
         ret = tr_resume::Idlelimit;
