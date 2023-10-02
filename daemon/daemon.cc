@@ -669,7 +669,6 @@ void tr_daemon::reconfigure(void)
     }
     else
     {
-        tr_variant newsettings;
         char const* configDir;
 
         /* reopen the logfile to allow for log rotation */
@@ -680,11 +679,12 @@ void tr_daemon::reconfigure(void)
 
         configDir = tr_sessionGetConfigDir(my_session_);
         tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", configDir)));
-        tr_variantInitDict(&newsettings, 0);
+
+        auto newsettings = tr_variant::make_map();
         tr_variantDictAddBool(&newsettings, TR_KEY_rpc_enabled, true);
-        tr_sessionLoadSettings(&newsettings, configDir, MyName);
-        tr_sessionSet(my_session_, &newsettings);
-        tr_variantClear(&newsettings);
+        newsettings.merge(tr_sessionLoadSettings(configDir, MyName));
+
+        tr_sessionSet(my_session_, newsettings);
         tr_sessionReloadBlocklists(my_session_);
     }
 }
@@ -725,10 +725,10 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
-    session = tr_sessionInit(cdir, true, &settings_);
+    session = tr_sessionInit(cdir, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", cdir)));
-    tr_sessionSaveSettings(session, cdir, &settings_);
+    tr_sessionSaveSettings(session, cdir, settings_);
 
     auto sv = std::string_view{};
     (void)tr_variantDictFindStrView(&settings_, key_pidfile_, &sv);
@@ -874,7 +874,7 @@ CLEANUP:
 
     event_base_free(ev_base_);
 
-    tr_sessionSaveSettings(my_session_, cdir, &settings_);
+    tr_sessionSaveSettings(my_session_, cdir, settings_);
     tr_sessionClose(my_session_);
     pumpLogMessages(logfile_, logfile_flush_);
     printf(" done.\n");
@@ -906,9 +906,9 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
     config_dir_ = getConfigDir(argc, argv);
 
     /* load settings from defaults + config file */
-    tr_variantInitDict(&settings_, 0);
+    settings_ = tr_variant::make_map();
     tr_variantDictAddBool(&settings_, TR_KEY_rpc_enabled, true);
-    bool const loaded = tr_sessionLoadSettings(&settings_, config_dir_.c_str(), MyName);
+    settings_.merge(tr_sessionLoadSettings(config_dir_.c_str(), MyName));
 
     bool dumpSettings;
 
@@ -926,24 +926,15 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
         logfile_flush_ = tr_sys_file_flush_possible(logfile_);
     }
 
-    if (!loaded)
-    {
-        printMessage(logfile_, TR_LOG_ERROR, MyName, "Error loading config file -- exiting.", __FILE__, __LINE__);
-        *ret = 1;
-        goto EXIT_EARLY;
-    }
-
     if (dumpSettings)
     {
-        auto const str = tr_variantToStr(&settings_, TR_VARIANT_FMT_JSON);
-        fprintf(stderr, "%s", str.c_str());
+        fmt::print("{:s}\n", tr_variant_serde::json().to_string(settings_));
         goto EXIT_EARLY;
     }
 
     return true;
 
 EXIT_EARLY:
-    tr_variantClear(&settings_);
     return false;
 }
 

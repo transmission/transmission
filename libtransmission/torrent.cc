@@ -1180,6 +1180,7 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     this->mark_edited();
 
     on_metainfo_completed(this);
+    this->on_announce_list_changed();
 }
 
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
@@ -1440,14 +1441,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     auto const now = tr_time_msec();
     auto const now_sec = tr_time();
 
-    auto swarm_stats = tr_swarm_stats{};
-
-    tor->lastStatTime = now_sec;
-
-    if (tor->swarm != nullptr)
-    {
-        swarm_stats = tr_swarmGetStats(tor->swarm);
-    }
+    auto const swarm_stats = tor->swarm != nullptr ? tr_swarmGetStats(tor->swarm) : tr_swarm_stats{};
 
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
@@ -1597,13 +1591,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     TR_ASSERT(s->desiredAvailable <= s->leftUntilDone);
 
     return s;
-}
-
-tr_stat const* tr_torrentStatCached(tr_torrent* tor)
-{
-    time_t const now = tr_time();
-
-    return (tr_isTorrent(tor) && now == tor->lastStatTime) ? &tor->stats : tr_torrentStat(tor);
 }
 
 // ---
@@ -1894,8 +1881,8 @@ void tr_torrent::recheck_completeness()
                 this,
                 fmt::format(
                     "State changed from {} to {}",
-                    get_completion_string(this->completeness),
-                    get_completion_string(completeness)));
+                    get_completion_string(completeness),
+                    get_completion_string(new_completeness)));
         }
 
         this->completeness = new_completeness;
@@ -2407,6 +2394,10 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
             doneDate = addedDate;
             recheck_completeness();
         }
+    }
+    else if (error == TR_STAT_LOCAL_ERROR && !setLocalErrorIfFilesDisappeared(this))
+    {
+        tr_torrentClearError(this);
     }
 }
 

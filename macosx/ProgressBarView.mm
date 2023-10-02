@@ -187,7 +187,12 @@ static NSInteger const kMaxPieces = 18 * 18;
         }
 
         //it's faster to just set color instead of checking previous color
-        [bitmap setColor:pieceColor atX:i y:0];
+        // faster and non-broken alternative to `[bitmap setColor:pieceColor atX:i y:0]`
+        unsigned char* data = bitmap.bitmapData + (i << 2);
+        data[0] = pieceColor.redComponent * 255;
+        data[1] = pieceColor.greenComponent * 255;
+        data[2] = pieceColor.blueComponent * 255;
+        data[3] = pieceColor.alphaComponent * 255;
     }
 
     free(piecesPercent);
@@ -196,7 +201,8 @@ static NSInteger const kMaxPieces = 18 * 18;
 
     //actually draw image
     [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
-              fraction:([self.fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0)respectFlipped:YES
+              fraction:[self.fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0
+        respectFlipped:YES
                  hints:nil];
 }
 

@@ -148,33 +148,30 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
  *
  * Example:
  * @code
- *     tr_variant settings;
  *     int64_t i;
  *
- *     tr_variantInitDict(&settings, 0);
- *     tr_sessionGetDefaultSettings(&settings);
+ *     auto settings = tr_sessionGetDefaultSettings();
  *     if (tr_variantDictFindInt(&settings, TR_PREFS_KEY_PEER_PORT, &i))
  *         fprintf(stderr, "the default peer port is %d\n", (int)i);
- *     tr_variantClear(&settings);
  * @endcode
  *
- * @param setme_dictionary pointer to a tr_variant dictionary
+ * @return a variant map of the default settinggs
  * @see `tr_sessionLoadSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_getDefaultConfigDir()`
  */
-void tr_sessionGetDefaultSettings(struct tr_variant* setme_dictionary);
+tr_variant tr_sessionGetDefaultSettings();
 
 /**
  * Add the session's current configuration settings to the benc dictionary.
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param session          the session to query
- * @param setme_dictionary the dictionary to populate
+ * @return a variant map of the session's current settings
+ * @param session the session to query
  * @see `tr_sessionGetDefaultSettings()`
  */
-void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_dictionary);
+tr_variant tr_sessionGetSettings(tr_session const* session);
 
 /**
  * Load settings from the configuration directory's settings.json file,
@@ -182,15 +179,14 @@ void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_d
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param dictionary pointer to an uninitialized tr_variant
  * @param config_dir the configuration directory to find settings.json
  * @param app_name if config_dir is empty, app_name is used to find the default dir.
- * @return success true if the settings were loaded, false otherwise
+ * @return the loaded settings
  * @see `tr_sessionGetDefaultSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_dir, char const* app_name);
+tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -203,23 +199,16 @@ bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_di
  * @param client_settings the dictionary to save
  * @see `tr_sessionLoadSettings()`
  */
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct tr_variant const* client_settings);
+void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings);
 
 /**
  * @brief Initialize a libtransmission session.
  *
  * For example, this will instantiate a session with all the default values:
  * @code
- *     tr_variant settings;
- *     tr_session* session;
- *     char const* configDir;
- *
- *     tr_variantInitDict(&settings, 0);
- *     tr_sessionGetDefaultSettings(&settings);
- *     configDir = tr_getDefaultConfigDir("Transmission");
- *     session = tr_sessionInit(configDir, true, &settings);
- *
- *     tr_variantClear(&settings);
+ *     auto settings = tr_sessionGetDefaultSettings();
+ *     char const* const configDir = tr_getDefaultConfigDir("Transmission");
+ *     tr_session* const session = tr_sessionInit(configDir, true, &settings);
  * @endcode
  *
  * @param config_dir where Transmission will look for resume files, blocklists, etc.
@@ -229,11 +218,11 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct 
  * @see `tr_sessionLoadSettings()`
  * @see `tr_getDefaultConfigDir()`
  */
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, struct tr_variant* settings);
+tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& settings);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in `tr_sessionInit()` */
-void tr_sessionSet(tr_session* session, struct tr_variant* settings);
+void tr_sessionSet(tr_session* session, tr_variant const& settings);
 
 /** @brief Rescan the blocklists directory and
            reload whatever blocklist files are found there */
@@ -1620,11 +1609,6 @@ struct tr_stat
     on the torrent. This is typically called by the GUI clients every
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
-
-/** Like `tr_torrentStat()`, but only recalculates the statistics if it's
-    been longer than a second since they were last calculated. This can
-    reduce the CPU load if you're calling `tr_torrentStat()` frequently. */
-tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
 
 /** @} */
 

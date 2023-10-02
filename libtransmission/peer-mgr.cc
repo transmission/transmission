@@ -273,8 +273,7 @@ public:
 
         auto* const peer_info = peer->peer_info;
         auto const socket_address = peer->socket_address();
-        auto const listen_socket_address = peer_info->listen_socket_address();
-        auto const was_incoming = peer->is_incoming_connection();
+        [[maybe_unused]] auto const is_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
         --stats.peer_count;
@@ -288,15 +287,16 @@ public:
 
         delete peer;
 
-        if (was_incoming)
+        if (std::empty(peer_info->listen_port())) // is not connectable
         {
-            [[maybe_unused]] auto const port_empty = std::empty(peer_info->listen_port());
-            if (incoming_pool.erase(socket_address) != 0U)
-            {
-                TR_ASSERT(port_empty);
-            }
+            TR_ASSERT(is_incoming);
+            [[maybe_unused]] auto const count = incoming_pool.erase(socket_address);
+            TR_ASSERT(count != 0U);
         }
-        graveyard_pool.erase(listen_socket_address);
+        else
+        {
+            graveyard_pool.erase(peer_info->listen_socket_address());
+        }
     }
 
     void remove_all_peers()
@@ -658,12 +658,14 @@ private:
                 tr_logAddDebugSwarm(
                     s,
                     fmt::format(
-                        "setting {} do_purge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
-                        peer->display_name()));
+                        "setting {} do_purge flag because we got [({}) {}]",
+                        peer->display_name(),
+                        event.err,
+                        tr_strerror(event.err)));
             }
             else
             {
-                tr_logAddDebugSwarm(s, fmt::format("unhandled error: {}", tr_strerror(event.err)));
+                tr_logAddDebugSwarm(s, fmt::format("unhandled error: ({}) {}", event.err, tr_strerror(event.err)));
             }
 
             break;
@@ -746,11 +748,8 @@ private:
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
 
-            if (was_connectable)
-            {
-                // Note that it_that is invalid after this point
-                graveyard_pool.insert(connectable_pool.extract(it_that));
-            }
+            // Note that it_that is invalid after this point
+            graveyard_pool.insert(connectable_pool.extract(it_that));
 
             return false;
         }
@@ -1205,12 +1204,12 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->session->addressIsBlocked(pex->addr) && pex->is_valid_for_peers() && from != TR_PEER_FROM_INCOMING &&
-            (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
+            !s->manager->session->addressIsBlocked(pex->socket_address.address()) && pex->is_valid_for_peers() &&
+            from != TR_PEER_FROM_INCOMING && (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
         {
             // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
             // don't care about non-connectable peers that we are not connected to
-            s->ensure_info_exists({ pex->addr, pex->port }, pex->flags, from, true);
+            s->ensure_info_exists(pex->socket_address, pex->flags, from, true);
             ++n_used;
         }
     }
@@ -1230,8 +1229,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv4(
 
     for (size_t i = 0; i < n; ++i)
     {
-        std::tie(pex[i].addr, walk) = tr_address::from_compact_ipv4(walk);
-        std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
+        std::tie(pex[i].socket_address, walk) = tr_socket_address::from_compact_ipv4(walk);
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1254,8 +1252,7 @@ std::vector<tr_pex> tr_pex::from_compact_ipv6(
 
     for (size_t i = 0; i < n; ++i)
     {
-        std::tie(pex[i].addr, walk) = tr_address::from_compact_ipv6(walk);
-        std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
+        std::tie(pex[i].socket_address, walk) = tr_socket_address::from_compact_ipv6(walk);
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1353,11 +1350,12 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
     for (auto const* const info : infos)
     {
-        auto const& [addr, port] = info->listen_socket_address();
+        auto const& socket_address = info->listen_socket_address();
+        [[maybe_unused]] auto const& addr = socket_address.address();
 
         TR_ASSERT(addr.is_valid());
         TR_ASSERT(addr.type == address_type);
-        pex.emplace_back(addr, port, info->pex_flags());
+        pex.emplace_back(socket_address, info->pex_flags());
     }
 
     std::sort(std::begin(pex), std::end(pex));
@@ -2362,7 +2360,7 @@ struct peer_candidate
         candidates.resize(max);
     }
 
-    // put the best candiates at the end of the list
+    // put the best candidates at the end of the list
     auto ret = tr_peerMgr::OutboundCandidates{};
     for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
     {

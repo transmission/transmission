@@ -22,23 +22,6 @@ export const Utils = {
 
     return result;
   },
-
-  /**
-   * Checks to see if the content actually changed before poking the DOM.
-   */
-  setInnerHTML(e, html) {
-    if (!e) {
-      return;
-    }
-
-    /* innerHTML is listed as a string, but the browser seems to change it.
-     * For example, "&infin;" gets changed to "∞" somewhere down the line.
-     * So, let's use an arbitrary  different field to test our state... */
-    if (e.currentHTML !== html) {
-      e.currentHTML = html;
-      e.innerHTML = html;
-    }
-  },
 };
 
 function toggleClass(buttons, button, pages, page, callback) {
@@ -61,6 +44,11 @@ export function createTextualTabsContainer(id, tabs, callback) {
   const buttons = document.createElement('div');
   buttons.classList.add('tabs-buttons');
   root.append(buttons);
+
+  const dismiss = document.createElement('button');
+  dismiss.classList.add('tabs-container-close');
+  dismiss.innerHTML = '&times;';
+  root.append(dismiss);
 
   const pages = document.createElement('div');
   pages.classList.add('tabs-pages');
@@ -89,6 +77,7 @@ export function createTextualTabsContainer(id, tabs, callback) {
 
   return {
     buttons: button_array,
+    dismiss,
     root,
   };
 }
@@ -266,35 +255,6 @@ export function setChecked(element, b) {
 
 export function addCheckedClass(element, b) {
   element.classList.toggle('checked', b);
-}
-
-function getBestMenuPos(r, bounds) {
-  let { x, y } = r;
-  const { width, height } = r;
-
-  if (x > bounds.x + bounds.width - width && x - width >= bounds.x) {
-    x -= width;
-  } else {
-    x = Math.min(x, bounds.x + bounds.width - width);
-  }
-
-  if (y > bounds.y + bounds.height - height && y - height >= bounds.y) {
-    y -= height;
-  } else {
-    y = Math.min(y, bounds.y + bounds.height - height);
-  }
-
-  return new DOMRect(x, y, width, height);
-}
-
-export function movePopup(popup, x, y, boundingElement) {
-  const initial_pos = new DOMRect(x, y, popup.clientWidth, popup.clientHeight);
-  const clamped_pos = getBestMenuPos(
-    initial_pos,
-    boundingElement.getBoundingClientRect(),
-  );
-  popup.style.left = `${clamped_pos.left}px`;
-  popup.style.top = `${clamped_pos.top}px`;
 }
 
 export class OutsideClickListener extends EventTarget {
