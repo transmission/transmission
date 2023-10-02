@@ -273,8 +273,7 @@ public:
 
         auto* const peer_info = peer->peer_info;
         auto const socket_address = peer->socket_address();
-        auto const listen_socket_address = peer_info->listen_socket_address();
-        auto const was_incoming = peer->is_incoming_connection();
+        [[maybe_unused]] auto const is_incoming = peer->is_incoming_connection();
         TR_ASSERT(peer_info != nullptr);
 
         --stats.peer_count;
@@ -288,15 +287,16 @@ public:
 
         delete peer;
 
-        if (was_incoming)
+        if (std::empty(peer_info->listen_port())) // is not connectable
         {
-            [[maybe_unused]] auto const port_empty = std::empty(peer_info->listen_port());
-            if (incoming_pool.erase(socket_address) != 0U)
-            {
-                TR_ASSERT(port_empty);
-            }
+            TR_ASSERT(is_incoming);
+            [[maybe_unused]] auto const count = incoming_pool.erase(socket_address);
+            TR_ASSERT(count != 0U);
         }
-        graveyard_pool.erase(listen_socket_address);
+        else
+        {
+            graveyard_pool.erase(peer_info->listen_socket_address());
+        }
     }
 
     void remove_all_peers()
