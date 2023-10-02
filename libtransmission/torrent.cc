@@ -1443,8 +1443,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     auto swarm_stats = tr_swarm_stats{};
 
-    tor->lastStatTime = now_sec;
-
     if (tor->swarm != nullptr)
     {
         swarm_stats = tr_swarmGetStats(tor->swarm);
@@ -1598,13 +1596,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     TR_ASSERT(s->desiredAvailable <= s->leftUntilDone);
 
     return s;
-}
-
-tr_stat const* tr_torrentStatCached(tr_torrent* tor)
-{
-    time_t const now = tr_time();
-
-    return (tr_isTorrent(tor) && now == tor->lastStatTime) ? &tor->stats : tr_torrentStat(tor);
 }
 
 // ---

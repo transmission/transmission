@@ -1610,11 +1610,6 @@ struct tr_stat
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
 
-/** Like `tr_torrentStat()`, but only recalculates the statistics if it's
-    been longer than a second since they were last calculated. This can
-    reduce the CPU load if you're calling `tr_torrentStat()` frequently. */
-tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
-
 /** @} */
 
 /** @brief Sanity checker to test that the direction is `TR_UP` or `TR_DOWN` */
