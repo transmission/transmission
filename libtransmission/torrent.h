@@ -771,13 +771,12 @@ public:
 
     constexpr void set_seed_ratio_mode(tr_ratiolimit mode) noexcept
     {
-        if (mode == TR_RATIOLIMIT_GLOBAL || mode == TR_RATIOLIMIT_SINGLE || mode == TR_RATIOLIMIT_UNLIMITED)
+        auto const is_valid = mode == TR_RATIOLIMIT_GLOBAL || mode == TR_RATIOLIMIT_SINGLE || mode == TR_RATIOLIMIT_UNLIMITED;
+        TR_ASSERT(is_valid);
+        if (seed_ratio_mode_ != mode && is_valid)
         {
-            if (seed_ratio_mode_ != mode)
-            {
-                seed_ratio_mode_ = mode;
-                set_dirty();
-            }
+            seed_ratio_mode_ = mode;
+            set_dirty();
         }
     }
 
