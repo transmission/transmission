@@ -32,6 +32,7 @@
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 
 class tr_swarm;
@@ -718,15 +719,14 @@ public:
 
     // --- idleness
 
-    constexpr void set_idle_limit_mode(tr_idlelimit mode) noexcept
+    void set_idle_limit_mode(tr_idlelimit mode) noexcept
     {
-        if (mode == TR_IDLELIMIT_GLOBAL || mode == TR_IDLELIMIT_SINGLE || mode == TR_IDLELIMIT_UNLIMITED)
+        auto const is_valid = mode == TR_IDLELIMIT_GLOBAL || mode == TR_IDLELIMIT_SINGLE || mode == TR_IDLELIMIT_UNLIMITED;
+        TR_ASSERT(is_valid);
+        if (idle_limit_mode_ != mode && is_valid)
         {
-            if (idle_limit_mode_ != mode)
-            {
-                idle_limit_mode_ = mode;
-                set_dirty();
-            }
+            idle_limit_mode_ = mode;
+            set_dirty();
         }
     }
 
