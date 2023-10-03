@@ -1022,8 +1022,9 @@ private:
 
         if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
         {
-            if (auto const latest = std::max(startDate, activityDate); latest != 0 && now >= latest)
+            if (auto const latest = std::max(startDate, activityDate); latest != 0)
             {
+                TR_ASSERT(now >= latest);
                 return now - latest;
             }
         }
