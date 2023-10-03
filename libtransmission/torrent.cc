@@ -1373,10 +1373,11 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     auto const now_sec = tr_time();
 
     auto const swarm_stats = tor->swarm != nullptr ? tr_swarmGetStats(tor->swarm) : tr_swarm_stats{};
+    auto const activity = tor->activity();
 
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
-    s->activity = tor->activity();
+    s->activity = activity;
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
     s->idleSecs = torrentGetIdleSecs(tor, s->activity);
@@ -1430,13 +1431,12 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     s->eta = TR_ETA_NOT_AVAIL;
     s->etaIdle = TR_ETA_NOT_AVAIL;
-    switch (s->activity)
+    if (activity == TR_STATUS_DOWNLOAD)
     {
-    /* etaSpeed exists because if we use the piece speed directly,
-     * brief fluctuations cause the ETA to jump all over the place.
-     * so, etaXLSpeed is a smoothed-out version of the piece speed
-     * to dampen the effect of fluctuations */
-    case TR_STATUS_DOWNLOAD:
+        /* etaSpeed exists because if we use the piece speed directly,
+         * brief fluctuations cause the ETA to jump all over the place.
+         * so, etaXLSpeed is a smoothed-out version of the piece speed
+         * to dampen the effect of fluctuations */
         if (tor->etaSpeedCalculatedAt + 800 < now)
         {
             tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
@@ -1445,28 +1445,18 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
             tor->etaSpeedCalculatedAt = now;
         }
 
-        if (s->leftUntilDone > s->desiredAvailable && tor->webseed_count() < 1)
-        {
-            s->eta = TR_ETA_NOT_AVAIL;
-        }
-        else if (tor->etaSpeed_Bps == 0)
+        if (tor->etaSpeed_Bps == 0)
         {
             s->eta = TR_ETA_UNKNOWN;
         }
-        else
+        else if (s->leftUntilDone <= s->desiredAvailable)
         {
             s->eta = s->leftUntilDone / tor->etaSpeed_Bps;
         }
-
-        s->etaIdle = TR_ETA_NOT_AVAIL;
-        break;
-
-    case TR_STATUS_SEED:
-        if (!seed_ratio_applies)
-        {
-            s->eta = TR_ETA_NOT_AVAIL;
-        }
-        else
+    }
+    else if (activity == TR_STATUS_SEED)
+    {
+        if (seed_ratio_applies)
         {
             if (tor->etaSpeedCalculatedAt + 800 < now)
             {
@@ -1476,14 +1466,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
                 tor->etaSpeedCalculatedAt = now;
             }
 
-            if (tor->etaSpeed_Bps == 0)
-            {
-                s->eta = TR_ETA_UNKNOWN;
-            }
-            else
-            {
-                s->eta = seed_ratio_bytes_left / tor->etaSpeed_Bps;
-            }
+            s->eta = tor->etaSpeed_Bps == 0U ? TR_ETA_UNKNOWN : seed_ratio_bytes_left / tor->etaSpeed_Bps;
         }
 
         if (tor->etaSpeed_Bps < 1U)
@@ -1493,13 +1476,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
                 s->etaIdle = *secs_left;
             }
         }
-
-        break;
-
-    default:
-        s->eta = TR_ETA_NOT_AVAIL;
-        s->etaIdle = TR_ETA_NOT_AVAIL;
-        break;
     }
 
     /* s->haveValid is here to make sure a torrent isn't marked 'finished'
