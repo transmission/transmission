@@ -346,7 +346,7 @@ auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
 
 void saveName(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_variantDictAddStrView(dict, TR_KEY_name, tr_torrentName(tor));
+    tr_variantDictAddStrView(dict, TR_KEY_name, tor->name());
 }
 
 auto loadName(tr_variant* dict, tr_torrent* tor)

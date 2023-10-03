@@ -612,7 +612,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (uint64_t)size
 {
-    return tr_torrentTotalSize(self.fHandle);
+    return tr_torrentView(self.fHandle).total_size;
 }
 
 - (uint64_t)sizeLeft
