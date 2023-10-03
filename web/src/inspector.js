@@ -735,10 +735,6 @@ export class Inspector extends EventTarget {
 
     const rows = [];
     for (const tor of torrents) {
-      const group = document.createElement('div');
-      group.classList.add('inspector-group');
-      rows.push(group);
-
       // if >1 torrent to be shown, give a title
       if (torrents.length > 1) {
         const title = document.createElement('div');
