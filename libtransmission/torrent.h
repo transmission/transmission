@@ -11,6 +11,7 @@
 
 #include <cstddef> // size_t
 #include <ctime>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -78,8 +79,6 @@ enum tr_verify_state : uint8_t
     TR_VERIFY_WAIT,
     TR_VERIFY_NOW
 };
-
-struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
@@ -942,8 +941,6 @@ public:
 
     tr_sha1_digest_t obfuscated_hash = {};
 
-    tr_stat_errtype error = TR_STAT_OK;
-
     tr_session* session = nullptr;
 
     tr_torrent_announcer* torrent_announcer = nullptr;
@@ -953,7 +950,7 @@ public:
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
      * other peers */
-    std::optional<tr_incomplete_metadata> incomplete_metadata;
+    std::unique_ptr<tr_incomplete_metadata> incomplete_metadata;
 
     time_t lpdAnnounceAt = 0;
 
@@ -981,6 +978,8 @@ public:
     size_t queuePosition = 0;
 
     tr_torrent_id_t unique_id_ = 0;
+
+    tr_stat_errtype error = TR_STAT_OK;
 
     tr_completeness completeness = TR_LEECH;
 
@@ -1078,8 +1077,6 @@ private:
     float verify_progress_ = -1.0F;
     float seed_ratio_ = 0.0F;
 
-    uint16_t idle_limit_minutes_ = 0;
-
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
 
     tr_ratiolimit seed_ratio_mode_ = TR_RATIOLIMIT_GLOBAL;
@@ -1087,6 +1084,8 @@ private:
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
+
+    uint16_t idle_limit_minutes_ = 0;
 
     bool needs_completeness_check_ = true;
 

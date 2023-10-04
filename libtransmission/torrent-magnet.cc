@@ -32,7 +32,7 @@ namespace
 // don't ask for the same metadata piece more than this often
 auto constexpr MinRepeatIntervalSecs = int{ 3 };
 
-auto create_all_needed(int n_pieces)
+[[nodiscard]] auto create_all_needed(int n_pieces)
 {
     auto ret = std::deque<tr_incomplete_metadata::metadata_node>{};
 
@@ -72,13 +72,12 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    auto m = tr_incomplete_metadata{};
+    auto m = std::make_unique<tr_incomplete_metadata>();
+    m->piece_count = n;
+    m->metadata.resize(size);
+    m->pieces_needed = create_all_needed(n);
 
-    m.piece_count = n;
-    m.metadata.resize(size);
-    m.pieces_needed = create_all_needed(n);
-
-    if (std::empty(m.metadata) || std::empty(m.pieces_needed))
+    if (std::empty(m->metadata) || std::empty(m->pieces_needed))
     {
         return false;
     }
