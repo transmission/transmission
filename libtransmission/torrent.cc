@@ -1349,7 +1349,7 @@ namespace
 {
 namespace stat_helpers
 {
-[[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, size_t idle_secs)
+[[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, std::optional<size_t> idle_secs)
 {
     return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60U;
 }
@@ -1375,7 +1375,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
     s->idleSecs = idle_seconds ? static_cast<time_t>(*idle_seconds) : -1;
-    s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
+    s->isStalled = tr_torrentIsStalled(tor, idle_seconds);
     s->errorString = tor->error_string.c_str();
 
     s->peersConnected = swarm_stats.peer_count;
