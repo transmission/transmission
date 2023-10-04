@@ -603,7 +603,10 @@ export class Inspector extends EventTarget {
         setTextContent(td, peer.flagStr);
         td.setAttribute('title', Inspector._peerStatusTitle(peer.flagStr));
       },
-      (peer, td) => setTextContent(td, peer.address),
+      (peer, td) => {
+        setTextContent(td, peer.address);
+        td.setAttribute('title', peer.address);
+      },
       (peer, td) => setTextContent(td, peer.clientName),
     ];
 
