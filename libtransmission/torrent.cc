@@ -1438,7 +1438,7 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
         {
             s->eta = TR_ETA_UNKNOWN;
         }
-        else if (s->leftUntilDone <= s->desiredAvailable)
+        else if (s->leftUntilDone <= s->desiredAvailable || tor->webseed_count() >= 1U)
         {
             s->eta = s->leftUntilDone / eta_speed_byps;
         }
@@ -1452,7 +1452,7 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
             s->eta = eta_speed_byps == 0U ? TR_ETA_UNKNOWN : seed_ratio_bytes_left / eta_speed_byps;
         }
 
-        if (eta_speed_byps == 0U)
+        if (eta_speed_byps < 1U)
         {
             if (auto const secs_left = tor->idle_seconds_left(now); secs_left)
             {
