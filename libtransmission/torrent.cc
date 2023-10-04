@@ -1349,14 +1349,7 @@ namespace
 {
 namespace stat_helpers
 {
-[[nodiscard]] time_t torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
-{
-    return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
-        (time_t)difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) :
-        -1;
-}
-
-[[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, size_t idle_secs)
+[[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, std::optional<size_t> idle_secs)
 {
     return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60U;
 }
@@ -1369,19 +1362,20 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto const now = tr_time_msec();
+    auto const now_msec = tr_time_msec();
     auto const now_sec = tr_time();
 
     auto const swarm_stats = tor->swarm != nullptr ? tr_swarmGetStats(tor->swarm) : tr_swarm_stats{};
     auto const activity = tor->activity();
+    auto const idle_seconds = tor->idle_seconds(now_sec);
 
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
     s->activity = activity;
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
-    s->idleSecs = torrentGetIdleSecs(tor, s->activity);
-    s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
+    s->idleSecs = idle_seconds ? static_cast<time_t>(*idle_seconds) : -1;
+    s->isStalled = tr_torrentIsStalled(tor, idle_seconds);
     s->errorString = tor->error_string.c_str();
 
     s->peersConnected = swarm_stats.peer_count;
@@ -1394,9 +1388,9 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
-    auto const piece_upload_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now, TR_UP);
+    auto const piece_upload_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_UP);
     s->pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_bytes_per_second);
-    auto const piece_download_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now, TR_DOWN);
+    auto const piece_download_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_DOWN);
     s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_bytes_per_second);
 
     s->percentComplete = tor->completion.percent_complete();
@@ -1437,12 +1431,12 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
          * brief fluctuations cause the ETA to jump all over the place.
          * so, etaXLSpeed is a smoothed-out version of the piece speed
          * to dampen the effect of fluctuations */
-        if (tor->etaSpeedCalculatedAt + 800 < now)
+        if (tor->etaSpeedCalculatedAt + 800 < now_msec)
         {
-            tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
+            tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now_msec ?
                 piece_download_speed_bytes_per_second : /* if no recent previous speed, no need to smooth */
                 (tor->etaSpeed_Bps * 4.0 + piece_download_speed_bytes_per_second) / 5.0; /* smooth across 5 readings */
-            tor->etaSpeedCalculatedAt = now;
+            tor->etaSpeedCalculatedAt = now_msec;
         }
 
         if (tor->etaSpeed_Bps == 0)
@@ -1458,12 +1452,12 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     {
         if (seed_ratio_applies)
         {
-            if (tor->etaSpeedCalculatedAt + 800 < now)
+            if (tor->etaSpeedCalculatedAt + 800 < now_msec)
             {
-                tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
+                tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now_msec ?
                     piece_upload_speed_bytes_per_second : /* if no recent previous speed, no need to smooth */
                     (tor->etaSpeed_Bps * 4.0 + piece_upload_speed_bytes_per_second) / 5.0; /* smooth across 5 readings */
-                tor->etaSpeedCalculatedAt = now;
+                tor->etaSpeedCalculatedAt = now_msec;
             }
 
             s->eta = tor->etaSpeed_Bps == 0U ? TR_ETA_UNKNOWN : seed_ratio_bytes_left / tor->etaSpeed_Bps;
@@ -1471,7 +1465,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
         if (tor->etaSpeed_Bps < 1U)
         {
-            if (auto const secs_left = tor->idle_seconds_left(now); secs_left)
+            if (auto const secs_left = tor->idle_seconds_left(now_sec); secs_left)
             {
                 s->etaIdle = *secs_left;
             }
