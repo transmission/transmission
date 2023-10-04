@@ -916,8 +916,8 @@ public:
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
-    tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
+    tr_file_priorities file_priorities_{ &fpm_ };
 
     std::string error_string;
 
@@ -927,7 +927,22 @@ public:
     // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
 
+    tr_interned_string error_announce_url;
+
+    // Where the files are when the torrent is complete.
+    tr_interned_string download_dir_;
+
+    // Where the files are when the torrent is incomplete.
+    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
+    tr_interned_string incomplete_dir_;
+
+    // Where the files are now.
+    // Will equal either download_dir or incomplete_dir
+    tr_interned_string current_dir_;
+
     tr_sha1_digest_t obfuscated_hash = {};
+
+    tr_stat_errtype error = TR_STAT_OK;
 
     tr_session* session = nullptr;
 
@@ -960,21 +975,6 @@ public:
     uint64_t corruptPrev = 0;
 
     uint64_t etaSpeedCalculatedAt = 0;
-
-    tr_interned_string error_announce_url;
-
-    // Where the files are when the torrent is complete.
-    tr_interned_string download_dir_;
-
-    // Where the files are when the torrent is incomplete.
-    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
-    tr_interned_string incomplete_dir_;
-
-    // Where the files are now.
-    // Will equal either download_dir or incomplete_dir
-    tr_interned_string current_dir_;
-
-    tr_stat_errtype error = TR_STAT_OK;
 
     tr_bytes_per_second_t etaSpeed_Bps = 0;
 
@@ -1064,6 +1064,8 @@ private:
         }
     }
 
+    tr_interned_string bandwidth_group_;
+
     /* If the initiator of the connection receives a handshake in which the
      * peer_id does not match the expected peerid, then the initiator is
      * expected to drop the connection. Note that the initiator presumably
@@ -1073,8 +1075,6 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
-    tr_verify_state verify_state_ = TR_VERIFY_NONE;
-
     float verify_progress_ = -1.0F;
     float seed_ratio_ = 0.0F;
 
@@ -1082,11 +1082,11 @@ private:
 
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
 
-    tr_interned_string bandwidth_group_;
-
     tr_ratiolimit seed_ratio_mode_ = TR_RATIOLIMIT_GLOBAL;
 
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
+
+    tr_verify_state verify_state_ = TR_VERIFY_NONE;
 
     bool needs_completeness_check_ = true;
 
