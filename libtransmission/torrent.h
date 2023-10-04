@@ -808,7 +808,7 @@ public:
             return seed_ratio_;
         }
 
-        if (mode == TR_RATIOLIMIT_GLOBAL)
+        if (mode == TR_RATIOLIMIT_GLOBAL && session->isRatioLimited())
         {
             return session->desiredRatio();
         }

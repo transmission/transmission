@@ -1349,14 +1349,7 @@ namespace
 {
 namespace stat_helpers
 {
-[[nodiscard]] time_t torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
-{
-    return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
-        (time_t)difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) :
-        -1;
-}
-
-[[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, size_t idle_secs)
+[[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, std::optional<size_t> idle_secs)
 {
     return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60U;
 }
@@ -1369,19 +1362,20 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto const now = tr_time_msec();
+    auto const now_msec = tr_time_msec();
     auto const now_sec = tr_time();
 
     auto const swarm_stats = tor->swarm != nullptr ? tr_swarmGetStats(tor->swarm) : tr_swarm_stats{};
     auto const activity = tor->activity();
+    auto const idle_seconds = tor->idle_seconds(now_sec);
 
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
     s->activity = activity;
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
-    s->idleSecs = torrentGetIdleSecs(tor, s->activity);
-    s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
+    s->idleSecs = idle_seconds ? static_cast<time_t>(*idle_seconds) : -1;
+    s->isStalled = tr_torrentIsStalled(tor, idle_seconds);
     s->errorString = tor->error_string.c_str();
 
     s->peersConnected = swarm_stats.peer_count;
@@ -1394,9 +1388,9 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
         s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
-    auto const piece_upload_speed_byps = tor->bandwidth_.get_piece_speed_bytes_per_second(now, TR_UP);
+    auto const piece_upload_speed_byps = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_UP);
     s->pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_byps);
-    auto const piece_download_speed_byps = tor->bandwidth_.get_piece_speed_bytes_per_second(now, TR_DOWN);
+    auto const piece_download_speed_byps = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_DOWN);
     s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_byps);
 
     s->percentComplete = tor->completion.percent_complete();
@@ -1434,7 +1428,7 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
     s->etaIdle = TR_ETA_NOT_AVAIL;
     if (activity == TR_STATUS_DOWNLOAD)
     {
-        if (auto const eta_speed_byps = tor->eta_speed_.update(now, piece_download_speed_byps); eta_speed_byps == 0U)
+        if (auto const eta_speed_byps = tor->eta_speed_.update(now_msec, piece_download_speed_byps); eta_speed_byps == 0U)
         {
             s->eta = TR_ETA_UNKNOWN;
         }
@@ -1445,7 +1439,7 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
     }
     else if (activity == TR_STATUS_SEED)
     {
-        auto const eta_speed_byps = tor->eta_speed_.update(now, piece_upload_speed_byps);
+        auto const eta_speed_byps = tor->eta_speed_.update(now_msec, piece_upload_speed_byps);
 
         if (seed_ratio_applies)
         {
@@ -1454,7 +1448,7 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
 
         if (eta_speed_byps < 1U)
         {
-            if (auto const secs_left = tor->idle_seconds_left(now); secs_left)
+            if (auto const secs_left = tor->idle_seconds_left(now_sec); secs_left)
             {
                 s->etaIdle = *secs_left;
             }
