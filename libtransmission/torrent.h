@@ -999,6 +999,8 @@ public:
     bool start_when_stable = false;
 
 private:
+    friend tr_stat const* tr_torrentStat(tr_torrent* tor);
+
     [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
     {
         auto const mode = idle_limit_mode();

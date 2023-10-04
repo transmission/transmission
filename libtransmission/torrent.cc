@@ -1349,13 +1349,6 @@ namespace
 {
 namespace stat_helpers
 {
-[[nodiscard]] time_t torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
-{
-    return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
-        (time_t)difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) :
-        -1;
-}
-
 [[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, size_t idle_secs)
 {
     return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60U;
@@ -1374,13 +1367,14 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     auto const swarm_stats = tor->swarm != nullptr ? tr_swarmGetStats(tor->swarm) : tr_swarm_stats{};
     auto const activity = tor->activity();
+    auto const idle_seconds = tor->idle_seconds(now_sec);
 
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
     s->activity = activity;
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
-    s->idleSecs = torrentGetIdleSecs(tor, s->activity);
+    s->idleSecs = idle_seconds ? static_cast<time_t>(*idle_seconds) : -1;
     s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
     s->errorString = tor->error_string.c_str();
 
