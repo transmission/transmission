@@ -669,8 +669,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_secondsSeeding: return st.secondsSeeding;
     case TR_KEY_seedIdleLimit: return tor.idle_limit_minutes();
     case TR_KEY_seedIdleMode: return tor.idle_limit_mode();
-    case TR_KEY_seedRatioLimit: return tr_torrentGetRatioLimit(&tor);
-    case TR_KEY_seedRatioMode: return tr_torrentGetRatioMode(&tor);
+    case TR_KEY_seedRatioLimit: return tor.seed_ratio();
+    case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
     case TR_KEY_sequentialDownload: return tor.is_sequential_download();
     case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
     case TR_KEY_source: return tor.source();
@@ -1075,22 +1075,22 @@ char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
         {
-            tor->set_idle_limit(static_cast<uint16_t>(tmp));
+            tor->set_idle_limit_minutes(static_cast<uint16_t>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
         {
-            tr_torrentSetIdleMode(tor, (tr_idlelimit)tmp);
+            tor->set_idle_limit_mode(static_cast<tr_idlelimit>(tmp));
         }
 
         if (tr_variantDictFindReal(args_in, TR_KEY_seedRatioLimit, &d))
         {
-            tr_torrentSetRatioLimit(tor, d);
+            tor->set_seed_ratio(d);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedRatioMode, &tmp))
         {
-            tor->set_ratio_mode(static_cast<tr_ratiolimit>(tmp));
+            tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))

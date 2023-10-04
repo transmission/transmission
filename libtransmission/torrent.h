@@ -32,6 +32,7 @@
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 
 class tr_swarm;
@@ -711,31 +712,30 @@ public:
         return bandwidth_group_;
     }
 
-    [[nodiscard]] constexpr auto idle_limit_mode() const noexcept
-    {
-        return idle_limit_mode_;
-    }
-
-    [[nodiscard]] constexpr auto idle_limit_minutes() const noexcept
-    {
-        return idle_limit_minutes_;
-    }
-
     [[nodiscard]] constexpr auto peer_limit() const noexcept
     {
         return max_connected_peers_;
     }
 
-    constexpr void set_ratio_mode(tr_ratiolimit mode) noexcept
+    // --- idleness
+
+    void set_idle_limit_mode(tr_idlelimit mode) noexcept
     {
-        if (ratioLimitMode != mode)
+        auto const is_valid = mode == TR_IDLELIMIT_GLOBAL || mode == TR_IDLELIMIT_SINGLE || mode == TR_IDLELIMIT_UNLIMITED;
+        TR_ASSERT(is_valid);
+        if (idle_limit_mode_ != mode && is_valid)
         {
-            ratioLimitMode = mode;
+            idle_limit_mode_ = mode;
             set_dirty();
         }
     }
 
-    constexpr void set_idle_limit(uint16_t idle_minutes) noexcept
+    [[nodiscard]] constexpr auto idle_limit_mode() const noexcept
+    {
+        return idle_limit_mode_;
+    }
+
+    constexpr void set_idle_limit_minutes(uint16_t idle_minutes) noexcept
     {
         if ((idle_limit_minutes_ != idle_minutes) && (idle_minutes > 0))
         {
@@ -743,6 +743,80 @@ public:
             set_dirty();
         }
     }
+
+    [[nodiscard]] constexpr auto idle_limit_minutes() const noexcept
+    {
+        return idle_limit_minutes_;
+    }
+
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
+    {
+        auto const idle_limit_minutes = effective_idle_limit_minutes();
+        if (!idle_limit_minutes)
+        {
+            return {};
+        }
+
+        auto const idle_seconds = this->idle_seconds(now);
+        if (!idle_seconds)
+        {
+            return {};
+        }
+
+        auto const idle_limit_seconds = size_t{ *idle_limit_minutes } * 60U;
+        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : 0U;
+    }
+
+    // --- seed ratio
+
+    constexpr void set_seed_ratio_mode(tr_ratiolimit mode) noexcept
+    {
+        auto const is_valid = mode == TR_RATIOLIMIT_GLOBAL || mode == TR_RATIOLIMIT_SINGLE || mode == TR_RATIOLIMIT_UNLIMITED;
+        TR_ASSERT(is_valid);
+        if (seed_ratio_mode_ != mode && is_valid)
+        {
+            seed_ratio_mode_ = mode;
+            set_dirty();
+        }
+    }
+
+    [[nodiscard]] constexpr auto seed_ratio_mode() const noexcept
+    {
+        return seed_ratio_mode_;
+    }
+
+    constexpr void set_seed_ratio(double desired_ratio)
+    {
+        if (static_cast<int>(seed_ratio_ * 100.0) != static_cast<int>(desired_ratio * 100.0))
+        {
+            seed_ratio_ = desired_ratio;
+            set_dirty();
+        }
+    }
+
+    [[nodiscard]] auto seed_ratio() const noexcept
+    {
+        return seed_ratio_;
+    }
+
+    [[nodiscard]] constexpr std::optional<double> effective_seed_ratio() const noexcept
+    {
+        auto const mode = seed_ratio_mode();
+
+        if (mode == TR_RATIOLIMIT_SINGLE)
+        {
+            return seed_ratio_;
+        }
+
+        if (mode == TR_RATIOLIMIT_GLOBAL)
+        {
+            return session->desiredRatio();
+        }
+
+        return {};
+    }
+
+    // ---
 
     [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
     {
@@ -910,14 +984,7 @@ public:
 
     tr_completeness completeness = TR_LEECH;
 
-    float desiredRatio = 0.0F;
-    tr_ratiolimit ratioLimitMode = TR_RATIOLIMIT_GLOBAL;
-
-    tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
-
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
-
-    uint16_t idle_limit_minutes_ = 0;
 
     bool finished_seeding_by_idle_ = false;
 
@@ -932,6 +999,39 @@ public:
     bool start_when_stable = false;
 
 private:
+    [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
+    {
+        auto const mode = idle_limit_mode();
+
+        if (mode == TR_IDLELIMIT_SINGLE)
+        {
+            return idle_limit_minutes();
+        }
+
+        if (mode == TR_IDLELIMIT_GLOBAL && session->isIdleLimited())
+        {
+            return session->idleLimitMinutes();
+        }
+
+        return {};
+    }
+
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
+    {
+        auto const activity = this->activity();
+
+        if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
+        {
+            if (auto const latest = std::max(startDate, activityDate); latest != 0)
+            {
+                TR_ASSERT(now >= latest);
+                return now - latest;
+            }
+        }
+
+        return {};
+    }
+
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
         if (uses_speed_limit(direction) && speed_limit_bps(direction) <= 0)
@@ -975,11 +1075,18 @@ private:
 
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
 
-    float verify_progress_ = -1;
+    float verify_progress_ = -1.0F;
+    float seed_ratio_ = 0.0F;
+
+    uint16_t idle_limit_minutes_ = 0;
 
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
 
     tr_interned_string bandwidth_group_;
+
+    tr_ratiolimit seed_ratio_mode_ = TR_RATIOLIMIT_GLOBAL;
+
+    tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
     bool needs_completeness_check_ = true;
 
