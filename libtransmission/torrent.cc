@@ -1356,7 +1356,7 @@ namespace stat_helpers
 } // namespace stat_helpers
 } // namespace
 
-tr_stat const* tr_torrentStat(tr_torrent* tor)
+tr_stat const* tr_torrentStat(tr_torrent* const tor)
 {
     using namespace stat_helpers;
 
@@ -1388,10 +1388,10 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
-    auto const piece_upload_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_UP);
-    s->pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_bytes_per_second);
-    auto const piece_download_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_DOWN);
-    s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_bytes_per_second);
+    auto const piece_upload_speed_byps = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_UP);
+    s->pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_byps);
+    auto const piece_download_speed_byps = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_DOWN);
+    s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_byps);
 
     s->percentComplete = tor->completion.percent_complete();
     s->metadataPercentComplete = tr_torrentGetMetadataPercent(tor);
@@ -1423,47 +1423,30 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     auto seed_ratio_bytes_goal = uint64_t{};
     bool const seed_ratio_applies = tr_torrentGetSeedRatioBytes(tor, &seed_ratio_bytes_left, &seed_ratio_bytes_goal);
 
+    // eta, etaIdle
     s->eta = TR_ETA_NOT_AVAIL;
     s->etaIdle = TR_ETA_NOT_AVAIL;
     if (activity == TR_STATUS_DOWNLOAD)
     {
-        /* etaSpeed exists because if we use the piece speed directly,
-         * brief fluctuations cause the ETA to jump all over the place.
-         * so, etaXLSpeed is a smoothed-out version of the piece speed
-         * to dampen the effect of fluctuations */
-        if (tor->etaSpeedCalculatedAt + 800 < now_msec)
-        {
-            tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now_msec ?
-                piece_download_speed_bytes_per_second : /* if no recent previous speed, no need to smooth */
-                (tor->etaSpeed_Bps * 4.0 + piece_download_speed_bytes_per_second) / 5.0; /* smooth across 5 readings */
-            tor->etaSpeedCalculatedAt = now_msec;
-        }
-
-        if (tor->etaSpeed_Bps == 0)
+        if (auto const eta_speed_byps = tor->eta_speed_.update(now_msec, piece_download_speed_byps); eta_speed_byps == 0U)
         {
             s->eta = TR_ETA_UNKNOWN;
         }
         else if (s->leftUntilDone <= s->desiredAvailable || tor->webseed_count() >= 1U)
         {
-            s->eta = s->leftUntilDone / tor->etaSpeed_Bps;
+            s->eta = s->leftUntilDone / eta_speed_byps;
         }
     }
     else if (activity == TR_STATUS_SEED)
     {
+        auto const eta_speed_byps = tor->eta_speed_.update(now_msec, piece_upload_speed_byps);
+
         if (seed_ratio_applies)
         {
-            if (tor->etaSpeedCalculatedAt + 800 < now_msec)
-            {
-                tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now_msec ?
-                    piece_upload_speed_bytes_per_second : /* if no recent previous speed, no need to smooth */
-                    (tor->etaSpeed_Bps * 4.0 + piece_upload_speed_bytes_per_second) / 5.0; /* smooth across 5 readings */
-                tor->etaSpeedCalculatedAt = now_msec;
-            }
-
-            s->eta = tor->etaSpeed_Bps == 0U ? TR_ETA_UNKNOWN : seed_ratio_bytes_left / tor->etaSpeed_Bps;
+            s->eta = eta_speed_byps == 0U ? TR_ETA_UNKNOWN : seed_ratio_bytes_left / eta_speed_byps;
         }
 
-        if (tor->etaSpeed_Bps < 1U)
+        if (eta_speed_byps < 1U)
         {
             if (auto const secs_left = tor->idle_seconds_left(now_sec); secs_left)
             {
