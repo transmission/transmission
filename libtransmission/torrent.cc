@@ -1449,7 +1449,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         {
             s->eta = TR_ETA_UNKNOWN;
         }
-        else if (s->leftUntilDone <= s->desiredAvailable)
+        else if (s->leftUntilDone <= s->desiredAvailable || tor->webseed_count() >= 1U)
         {
             s->eta = s->leftUntilDone / tor->etaSpeed_Bps;
         }
