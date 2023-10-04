@@ -959,8 +959,6 @@ public:
     uint64_t corruptCur = 0;
     uint64_t corruptPrev = 0;
 
-    uint64_t etaSpeedCalculatedAt = 0;
-
     tr_interned_string error_announce_url;
 
     // Where the files are when the torrent is complete.
@@ -975,8 +973,6 @@ public:
     tr_interned_string current_dir_;
 
     tr_stat_errtype error = TR_STAT_OK;
-
-    tr_bytes_per_second_t etaSpeed_Bps = 0;
 
     size_t queuePosition = 0;
 
@@ -999,6 +995,41 @@ public:
     bool start_when_stable = false;
 
 private:
+    friend tr_stat const* tr_torrentStat(tr_torrent* tor);
+
+    // Helper class to smooth out speed estimates.
+    // Used to prevent temporary speed changes from skewing the ETA too much.
+    class SimpleSmoothedSpeed
+    {
+    public:
+        constexpr auto update(uint64_t time_msec, tr_bytes_per_second_t speed_byps)
+        {
+            // If the old speed is too old, just replace it
+            if (timestamp_msec_ + MaxAgeMSec <= time_msec)
+            {
+                timestamp_msec_ = time_msec;
+                speed_byps_ = speed_byps;
+            }
+
+            // To prevent the smoothing from being overwhelmed by frequent calls
+            // to update(), do nothing if not enough time elapsed since last update.
+            else if (timestamp_msec_ + MinUpdateMSec <= time_msec)
+            {
+                timestamp_msec_ = time_msec;
+                speed_byps_ = (speed_byps_ * 4U + speed_byps) / 5U;
+            }
+
+            return speed_byps_;
+        }
+
+    private:
+        static auto constexpr MaxAgeMSec = 4000U;
+        static auto constexpr MinUpdateMSec = 800U;
+
+        uint64_t timestamp_msec_ = {};
+        tr_bytes_per_second_t speed_byps_ = {};
+    };
+
     [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
     {
         auto const mode = idle_limit_mode();
@@ -1063,6 +1094,8 @@ private:
             recheck_completeness();
         }
     }
+
+    SimpleSmoothedSpeed eta_speed_;
 
     /* If the initiator of the connection receives a handshake in which the
      * peer_id does not match the expected peerid, then the initiator is
