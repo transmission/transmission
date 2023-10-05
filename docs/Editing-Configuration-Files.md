@@ -78,7 +78,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
  * **lazy-bitfield-enabled:** Boolean (default = true) May help get around some ISP filtering. [Vuze specification](https://wiki.vuze.com/w/Commandline_options#Network_Options).
  * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
- * **message-level:** Number (0 = None, 1 = Critical, 2 = Error, 3 = Warn, 4 = Info, 5 = Debug, 6 = Trace, default = 2) Set verbosity of Transmission's log messages.
+ * **message-level:** Number (0 = None, 1 = Critical, 2 = Error, 3 = Warn, 4 = Info, 5 = Debug, 6 = Trace; default = 2) Set verbosity of Transmission's log messages.
  * **pex-enabled:** Boolean (default = true) Enable [Peer Exchange (PEX)](https://en.wikipedia.org/wiki/Peer_exchange).
  * **pidfile:** String Path to file in which daemon PID will be stored (transmission-daemon only)
  * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html).
@@ -89,9 +89,10 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **script-torrent-done-filename:** String (default = "") Path to script.
  * **script-torrent-done-seeding-enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-done-seeding-filename:** String (default = "") Path to script.
- * **tcp-enabled:** Boolean (default = true) Optionally disable TCP connection to other peers. Never disable TCP when you also disable UTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds. Unless you have a good reason, you should not set this to false.
+ * **tcp-enabled:** Boolean (default = true) Optionally disable TCP connection to other peers. Never disable TCP when you also disable µTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds. Unless you have a good reason, you should not set this to false.
  * **torrent-added-verify-mode:** String ("fast", "full", default: "fast") Whether newly-added torrents' local data should be fully verified when added, or wait and verify them on-demand later. See [#2626](https://github.com/transmission/transmission/pull/2626) for more discussion.
  * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol)
+ * **preferred-transport:** String ("utp" = Prefer µTP, "tcp" = Prefer TCP; default = "utp") Choose your preferred transport protocol (has no effect if one of them is disabled).
 
 #### Peers
  * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections. When no valid IPv4 address is provided, Transmission will bind to "0.0.0.0".

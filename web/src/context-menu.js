@@ -47,6 +47,10 @@ export class ContextMenu extends EventTarget {
     const root = document.createElement('div');
     root.role = 'menu';
     root.classList.add('context-menu', 'popup');
+    root.addEventListener('contextmenu', (e_) => {
+      e_.preventDefault();
+    });
+    root.style.pointerEvents = 'none';
 
     const actions = {};
     const add_item = (action, warn = false) => {

@@ -9,6 +9,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <optional>
+#include <numeric>
 #include <string>
 #include <string_view>
 #include <type_traits> // std::is_same_v
@@ -102,9 +103,9 @@ public:
             return std::empty(vec_);
         }
 
-        void reserve(size_t new_cap)
+        void reserve(size_t const new_cap)
         {
-            vec_.reserve(new_cap);
+            vec_.reserve(std::max(new_cap, size_t{ 16U }));
         }
 
         auto erase(tr_quark const key)
@@ -142,7 +143,7 @@ public:
         // --- custom functions
 
         template<typename Type>
-        [[nodiscard]] TR_CONSTEXPR20 auto TR_CONSTEXPR20 find_if(tr_quark const key) const noexcept
+        [[nodiscard]] TR_CONSTEXPR20 auto find_if(tr_quark const key) const noexcept
         {
             auto const iter = find(key);
             return iter != end() ? iter->second.get_if<Type>() : nullptr;
@@ -319,9 +320,10 @@ public:
         val_.emplace<std::monostate>();
     }
 
-    void merge(tr_variant const& that)
+    tr_variant& merge(tr_variant const& that)
     {
         std::visit(Merge{ *this }, that.val_);
+        return *this;
     }
 
 private:

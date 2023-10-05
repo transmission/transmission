@@ -199,7 +199,7 @@ tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name);
  * @param client_settings the dictionary to save
  * @see `tr_sessionLoadSettings()`
  */
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct tr_variant const* client_settings);
+void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings);
 
 /**
  * @brief Initialize a libtransmission session.
@@ -218,11 +218,11 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct 
  * @see `tr_sessionLoadSettings()`
  * @see `tr_getDefaultConfigDir()`
  */
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, struct tr_variant* settings);
+tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& settings);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in `tr_sessionInit()` */
-void tr_sessionSet(tr_session* session, struct tr_variant* settings);
+void tr_sessionSet(tr_session* session, tr_variant const& settings);
 
 /** @brief Rescan the blocklists directory and
            reload whatever blocklist files are found there */
@@ -1022,8 +1022,6 @@ void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode);
 uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor);
 void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes);
 
-bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* minutes);
-
 // --- Peer Limits
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
@@ -1609,11 +1607,6 @@ struct tr_stat
     on the torrent. This is typically called by the GUI clients every
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
-
-/** Like `tr_torrentStat()`, but only recalculates the statistics if it's
-    been longer than a second since they were last calculated. This can
-    reduce the CPU load if you're calling `tr_torrentStat()` frequently. */
-tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
 
 /** @} */
 

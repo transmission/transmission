@@ -99,7 +99,7 @@ namespace
 int constexpr DebounceIntervalMSec = 100;
 int constexpr RefreshIntervalMSec = 4000;
 
-char const constexpr* const PrefKey = "pref_key";
+char constexpr const* const PrefKey = "pref_key";
 
 enum // peer columns
 {

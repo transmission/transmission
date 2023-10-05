@@ -483,10 +483,7 @@ export class Inspector extends EventTarget {
     string = string || none;
     if (string.startsWith('https://') || string.startsWith('http://')) {
       string = encodeURI(string);
-      Utils.setInnerHTML(
-        e.info.comment,
-        `<a href="${string}" target="_blank" >${string}</a>`,
-      );
+      e.info.comment.innerHTML = `<a href="${string}" target="_blank" >${string}</a>`;
     } else {
       setTextContent(e.info.comment, string);
     }
@@ -554,10 +551,7 @@ export class Inspector extends EventTarget {
       setTextContent(e.info.magnetLink, mixed);
     } else {
       const link = torrents[0].getMagnetLink();
-      Utils.setInnerHTML(
-        e.info.magnetLink,
-        `<a class="inspector-info-magnet" href="${link}"><button></button></a>`,
-      );
+      e.info.magnetLink.innerHTML = `<a class="inspector-info-magnet" href="${link}"><button></button></a>`;
     }
   }
 
@@ -741,10 +735,6 @@ export class Inspector extends EventTarget {
 
     const rows = [];
     for (const tor of torrents) {
-      const group = document.createElement('div');
-      group.classList.add('inspector-group');
-      rows.push(group);
-
       // if >1 torrent to be shown, give a title
       if (torrents.length > 1) {
         const title = document.createElement('div');
