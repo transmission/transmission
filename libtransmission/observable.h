@@ -104,7 +104,7 @@ private:
     }
 
     static auto inline next_key_ = Key{ 1U };
-    small::map<Key, Observer, 64U> observers_;
+    small::map<Key, Observer, 4U> observers_;
 };
 
 } // namespace libtransmission

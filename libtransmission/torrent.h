@@ -11,6 +11,7 @@
 
 #include <cstddef> // size_t
 #include <ctime>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -78,8 +79,6 @@ enum tr_verify_state : uint8_t
     TR_VERIFY_WAIT,
     TR_VERIFY_NOW
 };
-
-struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
@@ -916,8 +915,8 @@ public:
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
-    tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
+    tr_file_priorities file_priorities_{ &fpm_ };
 
     std::string error_string;
 
@@ -927,18 +926,31 @@ public:
     // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
 
+    tr_interned_string error_announce_url;
+
+    // Where the files are when the torrent is complete.
+    tr_interned_string download_dir_;
+
+    // Where the files are when the torrent is incomplete.
+    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
+    tr_interned_string incomplete_dir_;
+
+    // Where the files are now.
+    // Will equal either download_dir or incomplete_dir
+    tr_interned_string current_dir_;
+
     tr_sha1_digest_t obfuscated_hash = {};
+
+    /* Used when the torrent has been created with a magnet link
+     * and we're in the process of downloading the metainfo from
+     * other peers */
+    std::unique_ptr<tr_incomplete_metadata> incomplete_metadata;
 
     tr_session* session = nullptr;
 
     tr_torrent_announcer* torrent_announcer = nullptr;
 
     tr_swarm* swarm = nullptr;
-
-    /* Used when the torrent has been created with a magnet link
-     * and we're in the process of downloading the metainfo from
-     * other peers */
-    std::optional<tr_incomplete_metadata> incomplete_metadata;
 
     time_t lpdAnnounceAt = 0;
 
@@ -959,24 +971,11 @@ public:
     uint64_t corruptCur = 0;
     uint64_t corruptPrev = 0;
 
-    tr_interned_string error_announce_url;
-
-    // Where the files are when the torrent is complete.
-    tr_interned_string download_dir_;
-
-    // Where the files are when the torrent is incomplete.
-    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
-    tr_interned_string incomplete_dir_;
-
-    // Where the files are now.
-    // Will equal either download_dir or incomplete_dir
-    tr_interned_string current_dir_;
-
-    tr_stat_errtype error = TR_STAT_OK;
-
     size_t queuePosition = 0;
 
     tr_torrent_id_t unique_id_ = 0;
+
+    tr_stat_errtype error = TR_STAT_OK;
 
     tr_completeness completeness = TR_LEECH;
 
@@ -1095,6 +1094,8 @@ private:
         }
     }
 
+    tr_interned_string bandwidth_group_;
+
     SimpleSmoothedSpeed eta_speed_;
 
     /* If the initiator of the connection receives a handshake in which the
@@ -1106,20 +1107,18 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
-    tr_verify_state verify_state_ = TR_VERIFY_NONE;
-
     float verify_progress_ = -1.0F;
     float seed_ratio_ = 0.0F;
 
-    uint16_t idle_limit_minutes_ = 0;
-
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
-
-    tr_interned_string bandwidth_group_;
 
     tr_ratiolimit seed_ratio_mode_ = TR_RATIOLIMIT_GLOBAL;
 
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
+
+    tr_verify_state verify_state_ = TR_VERIFY_NONE;
+
+    uint16_t idle_limit_minutes_ = 0;
 
     bool needs_completeness_check_ = true;
 
