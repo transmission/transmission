@@ -603,7 +603,7 @@ static void addIdArg(tr_variant* args, std::string_view id_str, std::string_view
 
         if (is_num || is_list)
         {
-            tr_rpc_parse_list_str(tr_variantDictAdd(args, TR_KEY_ids), id_str);
+            *tr_variantDictAdd(args, TR_KEY_ids) = tr_rpc_parse_list_str(id_str);
         }
         else
         {

@@ -11,6 +11,7 @@
 
 #include <cstddef> // size_t
 #include <ctime>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -32,6 +33,7 @@
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 
 class tr_swarm;
@@ -77,8 +79,6 @@ enum tr_verify_state : uint8_t
     TR_VERIFY_WAIT,
     TR_VERIFY_NOW
 };
-
-struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
@@ -711,31 +711,30 @@ public:
         return bandwidth_group_;
     }
 
-    [[nodiscard]] constexpr auto idle_limit_mode() const noexcept
-    {
-        return idle_limit_mode_;
-    }
-
-    [[nodiscard]] constexpr auto idle_limit_minutes() const noexcept
-    {
-        return idle_limit_minutes_;
-    }
-
     [[nodiscard]] constexpr auto peer_limit() const noexcept
     {
         return max_connected_peers_;
     }
 
-    constexpr void set_ratio_mode(tr_ratiolimit mode) noexcept
+    // --- idleness
+
+    void set_idle_limit_mode(tr_idlelimit mode) noexcept
     {
-        if (ratioLimitMode != mode)
+        auto const is_valid = mode == TR_IDLELIMIT_GLOBAL || mode == TR_IDLELIMIT_SINGLE || mode == TR_IDLELIMIT_UNLIMITED;
+        TR_ASSERT(is_valid);
+        if (idle_limit_mode_ != mode && is_valid)
         {
-            ratioLimitMode = mode;
+            idle_limit_mode_ = mode;
             set_dirty();
         }
     }
 
-    constexpr void set_idle_limit(uint16_t idle_minutes) noexcept
+    [[nodiscard]] constexpr auto idle_limit_mode() const noexcept
+    {
+        return idle_limit_mode_;
+    }
+
+    constexpr void set_idle_limit_minutes(uint16_t idle_minutes) noexcept
     {
         if ((idle_limit_minutes_ != idle_minutes) && (idle_minutes > 0))
         {
@@ -743,6 +742,80 @@ public:
             set_dirty();
         }
     }
+
+    [[nodiscard]] constexpr auto idle_limit_minutes() const noexcept
+    {
+        return idle_limit_minutes_;
+    }
+
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
+    {
+        auto const idle_limit_minutes = effective_idle_limit_minutes();
+        if (!idle_limit_minutes)
+        {
+            return {};
+        }
+
+        auto const idle_seconds = this->idle_seconds(now);
+        if (!idle_seconds)
+        {
+            return {};
+        }
+
+        auto const idle_limit_seconds = size_t{ *idle_limit_minutes } * 60U;
+        return idle_limit_seconds > *idle_seconds ? idle_limit_seconds - *idle_seconds : 0U;
+    }
+
+    // --- seed ratio
+
+    constexpr void set_seed_ratio_mode(tr_ratiolimit mode) noexcept
+    {
+        auto const is_valid = mode == TR_RATIOLIMIT_GLOBAL || mode == TR_RATIOLIMIT_SINGLE || mode == TR_RATIOLIMIT_UNLIMITED;
+        TR_ASSERT(is_valid);
+        if (seed_ratio_mode_ != mode && is_valid)
+        {
+            seed_ratio_mode_ = mode;
+            set_dirty();
+        }
+    }
+
+    [[nodiscard]] constexpr auto seed_ratio_mode() const noexcept
+    {
+        return seed_ratio_mode_;
+    }
+
+    constexpr void set_seed_ratio(double desired_ratio)
+    {
+        if (static_cast<int>(seed_ratio_ * 100.0) != static_cast<int>(desired_ratio * 100.0))
+        {
+            seed_ratio_ = desired_ratio;
+            set_dirty();
+        }
+    }
+
+    [[nodiscard]] auto seed_ratio() const noexcept
+    {
+        return seed_ratio_;
+    }
+
+    [[nodiscard]] constexpr std::optional<double> effective_seed_ratio() const noexcept
+    {
+        auto const mode = seed_ratio_mode();
+
+        if (mode == TR_RATIOLIMIT_SINGLE)
+        {
+            return seed_ratio_;
+        }
+
+        if (mode == TR_RATIOLIMIT_GLOBAL && session->isRatioLimited())
+        {
+            return session->desiredRatio();
+        }
+
+        return {};
+    }
+
+    // ---
 
     [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
     {
@@ -842,8 +915,8 @@ public:
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
-    tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
+    tr_file_priorities file_priorities_{ &fpm_ };
 
     std::string error_string;
 
@@ -852,42 +925,6 @@ public:
 
     // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
-
-    tr_sha1_digest_t obfuscated_hash = {};
-
-    tr_session* session = nullptr;
-
-    tr_torrent_announcer* torrent_announcer = nullptr;
-
-    tr_swarm* swarm = nullptr;
-
-    /* Used when the torrent has been created with a magnet link
-     * and we're in the process of downloading the metainfo from
-     * other peers */
-    std::optional<tr_incomplete_metadata> incomplete_metadata;
-
-    time_t lpdAnnounceAt = 0;
-
-    time_t activityDate = 0;
-    time_t addedDate = 0;
-    time_t anyDate = 0;
-    time_t doneDate = 0;
-    time_t editDate = 0;
-    time_t startDate = 0;
-
-    time_t lastStatTime = 0;
-
-    time_t seconds_downloading_before_current_start_ = 0;
-    time_t seconds_seeding_before_current_start_ = 0;
-
-    uint64_t downloadedCur = 0;
-    uint64_t downloadedPrev = 0;
-    uint64_t uploadedCur = 0;
-    uint64_t uploadedPrev = 0;
-    uint64_t corruptCur = 0;
-    uint64_t corruptPrev = 0;
-
-    uint64_t etaSpeedCalculatedAt = 0;
 
     tr_interned_string error_announce_url;
 
@@ -902,24 +939,47 @@ public:
     // Will equal either download_dir or incomplete_dir
     tr_interned_string current_dir_;
 
-    tr_stat_errtype error = TR_STAT_OK;
+    tr_sha1_digest_t obfuscated_hash = {};
 
-    tr_bytes_per_second_t etaSpeed_Bps = 0;
+    /* Used when the torrent has been created with a magnet link
+     * and we're in the process of downloading the metainfo from
+     * other peers */
+    std::unique_ptr<tr_incomplete_metadata> incomplete_metadata;
+
+    tr_session* session = nullptr;
+
+    tr_torrent_announcer* torrent_announcer = nullptr;
+
+    tr_swarm* swarm = nullptr;
+
+    time_t lpdAnnounceAt = 0;
+
+    time_t activityDate = 0;
+    time_t addedDate = 0;
+    time_t anyDate = 0;
+    time_t doneDate = 0;
+    time_t editDate = 0;
+    time_t startDate = 0;
+
+    time_t seconds_downloading_before_current_start_ = 0;
+    time_t seconds_seeding_before_current_start_ = 0;
+
+    uint64_t downloadedCur = 0;
+    uint64_t downloadedPrev = 0;
+    uint64_t uploadedCur = 0;
+    uint64_t uploadedPrev = 0;
+    uint64_t corruptCur = 0;
+    uint64_t corruptPrev = 0;
 
     size_t queuePosition = 0;
 
     tr_torrent_id_t unique_id_ = 0;
 
+    tr_stat_errtype error = TR_STAT_OK;
+
     tr_completeness completeness = TR_LEECH;
 
-    float desiredRatio = 0.0F;
-    tr_ratiolimit ratioLimitMode = TR_RATIOLIMIT_GLOBAL;
-
-    tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
-
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
-
-    uint16_t idle_limit_minutes_ = 0;
 
     bool finished_seeding_by_idle_ = false;
 
@@ -934,6 +994,74 @@ public:
     bool start_when_stable = false;
 
 private:
+    friend tr_stat const* tr_torrentStat(tr_torrent* tor);
+
+    // Helper class to smooth out speed estimates.
+    // Used to prevent temporary speed changes from skewing the ETA too much.
+    class SimpleSmoothedSpeed
+    {
+    public:
+        constexpr auto update(uint64_t time_msec, tr_bytes_per_second_t speed_byps)
+        {
+            // If the old speed is too old, just replace it
+            if (timestamp_msec_ + MaxAgeMSec <= time_msec)
+            {
+                timestamp_msec_ = time_msec;
+                speed_byps_ = speed_byps;
+            }
+
+            // To prevent the smoothing from being overwhelmed by frequent calls
+            // to update(), do nothing if not enough time elapsed since last update.
+            else if (timestamp_msec_ + MinUpdateMSec <= time_msec)
+            {
+                timestamp_msec_ = time_msec;
+                speed_byps_ = (speed_byps_ * 4U + speed_byps) / 5U;
+            }
+
+            return speed_byps_;
+        }
+
+    private:
+        static auto constexpr MaxAgeMSec = 4000U;
+        static auto constexpr MinUpdateMSec = 800U;
+
+        uint64_t timestamp_msec_ = {};
+        tr_bytes_per_second_t speed_byps_ = {};
+    };
+
+    [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
+    {
+        auto const mode = idle_limit_mode();
+
+        if (mode == TR_IDLELIMIT_SINGLE)
+        {
+            return idle_limit_minutes();
+        }
+
+        if (mode == TR_IDLELIMIT_GLOBAL && session->isIdleLimited())
+        {
+            return session->idleLimitMinutes();
+        }
+
+        return {};
+    }
+
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
+    {
+        auto const activity = this->activity();
+
+        if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
+        {
+            if (auto const latest = std::max(startDate, activityDate); latest != 0)
+            {
+                TR_ASSERT(now >= latest);
+                return now - latest;
+            }
+        }
+
+        return {};
+    }
+
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
         if (uses_speed_limit(direction) && speed_limit_bps(direction) <= 0)
@@ -966,6 +1094,10 @@ private:
         }
     }
 
+    tr_interned_string bandwidth_group_;
+
+    SimpleSmoothedSpeed eta_speed_;
+
     /* If the initiator of the connection receives a handshake in which the
      * peer_id does not match the expected peerid, then the initiator is
      * expected to drop the connection. Note that the initiator presumably
@@ -975,13 +1107,18 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
-    tr_verify_state verify_state_ = TR_VERIFY_NONE;
-
-    float verify_progress_ = -1;
+    float verify_progress_ = -1.0F;
+    float seed_ratio_ = 0.0F;
 
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
 
-    tr_interned_string bandwidth_group_;
+    tr_ratiolimit seed_ratio_mode_ = TR_RATIOLIMIT_GLOBAL;
+
+    tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
+
+    tr_verify_state verify_state_ = TR_VERIFY_NONE;
+
+    uint16_t idle_limit_minutes_ = 0;
 
     bool needs_completeness_check_ = true;
 

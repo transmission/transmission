@@ -1165,6 +1165,14 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
         return;
     }
 
+    NSString* urlString = task.currentRequest.URL.absoluteString;
+    if ([urlString rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
+    {
+        // originalRequest was a redirect to a magnet
+        [self performSelectorOnMainThread:@selector(openMagnet:) withObject:urlString waitUntilDone:NO];
+        return;
+    }
+
     NSString* message = [NSString
         stringWithFormat:NSLocalizedString(@"The torrent could not be downloaded from %@: %@.", "Torrent download failed -> message"),
                          task.originalRequest.URL.absoluteString.stringByRemovingPercentEncoding,

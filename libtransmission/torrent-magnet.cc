@@ -32,7 +32,7 @@ namespace
 // don't ask for the same metadata piece more than this often
 auto constexpr MinRepeatIntervalSecs = int{ 3 };
 
-auto create_all_needed(int n_pieces)
+[[nodiscard]] auto create_all_needed(int n_pieces)
 {
     auto ret = std::deque<tr_incomplete_metadata::metadata_node>{};
 
@@ -72,13 +72,12 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    auto m = tr_incomplete_metadata{};
+    auto m = std::make_unique<tr_incomplete_metadata>();
+    m->piece_count = n;
+    m->metadata.resize(size);
+    m->pieces_needed = create_all_needed(n);
 
-    m.piece_count = n;
-    m.metadata.resize(size);
-    m.pieces_needed = create_all_needed(n);
-
-    if (std::empty(m.metadata) || std::empty(m.pieces_needed))
+    if (std::empty(m->metadata) || std::empty(m->pieces_needed))
     {
         return false;
     }
@@ -159,62 +158,46 @@ namespace set_metadata_piece_helpers
         MetadataPieceSize;
 }
 
-void build_metainfo_except_info_dict(tr_torrent_metainfo const& tm, tr_variant* top)
+tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
 {
-    tr_variantInitDict(top, 6);
+    auto top = tr_variant::Map{ 8U };
 
     if (auto const& val = tm.comment(); !std::empty(val))
     {
-        tr_variantDictAddStr(top, TR_KEY_comment, val);
+        top.try_emplace(TR_KEY_comment, val);
     }
 
     if (auto const& val = tm.source(); !std::empty(val))
     {
-        tr_variantDictAddStr(top, TR_KEY_source, val);
+        top.try_emplace(TR_KEY_source, val);
     }
 
     if (auto const& val = tm.creator(); !std::empty(val))
     {
-        tr_variantDictAddStr(top, TR_KEY_created_by, val);
+        top.try_emplace(TR_KEY_created_by, val);
     }
 
     if (auto const val = tm.date_created(); val != 0)
     {
-        tr_variantDictAddInt(top, TR_KEY_creation_date, val);
+        top.try_emplace(TR_KEY_creation_date, val);
     }
 
     if (auto const& announce_list = tm.announce_list(); !std::empty(announce_list))
     {
-        auto const n = std::size(announce_list);
-        if (n == 1)
-        {
-            tr_variantDictAddStr(top, TR_KEY_announce, announce_list.at(0).announce.sv());
-        }
-        else
-        {
-            auto* const announce_list_variant = tr_variantDictAddList(top, TR_KEY_announce_list, n);
-            tr_variant* tier_variant = nullptr;
-            auto current_tier = std::optional<tr_tracker_tier_t>{};
-            for (auto const& tracker : announce_list)
-            {
-                if (!current_tier || *current_tier != tracker.tier)
-                {
-                    tier_variant = tr_variantListAddList(announce_list_variant, n);
-                }
-
-                tr_variantListAddStr(tier_variant, tracker.announce.sv());
-            }
-        }
+        announce_list.add_to_map(top);
     }
 
-    if (auto const n_webseeds = tm.webseed_count(); n_webseeds > 0)
+    if (auto const n_webseeds = tm.webseed_count(); n_webseeds > 0U)
     {
-        auto* const webseeds_variant = tr_variantDictAddList(top, TR_KEY_url_list, n_webseeds);
-        for (size_t i = 0; i < n_webseeds; ++i)
+        auto webseed_vec = tr_variant::Vector{};
+        webseed_vec.reserve(n_webseeds);
+        for (size_t i = 0U; i < n_webseeds; ++i)
         {
-            tr_variantListAddStr(webseeds_variant, tm.webseed(i));
+            webseed_vec.emplace_back(tm.webseed(i));
         }
     }
+
+    return tr_variant{ std::move(top) };
 }
 
 bool use_new_metainfo(tr_torrent* tor, tr_error** error)
@@ -238,10 +221,9 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
     }
 
     // yay we have an info dict. Let's make a torrent file
-    auto top_v = tr_variant{};
-    build_metainfo_except_info_dict(tor->metainfo_, &top_v);
-    tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &*info_dict_v);
-    auto const benc = serde.to_string(top_v);
+    auto top_var = build_metainfo_except_info_dict(tor->metainfo_);
+    tr_variantMergeDicts(tr_variantDictAddDict(&top_var, TR_KEY_info, 0), &*info_dict_v);
+    auto const benc = serde.to_string(top_var);
 
     // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};

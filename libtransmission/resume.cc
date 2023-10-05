@@ -246,8 +246,8 @@ void saveSpeedLimits(tr_variant* dict, tr_torrent const* tor)
 void saveRatioLimits(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_ratio_limit, 2);
-    tr_variantDictAddReal(d, TR_KEY_ratio_limit, tr_torrentGetRatioLimit(tor));
-    tr_variantDictAddInt(d, TR_KEY_ratio_mode, tr_torrentGetRatioMode(tor));
+    tr_variantDictAddReal(d, TR_KEY_ratio_limit, tor->seed_ratio());
+    tr_variantDictAddInt(d, TR_KEY_ratio_mode, tor->seed_ratio_mode());
 }
 
 void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
@@ -306,12 +306,12 @@ auto loadRatioLimits(tr_variant* dict, tr_torrent* tor)
     {
         if (auto dratio = double{}; tr_variantDictFindReal(d, TR_KEY_ratio_limit, &dratio))
         {
-            tr_torrentSetRatioLimit(tor, dratio);
+            tor->set_seed_ratio(dratio);
         }
 
         if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_ratio_mode, &i))
         {
-            tor->set_ratio_mode(tr_ratiolimit(i));
+            tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(i));
         }
 
         ret = tr_resume::Ratiolimit;
@@ -328,12 +328,12 @@ auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
     {
         if (auto imin = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_limit, &imin))
         {
-            tor->set_idle_limit(imin);
+            tor->set_idle_limit_minutes(imin);
         }
 
         if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))
         {
-            tr_torrentSetIdleMode(tor, tr_idlelimit(i));
+            tor->set_idle_limit_mode(static_cast<tr_idlelimit>(i));
         }
 
         ret = tr_resume::Idlelimit;

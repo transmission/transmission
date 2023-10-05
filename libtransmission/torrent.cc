@@ -174,11 +174,11 @@ bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_left, ui
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (auto seed_ratio = double{}; tr_torrentGetSeedRatio(tor, &seed_ratio))
+    if (auto const seed_ratio = tor->effective_seed_ratio(); seed_ratio)
     {
         auto const uploaded = tor->uploadedCur + tor->uploadedPrev;
         auto const baseline = tor->size_when_done();
-        auto const goal = baseline * seed_ratio;
+        auto const goal = baseline * *seed_ratio;
 
         if (setme_left != nullptr)
         {
@@ -252,144 +252,76 @@ bool tr_torrentUsesSessionLimits(tr_torrent const* tor)
 
 // --- Download Ratio
 
-void tr_torrentSetRatioMode(tr_torrent* tor, tr_ratiolimit mode)
+void tr_torrentSetRatioMode(tr_torrent* const tor, tr_ratiolimit mode)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(mode == TR_RATIOLIMIT_GLOBAL || mode == TR_RATIOLIMIT_SINGLE || mode == TR_RATIOLIMIT_UNLIMITED);
 
-    tor->set_ratio_mode(mode);
+    tor->set_seed_ratio_mode(mode);
 }
 
-tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* tor)
+tr_ratiolimit tr_torrentGetRatioMode(tr_torrent const* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->ratioLimitMode;
+    return tor->seed_ratio_mode();
 }
 
-void tr_torrentSetRatioLimit(tr_torrent* tor, double desired_ratio)
+void tr_torrentSetRatioLimit(tr_torrent* const tor, double desired_ratio)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if ((int)(desired_ratio * 100.0) != (int)(tor->desiredRatio * 100.0))
+    tor->set_seed_ratio(desired_ratio);
+}
+
+double tr_torrentGetRatioLimit(tr_torrent const* const tor)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    return tor->seed_ratio();
+}
+
+bool tr_torrentGetSeedRatio(tr_torrent const* const tor, double* ratio)
+{
+    TR_ASSERT(tr_isTorrent(tor));
+
+    auto const val = tor->effective_seed_ratio();
+
+    if (ratio != nullptr && val)
     {
-        tor->desiredRatio = desired_ratio;
-
-        tor->set_dirty();
-    }
-}
-
-double tr_torrentGetRatioLimit(tr_torrent const* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    return tor->desiredRatio;
-}
-
-bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
-{
-    auto is_limited = bool{};
-
-    TR_ASSERT(tr_isTorrent(tor));
-
-    switch (tr_torrentGetRatioMode(tor))
-    {
-    case TR_RATIOLIMIT_SINGLE:
-        is_limited = true;
-
-        if (ratio != nullptr)
-        {
-            *ratio = tr_torrentGetRatioLimit(tor);
-        }
-
-        break;
-
-    case TR_RATIOLIMIT_GLOBAL:
-        is_limited = tor->session->isRatioLimited();
-
-        if (is_limited && ratio != nullptr)
-        {
-            *ratio = tor->session->desiredRatio();
-        }
-
-        break;
-
-    default: /* TR_RATIOLIMIT_UNLIMITED */
-        is_limited = false;
-        break;
+        *ratio = *val;
     }
 
-    return is_limited;
+    return val.has_value();
 }
 
 // ---
 
-void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode)
+void tr_torrentSetIdleMode(tr_torrent* const tor, tr_idlelimit mode)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(mode == TR_IDLELIMIT_GLOBAL || mode == TR_IDLELIMIT_SINGLE || mode == TR_IDLELIMIT_UNLIMITED);
 
-    if (tor->idle_limit_mode_ != mode)
-    {
-        tor->idle_limit_mode_ = mode;
-
-        tor->set_dirty();
-    }
+    tor->set_idle_limit_mode(mode);
 }
 
-tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* tor)
+tr_idlelimit tr_torrentGetIdleMode(tr_torrent const* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->idle_limit_mode();
 }
 
-void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes)
+void tr_torrentSetIdleLimit(tr_torrent* const tor, uint16_t idle_minutes)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    tor->set_idle_limit(idle_minutes);
+    tor->set_idle_limit_minutes(idle_minutes);
 }
 
-uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor)
+uint16_t tr_torrentGetIdleLimit(tr_torrent const* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->idle_limit_minutes();
-}
-
-bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* idle_minutes)
-{
-    auto is_limited = bool{};
-
-    switch (tor->idle_limit_mode())
-    {
-    case TR_IDLELIMIT_SINGLE:
-        is_limited = true;
-
-        if (idle_minutes != nullptr)
-        {
-            *idle_minutes = tor->idle_limit_minutes();
-        }
-
-        break;
-
-    case TR_IDLELIMIT_GLOBAL:
-        is_limited = tor->session->isIdleLimited();
-
-        if (is_limited && idle_minutes != nullptr)
-        {
-            *idle_minutes = tor->session->idleLimitMinutes();
-        }
-
-        break;
-
-    default: /* TR_IDLELIMIT_UNLIMITED */
-        is_limited = false;
-        break;
-    }
-
-    return is_limited;
 }
 
 namespace
@@ -498,11 +430,10 @@ namespace
 {
 namespace seed_limit_helpers
 {
-bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
+bool torrent_is_seed_idle_limit_done(tr_torrent const& tor, time_t now)
 {
-    auto idle_minutes = uint16_t{};
-    return tr_torrentGetSeedIdle(tor, &idle_minutes) &&
-        difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idle_minutes * 60U;
+    auto const secs_left = tor.idle_seconds_left(now);
+    return secs_left && *secs_left == 0U;
 }
 } // namespace seed_limit_helpers
 } // namespace
@@ -526,7 +457,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         tor->session->onRatioLimitHit(tor);
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
-    else if (tr_torrentIsSeedIdleLimitDone(tor))
+    else if (torrent_is_seed_idle_limit_done(*tor, tr_time()))
     {
         tr_logAddInfoTor(tor, _("Seeding idle limit reached; pausing torrent"));
 
@@ -845,7 +776,7 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     if (tr_torrentIsSeedRatioDone(tor))
     {
         tr_logAddInfoTor(tor, _("Restarted manually -- disabling its seed ratio"));
-        tor->set_ratio_mode(TR_RATIOLIMIT_UNLIMITED);
+        tor->set_seed_ratio_mode(TR_RATIOLIMIT_UNLIMITED);
     }
 
     tor->is_running_ = true;
@@ -1093,14 +1024,14 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if ((loaded & tr_resume::Ratiolimit) == 0)
     {
-        tor->set_ratio_mode(TR_RATIOLIMIT_GLOBAL);
-        tr_torrentSetRatioLimit(tor, tor->session->desiredRatio());
+        tor->set_seed_ratio_mode(TR_RATIOLIMIT_GLOBAL);
+        tor->set_seed_ratio(tor->session->desiredRatio());
     }
 
     if ((loaded & tr_resume::Idlelimit) == 0)
     {
-        tr_torrentSetIdleMode(tor, TR_IDLELIMIT_GLOBAL);
-        tor->set_idle_limit(tor->session->idleLimitMinutes());
+        tor->set_idle_limit_mode(TR_IDLELIMIT_GLOBAL);
+        tor->set_idle_limit_minutes(tor->session->idleLimitMinutes());
     }
 
     auto has_local_data = std::optional<bool>{};
@@ -1418,45 +1349,33 @@ namespace
 {
 namespace stat_helpers
 {
-[[nodiscard]] time_t torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activity)
-{
-    return ((activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED) && tor->startDate != 0) ?
-        (time_t)difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) :
-        -1;
-}
-
-[[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, size_t idle_secs)
+[[nodiscard]] constexpr bool tr_torrentIsStalled(tr_torrent const* tor, std::optional<size_t> idle_secs)
 {
     return tor->session->queueStalledEnabled() && idle_secs > tor->session->queueStalledMinutes() * 60U;
 }
 } // namespace stat_helpers
 } // namespace
 
-tr_stat const* tr_torrentStat(tr_torrent* tor)
+tr_stat const* tr_torrentStat(tr_torrent* const tor)
 {
     using namespace stat_helpers;
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto const now = tr_time_msec();
+    auto const now_msec = tr_time_msec();
     auto const now_sec = tr_time();
 
-    auto swarm_stats = tr_swarm_stats{};
-
-    tor->lastStatTime = now_sec;
-
-    if (tor->swarm != nullptr)
-    {
-        swarm_stats = tr_swarmGetStats(tor->swarm);
-    }
+    auto const swarm_stats = tor->swarm != nullptr ? tr_swarmGetStats(tor->swarm) : tr_swarm_stats{};
+    auto const activity = tor->activity();
+    auto const idle_seconds = tor->idle_seconds(now_sec);
 
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
-    s->activity = tor->activity();
+    s->activity = activity;
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
-    s->idleSecs = torrentGetIdleSecs(tor, s->activity);
-    s->isStalled = tr_torrentIsStalled(tor, s->idleSecs);
+    s->idleSecs = idle_seconds ? static_cast<time_t>(*idle_seconds) : -1;
+    s->isStalled = tr_torrentIsStalled(tor, idle_seconds);
     s->errorString = tor->error_string.c_str();
 
     s->peersConnected = swarm_stats.peer_count;
@@ -1469,10 +1388,10 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
-    auto const piece_upload_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now, TR_UP);
-    s->pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_bytes_per_second);
-    auto const piece_download_speed_bytes_per_second = tor->bandwidth_.get_piece_speed_bytes_per_second(now, TR_DOWN);
-    s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_bytes_per_second);
+    auto const piece_upload_speed_byps = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_UP);
+    s->pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_byps);
+    auto const piece_download_speed_byps = tor->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_DOWN);
+    s->pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_byps);
 
     s->percentComplete = tor->completion.percent_complete();
     s->metadataPercentComplete = tr_torrentGetMetadataPercent(tor);
@@ -1504,75 +1423,36 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     auto seed_ratio_bytes_goal = uint64_t{};
     bool const seed_ratio_applies = tr_torrentGetSeedRatioBytes(tor, &seed_ratio_bytes_left, &seed_ratio_bytes_goal);
 
-    switch (s->activity)
+    // eta, etaIdle
+    s->eta = TR_ETA_NOT_AVAIL;
+    s->etaIdle = TR_ETA_NOT_AVAIL;
+    if (activity == TR_STATUS_DOWNLOAD)
     {
-    /* etaSpeed exists because if we use the piece speed directly,
-     * brief fluctuations cause the ETA to jump all over the place.
-     * so, etaXLSpeed is a smoothed-out version of the piece speed
-     * to dampen the effect of fluctuations */
-    case TR_STATUS_DOWNLOAD:
-        if (tor->etaSpeedCalculatedAt + 800 < now)
-        {
-            tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
-                piece_download_speed_bytes_per_second : /* if no recent previous speed, no need to smooth */
-                (tor->etaSpeed_Bps * 4.0 + piece_download_speed_bytes_per_second) / 5.0; /* smooth across 5 readings */
-            tor->etaSpeedCalculatedAt = now;
-        }
-
-        if (s->leftUntilDone > s->desiredAvailable && tor->webseed_count() < 1)
-        {
-            s->eta = TR_ETA_NOT_AVAIL;
-        }
-        else if (tor->etaSpeed_Bps == 0)
+        if (auto const eta_speed_byps = tor->eta_speed_.update(now_msec, piece_download_speed_byps); eta_speed_byps == 0U)
         {
             s->eta = TR_ETA_UNKNOWN;
         }
-        else
+        else if (s->leftUntilDone <= s->desiredAvailable || tor->webseed_count() >= 1U)
         {
-            s->eta = s->leftUntilDone / tor->etaSpeed_Bps;
+            s->eta = s->leftUntilDone / eta_speed_byps;
+        }
+    }
+    else if (activity == TR_STATUS_SEED)
+    {
+        auto const eta_speed_byps = tor->eta_speed_.update(now_msec, piece_upload_speed_byps);
+
+        if (seed_ratio_applies)
+        {
+            s->eta = eta_speed_byps == 0U ? TR_ETA_UNKNOWN : seed_ratio_bytes_left / eta_speed_byps;
         }
 
-        s->etaIdle = TR_ETA_NOT_AVAIL;
-        break;
-
-    case TR_STATUS_SEED:
-        if (!seed_ratio_applies)
+        if (eta_speed_byps < 1U)
         {
-            s->eta = TR_ETA_NOT_AVAIL;
-        }
-        else
-        {
-            if (tor->etaSpeedCalculatedAt + 800 < now)
+            if (auto const secs_left = tor->idle_seconds_left(now_sec); secs_left)
             {
-                tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
-                    piece_upload_speed_bytes_per_second : /* if no recent previous speed, no need to smooth */
-                    (tor->etaSpeed_Bps * 4.0 + piece_upload_speed_bytes_per_second) / 5.0; /* smooth across 5 readings */
-                tor->etaSpeedCalculatedAt = now;
-            }
-
-            if (tor->etaSpeed_Bps == 0)
-            {
-                s->eta = TR_ETA_UNKNOWN;
-            }
-            else
-            {
-                s->eta = seed_ratio_bytes_left / tor->etaSpeed_Bps;
+                s->etaIdle = *secs_left;
             }
         }
-
-        {
-            auto seed_idle_minutes = uint16_t{};
-            s->etaIdle = tor->etaSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seed_idle_minutes) ?
-                seed_idle_minutes * 60 - s->idleSecs :
-                TR_ETA_NOT_AVAIL;
-        }
-
-        break;
-
-    default:
-        s->eta = TR_ETA_NOT_AVAIL;
-        s->etaIdle = TR_ETA_NOT_AVAIL;
-        break;
     }
 
     /* s->haveValid is here to make sure a torrent isn't marked 'finished'
@@ -1598,13 +1478,6 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     TR_ASSERT(s->desiredAvailable <= s->leftUntilDone);
 
     return s;
-}
-
-tr_stat const* tr_torrentStatCached(tr_torrent* tor)
-{
-    time_t const now = tr_time();
-
-    return (tr_isTorrent(tor) && now == tor->lastStatTime) ? &tor->stats : tr_torrentStat(tor);
 }
 
 // ---
@@ -1895,8 +1768,8 @@ void tr_torrent::recheck_completeness()
                 this,
                 fmt::format(
                     "State changed from {} to {}",
-                    get_completion_string(this->completeness),
-                    get_completion_string(completeness)));
+                    get_completion_string(completeness),
+                    get_completion_string(new_completeness)));
         }
 
         this->completeness = new_completeness;
@@ -2408,6 +2281,10 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
             doneDate = addedDate;
             recheck_completeness();
         }
+    }
+    else if (error == TR_STAT_LOCAL_ERROR && !setLocalErrorIfFilesDisappeared(this))
+    {
+        tr_torrentClearError(this);
     }
 }
 
