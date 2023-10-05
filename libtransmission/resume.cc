@@ -654,7 +654,7 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
 
     if ((fields_to_load & tr_resume::Corrupt) != 0 && tr_variantDictFindInt(&top, TR_KEY_corrupt, &i))
     {
-        tor->corruptPrev = i;
+        tor->bytes_corrupt_.set_prev(i);
         fields_loaded |= tr_resume::Corrupt;
     }
 
@@ -686,13 +686,13 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
 
     if ((fields_to_load & tr_resume::Downloaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloaded, &i))
     {
-        tor->downloadedPrev = i;
+        tor->bytes_downloaded_.set_prev(i);
         fields_loaded |= tr_resume::Downloaded;
     }
 
     if ((fields_to_load & tr_resume::Uploaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_uploaded, &i))
     {
-        tor->uploadedPrev = i;
+        tor->bytes_uploaded_.set_prev(i);
         fields_loaded |= tr_resume::Uploaded;
     }
 
@@ -871,7 +871,7 @@ fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor)
     return ret;
 }
 
-void save(tr_torrent* tor)
+void save(tr_torrent* const tor)
 {
     if (!tr_isTorrent(tor))
     {
@@ -885,7 +885,7 @@ void save(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, tor->seconds_downloading(now));
     tr_variantDictAddInt(&top, TR_KEY_activity_date, tor->activityDate);
     tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
-    tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->corruptPrev + tor->corruptCur);
+    tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->bytes_corrupt_.ever());
     tr_variantDictAddInt(&top, TR_KEY_done_date, tor->doneDate);
     tr_variantDictAddStrView(&top, TR_KEY_destination, tor->download_dir().sv());
 
@@ -894,8 +894,8 @@ void save(tr_torrent* tor)
         tr_variantDictAddStrView(&top, TR_KEY_incomplete_dir, tor->incomplete_dir().sv());
     }
 
-    tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
-    tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
+    tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->bytes_downloaded_.ever());
+    tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->bytes_uploaded_.ever());
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->peer_limit());
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tor->get_priority());
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->start_when_stable);

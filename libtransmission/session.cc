@@ -1346,8 +1346,8 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
         std::end(torrents),
         [](auto const* a, auto const* b)
         {
-            auto const a_cur = a->downloadedCur + a->uploadedCur;
-            auto const b_cur = b->downloadedCur + b->uploadedCur;
+            auto const a_cur = a->bytes_downloaded_.ever();
+            auto const b_cur = b->bytes_downloaded_.ever();
             return a_cur > b_cur; // larger xfers go first
         });
     for (auto* tor : torrents)

@@ -173,7 +173,7 @@ bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_left, ui
 
     if (auto const seed_ratio = tor->effective_seed_ratio(); seed_ratio)
     {
-        auto const uploaded = tor->uploadedCur + tor->uploadedPrev;
+        auto const uploaded = tor->bytes_uploaded_.ever();
         auto const baseline = tor->size_when_done();
         auto const goal = baseline * *seed_ratio;
 
@@ -374,7 +374,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
     auto const id_str = std::to_string(tr_torrentId(tor));
     auto const labels_str = build_labels_string(tor->labels());
     auto const trackers_str = buildTrackersString(tor);
-    auto const bytes_downloaded_str = std::to_string(tor->downloadedCur + tor->downloadedPrev);
+    auto const bytes_downloaded_str = std::to_string(tor->bytes_downloaded_.ever());
     auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time()));
 
     auto const env = std::map<std::string_view, std::string_view>{
@@ -615,12 +615,9 @@ void torrentResetTransferStats(tr_torrent* tor)
 {
     auto const lock = tor->unique_lock();
 
-    tor->downloadedPrev += tor->downloadedCur;
-    tor->downloadedCur = 0;
-    tor->uploadedPrev += tor->uploadedCur;
-    tor->uploadedCur = 0;
-    tor->corruptPrev += tor->corruptCur;
-    tor->corruptCur = 0;
+    tor->bytes_uploaded_.start_new_session();
+    tor->bytes_downloaded_.start_new_session();
+    tor->bytes_corrupt_.start_new_session();
 
     tor->set_dirty();
 }
@@ -980,8 +977,8 @@ void tr_torrent::init(tr_ctor const* const ctor)
 
     session->addTorrent(this);
 
-    TR_ASSERT(downloadedCur == 0);
-    TR_ASSERT(uploadedCur == 0);
+    TR_ASSERT(tor->bytes_downloaded_.during_this_session() == 0U);
+    TR_ASSERT(tor->bytes_uploaded_.during_this_session() == 0);
 
     mark_changed();
 
@@ -1371,9 +1368,9 @@ tr_stat tr_torrent::stats() const
     stats.secondsSeeding = this->seconds_seeding(now_sec);
     stats.secondsDownloading = this->seconds_downloading(now_sec);
 
-    stats.corruptEver = this->corruptCur + this->corruptPrev;
-    stats.downloadedEver = this->downloadedCur + this->downloadedPrev;
-    stats.uploadedEver = this->uploadedCur + this->uploadedPrev;
+    stats.corruptEver = this->bytes_corrupt_.ever();
+    stats.downloadedEver = this->bytes_downloaded_.ever();
+    stats.uploadedEver = this->bytes_uploaded_.ever();
     stats.haveValid = this->completion.has_valid();
     stats.haveUnchecked = this->has_total() - stats.haveValid;
     stats.desiredAvailable = tr_peerMgrGetDesiredAvailable(this);
@@ -1773,7 +1770,7 @@ void tr_torrent::recheck_completeness()
 
     if (new_completeness != completeness)
     {
-        bool const recent_change = downloadedCur != 0;
+        bool const recent_change = bytes_downloaded_.during_this_session() != 0U;
         bool const was_running = is_running();
 
         if (recent_change)
@@ -2203,8 +2200,8 @@ void onPieceFailed(tr_torrent* tor, tr_piece_index_t piece)
     tr_logAddDebugTor(tor, fmt::format("Piece {}, which was just downloaded, failed its checksum test", piece));
 
     auto const n = tor->piece_size(piece);
-    tor->corruptCur += n;
-    tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
+    tor->bytes_corrupt_ += n;
+    tor->bytes_downloaded_.reduce(n);
     tor->got_bad_piece_.emit(tor, piece);
     tor->set_has_piece(piece, false);
 }
@@ -2221,8 +2218,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
     if (tor->has_block(block))
     {
         tr_logAddDebugTor(tor, "we have this block already...");
-        auto const n = tor->block_size(block);
-        tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
+        tor->bytes_downloaded_.reduce(tor->block_size(block));
         return;
     }
 
