@@ -119,7 +119,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
             limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
         }
 
-        group.set_limits(&limits);
+        group.set_limits(limits);
 
         if (auto const* val = group_map->find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
         {
