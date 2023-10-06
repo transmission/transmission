@@ -76,7 +76,8 @@ void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateContr
 
 // ---
 
-tr_bandwidth::tr_bandwidth(tr_bandwidth* parent)
+tr_bandwidth::tr_bandwidth(tr_bandwidth* parent, bool is_group)
+    : priority_(is_group ? TR_PRI_HIGH : TR_PRI_NORMAL)
 {
     this->set_parent(parent);
 }
@@ -139,7 +140,7 @@ void tr_bandwidth::allocate_bandwidth(
     unsigned int period_msec,
     std::vector<std::shared_ptr<tr_peerIo>>& peer_pool)
 {
-    auto const priority = std::max(parent_priority, this->priority_);
+    auto const priority = std::min(parent_priority, this->priority_);
 
     // set the available bandwidth
     for (auto const dir : { TR_UP, TR_DOWN })

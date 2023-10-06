@@ -1146,7 +1146,7 @@ public:
     std::unique_ptr<tr_udp_core> udp_core_;
 
     // monitors the "global pool" speeds
-    tr_bandwidth top_bandwidth_;
+    tr_bandwidth top_bandwidth_{ true };
 
 private:
     // depends-on: top_bandwidth_
