@@ -267,33 +267,6 @@ size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) co
     if (this->band_[dir].is_limited_)
     {
         byte_count = std::min(byte_count, this->band_[dir].bytes_left_);
-
-        /* if we're getting close to exceeding the speed limit,
-         * clamp down harder on the bytes available */
-        if (byte_count > 0)
-        {
-            if (now == 0)
-            {
-                now = tr_time_msec();
-            }
-
-            auto const current = this->get_raw_speed_bytes_per_second(now, dir);
-            auto const desired = this->get_desired_speed_bytes_per_second(dir);
-            auto const r = desired >= 1 ? static_cast<double>(current) / desired : 0.0;
-
-            if (r > 1.0)
-            {
-                byte_count = 0; // none left
-            }
-            else if (r > 0.9)
-            {
-                byte_count -= (byte_count / 5U); // cap at 80%
-            }
-            else if (r > 0.8)
-            {
-                byte_count -= (byte_count / 10U); // cap at 90%
-            }
-        }
     }
 
     if (this->parent_ != nullptr && this->band_[dir].honor_parent_limits_ && byte_count > 0)
