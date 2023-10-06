@@ -192,9 +192,9 @@ public:
      */
     constexpr bool set_limited(tr_direction dir, bool is_limited)
     {
-        bool* value = &this->band_[dir].is_limited_;
-        bool const did_change = is_limited != *value;
-        *value = is_limited;
+        bool& value = this->band_[dir].is_limited_;
+        bool const did_change = is_limited != value;
+        value = is_limited;
         return did_change;
     }
 
@@ -214,9 +214,9 @@ public:
      */
     constexpr bool honor_parent_limits(tr_direction direction, bool is_enabled)
     {
-        bool* value = &this->band_[direction].honor_parent_limits_;
-        bool const did_change = is_enabled != *value;
-        *value = is_enabled;
+        bool& value = this->band_[direction].honor_parent_limits_;
+        bool const did_change = is_enabled != value;
+        value = is_enabled;
         return did_change;
     }
 
@@ -229,7 +229,7 @@ public:
 
     [[nodiscard]] tr_bandwidth_limits get_limits() const;
 
-    void set_limits(tr_bandwidth_limits const* limits);
+    void set_limits(tr_bandwidth_limits const& limits);
 
 private:
     struct RateControl
@@ -260,7 +260,7 @@ private:
 
     void deparent() noexcept;
 
-    static void notify_bandwidth_consumed_bytes(uint64_t now, RateControl* r, size_t size);
+    static void notify_bandwidth_consumed_bytes(uint64_t now, RateControl& r, size_t size);
 
     [[nodiscard]] size_t clamp(uint64_t now, tr_direction dir, size_t byte_count) const;
 

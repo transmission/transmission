@@ -1611,7 +1611,7 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
         limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
     }
 
-    group.set_limits(&limits);
+    group.set_limits(limits);
 
     if (auto honors = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))
     {

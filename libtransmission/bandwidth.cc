@@ -53,25 +53,25 @@ tr_bytes_per_second_t tr_bandwidth::get_speed_bytes_per_second(RateControl& r, u
     return r.cache_val_;
 }
 
-void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateControl* r, size_t size)
+void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateControl& r, size_t size)
 {
-    if (r->date_[r->newest_] + GranularityMSec >= now)
+    if (r.date_[r.newest_] + GranularityMSec >= now)
     {
-        r->size_[r->newest_] += size;
+        r.size_[r.newest_] += size;
     }
     else
     {
-        if (++r->newest_ == HistorySize)
+        if (++r.newest_ == HistorySize)
         {
-            r->newest_ = 0;
+            r.newest_ = 0;
         }
 
-        r->date_[r->newest_] = now;
-        r->size_[r->newest_] = size;
+        r.date_[r.newest_] = now;
+        r.size_[r.newest_] = size;
     }
 
     /* invalidate cache_val*/
-    r->cache_time_ = 0;
+    r.cache_time_ = 0;
 }
 
 // ---
@@ -331,11 +331,11 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 
 #endif
 
-    notify_bandwidth_consumed_bytes(now, &band->raw_, byte_count);
+    notify_bandwidth_consumed_bytes(now, band->raw_, byte_count);
 
     if (is_piece_data)
     {
-        notify_bandwidth_consumed_bytes(now, &band->piece_, byte_count);
+        notify_bandwidth_consumed_bytes(now, band->piece_, byte_count);
     }
 
     if (this->parent_ != nullptr)
@@ -356,10 +356,10 @@ tr_bandwidth_limits tr_bandwidth::get_limits() const
     return limits;
 }
 
-void tr_bandwidth::set_limits(tr_bandwidth_limits const* limits)
+void tr_bandwidth::set_limits(tr_bandwidth_limits const& limits)
 {
-    this->set_desired_speed_bytes_per_second(TR_UP, tr_toSpeedBytes(limits->up_limit_KBps));
-    this->set_desired_speed_bytes_per_second(TR_DOWN, tr_toSpeedBytes(limits->down_limit_KBps));
-    this->set_limited(TR_UP, limits->up_limited);
-    this->set_limited(TR_DOWN, limits->down_limited);
+    this->set_desired_speed_bytes_per_second(TR_UP, tr_toSpeedBytes(limits.up_limit_KBps));
+    this->set_desired_speed_bytes_per_second(TR_DOWN, tr_toSpeedBytes(limits.down_limit_KBps));
+    this->set_limited(TR_UP, limits.up_limited);
+    this->set_limited(TR_DOWN, limits.down_limited);
 }
