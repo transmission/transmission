@@ -93,8 +93,8 @@ void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me) noexce
     // do the cheaper option of overwriting it with the final item
     if (auto it = std::find(std::begin(v), std::end(v), remove_me); it != std::end(v))
     {
-        *it = v.back();
-        v.resize(v.size() - 1);
+        std::swap(*it, v.back());
+        v.pop_back();
     }
 }
 } // namespace deparent_helpers
@@ -184,7 +184,7 @@ void tr_bandwidth::phase_one(std::vector<tr_peerIo*>& peers, tr_direction dir)
             // Value of 3000 bytes chosen so that when using µTP we'll send a full-size
             // frame right away and leave enough buffered data for the next frame to go
             // out in a timely manner.
-            static auto constexpr Increment = size_t{ 3000 };
+            static auto constexpr Increment = 3000U;
 
             auto const bytes_used = peers[i]->flush(dir, Increment);
             tr_logAddTrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n_unfinished, bytes_used));
@@ -312,7 +312,7 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 
     if (band->is_limited_ && is_piece_data)
     {
-        band->bytes_left_ -= std::min(size_t{ band->bytes_left_ }, byte_count);
+        band->bytes_left_ -= std::min(band->bytes_left_, byte_count);
     }
 
 #ifdef DEBUG_DIRECTION
