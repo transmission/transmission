@@ -80,12 +80,12 @@ struct tr_bandwidth
 private:
     using Speed = libtransmission::Values::Speed;
 
-    static constexpr size_t HistoryMSec = 2000U;
-    static constexpr size_t GranularityMSec = 250U;
-    static constexpr size_t HistorySize = HistoryMSec / GranularityMSec;
+    static constexpr auto HistoryMSec = 2000U;
+    static constexpr auto GranularityMSec = 250U;
+    static constexpr auto HistorySize = HistoryMSec / GranularityMSec;
 
 public:
-    explicit tr_bandwidth(tr_bandwidth* new_parent, bool is_group = false);
+    explicit tr_bandwidth(tr_bandwidth* parent, bool is_group = false);
 
     explicit tr_bandwidth(bool is_group = false)
         : tr_bandwidth{ nullptr, is_group }
@@ -123,7 +123,7 @@ public:
 
     void set_parent(tr_bandwidth* new_parent);
 
-    [[nodiscard]] constexpr tr_priority_t get_priority() const noexcept
+    [[nodiscard]] constexpr auto get_priority() const noexcept
     {
         return this->priority_;
     }
@@ -193,8 +193,8 @@ public:
      */
     constexpr bool set_limited(tr_direction dir, bool is_limited)
     {
-        bool& value = this->band_[dir].is_limited_;
-        bool const did_change = is_limited != value;
+        auto& value = this->band_[dir].is_limited_;
+        auto const did_change = is_limited != value;
         value = is_limited;
         return did_change;
     }
@@ -215,16 +215,14 @@ public:
      */
     constexpr bool honor_parent_limits(tr_direction direction, bool is_enabled)
     {
-        bool& value = this->band_[direction].honor_parent_limits_;
-        bool const did_change = is_enabled != value;
+        auto& value = this->band_[direction].honor_parent_limits_;
+        auto const did_change = is_enabled != value;
         value = is_enabled;
         return did_change;
     }
 
     [[nodiscard]] constexpr bool are_parent_limits_honored(tr_direction direction) const
     {
-        TR_ASSERT(tr_isDirection(direction));
-
         return this->band_[direction].honor_parent_limits_;
     }
 
@@ -279,7 +277,7 @@ private:
 
 /* @} */
 
-constexpr bool tr_isPriority(tr_priority_t p)
+constexpr auto tr_isPriority(tr_priority_t p)
 {
     return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
 }

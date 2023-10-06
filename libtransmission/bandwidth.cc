@@ -83,10 +83,10 @@ void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateContr
 
 // ---
 
-tr_bandwidth::tr_bandwidth(tr_bandwidth* new_parent, bool is_group)
+tr_bandwidth::tr_bandwidth(tr_bandwidth* parent, bool is_group)
     : priority_(is_group ? TR_PRI_NONE : TR_PRI_NORMAL)
 {
-    this->set_parent(new_parent);
+    this->set_parent(parent);
 }
 
 // ---
@@ -295,34 +295,18 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    Band* band = &this->band_[dir];
+    auto& band = this->band_[dir];
 
-    if (band->is_limited_ && is_piece_data)
+    if (band.is_limited_ && is_piece_data)
     {
-        band->bytes_left_ -= std::min(band->bytes_left_, byte_count);
+        band.bytes_left_ -= std::min(band.bytes_left_, byte_count);
     }
 
-#ifdef DEBUG_DIRECTION
-
-    if (dir == DEBUG_DIRECTION && band_->isLimited)
-    {
-        fprintf(
-            stderr,
-            "%p consumed %5zu bytes of %5s data... was %6zu, now %6zu left\n",
-            this,
-            byte_count,
-            is_piece_data ? "piece" : "raw",
-            oldBytesLeft,
-            band_->bytesLeft);
-    }
-
-#endif
-
-    notify_bandwidth_consumed_bytes(now, band->raw_, byte_count);
+    notify_bandwidth_consumed_bytes(now, band.raw_, byte_count);
 
     if (is_piece_data)
     {
-        notify_bandwidth_consumed_bytes(now, band->piece_, byte_count);
+        notify_bandwidth_consumed_bytes(now, band.piece_, byte_count);
     }
 
     if (this->parent_ != nullptr)
