@@ -76,9 +76,9 @@ void tr_bandwidth::notify_bandwidth_consumed_bytes(uint64_t const now, RateContr
 
 // ---
 
-tr_bandwidth::tr_bandwidth(tr_bandwidth* parent)
+tr_bandwidth::tr_bandwidth(tr_bandwidth* new_parent)
 {
-    this->set_parent(parent);
+    this->set_parent(new_parent);
 }
 
 // ---
@@ -136,7 +136,7 @@ void tr_bandwidth::set_parent(tr_bandwidth* new_parent)
 
 void tr_bandwidth::allocate_bandwidth(
     tr_priority_t parent_priority,
-    unsigned int period_msec,
+    uint64_t period_msec,
     std::vector<std::shared_ptr<tr_peerIo>>& peer_pool)
 {
     auto const priority = std::max(parent_priority, this->priority_);
@@ -203,7 +203,7 @@ void tr_bandwidth::phase_one(std::vector<tr_peerIo*>& peers, tr_direction dir)
     }
 }
 
-void tr_bandwidth::allocate(unsigned int period_msec)
+void tr_bandwidth::allocate(uint64_t period_msec)
 {
     // keep these peers alive for the scope of this function
     auto refs = std::vector<std::shared_ptr<tr_peerIo>>{};
@@ -260,7 +260,7 @@ void tr_bandwidth::allocate(unsigned int period_msec)
 
 // ---
 
-size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) const
+size_t tr_bandwidth::clamp(uint64_t now, tr_direction const dir, size_t byte_count) const
 {
     TR_ASSERT(tr_isDirection(dir));
 
