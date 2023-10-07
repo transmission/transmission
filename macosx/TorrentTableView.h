@@ -6,7 +6,7 @@
 
 @class Torrent;
 
-extern const CGFloat kGroupSeparatorHeight;
+extern CGFloat const kGroupSeparatorHeight;
 
 @interface TorrentTableView : NSOutlineView<NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
 
@@ -17,9 +17,7 @@ extern const CGFloat kGroupSeparatorHeight;
 - (void)removeAllCollapsedGroups;
 - (void)saveCollapsedGroups;
 
-- (void)restoreSelectionIndexes;
-
-@property(nonatomic, readonly) NSArray<Torrent*>* selectedTorrents;
+@property(nonatomic) NSArray<Torrent*>* selectedTorrents;
 
 - (NSRect)iconRectForRow:(NSInteger)row;
 

@@ -204,8 +204,6 @@ int tr_main(int argc, char* argv[])
 
     tr_locale_set_global("");
 
-    tr_variant settings;
-
     tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
     tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
@@ -220,9 +218,8 @@ int tr_main(int argc, char* argv[])
     }
 
     /* load the defaults from config file + libtransmission defaults */
-    tr_variantInitDict(&settings, 0);
     auto const config_dir = getConfigDir(argc, (char const**)argv);
-    tr_sessionLoadSettings(&settings, config_dir.c_str(), MyConfigName);
+    auto settings = tr_sessionLoadSettings(config_dir.c_str(), MyConfigName);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
@@ -259,7 +256,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    auto* const h = tr_sessionInit(config_dir.c_str(), false, &settings);
+    auto* const h = tr_sessionInit(config_dir.c_str(), false, settings);
     auto* const ctor = tr_ctorNew(h);
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);
@@ -357,7 +354,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    tr_sessionSaveSettings(h, config_dir.c_str(), &settings);
+    tr_sessionSaveSettings(h, config_dir.c_str(), settings);
 
     printf("\n");
     tr_sessionClose(h);

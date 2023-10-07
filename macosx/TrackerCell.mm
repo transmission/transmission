@@ -227,7 +227,7 @@ NSMutableSet* fTrackerIconLoading;
                 {
                     [fTrackerIconCache setObject:icon forKey:baseAddress];
 
-                    [self.controlView setNeedsDisplay:YES];
+                    self.controlView.needsDisplay = YES;
                 }
                 else
                 {

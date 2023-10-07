@@ -439,7 +439,11 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
                 if (copied == -1)
                 {
                     errno_cpy = errno; /* remember me for later */
-                    tr_error_set_from_errno(error, errno);
+                    /* use sendfile with EINVAL (invalid argument) for falling to user-space copy */
+                    if (errno != EINVAL) /* EINVAL is expected on some 32-bit devices (of Synology), don't log error */
+                    {
+                        tr_error_set_from_errno(error, errno);
+                    }
                     if (file_size > 0U)
                     {
                         file_size = info->size; /* restore file_size for next fallback */
@@ -460,7 +464,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* Fallback to user-space copy. */
     /* if file_size>0 and errno_cpy==0, we probably never entered any copy attempt, also: */
     /* if we (still) got something to copy and we encountered certain error in previous attempts */
-    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV))
+    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV || errno_cpy == EINVAL))
     {
         static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
         auto buf = std::vector<char>{};
