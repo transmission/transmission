@@ -2311,9 +2311,9 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
             recheck_completeness();
         }
     }
-    else if (!std::empty(error_) && !setLocalErrorIfFilesDisappeared(this))
+    else if (error_.error_type() == TR_STAT_LOCAL_ERROR && !setLocalErrorIfFilesDisappeared(this))
     {
-        error_.clear_if_local();
+        error_.clear();
     }
 }
 
