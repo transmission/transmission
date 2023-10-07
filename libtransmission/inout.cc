@@ -220,7 +220,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
 
         if (error != nullptr) // if IO failed, set torrent's error if not already set
         {
-            if (io_mode == IoMode::Write && std::empty(tor->error()))
+            if (io_mode == IoMode::Write && tor->error().error_type() != TR_STAT_LOCAL_ERROR)
             {
                 tor->error().set_local_error(error->message);
                 tr_torrentStop(tor);
