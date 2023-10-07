@@ -83,14 +83,6 @@ void tr_torrent::Error::clear() noexcept
     error_type_ = TR_STAT_OK;
 }
 
-void tr_torrent::Error::clear_if_local() noexcept
-{
-    if (error_type_ == TR_STAT_LOCAL_ERROR)
-    {
-        clear();
-    }
-}
-
 void tr_torrent::Error::clear_if_tracker() noexcept
 {
     if (error_type_ == TR_STAT_TRACKER_WARNING || error_type_ == TR_STAT_TRACKER_ERROR)

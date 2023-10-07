@@ -1023,7 +1023,6 @@ private:
         void set_local_error(std::string_view errmsg);
 
         void clear() noexcept;
-        void clear_if_local() noexcept;
         void clear_if_tracker() noexcept;
 
     private:
