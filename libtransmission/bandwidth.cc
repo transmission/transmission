@@ -217,7 +217,7 @@ void tr_bandwidth::allocate(uint64_t period_msec)
     // allocateBandwidth () is a helper function with two purposes:
     // 1. allocate bandwidth to b and its subtree
     // 2. accumulate an array of all the peerIos from b and its subtree.
-    this->allocate_bandwidth(TR_PRI_LOW, period_msec, refs);
+    this->allocate_bandwidth(TR_PRI_HIGH, period_msec, refs);
 
     for (auto const& io : refs)
     {
