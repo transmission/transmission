@@ -18,6 +18,8 @@
 #include "net.h" // tr_socket_t
 #include "utils.h" // for tr_htonll(), tr_ntohll()
 
+#include "event2/util.h"
+
 namespace libtransmission
 {
 
@@ -199,6 +201,7 @@ public:
 
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
+        EVUTIL_SET_SOCKET_ERROR(0);
         auto const [buf, buflen] = reserve_space(n_bytes);
         auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
         auto const err = sockerrno;
