@@ -55,6 +55,44 @@ using namespace std::literals;
 
 // ---
 
+void tr_torrent::Error::set_tracker_warning(tr_interned_string announce_url, std::string_view errmsg)
+{
+    announce_url_ = announce_url;
+    errmsg_.assign(errmsg);
+    error_type_ = TR_STAT_TRACKER_WARNING;
+}
+
+void tr_torrent::Error::set_tracker_error(tr_interned_string announce_url, std::string_view errmsg)
+{
+    announce_url_ = announce_url;
+    errmsg_.assign(errmsg);
+    error_type_ = TR_STAT_TRACKER_ERROR;
+}
+
+void tr_torrent::Error::set_local_error(std::string_view errmsg)
+{
+    announce_url_.clear();
+    errmsg_.assign(errmsg);
+    error_type_ = TR_STAT_LOCAL_ERROR;
+}
+
+void tr_torrent::Error::clear() noexcept
+{
+    announce_url_.clear();
+    errmsg_.clear();
+    error_type_ = TR_STAT_OK;
+}
+
+void tr_torrent::Error::clear_if_tracker() noexcept
+{
+    if (error_type_ == TR_STAT_TRACKER_WARNING || error_type_ == TR_STAT_TRACKER_ERROR)
+    {
+        clear();
+    }
+}
+
+// ---
+
 char const* tr_torrentName(tr_torrent const* tor)
 {
     return tor != nullptr ? tor->name().c_str() : "";
@@ -117,7 +155,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
 
     if (error != nullptr)
     {
-        tor->set_local_error(fmt::format(
+        tor->error().set_local_error(fmt::format(
             _("Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"),
             fmt::arg("path", filename),
             fmt::arg("magnet", tor->magnet()),
@@ -152,18 +190,11 @@ bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool> has_lo
     if (files_disappeared)
     {
         tr_logAddTraceTor(tor, "[LAZY] uh oh, the files disappeared");
-        tor->set_local_error(_(
+        tor->error().set_local_error(_(
             "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."));
     }
 
     return files_disappeared;
-}
-
-void tr_torrentClearError(tr_torrent* tor)
-{
-    tor->error = TR_STAT_OK;
-    tor->error_announce_url.clear();
-    tor->error_string.clear();
 }
 
 /* returns true if the seed ratio applies --
@@ -645,7 +676,7 @@ void torrentStartImpl(tr_torrent* const tor)
     tor->completeness = tor->completion.status();
     tor->startDate = now;
     tor->mark_changed();
-    tr_torrentClearError(tor);
+    tor->error().clear();
     tor->finished_seeding_by_idle_ = false;
 
     torrentResetTransferStats(tor);
@@ -978,7 +1009,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     }
     tor->bandwidth_.set_parent(&session->top_bandwidth_);
     tor->bandwidth_.set_priority(tr_ctorGetBandwidthPriority(ctor));
-    tor->error = TR_STAT_OK;
+    tor->error().clear();
     tor->finished_seeding_by_idle_ = false;
 
     auto const& labels = tr_ctorGetLabels(ctor);
@@ -1067,7 +1098,7 @@ void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
         if (error != nullptr)
         {
-            tor->set_local_error(fmt::format(
+            tor->error().set_local_error(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
                 fmt::arg("error", error->message),
@@ -1177,7 +1208,7 @@ void setLocationInSessionThread(
         ok = tor->metainfo_.files().move(tor->current_dir(), path, setme_progress, tor->name(), &error);
         if (error != nullptr)
         {
-            tor->set_local_error(fmt::format(
+            tor->error().set_local_error(fmt::format(
                 _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
                 fmt::arg("old_path", tor->current_dir()),
                 fmt::arg("path", path),
@@ -1372,11 +1403,11 @@ tr_stat const* tr_torrentStat(tr_torrent* const tor)
     tr_stat* const s = &tor->stats;
     s->id = tor->id();
     s->activity = activity;
-    s->error = tor->error;
+    s->error = tor->error().error_type();
     s->queuePosition = tor->queuePosition;
     s->idleSecs = idle_seconds ? static_cast<time_t>(*idle_seconds) : -1;
     s->isStalled = tr_torrentIsStalled(tor, idle_seconds);
-    s->errorString = tor->error_string.c_str();
+    s->errorString = tor->error().errmsg().c_str();
 
     s->peersConnected = swarm_stats.peer_count;
     s->peersSendingToUs = swarm_stats.active_peer_count[TR_DOWN];
@@ -1988,7 +2019,7 @@ bool tr_torrent::set_tracker_list(std::string_view text)
         tr_error* save_error = nullptr;
         if (!tr_file_save(magnet_file, magnet_link, &save_error))
         {
-            this->set_local_error(fmt::format(
+            this->error().set_local_error(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", magnet_file),
                 fmt::arg("error", save_error->message),
@@ -2000,16 +2031,14 @@ bool tr_torrent::set_tracker_list(std::string_view text)
     /* if we had a tracker-related error on this torrent,
      * and that tracker's been removed,
      * then clear the error */
-    if (this->error == TR_STAT_TRACKER_WARNING || this->error == TR_STAT_TRACKER_ERROR)
+    if (auto const& error_url = error_.announce_url(); !std::empty(error_url))
     {
-        auto const error_url = this->error_announce_url;
-
         if (std::any_of(
                 std::begin(this->announce_list()),
                 std::end(this->announce_list()),
                 [error_url](auto const& tracker) { return tracker.announce == error_url; }))
         {
-            tr_torrentClearError(this);
+            error_.clear();
         }
     }
 
@@ -2042,23 +2071,15 @@ void tr_torrent::on_tracker_response(tr_tracker_event const* event)
                 _("Tracker warning: '{warning}' ({url})"),
                 fmt::arg("warning", event->text),
                 fmt::arg("url", tr_urlTrackerLogName(event->announce_url))));
-        error = TR_STAT_TRACKER_WARNING;
-        error_announce_url = event->announce_url;
-        error_string = event->text;
+        error_.set_tracker_warning(event->announce_url, event->text);
         break;
 
     case tr_tracker_event::Type::Error:
-        error = TR_STAT_TRACKER_ERROR;
-        error_announce_url = event->announce_url;
-        error_string = event->text;
+        error_.set_tracker_error(event->announce_url, event->text);
         break;
 
     case tr_tracker_event::Type::ErrorClear:
-        if (error != TR_STAT_LOCAL_ERROR)
-        {
-            tr_torrentClearError(this);
-        }
-
+        error_.clear_if_tracker();
         break;
     }
 }
@@ -2282,9 +2303,9 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
             recheck_completeness();
         }
     }
-    else if (error == TR_STAT_LOCAL_ERROR && !setLocalErrorIfFilesDisappeared(this))
+    else if (error_.error_type() == TR_STAT_LOCAL_ERROR && !setLocalErrorIfFilesDisappeared(this))
     {
-        tr_torrentClearError(this);
+        error_.clear();
     }
 }
 
