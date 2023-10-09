@@ -1029,7 +1029,7 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 // --- File Priorities
 
-enum
+enum : tr_priority_t
 {
     TR_PRI_LOW = -1,
     TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
@@ -1395,7 +1395,7 @@ void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs)
 /**
  * Queue a torrent for verification.
  */
-void tr_torrentVerify(tr_torrent* torrent);
+void tr_torrentVerify(tr_torrent* torrent, bool force = false);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 

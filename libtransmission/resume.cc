@@ -914,7 +914,7 @@ void save(tr_torrent* tor)
     auto serde = tr_variant_serde::benc();
     if (!serde.to_file(top, tor->resume_file()))
     {
-        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
+        tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
     }
 }
 
