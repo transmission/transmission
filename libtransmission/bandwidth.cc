@@ -259,45 +259,18 @@ void tr_bandwidth::allocate(unsigned int period_msec)
 
 // ---
 
-size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) const
+size_t tr_bandwidth::clamp(tr_direction const dir, size_t byte_count) const noexcept
 {
     TR_ASSERT(tr_isDirection(dir));
 
     if (this->band_[dir].is_limited_)
     {
         byte_count = std::min(byte_count, this->band_[dir].bytes_left_);
-
-        /* if we're getting close to exceeding the speed limit,
-         * clamp down harder on the bytes available */
-        if (byte_count > 0)
-        {
-            if (now == 0)
-            {
-                now = tr_time_msec();
-            }
-
-            auto const current = this->getRawSpeedBytesPerSecond(now, dir);
-            auto const desired = this->getDesiredSpeedBytesPerSecond(dir);
-            auto const r = desired >= 1 ? static_cast<double>(current) / desired : 0.0;
-
-            if (r > 1.0)
-            {
-                byte_count = 0; // none left
-            }
-            else if (r > 0.9)
-            {
-                byte_count -= (byte_count / 5U); // cap at 80%
-            }
-            else if (r > 0.8)
-            {
-                byte_count -= (byte_count / 10U); // cap at 90%
-            }
-        }
     }
 
     if (this->parent_ != nullptr && this->band_[dir].honor_parent_limits_ && byte_count > 0)
     {
-        byte_count = this->parent_->clamp(now, dir, byte_count);
+        byte_count = this->parent_->clamp(dir, byte_count);
     }
 
     return byte_count;
