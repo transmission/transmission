@@ -260,7 +260,7 @@ void tr_bandwidth::allocate(unsigned int period_msec)
 
 // ---
 
-size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) const
+size_t tr_bandwidth::clamp(tr_direction dir, size_t byte_count) const noexcept
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -271,7 +271,7 @@ size_t tr_bandwidth::clamp(uint64_t now, tr_direction dir, size_t byte_count) co
 
     if (this->parent_ != nullptr && this->band_[dir].honor_parent_limits_ && byte_count > 0)
     {
-        byte_count = this->parent_->clamp(now, dir, byte_count);
+        byte_count = this->parent_->clamp(dir, byte_count);
     }
 
     return byte_count;
