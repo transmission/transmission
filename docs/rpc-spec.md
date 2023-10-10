@@ -663,7 +663,7 @@ from the outside world.
 Method name: `port-test`
 
 Request arguments: an optional argument `ipProtocol`.
-`ipProtocol` specifies the IP protocol version to be used for the port test.
+`ipProtocol` is a string specifying the IP protocol version to be used for the port test.
 Set to `ipv4` to *only* check IPv4, set to `ipv6` to *only* check IPv6,
 or set to `any` to check if the port is open on *any* of the IP protocol versions.
 Omitting `ipProtocol` is the same as setting it to `any`.
@@ -671,7 +671,7 @@ Omitting `ipProtocol` is the same as setting it to `any`.
 Response arguments:
 
 | Key | Value Type | Description
-| :-- |:-----------| :--
+| :-- | :-- | :--
 | `port-is-open` | boolean | true if port is open, false if port is closed
 | `ipProtocol` | string | copied from request argument `ipProtocol` if it was specified
 
