@@ -1243,10 +1243,10 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* /*arg
     auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
 
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
-    if (auto arg = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_ip_protocol, &arg))
+    if (auto arg = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_ipProtocol, &arg))
     {
         options.ip_proto = arg == 0 ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
-        tr_variantDictAddInt(idle_data->args_out, TR_KEY_ip_protocol, static_cast<int64_t>(arg != 0));
+        tr_variantDictAddInt(idle_data->args_out, TR_KEY_ipProtocol, static_cast<int64_t>(arg != 0));
     }
     session->fetch(std::move(options));
     return nullptr;
