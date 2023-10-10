@@ -662,22 +662,18 @@ from the outside world.
 
 Method name: `port-test`
 
-Request arguments:
-
-| Key | Value Type | Description
-| :-- | :-- | :--
-| `ipProtocol` | number | see below
-
-`ipProtocol` indicates the IP protocol version to be used to check the port status.
-Set to `0` to *only* check for IPv4 port status, set to `1` to *only* check for IPv6 port status,
-or omit it to check if the port is open on *any* of the IP protocol versions.
+Request arguments: an optional argument `ipProtocol`.
+`ipProtocol` specifies the IP protocol version to be used for the port test.
+Set to `ipv4` to *only* check IPv4, set to `ipv6` to *only* check IPv6,
+or set to `any` to check if the port is open on *any* of the IP protocol versions.
+Omitting `ipProtocol` is the same as setting it to `any`.
 
 Response arguments:
 
 | Key | Value Type | Description
-| :-- | :-- | :--
+| :-- |:-----------| :--
 | `port-is-open` | boolean | true if port is open, false if port is closed
-| `ipProtocol` | number | mirrors the description of request argument `IpProtocol`
+| `ipProtocol` | string | copied from request argument `ipProtocol` if it was specified
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
