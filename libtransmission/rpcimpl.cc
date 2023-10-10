@@ -1237,16 +1237,27 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     }
 }
 
-char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, struct tr_rpc_idle_data* idle_data)
+char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
 {
     auto const port = session->advertisedPeerPort();
-    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
+    auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
 
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
-    if (auto arg = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_ipProtocol, &arg))
+    if (std::string_view arg; tr_variantDictFindStrView(args_in, TR_KEY_ipProtocol, &arg))
     {
-        options.ip_proto = arg == 0 ? tr_web::FetchOptions::IPProtocol::V4 : tr_web::FetchOptions::IPProtocol::V6;
-        tr_variantDictAddInt(idle_data->args_out, TR_KEY_ipProtocol, static_cast<int64_t>(arg != 0));
+        tr_variantDictAddStrView(args_out, TR_KEY_ipProtocol, arg);
+        if (arg == "ipv4"sv)
+        {
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+        }
+        else if (arg == "ipv6"sv)
+        {
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+        }
+        else if (arg != "any"sv)
+        {
+            return "invalid ip protocol string";
+        }
     }
     session->fetch(std::move(options));
     return nullptr;

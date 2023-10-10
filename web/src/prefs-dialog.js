@@ -44,12 +44,12 @@ export class PrefsDialog extends EventTarget {
 
   _checkPort() {
     for (const [
-      ix,
+      key,
       element,
     ] of this.elements.network.port_status_label.entries()) {
       delete element.dataset.open;
       setTextContent(element, 'Checking...');
-      this.remote.checkPort(ix, this._onPortChecked, this);
+      this.remote.checkPort(key, this._onPortChecked, this);
     }
   }
 
@@ -746,7 +746,10 @@ export class PrefsDialog extends EventTarget {
       default_trackers_textarea,
       port_forwarding_check,
       port_input,
-      port_status_label: [port_status_label_ipv4, port_status_label_ipv6],
+      port_status_label: {
+        ipv4: port_status_label_ipv4,
+        ipv6: port_status_label_ipv6,
+      },
       random_port_check,
       root,
       utp_check,
