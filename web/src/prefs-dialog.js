@@ -43,10 +43,9 @@ export class PrefsDialog extends EventTarget {
   }
 
   _checkPort() {
-    for (const [
-      key,
-      element,
-    ] of this.elements.network.port_status_label.entries()) {
+    for (const [key, element] of Object.entries(
+      this.elements.network.port_status_label,
+    )) {
       delete element.dataset.open;
       setTextContent(element, 'Checking...');
       this.remote.checkPort(key, this._onPortChecked, this);
