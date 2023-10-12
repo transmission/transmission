@@ -76,7 +76,7 @@ tr_file_piece_map::file_span_t tr_file_piece_map::file_span(tr_piece_index_t pie
     constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
     auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, Compare);
-    return { tr_piece_index_t(equal_begin - begin), tr_piece_index_t(equal_end - begin) };
+    return { static_cast<tr_file_index_t>(equal_begin - begin), static_cast<tr_file_index_t>(equal_end - begin) };
 }
 
 tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t offset) const
