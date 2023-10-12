@@ -39,7 +39,7 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
 
         if (file_size != 0)
         {
-            end_byte = offset + file_size;
+            end_byte = begin_byte + file_size;
             auto const final_byte = end_byte - 1;
             auto const final_piece = block_info.byte_loc(final_byte).piece;
             end_piece = final_piece + 1;
@@ -52,8 +52,8 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
             // TODO(ckerr): should end_piece == begin_piece, same as _bytes are?
             end_piece = begin_piece + 1;
         }
-        file_pieces_[i] = piece_span_t{ begin_piece, end_piece };
         file_bytes_[i] = byte_span_t{ begin_byte, end_byte };
+        file_pieces_[i] = piece_span_t{ begin_piece, end_piece };
         offset += file_size;
     }
 
@@ -73,7 +73,7 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
 
 tr_file_piece_map::file_span_t tr_file_piece_map::file_span(tr_piece_index_t piece) const
 {
-    constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
+    static constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
     auto const& [equal_begin, equal_end] = std::equal_range(begin, std::end(file_pieces_), piece, Compare);
     return { static_cast<tr_file_index_t>(equal_begin - begin), static_cast<tr_file_index_t>(equal_end - begin) };
@@ -81,7 +81,7 @@ tr_file_piece_map::file_span_t tr_file_piece_map::file_span(tr_piece_index_t pie
 
 tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t offset) const
 {
-    constexpr auto Compare = CompareToSpan<uint64_t>{};
+    static constexpr auto Compare = CompareToSpan<uint64_t>{};
     auto const begin = std::begin(file_bytes_);
     auto const it = std::lower_bound(begin, std::end(file_bytes_), offset, Compare);
     tr_file_index_t const file_index = std::distance(begin, it);

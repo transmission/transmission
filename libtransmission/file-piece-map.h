@@ -77,7 +77,7 @@ public:
     // TODO(ckerr) minor wart here, two identical span types
     [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span(tr_file_index_t file) const
     {
-        auto const& span = file_bytes_.at(file);
+        auto const& span = file_bytes_[file];
         return tr_byte_span_t{ span.begin, span.end };
     }
 
