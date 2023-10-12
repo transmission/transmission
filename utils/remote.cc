@@ -704,18 +704,20 @@ auto constexpr FilesKeys = std::array<tr_quark, 4>{
     TR_KEY_wanted,
 };
 
-auto constexpr DetailsKeys = std::array<tr_quark, 53>{
+auto constexpr DetailsKeys = std::array<tr_quark, 55>{
     TR_KEY_activityDate,
     TR_KEY_addedDate,
     TR_KEY_bandwidthPriority,
     TR_KEY_comment,
     TR_KEY_corruptEver,
+    TR_KEY_corruptThisSession,
     TR_KEY_creator,
     TR_KEY_dateCreated,
     TR_KEY_desiredAvailable,
     TR_KEY_doneDate,
     TR_KEY_downloadDir,
     TR_KEY_downloadedEver,
+    TR_KEY_downloadedThisSession,
     TR_KEY_downloadLimit,
     TR_KEY_downloadLimited,
     TR_KEY_error,
@@ -753,6 +755,7 @@ auto constexpr DetailsKeys = std::array<tr_quark, 53>{
     TR_KEY_status,
     TR_KEY_totalSize,
     TR_KEY_uploadedEver,
+    TR_KEY_uploadedThisSession,
     TR_KEY_uploadLimit,
     TR_KEY_uploadLimited,
     TR_KEY_uploadRatio,
@@ -1020,6 +1023,21 @@ void printDetails(tr_variant* top)
                 }
             }
 
+            if (tr_variantDictFindInt(t, TR_KEY_downloadedThisSession, &i))
+            {
+                if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptThisSession, &corrupt) && corrupt != 0)
+                {
+                    fmt::print(
+                        "  Downloaded this session: {:s} (+{:s} discarded after failed checksum)\n",
+                        strlsize(i),
+                        strlsize(corrupt));
+                }
+                else
+                {
+                    fmt::print("  Downloaded this session: {:s}\n", strlsize(i));
+                }
+            }
+
             if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i))
             {
                 if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
@@ -1030,6 +1048,11 @@ void printDetails(tr_variant* top)
                 {
                     fmt::print("  Downloaded: {:s}\n", strlsize(i));
                 }
+            }
+
+            if (tr_variantDictFindInt(t, TR_KEY_uploadedThisSession, &i))
+            {
+                fmt::print("  Uploaded this session: {:s}\n", strlsize(i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_uploadedEver, &i))
