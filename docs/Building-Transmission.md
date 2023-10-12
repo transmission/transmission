@@ -109,10 +109,11 @@ $ sudo cmake --install .
 ### Building Transmission from Git (updating) ###
 ```bash
 $ cd Transmission/build
+$ cmake --build . -t clean
 $ git submodule foreach --recursive git clean -xfd
 $ git pull --rebase --prune
 $ git submodule update --init --recursive
-$ cmake --build . --clean-first
+$ cmake --build .
 $ sudo cmake --install .
 ```
 
