@@ -3,8 +3,11 @@
 @import QuickLook;
 
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/utils.h>
 
 #import "NSStringAdditions.h"
 
@@ -12,6 +15,31 @@ QL_EXTERN_C_BEGIN
 OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options);
 void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview);
 QL_EXTERN_C_END
+
+static NSUInteger const kIconWidth = 16;
+
+namespace
+{
+
+class FileTreeNode
+{
+  public:
+    FileTreeNode() = default;
+    ~FileTreeNode() = default;
+
+    auto MaybeCreateChild(std::string_view child_name)
+    {
+        return children_.try_emplace(std::string{ child_name });
+    }
+
+  private:
+    FileTreeNode(FileTreeNode const&) = delete;
+    FileTreeNode& operator=(FileTreeNode&) = delete;
+
+    std::unordered_map<std::string, FileTreeNode> children_;
+};
+
+} // namespace
 
 NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableDictionary* allImgProps)
 {
@@ -189,22 +217,61 @@ OSStatus GeneratePreviewForURL(void* /*thisInterface*/, QLPreviewRequestRef prev
             localizedStringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Files", nil, bundle, "quicklook file header"), n_files];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
-#warning display folders?
+        FileTreeNode root{};
+
         for (auto const& [path, size] : metainfo.files().sortedByPath())
         {
-            NSString* fullFilePath = @(path.c_str());
-            NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
+            FileTreeNode* curNode = &root;
+            size_t level = 0;
 
-            NSString* shortenedFilePath = [fullFilePath substringFromIndex:name.length + 1];
-            NSString* fileSize = [NSString stringForFileSize:size];
+            auto subpath = std::string_view{ path };
+            auto path_vec = std::vector<std::string_view>{};
+            auto token = std::string_view{};
+            while (tr_strv_sep(&subpath, &token, '/'))
+            {
+                path_vec.emplace_back(token);
+            }
+            size_t const last = path_vec.size() - 1;
 
-            NSUInteger const icon_width = 16;
-            [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</td><td class=\"grey\">%@</td></tr>",
-                                      generateIconData(shortenedFilePath.pathExtension, icon_width, allImgProps),
-                                      icon_width,
-                                      icon_width,
-                                      shortenedFilePath,
-                                      fileSize];
+            for (auto const& part : path_vec)
+            {
+                auto [it, inserted] = curNode->MaybeCreateChild(part);
+                if (inserted)
+                {
+                    NSString* prefix = @"";
+                    for (size_t i = 0; i < level; ++i)
+                    {
+                        prefix = [prefix stringByAppendingString:@"&emsp;"];
+                    }
+
+                    NSString* pathPart = @(it->first.c_str());
+                    NSString* pathExt = nil;
+                    NSString* fileSize = nil;
+                    if (level < last)
+                    {
+                        // This node is a directory.
+                        pathExt = NSFileTypeForHFSTypeCode(kGenericFolderIcon);
+                        fileSize = @"";
+                    }
+                    else
+                    {
+                        // This node is a leaf file.
+                        pathExt = pathPart.pathExtension;
+                        fileSize = [NSString stringForFileSize:size];
+                    }
+
+                    [listSection appendFormat:@"<tr><td>%@<img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</td><td class=\"grey\">%@</td></tr>",
+                                              prefix,
+                                              generateIconData(pathExt, kIconWidth, allImgProps),
+                                              kIconWidth,
+                                              kIconWidth,
+                                              pathPart,
+                                              fileSize];
+                }
+
+                curNode = &it->second;
+                level++;
+            }
         }
 
         [listSection appendString:@"</table>"];
