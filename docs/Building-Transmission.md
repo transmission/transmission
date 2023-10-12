@@ -19,20 +19,20 @@ Transmission has an Xcode project file for building in Xcode.
 - Open Transmission.xcodeproj
 - Run the Transmission scheme
 
-### Building the native app with ninja ###
+### Building the native app with CMake ###
 Build the app:
 ```console
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
-ninja -C build transmission-mac
+cmake --build build -t transmission-mac
 open ./build/macosx/Transmission.app
 ```
 
-### Building the GTK app with ninja ###
+### Building the GTK app with CMake ###
 Install GTK and build the app:
 ```console
 brew install gtk4 gtkmm4
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_GTK=ON -DENABLE_MAC=OFF
-ninja -C build transmission-gtk
+cmake --build build -t transmission-gtk
 ./build/gtk/transmission-gtk
 ```
 
@@ -96,27 +96,24 @@ $ export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
 ### Building Transmission from Git (first time) ###
 ```console
-$ git clone https://github.com/transmission/transmission Transmission
+$ git clone --recurse-submodules https://github.com/transmission/transmission Transmission
 $ cd Transmission
-$ git submodule update --init --recursive
-$ mkdir build
+# Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
+# Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
+$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 $ cd build
-$ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
-$ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-$ make
-$ sudo make install
+$ cmake --build .
+$ sudo cmake --install .
 ```
 
 ### Building Transmission from Git (updating) ###
 ```console
 $ cd Transmission/build
-$ make clean
+$ git submodule foreach --recursive git clean -xfd
 $ git pull --rebase --prune
-$ git submodule update --recursive
-$ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
-$ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-$ make
-$ sudo make install
+$ git submodule update --init --recursive
+$ cmake --build . --clean-first
+$ sudo cmake --install .
 ```
 
 ## On Windows ##
