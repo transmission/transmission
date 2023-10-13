@@ -214,11 +214,8 @@ public:
     {
         auto const lock = unique_lock();
         TR_ASSERT(!is_running);
-        TR_ASSERT(std::empty(outgoing_handshakes));
         TR_ASSERT(std::empty(peers));
     }
-
-    [[nodiscard]] bool peer_is_in_use(tr_peer_info const& peer_info) const;
 
     void cancelOldRequests()
     {
@@ -264,7 +261,10 @@ public:
 
         is_running = false;
         remove_all_peers();
-        outgoing_handshakes.clear();
+        for (auto& [sockaddr, peer_info] : connectable_pool)
+        {
+            peer_info.destroy_handshake();
+        }
     }
 
     void remove_peer(tr_peerMsgs* peer)
@@ -493,8 +493,6 @@ public:
             break;
         }
     }
-
-    Handshakes outgoing_handshakes;
 
     mutable tr_swarm_stats stats = {};
 
@@ -1082,35 +1080,34 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 
     auto const& socket_address = result.io->socket_address();
 
+    tr_peer_info* const info_ptr = s != nullptr ? s->get_existing_peer_info(socket_address) : nullptr;
+
     if (result.io->is_incoming())
     {
         manager->incoming_handshakes.erase(socket_address);
     }
-    else if (s != nullptr)
+    else if (info_ptr != nullptr)
     {
-        s->outgoing_handshakes.erase(socket_address);
+        info_ptr->destroy_handshake();
     }
 
     auto const lock = manager->unique_lock();
 
     if (!ok || s == nullptr || !s->is_running)
     {
-        if (s != nullptr)
+        if (info_ptr != nullptr && !info_ptr->is_connected())
         {
-            if (auto* const info = s->get_existing_peer_info(socket_address); info != nullptr && !info->is_connected())
-            {
-                info->on_connection_failed();
+            info_ptr->on_connection_failed();
 
-                if (!result.read_anything_from_peer)
-                {
-                    tr_logAddTraceSwarm(
-                        s,
-                        fmt::format(
-                            "marking peer {} as unreachable... num_fails is {}",
-                            info->display_name(),
-                            info->connection_failure_count()));
-                    info->set_connectable(false);
-                }
+            if (!result.read_anything_from_peer)
+            {
+                tr_logAddTraceSwarm(
+                    s,
+                    fmt::format(
+                        "marking peer {} as unreachable... num_fails is {}",
+                        info_ptr->display_name(),
+                        info_ptr->connection_failure_count()));
+                info_ptr->set_connectable(false);
             }
         }
     }
@@ -1118,7 +1115,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     {
         // If this is an outgoing connection, then we are sure we already have the peer info object
         auto& info = result.io->is_incoming() ? s->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false) :
-                                                *s->get_existing_peer_info(socket_address);
+                                                *info_ptr;
 
         if (!result.io->is_incoming())
         {
@@ -1277,7 +1274,7 @@ namespace get_peers_helpers
         return false;
     }
 
-    if (tor->swarm->peer_is_in_use(info))
+    if (info.peer_is_in_use())
     {
         return true;
     }
@@ -2157,12 +2154,6 @@ void tr_peerMgr::bandwidthPulse()
 
 // ---
 
-bool tr_swarm::peer_is_in_use(tr_peer_info const& peer_info) const
-{
-    // TODO(tearfur): maybe it's possible to store each handshake in the peer_info objects
-    return peer_info.is_connected() || outgoing_handshakes.count(peer_info.listen_socket_address()) != 0U;
-}
-
 namespace
 {
 namespace connect_helpers
@@ -2183,7 +2174,7 @@ namespace connect_helpers
     }
 
     // not if we've already got a connection to them...
-    if (tor->swarm->peer_is_in_use(peer_info))
+    if (peer_info.peer_is_in_use())
     {
         return false;
     }
@@ -2402,8 +2393,7 @@ void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
     }
     else
     {
-        s->outgoing_handshakes.try_emplace(
-            peer_info.listen_socket_address(),
+        peer_info.start_handshake(
             &mgr->handshake_mediator_,
             peer_io,
             session->encryptionMode(),

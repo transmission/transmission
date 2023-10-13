@@ -19,6 +19,7 @@
 
 #include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
 
+#include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
@@ -215,6 +216,31 @@ public:
         return is_connected_;
     }
 
+    [[nodiscard]] auto has_handshake() const noexcept
+    {
+        return static_cast<bool>(outgoing_handshake_);
+    }
+
+    template<typename... Args>
+    void start_handshake(Args&&... args)
+    {
+        TR_ASSERT(!outgoing_handshake_);
+        if (!outgoing_handshake_)
+        {
+            outgoing_handshake_ = std::make_unique<tr_handshake>(std::forward<Args>(args)...);
+        }
+    }
+
+    void destroy_handshake() noexcept
+    {
+        outgoing_handshake_.reset();
+    }
+
+    [[nodiscard]] auto peer_is_in_use() const noexcept
+    {
+        return is_connected() && has_handshake();
+    }
+
     // ---
 
     [[nodiscard]] bool is_blocklisted(tr_session const* session) const;
@@ -347,7 +373,7 @@ public:
     // ---
 
     // merge two peer info objects that supposedly describes the same peer
-    void merge(tr_peer_info const& that) noexcept
+    void merge(tr_peer_info& that) noexcept
     {
         TR_ASSERT(is_connectable_.value_or(true) || !is_connected());
         TR_ASSERT(that.is_connectable_.value_or(true) || !that.is_connected());
@@ -435,6 +461,18 @@ public:
         }
         /* is_connected_ should already be set */
         set_seed(is_seed() || that.is_seed());
+
+        if (that.outgoing_handshake_)
+        {
+            if (outgoing_handshake_)
+            {
+                that.destroy_handshake();
+            }
+            else
+            {
+                outgoing_handshake_ = std::move(that.outgoing_handshake_);
+            }
+        }
     }
 
 private:
@@ -502,6 +540,8 @@ private:
     bool is_banned_ = false;
     bool is_connected_ = false;
     bool is_seed_ = false;
+
+    std::unique_ptr<tr_handshake> outgoing_handshake_;
 };
 
 struct tr_pex
