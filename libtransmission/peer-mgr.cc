@@ -339,6 +339,23 @@ public:
         }
     }
 
+    void remove_inactive_peer_info() noexcept
+    {
+        auto const now = tr_time();
+        for (auto iter = std::begin(connectable_pool), end = std::end(connectable_pool); iter != end;)
+        {
+            auto& [socket_address, peer_info] = *iter;
+            if (peer_info.is_inactive(now))
+            {
+                iter = connectable_pool.erase(iter);
+            }
+            else
+            {
+                ++iter;
+            }
+        }
+    }
+
     [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
     {
         if (!tor->is_running() || tor->is_done())
@@ -1145,6 +1162,7 @@ void tr_peerMgr::refillUpkeep() const
     for (auto* const tor : session->torrents())
     {
         tor->swarm->cancelOldRequests();
+        tor->swarm->remove_inactive_peer_info();
     }
 }
 
