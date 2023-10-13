@@ -1080,7 +1080,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 
     auto const& socket_address = result.io->socket_address();
 
-    tr_peer_info* const info_ptr = s != nullptr ? s->get_existing_peer_info(socket_address) : nullptr;
+    auto* const info_ptr = s != nullptr ? s->get_existing_peer_info(socket_address) : nullptr;
 
     if (result.io->is_incoming())
     {
@@ -1274,7 +1274,7 @@ namespace get_peers_helpers
         return false;
     }
 
-    if (info.peer_is_in_use())
+    if (info.is_in_use())
     {
         return true;
     }
@@ -2174,7 +2174,7 @@ namespace connect_helpers
     }
 
     // not if we've already got a connection to them...
-    if (peer_info.peer_is_in_use())
+    if (peer_info.is_in_use())
     {
         return false;
     }

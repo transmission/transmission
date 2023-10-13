@@ -236,9 +236,9 @@ public:
         outgoing_handshake_.reset();
     }
 
-    [[nodiscard]] auto peer_is_in_use() const noexcept
+    [[nodiscard]] auto is_in_use() const noexcept
     {
-        return is_connected() && has_handshake();
+        return is_connected() || has_handshake();
     }
 
     // ---
