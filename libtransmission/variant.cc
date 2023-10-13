@@ -534,11 +534,11 @@ tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark key, std::s
     return child;
 }
 
-tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark key, void const* value, size_t value_len)
+tr_variant* tr_variantDictAddRaw(tr_variant* const var, tr_quark key, void const* value, size_t n_bytes)
 {
     tr_variantDictRemove(var, key);
     auto* const child = tr_variantDictAdd(var, key);
-    *child = tr_variant::make_raw(value, value_len);
+    *child = tr_variant::make_raw(value, n_bytes);
     return child;
 }
 

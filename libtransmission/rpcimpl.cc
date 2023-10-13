@@ -333,7 +333,11 @@ char const* torrentVerifyImpl(tr_session* session, tr_variant::Map const& args_i
 }
 } // namespace torrent_verify_helpers
 
-char const* torrentVerify(tr_session* session, tr_variant::Map const& args_in, tr_variant::Map& /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+char const* torrentVerify(
+    tr_session* session,
+    tr_variant::Map const& args_in,
+    tr_variant::Map& /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
 {
     return torrent_verify_helpers::torrentVerifyImpl(session, args_in, false);
 }

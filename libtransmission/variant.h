@@ -223,7 +223,6 @@ public:
         {
             val_.emplace<StringHolder>(std::string{ value });
         }
-
         // note: std::is_integral_v<bool> is true, so this check
         // must come first to prevent bools from being stored as ints
         else if constexpr (std::is_same_v<Val, bool>)
@@ -410,7 +409,6 @@ tr_variant* tr_variantListAddInt(tr_variant* var, int64_t value);
 tr_variant* tr_variantListAddReal(tr_variant* var, double value);
 tr_variant* tr_variantListAddStr(tr_variant* var, std::string_view value);
 tr_variant* tr_variantListAddStrView(tr_variant* var, std::string_view value);
-tr_variant* tr_variantListAddQuark(tr_variant* var, tr_quark value);
 tr_variant* tr_variantListAddRaw(tr_variant* var, void const* value, size_t n_bytes);
 tr_variant* tr_variantListAddList(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListAddDict(tr_variant* var, size_t n_reserve);
@@ -445,7 +443,7 @@ tr_variant* tr_variantDictAddStr(tr_variant* var, tr_quark key, std::string_view
 tr_variant* tr_variantDictAddStrView(tr_variant* var, tr_quark key, std::string_view value);
 tr_variant* tr_variantDictAddList(tr_variant* var, tr_quark key, size_t n_reserve);
 tr_variant* tr_variantDictAddDict(tr_variant* var, tr_quark key, size_t n_reserve);
-tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t value_len);
+tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t n_bytes);
 
 bool tr_variantDictChild(tr_variant* var, size_t pos, tr_quark* setme_key, tr_variant** setme_value);
 tr_variant* tr_variantDictFind(tr_variant* var, tr_quark key);
