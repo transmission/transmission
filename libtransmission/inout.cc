@@ -218,11 +218,11 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
         tr_error* error = nullptr;
         readOrWriteBytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, &error);
 
-        if (error != nullptr)
+        if (error != nullptr) // if IO failed, set torrent's error if not already set
         {
-            if (io_mode == IoMode::Write && tor->error != TR_STAT_LOCAL_ERROR)
+            if (io_mode == IoMode::Write && tor->error().error_type() != TR_STAT_LOCAL_ERROR)
             {
-                tor->set_local_error(error->message);
+                tor->error().set_local_error(error->message);
                 tr_torrentStop(tor);
             }
 

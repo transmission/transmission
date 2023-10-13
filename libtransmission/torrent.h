@@ -577,13 +577,6 @@ public:
         return this->is_piece_transfer_allowed(TR_CLIENT_TO_PEER);
     }
 
-    void set_local_error(std::string_view errmsg)
-    {
-        this->error = TR_STAT_LOCAL_ERROR;
-        this->error_announce_url = TR_KEY_NONE;
-        this->error_string = errmsg;
-    }
-
     void set_download_dir(std::string_view path, bool is_new_torrent = false);
 
     void refresh_current_dir();
@@ -891,6 +884,16 @@ public:
         session->announcer_->resetTorrent(this);
     }
 
+    [[nodiscard]] constexpr auto& error() noexcept
+    {
+        return error_;
+    }
+
+    [[nodiscard]] constexpr auto const& error() const noexcept
+    {
+        return error_;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -918,15 +921,11 @@ public:
     tr_files_wanted files_wanted_{ &fpm_ };
     tr_file_priorities file_priorities_{ &fpm_ };
 
-    std::string error_string;
-
     using labels_t = std::vector<tr_quark>;
     labels_t labels;
 
     // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
-
-    tr_interned_string error_announce_url;
 
     // Where the files are when the torrent is complete.
     tr_interned_string download_dir_;
@@ -975,8 +974,6 @@ public:
 
     tr_torrent_id_t unique_id_ = 0;
 
-    tr_stat_errtype error = TR_STAT_OK;
-
     tr_completeness completeness = TR_LEECH;
 
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
@@ -995,6 +992,44 @@ public:
 
 private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
+
+    // Tracks a torrent's error state, either local (e.g. file IO errors)
+    // or tracker errors (e.g. warnings returned by a tracker).
+    class Error
+    {
+    public:
+        [[nodiscard]] constexpr auto empty() const noexcept
+        {
+            return error_type_ == TR_STAT_OK;
+        }
+
+        [[nodiscard]] constexpr auto error_type() const noexcept
+        {
+            return error_type_;
+        }
+
+        [[nodiscard]] constexpr auto const& announce_url() const noexcept
+        {
+            return announce_url_;
+        }
+
+        [[nodiscard]] constexpr auto const& errmsg() const noexcept
+        {
+            return errmsg_;
+        }
+
+        void set_tracker_warning(tr_interned_string announce_url, std::string_view errmsg);
+        void set_tracker_error(tr_interned_string announce_url, std::string_view errmsg);
+        void set_local_error(std::string_view errmsg);
+
+        void clear() noexcept;
+        void clear_if_tracker() noexcept;
+
+    private:
+        tr_interned_string announce_url_; // the source for tracker errors/warnings
+        std::string errmsg_;
+        tr_stat_errtype error_type_ = TR_STAT_OK;
+    };
 
     // Helper class to smooth out speed estimates.
     // Used to prevent temporary speed changes from skewing the ETA too much.
@@ -1093,6 +1128,8 @@ private:
             recheck_completeness();
         }
     }
+
+    Error error_;
 
     tr_interned_string bandwidth_group_;
 

@@ -133,10 +133,7 @@ public:
     /**
      * @brief clamps `byte_count` down to a number that this bandwidth will allow to be consumed
      */
-    [[nodiscard]] size_t clamp(tr_direction const dir, size_t const byte_count) const noexcept
-    {
-        return this->clamp(0, dir, byte_count);
-    }
+    [[nodiscard]] size_t clamp(tr_direction dir, size_t byte_count) const noexcept;
 
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
     [[nodiscard]] auto get_raw_speed_bytes_per_second(uint64_t const now, tr_direction const dir) const
@@ -262,8 +259,6 @@ private:
     void deparent() noexcept;
 
     static void notify_bandwidth_consumed_bytes(uint64_t now, RateControl& r, size_t size);
-
-    [[nodiscard]] size_t clamp(uint64_t now, tr_direction const dir, size_t byte_count) const;
 
     static void phase_one(std::vector<tr_peerIo*>& peers, tr_direction dir);
 

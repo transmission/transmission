@@ -112,13 +112,14 @@ username and password (respectively), separated by a colon.
 
 ## 3 Torrent requests
 ### 3.1 Torrent action requests
-| Method name          | libtransmission function
+| Method name            | libtransmission function
 |:--|:--
-| `torrent-start`      | tr_torrentStart
-| `torrent-start-now`  | tr_torrentStartNow
-| `torrent-stop`       | tr_torrentStop
-| `torrent-verify`     | tr_torrentVerify
-| `torrent-reannounce` | tr_torrentManualUpdate ("ask tracker for more peers")
+| `torrent-start`        | tr_torrentStart
+| `torrent-start-now`    | tr_torrentStartNow
+| `torrent-stop`         | tr_torrentStop
+| `torrent-verify`       | tr_torrentVerify
+| `torrent-verify-force` | tr_torrentVerifyForce
+| `torrent-reannounce`   | tr_torrentManualUpdate ("ask tracker for more peers")
 
 Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
@@ -1014,3 +1015,4 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-set` | new arg `sequentialDownload`
 | `torrent-get` | new arg `files.beginPiece`
 | `torrent-get` | new arg `files.endPiece`
+| `torrent-verify-force` | new method
