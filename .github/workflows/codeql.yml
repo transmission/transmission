@@ -30,7 +30,7 @@ jobs:
 
     steps:
     - name: Checkout repository and submodules
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         submodules: recursive
 
@@ -76,10 +76,17 @@ jobs:
             xargs -L1 ninja -C _build
 
     - name: Initialize CodeQL
+      if: ${{ matrix.language == 'javascript' }}
       uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
-        config-file: ./.github/codeql/codeql-config.yml
+        config-file: ./.github/codeql/codeql-config-js.yml
+
+    - name: Initialize CodeQL
+      if: ${{ matrix.language == 'cpp' }}
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
 
     - name: Build Project
       if: ${{ matrix.language == 'cpp' }}
