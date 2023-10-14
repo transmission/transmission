@@ -217,7 +217,9 @@ public:
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
     {
         auto const [buf, buflen] = reserve_space(n_bytes);
-        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
+        n_bytes = std::min(n_bytes, buflen);
+        TR_ASSERT(n_bytes > 0U);
+        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), n_bytes, 0);
         auto const err = sockerrno;
 
         if (n_read > 0)
