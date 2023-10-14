@@ -2388,15 +2388,17 @@ struct peer_candidate
     return score;
 }
 
-[[nodiscard]] tr_peerMgr::OutboundCandidates get_peer_candidates(tr_session* session)
+void get_peer_candidates(tr_session* session, tr_peerMgr::OutboundCandidates& setme)
 {
+    setme.clear();
+
     auto const now = tr_time();
     auto const now_msec = tr_time_msec();
 
     // leave 5% of connection slots for incoming connections -- ticket #2609
     if (auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95); max_candidates <= tr_peerMsgs::size())
     {
-        return {};
+        return;
     }
 
     auto candidates = std::vector<peer_candidate>{};
@@ -2454,12 +2456,10 @@ struct peer_candidate
     }
 
     // put the best candidates at the end of the list
-    auto ret = tr_peerMgr::OutboundCandidates{};
     for (auto it = std::crbegin(candidates), end = std::crend(candidates); it != end; ++it)
     {
-        ret.emplace_back(it->tor->id(), it->peer_info->listen_socket_address());
+        setme.emplace_back(it->tor->id(), it->peer_info->listen_socket_address());
     }
-    return ret;
 }
 
 void initiate_connection(tr_peerMgr* mgr, tr_swarm* s, tr_peer_info& peer_info)
@@ -2517,7 +2517,7 @@ void tr_peerMgr::make_new_peer_connections()
     auto& candidates = outbound_candidates_;
     if (std::empty(candidates))
     {
-        candidates = get_peer_candidates(session);
+        get_peer_candidates(session, candidates);
     }
 
     // initiate connections to the last N candidates
