@@ -60,18 +60,32 @@ time_t libtransmission::detail::tr_time::current_time = {};
 
 // ---
 
-void tr_locale_set_global(char const* locale_name) noexcept
+std::optional<std::locale> tr_locale_set_global(char const* locale_name) noexcept
 {
     try
     {
-        std::locale::global(std::locale{ locale_name });
-
-        std::cout.imbue(std::locale{});
-        std::cerr.imbue(std::locale{});
+        return tr_locale_set_global(std::locale{ locale_name });
     }
     catch (std::exception const&)
     {
-        // Ignore.
+        return {};
+    }
+}
+
+std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexcept
+{
+    try
+    {
+        std::locale::global(locale);
+
+        std::cout.imbue(std::locale{});
+        std::cerr.imbue(std::locale{});
+
+        return std::locale{};
+    }
+    catch (std::exception const&)
+    {
+        return {};
     }
 }
 

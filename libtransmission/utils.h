@@ -54,7 +54,9 @@ struct tr_error;
 #define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 
-void tr_locale_set_global(char const* locale_name) noexcept;
+std::optional<std::locale> tr_locale_set_global(char const* locale_name) noexcept;
+
+std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexcept;
 
 // ---
 

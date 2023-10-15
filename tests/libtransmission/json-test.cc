@@ -13,6 +13,7 @@
 #include <string_view>
 
 #include <libtransmission/quark.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
@@ -24,12 +25,11 @@ class JSONTest : public ::testing::TestWithParam<char const*>
 protected:
     void SetUp() override
     {
+        ::testing::TestWithParam<char const*>::SetUp();
+
         auto const* locale_str = GetParam();
-        try
-        {
-            old_locale_ = std::locale::global(std::locale{ {}, new std::numpunct_byname<char>{ locale_str } });
-        }
-        catch (std::runtime_error const&)
+        old_locale_ = tr_locale_set_global(locale_str);
+        if (!old_locale_)
         {
             GTEST_SKIP();
         }
@@ -39,8 +39,10 @@ protected:
     {
         if (old_locale_)
         {
-            std::locale::global(*old_locale_);
+            tr_locale_set_global(*old_locale_);
         }
+
+        ::testing::TestWithParam<char const*>::TearDown();
     }
 
 private:
