@@ -39,7 +39,6 @@
 #include "SessionDialog.h"
 #include "Torrent.h"
 #include "VariantHelpers.h"
-#include "libtransmission/quark.h"
 
 using namespace std::literals;
 
