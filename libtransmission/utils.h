@@ -10,6 +10,7 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
 #include <ctime> // time_t
+#include <locale>
 #include <memory>
 #include <optional>
 #include <string>
