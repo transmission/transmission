@@ -476,15 +476,14 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
     }
     else if (!isSeed && cache_.has_seed_ratio) // partial seed, seed ratio
     {
-        // 50 MB of 200 MB (25%), uploaded 30 MB (15 MB this session) (Ratio: X%, Goal: Y%)
+        // 50 MB of 200 MB (25%), uploaded 30 MB (Ratio: X%, Goal: Y%)
         gstr += fmt::format(
             // xgettext:no-c-format
-            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} ({uploaded_this_session} this session) (Ratio: {ratio}, Goal: {seed_ratio})"),
+            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
             fmt::arg("percent_complete", cache_.percent_complete.to_string()),
             fmt::arg("uploaded_size", tr_strlsize(cache_.uploaded_ever)),
-            fmt::arg("uploaded_this_session", tr_strlsize(cache_.uploaded_this_session)),
             fmt::arg("ratio", tr_strlratio(cache_.ratio)),
             fmt::arg("seed_ratio", tr_strlratio(cache_.seed_ratio)));
     }
@@ -492,31 +491,28 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
     {
         gstr += fmt::format(
             // xgettext:no-c-format
-            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} ({uploaded_this_session} this session) (Ratio: {ratio})"),
+            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
             fmt::arg("percent_complete", cache_.percent_complete.to_string()),
             fmt::arg("uploaded_size", tr_strlsize(cache_.uploaded_ever)),
-            fmt::arg("uploaded_this_session", tr_strlsize(cache_.uploaded_this_session)),
             fmt::arg("ratio", tr_strlratio(cache_.ratio)));
     }
     else if (cache_.has_seed_ratio) // seed, seed ratio
     {
         gstr += fmt::format(
-            _("{complete_size}, uploaded {uploaded_size} ({uploaded_this_session} this session) (Ratio: {ratio}, Goal: {seed_ratio})"),
+            _("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
             fmt::arg("uploaded_size", tr_strlsize(cache_.uploaded_ever)),
-            fmt::arg("uploaded_this_session", tr_strlsize(cache_.uploaded_this_session)),
             fmt::arg("ratio", tr_strlratio(cache_.ratio)),
             fmt::arg("seed_ratio", tr_strlratio(cache_.seed_ratio)));
     }
     else // seed, no seed ratio
     {
         gstr += fmt::format(
-            _("{complete_size}, uploaded {uploaded_size} ({uploaded_this_session} this session) (Ratio: {ratio})"),
+            _("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"),
             fmt::arg("complete_size", tr_strlsize(cache_.total_size)),
             fmt::arg("uploaded_size", tr_strlsize(cache_.uploaded_ever)),
-            fmt::arg("uploaded_this_session", tr_strlsize(cache_.uploaded_this_session)),
             fmt::arg("ratio", tr_strlratio(cache_.ratio)));
     }
 

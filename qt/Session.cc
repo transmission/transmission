@@ -39,7 +39,6 @@
 #include "Torrent.h"
 #include "Utils.h"
 #include "VariantHelpers.h"
-#include "libtransmission/quark.h"
 
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
