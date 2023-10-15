@@ -28,15 +28,25 @@ protected:
         ::testing::TestWithParam<char const*>::SetUp();
 
         auto const* locale_str = GetParam();
-        try
-        {
-            tr_locale_set_global(locale_str);
-        }
-        catch (std::runtime_error const&)
+        old_locale_ = tr_locale_set_global(locale_str);
+        if (!old_locale_)
         {
             GTEST_SKIP();
         }
     }
+
+    void TearDown() override
+    {
+        if (old_locale_)
+        {
+            tr_locale_set_global(*old_locale_);
+        }
+
+        ::testing::TestWithParam<char const*>::TearDown();
+    }
+
+private:
+    std::optional<std::locale> old_locale_;
 };
 
 TEST_P(JSONTest, testElements)
