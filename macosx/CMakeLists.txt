@@ -62,6 +62,8 @@ target_sources(${TR_NAME}-mac
         Controller.mm
         CreatorWindowController.h
         CreatorWindowController.mm
+        DefaultAppHelper.h
+        DefaultAppHelper.mm
         DragOverlayView.h
         DragOverlayView.mm
         DragOverlayWindow.h
