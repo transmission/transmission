@@ -76,12 +76,12 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 {
     try
     {
-        std::locale::global(locale);
+        auto old_locale = std::locale::global(locale);
 
         std::cout.imbue(std::locale{});
         std::cerr.imbue(std::locale{});
 
-        return std::locale{};
+        return old_locale;
     }
     catch (std::exception const&)
     {
