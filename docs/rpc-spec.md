@@ -213,12 +213,14 @@ The 'source' column here corresponds to the data structure there.
 | `bandwidthPriority` | number | tr_priority_t
 | `comment` | string | tr_torrent_view
 | `corruptEver`| number | tr_stat
+| `corruptThisSession`| number | tr_stat
 | `creator`| string | tr_torrent_view
 | `dateCreated`| number| tr_torrent_view
 | `desiredAvailable`| number| tr_stat
 | `doneDate`| number | tr_stat
 | `downloadDir` | string  | tr_torrent
 | `downloadedEver` | number  | tr_stat
+| `downloadedThisSession` | number  | tr_stat
 | `downloadLimit` | number  | tr_torrent
 | `downloadLimited` | boolean | tr_torrent
 | `editDate` | number | tr_stat
@@ -278,6 +280,7 @@ The 'source' column here corresponds to the data structure there.
 | `totalSize`| number| tr_torrent_view
 | `torrentFile`| string| tr_info
 | `uploadedEver`| number| tr_stat
+| `uploadedThisSession`| number| tr_stat
 | `uploadLimit`| number| tr_torrent
 | `uploadLimited`| boolean| tr_torrent
 | `uploadRatio`| double| tr_stat
