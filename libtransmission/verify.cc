@@ -20,7 +20,6 @@
 #include "libtransmission/log.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h" // tr_time()
 #include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;
@@ -54,11 +53,11 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
 
 void tr_verify_worker::verify_torrent(
     tr_torrent_metainfo const& metainfo,
-    TorrentMediator& torrent_mediator,
+    VerifyMediator& verify_mediator,
     std::atomic<bool> const& stop_flag)
 {
-    auto const begin = tr_time();
-    torrent_mediator.on_verify_started();
+    auto const begin = verify_mediator.current_time();
+    verify_mediator.on_verify_started();
 
     tr_sys_file_t fd = TR_BAD_SYS_FILE;
     uint64_t file_pos = 0;
@@ -79,7 +78,7 @@ void tr_verify_worker::verify_torrent(
         /* if we're starting a new file... */
         if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
-            auto const found = torrent_mediator.find_file(file_index);
+            auto const found = verify_mediator.find_file(file_index);
             fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
             prev_file_index = file_index;
         }
@@ -112,11 +111,11 @@ void tr_verify_worker::verify_torrent(
         if (left_in_piece == 0)
         {
             auto const has_piece = sha->finish() == metainfo.piece_hash(piece);
-            torrent_mediator.on_piece_checked(piece, has_piece);
+            verify_mediator.on_piece_checked(piece, has_piece);
 
             /* sleeping even just a few msec per second goes a long
              * way towards reducing IO load... */
-            if (auto const now = tr_time(); last_slept_at != now)
+            if (auto const now = verify_mediator.current_time(); last_slept_at != now)
             {
                 last_slept_at = now;
                 std::this_thread::sleep_for(SleepPerSecondDuringVerify);
@@ -157,7 +156,7 @@ void tr_verify_worker::verify_torrent(
             metainfo.total_size(),
             metainfo.total_size() / (1 + (end - begin))));
 
-    torrent_mediator.on_verify_done(stop_flag);
+    verify_mediator.on_verify_done(stop_flag);
 }
 
 void tr_verify_worker::verify_thread_func()

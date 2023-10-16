@@ -2628,6 +2628,11 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent::VerifyMediator::find_file
     return tor_->find_file(file_index);
 }
 
+time_t tr_torrent::VerifyMediator::current_time() const
+{
+    return tr_time();
+}
+
 void tr_torrent::VerifyMediator::on_verify_started()
 {
     tor_->set_verify_state(TR_VERIFY_NOW);

@@ -92,7 +92,8 @@ public:
         {
         }
 
-        std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const override;
+        [[nodiscard]] time_t current_time() const override;
+        [[nodiscard]] std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const override;
 
         void on_verify_started() override;
         void on_piece_checked(tr_piece_index_t piece, bool has_piece) override;

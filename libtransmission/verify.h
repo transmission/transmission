@@ -29,6 +29,7 @@ class tr_verify_worker
 public:
     struct VerifyMediator
     {
+        [[nodiscard]] virtual time_t current_time() const = 0;
         [[nodiscard]] virtual std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const = 0;
 
         virtual void on_verify_started() = 0;
