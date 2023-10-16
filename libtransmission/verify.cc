@@ -37,19 +37,19 @@ auto constexpr SleepPerSecondDuringVerify = 100ms;
 
 void tr_verify_worker::verify_torrent(VerifyMediator& verify_mediator, std::atomic<bool> const& abort_flag)
 {
-    auto const& metainfo = verify_mediator.metainfo();
     verify_mediator.on_verify_started();
 
     tr_sys_file_t fd = TR_BAD_SYS_FILE;
-    uint64_t file_pos = 0;
-    uint32_t piece_pos = 0;
-    tr_file_index_t file_index = 0;
+    uint64_t file_pos = 0U;
+    uint32_t piece_pos = 0U;
+    tr_file_index_t file_index = 0U;
     tr_file_index_t prev_file_index = ~file_index;
-    tr_piece_index_t piece = 0;
-    auto buffer = std::vector<std::byte>(1024 * 256);
+    tr_piece_index_t piece = 0U;
+    auto buffer = std::vector<std::byte>(1024U * 256U);
     auto sha = tr_sha1::create();
     auto last_slept_at = current_time_secs();
 
+    auto const& metainfo = verify_mediator.metainfo();
     while (!abort_flag && piece < metainfo.piece_count())
     {
         auto const file_length = metainfo.file_size(file_index);
