@@ -92,16 +92,19 @@ public:
         {
         }
 
+        ~VerifyMediator() override = default;
+
         [[nodiscard]] tr_torrent_metainfo const& metainfo() const override;
-        [[nodiscard]] time_t current_time() const override;
         [[nodiscard]] std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const override;
 
+        void on_verify_queued() override;
         void on_verify_started() override;
         void on_piece_checked(tr_piece_index_t piece, bool has_piece) override;
-        void on_verify_done(bool stop_flag) override;
+        void on_verify_done(bool aborted) override;
 
     private:
         tr_torrent* const tor_;
+        time_t time_started_ = 0;
     };
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
@@ -600,8 +603,6 @@ public:
     void set_download_dir(std::string_view path, bool is_new_torrent = false);
 
     void refresh_current_dir();
-
-    void set_verify_state(tr_verify_state state);
 
     [[nodiscard]] constexpr auto verify_state() const noexcept
     {
@@ -1143,6 +1144,8 @@ private:
             recheck_completeness();
         }
     }
+
+    void set_verify_state(tr_verify_state state);
 
     Error error_;
 

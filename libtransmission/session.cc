@@ -2004,6 +2004,24 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
 
 // ---
 
+void tr_session::verifyRemove(tr_torrent* tor)
+{
+    if (verifier_)
+    {
+        verifier_->remove(tor->info_hash());
+    }
+}
+
+void tr_session::verifyAdd(tr_torrent* tor)
+{
+    if (verifier_)
+    {
+        verifier_->add(std::make_unique<tr_torrent::VerifyMediator>(tor), tor->get_priority());
+    }
+}
+
+// ---
+
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
 {
     this->cache->flush_torrent(tor);

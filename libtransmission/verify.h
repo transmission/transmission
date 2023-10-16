@@ -14,12 +14,14 @@
 #include <cstdint>
 #include <functional>
 #include <list>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <set>
 #include <thread>
 
 #include "libtransmission/transmission.h" // tr_piece_index_t
+#include "libtransmission/tr-macros.h" // tr_info_hash_t
 #include "libtransmission/torrent-metainfo.h" // tr_torrent_files::FoundFile
 
 struct tr_torrent;
@@ -29,10 +31,12 @@ class tr_verify_worker
 public:
     struct VerifyMediator
     {
+        virtual ~VerifyMediator() = default;
+
         [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
-        [[nodiscard]] virtual time_t current_time() const = 0;
         [[nodiscard]] virtual std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const = 0;
 
+        virtual void on_verify_queued() = 0;
         virtual void on_verify_started() = 0;
         virtual void on_piece_checked(tr_piece_index_t piece, bool has_piece) = 0;
         virtual void on_verify_done(bool aborted) = 0;
@@ -42,22 +46,64 @@ public:
 
     ~tr_verify_worker();
 
-    void add(tr_torrent* tor);
+    void add(std::unique_ptr<VerifyMediator> mediator, tr_priority_t priority);
 
-    void remove(tr_torrent* tor);
+    void remove(tr_sha1_digest_t const& info_hash);
 
 private:
     struct Node
     {
-        tr_torrent* torrent = nullptr;
-        uint64_t current_size = 0;
+        Node(std::unique_ptr<VerifyMediator> mediator, tr_priority_t priority)
+            : mediator_{ std::move(mediator) }
+            , priority_{ priority }
+            , total_size_{ mediator->metainfo().total_size() }
+        {
+        }
 
-        [[nodiscard]] int compare(Node const& that) const;
+        [[nodiscard]] int compare(Node const& that) const // <=>
+        {
+            // prefer higher-priority torrents
+            if (priority_ != that.priority_)
+            {
+                return priority_ > that.priority_ ? 1 : -1;
+            }
+
+            // prefer smaller torrents, since they will verify faster
+            if (total_size_ != that.total_size_)
+            {
+                return total_size_ < that.total_size_ ? 1 : -1;
+            }
+
+            // uniqueness check
+            auto const& this_hash = mediator().metainfo().info_hash();
+            auto const& that_hash = that.mediator().metainfo().info_hash();
+            if (this_hash != that_hash)
+            {
+                return this_hash < that_hash ? 1 : -1;
+            }
+
+            return 0;
+        }
 
         [[nodiscard]] bool operator<(Node const& that) const
         {
             return compare(that) < 0;
         }
+
+        [[nodiscard]] constexpr bool matches(tr_sha1_digest_t const& info_hash) const noexcept
+        {
+            return mediator().metainfo().info_hash() == info_hash;
+        }
+
+        [[nodiscard]] constexpr VerifyMediator& mediator() const noexcept
+        {
+            return *mediator_;
+        }
+
+    private:
+        std::unique_ptr<VerifyMediator> mediator_;
+        tr_priority_t priority_;
+        uint64_t total_size_;
     };
 
     void verify_thread_func();

@@ -2633,13 +2633,16 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent::VerifyMediator::find_file
     return tor_->find_file(file_index);
 }
 
-time_t tr_torrent::VerifyMediator::current_time() const
+void tr_torrent::VerifyMediator::on_verify_queued()
 {
-    return tr_time();
+    tr_logAddTraceTor(tor_, "Queued for verification");
+    tor_->set_verify_state(TR_VERIFY_WAIT);
 }
 
 void tr_torrent::VerifyMediator::on_verify_started()
 {
+    tr_logAddDebugTor(tor_, "Verifying torrent");
+    time_started_ = tr_time();
     tor_->set_verify_state(TR_VERIFY_NOW);
 }
 
@@ -2661,6 +2664,17 @@ void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t piece, bool h
 void tr_torrent::VerifyMediator::on_verify_done(bool aborted)
 {
     using namespace verify_helpers;
+
+    auto const now = tr_time();
+    auto const duration_secs = now - time_started_;
+    auto const total_size = tor_->total_size();
+    tr_logAddDebugTor(
+        tor_,
+        fmt::format(
+            "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
+            duration_secs,
+            total_size,
+            total_size / (1 + duration_secs)));
 
     tor_->set_verify_state(TR_VERIFY_NONE);
 
