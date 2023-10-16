@@ -92,6 +92,7 @@ public:
         {
         }
 
+        [[nodiscard]] tr_torrent_metainfo const& metainfo() const override;
         [[nodiscard]] time_t current_time() const override;
         [[nodiscard]] std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const override;
 

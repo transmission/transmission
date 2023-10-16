@@ -20,7 +20,7 @@
 #include <thread>
 
 #include "libtransmission/transmission.h" // tr_piece_index_t
-#include "libtransmission/torrent-files.h" // tr_torrent_files::FoundFile
+#include "libtransmission/torrent-metainfo.h" // tr_torrent_files::FoundFile
 
 struct tr_torrent;
 
@@ -29,6 +29,7 @@ class tr_verify_worker
 public:
     struct VerifyMediator
     {
+        [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
         [[nodiscard]] virtual time_t current_time() const = 0;
         [[nodiscard]] virtual std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const = 0;
 
@@ -37,10 +38,7 @@ public:
         virtual void on_verify_done(bool aborted) = 0;
     };
 
-    static void verify_torrent(
-        tr_torrent_metainfo const& metainfo,
-        VerifyMediator& verify_mediator,
-        std::atomic<bool> const& abort_flag);
+    static void verify_torrent(VerifyMediator& verify_mediator, std::atomic<bool> const& abort_flag);
 
     ~tr_verify_worker();
 

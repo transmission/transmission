@@ -51,11 +51,9 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
     return tr_compare_3way(torrent->id(), that.torrent->id());
 }
 
-void tr_verify_worker::verify_torrent(
-    tr_torrent_metainfo const& metainfo,
-    VerifyMediator& verify_mediator,
-    std::atomic<bool> const& abort_flag)
+void tr_verify_worker::verify_torrent(VerifyMediator& verify_mediator, std::atomic<bool> const& abort_flag)
 {
+    auto const& metainfo = verify_mediator.metainfo();
     auto const begin = verify_mediator.current_time();
     verify_mediator.on_verify_started();
 
@@ -187,7 +185,7 @@ void tr_verify_worker::verify_thread_func()
         auto* const tor = current_node_->torrent;
         tr_logAddTraceTor(tor, "Verifying torrent");
         auto verify_mediator = tr_torrent::VerifyMediator{ tor };
-        verify_torrent(tor->metainfo_, verify_mediator, stop_current_);
+        verify_torrent(verify_mediator, stop_current_);
     }
 }
 

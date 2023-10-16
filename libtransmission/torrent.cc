@@ -2623,6 +2623,11 @@ void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* m
 
 // ---
 
+tr_torrent_metainfo const& tr_torrent::VerifyMediator::metainfo() const
+{
+    return tor_->metainfo_;
+}
+
 std::optional<tr_torrent_files::FoundFile> tr_torrent::VerifyMediator::find_file(tr_file_index_t file_index) const
 {
     return tor_->find_file(file_index);
