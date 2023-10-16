@@ -1716,13 +1716,13 @@ void tr_torrentVerify(tr_torrent* tor, bool force)
     tor->session->runInSessionThread(verifyTorrent, tor, force);
 }
 
-void tr_torrent::set_verify_state(tr_verify_state state)
+void tr_torrent::set_verify_state(VerifyState state)
 {
-    TR_ASSERT(state == TR_VERIFY_NONE || state == TR_VERIFY_WAIT || state == TR_VERIFY_NOW);
+    TR_ASSERT(state == VerifyState::None || state == VerifyState::Queued || state == VerifyState::Active);
 
-    this->verify_state_ = state;
-    this->verify_progress_ = {};
-    this->mark_changed();
+    verify_state_ = state;
+    verify_progress_ = {};
+    mark_changed();
 }
 
 // ---
@@ -2636,14 +2636,14 @@ std::optional<tr_torrent_files::FoundFile> tr_torrent::VerifyMediator::find_file
 void tr_torrent::VerifyMediator::on_verify_queued()
 {
     tr_logAddTraceTor(tor_, "Queued for verification");
-    tor_->set_verify_state(TR_VERIFY_WAIT);
+    tor_->set_verify_state(VerifyState::Queued);
 }
 
 void tr_torrent::VerifyMediator::on_verify_started()
 {
     tr_logAddDebugTor(tor_, "Verifying torrent");
     time_started_ = tr_time();
-    tor_->set_verify_state(TR_VERIFY_NOW);
+    tor_->set_verify_state(VerifyState::Active);
 }
 
 void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t piece, bool has_piece)
@@ -2676,7 +2676,7 @@ void tr_torrent::VerifyMediator::on_verify_done(bool aborted)
             total_size,
             total_size / (1 + duration_secs)));
 
-    tor_->set_verify_state(TR_VERIFY_NONE);
+    tor_->set_verify_state(VerifyState::None);
 
     if (!aborted && !tor_->is_deleting_)
     {

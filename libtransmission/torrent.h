@@ -74,13 +74,6 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
-enum tr_verify_state : uint8_t
-{
-    TR_VERIFY_NONE,
-    TR_VERIFY_WAIT,
-    TR_VERIFY_NOW
-};
-
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
 {
@@ -604,14 +597,9 @@ public:
 
     void refresh_current_dir();
 
-    [[nodiscard]] constexpr auto verify_state() const noexcept
-    {
-        return verify_state_;
-    }
-
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
     {
-        if (verify_state_ == TR_VERIFY_NOW)
+        if (verify_state_ == VerifyState::Active)
         {
             return verify_progress_;
         }
@@ -638,12 +626,12 @@ public:
     {
         bool const is_seed = this->is_done();
 
-        if (this->verify_state() == TR_VERIFY_NOW)
+        if (verify_state_ == VerifyState::Active)
         {
             return TR_STATUS_CHECK;
         }
 
-        if (this->verify_state() == TR_VERIFY_WAIT)
+        if (verify_state_ == VerifyState::Queued)
         {
             return TR_STATUS_CHECK_WAIT;
         }
@@ -1009,6 +997,13 @@ public:
 private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
 
+    enum VerifyState : uint8_t
+    {
+        None,
+        Queued,
+        Active
+    };
+
     // Tracks a torrent's error state, either local (e.g. file IO errors)
     // or tracker errors (e.g. warnings returned by a tracker).
     class Error
@@ -1145,7 +1140,7 @@ private:
         }
     }
 
-    void set_verify_state(tr_verify_state state);
+    void set_verify_state(VerifyState state);
 
     Error error_;
 
@@ -1171,7 +1166,7 @@ private:
 
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
-    tr_verify_state verify_state_ = TR_VERIFY_NONE;
+    VerifyState verify_state_ = VerifyState::None;
 
     uint16_t idle_limit_minutes_ = 0;
 
