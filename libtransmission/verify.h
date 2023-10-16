@@ -19,20 +19,29 @@
 #include <set>
 #include <thread>
 
-struct tr_session;
+#include "libtransmission/transmission.h" // tr_piece_index_t
+#include "libtransmission/torrent-files.h" // tr_torrent_files::FoundFile
+
 struct tr_torrent;
 
 class tr_verify_worker
 {
 public:
-    using callback_func = std::function<void(tr_torrent*, bool aborted)>;
+    struct VerifyMediator
+    {
+        [[nodiscard]] virtual std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const = 0;
+
+        virtual void on_verify_started() = 0;
+        virtual void on_piece_checked(tr_piece_index_t piece, bool has_piece) = 0;
+        virtual void on_verify_done(bool aborted) = 0;
+    };
+
+    static void verify_torrent(
+        tr_torrent_metainfo const& metainfo,
+        VerifyMediator& verify_mediator,
+        std::atomic<bool> const& stop_flag);
 
     ~tr_verify_worker();
-
-    void add_callback(callback_func callback)
-    {
-        callbacks_.emplace_back(std::move(callback));
-    }
 
     void add(tr_torrent* tor);
 
@@ -52,18 +61,8 @@ private:
         }
     };
 
-    void call_callback(tr_torrent* tor, bool aborted) const
-    {
-        for (auto const& callback : callbacks_)
-        {
-            callback(tor, aborted);
-        }
-    }
-
     void verify_thread_func();
-    [[nodiscard]] static bool verify_torrent(tr_torrent* tor, std::atomic<bool> const& stop_flag);
 
-    std::list<callback_func> callbacks_;
     std::mutex verify_mutex_;
 
     std::set<Node> todo_;

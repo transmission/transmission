@@ -28,13 +28,14 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/interned-string.h"
-#include "libtransmission/observable.h"
 #include "libtransmission/log.h"
+#include "libtransmission/observable.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/verify.h"
 
 class tr_swarm;
 struct tr_error;
@@ -84,6 +85,23 @@ enum tr_verify_state : uint8_t
 struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
+    struct VerifyMediator : public tr_verify_worker::VerifyMediator
+    {
+        explicit VerifyMediator(tr_torrent* const tor)
+            : tor_{ tor }
+        {
+        }
+
+        std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const override;
+
+        void on_verify_started() override;
+        void on_piece_checked(tr_piece_index_t piece, bool has_piece) override;
+        void on_verify_done(bool stop_flag) override;
+
+    private:
+        tr_torrent* const tor_;
+    };
+
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
         , completion{ this, &this->metainfo_.block_info() }
@@ -237,7 +255,7 @@ public:
         return completion.has_none();
     }
 
-    [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
+    [[nodiscard]] bool has_piece(tr_piece_index_t piece) const
     {
         return completion.has_piece(piece);
     }
@@ -586,11 +604,6 @@ public:
     [[nodiscard]] constexpr auto verify_state() const noexcept
     {
         return verify_state_;
-    }
-
-    constexpr void set_verify_progress(float f) noexcept
-    {
-        verify_progress_ = f;
     }
 
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
@@ -1164,6 +1177,8 @@ private:
 
 // ---
 
+// ---
+
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
     return tor != nullptr && tor->session != nullptr;
@@ -1182,8 +1197,6 @@ void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
-
-void tr_torrentOnVerifyDone(tr_torrent* tor, bool aborted);
 
 #define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
 #define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())

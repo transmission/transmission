@@ -2122,8 +2122,6 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
             stats().save();
         });
     save_timer_->start_repeating(SaveIntervalSecs);
-
-    verifier_->add_callback(tr_torrentOnVerifyDone);
 }
 
 void tr_session::addIncoming(tr_peer_socket&& socket)

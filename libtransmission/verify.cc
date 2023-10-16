@@ -52,14 +52,16 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
     return tr_compare_3way(torrent->id(), that.torrent->id());
 }
 
-bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& stop_flag)
+void tr_verify_worker::verify_torrent(
+    tr_torrent_metainfo const& metainfo,
+    TorrentMediator& torrent_mediator,
+    std::atomic<bool> const& stop_flag)
 {
     auto const begin = tr_time();
+    torrent_mediator.on_verify_started();
 
     tr_sys_file_t fd = TR_BAD_SYS_FILE;
     uint64_t file_pos = 0;
-    bool changed = false;
-    bool had_piece = false;
     time_t last_slept_at = 0;
     uint32_t piece_pos = 0;
     tr_file_index_t file_index = 0;
@@ -68,28 +70,22 @@ bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& 
     auto buffer = std::vector<std::byte>(1024 * 256);
     auto sha = tr_sha1::create();
 
-    tr_logAddDebugTor(tor, "verifying torrent...");
+    tr_logAddDebugMetainfo(metainfo, "verifying torrent...");
 
-    while (!stop_flag && piece < tor->piece_count())
+    while (!stop_flag && piece < metainfo.piece_count())
     {
-        auto const file_length = tor->file_size(file_index);
-
-        /* if we're starting a new piece... */
-        if (piece_pos == 0)
-        {
-            had_piece = tor->has_piece(piece);
-        }
+        auto const file_length = metainfo.file_size(file_index);
 
         /* if we're starting a new file... */
         if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
-            auto const found = tor->find_file(file_index);
+            auto const found = torrent_mediator.find_file(file_index);
             fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
             prev_file_index = file_index;
         }
 
         /* figure out how much we can read this pass */
-        uint64_t left_in_piece = tor->piece_size(piece) - piece_pos;
+        uint64_t left_in_piece = metainfo.piece_size(piece) - piece_pos;
         uint64_t left_in_file = file_length - file_pos;
         uint64_t bytes_this_pass = std::min(left_in_file, left_in_piece);
         bytes_this_pass = std::min(bytes_this_pass, uint64_t(std::size(buffer)));
@@ -115,14 +111,8 @@ bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& 
         /* if we're finishing a piece... */
         if (left_in_piece == 0)
         {
-            if (auto const has_piece = sha->finish() == tor->piece_hash(piece); has_piece || had_piece)
-            {
-                tor->set_has_piece(piece, has_piece);
-                changed |= has_piece != had_piece;
-            }
-
-            tor->checked_pieces_.set(piece, true);
-            tor->mark_changed();
+            auto const has_piece = sha->finish() == metainfo.piece_hash(piece);
+            torrent_mediator.on_piece_checked(piece, has_piece);
 
             /* sleeping even just a few msec per second goes a long
              * way towards reducing IO load... */
@@ -134,7 +124,6 @@ bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& 
 
             sha->clear();
             ++piece;
-            tor->set_verify_progress(piece / float(tor->piece_count()));
             piece_pos = 0;
         }
 
@@ -160,15 +149,15 @@ bool tr_verify_worker::verify_torrent(tr_torrent* tor, std::atomic<bool> const& 
 
     /* stopwatch */
     time_t const end = tr_time();
-    tr_logAddDebugTor(
-        tor,
+    tr_logAddDebugMetainfo(
+        metainfo,
         fmt::format(
             "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
             end - begin,
-            tor->total_size(),
-            tor->total_size() / (1 + (end - begin))));
+            metainfo.total_size(),
+            metainfo.total_size() / (1 + (end - begin))));
 
-    return changed;
+    torrent_mediator.on_verify_done(stop_flag);
 }
 
 void tr_verify_worker::verify_thread_func()
@@ -198,17 +187,8 @@ void tr_verify_worker::verify_thread_func()
 
         auto* const tor = current_node_->torrent;
         tr_logAddTraceTor(tor, "Verifying torrent");
-        tor->set_verify_state(TR_VERIFY_NOW);
-        auto const changed = verify_torrent(tor, stop_current_);
-        tor->set_verify_state(TR_VERIFY_NONE);
-        TR_ASSERT(tr_isTorrent(tor));
-
-        if (!stop_current_ && changed)
-        {
-            tor->set_dirty();
-        }
-
-        call_callback(tor, stop_current_);
+        auto verify_mediator = tr_torrent::VerifyMediator{ tor };
+        verify_torrent(tor->metainfo_, verify_mediator, stop_current_);
     }
 }
 
@@ -255,7 +235,7 @@ void tr_verify_worker::remove(tr_torrent* tor)
 
         if (iter != std::end(todo_))
         {
-            call_callback(tor, true);
+            tr_torrent::VerifyMediator{ tor }.on_verify_done(true);
             todo_.erase(iter);
         }
     }

@@ -1709,18 +1709,6 @@ void verifyTorrent(tr_torrent* const tor, bool force)
 } // namespace verify_helpers
 } // namespace
 
-void tr_torrentOnVerifyDone(tr_torrent* tor, bool aborted)
-{
-    using namespace verify_helpers;
-
-    if (aborted || tor->is_deleting_)
-    {
-        return;
-    }
-
-    tor->session->runInSessionThread(onVerifyDoneThreadFunc, tor);
-}
-
 void tr_torrentVerify(tr_torrent* tor, bool force)
 {
     using namespace verify_helpers;
@@ -2630,5 +2618,44 @@ void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* m
             auto const [begin, end] = pieces_in_file(i);
             checked_pieces_.unset_span(begin, end);
         }
+    }
+}
+
+// ---
+
+std::optional<tr_torrent_files::FoundFile> tr_torrent::VerifyMediator::find_file(tr_file_index_t file_index) const
+{
+    return tor_->find_file(file_index);
+}
+
+void tr_torrent::VerifyMediator::on_verify_started()
+{
+    tor_->set_verify_state(TR_VERIFY_NOW);
+}
+
+void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t piece, bool has_piece)
+{
+    auto const had_piece = tor_->has_piece(piece);
+
+    if (has_piece || had_piece)
+    {
+        tor_->set_has_piece(piece, has_piece);
+        tor_->set_dirty();
+    }
+
+    tor_->checked_pieces_.set(piece, true);
+    tor_->mark_changed();
+    tor_->verify_progress_ = static_cast<float>(piece + 1U) / static_cast<float>(tor_->metainfo_.piece_count());
+}
+
+void tr_torrent::VerifyMediator::on_verify_done(bool aborted)
+{
+    using namespace verify_helpers;
+
+    tor_->set_verify_state(TR_VERIFY_NONE);
+
+    if (!aborted && !tor_->is_deleting_)
+    {
+        tor_->session->runInSessionThread(onVerifyDoneThreadFunc, tor_);
     }
 }
