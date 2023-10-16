@@ -40,7 +40,7 @@ public:
     static void verify_torrent(
         tr_torrent_metainfo const& metainfo,
         VerifyMediator& verify_mediator,
-        std::atomic<bool> const& stop_flag);
+        std::atomic<bool> const& abort_flag);
 
     ~tr_verify_worker();
 

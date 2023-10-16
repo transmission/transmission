@@ -54,7 +54,7 @@ int tr_verify_worker::Node::compare(tr_verify_worker::Node const& that) const
 void tr_verify_worker::verify_torrent(
     tr_torrent_metainfo const& metainfo,
     VerifyMediator& verify_mediator,
-    std::atomic<bool> const& stop_flag)
+    std::atomic<bool> const& abort_flag)
 {
     auto const begin = verify_mediator.current_time();
     verify_mediator.on_verify_started();
@@ -71,7 +71,7 @@ void tr_verify_worker::verify_torrent(
 
     tr_logAddDebugMetainfo(metainfo, "verifying torrent...");
 
-    while (!stop_flag && piece < metainfo.piece_count())
+    while (!abort_flag && piece < metainfo.piece_count())
     {
         auto const file_length = metainfo.file_size(file_index);
 
@@ -156,7 +156,7 @@ void tr_verify_worker::verify_torrent(
             metainfo.total_size(),
             metainfo.total_size() / (1 + (end - begin))));
 
-    verify_mediator.on_verify_done(stop_flag);
+    verify_mediator.on_verify_done(abort_flag);
 }
 
 void tr_verify_worker::verify_thread_func()
