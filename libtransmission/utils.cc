@@ -66,7 +66,7 @@ std::optional<std::locale> tr_locale_set_global(char const* locale_name) noexcep
     {
         return tr_locale_set_global(std::locale{ locale_name });
     }
-    catch (std::exception const&)
+    catch (std::runtime_error const&)
     {
         return {};
     }
