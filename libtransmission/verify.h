@@ -56,7 +56,6 @@ private:
         Node(std::unique_ptr<VerifyMediator> mediator, tr_priority_t priority)
             : mediator_{ std::move(mediator) }
             , priority_{ priority }
-            , total_size_{ mediator->metainfo().total_size() }
         {
         }
 
@@ -69,9 +68,11 @@ private:
             }
 
             // prefer smaller torrents, since they will verify faster
-            if (total_size_ != that.total_size_)
+            auto const& metainfo = mediator().metainfo();
+            auto const& that_metainfo = that.mediator().metainfo();
+            if (metainfo.total_size() != that_metainfo.total_size())
             {
-                return total_size_ < that.total_size_ ? 1 : -1;
+                return metainfo.total_size() < that_metainfo.total_size() ? 1 : -1;
             }
 
             // uniqueness check
@@ -100,10 +101,8 @@ private:
             return *mediator_;
         }
 
-    private:
         std::unique_ptr<VerifyMediator> mediator_;
         tr_priority_t priority_;
-        uint64_t total_size_;
     };
 
     void verify_thread_func();
