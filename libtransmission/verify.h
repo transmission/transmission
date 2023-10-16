@@ -24,8 +24,6 @@
 #include "libtransmission/tr-macros.h" // tr_info_hash_t
 #include "libtransmission/torrent-metainfo.h" // tr_torrent_files::FoundFile
 
-struct tr_torrent;
-
 class tr_verify_worker
 {
 public:

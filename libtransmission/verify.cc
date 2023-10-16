@@ -18,9 +18,6 @@
 #include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
-#include "libtransmission/log.h"
-#include "libtransmission/torrent.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;
