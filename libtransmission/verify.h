@@ -42,8 +42,6 @@ public:
         virtual void on_verify_done(bool aborted) = 0;
     };
 
-    static void verify_torrent(VerifyMediator& verify_mediator, std::atomic<bool> const& abort_flag);
-
     ~tr_verify_worker();
 
     void add(std::unique_ptr<VerifyMediator> mediator, tr_priority_t priority);
@@ -104,6 +102,8 @@ private:
         std::unique_ptr<VerifyMediator> mediator_;
         tr_priority_t priority_;
     };
+
+    static void verify_torrent(VerifyMediator& verify_mediator, std::atomic<bool> const& abort_flag);
 
     void verify_thread_func();
 
