@@ -87,7 +87,7 @@ private:
             return compare(that) < 0;
         }
 
-        [[nodiscard]] constexpr bool matches(tr_sha1_digest_t const& info_hash) const noexcept
+        [[nodiscard]] bool matches(tr_sha1_digest_t const& info_hash) const noexcept
         {
             return mediator_->metainfo().info_hash() == info_hash;
         }
