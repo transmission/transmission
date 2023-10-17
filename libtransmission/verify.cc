@@ -32,7 +32,7 @@ auto constexpr SleepPerSecondDuringVerify = 100ms;
 }
 } // namespace
 
-void tr_verify_worker::verify_torrent(VerifyMediator& verify_mediator, std::atomic<bool> const& abort_flag)
+void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag)
 {
     verify_mediator.on_verify_started();
 
@@ -149,11 +149,11 @@ void tr_verify_worker::verify_thread_func()
             current_node_ = std::move(todo_.extract(std::begin(todo_)).value());
         }
 
-        verify_torrent(current_node_->mediator(), stop_current_);
+        verify_torrent(*current_node_->mediator_, stop_current_);
     }
 }
 
-void tr_verify_worker::add(std::unique_ptr<VerifyMediator> mediator, tr_priority_t priority)
+void tr_verify_worker::add(std::unique_ptr<Mediator> mediator, tr_priority_t priority)
 {
     auto const lock = std::lock_guard{ verify_mutex_ };
 
@@ -185,7 +185,7 @@ void tr_verify_worker::remove(tr_sha1_digest_t const& info_hash)
 
         if (iter != std::end(todo_))
         {
-            iter->mediator().on_verify_done(true);
+            iter->mediator_->on_verify_done(true);
             todo_.erase(iter);
         }
     }

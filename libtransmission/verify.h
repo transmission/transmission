@@ -27,9 +27,9 @@
 class tr_verify_worker
 {
 public:
-    struct VerifyMediator
+    struct Mediator
     {
-        virtual ~VerifyMediator() = default;
+        virtual ~Mediator() = default;
 
         [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
         [[nodiscard]] virtual std::optional<std::string> find_file(tr_file_index_t file_index) const = 0;
@@ -42,14 +42,14 @@ public:
 
     ~tr_verify_worker();
 
-    void add(std::unique_ptr<VerifyMediator> mediator, tr_priority_t priority);
+    void add(std::unique_ptr<Mediator> mediator, tr_priority_t priority);
 
     void remove(tr_sha1_digest_t const& info_hash);
 
 private:
     struct Node
     {
-        Node(std::unique_ptr<VerifyMediator> mediator, tr_priority_t priority)
+        Node(std::unique_ptr<Mediator> mediator, tr_priority_t priority)
             : mediator_{ std::move(mediator) }
             , priority_{ priority }
         {
@@ -64,16 +64,16 @@ private:
             }
 
             // prefer smaller torrents, since they will verify faster
-            auto const& metainfo = mediator().metainfo();
-            auto const& that_metainfo = that.mediator().metainfo();
+            auto const& metainfo = mediator_->metainfo();
+            auto const& that_metainfo = that.mediator_->metainfo();
             if (metainfo.total_size() != that_metainfo.total_size())
             {
                 return metainfo.total_size() < that_metainfo.total_size() ? 1 : -1;
             }
 
             // uniqueness check
-            auto const& this_hash = mediator().metainfo().info_hash();
-            auto const& that_hash = that.mediator().metainfo().info_hash();
+            auto const& this_hash = metainfo.info_hash();
+            auto const& that_hash = that_metainfo.info_hash();
             if (this_hash != that_hash)
             {
                 return this_hash < that_hash ? 1 : -1;
@@ -89,19 +89,14 @@ private:
 
         [[nodiscard]] constexpr bool matches(tr_sha1_digest_t const& info_hash) const noexcept
         {
-            return mediator().metainfo().info_hash() == info_hash;
+            return mediator_->metainfo().info_hash() == info_hash;
         }
 
-        [[nodiscard]] constexpr VerifyMediator& mediator() const noexcept
-        {
-            return *mediator_;
-        }
-
-        std::unique_ptr<VerifyMediator> mediator_;
+        std::unique_ptr<Mediator> mediator_;
         tr_priority_t priority_;
     };
 
-    static void verify_torrent(VerifyMediator& verify_mediator, std::atomic<bool> const& abort_flag);
+    static void verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag);
 
     void verify_thread_func();
 

@@ -78,7 +78,7 @@ void tr_torrentSave(tr_torrent* tor);
 struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
-    struct VerifyMediator : public tr_verify_worker::VerifyMediator
+    struct VerifyMediator : public tr_verify_worker::Mediator
     {
         explicit VerifyMediator(tr_torrent* const tor)
             : tor_{ tor }
