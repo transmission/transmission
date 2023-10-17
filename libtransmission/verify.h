@@ -54,34 +54,9 @@ private:
         {
         }
 
-        [[nodiscard]] int compare(Node const& that) const noexcept // <=>
-        {
-            // prefer higher-priority torrents
-            if (priority_ != that.priority_)
-            {
-                return priority_ > that.priority_ ? 1 : -1;
-            }
+        [[nodiscard]] int compare(Node const& that) const noexcept; // <=>
 
-            // prefer smaller torrents, since they will verify faster
-            auto const& metainfo = mediator_->metainfo();
-            auto const& that_metainfo = that.mediator_->metainfo();
-            if (metainfo.total_size() != that_metainfo.total_size())
-            {
-                return metainfo.total_size() < that_metainfo.total_size() ? 1 : -1;
-            }
-
-            // uniqueness check
-            auto const& this_hash = metainfo.info_hash();
-            auto const& that_hash = that_metainfo.info_hash();
-            if (this_hash != that_hash)
-            {
-                return this_hash < that_hash ? 1 : -1;
-            }
-
-            return 0;
-        }
-
-        [[nodiscard]] bool operator<(Node const& that) const noexcept
+        [[nodiscard]] auto operator<(Node const& that) const noexcept
         {
             return compare(that) < 0;
         }

@@ -98,7 +98,7 @@ public:
 
     private:
         tr_torrent* const tor_;
-        time_t time_started_ = {};
+        std::optional<time_t> time_started_;
     };
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)

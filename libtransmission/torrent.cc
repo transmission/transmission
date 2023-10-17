@@ -698,7 +698,7 @@ void removeTorrentInSessionThread(tr_torrent* tor, bool delete_flag, tr_fileFunc
     {
         // ensure the files are all closed and idle before moving
         tor->session->closeTorrentFiles(tor);
-        tor->session->verifyRemove(tor);
+        tor->session->verify_remove(tor);
 
         if (delete_func == nullptr)
         {
@@ -829,7 +829,7 @@ void torrentStop(tr_torrent* const tor)
         tr_logAddInfoTor(tor, _("Pausing torrent"));
     }
 
-    tor->session->verifyRemove(tor);
+    tor->session->verify_remove(tor);
 
     tor->stopped_.emit(tor);
     tor->session->announcer_->stopTorrent(tor);
@@ -1202,7 +1202,7 @@ void setLocationInSessionThread(
 
         // ensure the files are all closed and idle before moving
         tor->session->closeTorrentFiles(tor);
-        tor->session->verifyRemove(tor);
+        tor->session->verify_remove(tor);
 
         tr_error* error = nullptr;
         ok = tor->metainfo_.files().move(tor->current_dir(), path, setme_progress, tor->name(), &error);
@@ -1689,7 +1689,7 @@ void verifyTorrent(tr_torrent* const tor, bool force)
     }
 
     /* if the torrent's already being verified, stop it */
-    tor->session->verifyRemove(tor);
+    tor->session->verify_remove(tor);
 
     if (!tor->has_metainfo())
     {
@@ -1703,7 +1703,7 @@ void verifyTorrent(tr_torrent* const tor, bool force)
 
     if (force || !setLocalErrorIfFilesDisappeared(tor))
     {
-        tor->session->verifyAdd(tor);
+        tor->session->verify_add(tor);
     }
 }
 } // namespace verify_helpers
@@ -1716,7 +1716,7 @@ void tr_torrentVerify(tr_torrent* tor, bool force)
     tor->session->runInSessionThread(verifyTorrent, tor, force);
 }
 
-void tr_torrent::set_verify_state(VerifyState state)
+void tr_torrent::set_verify_state(VerifyState const state)
 {
     TR_ASSERT(state == VerifyState::None || state == VerifyState::Queued || state == VerifyState::Active);
 
@@ -1730,7 +1730,7 @@ tr_torrent_metainfo const& tr_torrent::VerifyMediator::metainfo() const
     return tor_->metainfo_;
 }
 
-std::optional<std::string> tr_torrent::VerifyMediator::find_file(tr_file_index_t file_index) const
+std::optional<std::string> tr_torrent::VerifyMediator::find_file(tr_file_index_t const file_index) const
 {
     if (auto const found = tor_->find_file(file_index); found)
     {
@@ -1753,7 +1753,7 @@ void tr_torrent::VerifyMediator::on_verify_started()
     tor_->set_verify_state(VerifyState::Active);
 }
 
-void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t piece, bool has_piece)
+void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t const piece, bool const has_piece)
 {
     auto const had_piece = tor_->has_piece(piece);
 
@@ -1769,20 +1769,22 @@ void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t piece, bool h
     fmt::print("{}\n", tor_->verify_progress_);
 }
 
-void tr_torrent::VerifyMediator::on_verify_done(bool aborted)
+void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
 {
     using namespace verify_helpers;
 
-    auto const now = tr_time();
-    auto const duration_secs = now - time_started_;
-    auto const total_size = tor_->total_size();
-    tr_logAddDebugTor(
-        tor_,
-        fmt::format(
-            "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
-            duration_secs,
-            total_size,
-            total_size / (1 + duration_secs)));
+    if (time_started_.has_value())
+    {
+        auto const total_size = tor_->total_size();
+        auto const duration_secs = tr_time() - *time_started_;
+        tr_logAddDebugTor(
+            tor_,
+            fmt::format(
+                "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
+                duration_secs,
+                total_size,
+                total_size / (1 + duration_secs)));
+    }
 
     tor_->set_verify_state(VerifyState::None);
 
