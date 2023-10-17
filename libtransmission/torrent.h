@@ -78,8 +78,9 @@ void tr_torrentSave(tr_torrent* tor);
 struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
-    struct VerifyMediator : public tr_verify_worker::Mediator
+    class VerifyMediator : public tr_verify_worker::Mediator
     {
+    public:
         explicit VerifyMediator(tr_torrent* const tor)
             : tor_{ tor }
         {
@@ -97,7 +98,7 @@ public:
 
     private:
         tr_torrent* const tor_;
-        time_t time_started_ = 0;
+        time_t time_started_ = {};
     };
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
@@ -253,7 +254,7 @@ public:
         return completion.has_none();
     }
 
-    [[nodiscard]] bool has_piece(tr_piece_index_t piece) const
+    [[nodiscard]] auto has_piece(tr_piece_index_t piece) const
     {
         return completion.has_piece(piece);
     }
@@ -997,7 +998,7 @@ public:
 private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
 
-    enum VerifyState : uint8_t
+    enum class VerifyState : uint8_t
     {
         None,
         Queued,
@@ -1174,8 +1175,6 @@ private:
 
     bool sequential_download_ = false;
 };
-
-// ---
 
 // ---
 

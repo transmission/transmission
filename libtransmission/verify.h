@@ -20,15 +20,14 @@
 #include <set>
 #include <thread>
 
-#include "libtransmission/transmission.h" // tr_piece_index_t
 #include "libtransmission/torrent-metainfo.h"
-#include "libtransmission/tr-macros.h" // tr_info_hash_t
 
 class tr_verify_worker
 {
 public:
-    struct Mediator
+    class Mediator
     {
+    public:
         virtual ~Mediator() = default;
 
         [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
@@ -49,13 +48,13 @@ public:
 private:
     struct Node
     {
-        Node(std::unique_ptr<Mediator> mediator, tr_priority_t priority)
+        Node(std::unique_ptr<Mediator> mediator, tr_priority_t priority) noexcept
             : mediator_{ std::move(mediator) }
             , priority_{ priority }
         {
         }
 
-        [[nodiscard]] int compare(Node const& that) const // <=>
+        [[nodiscard]] int compare(Node const& that) const noexcept // <=>
         {
             // prefer higher-priority torrents
             if (priority_ != that.priority_)
@@ -82,7 +81,7 @@ private:
             return 0;
         }
 
-        [[nodiscard]] bool operator<(Node const& that) const
+        [[nodiscard]] bool operator<(Node const& that) const noexcept
         {
             return compare(that) < 0;
         }

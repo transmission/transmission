@@ -122,7 +122,6 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<boo
         tr_sys_file_close(fd);
     }
 
-    /* stopwatch */
     verify_mediator.on_verify_done(abort_flag);
 }
 
@@ -185,7 +184,7 @@ void tr_verify_worker::remove(tr_sha1_digest_t const& info_hash)
 
         if (iter != std::end(todo_))
         {
-            iter->mediator_->on_verify_done(true);
+            iter->mediator_->on_verify_done(true /*aborted*/);
             todo_.erase(iter);
         }
     }
