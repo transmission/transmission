@@ -13,6 +13,7 @@
 #include <string_view>
 
 #include <libtransmission/quark.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
 #include "gtest/gtest.h"
@@ -24,12 +25,11 @@ class JSONTest : public ::testing::TestWithParam<char const*>
 protected:
     void SetUp() override
     {
+        ::testing::TestWithParam<char const*>::SetUp();
+
         auto const* locale_str = GetParam();
-        try
-        {
-            old_locale_ = std::locale::global(std::locale{ {}, new std::numpunct_byname<char>{ locale_str } });
-        }
-        catch (std::runtime_error const&)
+        old_locale_ = tr_locale_set_global(locale_str);
+        if (!old_locale_)
         {
             GTEST_SKIP();
         }
@@ -39,8 +39,10 @@ protected:
     {
         if (old_locale_)
         {
-            std::locale::global(*old_locale_);
+            tr_locale_set_global(*old_locale_);
         }
+
+        ::testing::TestWithParam<char const*>::TearDown();
     }
 
 private:
@@ -95,8 +97,7 @@ TEST_P(JSONTest, testUtf8)
     auto sv = std::string_view{};
     tr_quark const key = tr_quark_new("key"sv);
 
-    auto serde = tr_variant_serde::json();
-    serde.inplace();
+    auto serde = tr_variant_serde::json().inplace().compact();
     auto var = serde.parse(in).value_or(tr_variant{});
     EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
     EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
@@ -114,7 +115,7 @@ TEST_P(JSONTest, testUtf8)
      * 1. Feed it JSON-escaped nonascii to the JSON decoder.
      * 2. Confirm that the result is UTF-8.
      * 3. Feed the same UTF-8 back into the JSON encoder.
-     * 4. Confirm that the result is JSON-escaped.
+     * 4. Confirm that the result is UTF-8.
      * 5. Dogfood that result back into the parser.
      * 6. Confirm that the result is UTF-8.
      */
@@ -127,32 +128,34 @@ TEST_P(JSONTest, testUtf8)
     var.clear();
 
     EXPECT_FALSE(std::empty(json));
-    EXPECT_NE(std::string::npos, json.find("\\u00f6"));
-    EXPECT_NE(std::string::npos, json.find("\\u00e9"));
+    EXPECT_EQ(R"({"key":"Letöltések"})"sv, json);
     var = serde.parse(json).value_or(tr_variant{});
     EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
     EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
-}
 
-TEST_P(JSONTest, testUtf16Surrogates)
-{
-    static auto constexpr ThinkingFaceEmojiUtf8 = "\xf0\x9f\xa4\x94"sv;
-    auto var = tr_variant{};
-    tr_variantInitDict(&var, 1);
-    auto const key = tr_quark_new("key"sv);
-    tr_variantDictAddStr(&var, key, ThinkingFaceEmojiUtf8);
+    // Test string known to be prone to locale issues
+    // https://github.com/transmission/transmission/issues/5967
+    var.clear();
+    tr_variantInitDict(&var, 1U);
+    tr_variantDictAddStr(&var, key, "Дыскаграфія"sv);
+    json = serde.to_string(var);
+    EXPECT_EQ(R"({"key":"Дыскаграфія"})"sv, json);
+    var = serde.parse(json).value_or(tr_variant{});
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
+    EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
+    EXPECT_EQ("Дыскаграфія"sv, sv);
 
-    auto serde = tr_variant_serde::json();
-    auto const json = serde.compact().to_string(var);
-    EXPECT_NE(std::string::npos, json.find("ud83e"));
-    EXPECT_NE(std::string::npos, json.find("udd14"));
-
-    auto parsed = serde.parse(json).value_or(tr_variant{});
-    EXPECT_TRUE(parsed.holds_alternative<tr_variant::Map>());
-    auto value = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&parsed, key, &value));
-    EXPECT_EQ(ThinkingFaceEmojiUtf8, value);
+    // Thinking emoji 🤔
+    var.clear();
+    tr_variantInitDict(&var, 1U);
+    tr_variantDictAddStr(&var, key, "\xf0\x9f\xa4\x94"sv);
+    json = serde.to_string(var);
+    EXPECT_EQ("{\"key\":\"\xf0\x9f\xa4\x94\"}"sv, json);
+    var = serde.parse(json).value_or(tr_variant{});
+    EXPECT_TRUE(var.holds_alternative<tr_variant::Map>());
+    EXPECT_TRUE(tr_variantDictFindStrView(&var, key, &sv));
+    EXPECT_EQ("\xf0\x9f\xa4\x94"sv, sv);
 }
 
 TEST_P(JSONTest, test1)

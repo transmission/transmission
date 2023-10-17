@@ -569,41 +569,36 @@ void jsonRealFunc(tr_variant const& /*var*/, double const val, void* vdata)
     jsonChildFunc(data);
 }
 
-[[nodiscard]] char* write_escaped_char(char* buf, char const* const end, std::string_view& sv)
-{
-    auto u16buf = std::array<std::uint16_t, 2>{};
-
-    auto const* const begin8 = std::data(sv);
-    auto const* const end8 = begin8 + std::size(sv);
-    auto const* walk8 = begin8;
-    utf8::next(walk8, end8);
-    auto const end16 = utf8::utf8to16(begin8, walk8, std::begin(u16buf));
-
-    for (auto it = std::cbegin(u16buf); it != end16; ++it)
-    {
-        buf = fmt::format_to_n(buf, end - buf - 1, FMT_COMPILE("\\u{:04x}"), *it).out;
-    }
-
-    sv.remove_prefix(walk8 - begin8 - 1);
-    return buf;
-}
-
+// https://datatracker.ietf.org/doc/html/rfc8259#section-7
 void jsonStringFunc(tr_variant const& /*var*/, std::string_view sv, void* vdata)
 {
     auto* const data = static_cast<struct JsonWalk*>(vdata);
 
+    auto const utf8_str = tr_strv_convert_utf8(sv);
+    auto utf8_sv = std::string_view{ utf8_str };
+
     auto& out = data->out;
-    auto const [buf, buflen] = out.reserve_space(std::size(sv) * 6 + 2);
+    auto const [buf, buflen] = out.reserve_space(std::size(utf8_sv) * 6 + 2);
     auto* walk = reinterpret_cast<char*>(buf);
     auto const* const begin = walk;
     auto const* const end = begin + buflen;
 
     *walk++ = '"';
 
-    for (; !std::empty(sv); sv.remove_prefix(1))
+    for (; !std::empty(utf8_sv); utf8_sv.remove_prefix(1))
     {
-        switch (sv.front())
+        switch (utf8_sv.front())
         {
+        case '"':
+            *walk++ = '\\';
+            *walk++ = '"';
+            break;
+
+        case '\\':
+            *walk++ = '\\';
+            *walk++ = '\\';
+            break;
+
         case '\b':
             *walk++ = '\\';
             *walk++ = 'b';
@@ -629,31 +624,14 @@ void jsonStringFunc(tr_variant const& /*var*/, std::string_view sv, void* vdata)
             *walk++ = 't';
             break;
 
-        case '"':
-            *walk++ = '\\';
-            *walk++ = '"';
-            break;
-
-        case '\\':
-            *walk++ = '\\';
-            *walk++ = '\\';
-            break;
-
         default:
-            if (isprint((unsigned char)sv.front()) != 0)
+            if (utf8_sv.front() >= '\u0000' && utf8_sv.front() <= '\u001f')
             {
-                *walk++ = sv.front();
+                walk = fmt::format_to_n(walk, end - walk - 1, "\\u{:04x}", utf8_sv.front()).out;
             }
             else
             {
-                try
-                {
-                    walk = write_escaped_char(walk, end, sv);
-                }
-                catch (utf8::exception const&)
-                {
-                    *walk++ = '?';
-                }
+                *walk++ = utf8_sv.front();
             }
             break;
         }
@@ -733,7 +711,7 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
     walk(var, Funcs, &data, true);
 
     auto& buf = data.out;
-    if (!std::empty(buf))
+    if (!compact_ && !std::empty(buf))
     {
         buf.push_back('\n');
     }
