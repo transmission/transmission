@@ -160,35 +160,32 @@ public:
 
     void add_uint16(uint16_t hs)
     {
-        uint16_t const ns = htons(hs);
-        add(&ns, sizeof(ns));
+        add_uint16_n(htons(hs));
     }
 
-    void add_hton16(uint16_t hs)
+    void add_uint16_n(uint16_t ns)
     {
-        add_uint16(hs);
+        add(&ns, sizeof(ns));
     }
 
     void add_uint32(uint32_t hl)
     {
-        uint32_t const nl = htonl(hl);
-        add(&nl, sizeof(nl));
+        add_uint32_n(htonl(hl));
     }
 
-    void eadd_hton32(uint32_t hl)
+    void add_uint32_n(uint32_t nl)
     {
-        add_uint32(hl);
+        add(&nl, sizeof(nl));
     }
 
     void add_uint64(uint64_t hll)
     {
-        uint64_t const nll = tr_htonll(hll);
-        add(&nll, sizeof(nll));
+        add_uint64_n(tr_htonll(hll));
     }
 
-    void add_hton64(uint64_t hll)
+    void add_uint64_n(uint64_t nll)
     {
-        add_uint64(hll);
+        add(&nll, sizeof(nll));
     }
 
     void add_port(tr_port port)

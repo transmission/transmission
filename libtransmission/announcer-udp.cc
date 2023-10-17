@@ -187,7 +187,7 @@ struct tau_announce_request
         buf.add_uint64(in.leftUntilComplete);
         buf.add_uint64(in.up);
         buf.add_uint32(get_tau_announce_event(in.event));
-        buf.add_uint32(announce_ip);
+        buf.add_uint32_n(announce_ip);
         buf.add_uint32(in.key);
         buf.add_uint32(in.numwant);
         buf.add_port(in.port);
