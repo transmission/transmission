@@ -2628,9 +2628,14 @@ tr_torrent_metainfo const& tr_torrent::VerifyMediator::metainfo() const
     return tor_->metainfo_;
 }
 
-std::optional<tr_torrent_files::FoundFile> tr_torrent::VerifyMediator::find_file(tr_file_index_t file_index) const
+std::optional<std::string> tr_torrent::VerifyMediator::find_file(tr_file_index_t file_index) const
 {
-    return tor_->find_file(file_index);
+    if (auto const found = tor_->find_file(file_index); found)
+    {
+        return std::string{ found->filename().sv() };
+    }
+
+    return {};
 }
 
 void tr_torrent::VerifyMediator::on_verify_queued()
@@ -2658,7 +2663,8 @@ void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t piece, bool h
 
     tor_->checked_pieces_.set(piece, true);
     tor_->mark_changed();
-    tor_->verify_progress_ = static_cast<float>(piece + 1U) / static_cast<float>(tor_->metainfo_.piece_count());
+    tor_->verify_progress_ = std::clamp(static_cast<float>(piece + 1U) / tor_->metainfo_.piece_count(), 0.0F, 1.0F);
+    fmt::print("{}\n", tor_->verify_progress_);
 }
 
 void tr_torrent::VerifyMediator::on_verify_done(bool aborted)

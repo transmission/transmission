@@ -21,8 +21,8 @@
 #include <thread>
 
 #include "libtransmission/transmission.h" // tr_piece_index_t
+#include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-macros.h" // tr_info_hash_t
-#include "libtransmission/torrent-metainfo.h" // tr_torrent_files::FoundFile
 
 class tr_verify_worker
 {
@@ -32,7 +32,7 @@ public:
         virtual ~VerifyMediator() = default;
 
         [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
-        [[nodiscard]] virtual std::optional<tr_torrent_files::FoundFile> find_file(tr_file_index_t file_index) const = 0;
+        [[nodiscard]] virtual std::optional<std::string> find_file(tr_file_index_t file_index) const = 0;
 
         virtual void on_verify_queued() = 0;
         virtual void on_verify_started() = 0;
