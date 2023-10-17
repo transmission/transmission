@@ -11,7 +11,8 @@
 #include <string_view>
 #include <tuple>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/quark.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/variant-common.h>
 
@@ -24,12 +25,11 @@ class JSONTest : public ::testing::TestWithParam<char const*>
 protected:
     void SetUp() override
     {
+        ::testing::TestWithParam<char const*>::SetUp();
+
         auto const* locale_str = GetParam();
-        try
-        {
-            old_locale_ = std::locale::global(std::locale{ {}, new std::numpunct_byname<char>{ locale_str } });
-        }
-        catch (std::runtime_error const&)
+        old_locale_ = tr_locale_set_global(locale_str);
+        if (!old_locale_)
         {
             GTEST_SKIP();
         }
@@ -39,8 +39,10 @@ protected:
     {
         if (old_locale_)
         {
-            std::ignore = std::locale::global(*old_locale_);
+            tr_locale_set_global(*old_locale_);
         }
+
+        ::testing::TestWithParam<char const*>::TearDown();
     }
 
 private:
@@ -116,7 +118,7 @@ TEST_P(JSONTest, testUtf8)
      * 1. Feed it JSON-escaped nonascii to the JSON decoder.
      * 2. Confirm that the result is UTF-8.
      * 3. Feed the same UTF-8 back into the JSON encoder.
-     * 4. Confirm that the result is JSON-escaped.
+     * 4. Confirm that the result is UTF-8.
      * 5. Dogfood that result back into the parser.
      * 6. Confirm that the result is UTF-8.
      */
@@ -125,38 +127,38 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
-    auto json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON);
+    auto json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
     tr_variantClear(&top);
 
     EXPECT_FALSE(std::empty(json));
-    EXPECT_NE(std::string::npos, json.find("\\u00f6"));
-    EXPECT_NE(std::string::npos, json.find("\\u00e9"));
+    EXPECT_EQ(R"({"key":"Letöltések"})"sv, json);
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
-    tr_variantClear(&top);
-}
 
-TEST_P(JSONTest, testUtf16Surrogates)
-{
-    static auto constexpr ThinkingFaceEmojiUtf8 = "\xf0\x9f\xa4\x94"sv;
-    auto top = tr_variant{};
-    tr_variantInitDict(&top, 1);
-    auto const key = tr_quark_new("key"sv);
-    tr_variantDictAddStr(&top, key, ThinkingFaceEmojiUtf8);
-    auto const json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
-    EXPECT_NE(std::string::npos, json.find("ud83e"));
-    EXPECT_NE(std::string::npos, json.find("udd14"));
+    // Test string known to be prone to locale issues
+    // https://github.com/transmission/transmission/issues/5967
     tr_variantClear(&top);
+    tr_variantInitDict(&top, 1U);
+    tr_variantDictAddStr(&top, key, "Дыскаграфія"sv);
+    json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
+    EXPECT_EQ(R"({"key":"Дыскаграфія"})"sv, json);
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
+    EXPECT_TRUE(tr_variantIsDict(&top));
+    EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
+    EXPECT_EQ("Дыскаграфія"sv, sv);
 
-    auto parsed = tr_variant{};
-    EXPECT_TRUE(tr_variantFromBuf(&parsed, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
-    EXPECT_TRUE(tr_variantIsDict(&parsed));
-    auto value = std::string_view{};
-    EXPECT_TRUE(tr_variantDictFindStrView(&parsed, key, &value));
-    EXPECT_EQ(ThinkingFaceEmojiUtf8, value);
-    tr_variantClear(&parsed);
+    // Thinking emoji 🤔
+    tr_variantClear(&top);
+    tr_variantInitDict(&top, 1U);
+    tr_variantDictAddStr(&top, key, "\xf0\x9f\xa4\x94"sv);
+    json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON_LEAN);
+    EXPECT_EQ("{\"key\":\"\xf0\x9f\xa4\x94\"}"sv, json);
+    EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
+    EXPECT_TRUE(tr_variantIsDict(&top));
+    EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
+    EXPECT_EQ("\xf0\x9f\xa4\x94"sv, sv);
 }
 
 TEST_P(JSONTest, test1)

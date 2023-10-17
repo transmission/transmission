@@ -11,6 +11,8 @@
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
 #include <ctime> // time_t
+#include <locale>
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -56,7 +58,9 @@ struct tr_error;
 #define tr_ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 
-void tr_locale_set_global(char const* locale_name) noexcept;
+std::optional<std::locale> tr_locale_set_global(char const* locale_name) noexcept;
+
+std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexcept;
 
 // ---
 
