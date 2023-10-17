@@ -50,3 +50,6 @@
 [submodule "third-party/small"]
 	path = third-party/small
 	url = https://github.com/transmission/small.git
+[submodule "third-party/rapidjson"]
+	path = third-party/rapidjson
+	url = https://github.com/Tencent/rapidjson.git

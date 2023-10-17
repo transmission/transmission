@@ -288,6 +288,7 @@ target_link_libraries(${TR_NAME}
         ${LIBQUOTA_LIBRARY}
         ${TR_NETWORK_LIBRARIES}
         jsonsl
+        RapidJSON
         utf8::cpp
         wildmat
         WideInteger::WideInteger
