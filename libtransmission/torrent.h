@@ -11,6 +11,7 @@
 
 #include <cstddef> // size_t
 #include <ctime>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -78,6 +79,8 @@ void tr_torrentSave(tr_torrent* tor);
 struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
+    using VerifyDoneCallback = std::function<void(tr_torrent*)>;
+
     class VerifyMediator : public tr_verify_worker::Mediator
     {
     public:
@@ -997,6 +1000,7 @@ public:
 
 private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
+    friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 
     enum class VerifyState : uint8_t
     {
@@ -1145,6 +1149,8 @@ private:
 
     Error error_;
 
+    VerifyDoneCallback verify_done_callback_;
+
     tr_interned_string bandwidth_group_;
 
     SimpleSmoothedSpeed eta_speed_;
@@ -1196,6 +1202,9 @@ void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
+
+void tr_ctorSetVerifyDoneCallback(tr_ctor* ctor, tr_torrent::VerifyDoneCallback&& callback);
+tr_torrent::VerifyDoneCallback tr_ctorStealVerifyDoneCallback(tr_ctor* ctor);
 
 #define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
 #define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())

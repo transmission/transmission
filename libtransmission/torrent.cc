@@ -1172,6 +1172,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
     }
 
     auto* const tor = new tr_torrent{ std::move(metainfo) };
+    tor->verify_done_callback_ = tr_ctorStealVerifyDoneCallback(ctor);
     torrentInit(tor, ctor);
     return tor;
 }
@@ -1790,6 +1791,11 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
     if (!aborted && !tor_->is_deleting_)
     {
         tor_->session->runInSessionThread(onVerifyDoneThreadFunc, tor_);
+    }
+
+    if (tor_->verify_done_callback_)
+    {
+        tor_->verify_done_callback_(tor_);
     }
 }
 

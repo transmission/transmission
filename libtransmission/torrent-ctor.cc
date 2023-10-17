@@ -60,11 +60,27 @@ struct tr_ctor
 
     std::vector<char> contents;
 
+    tr_torrent::VerifyDoneCallback verify_done_callback_;
+
     explicit tr_ctor(tr_session const* session_in)
         : session{ session_in }
     {
     }
 };
+
+// ---
+
+void tr_ctorSetVerifyDoneCallback(tr_ctor* ctor, tr_torrent::VerifyDoneCallback&& callback)
+{
+    ctor->verify_done_callback_ = std::move(callback);
+}
+
+tr_torrent::VerifyDoneCallback tr_ctorStealVerifyDoneCallback(tr_ctor* ctor)
+{
+    auto tmp = tr_torrent::VerifyDoneCallback{};
+    std::swap(ctor->verify_done_callback_, tmp);
+    return tmp;
+}
 
 // ---
 
