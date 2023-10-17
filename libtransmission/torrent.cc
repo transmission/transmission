@@ -1766,7 +1766,6 @@ void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t const piece, 
     tor_->checked_pieces_.set(piece, true);
     tor_->mark_changed();
     tor_->verify_progress_ = std::clamp(static_cast<float>(piece + 1U) / tor_->metainfo_.piece_count(), 0.0F, 1.0F);
-    fmt::print("{}\n", tor_->verify_progress_);
 }
 
 void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
