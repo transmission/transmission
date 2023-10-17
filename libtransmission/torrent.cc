@@ -1725,6 +1725,73 @@ void tr_torrent::set_verify_state(VerifyState state)
     mark_changed();
 }
 
+tr_torrent_metainfo const& tr_torrent::VerifyMediator::metainfo() const
+{
+    return tor_->metainfo_;
+}
+
+std::optional<std::string> tr_torrent::VerifyMediator::find_file(tr_file_index_t file_index) const
+{
+    if (auto const found = tor_->find_file(file_index); found)
+    {
+        return std::string{ found->filename().sv() };
+    }
+
+    return {};
+}
+
+void tr_torrent::VerifyMediator::on_verify_queued()
+{
+    tr_logAddTraceTor(tor_, "Queued for verification");
+    tor_->set_verify_state(VerifyState::Queued);
+}
+
+void tr_torrent::VerifyMediator::on_verify_started()
+{
+    tr_logAddDebugTor(tor_, "Verifying torrent");
+    time_started_ = tr_time();
+    tor_->set_verify_state(VerifyState::Active);
+}
+
+void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t piece, bool has_piece)
+{
+    auto const had_piece = tor_->has_piece(piece);
+
+    if (has_piece || had_piece)
+    {
+        tor_->set_has_piece(piece, has_piece);
+        tor_->set_dirty();
+    }
+
+    tor_->checked_pieces_.set(piece, true);
+    tor_->mark_changed();
+    tor_->verify_progress_ = std::clamp(static_cast<float>(piece + 1U) / tor_->metainfo_.piece_count(), 0.0F, 1.0F);
+    fmt::print("{}\n", tor_->verify_progress_);
+}
+
+void tr_torrent::VerifyMediator::on_verify_done(bool aborted)
+{
+    using namespace verify_helpers;
+
+    auto const now = tr_time();
+    auto const duration_secs = now - time_started_;
+    auto const total_size = tor_->total_size();
+    tr_logAddDebugTor(
+        tor_,
+        fmt::format(
+            "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
+            duration_secs,
+            total_size,
+            total_size / (1 + duration_secs)));
+
+    tor_->set_verify_state(VerifyState::None);
+
+    if (!aborted && !tor_->is_deleting_)
+    {
+        tor_->session->runInSessionThread(onVerifyDoneThreadFunc, tor_);
+    }
+}
+
 // ---
 
 void tr_torrentSave(tr_torrent* tor)
@@ -2618,74 +2685,5 @@ void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* m
             auto const [begin, end] = pieces_in_file(i);
             checked_pieces_.unset_span(begin, end);
         }
-    }
-}
-
-// ---
-
-tr_torrent_metainfo const& tr_torrent::VerifyMediator::metainfo() const
-{
-    return tor_->metainfo_;
-}
-
-std::optional<std::string> tr_torrent::VerifyMediator::find_file(tr_file_index_t file_index) const
-{
-    if (auto const found = tor_->find_file(file_index); found)
-    {
-        return std::string{ found->filename().sv() };
-    }
-
-    return {};
-}
-
-void tr_torrent::VerifyMediator::on_verify_queued()
-{
-    tr_logAddTraceTor(tor_, "Queued for verification");
-    tor_->set_verify_state(VerifyState::Queued);
-}
-
-void tr_torrent::VerifyMediator::on_verify_started()
-{
-    tr_logAddDebugTor(tor_, "Verifying torrent");
-    time_started_ = tr_time();
-    tor_->set_verify_state(VerifyState::Active);
-}
-
-void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t piece, bool has_piece)
-{
-    auto const had_piece = tor_->has_piece(piece);
-
-    if (has_piece || had_piece)
-    {
-        tor_->set_has_piece(piece, has_piece);
-        tor_->set_dirty();
-    }
-
-    tor_->checked_pieces_.set(piece, true);
-    tor_->mark_changed();
-    tor_->verify_progress_ = std::clamp(static_cast<float>(piece + 1U) / tor_->metainfo_.piece_count(), 0.0F, 1.0F);
-    fmt::print("{}\n", tor_->verify_progress_);
-}
-
-void tr_torrent::VerifyMediator::on_verify_done(bool aborted)
-{
-    using namespace verify_helpers;
-
-    auto const now = tr_time();
-    auto const duration_secs = now - time_started_;
-    auto const total_size = tor_->total_size();
-    tr_logAddDebugTor(
-        tor_,
-        fmt::format(
-            "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
-            duration_secs,
-            total_size,
-            total_size / (1 + duration_secs)));
-
-    tor_->set_verify_state(VerifyState::None);
-
-    if (!aborted && !tor_->is_deleting_)
-    {
-        tor_->session->runInSessionThread(onVerifyDoneThreadFunc, tor_);
     }
 }
