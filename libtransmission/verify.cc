@@ -169,7 +169,7 @@ void tr_verify_worker::add(std::unique_ptr<Mediator> mediator, tr_priority_t pri
 
 void tr_verify_worker::remove(tr_sha1_digest_t const& info_hash)
 {
-    auto lock = std::unique_lock(verify_mutex_);
+    auto lock = std::lock_guard{ verify_mutex_ };
 
     if (current_node_ && current_node_->matches(info_hash))
     {
