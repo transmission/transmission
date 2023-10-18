@@ -401,7 +401,7 @@ protected:
             ctor,
             [this](tr_torrent* const tor)
             {
-                auto verified_lock = std::scoped_lock(verified_mutex_);
+                auto verified_lock = std::lock_guard{ verified_mutex_ };
                 verified_.emplace_back(tor);
                 verified_cv_.notify_one();
             });
