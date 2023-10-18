@@ -156,6 +156,7 @@ void tr_verify_worker::add(std::unique_ptr<Mediator> mediator, tr_priority_t pri
 {
     auto const lock = std::lock_guard{ verify_mutex_ };
 
+    mediator->on_verify_queued();
     todo_.emplace(std::move(mediator), priority);
 
     if (!verify_thread_id_)
