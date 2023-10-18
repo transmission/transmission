@@ -2004,7 +2004,7 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
 
 // ---
 
-void tr_session::verify_remove(tr_torrent* const tor)
+void tr_session::verify_remove(tr_torrent const* const tor)
 {
     if (verifier_)
     {
