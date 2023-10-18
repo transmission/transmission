@@ -206,7 +206,7 @@ int tr_verify_worker::Node::compare(Node const& that) const noexcept
     // prefer higher-priority torrents
     if (priority_ != that.priority_)
     {
-        return priority_ > that.priority_ ? 1 : -1;
+        return priority_ > that.priority_ ? -1 : 1;
     }
 
     // prefer smaller torrents, since they will verify faster
@@ -214,7 +214,7 @@ int tr_verify_worker::Node::compare(Node const& that) const noexcept
     auto const& that_metainfo = that.mediator_->metainfo();
     if (metainfo.total_size() != that_metainfo.total_size())
     {
-        return metainfo.total_size() < that_metainfo.total_size() ? 1 : -1;
+        return metainfo.total_size() < that_metainfo.total_size() ? -1 : 1;
     }
 
     // uniqueness check
@@ -222,7 +222,7 @@ int tr_verify_worker::Node::compare(Node const& that) const noexcept
     auto const& that_hash = that_metainfo.info_hash();
     if (this_hash != that_hash)
     {
-        return this_hash < that_hash ? 1 : -1;
+        return this_hash < that_hash ? -1 : 1;
     }
 
     return 0;
