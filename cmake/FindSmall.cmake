@@ -5,7 +5,6 @@ target_include_directories(small::small
         ${CMAKE_CURRENT_LIST_DIR}/../third-party/small/include)
 
 
-target_compile_definitions(fmt::fmt-header-only
+target_compile_definitions(small::small
     INTERFACE
         SMALL_DISABLE_EXCEPTIONS=1)
-
