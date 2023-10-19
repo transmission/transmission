@@ -26,6 +26,10 @@
 
 #include <jsonsl.h>
 
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "libtransmission/error.h"
@@ -443,251 +447,67 @@ namespace
 {
 namespace to_string_helpers
 {
-struct ParentState
-{
-    bool is_map = false;
-    bool is_list = false;
-    size_t child_index;
-    size_t child_count;
-};
-
 struct JsonWalk
 {
-    explicit JsonWalk(bool do_indent)
-        : doIndent{ do_indent }
+    JsonWalk(rapidjson::StringBuffer& buf, bool is_compact)
     {
-    }
-
-    std::deque<ParentState> parents;
-    libtransmission::StackBuffer<1024U * 8U, std::byte> out;
-    bool doIndent;
-};
-
-void jsonIndent(struct JsonWalk* data)
-{
-    static auto buf = std::array<char, 1024>{};
-
-    if (buf.front() == '\0')
-    {
-        memset(std::data(buf), ' ', std::size(buf));
-        buf[0] = '\n';
-    }
-
-    if (data->doIndent)
-    {
-        data->out.add(std::data(buf), std::size(data->parents) * 4 + 1);
-    }
-}
-
-void jsonChildFunc(struct JsonWalk* data)
-{
-    if (std::empty(data->parents))
-    {
-        return;
-    }
-
-    auto& parent_state = data->parents.back();
-
-    if (parent_state.is_map)
-    {
-        int const i = parent_state.child_index;
-        ++parent_state.child_index;
-
-        if (i % 2 == 0)
+        if (is_compact)
         {
-            data->out.add(data->doIndent ? ": "sv : ":"sv);
+            writer.emplace<0>(buf);
         }
         else
         {
-            bool const is_last = parent_state.child_index == parent_state.child_count;
-            if (!is_last)
-            {
-                data->out.push_back(',');
-                jsonIndent(data);
-            }
+            writer.emplace<1>(buf);
         }
     }
-    else if (parent_state.is_list)
-    {
-        ++parent_state.child_index;
-        if (bool const is_last = parent_state.child_index == parent_state.child_count; !is_last)
-        {
-            data->out.push_back(',');
-            jsonIndent(data);
-        }
-    }
-}
 
-void jsonPushParent(struct JsonWalk* data, tr_variant const& v)
-{
-    auto const is_dict = v.holds_alternative<tr_variant::Map>();
-    auto const is_list = v.holds_alternative<tr_variant::Vector>();
-    auto const n_children = variant_size(v) * (is_dict ? 2U : 1U);
-    data->parents.push_back({ is_dict, is_list, 0, n_children });
-}
-
-void jsonPopParent(struct JsonWalk* data)
-{
-    data->parents.pop_back();
-}
+    std::variant<rapidjson::Writer<rapidjson::StringBuffer>, rapidjson::PrettyWriter<rapidjson::StringBuffer>> writer;
+};
 
 void jsonIntFunc(tr_variant const& /*var*/, int64_t const val, void* vdata)
 {
-    auto buf = std::array<char, 64>{};
-    auto const* const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val);
-    auto* const data = static_cast<JsonWalk*>(vdata);
-    data->out.add(std::data(buf), static_cast<size_t>(out - std::data(buf)));
-    jsonChildFunc(data);
+    std::visit([val](auto&& writer) { writer.Int64(val); }, static_cast<JsonWalk*>(vdata)->writer);
 }
 
 void jsonBoolFunc(tr_variant const& /*var*/, bool const val, void* vdata)
 {
-    auto* data = static_cast<struct JsonWalk*>(vdata);
-    data->out.add(val ? "true"sv : "false"sv);
-    jsonChildFunc(data);
+    std::visit([val](auto&& writer) { writer.Bool(val); }, static_cast<struct JsonWalk*>(vdata)->writer);
 }
 
 void jsonRealFunc(tr_variant const& /*var*/, double const val, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
-
-    auto const [buf, buflen] = data->out.reserve_space(64);
-    auto* walk = reinterpret_cast<char*>(buf);
-    auto const* const begin = walk;
-
-    if (fabs(val - (int)val) < 0.00001)
-    {
-        walk = fmt::format_to(walk, FMT_COMPILE("{:.0f}"), val);
-    }
-    else
-    {
-        walk = fmt::format_to(walk, FMT_COMPILE("{:.4f}"), val);
-    }
-
-    data->out.commit_space(walk - begin);
-
-    jsonChildFunc(data);
+    std::visit([val](auto&& writer) { writer.Double(val); }, static_cast<struct JsonWalk*>(vdata)->writer);
 }
 
-// https://datatracker.ietf.org/doc/html/rfc8259#section-7
 void jsonStringFunc(tr_variant const& /*var*/, std::string_view sv, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
-
-    auto const utf8_str = tr_strv_convert_utf8(sv);
-    auto utf8_sv = std::string_view{ utf8_str };
-
-    auto& out = data->out;
-    auto const [buf, buflen] = out.reserve_space(std::size(utf8_sv) * 6 + 2);
-    auto* walk = reinterpret_cast<char*>(buf);
-    auto const* const begin = walk;
-    auto const* const end = begin + buflen;
-
-    *walk++ = '"';
-
-    for (; !std::empty(utf8_sv); utf8_sv.remove_prefix(1))
-    {
-        switch (utf8_sv.front())
-        {
-        case '"':
-            *walk++ = '\\';
-            *walk++ = '"';
-            break;
-
-        case '\\':
-            *walk++ = '\\';
-            *walk++ = '\\';
-            break;
-
-        case '\b':
-            *walk++ = '\\';
-            *walk++ = 'b';
-            break;
-
-        case '\f':
-            *walk++ = '\\';
-            *walk++ = 'f';
-            break;
-
-        case '\n':
-            *walk++ = '\\';
-            *walk++ = 'n';
-            break;
-
-        case '\r':
-            *walk++ = '\\';
-            *walk++ = 'r';
-            break;
-
-        case '\t':
-            *walk++ = '\\';
-            *walk++ = 't';
-            break;
-
-        default:
-            if (utf8_sv.front() >= '\u0000' && utf8_sv.front() <= '\u001f')
-            {
-                walk = fmt::format_to_n(walk, end - walk - 1, "\\u{:04x}", utf8_sv.front()).out;
-            }
-            else
-            {
-                *walk++ = utf8_sv.front();
-            }
-            break;
-        }
-    }
-
-    *walk++ = '"';
-    TR_ASSERT(walk <= end);
-    out.commit_space(walk - begin);
-
-    jsonChildFunc(data);
+    std::visit(
+        [sv](auto&& writer) { writer.String(std::data(sv), std::size(sv)); },
+        static_cast<struct JsonWalk*>(vdata)->writer);
 }
 
-void jsonDictBeginFunc(tr_variant const& var, void* vdata)
+void jsonDictBeginFunc(tr_variant const& /*var*/, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
-
-    jsonPushParent(data, var);
-    data->out.push_back('{');
-
-    if (variant_size(var) != 0U)
-    {
-        jsonIndent(data);
-    }
+    std::visit([](auto&& writer) { writer.StartObject(); }, static_cast<struct JsonWalk*>(vdata)->writer);
 }
 
-void jsonListBeginFunc(tr_variant const& var, void* vdata)
+void jsonListBeginFunc(tr_variant const& /*var*/, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
-
-    jsonPushParent(data, var);
-    data->out.push_back('[');
-
-    if (variant_size(var) != 0U)
-    {
-        jsonIndent(data);
-    }
+    std::visit([](auto&& writer) { writer.StartArray(); }, static_cast<struct JsonWalk*>(vdata)->writer);
 }
 
 void jsonContainerEndFunc(tr_variant const& var, void* vdata)
 {
-    auto* const data = static_cast<struct JsonWalk*>(vdata);
-
-    jsonPopParent(data);
-
-    jsonIndent(data);
+    auto& writer_var = static_cast<struct JsonWalk*>(vdata)->writer;
 
     if (var.holds_alternative<tr_variant::Map>())
     {
-        data->out.push_back('}');
+        std::visit([](auto&& writer) { writer.EndObject(); }, writer_var);
     }
     else /* list */
     {
-        data->out.push_back(']');
+        std::visit([](auto&& writer) { writer.EndArray(); }, writer_var);
     }
-
-    jsonChildFunc(data);
 }
 
 } // namespace to_string_helpers
@@ -707,13 +527,9 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
         jsonContainerEndFunc, //
     };
 
-    auto data = JsonWalk{ !compact_ };
+    auto buf = rapidjson::StringBuffer{};
+    auto data = JsonWalk{ buf, compact_ };
     walk(var, Funcs, &data, true);
 
-    auto& buf = data.out;
-    if (!compact_ && !std::empty(buf))
-    {
-        buf.push_back('\n');
-    }
-    return buf.to_string();
+    return { buf.GetString(), buf.GetLength() };
 }
