@@ -12,10 +12,11 @@
 #include <cstdint> // uint16_t
 #include <cstdlib>
 #include <cstring>
-#include <deque>
 #include <iterator> // std::back_inserter
+#include <stack>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 
 #define UTF_CPP_CPLUSPLUS 201703L
@@ -26,7 +27,11 @@
 
 #include <jsonsl.h>
 
+#include <rapidjson/encodedstream.h>
+#include <rapidjson/error/en.h>
+#include <rapidjson/memorystream.h>
 #include <rapidjson/prettywriter.h>
+#include <rapidjson/reader.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
@@ -43,399 +48,209 @@ using namespace std::literals;
 
 namespace
 {
-[[nodiscard]] constexpr size_t variant_size(tr_variant const& var) noexcept
-{
-    switch (var.index())
-    {
-    case tr_variant::MapIndex:
-        return std::size(*var.get_if<tr_variant::Map>());
-
-    case tr_variant::VectorIndex:
-        return std::size(*var.get_if<tr_variant::Vector>());
-
-    default:
-        return {};
-    }
-}
-
 namespace parse_helpers
 {
-/* arbitrary value... this is much deeper than our code goes */
-auto constexpr MaxDepth = size_t{ 64 };
-
-struct json_wrapper_data
+struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 {
-    bool has_content;
-    size_t size;
-    std::string_view key;
-    std::string keybuf;
-    std::string strbuf;
-    tr_error* error;
-    std::deque<tr_variant*> stack;
-    tr_variant* top;
-    bool inplace = false;
+    explicit json_to_variant_handler(tr_variant* const top)
+    {
+        stack_.emplace(top);
+    }
+
+    bool Null()
+    {
+        tr_variantInitQuark(get_leaf(), TR_KEY_NONE);
+        return true;
+    }
+
+    bool Bool(bool const val)
+    {
+        tr_variantInitBool(get_leaf(), val);
+        return true;
+    }
+
+    bool Int(int const val)
+    {
+        return Int64(val);
+    }
+
+    bool Uint(unsigned const val)
+    {
+        return Uint64(val);
+    }
+
+    bool Int64(int64_t const val)
+    {
+        tr_variantInitInt(get_leaf(), val);
+        return true;
+    }
+
+    bool Uint64(uint64_t const val)
+    {
+        return Int64(val);
+    }
+
+    bool Double(double const val)
+    {
+        tr_variantInitReal(get_leaf(), val);
+        return true;
+    }
+
+    bool String(Ch const* const str, rapidjson::SizeType const len, bool const copy)
+    {
+        if (copy)
+        {
+            tr_variantInitStr(get_leaf(), { str, len });
+        }
+        else
+        {
+            tr_variantInitStrView(get_leaf(), { str, len });
+        }
+        return true;
+    }
+
+    bool StartObject()
+    {
+        tr_variantInitDict(push_stack(), prealloc_guess());
+        return true;
+    }
+
+    bool Key(Ch const* const str, rapidjson::SizeType const len, bool const copy)
+    {
+        if (copy)
+        {
+            key_buf_ = std::string{ str, len };
+            cur_key_ = key_buf_;
+        }
+        else
+        {
+            cur_key_ = std::string_view{ str, len };
+        }
+        return true;
+    }
+
+    bool EndObject(rapidjson::SizeType const len)
+    {
+        pop_stack(len);
+        return true;
+    }
+
+    bool StartArray()
+    {
+        tr_variantInitList(push_stack(), prealloc_guess());
+        return true;
+    }
+
+    bool EndArray(rapidjson::SizeType const len)
+    {
+        pop_stack(len);
+        return true;
+    }
+
+private:
+    [[nodiscard]] size_t prealloc_guess() const noexcept
+    {
+        auto const depth = std::size(stack_);
+        return depth < MaxDepth ? prealloc_guess_[depth] : 0;
+    }
+
+    tr_variant* push_stack() noexcept
+    {
+        return stack_.emplace(get_leaf());
+    }
+
+    void pop_stack(rapidjson::SizeType const len) noexcept
+    {
+#ifdef TR_ENABLE_ASSERTS
+        if (auto* top = stack_.top(); top->holds_alternative<tr_variant::Vector>())
+        {
+            TR_ASSERT(std::size(*top->get_if<tr_variant::Vector>()) == len);
+        }
+        else if (top->holds_alternative<tr_variant::Map>())
+        {
+            TR_ASSERT(std::size(*top->get_if<tr_variant::Map>()) == len);
+        }
+#endif
+
+        auto const depth = std::size(stack_);
+        stack_.pop();
+        TR_ASSERT(!std::empty(stack_));
+        if (depth < MaxDepth)
+        {
+            prealloc_guess_[depth] = len;
+        }
+    }
+
+    tr_variant* get_leaf()
+    {
+        auto* const parent = stack_.top();
+        TR_ASSERT(parent != nullptr);
+
+        if (parent->holds_alternative<tr_variant::Vector>())
+        {
+            return tr_variantListAdd(parent);
+        }
+        if (parent->holds_alternative<tr_variant::Map>())
+        {
+            TR_ASSERT(!std::empty(cur_key_));
+            auto tmp = std::string_view{};
+            std::swap(cur_key_, tmp);
+            return tr_variantDictAdd(parent, tr_quark_new(tmp));
+        }
+
+        return parent;
+    }
+
+    /* arbitrary value... this is much deeper than our code goes */
+    static auto constexpr MaxDepth = size_t{ 64 };
 
     /* A very common pattern is for a container's children to be similar,
      * e.g. they may all be objects with the same set of keys. So when
      * a container is popped off the stack, remember its size to use as
      * a preallocation heuristic for the next container at that depth. */
-    std::array<size_t, MaxDepth> preallocGuess;
+    std::array<size_t, MaxDepth> prealloc_guess_{};
+
+    std::string key_buf_;
+    std::string_view cur_key_;
+    std::stack<tr_variant*> stack_;
 };
-
-tr_variant* get_node(struct jsonsl_st* jsn)
-{
-    auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
-
-    auto* parent = std::empty(data->stack) ? nullptr : data->stack.back();
-
-    tr_variant* node = nullptr;
-    if (parent == nullptr)
-    {
-        node = data->top;
-    }
-    else if (parent->holds_alternative<tr_variant::Vector>())
-    {
-        node = tr_variantListAdd(parent);
-    }
-    else if (parent->holds_alternative<tr_variant::Map>() && !std::empty(data->key))
-    {
-        node = tr_variantDictAdd(parent, tr_quark_new(data->key));
-        data->key = ""sv;
-    }
-
-    return node;
-}
-
-void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /*state*/, jsonsl_char_t const* buf)
-{
-    auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
-
-    tr_error_set(
-        &data->error,
-        EILSEQ,
-        fmt::format(
-            _("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"),
-            fmt::arg("position", jsn->pos),
-            fmt::arg("text", std::string_view{ buf, std::min(size_t{ 16U }, data->size - jsn->pos) }),
-            fmt::arg("error", jsonsl_strerror(error)),
-            fmt::arg("error_code", static_cast<int>(error))));
-}
-
-int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t* at)
-{
-    error_handler(jsn, error, state, at);
-    return 0; /* bail */
-}
-
-void action_callback_PUSH(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl_state_st* state, jsonsl_char_t const* /*buf*/)
-{
-    auto* const data = static_cast<json_wrapper_data*>(jsn->data);
-
-    if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
-    {
-        data->has_content = true;
-        tr_variant* node = get_node(jsn);
-        data->stack.push_back(node);
-
-        size_t const depth = std::size(data->stack);
-        size_t const n = depth < MaxDepth ? data->preallocGuess[depth] : 0;
-        if (state->type == JSONSL_T_LIST)
-        {
-            tr_variantInitList(node, n);
-        }
-        else
-        {
-            tr_variantInitDict(node, n);
-        }
-    }
-}
-
-/* like sscanf(in+2, "%4x", &val) but less slow */
-[[nodiscard]] constexpr bool decode_hex_string(char const* in, std::uint16_t& setme)
-{
-    TR_ASSERT(in != nullptr);
-
-    unsigned int val = 0;
-    char const* const end = in + 6;
-
-    TR_ASSERT(in[0] == '\\');
-    TR_ASSERT(in[1] == 'u');
-    in += 2;
-
-    do
-    {
-        val <<= 4;
-
-        if ('0' <= *in && *in <= '9')
-        {
-            val += *in - '0';
-        }
-        else if ('a' <= *in && *in <= 'f')
-        {
-            val += *in - 'a' + 10U;
-        }
-        else if ('A' <= *in && *in <= 'F')
-        {
-            val += *in - 'A' + 10U;
-        }
-        else
-        {
-            return false;
-        }
-    } while (++in != end);
-
-    setme = val;
-    return true;
-}
-
-template<typename Iter>
-void decode_single_uchar(char const*& in, char const* const in_end, Iter& buf16_out_it)
-{
-    static auto constexpr EscapedUcharLength = 6U;
-    if (in_end - in >= EscapedUcharLength && decode_hex_string(in, *buf16_out_it))
-    {
-        in += EscapedUcharLength;
-        ++buf16_out_it;
-    }
-}
-
-[[nodiscard]] bool decode_escaped_uchar_sequence(char const*& in, char const* const in_end, std::string& buf)
-{
-    auto buf16 = std::array<std::uint16_t, 2>{};
-    auto buf16_out_it = std::begin(buf16);
-
-    decode_single_uchar(in, in_end, buf16_out_it);
-    if (in[0] == '\\' && in[1] == 'u')
-    {
-        decode_single_uchar(in, in_end, buf16_out_it);
-    }
-
-    if (buf16_out_it == std::begin(buf16))
-    {
-        return false;
-    }
-
-    try
-    {
-        utf8::utf16to8(std::begin(buf16), buf16_out_it, std::back_inserter(buf));
-    }
-    catch (utf8::exception const&) // invalid codepoint
-    {
-        buf.push_back('?');
-    }
-
-    return true;
-}
-
-[[nodiscard]] std::string_view extract_escaped_string(char const* in, size_t in_len, std::string& buf)
-{
-    char const* const in_end = in + in_len;
-
-    buf.clear();
-
-    while (in < in_end)
-    {
-        bool unescaped = false;
-
-        if (*in == '\\' && in_end - in >= 2)
-        {
-            switch (in[1])
-            {
-            case 'b':
-                buf.push_back('\b');
-                in += 2;
-                unescaped = true;
-                break;
-
-            case 'f':
-                buf.push_back('\f');
-                in += 2;
-                unescaped = true;
-                break;
-
-            case 'n':
-                buf.push_back('\n');
-                in += 2;
-                unescaped = true;
-                break;
-
-            case 'r':
-                buf.push_back('\r');
-                in += 2;
-                unescaped = true;
-                break;
-
-            case 't':
-                buf.push_back('\t');
-                in += 2;
-                unescaped = true;
-                break;
-
-            case '/':
-                buf.push_back('/');
-                in += 2;
-                unescaped = true;
-                break;
-
-            case '"':
-                buf.push_back('"');
-                in += 2;
-                unescaped = true;
-                break;
-
-            case '\\':
-                buf.push_back('\\');
-                in += 2;
-                unescaped = true;
-                break;
-
-            case 'u':
-                if (decode_escaped_uchar_sequence(in, in_end, buf))
-                {
-                    unescaped = true;
-                    break;
-                }
-            }
-        }
-
-        if (!unescaped)
-        {
-            buf.push_back(*in);
-            ++in;
-        }
-    }
-
-    return buf;
-}
-
-[[nodiscard]] std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, std::string& buf)
-{
-    // figure out where the string is
-    char const* in_begin = jsn->base + state->pos_begin;
-    if (*in_begin == '"')
-    {
-        in_begin++;
-    }
-
-    char const* const in_end = jsn->base + state->pos_cur;
-    size_t const in_len = in_end - in_begin;
-    if (memchr(in_begin, '\\', in_len) == nullptr)
-    {
-        /* it's not escaped */
-        return std::make_pair(std::string_view{ in_begin, in_len }, true);
-    }
-
-    return std::make_pair(extract_escaped_string(in_begin, in_len, buf), false);
-}
-
-void action_callback_POP(jsonsl_t jsn, jsonsl_action_t /*action*/, struct jsonsl_state_st* state, jsonsl_char_t const* /*buf*/)
-{
-    auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
-
-    if (state->type == JSONSL_T_STRING)
-    {
-        auto const [str, inplace] = extract_string(jsn, state, data->strbuf);
-        if (inplace && data->inplace)
-        {
-            tr_variantInitStrView(get_node(jsn), str);
-        }
-        else
-        {
-            tr_variantInitStr(get_node(jsn), str);
-        }
-        data->has_content = true;
-    }
-    else if (state->type == JSONSL_T_HKEY)
-    {
-        data->has_content = true;
-        auto const [key, inplace] = extract_string(jsn, state, data->keybuf);
-        data->key = key;
-    }
-    else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
-    {
-        auto const depth = std::size(data->stack);
-        auto const* const v = data->stack.back();
-        data->stack.pop_back();
-        if (depth < MaxDepth)
-        {
-            data->preallocGuess[depth] = variant_size(*v);
-        }
-    }
-    else if (state->type == JSONSL_T_SPECIAL)
-    {
-        if ((state->special_flags & JSONSL_SPECIALf_NUMNOINT) != 0)
-        {
-            auto sv = std::string_view{ jsn->base + state->pos_begin, jsn->pos - state->pos_begin };
-            tr_variantInitReal(get_node(jsn), tr_num_parse<double>(sv).value_or(0.0));
-        }
-        else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
-        {
-            char const* begin = jsn->base + state->pos_begin;
-            data->has_content = true;
-            tr_variantInitInt(get_node(jsn), std::strtoll(begin, nullptr, 10));
-        }
-        else if ((state->special_flags & JSONSL_SPECIALf_BOOLEAN) != 0)
-        {
-            bool const b = (state->special_flags & JSONSL_SPECIALf_TRUE) != 0;
-            data->has_content = true;
-            tr_variantInitBool(get_node(jsn), b);
-        }
-        else if ((state->special_flags & JSONSL_SPECIALf_NULL) != 0)
-        {
-            data->has_content = true;
-            tr_variantInitQuark(get_node(jsn), TR_KEY_NONE);
-        }
-    }
-}
-
 } // namespace parse_helpers
 } // namespace
 
 std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 {
-    using namespace parse_helpers;
-
     auto top = tr_variant{};
 
-    auto data = json_wrapper_data{};
-    data.error = nullptr;
-    data.size = std::size(input);
-    data.has_content = false;
-    data.key = ""sv;
-    data.inplace = parse_inplace_;
-    data.preallocGuess = {};
-    data.stack = {};
-    data.top = &top;
+    auto* const begin = std::data(input);
+    auto const size = std::size(input);
 
-    auto jsn = jsonsl_new(MaxDepth);
-    jsn->action_callback_PUSH = action_callback_PUSH;
-    jsn->action_callback_POP = action_callback_POP;
-    jsn->error_callback = error_callback;
-    jsn->data = &data;
-    jsonsl_enable_all_callbacks(jsn);
+    auto handler = parse_helpers::json_to_variant_handler{ &top };
+    auto ms = rapidjson::MemoryStream{ begin, size };
+    auto eis = rapidjson::AutoUTFInputStream<unsigned, rapidjson::MemoryStream>{ ms };
+    auto reader = rapidjson::GenericReader<rapidjson::AutoUTF<unsigned>, rapidjson::UTF8<char>>{};
+    reader.Parse(eis, handler);
 
-    // parse it
-    jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(input)), std::size(input));
-
-    // EINVAL if there was no content
-    if (data.error == nullptr && !data.has_content)
+    if (!reader.HasParseError())
     {
-        tr_error_set(&data.error, EINVAL, "No content");
+        return top;
     }
 
-    end_ = std::data(input) + jsn->pos;
-
-    if (data.error != nullptr)
+    if (auto err_code = reader.GetParseErrorCode(); err_code == rapidjson::kParseErrorDocumentEmpty)
     {
-        tr_error_propagate(&error_, &data.error);
+        tr_error_set(&error_, EINVAL, "No content");
     }
-
-    // cleanup
-    jsonsl_destroy(jsn);
-
-    if (error_ == nullptr)
+    else
     {
-        return std::optional<tr_variant>{ std::move(top) };
+        auto const err_offset = reader.GetErrorOffset();
+        tr_error_set(
+            &error_,
+            EILSEQ,
+            fmt::format(
+                _("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"),
+                fmt::arg("position", err_offset),
+                fmt::arg("text", std::string_view{ begin + err_offset, std::min(size_t{ 16U }, size - err_offset) }),
+                fmt::arg("error", rapidjson::GetParseError_En(err_code)),
+                fmt::arg("error_code", static_cast<std::underlying_type_t<decltype(err_code)>>(err_code))));
     }
 
     return {};
