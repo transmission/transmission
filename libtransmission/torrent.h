@@ -11,6 +11,7 @@
 
 #include <cstddef> // size_t
 #include <ctime>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -28,13 +29,14 @@
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/interned-string.h"
-#include "libtransmission/observable.h"
 #include "libtransmission/log.h"
+#include "libtransmission/observable.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/verify.h"
 
 class tr_swarm;
 struct tr_error;
@@ -73,17 +75,35 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
-enum tr_verify_state : uint8_t
-{
-    TR_VERIFY_NONE,
-    TR_VERIFY_WAIT,
-    TR_VERIFY_NOW
-};
-
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
+    using VerifyDoneCallback = std::function<void(tr_torrent*)>;
+
+    class VerifyMediator : public tr_verify_worker::Mediator
+    {
+    public:
+        explicit VerifyMediator(tr_torrent* const tor)
+            : tor_{ tor }
+        {
+        }
+
+        ~VerifyMediator() override = default;
+
+        [[nodiscard]] tr_torrent_metainfo const& metainfo() const override;
+        [[nodiscard]] std::optional<std::string> find_file(tr_file_index_t file_index) const override;
+
+        void on_verify_queued() override;
+        void on_verify_started() override;
+        void on_piece_checked(tr_piece_index_t piece, bool has_piece) override;
+        void on_verify_done(bool aborted) override;
+
+    private:
+        tr_torrent* const tor_;
+        std::optional<time_t> time_started_;
+    };
+
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
         , completion{ this, &this->metainfo_.block_info() }
@@ -581,21 +601,9 @@ public:
 
     void refresh_current_dir();
 
-    void set_verify_state(tr_verify_state state);
-
-    [[nodiscard]] constexpr auto verify_state() const noexcept
-    {
-        return verify_state_;
-    }
-
-    constexpr void set_verify_progress(float f) noexcept
-    {
-        verify_progress_ = f;
-    }
-
     [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
     {
-        if (verify_state_ == TR_VERIFY_NOW)
+        if (verify_state_ == VerifyState::Active)
         {
             return verify_progress_;
         }
@@ -622,12 +630,12 @@ public:
     {
         bool const is_seed = this->is_done();
 
-        if (this->verify_state() == TR_VERIFY_NOW)
+        if (verify_state_ == VerifyState::Active)
         {
             return TR_STATUS_CHECK;
         }
 
-        if (this->verify_state() == TR_VERIFY_WAIT)
+        if (verify_state_ == VerifyState::Queued)
         {
             return TR_STATUS_CHECK_WAIT;
         }
@@ -992,6 +1000,14 @@ public:
 
 private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
+    friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
+
+    enum class VerifyState : uint8_t
+    {
+        None,
+        Queued,
+        Active
+    };
 
     // Tracks a torrent's error state, either local (e.g. file IO errors)
     // or tracker errors (e.g. warnings returned by a tracker).
@@ -1129,7 +1145,11 @@ private:
         }
     }
 
+    void set_verify_state(VerifyState state);
+
     Error error_;
+
+    VerifyDoneCallback verify_done_callback_;
 
     tr_interned_string bandwidth_group_;
 
@@ -1153,7 +1173,7 @@ private:
 
     tr_idlelimit idle_limit_mode_ = TR_IDLELIMIT_GLOBAL;
 
-    tr_verify_state verify_state_ = TR_VERIFY_NONE;
+    VerifyState verify_state_ = VerifyState::None;
 
     uint16_t idle_limit_minutes_ = 0;
 
@@ -1183,7 +1203,8 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
 
-void tr_torrentOnVerifyDone(tr_torrent* tor, bool aborted);
+void tr_ctorSetVerifyDoneCallback(tr_ctor* ctor, tr_torrent::VerifyDoneCallback&& callback);
+tr_torrent::VerifyDoneCallback tr_ctorStealVerifyDoneCallback(tr_ctor* ctor);
 
 #define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
 #define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())

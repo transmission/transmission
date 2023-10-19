@@ -396,8 +396,17 @@ protected:
     {
         auto verified_lock = std::unique_lock(verified_mutex_);
         auto const n_previously_verified = std::size(verified_);
-        auto* const tor = tr_torrentNew(ctor, nullptr);
 
+        tr_ctorSetVerifyDoneCallback(
+            ctor,
+            [this](tr_torrent* const tor)
+            {
+                auto verified_lock = std::lock_guard{ verified_mutex_ };
+                verified_.emplace_back(tor);
+                verified_cv_.notify_one();
+            });
+
+        auto* const tor = tr_torrentNew(ctor, nullptr);
         auto const stop_waiting = [this, tor, n_previously_verified]()
         {
             return std::size(verified_) > n_previously_verified && verified_.back() == tor;
@@ -514,15 +523,7 @@ protected:
 
         init_mgr_ = tr_lib_init();
 
-        auto callback = [this](tr_torrent* tor, bool /*aborted*/)
-        {
-            auto verified_lock = std::scoped_lock(verified_mutex_);
-            verified_.emplace_back(tor);
-            verified_cv_.notify_one();
-        };
-
         session_ = sessionInit(*settings());
-        session_->verifier_->add_callback(callback);
     }
 
     virtual void TearDown() override

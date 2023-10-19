@@ -888,21 +888,8 @@ public:
         return settings_.ratio_limit;
     }
 
-    void verifyRemove(tr_torrent* tor)
-    {
-        if (verifier_)
-        {
-            verifier_->remove(tor);
-        }
-    }
-
-    void verifyAdd(tr_torrent* tor)
-    {
-        if (verifier_)
-        {
-            verifier_->add(tor);
-        }
-    }
+    void verify_add(tr_torrent* tor);
+    void verify_remove(tr_torrent const* tor);
 
     void fetch(tr_web::FetchOptions&& options) const
     {

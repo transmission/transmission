@@ -2004,6 +2004,24 @@ size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
 
 // ---
 
+void tr_session::verify_remove(tr_torrent const* const tor)
+{
+    if (verifier_)
+    {
+        verifier_->remove(tor->info_hash());
+    }
+}
+
+void tr_session::verify_add(tr_torrent* const tor)
+{
+    if (verifier_)
+    {
+        verifier_->add(std::make_unique<tr_torrent::VerifyMediator>(tor), tor->get_priority());
+    }
+}
+
+// ---
+
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
 {
     this->cache->flush_torrent(tor);
@@ -2122,8 +2140,6 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
             stats().save();
         });
     save_timer_->start_repeating(SaveIntervalSecs);
-
-    verifier_->add_callback(tr_torrentOnVerifyDone);
 }
 
 void tr_session::addIncoming(tr_peer_socket&& socket)
