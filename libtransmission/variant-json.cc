@@ -23,9 +23,6 @@
 #include <utf8.h>
 
 #include <fmt/core.h>
-#include <fmt/compile.h>
-
-#include <jsonsl.h>
 
 #include <rapidjson/encodedstream.h>
 #include <rapidjson/error/en.h>
