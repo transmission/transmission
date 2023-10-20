@@ -1310,7 +1310,7 @@
                                                 </tableHeaderCell>
                                                 <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:1782:image" id="1782"/>
                                             </tableColumn>
-                                            <tableColumn identifier="Name" editable="NO" width="77" minWidth="40" maxWidth="1000" id="1779">
+                                            <tableColumn identifier="Name" editable="NO" width="115" minWidth="40" maxWidth="1000" id="1779">
                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Name">
                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
