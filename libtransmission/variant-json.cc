@@ -5,19 +5,16 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype>
 #include <cerrno> /* EILSEQ, EINVAL */
-#include <cmath> /* fabs() */
 #include <cstddef> // std::byte
 #include <cstdint> // uint16_t
-#include <cstdlib>
-#include <cstring>
-#include <iterator> // std::back_inserter
+#include <optional>
 #include <stack>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 #include <fmt/core.h>
 
@@ -32,6 +29,7 @@
 #define RAPIDJSON_NEON
 #endif
 #include <rapidjson/encodedstream.h>
+#include <rapidjson/encodings.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/memorystream.h>
 #include <rapidjson/prettywriter.h>
@@ -44,11 +42,8 @@
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-buffer.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
-
-using namespace std::literals;
 
 namespace
 {
