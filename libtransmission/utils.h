@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <algorithm>
 #include <cctype>
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 #include <cstddef> // size_t
@@ -19,6 +18,7 @@
 #include <vector>
 
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/variant.h"
 
 struct tr_error;
 
