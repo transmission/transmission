@@ -19,9 +19,6 @@
 #include <type_traits>
 #include <utility>
 
-#define UTF_CPP_CPLUSPLUS 201703L
-#include <utf8.h>
-
 #include <fmt/core.h>
 
 #include <rapidjson/encodedstream.h>
