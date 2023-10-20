@@ -10,10 +10,7 @@
 #include <memory>
 #include <string_view>
 
-extern "C"
-{
-    struct event_base;
-}
+struct event_base;
 
 namespace libtransmission
 {
