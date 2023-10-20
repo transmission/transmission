@@ -917,8 +917,6 @@ public:
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
 
-    tr_stat stats_ = {};
-
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
 
@@ -1001,6 +999,7 @@ public:
     bool start_when_stable = false;
 
 private:
+    friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 
     enum class VerifyState : uint8_t
@@ -1147,6 +1146,8 @@ private:
     }
 
     void set_verify_state(VerifyState state);
+
+    tr_stat stats_ = {};
 
     Error error_;
 
