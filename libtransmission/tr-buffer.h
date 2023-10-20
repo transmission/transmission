@@ -16,6 +16,7 @@
 
 #include "error.h"
 #include "net.h" // tr_socket_t
+#include "tr-assert.h"
 #include "utils-ev.h"
 #include "utils.h" // for tr_htonll(), tr_ntohll()
 
