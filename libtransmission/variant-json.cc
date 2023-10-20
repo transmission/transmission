@@ -236,7 +236,7 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 
     if (!reader.HasParseError())
     {
-        return top;
+        return std::optional<tr_variant>{ std::move(top) };
     }
 
     if (auto err_code = reader.GetParseErrorCode(); err_code == rapidjson::kParseErrorDocumentEmpty)
