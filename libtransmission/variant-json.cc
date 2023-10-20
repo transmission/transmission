@@ -266,58 +266,41 @@ namespace
 {
 namespace to_string_helpers
 {
-struct JsonWalk
-{
-    JsonWalk(rapidjson::StringBuffer& buf, bool is_compact)
-    {
-        if (is_compact)
-        {
-            writer.emplace<0>(buf);
-        }
-        else
-        {
-            writer.emplace<1>(buf);
-        }
-    }
-
-    std::variant<rapidjson::Writer<rapidjson::StringBuffer>, rapidjson::PrettyWriter<rapidjson::StringBuffer>> writer;
-};
+using writer_var_t = std::variant<rapidjson::Writer<rapidjson::StringBuffer>, rapidjson::PrettyWriter<rapidjson::StringBuffer>>;
 
 void jsonIntFunc(tr_variant const& /*var*/, int64_t const val, void* vdata)
 {
-    std::visit([val](auto&& writer) { writer.Int64(val); }, static_cast<JsonWalk*>(vdata)->writer);
+    std::visit([val](auto&& writer) { writer.Int64(val); }, *static_cast<writer_var_t*>(vdata));
 }
 
 void jsonBoolFunc(tr_variant const& /*var*/, bool const val, void* vdata)
 {
-    std::visit([val](auto&& writer) { writer.Bool(val); }, static_cast<struct JsonWalk*>(vdata)->writer);
+    std::visit([val](auto&& writer) { writer.Bool(val); }, *static_cast<writer_var_t*>(vdata));
 }
 
 void jsonRealFunc(tr_variant const& /*var*/, double const val, void* vdata)
 {
-    std::visit([val](auto&& writer) { writer.Double(val); }, static_cast<struct JsonWalk*>(vdata)->writer);
+    std::visit([val](auto&& writer) { writer.Double(val); }, *static_cast<writer_var_t*>(vdata));
 }
 
 void jsonStringFunc(tr_variant const& /*var*/, std::string_view sv, void* vdata)
 {
-    std::visit(
-        [sv](auto&& writer) { writer.String(std::data(sv), std::size(sv)); },
-        static_cast<struct JsonWalk*>(vdata)->writer);
+    std::visit([sv](auto&& writer) { writer.String(std::data(sv), std::size(sv)); }, *static_cast<writer_var_t*>(vdata));
 }
 
 void jsonDictBeginFunc(tr_variant const& /*var*/, void* vdata)
 {
-    std::visit([](auto&& writer) { writer.StartObject(); }, static_cast<struct JsonWalk*>(vdata)->writer);
+    std::visit([](auto&& writer) { writer.StartObject(); }, *static_cast<writer_var_t*>(vdata));
 }
 
 void jsonListBeginFunc(tr_variant const& /*var*/, void* vdata)
 {
-    std::visit([](auto&& writer) { writer.StartArray(); }, static_cast<struct JsonWalk*>(vdata)->writer);
+    std::visit([](auto&& writer) { writer.StartArray(); }, *static_cast<writer_var_t*>(vdata));
 }
 
 void jsonContainerEndFunc(tr_variant const& var, void* vdata)
 {
-    auto& writer_var = static_cast<struct JsonWalk*>(vdata)->writer;
+    auto& writer_var = *static_cast<writer_var_t*>(vdata);
 
     if (var.holds_alternative<tr_variant::Map>())
     {
@@ -347,8 +330,16 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
     };
 
     auto buf = rapidjson::StringBuffer{};
-    auto data = JsonWalk{ buf, compact_ };
-    walk(var, Funcs, &data, true);
+    auto writer = writer_var_t{};
+    if (compact_)
+    {
+        writer.emplace<0>(buf);
+    }
+    else
+    {
+        writer.emplace<1>(buf);
+    }
+    walk(var, Funcs, &writer, true);
 
     return { buf.GetString(), buf.GetLength() };
 }
