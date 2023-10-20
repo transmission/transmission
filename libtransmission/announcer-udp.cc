@@ -166,7 +166,10 @@ private:
 
 struct tau_announce_request
 {
-    tau_announce_request(uint32_t announce_ip, tr_announce_request const& in, tr_announce_response_func on_response)
+    tau_announce_request(
+        std::optional<tr_address> announce_ip,
+        tr_announce_request const& in,
+        tr_announce_response_func on_response)
         : on_response_{ std::move(on_response) }
     {
         // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
@@ -187,7 +190,14 @@ struct tau_announce_request
         buf.add_uint64(in.leftUntilComplete);
         buf.add_uint64(in.up);
         buf.add_uint32(get_tau_announce_event(in.event));
-        buf.add_uint32(announce_ip);
+        if (announce_ip && announce_ip->is_ipv4())
+        {
+            buf.add_address(*announce_ip);
+        }
+        else
+        {
+            buf.add_uint32(0U);
+        }
         buf.add_uint32(in.key);
         buf.add_uint32(in.numwant);
         buf.add_port(in.port);
@@ -588,9 +598,7 @@ public:
         }
 
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
-        auto const addr = mediator_.announceIP();
-        uint32_t const announce_ip = addr && addr->is_ipv4() ? addr->addr.addr4.s_addr : 0;
-        tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
+        tracker->announces.emplace_back(mediator_.announceIP(), request, std::move(on_response));
         tracker->upkeep(false);
     }
 

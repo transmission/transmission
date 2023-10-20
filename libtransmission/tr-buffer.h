@@ -16,6 +16,7 @@
 
 #include "error.h"
 #include "net.h" // tr_socket_t
+#include "tr-assert.h"
 #include "utils-ev.h"
 #include "utils.h" // for tr_htonll(), tr_ntohll()
 
@@ -353,6 +354,22 @@ public:
     {
         auto nport = port.network();
         add(&nport, sizeof(nport));
+    }
+
+    void add_address(tr_address const& addr)
+    {
+        switch (addr.type)
+        {
+        case TR_AF_INET:
+            add(&addr.addr.addr4.s_addr, sizeof(addr.addr.addr4.s_addr));
+            break;
+        case TR_AF_INET6:
+            add(&addr.addr.addr6.s6_addr, sizeof(addr.addr.addr6.s6_addr));
+            break;
+        default:
+            TR_ASSERT_MSG(false, "invalid type");
+            break;
+        }
     }
 
     void add_uint8(uint8_t uch)
