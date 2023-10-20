@@ -4,9 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <ctime>
 #include <optional>
 #include <tuple>
 #include <utility>
+
+#include <libtransmission/transmission.h>
 
 #include <libtransmission/net.h>
 #include <libtransmission/peer-mgr.h>
