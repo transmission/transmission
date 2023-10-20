@@ -24,7 +24,6 @@
 #include "libtransmission/tr-macros.h"
 
 struct tr_torrent;
-struct tr_torrent_metainfo;
 
 // A helper class to manage tracking sets of tr_torrent objects.
 class tr_torrents
