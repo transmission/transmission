@@ -564,26 +564,7 @@ void jsonRealFunc(tr_variant const* val, void* vdata)
     jsonChildFunc(data);
 }
 
-void write_escaped_char(Buffer& out, std::string_view& sv)
-{
-    auto u16buf = std::array<std::uint16_t, 2>{};
-
-    auto const* const begin8 = std::data(sv);
-    auto const* const end8 = begin8 + std::size(sv);
-    auto const* walk8 = begin8;
-    utf8::next(walk8, end8);
-    auto const end16 = utf8::utf8to16(begin8, walk8, std::begin(u16buf));
-
-    for (auto it = std::cbegin(u16buf); it != end16; ++it)
-    {
-        auto arr = std::array<char, 16>{};
-        auto const result = fmt::format_to_n(std::data(arr), std::size(arr), FMT_COMPILE("\\u{:04x}"), *it);
-        out.add(std::data(arr), result.size);
-    }
-
-    sv.remove_prefix(walk8 - begin8 - 1);
-}
-
+// https://datatracker.ietf.org/doc/html/rfc8259#section-7
 void jsonStringFunc(tr_variant const* val, void* vdata)
 {
     auto* data = static_cast<struct JsonWalk*>(vdata);
@@ -591,14 +572,25 @@ void jsonStringFunc(tr_variant const* val, void* vdata)
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(val, &sv);
 
+    auto const utf8_str = tr_strv_convert_utf8(sv);
+    auto utf8_sv = std::string_view{ utf8_str };
+
     auto& out = data->out;
     out.reserve(std::size(data->out) + std::size(sv) * 6 + 2);
     out.push_back('"');
 
-    for (; !std::empty(sv); sv.remove_prefix(1))
+    for (; !std::empty(utf8_sv); utf8_sv.remove_prefix(1))
     {
-        switch (sv.front())
+        switch (utf8_sv.front())
         {
+        case '"':
+            out.add(R"(\")"sv);
+            break;
+
+        case '\\':
+            out.add(R"(\\)"sv);
+            break;
+
         case '\b':
             out.add(R"(\b)"sv);
             break;
@@ -619,29 +611,14 @@ void jsonStringFunc(tr_variant const* val, void* vdata)
             out.add(R"(\t)"sv);
             break;
 
-        case '"':
-            out.add(R"(\")"sv);
-            break;
-
-        case '\\':
-            out.add(R"(\\)"sv);
-            break;
-
         default:
-            if (isprint((unsigned char)sv.front()) != 0)
+            if (utf8_sv.front() >= '\u0000' && utf8_sv.front() <= '\u001f')
             {
-                out.push_back(sv.front());
+                out.add(fmt::format("\\u{:04x}", utf8_sv.front()));
             }
             else
             {
-                try
-                {
-                    write_escaped_char(out, sv);
-                }
-                catch (utf8::exception const&)
-                {
-                    out.push_back('?');
-                }
+                out.push_back(utf8_sv.front());
             }
             break;
         }
@@ -721,7 +698,7 @@ std::string tr_variantToStrJson(tr_variant const* top, bool lean)
     tr_variantWalk(top, &walk_funcs, &data, true);
 
     auto& buf = data.out;
-    if (!std::empty(buf))
+    if (!lean && !std::empty(buf))
     {
         buf.push_back('\n');
     }
