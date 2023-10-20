@@ -21,7 +21,7 @@
     "@babel/core": "^7.23.2",
     "@babel/eslint-parser": "^7.22.15",
     "@babel/plugin-transform-class-properties": "^7.22.5",
-    "@primer/stylelint-config": "^12.7.2",
+    "@primer/stylelint-config": "^12.8.0",
     "css-loader": "^6.8.1",
     "css-minimizer-webpack-plugin": "^5.0.1",
     "eslint": "^8.45.0",
