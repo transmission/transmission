@@ -563,6 +563,18 @@ $video-image: '../img/film.svg';
       $icon-size-num: 16;
       $icon-size: $icon-size-num * 1px;
 
+      // This is an optimization to ensure that browsers don't need
+      // to render torrents that are far off screen. It improves
+      // browser performance when a large number of torrents are running.
+      // In terms of appearace, the only thing you need to know is this
+      // works the same as overflow: hidden;
+      contain: strict;
+      // We need to match this to the height of a torrent or the scrollbar
+      // will get confused
+      contain-intrinsic-height: 30px;
+      content-visibility: auto;
+
+
       align-items: center;
       display: flex;
       flex-direction: row-reverse;
@@ -601,6 +613,17 @@ $video-image: '../img/film.svg';
         'icon peers peers';
       grid-template-columns: $icon-size auto 1fr;
       padding: 6px 12px;
+
+      // This is an optimization to ensure that browsers don't need
+      // to render torrents that are far off screen. It improves
+      // browser performance when a large number of torrents are running.
+      // In terms of appearace, the only thing you need to know is this
+      // works the same as overflow: hidden;
+      contain: strict;
+      // We need to match this to the height of a torrent or the scrollbar
+      // will get confused
+      contain-intrinsic-height: 72px;
+      content-visibility: auto;
 
       .icon {
         background-size:
