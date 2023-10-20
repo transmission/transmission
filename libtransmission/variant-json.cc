@@ -51,6 +51,8 @@ namespace parse_helpers
 {
 struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 {
+    static_assert(std::is_same_v<Ch, char>);
+
     explicit json_to_variant_handler(tr_variant* const top)
     {
         stack_.emplace(top);
@@ -218,6 +220,8 @@ private:
 
 std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 {
+    TR_ASSERT(std::data(input) != nullptr);
+
     auto top = tr_variant{};
 
     auto* const begin = std::data(input);
