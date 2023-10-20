@@ -818,7 +818,24 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (IBAction)openNotificationSystemPrefs:(NSButton*)sender
 {
-    [NSWorkspace.sharedWorkspace openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
+    NSURL* prefPaneUrl = nil;
+    if (@available(macOS 13, *))
+    {
+        NSString* prefPaneName = @"x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=";
+        prefPaneName = [prefPaneName stringByAppendingString:NSBundle.mainBundle.bundleIdentifier];
+        prefPaneUrl = [NSURL URLWithString:prefPaneName];
+    }
+    else if (@available(macOS 12, *))
+    {
+        NSString* prefPaneName = @"x-apple.systempreferences:com.apple.preference.notifications?id=";
+        prefPaneName = [prefPaneName stringByAppendingString:NSBundle.mainBundle.bundleIdentifier];
+        prefPaneUrl = [NSURL URLWithString:prefPaneName];
+    }
+    else
+    {
+        prefPaneUrl = [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"];
+    }
+    [NSWorkspace.sharedWorkspace openURL:prefPaneUrl];
 }
 
 - (void)resetWarnings:(id)sender
