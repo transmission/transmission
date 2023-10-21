@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype> /* isprint() */
+#include <cstdint> // uint8_t
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -17,6 +18,7 @@
 #include <fmt/core.h>
 
 #include "libtransmission/clients.h"
+#include "libtransmission/tr-macros.h" // tr_peer_id_t
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
