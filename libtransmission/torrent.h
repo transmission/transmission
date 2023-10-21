@@ -559,6 +559,16 @@ public:
         return this->is_queued_;
     }
 
+    void set_is_queued(bool queued = true) noexcept
+    {
+        if (is_queued_ != queued)
+        {
+            is_queued_ = queued;
+            mark_changed();
+            set_dirty();
+        }
+    }
+
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
         return this->is_done() ? TR_UP : TR_DOWN;
@@ -983,7 +993,6 @@ public:
 
     bool is_deleting_ = false;
     bool is_dirty_ = false;
-    bool is_queued_ = false;
     bool is_running_ = false;
 
     // start the torrent after all the startup scaffolding is done,
@@ -1217,6 +1226,7 @@ private:
     uint16_t idle_limit_minutes_ = 0;
 
     bool is_stopping_ = false;
+    bool is_queued_ = false;
 
     bool needs_completeness_check_ = true;
 

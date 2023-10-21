@@ -148,16 +148,6 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
 
 namespace
 {
-constexpr void torrentSetQueued(tr_torrent* tor, bool queued)
-{
-    if (tor->is_queued_ != queued)
-    {
-        tor->is_queued_ = queued;
-        tor->mark_changed();
-        tor->set_dirty();
-    }
-}
-
 bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
 {
     auto const has = has_local_data ? *has_local_data : tor->has_any_local_data();
@@ -642,7 +632,7 @@ void torrentStartImpl(tr_torrent* const tor)
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->recheck_completeness();
-    torrentSetQueued(tor, false);
+    tor->set_is_queued(false);
 
     time_t const now = tr_time();
 
@@ -764,7 +754,7 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     case TR_STATUS_STOPPED:
         if (!opts.bypass_queue && torrentShouldQueue(tor))
         {
-            torrentSetQueued(tor, true);
+            tor->set_is_queued();
             return;
         }
 
@@ -815,7 +805,7 @@ void tr_torrent::stop_now()
         tr_torrentSave(this);
     }
 
-    torrentSetQueued(this, false);
+    set_is_queued(false);
 }
 
 void tr_torrentStop(tr_torrent* tor)
