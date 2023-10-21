@@ -53,3 +53,4 @@
 [submodule "third-party/rapidjson"]
 	path = third-party/rapidjson
 	url = https://github.com/transmission/rapidjson.git
+	fetchRecurseSubmodules = false
