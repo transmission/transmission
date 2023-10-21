@@ -20,7 +20,6 @@
 #include "libtransmission/log.h"
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 namespace
