@@ -120,7 +120,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
     {
         if (copy)
         {
-            key_buf_ = std::string{ str, len };
+            key_buf_.assign(str, len);
             cur_key_ = key_buf_;
         }
         else
@@ -264,7 +264,62 @@ namespace
 {
 namespace to_string_helpers
 {
-using writer_var_t = std::variant<rapidjson::Writer<rapidjson::StringBuffer>, rapidjson::PrettyWriter<rapidjson::StringBuffer>>;
+// implements RapidJSON's Stream concept, so that the library can output
+// directly to a std::string, and we can avoid some copying by copy elision
+// http://rapidjson.org/md_doc_stream.html
+struct string_output_stream
+{
+    using Ch = char;
+
+    explicit string_output_stream(std::string& str)
+        : str_ref_(str)
+    {
+    }
+
+    [[nodiscard]] Ch Peek() const
+    {
+        TR_ASSERT(false);
+        return 0;
+    }
+
+    [[nodiscard]] Ch Take()
+    {
+        TR_ASSERT(false);
+        return 0;
+    }
+
+    size_t Tell()
+    {
+        TR_ASSERT(false);
+        return 0U;
+    }
+
+    Ch* PutBegin()
+    {
+        TR_ASSERT(false);
+        return nullptr;
+    }
+
+    void Put(Ch const c)
+    {
+        str_ref_ += c;
+    }
+
+    void Flush()
+    {
+    }
+
+    size_t PutEnd(Ch* /*begin*/)
+    {
+        TR_ASSERT(false);
+        return 0U;
+    }
+
+private:
+    std::string& str_ref_;
+};
+
+using writer_var_t = std::variant<rapidjson::Writer<string_output_stream>, rapidjson::PrettyWriter<string_output_stream>>;
 
 void jsonIntFunc(tr_variant const& /*var*/, int64_t const val, void* vdata)
 {
@@ -327,17 +382,19 @@ std::string tr_variant_serde::to_json_string(tr_variant const& var) const
         jsonContainerEndFunc, //
     };
 
-    auto buf = rapidjson::StringBuffer{};
+    auto out = std::string{};
+    out.reserve(rapidjson::StringBuffer::kDefaultCapacity);
+    auto stream = string_output_stream{ out };
     auto writer = writer_var_t{};
     if (compact_)
     {
-        writer.emplace<0>(buf);
+        writer.emplace<0>(stream);
     }
     else
     {
-        writer.emplace<1>(buf);
+        writer.emplace<1>(stream);
     }
     walk(var, Funcs, &writer, true);
 
-    return { buf.GetString(), buf.GetLength() };
+    return out;
 }
