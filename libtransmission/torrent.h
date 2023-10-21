@@ -562,6 +562,8 @@ public:
 
     ///
 
+    [[nodiscard]] tr_stat stats() const;
+
     [[nodiscard]] constexpr auto is_queued() const noexcept
     {
         return this->is_queued_;
@@ -915,8 +917,6 @@ public:
     libtransmission::SimpleObservable<tr_torrent*> stopped_;
     libtransmission::SimpleObservable<tr_torrent*> swarm_is_all_seeds_;
 
-    tr_stat stats = {};
-
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
 
@@ -1147,13 +1147,15 @@ private:
 
     void set_verify_state(VerifyState state);
 
+    tr_stat stats_ = {};
+
     Error error_;
 
     VerifyDoneCallback verify_done_callback_;
 
     tr_interned_string bandwidth_group_;
 
-    SimpleSmoothedSpeed eta_speed_;
+    mutable SimpleSmoothedSpeed eta_speed_;
 
     /* If the initiator of the connection receives a handshake in which the
      * peer_id does not match the expected peerid, then the initiator is
