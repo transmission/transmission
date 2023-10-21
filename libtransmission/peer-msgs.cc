@@ -7,8 +7,8 @@
 #include <array>
 #include <bitset>
 #include <cerrno>
-#include <cstdint>
-#include <cstring>
+#include <cstddef>
+#include <cstdint> // uint8_t, uint32_t, int64_t
 #include <ctime>
 #include <iterator>
 #include <map>
@@ -17,6 +17,7 @@
 #include <queue>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
