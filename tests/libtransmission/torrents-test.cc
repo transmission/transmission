@@ -42,7 +42,7 @@ TEST_F(TorrentsTest, simpleTests)
 
     auto const id = torrents.add(tor);
     EXPECT_GT(id, 0);
-    tor->unique_id_ = id;
+    tor->init_id(id);
 
     EXPECT_TRUE(std::empty(torrents.removedSince(0)));
     EXPECT_FALSE(std::empty(torrents));
@@ -79,7 +79,7 @@ TEST_F(TorrentsTest, rangedLoop)
         owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
 
         auto* const tor = owned.back().get();
-        tor->unique_id_ = torrents.add(tor);
+        tor->init_id(torrents.add(tor));
         EXPECT_EQ(tor, torrents.get(tor->id()));
         torrents_set.insert(tor);
     }
@@ -112,7 +112,7 @@ TEST_F(TorrentsTest, removedSince)
         owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
 
         auto* const tor = owned.back().get();
-        tor->unique_id_ = torrents.add(tor);
+        tor->init_id(torrents.add(tor));
         torrents_v.push_back(tor);
     }
 

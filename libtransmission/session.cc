@@ -2149,7 +2149,7 @@ void tr_session::addIncoming(tr_peer_socket&& socket)
 
 void tr_session::addTorrent(tr_torrent* tor)
 {
-    tor->unique_id_ = torrents().add(tor);
+    tor->init_id(torrents().add(tor));
 
     tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
 }

@@ -618,6 +618,13 @@ public:
         return unique_id_;
     }
 
+    void init_id(tr_torrent_id_t id)
+    {
+        TR_ASSERT(unique_id_ == tr_torrent_id_t{});
+        TR_ASSERT(id != tr_torrent_id_t{});
+        unique_id_ = id;
+    }
+
     constexpr void set_date_active(time_t t) noexcept
     {
         this->activityDate = t;
@@ -980,8 +987,6 @@ public:
 
     size_t queuePosition = 0;
 
-    tr_torrent_id_t unique_id_ = 0;
-
     tr_completeness completeness = TR_LEECH;
 
     uint16_t max_connected_peers_ = TR_DEFAULT_PEER_LIMIT_TORRENT;
@@ -1170,6 +1175,8 @@ private:
     float seed_ratio_ = 0.0F;
 
     tr_announce_key_t announce_key_ = tr_rand_obj<tr_announce_key_t>();
+
+    tr_torrent_id_t unique_id_ = 0;
 
     tr_ratiolimit seed_ratio_mode_ = TR_RATIOLIMIT_GLOBAL;
 
