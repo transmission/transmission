@@ -276,25 +276,25 @@ struct string_output_stream
     {
     }
 
-    [[nodiscard]] Ch Peek() const
+    [[nodiscard]] static Ch Peek()
     {
         TR_ASSERT(false);
         return 0;
     }
 
-    [[nodiscard]] Ch Take()
+    [[nodiscard]] static Ch Take()
     {
         TR_ASSERT(false);
         return 0;
     }
 
-    size_t Tell()
+    static size_t Tell()
     {
         TR_ASSERT(false);
         return 0U;
     }
 
-    Ch* PutBegin()
+    static Ch* PutBegin()
     {
         TR_ASSERT(false);
         return nullptr;
@@ -305,11 +305,11 @@ struct string_output_stream
         str_ref_ += c;
     }
 
-    void Flush()
+    static void Flush()
     {
     }
 
-    size_t PutEnd(Ch* /*begin*/)
+    static size_t PutEnd(Ch* /*begin*/)
     {
         TR_ASSERT(false);
         return 0U;
