@@ -5,6 +5,9 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdint> // int64_t
+#include <cstdio> // FILE
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -63,12 +66,9 @@
 #include <xfs/xqm.h>
 #endif
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/tr-macros.h"
-#include "libtransmission/utils.h"
 
 namespace
 {
