@@ -915,6 +915,11 @@ public:
 
     void init(tr_ctor const* ctor);
 
+    [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
+    {
+        return obfuscated_hash_ == test;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -951,8 +956,6 @@ public:
     // Where the files are now.
     // Will equal either download_dir or incomplete_dir
     tr_interned_string current_dir_;
-
-    tr_sha1_digest_t obfuscated_hash = {};
 
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
@@ -1192,6 +1195,8 @@ private:
     labels_t labels_;
 
     tr_interned_string bandwidth_group_;
+
+    tr_sha1_digest_t obfuscated_hash_ = {};
 
     mutable SimpleSmoothedSpeed eta_speed_;
 

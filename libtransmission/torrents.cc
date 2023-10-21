@@ -59,7 +59,7 @@ tr_torrent* tr_torrents::find_from_obfuscated_hash(tr_sha1_digest_t const& obfus
 {
     for (auto* const tor : *this)
     {
-        if (tor->obfuscated_hash == obfuscated_hash)
+        if (tor->obfuscated_hash_equals(obfuscated_hash))
         {
             return tor;
         }
