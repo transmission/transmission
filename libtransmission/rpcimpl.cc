@@ -241,7 +241,7 @@ char const* torrentStop(tr_session* session, tr_variant* args_in, tr_variant* /*
     {
         if (tor->activity() != TR_STATUS_STOPPED)
         {
-            tor->is_stopping_ = true;
+            tor->stop_soon();
             session->rpcNotify(TR_RPC_TORRENT_STOPPED, tor);
         }
     }

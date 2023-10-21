@@ -696,6 +696,11 @@ public:
         return is_stopping_;
     }
 
+    constexpr void stop_soon() noexcept
+    {
+        is_stopping_ = true;
+    }
+
     [[nodiscard]] constexpr auto is_dirty() const noexcept
     {
         return is_dirty_;
@@ -997,7 +1002,6 @@ public:
     bool is_dirty_ = false;
     bool is_queued_ = false;
     bool is_running_ = false;
-    bool is_stopping_ = false;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
@@ -1009,6 +1013,10 @@ private:
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
+    friend void tr_torrentCheckSeedLimit(tr_torrent* tor);
+    friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
+    friend void tr_torrentStop(tr_torrent* tor);
+    friend void tr_torrentVerify(tr_torrent* tor, bool force);
 
     enum class VerifyState : uint8_t
     {
@@ -1157,6 +1165,8 @@ private:
 
     void on_metainfo_updated();
 
+    void stop_now();
+
     tr_stat stats_ = {};
 
     Error error_;
@@ -1193,6 +1203,8 @@ private:
     VerifyState verify_state_ = VerifyState::None;
 
     uint16_t idle_limit_minutes_ = 0;
+
+    bool is_stopping_ = false;
 
     bool needs_completeness_check_ = true;
 
