@@ -133,6 +133,7 @@ public:
 
     // Used to add metainfo to a magnet torrent.
     void set_metainfo(tr_torrent_metainfo tm);
+    void init(tr_ctor const* ctor);
 
     [[nodiscard]] auto unique_lock() const
     {
@@ -933,8 +934,6 @@ public:
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
-    tr_files_wanted files_wanted_{ &fpm_ };
-    tr_file_priorities file_priorities_{ &fpm_ };
 
     using labels_t = std::vector<tr_quark>;
     labels_t labels;
@@ -1004,8 +1003,11 @@ public:
     bool start_when_stable = false;
 
 private:
+    friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
+    friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
+    friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
 
     enum class VerifyState : uint8_t
     {
@@ -1152,6 +1154,8 @@ private:
 
     void set_verify_state(VerifyState state);
 
+    void on_metainfo_updated();
+
     tr_stat stats_ = {};
 
     Error error_;
@@ -1161,6 +1165,9 @@ private:
     tr_interned_string bandwidth_group_;
 
     mutable SimpleSmoothedSpeed eta_speed_;
+
+    tr_files_wanted files_wanted_{ &fpm_ };
+    tr_file_priorities file_priorities_{ &fpm_ };
 
     /* If the initiator of the connection receives a handshake in which the
      * peer_id does not match the expected peerid, then the initiator is
