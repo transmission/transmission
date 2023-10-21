@@ -1739,9 +1739,9 @@ void tr_torrentSave(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->is_dirty_)
+    if (tor->is_dirty())
     {
-        tor->is_dirty_ = false;
+        tor->set_dirty(false);
         tr_resume::save(tor);
     }
 }
