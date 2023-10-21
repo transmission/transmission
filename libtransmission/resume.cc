@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::min
+#include <array>
 #include <cstring>
 #include <ctime>
 #include <string_view>
@@ -12,14 +14,17 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/bitfield.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
-#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
+#include "libtransmission/quark.h"
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
