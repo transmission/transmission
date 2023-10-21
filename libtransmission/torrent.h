@@ -1009,7 +1009,6 @@ public:
     bool finished_seeding_by_idle_ = false;
 
     bool is_deleting_ = false;
-    bool is_dirty_ = false;
     bool is_running_ = false;
 
     // start the torrent after all the startup scaffolding is done,
@@ -1213,6 +1212,7 @@ private:
 
     uint16_t idle_limit_minutes_ = 0;
 
+    bool is_dirty_ = false;
     bool is_stopping_ = false;
     bool is_queued_ = false;
 
