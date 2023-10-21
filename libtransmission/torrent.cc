@@ -134,7 +134,7 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest
 {
     for (auto* const tor : session->torrents())
     {
-        if (tor->obfuscated_hash == obfuscated_hash)
+        if (tor->obfuscated_hash_ == obfuscated_hash)
         {
             return tor;
         }
@@ -963,7 +963,7 @@ void on_metainfo_completed(tr_torrent* tor)
 void tr_torrent::on_metainfo_updated()
 {
     completion = tr_completion{ this, &block_info() };
-    obfuscated_hash = tr_sha1::digest("req2"sv, info_hash());
+    obfuscated_hash_ = tr_sha1::digest("req2"sv, info_hash());
     fpm_.reset(metainfo_);
     file_mtimes_.resize(file_count());
     file_priorities_.reset(&fpm_);
@@ -982,7 +982,6 @@ void tr_torrent::init(tr_ctor const* const ctor)
     queuePosition = std::size(session->torrents());
 
     on_metainfo_updated();
-
     char const* dir = nullptr;
     if (tr_ctorGetDownloadDir(ctor, TR_FORCE, &dir) || tr_ctorGetDownloadDir(ctor, TR_FALLBACK, &dir))
     {

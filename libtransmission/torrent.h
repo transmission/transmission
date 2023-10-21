@@ -968,8 +968,6 @@ public:
     // Will equal either download_dir or incomplete_dir
     tr_interned_string current_dir_;
 
-    tr_sha1_digest_t obfuscated_hash = {};
-
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
      * other peers */
@@ -1017,6 +1015,7 @@ public:
 private:
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
+    friend tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& obfuscated_hash);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
@@ -1182,6 +1181,8 @@ private:
     VerifyDoneCallback verify_done_callback_;
 
     tr_interned_string bandwidth_group_;
+
+    tr_sha1_digest_t obfuscated_hash_ = {};
 
     mutable SimpleSmoothedSpeed eta_speed_;
 
