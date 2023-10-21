@@ -23,13 +23,19 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/net.h"
 #include "libtransmission/peer-mse.h" // tr_message_stream_encryption::DH
 #include "libtransmission/peer-io.h"
 #include "libtransmission/timer.h"
 #include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_peer_id_t
 
 struct tr_error;
+struct tr_socket_address;
+
+namespace libtransmission
+{
+template<typename value_type>
+class BufferWriter;
+}
 
 // short-term class which manages the handshake phase of a tr_peerIo
 class tr_handshake
