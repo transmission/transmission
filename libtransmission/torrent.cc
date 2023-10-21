@@ -1638,35 +1638,8 @@ void tr_torrentStartMagnet(tr_torrent* tor)
 
 // ---
 
-namespace
-{
-namespace verify_helpers
-{
-void onVerifyDoneThreadFunc(tr_torrent* const tor)
-{
-    TR_ASSERT(tor->session->am_in_session_thread());
-
-    if (tor->is_deleting_)
-    {
-        return;
-    }
-
-    tor->recheck_completeness();
-
-    if (tor->start_when_stable)
-    {
-        auto opts = torrent_start_opts{};
-        opts.has_local_data = !tor->checked_pieces_.has_none();
-        torrentStart(tor, opts);
-    }
-}
-} // namespace verify_helpers
-} // namespace
-
 void tr_torrentVerify(tr_torrent* tor, bool force)
 {
-    using namespace verify_helpers;
-
     tor->session->runInSessionThread(
         [tor, force]()
         {
@@ -1749,10 +1722,9 @@ void tr_torrent::VerifyMediator::on_piece_checked(tr_piece_index_t const piece, 
     tor_->verify_progress_ = std::clamp(static_cast<float>(piece + 1U) / tor_->metainfo_.piece_count(), 0.0F, 1.0F);
 }
 
+// (usually called from tr_verify_worker's thread)
 void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
 {
-    using namespace verify_helpers;
-
     if (time_started_.has_value())
     {
         auto const total_size = tor_->total_size();
@@ -1770,12 +1742,28 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
 
     if (!aborted && !tor_->is_deleting_)
     {
-        tor_->session->runInSessionThread(onVerifyDoneThreadFunc, tor_);
-    }
+        tor_->session->runInSessionThread(
+            [tor = tor_]()
+            {
+                if (tor->is_deleting_)
+                {
+                    return;
+                }
 
-    if (tor_->verify_done_callback_)
-    {
-        tor_->verify_done_callback_(tor_);
+                tor->recheck_completeness();
+
+                if (tor->verify_done_callback_)
+                {
+                    tor->verify_done_callback_(tor);
+                }
+
+                if (tor->start_when_stable)
+                {
+                    auto opts = torrent_start_opts{};
+                    opts.has_local_data = !tor->checked_pieces_.has_none();
+                    torrentStart(tor, opts);
+                }
+            });
     }
 }
 
