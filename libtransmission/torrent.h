@@ -133,7 +133,6 @@ public:
 
     // Used to add metainfo to a magnet torrent.
     void set_metainfo(tr_torrent_metainfo tm);
-    void init(tr_ctor const* ctor);
 
     [[nodiscard]] auto unique_lock() const
     {
@@ -911,6 +910,8 @@ public:
     {
         return error_;
     }
+
+    void init(tr_ctor const* ctor);
 
     tr_torrent_metainfo metainfo_;
 
