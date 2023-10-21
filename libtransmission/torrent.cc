@@ -458,7 +458,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
     if (tr_torrentIsSeedRatioDone(tor))
     {
         tr_logAddInfoTor(tor, _("Seed ratio reached; pausing torrent"));
-        tor->is_stopping_ = true;
+        tor->stop_soon();
         tor->session->onRatioLimitHit(tor);
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
@@ -466,7 +466,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
     {
         tr_logAddInfoTor(tor, _("Seeding idle limit reached; pausing torrent"));
 
-        tor->is_stopping_ = true;
+        tor->stop_soon();
         tor->finished_seeding_by_idle_ = true;
         tor->session->onIdleLimitHit(tor);
     }
@@ -788,36 +788,35 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     tor->set_dirty();
     tor->session->runInSessionThread(torrentStartImpl, tor);
 }
-
-void torrentStop(tr_torrent* const tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-    TR_ASSERT(tor->session->am_in_session_thread());
-    auto const lock = tor->unique_lock();
-
-    tor->is_running_ = false;
-    tor->is_stopping_ = false;
-
-    if (!tor->session->isClosing())
-    {
-        tr_logAddInfoTor(tor, _("Pausing torrent"));
-    }
-
-    tor->session->verify_remove(tor);
-
-    tor->stopped_.emit(tor);
-    tor->session->announcer_->stopTorrent(tor);
-
-    tor->session->closeTorrentFiles(tor);
-
-    if (!tor->is_deleting_)
-    {
-        tr_torrentSave(tor);
-    }
-
-    torrentSetQueued(tor, false);
-}
 } // namespace
+
+void tr_torrent::stop_now()
+{
+    TR_ASSERT(session->am_in_session_thread());
+    auto const lock = unique_lock();
+
+    is_running_ = false;
+    is_stopping_ = false;
+
+    if (!session->isClosing())
+    {
+        tr_logAddInfoTor(this, _("Pausing torrent"));
+    }
+
+    session->verify_remove(this);
+
+    stopped_.emit(this);
+    session->announcer_->stopTorrent(this);
+
+    session->closeTorrentFiles(this);
+
+    if (!is_deleting_)
+    {
+        tr_torrentSave(this);
+    }
+
+    torrentSetQueued(this, false);
+}
 
 void tr_torrentStop(tr_torrent* tor)
 {
@@ -830,7 +829,7 @@ void tr_torrentStop(tr_torrent* tor)
 
     tor->start_when_stable = false;
     tor->set_dirty();
-    tor->session->runInSessionThread(torrentStop, tor);
+    tor->session->runInSessionThread([tor]() { tor->stop_now(); });
 }
 
 void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data)
@@ -857,7 +856,7 @@ void tr_torrentFreeInSessionThread(tr_torrent* tor)
         tr_logAddInfoTor(tor, _("Removing torrent"));
     }
 
-    torrentStop(tor);
+    tor->stop_now();
 
     if (tor->is_deleting_)
     {
@@ -1625,35 +1624,6 @@ void onVerifyDoneThreadFunc(tr_torrent* const tor)
         torrentStart(tor, opts);
     }
 }
-
-void verifyTorrent(tr_torrent* const tor, bool force)
-{
-    TR_ASSERT(tor->session->am_in_session_thread());
-    auto const lock = tor->unique_lock();
-
-    if (tor->is_deleting_)
-    {
-        return;
-    }
-
-    /* if the torrent's already being verified, stop it */
-    tor->session->verify_remove(tor);
-
-    if (!tor->has_metainfo())
-    {
-        return;
-    }
-
-    if (tor->is_running())
-    {
-        torrentStop(tor);
-    }
-
-    if (force || !setLocalErrorIfFilesDisappeared(tor))
-    {
-        tor->session->verify_add(tor);
-    }
-}
 } // namespace verify_helpers
 } // namespace
 
@@ -1661,7 +1631,34 @@ void tr_torrentVerify(tr_torrent* tor, bool force)
 {
     using namespace verify_helpers;
 
-    tor->session->runInSessionThread(verifyTorrent, tor, force);
+    tor->session->runInSessionThread(
+        [tor, force]()
+        {
+            TR_ASSERT(tor->session->am_in_session_thread());
+            auto const lock = tor->unique_lock();
+
+            if (tor->is_deleting_)
+            {
+                return;
+            }
+
+            tor->session->verify_remove(tor);
+
+            if (!tor->has_metainfo())
+            {
+                return;
+            }
+
+            if (tor->is_running())
+            {
+                tor->stop_now();
+            }
+
+            if (force || !setLocalErrorIfFilesDisappeared(tor))
+            {
+                tor->session->verify_add(tor);
+            }
+        });
 }
 
 void tr_torrent::set_verify_state(VerifyState const state)
