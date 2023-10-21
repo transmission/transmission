@@ -991,7 +991,6 @@ public:
 
     bool finished_seeding_by_idle_ = false;
 
-    bool is_deleting_ = false;
     bool is_running_ = false;
 
     // start the torrent after all the startup scaffolding is done,
@@ -1006,6 +1005,7 @@ private:
     friend void tr_torrentCheckSeedLimit(tr_torrent* tor);
     friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
     friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
+    friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
     friend void tr_torrentStop(tr_torrent* tor);
     friend void tr_torrentVerify(tr_torrent* tor, bool force);
 
@@ -1224,9 +1224,10 @@ private:
 
     uint16_t idle_limit_minutes_ = 0;
 
+    bool is_deleting_ = false;
     bool is_dirty_ = false;
-    bool is_stopping_ = false;
     bool is_queued_ = false;
+    bool is_stopping_ = false;
 
     bool needs_completeness_check_ = true;
 
