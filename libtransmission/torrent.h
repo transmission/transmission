@@ -110,11 +110,7 @@ public:
     {
     }
 
-    void set_location(
-        std::string_view location,
-        bool move_from_old_path,
-        double volatile* setme_progress,
-        int volatile* setme_state);
+    void set_location(std::string_view location, bool move_from_old_path, int volatile* setme_state);
 
     void rename_path(
         std::string_view oldpath,

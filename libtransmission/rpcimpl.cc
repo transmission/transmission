@@ -1167,7 +1167,7 @@ char const* torrentSetLocation(
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        tor->set_location(location, move, nullptr, nullptr);
+        tor->set_location(location, move, nullptr);
         session->rpcNotify(TR_RPC_TORRENT_MOVED, tor);
     }
 

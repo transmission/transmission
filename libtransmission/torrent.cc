@@ -1179,12 +1179,7 @@ namespace
 {
 namespace location_helpers
 {
-void setLocationInSessionThread(
-    tr_torrent* tor,
-    std::string const& path,
-    bool move_from_old_path,
-    double volatile* setme_progress,
-    int volatile* setme_state)
+void setLocationInSessionThread(tr_torrent* tor, std::string const& path, bool move_from_old_path, int volatile* setme_state)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->session->am_in_session_thread());
@@ -1202,7 +1197,7 @@ void setLocationInSessionThread(
         tor->session->verify_remove(tor);
 
         tr_error* error = nullptr;
-        ok = tor->metainfo_.files().move(tor->current_dir(), path, setme_progress, tor->name(), &error);
+        ok = tor->metainfo_.files().move(tor->current_dir(), path, tor->name(), &error);
         if (error != nullptr)
         {
             tor->error().set_local_error(fmt::format(
@@ -1252,11 +1247,7 @@ size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
 } // namespace location_helpers
 } // namespace
 
-void tr_torrent::set_location(
-    std::string_view location,
-    bool move_from_old_path,
-    double volatile* setme_progress,
-    int volatile* setme_state)
+void tr_torrent::set_location(std::string_view location, bool move_from_old_path, int volatile* setme_state)
 {
     using namespace location_helpers;
 
@@ -1265,26 +1256,16 @@ void tr_torrent::set_location(
         *setme_state = TR_LOC_MOVING;
     }
 
-    this->session->runInSessionThread(
-        setLocationInSessionThread,
-        this,
-        std::string{ location },
-        move_from_old_path,
-        setme_progress,
-        setme_state);
+    this->session
+        ->runInSessionThread(setLocationInSessionThread, this, std::string{ location }, move_from_old_path, setme_state);
 }
 
-void tr_torrentSetLocation(
-    tr_torrent* tor,
-    char const* location,
-    bool move_from_old_path,
-    double volatile* setme_progress,
-    int volatile* setme_state)
+void tr_torrentSetLocation(tr_torrent* tor, char const* location, bool move_from_old_path, int volatile* setme_state)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(!tr_str_is_empty(location));
 
-    tor->set_location(location, move_from_old_path, setme_progress, setme_state);
+    tor->set_location(location, move_from_old_path, setme_state);
 }
 
 std::optional<tr_torrent_files::FoundFile> tr_torrent::find_file(tr_file_index_t file_index) const
@@ -1872,7 +1853,7 @@ void tr_torrent::recheck_completeness()
 
             if (this->current_dir() == this->incomplete_dir())
             {
-                this->set_location(this->download_dir(), true, nullptr, nullptr);
+                this->set_location(this->download_dir(), true, nullptr);
             }
 
             done_.emit(this, recent_change);
