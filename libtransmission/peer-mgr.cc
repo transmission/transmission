@@ -2214,7 +2214,6 @@ namespace
 {
 namespace bandwidth_helpers
 {
-
 void pumpAllPeers(tr_peerMgr* mgr)
 {
     for (auto* const tor : mgr->session->torrents())
@@ -2225,25 +2224,6 @@ void pumpAllPeers(tr_peerMgr* mgr)
         }
     }
 }
-
-void queuePulse(tr_session* session, tr_direction dir)
-{
-    TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
-    if (!session->queueEnabled(dir))
-    {
-        return;
-    }
-
-    auto const n = session->countQueueFreeSlots(dir);
-    for (auto* tor : session->getNextQueuedTorrents(dir, n))
-    {
-        tr_torrentStartNow(tor);
-        session->onQueuedTorrentStarted(tor);
-    }
-}
-
 } // namespace bandwidth_helpers
 } // namespace
 
@@ -2265,10 +2245,6 @@ void tr_peerMgr::bandwidthPulse()
         tor->do_idle_work();
         tr_torrentMagnetDoIdleWork(tor);
     }
-
-    /* pump the queues */
-    queuePulse(session, TR_UP);
-    queuePulse(session, TR_DOWN);
 
     reconnectPulse();
 }
