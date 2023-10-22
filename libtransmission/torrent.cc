@@ -1021,9 +1021,9 @@ void tr_torrent::init(tr_ctor const* const ctor)
     TR_ASSERT(downloadedCur == 0);
     TR_ASSERT(uploadedCur == 0);
 
-    auto const now = tr_time();
-    addedDate = now; // this is a default that will be overwritten by the resume file
-    anyDate = now;
+    mark_changed();
+
+    addedDate = tr_time(); // this is a default that will be overwritten by the resume file
 
     tr_resume::fields_t loaded = {};
 
@@ -2620,7 +2620,7 @@ void tr_torrent::mark_edited()
 
 void tr_torrent::mark_changed()
 {
-    this->anyDate = tr_time();
+    this->bump_date_changed(tr_time());
 }
 
 void tr_torrent::set_blocks(tr_bitfield blocks)
