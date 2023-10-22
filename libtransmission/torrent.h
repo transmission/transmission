@@ -621,14 +621,11 @@ public:
         unique_id_ = id;
     }
 
-    constexpr void set_date_active(time_t t) noexcept
+    constexpr void set_date_active(time_t when) noexcept
     {
-        this->activityDate = t;
+        this->activityDate = when;
 
-        if (this->anyDate < t)
-        {
-            this->anyDate = t;
-        }
+        bump_date_changed(when);
     }
 
     [[nodiscard]] constexpr auto activity() const noexcept
@@ -704,6 +701,11 @@ public:
 
     void mark_edited();
     void mark_changed();
+
+    [[nodiscard]] constexpr auto has_changed_since(time_t when) const noexcept
+    {
+        return changed_date_ > when;
+    }
 
     void set_bandwidth_group(std::string_view group_name) noexcept;
 
@@ -966,7 +968,6 @@ public:
 
     time_t activityDate = 0;
     time_t addedDate = 0;
-    time_t anyDate = 0;
     time_t doneDate = 0;
     time_t editDate = 0;
     time_t startDate = 0;
@@ -1149,6 +1150,14 @@ private:
         }
     }
 
+    constexpr void bump_date_changed(time_t when)
+    {
+        if (changed_date_ < when)
+        {
+            changed_date_ = when;
+        }
+    }
+
     void set_verify_state(VerifyState state);
 
     void on_metainfo_updated();
@@ -1174,6 +1183,8 @@ private:
      * and in the handshake are expected to match.
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
+
+    time_t changed_date_ = 0;
 
     float verify_progress_ = -1.0F;
     float seed_ratio_ = 0.0F;
