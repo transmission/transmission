@@ -659,7 +659,7 @@ private:
 
     void on_torrent_doomed()
     {
-        auto const lock = tor->unique_lock();
+        auto const lock = unique_lock();
         stop();
         tor->swarm = nullptr;
         delete this;
@@ -672,7 +672,7 @@ private:
 
     void on_swarm_is_all_seeds()
     {
-        auto const lock = tor->unique_lock();
+        auto const lock = unique_lock();
 
         for (auto& [socket_address, atom] : connectable_pool)
         {
@@ -1481,7 +1481,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
 void tr_swarm::on_torrent_started()
 {
-    auto const lock = tor->unique_lock();
+    auto const lock = unique_lock();
     is_running = true;
     manager->rechokeSoon();
 }
