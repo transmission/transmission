@@ -359,13 +359,13 @@ namespace
 {
 namespace script_helpers
 {
-[[nodiscard]] std::string buildLabelsString(tr_torrent const* tor)
+[[nodiscard]] std::string build_labels_string(tr_torrent::labels_t const& labels)
 {
     auto buf = std::stringstream{};
 
-    for (auto it = std::begin(tor->labels), end = std::end(tor->labels); it != end;)
+    for (auto it = std::begin(labels), end = std::end(labels); it != end;)
     {
-        buf << tr_quark_get_string_view(*it);
+        buf << it->sv();
 
         if (++it != end)
         {
@@ -406,7 +406,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
     auto const cmd = std::array<char const*, 2>{ script.c_str(), nullptr };
 
     auto const id_str = std::to_string(tr_torrentId(tor));
-    auto const labels_str = buildLabelsString(tor);
+    auto const labels_str = build_labels_string(tor->labels());
     auto const trackers_str = buildTrackersString(tor);
     auto const bytes_downloaded_str = std::to_string(tor->downloadedCur + tor->downloadedPrev);
     auto const localtime_str = fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time()));
@@ -1014,7 +1014,7 @@ void tr_torrent::init(tr_ctor const* const ctor)
     error().clear();
     finished_seeding_by_idle_ = false;
 
-    setLabels(tr_ctorGetLabels(ctor));
+    set_labels(tr_ctorGetLabels(ctor));
 
     session->addTorrent(this);
 
@@ -1882,19 +1882,19 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 
 // ---
 
-void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
+void tr_torrent::set_labels(labels_t const& new_labels)
 {
     auto const lock = unique_lock();
-    this->labels.clear();
+    labels_.clear();
 
     for (auto label : new_labels)
     {
-        if (std::find(std::begin(this->labels), std::end(this->labels), label) == std::end(this->labels))
+        if (std::find(std::begin(labels_), std::end(labels_), label) == std::end(labels_))
         {
-            this->labels.push_back(label);
+            labels_.push_back(label);
         }
     }
-    this->labels.shrink_to_fit();
+    labels_.shrink_to_fit();
     this->set_dirty();
 }
 
