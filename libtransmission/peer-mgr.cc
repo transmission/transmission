@@ -659,7 +659,7 @@ private:
 
     void on_torrent_doomed()
     {
-        auto const lock = tor->unique_lock();
+        auto const lock = unique_lock();
         stop();
         tor->swarm = nullptr;
         delete this;
@@ -672,7 +672,7 @@ private:
 
     void on_swarm_is_all_seeds()
     {
-        auto const lock = tor->unique_lock();
+        auto const lock = unique_lock();
 
         for (auto& [socket_address, atom] : connectable_pool)
         {
@@ -1481,7 +1481,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t address_ty
 
 void tr_swarm::on_torrent_started()
 {
-    auto const lock = tor->unique_lock();
+    auto const lock = unique_lock();
     is_running = true;
     manager->rechokeSoon();
 }
@@ -2141,28 +2141,28 @@ void enforceSwarmPeerLimit(tr_swarm* swarm, size_t max)
     std::for_each(std::begin(peers), std::end(peers), close_peer);
 }
 
-void enforceSessionPeerLimit(tr_session* session)
+void enforceSessionPeerLimit(size_t global_peer_limit, tr_torrents& torrents)
 {
-    // No need to disconnect if we are under the peer limit
-    auto const max = session->peerLimit();
-    if (tr_peerMsgs::size() <= max)
+    // if we're under the limit, then no action needed
+    auto const current_size = tr_peerMsgs::size();
+    if (current_size <= global_peer_limit)
     {
         return;
     }
 
-    // Make a list of all the peers.
+    // make a list of all the peers
     auto peers = std::vector<tr_peerMsgs*>{};
-    peers.reserve(tr_peerMsgs::size());
-    for (auto const* const tor : session->torrents())
+    peers.reserve(current_size);
+    for (auto const* const tor : torrents)
     {
         peers.insert(std::end(peers), std::begin(tor->swarm->peers), std::end(tor->swarm->peers));
     }
 
-    TR_ASSERT(tr_peerMsgs::size() == std::size(peers));
-    if (std::size(peers) > max)
+    TR_ASSERT(current_size == std::size(peers));
+    if (std::size(peers) > global_peer_limit)
     {
-        std::partial_sort(std::begin(peers), std::begin(peers) + max, std::end(peers), ComparePeerByMostActive);
-        std::for_each(std::begin(peers) + max, std::end(peers), close_peer);
+        std::partial_sort(std::begin(peers), std::begin(peers) + global_peer_limit, std::end(peers), ComparePeerByMostActive);
+        std::for_each(std::begin(peers) + global_peer_limit, std::end(peers), close_peer);
     }
 }
 } // namespace disconnect_helpers
@@ -2177,7 +2177,8 @@ void tr_peerMgr::reconnectPulse()
 
     // remove crappy peers
     auto bad_peers_buf = bad_peers_t{};
-    for (auto* const tor : session->torrents())
+    auto& torrents = session->torrents();
+    for (auto* const tor : torrents)
     {
         auto* const swarm = tor->swarm;
 
@@ -2192,7 +2193,7 @@ void tr_peerMgr::reconnectPulse()
     }
 
     // if we're over the per-torrent peer limits, cull some peers
-    for (auto* const tor : session->torrents())
+    for (auto* const tor : torrents)
     {
         if (tor->is_running())
         {
@@ -2201,7 +2202,7 @@ void tr_peerMgr::reconnectPulse()
     }
 
     // if we're over the per-session peer limits, cull some peers
-    enforceSessionPeerLimit(session);
+    enforceSessionPeerLimit(session->peerLimit(), torrents);
 
     // try to make new peer connections
     make_new_peer_connections();
@@ -2213,7 +2214,6 @@ namespace
 {
 namespace bandwidth_helpers
 {
-
 void pumpAllPeers(tr_peerMgr* mgr)
 {
     for (auto* const tor : mgr->session->torrents())
@@ -2224,25 +2224,6 @@ void pumpAllPeers(tr_peerMgr* mgr)
         }
     }
 }
-
-void queuePulse(tr_session* session, tr_direction dir)
-{
-    TR_ASSERT(session != nullptr);
-    TR_ASSERT(tr_isDirection(dir));
-
-    if (!session->queueEnabled(dir))
-    {
-        return;
-    }
-
-    auto const n = session->countQueueFreeSlots(dir);
-    for (auto* tor : session->getNextQueuedTorrents(dir, n))
-    {
-        tr_torrentStartNow(tor);
-        session->onQueuedTorrentStarted(tor);
-    }
-}
-
 } // namespace bandwidth_helpers
 } // namespace
 
@@ -2264,10 +2245,6 @@ void tr_peerMgr::bandwidthPulse()
         tor->do_idle_work();
         tr_torrentMagnetDoIdleWork(tor);
     }
-
-    /* pump the queues */
-    queuePulse(session, TR_UP);
-    queuePulse(session, TR_DOWN);
 
     reconnectPulse();
 }
@@ -2406,7 +2383,7 @@ struct peer_candidate
     return score;
 }
 
-void get_peer_candidates(tr_session* session, tr_peerMgr::OutboundCandidates& setme)
+void get_peer_candidates(size_t global_peer_limit, tr_torrents& torrents, tr_peerMgr::OutboundCandidates& setme)
 {
     setme.clear();
 
@@ -2414,7 +2391,7 @@ void get_peer_candidates(tr_session* session, tr_peerMgr::OutboundCandidates& se
     auto const now_msec = tr_time_msec();
 
     // leave 5% of connection slots for incoming connections -- ticket #2609
-    if (auto const max_candidates = static_cast<size_t>(session->peerLimit() * 0.95); max_candidates <= tr_peerMsgs::size())
+    if (auto const max_candidates = static_cast<size_t>(global_peer_limit * 0.95); max_candidates <= tr_peerMsgs::size())
     {
         return;
     }
@@ -2424,7 +2401,7 @@ void get_peer_candidates(tr_session* session, tr_peerMgr::OutboundCandidates& se
 
     /* populate the candidate array */
     auto salter = tr_salt_shaker{};
-    for (auto* const tor : session->torrents())
+    for (auto* const tor : torrents)
     {
         auto* const swarm = tor->swarm;
 
@@ -2535,7 +2512,7 @@ void tr_peerMgr::make_new_peer_connections()
     auto& candidates = outbound_candidates_;
     if (std::empty(candidates))
     {
-        get_peer_candidates(session, candidates);
+        get_peer_candidates(session->peerLimit(), session->torrents(), candidates);
     }
 
     // initiate connections to the last N candidates

@@ -644,7 +644,7 @@ bool torrentShouldQueue(tr_torrent const* const tor)
 {
     tr_direction const dir = tor->queue_direction();
 
-    return tor->session->countQueueFreeSlots(dir) == 0;
+    return tor->session->count_queue_free_slots(dir) == 0;
 }
 
 void torrentResetTransferStats(tr_torrent* tor)
