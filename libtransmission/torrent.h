@@ -79,6 +79,7 @@ void tr_torrentSave(tr_torrent* tor);
 struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
+    using labels_t = std::vector<tr_interned_string>;
     using VerifyDoneCallback = std::function<void(tr_torrent*)>;
 
     class VerifyMediator : public tr_verify_worker::Mediator
@@ -663,7 +664,12 @@ public:
         return TR_STATUS_STOPPED;
     }
 
-    void setLabels(std::vector<tr_quark> const& new_labels);
+    [[nodiscard]] constexpr auto const& labels() const noexcept
+    {
+        return labels_;
+    }
+
+    void set_labels(labels_t const& new_labels);
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
@@ -934,9 +940,6 @@ public:
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
 
-    using labels_t = std::vector<tr_quark>;
-    labels_t labels;
-
     // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
 
@@ -1168,6 +1171,8 @@ private:
 
     VerifyDoneCallback verify_done_callback_;
 
+    labels_t labels_;
+
     tr_interned_string bandwidth_group_;
 
     mutable SimpleSmoothedSpeed eta_speed_;
@@ -1222,7 +1227,7 @@ tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error = nullptr);
-void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
+void tr_ctorSetLabels(tr_ctor* ctor, tr_torrent::labels_t&& labels);
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);

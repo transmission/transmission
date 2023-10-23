@@ -339,9 +339,9 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 
 // ---
 
-void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels)
+void tr_ctorSetLabels(tr_ctor* ctor, tr_torrent::labels_t&& labels)
 {
-    ctor->labels = { labels, labels + n_labels };
+    ctor->labels = std::move(labels);
 }
 
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor)
