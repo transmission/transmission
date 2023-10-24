@@ -8,9 +8,9 @@
 #include <cstdint> // uint64_t
 #include <map>
 #include <memory>
+#include <set>
 
 #include <QAbstractItemModel>
-#include <QSet>
 
 #include <libtransmission/tr-macros.h>
 
@@ -91,7 +91,7 @@ private:
         QModelIndex const&,
         int first_column,
         int last_column,
-        QSet<QModelIndex>* visited_parent_indices = nullptr);
+        std::set<QModelIndex>* visited_parent_indices = nullptr);
     void emitSubtreeChanged(QModelIndex const&, int first_column, int last_column);
     FileTreeItem* findItemForFileIndex(int file_index) const;
     FileTreeItem* itemFromIndex(QModelIndex const&) const;

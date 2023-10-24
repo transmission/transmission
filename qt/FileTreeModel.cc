@@ -7,6 +7,7 @@
 #include <cassert>
 #include <map>
 #include <memory>
+#include <set>
 
 #include <libtransmission/transmission.h> // priorities
 
@@ -412,7 +413,7 @@ void FileTreeModel::emitParentsChanged(
     QModelIndex const& index,
     int first_column,
     int last_column,
-    QSet<QModelIndex>* visited_parent_indices)
+    std::set<QModelIndex>* visited_parent_indices)
 {
     assert(first_column <= last_column);
 
@@ -429,7 +430,7 @@ void FileTreeModel::emitParentsChanged(
 
         if (visited_parent_indices != nullptr)
         {
-            if (visited_parent_indices->contains(walk))
+            if (visited_parent_indices->count(walk) != 0U)
             {
                 break;
             }
@@ -537,7 +538,7 @@ void FileTreeModel::setWanted(QModelIndexList const& indices, bool wanted)
     }
 
     // emit parent changes separately to avoid multiple updates for same items
-    QSet<QModelIndex> parent_indices;
+    auto parent_indices = std::set<QModelIndex>{};
 
     for (QModelIndex const& i : orphan_indices)
     {
@@ -571,8 +572,7 @@ void FileTreeModel::setPriority(QModelIndexList const& indices, int priority)
     }
 
     // emit parent changes separately to avoid multiple updates for same items
-    QSet<QModelIndex> parent_indices;
-
+    auto parent_indices = std::set<QModelIndex>{};
     for (QModelIndex const& i : orphan_indices)
     {
         emitParentsChanged(i, COL_PRIORITY, COL_PRIORITY, &parent_indices);
