@@ -130,19 +130,6 @@ tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet
     return magnet_link == nullptr ? nullptr : session->torrents().get(magnet_link);
 }
 
-tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& obfuscated_hash)
-{
-    for (auto* const tor : session->torrents())
-    {
-        if (tor->obfuscated_hash == obfuscated_hash)
-        {
-            return tor;
-        }
-    }
-
-    return nullptr;
-}
-
 bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename)
 {
     if (tr_torrentHasMetadata(tor))

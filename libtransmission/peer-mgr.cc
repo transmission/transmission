@@ -79,19 +79,22 @@ private:
     }
 
 public:
-    explicit HandshakeMediator(tr_session& session) noexcept
+    explicit HandshakeMediator(tr_session& session, libtransmission::TimerMaker& timer_maker, tr_torrents& torrents) noexcept
         : session_{ session }
+        , timer_maker_{ timer_maker }
+        , torrents_{ torrents }
     {
     }
 
     [[nodiscard]] std::optional<TorrentInfo> torrent(tr_sha1_digest_t const& info_hash) const override
     {
-        return torrent(session_.torrents().get(info_hash));
+        return torrent(torrents_.get(info_hash));
     }
 
-    [[nodiscard]] std::optional<TorrentInfo> torrent_from_obfuscated(tr_sha1_digest_t const& info_hash) const override
+    [[nodiscard]] std::optional<TorrentInfo> torrent_from_obfuscated(
+        tr_sha1_digest_t const& obfuscated_info_hash) const override
     {
-        return torrent(tr_torrentFindFromObfuscatedHash(&session_, info_hash));
+        return torrent(torrents_.find_from_obfuscated_hash(obfuscated_info_hash));
     }
 
     [[nodiscard]] bool allows_dht() const override
@@ -108,7 +111,7 @@ public:
 
     [[nodiscard]] libtransmission::TimerMaker& timer_maker() override
     {
-        return session_.timerMaker();
+        return timer_maker_;
     }
 
     [[nodiscard]] size_t pad(void* setme, size_t maxlen) const override
@@ -120,6 +123,8 @@ public:
 
 private:
     tr_session& session_;
+    libtransmission::TimerMaker& timer_maker_;
+    tr_torrents& torrents_;
 };
 
 using Handshakes = std::unordered_map<tr_socket_address, tr_handshake>;
@@ -926,12 +931,13 @@ public:
     using OutboundCandidates = small::
         max_size_vector<std::pair<tr_torrent_id_t, tr_socket_address>, OutboundCandidateListCapacity>;
 
-    explicit tr_peerMgr(tr_session* session_in)
+    explicit tr_peerMgr(tr_session* session_in, libtransmission::TimerMaker& timer_maker, tr_torrents& torrents)
         : session{ session_in }
-        , handshake_mediator_{ *session }
-        , bandwidth_timer_{ session->timerMaker().create([this]() { bandwidthPulse(); }) }
-        , rechoke_timer_{ session->timerMaker().create([this]() { rechokePulseMarshall(); }) }
-        , refill_upkeep_timer_{ session->timerMaker().create([this]() { refillUpkeep(); }) }
+        , torrents_{ torrents }
+        , handshake_mediator_{ *session, timer_maker, torrents }
+        , bandwidth_timer_{ timer_maker.create([this]() { bandwidthPulse(); }) }
+        , rechoke_timer_{ timer_maker.create([this]() { rechokePulseMarshall(); }) }
+        , refill_upkeep_timer_{ timer_maker.create([this]() { refillUpkeep(); }) }
         , blocklist_tag_{ session->blocklist_changed_.observe([this]() { on_blocklist_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthTimerPeriod);
@@ -968,11 +974,12 @@ public:
 
     [[nodiscard]] tr_swarm* get_existing_swarm(tr_sha1_digest_t const& hash) const
     {
-        auto* const tor = session->torrents().get(hash);
+        auto* const tor = torrents_.get(hash);
         return tor == nullptr ? nullptr : tor->swarm;
     }
 
     tr_session* const session;
+    tr_torrents& torrents_;
     Handshakes incoming_handshakes;
 
     HandshakeMediator handshake_mediator_;
@@ -988,7 +995,7 @@ private:
     {
         /* we cache whether or not a peer is blocklisted...
            since the blocklist has changed, erase that cached value */
-        for (auto* const tor : session->torrents())
+        for (auto* const tor : torrents_)
         {
             for (auto& pool : { std::ref(tor->swarm->connectable_pool), std::ref(tor->swarm->incoming_pool) })
             {
@@ -1030,7 +1037,7 @@ tr_peer::~tr_peer()
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
-    return new tr_peerMgr{ session };
+    return new tr_peerMgr{ session, session->timerMaker(), session->torrents() };
 }
 
 void tr_peerMgrFree(tr_peerMgr* manager)
@@ -1159,7 +1166,7 @@ void tr_peerMgr::refillUpkeep() const
 {
     auto const lock = unique_lock();
 
-    for (auto* const tor : session->torrents())
+    for (auto* const tor : torrents_)
     {
         tor->swarm->cancelOldRequests();
         tor->swarm->remove_inactive_peer_info();
@@ -1986,7 +1993,7 @@ void tr_peerMgr::rechokePulse() const
     auto const lock = unique_lock();
     auto const now = tr_time_msec();
 
-    for (auto* const tor : session->torrents())
+    for (auto* const tor : torrents_)
     {
         if (tor->is_running())
         {
@@ -2172,12 +2179,12 @@ void tr_peerMgr::reconnectPulse()
 {
     using namespace disconnect_helpers;
 
-    auto const lock = session->unique_lock();
+    auto const lock = unique_lock();
     auto const now_sec = tr_time();
 
     // remove crappy peers
     auto bad_peers_buf = bad_peers_t{};
-    auto& torrents = session->torrents();
+    auto& torrents = torrents_;
     for (auto* const tor : torrents)
     {
         auto* const swarm = tor->swarm;
@@ -2216,7 +2223,7 @@ namespace bandwidth_helpers
 {
 void pumpAllPeers(tr_peerMgr* mgr)
 {
-    for (auto* const tor : mgr->session->torrents())
+    for (auto* const tor : mgr->torrents_)
     {
         for (auto* const peer : tor->swarm->peers)
         {
@@ -2240,7 +2247,7 @@ void tr_peerMgr::bandwidthPulse()
     session->top_bandwidth_.allocate(Msec);
 
     // torrent upkeep
-    for (auto* const tor : session->torrents())
+    for (auto* const tor : torrents_)
     {
         tor->do_idle_work();
         tr_torrentMagnetDoIdleWork(tor);
@@ -2506,13 +2513,13 @@ void tr_peerMgr::make_new_peer_connections()
 {
     using namespace connect_helpers;
 
-    auto const lock = session->unique_lock();
+    auto const lock = unique_lock();
 
     // get the candidates if we need to
     auto& candidates = outbound_candidates_;
     if (std::empty(candidates))
     {
-        get_peer_candidates(session->peerLimit(), session->torrents(), candidates);
+        get_peer_candidates(session->peerLimit(), torrents_, candidates);
     }
 
     // initiate connections to the last N candidates
@@ -2522,7 +2529,7 @@ void tr_peerMgr::make_new_peer_connections()
     {
         auto const& [tor_id, sock_addr] = *it;
 
-        if (auto* const tor = session->torrents().get(tor_id); tor != nullptr)
+        if (auto* const tor = torrents_.get(tor_id); tor != nullptr)
         {
             if (auto* const peer_info = tor->swarm->get_existing_peer_info(sock_addr); peer_info != nullptr)
             {
@@ -2537,7 +2544,7 @@ void tr_peerMgr::make_new_peer_connections()
 
 void HandshakeMediator::set_utp_failed(tr_sha1_digest_t const& info_hash, tr_socket_address const& socket_address)
 {
-    if (auto* const tor = session_.torrents().get(info_hash); tor != nullptr)
+    if (auto* const tor = torrents_.get(info_hash); tor != nullptr)
     {
         if (auto* const peer_info = tor->swarm->get_existing_peer_info(socket_address); peer_info != nullptr)
         {
