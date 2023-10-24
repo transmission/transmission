@@ -88,7 +88,7 @@ public:
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, int val);
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, double val);
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QString const& val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QList<int> const& val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, std::vector<int> const& val);
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QStringList const& val);
 
     void torrentSetLocation(torrent_ids_t const& torrent_ids, QString const& path, bool do_move);
