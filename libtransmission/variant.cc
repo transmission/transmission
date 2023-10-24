@@ -528,14 +528,6 @@ tr_variant* tr_variantDictAddReal(tr_variant* const var, tr_quark key, double va
     return child;
 }
 
-tr_variant* tr_variantDictAddQuark(tr_variant* const var, tr_quark key, tr_quark const val)
-{
-    tr_variantDictRemove(var, key);
-    auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitQuark(child, val);
-    return child;
-}
-
 tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark key, std::string_view val)
 {
     tr_variantDictRemove(var, key);

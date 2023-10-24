@@ -437,7 +437,6 @@ tr_variant* tr_variantDictAddInt(tr_variant* var, tr_quark key, int64_t value);
 tr_variant* tr_variantDictAddBool(tr_variant* var, tr_quark key, bool value);
 tr_variant* tr_variantDictAddStr(tr_variant* var, tr_quark key, std::string_view value);
 tr_variant* tr_variantDictAddStrView(tr_variant* var, tr_quark key, std::string_view value);
-tr_variant* tr_variantDictAddQuark(tr_variant* var, tr_quark key, tr_quark val);
 tr_variant* tr_variantDictAddList(tr_variant* var, tr_quark key, size_t n_reserve);
 tr_variant* tr_variantDictAddDict(tr_variant* var, tr_quark key, size_t n_reserve);
 tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t n_bytes);
