@@ -175,9 +175,13 @@ BlocklistDownloader* fBLDownloader = nil;
     {
         urlString = @"";
     }
-    else if (![urlString isEqualToString:@""] && [urlString rangeOfString:@"://"].location == NSNotFound)
+    else
     {
-        urlString = [@"https://" stringByAppendingString:urlString];
+        urlString = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (![urlString isEqualToString:@""] && [urlString rangeOfString:@"://"].location == NSNotFound)
+        {
+            urlString = [@"https://" stringByAppendingString:urlString];
+        }
     }
 
     NSURLSessionDownloadTask* task = [self.fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];
