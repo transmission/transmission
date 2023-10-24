@@ -463,11 +463,6 @@ tr_variant* tr_variantListAddStrView(tr_variant* const var, std::string_view val
     return child;
 }
 
-tr_variant* tr_variantListAddQuark(tr_variant* const var, tr_quark value)
-{
-    return tr_variantListAddStrView(var, tr_quark_get_string_view(value));
-}
-
 tr_variant* tr_variantListAddRaw(tr_variant* const var, void const* value, size_t n_bytes)
 {
     auto* const child = tr_variantListAdd(var);
