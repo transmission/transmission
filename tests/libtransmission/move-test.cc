@@ -166,7 +166,7 @@ TEST_F(MoveTest, setLocation)
 
     // now move it
     auto state = int{ -1 };
-    tr_torrentSetLocation(tor, target_dir, true, nullptr, &state);
+    tr_torrentSetLocation(tor, target_dir, true, &state);
     auto test = [&state]()
     {
         return state == TR_LOC_DONE;

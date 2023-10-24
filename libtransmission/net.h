@@ -181,13 +181,13 @@ struct tr_address
     template<typename OutputIt>
     static OutputIt to_compact_ipv4(OutputIt out, in_addr const& addr4)
     {
-        return std::copy_n(reinterpret_cast<std::byte const*>(&addr4), sizeof(addr4), out);
+        return std::copy_n(reinterpret_cast<std::byte const*>(&addr4.s_addr), sizeof(addr4.s_addr), out);
     }
 
     template<typename OutputIt>
     static OutputIt to_compact_ipv6(OutputIt out, in6_addr const& addr6)
     {
-        return std::copy_n(reinterpret_cast<std::byte const*>(&addr6), sizeof(addr6), out);
+        return std::copy_n(reinterpret_cast<std::byte const*>(&addr6.s6_addr), sizeof(addr6.s6_addr), out);
     }
 
     template<typename OutputIt>

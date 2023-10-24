@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -350,11 +350,8 @@
 		C1639A7D1A55F57200E42033 /* cencode.h in Headers */ = {isa = PBXBuildFile; fileRef = C1639A7B1A55F57200E42033 /* cencode.h */; };
 		C17740D5273A002C00E455D2 /* web-utils.cc in Sources */ = {isa = PBXBuildFile; fileRef = C17740D3273A002C00E455D2 /* web-utils.cc */; };
 		C17740D6273A002C00E455D2 /* web-utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C17740D4273A002C00E455D2 /* web-utils.h */; };
-		C1846BA0294F7A6300A98F30 /* jsonsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C1846B86294F780700A98F30 /* jsonsl.h */; };
-		C1846BA1294F7A6300A98F30 /* jsonsl.c in Sources */ = {isa = PBXBuildFile; fileRef = C1846B85294F780700A98F30 /* jsonsl.c */; };
 		C1846BA2294F7A6800A98F30 /* wildmat.c in Sources */ = {isa = PBXBuildFile; fileRef = C1846B88294F781800A98F30 /* wildmat.c */; };
 		C1846BA3294F7A6800A98F30 /* wildmat.h in Headers */ = {isa = PBXBuildFile; fileRef = C1846B87294F781800A98F30 /* wildmat.h */; };
-		C1846BA8294F7B5700A98F30 /* libjsonsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1846B91294F796A00A98F30 /* libjsonsl.a */; };
 		C1846BA9294F7B5A00A98F30 /* libwildmat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1846B9E294F7A3400A98F30 /* libwildmat.a */; };
 		C1BF7BA81F2A3CB7008E88A7 /* upnpdev.c in Sources */ = {isa = PBXBuildFile; fileRef = C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */; };
 		C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */ = {isa = PBXBuildFile; fileRef = C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */; };
@@ -547,13 +544,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C1639A6E1A55F4D600E42033;
 			remoteInfo = b64;
-		};
-		C1846BA4294F7B1100A98F30 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C1846B90294F796A00A98F30;
-			remoteInfo = jsonsl;
 		};
 		C1846BA6294F7B1400A98F30 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1163,11 +1153,8 @@
 		C1639A7B1A55F57200E42033 /* cencode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = cencode.h; path = include/b64/cencode.h; sourceTree = "<group>"; };
 		C17740D3273A002C00E455D2 /* web-utils.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "web-utils.cc"; sourceTree = "<group>"; };
 		C17740D4273A002C00E455D2 /* web-utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "web-utils.h"; sourceTree = "<group>"; };
-		C1846B85294F780700A98F30 /* jsonsl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = jsonsl.c; sourceTree = "<group>"; };
-		C1846B86294F780700A98F30 /* jsonsl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jsonsl.h; sourceTree = "<group>"; };
 		C1846B87294F781800A98F30 /* wildmat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wildmat.h; sourceTree = "<group>"; };
 		C1846B88294F781800A98F30 /* wildmat.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = wildmat.c; sourceTree = "<group>"; };
-		C1846B91294F796A00A98F30 /* libjsonsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libjsonsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1846B9E294F7A3400A98F30 /* libwildmat.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libwildmat.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = upnpdev.c; sourceTree = "<group>"; };
 		C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = upnpdev.h; sourceTree = "<group>"; };
@@ -1345,7 +1332,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C1846BA9294F7B5A00A98F30 /* libwildmat.a in Frameworks */,
-				C1846BA8294F7B5700A98F30 /* libjsonsl.a in Frameworks */,
 				C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */,
 				C3CEBBFC2794A12200683BE0 /* libdeflate.a in Frameworks */,
 				C1639A741A55F4E000E42033 /* libb64.a in Frameworks */,
@@ -1382,13 +1368,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C1639A6C1A55F4D600E42033 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C1846B8F294F796A00A98F30 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1583,7 +1562,6 @@
 				C1639A6F1A55F4D600E42033 /* libb64.a */,
 				C3CEBBA927949CA000683BE0 /* libdeflate.a */,
 				C3D9062127B7E3C900EF2386 /* libpsl.a */,
-				C1846B91294F796A00A98F30 /* libjsonsl.a */,
 				C1846B9E294F7A3400A98F30 /* libwildmat.a */,
 			);
 			name = Products;
@@ -1607,7 +1585,6 @@
 				3C7A11880D0B2E6700B5701F /* libnatpmp */,
 				C3D9061627B7E12F00EF2386 /* libpsl */,
 				C1639A751A55F52800E42033 /* b64 */,
-				C1846B81294F774D00A98F30 /* jsonsl */,
 				C1846B82294F777000A98F30 /* wildmat */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
 				A2F35BBA15C5A0A100EBF632 /* Frameworks */,
@@ -2085,16 +2062,6 @@
 			path = "third-party/libb64";
 			sourceTree = "<group>";
 		};
-		C1846B81294F774D00A98F30 /* jsonsl */ = {
-			isa = PBXGroup;
-			children = (
-				C1846B85294F780700A98F30 /* jsonsl.c */,
-				C1846B86294F780700A98F30 /* jsonsl.h */,
-			);
-			name = jsonsl;
-			path = "third-party/jsonsl";
-			sourceTree = "<group>";
-		};
 		C1846B82294F777000A98F30 /* wildmat */ = {
 			isa = PBXGroup;
 			children = (
@@ -2402,14 +2369,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C1846B8D294F796A00A98F30 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C1846BA0294F7A6300A98F30 /* jsonsl.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C1846B97294F7A3400A98F30 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2493,7 +2452,6 @@
 			);
 			dependencies = (
 				C1846BA7294F7B1400A98F30 /* PBXTargetDependency */,
-				C1846BA5294F7B1100A98F30 /* PBXTargetDependency */,
 				C33E46A22794B3CC0090F2AA /* PBXTargetDependency */,
 				A226FDB10D0CDF6E005A7F71 /* PBXTargetDependency */,
 				BE1183760CE161040002D0F3 /* PBXTargetDependency */,
@@ -2688,23 +2646,6 @@
 			productReference = C1639A6F1A55F4D600E42033 /* libb64.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		C1846B90294F796A00A98F30 /* jsonsl */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C1846B92294F796C00A98F30 /* Build configuration list for PBXNativeTarget "jsonsl" */;
-			buildPhases = (
-				C1846B8D294F796A00A98F30 /* Headers */,
-				C1846B8E294F796A00A98F30 /* Sources */,
-				C1846B8F294F796A00A98F30 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = jsonsl;
-			productName = jsonsl;
-			productReference = C1846B91294F796A00A98F30 /* libjsonsl.a */;
-			productType = "com.apple.product-type.library.static";
-		};
 		C1846B96294F7A3400A98F30 /* wildmat */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C1846B9A294F7A3400A98F30 /* Build configuration list for PBXNativeTarget "wildmat" */;
@@ -2718,7 +2659,7 @@
 			dependencies = (
 			);
 			name = wildmat;
-			productName = jsonsl;
+			productName = wildmat;
 			productReference = C1846B9E294F7A3400A98F30 /* libwildmat.a */;
 			productType = "com.apple.product-type.library.static";
 		};
@@ -2827,9 +2768,6 @@
 					C1639A6E1A55F4D600E42033 = {
 						CreatedOnToolsVersion = 6.1.1;
 					};
-					C1846B90294F796A00A98F30 = {
-						CreatedOnToolsVersion = 14.1;
-					};
 					C3D9062027B7E3C900EF2386 = {
 						CreatedOnToolsVersion = 13.0;
 					};
@@ -2874,7 +2812,6 @@
 				C1639A6E1A55F4D600E42033 /* b64 */,
 				C3CEBB9F27949CA000683BE0 /* deflate */,
 				C3D9062027B7E3C900EF2386 /* psl */,
-				C1846B90294F796A00A98F30 /* jsonsl */,
 				C1846B96294F7A3400A98F30 /* wildmat */,
 			);
 		};
@@ -3328,14 +3265,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C1846B8E294F796A00A98F30 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C1846BA1294F7A6300A98F30 /* jsonsl.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C1846B98294F7A3400A98F30 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3457,11 +3386,6 @@
 			isa = PBXTargetDependency;
 			target = C1639A6E1A55F4D600E42033 /* b64 */;
 			targetProxy = C165AB8C1A55FAA900D37711 /* PBXContainerItemProxy */;
-		};
-		C1846BA5294F7B1100A98F30 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C1846B90294F796A00A98F30 /* jsonsl */;
-			targetProxy = C1846BA4294F7B1100A98F30 /* PBXContainerItemProxy */;
 		};
 		C1846BA7294F7B1400A98F30 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3757,7 +3681,7 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/utfcpp/source",
-					"third-party/jsonsl",
+					"third-party/rapidjson/include",
 					"third-party/wildmat",
 				);
 				OTHER_CFLAGS = (
@@ -3766,6 +3690,7 @@
 					"-D__TRANSMISSION__",
 					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
+					"-DRAPIDJSON_HAS_STDSTRING=1",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 				);
@@ -3776,7 +3701,7 @@
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
 					"third-party/small/include",
-					"third-party/jsonsl",
+					"third-party/rapidjson/include",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
@@ -4016,7 +3941,7 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/utfcpp/source",
-					"third-party/jsonsl",
+					"third-party/rapidjson/include",
 					"third-party/wildmat",
 				);
 				OTHER_CFLAGS = (
@@ -4025,6 +3950,7 @@
 					"-D__TRANSMISSION__",
 					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
+					"-DRAPIDJSON_HAS_STDSTRING=1",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 				);
@@ -4035,7 +3961,7 @@
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
 					"third-party/small/include",
-					"third-party/jsonsl",
+					"third-party/rapidjson/include",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
@@ -4347,7 +4273,7 @@
 					"third-party/libpsl/include",
 					"third-party/libutp/include",
 					"third-party/utfcpp/source",
-					"third-party/jsonsl",
+					"third-party/rapidjson/include",
 					"third-party/wildmat",
 				);
 				OTHER_CFLAGS = (
@@ -4356,6 +4282,7 @@
 					"-D__TRANSMISSION__",
 					"-DWIDE_INTEGER_DISABLE_FLOAT_INTEROP",
 					"-DWIDE_INTEGER_DISABLE_IOSTREAM",
+					"-DRAPIDJSON_HAS_STDSTRING=1",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 				);
@@ -4366,7 +4293,7 @@
 					"third-party/fast_float/include",
 					"third-party/fmt/include",
 					"third-party/small/include",
-					"third-party/jsonsl",
+					"third-party/rapidjson/include",
 					"third-party/libb64/include",
 					"third-party/libdeflate",
 					"third-party/libevent/include",
@@ -4692,36 +4619,6 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
-		C1846B93294F796C00A98F30 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				PRODUCT_NAME = jsonsl;
-			};
-			name = Debug;
-		};
-		C1846B94294F796C00A98F30 /* Release - Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				PRODUCT_NAME = jsonsl;
-			};
-			name = "Release - Debug";
-		};
-		C1846B95294F796C00A98F30 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = NO;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				PRODUCT_NAME = jsonsl;
 			};
 			name = Release;
 		};
@@ -5163,16 +5060,6 @@
 				C1639A701A55F4D600E42033 /* Debug */,
 				C1639A711A55F4D600E42033 /* Release - Debug */,
 				C1639A721A55F4D600E42033 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
-		C1846B92294F796C00A98F30 /* Build configuration list for PBXNativeTarget "jsonsl" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C1846B93294F796C00A98F30 /* Debug */,
-				C1846B94294F796C00A98F30 /* Release - Debug */,
-				C1846B95294F796C00A98F30 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

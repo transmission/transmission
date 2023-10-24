@@ -1886,7 +1886,7 @@ namespace peer_pulse_helpers
 
         if (!ok)
         {
-            msgs->torrent->set_local_error(
+            msgs->torrent->error().set_local_error(
                 fmt::format(FMT_STRING("Please Verify Local Data! Piece #{:d} is corrupt."), req.index));
         }
     }

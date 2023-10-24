@@ -133,7 +133,7 @@ auto getTorrents(tr_session* session, tr_variant* args)
                 std::begin(session->torrents()),
                 std::end(session->torrents()),
                 std::back_inserter(torrents),
-                [&cutoff](auto const* tor) { return tor->anyDate >= cutoff; });
+                [&cutoff](auto const* tor) { return tor->has_changed_since(cutoff); });
         }
         else
         {
@@ -239,7 +239,7 @@ char const* torrentStop(tr_session* session, tr_variant* args_in, tr_variant* /*
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (tor->is_running() || tor->is_queued() || tor->verify_state() != TR_VERIFY_NONE)
+        if (tor->activity() != TR_STATUS_STOPPED)
         {
             tor->is_stopping_ = true;
             session->rpcNotify(TR_RPC_TORRENT_STOPPED, tor);
@@ -331,14 +331,15 @@ namespace make_torrent_field_helpers
 
 [[nodiscard]] auto make_labels_vec(tr_torrent const& tor)
 {
-    auto const n_labels = std::size(tor.labels);
-    auto labels = tr_variant::Vector{};
-    labels.reserve(n_labels);
-    for (auto const& label : tor.labels)
+    auto const& labels = tor.labels();
+    auto const n_labels = std::size(labels);
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_labels);
+    for (auto const& label : labels)
     {
-        labels.emplace_back(tr_variant::unmanaged_string(tr_quark_get_string_view(label)));
+        vec.emplace_back(tr_variant::unmanaged_string(label.sv()));
     }
-    return tr_variant{ std::move(labels) };
+    return tr_variant{ std::move(vec) };
 }
 
 [[nodiscard]] auto make_file_priorities_vec(tr_torrent const& tor)
@@ -801,9 +802,9 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
 
 // ---
 
-[[nodiscard]] std::pair<std::vector<tr_quark>, char const* /*errmsg*/> makeLabels(tr_variant* list)
+[[nodiscard]] std::pair<tr_torrent::labels_t, char const* /*errmsg*/> makeLabels(tr_variant* list)
 {
-    auto labels = std::vector<tr_quark>{};
+    auto labels = tr_torrent::labels_t{};
     size_t const n = tr_variantListSize(list);
     labels.reserve(n);
 
@@ -826,7 +827,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             return { {}, "labels cannot contain comma (,) character" };
         }
 
-        labels.emplace_back(tr_quark_new(label));
+        labels.emplace_back(label);
     }
 
     return { labels, nullptr };
@@ -841,7 +842,7 @@ char const* setLabels(tr_torrent* tor, tr_variant* list)
         return errmsg;
     }
 
-    tor->setLabels(labels);
+    tor->set_labels(labels);
     return nullptr;
 }
 
@@ -1167,7 +1168,7 @@ char const* torrentSetLocation(
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        tor->set_location(location, move, nullptr, nullptr);
+        tor->set_location(location, move, nullptr);
         session->rpcNotify(TR_RPC_TORRENT_MOVED, tor);
     }
 
@@ -1536,7 +1537,7 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
             return errmsg;
         }
 
-        tr_ctorSetLabels(ctor, std::data(labels), std::size(labels));
+        tr_ctorSetLabels(ctor, std::move(labels));
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));

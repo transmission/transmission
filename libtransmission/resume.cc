@@ -84,11 +84,11 @@ auto loadPeers(tr_variant* dict, tr_torrent* tor)
 
 void saveLabels(tr_variant* dict, tr_torrent const* tor)
 {
-    auto const& labels = tor->labels;
+    auto const& labels = tor->labels();
     tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
     for (auto const& label : labels)
     {
-        tr_variantListAddQuark(list, label);
+        tr_variantListAddStrView(list, label.sv());
     }
 }
 
@@ -101,18 +101,18 @@ auto loadLabels(tr_variant* dict, tr_torrent* tor)
     }
 
     auto const n = tr_variantListSize(list);
-    auto labels = std::vector<tr_quark>{};
+    auto labels = tr_torrent::labels_t{};
     labels.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            labels.emplace_back(tr_quark_new(sv));
+            labels.emplace_back(tr_interned_string{ sv });
         }
     }
 
-    tor->setLabels(labels);
+    tor->set_labels(labels);
     return tr_resume::Labels;
 }
 
@@ -914,7 +914,7 @@ void save(tr_torrent* tor)
     auto serde = tr_variant_serde::benc();
     if (!serde.to_file(top, tor->resume_file()))
     {
-        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
+        tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
     }
 }
 

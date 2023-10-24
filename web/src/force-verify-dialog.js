@@ -58,16 +58,12 @@ export class ForceVerifyDialog extends EventTarget {
   }
 
   static _createMessage(options) {
-    let heading = null;
-    let message = null;
     const { torrents } = options;
-    if (torrents.length === 1) {
-      heading = `Force verify local data of ${torrents[0].getName()}?`;
-      message = `This torrent's progress will be rechecked without any safety checks. Are you sure?`;
-    } else {
-      heading = `Force verify local data of ${torrents.length} transfers?`;
-      message = `These torrents' progress will be rechecked without any safety checks. Are you sure?`;
-    }
+    const heading =
+      torrents.length === 1
+        ? `Force verify local data of ${torrents[0].getName()}?`
+        : `Force verify local data of ${torrents.length} transfers?`;
+    const message = `Missing files will be re-downloaded, use the non-forced verify function if you'd like to check for missing files.`;
     return { heading, message };
   }
 }

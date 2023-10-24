@@ -19,6 +19,7 @@
 
 #include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
 
+#include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" /* tr_compare_3way */
@@ -215,6 +216,31 @@ public:
         return is_connected_;
     }
 
+    [[nodiscard]] auto has_handshake() const noexcept
+    {
+        return static_cast<bool>(outgoing_handshake_);
+    }
+
+    template<typename... Args>
+    void start_handshake(Args&&... args)
+    {
+        TR_ASSERT(!outgoing_handshake_);
+        if (!outgoing_handshake_)
+        {
+            outgoing_handshake_ = std::make_unique<tr_handshake>(std::forward<Args>(args)...);
+        }
+    }
+
+    void destroy_handshake() noexcept
+    {
+        outgoing_handshake_.reset();
+    }
+
+    [[nodiscard]] auto is_in_use() const noexcept
+    {
+        return is_connected() || has_handshake();
+    }
+
     // ---
 
     [[nodiscard]] bool is_blocklisted(tr_session const* session) const;
@@ -272,6 +298,11 @@ public:
         }
 
         return now - std::max(piece_data_at_, connection_changed_at_);
+    }
+
+    [[nodiscard]] auto is_inactive(time_t const now) const noexcept
+    {
+        return !is_in_use() && now - connection_changed_at_ >= UselessThresSecs;
     }
 
     // ---
@@ -347,95 +378,7 @@ public:
     // ---
 
     // merge two peer info objects that supposedly describes the same peer
-    void merge(tr_peer_info const& that) noexcept
-    {
-        TR_ASSERT(is_connectable_.value_or(true) || !is_connected());
-        TR_ASSERT(that.is_connectable_.value_or(true) || !that.is_connected());
-
-        connection_attempted_at_ = std::max(connection_attempted_at_, that.connection_attempted_at_);
-        connection_changed_at_ = std::max(connection_changed_at_, that.connection_changed_at_);
-        piece_data_at_ = std::max(piece_data_at_, that.piece_data_at_);
-
-        /* no need to merge blocklist since it gets updated elsewhere */
-
-        {
-            // This part is frankly convoluted and confusing, but the idea is:
-            // 1. If the two peer info objects agree that this peer is connectable/non-connectable,
-            //    then the answer is straightforward: We keep the agreed value.
-            // 2. If the two peer info objects disagrees as to whether this peer is connectable,
-            //    then we reset the flag to an empty value, so that we can try for ourselves when
-            //    initiating outgoing connections.
-            // 3. If one object has knowledge and the other doesn't, then we take the word of the
-            //    peer info object with knowledge with one exception:
-            //    - If the object with knowledge says the peer is not connectable, but we are
-            //      currently connected to the peer, then we give it the benefit of the doubt.
-            //      The connectable flag will be reset to an empty value.
-            // 4. In case both objects have no knowledge about whether this peer is connectable,
-            //    we shall not make any assumptions: We keep the flag empty.
-            //
-            // Truth table:
-            //   +-----------------+---------------+----------------------+--------------------+---------+
-            //   | is_connectable_ | is_connected_ | that.is_connectable_ | that.is_connected_ | Result  |
-            //   +=================+===============+======================+====================+=========+
-            //   | T               | T             | T                    | T                  | T       |
-            //   | T               | T             | T                    | F                  | T       |
-            //   | T               | T             | F                    | F                  | ?       |
-            //   | T               | T             | ?                    | T                  | T       |
-            //   | T               | T             | ?                    | F                  | T       |
-            //   | T               | F             | T                    | T                  | T       |
-            //   | T               | F             | T                    | F                  | T       |
-            //   | T               | F             | F                    | F                  | ?       |
-            //   | T               | F             | ?                    | T                  | T       |
-            //   | T               | F             | ?                    | F                  | T       |
-            //   | F               | F             | T                    | T                  | ?       |
-            //   | F               | F             | T                    | F                  | ?       |
-            //   | F               | F             | F                    | F                  | F       |
-            //   | F               | F             | ?                    | T                  | ?       |
-            //   | F               | F             | ?                    | F                  | F       |
-            //   | ?               | T             | T                    | T                  | T       |
-            //   | ?               | T             | T                    | F                  | T       |
-            //   | ?               | T             | F                    | F                  | ?       |
-            //   | ?               | T             | ?                    | T                  | ?       |
-            //   | ?               | T             | ?                    | F                  | ?       |
-            //   | ?               | F             | T                    | T                  | T       |
-            //   | ?               | F             | T                    | F                  | T       |
-            //   | ?               | F             | F                    | F                  | F       |
-            //   | ?               | F             | ?                    | T                  | ?       |
-            //   | ?               | F             | ?                    | F                  | ?       |
-            //   | N/A             | N/A           | F                    | T                  | Invalid |
-            //   | F               | T             | N/A                  | N/A                | Invalid |
-            //   +-----------------+---------------+----------------------+--------------------+---------+
-
-            auto const conn_this = is_connectable_ && *is_connectable_;
-            auto const conn_that = that.is_connectable_ && *that.is_connectable_;
-
-            if ((!is_connectable_ && !that.is_connectable_) ||
-                is_connectable_.value_or(conn_that || is_connected()) !=
-                    that.is_connectable_.value_or(conn_this || that.is_connected()))
-            {
-                is_connectable_.reset();
-            }
-            else
-            {
-                set_connectable(conn_this || conn_that);
-            }
-        }
-
-        set_utp_supported(supports_utp() || that.supports_utp());
-
-        /* from_first_ should never be modified */
-        found_at(that.from_best());
-
-        /* num_consecutive_fails_ is already the latest */
-        pex_flags_ |= that.pex_flags_;
-
-        if (that.is_banned())
-        {
-            ban();
-        }
-        /* is_connected_ should already be set */
-        set_seed(is_seed() || that.is_seed());
-    }
+    void merge(tr_peer_info& that) noexcept;
 
 private:
     [[nodiscard]] constexpr time_t get_reconnect_interval_secs(time_t const now) const noexcept
@@ -479,6 +422,7 @@ private:
 
     // the minimum we'll wait before attempting to reconnect to a peer
     static auto constexpr MinimumReconnectIntervalSecs = time_t{ 5U };
+    static auto constexpr UselessThresSecs = time_t{ 24 * 60 * 60 };
 
     static auto inline n_known_connectable = size_t{};
 
@@ -502,6 +446,8 @@ private:
     bool is_banned_ = false;
     bool is_connected_ = false;
     bool is_seed_ = false;
+
+    std::unique_ptr<tr_handshake> outgoing_handshake_;
 };
 
 struct tr_pex
