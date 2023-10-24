@@ -79,7 +79,10 @@ private:
     }
 
 public:
-    explicit HandshakeMediator(tr_session& session, libtransmission::TimerMaker& timer_maker, tr_torrents& torrents) noexcept
+    explicit HandshakeMediator(
+        tr_session const& session,
+        libtransmission::TimerMaker& timer_maker,
+        tr_torrents& torrents) noexcept
         : session_{ session }
         , timer_maker_{ timer_maker }
         , torrents_{ torrents }
@@ -122,7 +125,7 @@ public:
     }
 
 private:
-    tr_session& session_;
+    tr_session const& session_;
     libtransmission::TimerMaker& timer_maker_;
     tr_torrents& torrents_;
 };
@@ -1296,7 +1299,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     TR_ASSERT(manager->session != nullptr);
     auto const lock = manager->unique_lock();
 
-    tr_session* session = manager->session;
+    auto* const session = manager->session;
 
     if (session->addressIsBlocked(socket.address()))
     {
