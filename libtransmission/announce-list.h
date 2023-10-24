@@ -131,7 +131,6 @@ public:
     bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
 
     [[nodiscard]] static std::optional<std::string> announce_to_scrape(std::string_view announce);
-    [[nodiscard]] static tr_quark announce_to_scrape(tr_quark announce);
 
 private:
     [[nodiscard]] tr_variant to_tiers_variant() const;
