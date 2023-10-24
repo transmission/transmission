@@ -130,7 +130,7 @@ size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool bu
     return {};
 }
 
-bool tr_peer_socket::limit_reached(tr_session* const session) noexcept
+bool tr_peer_socket::limit_reached(tr_session const* const session) noexcept
 {
     return n_open_sockets_.load() >= session->peerLimit();
 }

@@ -64,8 +64,6 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme_incomplete_
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
-[[nodiscard]] tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
-
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
 [[nodiscard]] tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file);
