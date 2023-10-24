@@ -586,14 +586,6 @@ public:
         queue_start_user_data_ = user_data;
     }
 
-    void onQueuedTorrentStarted(tr_torrent* tor)
-    {
-        if (queue_start_callback_ != nullptr)
-        {
-            queue_start_callback_(this, tor, queue_start_user_data_);
-        }
-    }
-
     constexpr void setIdleLimitHitCallback(tr_session_idle_limit_hit_func cb, void* user_data)
     {
         idle_limit_hit_callback_ = cb;
@@ -820,9 +812,7 @@ public:
         return TR_RPC_OK;
     }
 
-    [[nodiscard]] size_t countQueueFreeSlots(tr_direction dir) const noexcept;
-
-    [[nodiscard]] std::vector<tr_torrent*> getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const;
+    [[nodiscard]] size_t count_queue_free_slots(tr_direction dir) const noexcept;
 
     [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
 
@@ -888,21 +878,8 @@ public:
         return settings_.ratio_limit;
     }
 
-    void verifyRemove(tr_torrent* tor)
-    {
-        if (verifier_)
-        {
-            verifier_->remove(tor);
-        }
-    }
-
-    void verifyAdd(tr_torrent* tor)
-    {
-        if (verifier_)
-        {
-            verifier_->add(tor);
-        }
-    }
+    void verify_add(tr_torrent* tor);
+    void verify_remove(tr_torrent const* tor);
 
     void fetch(tr_web::FetchOptions&& options) const
     {
@@ -972,7 +949,9 @@ private:
     void closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
     void closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline);
 
-    void onNowTimer();
+    void on_now_timer();
+    void on_queue_timer();
+    void on_save_timer();
 
     static void onIncomingPeerConnection(tr_socket_t fd, void* vsession);
 
@@ -1212,6 +1191,9 @@ private:
 
     // depends-on: alt_speeds_, udp_core_, torrents_
     std::unique_ptr<libtransmission::Timer> now_timer_;
+
+    // depends-on: torrents_
+    std::unique_ptr<libtransmission::Timer> queue_timer_;
 
     // depends-on: torrents_
     std::unique_ptr<libtransmission::Timer> save_timer_;

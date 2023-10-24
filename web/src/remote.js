@@ -84,8 +84,11 @@ export class Remote {
     this.sendRequest(o, callback, context);
   }
 
-  checkPort(callback, context) {
+  checkPort(ipProtocol, callback, context) {
     const o = {
+      arguments: {
+        ipProtocol,
+      },
       method: 'port-test',
     };
     this.sendRequest(o, callback, context);

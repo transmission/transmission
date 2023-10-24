@@ -207,6 +207,7 @@ endif()
 set(CMAKE_FOLDER "third-party")
 find_package(FastFloat)
 find_package(Fmt)
+find_package(RapidJSON)
 find_package(Small)
 find_package(UtfCpp)
 find_package(WideInteger)
@@ -507,7 +508,6 @@ target_compile_definitions(miniupnpc::libminiupnpc
         SYSTEM_MINIUPNP
         $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
 
-add_subdirectory(third-party/jsonsl)
 add_subdirectory(third-party/wildmat)
 
 tr_add_external_auto_library(DHT dht dht

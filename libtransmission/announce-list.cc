@@ -152,16 +152,6 @@ std::optional<std::string> tr_announce_list::announce_to_scrape(std::string_view
     return {};
 }
 
-tr_quark tr_announce_list::announce_to_scrape(tr_quark announce)
-{
-    if (auto const scrape_str = announce_to_scrape(tr_quark_get_string_view(announce)); scrape_str)
-    {
-        return tr_quark_new(*scrape_str);
-    }
-
-    return TR_KEY_NONE;
-}
-
 tr_tracker_tier_t tr_announce_list::nextTier() const
 {
     return std::empty(trackers_) ? 0 : trackers_.back().tier + 1;
