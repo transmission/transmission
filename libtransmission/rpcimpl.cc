@@ -787,7 +787,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             tr_variant* names = tr_variantListAddList(list, std::size(keys));
             for (auto const& key : keys)
             {
-                tr_variantListAddQuark(names, key);
+                tr_variantListAddStrView(names, tr_quark_get_string_view(key));
             }
         }
 

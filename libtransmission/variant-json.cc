@@ -60,7 +60,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Null()
     {
-        tr_variantInitQuark(get_leaf(), TR_KEY_NONE);
+        tr_variantInitStrView(get_leaf(), "");
         return true;
     }
 
