@@ -76,8 +76,6 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
 
 void WatchDir::watcherActivated(QString const& path)
 {
-    auto const dir = QDir{ path };
-
     // get the list of files currently in the watch directory
     auto const dir = QDir{ path };
     auto const files = dir.entryList(QDir::Readable | QDir::Files);
@@ -86,8 +84,10 @@ void WatchDir::watcherActivated(QString const& path)
     auto const torrent_suffix = QStringLiteral(".torrent");
     for (auto const& name : files)
     {
-        if (!name.endsWith(torrent_suffix, Qt::CaseInsensitive) || watch_dir_files_.count(name) != 0U)
+        if (!name.endsWith(torrent_suffix, Qt::CaseInsensitive) || (watch_dir_files_.count(name) != 0U))
+        {
             continue;
+        }
 
         auto const filename = dir.absoluteFilePath(name);
         switch (metainfoTest(filename))
