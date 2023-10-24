@@ -19,6 +19,7 @@
 
 #include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
 
+#include "libtransmission/blocklist.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
@@ -243,7 +244,15 @@ public:
 
     // ---
 
-    [[nodiscard]] bool is_blocklisted(tr_session const* session) const;
+    [[nodiscard]] bool is_blocklisted(libtransmission::Blocklists const& blocklist) const
+    {
+        if (!blocklisted_.has_value())
+        {
+            blocklisted_ = blocklist.contains(listen_address());
+        }
+
+        return *blocklisted_;
+    }
 
     void set_blocklisted_dirty()
     {

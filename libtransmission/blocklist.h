@@ -9,63 +9,85 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <numeric>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <utility> // for std::pair
 #include <vector>
 
-#include "net.h" // for tr_address
+#include "libtransmission/net.h" // for tr_address
+#include "libtransmission/observable.h"
 
 namespace libtransmission
 {
 
-class Blocklist
+class Blocklists
 {
 public:
-    [[nodiscard]] static std::vector<Blocklist> loadBlocklists(std::string_view const blocklist_dir, bool const is_enabled);
+    Blocklists() = default;
 
-    static std::optional<Blocklist> saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled);
+    [[nodiscard]] bool contains(tr_address const& addr) const noexcept;
+    [[nodiscard]] bool empty() const noexcept;
+    [[nodiscard]] size_t size() const noexcept;
 
-    Blocklist() = default;
+    void load(std::string_view folder, bool is_enabled);
+    void set_enabled(bool is_enabled);
+    size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
-    Blocklist(std::string_view bin_file, bool is_enabled)
-        : bin_file_{ bin_file }
-        , is_enabled_{ is_enabled }
-    {
-    }
-
-    [[nodiscard]] bool contains(tr_address const& addr) const;
-
-    [[nodiscard]] auto size() const
-    {
-        ensureLoaded();
-
-        return std::size(rules_);
-    }
-
-    [[nodiscard]] constexpr bool enabled() const noexcept
-    {
-        return is_enabled_;
-    }
-
-    constexpr void setEnabled(bool is_enabled) noexcept
-    {
-        is_enabled_ = is_enabled;
-    }
-
-    [[nodiscard]] constexpr auto const& binFile() const noexcept
-    {
-        return bin_file_;
-    }
+    libtransmission::SimpleObservable<> changed_;
 
 private:
-    void ensureLoaded() const;
+    class Blocklist
+    {
+    public:
+        static std::optional<Blocklist> saveNew(std::string_view external_file, std::string_view bin_file, bool is_enabled);
 
-    mutable std::vector<std::pair<tr_address, tr_address>> rules_;
+        Blocklist() = default;
 
-    std::string bin_file_;
-    bool is_enabled_ = false;
+        Blocklist(std::string_view bin_file, bool is_enabled)
+            : bin_file_{ bin_file }
+            , is_enabled_{ is_enabled }
+        {
+        }
+
+        [[nodiscard]] bool contains(tr_address const& addr) const;
+
+        [[nodiscard]] auto size() const
+        {
+            ensureLoaded();
+
+            return std::size(rules_);
+        }
+
+        [[nodiscard]] constexpr bool enabled() const noexcept
+        {
+            return is_enabled_;
+        }
+
+        constexpr void setEnabled(bool is_enabled) noexcept
+        {
+            is_enabled_ = is_enabled;
+        }
+
+        [[nodiscard]] constexpr auto const& binFile() const noexcept
+        {
+            return bin_file_;
+        }
+
+    private:
+        void ensureLoaded() const;
+
+        mutable std::vector<std::pair<tr_address, tr_address>> rules_;
+
+        std::string bin_file_;
+        bool is_enabled_ = false;
+    };
+
+    std::vector<Blocklist> blocklists_;
+
+    std::string folder_;
+
+    [[nodiscard]] static std::vector<Blocklist> load_folder(std::string_view folder, bool is_enabled);
 };
-
 } // namespace libtransmission

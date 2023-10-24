@@ -134,18 +134,6 @@ using Handshakes = std::unordered_map<tr_socket_address, tr_handshake>;
 
 } // anonymous namespace
 
-bool tr_peer_info::is_blocklisted(tr_session const* session) const
-{
-    if (blocklisted_)
-    {
-        return *blocklisted_;
-    }
-
-    auto const value = session->addressIsBlocked(listen_address());
-    blocklisted_ = value;
-    return value;
-}
-
 void tr_peer_info::merge(tr_peer_info& that) noexcept
 {
     TR_ASSERT(is_connectable_.value_or(true) || !is_connected());
@@ -935,14 +923,15 @@ public:
     using OutboundCandidates = small::
         max_size_vector<std::pair<tr_torrent_id_t, tr_socket_address>, OutboundCandidateListCapacity>;
 
-    explicit tr_peerMgr(tr_session* session_in, libtransmission::TimerMaker& timer_maker, tr_torrents& torrents)
+    explicit tr_peerMgr(tr_session* session_in, libtransmission::TimerMaker& timer_maker, tr_torrents& torrents, libtransmission::Blocklists& blocklist)
         : session{ session_in }
         , torrents_{ torrents }
+        , blocklist_{ blocklist }
         , handshake_mediator_{ *session, timer_maker, torrents }
         , bandwidth_timer_{ timer_maker.create([this]() { bandwidth_pulse(); }) }
         , rechoke_timer_{ timer_maker.create([this]() { rechoke_pulse_marshall(); }) }
         , refill_upkeep_timer_{ timer_maker.create([this]() { refill_upkeep(); }) }
-        , blocklist_tag_{ session->blocklist_changed_.observe([this]() { on_blocklist_changed(); }) }
+        , blocklist_tag_{ blocklist.changed_.observe([this]() { on_blocklist_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthTimerPeriod);
         rechoke_timer_->start_repeating(RechokePeriod);
@@ -978,6 +967,7 @@ public:
 
     tr_session* const session;
     tr_torrents& torrents_;
+    libtransmission::Blocklists const& blocklist_;
     Handshakes incoming_handshakes;
 
     HandshakeMediator handshake_mediator_;
@@ -1041,7 +1031,7 @@ tr_peer::~tr_peer()
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
-    return new tr_peerMgr{ session, session->timerMaker(), session->torrents() };
+    return new tr_peerMgr{ session, session->timerMaker(), session->torrents(), session->blocklist() };
 }
 
 void tr_peerMgrFree(tr_peerMgr* manager)
@@ -1297,12 +1287,9 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
 {
     using namespace handshake_helpers;
 
-    TR_ASSERT(manager->session != nullptr);
     auto const lock = manager->unique_lock();
 
-    auto* const session = manager->session;
-
-    if (session->addressIsBlocked(socket.address()))
+    if (manager->blocklist_.contains(socket.address()))
     {
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket.display_name()));
         socket.close();
@@ -1311,9 +1298,10 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
     {
         socket.close();
     }
-    else /* we don't have a connection to them yet... */
+    else // we don't have a connection to them yet...
     {
-        auto socket_address = socket.socket_address();
+        auto const socket_address = socket.socket_address();
+        auto* const session = manager->session;
         manager->incoming_handshakes.try_emplace(
             socket_address,
             &manager->handshake_mediator_,
@@ -1332,7 +1320,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->session->addressIsBlocked(pex->socket_address.address()) && pex->is_valid_for_peers() &&
+            !s->manager->blocklist_.contains(pex->socket_address.address()) && pex->is_valid_for_peers() &&
             from != TR_PEER_FROM_INCOMING && (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
         {
             // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
@@ -1410,7 +1398,7 @@ namespace get_peers_helpers
         return true;
     }
 
-    if (info.is_blocklisted(tor->session))
+    if (info.is_blocklisted(tor->session->blocklist()))
     {
         return false;
     }
@@ -2188,8 +2176,7 @@ void tr_peerMgr::reconnect_pulse()
 
     // remove crappy peers
     auto bad_peers_buf = bad_peers_t{};
-    auto& torrents = torrents_;
-    for (auto* const tor : torrents)
+    for (auto* const tor : torrents_)
     {
         auto* const swarm = tor->swarm;
 
@@ -2204,7 +2191,7 @@ void tr_peerMgr::reconnect_pulse()
     }
 
     // if we're over the per-torrent peer limits, cull some peers
-    for (auto* const tor : torrents)
+    for (auto* const tor : torrents_)
     {
         if (tor->is_running())
         {
@@ -2213,7 +2200,7 @@ void tr_peerMgr::reconnect_pulse()
     }
 
     // if we're over the per-session peer limits, cull some peers
-    enforceSessionPeerLimit(session->peerLimit(), torrents);
+    enforceSessionPeerLimit(session->peerLimit(), torrents_);
 
     // try to make new peer connections
     make_new_peer_connections();
@@ -2294,7 +2281,7 @@ namespace connect_helpers
     }
 
     // not if they're blocklisted
-    if (peer_info.is_blocklisted(tor->session))
+    if (peer_info.is_blocklisted(tor->session->blocklist()))
     {
         return false;
     }

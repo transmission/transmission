@@ -488,12 +488,16 @@ public:
 
     // blocklist
 
-    [[nodiscard]] constexpr auto useBlocklist() const noexcept
+    void set_blocklist_enabled(bool is_enabled)
+    {
+        settings_.blocklist_enabled = is_enabled;
+        blocklists_.set_enabled(is_enabled);
+    }
+
+    [[nodiscard]] auto blocklist_enabled() const noexcept
     {
         return settings_.blocklist_enabled;
     }
-
-    void useBlocklist(bool enabled);
 
     [[nodiscard]] constexpr auto const& blocklistUrl() const noexcept
     {
@@ -503,6 +507,11 @@ public:
     void setBlocklistUrl(std::string_view url)
     {
         settings_.blocklist_url = url;
+    }
+
+    [[nodiscard]] constexpr auto& blocklist() noexcept
+    {
+        return blocklists_;
     }
 
     // RPC
@@ -809,8 +818,6 @@ public:
 
     [[nodiscard]] size_t count_queue_free_slots(tr_direction dir) const noexcept;
 
-    [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
-
     [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
     {
         TR_ASSERT(tr_address::is_valid(type));
@@ -1100,10 +1107,7 @@ private:
 
     tr_open_files open_files_;
 
-    std::vector<libtransmission::Blocklist> blocklists_;
-
-public:
-    libtransmission::SimpleObservable<> blocklist_changed_;
+    libtransmission::Blocklists blocklists_;
 
 private:
     /// other fields
