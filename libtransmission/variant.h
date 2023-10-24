@@ -368,7 +368,6 @@ private:
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
 void tr_variantInitStr(tr_variant* initme, std::string_view value);
-void tr_variantInitQuark(tr_variant* initme, tr_quark value);
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len);
 void tr_variantInitStrView(tr_variant* initme, std::string_view val);
 

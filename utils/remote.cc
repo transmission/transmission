@@ -2584,7 +2584,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
                 for (auto const& key : DetailsKeys)
                 {
-                    tr_variantListAddQuark(fields, key);
+                    tr_variantListAddStrView(fields, tr_quark_get_string_view(key));
                 }
 
                 addIdArg(args, config, "all");
@@ -2594,7 +2594,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
                 for (auto const& key : DetailsKeys)
                 {
-                    tr_variantListAddQuark(fields, key);
+                    tr_variantListAddStrView(fields, tr_quark_get_string_view(key));
                 }
 
                 addIdArg(args, config);
@@ -2605,7 +2605,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
                 for (auto const& key : ListKeys)
                 {
-                    tr_variantListAddQuark(fields, key);
+                    tr_variantListAddStrView(fields, tr_quark_get_string_view(key));
                 }
 
                 addIdArg(args, config, "all");
@@ -2616,7 +2616,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv, Co
 
                 for (auto const& key : FilesKeys)
                 {
-                    tr_variantListAddQuark(fields, key);
+                    tr_variantListAddStrView(fields, tr_quark_get_string_view(key));
                 }
 
                 addIdArg(args, config);
