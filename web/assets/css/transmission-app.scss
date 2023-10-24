@@ -370,19 +370,32 @@ $toolbar-height: $toolbar-height-number * 1px;
 
 $speed-icon-size: 20px;
 
-.speed-up-icon,
-.speed-dn-icon {
-  fill: var(--color-fg-primary);
+.speed-info-status {
+  align-items: center;
+  display: flex;
+  height: 30px;
+  padding: 0;
 
-  svg {
-    width: $speed-icon-size;
+  .speed-up-icon,
+  .speed-dn-icon {
+    fill: var(--color-fg-primary);
+    width: 20px;
+    height: 30px;
+    svg {
+      width: $speed-icon-size;
+    }    
   }
+
+  #speed-dn-label,
+  #speed-up-label {
+    line-height: 30px;
+    padding-left: 3px;
+    width: 88px;    
+  }
+
 }
 
-#speed-dn-label,
-#speed-up-label {
-  text-align: right;
-}
+
 
 /// TORRENT CONTAINER
 
