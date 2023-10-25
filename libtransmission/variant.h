@@ -85,12 +85,20 @@ public:
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) noexcept
         {
-            return std::find_if(begin(), end(), [key](auto const& item) { return item.first == key; });
+            auto const predicate = [key](auto const& item)
+            {
+                return item.first == key;
+            };
+            return std::find_if(begin(), end(), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) const noexcept
         {
-            return std::find_if(begin(), end(), [key](auto const& item) { return item.first == key; });
+            auto const predicate = [key](auto const& item)
+            {
+                return item.first == key;
+            };
+            return std::find_if(cbegin(), cend(), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
