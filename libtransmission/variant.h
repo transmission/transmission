@@ -85,12 +85,20 @@ public:
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) noexcept
         {
-            return std::find_if(begin(), end(), [key](auto const& item) { return item.first == key; });
+            auto const predicate = [key](auto const& item)
+            {
+                return item.first == key;
+            };
+            return std::find_if(begin(), end(), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) const noexcept
         {
-            return std::find_if(begin(), end(), [key](auto const& item) { return item.first == key; });
+            auto const predicate = [key](auto const& item)
+            {
+                return item.first == key;
+            };
+            return std::find_if(cbegin(), cend(), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
@@ -368,7 +376,6 @@ private:
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
 void tr_variantInitStr(tr_variant* initme, std::string_view value);
-void tr_variantInitQuark(tr_variant* initme, tr_quark value);
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len);
 void tr_variantInitStrView(tr_variant* initme, std::string_view val);
 
@@ -404,7 +411,6 @@ tr_variant* tr_variantListAddInt(tr_variant* var, int64_t value);
 tr_variant* tr_variantListAddReal(tr_variant* var, double value);
 tr_variant* tr_variantListAddStr(tr_variant* var, std::string_view value);
 tr_variant* tr_variantListAddStrView(tr_variant* var, std::string_view value);
-tr_variant* tr_variantListAddQuark(tr_variant* var, tr_quark value);
 tr_variant* tr_variantListAddRaw(tr_variant* var, void const* value, size_t n_bytes);
 tr_variant* tr_variantListAddList(tr_variant* var, size_t n_reserve);
 tr_variant* tr_variantListAddDict(tr_variant* var, size_t n_reserve);
@@ -437,7 +443,6 @@ tr_variant* tr_variantDictAddInt(tr_variant* var, tr_quark key, int64_t value);
 tr_variant* tr_variantDictAddBool(tr_variant* var, tr_quark key, bool value);
 tr_variant* tr_variantDictAddStr(tr_variant* var, tr_quark key, std::string_view value);
 tr_variant* tr_variantDictAddStrView(tr_variant* var, tr_quark key, std::string_view value);
-tr_variant* tr_variantDictAddQuark(tr_variant* var, tr_quark key, tr_quark val);
 tr_variant* tr_variantDictAddList(tr_variant* var, tr_quark key, size_t n_reserve);
 tr_variant* tr_variantDictAddDict(tr_variant* var, tr_quark key, size_t n_reserve);
 tr_variant* tr_variantDictAddRaw(tr_variant* var, tr_quark key, void const* value, size_t n_bytes);

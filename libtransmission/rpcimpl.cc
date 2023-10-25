@@ -128,12 +128,13 @@ auto getTorrents(tr_session* session, tr_variant* args)
         {
             time_t const cutoff = tr_time() - RecentlyActiveSeconds;
 
-            torrents.reserve(std::size(session->torrents()));
+            auto const& by_id = session->torrents().sorted_by_id();
+            torrents.reserve(std::size(by_id));
             std::copy_if(
-                std::begin(session->torrents()),
-                std::end(session->torrents()),
+                std::begin(by_id),
+                std::end(by_id),
                 std::back_inserter(torrents),
-                [&cutoff](auto const* tor) { return tor->anyDate >= cutoff; });
+                [&cutoff](auto const* tor) { return tor->has_changed_since(cutoff); });
         }
         else
         {
@@ -146,8 +147,8 @@ auto getTorrents(tr_session* session, tr_variant* args)
     }
     else // all of them
     {
-        torrents.reserve(std::size(session->torrents()));
-        std::copy(std::begin(session->torrents()), std::end(session->torrents()), std::back_inserter(torrents));
+        auto const& by_id = session->torrents().sorted_by_id();
+        torrents = std::vector<tr_torrent*>{ std::begin(by_id), std::end(by_id) };
     }
 
     return torrents;
@@ -239,7 +240,7 @@ char const* torrentStop(tr_session* session, tr_variant* args_in, tr_variant* /*
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (tor->is_running() || tor->is_queued() || tor->verify_state() != TR_VERIFY_NONE)
+        if (tor->activity() != TR_STATUS_STOPPED)
         {
             tor->is_stopping_ = true;
             session->rpcNotify(TR_RPC_TORRENT_STOPPED, tor);
@@ -285,138 +286,251 @@ char const* torrentReannounce(
     return nullptr;
 }
 
-char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+namespace torrent_verify_helpers
+{
+char const* torrentVerifyImpl(tr_session* session, tr_variant* args_in, bool force)
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        tr_torrentVerify(tor);
+        tr_torrentVerify(tor, force);
         session->rpcNotify(TR_RPC_TORRENT_CHANGED, tor);
     }
 
     return nullptr;
 }
+} // namespace torrent_verify_helpers
+
+char const* torrentVerify(tr_session* session, tr_variant* args_in, tr_variant* /*args_out*/, tr_rpc_idle_data* /*idle_data*/)
+{
+    return torrent_verify_helpers::torrentVerifyImpl(session, args_in, false);
+}
+
+char const* torrentVerifyForce(
+    tr_session* session,
+    tr_variant* args_in,
+    tr_variant* /*args_out*/,
+    tr_rpc_idle_data* /*idle_data*/)
+{
+    return torrent_verify_helpers::torrentVerifyImpl(session, args_in, true);
+}
 
 // ---
 
-void addLabels(tr_torrent const* tor, tr_variant* list)
+namespace make_torrent_field_helpers
 {
-    tr_variantInitList(list, std::size(tor->labels));
-    for (auto const& label : tor->labels)
+[[nodiscard]] auto make_file_wanted_vec(tr_torrent const& tor)
+{
+    auto const n_files = tor.file_count();
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_files);
+    for (tr_file_index_t idx = 0U; idx != n_files; ++idx)
     {
-        tr_variantListAddQuark(list, label);
+        vec.emplace_back(tr_torrentFile(&tor, idx).wanted ? 1 : 0);
     }
+    return tr_variant{ std::move(vec) };
 }
 
-void addFileStats(tr_torrent const* tor, tr_variant* list)
+[[nodiscard]] auto make_labels_vec(tr_torrent const& tor)
 {
-    for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
+    auto const& labels = tor.labels();
+    auto const n_labels = std::size(labels);
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_labels);
+    for (auto const& label : labels)
     {
-        auto const file = tr_torrentFile(tor, i);
-        tr_variant* d = tr_variantListAddDict(list, 3);
-        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
-        tr_variantDictAddInt(d, TR_KEY_priority, file.priority);
-        tr_variantDictAddBool(d, TR_KEY_wanted, file.wanted);
+        vec.emplace_back(tr_variant::unmanaged_string(label.sv()));
     }
+    return tr_variant{ std::move(vec) };
 }
 
-void addFiles(tr_torrent const* tor, tr_variant* list)
+[[nodiscard]] auto make_file_priorities_vec(tr_torrent const& tor)
 {
-    for (tr_file_index_t i = 0, n = tor->file_count(); i < n; ++i)
+    auto const n_files = tor.file_count();
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_files);
+    for (tr_file_index_t idx = 0U; idx != n_files; ++idx)
     {
-        auto const file = tr_torrentFile(tor, i);
-        tr_variant* d = tr_variantListAddDict(list, 5);
-        tr_variantDictAddInt(d, TR_KEY_beginPiece, file.beginPiece);
-        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
-        tr_variantDictAddInt(d, TR_KEY_endPiece, file.endPiece);
-        tr_variantDictAddInt(d, TR_KEY_length, file.length);
-        tr_variantDictAddStr(d, TR_KEY_name, file.name);
+        vec.emplace_back(tr_torrentFile(&tor, idx).priority);
     }
+    return tr_variant{ std::move(vec) };
 }
 
-void addWebseeds(tr_torrent const* tor, tr_variant* webseeds)
+[[nodiscard]] auto make_file_stats_vec(tr_torrent const& tor)
 {
-    for (size_t i = 0, n = tor->webseed_count(); i < n; ++i)
+    auto const n_files = tor.file_count();
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_files);
+    for (tr_file_index_t idx = 0U; idx != n_files; ++idx)
     {
-        tr_variantListAddStr(webseeds, tor->webseed(i));
+        auto const file = tr_torrentFile(&tor, idx);
+        auto stats_map = tr_variant::Map{ 3U };
+        stats_map.try_emplace(TR_KEY_bytesCompleted, file.have);
+        stats_map.try_emplace(TR_KEY_priority, file.priority);
+        stats_map.try_emplace(TR_KEY_wanted, file.wanted);
+        vec.emplace_back(std::move(stats_map));
     }
+    return tr_variant{ std::move(vec) };
 }
 
-void addTrackers(tr_torrent const* tor, tr_variant* trackers)
+[[nodiscard]] auto make_file_vec(tr_torrent const& tor)
 {
-    for (auto const& tracker : tor->announce_list())
+    auto const n_files = tor.file_count();
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_files);
+    for (tr_file_index_t idx = 0U; idx != n_files; ++idx)
     {
-        auto* const d = tr_variantListAddDict(trackers, 5);
-        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce.quark());
-        tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
-        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape.quark());
-        tr_variantDictAddStrView(d, TR_KEY_sitename, tracker.sitename);
-        tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
+        auto const file = tr_torrentFile(&tor, idx);
+        auto file_map = tr_variant::Map{ 5U };
+        file_map.try_emplace(TR_KEY_beginPiece, file.beginPiece);
+        file_map.try_emplace(TR_KEY_bytesCompleted, file.have);
+        file_map.try_emplace(TR_KEY_endPiece, file.endPiece);
+        file_map.try_emplace(TR_KEY_length, file.length);
+        file_map.try_emplace(TR_KEY_name, file.name);
+        vec.emplace_back(std::move(file_map));
     }
+    return tr_variant{ std::move(vec) };
 }
 
-void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
+[[nodiscard]] auto make_webseed_vec(tr_torrent const& tor)
 {
-    auto* const d = tr_variantListAddDict(list, 27);
-    tr_variantDictAddStr(d, TR_KEY_announce, tracker.announce);
-    tr_variantDictAddInt(d, TR_KEY_announceState, tracker.announceState);
-    tr_variantDictAddInt(d, TR_KEY_downloadCount, tracker.downloadCount);
-    tr_variantDictAddBool(d, TR_KEY_hasAnnounced, tracker.hasAnnounced);
-    tr_variantDictAddBool(d, TR_KEY_hasScraped, tracker.hasScraped);
-    tr_variantDictAddStr(d, TR_KEY_host, tracker.host_and_port);
-    tr_variantDictAddStr(d, TR_KEY_sitename, tracker.sitename);
-    tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
-    tr_variantDictAddBool(d, TR_KEY_isBackup, tracker.isBackup);
-    tr_variantDictAddInt(d, TR_KEY_lastAnnouncePeerCount, tracker.lastAnnouncePeerCount);
-    tr_variantDictAddStr(d, TR_KEY_lastAnnounceResult, tracker.lastAnnounceResult);
-    tr_variantDictAddInt(d, TR_KEY_lastAnnounceStartTime, tracker.lastAnnounceStartTime);
-    tr_variantDictAddBool(d, TR_KEY_lastAnnounceSucceeded, tracker.lastAnnounceSucceeded);
-    tr_variantDictAddInt(d, TR_KEY_lastAnnounceTime, tracker.lastAnnounceTime);
-    tr_variantDictAddBool(d, TR_KEY_lastAnnounceTimedOut, tracker.lastAnnounceTimedOut);
-    tr_variantDictAddStr(d, TR_KEY_lastScrapeResult, tracker.lastScrapeResult);
-    tr_variantDictAddInt(d, TR_KEY_lastScrapeStartTime, tracker.lastScrapeStartTime);
-    tr_variantDictAddBool(d, TR_KEY_lastScrapeSucceeded, tracker.lastScrapeSucceeded);
-    tr_variantDictAddInt(d, TR_KEY_lastScrapeTime, tracker.lastScrapeTime);
-    tr_variantDictAddBool(d, TR_KEY_lastScrapeTimedOut, tracker.lastScrapeTimedOut);
-    tr_variantDictAddInt(d, TR_KEY_leecherCount, tracker.leecherCount);
-    tr_variantDictAddInt(d, TR_KEY_nextAnnounceTime, tracker.nextAnnounceTime);
-    tr_variantDictAddInt(d, TR_KEY_nextScrapeTime, tracker.nextScrapeTime);
-    tr_variantDictAddStr(d, TR_KEY_scrape, tracker.scrape);
-    tr_variantDictAddInt(d, TR_KEY_scrapeState, tracker.scrapeState);
-    tr_variantDictAddInt(d, TR_KEY_seederCount, tracker.seederCount);
-    tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
-}
-
-void addPeers(tr_torrent const* tor, tr_variant* list)
-{
-    auto peer_count = size_t{};
-    tr_peer_stat* peers = tr_torrentPeers(tor, &peer_count);
-
-    tr_variantInitList(list, peer_count);
-
-    for (size_t i = 0; i < peer_count; ++i)
+    auto const n_webseeds = tor.webseed_count();
+    auto vec = tr_variant::Vector{};
+    for (size_t idx = 0U; idx != n_webseeds; ++idx)
     {
-        tr_variant* d = tr_variantListAddDict(list, 16);
-        tr_peer_stat const* peer = peers + i;
-        tr_variantDictAddStr(d, TR_KEY_address, peer->addr);
-        tr_variantDictAddStr(d, TR_KEY_clientName, peer->client);
-        tr_variantDictAddBool(d, TR_KEY_clientIsChoked, peer->clientIsChoked);
-        tr_variantDictAddBool(d, TR_KEY_clientIsInterested, peer->clientIsInterested);
-        tr_variantDictAddStr(d, TR_KEY_flagStr, peer->flagStr);
-        tr_variantDictAddBool(d, TR_KEY_isDownloadingFrom, peer->isDownloadingFrom);
-        tr_variantDictAddBool(d, TR_KEY_isEncrypted, peer->isEncrypted);
-        tr_variantDictAddBool(d, TR_KEY_isIncoming, peer->isIncoming);
-        tr_variantDictAddBool(d, TR_KEY_isUploadingTo, peer->isUploadingTo);
-        tr_variantDictAddBool(d, TR_KEY_isUTP, peer->isUTP);
-        tr_variantDictAddBool(d, TR_KEY_peerIsChoked, peer->peerIsChoked);
-        tr_variantDictAddBool(d, TR_KEY_peerIsInterested, peer->peerIsInterested);
-        tr_variantDictAddInt(d, TR_KEY_port, peer->port);
-        tr_variantDictAddReal(d, TR_KEY_progress, peer->progress);
-        tr_variantDictAddInt(d, TR_KEY_rateToClient, tr_toSpeedBytes(peer->rateToClient_KBps));
-        tr_variantDictAddInt(d, TR_KEY_rateToPeer, tr_toSpeedBytes(peer->rateToPeer_KBps));
+        vec.emplace_back(tor.webseed(idx));
+    }
+    return tr_variant{ std::move(vec) };
+}
+
+[[nodiscard]] auto make_tracker_vec(tr_torrent const& tor)
+{
+    auto const& trackers = tor.announce_list();
+    auto const n_trackers = std::size(trackers);
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_trackers);
+    for (auto const& tracker : trackers)
+    {
+        auto tracker_map = tr_variant::Map{ 5U };
+        tracker_map.try_emplace(TR_KEY_announce, tracker.announce.sv());
+        tracker_map.try_emplace(TR_KEY_id, tracker.id);
+        tracker_map.try_emplace(TR_KEY_scrape, tracker.scrape.sv());
+        tracker_map.try_emplace(TR_KEY_sitename, tracker.sitename.sv());
+        tracker_map.try_emplace(TR_KEY_tier, tracker.tier);
+        vec.emplace_back(std::move(tracker_map));
+    }
+    return tr_variant{ std::move(vec) };
+}
+
+[[nodiscard]] auto make_tracker_stats_vec(tr_torrent const& tor)
+{
+    auto const n_trackers = tr_torrentTrackerCount(&tor);
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_trackers);
+    for (size_t idx = 0U; idx != n_trackers; ++idx)
+    {
+        auto const tracker = tr_torrentTracker(&tor, idx);
+        auto stats_map = tr_variant::Map{ 27U };
+        stats_map.try_emplace(TR_KEY_announce, tracker.announce);
+        stats_map.try_emplace(TR_KEY_announceState, tracker.announceState);
+        stats_map.try_emplace(TR_KEY_downloadCount, tracker.downloadCount);
+        stats_map.try_emplace(TR_KEY_hasAnnounced, tracker.hasAnnounced);
+        stats_map.try_emplace(TR_KEY_hasScraped, tracker.hasScraped);
+        stats_map.try_emplace(TR_KEY_host, tracker.host_and_port);
+        stats_map.try_emplace(TR_KEY_id, tracker.id);
+        stats_map.try_emplace(TR_KEY_isBackup, tracker.isBackup);
+        stats_map.try_emplace(TR_KEY_lastAnnouncePeerCount, tracker.lastAnnouncePeerCount);
+        stats_map.try_emplace(TR_KEY_lastAnnounceResult, tracker.lastAnnounceResult);
+        stats_map.try_emplace(TR_KEY_lastAnnounceStartTime, tracker.lastAnnounceStartTime);
+        stats_map.try_emplace(TR_KEY_lastAnnounceSucceeded, tracker.lastAnnounceSucceeded);
+        stats_map.try_emplace(TR_KEY_lastAnnounceTime, tracker.lastAnnounceTime);
+        stats_map.try_emplace(TR_KEY_lastAnnounceTimedOut, tracker.lastAnnounceTimedOut);
+        stats_map.try_emplace(TR_KEY_lastScrapeResult, tracker.lastScrapeResult);
+        stats_map.try_emplace(TR_KEY_lastScrapeStartTime, tracker.lastScrapeStartTime);
+        stats_map.try_emplace(TR_KEY_lastScrapeSucceeded, tracker.lastScrapeSucceeded);
+        stats_map.try_emplace(TR_KEY_lastScrapeTime, tracker.lastScrapeTime);
+        stats_map.try_emplace(TR_KEY_lastScrapeTimedOut, tracker.lastScrapeTimedOut);
+        stats_map.try_emplace(TR_KEY_leecherCount, tracker.leecherCount);
+        stats_map.try_emplace(TR_KEY_nextAnnounceTime, tracker.nextAnnounceTime);
+        stats_map.try_emplace(TR_KEY_nextScrapeTime, tracker.nextScrapeTime);
+        stats_map.try_emplace(TR_KEY_scrape, tracker.scrape);
+        stats_map.try_emplace(TR_KEY_scrapeState, tracker.scrapeState);
+        stats_map.try_emplace(TR_KEY_seederCount, tracker.seederCount);
+        stats_map.try_emplace(TR_KEY_sitename, tracker.sitename);
+        stats_map.try_emplace(TR_KEY_tier, tracker.tier);
+        vec.emplace_back(std::move(stats_map));
+    }
+    return tr_variant{ std::move(vec) };
+}
+
+[[nodiscard]] auto make_peer_vec(tr_torrent const& tor)
+{
+    auto n_peers = size_t{};
+    auto* const peers = tr_torrentPeers(&tor, &n_peers);
+    auto peers_vec = tr_variant::Vector{};
+    peers_vec.reserve(n_peers);
+    for (size_t idx = 0U; idx != n_peers; ++idx)
+    {
+        auto const& peer = peers[idx];
+        auto peer_map = tr_variant::Map{ 16U };
+        peer_map.try_emplace(TR_KEY_address, peer.addr);
+        peer_map.try_emplace(TR_KEY_clientIsChoked, peer.clientIsChoked);
+        peer_map.try_emplace(TR_KEY_clientIsInterested, peer.clientIsInterested);
+        peer_map.try_emplace(TR_KEY_clientName, peer.client);
+        peer_map.try_emplace(TR_KEY_flagStr, peer.flagStr);
+        peer_map.try_emplace(TR_KEY_isDownloadingFrom, peer.isDownloadingFrom);
+        peer_map.try_emplace(TR_KEY_isEncrypted, peer.isEncrypted);
+        peer_map.try_emplace(TR_KEY_isIncoming, peer.isIncoming);
+        peer_map.try_emplace(TR_KEY_isUTP, peer.isUTP);
+        peer_map.try_emplace(TR_KEY_isUploadingTo, peer.isUploadingTo);
+        peer_map.try_emplace(TR_KEY_peerIsChoked, peer.peerIsChoked);
+        peer_map.try_emplace(TR_KEY_peerIsInterested, peer.peerIsInterested);
+        peer_map.try_emplace(TR_KEY_port, peer.port);
+        peer_map.try_emplace(TR_KEY_progress, peer.progress);
+        peer_map.try_emplace(TR_KEY_rateToClient, tr_toSpeedBytes(peer.rateToClient_KBps));
+        peer_map.try_emplace(TR_KEY_rateToPeer, tr_toSpeedBytes(peer.rateToPeer_KBps));
+        peers_vec.emplace_back(std::move(peer_map));
+    }
+    tr_torrentPeersFree(peers, n_peers);
+    return tr_variant{ std::move(peers_vec) };
+}
+
+[[nodiscard]] auto make_peer_counts_map(tr_stat const& st)
+{
+    auto const& from = st.peersFrom;
+    auto from_map = tr_variant::Map{ 7U };
+    from_map.try_emplace(TR_KEY_fromCache, from[TR_PEER_FROM_RESUME]);
+    from_map.try_emplace(TR_KEY_fromDht, from[TR_PEER_FROM_DHT]);
+    from_map.try_emplace(TR_KEY_fromIncoming, from[TR_PEER_FROM_INCOMING]);
+    from_map.try_emplace(TR_KEY_fromLpd, from[TR_PEER_FROM_LPD]);
+    from_map.try_emplace(TR_KEY_fromLtep, from[TR_PEER_FROM_LTEP]);
+    from_map.try_emplace(TR_KEY_fromPex, from[TR_PEER_FROM_PEX]);
+    from_map.try_emplace(TR_KEY_fromTracker, from[TR_PEER_FROM_TRACKER]);
+    return tr_variant{ std::move(from_map) };
+}
+
+[[nodiscard]] auto make_piece_availability_vec(tr_torrent const& tor)
+{
+    auto const n_pieces = tor.piece_count();
+    auto vec = tr_variant::Vector{};
+    vec.reserve(n_pieces);
+    for (tr_piece_index_t idx = 0U; idx != n_pieces; ++idx)
+    {
+        vec.emplace_back(tr_peerMgrPieceAvailability(&tor, idx));
+    }
+    return tr_variant{ std::move(vec) };
+}
+
+[[nodiscard]] auto make_piece_bitfield(tr_torrent const& tor)
+{
+    if (tor.has_metainfo())
+    {
+        auto const bytes = tor.create_piece_bitfield();
+        return tr_variant{ tr_base64_encode({ reinterpret_cast<char const*>(std::data(bytes)), std::size(bytes) }) };
     }
 
-    tr_torrentPeersFree(peers, peer_count);
+    return tr_variant::unmanaged_string(""sv);
 }
+} // namespace make_torrent_field_helpers
 
 [[nodiscard]] auto constexpr isSupportedTorrentGetField(tr_quark key)
 {
@@ -506,374 +620,96 @@ void addPeers(tr_torrent const* tor, tr_variant* list)
     }
 }
 
-void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
+[[nodiscard]] tr_variant make_torrent_field(tr_torrent const& tor, tr_stat const& st, tr_quark key)
 {
+    using namespace make_torrent_field_helpers;
+
     TR_ASSERT(isSupportedTorrentGetField(key));
 
+    // clang-format off
     switch (key)
     {
-    case TR_KEY_activityDate:
-        tr_variantInitInt(initme, st->activityDate);
-        break;
-
-    case TR_KEY_addedDate:
-        tr_variantInitInt(initme, st->addedDate);
-        break;
-
-    case TR_KEY_availability:
-        tr_variantInitList(initme, tor->piece_count());
-        for (tr_piece_index_t piece = 0, n = tor->piece_count(); piece < n; ++piece)
-        {
-            tr_variantListAddInt(initme, tr_peerMgrPieceAvailability(tor, piece));
-        }
-        break;
-
-    case TR_KEY_bandwidthPriority:
-        tr_variantInitInt(initme, tor->get_priority());
-        break;
-
-    case TR_KEY_comment:
-        tr_variantInitStr(initme, tor->comment());
-        break;
-
-    case TR_KEY_corruptEver:
-        tr_variantInitInt(initme, st->corruptEver);
-        break;
-
-    case TR_KEY_creator:
-        tr_variantInitStrView(initme, tor->creator());
-        break;
-
-    case TR_KEY_dateCreated:
-        tr_variantInitInt(initme, tor->date_created());
-        break;
-
-    case TR_KEY_desiredAvailable:
-        tr_variantInitInt(initme, st->desiredAvailable);
-        break;
-
-    case TR_KEY_doneDate:
-        tr_variantInitInt(initme, st->doneDate);
-        break;
-
-    case TR_KEY_downloadDir:
-        tr_variantInitStrView(initme, tr_torrentGetDownloadDir(tor));
-        break;
-
-    case TR_KEY_downloadedEver:
-        tr_variantInitInt(initme, st->downloadedEver);
-        break;
-
-    case TR_KEY_downloadLimit:
-        tr_variantInitInt(initme, tr_torrentGetSpeedLimit_KBps(tor, TR_DOWN));
-        break;
-
-    case TR_KEY_downloadLimited:
-        tr_variantInitBool(initme, tor->uses_speed_limit(TR_DOWN));
-        break;
-
-    case TR_KEY_error:
-        tr_variantInitInt(initme, st->error);
-        break;
-
-    case TR_KEY_errorString:
-        tr_variantInitStrView(initme, st->errorString);
-        break;
-
-    case TR_KEY_eta:
-        tr_variantInitInt(initme, st->eta);
-        break;
-
-    case TR_KEY_file_count:
-        tr_variantInitInt(initme, tor->file_count());
-        break;
-
-    case TR_KEY_files:
-        tr_variantInitList(initme, tor->file_count());
-        addFiles(tor, initme);
-        break;
-
-    case TR_KEY_fileStats:
-        tr_variantInitList(initme, tor->file_count());
-        addFileStats(tor, initme);
-        break;
-
-    case TR_KEY_group:
-        tr_variantInitStrView(initme, tor->bandwidth_group().sv());
-        break;
-
-    case TR_KEY_hashString:
-        tr_variantInitStrView(initme, tor->info_hash_string());
-        break;
-
-    case TR_KEY_haveUnchecked:
-        tr_variantInitInt(initme, st->haveUnchecked);
-        break;
-
-    case TR_KEY_sequentialDownload:
-        tr_variantDictAddBool(initme, TR_KEY_sequentialDownload, tor->is_sequential_download());
-        break;
-
-    case TR_KEY_haveValid:
-        tr_variantInitInt(initme, st->haveValid);
-        break;
-
-    case TR_KEY_honorsSessionLimits:
-        tr_variantInitBool(initme, tor->uses_session_limits());
-        break;
-
-    case TR_KEY_id:
-        tr_variantInitInt(initme, st->id);
-        break;
-
-    case TR_KEY_editDate:
-        tr_variantInitInt(initme, st->editDate);
-        break;
-
-    case TR_KEY_isFinished:
-        tr_variantInitBool(initme, st->finished);
-        break;
-
-    case TR_KEY_isPrivate:
-        tr_variantInitBool(initme, tor->is_private());
-        break;
-
-    case TR_KEY_isStalled:
-        tr_variantInitBool(initme, st->isStalled);
-        break;
-
-    case TR_KEY_labels:
-        addLabels(tor, initme);
-        break;
-
-    case TR_KEY_leftUntilDone:
-        tr_variantInitInt(initme, st->leftUntilDone);
-        break;
-
-    case TR_KEY_manualAnnounceTime:
-        tr_variantInitInt(initme, tr_announcerNextManualAnnounce(tor));
-        break;
-
-    case TR_KEY_maxConnectedPeers:
-    case TR_KEY_peer_limit:
-        tr_variantInitInt(initme, tor->peer_limit());
-        break;
-
-    case TR_KEY_magnetLink:
-        tr_variantInitStr(initme, tor->metainfo_.magnet());
-        break;
-
-    case TR_KEY_metadataPercentComplete:
-        tr_variantInitReal(initme, st->metadataPercentComplete);
-        break;
-
-    case TR_KEY_name:
-        tr_variantInitStrView(initme, tr_torrentName(tor));
-        break;
-
-    case TR_KEY_percentComplete:
-        tr_variantInitReal(initme, st->percentComplete);
-        break;
-
-    case TR_KEY_percentDone:
-        tr_variantInitReal(initme, st->percentDone);
-        break;
-
-    case TR_KEY_peers:
-        addPeers(tor, initme);
-        break;
-
-    case TR_KEY_peersConnected:
-        tr_variantInitInt(initme, st->peersConnected);
-        break;
-
-    case TR_KEY_peersFrom:
-        {
-            tr_variantInitDict(initme, 7);
-            auto const* f = st->peersFrom;
-            tr_variantDictAddInt(initme, TR_KEY_fromCache, f[TR_PEER_FROM_RESUME]);
-            tr_variantDictAddInt(initme, TR_KEY_fromDht, f[TR_PEER_FROM_DHT]);
-            tr_variantDictAddInt(initme, TR_KEY_fromIncoming, f[TR_PEER_FROM_INCOMING]);
-            tr_variantDictAddInt(initme, TR_KEY_fromLpd, f[TR_PEER_FROM_LPD]);
-            tr_variantDictAddInt(initme, TR_KEY_fromLtep, f[TR_PEER_FROM_LTEP]);
-            tr_variantDictAddInt(initme, TR_KEY_fromPex, f[TR_PEER_FROM_PEX]);
-            tr_variantDictAddInt(initme, TR_KEY_fromTracker, f[TR_PEER_FROM_TRACKER]);
-            break;
-        }
-
-    case TR_KEY_peersGettingFromUs:
-        tr_variantInitInt(initme, st->peersGettingFromUs);
-        break;
-
-    case TR_KEY_peersSendingToUs:
-        tr_variantInitInt(initme, st->peersSendingToUs);
-        break;
-
-    case TR_KEY_pieces:
-        if (tor->has_metainfo())
-        {
-            auto const bytes = tor->create_piece_bitfield();
-            auto const enc = tr_base64_encode({ reinterpret_cast<char const*>(std::data(bytes)), std::size(bytes) });
-            tr_variantInitStr(initme, enc);
-        }
-        else
-        {
-            tr_variantInitStrView(initme, ""sv);
-        }
-
-        break;
-
-    case TR_KEY_pieceCount:
-        tr_variantInitInt(initme, tor->piece_count());
-        break;
-
-    case TR_KEY_pieceSize:
-        tr_variantInitInt(initme, tor->piece_size());
-        break;
-
-    case TR_KEY_primary_mime_type:
-        tr_variantInitStrView(initme, tor->primary_mime_type());
-        break;
-
-    case TR_KEY_priorities:
-        {
-            auto const n = tor->file_count();
-            tr_variantInitList(initme, n);
-            for (tr_file_index_t i = 0; i < n; ++i)
-            {
-                tr_variantListAddInt(initme, tr_torrentFile(tor, i).priority);
-            }
-        }
-        break;
-
-    case TR_KEY_queuePosition:
-        tr_variantInitInt(initme, st->queuePosition);
-        break;
-
-    case TR_KEY_etaIdle:
-        tr_variantInitInt(initme, st->etaIdle);
-        break;
-
-    case TR_KEY_rateDownload:
-        tr_variantInitInt(initme, tr_toSpeedBytes(st->pieceDownloadSpeed_KBps));
-        break;
-
-    case TR_KEY_rateUpload:
-        tr_variantInitInt(initme, tr_toSpeedBytes(st->pieceUploadSpeed_KBps));
-        break;
-
-    case TR_KEY_recheckProgress:
-        tr_variantInitReal(initme, st->recheckProgress);
-        break;
-
-    case TR_KEY_seedIdleLimit:
-        tr_variantInitInt(initme, tor->idle_limit_minutes());
-        break;
-
-    case TR_KEY_seedIdleMode:
-        tr_variantInitInt(initme, tor->idle_limit_mode());
-        break;
-
-    case TR_KEY_seedRatioLimit:
-        tr_variantInitReal(initme, tr_torrentGetRatioLimit(tor));
-        break;
-
-    case TR_KEY_seedRatioMode:
-        tr_variantInitInt(initme, tr_torrentGetRatioMode(tor));
-        break;
-
-    case TR_KEY_sizeWhenDone:
-        tr_variantInitInt(initme, st->sizeWhenDone);
-        break;
-
-    case TR_KEY_source:
-        tr_variantInitStrView(initme, tor->source());
-        break;
-
-    case TR_KEY_startDate:
-        tr_variantInitInt(initme, st->startDate);
-        break;
-
-    case TR_KEY_status:
-        tr_variantInitInt(initme, st->activity);
-        break;
-
-    case TR_KEY_secondsDownloading:
-        tr_variantInitInt(initme, st->secondsDownloading);
-        break;
-
-    case TR_KEY_secondsSeeding:
-        tr_variantInitInt(initme, st->secondsSeeding);
-        break;
-
-    case TR_KEY_trackers:
-        tr_variantInitList(initme, tor->tracker_count());
-        addTrackers(tor, initme);
-        break;
-
-    case TR_KEY_trackerList:
-        tr_variantInitStr(initme, tor->tracker_list());
-        break;
-
-    case TR_KEY_trackerStats:
-        {
-            auto const n = tr_torrentTrackerCount(tor);
-            tr_variantInitList(initme, n);
-            for (size_t i = 0; i < n; ++i)
-            {
-                auto const& tracker = tr_torrentTracker(tor, i);
-                addTrackerStats(tracker, initme);
-            }
-            break;
-        }
-
-    case TR_KEY_torrentFile:
-        tr_variantInitStr(initme, tor->torrent_file());
-        break;
-
-    case TR_KEY_totalSize:
-        tr_variantInitInt(initme, tor->total_size());
-        break;
-
-    case TR_KEY_uploadedEver:
-        tr_variantInitInt(initme, st->uploadedEver);
-        break;
-
-    case TR_KEY_uploadLimit:
-        tr_variantInitInt(initme, tr_torrentGetSpeedLimit_KBps(tor, TR_UP));
-        break;
-
-    case TR_KEY_uploadLimited:
-        tr_variantInitBool(initme, tor->uses_speed_limit(TR_UP));
-        break;
-
-    case TR_KEY_uploadRatio:
-        tr_variantInitReal(initme, st->ratio);
-        break;
-
-    case TR_KEY_wanted:
-        {
-            auto const n = tor->file_count();
-            tr_variantInitList(initme, n);
-            for (tr_file_index_t i = 0; i < n; ++i)
-            {
-                tr_variantListAddInt(initme, tr_torrentFile(tor, i).wanted ? 1 : 0);
-            }
-        }
-        break;
-
-    case TR_KEY_webseeds:
-        tr_variantInitList(initme, tor->webseed_count());
-        addWebseeds(tor, initme);
-        break;
-
-    case TR_KEY_webseedsSendingToUs:
-        tr_variantInitInt(initme, st->webseedsSendingToUs);
-        break;
-
-    default:
-        break;
+    case TR_KEY_activityDate: return st.activityDate;
+    case TR_KEY_addedDate: return st.addedDate;
+    case TR_KEY_availability: return make_piece_availability_vec(tor);
+    case TR_KEY_bandwidthPriority: return tor.get_priority();
+    case TR_KEY_comment: return tor.comment();
+    case TR_KEY_corruptEver: return st.corruptEver;
+    case TR_KEY_creator: return tor.creator();
+    case TR_KEY_dateCreated: return tor.date_created();
+    case TR_KEY_desiredAvailable: return st.desiredAvailable;
+    case TR_KEY_doneDate: return st.doneDate;
+    case TR_KEY_downloadDir: return tor.download_dir().sv();
+    case TR_KEY_downloadLimit: return tr_torrentGetSpeedLimit_KBps(&tor, TR_DOWN);
+    case TR_KEY_downloadLimited: return tor.uses_speed_limit(TR_DOWN);
+    case TR_KEY_downloadedEver: return st.downloadedEver;
+    case TR_KEY_editDate: return st.editDate;
+    case TR_KEY_error: return st.error;
+    case TR_KEY_errorString: return st.errorString;
+    case TR_KEY_eta: return st.eta;
+    case TR_KEY_etaIdle: return st.etaIdle;
+    case TR_KEY_fileStats: return make_file_stats_vec(tor);
+    case TR_KEY_file_count: return tor.file_count();
+    case TR_KEY_files: return make_file_vec(tor);
+    case TR_KEY_group: return tor.bandwidth_group().sv();
+    case TR_KEY_hashString: return tor.info_hash_string().sv();
+    case TR_KEY_haveUnchecked: return st.haveUnchecked;
+    case TR_KEY_haveValid: return st.haveValid;
+    case TR_KEY_honorsSessionLimits: return tor.uses_session_limits();
+    case TR_KEY_id: return st.id;
+    case TR_KEY_isFinished: return st.finished;
+    case TR_KEY_isPrivate: return tor.is_private();
+    case TR_KEY_isStalled: return st.isStalled;
+    case TR_KEY_labels: return make_labels_vec(tor);
+    case TR_KEY_leftUntilDone: return st.leftUntilDone;
+    case TR_KEY_magnetLink: return tor.metainfo_.magnet();
+    case TR_KEY_manualAnnounceTime: return tr_announcerNextManualAnnounce(&tor);
+    case TR_KEY_maxConnectedPeers: return tor.peer_limit();
+    case TR_KEY_metadataPercentComplete: return st.metadataPercentComplete;
+    case TR_KEY_name: return tor.name();
+    case TR_KEY_peer_limit: return tor.peer_limit();
+    case TR_KEY_peers: return make_peer_vec(tor);
+    case TR_KEY_peersConnected: return st.peersConnected;
+    case TR_KEY_peersFrom: return make_peer_counts_map(st);
+    case TR_KEY_peersGettingFromUs: return st.peersGettingFromUs;
+    case TR_KEY_peersSendingToUs: return st.peersSendingToUs;
+    case TR_KEY_percentComplete: return st.percentComplete;
+    case TR_KEY_percentDone: return st.percentDone;
+    case TR_KEY_pieceCount: return tor.piece_count();
+    case TR_KEY_pieceSize: return tor.piece_size();
+    case TR_KEY_pieces: return make_piece_bitfield(tor);
+    case TR_KEY_primary_mime_type: return tor.primary_mime_type();
+    case TR_KEY_priorities: return make_file_priorities_vec(tor);
+    case TR_KEY_queuePosition: return st.queuePosition;
+    case TR_KEY_rateDownload: return tr_toSpeedBytes(st.pieceDownloadSpeed_KBps);
+    case TR_KEY_rateUpload: return tr_toSpeedBytes(st.pieceUploadSpeed_KBps);
+    case TR_KEY_recheckProgress: return st.recheckProgress;
+    case TR_KEY_secondsDownloading: return st.secondsDownloading;
+    case TR_KEY_secondsSeeding: return st.secondsSeeding;
+    case TR_KEY_seedIdleLimit: return tor.idle_limit_minutes();
+    case TR_KEY_seedIdleMode: return tor.idle_limit_mode();
+    case TR_KEY_seedRatioLimit: return tor.seed_ratio();
+    case TR_KEY_seedRatioMode: return tor.seed_ratio_mode();
+    case TR_KEY_sequentialDownload: return tor.is_sequential_download();
+    case TR_KEY_sizeWhenDone: return st.sizeWhenDone;
+    case TR_KEY_source: return tor.source();
+    case TR_KEY_startDate: return st.startDate;
+    case TR_KEY_status: return st.activity;
+    case TR_KEY_torrentFile: return tor.torrent_file();
+    case TR_KEY_totalSize: return tor.total_size();
+    case TR_KEY_trackerList: return tor.tracker_list();
+    case TR_KEY_trackerStats: return make_tracker_stats_vec(tor);
+    case TR_KEY_trackers: return make_tracker_vec(tor);
+    case TR_KEY_uploadLimit: return tr_torrentGetSpeedLimit_KBps(&tor, TR_UP);
+    case TR_KEY_uploadLimited: return tor.uses_speed_limit(TR_UP);
+    case TR_KEY_uploadRatio: return st.ratio;
+    case TR_KEY_uploadedEver: return st.uploadedEver;
+    case TR_KEY_wanted: return make_file_wanted_vec(tor);
+    case TR_KEY_webseeds: return make_webseed_vec(tor);
+    case TR_KEY_webseedsSendingToUs: return st.webseedsSendingToUs;
+    default: return tr_variant{};
     }
+    // clang-format on
 }
 
 void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quark const* fields, size_t field_count)
@@ -895,7 +731,7 @@ void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quar
         {
             tr_variant* child = format == TrFormat::Table ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
 
-            initField(tor, st, child, fields[i]);
+            *child = make_torrent_field(*tor, *st, fields[i]);
         }
     }
 }
@@ -952,7 +788,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             tr_variant* names = tr_variantListAddList(list, std::size(keys));
             for (auto const& key : keys)
             {
-                tr_variantListAddQuark(names, key);
+                tr_variantListAddStrView(names, tr_quark_get_string_view(key));
             }
         }
 
@@ -967,9 +803,9 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
 
 // ---
 
-[[nodiscard]] std::pair<std::vector<tr_quark>, char const* /*errmsg*/> makeLabels(tr_variant* list)
+[[nodiscard]] std::pair<tr_torrent::labels_t, char const* /*errmsg*/> makeLabels(tr_variant* list)
 {
-    auto labels = std::vector<tr_quark>{};
+    auto labels = tr_torrent::labels_t{};
     size_t const n = tr_variantListSize(list);
     labels.reserve(n);
 
@@ -992,7 +828,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             return { {}, "labels cannot contain comma (,) character" };
         }
 
-        labels.emplace_back(tr_quark_new(label));
+        labels.emplace_back(label);
     }
 
     return { labels, nullptr };
@@ -1007,7 +843,7 @@ char const* setLabels(tr_torrent* tor, tr_variant* list)
         return errmsg;
     }
 
-    tor->setLabels(labels);
+    tor->set_labels(labels);
     return nullptr;
 }
 
@@ -1258,22 +1094,22 @@ char const* torrentSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleLimit, &tmp))
         {
-            tor->set_idle_limit(static_cast<uint16_t>(tmp));
+            tor->set_idle_limit_minutes(static_cast<uint16_t>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedIdleMode, &tmp))
         {
-            tr_torrentSetIdleMode(tor, (tr_idlelimit)tmp);
+            tor->set_idle_limit_mode(static_cast<tr_idlelimit>(tmp));
         }
 
         if (tr_variantDictFindReal(args_in, TR_KEY_seedRatioLimit, &d))
         {
-            tr_torrentSetRatioLimit(tor, d);
+            tor->set_seed_ratio(d);
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_seedRatioMode, &tmp))
         {
-            tor->set_ratio_mode(static_cast<tr_ratiolimit>(tmp));
+            tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(tmp));
         }
 
         if (tr_variantDictFindInt(args_in, TR_KEY_queuePosition, &tmp))
@@ -1333,7 +1169,7 @@ char const* torrentSetLocation(
 
     for (auto* tor : getTorrents(session, args_in))
     {
-        tor->set_location(location, move, nullptr, nullptr);
+        tor->set_location(location, move, nullptr);
         session->rpcNotify(TR_RPC_TORRENT_MOVED, tor);
     }
 
@@ -1403,11 +1239,29 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     }
 }
 
-char const* portTest(tr_session* session, tr_variant* /*args_in*/, tr_variant* /*args_out*/, struct tr_rpc_idle_data* idle_data)
+char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
 {
     auto const port = session->advertisedPeerPort();
-    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
-    session->fetch({ url, onPortTested, idle_data });
+    auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
+
+    auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
+    if (std::string_view arg; tr_variantDictFindStrView(args_in, TR_KEY_ipProtocol, &arg))
+    {
+        tr_variantDictAddStrView(args_out, TR_KEY_ipProtocol, arg);
+        if (arg == "ipv4"sv)
+        {
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+        }
+        else if (arg == "ipv6"sv)
+        {
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+        }
+        else if (arg != "any"sv)
+        {
+            return "invalid ip protocol string";
+        }
+    }
+    session->fetch(std::move(options));
     return nullptr;
 }
 
@@ -1684,7 +1538,7 @@ char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_variant* /*a
             return errmsg;
         }
 
-        tr_ctorSetLabels(ctor, std::data(labels), std::size(labels));
+        tr_ctorSetLabels(ctor, std::move(labels));
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
@@ -1794,7 +1648,7 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
         limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
     }
 
-    group.set_limits(&limits);
+    group.set_limits(limits);
 
     if (auto honors = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))
     {
@@ -2451,7 +2305,7 @@ struct rpc_method
     handler func;
 };
 
-auto constexpr Methods = std::array<rpc_method, 24>{ {
+auto constexpr Methods = std::array<rpc_method, 25>{ {
     { "blocklist-update"sv, false, blocklistUpdate },
     { "free-space"sv, true, freeSpace },
     { "group-get"sv, true, groupGet },
@@ -2476,6 +2330,7 @@ auto constexpr Methods = std::array<rpc_method, 24>{ {
     { "torrent-start-now"sv, true, torrentStartNow },
     { "torrent-stop"sv, true, torrentStop },
     { "torrent-verify"sv, true, torrentVerify },
+    { "torrent-verify-force"sv, true, torrentVerifyForce },
 } };
 
 void noop_response_callback(tr_session* /*session*/, tr_variant* /*response*/, void* /*user_data*/)
@@ -2590,26 +2445,23 @@ void tr_rpc_request_exec_json(
  * - values that are all-digits or commas are number lists
  * - all other values are strings
  */
-void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
+tr_variant tr_rpc_parse_list_str(std::string_view str)
 {
     auto const values = tr_num_parse_range(str);
-    auto const value_count = std::size(values);
+    auto const n_values = std::size(values);
 
-    if (value_count == 0)
+    if (n_values == 0)
     {
-        tr_variantInitStr(setme, str);
+        return { str };
     }
-    else if (value_count == 1)
-    {
-        tr_variantInitInt(setme, values[0]);
-    }
-    else
-    {
-        tr_variantInitList(setme, value_count);
 
-        for (auto const& value : values)
-        {
-            tr_variantListAddInt(setme, value);
-        }
+    if (n_values == 1)
+    {
+        return { values[0] };
     }
+
+    auto num_vec = tr_variant::Vector{};
+    num_vec.reserve(n_values);
+    std::copy_n(std::cbegin(values), n_values, std::back_inserter(num_vec));
+    return { std::move(num_vec) };
 }

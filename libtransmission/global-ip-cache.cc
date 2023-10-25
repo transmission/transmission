@@ -186,7 +186,7 @@ bool tr_global_ip_cache::try_shutdown() noexcept
 
 tr_address tr_global_ip_cache::bind_addr(tr_address_type type) const noexcept
 {
-    if (type == TR_AF_INET || type == TR_AF_INET6)
+    if (tr_address::is_valid(type))
     {
         if (auto const addr = tr_address::from_string(mediator_.settings_bind_addr(type)); addr && type == addr->type)
         {

@@ -339,8 +339,8 @@ TEST_F(AnnounceListTest, announceToScrape)
 
     for (auto const& test : Tests)
     {
-        auto const scrape = tr_announce_list::announce_to_scrape(tr_quark_new(test.announce));
-        EXPECT_EQ(tr_quark_new(test.expected_scrape), scrape);
+        auto const scrape = tr_announce_list::announce_to_scrape(test.announce);
+        EXPECT_EQ(test.expected_scrape, scrape.value_or(""));
     }
 }
 

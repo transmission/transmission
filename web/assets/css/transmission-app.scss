@@ -94,7 +94,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-fg-primary: #{$dark-mode-white};
     --color-fg-secondary: #{$nice-grey};
     --color-fg-on-popup: #{$nice-grey};
-    --color-fg-disabled: #{$dark-mode-white};
+    --color-fg-disabled: #808088;
     --color-bg-warn: #cf6679;
     --color-fg-warn: #{$dark-mode-black};
     --color-border: #{$dark-mode-white};
@@ -1146,30 +1146,30 @@ $video-image: '../img/film.svg';
 #inspector-tiers-list {
   color: var(--color-fg-primary);
   margin: 0 10px;
-  padding: 0 12px;
+  padding: 0;
 
   .tier-list-row {
     display: grid;
     font-size: 12px;
     grid-column-gap: 8px;
     grid-row-gap: 4px;
-    margin-top: 8px;
+    padding: 8px 12px;
   }
 
-  .tier-list-row:nth-child(even) {
+  .tier-list-row:nth-child(even of .tier-list-row) {
     background-color: var(--color-bg-even);
   }
 
-  .tier-list-row:nth-child(odd) {
+  .tier-list-row:nth-child(odd of .tier-list-row) {
     background-color: var(--color-bg-odd);
   }
 
   .tier-list-torrent {
     color: var(--color-fg-primary);
     font-weight: bolder;
-    margin-left: -12px;
     overflow-x: hidden;
-    padding-top: 20px;
+    padding-top: 12px;
+    padding-bottom: 8px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1178,7 +1178,6 @@ $video-image: '../img/film.svg';
     font-size: 14px;
     font-weight: bolder;
     grid-column: span 2;
-    margin-top: 8px;
     padding-bottom: 4px;
   }
 

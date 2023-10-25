@@ -181,13 +181,13 @@ struct tr_address
     template<typename OutputIt>
     static OutputIt to_compact_ipv4(OutputIt out, in_addr const& addr4)
     {
-        return std::copy_n(reinterpret_cast<std::byte const*>(&addr4), sizeof(addr4), out);
+        return std::copy_n(reinterpret_cast<std::byte const*>(&addr4.s_addr), sizeof(addr4.s_addr), out);
     }
 
     template<typename OutputIt>
     static OutputIt to_compact_ipv6(OutputIt out, in6_addr const& addr6)
     {
-        return std::copy_n(reinterpret_cast<std::byte const*>(&addr6), sizeof(addr6), out);
+        return std::copy_n(reinterpret_cast<std::byte const*>(&addr6.s6_addr), sizeof(addr6.s6_addr), out);
     }
 
     template<typename OutputIt>
@@ -243,7 +243,7 @@ struct tr_address
     static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
     static_assert(std::size(CompactAddrBytes) == NUM_TR_AF_INET_TYPES);
 
-    [[nodiscard]] static auto constexpr any(tr_address_type type) noexcept
+    [[nodiscard]] static auto any(tr_address_type type) noexcept
     {
         switch (type)
         {
@@ -252,18 +252,24 @@ struct tr_address
         case TR_AF_INET6:
             return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
         default:
+            TR_ASSERT_MSG(false, "invalid type");
             return tr_address{};
         }
     }
 
-    [[nodiscard]] constexpr auto is_valid() const noexcept
+    [[nodiscard]] static constexpr auto is_valid(tr_address_type type) noexcept
     {
         return type == TR_AF_INET || type == TR_AF_INET6;
     }
 
+    [[nodiscard]] constexpr auto is_valid() const noexcept
+    {
+        return is_valid(type);
+    }
+
     [[nodiscard]] auto is_any() const noexcept
     {
-        return *this == any(type);
+        return is_valid() ? *this == any(type) : false;
     }
 };
 

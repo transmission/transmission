@@ -53,6 +53,9 @@ public:
         return get(metainfo.info_hash());
     }
 
+    // O(n)}
+    [[nodiscard]] tr_torrent* find_from_obfuscated_hash(tr_sha1_digest_t const& obfuscated_hash);
+
     // These convenience functions use get(tr_sha1_digest_t const&)
     // after parsing the magnet link to get the info hash. If you have
     // the info hash already, use get() instead to avoid excess parsing.
@@ -102,6 +105,11 @@ public:
     [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
     {
         return std::empty(by_hash_);
+    }
+
+    [[nodiscard]] constexpr auto const& sorted_by_id() const noexcept
+    {
+        return by_id_;
     }
 
 private:

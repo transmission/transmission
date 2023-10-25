@@ -32,30 +32,26 @@ TEST_F(RpcTest, list)
 {
     auto i = int64_t{};
     auto sv = std::string_view{};
-    tr_variant top;
 
-    tr_rpc_parse_list_str(&top, "12"sv);
+    auto top = tr_rpc_parse_list_str("12"sv);
     EXPECT_TRUE(top.holds_alternative<int64_t>());
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
-    top.clear();
 
-    tr_rpc_parse_list_str(&top, "6,7"sv);
+    top = tr_rpc_parse_list_str("6,7"sv);
     EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(2U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(6, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
     EXPECT_EQ(7, i);
-    top.clear();
 
-    tr_rpc_parse_list_str(&top, "asdf"sv);
+    top = tr_rpc_parse_list_str("asdf"sv);
     EXPECT_TRUE(top.holds_alternative<std::string_view>());
     EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
     EXPECT_EQ("asdf"sv, sv);
-    top.clear();
 
-    tr_rpc_parse_list_str(&top, "1,3-5"sv);
+    top = tr_rpc_parse_list_str("1,3-5"sv);
     EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(4U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));

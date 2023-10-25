@@ -510,7 +510,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     }
 
     int volatile status;
-    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, NULL, &status);
+    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, &status);
 
     while (status == TR_LOC_MOVING) //block while moving (for now)
     {
@@ -612,7 +612,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (uint64_t)size
 {
-    return tr_torrentTotalSize(self.fHandle);
+    return tr_torrentView(self.fHandle).total_size;
 }
 
 - (uint64_t)sizeLeft

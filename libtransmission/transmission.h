@@ -922,12 +922,7 @@ enum
  * will be clobbered s.t. additional files being added will be saved
  * to the torrent's downloadDir.
  */
-void tr_torrentSetLocation(
-    tr_torrent* torrent,
-    char const* location,
-    bool move_from_old_path,
-    double volatile* setme_progress,
-    int volatile* setme_state);
+void tr_torrentSetLocation(tr_torrent* torrent, char const* location, bool move_from_old_path, int volatile* setme_state);
 
 uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
 
@@ -956,8 +951,6 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo cons
  * @return this torrent's name.
  */
 char const* tr_torrentName(tr_torrent const* tor);
-
-uint64_t tr_torrentTotalSize(tr_torrent const* tor);
 
 /**
  * @brief find the location of a torrent's file by looking with and without
@@ -1022,8 +1015,6 @@ void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode);
 uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor);
 void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes);
 
-bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* minutes);
-
 // --- Peer Limits
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
@@ -1031,7 +1022,7 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 // --- File Priorities
 
-enum
+enum : tr_priority_t
 {
     TR_PRI_LOW = -1,
     TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
@@ -1397,7 +1388,7 @@ void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs)
 /**
  * Queue a torrent for verification.
  */
-void tr_torrentVerify(tr_torrent* torrent);
+void tr_torrentVerify(tr_torrent* torrent, bool force = false);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 
@@ -1454,9 +1445,9 @@ struct tr_stat
     char const* errorString;
 
     /** Byte count of all the piece data we'll have downloaded when we're done,
-        whether or not we have it yet. This may be less than `tr_torrentTotalSize()`
-        if only some of the torrent's files are wanted.
-        [0...tr_torrentTotalSize()] */
+        whether or not we have it yet. If we only want some of the files,
+        this may be less than `tr_torrent_view.total_size`.
+        [0...tr_torrent_view.total_size] */
     uint64_t sizeWhenDone;
 
     /** Byte count of how much data is left to be downloaded until we've got

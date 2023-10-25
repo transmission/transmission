@@ -241,8 +241,9 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
 
     auto seed_ratio = 0.0;
     auto const has_seed_ratio = tr_torrentGetSeedRatio(raw_torrent_, &seed_ratio);
+    auto const view = tr_torrentView(raw_torrent_);
 
-    update_cache_value(cache_.name, tr_torrentName(raw_torrent_), result, ChangeFlag::NAME);
+    update_cache_value(cache_.name, view.name, result, ChangeFlag::NAME);
     update_cache_value(cache_.speed_up, stats->pieceUploadSpeed_KBps, 0.01F, result, ChangeFlag::SPEED_UP);
     update_cache_value(cache_.speed_down, stats->pieceDownloadSpeed_KBps, 0.01F, result, ChangeFlag::SPEED_DOWN);
     update_cache_value(cache_.active_peers_up, stats->peersGettingFromUs, result, ChangeFlag::ACTIVE_PEERS_UP);
@@ -290,7 +291,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
         Percents(stats->seedRatioPercentDone),
         result,
         ChangeFlag::SEED_RATIO_PERCENT_DONE);
-    update_cache_value(cache_.total_size, tr_torrentTotalSize(raw_torrent_), result, ChangeFlag::TOTAL_SIZE);
+    update_cache_value(cache_.total_size, view.total_size, result, ChangeFlag::TOTAL_SIZE);
 
     update_cache_value(cache_.has_seed_ratio, has_seed_ratio, result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.have_unchecked, stats->haveUnchecked, result, ChangeFlag::LONG_PROGRESS);
@@ -313,7 +314,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
 
     if (result.test(ChangeFlag::NAME))
     {
-        cache_.name_collated = fmt::format("{}\t{}", cache_.name.lowercase(), tr_torrentView(raw_torrent_).hash_string);
+        cache_.name_collated = fmt::format("{}\t{}", cache_.name.lowercase(), view.hash_string);
     }
 
     return result;
