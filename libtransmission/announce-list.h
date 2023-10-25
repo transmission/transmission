@@ -16,6 +16,7 @@
 #include "libtransmission/quark.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/variant.h"
 
 struct tr_error;
 struct tr_url_parsed_t;
@@ -100,6 +101,8 @@ public:
         return trackers_ != that.trackers_;
     }
 
+    void add_to_map(tr_variant::Map& setme) const;
+
     bool add(std::string_view announce_url_sv)
     {
         return add(announce_url_sv, this->nextTier());
@@ -128,9 +131,10 @@ public:
     bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
 
     [[nodiscard]] static std::optional<std::string> announce_to_scrape(std::string_view announce);
-    [[nodiscard]] static tr_quark announce_to_scrape(tr_quark announce);
 
 private:
+    [[nodiscard]] tr_variant to_tiers_variant() const;
+
     [[nodiscard]] tr_tracker_tier_t get_tier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
 
     [[nodiscard]] bool can_add(tr_url_parsed_t const& announce) const noexcept;

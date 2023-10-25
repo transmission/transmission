@@ -64,6 +64,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
   display: inline-block;
   padding: 3px;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 /// GLOBAL
@@ -279,6 +280,7 @@ $toolbar-height: $toolbar-height-number * 1px;
     height: $toolbar-height;
     margin-right: 6px;
     user-select: none;
+    -webkit-user-select: none;
     width: $toolbar-height;
 
     svg {
@@ -455,6 +457,8 @@ $video-image: '../img/film.svg';
   padding: 0;
   text-align: left;
   width: 100%;
+  user-select: none;
+  -webkit-user-select: none;
 
   .torrent:nth-child(even) {
     background-color: var(--color-bg-even);
@@ -466,7 +470,6 @@ $video-image: '../img/film.svg';
 
   .torrent {
     border-bottom: 1px solid var(--color-default-border);
-    user-select: none;
 
     .icon {
       // color the background svg fill
@@ -894,6 +897,7 @@ $video-image: '../img/film.svg';
 #prefs-dialog.ui-tabs .ui-tabs-panel {
   padding: 0;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 .prefs-section {
@@ -1142,30 +1146,30 @@ $video-image: '../img/film.svg';
 #inspector-tiers-list {
   color: var(--color-fg-primary);
   margin: 0 10px;
-  padding: 0 12px;
+  padding: 0;
 
   .tier-list-row {
     display: grid;
     font-size: 12px;
     grid-column-gap: 8px;
     grid-row-gap: 4px;
-    margin-top: 8px;
+    padding: 8px 12px;
   }
 
-  .tier-list-row:nth-child(even) {
+  .tier-list-row:nth-child(even of .tier-list-row) {
     background-color: var(--color-bg-even);
   }
 
-  .tier-list-row:nth-child(odd) {
+  .tier-list-row:nth-child(odd of .tier-list-row) {
     background-color: var(--color-bg-odd);
   }
 
   .tier-list-torrent {
     color: var(--color-fg-primary);
     font-weight: bolder;
-    margin-left: -12px;
     overflow-x: hidden;
-    padding-top: 20px;
+    padding-top: 12px;
+    padding-bottom: 8px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1174,7 +1178,6 @@ $video-image: '../img/film.svg';
     font-size: 14px;
     font-weight: bolder;
     grid-column: span 2;
-    margin-top: 8px;
     padding-bottom: 4px;
   }
 
@@ -1331,6 +1334,8 @@ $video-image: '../img/film.svg';
   padding: 10px 5px;
   position: absolute;
   z-index: 9999;
+  user-select: none;
+  -webkit-user-select: none;
 
   .context-menuitem {
     font-size: 13px;

@@ -61,6 +61,19 @@ tr_torrent const* tr_torrents::get(tr_sha1_digest_t const& hash) const
     return begin == end ? nullptr : *begin;
 }
 
+tr_torrent* tr_torrents::find_from_obfuscated_hash(tr_sha1_digest_t const& obfuscated_hash)
+{
+    for (auto* const tor : *this)
+    {
+        if (tor->obfuscated_hash == obfuscated_hash)
+        {
+            return tor;
+        }
+    }
+
+    return nullptr;
+}
+
 tr_torrent_id_t tr_torrents::add(tr_torrent* tor)
 {
     auto const id = static_cast<tr_torrent_id_t>(std::size(by_id_));

@@ -22,23 +22,6 @@ export const Utils = {
 
     return result;
   },
-
-  /**
-   * Checks to see if the content actually changed before poking the DOM.
-   */
-  setInnerHTML(e, html) {
-    if (!e) {
-      return;
-    }
-
-    /* innerHTML is listed as a string, but the browser seems to change it.
-     * For example, "&infin;" gets changed to "∞" somewhere down the line.
-     * So, let's use an arbitrary  different field to test our state... */
-    if (e.currentHTML !== html) {
-      e.currentHTML = html;
-      e.innerHTML = html;
-    }
-  },
 };
 
 function toggleClass(buttons, button, pages, page, callback) {

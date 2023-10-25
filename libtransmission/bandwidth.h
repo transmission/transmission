@@ -29,8 +29,8 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    tr_kilobytes_per_second_t up_limit_KBps = 0;
-    tr_kilobytes_per_second_t down_limit_KBps = 0;
+    tr_kilobytes_per_second_t up_limit_KBps = 0U;
+    tr_kilobytes_per_second_t down_limit_KBps = 0U;
     bool up_limited = false;
     bool down_limited = false;
 };
@@ -78,12 +78,11 @@ struct tr_bandwidth
 {
 private:
     static constexpr size_t HistoryMSec = 2000U;
-    static constexpr size_t IntervalMSec = HistoryMSec;
-    static constexpr size_t GranularityMSec = 250;
-    static constexpr size_t HistorySize = (IntervalMSec / GranularityMSec);
+    static constexpr size_t GranularityMSec = 250U;
+    static constexpr size_t HistorySize = HistoryMSec / GranularityMSec;
 
 public:
-    explicit tr_bandwidth(tr_bandwidth* newParent);
+    explicit tr_bandwidth(tr_bandwidth* new_parent);
 
     tr_bandwidth()
         : tr_bandwidth(nullptr)
@@ -100,7 +99,9 @@ public:
     tr_bandwidth(tr_bandwidth&&) = delete;
     tr_bandwidth(tr_bandwidth&) = delete;
 
-    // @brief Sets the peer. nullptr is allowed.
+    /**
+     * @brief Sets the peer. nullptr is allowed.
+     */
     void set_peer(std::weak_ptr<tr_peerIo> peer) noexcept
     {
         this->peer_ = std::move(peer);
@@ -115,7 +116,7 @@ public:
     /**
      * @brief allocate the next `period_msec`'s worth of bandwidth for the peer-ios to consume
      */
-    void allocate(unsigned int period_msec);
+    void allocate(uint64_t period_msec);
 
     void set_parent(tr_bandwidth* new_parent);
 
@@ -132,10 +133,7 @@ public:
     /**
      * @brief clamps `byte_count` down to a number that this bandwidth will allow to be consumed
      */
-    [[nodiscard]] size_t clamp(tr_direction dir, size_t byte_count) const noexcept
-    {
-        return this->clamp(0, dir, byte_count);
-    }
+    [[nodiscard]] size_t clamp(tr_direction dir, size_t byte_count) const noexcept;
 
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
     [[nodiscard]] auto get_raw_speed_bytes_per_second(uint64_t const now, tr_direction const dir) const
@@ -192,9 +190,9 @@ public:
      */
     constexpr bool set_limited(tr_direction dir, bool is_limited)
     {
-        bool* value = &this->band_[dir].is_limited_;
-        bool const did_change = is_limited != *value;
-        *value = is_limited;
+        bool& value = this->band_[dir].is_limited_;
+        bool const did_change = is_limited != value;
+        value = is_limited;
         return did_change;
     }
 
@@ -214,9 +212,9 @@ public:
      */
     constexpr bool honor_parent_limits(tr_direction direction, bool is_enabled)
     {
-        bool* value = &this->band_[direction].honor_parent_limits_;
-        bool const did_change = is_enabled != *value;
-        *value = is_enabled;
+        bool& value = this->band_[direction].honor_parent_limits_;
+        bool const did_change = is_enabled != value;
+        value = is_enabled;
         return did_change;
     }
 
@@ -229,7 +227,7 @@ public:
 
     [[nodiscard]] tr_bandwidth_limits get_limits() const;
 
-    void set_limits(tr_bandwidth_limits const* limits);
+    void set_limits(tr_bandwidth_limits const& limits);
 
 private:
     struct RateControl
@@ -260,15 +258,13 @@ private:
 
     void deparent() noexcept;
 
-    static void notify_bandwidth_consumed_bytes(uint64_t now, RateControl* r, size_t size);
-
-    [[nodiscard]] size_t clamp(uint64_t now, tr_direction dir, size_t byte_count) const;
+    static void notify_bandwidth_consumed_bytes(uint64_t now, RateControl& r, size_t size);
 
     static void phase_one(std::vector<tr_peerIo*>& peers, tr_direction dir);
 
     void allocate_bandwidth(
         tr_priority_t parent_priority,
-        unsigned int period_msec,
+        uint64_t period_msec,
         std::vector<std::shared_ptr<tr_peerIo>>& peer_pool);
 
     mutable std::array<Band, 2> band_ = {};

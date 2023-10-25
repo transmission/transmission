@@ -112,13 +112,14 @@ username and password (respectively), separated by a colon.
 
 ## 3 Torrent requests
 ### 3.1 Torrent action requests
-| Method name          | libtransmission function
+| Method name            | libtransmission function
 |:--|:--
-| `torrent-start`      | tr_torrentStart
-| `torrent-start-now`  | tr_torrentStartNow
-| `torrent-stop`       | tr_torrentStop
-| `torrent-verify`     | tr_torrentVerify
-| `torrent-reannounce` | tr_torrentManualUpdate ("ask tracker for more peers")
+| `torrent-start`        | tr_torrentStart
+| `torrent-start-now`    | tr_torrentStartNow
+| `torrent-stop`         | tr_torrentStop
+| `torrent-verify`       | tr_torrentVerify
+| `torrent-verify-force` | tr_torrentVerifyForce
+| `torrent-reannounce`   | tr_torrentManualUpdate ("ask tracker for more peers")
 
 Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
@@ -642,11 +643,11 @@ A stats object contains:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| uploadedBytes    | number     | tr_session_stats
-| downloadedBytes  | number     | tr_session_stats
-| filesAdded       | number     | tr_session_stats
-| sessionCount     | number     | tr_session_stats
-| secondsActive    | number     | tr_session_stats
+| `uploadedBytes`    | number     | tr_session_stats
+| `downloadedBytes`  | number     | tr_session_stats
+| `filesAdded`       | number     | tr_session_stats
+| `sessionCount`     | number     | tr_session_stats
+| `secondsActive`    | number     | tr_session_stats
 
 ### 4.3 Blocklist
 Method name: `blocklist-update`
@@ -661,9 +662,18 @@ from the outside world.
 
 Method name: `port-test`
 
-Request arguments: none
+Request arguments: an optional argument `ipProtocol`.
+`ipProtocol` is a string specifying the IP protocol version to be used for the port test.
+Set to `ipv4` to *only* check IPv4, set to `ipv6` to *only* check IPv6,
+or set to `any` to check if the port is open on *any* of the IP protocol versions.
+Omitting `ipProtocol` is the same as setting it to `any`.
 
-Response arguments: a Boolean, `port-is-open`
+Response arguments:
+
+| Key | Value Type | Description
+| :-- | :-- | :--
+| `port-is-open` | boolean | true if port is open, false if port is closed
+| `ipProtocol` | string | copied from request argument `ipProtocol` if it was specified
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
@@ -1014,3 +1024,5 @@ Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
 | `torrent-set` | new arg `sequentialDownload`
 | `torrent-get` | new arg `files.beginPiece`
 | `torrent-get` | new arg `files.endPiece`
+| `port-test` | new arg `ipProtocol`
+| `torrent-verify-force` | new method

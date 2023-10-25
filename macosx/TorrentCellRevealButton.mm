@@ -61,7 +61,7 @@
 
     NSImage* revealImage = [NSImage imageNamed:self.revealImageString];
     self.image = revealImage;
-    [self setNeedsDisplay:YES];
+    self.needsDisplay = YES;
 }
 
 - (void)updateTrackingAreas

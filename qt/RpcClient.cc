@@ -29,8 +29,8 @@ using ::trqt::variant_helpers::variantInit;
 namespace
 {
 
-char const constexpr* const RequestDataPropertyKey{ "requestData" };
-char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
+char constexpr const* const RequestDataPropertyKey{ "requestData" };
+char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
 TrVariantPtr createVariant()
 {

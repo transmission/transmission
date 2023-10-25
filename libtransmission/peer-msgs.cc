@@ -916,16 +916,9 @@ void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 
 void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
-    static tr_quark version_quark = 0;
-
     if (msgs->clientSentLtepHandshake)
     {
         return;
-    }
-
-    if (version_quark == 0)
-    {
-        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX);
     }
 
     logtrace(msgs, "sending an ltep handshake");
@@ -998,7 +991,7 @@ void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // Client name and version (as a utf-8 string). This is a much more
     // reliable way of identifying the client than relying on the
     // peer id encoding.
-    tr_variantDictAddQuark(&val, TR_KEY_v, version_quark);
+    tr_variantDictAddStrView(&val, TR_KEY_v, TR_NAME " " USERAGENT_PREFIX);
 
     // http://bittorrent.org/beps/bep_0021.html
     // A peer that is a partial seed SHOULD include an extra header in
@@ -1886,7 +1879,7 @@ namespace peer_pulse_helpers
 
         if (!ok)
         {
-            msgs->torrent->set_local_error(
+            msgs->torrent->error().set_local_error(
                 fmt::format(FMT_STRING("Please Verify Local Data! Piece #{:d} is corrupt."), req.index));
         }
     }

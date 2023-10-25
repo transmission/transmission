@@ -9,11 +9,14 @@
 
 #include <fmt/core.h>
 
+#include <small/map.hpp>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/announce-list.h"
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
@@ -149,16 +152,6 @@ std::optional<std::string> tr_announce_list::announce_to_scrape(std::string_view
     return {};
 }
 
-tr_quark tr_announce_list::announce_to_scrape(tr_quark announce)
-{
-    if (auto const scrape_str = announce_to_scrape(tr_quark_get_string_view(announce)); scrape_str)
-    {
-        return tr_quark_new(*scrape_str);
-    }
-
-    return TR_KEY_NONE;
-}
-
 tr_tracker_tier_t tr_announce_list::nextTier() const
 {
     return std::empty(trackers_) ? 0 : trackers_.back().tier + 1;
@@ -234,6 +227,43 @@ bool tr_announce_list::can_add(tr_url_parsed_t const& announce) const noexcept
     return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
 }
 
+tr_variant tr_announce_list::to_tiers_variant() const
+{
+    TR_ASSERT(size() > 1U);
+
+    auto tiers_map = small::map<tr_tracker_tier_t, tr_variant::Vector>{};
+    for (auto const& tracker : *this)
+    {
+        tiers_map[tracker.tier].emplace_back(tracker.announce.sv());
+    }
+
+    auto tiers_vec = tr_variant::Vector{};
+    tiers_vec.reserve(std::size(tiers_map));
+    for (auto& [tier_num, trackers_vec] : tiers_map)
+    {
+        tiers_vec.emplace_back(std::move(trackers_vec));
+    }
+
+    return tr_variant{ std::move(tiers_vec) };
+}
+
+void tr_announce_list::add_to_map(tr_variant::Map& setme) const
+{
+    setme.erase(TR_KEY_announce);
+    setme.erase(TR_KEY_announce_list);
+    setme.reserve(std::size(setme) + 2U);
+
+    if (!empty())
+    {
+        setme.try_emplace(TR_KEY_announce, at(0).announce.sv());
+    }
+
+    if (size() > 1U)
+    {
+        setme.try_emplace(TR_KEY_announce_list, tr_announce_list::to_tiers_variant());
+    }
+}
+
 bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
 {
     // load the torrent file
@@ -246,32 +276,10 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
     auto& metainfo = *ometainfo;
 
-    // remove the old fields
-    tr_variantDictRemove(&metainfo, TR_KEY_announce);
-    tr_variantDictRemove(&metainfo, TR_KEY_announce_list);
-
-    // add the new fields
-    if (this->size() == 1)
+    // replace the trackers
+    if (auto* const metainfo_map = metainfo.get_if<tr_variant::Map>(); metainfo_map != nullptr)
     {
-        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce.quark());
-    }
-    else if (this->size() > 1)
-    {
-        tr_variant* tier_list = tr_variantDictAddList(&metainfo, TR_KEY_announce_list, 0);
-
-        auto current_tier = std::optional<tr_tracker_tier_t>{};
-        tr_variant* tracker_list = nullptr;
-
-        for (auto const& tracker : *this)
-        {
-            if (tracker_list == nullptr || !current_tier || current_tier != tracker.tier)
-            {
-                tracker_list = tr_variantListAddList(tier_list, 1);
-                current_tier = tracker.tier;
-            }
-
-            tr_variantListAddQuark(tracker_list, tracker.announce.quark());
-        }
+        add_to_map(*metainfo_map);
     }
 
     // confirm that it's good by parsing it back again
