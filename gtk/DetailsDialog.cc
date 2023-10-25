@@ -626,7 +626,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     infos.reserve(torrents.size());
     for (auto* const torrent : torrents)
     {
-        stats.push_back(tr_torrentStatCached(torrent));
+        stats.push_back(tr_torrentStat(torrent));
         infos.push_back(tr_torrentView(torrent));
     }
 

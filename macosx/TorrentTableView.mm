@@ -119,7 +119,13 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)awakeFromNib
 {
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setNeedsDisplay) name:@"RefreshTorrentTable" object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshTorrentTable) name:@"RefreshTorrentTable"
+                                             object:nil];
+}
+
+- (void)refreshTorrentTable
+{
+    self.needsDisplay = YES;
 }
 
 //make sure we don't lose selection on manual reloads

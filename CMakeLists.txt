@@ -40,7 +40,7 @@ set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
 set(GTKMM3_MINIMUM 3.24.0)
 set(GTKMM4_MINIMUM 4.11.1)
-set(OPENSSL_MINIMUM 0.9.7)
+set(OPENSSL_MINIMUM 1.1.0)
 set(MBEDTLS_MINIMUM 1.3)
 set(NPM_MINIMUM 8.1.307) # Node.js 14
 set(PSL_MINIMUM 0.21.1)
@@ -207,6 +207,7 @@ endif()
 set(CMAKE_FOLDER "third-party")
 find_package(FastFloat)
 find_package(Fmt)
+find_package(RapidJSON)
 find_package(Small)
 find_package(UtfCpp)
 find_package(WideInteger)
@@ -507,7 +508,6 @@ target_compile_definitions(miniupnpc::libminiupnpc
         SYSTEM_MINIUPNP
         $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
 
-add_subdirectory(third-party/jsonsl)
 add_subdirectory(third-party/wildmat)
 
 tr_add_external_auto_library(DHT dht dht

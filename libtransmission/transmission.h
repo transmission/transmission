@@ -922,12 +922,7 @@ enum
  * will be clobbered s.t. additional files being added will be saved
  * to the torrent's downloadDir.
  */
-void tr_torrentSetLocation(
-    tr_torrent* torrent,
-    char const* location,
-    bool move_from_old_path,
-    double volatile* setme_progress,
-    int volatile* setme_state);
+void tr_torrentSetLocation(tr_torrent* torrent, char const* location, bool move_from_old_path, int volatile* setme_state);
 
 uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
 
@@ -1022,8 +1017,6 @@ void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode);
 uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor);
 void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes);
 
-bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* minutes);
-
 // --- Peer Limits
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
@@ -1031,7 +1024,7 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 // --- File Priorities
 
-enum
+enum : tr_priority_t
 {
     TR_PRI_LOW = -1,
     TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
@@ -1397,7 +1390,7 @@ void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs)
 /**
  * Queue a torrent for verification.
  */
-void tr_torrentVerify(tr_torrent* torrent);
+void tr_torrentVerify(tr_torrent* torrent, bool force = false);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 
@@ -1609,11 +1602,6 @@ struct tr_stat
     on the torrent. This is typically called by the GUI clients every
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
-
-/** Like `tr_torrentStat()`, but only recalculates the statistics if it's
-    been longer than a second since they were last calculated. This can
-    reduce the CPU load if you're calling `tr_torrentStat()` frequently. */
-tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
 
 /** @} */
 

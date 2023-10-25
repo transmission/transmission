@@ -47,6 +47,10 @@ export class ContextMenu extends EventTarget {
     const root = document.createElement('div');
     root.role = 'menu';
     root.classList.add('context-menu', 'popup');
+    root.addEventListener('contextmenu', (e_) => {
+      e_.preventDefault();
+    });
+    root.style.pointerEvents = 'none';
 
     const actions = {};
     const add_item = (action, warn = false) => {
@@ -91,6 +95,7 @@ export class ContextMenu extends EventTarget {
     add_item('trash-selected-torrents', true);
     add_separator();
     add_item('verify-selected-torrents');
+    add_item('verify-selected-torrents-force');
     add_item('show-move-dialog');
     add_item('show-rename-dialog');
     add_item('show-labels-dialog');

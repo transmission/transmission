@@ -1,6 +1,10 @@
+:root {
+  color-scheme: light dark;
+}
+
 html {
   color: rgb(0,0,0);
-  font-family: 'Lucida Grande', Sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Lucida Grande', sans-serif;
   text-align: left;
 }
 
@@ -38,4 +42,22 @@ td.grey {
 img.icon {
   margin-right: 8px;
   vertical-align: text-bottom;
+}
+
+@media (prefers-color-scheme: dark) {
+    html {
+      color: rgb(255,255,255);
+    }
+
+    th {
+      color: rgb(200,200,200);
+    }
+
+    tr:nth-child(even) {
+      background: rgb(50,50,50);
+    }
+
+    td {
+      color: rgb(175,175,175);
+    }
 }

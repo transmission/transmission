@@ -84,11 +84,11 @@ auto loadPeers(tr_variant* dict, tr_torrent* tor)
 
 void saveLabels(tr_variant* dict, tr_torrent const* tor)
 {
-    auto const& labels = tor->labels;
+    auto const& labels = tor->labels();
     tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
     for (auto const& label : labels)
     {
-        tr_variantListAddQuark(list, label);
+        tr_variantListAddStrView(list, label.sv());
     }
 }
 
@@ -101,18 +101,18 @@ auto loadLabels(tr_variant* dict, tr_torrent* tor)
     }
 
     auto const n = tr_variantListSize(list);
-    auto labels = std::vector<tr_quark>{};
+    auto labels = tr_torrent::labels_t{};
     labels.reserve(n);
     for (size_t i = 0; i < n; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            labels.emplace_back(tr_quark_new(sv));
+            labels.emplace_back(tr_interned_string{ sv });
         }
     }
 
-    tor->setLabels(labels);
+    tor->set_labels(labels);
     return tr_resume::Labels;
 }
 
@@ -246,8 +246,8 @@ void saveSpeedLimits(tr_variant* dict, tr_torrent const* tor)
 void saveRatioLimits(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_ratio_limit, 2);
-    tr_variantDictAddReal(d, TR_KEY_ratio_limit, tr_torrentGetRatioLimit(tor));
-    tr_variantDictAddInt(d, TR_KEY_ratio_mode, tr_torrentGetRatioMode(tor));
+    tr_variantDictAddReal(d, TR_KEY_ratio_limit, tor->seed_ratio());
+    tr_variantDictAddInt(d, TR_KEY_ratio_mode, tor->seed_ratio_mode());
 }
 
 void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
@@ -306,12 +306,12 @@ auto loadRatioLimits(tr_variant* dict, tr_torrent* tor)
     {
         if (auto dratio = double{}; tr_variantDictFindReal(d, TR_KEY_ratio_limit, &dratio))
         {
-            tr_torrentSetRatioLimit(tor, dratio);
+            tor->set_seed_ratio(dratio);
         }
 
         if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_ratio_mode, &i))
         {
-            tor->set_ratio_mode(tr_ratiolimit(i));
+            tor->set_seed_ratio_mode(static_cast<tr_ratiolimit>(i));
         }
 
         ret = tr_resume::Ratiolimit;
@@ -328,12 +328,12 @@ auto loadIdleLimits(tr_variant* dict, tr_torrent* tor)
     {
         if (auto imin = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_limit, &imin))
         {
-            tor->set_idle_limit(imin);
+            tor->set_idle_limit_minutes(imin);
         }
 
         if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))
         {
-            tr_torrentSetIdleMode(tor, tr_idlelimit(i));
+            tor->set_idle_limit_mode(static_cast<tr_idlelimit>(i));
         }
 
         ret = tr_resume::Idlelimit;
@@ -881,11 +881,11 @@ void save(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->corruptPrev + tor->corruptCur);
     tr_variantDictAddInt(&top, TR_KEY_done_date, tor->doneDate);
-    tr_variantDictAddQuark(&top, TR_KEY_destination, tor->download_dir().quark());
+    tr_variantDictAddStrView(&top, TR_KEY_destination, tor->download_dir().sv());
 
     if (!std::empty(tor->incomplete_dir()))
     {
-        tr_variantDictAddQuark(&top, TR_KEY_incomplete_dir, tor->incomplete_dir().quark());
+        tr_variantDictAddStrView(&top, TR_KEY_incomplete_dir, tor->incomplete_dir().sv());
     }
 
     tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
@@ -914,7 +914,7 @@ void save(tr_torrent* tor)
     auto serde = tr_variant_serde::benc();
     if (!serde.to_file(top, tor->resume_file()))
     {
-        tor->set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
+        tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
     }
 }
 

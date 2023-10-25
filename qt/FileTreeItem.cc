@@ -336,7 +336,7 @@ int FileTreeItem::priority() const
     return i;
 }
 
-void FileTreeItem::setSubtreePriority(int priority, QSet<int>& ids)
+void FileTreeItem::setSubtreePriority(int priority, file_indices_t& setme_changed_ids)
 {
     if (priority_ != priority)
     {
@@ -344,13 +344,13 @@ void FileTreeItem::setSubtreePriority(int priority, QSet<int>& ids)
 
         if (file_index_ >= 0)
         {
-            ids.insert(file_index_);
+            setme_changed_ids.insert(file_index_);
         }
     }
 
     for (FileTreeItem* const child : children_)
     {
-        child->setSubtreePriority(priority, ids);
+        child->setSubtreePriority(priority, setme_changed_ids);
     }
 }
 
@@ -386,21 +386,21 @@ int FileTreeItem::isSubtreeWanted() const
     return wanted;
 }
 
-void FileTreeItem::setSubtreeWanted(bool b, QSet<int>& ids)
+void FileTreeItem::setSubtreeWanted(bool wanted, file_indices_t& setme_changed_ids)
 {
-    if (is_wanted_ != b)
+    if (is_wanted_ != wanted)
     {
-        is_wanted_ = b;
+        is_wanted_ = wanted;
 
         if (file_index_ >= 0)
         {
-            ids.insert(file_index_);
+            setme_changed_ids.insert(file_index_);
         }
     }
 
     for (FileTreeItem* const child : children_)
     {
-        child->setSubtreeWanted(b, ids);
+        child->setSubtreeWanted(wanted, setme_changed_ids);
     }
 }
 

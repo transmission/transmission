@@ -460,7 +460,7 @@ Session::Tag Session::torrentSet(torrent_ids_t const& torrent_ids, tr_quark cons
     return torrentSetImpl(&args);
 }
 
-Session::Tag Session::torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QList<int> const& value)
+Session::Tag Session::torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, std::vector<int> const& value)
 {
     tr_variant args;
     tr_variantInitDict(&args, 2);

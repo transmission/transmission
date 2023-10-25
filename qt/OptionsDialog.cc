@@ -205,7 +205,7 @@ void OptionsDialog::onSessionUpdated()
     }
 }
 
-void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priority)
+void OptionsDialog::onPriorityChanged(file_indices_t const& file_indices, int priority)
 {
     for (int const i : file_indices)
     {
@@ -213,7 +213,7 @@ void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priorit
     }
 }
 
-void OptionsDialog::onWantedChanged(QSet<int> const& file_indices, bool is_wanted)
+void OptionsDialog::onWantedChanged(file_indices_t const& file_indices, bool is_wanted)
 {
     for (int const i : file_indices)
     {
