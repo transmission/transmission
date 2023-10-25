@@ -102,6 +102,11 @@ public:
         return std::empty(by_hash_);
     }
 
+    [[nodiscard]] constexpr auto const& sorted_by_id() const noexcept
+    {
+        return by_id_;
+    }
+
 private:
     std::vector<tr_torrent*> by_hash_;
 
