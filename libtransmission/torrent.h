@@ -1006,7 +1006,6 @@ private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
-    friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
 
     enum class VerifyState : uint8_t
     {

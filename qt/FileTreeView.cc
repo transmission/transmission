@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <queue>
+#include <set>
 
 #include <QHeaderView>
 #include <QMenu>
@@ -253,7 +254,7 @@ void FileTreeView::onlyCheckSelectedItems()
 
     std::sort(wanted_indices.begin(), wanted_indices.end());
 
-    QSet<QModelIndex> wanted_indices_parents;
+    auto wanted_indices_parents = std::set<QModelIndex>{};
 
     for (QModelIndex const& i : wanted_indices)
     {
@@ -294,7 +295,7 @@ void FileTreeView::onlyCheckSelectedItems()
             {
                 unwanted_indices << child_index;
             }
-            else if (!wanted_indices_parents.contains(child_index))
+            else if (wanted_indices_parents.count(child_index) == 0U)
             {
                 unwanted_indices << child_index;
             }
