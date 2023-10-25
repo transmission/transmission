@@ -42,13 +42,13 @@ const TorrentRendererHelper = {
 
     if (t.needsMetaData()) {
       classList.push('magnet');
-      percent = Math.round(t.getMetadataPercentComplete() * 100);
+      percent = t.getMetadataPercentComplete() * 100;
     } else if (status === Torrent._StatusCheck) {
       classList.push('verify');
-      percent = Math.round(t.getRecheckProgress() * 100);
+      percent = t.getRecheckProgress() * 100;
     } else if (t.getLeftUntilDone() > 0) {
       classList.push('leech');
-      percent = Math.round(t.getPercentDone() * 100);
+      percent = t.getPercentDone() * 100;
     } else {
       classList.push('seed');
       const seed_ratio_limit = t.seedRatioLimit(controller);

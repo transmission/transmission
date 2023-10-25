@@ -26,17 +26,7 @@
 
 using namespace std::literals;
 
-class VariantTest : public ::testing::Test
-{
-protected:
-    static std::string stripWhitespace(std::string const& in)
-    {
-        auto s = in;
-        s.erase(s.begin(), std::find_if_not(s.begin(), s.end(), ::isspace));
-        s.erase(std::find_if_not(s.rbegin(), s.rend(), ::isspace).base(), s.end());
-        return s;
-    }
-};
+using VariantTest = ::testing::Test;
 
 #ifndef _WIN32
 #define STACK_SMASH_DEPTH (1 * 1000 * 1000)
@@ -363,7 +353,7 @@ TEST_F(VariantTest, bencToJson)
     for (auto const& test : Tests)
     {
         auto top = benc_serde.parse(test.benc).value_or(tr_variant{});
-        EXPECT_EQ(test.expected, stripWhitespace(json_serde.to_string(top)));
+        EXPECT_EQ(test.expected, json_serde.to_string(top));
     }
 }
 

@@ -10,7 +10,6 @@
 #include <unordered_set>
 
 #include <QString>
-#include <QSet>
 #include <QTimer>
 
 #include <libtransmission/tr-macros.h>
@@ -77,8 +76,8 @@ private slots:
     void onTrackerListEdited(QString);
 
     // Files tab
-    void onFilePriorityChanged(QSet<int> const& file_indices, int);
-    void onFileWantedChanged(QSet<int> const& file_indices, bool);
+    void onFilePriorityChanged(file_indices_t const& file_indices, int);
+    void onFileWantedChanged(file_indices_t const& file_indices, bool);
     void onPathEdited(QString const& old_path, QString const& new_name);
     void onOpenRequested(QString const& path) const;
 

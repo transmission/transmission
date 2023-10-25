@@ -922,12 +922,7 @@ enum
  * will be clobbered s.t. additional files being added will be saved
  * to the torrent's downloadDir.
  */
-void tr_torrentSetLocation(
-    tr_torrent* torrent,
-    char const* location,
-    bool move_from_old_path,
-    double volatile* setme_progress,
-    int volatile* setme_state);
+void tr_torrentSetLocation(tr_torrent* torrent, char const* location, bool move_from_old_path, int volatile* setme_state);
 
 uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
 
@@ -1029,7 +1024,7 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 // --- File Priorities
 
-enum
+enum : tr_priority_t
 {
     TR_PRI_LOW = -1,
     TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
@@ -1395,7 +1390,7 @@ void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs)
 /**
  * Queue a torrent for verification.
  */
-void tr_torrentVerify(tr_torrent* torrent);
+void tr_torrentVerify(tr_torrent* torrent, bool force = false);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 

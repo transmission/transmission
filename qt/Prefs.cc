@@ -225,7 +225,7 @@ Prefs::Prefs(QString config_dir)
 
     // these are the prefs that don't get saved to settings.json
     // when the application exits.
-    temporary_prefs_ << FILTER_TEXT;
+    temporary_prefs_.insert(FILTER_TEXT);
 
     auto top = get_default_app_settings();
     top.merge(tr_sessionLoadSettings(config_dir_.toUtf8().constData(), nullptr));
@@ -326,7 +326,7 @@ Prefs::~Prefs()
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        if (temporary_prefs_.contains(i))
+        if (temporary_prefs_.count(i) != 0U)
         {
             continue;
         }
