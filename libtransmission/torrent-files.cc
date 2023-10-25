@@ -158,15 +158,9 @@ bool tr_torrent_files::hasAnyLocalData(std::string_view const* paths, size_t n_p
 bool tr_torrent_files::move(
     std::string_view old_parent_in,
     std::string_view parent_in,
-    double volatile* setme_progress,
     std::string_view parent_name,
     tr_error** error) const
 {
-    if (setme_progress != nullptr)
-    {
-        *setme_progress = 0.0;
-    }
-
     auto const old_parent = tr_pathbuf{ old_parent_in };
     auto const parent = tr_pathbuf{ parent_in };
     tr_logAddTrace(fmt::format(FMT_STRING("Moving files from '{:s}' to '{:s}'"), old_parent, parent), parent_name);
@@ -183,9 +177,7 @@ bool tr_torrent_files::move(
 
     auto const paths = std::array<std::string_view, 1>{ old_parent.sv() };
 
-    auto const total_size = totalSize();
     auto err = bool{};
-    auto bytes_moved = uint64_t{};
 
     for (tr_file_index_t i = 0, n = fileCount(); i < n; ++i)
     {
@@ -209,12 +201,6 @@ bool tr_torrent_files::move(
         {
             err = true;
             break;
-        }
-
-        if (setme_progress != nullptr && total_size > 0U)
-        {
-            bytes_moved += fileSize(i);
-            *setme_progress = static_cast<double>(bytes_moved) / total_size;
         }
     }
 

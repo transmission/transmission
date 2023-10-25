@@ -1428,19 +1428,20 @@ void DetailsDialog::onRemoveTrackerClicked()
     // make a map of torrentIds to announce URLs to remove
     QItemSelectionModel* selection_model = ui_.trackersView->selectionModel();
     QModelIndexList const selected_rows = selection_model->selectedRows();
-    QMultiMap<int, int> torrent_id_to_tracker_ids;
+    auto torrent_id_to_tracker_ids = std::map<int, std::set<int>>{};
 
-    for (QModelIndex const& i : selected_rows)
+    for (auto const& model_index : selected_rows)
     {
-        auto const inf = ui_.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
-        torrent_id_to_tracker_ids.insert(inf.torrent_id, inf.st.id);
+        auto const inf = ui_.trackersView->model()->data(model_index, TrackerModel::TrackerRole).value<TrackerInfo>();
+        torrent_id_to_tracker_ids[inf.torrent_id].insert(inf.st.id);
     }
 
     // batch all of a tracker's torrents into one command
-    for (int const id : torrent_id_to_tracker_ids.uniqueKeys())
+    for (auto const& [torrent_id, tracker_ids] : torrent_id_to_tracker_ids)
     {
-        torrent_ids_t const ids{ id };
-        torrentSet(ids, TR_KEY_trackerRemove, torrent_id_to_tracker_ids.values(id));
+        auto const ids = torrent_ids_t{ torrent_id };
+        auto const values = std::vector<int>{ std::begin(tracker_ids), std::end(tracker_ids) };
+        torrentSet(ids, TR_KEY_trackerRemove, values);
     }
 
     selection_model->clearSelection();
@@ -1582,15 +1583,15 @@ static constexpr tr_quark priorityKey(int priority)
     }
 }
 
-void DetailsDialog::onFilePriorityChanged(QSet<int> const& indices, int priority)
+void DetailsDialog::onFilePriorityChanged(file_indices_t const& indices, int priority)
 {
-    torrentSet(priorityKey(priority), indices.values());
+    torrentSet(priorityKey(priority), std::vector<int>{ std::begin(indices), std::end(indices) });
 }
 
-void DetailsDialog::onFileWantedChanged(QSet<int> const& indices, bool wanted)
+void DetailsDialog::onFileWantedChanged(file_indices_t const& indices, bool wanted)
 {
     tr_quark const key = wanted ? TR_KEY_files_wanted : TR_KEY_files_unwanted;
-    torrentSet(key, indices.values());
+    torrentSet(key, std::vector<int>{ std::begin(indices), std::end(indices) });
 }
 
 void DetailsDialog::onPathEdited(QString const& old_path, QString const& new_name)

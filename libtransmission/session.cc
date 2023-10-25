@@ -119,7 +119,7 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
             limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
         }
 
-        group.set_limits(&limits);
+        group.set_limits(limits);
 
         if (auto const* val = group_map->find_if<bool>(TR_KEY_honorsSessionLimits); val != nullptr)
         {
@@ -576,7 +576,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled
     return session;
 }
 
-void tr_session::onNowTimer()
+void tr_session::on_now_timer()
 {
     TR_ASSERT(now_timer_);
     auto const now = std::chrono::system_clock::now();
@@ -593,6 +593,121 @@ void tr_session::onNowTimer()
         target_interval += 1s;
     }
     now_timer_->set_interval(std::chrono::duration_cast<std::chrono::milliseconds>(target_interval));
+}
+
+namespace
+{
+namespace queue_helpers
+{
+std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_direction dir, size_t num_wanted)
+{
+    TR_ASSERT(tr_isDirection(dir));
+
+    // build an array of the candidates
+    auto candidates = std::vector<tr_torrent*>{};
+    candidates.reserve(std::size(torrents));
+    for (auto* const tor : torrents)
+    {
+        if (tor->is_queued() && (dir == tor->queue_direction()))
+        {
+            candidates.push_back(tor);
+        }
+    }
+
+    // find the best n candidates
+    num_wanted = std::min(num_wanted, std::size(candidates));
+    if (num_wanted < candidates.size())
+    {
+        std::partial_sort(
+            std::begin(candidates),
+            std::begin(candidates) + num_wanted,
+            std::end(candidates),
+            [](auto const* a, auto const* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
+        candidates.resize(num_wanted);
+    }
+
+    return candidates;
+}
+} // namespace queue_helpers
+} // namespace
+
+size_t tr_session::count_queue_free_slots(tr_direction dir) const noexcept
+{
+    if (!queueEnabled(dir))
+    {
+        return std::numeric_limits<size_t>::max();
+    }
+
+    auto const max = queueSize(dir);
+    auto const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+
+    // count how many torrents are active
+    auto active_count = size_t{};
+    auto const stalled_enabled = queueStalledEnabled();
+    auto const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
+    auto const now = tr_time();
+    for (auto const* const tor : torrents())
+    {
+        /* is it the right activity? */
+        if (activity != tor->activity())
+        {
+            continue;
+        }
+
+        /* is it stalled? */
+        if (stalled_enabled && difftime(now, std::max(tor->startDate, tor->activityDate)) >= stalled_if_idle_for_n_seconds)
+        {
+            continue;
+        }
+
+        ++active_count;
+
+        /* if we've reached the limit, no need to keep counting */
+        if (active_count >= max)
+        {
+            return 0;
+        }
+    }
+
+    return max - active_count;
+}
+
+void tr_session::on_queue_timer()
+{
+    using namespace queue_helpers;
+
+    for (auto const dir : { TR_UP, TR_DOWN })
+    {
+        if (!queueEnabled(dir))
+        {
+            continue;
+        }
+
+        auto const n_wanted = count_queue_free_slots(dir);
+
+        for (auto* tor : get_next_queued_torrents(torrents(), dir, n_wanted))
+        {
+            tr_torrentStartNow(tor);
+
+            if (queue_start_callback_ != nullptr)
+            {
+                queue_start_callback_(this, tor, queue_start_user_data_);
+            }
+        }
+    }
+}
+
+// Periodically save the .resume files of any torrents whose
+// status has recently changed. This prevents loss of metadata
+// in the case of a crash, unclean shutdown, clumsy user, etc.
+void tr_session::on_save_timer()
+{
+    for (auto* const tor : torrents())
+    {
+        tr_torrentSave(tor);
+    }
+
+    stats().save();
 }
 
 void tr_session::initImpl(init_data& data)
@@ -1217,6 +1332,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     utp_timer.reset();
     verifier_.reset();
     save_timer_.reset();
+    queue_timer_.reset();
     now_timer_.reset();
     rpc_server_.reset();
     dht_.reset();
@@ -1931,75 +2047,20 @@ bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
 
 // ---
 
-std::vector<tr_torrent*> tr_session::getNextQueuedTorrents(tr_direction dir, size_t num_wanted) const
+void tr_session::verify_remove(tr_torrent const* const tor)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
-    // build an array of the candidates
-    auto candidates = std::vector<tr_torrent*>{};
-    candidates.reserve(std::size(torrents()));
-    for (auto* const tor : torrents())
+    if (verifier_)
     {
-        if (tor->is_queued() && (dir == tor->queue_direction()))
-        {
-            candidates.push_back(tor);
-        }
+        verifier_->remove(tor->info_hash());
     }
-
-    // find the best n candidates
-    num_wanted = std::min(num_wanted, std::size(candidates));
-    if (num_wanted < candidates.size())
-    {
-        std::partial_sort(
-            std::begin(candidates),
-            std::begin(candidates) + num_wanted,
-            std::end(candidates),
-            [](auto const* a, auto const* b) { return tr_torrentGetQueuePosition(a) < tr_torrentGetQueuePosition(b); });
-        candidates.resize(num_wanted);
-    }
-
-    return candidates;
 }
 
-size_t tr_session::countQueueFreeSlots(tr_direction dir) const noexcept
+void tr_session::verify_add(tr_torrent* const tor)
 {
-    if (!queueEnabled(dir))
+    if (verifier_)
     {
-        return std::numeric_limits<size_t>::max();
+        verifier_->add(std::make_unique<tr_torrent::VerifyMediator>(tor), tor->get_priority());
     }
-
-    auto const max = queueSize(dir);
-    auto const activity = dir == TR_UP ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
-
-    /* count how many torrents are active */
-    auto active_count = size_t{};
-    bool const stalled_enabled = queueStalledEnabled();
-    auto const stalled_if_idle_for_n_seconds = queueStalledMinutes() * 60;
-    time_t const now = tr_time();
-    for (auto const* const tor : torrents())
-    {
-        /* is it the right activity? */
-        if (activity != tor->activity())
-        {
-            continue;
-        }
-
-        /* is it stalled? */
-        if (stalled_enabled && difftime(now, std::max(tor->startDate, tor->activityDate)) >= stalled_if_idle_for_n_seconds)
-        {
-            continue;
-        }
-
-        ++active_count;
-
-        /* if we've reached the limit, no need to keep counting */
-        if (active_count >= max)
-        {
-            return 0;
-        }
-    }
-
-    return max - active_count;
 }
 
 // ---
@@ -2058,9 +2119,12 @@ void tr_sessionClearStats(tr_session* session)
     session->stats().clear();
 }
 
+// ---
+
 namespace
 {
-auto constexpr SaveIntervalSecs = 360s;
+auto constexpr QueueInterval = 1s;
+auto constexpr SaveInterval = 360s;
 
 auto makeResumeDir(std::string_view config_dir)
 {
@@ -2090,7 +2154,6 @@ auto makeBlocklistDir(std::string_view config_dir)
     tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
     return dir;
 }
-
 } // namespace
 
 tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_dict)
@@ -2104,26 +2167,13 @@ tr_session::tr_session(std::string_view config_dir, tr_variant const& settings_d
     , session_id_{ tr_time }
     , peer_mgr_{ tr_peerMgrNew(this), &tr_peerMgrFree }
     , rpc_server_{ std::make_unique<tr_rpc_server>(this, settings_dict) }
+    , now_timer_{ timer_maker_->create([this]() { on_now_timer(); }) }
+    , queue_timer_{ timer_maker_->create([this]() { on_queue_timer(); }) }
+    , save_timer_{ timer_maker_->create([this]() { on_save_timer(); }) }
 {
-    now_timer_ = timerMaker().create([this]() { onNowTimer(); });
     now_timer_->start_repeating(1s);
-
-    // Periodically save the .resume files of any torrents whose
-    // status has recently changed. This prevents loss of metadata
-    // in the case of a crash, unclean shutdown, clumsy user, etc.
-    save_timer_ = timerMaker().create(
-        [this]()
-        {
-            for (auto* const tor : torrents())
-            {
-                tr_torrentSave(tor);
-            }
-
-            stats().save();
-        });
-    save_timer_->start_repeating(SaveIntervalSecs);
-
-    verifier_->add_callback(tr_torrentOnVerifyDone);
+    queue_timer_->start_repeating(QueueInterval);
+    save_timer_->start_repeating(SaveInterval);
 }
 
 void tr_session::addIncoming(tr_peer_socket&& socket)
@@ -2133,7 +2183,7 @@ void tr_session::addIncoming(tr_peer_socket&& socket)
 
 void tr_session::addTorrent(tr_torrent* tor)
 {
-    tor->unique_id_ = torrents().add(tor);
+    tor->init_id(torrents().add(tor));
 
     tr_peerMgrAddTorrent(peer_mgr_.get(), tor);
 }
