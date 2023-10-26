@@ -471,12 +471,15 @@ export class Transmission extends EventTarget {
     const { ctrlKey, keyCode, metaKey, shiftKey, target } = event_;
 
     // look for a shortcut
-    const aria_keys = Transmission._createKeyShortcutFromKeyboardEvent(event_);
-    const action = this.action_manager.getActionForShortcut(aria_keys);
-    if (action) {
-      event_.preventDefault();
-      this.action_manager.click(action);
-      return;
+    const is_input_focused = target.matches('input');
+    if (!is_input_focused) {
+      const shortcut = Transmission._createKeyShortcutFromKeyboardEvent(event_);
+      const action = this.action_manager.getActionForShortcut(shortcut);
+      if (action) {
+        event_.preventDefault();
+        this.action_manager.click(action);
+        return;
+      }
     }
 
     const esc_key = keyCode === 27; // esc key pressed
@@ -487,7 +490,6 @@ export class Transmission extends EventTarget {
     }
 
     const any_popup_active = document.querySelector('.popup:not(.hidden)');
-    const is_input_focused = target.matches('input');
     const rows = this._rows;
 
     // Some shortcuts can only be used if the following conditions are met:
@@ -940,7 +942,7 @@ TODO: fix this when notifications get fixed
 
     let filter_text = null;
     let labels = null;
-    const m = /^labels:([\w,]*)(.*)$/.exec(this.filterText);
+    const m = /^labels:([\w,-\s]*)(.*)$/.exec(this.filterText);
     if (m) {
       filter_text = m[2].trim();
       labels = m[1].split(',');

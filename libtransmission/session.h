@@ -822,11 +822,6 @@ public:
         return settings_.ratio_limit;
     }
 
-    [[nodiscard]] constexpr auto peerIdTTLHours() const noexcept
-    {
-        return settings_.peer_id_ttl_hours;
-    }
-
     void verifyRemove(tr_torrent* tor)
     {
         if (verifier_)

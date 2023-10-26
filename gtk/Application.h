@@ -18,7 +18,7 @@
 class Application : public Gtk::Application
 {
 public:
-    Application(std::string const& config_dir, bool start_paused, bool is_iconified);
+    Application(std::string const& config_dir, bool start_paused, bool start_iconified);
     ~Application() override;
 
     TR_DISABLE_COPY_MOVE(Application)

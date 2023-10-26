@@ -6,4 +6,6 @@
 
 @interface GroupTextCell : NSTextFieldCell
 
+@property(nonatomic) BOOL selected;
+
 @end

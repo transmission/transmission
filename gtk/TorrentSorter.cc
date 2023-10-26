@@ -5,6 +5,7 @@
 
 #include "TorrentSorter.h"
 
+#include "Percents.h"
 #include "SorterBase.hh"
 #include "Utils.h"
 

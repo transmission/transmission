@@ -22,10 +22,11 @@ extern "C"
 
 #include <fmt/format.h>
 
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

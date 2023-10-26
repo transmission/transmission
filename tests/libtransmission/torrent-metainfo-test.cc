@@ -219,6 +219,14 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     tr_ctorFree(ctor);
 }
 
+TEST_F(TorrentMetainfoTest, magnetInfoHash)
+{
+    // compatibility with magnet torrents created by Transmission <= 3.0
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/gimp-2.10.32-1-arm64.dmg.torrent"sv };
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+}
+
 TEST_F(TorrentMetainfoTest, HoffmanStyleWebseeds)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv };

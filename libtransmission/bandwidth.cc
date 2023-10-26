@@ -9,14 +9,14 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bandwidth.h"
-#include "crypto-utils.h"
-#include "log.h"
-#include "peer-io.h"
-#include "tr-assert.h"
-#include "utils.h" // tr_time_msec()
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // tr_time_msec()
 
 tr_bytes_per_second_t tr_bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
 {

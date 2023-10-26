@@ -151,15 +151,15 @@ TEST_F(UtilsTest, strvReplaceInvalid)
     EXPECT_EQ(out, tr_strv_replace_invalid(out));
 }
 
-TEST_F(UtilsTest, strvReplaceInvalidFuzz)
+TEST_F(UtilsTest, strvConvertUtf8Fuzz)
 {
     auto buf = std::vector<char>{};
     for (size_t i = 0; i < 1000; ++i)
     {
         buf.resize(tr_rand_int(4096U));
         tr_rand_buffer(std::data(buf), std::size(buf));
-        auto const out = tr_strv_replace_invalid({ std::data(buf), std::size(buf) });
-        EXPECT_EQ(out, tr_strv_replace_invalid(out));
+        auto const out = tr_strv_convert_utf8({ std::data(buf), std::size(buf) });
+        EXPECT_EQ(out, tr_strv_convert_utf8(out));
     }
 }
 

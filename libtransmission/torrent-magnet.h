@@ -33,6 +33,8 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t metadata_size);
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor);
 
+void tr_torrentMagnetDoIdleWork(tr_torrent* tor);
+
 bool tr_torrentUseMetainfoFromFile(
     tr_torrent* tor,
     tr_torrent_metainfo const* metainfo,

@@ -13,16 +13,16 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "completion.h"
-#include "crypto-utils.h"
-#include "file.h"
-#include "log.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h" // tr_time(), tr_wait()
-#include "verify.h"
+#include "libtransmission/completion.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // tr_time(), tr_wait()
+#include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;
 

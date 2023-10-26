@@ -13,16 +13,16 @@
 #include <fmt/core.h>
 
 #define ENABLE_STRNATPMPERR
-#include "natpmp.h"
+#include <natpmp.h>
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "port-forwarding-natpmp.h"
-#include "port-forwarding.h"
-#include "utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/port-forwarding-natpmp.h"
+#include "libtransmission/port-forwarding.h"
+#include "libtransmission/utils.h"
 
 namespace
 {

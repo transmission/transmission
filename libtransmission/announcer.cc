@@ -22,19 +22,19 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "announcer-common.h"
-#include "announcer.h"
-#include "crypto-utils.h" /* tr_rand_int() */
-#include "log.h"
-#include "session.h"
-#include "timer.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/announce-list.h"
+#include "libtransmission/announcer-common.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/crypto-utils.h" /* tr_rand_int() */
+#include "libtransmission/log.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -419,7 +419,7 @@ struct tr_tier
         return currentTracker();
     }
 
-    [[nodiscard]] std::optional<size_t> indexOf(tr_interned_string const& announce_url) const
+    [[nodiscard]] std::optional<size_t> indexOf(tr_interned_string announce_url) const
     {
         for (size_t i = 0, n = std::size(trackers); i < n; ++i)
         {
@@ -579,7 +579,7 @@ struct tr_torrent_announcer
         return nullptr;
     }
 
-    tr_tier* getTierFromScrape(tr_interned_string const& scrape_url)
+    tr_tier* getTierFromScrape(tr_interned_string scrape_url)
     {
         for (auto& tier : tiers)
         {
@@ -600,7 +600,7 @@ struct tr_torrent_announcer
     }
 
     [[nodiscard]] bool findTracker(
-        tr_interned_string const& announce_url,
+        tr_interned_string announce_url,
         tr_tier const** setme_tier,
         tr_tracker const** setme_tracker) const
     {
@@ -910,7 +910,7 @@ void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
     req.announce_url = current_tracker->announce_url;
     req.tracker_id = current_tracker->tracker_id;
     req.info_hash = tor->infoHash();
-    req.peer_id = tr_torrentGetPeerId(tor);
+    req.peer_id = tor->peer_id();
     req.up = tier->byteCounts[TR_ANN_UP];
     req.down = tier->byteCounts[TR_ANN_DOWN];
     req.corrupt = tier->byteCounts[TR_ANN_CORRUPT];
@@ -1099,7 +1099,11 @@ void tr_announcer_impl::onAnnounceDone(
             publishPeersPex(tier, seeders, leechers, response.pex6);
         }
 
-        publishPeerCounts(tier, seeders, leechers);
+        /* Only publish leechers if it was actually returned during the announce */
+        if (response.leechers >= 0)
+        {
+            publishPeerCounts(tier, seeders, leechers);
+        }
 
         tier->isRunning = is_running_on_success;
 
@@ -1729,18 +1733,21 @@ tr_tracker_view tr_announcerTracker(tr_torrent const* tor, size_t nth)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tor->torrent_announcer != nullptr);
 
-    auto i = size_t{ 0 };
+    auto tier_index = size_t{ 0 };
+    auto tracker_index = size_t{ 0 };
     for (auto const& tier : tor->torrent_announcer->tiers)
     {
         for (auto const& tracker : tier.trackers)
         {
-            if (i == nth)
+            if (tracker_index == nth)
             {
-                return trackerView(*tor, i, tier, tracker);
+                return trackerView(*tor, tier_index, tier, tracker);
             }
 
-            ++i;
+            ++tracker_index;
         }
+
+        ++tier_index;
     }
 
     TR_ASSERT(false);

@@ -19,20 +19,19 @@
 #endif
 
 #include <event2/event.h>
-#include <event2/util.h>
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "log.h"
-#include "net.h"
-#include "timer.h"
-#include "tr-assert.h"
-#include "tr-lpd.h"
-#include "utils.h" // for tr_net_init()
-#include "utils-ev.h" // for tr_net_init()
+#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-lpd.h"
+#include "libtransmission/utils.h" // for tr_net_init()
+#include "libtransmission/utils-ev.h" // for tr_net_init()
 
 using namespace std::literals;
 

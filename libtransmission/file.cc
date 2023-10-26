@@ -6,10 +6,11 @@
 #include <algorithm>
 #include <string_view>
 
-#include "transmission.h"
-#include "error.h"
-#include "file.h"
-#include "tr-assert.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/tr-assert.h"
 
 using namespace std::literals;
 

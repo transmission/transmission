@@ -7,12 +7,12 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "magnet-metainfo.h"
-#include "torrent.h"
-#include "torrents.h"
-#include "tr-assert.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/torrents.h"
+#include "libtransmission/tr-assert.h"
 
 namespace
 {

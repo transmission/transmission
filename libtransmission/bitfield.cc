@@ -8,12 +8,11 @@
 #include <climits> // SIZE_MAX
 #include <vector>
 
-#include "tr-popcount.h"
+#include "libtransmission/transmission.h"
 
-#include "transmission.h"
-
-#include "bitfield.h"
-#include "tr-assert.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-popcount.h"
 
 // ---
 

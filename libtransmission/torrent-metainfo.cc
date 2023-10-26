@@ -13,20 +13,20 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "benc.h"
-#include "crypto-utils.h"
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "quark.h"
-#include "torrent-metainfo.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/benc.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -171,6 +171,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             file_subpath_.clear();
             file_length_ = 0;
         }
+        else if (pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
+        {
+            // torrent has a utf8 path, drop the other one due to probable non-utf8 encoding
+            file_subpath_.clear();
+        }
 
         return BasicHandler::StartArray(context);
     }
@@ -251,7 +256,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathStartsWith(InfoKey, FileDurationKey) || //
             pathStartsWith(InfoKey, FileMediaKey) || //
             pathStartsWith(InfoKey, ProfilesKey) || //
-            pathStartsWith(LibtorrentResumeKey))
+            pathStartsWith(LibtorrentResumeKey) || //
+            pathStartsWith(NodesKey))
         {
             // unused by Transmission
         }
@@ -292,7 +298,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (state_ == State::Files)
         {
-            if (curdepth > 1 && key(curdepth - 1) == PathKey)
+            if (curdepth > 1 && (key(curdepth - 1) == PathKey || key(curdepth - 1) == PathUtf8Key))
             {
                 if (!std::empty(file_subpath_))
                 {
@@ -312,8 +318,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 pathIs(InfoKey, FilesKey, ""sv, Md5Key) || //
                 pathIs(InfoKey, FilesKey, ""sv, Md5sumKey) || //
                 pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || // (why a string?)
-                pathIs(InfoKey, FilesKey, ""sv, Sha1Key) || //
-                pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
+                pathIs(InfoKey, FilesKey, ""sv, Sha1Key))
             {
                 // unused by Transmission
             }
@@ -324,19 +329,22 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(CommentKey) || pathIs(CommentUtf8Key))
         {
-            tm_.comment_ = tr_strv_replace_invalid(value);
+            tm_.comment_ = tr_strv_convert_utf8(value);
         }
         else if (pathIs(CreatedByKey) || pathIs(CreatedByUtf8Key))
         {
-            tm_.creator_ = tr_strv_replace_invalid(value);
+            tm_.creator_ = tr_strv_convert_utf8(value);
         }
-        else if (pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || pathIs(PublisherKey) || pathIs(InfoKey, PublisherKey))
+        else if (
+            pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || //
+            pathIs(PublisherKey) || pathIs(InfoKey, PublisherKey) || //
+            pathIs(PublisherUtf8Key) || pathIs(InfoKey, PublisherUtf8Key))
         {
             // “publisher” is rare, but used by BitComet and appears
             // to have the same use as the 'source' key
             // http://wiki.bitcomet.com/inside_bitcomet
 
-            tm_.source_ = tr_strv_replace_invalid(value);
+            tm_.source_ = tr_strv_convert_utf8(value);
         }
         else if (pathIs(AnnounceKey))
         {
@@ -352,7 +360,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (pathIs(InfoKey, NameKey) || pathIs(InfoKey, NameUtf8Key))
         {
-            tm_.name_ = tr_strv_replace_invalid(value);
+            tm_.setName(value);
         }
         else if (pathIs(InfoKey, PiecesKey))
         {
@@ -382,27 +390,47 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tm_.addWebseed(value);
         }
+        else if (pathIs(MagnetInfoKey, DisplayNameKey) && std::empty(tm_.name()))
+        {
+            // compatibility with Transmission <= 3.0
+            tm_.setName(value);
+        }
+        else if (pathIs(MagnetInfoKey, InfoHashKey))
+        {
+            // compatibility with Transmission <= 3.0
+            if (value.length() == sizeof(tr_sha1_digest_t))
+            {
+                std::copy_n(std::data(value), sizeof(tr_sha1_digest_t), reinterpret_cast<char*>(std::data(tm_.info_hash_)));
+                tm_.info_hash_str_ = tr_sha1_to_string(tm_.info_hash_);
+                tm_.has_magnet_info_hash_ = true;
+            }
+        }
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
+            pathIs(InfoKey, CrossSeedEntryKey) || //
             pathIs(InfoKey, Ed2kKey) || //
             pathIs(InfoKey, EntropyKey) || //
             pathIs(InfoKey, Md5sumKey) || //
             pathIs(InfoKey, PublisherUrlKey) || //
+            pathIs(InfoKey, PublisherUrlUtf8Key) || //
             pathIs(InfoKey, Sha1Key) || //
             pathIs(InfoKey, UniqueKey) || //
             pathIs(InfoKey, XCrossSeedKey) || //
             pathIs(LocaleKey) || //
             pathIs(LogCallbackKey) || //
             pathIs(PublisherUrlKey) || //
+            pathIs(PublisherUrlUtf8Key) || //
             pathIs(TitleKey) || //
+            pathIs(UidKey) || //
             pathStartsWith(AzureusPrivatePropertiesKey) || //
             pathStartsWith(AzureusPropertiesKey) || //
             pathStartsWith(InfoKey, CollectionsKey) || //
             pathStartsWith(InfoKey, FileDurationKey) || //
             pathStartsWith(InfoKey, ProfilesKey) || //
             pathStartsWith(LibtorrentResumeKey) || //
-            pathStartsWith(MagnetInfoKey))
+            pathStartsWith(MagnetInfoKey) || //
+            pathStartsWith(NodesKey))
         {
             // unused by Transmission
         }
@@ -508,26 +536,34 @@ private:
             tm_.files_.add(tm_.name_, length_);
         }
 
-        if (tm_.fileCount() == 0)
+        if (auto const has_metainfo = tm_.infoDictSize() != 0U; has_metainfo)
         {
-            if (!tr_error_is_set(context.error))
+            // do some sanity checks to make sure the torrent looks sane
+            if (tm_.fileCount() == 0)
             {
-                tr_error_set(context.error, EINVAL, "no files found");
+                if (!tr_error_is_set(context.error))
+                {
+                    tr_error_set(context.error, EINVAL, "no files found");
+                }
+                return false;
             }
-            return false;
+
+            if (piece_size_ == 0)
+            {
+                if (!tr_error_is_set(context.error))
+                {
+                    tr_error_set(context.error, EINVAL, fmt::format("invalid piece size: {}", piece_size_));
+                }
+                return false;
+            }
+
+            tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
+            return true;
         }
 
-        if (piece_size_ == 0)
-        {
-            if (!tr_error_is_set(context.error))
-            {
-                tr_error_set(context.error, EINVAL, fmt::format("invalid piece size: {}", piece_size_));
-            }
-            return false;
-        }
-
-        tm_.block_info_.initSizes(tm_.files_.totalSize(), piece_size_);
-        return true;
+        // no metainfo; might be a Transmission 3.00-style magnet file
+        auto const ok = tm_.has_magnet_info_hash_;
+        return ok;
     }
 
     static constexpr std::string_view AcodecKey = "acodec"sv;
@@ -544,6 +580,8 @@ private:
     static constexpr std::string_view CreatedByKey = "created by"sv;
     static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
     static constexpr std::string_view CreationDateKey = "creation date"sv;
+    static constexpr std::string_view CrossSeedEntryKey = "cross_seed_entry"sv;
+    static constexpr std::string_view DisplayNameKey = "display-name"sv;
     static constexpr std::string_view DurationKey = "duration"sv;
     static constexpr std::string_view Ed2kKey = "ed2k"sv;
     static constexpr std::string_view EncodedRateKey = "encoded rate"sv;
@@ -558,6 +596,7 @@ private:
     static constexpr std::string_view HeightKey = "height"sv;
     static constexpr std::string_view HttpSeedsKey = "httpseeds"sv;
     static constexpr std::string_view InfoKey = "info"sv;
+    static constexpr std::string_view InfoHashKey = "info_hash"sv;
     static constexpr std::string_view LengthKey = "length"sv;
     static constexpr std::string_view LibtorrentResumeKey = "libtorrent_resume"sv;
     static constexpr std::string_view LocaleKey = "locale"sv;
@@ -569,6 +608,7 @@ private:
     static constexpr std::string_view MtimeKey = "mtime"sv;
     static constexpr std::string_view NameKey = "name"sv;
     static constexpr std::string_view NameUtf8Key = "name.utf-8"sv;
+    static constexpr std::string_view NodesKey = "nodes"sv;
     static constexpr std::string_view PathKey = "path"sv;
     static constexpr std::string_view PathUtf8Key = "path.utf-8"sv;
     static constexpr std::string_view PieceLayersKey = "piece layers"sv;
@@ -578,10 +618,13 @@ private:
     static constexpr std::string_view PrivateKey = "private"sv;
     static constexpr std::string_view ProfilesKey = "profiles"sv;
     static constexpr std::string_view PublisherKey = "publisher"sv;
+    static constexpr std::string_view PublisherUtf8Key = "publisher.utf-8"sv;
     static constexpr std::string_view PublisherUrlKey = "publisher-url"sv;
+    static constexpr std::string_view PublisherUrlUtf8Key = "publisher-url.utf-8"sv;
     static constexpr std::string_view Sha1Key = "sha1"sv;
     static constexpr std::string_view SourceKey = "source"sv;
     static constexpr std::string_view TitleKey = "title"sv;
+    static constexpr std::string_view UidKey = "uid"sv;
     static constexpr std::string_view UniqueKey = "unique"sv;
     static constexpr std::string_view UrlListKey = "url-list"sv;
     static constexpr std::string_view VcodecKey = "vcodec"sv;
@@ -654,22 +697,20 @@ bool tr_torrent_metainfo::migrateFile(
     std::string_view suffix)
 {
     auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    auto const old_filename_exists = tr_sys_path_exists(old_filename);
-    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    auto const new_filename_exists = tr_sys_path_exists(new_filename);
+    if (!tr_sys_path_exists(old_filename))
+    {
+        return false;
+    }
 
-    if (old_filename_exists && new_filename_exists)
+    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    if (tr_sys_path_exists(new_filename))
     {
         tr_sys_path_remove(old_filename);
         return false;
     }
 
-    if (new_filename_exists)
-    {
-        return false;
-    }
-
-    if (old_filename_exists && tr_sys_path_rename(old_filename, new_filename))
+    auto const renamed = tr_sys_path_rename(old_filename, new_filename);
+    if (!renamed)
     {
         tr_logAddError(
             fmt::format(
@@ -680,7 +721,7 @@ bool tr_torrent_metainfo::migrateFile(
         return true;
     }
 
-    return false; // neither file exists
+    return renamed;
 }
 
 void tr_torrent_metainfo::removeFile(

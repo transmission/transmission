@@ -25,18 +25,18 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "announcer-common.h"
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "log.h"
-#include "peer-io.h"
-#include "peer-mgr.h" // for tr_pex::fromCompact4()
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
-#include "web-utils.h"
+#include "libtransmission/announcer.h"
+#include "libtransmission/announcer-common.h"
+#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/log.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web-utils.h"
 
 #define logwarn(interned, msg) tr_logAddWarn(msg, (interned).sv())
 #define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())

@@ -11,21 +11,21 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "open-files.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h" // _()
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/open-files.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // _()
 
 namespace
 {
 
-[[nodiscard]] auto constexpr isOpen(tr_sys_file_t fd) noexcept
+[[nodiscard]] auto isOpen(tr_sys_file_t fd) noexcept
 {
     return fd != TR_BAD_SYS_FILE;
 }

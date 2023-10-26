@@ -62,10 +62,11 @@
 #include <xfs/xqm.h>
 #endif
 
-#include "transmission.h"
-#include "tr-macros.h"
-#include "utils.h"
-#include "platform-quota.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/platform-quota.h"
 
 namespace
 {

@@ -3,9 +3,12 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 if(POLICY CMP0092)
     cmake_policy(SET CMP0092 NEW)
 endif()
+if(POLICY CMP0114)
+    cmake_policy(SET CMP0114 NEW)
+endif()
 
 # Value should follow latest stable Xcode's RECOMMENDED_MACOSX_DEPLOYMENT_TARGET
-set(MACOS_SUPPORT_MINIMUM 10.13)
+set(MACOS_SUPPORT_MINIMUM 10.14.6)
 
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
@@ -31,7 +34,7 @@ include(TrMacros)
 
 set(CURL_MINIMUM 7.28.0)
 set(WOLFSSL_MINIMUM 3.4)
-set(DEFLATE_MINIMUM 1.10)
+set(DEFLATE_MINIMUM 1.7)
 set(EVENT2_MINIMUM 2.1.0)
 set(GIOMM_MINIMUM 2.26.0)
 set(GLIBMM_MINIMUM 2.60.0)
@@ -47,6 +50,7 @@ tr_auto_option(ENABLE_GTK "Build GTK client" AUTO)
 tr_auto_option(ENABLE_QT "Build Qt client" AUTO)
 tr_auto_option(ENABLE_MAC "Build Mac client" AUTO)
 tr_auto_option(REBUILD_WEB "Rebuild the web client's generated assets. Requires Node.js and network access." OFF)
+option(INSTALL_WEB "Install the web client's generated assets." ON)
 option(ENABLE_UTILS "Build utils (create, edit, show)" ON)
 option(ENABLE_CLI "Build command-line client" OFF)
 option(ENABLE_TESTS "Build unit tests" ON)
@@ -55,6 +59,7 @@ option(ENABLE_WERROR "Treat warnings as errors" OFF)
 option(ENABLE_NLS "Enable native language support" ON)
 option(INSTALL_DOC "Build/install documentation" ON)
 option(INSTALL_LIB "Install the library" OFF)
+tr_auto_option(ENABLE_DEPRECATED "Allow deprecated API use of upstream packages, e.g. GTK" AUTO)
 tr_auto_option(RUN_CLANG_TIDY "Run clang-tidy on the code" OFF)
 tr_auto_option(USE_SYSTEM_EVENT2 "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE "Use system deflate library" AUTO)
@@ -79,7 +84,7 @@ set(TR_NAME ${PROJECT_NAME})
 
 # these should be the only five lines you need to change
 set(TR_VERSION_MAJOR "4")
-set(TR_VERSION_MINOR "0")
+set(TR_VERSION_MINOR "1")
 set(TR_VERSION_PATCH "0")
 set(TR_VERSION_BETA_NUMBER "") # empty string for not beta
 set(TR_VERSION_DEV TRUE)
@@ -181,6 +186,8 @@ if(WIN32)
         # Ignore various deprecation and security warnings (at least for now)
         set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS -D_WINSOCK_DEPRECATED_NO_WARNINGS")
         if(MSVC)
+            # Set source file encoding and execution charset to UTF-8
+            set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /utf-8")
             # Reduce noise (at least for now)
             set(CMAKE_${L}_FLAGS "${CMAKE_${L}_FLAGS} /wd4244 /wd4267")
             # Make caching-friendly (store debug info inside object files)
@@ -210,6 +217,14 @@ if(NOT TARGET CURL::libcurl)
     add_library(CURL::libcurl INTERFACE IMPORTED)
     target_link_libraries(CURL::libcurl INTERFACE ${CURL_LIBRARIES})
     target_include_directories(CURL::libcurl INTERFACE ${CURL_INCLUDE_DIRS})
+endif()
+
+if(ENABLE_DEPRECATED STREQUAL "AUTO")
+    if(DEFINED ENV{CI})
+        set(ENABLE_DEPRECATED OFF)
+    else()
+        set(ENABLE_DEPRECATED ON)
+    endif()
 endif()
 
 set(CRYPTO_PKG "")
@@ -513,6 +528,7 @@ tr_add_external_auto_library(B64 libb64 b64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
+set(TR_WEB_ASSETS ${CMAKE_SOURCE_DIR}/web/public_html)
 if(NOT ${REBUILD_WEB} STREQUAL "OFF")
     find_program(NPM npm)
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
@@ -708,6 +724,11 @@ if(HAVE_LIBM)
     set(LIBM_LIBRARY m)
 endif()
 
+check_library_exists(quota quotacursor_skipidtype "" HAVE_LIBQUOTA)
+if(HAVE_LIBQUOTA)
+    set(LIBQUOTA_LIBRARY quota)
+endif()
+
 set(TR_NETWORK_LIBRARIES)
 if(WIN32)
     list(APPEND TR_NETWORK_LIBRARIES iphlpapi ws2_32)
@@ -748,9 +769,11 @@ if(ENABLE_TESTS)
 endif()
 
 function(tr_install_web DST_DIR)
-    install(
-        DIRECTORY ${CMAKE_SOURCE_DIR}/web/public_html
-        DESTINATION ${DST_DIR})
+    if(INSTALL_WEB)
+        install(
+            DIRECTORY ${TR_WEB_ASSETS}
+            DESTINATION ${DST_DIR})
+    endif()
 endfunction()
 
 add_subdirectory(libtransmission)
@@ -790,7 +813,7 @@ if(INSTALL_DOC)
         DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
-if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl")
+if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl" AND INSTALL_WEB)
     add_subdirectory(dist/msi)
 endif()
 

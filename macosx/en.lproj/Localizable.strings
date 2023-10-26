@@ -986,6 +986,9 @@
 /* Create torrent -> no files -> title */
 "This folder contains no files." = "This folder contains no files.";
 
+/* Preferences -> Transfers -> Adding -> Magnet tooltip */
+"This option is not available if Default location is set to Same as torrent file." = "This option is not available if Default location is set to Same as torrent file.";
+
 /* Removal confirm panel -> message */
 "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link." = "This transfer is active. Once removed, continuing the transfer will require the torrent file or magnet link.";
 

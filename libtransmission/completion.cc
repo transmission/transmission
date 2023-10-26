@@ -8,11 +8,11 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "completion.h"
-#include "torrent.h"
-#include "tr-assert.h"
+#include "libtransmission/completion.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
 
 uint64_t tr_completion::computeHasValid() const
 {
@@ -156,13 +156,26 @@ void tr_completion::addPiece(tr_piece_index_t piece)
     }
 }
 
-void tr_completion::removePiece(tr_piece_index_t piece)
+void tr_completion::removeBlock(tr_block_index_t block)
 {
-    auto const [begin, end] = block_info_->blockSpanForPiece(piece);
-    size_now_ -= countHasBytesInPiece(piece);
+    if (!hasBlock(block))
+    {
+        return; // already didn't have it
+    }
+
+    blocks_.unset(block);
+    size_now_ -= block_info_->blockSize(block);
+
     size_when_done_.reset();
     has_valid_.reset();
-    blocks_.unsetSpan(begin, end);
+}
+
+void tr_completion::removePiece(tr_piece_index_t piece)
+{
+    for (auto [block, end] = block_info_->blockSpanForPiece(piece); block < end; ++block)
+    {
+        removeBlock(block);
+    }
 }
 
 uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const

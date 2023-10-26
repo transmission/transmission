@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -20,15 +20,15 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Torrent Inspector" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="5" userLabel="InfoWindow" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
-            <rect key="contentRect" x="897" y="867" width="403" height="70"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="contentRect" x="897" y="867" width="403" height="77"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1728" height="1079"/>
             <value key="minSize" type="size" width="350" height="77"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="403" height="70"/>
+                <rect key="frame" x="0.0" y="0.0" width="403" height="77"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="15" customClass="InfoTextField">
-                        <rect key="frame" x="48" y="44" width="347" height="16"/>
+                        <rect key="frame" x="48" y="51" width="347" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="title" id="1481">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -36,7 +36,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1832">
-                        <rect key="frame" x="48" y="36" width="347" height="16"/>
+                        <rect key="frame" x="48" y="43" width="347" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="No Torrents Selected" id="1833">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -44,7 +44,7 @@
                         </textFieldCell>
                     </textField>
                     <imageView horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="28">
-                        <rect key="frame" x="10" y="28" width="32" height="32"/>
+                        <rect key="frame" x="10" y="35" width="32" height="32"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="32" id="8RE-eg-dQr"/>
                             <constraint firstAttribute="height" constant="32" id="dFT-cY-S1H"/>
@@ -52,7 +52,7 @@
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="NSApplicationIcon" id="1482"/>
                     </imageView>
                     <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="249" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="29" customClass="InfoTextField">
-                        <rect key="frame" x="48" y="30" width="347" height="14"/>
+                        <rect key="frame" x="48" y="37" width="347" height="14"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="info" id="1483">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -60,7 +60,7 @@
                         </textFieldCell>
                     </textField>
                     <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xlT-co-gnG" userLabel="Segments">
-                        <rect key="frame" x="8" y="-1" width="387" height="24"/>
+                        <rect key="frame" x="8" y="6" width="387" height="24"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="NcB-d2-g62"/>
                         </constraints>

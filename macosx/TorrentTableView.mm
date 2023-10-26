@@ -221,6 +221,18 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             }
         }
     }
+    else
+    {
+        if ([cell isKindOfClass:[GroupTextCell class]])
+        {
+            GroupTextCell* groupCell = cell;
+
+            // if cell is selected, set selected flag so we can style the title in GroupTextCell drawInteriorWithFrame
+            NSInteger const row = [self rowForItem:item];
+            NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
+            groupCell.selected = [selectedRowIndexes containsIndex:row];
+        }
+    }
 }
 
 //we override row highlighting because we are custom drawing the group rows

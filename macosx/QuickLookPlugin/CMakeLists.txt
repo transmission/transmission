@@ -1,3 +1,5 @@
+set(MAC_QL_BUNDLE_NAME QuickLookPlugin)
+
 add_library(${TR_NAME}-mac-ql MODULE)
 
 target_sources(${TR_NAME}-mac-ql
@@ -61,17 +63,15 @@ target_sources(${TR_NAME}-mac-ql
     PRIVATE
         ${RESOURCES})
 
-set(MAC_QL_BUNDLE_NAME QuickLookPlugin)
-
 set_target_properties(
     ${TR_NAME}-mac-ql
     PROPERTIES
-        OUTPUT_NAME ${MAC_QL_BUNDLE_NAME}
-        MACOSX_BUNDLE ON
         BUNDLE ON
         BUNDLE_EXTENSION qlgenerator
+        INSTALL_RPATH "@loader_path/../../../../../MacOS;@loader_path/../../../../../Frameworks"
+        MACOSX_BUNDLE ON
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
-        INSTALL_RPATH "@loader_path/../../../../../MacOS;@loader_path/../../../../../Frameworks")
+        OUTPUT_NAME ${MAC_QL_BUNDLE_NAME})
 
 target_include_directories(${TR_NAME}-mac-ql
     PRIVATE

@@ -10,18 +10,18 @@
 
 #include <libutp/utp.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" // tr_rand_int()
-#include "log.h"
-#include "net.h"
-#include "peer-io.h"
-#include "peer-mgr.h"
-#include "peer-socket.h"
-#include "session.h"
-#include "timer.h"
-#include "tr-utp.h"
-#include "utils.h"
+#include "libtransmission/crypto-utils.h" // tr_rand_int()
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/peer-mgr.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/session.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -134,14 +134,14 @@ uint64 utp_callback(utp_callback_arguments* args)
         break;
 
     case UTP_SENDTO:
-        utp_send_to(session, args->buf, args->len, args->u1.address, args->u2.address_len);
+        utp_send_to(session, args->buf, args->len, args->address, args->address_len);
         break;
     }
 
     return 0;
 }
 
-void reset_timer(tr_session* session)
+void restart_timer(tr_session* session)
 {
     auto interval = std::chrono::milliseconds{};
     auto const random_percent = tr_rand_int(1000U) / 1000.0;
@@ -177,7 +177,7 @@ void timer_callback(void* vsession)
     utp_issue_deferred_acks(session->utp_context);
 
     utp_check_timeouts(session->utp_context);
-    reset_timer(session);
+    restart_timer(session);
 }
 } // namespace
 
@@ -208,16 +208,12 @@ void tr_utpInit(tr_session* session)
 #endif
 
     session->utp_context = ctx;
+    session->utp_timer = session->timerMaker().create(timer_callback, session);
+    restart_timer(session);
 }
 
 bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
-    if (!ss->isClosing() && !ss->utp_timer)
-    {
-        ss->utp_timer = ss->timerMaker().create(timer_callback, ss);
-        reset_timer(ss);
-    }
-
     auto const ret = utp_process_udp(ss->utp_context, buf, buflen, from, fromlen);
 
     /* utp_internal.cpp says "Should be called each time the UDP socket is drained" but it's tricky with libevent */

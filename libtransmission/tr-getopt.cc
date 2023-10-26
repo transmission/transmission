@@ -10,11 +10,11 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "tr-getopt.h"
-#include "tr-macros.h"
-#include "utils.h"
+#include "libtransmission/tr-getopt.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

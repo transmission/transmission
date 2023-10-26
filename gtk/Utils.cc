@@ -655,6 +655,13 @@ void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible)
 
         for (auto* const top_level_window : Gtk::Window::list_toplevels())
         {
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
+            if (top_level_window->get_window_type() != Gtk::WINDOW_TOPLEVEL)
+            {
+                continue;
+            }
+#endif
+
             if (top_level_window->get_transient_for() != window || top_level_window->get_visible() == is_visible)
             {
                 continue;

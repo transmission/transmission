@@ -129,6 +129,10 @@ export const Formatter = {
     return this.speed(this.toKBps(Bps));
   },
 
+  stringSanitizer(str) {
+    return ['E2BIG', 'NaN'].some((badStr) => str.includes(badStr)) ? `…` : str;
+  },
+
   timeInterval(seconds) {
     const days = Math.floor(seconds / 86_400);
     if (days) {

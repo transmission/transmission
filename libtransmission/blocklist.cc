@@ -11,16 +11,16 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "blocklist.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "net.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h" // for _(), tr_strerror(), tr_strvEndsWith()
+#include "libtransmission/blocklist.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // for _(), tr_strerror(), tr_strvEndsWith()
 
 using namespace std::literals;
 
@@ -296,7 +296,7 @@ auto getFilenamesInDir(std::string_view folder)
 {
     auto files = std::vector<std::string>{};
 
-    if (auto const odir = tr_sys_dir_open(tr_pathbuf{ folder }); odir != TR_BAD_SYS_DIR)
+    if (auto const odir = tr_sys_dir_open(folder); odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
         auto const prefix = std::string{ folder } + '/';
@@ -390,7 +390,7 @@ void Blocklist::ensureLoaded() const
     }
 
     auto range = address_range_t{};
-    rules_.reserve(file_info->size - std::size(BinContentsPrefix) / sizeof(address_range_t));
+    rules_.reserve((file_info->size - std::size(BinContentsPrefix)) / sizeof(address_range_t));
     while (in.read(reinterpret_cast<char*>(&range), sizeof(range)))
     {
         rules_.emplace_back(range);

@@ -994,11 +994,15 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         //always show the add window for magnet links when the download location is the same as the torrent file
         self.fShowMagnetAddWindowCheck.state = NSControlStateValueOn;
         self.fShowMagnetAddWindowCheck.enabled = NO;
+        self.fShowMagnetAddWindowCheck.toolTip = NSLocalizedString(
+            @"This option is not available if Default location is set to Same as torrent file.",
+            "Preferences -> Transfers -> Adding -> Magnet tooltip");
     }
     else
     {
         self.fShowMagnetAddWindowCheck.state = [self.fDefaults boolForKey:@"MagnetOpenAsk"];
         self.fShowMagnetAddWindowCheck.enabled = YES;
+        self.fShowMagnetAddWindowCheck.toolTip = nil;
     }
 }
 

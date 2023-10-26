@@ -63,7 +63,7 @@ Then you can begin [building.](#building-transmission-from-git-first-time)
 On Ubuntu, you can install the required development tools for GTK with this command:
 
 ```console
-$ sudo apt-get install build-essential automake autoconf libtool pkg-config intltool libcurl4-openssl-dev libglib2.0-dev libevent-dev libminiupnpc-dev libgtk-3-dev libappindicator3-dev
+$ sudo apt-get install build-essential automake autoconf libtool pkg-config intltool libcurl4-openssl-dev libglib2.0-dev libevent-dev libminiupnpc-dev libgtk-3-dev libappindicator3-dev libssl-dev
 ```
 
 Then you can begin [building.](#building-transmission-from-git-first-time)

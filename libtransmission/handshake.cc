@@ -12,18 +12,18 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bitfield.h"
-#include "clients.h"
-#include "crypto-utils.h"
-#include "handshake.h"
-#include "log.h"
-#include "peer-io.h"
-#include "timer.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
-#include "utils.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/clients.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/handshake.h"
+#include "libtransmission/log.h"
+#include "libtransmission/peer-io.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/utils.h"
 
 #define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->peer_io_->display_name())
 
@@ -792,6 +792,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
             handshake->have_sent_bittorrent_handshake_ = true;
             handshake->set_state(State::AwaitingHandshake);
             io->write_bytes(std::data(msg), std::size(msg), false);
+            return;
         }
     }
 
@@ -807,12 +808,11 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         handshake->have_sent_bittorrent_handshake_ = true;
         handshake->set_state(State::AwaitingHandshake);
         io->write_bytes(std::data(msg), std::size(msg), false);
+        return;
     }
-    else
-    {
-        tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
-        handshake->done(false);
-    }
+
+    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
+    handshake->done(false);
 }
 
 bool tr_handshake::fire_done(bool is_connected)

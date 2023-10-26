@@ -25,13 +25,13 @@
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "port-forwarding-upnp.h"
-#include "port-forwarding.h"
-#include "tr-assert.h"
-#include "utils.h" // for _(), tr_strerror()
+#include "libtransmission/log.h"
+#include "libtransmission/port-forwarding-upnp.h"
+#include "libtransmission/port-forwarding.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h" // for _(), tr_strerror()
 
 namespace
 {

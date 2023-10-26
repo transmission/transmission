@@ -177,6 +177,8 @@ template<typename T>
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 constexpr int gtr_compare_generic(T const& lhs, T const& rhs)
 {
+    using std::rel_ops::operator>;
+
     if (lhs < rhs)
     {
         return -1;

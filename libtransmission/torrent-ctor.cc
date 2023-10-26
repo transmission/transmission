@@ -10,16 +10,16 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "error-types.h"
-#include "magnet-metainfo.h"
-#include "session.h"
-#include "torrent-metainfo.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/session.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 

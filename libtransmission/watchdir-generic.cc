@@ -7,9 +7,9 @@
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "watchdir-base.h"
+#include "libtransmission/watchdir-base.h"
 
 namespace libtransmission
 {

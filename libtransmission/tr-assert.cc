@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string_view>
 
-#include "tr-assert.h"
+#include "libtransmission/tr-assert.h"
 
 #if !defined(NDEBUG) || defined(TR_FORCE_ASSERTIONS)
 

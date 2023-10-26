@@ -172,6 +172,8 @@ private:
         return countHasBytesInSpan(block_info_->byteSpanForPiece(piece));
     }
 
+    void removeBlock(tr_block_index_t block);
+
     torrent_view const* tor_;
     tr_block_info const* block_info_;
 

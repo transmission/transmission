@@ -4,24 +4,24 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Mike Gelfand <mikedld@mikedld.com>, 2023
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-07 20:00+0000\n"
+"POT-Creation-Date: 2023-04-14 01:08+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
-"Language-Team: Romanian (https://www.transifex.com/transmissionbt/teams/33778/ro/)\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2023\n"
+"Language-Team: Romanian (https://app.transifex.com/transmissionbt/teams/33778/ro/)\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));\n"
 
-#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:512
+#: ../cli/cli.cc:107 ../gtk/Utils.cc:137 ../libtransmission/utils.cc:527
 msgid "None"
 msgstr "Nimic"
 
@@ -29,7 +29,7 @@ msgstr "Nimic"
 msgid "Inf"
 msgstr ""
 
-#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:162 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
+#: ../daemon/daemon.cc:234 ../gtk/Session.cc:812 ../libtransmission/blocklist.cc:47 ../libtransmission/blocklist.cc:223 ../libtransmission/blocklist.cc:334 ../libtransmission/blocklist.cc:350 ../libtransmission/inout.cc:168 ../libtransmission/utils.cc:73 ../libtransmission/utils.cc:93 ../libtransmission/utils.cc:105 ../libtransmission/watchdir.cc:117 ../libtransmission/watchdir.cc:144
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -41,7 +41,7 @@ msgstr ""
 msgid "Removing torrent file '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:570
+#: ../daemon/daemon.cc:276 ../gtk/Utils.cc:446 ../libtransmission/utils.cc:585
 msgid "Couldn't remove '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -49,108 +49,108 @@ msgstr ""
 msgid "Couldn't parse log level '{level}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:645
+#: ../daemon/daemon.cc:651
 msgid "Deferring reload until session is fully started."
 msgstr ""
 
-#: ../daemon/daemon.cc:660
+#: ../daemon/daemon.cc:666
 msgid "Reloading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:696
+#: ../daemon/daemon.cc:702
 msgid "Couldn't initialize daemon: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:709
+#: ../daemon/daemon.cc:715
 msgid "Loading settings from '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:729
+#: ../daemon/daemon.cc:735
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:735 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:178 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1167 ../libtransmission/torrent.cc:2178 ../libtransmission/variant.cc:1099
+#: ../daemon/daemon.cc:741 ../gtk/MessageLogWindow.cc:228 ../libtransmission/blocklist.cc:58 ../libtransmission/blocklist.cc:502 ../libtransmission/inout.cc:183 ../libtransmission/rpcimpl.cc:1463 ../libtransmission/torrent.cc:1141 ../libtransmission/torrent.cc:2130 ../libtransmission/variant.cc:1099
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:745
+#: ../daemon/daemon.cc:751
 msgid "Requiring authentication"
 msgstr ""
 
-#: ../daemon/daemon.cc:766
+#: ../daemon/daemon.cc:772
 msgid "Watching '{path}' for new torrent files"
 msgstr ""
 
-#: ../daemon/daemon.cc:810 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
+#: ../daemon/daemon.cc:816 ../libtransmission/watchdir-kqueue.cc:117 ../libtransmission/watchdir-win32.cc:182
 msgid "Couldn't create event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:820 ../libtransmission/watchdir-kqueue.cc:127
+#: ../daemon/daemon.cc:826 ../libtransmission/watchdir-kqueue.cc:127
 msgid "Couldn't add event: {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:834
+#: ../daemon/daemon.cc:840
 msgid "Couldn't launch daemon event loop: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:393
+#: ../gtk/Application.cc:395
 msgid "Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"
 msgstr ""
 
-#: ../gtk/Application.cc:550
+#: ../gtk/Application.cc:552
 msgid "Got termination signal, trying to shut down cleanly. Do it again if it gets stuck."
 msgstr ""
 
-#: ../gtk/Application.cc:777
+#: ../gtk/Application.cc:778
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
 msgstr ""
 
-#: ../gtk/Application.cc:783 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
+#: ../gtk/Application.cc:784 ../gtk/Dialogs.cc:117 ../gtk/MessageLogWindow.cc:254 ../gtk/OptionsDialog.cc:373 ../gtk/PathButton.cc:147 ../gtk/StatsDialog.cc:110 ../gtk/ui/gtk3/AddTrackerDialog.ui:21 ../gtk/ui/gtk3/EditTrackersDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:22 ../gtk/ui/gtk3/OptionsDialog.ui:21 ../gtk/ui/gtk3/RelocateDialog.ui:21 ../gtk/ui/gtk3/TorrentUrlChooserDialog.ui:21 ../gtk/ui/gtk4/AddTrackerDialog.ui:64 ../gtk/ui/gtk4/EditTrackersDialog.ui:84 ../gtk/ui/gtk4/MakeProgressDialog.ui:36 ../gtk/ui/gtk4/OptionsDialog.ui:176 ../gtk/ui/gtk4/RelocateDialog.ui:93 ../gtk/ui/gtk4/TorrentUrlChooserDialog.ui:64
 msgid "_Cancel"
 msgstr ""
 
-#: ../gtk/Application.cc:784
+#: ../gtk/Application.cc:785
 msgid "I _Agree"
 msgstr ""
 
-#: ../gtk/Application.cc:1013
+#: ../gtk/Application.cc:1014
 msgid "Closing Connections…"
 msgstr ""
 
-#: ../gtk/Application.cc:1018
+#: ../gtk/Application.cc:1019
 msgid "Sending upload/download totals to tracker…"
 msgstr "Se trimit totalurile pentru încărcare/descărcare către tracker…"
 
-#: ../gtk/Application.cc:1023
+#: ../gtk/Application.cc:1024
 msgid "_Quit Now"
 msgstr "Închide _acum"
 
-#: ../gtk/Application.cc:1085
+#: ../gtk/Application.cc:1086
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Nu s-a putut adăuga torentul corupt"
 msgstr[1] "Nu s-au putut adăuga torentele corupte"
 msgstr[2] "Nu s-au putut adăuga torentele corupte"
 
-#: ../gtk/Application.cc:1092
+#: ../gtk/Application.cc:1093
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Nu s-a putut adăugat torentul de două ori"
 msgstr[1] "Nu s-au putut adăuga torenții de două ori"
 msgstr[2] "Nu s-au putut adăuga torenții de două ori"
 
-#: ../gtk/Application.cc:1415
+#: ../gtk/Application.cc:1414
 msgid "A fast and easy BitTorrent client"
 msgstr "Un client BitTorrent simplu și rapid"
 
-#: ../gtk/Application.cc:1416
+#: ../gtk/Application.cc:1415
 msgid "Copyright © The Transmission Project"
 msgstr ""
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
 #. dialog
-#: ../gtk/Application.cc:1422
+#: ../gtk/Application.cc:1421
 msgid "translator-credits"
 msgstr ""
 "Launchpad Contributions:\n"
@@ -205,7 +205,7 @@ msgstr "Contribuie indiferent de activitate"
 msgid "Stop seeding if idle for N minutes:"
 msgstr "Oprește contribuirea după N minute de inactivitate:"
 
-#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:325
+#: ../gtk/DetailsDialog.cc:569 ../gtk/Torrent.cc:327
 msgid "Queued for verification"
 msgstr "Pus în coadă pentru verificare"
 
@@ -213,7 +213,7 @@ msgstr "Pus în coadă pentru verificare"
 msgid "Verifying local data"
 msgstr "Se verifică datele locale"
 
-#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:328
+#: ../gtk/DetailsDialog.cc:575 ../gtk/Torrent.cc:330
 msgid "Queued for download"
 msgstr "În așteptare pentru descărcare"
 
@@ -222,7 +222,7 @@ msgctxt "Verb"
 msgid "Downloading"
 msgstr "Se descarcă"
 
-#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:331
+#: ../gtk/DetailsDialog.cc:581 ../gtk/Torrent.cc:333
 msgid "Queued for seeding"
 msgstr "În așteptare pentru încărcare"
 
@@ -231,11 +231,11 @@ msgctxt "Verb"
 msgid "Seeding"
 msgstr "Încărcare"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:476 ../gtk/Torrent.cc:324
 msgid "Finished"
 msgstr "Finalizat"
 
-#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:322
+#: ../gtk/DetailsDialog.cc:587 ../gtk/FilterBar.cc:475 ../gtk/Torrent.cc:324
 msgid "Paused"
 msgstr "Suspendat"
 
@@ -275,14 +275,14 @@ msgstr ""
 msgid "Unknown"
 msgstr "Necunoscut"
 
-#: ../gtk/DetailsDialog.cc:874 ../gtk/MakeDialog.cc:387
+#: ../gtk/DetailsDialog.cc:874 ../gtk/MakeDialog.cc:388
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:393
+#: ../gtk/DetailsDialog.cc:889 ../gtk/MakeDialog.cc:394
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] ""
@@ -526,20 +526,18 @@ msgstr[1] ""
 msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:57
-#, fuzzy
 msgid "Remove torrent?"
 msgid_plural "Remove {count:L} torrents?"
-msgstr[0] "Eliminați torentul?"
-msgstr[1] "Eliminați %d torente?"
-msgstr[2] "Eliminați %d de torente?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:58
-#, fuzzy
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these {count:L} torrents' downloaded files?"
-msgstr[0] "Ștergeți fișierele descărcate de acest torent?"
-msgstr[1] "Ștergeți fișierele descărcate de aceste %d torente?"
-msgstr[2] "Ștergeți fișierele descărcate de aceste %d de torente?"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:65
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -580,7 +578,7 @@ msgstr[2] "Unele dintre aceste torente nu s-au terminat de descărcat."
 msgid "_Delete"
 msgstr ""
 
-#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2021 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1420
+#: ../gtk/Dialogs.cc:118 ../gtk/ui/gtk3/DetailsDialog.ui:694 ../gtk/ui/gtk3/PrefsDialog.ui:2025 ../gtk/ui/gtk4/DetailsDialog.ui:516 ../gtk/ui/gtk4/PrefsDialog.ui:1424
 msgid "_Remove"
 msgstr "Ște_rge"
 
@@ -704,7 +702,7 @@ msgstr "Transfer total"
 msgid "Session Transfer"
 msgstr "Transfer sesiune"
 
-#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:344
+#: ../gtk/MainWindow.cc:684 ../gtk/MainWindow.cc:705 ../gtk/Torrent.cc:346
 msgid "Ratio: {ratio}"
 msgstr ""
 
@@ -722,7 +720,7 @@ msgstr ""
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:467
+#: ../gtk/MainWindow.cc:735 ../gtk/Torrent.cc:469
 msgid "{upload_speed} ▲"
 msgstr ""
 
@@ -742,7 +740,7 @@ msgstr ""
 msgid "Scanned {file_size}"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:381 ../gtk/MakeDialog.cc:544 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
+#: ../gtk/MakeDialog.cc:382 ../gtk/MakeDialog.cc:545 ../gtk/ui/gtk3/MakeDialog.ui:178 ../gtk/ui/gtk4/MakeDialog.ui:102
 msgid "No source selected"
 msgstr "Nicio sursă selectată"
 
@@ -880,9 +878,9 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:579
 msgid "Getting new blocklist…"
-msgstr "Se obține o listă de blocare nouă..."
+msgstr "Se obține o listă de blocare nouă…"
 
-#: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1266 ../gtk/ui/gtk4/PrefsDialog.ui:885
+#: ../gtk/PrefsDialog.cc:897 ../gtk/ui/gtk3/PrefsDialog.ui:1268 ../gtk/ui/gtk4/PrefsDialog.ui:887
 msgid "Status unknown"
 msgstr "Stare necunoscută"
 
@@ -955,58 +953,58 @@ msgstr "Aceste statistici sunt doar pentru informarea dumneavoastră. Resetarea 
 msgid "{upload_speed} ▲ {download_speed} ▼"
 msgstr ""
 
-#: ../gtk/Torrent.cc:336
+#: ../gtk/Torrent.cc:338
 #, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:363
+#: ../gtk/Torrent.cc:365
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/Torrent.cc:373
+#: ../gtk/Torrent.cc:375
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:385
+#: ../gtk/Torrent.cc:387
 #, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:395
+#: ../gtk/Torrent.cc:397
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:404
+#: ../gtk/Torrent.cc:406
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/Torrent.cc:417
+#: ../gtk/Torrent.cc:419
 msgid "Remaining time unknown"
 msgstr "Timp rămas necunoscut"
 
-#: ../gtk/Torrent.cc:460
+#: ../gtk/Torrent.cc:462
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/Torrent.cc:472
+#: ../gtk/Torrent.cc:474
 msgid "Stalled"
 msgstr "Întrerupt"
 
-#: ../gtk/Torrent.cc:483 ../libtransmission/torrent.cc:2227
+#: ../gtk/Torrent.cc:485 ../libtransmission/torrent.cc:2179
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:486
+#: ../gtk/Torrent.cc:488
 msgid "Tracker Error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:489
+#: ../gtk/Torrent.cc:491
 msgid "Local error: '{error}'"
 msgstr ""
 
-#: ../gtk/Torrent.cc:513
+#: ../gtk/Torrent.cc:515
 #, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done}% done)"
@@ -1014,28 +1012,28 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../gtk/Torrent.cc:524
+#: ../gtk/Torrent.cc:526
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../gtk/Torrent.cc:535
+#: ../gtk/Torrent.cc:537
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../gtk/Torrent.cc:543
+#: ../gtk/Torrent.cc:545
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../gtk/Torrent.cc:552
+#: ../gtk/Torrent.cc:554
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
@@ -1222,16 +1220,16 @@ msgstr ""
 msgid "Couldn't open '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:747 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
+#: ../gtk/Utils.cc:754 ../libtransmission/announcer.cc:191 ../libtransmission/announcer.cc:225
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:753
+#: ../gtk/Utils.cc:760
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:758
+#: ../gtk/Utils.cc:765
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
@@ -1295,11 +1293,11 @@ msgstr "Deschide un torent"
 
 #: ../gtk/transmission.ui:19 ../gtk/transmission.ui:464
 msgid "Open _URL…"
-msgstr "Deschide _URL..."
+msgstr "Deschide _URL…"
 
 #: ../gtk/transmission.ui:21 ../gtk/transmission.ui:466
 msgid "Open URL…"
-msgstr "Deschide URL..."
+msgstr "Deschide URL…"
 
 #: ../gtk/transmission.ui:27
 msgid "_New…"
@@ -1485,7 +1483,7 @@ msgstr "Sortează după _timp rămas"
 msgid "Re_verse Sort Order"
 msgstr "In_versează ordinea de sortare"
 
-#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1478
+#: ../gtk/transmission.ui:255 ../gtk/ui/gtk3/PrefsDialog.ui:23 ../gtk/ui/gtk4/PrefsDialog.ui:1482
 msgid "_Help"
 msgstr "_Ajutor"
 
@@ -1521,7 +1519,7 @@ msgstr "_Arată Transmission"
 msgid "Enable Alternative Speed _Limits"
 msgstr "Activează _limitele alternative de viteză"
 
-#: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2006 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1412
+#: ../gtk/ui/gtk3/AddTrackerDialog.ui:35 ../gtk/ui/gtk3/DetailsDialog.ui:666 ../gtk/ui/gtk3/MakeProgressDialog.ui:52 ../gtk/ui/gtk3/PrefsDialog.ui:2010 ../gtk/ui/gtk4/AddTrackerDialog.ui:72 ../gtk/ui/gtk4/DetailsDialog.ui:500 ../gtk/ui/gtk4/MakeProgressDialog.ui:52 ../gtk/ui/gtk4/PrefsDialog.ui:1416
 msgid "_Add"
 msgstr "_Adaugă"
 
@@ -1533,7 +1531,7 @@ msgstr "Tracker"
 msgid "_Announce URL:"
 msgstr "_Anunț URL:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1491 ../gtk/ui/gtk4/StatsDialog.ui:253
+#: ../gtk/ui/gtk3/DetailsDialog.ui:21 ../gtk/ui/gtk3/MakeDialog.ui:21 ../gtk/ui/gtk3/MakeProgressDialog.ui:37 ../gtk/ui/gtk3/PrefsDialog.ui:38 ../gtk/ui/gtk3/StatsDialog.ui:37 ../gtk/ui/gtk4/DetailsDialog.ui:842 ../gtk/ui/gtk4/MakeDialog.ui:281 ../gtk/ui/gtk4/MakeProgressDialog.ui:44 ../gtk/ui/gtk4/PrefsDialog.ui:1495 ../gtk/ui/gtk4/StatsDialog.ui:253
 msgid "_Close"
 msgstr ""
 
@@ -1629,7 +1627,7 @@ msgstr "Listarea fișierelor nu este disponibilă pentru proprietățile combina
 msgid "Files"
 msgstr "Fișiere"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:390 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:245
+#: ../gtk/ui/gtk3/DetailsDialog.ui:835 ../gtk/ui/gtk3/PrefsDialog.ui:391 ../gtk/ui/gtk4/DetailsDialog.ui:599 ../gtk/ui/gtk4/PrefsDialog.ui:246
 msgid "Speed"
 msgstr "Viteză"
 
@@ -1669,7 +1667,7 @@ msgstr "Conexiuni parteneri"
 msgid "_Maximum peers:"
 msgstr "Număr _maxim de parteneri:"
 
-#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1415 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:980
+#: ../gtk/ui/gtk3/DetailsDialog.ui:1178 ../gtk/ui/gtk3/MainWindow.ui:169 ../gtk/ui/gtk3/PrefsDialog.ui:1417 ../gtk/ui/gtk4/DetailsDialog.ui:827 ../gtk/ui/gtk4/MainWindow.ui:148 ../gtk/ui/gtk4/PrefsDialog.ui:982
 msgid "Options"
 msgstr "Opțiuni"
 
@@ -1741,7 +1739,7 @@ msgstr "Torent _privat"
 
 #: ../gtk/ui/gtk3/MakeProgressDialog.ui:82 ../gtk/ui/gtk4/MakeProgressDialog.ui:19
 msgid "Creating torrent…"
-msgstr "Se creează un torent..."
+msgstr "Se creează un torent…"
 
 #: ../gtk/ui/gtk3/MessageLogWindow.ui:7 ../gtk/ui/gtk4/MessageLogWindow.ui:5
 msgid "Message Log"
@@ -1787,7 +1785,7 @@ msgstr "Alegeți dosarul destinaţie"
 msgid "_Start when added"
 msgstr "_Pornește la adăugare"
 
-#: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:478 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:314
+#: ../gtk/ui/gtk3/OptionsDialog.ui:184 ../gtk/ui/gtk3/PrefsDialog.ui:479 ../gtk/ui/gtk4/OptionsDialog.ui:121 ../gtk/ui/gtk4/PrefsDialog.ui:315
 msgid "Mo_ve torrent file to the trash"
 msgstr ""
 
@@ -1795,219 +1793,219 @@ msgstr ""
 msgid "Transmission Preferences"
 msgstr "Preferințe Transmission"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:72 ../gtk/ui/gtk4/PrefsDialog.ui:26
+#: ../gtk/ui/gtk3/PrefsDialog.ui:73 ../gtk/ui/gtk4/PrefsDialog.ui:27
 msgid "Speed Limits"
 msgstr "Limite de viteză"
 
 #. Checkbox to limit upload speed
-#: ../gtk/ui/gtk3/PrefsDialog.ui:94 ../gtk/ui/gtk4/PrefsDialog.ui:40
+#: ../gtk/ui/gtk3/PrefsDialog.ui:95 ../gtk/ui/gtk4/PrefsDialog.ui:41
 msgid "_Upload ({speed_units}):"
 msgstr ""
 
 #. Checkbox to limit download speed
-#: ../gtk/ui/gtk3/PrefsDialog.ui:109 ../gtk/ui/gtk4/PrefsDialog.ui:52
+#: ../gtk/ui/gtk3/PrefsDialog.ui:110 ../gtk/ui/gtk4/PrefsDialog.ui:53
 msgid "_Download ({speed_units}):"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:174 ../gtk/ui/gtk4/PrefsDialog.ui:96
+#: ../gtk/ui/gtk3/PrefsDialog.ui:175 ../gtk/ui/gtk4/PrefsDialog.ui:97
 msgid "Alternative Speed Limits"
 msgstr "Limite alternative de viteză"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:218 ../gtk/ui/gtk4/PrefsDialog.ui:118
+#: ../gtk/ui/gtk3/PrefsDialog.ui:219 ../gtk/ui/gtk4/PrefsDialog.ui:119
 msgid "Override normal speed limits manually or at scheduled times"
 msgstr "Suprascrie manual sau la un interval programat limitele normale de viteză"
 
 #. Labels a spinbutton for alternate upload speed limits
-#: ../gtk/ui/gtk3/PrefsDialog.ui:234 ../gtk/ui/gtk4/PrefsDialog.ui:132
+#: ../gtk/ui/gtk3/PrefsDialog.ui:235 ../gtk/ui/gtk4/PrefsDialog.ui:133
 msgid "U_pload ({speed_units}):"
 msgstr ""
 
 #. Labels a spinbutton for alternate download speed limits
-#: ../gtk/ui/gtk3/PrefsDialog.ui:248 ../gtk/ui/gtk4/PrefsDialog.ui:144
+#: ../gtk/ui/gtk3/PrefsDialog.ui:249 ../gtk/ui/gtk4/PrefsDialog.ui:145
 msgid "Do_wnload ({speed_units}):"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:260 ../gtk/ui/gtk4/PrefsDialog.ui:156
+#: ../gtk/ui/gtk3/PrefsDialog.ui:261 ../gtk/ui/gtk4/PrefsDialog.ui:157
 msgid "_Scheduled times:"
 msgstr "_Interval programat:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:278 ../gtk/ui/gtk4/PrefsDialog.ui:169
+#: ../gtk/ui/gtk3/PrefsDialog.ui:279 ../gtk/ui/gtk4/PrefsDialog.ui:170
 msgid "_On days:"
 msgstr "În _zilele:"
 
 #. Label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
-#: ../gtk/ui/gtk3/PrefsDialog.ui:335 ../gtk/ui/gtk4/PrefsDialog.ui:212
+#: ../gtk/ui/gtk3/PrefsDialog.ui:336 ../gtk/ui/gtk4/PrefsDialog.ui:213
 msgid "_to"
-msgstr ""
+msgstr "_până la"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:407 ../gtk/ui/gtk4/PrefsDialog.ui:260
+#: ../gtk/ui/gtk3/PrefsDialog.ui:408 ../gtk/ui/gtk4/PrefsDialog.ui:261
 msgctxt "Gerund"
 msgid "Adding"
 msgstr "Se adaugă"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:429 ../gtk/ui/gtk4/PrefsDialog.ui:274
+#: ../gtk/ui/gtk3/PrefsDialog.ui:430 ../gtk/ui/gtk4/PrefsDialog.ui:275
 msgid "Automatically add torrent files _from:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:444 ../gtk/ui/gtk4/PrefsDialog.ui:286
+#: ../gtk/ui/gtk3/PrefsDialog.ui:445 ../gtk/ui/gtk4/PrefsDialog.ui:287
 msgid "Show the Torrent Options _dialog"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:461 ../gtk/ui/gtk4/PrefsDialog.ui:300
+#: ../gtk/ui/gtk3/PrefsDialog.ui:462 ../gtk/ui/gtk4/PrefsDialog.ui:301
 msgid "_Start added torrents"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:497 ../gtk/ui/gtk4/PrefsDialog.ui:328
+#: ../gtk/ui/gtk3/PrefsDialog.ui:498 ../gtk/ui/gtk4/PrefsDialog.ui:329
 msgid "Save to _Location:"
 msgstr "Salvat la _locația:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:583 ../gtk/ui/gtk4/PrefsDialog.ui:392
+#: ../gtk/ui/gtk3/PrefsDialog.ui:584 ../gtk/ui/gtk4/PrefsDialog.ui:393
 msgid "Download Queue"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:607 ../gtk/ui/gtk4/PrefsDialog.ui:406
+#: ../gtk/ui/gtk3/PrefsDialog.ui:608 ../gtk/ui/gtk4/PrefsDialog.ui:407
 msgid "Ma_ximum active downloads:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:621 ../gtk/ui/gtk4/PrefsDialog.ui:418
+#: ../gtk/ui/gtk3/PrefsDialog.ui:622 ../gtk/ui/gtk4/PrefsDialog.ui:419
 msgid "Downloads sharing data in the last _N minutes are active:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:676 ../gtk/ui/gtk4/PrefsDialog.ui:457
+#: ../gtk/ui/gtk3/PrefsDialog.ui:677 ../gtk/ui/gtk4/PrefsDialog.ui:458
 msgid "Incomplete"
 msgstr "Incomplet"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:698 ../gtk/ui/gtk4/PrefsDialog.ui:471
+#: ../gtk/ui/gtk3/PrefsDialog.ui:699 ../gtk/ui/gtk4/PrefsDialog.ui:472
 msgid "Append \"._part\" to incomplete files' names"
 msgstr "Adaugă „._part” numelor fișierelor incomplete"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:715 ../gtk/ui/gtk4/PrefsDialog.ui:485
+#: ../gtk/ui/gtk3/PrefsDialog.ui:716 ../gtk/ui/gtk4/PrefsDialog.ui:486
 msgid "Keep _incomplete torrents in:"
 msgstr "Păstrează torentele _incomplete în:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:730 ../gtk/ui/gtk4/PrefsDialog.ui:497
+#: ../gtk/ui/gtk3/PrefsDialog.ui:731 ../gtk/ui/gtk4/PrefsDialog.ui:498
 msgid "Call scrip_t when done downloading:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:786 ../gtk/ui/gtk4/PrefsDialog.ui:536
+#: ../gtk/ui/gtk3/PrefsDialog.ui:787 ../gtk/ui/gtk4/PrefsDialog.ui:537
 msgctxt "Gerund"
 msgid "Downloading"
 msgstr "Se descarcă"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:804 ../gtk/ui/gtk4/PrefsDialog.ui:551
+#: ../gtk/ui/gtk3/PrefsDialog.ui:805 ../gtk/ui/gtk4/PrefsDialog.ui:552
 msgid "Limits"
 msgstr "Limite"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:826 ../gtk/ui/gtk4/PrefsDialog.ui:565
+#: ../gtk/ui/gtk3/PrefsDialog.ui:827 ../gtk/ui/gtk4/PrefsDialog.ui:566
 msgid "Stop seeding at _ratio:"
 msgstr "Oprește trimiterea la _rația:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:841 ../gtk/ui/gtk4/PrefsDialog.ui:577
+#: ../gtk/ui/gtk3/PrefsDialog.ui:842 ../gtk/ui/gtk4/PrefsDialog.ui:578
 msgid "Stop seeding if idle for _N minutes:"
 msgstr "Oprește trimiterea dacă este inactiv pentru _N minute:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:856 ../gtk/ui/gtk4/PrefsDialog.ui:589
+#: ../gtk/ui/gtk3/PrefsDialog.ui:857 ../gtk/ui/gtk4/PrefsDialog.ui:590
 msgid "Call scrip_t when done seeding:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:922 ../gtk/ui/gtk4/PrefsDialog.ui:638
+#: ../gtk/ui/gtk3/PrefsDialog.ui:923 ../gtk/ui/gtk4/PrefsDialog.ui:639
 msgctxt "Gerund"
 msgid "Seeding"
 msgstr "Se trimite"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:940 ../gtk/ui/gtk3/PrefsDialog.ui:1147 ../gtk/ui/gtk4/PrefsDialog.ui:653 ../gtk/ui/gtk4/PrefsDialog.ui:791
+#: ../gtk/ui/gtk3/PrefsDialog.ui:941 ../gtk/ui/gtk3/PrefsDialog.ui:1148 ../gtk/ui/gtk4/PrefsDialog.ui:654 ../gtk/ui/gtk4/PrefsDialog.ui:792
 msgid "Privacy"
 msgstr "Intimitate"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:964 ../gtk/ui/gtk4/PrefsDialog.ui:667
+#: ../gtk/ui/gtk3/PrefsDialog.ui:965 ../gtk/ui/gtk4/PrefsDialog.ui:668
 msgid "_Encryption mode:"
 msgstr "Mod criptar_e:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1008 ../gtk/ui/gtk4/PrefsDialog.ui:695
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1009 ../gtk/ui/gtk4/PrefsDialog.ui:696
 msgid "Blocklist"
 msgstr "Listă de blocare"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1030 ../gtk/ui/gtk4/PrefsDialog.ui:709
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1031 ../gtk/ui/gtk4/PrefsDialog.ui:710
 msgid "Enable _blocklist:"
 msgstr "Activează lista de _blocare:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1045 ../gtk/ui/gtk4/PrefsDialog.ui:722
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1046 ../gtk/ui/gtk4/PrefsDialog.ui:723
 msgid "Enable _automatic updates"
 msgstr "Permite _actualizări automate"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1100 ../gtk/ui/gtk4/PrefsDialog.ui:763
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1101 ../gtk/ui/gtk4/PrefsDialog.ui:764
 msgid "_Update"
 msgstr "Act_ualizează"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1165 ../gtk/ui/gtk4/PrefsDialog.ui:806
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1167 ../gtk/ui/gtk4/PrefsDialog.ui:808
 msgid "Listening Port"
 msgstr "Se ascultă portul"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1189 ../gtk/ui/gtk4/PrefsDialog.ui:820
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1191 ../gtk/ui/gtk4/PrefsDialog.ui:822
 msgid "_Port used for incoming connections:"
 msgstr "_Port folosit pentru conexiunile de intrare:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1201 ../gtk/ui/gtk4/PrefsDialog.ui:832
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1203 ../gtk/ui/gtk4/PrefsDialog.ui:834
 msgid "Pick a _random port every time Transmission is started"
 msgstr "Alege un port aleato_r la fiecare pornire Transmission"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1218 ../gtk/ui/gtk4/PrefsDialog.ui:846
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1220 ../gtk/ui/gtk4/PrefsDialog.ui:848
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
 msgstr "_Foloseşte UPnP sau înaintarea portului NAT-PMP dinspre ruterul meu"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1280 ../gtk/ui/gtk4/PrefsDialog.ui:894
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1282 ../gtk/ui/gtk4/PrefsDialog.ui:896
 msgid "Te_st Port"
 msgstr "Te_st port"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1322 ../gtk/ui/gtk4/PrefsDialog.ui:915
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1324 ../gtk/ui/gtk4/PrefsDialog.ui:917
 msgid "Peer Limits"
 msgstr "Limită parteneri"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1346 ../gtk/ui/gtk4/PrefsDialog.ui:929
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1348 ../gtk/ui/gtk4/PrefsDialog.ui:931
 msgid "Maximum peers per _torrent:"
 msgstr "Număr maximum de parteneri pe _torent:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1360 ../gtk/ui/gtk4/PrefsDialog.ui:941
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1362 ../gtk/ui/gtk4/PrefsDialog.ui:943
 msgid "Maximum peers _overall:"
 msgstr "Număr maxim de parteneri în t_otal:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1437 ../gtk/ui/gtk4/PrefsDialog.ui:994
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1439 ../gtk/ui/gtk4/PrefsDialog.ui:996
 msgid "Enable µ_TP for peer communication"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1441 ../gtk/ui/gtk4/PrefsDialog.ui:996
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1443 ../gtk/ui/gtk4/PrefsDialog.ui:998
 msgid "µTP is a tool for reducing network congestion."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1455 ../gtk/ui/gtk4/PrefsDialog.ui:1009
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1457 ../gtk/ui/gtk4/PrefsDialog.ui:1011
 msgid "Use PE_X to find more peers"
 msgstr "Folosește PE_X pentru a găsi mai mulți parteneri"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1459 ../gtk/ui/gtk4/PrefsDialog.ui:1011
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1461 ../gtk/ui/gtk4/PrefsDialog.ui:1013
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
 msgstr "PEX este un instrument de schimb a listelor de parteneri, cu partenerii la care sunteți conectat."
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1473 ../gtk/ui/gtk4/PrefsDialog.ui:1024
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1475 ../gtk/ui/gtk4/PrefsDialog.ui:1026
 msgid "Use _DHT to find more peers"
 msgstr "Folosește _DHT pentru a găsi mai mulți parteneri"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1477 ../gtk/ui/gtk4/PrefsDialog.ui:1026
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1479 ../gtk/ui/gtk4/PrefsDialog.ui:1028
 msgid "DHT is a tool for finding peers without a tracker."
 msgstr "DHT este un instrument de găsire parteneri fără ajutorul trackerului."
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1491 ../gtk/ui/gtk4/PrefsDialog.ui:1039
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1493 ../gtk/ui/gtk4/PrefsDialog.ui:1041
 msgid "Use _Local Peer Discovery to find more peers"
 msgstr "Utilizează serviciul de descoperire a partenerilor _locali pentru a obține mai mulți parteneri"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1495 ../gtk/ui/gtk4/PrefsDialog.ui:1041
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1497 ../gtk/ui/gtk4/PrefsDialog.ui:1043
 msgid "LPD is a tool for finding peers on your local network."
 msgstr "LPD este o unealtă pentru găsirea partenerilor în rețeaua voastră locală."
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1530 ../gtk/ui/gtk4/PrefsDialog.ui:1061
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1532 ../gtk/ui/gtk4/PrefsDialog.ui:1063
 msgid "Default Public Trackers"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1562 ../gtk/ui/gtk4/PrefsDialog.ui:1084
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1565 ../gtk/ui/gtk4/PrefsDialog.ui:1087
 msgid ""
 "Trackers to use on all public torrents.\n"
 "\n"
@@ -2015,79 +2013,79 @@ msgid ""
 "To add a new primary URL, add it after a blank line."
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1591 ../gtk/ui/gtk4/PrefsDialog.ui:1103
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1595 ../gtk/ui/gtk4/PrefsDialog.ui:1107
 msgid "Network"
 msgstr "Rețea"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1609 ../gtk/ui/gtk3/PrefsDialog.ui:1773 ../gtk/ui/gtk4/PrefsDialog.ui:1118 ../gtk/ui/gtk4/PrefsDialog.ui:1227
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1613 ../gtk/ui/gtk3/PrefsDialog.ui:1777 ../gtk/ui/gtk4/PrefsDialog.ui:1122 ../gtk/ui/gtk4/PrefsDialog.ui:1231
 msgid "Desktop"
 msgstr "Desktop"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1631 ../gtk/ui/gtk4/PrefsDialog.ui:1132
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1635 ../gtk/ui/gtk4/PrefsDialog.ui:1136
 msgid "_Inhibit hibernation when torrents are active"
 msgstr "_Inhibă intrarea în hibernare când torentele sunt active"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1648 ../gtk/ui/gtk4/PrefsDialog.ui:1146
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1652 ../gtk/ui/gtk4/PrefsDialog.ui:1150
 msgid "Show Transmission icon in the _notification area"
 msgstr "Arată Transmission în zona de no_tificare"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1686 ../gtk/ui/gtk4/PrefsDialog.ui:1167
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1690 ../gtk/ui/gtk4/PrefsDialog.ui:1171
 msgid "Notification"
 msgstr "Notificare"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1708 ../gtk/ui/gtk4/PrefsDialog.ui:1181
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1712 ../gtk/ui/gtk4/PrefsDialog.ui:1185
 msgid "Show a notification when torrents are a_dded"
 msgstr "Arată o notificare când sunt a_dăugate torente"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1725 ../gtk/ui/gtk4/PrefsDialog.ui:1195
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1729 ../gtk/ui/gtk4/PrefsDialog.ui:1199
 msgid "Show a notification when torrents _finish"
 msgstr "Arată o notificare când _torenții sunt finalizați"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1742 ../gtk/ui/gtk4/PrefsDialog.ui:1209
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1746 ../gtk/ui/gtk4/PrefsDialog.ui:1213
 msgid "Play a _sound when torrents finish"
 msgstr "Redă un _sunet la finalizarea torenților"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1791 ../gtk/ui/gtk4/PrefsDialog.ui:1242
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1795 ../gtk/ui/gtk4/PrefsDialog.ui:1246
 msgid "Remote Control"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1819 ../gtk/ui/gtk4/PrefsDialog.ui:1261
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1823 ../gtk/ui/gtk4/PrefsDialog.ui:1265
 msgid "Allow _remote access"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1835 ../gtk/ui/gtk4/PrefsDialog.ui:1270
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1839 ../gtk/ui/gtk4/PrefsDialog.ui:1274
 msgid "_Open web client"
 msgstr "_Deschide clientul web"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1861 ../gtk/ui/gtk4/PrefsDialog.ui:1286
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1865 ../gtk/ui/gtk4/PrefsDialog.ui:1290
 msgid "HTTP _port:"
 msgstr "_Port HTTP:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1873 ../gtk/ui/gtk4/PrefsDialog.ui:1299
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1877 ../gtk/ui/gtk4/PrefsDialog.ui:1303
 msgid "Use _authentication"
 msgstr "Folosește _autentificare"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1893 ../gtk/ui/gtk4/PrefsDialog.ui:1313
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1897 ../gtk/ui/gtk4/PrefsDialog.ui:1317
 msgid "_Username:"
 msgstr "Nume _utilizator:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1907 ../gtk/ui/gtk4/PrefsDialog.ui:1325
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1911 ../gtk/ui/gtk4/PrefsDialog.ui:1329
 msgid "Pass_word:"
 msgstr "Par_olă:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1919 ../gtk/ui/gtk4/PrefsDialog.ui:1338
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1923 ../gtk/ui/gtk4/PrefsDialog.ui:1342
 msgid "Only allow these IP a_ddresses:"
 msgstr ""
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:1941 ../gtk/ui/gtk4/PrefsDialog.ui:1354
+#: ../gtk/ui/gtk3/PrefsDialog.ui:1945 ../gtk/ui/gtk4/PrefsDialog.ui:1358
 msgid "Addresses:"
 msgstr "Adrese:"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:2052 ../gtk/ui/gtk4/PrefsDialog.ui:1442
+#: ../gtk/ui/gtk3/PrefsDialog.ui:2056 ../gtk/ui/gtk4/PrefsDialog.ui:1446
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
 msgstr "Adresele de IP pot folosi metacaractere, ca de exemplu 192.168.*.*"
 
-#: ../gtk/ui/gtk3/PrefsDialog.ui:2081 ../gtk/ui/gtk4/PrefsDialog.ui:1461
+#: ../gtk/ui/gtk3/PrefsDialog.ui:2085 ../gtk/ui/gtk4/PrefsDialog.ui:1465
 msgid "Remote"
 msgstr ""
 
@@ -2143,11 +2141,11 @@ msgstr "Deschide un torent utilizând URL"
 msgid "_URL"
 msgstr "_URL"
 
-#: ../libtransmission/announcer-http.cc:465
+#: ../libtransmission/announcer-http.cc:448
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:676
+#: ../libtransmission/announcer-http.cc:659
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr ""
 
@@ -2159,7 +2157,7 @@ msgstr ""
 msgid "Connection failed"
 msgstr ""
 
-#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:554
+#: ../libtransmission/announcer-udp.cc:422 ../libtransmission/tr-dht.cc:567
 msgid "Couldn't look up '{address}:{port}': {error} ({error_code})"
 msgstr ""
 
@@ -2174,11 +2172,11 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1345
+#: ../libtransmission/announcer.cc:1014 ../libtransmission/announcer.cc:1349
 msgid "Could not connect to tracker"
 msgstr ""
 
-#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1349
+#: ../libtransmission/announcer.cc:1018 ../libtransmission/announcer.cc:1353
 msgid "Tracker did not respond"
 msgstr ""
 
@@ -2206,11 +2204,11 @@ msgstr ""
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/inout.cc:146
+#: ../libtransmission/inout.cc:126 ../libtransmission/inout.cc:151
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/log.cc:290
+#: ../libtransmission/log.cc:300
 msgid "Too many messages like this! I won't log this message anymore this session."
 msgstr ""
 
@@ -2405,69 +2403,69 @@ msgstr ""
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:1381
+#: ../libtransmission/session.cc:1407
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../libtransmission/torrent-magnet.cc:332
+#: ../libtransmission/torrent-magnet.cc:318
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../libtransmission/torrent-metainfo.cc:676
+#: ../libtransmission/torrent-metainfo.cc:717
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:122
+#: ../libtransmission/torrent.cc:120
 msgid "Couldn't use metainfo from '{path}' for '{magnet}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:159
+#: ../libtransmission/torrent.cc:157
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "Nu au fost găsite date! Asigurați-vă că discurile sunt conectate sau utilizați „Stabiliți locul”. Pentru a relua descărcarea, ștergeți torentul și adăugați-l din nou."
 
-#: ../libtransmission/torrent.cc:491
+#: ../libtransmission/torrent.cc:464
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:500
+#: ../libtransmission/torrent.cc:473
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:552
+#: ../libtransmission/torrent.cc:525
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:559
+#: ../libtransmission/torrent.cc:532
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:877
+#: ../libtransmission/torrent.cc:848
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Repornire manuală -- se deazctivează rația"
 
-#: ../libtransmission/torrent.cc:900
+#: ../libtransmission/torrent.cc:868
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:965
+#: ../libtransmission/torrent.cc:922
 msgid "Removing torrent"
 msgstr "Se elimină torentul"
 
-#: ../libtransmission/torrent.cc:1295 ../libtransmission/torrent.cc:2354
+#: ../libtransmission/torrent.cc:1250 ../libtransmission/torrent.cc:2306
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/tr-dht.cc:528
+#: ../libtransmission/tr-dht.cc:541
 msgid "Couldn't parse '{filename}' line: '{line}'"
 msgstr ""
 
-#: ../libtransmission/tr-lpd.cc:259
+#: ../libtransmission/tr-lpd.cc:258
 msgid "Couldn't initialize LPD: {error} ({error_code})"
 msgstr ""
 
@@ -2548,7 +2546,7 @@ msgstr ""
 msgid "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"
 msgstr ""
 
-#: ../libtransmission/web.cc:446
+#: ../libtransmission/web.cc:448
 msgid "Couldn't fetch '{url}': expected HTTP response code {expected_code}, got {actual_code}"
 msgstr ""
 
@@ -2566,616 +2564,30 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../utils/remote.cc:140
+#: ../utils/remote.cc:139
 msgid "hour"
 msgid_plural "hours"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../utils/remote.cc:141
+#: ../utils/remote.cc:140
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../utils/remote.cc:142 ../utils/remote.cc:162
+#: ../utils/remote.cc:141 ../utils/remote.cc:161
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: ../utils/remote.cc:146
+#: ../utils/remote.cc:145
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
-
-#~ msgid " _to "
-#~ msgstr " _până la "
-
-#, c-format
-#~ msgid "%'d Torrent Properties"
-#~ msgstr "%'d proprietăți torent"
-
-#, c-format
-#~ msgid "%'d day"
-#~ msgid_plural "%'d days"
-#~ msgstr[0] "%'d zi"
-#~ msgstr[1] "%'d zile"
-#~ msgstr[2] "%'d de zile"
-
-#, c-format
-#~ msgid "%'d hour"
-#~ msgid_plural "%'d hours"
-#~ msgstr[0] "%'d oră"
-#~ msgstr[1] "%'d ore"
-#~ msgstr[2] "%'d de ore"
-
-#, c-format
-#~ msgid "%'d minute"
-#~ msgid_plural "%'d minutes"
-#~ msgstr[0] "%'d minut"
-#~ msgstr[1] "%'d minute"
-#~ msgstr[2] "%'d de minute"
-
-#, c-format
-#~ msgid "%'d second"
-#~ msgid_plural "%'d seconds"
-#~ msgstr[0] "%'d secundă"
-#~ msgstr[1] "%'d secunde"
-#~ msgstr[2] "%'d de secunde"
-
-#, c-format
-#~ msgid "%1$'d Piece @ %2$s"
-#~ msgid_plural "%1$'d Pieces @ %2$s"
-#~ msgstr[0] "%1$'d element @ %2$s"
-#~ msgstr[1] "%1$'d elemente @ %2$s"
-#~ msgstr[2] "%1$'d de elemente @ %2$s"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece @ %3$s)"
-#~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
-#~ msgstr[0] "%1$s (%2$'d parte @ %3$s)"
-#~ msgstr[1] "%1$s (%2$'d părți @ %3$s)"
-#~ msgstr[2] "%1$s (%2$'d de părți @ %3$s)"
-
-#, c-format
-#~ msgid "%1$s (%2$'d piece)"
-#~ msgid_plural "%1$s (%2$'d pieces)"
-#~ msgstr[0] "%1$s (%2$'d parte)"
-#~ msgstr[1] "%1$s (%2$'d părți)"
-#~ msgstr[2] "%1$s (%2$'d de părți)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available)"
-#~ msgstr "%1$s (%2$s%% din %3$s%% disponibili)"
-
-#, c-format
-#~ msgid "%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"
-#~ msgstr "%1$s (%2$s%% din %3$s%% disponibili); %4$s neverificați"
-
-#, c-format
-#~ msgid "%1$s (%2$s%%)"
-#~ msgstr "%1$s (%2$s%%)"
-
-#, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s corupt)"
-
-#, c-format
-#~ msgid "%1$s ago"
-#~ msgstr "acum %1$s"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%)"
-#~ msgstr "%1$s din %2$s (%3$s%%)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"
-#~ msgstr "%1$s din %2$s (%3$s%%), încărcare %4$s (rație: %5$s obiectiv: %6$s)"
-
-#, c-format
-#~ msgid "%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"
-#~ msgstr "%1$s din %2$s (%3$s%%), încărcare %4$s (rație: %5$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-#~ msgstr "%1$s, încărcat %2$s (Raport: %3$s Obiectiv: %4$s)"
-
-#, c-format
-#~ msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-#~ msgstr "%1$s, a fost trimis %2$s (Raport: %3$s)"
-
-#, c-format
-#~ msgid "%1$s; %2$'d File"
-#~ msgid_plural "%1$s; %2$'d Files"
-#~ msgstr[0] "%1$s; %2$'d fișier"
-#~ msgstr[1] "%1$s; %2$'d fișiere"
-#~ msgstr[2] "%1$s; %2$'d de fișiere"
-
-#, c-format
-#~ msgid ""
-#~ "%s\n"
-#~ "Run '%s --help' to see a full list of available command line options.\n"
-#~ msgstr ""
-#~ "%s\n"
-#~ "Executați „%s --help” pentru a vizualiza lista completă a opțiunilor din linia de comandă.\n"
-
-#, c-format
-#~ msgid "%s %s started"
-#~ msgstr "%s %s pornit"
-
-#, c-format
-#~ msgid "%s (Ratio: %s)"
-#~ msgstr "%s (Rație: %s)"
-
-#, c-format
-#~ msgid "%s - Add Tracker"
-#~ msgstr "%s - Adăugare tracker"
-
-#, c-format
-#~ msgid "%s - Edit Trackers"
-#~ msgstr "%s - Editare tracker"
-
-#, c-format
-#~ msgid "%s Properties"
-#~ msgstr "Proprietăți %s"
-
-#, c-format
-#~ msgid "%s remaining"
-#~ msgstr "%s rămase"
-
-#, c-format
-#~ msgid "%s succeeded (%d)"
-#~ msgstr "%s cu succes (%d)"
-
-#~ msgid "<b>Closing Connections</b>"
-#~ msgstr "<b>Se închid conexiunile</b>"
-
-#~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>Nu se poate actualiza.</b>"
-
-#~ msgid "<b>Update succeeded!</b>"
-#~ msgstr "<b>Actualizare reușită!</b>"
-
-#~ msgid "<i>No source selected</i>"
-#~ msgstr "<i>Nicio sursă selectată</i>"
-
-#~ msgid "<i>Testing TCP port…</i>"
-#~ msgstr "<i>Se testează portul TCP…</i>"
-
-#, c-format
-#~ msgid "Asking for more peers in %s"
-#~ msgstr "Se solicită mai mulți parteneri în %s"
-
-#, c-format
-#~ msgid "Asking for more peers now… <small>%s</small>"
-#~ msgstr "Se solicită mai mulți parteneri acum… <small>%s</small>"
-
-#, c-format
-#~ msgid "Asking for peer counts in %s"
-#~ msgstr "Se solicită numărarea partenerilor în %s"
-
-#, c-format
-#~ msgid "Asking for peer counts now… <small>%s</small>"
-#~ msgstr "Se solicită numărarea partenerilor acum... <small>%s</small>"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" contains %zu entries"
-#~ msgstr "Lista de blocare „%s” conține %zu (de) intrări"
-
-#, c-format
-#~ msgid "Blocklist \"%s\" updated with %zu entries"
-#~ msgstr "Lista de blocare „%s” a fost actualizată cu %zu (de) intrări"
-
-#, c-format
-#~ msgid "Blocklist contains %'d rule"
-#~ msgid_plural "Blocklist contains %'d rules"
-#~ msgstr[0] "Lista de bocare conține %'d regulă"
-#~ msgstr[1] "Lista de bocare conține %'d reguli"
-#~ msgstr[2] "Lista de bocare conține %'d de reguli"
-
-#, c-format
-#~ msgid "Blocklist has %'d rule."
-#~ msgid_plural "Blocklist has %'d rules."
-#~ msgstr[0] "Lista de blocare conține %'d regulă."
-#~ msgstr[1] "Lista de bocare conține %'d reguli."
-#~ msgstr[2] "Lista de bocare conține %'d de reguli."
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Apelează scrip_tul atunci când torrentul s-a finalizat:"
-
-#~ msgid "Cancelled"
-#~ msgstr "Anulat"
-
-#~ msgid "Complete"
-#~ msgstr "Complet"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s"
-#~ msgstr "Nu s-a putut lega la portul %d pe %s: %s"
-
-#, c-format
-#~ msgid "Couldn't bind port %d on %s: %s (%s)"
-#~ msgstr "Nu s-a putut lega la portul %d de pe %s: %s (%s)"
-
-#, c-format
-#~ msgid "Couldn't create \"%1$s\": %2$s"
-#~ msgstr "Nu s-a putut crea „%1$s”: %2$s"
-
-#, c-format
-#~ msgid "Couldn't create socket: %s"
-#~ msgstr "Nu s-a putut crea socketul: %s"
-
-#, c-format
-#~ msgid "Couldn't inhibit desktop hibernation: %s"
-#~ msgstr "Nu se poate inhiba intrarea în hibernare: %s"
-
-#, c-format
-#~ msgid "Couldn't open \"%1$s\": %2$s"
-#~ msgstr "Nu s-a putut deschide „%1$s”: %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%1$s\": %2$s"
-#~ msgstr "Nu s-a putut citi „%1$s”: %2$s"
-
-#, c-format
-#~ msgid "Couldn't read \"%s\": %s"
-#~ msgstr "Nu se poate citi „%s”: %s"
-
-#, c-format
-#~ msgid "Couldn't save \"%s\""
-#~ msgstr "Nu s-a putut salva „%s”"
-
-#, c-format
-#~ msgid "Couldn't save file \"%1$s\": %2$s"
-#~ msgstr "Fișierul „%1$s”: %2$s nu a putut fi salvat"
-
-#, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Nu se poate salva fișierul temporar „%1$s”: %2$s"
-
-#, c-format
-#~ msgid "Couldn't truncate \"%1$s\": %2$s"
-#~ msgstr "Nu se poate trunchia „%1$s”: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Creează un torent nou"
-
-#, c-format
-#~ msgid "Created \"%s\"!"
-#~ msgstr "S-a creat „%s”"
-
-#, c-format
-#~ msgid "Created by %1$s"
-#~ msgstr "Creat de %1$s"
-
-#, c-format
-#~ msgid "Created by %1$s on %2$s"
-#~ msgstr "Creat de %1$s în data de %2$s"
-
-#, c-format
-#~ msgid "Created on %1$s"
-#~ msgstr "Creat în data de %1$s"
-
-#, c-format
-#~ msgid "Creating \"%s\""
-#~ msgstr "Se creează „%s”"
-
-#~ msgid "Debug"
-#~ msgstr "Depanare"
-
-#, c-format
-#~ msgid "Do_wnload (%s):"
-#~ msgstr "Des_cărcare (%s):"
-
-#~ msgid "Done"
-#~ msgstr "Terminat"
-
-#, c-format
-#~ msgid "Down: %1$s, Up: %2$s"
-#~ msgstr "Descărcare: %1$s, Încărcare: %2$s"
-
-#~ msgid "Enable _uTP for peer communication"
-#~ msgstr "Activează _uTP pentru comunicările partenerilor"
-
-#~ msgid "Error opening torrent"
-#~ msgstr "Eroare la deschiderea torentului"
-
-#, c-format
-#~ msgid "Error reading \"%s\": %s"
-#~ msgstr "Eroare la citirea „%s”: %s"
-
-#, c-format
-#~ msgid "Error writing \"%s\": %s"
-#~ msgstr "Eroare la scrierea „%s”: %s"
-
-#, c-format
-#~ msgid "Error: %s"
-#~ msgstr "Eroare: %s"
-
-#, c-format
-#~ msgid "Error: invalid announce URL \"%s\""
-#~ msgstr "Eroare: anunț URL nevalid „%s”"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Fişierul „%s” stă în cale"
-
-#, c-format
-#~ msgid "Found Internet Gateway Device \"%s\""
-#~ msgstr "S-a găsit un dispozitiv de acces la Internet „%s”"
-
-#, c-format
-#~ msgid "Found public address \"%s\""
-#~ msgstr "S-a găsit adresa publică „%s”"
-
-#~ msgid "Friday"
-#~ msgstr "Vineri"
-
-#, c-format
-#~ msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-#~ msgstr "S-a primit o listă de %1$s%2$'d parteneri în urmă cu %3$s %4$s"
-
-#, c-format
-#~ msgid "Got a scrape error \"%s%s%s\" %s ago"
-#~ msgstr "S-a primit eroarea  „%s%s%s” la interogarea serverului în urmă cu %s"
-
-#, c-format
-#~ msgid "Got an error %1$s\"%2$s\"%3$s %4$s ago"
-#~ msgstr "S-a produs o eroare acum %1$s\"%2$s\"%3$s %4$s"
-
-#, c-format
-#~ msgid "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck."
-#~ msgstr "S-a primit semnalul %d; se încearcă oprirea curată a programului. Reluați dacă procedura nu este dusă la bun sfârșit."
-
-#~ msgid "Idle"
-#~ msgstr "Inactiv"
-
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Intrare metadate nevalidă „%s”"
-
-#~ msgid "Is another copy of Transmission already running?"
-#~ msgstr "Rulează o altă instanță a Trasmission?"
-
-#, c-format
-#~ msgid "Limit _download speed (%s):"
-#~ msgstr "Limitează viteza de _descărcare (%s):"
-
-#, c-format
-#~ msgid "Limit _upload speed (%s):"
-#~ msgstr "Limitează vite_za de încărcare (%s):"
-
-#, c-format
-#~ msgid "Loaded %d torrents"
-#~ msgstr "S-au incărcat %d torente"
-
-#, c-format
-#~ msgid "Local Address is \"%s\""
-#~ msgstr "Adresa locală este „%s”"
-
-#~ msgid "Mo_ve .torrent file to the trash"
-#~ msgstr "M_ută fișierul .torrent la gunoi"
-
-#~ msgid "Monday"
-#~ msgstr "Luni"
-
-#, c-format
-#~ msgid "Moving \"%s\""
-#~ msgstr "Se mută „%s”"
-
-#~ msgid "Not a regular file"
-#~ msgstr "Nu este un fişier obişnuit"
-
-#, c-format
-#~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-#~ msgstr "Lista cererilor partenerilor de conexiune %1$sa expirat acum%2$s %3$s; se reîncearcă"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Verificați datele locale! Elementul #%zu este alterat."
-
-#, c-format
-#~ msgid "Port %d forwarded successfully"
-#~ msgstr "Portul %d a fost înaintat cu succes"
-
-#, c-format
-#~ msgid "Port %d isn't forwarded"
-#~ msgstr "Portul %d nu este înaintat"
-
-#~ msgid "Port Forwarding"
-#~ msgstr "Înaintarea port"
-
-#~ msgid "Port Forwarding (NAT-PMP)"
-#~ msgstr "Înaintare port (NAT-PMP)"
-
-#~ msgid "Port Forwarding (UPnP)"
-#~ msgstr "Înaintare port (UPnP)"
-
-#~ msgid "Port forwarding successful!"
-#~ msgstr "Înaintarea portului s-a efectuat cu succes!"
-
-#, c-format
-#~ msgid "Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"
-#~ msgstr "Port forwarding utilizând „%s”, serviciul „%s”. (adresa locală: %s:%d)"
-
-#~ msgid "Port is <b>closed</b>"
-#~ msgstr "Portul este <b>închis</b>"
-
-#~ msgid "Port is <b>open</b>"
-#~ msgstr "Portul este <b>deschis</b>"
-
-#~ msgid "Present Main Window"
-#~ msgstr "Prezintă fereastra principală"
-
-#, c-format
-#~ msgid "Ratio: %s"
-#~ msgstr "Raport: %s"
-
-#~ msgid "Saturday"
-#~ msgstr "Sâmbătă"
-
-#, c-format
-#~ msgid "Saved \"%s\""
-#~ msgstr "Salvat „%s”"
-
-#, c-format
-#~ msgid "Scanned %s"
-#~ msgstr "Scanat %s"
-
-#, c-format
-#~ msgid "Seeding to %1$'d of %2$'d connected peer"
-#~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-#~ msgstr[0] "Se trimite către %1$'d din %2$'d partener conectat"
-#~ msgstr[1] "Se trimite către %1$'d din %2$'d parteneri conectaţi"
-#~ msgstr[2] "Se trimite către %1$'d din %2$'d de parteneri conectaţi"
-
-#~ msgid "Show _options dialog"
-#~ msgstr "Afișează dialogul cu _opțiuni"
-
-#, c-format
-#~ msgid "Skipping unknown torrent \"%s\""
-#~ msgstr "Se omite torentul necunoscut „%s”"
-
-#, c-format
-#~ msgid "Started %'d time"
-#~ msgid_plural "Started %'d times"
-#~ msgstr[0] "Pornit %'d dată"
-#~ msgstr[1] "Pornit de %'d ori"
-#~ msgstr[2] "Pornit de %'d de ori"
-
-#, c-format
-#~ msgid "State changed from \"%1$s\" to \"%2$s\""
-#~ msgstr "Starea s-a schimbat de la „%1$s” la „%2$s”"
-
-#, c-format
-#~ msgid "Stop at Ratio (%s)"
-#~ msgstr "Oprește la raportul (%s)"
-
-#~ msgid "Stopped"
-#~ msgstr "Oprit"
-
-#, c-format
-#~ msgid "Stopping port forwarding through \"%s\", service \"%s\""
-#~ msgstr "Se oprește înaintarea portului prin „%s”, serviciul „%s”"
-
-#~ msgid "Sunday"
-#~ msgstr "Duminică"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Fișierul torent „%s” nu conține date valide."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Fișierul torent „%s” a detectat o eroare necunoscută."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Această legătură magnetică se pare că este destinată pentru alt program, nu pentru BitTorrent. Legăturile magnetice BitTorrent au o secțiune care conține „%s”."
-
-#~ msgid "Thursday"
-#~ msgstr "Joi"
-
-#~ msgid ""
-#~ "To add a backup URL, add it on the line after the primary URL.\n"
-#~ "To add another primary URL, add it after a blank line."
-#~ msgstr ""
-#~ "Pentru a adăuga un URL de rezervă, adăugați-l în prima linie după URL-ul primar.\n"
-#~ "Pentru a adăuga un alt URL primar, adăugați-l după o linie goală."
-
-#, c-format
-#~ msgid "Torrent Creator is skipping file \"%s\": %s"
-#~ msgstr "Creatorul de torente ignoră fişierul „%s”: %s"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Eroare tracker: „%s”"
-
-#, c-format
-#~ msgid "Tracker gave a warning: \"%s\""
-#~ msgstr "Trackerul a dat un avertisment: „%s”"
-
-#, c-format
-#~ msgid "Tracker gave an error: \"%s\""
-#~ msgstr "Trackerul a dat o eroare: „%s”"
-
-#, c-format
-#~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-#~ msgstr "Trackerul a avut %s%'d surse complete și %'d surse incomplete acum %s %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Avertisment tracker: „%s”"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Trackerul va permite cereri în %s"
-
-#, c-format
-#~ msgid ""
-#~ "Transmission\n"
-#~ "Up: %1$s %2$s\n"
-#~ "Down: %3$s %4$s"
-#~ msgstr ""
-#~ "Transmission\n"
-#~ "Încărcare: %1$s %2$s\n"
-#~ "Descărcare: %3$s %4$s"
-
-#, c-format
-#~ msgid "Transmission doesn't know how to use \"%s\""
-#~ msgstr "Transmission nu știe cum să folosească „%s”"
-
-#~ msgid "Tuesday"
-#~ msgstr "Marți"
-
-#, c-format
-#~ msgid "U_pload (%s):"
-#~ msgstr "Î_ncărcare (%s):"
-
-#~ msgid "Unrecognized URL"
-#~ msgstr "URL nerecunoscut"
-
-#~ msgid "Update Blocklist"
-#~ msgstr "Actualizează lista de blocare"
-
-#, c-format
-#~ msgid "Verifying local data (%.1f%% tested)"
-#~ msgstr "Se verifică datele locale (%.1f%% testate)"
-
-#~ msgid "Verifying torrent"
-#~ msgstr "Se verifică torentul"
-
-#~ msgid "Wednesday"
-#~ msgstr "Miercuri"
-
-#, c-format
-#~ msgid "_Download (%s):"
-#~ msgstr "_Descărcare (%s):"
-
-#, c-format
-#~ msgid "_Upload (%s):"
-#~ msgstr "Î_ncărcare (%s):"
-
-#, c-format
-#~ msgid "blocklist skipped invalid address at line %d"
-#~ msgstr "Lista de blocare a sărit o adresă nevalidă la linia %d"
-
-#, c-format
-#~ msgid "no longer forwarding port %d"
-#~ msgstr "nu se mai înaintează portul %d"
-
-#, c-format
-#~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "Descărcat: %1$s, Încărcat: %2$s"
-
-#~ msgid "uTP is a tool for reducing network congestion."
-#~ msgstr "uTP este un utilitar pentru reducerea congestionării rețelei."

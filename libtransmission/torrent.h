@@ -109,7 +109,8 @@ public:
     // but more refactoring is needed before that can happen
     // because much of tr_torrent's impl is in the non-member C bindings
 
-    void setMetainfo(tr_torrent_metainfo const& tm);
+    // Used to add metainfo to a magnet torrent.
+    void setMetainfo(tr_torrent_metainfo tm);
 
     [[nodiscard]] auto unique_lock() const
     {
@@ -581,13 +582,7 @@ public:
         this->error_string = errmsg;
     }
 
-    void setDownloadDir(std::string_view path)
-    {
-        download_dir = path;
-        markEdited();
-        setDirty();
-        refreshCurrentDir();
-    }
+    void setDownloadDir(std::string_view path, bool is_new_torrent = false);
 
     void refreshCurrentDir();
 
@@ -668,6 +663,16 @@ public:
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
+
+    constexpr void setSequentialDownload(bool is_sequential) noexcept
+    {
+        this->sequential_download_ = is_sequential;
+    }
+
+    [[nodiscard]] constexpr auto isSequentialDownload() const noexcept
+    {
+        return this->sequential_download_;
+    }
 
     constexpr void setDirty() noexcept
     {
@@ -784,6 +789,11 @@ public:
         return announce_key_;
     }
 
+    [[nodiscard]] constexpr tr_peer_id_t const& peer_id() const noexcept
+    {
+        return peer_id_;
+    }
+
     // should be called when done modifying the torrent's announce list.
     void on_announce_list_changed()
     {
@@ -819,15 +829,6 @@ public:
 
     tr_sha1_digest_t obfuscated_hash = {};
 
-    /* If the initiator of the connection receives a handshake in which the
-     * peer_id does not match the expected peerid, then the initiator is
-     * expected to drop the connection. Note that the initiator presumably
-     * received the peer information from the tracker, which includes the
-     * peer_id that was registered by the peer. The peer_id from the tracker
-     * and in the handshake are expected to match.
-     */
-    tr_peer_id_t peer_id_ = {};
-
     tr_session* session = nullptr;
 
     tr_torrent_announcer* torrent_announcer = nullptr;
@@ -838,8 +839,6 @@ public:
      * and we're in the process of downloading the metainfo from
      * other peers */
     struct tr_incomplete_metadata* incompleteMetadata = nullptr;
-
-    time_t peer_id_creation_time_ = 0;
 
     time_t lpdAnnounceAt = 0;
 
@@ -903,10 +902,10 @@ public:
     bool is_queued = false;
     bool isRunning = false;
     bool isStopping = false;
-    bool startAfterVerify = false;
-    bool magnetStartAfterVerify = false;
 
-    bool magnetVerify = false;
+    // start the torrent after all the startup scaffolding is done,
+    // e.g. fetching metadata from peers and/or verifying the torrent
+    bool start_when_stable = false;
 
 private:
     [[nodiscard]] constexpr bool isPieceTransferAllowed(tr_direction direction) const noexcept
@@ -941,6 +940,15 @@ private:
         }
     }
 
+    /* If the initiator of the connection receives a handshake in which the
+     * peer_id does not match the expected peerid, then the initiator is
+     * expected to drop the connection. Note that the initiator presumably
+     * received the peer information from the tracker, which includes the
+     * peer_id that was registered by the peer. The peer_id from the tracker
+     * and in the handshake are expected to match.
+     */
+    tr_peer_id_t peer_id_ = tr_peerIdInit();
+
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
 
     float verify_progress_ = -1;
@@ -950,6 +958,8 @@ private:
     tr_interned_string bandwidth_group_;
 
     bool needs_completeness_check_ = true;
+
+    bool sequential_download_ = false;
 };
 
 // ---
@@ -963,8 +973,6 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
  * Tell the `tr_torrent` that it's gotten a block
  */
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
-
-tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 

@@ -12,19 +12,19 @@
 #include <fmt/core.h>
 #include <fmt/format.h> // fmt::ptr
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "magnet-metainfo.h"
-#include "peer-mgr.h" /* pex */
-#include "resume.h"
-#include "session.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/peer-mgr.h" /* pex */
+#include "libtransmission/resume.h"
+#include "libtransmission/session.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -621,22 +621,14 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
 // ---
 
-auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did_migrate_filename)
+auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
 {
     auto fields_loaded = tr_resume::fields_t{};
 
     TR_ASSERT(tr_isTorrent(tor));
     auto const was_dirty = tor->isDirty;
 
-    auto const migrated = tr_torrent_metainfo::migrateFile(
-        tor->session->resumeDir(),
-        tor->name(),
-        tor->infoHashString(),
-        ".resume"sv);
-    if (did_migrate_filename != nullptr)
-    {
-        *did_migrate_filename = migrated;
-    }
+    tr_torrent_metainfo::migrateFile(tor->session->resumeDir(), tor->name(), tor->infoHashString(), ".resume"sv);
 
     auto const filename = tor->resumeFile();
     if (!tr_sys_path_exists(filename))
@@ -712,7 +704,7 @@ auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load, bool* did
 
     if (auto val = bool{}; (fields_to_load & tr_resume::Run) != 0 && tr_variantDictFindBool(&top, TR_KEY_paused, &val))
     {
-        tor->isRunning = !val;
+        tor->start_when_stable = !val;
         fields_loaded |= tr_resume::Run;
     }
 
@@ -831,7 +823,7 @@ auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* cto
     {
         if (auto is_paused = bool{}; tr_ctorGetPaused(ctor, mode, &is_paused))
         {
-            tor->isRunning = !is_paused;
+            tor->start_when_stable = !is_paused;
             ret |= tr_resume::Run;
         }
     }
@@ -865,7 +857,7 @@ auto useFallbackFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor cons
 }
 } // namespace
 
-fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, bool* did_rename_to_hash_only_name)
+fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -873,7 +865,7 @@ fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, boo
 
     ret |= useMandatoryFields(tor, fields_to_load, ctor);
     fields_to_load &= ~ret;
-    ret |= loadFromFile(tor, fields_to_load, did_rename_to_hash_only_name);
+    ret |= loadFromFile(tor, fields_to_load);
     fields_to_load &= ~ret;
     ret |= useFallbackFields(tor, fields_to_load, ctor);
 
@@ -907,7 +899,8 @@ void save(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->peerLimit());
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tor->getPriority());
-    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
+    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->start_when_stable);
+    tr_variantDictAddBool(&top, TR_KEY_sequentialDownload, tor->isSequentialDownload());
     savePeers(&top, tor);
 
     if (tor->hasMetainfo())

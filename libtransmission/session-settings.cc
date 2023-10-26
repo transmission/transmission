@@ -5,10 +5,10 @@
 
 #include <fmt/format.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "session-settings.h"
-#include "variant.h"
+#include "libtransmission/session-settings.h"
+#include "libtransmission/variant.h"
 
 void tr_session_settings::load(tr_variant* src)
 {
