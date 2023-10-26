@@ -3,11 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <fmt/format.h>
+#include <cstdint> // int64_t
+#include <string_view>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/benc.h>
+#include <libtransmission/error.h>
 
 #include "gtest/gtest.h"
 

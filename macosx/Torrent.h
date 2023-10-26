@@ -9,10 +9,7 @@
 
 @class FileListNode;
 
-typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
-    TorrentDeterminationAutomatic = 0,
-    TorrentDeterminationUserSpecified
-};
+typedef NS_ENUM(NSUInteger, TorrentDeterminationType) { TorrentDeterminationAutomatic = 0, TorrentDeterminationUserSpecified };
 
 extern NSString* const kTorrentDidChangeGroupNotification;
 

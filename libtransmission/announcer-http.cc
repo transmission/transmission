@@ -5,7 +5,8 @@
 
 #include <algorithm> // std::copy_n()
 #include <cctype>
-#include <chrono>
+#include <cstddef> // std::byte, size_t
+#include <cstdint> // int64_t, uint8_t, uint...
 #include <cstdio> /* fprintf() */
 #include <iomanip>
 #include <iostream>
@@ -32,9 +33,11 @@
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
-#include "libtransmission/quark.h"
+#include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-strbuf.h" // tr_strbuf, tr_urlbuf
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"
@@ -208,11 +211,11 @@ void announce_url_new(tr_urlbuf& url, tr_session const* session, tr_announce_req
         "&downloaded={downloaded}"
         "&left={left}"
         "&numwant={numwant}"
-        "&key={key}"
+        "&key={key:08X}"
         "&compact=1"
         "&supportcrypto=1",
         fmt::arg("url", req.announce_url),
-        fmt::arg("sep", tr_strvContains(req.announce_url.sv(), '?') ? '&' : '?'),
+        fmt::arg("sep", tr_strv_contains(req.announce_url.sv(), '?') ? '&' : '?'),
         fmt::arg("info_hash", std::data(escaped_info_hash)),
         fmt::arg("peer_id", std::string_view{ std::data(req.peer_id), std::size(req.peer_id) }),
         fmt::arg("port", req.port.host()),
@@ -368,19 +371,19 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "complete"sv)
             {
-                response_.seeders = static_cast<int>(value);
+                response_.seeders = value;
             }
             else if (key == "incomplete"sv)
             {
-                response_.leechers = static_cast<int>(value);
+                response_.leechers = value;
             }
             else if (key == "downloaded"sv)
             {
-                response_.downloads = static_cast<int>(value);
+                response_.downloads = value;
             }
             else if (key == "port"sv)
             {
-                pex_.port.setHost(static_cast<uint16_t>(value));
+                pex_.socket_address.port_.set_host(static_cast<uint16_t>(value));
             }
             else
             {
@@ -416,7 +419,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 if (auto const addr = tr_address::from_string(value); addr)
                 {
-                    pex_.addr = *addr;
+                    pex_.socket_address.address_ = *addr;
                 }
             }
             else if (key == "peer id")
@@ -521,7 +524,7 @@ void onScrapeDone(tr_web::FetchResponse const& web_response)
 void scrape_url_new(tr_pathbuf& scrape_url, tr_scrape_request const& req)
 {
     scrape_url = req.scrape_url.sv();
-    char delimiter = tr_strvContains(scrape_url, '?') ? '&' : '?';
+    char delimiter = tr_strv_contains(scrape_url, '?') ? '&' : '?';
 
     for (int i = 0; i < req.info_hash_count; ++i)
     {
@@ -545,9 +548,6 @@ void tr_tracker_http_scrape(tr_session const* session, tr_scrape_request const& 
     for (int i = 0; i < response.row_count; ++i)
     {
         response.rows[i].info_hash = request.info_hash[i];
-        response.rows[i].seeders = -1;
-        response.rows[i].leechers = -1;
-        response.rows[i].downloads = -1;
     }
 
     auto scrape_url = tr_pathbuf{};
@@ -607,19 +607,19 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         {
             if (auto const key = currentKey(); row_ && key == "complete"sv)
             {
-                response_.rows[*row_].seeders = static_cast<int>(value);
+                response_.rows[*row_].seeders = value;
             }
             else if (row_ && key == "downloaded"sv)
             {
-                response_.rows[*row_].downloads = static_cast<int>(value);
+                response_.rows[*row_].downloads = value;
             }
             else if (row_ && key == "incomplete"sv)
             {
-                response_.rows[*row_].leechers = static_cast<int>(value);
+                response_.rows[*row_].leechers = value;
             }
             else if (row_ && key == "downloaders"sv)
             {
-                response_.rows[*row_].downloaders = static_cast<int>(value);
+                response_.rows[*row_].downloaders = value;
             }
             else if (key == "min_request_interval"sv)
             {

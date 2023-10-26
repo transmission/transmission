@@ -69,20 +69,20 @@
             [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
         {
             auto metainfo = tr_torrent_metainfo{};
-            if (metainfo.parseTorrentFile(file.UTF8String))
+            if (metainfo.parse_torrent_file(file.UTF8String))
             {
                 ++count;
 
-                size += metainfo.totalSize();
+                size += metainfo.total_size();
 
-                auto const n_files = metainfo.fileCount();
+                auto const n_files = metainfo.file_count();
                 fileCount += n_files;
                 // only useful when one torrent
                 if (count == 1)
                 {
                     if (n_files == 1)
                     {
-                        name = [NSString convertedStringFromCString:metainfo.fileSubpath(0).c_str()];
+                        name = [NSString convertedStringFromCString:metainfo.file_subpath(0).c_str()];
                     }
                     else
                     {

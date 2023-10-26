@@ -5,12 +5,12 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef> // size_t
 #include <string_view>
-
-#include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj()
 #include <libtransmission/clients.h>
+#include <libtransmission/tr-macros.h>
 
 #include "gtest/gtest.h"
 

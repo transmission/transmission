@@ -674,7 +674,7 @@
 "Peers" = "Clientes";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port" = "Puerto";
+"Port: %@" = "Puerto: %@";
 
 /* Preferences -> Network -> port status */
 "Port check site is down" = "Sitio de comprobación de puertos caido";

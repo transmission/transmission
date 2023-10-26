@@ -41,7 +41,7 @@ static char const* const kRPCKeychainName = "Remote";
 
 static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
-@interface PrefsController ()
+@interface PrefsController ()<NSWindowRestoration>
 
 @property(nonatomic, readonly) tr_session* fHandle;
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
@@ -58,6 +58,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic, copy) NSString* fInitialString;
 
 @property(nonatomic) IBOutlet NSButton* fSystemPreferencesButton;
+@property(nonatomic) IBOutlet NSButton* fSetDefaultForMagnetButton;
+@property(nonatomic) IBOutlet NSButton* fSetDefaultForTorrentButton;
 @property(nonatomic) IBOutlet NSTextField* fCheckForUpdatesLabel;
 @property(nonatomic) IBOutlet NSButton* fCheckForUpdatesButton;
 @property(nonatomic) IBOutlet NSButton* fCheckForUpdatesBetaButton;
@@ -212,6 +214,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.window center];
 
     [self setPrefView:nil];
+
+    [self updateDefaultsStatus];
 
     //set special-handling of magnet link add window checkbox
     [self updateShowAddMagnetWindowField];
@@ -476,22 +480,22 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.fPortStatusProgress stopAnimation:self];
     switch (self.fPortChecker.status)
     {
-    case PORT_STATUS_OPEN:
+    case PortStatusOpen:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port is open", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusAvailable];
         break;
-    case PORT_STATUS_CLOSED:
+    case PortStatusClosed:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusUnavailable];
         break;
-    case PORT_STATUS_ERROR:
+    case PortStatusError:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
         break;
-    case PORT_STATUS_CHECKING:
+    case PortStatusChecking:
         break;
     default:
-        NSAssert(NO, @"Port checker returned invalid status: %d", self.fPortChecker.status);
+        NSAssert(NO, @"Port checker returned invalid status: %lu", self.fPortChecker.status);
         break;
     }
     self.fPortChecker = nil;
@@ -818,7 +822,24 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (IBAction)openNotificationSystemPrefs:(NSButton*)sender
 {
-    [NSWorkspace.sharedWorkspace openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
+    NSURL* prefPaneUrl = nil;
+    if (@available(macOS 13, *))
+    {
+        NSString* prefPaneName = @"x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=";
+        prefPaneName = [prefPaneName stringByAppendingString:NSBundle.mainBundle.bundleIdentifier];
+        prefPaneUrl = [NSURL URLWithString:prefPaneName];
+    }
+    else if (@available(macOS 12, *))
+    {
+        NSString* prefPaneName = @"x-apple.systempreferences:com.apple.preference.notifications?id=";
+        prefPaneName = [prefPaneName stringByAppendingString:NSBundle.mainBundle.bundleIdentifier];
+        prefPaneUrl = [NSURL URLWithString:prefPaneName];
+    }
+    else
+    {
+        prefPaneUrl = [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"];
+    }
+    [NSWorkspace.sharedWorkspace openURL:prefPaneUrl];
 }
 
 - (void)resetWarnings:(id)sender
@@ -836,7 +857,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     //[fDefaults removeObjectForKey: @"WarningLegal"];
 }
 
-- (void)setDefaultForMagnets:(id)sender
+- (IBAction)setDefaultForMagnets:(id)sender
 {
     NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
     OSStatus const result = LSSetDefaultHandlerForURLScheme((CFStringRef) @"magnet", (__bridge CFStringRef)bundleID);
@@ -844,6 +865,49 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     {
         NSLog(@"Failed setting default magnet link handler");
     }
+    [self updateDefaultsStatus];
+}
+
+- (IBAction)setDefaultForTorrentFiles:(id)sender
+{
+    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
+    OSStatus const result = LSSetDefaultRoleHandlerForContentType((CFStringRef) @"org.bittorrent.torrent", kLSRolesViewer, (__bridge CFStringRef)bundleID);
+    if (result != noErr)
+    {
+        NSLog(@"Failed setting default torrent file handler");
+    }
+    [self updateDefaultsStatus];
+}
+
+- (void)updateDefaultsStatus
+{
+    BOOL isDefaultForMagnetSet = NO;
+    BOOL isDefaultForTorrentSet = NO;
+
+    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
+
+    NSString* const defaultBundleIdForMagnet = (__bridge NSString*)LSCopyDefaultHandlerForURLScheme((CFStringRef) @"magnet");
+    if (defaultBundleIdForMagnet)
+    {
+        if ([bundleID isEqualToString:defaultBundleIdForMagnet])
+        {
+            isDefaultForMagnetSet = YES;
+        }
+    }
+
+    NSString* const defaultBundleIdForTorrent = (__bridge NSString*)LSCopyDefaultRoleHandlerForContentType(
+        (CFStringRef) @"org.bittorrent.torrent",
+        kLSRolesViewer);
+    if (defaultBundleIdForTorrent)
+    {
+        if ([bundleID isEqualToString:defaultBundleIdForTorrent])
+        {
+            isDefaultForTorrentSet = YES;
+        }
+    }
+
+    self.fSetDefaultForMagnetButton.enabled = !isDefaultForMagnetSet;
+    self.fSetDefaultForTorrentButton.enabled = !isDefaultForTorrentSet;
 }
 
 - (void)setQueue:(id)sender

@@ -9,7 +9,7 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 /**
  * A memory buffer which uses a builtin array of N bytes, using heap
@@ -26,15 +26,23 @@ private:
 
 public:
     using value_type = Char;
-    using const_reference = const Char&;
+    using const_reference = Char const&;
 
     tr_strbuf()
     {
         ensure_sz();
     }
 
-    tr_strbuf(tr_strbuf const& other) = delete;
-    tr_strbuf& operator=(tr_strbuf const& other) = delete;
+    tr_strbuf(tr_strbuf const& other)
+    {
+        assign(other.sv());
+    }
+
+    tr_strbuf& operator=(tr_strbuf const& other)
+    {
+        assign(other.sv());
+        return *this;
+    }
 
     tr_strbuf(tr_strbuf&& other)
         : buffer_{ std::move(other.buffer_) }

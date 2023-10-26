@@ -5,8 +5,9 @@
 
 #pragma once
 
+#include <set>
+
 #include <QObject>
-#include <QSet>
 #include <QTimer>
 
 #include <libtransmission/tr-macros.h>
@@ -33,5 +34,5 @@ private:
     void scheduleUpdate();
 
     QTimer timer_;
-    QSet<QGridLayout*> layouts_;
+    std::set<QGridLayout*> layouts_;
 };

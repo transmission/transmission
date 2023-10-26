@@ -33,7 +33,7 @@ export class FileRow extends EventTarget {
     const pct = 100 * (size ? have / size : 1);
     const fmt = Formatter;
     const c = `${fmt.size(have)} of ${fmt.size(size)} (${fmt.percentString(
-      pct
+      pct,
     )}%)`;
     setTextContent(this.elements.progress, c);
   }
@@ -96,12 +96,9 @@ export class FileRow extends EventTarget {
     this.dispatchEvent(e);
   }
 
-  createRow(torrent, depth, name, even) {
+  createRow(torrent, depth, name) {
     const root = document.createElement('li');
-    root.classList.add(
-      'inspector-torrent-file-list-entry',
-      even ? 'even' : 'odd'
-    );
+    root.classList.add('inspector-torrent-file-list-entry');
 
     this.elements.root = root;
 
@@ -112,7 +109,7 @@ export class FileRow extends EventTarget {
     e.title = 'Download file';
     e.id = check_id;
     e.addEventListener('change', (event_) =>
-      this.fireWantedChanged(event_.target.checked)
+      this.fireWantedChanged(event_.target.checked),
     );
     root.checkbox = e;
     root.append(e);
@@ -175,7 +172,7 @@ export class FileRow extends EventTarget {
     return this.elements.root;
   }
 
-  constructor(torrent, depth, name, indices, even) {
+  constructor(torrent, depth, name, indices) {
     super();
 
     this.fields = {
@@ -195,6 +192,6 @@ export class FileRow extends EventTarget {
       progress: null,
       root: null,
     };
-    this.createRow(torrent, depth, name, even);
+    this.createRow(torrent, depth, name);
   }
 }

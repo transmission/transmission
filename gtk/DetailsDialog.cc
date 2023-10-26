@@ -6,7 +6,6 @@
 #include "DetailsDialog.h"
 
 #include "Actions.h"
-#include "FaviconCache.h" // gtr_get_favicon()
 #include "FileList.h"
 #include "GtkCompat.h"
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_BIG, GUI_PAD_SMALL
@@ -49,7 +48,6 @@
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #include <algorithm>
 #include <array>
@@ -68,6 +66,7 @@
 #include <ws2tcpip.h>
 #else
 #include <arpa/inet.h>
+#include <sys/socket.h>
 #endif
 
 using namespace std::literals;
@@ -446,7 +445,6 @@ void DetailsDialog::Impl::torrent_set_bool(tr_quark key, bool value)
     }
 
     core_->exec(&top);
-    tr_variantClear(&top);
 }
 
 void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
@@ -465,7 +463,6 @@ void DetailsDialog::Impl::torrent_set_int(tr_quark key, int value)
     }
 
     core_->exec(&top);
-    tr_variantClear(&top);
 }
 
 void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
@@ -484,7 +481,6 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
     }
 
     core_->exec(&top);
-    tr_variantClear(&top);
 }
 
 void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*builder*/)
@@ -630,7 +626,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     infos.reserve(torrents.size());
     for (auto* const torrent : torrents)
     {
-        stats.push_back(tr_torrentStatCached(torrent));
+        stats.push_back(tr_torrentStat(torrent));
         infos.push_back(tr_torrentView(torrent));
     }
 
@@ -691,7 +687,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const creator = tr_strvStrip(infos.front().creator != nullptr ? infos.front().creator : "");
+        auto const creator = tr_strv_strip(infos.front().creator != nullptr ? infos.front().creator : "");
         auto const date = infos.front().date_created;
         auto const datestr = get_date_string(date);
         bool const mixed_creator = std::any_of(
@@ -1744,10 +1740,10 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
     webseed_store_ = Gtk::ListStore::create(webseed_cols);
     auto* v = gtr_get_widget<Gtk::TreeView>(builder, "webseeds_view");
     v->set_model(webseed_store_);
-    setup_tree_view_button_event_handling(
+    setup_item_view_button_event_handling(
         *v,
         {},
-        [v](double view_x, double view_y) { return on_tree_view_button_released(*v, view_x, view_y); });
+        [v](double view_x, double view_y) { return on_item_view_button_released(*v, view_x, view_y); });
 
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
@@ -1776,10 +1772,10 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
     peer_view_->set_model(m);
     peer_view_->set_has_tooltip(true);
     peer_view_->signal_query_tooltip().connect(sigc::mem_fun(*this, &Impl::onPeerViewQueryTooltip), false);
-    setup_tree_view_button_event_handling(
+    setup_item_view_button_event_handling(
         *peer_view_,
         {},
-        [this](double view_x, double view_y) { return on_tree_view_button_released(*peer_view_, view_x, view_y); });
+        [this](double view_x, double view_y) { return on_item_view_button_released(*peer_view_, view_x, view_y); });
 
     setPeerViewColumns(peer_view_);
 
@@ -1966,7 +1962,8 @@ void buildTrackerSummary(
     // hostname
     gstr << text_dir_mark.at(static_cast<int>(direction));
     gstr << (tracker.isBackup ? "<i>" : "<b>");
-    gstr << Glib::Markup::escape_text(!key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host, key) : tracker.host);
+    gstr << Glib::Markup::escape_text(
+        !key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host_and_port, key) : tracker.host_and_port);
     gstr << (tracker.isBackup ? "</i>" : "</b>");
 
     if (!tracker.isBackup)
@@ -2047,16 +2044,16 @@ tr_torrent* DetailsDialog::Impl::tracker_list_get_current_torrent() const
 namespace
 {
 
-void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeRowReference& reference)
+void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const* pixbuf, Gtk::TreeRowReference& reference)
 {
-    if (pixbuf != nullptr)
+    if (pixbuf != nullptr && *pixbuf != nullptr)
     {
         auto const path = reference.get_path();
         auto const model = reference.get_model();
 
         if (auto const iter = model->get_iter(path); iter)
         {
-            (*iter)[tracker_cols.favicon] = pixbuf;
+            (*iter)[tracker_cols.favicon] = *pixbuf;
         }
     }
 }
@@ -2068,7 +2065,6 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
     std::ostringstream gstr;
     auto& hash = tracker_hash_;
     auto const& store = tracker_store_;
-    auto* session = core_->get_session();
     bool const showScrape = scrape_check_->get_active();
 
     /* step 1: get all the trackers */
@@ -2105,10 +2101,10 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
 
             auto const p = store->get_path(iter);
             hash.try_emplace(gstr.str(), Gtk::TreeRowReference(store, p));
-            gtr_get_favicon_from_url(
-                session,
+            core_->favicon_cache().load(
                 tracker.announce,
-                [ref = Gtk::TreeRowReference(store, p)](auto const& pixbuf) mutable { favicon_ready_cb(pixbuf, ref); });
+                [ref = Gtk::TreeRowReference(store, p)](auto const* pixbuf_refptr) mutable
+                { favicon_ready_cb(pixbuf_refptr, ref); });
         }
     }
 
@@ -2386,8 +2382,6 @@ void AddTrackerDialog::on_response(int response)
 
                 core_->exec(&top);
                 parent_.refresh();
-
-                tr_variantClear(&top);
             }
             else
             {
@@ -2435,8 +2429,6 @@ void DetailsDialog::Impl::on_tracker_list_remove_button_clicked()
 
         core_->exec(&top);
         refresh();
-
-        tr_variantClear(&top);
     }
 }
 
@@ -2450,11 +2442,11 @@ void DetailsDialog::Impl::tracker_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     trackers_filtered_->set_visible_func(sigc::mem_fun(*this, &Impl::trackerVisibleFunc));
 
     tracker_view_->set_model(trackers_filtered_);
-    setup_tree_view_button_event_handling(
+    setup_item_view_button_event_handling(
         *tracker_view_,
         [this](guint /*button*/, TrGdkModifierType /*state*/, double view_x, double view_y, bool context_menu_requested)
-        { return on_tree_view_button_pressed(*tracker_view_, view_x, view_y, context_menu_requested); },
-        [this](double view_x, double view_y) { return on_tree_view_button_released(*tracker_view_, view_x, view_y); });
+        { return on_item_view_button_pressed(*tracker_view_, view_x, view_y, context_menu_requested); },
+        [this](double view_x, double view_y) { return on_item_view_button_released(*tracker_view_, view_x, view_y); });
 
     auto sel = tracker_view_->get_selection();
     sel->signal_changed().connect(sigc::mem_fun(*this, &Impl::on_tracker_list_selection_changed));

@@ -94,6 +94,9 @@ Prefs.AltSpeedEnabled = 'alt-speed-enabled';
 Prefs.DisplayCompact = 'compact';
 Prefs.DisplayFull = 'full';
 Prefs.DisplayMode = 'display-mode';
+Prefs.ContrastLess = 'less';
+Prefs.ContrastMore = 'more';
+Prefs.ContrastMode = 'contrast-mode';
 Prefs.FilterActive = 'active';
 Prefs.FilterAll = 'all';
 Prefs.FilterDownloading = 'downloading';
@@ -119,6 +122,9 @@ Prefs.SortMode = 'sort-mode';
 Prefs._Defaults = {
   [Prefs.AltSpeedEnabled]: false,
   [Prefs.DisplayMode]: Prefs.DisplayFull,
+  [Prefs.ContrastMode]: window.matchMedia('(prefers-contrast: more)').matches
+    ? Prefs.ContrastMore
+    : Prefs.ContrastLess,
   [Prefs.FilterMode]: Prefs.FilterAll,
   [Prefs.NotificationsEnabled]: false,
   [Prefs.RefreshRate]: 5,

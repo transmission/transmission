@@ -93,10 +93,9 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
 } // namespace
 
 Application::Application(int& argc, char** argv)
-    : QApplication(argc, argv)
+    : QApplication{ argc, argv }
     , config_name_{ QStringLiteral("transmission") }
     , display_name_{ QStringLiteral("transmission-qt") }
-    , start_now_regex_{ QRegularExpression(QStringLiteral(R"rgx(start-now\((\d+)\))rgx")) }
 {
     setApplicationName(config_name_);
     loadTranslations();
@@ -326,12 +325,11 @@ Application::Application(int& argc, char** argv)
 
     if (!prefs_->getBool(Prefs::USER_HAS_GIVEN_INFORMED_CONSENT))
     {
-        auto* dialog = new QMessageBox(
-            QMessageBox::Information,
-            QString(),
-            tr("<b>Transmission is a file sharing program.</b>"),
-            QMessageBox::Ok | QMessageBox::Cancel,
-            window_.get());
+        auto* dialog = new QMessageBox{ QMessageBox::Information,
+                                        QString{},
+                                        tr("<b>Transmission is a file sharing program.</b>"),
+                                        QMessageBox::Ok | QMessageBox::Cancel,
+                                        window_.get() };
         dialog->setInformativeText(
             tr("When you run a torrent, its data will be made available to others by means of upload. "
                "Any content you share is your sole responsibility."));
@@ -353,8 +351,7 @@ Application::Application(int& argc, char** argv)
     InteropHelper::registerObject(this);
 
 #ifdef QT_DBUS_LIB
-    QDBusConnection bus = QDBusConnection::sessionBus();
-    if (bus.isConnected())
+    if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
     {
         bus.connect(
             fdo_notifications_service_name_,
@@ -370,7 +367,7 @@ Application::Application(int& argc, char** argv)
 
 void Application::loadTranslations()
 {
-    auto const qt_qm_dirs = QStringList() <<
+    auto const qt_qm_dirs = QStringList{} <<
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         QLibraryInfo::path(QLibraryInfo::TranslationsPath) <<
 #else
@@ -381,7 +378,7 @@ void Application::loadTranslations()
 #endif
         (applicationDirPath() + QStringLiteral("/translations"));
 
-    QStringList const app_qm_dirs = QStringList() <<
+    QStringList const app_qm_dirs = QStringList{} <<
 #ifdef TRANSLATIONS_DIR
         QStringLiteral(TRANSLATIONS_DIR) <<
 #endif
@@ -473,7 +470,7 @@ void Application::onTorrentsNeedInfo(torrent_ids_t const& torrent_ids) const
 void Application::notifyTorrentAdded(Torrent const* tor) const
 {
     QStringList actions;
-    actions << QString(QLatin1String("start-now(%1)")).arg(tor->id()) << QObject::tr("Start Now");
+    actions << QString{ QLatin1String("start-now(%1)") }.arg(tor->id()) << QObject::tr("Start Now");
     notifyApp(tr("Torrent Added"), tor->name(), actions);
 }
 
@@ -592,7 +589,7 @@ void Application::addTorrent(AddData const& addme) const
     }
     else
     {
-        auto* o = new OptionsDialog(*session_, *prefs_, addme, window_.get());
+        auto* o = new OptionsDialog{ *session_, *prefs_, addme, window_.get() };
         o->show();
     }
 
@@ -656,17 +653,16 @@ void Application::onNotificationActionInvoked(quint32 /* notification_id */, QSt
 }
 #endif
 
-FaviconCache& Application::faviconCache()
-{
-    return favicons_;
-}
-
 /***
 ****
 ***/
 
 int tr_main(int argc, char** argv)
 {
+    auto const init_mgr = tr_lib_init();
+
+    tr_locale_set_global("");
+
     InteropHelper::initialize();
 
     Application const app(argc, argv);

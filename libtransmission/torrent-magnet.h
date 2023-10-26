@@ -12,18 +12,38 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <ctime> // time_t
+#include <deque>
 #include <optional>
 #include <vector>
 
-#include "transmission.h"
+#include <small/vector.hpp>
 
+struct tr_error;
 struct tr_torrent;
 struct tr_torrent_metainfo;
 
 // defined by BEP #9
-inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
+inline constexpr int MetadataPieceSize = 1024 * 16;
 
-std::optional<std::vector<std::byte>> tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece);
+using tr_metadata_piece = small::max_size_vector<std::byte, MetadataPieceSize>;
+
+struct tr_incomplete_metadata
+{
+    struct metadata_node
+    {
+        time_t requested_at = 0U;
+        int piece = 0;
+    };
+
+    std::vector<char> metadata;
+
+    /** sorted from least to most recently requested */
+    std::deque<metadata_node> pieces_needed;
+
+    int piece_count = 0;
+};
+
+bool tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, tr_metadata_piece& setme);
 
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, size_t len);
 

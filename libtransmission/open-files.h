@@ -20,8 +20,6 @@
 #include "file.h" // tr_sys_file_t
 #include "lru-cache.h"
 
-struct tr_session;
-
 // A pool of open files that are cached while reading / writing torrents' data
 class tr_open_files
 {
@@ -36,14 +34,14 @@ public:
         tr_preallocation_mode allocation,
         uint64_t file_size);
 
-    void closeAll();
-    void closeTorrent(tr_torrent_id_t tor_id);
-    void closeFile(tr_torrent_id_t tor_id, tr_file_index_t file_num);
+    void close_all();
+    void close_torrent(tr_torrent_id_t tor_id);
+    void close_file(tr_torrent_id_t tor_id, tr_file_index_t file_num);
 
 private:
     using Key = std::pair<tr_torrent_id_t, tr_file_index_t>;
 
-    [[nodiscard]] static Key makeKey(tr_torrent_id_t tor_id, tr_file_index_t file_num) noexcept
+    [[nodiscard]] static Key make_key(tr_torrent_id_t tor_id, tr_file_index_t file_num) noexcept
     {
         return std::make_pair(tor_id, file_num);
     }

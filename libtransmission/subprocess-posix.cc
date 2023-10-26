@@ -6,22 +6,20 @@
 #include <array>
 #include <cerrno>
 #include <csignal>
+#include <cstdlib>
 #include <map>
+#include <string>
 #include <string_view>
 
 #include <fcntl.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <fmt/format.h>
-
-#include "libtransmission/transmission.h"
+#include <fmt/core.h>
 
 #include "libtransmission/error.h"
 #include "libtransmission/subprocess.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 

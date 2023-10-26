@@ -19,6 +19,9 @@
 #include <process.h> /* _beginthreadex(), _endthreadex() */
 #include <windows.h>
 #include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
+#ifdef small // workaround name collision between libsmall and rpcndr.h
+#undef small
+#endif
 #else
 #include <pwd.h>
 #include <unistd.h> /* getuid() */
@@ -32,7 +35,7 @@
 #include <FindDirectory.h>
 #endif
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 
@@ -40,10 +43,13 @@
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/session.h"
-#include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
+
+// FIXME(ckerr) do not merge these three lines.
+// This comment is to make CI think libtransmission has
+// changed so that it will run the libtransmission CI tests
 
 namespace
 {
@@ -110,7 +116,7 @@ std::string getXdgEntryFromUserDirs(std::string_view key)
 {
     auto content = std::vector<char>{};
     if (auto const filename = fmt::format("{:s}/{:s}"sv, xdgConfigHome(), "user-dirs.dirs"sv);
-        !tr_sys_path_exists(filename) || !tr_loadFile(filename, content) || std::empty(content))
+        !tr_sys_path_exists(filename) || !tr_file_read(filename, content) || std::empty(content))
     {
         return {};
     }
@@ -187,7 +193,7 @@ std::string tr_getDefaultConfigDir(std::string_view appname)
 
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
+    return tr_strv_to_buf(tr_getDefaultConfigDir(appname != nullptr ? appname : ""), buf, buflen);
 }
 
 std::string tr_getDefaultDownloadDir()
@@ -213,7 +219,7 @@ std::string tr_getDefaultDownloadDir()
 
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen)
 {
-    return tr_strvToBuf(tr_getDefaultDownloadDir(), buf, buflen);
+    return tr_strv_to_buf(tr_getDefaultDownloadDir(), buf, buflen);
 }
 
 // ---
@@ -308,9 +314,9 @@ std::string tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 
         auto sv = std::string_view{ buf };
         auto token = std::string_view{};
-        while (tr_strvSep(&sv, &token, ':'))
+        while (tr_strv_sep(&sv, &token, ':'))
         {
-            token = tr_strvStrip(token);
+            token = tr_strv_strip(token);
             if (!std::empty(token))
             {
                 candidates.emplace_back(token);

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // size_t
 #include <ctime>
 #include <optional>
 #include <string>
@@ -69,8 +69,6 @@ struct tr_log_message
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 
-[[nodiscard]] bool tr_logGetQueueEnabled();
-
 void tr_logSetQueueEnabled(bool is_enabled);
 
 [[nodiscard]] tr_log_message* tr_logGetQueue();
@@ -91,7 +89,7 @@ void tr_logAddMessage(
     char const* source_file,
     long source_line,
     tr_log_level level,
-    std::string_view msg,
+    std::string&& msg,
     std::string_view module_name = {});
 
 #define tr_logAddLevel(level, ...) \

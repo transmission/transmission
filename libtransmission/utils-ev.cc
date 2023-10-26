@@ -3,13 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <memory>
-
 #include <event2/buffer.h>
 #include <event2/event.h>
 #include <event2/http.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/utils-ev.h"
 

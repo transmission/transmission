@@ -7,13 +7,12 @@
 #include <cerrno>
 #include <chrono>
 #include <future>
-#include <mutex>
+#include <optional>
 #include <string>
 #include <thread>
 #include <utility>
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #ifdef SYSTEM_MINIUPNP
 #include <miniupnpc/miniupnpc.h>
@@ -28,9 +27,10 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
+#include "libtransmission/net.h"
 #include "libtransmission/port-forwarding-upnp.h"
-#include "libtransmission/port-forwarding.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_ADDRSTRLEN
 #include "libtransmission/utils.h" // for _(), tr_strerror()
 
 namespace

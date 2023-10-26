@@ -37,12 +37,13 @@ public:
 
     /* The Torrent properties that can affect this filter.
        When one of these changes, it's time to refilter. */
-    static Torrent::fields_t constexpr TorrentFields = //
-        (uint64_t(1) << Torrent::ERROR) | //
-        (uint64_t(1) << Torrent::IS_FINISHED) | //
-        (uint64_t(1) << Torrent::PEERS_GETTING_FROM_US) | //
-        (uint64_t(1) << Torrent::PEERS_SENDING_TO_US) | //
-        (uint64_t(1) << Torrent::STATUS);
+    static constexpr auto TorrentFields = Torrent::fields_t{
+        (uint64_t{ 1 } << Torrent::TORRENT_ERROR) | //
+        (uint64_t{ 1 } << Torrent::IS_FINISHED) | //
+        (uint64_t{ 1 } << Torrent::PEERS_GETTING_FROM_US) | //
+        (uint64_t{ 1 } << Torrent::PEERS_SENDING_TO_US) | //
+        (uint64_t{ 1 } << Torrent::STATUS) //
+    };
 
     static bool test(Torrent const& tor, int mode);
 

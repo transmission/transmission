@@ -16,10 +16,11 @@
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "file.h"
-#include "tr-strbuf.h"
+#include "libtransmission/file.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-strbuf.h"
 
 struct tr_error;
 
@@ -112,7 +113,6 @@ public:
     bool move(
         std::string_view old_parent_in,
         std::string_view parent_in,
-        double volatile* setme_progress,
         std::string_view parent_name = "",
         tr_error** error = nullptr) const;
 

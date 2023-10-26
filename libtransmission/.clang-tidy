@@ -9,7 +9,6 @@ Checks: >
   cert-*,
   -cert-err58-cpp,
   clang-analyzer-*,
-  cppcoreguidelines-avoid-const-or-ref-data-members,
   cppcoreguidelines-avoid-do-while,
   cppcoreguidelines-avoid-goto,
   cppcoreguidelines-avoid-reference-coroutine-parameters,
@@ -37,7 +36,8 @@ Checks: >
   -readability-qualified-auto,
 
 CheckOptions:
-  - { key: readability-identifier-naming.ParameterCase,            value: lower_case }
+  - { key: cppcoreguidelines-avoid-do-while.IgnoreMacros,          value: true       }
   - { key: readability-identifier-naming.ConstexprVariableCase,    value: CamelCase  }
+  - { key: readability-identifier-naming.ParameterCase,            value: lower_case }
   - { key: readability-identifier-naming.VariableCase,             value: lower_case }
 

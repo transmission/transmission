@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <algorithm> // std::move
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <future>
@@ -14,13 +13,16 @@
 #include <utility> // std::pair
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announce-list.h"
-#include "block-info.h"
-#include "file.h"
-#include "torrent-files.h"
-#include "utils.h" // for tr_saveFile()
+#include "libtransmission/announce-list.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/file.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/utils.h" // for tr_file_save()
+
+struct tr_error;
 
 class tr_metainfo_builder
 {
@@ -37,27 +39,27 @@ public:
     // - Runs in a worker thread because it can be time-consuming.
     // - Can be cancelled with `cancelChecksums()` and polled with `checksumStatus()`
     // - Resolves with a `tr_error*` which is set on failure or nullptr on success.
-    std::future<tr_error*> makeChecksums()
+    std::future<tr_error*> make_checksums()
     {
         return std::async(
             std::launch::async,
             [this]()
             {
                 tr_error* error = nullptr;
-                blockingMakeChecksums(&error);
+                blocking_make_checksums(&error);
                 return error;
             });
     }
 
     // Returns the status of a `makeChecksums()` call:
     // The current piece being tested and the total number of pieces in the torrent.
-    [[nodiscard]] constexpr std::pair<tr_piece_index_t, tr_piece_index_t> checksumStatus() const noexcept
+    [[nodiscard]] constexpr std::pair<tr_piece_index_t, tr_piece_index_t> checksum_status() const noexcept
     {
-        return std::make_pair(checksum_piece_, block_info_.pieceCount());
+        return std::make_pair(checksum_piece_, block_info_.piece_count());
     }
 
     // Tell the `makeChecksums()` worker thread to cleanly exit ASAP.
-    constexpr void cancelChecksums() noexcept
+    constexpr void cancel_checksums() noexcept
     {
         cancel_ = true;
     }
@@ -68,47 +70,47 @@ public:
     // generate the metainfo and save it to a torrent file
     bool save(std::string_view filename, tr_error** error = nullptr) const
     {
-        return tr_saveFile(filename, benc(error), error);
+        return tr_file_save(filename, benc(error), error);
     }
 
     /// setters
 
-    void setAnnounceList(tr_announce_list announce)
+    void set_announce_list(tr_announce_list announce)
     {
         announce_ = std::move(announce);
     }
 
     // whether or not to include User-Agent and creation time
-    constexpr void setAnonymize(bool anonymize) noexcept
+    constexpr void set_anonymize(bool anonymize) noexcept
     {
         anonymize_ = anonymize;
     }
 
-    void setComment(std::string_view comment)
+    void set_comment(std::string_view comment)
     {
         comment_ = comment;
     }
 
-    bool setPieceSize(uint32_t piece_size) noexcept;
+    bool set_piece_size(uint32_t piece_size) noexcept;
 
-    constexpr void setPrivate(bool is_private) noexcept
+    constexpr void set_private(bool is_private) noexcept
     {
         is_private_ = is_private;
     }
 
-    void setSource(std::string_view source)
+    void set_source(std::string_view source)
     {
         source_ = source;
     }
 
-    void setWebseeds(std::vector<std::string> webseeds)
+    void set_webseeds(std::vector<std::string> webseeds)
     {
         webseeds_ = std::move(webseeds);
     }
 
     /// getters
 
-    [[nodiscard]] constexpr auto const& announceList() const noexcept
+    [[nodiscard]] constexpr auto const& announce_list() const noexcept
     {
         return announce_;
     }
@@ -123,17 +125,17 @@ public:
         return comment_;
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileCount() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto file_count() const noexcept
     {
         return files_.fileCount();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 auto fileSize(tr_file_index_t i) const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto file_size(tr_file_index_t i) const noexcept
     {
         return files_.fileSize(i);
     }
 
-    [[nodiscard]] constexpr auto const& isPrivate() const noexcept
+    [[nodiscard]] constexpr auto is_private() const noexcept
     {
         return is_private_;
     }
@@ -148,14 +150,14 @@ public:
         return files_.path(i);
     }
 
-    [[nodiscard]] constexpr auto pieceSize() const noexcept
+    [[nodiscard]] constexpr auto piece_size() const noexcept
     {
-        return block_info_.pieceSize();
+        return block_info_.piece_size();
     }
 
-    [[nodiscard]] constexpr auto pieceCount() const noexcept
+    [[nodiscard]] constexpr auto piece_count() const noexcept
     {
-        return block_info_.pieceCount();
+        return block_info_.piece_count();
     }
 
     [[nodiscard]] constexpr auto const& source() const noexcept
@@ -168,7 +170,7 @@ public:
         return top_;
     }
 
-    [[nodiscard]] constexpr auto totalSize() const noexcept
+    [[nodiscard]] constexpr auto total_size() const noexcept
     {
         return files_.totalSize();
     }
@@ -180,50 +182,18 @@ public:
 
     ///
 
-    [[nodiscard]] constexpr static uint32_t defaultPieceSize(uint64_t total_size) noexcept
+    [[nodiscard]] static uint32_t default_piece_size(uint64_t total_size) noexcept;
+
+    [[nodiscard]] constexpr static bool is_legal_piece_size(uint32_t x)
     {
-        uint32_t const KiB = 1024;
-        uint32_t const MiB = 1048576;
-        uint32_t const GiB = 1073741824;
-
-        if (total_size >= 2 * GiB)
-        {
-            return 2 * MiB;
-        }
-
-        if (total_size >= 1 * GiB)
-        {
-            return 1 * MiB;
-        }
-
-        if (total_size >= 512 * MiB)
-        {
-            return 512 * KiB;
-        }
-
-        if (total_size >= 350 * MiB)
-        {
-            return 256 * KiB;
-        }
-
-        if (total_size >= 150 * MiB)
-        {
-            return 128 * KiB;
-        }
-
-        if (total_size >= 50 * MiB)
-        {
-            return 64 * KiB;
-        }
-
-        return 32 * KiB; /* less than 50 meg */
+        // It must be a power of two and at least 16KiB
+        auto const MinSize = uint32_t{ 1024U * 16U };
+        auto const is_power_of_two = (x & (x - 1)) == 0;
+        return x >= MinSize && is_power_of_two;
     }
 
-    // must be a power of two and >= 16 KiB
-    [[nodiscard]] static bool isLegalPieceSize(uint32_t x);
-
 private:
-    bool blockingMakeChecksums(tr_error** error = nullptr);
+    bool blocking_make_checksums(tr_error** error = nullptr);
 
     std::string top_;
     tr_torrent_files files_;

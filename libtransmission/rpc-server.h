@@ -9,19 +9,21 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h"
-#include "utils-ev.h"
+#include "libtransmission/net.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/utils-ev.h"
 
-struct evhttp;
+class tr_rpc_address;
+struct tr_session;
 struct tr_variant;
-struct tr_rpc_address;
 struct libdeflate_compressor;
 
 namespace libtransmission
@@ -37,7 +39,7 @@ class Timer;
     V(TR_KEY_rpc_enabled, is_enabled_, bool, false, "") \
     V(TR_KEY_rpc_host_whitelist, host_whitelist_str_, std::string, "", "") \
     V(TR_KEY_rpc_host_whitelist_enabled, is_host_whitelist_enabled_, bool, true, "") \
-    V(TR_KEY_rpc_port, port_, tr_port, tr_port::fromHost(TR_DEFAULT_RPC_PORT), "") \
+    V(TR_KEY_rpc_port, port_, tr_port, tr_port::from_host(TR_DEFAULT_RPC_PORT), "") \
     V(TR_KEY_rpc_password, salted_password_, std::string, "", "") \
     V(TR_KEY_rpc_socket_mode, socket_mode_, tr_mode_t, 0750, "") \
     V(TR_KEY_rpc_url, url_, std::string, TR_DEFAULT_RPC_URL_STR, "") \
@@ -48,7 +50,7 @@ class Timer;
 class tr_rpc_server
 {
 public:
-    tr_rpc_server(tr_session* session, tr_variant* settings);
+    tr_rpc_server(tr_session* session, tr_variant const& settings);
     ~tr_rpc_server();
 
     tr_rpc_server(tr_rpc_server&) = delete;
@@ -56,30 +58,30 @@ public:
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
-    static void defaultSettings(tr_variant* tgt);
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
     [[nodiscard]] constexpr tr_port port() const noexcept
     {
         return port_;
     }
 
-    void setPort(tr_port port) noexcept;
+    void set_port(tr_port port) noexcept;
 
-    [[nodiscard]] constexpr auto isEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_enabled() const noexcept
     {
         return is_enabled_;
     }
 
-    void setEnabled(bool is_enabled);
+    void set_enabled(bool is_enabled);
 
-    [[nodiscard]] constexpr auto isWhitelistEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_whitelist_enabled() const noexcept
     {
         return is_whitelist_enabled_;
     }
 
-    constexpr void setWhitelistEnabled(bool is_whitelist_enabled) noexcept
+    constexpr void set_whitelist_enabled(bool is_whitelist_enabled) noexcept
     {
         is_whitelist_enabled_ = is_whitelist_enabled;
     }
@@ -89,42 +91,42 @@ public:
         return whitelist_str_;
     }
 
-    void setWhitelist(std::string_view whitelist);
+    void set_whitelist(std::string_view whitelist);
 
     [[nodiscard]] constexpr auto const& username() const noexcept
     {
         return username_;
     }
 
-    void setUsername(std::string_view username);
+    void set_username(std::string_view username);
 
-    [[nodiscard]] constexpr auto isPasswordEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_password_enabled() const noexcept
     {
         return is_password_enabled_;
     }
 
-    void setPasswordEnabled(bool enabled);
+    void set_password_enabled(bool enabled);
 
-    [[nodiscard]] constexpr auto const& getSaltedPassword() const noexcept
+    [[nodiscard]] constexpr auto const& get_salted_password() const noexcept
     {
         return salted_password_;
     }
 
-    void setPassword(std::string_view password) noexcept;
+    void set_password(std::string_view password) noexcept;
 
-    [[nodiscard]] constexpr auto isAntiBruteForceEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_anti_brute_force_enabled() const noexcept
     {
         return is_anti_brute_force_enabled_;
     }
 
-    void setAntiBruteForceEnabled(bool enabled) noexcept;
+    void set_anti_brute_force_enabled(bool enabled) noexcept;
 
-    [[nodiscard]] constexpr auto getAntiBruteForceLimit() const noexcept
+    [[nodiscard]] constexpr auto get_anti_brute_force_limit() const noexcept
     {
         return anti_brute_force_limit_;
     }
 
-    constexpr void setAntiBruteForceLimit(int limit) noexcept
+    constexpr void set_anti_brute_force_limit(int limit) noexcept
     {
         anti_brute_force_limit_ = limit;
     }
@@ -136,11 +138,11 @@ public:
         return url_;
     }
 
-    void setUrl(std::string_view url);
+    void set_url(std::string_view url);
 
-    [[nodiscard]] std::string getBindAddress() const;
+    [[nodiscard]] std::string get_bind_address() const;
 
-    [[nodiscard]] constexpr auto socketMode() const noexcept
+    [[nodiscard]] constexpr auto socket_mode() const noexcept
     {
         return socket_mode_;
     }
@@ -153,7 +155,7 @@ public:
     std::vector<std::string> whitelist_;
     std::string const web_client_dir_;
 
-    std::unique_ptr<struct tr_rpc_address> bind_address_;
+    std::unique_ptr<tr_rpc_address> bind_address_;
 
     std::unique_ptr<libtransmission::Timer> start_retry_timer;
     libtransmission::evhelpers::evhttp_unique_ptr httpd;

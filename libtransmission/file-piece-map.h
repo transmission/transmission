@@ -14,10 +14,10 @@
 #include <cstddef> // for size_t
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bitfield.h"
-#include "torrent-metainfo.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 
 struct tr_block_info;
 struct tr_torrent_metainfo;
@@ -55,14 +55,14 @@ public:
 
     void reset(tr_torrent_metainfo const& tm);
 
-    [[nodiscard]] TR_CONSTEXPR20 piece_span_t pieceSpan(tr_file_index_t file) const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span(tr_file_index_t file) const noexcept
     {
         return file_pieces_[file];
     }
 
-    [[nodiscard]] file_span_t fileSpan(tr_piece_index_t piece) const;
+    [[nodiscard]] file_span_t file_span(tr_piece_index_t piece) const;
 
-    [[nodiscard]] file_offset_t fileOffset(uint64_t offset) const;
+    [[nodiscard]] file_offset_t file_offset(uint64_t offset) const;
 
     [[nodiscard]] TR_CONSTEXPR20 size_t size() const
     {
@@ -75,7 +75,7 @@ public:
     }
 
     // TODO(ckerr) minor wart here, two identical span types
-    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byteSpan(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span(tr_file_index_t file) const
     {
         auto const& span = file_bytes_.at(file);
         return tr_byte_span_t{ span.begin, span.end };
@@ -145,8 +145,8 @@ public:
     void set(tr_file_index_t file, tr_priority_t priority);
     void set(tr_file_index_t const* files, size_t n, tr_priority_t priority);
 
-    [[nodiscard]] tr_priority_t filePriority(tr_file_index_t file) const;
-    [[nodiscard]] tr_priority_t piecePriority(tr_piece_index_t piece) const;
+    [[nodiscard]] tr_priority_t file_priority(tr_file_index_t file) const;
+    [[nodiscard]] tr_priority_t piece_priority(tr_piece_index_t piece) const;
 
 private:
     tr_file_piece_map const* fpm_;
@@ -166,12 +166,12 @@ public:
     void set(tr_file_index_t file, bool wanted);
     void set(tr_file_index_t const* files, size_t n, bool wanted);
 
-    [[nodiscard]] TR_CONSTEXPR20 bool fileWanted(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 bool file_wanted(tr_file_index_t file) const
     {
         return wanted_.test(file);
     }
 
-    [[nodiscard]] bool pieceWanted(tr_piece_index_t piece) const;
+    [[nodiscard]] bool piece_wanted(tr_piece_index_t piece) const;
 
 private:
     tr_file_piece_map const* fpm_;

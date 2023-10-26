@@ -90,14 +90,14 @@ target_sources(${TR_NAME}-mac
         FilterButton.mm
         GlobalOptionsPopoverViewController.h
         GlobalOptionsPopoverViewController.mm
+        GroupCell.h
+        GroupCell.mm
         GroupPopUpButtonCell.h
         GroupPopUpButtonCell.mm
         GroupsController.h
         GroupsController.mm
         GroupsPrefsController.h
         GroupsPrefsController.mm
-        GroupTextCell.h
-        GroupTextCell.mm
         GroupToolbarItem.h
         GroupToolbarItem.mm
         InfoActivityViewController.h
@@ -148,12 +148,16 @@ target_sources(${TR_NAME}-mac
         PrefsWindow.mm
         PriorityPopUpButtonCell.h
         PriorityPopUpButtonCell.mm
+        ProgressBarView.h
+        ProgressBarView.mm
         ProgressGradients.h
         ProgressGradients.mm
         ShareToolbarItem.h
         ShareToolbarItem.mm
         ShareTorrentFileHelper.h
         ShareTorrentFileHelper.mm
+        SmallTorrentCell.h
+        SmallTorrentCell.mm
         SparkleProxy.mm
         StatsWindowController.h
         StatsWindowController.mm
@@ -167,6 +171,12 @@ target_sources(${TR_NAME}-mac
         Torrent.mm
         TorrentCell.h
         TorrentCell.mm
+        TorrentCellActionButton.h
+        TorrentCellActionButton.mm
+        TorrentCellControlButton.h
+        TorrentCellControlButton.mm
+        TorrentCellRevealButton.h
+        TorrentCellRevealButton.mm
         TorrentGroup.h
         TorrentGroup.mm
         TorrentTableView.h

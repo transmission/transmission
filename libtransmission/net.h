@@ -11,6 +11,7 @@
 #include <algorithm> // for std::copy_n
 #include <array>
 #include <cstddef> // size_t
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -19,10 +20,10 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
+#include <arpa/inet.h>
 #include <cerrno>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #endif
 
 #ifdef _WIN32
@@ -58,6 +59,9 @@ using tr_socket_t = int;
 #define sockerrno errno
 #endif
 
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
+
 /**
  * Literally just a port number.
  *
@@ -68,12 +72,12 @@ class tr_port
 public:
     tr_port() noexcept = default;
 
-    [[nodiscard]] constexpr static tr_port fromHost(uint16_t hport) noexcept
+    [[nodiscard]] constexpr static tr_port from_host(uint16_t hport) noexcept
     {
         return tr_port{ hport };
     }
 
-    [[nodiscard]] static tr_port fromNetwork(uint16_t nport) noexcept
+    [[nodiscard]] static tr_port from_network(uint16_t nport) noexcept
     {
         return tr_port{ ntohs(nport) };
     }
@@ -88,17 +92,17 @@ public:
         return htons(hport_);
     }
 
-    constexpr void setHost(uint16_t hport) noexcept
+    constexpr void set_host(uint16_t hport) noexcept
     {
         hport_ = hport;
     }
 
-    void setNetwork(uint16_t nport) noexcept
+    void set_network(uint16_t nport) noexcept
     {
         hport_ = ntohs(nport);
     }
 
-    [[nodiscard]] static std::pair<tr_port, std::byte const*> fromCompact(std::byte const* compact) noexcept;
+    [[nodiscard]] static std::pair<tr_port, std::byte const*> from_compact(std::byte const* compact) noexcept;
 
     [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
     {
@@ -110,6 +114,7 @@ public:
         return hport_ == that.hport_;
     }
 
+    // Can be removed once we use C++20
     [[nodiscard]] constexpr auto operator!=(tr_port const& that) const noexcept
     {
         return hport_ != that.hport_;
@@ -125,6 +130,8 @@ public:
         hport_ = 0;
     }
 
+    static auto constexpr CompactPortBytes = 2U;
+
 private:
     explicit constexpr tr_port(uint16_t hport) noexcept
         : hport_{ hport }
@@ -134,25 +141,26 @@ private:
     uint16_t hport_ = 0;
 };
 
-enum tr_address_type
+enum tr_address_type : uint8_t
 {
     TR_AF_INET,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
 };
 
+std::string_view tr_ip_protocol_to_sv(tr_address_type type);
+int tr_ip_protocol_to_af(tr_address_type type);
+tr_address_type tr_af_to_ip_protocol(int af);
+
 struct tr_address
 {
     [[nodiscard]] static std::optional<tr_address> from_string(std::string_view address_sv);
-    [[nodiscard]] static std::optional<std::pair<tr_address, tr_port>> from_sockaddr(struct sockaddr const*);
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept;
 
     // write the text form of the address, e.g. inet_ntop()
-    template<typename OutputIt>
-    OutputIt display_name(OutputIt out, tr_port port = {}) const;
-    std::string_view display_name(char* out, size_t outlen, tr_port port = {}) const;
-    [[nodiscard]] std::string display_name(tr_port port = {}) const;
+    std::string_view display_name(char* out, size_t outlen) const;
+    [[nodiscard]] std::string display_name() const;
 
     ///
 
@@ -171,86 +179,30 @@ struct tr_address
     // compact addr only -- used e.g. as `yourip` value in extension protocol handshake
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, in_addr const* addr4)
+    static OutputIt to_compact_ipv4(OutputIt out, in_addr const& addr4)
     {
-        return std::copy_n(reinterpret_cast<std::byte const*>(addr4), sizeof(*addr4), out);
+        return std::copy_n(reinterpret_cast<std::byte const*>(&addr4.s_addr), sizeof(addr4.s_addr), out);
     }
 
     template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, in6_addr const* addr6)
+    static OutputIt to_compact_ipv6(OutputIt out, in6_addr const& addr6)
     {
-        return std::copy_n(reinterpret_cast<std::byte const*>(addr6), sizeof(*addr6), out);
+        return std::copy_n(reinterpret_cast<std::byte const*>(&addr6.s6_addr), sizeof(addr6.s6_addr), out);
     }
 
     template<typename OutputIt>
     OutputIt to_compact(OutputIt out) const
     {
-        return is_ipv4() ? to_compact_ipv4(out, &this->addr.addr4) : to_compact_ipv6(out, &this->addr.addr6);
-    }
-
-    // compact addr + port -- very common format used for peer exchange, dht, tracker announce responses
-
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, in_addr const* addr4, tr_port port)
-    {
-        out = tr_address::to_compact_ipv4(out, addr4);
-
-        auto const nport = port.network();
-        return std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, in6_addr const* addr6, tr_port port)
-    {
-        out = tr_address::to_compact_ipv6(out, addr6);
-
-        auto const nport = port.network();
-        return std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
-    }
-
-    template<typename OutputIt>
-    OutputIt to_compact_ipv4(OutputIt out, tr_port port) const
-    {
-        return to_compact_ipv4(out, &this->addr.addr4, port);
-    }
-
-    template<typename OutputIt>
-    OutputIt to_compact_ipv6(OutputIt out, tr_port port) const
-    {
-        return to_compact_ipv6(out, &this->addr.addr6, port);
-    }
-
-    template<typename OutputIt>
-    OutputIt to_compact(OutputIt out, tr_port port)
-    {
-        return is_ipv4() ? to_compact_4(out, &this->addr.addr4, port) : to_compact_ipv6(out, &this->addr.addr6, port);
-    }
-
-    // compact sockaddr helpers
-
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv4(OutputIt out, sockaddr_in const* sa4)
-    {
-        return to_compact_ipv4(out, &sa4->sin_addr, tr_port::fromNetwork(sa4->sin_port));
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact_ipv6(OutputIt out, sockaddr_in6 const* sa6)
-    {
-        return to_compact_ipv6(out, &sa6->sin6_addr, tr_port::fromNetwork(sa6->sin6_port));
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact(OutputIt out, sockaddr const* saddr)
-    {
-        return saddr->sa_family == AF_INET ? to_compact_ipv4(out, reinterpret_cast<sockaddr_in const*>(saddr)) :
-                                             to_compact_ipv6(out, reinterpret_cast<sockaddr_in6 const*>(saddr));
-    }
-
-    template<typename OutputIt>
-    static OutputIt to_compact(OutputIt out, struct sockaddr_storage* ss)
-    {
-        return to_compact(out, reinterpret_cast<struct sockaddr*>(ss));
+        switch (type)
+        {
+        case TR_AF_INET:
+            return to_compact_ipv4(out, addr.addr4);
+        case TR_AF_INET6:
+            return to_compact_ipv6(out, addr.addr6);
+        default:
+            TR_ASSERT_MSG(false, "invalid address type");
+            return out;
+        }
     }
 
     // comparisons
@@ -279,8 +231,6 @@ struct tr_address
 
     //
 
-    [[nodiscard]] std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_port port) const noexcept;
-
     [[nodiscard]] bool is_global_unicast_address() const noexcept;
 
     tr_address_type type;
@@ -290,22 +240,198 @@ struct tr_address
         struct in_addr addr4;
     } addr;
 
-    [[nodiscard]] static auto constexpr any_ipv4() noexcept
+    static auto constexpr CompactAddrBytes = std::array{ 4U, 16U };
+    static_assert(std::size(CompactAddrBytes) == NUM_TR_AF_INET_TYPES);
+
+    [[nodiscard]] static auto any(tr_address_type type) noexcept
     {
-        return tr_address{ TR_AF_INET, { { { { INADDR_ANY } } } } };
+        switch (type)
+        {
+        case TR_AF_INET:
+            return tr_address{ TR_AF_INET, { { { { INADDR_ANY } } } } };
+        case TR_AF_INET6:
+            return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
+        default:
+            TR_ASSERT_MSG(false, "invalid type");
+            return tr_address{};
+        }
     }
 
-    [[nodiscard]] static auto constexpr any_ipv6() noexcept
-    {
-        return tr_address{ TR_AF_INET6, { IN6ADDR_ANY_INIT } };
-    }
-
-    [[nodiscard]] constexpr auto is_valid() const noexcept
+    [[nodiscard]] static constexpr auto is_valid(tr_address_type type) noexcept
     {
         return type == TR_AF_INET || type == TR_AF_INET6;
     }
 
-    [[nodiscard]] bool is_valid_for_peers(tr_port port) const noexcept;
+    [[nodiscard]] constexpr auto is_valid() const noexcept
+    {
+        return is_valid(type);
+    }
+
+    [[nodiscard]] auto is_any() const noexcept
+    {
+        return is_valid() ? *this == any(type) : false;
+    }
+};
+
+struct tr_socket_address
+{
+    tr_socket_address() = default;
+
+    tr_socket_address(tr_address const& address, tr_port port)
+        : address_{ address }
+        , port_{ port }
+    {
+    }
+
+    [[nodiscard]] constexpr auto const& address() const noexcept
+    {
+        return address_;
+    }
+
+    [[nodiscard]] constexpr auto port() const noexcept
+    {
+        return port_;
+    }
+
+    [[nodiscard]] static std::string display_name(tr_address const& address, tr_port port) noexcept;
+    [[nodiscard]] auto display_name() const noexcept
+    {
+        return display_name(address_, port_);
+    }
+
+    [[nodiscard]] auto is_valid() const noexcept
+    {
+        return address_.is_valid();
+    }
+
+    [[nodiscard]] bool is_valid_for_peers() const noexcept;
+
+    [[nodiscard]] int compare(tr_socket_address const& that) const noexcept
+    {
+        if (auto const val = tr_compare_3way(address_, that.address_); val != 0)
+        {
+            return val;
+        }
+
+        return tr_compare_3way(port_, that.port_);
+    }
+
+    // --- compact addr + port -- very common format used for peer exchange, dht, tracker announce responses
+
+    [[nodiscard]] static std::pair<tr_socket_address, std::byte const*> from_compact_ipv4(std::byte const* compact) noexcept
+    {
+        auto socket_address = tr_socket_address{};
+        std::tie(socket_address.address_, compact) = tr_address::from_compact_ipv4(compact);
+        std::tie(socket_address.port_, compact) = tr_port::from_compact(compact);
+        return { socket_address, compact };
+    }
+
+    [[nodiscard]] static std::pair<tr_socket_address, std::byte const*> from_compact_ipv6(std::byte const* compact) noexcept
+    {
+        auto socket_address = tr_socket_address{};
+        std::tie(socket_address.address_, compact) = tr_address::from_compact_ipv6(compact);
+        std::tie(socket_address.port_, compact) = tr_port::from_compact(compact);
+        return { socket_address, compact };
+    }
+
+    template<typename OutputIt>
+    static OutputIt to_compact(OutputIt out, tr_address const& addr, tr_port const port)
+    {
+        out = addr.to_compact(out);
+
+        auto const nport = port.network();
+        return std::copy_n(reinterpret_cast<std::byte const*>(&nport), sizeof(nport), out);
+    }
+
+    template<typename OutputIt>
+    OutputIt to_compact(OutputIt out) const
+    {
+        return to_compact(out, address_, port_);
+    }
+
+    // --- compact sockaddr helpers
+
+    template<typename OutputIt>
+    static OutputIt to_compact(OutputIt out, sockaddr const* saddr)
+    {
+        if (auto socket_address = from_sockaddr(saddr); socket_address)
+        {
+            return socket_address->to_compact(out);
+        }
+
+        return out;
+    }
+
+    template<typename OutputIt>
+    static OutputIt to_compact(OutputIt out, sockaddr_storage const* ss)
+    {
+        return to_compact(out, reinterpret_cast<sockaddr const*>(ss));
+    }
+
+    // --- sockaddr helpers
+
+    [[nodiscard]] static std::optional<tr_socket_address> from_sockaddr(sockaddr const*);
+    [[nodiscard]] static std::pair<sockaddr_storage, socklen_t> to_sockaddr(tr_address const& addr, tr_port port) noexcept;
+
+    [[nodiscard]] std::pair<sockaddr_storage, socklen_t> to_sockaddr() const noexcept
+    {
+        return to_sockaddr(address_, port_);
+    }
+
+    // --- Comparisons
+
+    [[nodiscard]] auto operator<(tr_socket_address const& that) const noexcept
+    {
+        return compare(that) < 0;
+    }
+
+    [[nodiscard]] auto operator==(tr_socket_address const& that) const noexcept
+    {
+        return compare(that) == 0;
+    }
+
+    tr_address address_;
+    tr_port port_;
+
+    static auto constexpr CompactSockAddrBytes = std::array{ tr_address::CompactAddrBytes[0] + tr_port::CompactPortBytes,
+                                                             tr_address::CompactAddrBytes[1] + tr_port::CompactPortBytes };
+    static_assert(std::size(CompactSockAddrBytes) == NUM_TR_AF_INET_TYPES);
+};
+
+template<>
+class std::hash<tr_socket_address>
+{
+public:
+    std::size_t operator()(tr_socket_address const& socket_address) const noexcept
+    {
+        auto const& [addr, port] = socket_address;
+        return hash_combine(ip_hash(addr), PortHasher(port.host()));
+    }
+
+private:
+    // https://stackoverflow.com/a/27952689/11390656
+    [[nodiscard]] static constexpr std::size_t hash_combine(std::size_t const a, std::size_t const b)
+    {
+        return a ^ (b + 0x9e3779b9U + (a << 6U) + (a >> 2U));
+    }
+
+    [[nodiscard]] static std::size_t ip_hash(tr_address const& addr) noexcept
+    {
+        switch (addr.type)
+        {
+        case TR_AF_INET:
+            return IPv4Hasher(addr.addr.addr4.s_addr);
+        case TR_AF_INET6:
+            return IPv6Hasher({ reinterpret_cast<char const*>(addr.addr.addr6.s6_addr), sizeof(addr.addr.addr6.s6_addr) });
+        default:
+            TR_ASSERT_MSG(false, "Invalid type");
+            return {};
+        }
+    }
+
+    constexpr static std::hash<uint32_t> IPv4Hasher{};
+    constexpr static std::hash<std::string_view> IPv6Hasher{};
+    constexpr static std::hash<uint16_t> PortHasher{};
 };
 
 // --- Sockets
@@ -314,15 +440,13 @@ struct tr_session;
 
 tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_msgs);
 
-[[nodiscard]] std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(
+[[nodiscard]] std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(
     tr_session* session,
     tr_socket_t listening_sockfd);
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
 void tr_net_close_socket(tr_socket_t fd);
-
-bool tr_net_hasIPv6(tr_port);
 
 // --- TOS / DSCP
 
@@ -397,5 +521,3 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * @param err an errno on Unix/Linux and an WSAError on win32)
  */
 [[nodiscard]] std::string tr_net_strerror(int err);
-
-[[nodiscard]] std::optional<tr_address> tr_globalIPv6();

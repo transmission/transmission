@@ -14,56 +14,66 @@
 #include <cstdint>
 #include <functional>
 #include <list>
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <set>
 #include <thread>
 
-struct tr_session;
-struct tr_torrent;
+#include "libtransmission/torrent-metainfo.h"
 
 class tr_verify_worker
 {
 public:
-    using callback_func = std::function<void(tr_torrent*, bool aborted)>;
+    class Mediator
+    {
+    public:
+        virtual ~Mediator() = default;
+
+        [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
+        [[nodiscard]] virtual std::optional<std::string> find_file(tr_file_index_t file_index) const = 0;
+
+        virtual void on_verify_queued() = 0;
+        virtual void on_verify_started() = 0;
+        virtual void on_piece_checked(tr_piece_index_t piece, bool has_piece) = 0;
+        virtual void on_verify_done(bool aborted) = 0;
+    };
 
     ~tr_verify_worker();
 
-    void addCallback(callback_func callback)
-    {
-        callbacks_.emplace_back(std::move(callback));
-    }
+    void add(std::unique_ptr<Mediator> mediator, tr_priority_t priority);
 
-    void add(tr_torrent* tor);
-
-    void remove(tr_torrent* tor);
+    void remove(tr_sha1_digest_t const& info_hash);
 
 private:
     struct Node
     {
-        tr_torrent* torrent = nullptr;
-        uint64_t current_size = 0;
+        Node(std::unique_ptr<Mediator> mediator, tr_priority_t priority) noexcept
+            : mediator_{ std::move(mediator) }
+            , priority_{ priority }
+        {
+        }
 
-        [[nodiscard]] int compare(Node const& that) const;
+        [[nodiscard]] int compare(Node const& that) const noexcept; // <=>
 
-        [[nodiscard]] bool operator<(Node const& that) const
+        [[nodiscard]] auto operator<(Node const& that) const noexcept
         {
             return compare(that) < 0;
         }
+
+        [[nodiscard]] bool matches(tr_sha1_digest_t const& info_hash) const noexcept
+        {
+            return mediator_->metainfo().info_hash() == info_hash;
+        }
+
+        std::unique_ptr<Mediator> mediator_;
+        tr_priority_t priority_;
     };
 
-    void callCallback(tr_torrent* tor, bool aborted) const
-    {
-        for (auto const& callback : callbacks_)
-        {
-            callback(tor, aborted);
-        }
-    }
+    static void verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag);
 
-    void verifyThreadFunc();
-    [[nodiscard]] static bool verifyTorrent(tr_torrent* tor, std::atomic<bool> const& stop_flag);
+    void verify_thread_func();
 
-    std::list<callback_func> callbacks_;
     std::mutex verify_mutex_;
 
     std::set<Node> todo_;

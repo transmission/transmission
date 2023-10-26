@@ -49,11 +49,9 @@ struct mime_type_suffix
     std::string_view mime_type;
 };
 
-inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, ${suffixes.length}>
-{{
-${mime_type_lines}
-}};
-
+inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, ${suffixes.length}>{
+    { ${mime_type_lines.trim()} }
+};
 `);
     } catch (e) {
       console.error(e.message);

@@ -5,7 +5,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <map>
 #include <memory>
+#include <set>
 
 #include <libtransmission/transmission.h> // priorities
 
@@ -19,8 +21,8 @@ class PathIteratorBase
 {
 protected:
     PathIteratorBase(QString const& path, int slash_index)
-        : path_(path)
-        , slash_index_(slash_index)
+        : path_{ path }
+        , slash_index_{ slash_index }
     {
         token_.reserve(path.size() / 2);
     }
@@ -61,7 +63,7 @@ class BackwardPathIterator : public PathIteratorBase
 {
 public:
     explicit BackwardPathIterator(QString const& path)
-        : PathIteratorBase(path, 0)
+        : PathIteratorBase{ path, 0 }
     {
     }
 
@@ -300,7 +302,7 @@ void FileTreeModel::clearSubtree(QModelIndex const& top)
 void FileTreeModel::clear()
 {
     beginResetModel();
-    clearSubtree(QModelIndex());
+    clearSubtree(QModelIndex{});
     root_item_ = std::make_unique<FileTreeItem>();
     endResetModel();
 
@@ -376,11 +378,11 @@ void FileTreeModel::addFile(
 
                 if (!filename_it.hasNext())
                 {
-                    child = new FileTreeItem(token, file_index, total_size);
+                    child = new FileTreeItem{ token, file_index, total_size };
                 }
                 else
                 {
-                    child = new FileTreeItem(token);
+                    child = new FileTreeItem{ token };
                 }
 
                 item->appendChild(child);
@@ -411,7 +413,7 @@ void FileTreeModel::emitParentsChanged(
     QModelIndex const& index,
     int first_column,
     int last_column,
-    QSet<QModelIndex>* visited_parent_indices)
+    std::set<QModelIndex>* visited_parent_indices)
 {
     assert(first_column <= last_column);
 
@@ -428,7 +430,7 @@ void FileTreeModel::emitParentsChanged(
 
         if (visited_parent_indices != nullptr)
         {
-            if (visited_parent_indices->contains(walk))
+            if (visited_parent_indices->count(walk) != 0U)
             {
                 break;
             }
@@ -463,7 +465,7 @@ void FileTreeModel::emitSubtreeChanged(QModelIndex const& idx, int first_column,
 
 void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 {
-    QMap<bool, QModelIndexList> wanted_indices;
+    std::map<bool, QModelIndexList> wanted_indices;
 
     for (QModelIndex const& i : getOrphanIndices(indices))
     {
@@ -473,7 +475,7 @@ void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 
     for (int i = 0; i <= 1; ++i)
     {
-        if (wanted_indices.contains(i))
+        if (wanted_indices.count(i) != 0)
         {
             setWanted(wanted_indices[i], i != 0);
         }
@@ -482,7 +484,7 @@ void FileTreeModel::twiddleWanted(QModelIndexList const& indices)
 
 void FileTreeModel::twiddlePriority(QModelIndexList const& indices)
 {
-    QMap<int, QModelIndexList> priority_indices;
+    std::map<int, QModelIndexList> priority_indices;
 
     for (QModelIndex const& i : getOrphanIndices(indices))
     {
@@ -508,7 +510,7 @@ void FileTreeModel::twiddlePriority(QModelIndexList const& indices)
 
     for (int i = TR_PRI_LOW; i <= TR_PRI_HIGH; ++i)
     {
-        if (priority_indices.contains(i))
+        if (priority_indices.count(i) != 0U)
         {
             setPriority(priority_indices[i], i);
         }
@@ -524,7 +526,7 @@ void FileTreeModel::setWanted(QModelIndexList const& indices, bool wanted)
 
     QModelIndexList const orphan_indices = getOrphanIndices(indices);
 
-    QSet<int> file_ids;
+    auto file_ids = file_indices_t{};
 
     for (QModelIndex const& i : orphan_indices)
     {
@@ -536,14 +538,14 @@ void FileTreeModel::setWanted(QModelIndexList const& indices, bool wanted)
     }
 
     // emit parent changes separately to avoid multiple updates for same items
-    QSet<QModelIndex> parent_indices;
+    auto parent_indices = std::set<QModelIndex>{};
 
     for (QModelIndex const& i : orphan_indices)
     {
         emitParentsChanged(i, COL_SIZE, COL_WANTED, &parent_indices);
     }
 
-    if (!file_ids.isEmpty())
+    if (!std::empty(file_ids))
     {
         emit wantedChanged(file_ids, wanted);
     }
@@ -558,7 +560,7 @@ void FileTreeModel::setPriority(QModelIndexList const& indices, int priority)
 
     QModelIndexList const orphan_indices = getOrphanIndices(indices);
 
-    QSet<int> file_ids;
+    auto file_ids = file_indices_t{};
 
     for (QModelIndex const& i : orphan_indices)
     {
@@ -570,14 +572,13 @@ void FileTreeModel::setPriority(QModelIndexList const& indices, int priority)
     }
 
     // emit parent changes separately to avoid multiple updates for same items
-    QSet<QModelIndex> parent_indices;
-
+    auto parent_indices = std::set<QModelIndex>{};
     for (QModelIndex const& i : orphan_indices)
     {
         emitParentsChanged(i, COL_PRIORITY, COL_PRIORITY, &parent_indices);
     }
 
-    if (!file_ids.isEmpty())
+    if (!std::empty(file_ids))
     {
         emit priorityChanged(file_ids, priority);
     }

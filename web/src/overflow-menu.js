@@ -47,7 +47,7 @@ export class OverflowMenu extends EventTarget {
     this.session_manager = session_manager;
     this.session_manager.addEventListener(
       'session-change',
-      this.session_listener
+      this.session_listener,
     );
 
     const { session_properties } = session_manager;
@@ -69,7 +69,7 @@ export class OverflowMenu extends EventTarget {
       this.outside.stop();
       this.session_manager.removeEventListener(
         'session-change',
-        this.session_listener
+        this.session_listener,
       );
       this.action_manager.removeEventListener('change', this.action_listener);
       this.prefs.removeEventListener('change', this.prefs_listener);
@@ -223,7 +223,7 @@ export class OverflowMenu extends EventTarget {
     div.classList.add('table-row');
     options.append(div);
 
-    const action = 'toggle-compact-rows';
+    let action = 'toggle-compact-rows';
     check = document.createElement('input');
     check.id = 'display-compact-check';
     check.dataset.action = action;
@@ -235,14 +235,47 @@ export class OverflowMenu extends EventTarget {
     label.for = check.id;
     label.setAttribute('for', check.id);
     label.textContent = this.action_manager.text(action);
-    div.append(label);
 
     check.checked = this.prefs.display_mode === Prefs.DisplayCompact;
+
+    div.append(label);
+
     check.addEventListener('input', (event_) => {
       const { checked } = event_.target;
       this.prefs.display_mode = checked
         ? Prefs.DisplayCompact
         : Prefs.DisplayFull;
+    });
+
+    // contrast
+
+    div = document.createElement('div');
+    div.classList.add('table-row');
+    options.append(div);
+
+    action = 'toggle-contrast';
+    check = document.createElement('input');
+    check.id = 'contrast-more-check';
+    check.dataset.action = action;
+    check.type = 'checkbox';
+    check.classList.add('switch');
+
+    label = document.createElement('label');
+    label.id = 'contrast-more-label';
+    label.for = check.id;
+    label.setAttribute('for', check.id);
+    label.textContent = this.action_manager.text(action);
+
+    check.checked = this.prefs.contrast_mode === Prefs.ContrastMore;
+
+    div.append(check);
+    div.append(label);
+
+    check.addEventListener('input', (event_) => {
+      const { checked } = event_.target;
+      this.prefs.contrast_mode = checked
+        ? Prefs.ContrastMore
+        : Prefs.ContrastLess;
     });
 
     // fullscreen
@@ -426,6 +459,7 @@ export class OverflowMenu extends EventTarget {
 
     for (const action_name of [
       'show-preferences-dialog',
+      'show-shortcuts-dialog',
       'pause-all-torrents',
       'start-all-torrents',
     ]) {
@@ -433,50 +467,22 @@ export class OverflowMenu extends EventTarget {
       actions[action_name] = make_button(section, text, action_name, on_click);
     }
 
-    section = make_section('info', 'Info');
+    section = make_section('help', 'Help');
     root.append(section);
 
     options = document.createElement('div');
     section.append(options);
 
-    for (const action_name of [
-      'show-about-dialog',
-      'show-shortcuts-dialog',
-      'show-statistics-dialog',
-    ]) {
+    for (const action_name of ['show-statistics-dialog', 'show-about-dialog']) {
       const text = this.action_manager.text(action_name);
       actions[action_name] = make_button(options, text, action_name, on_click);
     }
 
-    section = make_section('links', 'Links');
-    root.append(section);
-
-    options = document.createElement('ul');
-    section.append(options);
-
-    let e = document.createElement('a');
-    e.href = 'https://transmissionbt.com/';
-    e.tabindex = '0';
-    e.textContent = 'Homepage';
-    let li = document.createElement('li');
-    li.append(e);
-    options.append(li);
-
-    e = document.createElement('a');
-    e.href = 'https://transmissionbt.com/donate/';
-    e.tabindex = '0';
-    e.textContent = 'Tip Jar';
-    li = document.createElement('li');
-    li.append(e);
-    options.append(li);
-
-    e = document.createElement('a');
-    e.href = 'https://github.com/transmission/transmission/';
-    e.tabindex = '0';
-    e.textContent = 'Source Code';
-    li = document.createElement('li');
-    li.append(e);
-    options.append(li);
+    const e = document.createElement('a');
+    e.href = 'https://transmissionbt.com/donate.html';
+    e.target = '_blank';
+    e.textContent = 'Donate';
+    options.append(e);
 
     this._updateElement = this._updateElement.bind(this);
 

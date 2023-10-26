@@ -7,8 +7,6 @@
 
 #include <string_view>
 
-#include "tr-macros.h"
-
 /**
  * @addtogroup error Error reporting
  * @{

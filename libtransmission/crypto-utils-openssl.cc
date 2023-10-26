@@ -8,6 +8,8 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
+#include <array>
+#include <cstddef> // size_t
 #include <memory>
 
 #include <openssl/crypto.h>
@@ -20,11 +22,10 @@
 
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha25...
 #include "libtransmission/utils.h"
 
 namespace

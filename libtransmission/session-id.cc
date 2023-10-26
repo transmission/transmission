@@ -3,17 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <ctime>
 #include <string_view>
 #include <iterator> // for std::back_inserter
 
 #ifndef _WIN32
+#include <cerrno>
 #include <sys/stat.h>
 #endif
 
-#include <fmt/format.h>
-
-#include "libtransmission/transmission.h"
+#include <fmt/core.h>
 
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
 #include "libtransmission/error-types.h"
@@ -118,7 +116,7 @@ tr_session_id::~tr_session_id()
     destroy_lockfile(previous_lock_file_, std::data(previous_value_));
 }
 
-bool tr_session_id::isLocal(std::string_view session_id) noexcept
+bool tr_session_id::is_local(std::string_view session_id) noexcept
 {
     if (std::empty(session_id))
     {

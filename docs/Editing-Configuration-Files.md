@@ -68,16 +68,18 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **watch-dir:** String
  * **watch-dir-enabled:** Boolean (default = false) Watch a directory for torrent files and add them to Transmission.
    _Note: When **watch-dir-enabled** is true, only the transmission-daemon, transmission-gtk, and transmission-qt applications will monitor **watch-dir** for new .torrent files and automatically load them._
+ * **watch-dir-force-generic**: Boolean (default = false) Force to use a watch directory implementation that does not rely on OS-specific mechanisms. Useful when your watch directory is on a network location, such as CIFS or NFS.
+   _Note: transmission-daemon only._
 
 #### Misc
- * **cache-size-mb:** Number (default = 4), in megabytes, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. The value is the total available to the Transmission instance.
+ * **cache-size-mb:** Number (default = 4), in megabytes, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. The value is the total available to the Transmission instance. Setting this to 0 bypasses the cache, which may be useful if your filesystem already has a cache layer that aggregates transactions.
  * **default-trackers:** String (default = "") A list of double-newline separated tracker announce URLs. These are used for all torrents in addition to the per torrent trackers specified in the torrent file. If a tracker is only meant to be a backup, it should be separated from its main tracker by a single newline character. If a tracker should be used additionally to another tracker it should be separated by two newlines. (e.g. "udp://tracker.example.invalid:1337/announce\n\nudp://tracker.another-example.invalid:6969/announce\nhttps://backup-tracker.another-example.invalid:443/announce\n\nudp://tracker.yet-another-example.invalid:1337/announce", in this case tracker.example.invalid, tracker.another-example.invalid and tracker.yet-another-example.invalid would be used as trackers and backup-tracker.another-example.invalid as backup in case tracker.another-example.invalid is unreachable.
  * **dht-enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](https://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
  * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
  * **lazy-bitfield-enabled:** Boolean (default = true) May help get around some ISP filtering. [Vuze specification](https://wiki.vuze.com/w/Commandline_options#Network_Options).
  * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
- * **message-level:** Number (0 = None, 1 = Error, 2 = Info, 3 = Debug, default = 2) Set verbosity of Transmission's log messages.
- * **pex-enabled:** Boolean (default =  true) Enable [https://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
+ * **message-level:** Number (0 = None, 1 = Critical, 2 = Error, 3 = Warn, 4 = Info, 5 = Debug, 6 = Trace; default = 2) Set verbosity of Transmission's log messages.
+ * **pex-enabled:** Boolean (default = true) Enable [Peer Exchange (PEX)](https://en.wikipedia.org/wiki/Peer_exchange).
  * **pidfile:** String Path to file in which daemon PID will be stored (transmission-daemon only)
  * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html).
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
@@ -87,13 +89,14 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **script-torrent-done-filename:** String (default = "") Path to script.
  * **script-torrent-done-seeding-enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-done-seeding-filename:** String (default = "") Path to script.
- * **tcp-enabled:** Boolean (default = true) Optionally disable TCP connection to other peers. Never disable TCP when you also disable UTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds. Unless you have a good reason, you should not set this to false.
+ * **tcp-enabled:** Boolean (default = true) Optionally disable TCP connection to other peers. Never disable TCP when you also disable µTP, because then your client would not be able to communicate. Disabling TCP might also break webseeds. Unless you have a good reason, you should not set this to false.
  * **torrent-added-verify-mode:** String ("fast", "full", default: "fast") Whether newly-added torrents' local data should be fully verified when added, or wait and verify them on-demand later. See [#2626](https://github.com/transmission/transmission/pull/2626) for more discussion.
  * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol)
+ * **preferred-transport:** String ("utp" = Prefer µTP, "tcp" = Prefer TCP; default = "utp") Choose your preferred transport protocol (has no effect if one of them is disabled).
 
 #### Peers
- * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections. When no valid IPv4 address is provided, Transmission will default to "0.0.0.0".
- * **bind-address-ipv6:** String (default = "::") Where to listen for peer connections. When no valid IPv6 address is provided, Transmission will determine your default public IPv6 address and use it.
+ * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections. When no valid IPv4 address is provided, Transmission will bind to "0.0.0.0".
+ * **bind-address-ipv6:** String (default = "::") Where to listen for peer connections. When no valid IPv6 address is provided, Transmission will try to bind to your default global IPv6 address. If that didn't work, then Transmission will bind to "::".
  * **peer-congestion-algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
  * **peer-limit-global:** Number (default = 240)
  * **peer-limit-per-torrent:** Number (default =  60)

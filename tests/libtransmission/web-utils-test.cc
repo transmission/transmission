@@ -3,7 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <cstddef> // size_t
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -11,13 +15,10 @@
 #define unsetenv(key) SetEnvironmentVariableA(key, nullptr)
 #endif
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/crypto-utils.h>
-#include <libtransmission/platform.h>
 #include <libtransmission/web-utils.h>
 
-#include "test-fixtures.h"
+#include "gtest/gtest.h"
 
 using namespace std::literals;
 

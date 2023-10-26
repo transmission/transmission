@@ -49,7 +49,7 @@ class PreferenceWidget
 
 public:
     explicit PreferenceWidget(QObject* object)
-        : object_(object)
+        : object_{ object }
     {
     }
 
@@ -155,7 +155,7 @@ QString qtDayName(int day)
 
 bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 {
-    PreferenceWidget pref_widget(widget);
+    auto pref_widget = PreferenceWidget{ widget };
 
     if (pref_widget.is<QCheckBox>())
     {
@@ -199,11 +199,11 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
 
 void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
 {
-    PreferenceWidget pref_widget(widget);
+    auto pref_widget = PreferenceWidget{ widget };
 
     pref_widget.setPrefKey(pref_key);
     updateWidgetValue(widget, pref_key);
-    widgets_.insert(pref_key, widget);
+    widgets_.try_emplace(pref_key, widget);
 
     if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
     {
@@ -259,7 +259,7 @@ void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
     // We don't want to change the preference every time there's a keystroke
     // in a QPlainTextEdit, so instead of connecting to the textChanged signal,
     // only update the pref when the text changed AND focus was lost.
-    char const constexpr* const StartValue = "StartValue";
+    char constexpr const* const StartValue = "StartValue";
 
     if (auto* const edit = qobject_cast<QPlainTextEdit*>(cur); isDescendantOf(edit, this))
     {
@@ -279,7 +279,7 @@ void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
 
 void PrefsDialog::checkBoxToggled(bool checked)
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QCheckBox>())
     {
@@ -289,7 +289,7 @@ void PrefsDialog::checkBoxToggled(bool checked)
 
 void PrefsDialog::spinBoxEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QDoubleSpinBox>())
     {
@@ -303,7 +303,7 @@ void PrefsDialog::spinBoxEditingFinished()
 
 void PrefsDialog::timeEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QTimeEdit>())
     {
@@ -313,7 +313,7 @@ void PrefsDialog::timeEditingFinished()
 
 void PrefsDialog::lineEditingFinished()
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<QLineEdit>())
     {
@@ -328,7 +328,7 @@ void PrefsDialog::lineEditingFinished()
 
 void PrefsDialog::pathChanged(QString const& path)
 {
-    PreferenceWidget const pref_widget(sender());
+    auto const pref_widget = PreferenceWidget{ sender() };
 
     if (pref_widget.is<PathButton>())
     {
@@ -410,7 +410,7 @@ void PrefsDialog::initSpeedTab()
     sched_widgets_ << ui_.altSpeedLimitStartTimeEdit << ui_.altSpeedLimitToLabel << ui_.altSpeedLimitEndTimeEdit
                    << ui_.altSpeedLimitDaysLabel << ui_.altSpeedLimitDaysCombo;
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.speedLimitsSectionLayout);
     cr->addLayout(ui_.altSpeedLimitsSectionLayout);
     cr->update();
@@ -466,7 +466,7 @@ void PrefsDialog::initNetworkTab()
     linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
     linkWidgetToPref(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.incomingPeersSectionLayout);
     cr->addLayout(ui_.peerLimitsSectionLayout);
     cr->update();
@@ -500,12 +500,11 @@ void PrefsDialog::onBlocklistUpdated(int n)
 
 void PrefsDialog::onUpdateBlocklistClicked()
 {
-    blocklist_dialog_ = new QMessageBox(
-        QMessageBox::Information,
-        QString(),
-        tr("<b>Update Blocklist</b><p>Getting new blocklist…</p>"),
-        QMessageBox::Close,
-        this);
+    blocklist_dialog_ = new QMessageBox{ QMessageBox::Information,
+                                         QString{},
+                                         tr("<b>Update Blocklist</b><p>Getting new blocklist…</p>"),
+                                         QMessageBox::Close,
+                                         this };
     connect(blocklist_dialog_, &QDialog::rejected, this, &PrefsDialog::onUpdateBlocklistCancelled);
     connect(&session_, &Session::blocklistUpdated, this, &PrefsDialog::onBlocklistUpdated);
     blocklist_dialog_->show();
@@ -532,7 +531,7 @@ void PrefsDialog::initPrivacyTab()
     block_widgets_ << ui_.blocklistEdit << ui_.blocklistStatusLabel << ui_.updateBlocklistButton
                    << ui_.autoUpdateBlocklistCheck;
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.encryptionSectionLayout);
     cr->addLayout(ui_.blocklistSectionLayout);
     cr->update();
@@ -550,7 +549,7 @@ void PrefsDialog::initPrivacyTab()
 void PrefsDialog::onIdleLimitChanged()
 {
     //: Spin box format, "Stop seeding if idle for: [ 5 minutes ]"
-    auto const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s)");
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s)");
     auto const placeholder = QStringLiteral("%1");
     Utils::updateSpinBoxFormat(ui_.idleLimitSpin, "PrefsDialog", units_format, placeholder);
 }
@@ -576,7 +575,7 @@ void PrefsDialog::initSeedingTab()
 void PrefsDialog::onQueueStalledMinutesChanged()
 {
     //: Spin box format, "Download is inactive if data sharing stopped: [ 5 minutes ago ]"
-    auto const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s) ago");
+    auto const* const units_format = QT_TRANSLATE_N_NOOP("PrefsDialog", "%1 minute(s) ago");
     auto const placeholder = QStringLiteral("%1");
     Utils::updateSpinBoxFormat(ui_.queueStalledMinutesSpin, "PrefsDialog", units_format, placeholder);
 }
@@ -619,7 +618,7 @@ void PrefsDialog::initDownloadingTab()
     linkWidgetToPref(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
     linkWidgetToPref(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.addingSectionLayout);
     cr->addLayout(ui_.downloadQueueSectionLayout);
     cr->addLayout(ui_.incompleteSectionLayout);
@@ -807,11 +806,9 @@ void PrefsDialog::refreshPref(int key)
         break;
     }
 
-    key2widget_t::iterator const it(widgets_.find(key));
-
-    if (it != widgets_.end())
+    if (auto iter = widgets_.find(key); iter != std::end(widgets_))
     {
-        QWidget* w(it.value());
+        QWidget* const w = iter->second;
 
         w->blockSignals(true);
 

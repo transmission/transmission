@@ -4,14 +4,18 @@
 
 #include <array>
 #include <cerrno>
-#include <cstdint>
-#include <cstring> /* memcmp(), memset() */
+#include <string>
+
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <netinet/in.h> // IPV6_V6ONLY, IPPROTO_IPV6
+#include <sys/socket.h> // setsockopt, SOL_SOCKET, bind
+#endif
 
 #include <event2/event.h>
 
 #include <fmt/core.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
@@ -114,12 +118,12 @@ void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void* vsessi
         if (session->dht_)
         {
             buf[rc] = '\0'; // libdht requires zero-terminated messages
-            session->dht_->handleMessage(std::data(buf), rc, from_sa, fromlen);
+            session->dht_->handle_message(std::data(buf), rc, from_sa, fromlen);
         }
     }
     else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
     {
-        if (!session->announcer_udp_->handleMessage(std::data(buf), rc))
+        if (!session->announcer_udp_->handle_message(std::data(buf), rc))
         {
             tr_logAddTrace("Couldn't parse UDP tracker packet.");
         }
@@ -148,17 +152,17 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
     if (auto sock = socket(PF_INET, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
     {
         auto optval = int{ 1 };
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
+        (void)setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
-        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET);
-        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
+        auto const addr = session_.bind_address(TR_AF_INET);
+        auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
         if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", addr.display_name(udp_port_)),
+                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
@@ -166,16 +170,16 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo(fmt::format("Bound UDP IPv4 address {:s}", addr.display_name(udp_port_)));
+            tr_logAddInfo(fmt::format("Bound UDP IPv4 address {:s}", tr_socket_address::display_name(addr, udp_port_)));
             session_.setSocketTOS(sock, TR_AF_INET);
             set_socket_buffers(sock, session_.allowsUTP());
             udp4_socket_ = sock;
-            udp4_event_.reset(event_new(session_.eventBase(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp4_event_.reset(event_new(session_.event_base(), udp4_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp4_event_.get(), nullptr);
         }
     }
 
-    if (!tr_net_hasIPv6(udp_port_))
+    if (!session.has_ip_protocol(TR_AF_INET6))
     {
         // no IPv6; do nothing
     }
@@ -184,15 +188,15 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         auto optval = int{ 1 };
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const*>(&optval), sizeof(optval));
 
-        auto const [addr, is_any] = session_.publicAddress(TR_AF_INET6);
-        auto const [ss, sslen] = addr.to_sockaddr(udp_port_);
+        auto const addr = session_.bind_address(TR_AF_INET6);
+        auto const [ss, sslen] = tr_socket_address::to_sockaddr(addr, udp_port_);
 
         if (bind(sock, reinterpret_cast<sockaddr const*>(&ss), sslen) != 0)
         {
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv6 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", addr.display_name(udp_port_)),
+                fmt::arg("address", tr_socket_address::display_name(addr, udp_port_)),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
 
@@ -200,11 +204,11 @@ tr_session::tr_udp_core::tr_udp_core(tr_session& session, tr_port udp_port)
         }
         else
         {
-            tr_logAddInfo(fmt::format("Bound UDP IPv6 address {:s}", addr.display_name(udp_port_)));
+            tr_logAddInfo(fmt::format("Bound UDP IPv6 address {:s}", tr_socket_address::display_name(addr, udp_port_)));
             session_.setSocketTOS(sock, TR_AF_INET6);
             set_socket_buffers(sock, session_.allowsUTP());
             udp6_socket_ = sock;
-            udp6_event_.reset(event_new(session_.eventBase(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
+            udp6_event_.reset(event_new(session_.event_base(), udp6_socket_, EV_READ | EV_PERSIST, event_callback, &session_));
             event_add(udp6_event_.get(), nullptr);
 
 #ifdef IPV6_V6ONLY
@@ -238,6 +242,7 @@ tr_session::tr_udp_core::~tr_udp_core()
 
 void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sockaddr const* to, socklen_t const tolen) const
 {
+    auto const addrport = tr_socket_address::from_sockaddr(to);
     if (to->sa_family != AF_INET && to->sa_family != AF_INET6)
     {
         errno = EAFNOSUPPORT;
@@ -247,16 +252,22 @@ void tr_session::tr_udp_core::sendto(void const* buf, size_t buflen, struct sock
         // don't warn on bad sockets; the system may not support IPv6
         return;
     }
+    else if (
+        addrport && addrport->address().is_global_unicast_address() &&
+        !session_.global_source_address(tr_af_to_ip_protocol(to->sa_family)))
+    {
+        // don't try to connect to a global address if we don't have connectivity to public internet
+        return;
+    }
     else if (::sendto(sock, static_cast<char const*>(buf), buflen, 0, to, tolen) != -1)
     {
         return;
     }
 
     auto display_name = std::string{};
-    if (auto const addrport = tr_address::from_sockaddr(to); addrport)
+    if (addrport)
     {
-        auto const& [addr, port] = *addrport;
-        display_name = addr.display_name(port);
+        display_name = addrport->display_name();
     }
 
     tr_logAddWarn(fmt::format(

@@ -21,7 +21,7 @@ typedef NS_ENUM(NSUInteger, LevelButtonLevel) {
 
 static NSTimeInterval const kUpdateSeconds = 0.75;
 
-@interface MessageWindowController ()
+@interface MessageWindowController ()<NSWindowRestoration>
 
 @property(nonatomic) IBOutlet NSTableView* fMessageTable;
 

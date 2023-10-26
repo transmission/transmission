@@ -10,14 +10,15 @@
 
 // --- Basic Types
 
-#include <stdbool.h> /* bool */
-#include <stddef.h> /* size_t */
-#include <stdint.h> /* uintN_t */
-#include <time.h> /* time_t */
+#include <stddef.h> // size_t
+#include <stdint.h> // uintN_t
+#include <time.h> // time_t
 
 #ifdef __cplusplus
 #include <string>
 #include <string_view>
+#else
+#include <stdbool.h> // bool
 #endif
 
 #include "tr-macros.h"
@@ -82,8 +83,8 @@ enum tr_encryption_mode
     TR_ENCRYPTION_REQUIRED
 };
 
-#define TR_RATIO_NA -1
-#define TR_RATIO_INF -2
+#define TR_RATIO_NA (-1)
+#define TR_RATIO_INF (-2)
 
 // --- Startup & Shutdown
 
@@ -112,7 +113,7 @@ enum tr_encryption_mode
 [[nodiscard]] std::string tr_getDefaultConfigDir(std::string_view appname);
 #endif
 
-/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_getDefaultConfigDir()`. See `tr_strv_to_buf()`. */
 size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen);
 
 /**
@@ -127,7 +128,7 @@ size_t tr_getDefaultConfigDirToBuf(char const* appname, char* buf, size_t buflen
 [[nodiscard]] std::string tr_getDefaultDownloadDir();
 #endif
 
-/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_getDefaultDownloadDir()`. See `tr_strv_to_buf()`. */
 size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
 
 #define TR_DEFAULT_RPC_WHITELIST "127.0.0.1,::1"
@@ -147,33 +148,30 @@ size_t tr_getDefaultDownloadDirToBuf(char* buf, size_t buflen);
  *
  * Example:
  * @code
- *     tr_variant settings;
  *     int64_t i;
  *
- *     tr_variantInitDict(&settings, 0);
- *     tr_sessionGetDefaultSettings(&settings);
+ *     auto settings = tr_sessionGetDefaultSettings();
  *     if (tr_variantDictFindInt(&settings, TR_PREFS_KEY_PEER_PORT, &i))
  *         fprintf(stderr, "the default peer port is %d\n", (int)i);
- *     tr_variantClear(&settings);
  * @endcode
  *
- * @param setme_dictionary pointer to a tr_variant dictionary
+ * @return a variant map of the default settinggs
  * @see `tr_sessionLoadSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_getDefaultConfigDir()`
  */
-void tr_sessionGetDefaultSettings(struct tr_variant* setme_dictionary);
+tr_variant tr_sessionGetDefaultSettings();
 
 /**
  * Add the session's current configuration settings to the benc dictionary.
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param session          the session to query
- * @param setme_dictionary the dictionary to populate
+ * @return a variant map of the session's current settings
+ * @param session the session to query
  * @see `tr_sessionGetDefaultSettings()`
  */
-void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_dictionary);
+tr_variant tr_sessionGetSettings(tr_session const* session);
 
 /**
  * Load settings from the configuration directory's settings.json file,
@@ -181,15 +179,14 @@ void tr_sessionGetSettings(tr_session const* session, struct tr_variant* setme_d
  *
  * TODO: if we ever make libtransmissionapp, this would go there.
  *
- * @param dictionary pointer to an uninitialized tr_variant
  * @param config_dir the configuration directory to find settings.json
  * @param app_name if config_dir is empty, app_name is used to find the default dir.
- * @return success true if the settings were loaded, false otherwise
+ * @return the loaded settings
  * @see `tr_sessionGetDefaultSettings()`
  * @see `tr_sessionInit()`
  * @see `tr_sessionSaveSettings()`
  */
-bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_dir, char const* app_name);
+tr_variant tr_sessionLoadSettings(char const* config_dir, char const* app_name);
 
 /**
  * Add the session's configuration settings to the benc dictionary
@@ -202,23 +199,16 @@ bool tr_sessionLoadSettings(struct tr_variant* dictionary, char const* config_di
  * @param client_settings the dictionary to save
  * @see `tr_sessionLoadSettings()`
  */
-void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct tr_variant const* client_settings);
+void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const& client_settings);
 
 /**
  * @brief Initialize a libtransmission session.
  *
  * For example, this will instantiate a session with all the default values:
  * @code
- *     tr_variant settings;
- *     tr_session* session;
- *     char const* configDir;
- *
- *     tr_variantInitDict(&settings, 0);
- *     tr_sessionGetDefaultSettings(&settings);
- *     configDir = tr_getDefaultConfigDir("Transmission");
- *     session = tr_sessionInit(configDir, true, &settings);
- *
- *     tr_variantClear(&settings);
+ *     auto settings = tr_sessionGetDefaultSettings();
+ *     char const* const configDir = tr_getDefaultConfigDir("Transmission");
+ *     tr_session* const session = tr_sessionInit(configDir, true, &settings);
  * @endcode
  *
  * @param config_dir where Transmission will look for resume files, blocklists, etc.
@@ -228,11 +218,11 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, struct 
  * @see `tr_sessionLoadSettings()`
  * @see `tr_getDefaultConfigDir()`
  */
-tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, struct tr_variant* settings);
+tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& settings);
 
 /** @brief Update a session's settings from a benc dictionary
            like to the one used in `tr_sessionInit()` */
-void tr_sessionSet(tr_session* session, struct tr_variant* settings);
+void tr_sessionSet(tr_session* session, tr_variant const& settings);
 
 /** @brief Rescan the blocklists directory and
            reload whatever blocklist files are found there */
@@ -932,12 +922,7 @@ enum
  * will be clobbered s.t. additional files being added will be saved
  * to the torrent's downloadDir.
  */
-void tr_torrentSetLocation(
-    tr_torrent* torrent,
-    char const* location,
-    bool move_from_old_path,
-    double volatile* setme_progress,
-    int volatile* setme_state);
+void tr_torrentSetLocation(tr_torrent* torrent, char const* location, bool move_from_old_path, int volatile* setme_state);
 
 uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
 
@@ -967,8 +952,6 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo cons
  */
 char const* tr_torrentName(tr_torrent const* tor);
 
-uint64_t tr_torrentTotalSize(tr_torrent const* tor);
-
 /**
  * @brief find the location of a torrent's file by looking with and without
  *        the ".part" suffix, looking in downloadDir and incompleteDir, etc.
@@ -980,7 +963,7 @@ uint64_t tr_torrentTotalSize(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t file_num);
 #endif
 
-/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentFindFile()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, char* buf, size_t buflen);
 
 // --- Torrent speed limits
@@ -1032,8 +1015,6 @@ void tr_torrentSetIdleMode(tr_torrent* tor, tr_idlelimit mode);
 uint16_t tr_torrentGetIdleLimit(tr_torrent const* tor);
 void tr_torrentSetIdleLimit(tr_torrent* tor, uint16_t idle_minutes);
 
-bool tr_torrentGetSeedIdle(tr_torrent const* tor, uint16_t* minutes);
-
 // --- Peer Limits
 
 uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor);
@@ -1041,7 +1022,7 @@ void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers);
 
 // --- File Priorities
 
-enum
+enum : tr_priority_t
 {
     TR_PRI_LOW = -1,
     TR_PRI_NORMAL = 0, /* since Normal is 0, memset initializes nicely */
@@ -1085,7 +1066,7 @@ char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentGetMagnetLink(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentGetMagnetLink()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 // ---
@@ -1104,7 +1085,7 @@ size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buf
 [[nodiscard]] std::string tr_torrentGetTrackerList(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentGetTrackerList()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentGetTrackerListToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
@@ -1274,7 +1255,7 @@ struct tr_tracker_view
 {
     char const* announce; // full announce URL
     char const* scrape; // full scrape URL
-    char const* host; // uniquely-identifying tracker name (`${host}:${port}`)
+    char const* host_and_port; // uniquely-identifying tracker name (`${host}:${port}`)
 
     // The tracker site's name. Uses the first label before the public suffix
     // (https://publicsuffix.org/) in the announce URL's host.
@@ -1334,6 +1315,8 @@ struct tr_file_view
     uint64_t have; // the current size of the file, i.e. how much we've downloaded
     uint64_t length; // the total size of the file
     double progress; // have / length
+    tr_piece_index_t beginPiece; // piece index where this file starts
+    tr_piece_index_t endPiece; // piece index where this file ends (exclusive)
     tr_priority_t priority; // the file's priority
     bool wanted; // do we want to download this file?
 };
@@ -1389,7 +1372,7 @@ struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 [[nodiscard]] std::string tr_torrentFilename(tr_torrent const* tor);
 #endif
 
-/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strvToBuf()`. */
+/** @brief buffer variant of `tr_torrentFilename()`. See `tr_strv_to_buf()`. */
 size_t tr_torrentFilenameToBuf(tr_torrent const* tor, char* buf, size_t buflen);
 
 /**
@@ -1405,7 +1388,7 @@ void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int n_tabs)
 /**
  * Queue a torrent for verification.
  */
-void tr_torrentVerify(tr_torrent* torrent);
+void tr_torrentVerify(tr_torrent* torrent, bool force = false);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 
@@ -1425,7 +1408,7 @@ enum tr_torrent_activity
     TR_STATUS_SEED_WAIT = 5, /* Queued to seed */
     TR_STATUS_SEED = 6 /* Seeding */
 };
-enum
+enum tr_peer_from : uint8_t
 {
     TR_PEER_FROM_INCOMING = 0, /* connections made to the listening port */
     TR_PEER_FROM_LPD, /* peers found by local announcements */
@@ -1462,9 +1445,9 @@ struct tr_stat
     char const* errorString;
 
     /** Byte count of all the piece data we'll have downloaded when we're done,
-        whether or not we have it yet. This may be less than `tr_torrentTotalSize()`
-        if only some of the torrent's files are wanted.
-        [0...tr_torrentTotalSize()] */
+        whether or not we have it yet. If we only want some of the files,
+        this may be less than `tr_torrent_view.total_size`.
+        [0...tr_torrent_view.total_size] */
     uint64_t sizeWhenDone;
 
     /** Byte count of how much data is left to be downloaded until we've got
@@ -1617,11 +1600,6 @@ struct tr_stat
     on the torrent. This is typically called by the GUI clients every
     second or so to get a new snapshot of the torrent's status. */
 tr_stat const* tr_torrentStat(tr_torrent* torrent);
-
-/** Like `tr_torrentStat()`, but only recalculates the statistics if it's
-    been longer than a second since they were last calculated. This can
-    reduce the CPU load if you're calling `tr_torrentStat()` frequently. */
-tr_stat const* tr_torrentStatCached(tr_torrent* torrent);
 
 /** @} */
 

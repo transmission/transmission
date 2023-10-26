@@ -3,16 +3,23 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <ctime> // time, size_t, time_t
+#include <memory>
 #include <set>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/torrent.h>
 #include <libtransmission/torrents.h>
+#include <libtransmission/torrent-metainfo.h>
+#include <libtransmission/tr-strbuf.h>
 
 #include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using namespace std::literals;
 
@@ -25,7 +32,7 @@ TEST_F(TorrentsTest, simpleTests)
     auto owned = std::vector<std::unique_ptr<tr_torrent>>{};
 
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(TorrentFile));
+    EXPECT_TRUE(tm.parse_torrent_file(TorrentFile));
     owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
     auto* const tor = owned.back().get();
 
@@ -35,18 +42,18 @@ TEST_F(TorrentsTest, simpleTests)
 
     auto const id = torrents.add(tor);
     EXPECT_GT(id, 0);
-    tor->unique_id_ = id;
+    tor->init_id(id);
 
     EXPECT_TRUE(std::empty(torrents.removedSince(0)));
     EXPECT_FALSE(std::empty(torrents));
     EXPECT_EQ(1U, std::size(torrents));
 
     EXPECT_EQ(tor, torrents.get(id));
-    EXPECT_EQ(tor, torrents.get(tor->infoHash()));
+    EXPECT_EQ(tor, torrents.get(tor->info_hash()));
     EXPECT_EQ(tor, torrents.get(tor->magnet()));
 
     tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(TorrentFile));
+    EXPECT_TRUE(tm.parse_torrent_file(TorrentFile));
     EXPECT_EQ(tor, torrents.get(tm));
 
     // cleanup
@@ -68,11 +75,11 @@ TEST_F(TorrentsTest, rangedLoop)
     {
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
-        EXPECT_TRUE(tm.parseTorrentFile(path));
+        EXPECT_TRUE(tm.parse_torrent_file(path));
         owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
 
         auto* const tor = owned.back().get();
-        tor->unique_id_ = torrents.add(tor);
+        tor->init_id(torrents.add(tor));
         EXPECT_EQ(tor, torrents.get(tor->id()));
         torrents_set.insert(tor);
     }
@@ -101,11 +108,11 @@ TEST_F(TorrentsTest, removedSince)
     {
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
-        EXPECT_TRUE(tm.parseTorrentFile(path));
+        EXPECT_TRUE(tm.parse_torrent_file(path));
         owned.emplace_back(std::make_unique<tr_torrent>(std::move(tm)));
 
         auto* const tor = owned.back().get();
-        tor->unique_id_ = torrents.add(tor);
+        tor->init_id(torrents.add(tor));
         torrents_v.push_back(tor);
     }
 
@@ -127,4 +134,14 @@ TEST_F(TorrentsTest, removedSince)
     EXPECT_EQ(remove, torrents.removedSince(200));
     remove = { torrents_v[0]->id(), torrents_v[1]->id(), torrents_v[2]->id(), torrents_v[3]->id() };
     EXPECT_EQ(remove, torrents.removedSince(50));
+}
+
+using TorrentsPieceSpanTest = libtransmission::test::SessionTest;
+
+TEST_F(TorrentsPieceSpanTest, exposesFilePieceSpan)
+{
+    auto tor = zeroTorrentInit(ZeroTorrentState::Complete);
+    auto file_view = tr_torrentFile(tor, 0);
+    EXPECT_EQ(file_view.beginPiece, 0);
+    EXPECT_EQ(file_view.endPiece, 32);
 }

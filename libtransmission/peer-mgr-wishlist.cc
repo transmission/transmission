@@ -3,7 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
+#include <algorithm> // std::min, std::partial_sort
 #include <cstddef>
 #include <set>
 #include <utility>
@@ -15,7 +15,7 @@
 
 #include "libtransmission/crypto-utils.h" // for tr_salt_shaker
 #include "libtransmission/peer-mgr-wishlist.h"
-#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 namespace
 {
@@ -36,26 +36,21 @@ struct Candidate
     {
     }
 
-    [[nodiscard]] int compare(Candidate const& that) const // <=>
+    [[nodiscard]] constexpr auto compare(Candidate const& that) const noexcept // <=>
     {
         // prefer pieces closer to completion
-        if (n_blocks_missing != that.n_blocks_missing)
+        if (auto const val = tr_compare_3way(n_blocks_missing, that.n_blocks_missing); val != 0)
         {
-            return n_blocks_missing < that.n_blocks_missing ? -1 : 1;
+            return val;
         }
 
         // prefer higher priority
-        if (priority != that.priority)
+        if (auto const val = tr_compare_3way(priority, that.priority); val != 0)
         {
-            return priority > that.priority ? -1 : 1;
+            return -val;
         }
 
-        if (salt != that.salt)
-        {
-            return salt < that.salt ? -1 : 1;
-        }
-
-        return 0;
+        return tr_compare_3way(salt, that.salt);
     }
 
     bool operator<(Candidate const& that) const // less than
@@ -141,7 +136,7 @@ std::vector<tr_block_span_t> Wishlist::next(size_t n_wanted_blocks)
 
     // We usually won't need all the candidates to be sorted until endgame, so don't
     // waste cycles sorting all of them here. partial sort is enough.
-    auto constexpr MaxSortedPieces = size_t{ 30 };
+    static auto constexpr MaxSortedPieces = size_t{ 30 };
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 

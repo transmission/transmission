@@ -41,7 +41,7 @@ public:
     int find(int torrent_id, QString const& url) const;
 
     // QAbstractItemModel
-    int rowCount(QModelIndex const& parent = QModelIndex()) const override;
+    int rowCount(QModelIndex const& parent = QModelIndex{}) const override;
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 private:

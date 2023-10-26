@@ -8,11 +8,12 @@
 #include <cstddef> // for size_t
 #include <string>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h" // for tr_log_level
-#include "net.h" // for tr_port, tr_tos_t
-#include "quark.h"
+#include "libtransmission/log.h" // for tr_log_level
+#include "libtransmission/net.h" // for tr_port, tr_tos_t
+#include "libtransmission/peer-io.h" // tr_preferred_transport
+#include "libtransmission/quark.h"
 
 struct tr_variant;
 
@@ -39,9 +40,13 @@ struct tr_variant;
     V(TR_KEY_peer_congestion_algorithm, peer_congestion_algorithm, std::string, "", "") \
     V(TR_KEY_peer_limit_global, peer_limit_global, size_t, TR_DEFAULT_PEER_LIMIT_GLOBAL, "") \
     V(TR_KEY_peer_limit_per_torrent, peer_limit_per_torrent, size_t, TR_DEFAULT_PEER_LIMIT_TORRENT, "") \
-    V(TR_KEY_peer_port, peer_port, tr_port, tr_port::fromHost(TR_DEFAULT_PEER_PORT), "The local machine's incoming peer port") \
-    V(TR_KEY_peer_port_random_high, peer_port_random_high, tr_port, tr_port::fromHost(65535), "") \
-    V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::fromHost(49152), "") \
+    V(TR_KEY_peer_port, \
+      peer_port, \
+      tr_port, \
+      tr_port::from_host(TR_DEFAULT_PEER_PORT), \
+      "The local machine's incoming peer port") \
+    V(TR_KEY_peer_port_random_high, peer_port_random_high, tr_port, tr_port::from_host(65535), "") \
+    V(TR_KEY_peer_port_random_low, peer_port_random_low, tr_port, tr_port::from_host(49152), "") \
     V(TR_KEY_peer_port_random_on_start, peer_port_random_on_start, bool, false, "") \
     V(TR_KEY_peer_socket_tos, peer_socket_tos, tr_tos_t, 0x04, "") \
     V(TR_KEY_pex_enabled, pex_enabled, bool, true, "") \
@@ -72,19 +77,21 @@ struct tr_variant;
     V(TR_KEY_umask, umask, tr_mode_t, 022, "") \
     V(TR_KEY_upload_slots_per_torrent, upload_slots_per_torrent, size_t, 8U, "") \
     V(TR_KEY_utp_enabled, utp_enabled, bool, true, "") \
+    V(TR_KEY_preferred_transport, preferred_transport, tr_preferred_transport, TR_PREFER_UTP, "") \
     V(TR_KEY_torrent_added_verify_mode, torrent_added_verify_mode, tr_verify_added_mode, TR_VERIFY_ADDED_FAST, "")
 
 struct tr_session_settings
 {
     tr_session_settings() = default;
 
-    explicit tr_session_settings(tr_variant* src)
+    explicit tr_session_settings(tr_variant const& src)
     {
         load(src);
     }
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
 #define V(key, name, type, default_value, comment) type name = type{ default_value };
     SESSION_SETTINGS_FIELDS(V)

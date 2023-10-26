@@ -5,7 +5,7 @@
 
 #include <string_view>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "RpcClient.h"
 
@@ -29,23 +29,18 @@ using ::trqt::variant_helpers::variantInit;
 namespace
 {
 
-char const constexpr* const RequestDataPropertyKey{ "requestData" };
-char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
+char constexpr const* const RequestDataPropertyKey{ "requestData" };
+char constexpr const* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
 TrVariantPtr createVariant()
 {
-    return { new tr_variant{},
-             [](tr_variant* var)
-             {
-                 tr_variantClear(var);
-                 delete var;
-             } };
+    return std::make_shared<tr_variant>();
 }
 
 } // namespace
 
 RpcClient::RpcClient(QObject* parent)
-    : QObject(parent)
+    : QObject{ parent }
 {
     qRegisterMetaType<TrVariantPtr>("TrVariantPtr");
 }
@@ -106,9 +101,16 @@ RpcResponseFuture RpcClient::exec(std::string_view method, tr_variant* args)
     tr_variantInitDict(json.get(), 3);
     dictAdd(json.get(), TR_KEY_method, method);
 
-    if (args != nullptr)
+    if (args != nullptr) // if args were passed in, use them
     {
-        tr_variantDictSteal(json.get(), TR_KEY_arguments, args);
+        auto* child = tr_variantDictFind(json.get(), TR_KEY_arguments);
+
+        if (child == nullptr)
+        {
+            child = tr_variantDictAddDict(json.get(), TR_KEY_arguments, 0);
+        }
+
+        std::swap(*child, *args);
     }
 
     return sendRequest(json);
@@ -137,7 +139,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
         request_ = request;
     }
 
-    auto const json_data = QByteArray::fromStdString(tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN));
+    auto const json_data = QByteArray::fromStdString(tr_variant_serde::json().compact().to_string(*json));
     QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
     reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
@@ -164,10 +166,10 @@ void RpcClient::sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse
 {
     if (verbose_)
     {
-        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON));
+        fmt::print("{:s}:{:d} sending req:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*json));
     }
 
-    local_requests_.insert(tag, promise);
+    local_requests_.try_emplace(tag, promise);
     tr_rpc_request_exec_json(session_, json.get(), localSessionCallback, this);
 }
 
@@ -198,7 +200,7 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
 {
     if (nam_ == nullptr)
     {
-        nam_ = new QNetworkAccessManager();
+        nam_ = new QNetworkAccessManager{};
 
         connect(nam_, &QNetworkAccessManager::finished, this, &RpcClient::networkRequestFinished);
 
@@ -216,11 +218,11 @@ void RpcClient::localSessionCallback(tr_session* s, tr_variant* response, void* 
 
     if (self->verbose_)
     {
-        fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variantToStr(response, TR_VARIANT_FMT_JSON));
+        fmt::print("{:s}:{:d} got response:\n{:s}\n", __FILE__, __LINE__, tr_variant_serde::json().to_string(*response));
     }
 
     TrVariantPtr const json = createVariant();
-    *json = *response;
+    std::swap(*json, *response);
 
     variantInit(response, false);
 
@@ -272,11 +274,13 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
     else
     {
-        auto const json_data = reply->readAll().trimmed();
+        auto const json_data = reply->readAll().trimmed().toStdString();
         auto const json = createVariant();
-        RpcResponse result;
-        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_data))
+        auto result = RpcResponse{};
+
+        if (auto top = tr_variant_serde::json().parse(json_data); top)
         {
+            std::swap(*json, *top);
             result = parseResponseData(*json);
         }
 
@@ -287,13 +291,15 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
 void RpcClient::localRequestFinished(TrVariantPtr response)
 {
-    int64_t const tag = parseResponseTag(*response);
-    RpcResponse const result = parseResponseData(*response);
-    QFutureInterface<RpcResponse> promise = local_requests_.take(tag);
+    if (auto node = local_requests_.extract(parseResponseTag(*response)); node)
+    {
+        auto const result = parseResponseData(*response);
 
-    promise.setProgressRange(0, 1);
-    promise.setProgressValue(1);
-    promise.reportFinished(&result);
+        auto& promise = node.mapped();
+        promise.setProgressRange(0, 1);
+        promise.setProgressValue(1);
+        promise.reportFinished(&result);
+    }
 }
 
 int64_t RpcClient::parseResponseTag(tr_variant& response) const
@@ -314,7 +320,7 @@ RpcResponse RpcClient::parseResponseData(tr_variant& response) const
     if (tr_variant* args = nullptr; tr_variantDictFindDict(&response, TR_KEY_arguments, &args))
     {
         ret.args = createVariant();
-        *ret.args = *args;
+        std::swap(*ret.args, *args);
         variantInit(args, false);
     }
 

@@ -46,7 +46,6 @@
 
 #include <algorithm>
 #include <cinttypes> // PRId64
-#include <cmath> // pow()
 #include <cstring> // strstr
 #include <functional>
 #include <iostream>
@@ -57,30 +56,6 @@
 #include <utility>
 
 using namespace std::literals;
-
-namespace
-{
-
-class TrVariantDeleter
-{
-public:
-    void operator()(tr_variant* ptr) const
-    {
-        tr_variantClear(ptr);
-        std::default_delete<tr_variant>()(ptr);
-    }
-};
-
-using TrVariantPtr = std::unique_ptr<tr_variant, TrVariantDeleter>;
-
-TrVariantPtr create_variant(tr_variant& other)
-{
-    auto result = TrVariantPtr(new tr_variant(other));
-    tr_variantInitBool(&other, false);
-    return result;
-}
-
-} // namespace
 
 class Session::Impl
 {
@@ -147,6 +122,11 @@ public:
         return signal_torrents_changed_;
     }
 
+    [[nodiscard]] constexpr auto& favicon_cache()
+    {
+        return favicon_cache_;
+    }
+
 private:
     Glib::RefPtr<Session> get_core_ptr() const;
 
@@ -209,6 +189,8 @@ private:
     Glib::RefPtr<SortListModel<Torrent>> sorted_model_;
     Glib::RefPtr<TorrentSorter> sorter_ = TorrentSorter::create();
     tr_session* session_ = nullptr;
+
+    FaviconCache<Glib::RefPtr<Gdk::Pixbuf>> favicon_cache_;
 };
 
 Glib::RefPtr<Session> Session::Impl::get_core_ptr() const
@@ -531,11 +513,11 @@ Session::Session(tr_session* session)
 Session::~Session() = default;
 
 Session::Impl::Impl(Session& core, tr_session* session)
-    : core_(core)
-    , session_(session)
+    : core_{ core }
+    , session_{ session }
 {
     raw_model_ = Gio::ListStore<Torrent>::create();
-    signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_.get(), &TorrentSorter::update)));
+    signal_torrents_changed_.connect(sigc::hide<0>(sigc::mem_fun(*sorter_, &TorrentSorter::update)));
     sorted_model_ = SortListModel<Torrent>::create(gtr_ptr_static_cast<Gio::ListModel>(raw_model_), sorter_);
 
     /* init from prefs & listen to pref changes */
@@ -645,7 +627,7 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent* raw_torrent)
         [this, core = get_core_ptr(), torrent_id = tr_torrentId(raw_torrent)]()
         {
             /* update the torrent's collated name */
-            if (auto const [torrent, position] = find_torrent_by_id(torrent_id); torrent != nullptr)
+            if (auto const& [torrent, position] = find_torrent_by_id(torrent_id); torrent)
             {
                 torrent->update();
             }
@@ -912,7 +894,7 @@ void Session::Impl::torrents_added()
 
 void Session::torrent_changed(tr_torrent_id_t id)
 {
-    if (auto const [torrent, position] = impl_->find_torrent_by_id(id); torrent != nullptr)
+    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
     {
         torrent->update();
     }
@@ -920,7 +902,7 @@ void Session::torrent_changed(tr_torrent_id_t id)
 
 void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
 {
-    if (auto const [torrent, position] = impl_->find_torrent_by_id(id); torrent != nullptr)
+    if (auto const& [torrent, position] = impl_->find_torrent_by_id(id); torrent)
     {
         /* remove from the gui */
         impl_->get_raw_model()->remove(position);
@@ -987,7 +969,6 @@ void Session::start_now(tr_torrent_id_t id)
     auto* ids = tr_variantDictAddList(args, TR_KEY_ids, 1);
     tr_variantListAddInt(ids, id);
     exec(&top);
-    tr_variantClear(&top);
 }
 
 void Session::Impl::update()
@@ -1208,8 +1189,11 @@ bool core_read_rpc_response_idle(tr_variant& response)
 
 void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
 {
-    Glib::signal_idle().connect([owned_response = std::shared_ptr(create_variant(*response))]() mutable
-                                { return core_read_rpc_response_idle(*owned_response); });
+    auto owned_response = std::make_shared<tr_variant>();
+    tr_variantInitBool(owned_response.get(), false);
+    std::swap(*owned_response, *response);
+
+    Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });
 }
 
 } // namespace
@@ -1266,7 +1250,6 @@ void Session::port_test()
 
             impl_->signal_port_tested().emit(is_open);
         });
-    tr_variantClear(&request);
 }
 
 /***
@@ -1303,7 +1286,6 @@ void Session::blocklist_update()
 
             impl_->signal_blocklist_updated().emit(ruleCount >= 0);
         });
-    tr_variantClear(&request);
 }
 
 /***
@@ -1357,6 +1339,11 @@ tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
     }
 
     return tor;
+}
+
+FaviconCache<Glib::RefPtr<Gdk::Pixbuf>>& Session::favicon_cache() const
+{
+    return impl_->favicon_cache();
 }
 
 void Session::open_folder(tr_torrent_id_t torrent_id) const

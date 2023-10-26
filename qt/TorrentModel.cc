@@ -164,7 +164,7 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
 
     // build a list of the property keys
     tr_variant* const first_child = tr_variantListChild(torrent_list, 0);
-    bool const table = tr_variantIsList(first_child);
+    bool const table = first_child != nullptr && first_child->holds_alternative<tr_variant::Vector>();
     std::vector<tr_quark> keys;
     if (table)
     {
@@ -242,7 +242,7 @@ void TorrentModel::updateTorrents(tr_variant* torrent_list, bool is_complete_lis
 
         if (tor == nullptr)
         {
-            tor = new Torrent(prefs_, *id);
+            tor = new Torrent{ prefs_, *id };
             instantiated.push_back(tor);
             is_new = true;
         }
@@ -433,9 +433,9 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
 
     if (torrents_.empty())
     {
-        beginInsertRows(QModelIndex(), 0, torrents.size() - 1);
+        beginInsertRows(QModelIndex{}, 0, torrents.size() - 1);
         torrents_ = torrents;
-        std::sort(torrents_.begin(), torrents_.end(), TorrentIdLessThan());
+        std::sort(torrents_.begin(), torrents_.end(), TorrentIdLessThan{});
         endInsertRows();
     }
     else
@@ -445,7 +445,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
             auto const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
             auto const row = static_cast<int>(std::distance(torrents_.begin(), it));
 
-            beginInsertRows(QModelIndex(), row, row);
+            beginInsertRows(QModelIndex{}, row, row);
             torrents_.insert(it, tor);
             endInsertRows();
         }
@@ -460,7 +460,7 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
     {
         auto const& [first, last] = *it;
 
-        beginRemoveRows(QModelIndex(), first, last);
+        beginRemoveRows(QModelIndex{}, first, last);
         torrents_.erase(torrents_.begin() + first, torrents_.begin() + last + 1);
         endRemoveRows();
     }

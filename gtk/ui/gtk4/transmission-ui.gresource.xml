@@ -13,6 +13,8 @@
     <file compressed="true" preprocess="xml-stripblanks">PrefsDialog.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">RelocateDialog.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">StatsDialog.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">TorrentListItemCompact.ui</file>
+    <file compressed="true" preprocess="xml-stripblanks">TorrentListItemFull.ui</file>
     <file compressed="true" preprocess="xml-stripblanks">TorrentUrlChooserDialog.ui</file>
   </gresource>
 </gresources>

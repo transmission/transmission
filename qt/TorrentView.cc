@@ -13,7 +13,7 @@ class TorrentView::HeaderWidget : public QWidget
 {
 public:
     explicit HeaderWidget(TorrentView* parent)
-        : QWidget(parent)
+        : QWidget{ parent }
     {
         setFont(QApplication::font("QMiniFont"));
     }
@@ -28,7 +28,7 @@ public:
     [[nodiscard]] QSize sizeHint() const override
     {
         QStyleOptionHeader option;
-        option.rect = QRect(0, 0, 100, 100);
+        option.rect = QRect{ 0, 0, 100, 100 };
 
         QRect const label_rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
 
@@ -44,7 +44,7 @@ protected:
         option.state = QStyle::State_Enabled;
         option.position = QStyleOptionHeader::OnlyOneSection;
 
-        QStylePainter painter(this);
+        QStylePainter painter{ this };
         painter.drawControl(QStyle::CE_HeaderSection, option);
 
         option.rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);

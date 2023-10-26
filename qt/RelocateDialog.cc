@@ -27,9 +27,9 @@ void RelocateDialog::onMoveToggled(bool b) const
 }
 
 RelocateDialog::RelocateDialog(Session& session, TorrentModel const& model, torrent_ids_t ids, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , ids_(std::move(ids))
+    : BaseDialog{ parent }
+    , session_{ session }
+    , ids_{ std::move(ids) }
 {
     ui_.setupUi(this);
 

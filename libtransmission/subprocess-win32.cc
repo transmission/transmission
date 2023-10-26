@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <fmt/xchar.h> // for wchar_t support
 
 #include <windows.h>
@@ -205,7 +205,7 @@ auto get_app_type(char const* app)
 {
     auto const lower = tr_strlower(app);
 
-    if (tr_strvEndsWith(lower, ".cmd") || tr_strvEndsWith(lower, ".bat"))
+    if (tr_strv_ends_with(lower, ".cmd") || tr_strv_ends_with(lower, ".bat"))
     {
         return tr_app_type::BATCH;
     }

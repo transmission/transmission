@@ -24,9 +24,9 @@ public:
     static std::unique_ptr<tr_session_thread> create();
     virtual ~tr_session_thread() = default;
 
-    [[nodiscard]] virtual struct event_base* eventBase() noexcept = 0;
+    [[nodiscard]] virtual struct event_base* event_base() noexcept = 0;
 
-    [[nodiscard]] virtual bool amInSessionThread() const noexcept = 0;
+    [[nodiscard]] virtual bool am_in_session_thread() const noexcept = 0;
 
     virtual void run(std::function<void(void)>&& func) = 0;
 

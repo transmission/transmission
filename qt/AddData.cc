@@ -21,13 +21,12 @@ namespace
 
 QString getNameFromMetainfo(QByteArray const& benc)
 {
-    auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parseBenc({ benc.constData(), static_cast<size_t>(benc.size()) }))
+    if (auto metainfo = tr_torrent_metainfo{}; metainfo.parse_benc({ benc.constData(), static_cast<size_t>(benc.size()) }))
     {
-        return {};
+        return QString::fromStdString(metainfo.name());
     }
 
-    return QString::fromStdString(metainfo.name());
+    return {};
 }
 
 QString getNameFromMagnet(QString const& magnet)
@@ -44,7 +43,8 @@ QString getNameFromMagnet(QString const& magnet)
         return QString::fromStdString(tmp.name());
     }
 
-    return QString::fromStdString(tmp.infoHashString());
+    auto const& hashstr = tmp.info_hash_string();
+    return QString::fromUtf8(std::data(hashstr), std::size(hashstr));
 }
 
 } // namespace

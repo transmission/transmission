@@ -5,197 +5,70 @@
 
 #pragma once
 
+#include <algorithm> // for std::copy_n
 #include <cstddef>
 #include <iterator>
 #include <limits>
-#include <memory>
 #include <string>
 #include <string_view>
 
-#include <event2/buffer.h>
+#include <small/vector.hpp>
 
 #include "error.h"
 #include "net.h" // tr_socket_t
-#include "utils-ev.h"
 #include "utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission
 {
 
-class Buffer
+template<typename value_type>
+class BufferReader
 {
 public:
-    class Iterator
-    {
-    public:
-        using difference_type = long;
-        using value_type = std::byte;
-        using pointer = value_type*;
-        using reference = value_type&;
-        using iterator_category = std::random_access_iterator_tag;
-
-        Iterator(evbuffer* buf, size_t offset)
-            : buf_{ buf }
-        {
-            set_offset(offset);
-        }
-
-        [[nodiscard]] constexpr value_type& operator*() noexcept
-        {
-            return static_cast<value_type*>(iov_.iov_base)[iov_offset_];
-        }
-
-        [[nodiscard]] constexpr value_type operator*() const noexcept
-        {
-            return static_cast<value_type*>(iov_.iov_base)[iov_offset_];
-        }
-
-        [[nodiscard]] Iterator operator+(size_t n_bytes)
-        {
-            return Iterator{ buf_, offset() + n_bytes };
-        }
-
-        [[nodiscard]] Iterator operator-(size_t n_bytes)
-        {
-            return Iterator{ buf_, offset() - n_bytes };
-        }
-
-        [[nodiscard]] constexpr auto operator-(Iterator const& that) const noexcept
-        {
-            return offset() - that.offset();
-        }
-
-        Iterator& operator++() noexcept
-        {
-            *this += 1U;
-            return *this;
-        }
-
-        Iterator& operator+=(size_t n_bytes)
-        {
-            if (iov_offset_ + n_bytes < iov_.iov_len)
-            {
-                iov_offset_ += n_bytes;
-            }
-            else
-            {
-                inc_offset(n_bytes);
-            }
-
-            return *this;
-        }
-
-        Iterator& operator--() noexcept
-        {
-            if (iov_offset_ > 0)
-            {
-                --iov_offset_;
-            }
-            else
-            {
-                set_offset(offset() - 1);
-            }
-            return *this;
-        }
-
-        [[nodiscard]] constexpr bool operator==(Iterator const& that) const noexcept
-        {
-            return offset() == that.offset();
-        }
-
-        [[nodiscard]] constexpr bool operator!=(Iterator const& that) const noexcept
-        {
-            return offset() != that.offset();
-        }
-
-    private:
-        [[nodiscard]] constexpr size_t offset() const noexcept
-        {
-            return ptr_.pos + iov_offset_;
-        }
-
-        void inc_offset(size_t increment)
-        {
-            evbuffer_ptr_set(buf_, &ptr_, iov_offset_ + increment, EVBUFFER_PTR_ADD);
-            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
-            iov_offset_ = 0;
-        }
-
-        void set_offset(size_t offset)
-        {
-            evbuffer_ptr_set(buf_, &ptr_, offset, EVBUFFER_PTR_SET);
-            evbuffer_peek(buf_, std::numeric_limits<ev_ssize_t>::max(), &ptr_, &iov_, 1);
-            iov_offset_ = 0;
-        }
-
-        evbuffer* buf_;
-        evbuffer_ptr ptr_ = {};
-        evbuffer_iovec iov_ = {};
-        size_t iov_offset_ = 0;
-    };
-
-    Buffer() = default;
-    Buffer(Buffer&&) = default;
-    Buffer(Buffer const&) = delete;
-    Buffer& operator=(Buffer const&) = delete;
-    Buffer& operator=(Buffer&&) = default;
-
-    template<typename T>
-    explicit Buffer(T const& data)
-    {
-        add(std::data(data), std::size(data));
-    }
-
-    [[nodiscard]] auto size() const noexcept
-    {
-        return evbuffer_get_length(buf_.get());
-    }
+    virtual ~BufferReader() = default;
+    virtual void drain(size_t n_bytes) = 0;
+    [[nodiscard]] virtual size_t size() const noexcept = 0;
+    [[nodiscard]] virtual value_type const* data() const noexcept = 0;
 
     [[nodiscard]] auto empty() const noexcept
     {
-        return evbuffer_get_length(buf_.get()) == 0;
+        return size() == 0;
     }
 
-    [[nodiscard]] auto begin() noexcept
+    [[nodiscard]] auto const* begin() const noexcept
     {
-        return Iterator{ buf_.get(), 0U };
+        return data();
     }
 
-    [[nodiscard]] auto end() noexcept
+    [[nodiscard]] auto const* end() const noexcept
     {
-        return Iterator{ buf_.get(), size() };
-    }
-
-    [[nodiscard]] auto begin() const noexcept
-    {
-        return Iterator{ buf_.get(), 0U };
-    }
-
-    [[nodiscard]] auto end() const noexcept
-    {
-        return Iterator{ buf_.get(), size() };
+        return begin() + size();
     }
 
     template<typename T>
     [[nodiscard]] TR_CONSTEXPR20 bool starts_with(T const& needle) const
     {
         auto const n_bytes = std::size(needle);
-        auto const needle_begin = reinterpret_cast<std::byte const*>(std::data(needle));
+        auto const needle_begin = reinterpret_cast<value_type const*>(std::data(needle));
         auto const needle_end = needle_begin + n_bytes;
-        return n_bytes <= size() && std::equal(needle_begin, needle_end, cbegin());
+        return n_bytes <= size() && std::equal(needle_begin, needle_end, data());
     }
 
-    [[nodiscard]] std::string to_string() const
+    [[nodiscard]] auto to_string_view() const
     {
-        auto str = std::string{};
-        str.resize(size());
-        evbuffer_copyout(buf_.get(), std::data(str), std::size(str));
-        return str;
+        return std::string_view{ reinterpret_cast<char const*>(data()), size() };
     }
 
-    auto to_buf(void* tgt, size_t n_bytes)
+    [[nodiscard]] auto to_string() const
     {
-        return evbuffer_remove(buf_.get(), tgt, n_bytes);
+        return std::string{ to_string_view() };
+    }
+
+    void to_buf(void* tgt, size_t n_bytes)
+    {
+        n_bytes = std::min(n_bytes, size());
+        std::copy_n(data(), n_bytes, static_cast<value_type*>(tgt));
+        drain(n_bytes);
     }
 
     [[nodiscard]] auto to_uint8()
@@ -226,58 +99,132 @@ public:
         return tr_ntohll(tmp);
     }
 
-    void drain(size_t n_bytes)
+    // Returns the number of bytes written. Check `error` for error.
+    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
-        evbuffer_drain(buf_.get(), n_bytes);
+        n_bytes = std::min(n_bytes, size());
+
+        if (n_bytes == 0U)
+        {
+            return {};
+        }
+
+        if (auto const n_sent = send(sockfd, reinterpret_cast<char const*>(data()), n_bytes, 0); n_sent >= 0U)
+        {
+            drain(n_sent);
+            return n_sent;
+        }
+
+        auto const err = sockerrno;
+        tr_error_set(error, err, tr_net_strerror(err));
+        return {};
     }
 
     void clear()
     {
         drain(size());
     }
+};
 
-    // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+template<typename value_type>
+class BufferWriter
+{
+public:
+    virtual ~BufferWriter() = default;
+    virtual std::pair<value_type*, size_t> reserve_space(size_t n_bytes) = 0;
+    virtual void commit_space(size_t n_bytes) = 0;
+
+    void add(void const* span_begin, size_t span_len)
     {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_write_atmost(buf_.get(), sockfd, n_bytes);
-        auto const err = EVUTIL_SOCKET_ERROR();
-        if (res >= 0)
+        auto [buf, buflen] = reserve_space(span_len);
+        std::copy_n(reinterpret_cast<value_type const*>(span_begin), span_len, buf);
+        commit_space(span_len);
+    }
+
+    template<typename ContiguousContainer>
+    void add(ContiguousContainer const& container)
+    {
+        add(std::data(container), std::size(container));
+    }
+
+    template<typename OneByteType>
+    void push_back(OneByteType ch)
+    {
+        add(&ch, 1);
+    }
+
+    void add_uint8(uint8_t uch)
+    {
+        add(&uch, 1);
+    }
+
+    void add_uint16(uint16_t hs)
+    {
+        add_uint16_n(htons(hs));
+    }
+
+    void add_uint16_n(uint16_t ns)
+    {
+        add(&ns, sizeof(ns));
+    }
+
+    void add_uint32(uint32_t hl)
+    {
+        add_uint32_n(htonl(hl));
+    }
+
+    void add_uint32_n(uint32_t nl)
+    {
+        add(&nl, sizeof(nl));
+    }
+
+    void add_uint64(uint64_t hll)
+    {
+        add_uint64_n(tr_htonll(hll));
+    }
+
+    void add_uint64_n(uint64_t nll)
+    {
+        add(&nll, sizeof(nll));
+    }
+
+    void add_port(tr_port port)
+    {
+        auto nport = port.network();
+        add(&nport, sizeof(nport));
+    }
+
+    void add_address(tr_address const& addr)
+    {
+        switch (addr.type)
         {
-            return static_cast<size_t>(res);
+        case TR_AF_INET:
+            add(&addr.addr.addr4.s_addr, sizeof(addr.addr.addr4.s_addr));
+            break;
+        case TR_AF_INET6:
+            add(&addr.addr.addr6.s6_addr, sizeof(addr.addr.addr6.s6_addr));
+            break;
+        default:
+            TR_ASSERT_MSG(false, "invalid type");
+            break;
         }
-        tr_error_set(error, err, tr_net_strerror(err));
-        return 0;
-    }
-
-    [[nodiscard]] std::pair<std::byte*, size_t> pullup()
-    {
-        return { reinterpret_cast<std::byte*>(evbuffer_pullup(buf_.get(), -1)), size() };
-    }
-
-    [[nodiscard]] auto pullup_sv()
-    {
-        auto const [buf, buflen] = pullup();
-        return std::string_view{ reinterpret_cast<char const*>(buf), buflen };
-    }
-
-    void reserve(size_t n_bytes)
-    {
-        evbuffer_expand(buf_.get(), n_bytes - size());
     }
 
     size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
     {
-        EVUTIL_SET_SOCKET_ERROR(0);
-        auto const res = evbuffer_read(buf_.get(), sockfd, static_cast<int>(n_bytes));
-        auto const err = EVUTIL_SOCKET_ERROR();
+        auto const [buf, buflen] = reserve_space(n_bytes);
+        auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
+        auto const err = sockerrno;
 
-        if (res > 0)
+        if (n_read > 0)
         {
-            return static_cast<size_t>(res);
+            commit_space(n_read);
+            return static_cast<size_t>(n_read);
         }
 
-        if (res == 0)
+        // When a stream socket peer has performed an orderly shutdown,
+        // the return value will be 0 (the traditional "end-of-file" return).
+        if (n_read == 0)
         {
             tr_error_set_from_errno(error, ENOTCONN);
         }
@@ -288,95 +235,76 @@ public:
 
         return {};
     }
+};
 
-    // Move all data from one buffer into another.
-    // This is a destructive add: the source buffer is empty after this call.
-    void add(Buffer& that)
+template<size_t N, typename value_type = std::byte, typename GrowthFactor = std::ratio<3, 2>>
+class StackBuffer final
+    : public BufferReader<value_type>
+    , public BufferWriter<value_type>
+{
+public:
+    StackBuffer() = default;
+    StackBuffer(StackBuffer&&) = delete;
+    StackBuffer(StackBuffer const&) = delete;
+    StackBuffer& operator=(StackBuffer&&) = delete;
+    StackBuffer& operator=(StackBuffer const&) = delete;
+
+    template<typename ContiguousContainer>
+    explicit StackBuffer(ContiguousContainer const& data)
     {
-        evbuffer_add_buffer(buf_.get(), that.buf_.get());
+        BufferWriter<value_type>::add(data);
     }
 
-    void add(Buffer&& that)
+    [[nodiscard]] size_t size() const noexcept override
     {
-        evbuffer_add_buffer(buf_.get(), that.buf_.get());
+        return end_pos_ - begin_pos_;
     }
 
-    void add(void const* bytes, size_t n_bytes)
+    [[nodiscard]] value_type const* data() const noexcept override
     {
-        evbuffer_add(buf_.get(), bytes, n_bytes);
+        return std::data(buf_) + begin_pos_;
     }
 
-    template<typename T>
-    void add(T const& data)
+    void drain(size_t n_bytes) override
     {
-        add(std::data(data), std::size(data));
+        begin_pos_ += std::min(n_bytes, size());
+
+        if (begin_pos_ == end_pos_) // empty; reuse the buf
+        {
+            begin_pos_ = end_pos_ = 0U;
+        }
     }
 
-    template<
-        typename T,
-        typename std::enable_if_t<
-            std::is_same_v<T, char> || std::is_same_v<T, unsigned char> || std::is_same_v<T, std::byte>>* = nullptr>
-    void push_back(T ch)
+    std::pair<value_type*, size_t> reserve_space(size_t n_bytes) override
     {
-        add(&ch, 1);
+        if (auto const free_at_end = buf_.size() - end_pos_; free_at_end < n_bytes)
+        {
+            if (auto const total_free = begin_pos_ + free_at_end; total_free >= n_bytes)
+            {
+                // move data so that all free space is at the end
+                auto const size = this->size();
+                std::copy(data(), data() + size, std::data(buf_));
+                begin_pos_ = 0;
+                end_pos_ = size;
+            }
+            else // even `total_free` is not enough, so resize
+            {
+                buf_.resize(end_pos_ + n_bytes);
+            }
+        }
+
+        return { buf_.data() + end_pos_, n_bytes };
     }
 
-    void add_port(tr_port const& port)
+    void commit_space(size_t n_bytes) override
     {
-        auto nport = port.network();
-        add(&nport, sizeof(nport));
-    }
-
-    void add_uint8(uint8_t uch)
-    {
-        add(&uch, 1);
-    }
-
-    void add_uint16(uint16_t hs)
-    {
-        uint16_t const ns = htons(hs);
-        add(&ns, sizeof(ns));
-    }
-
-    void add_hton16(uint16_t hs)
-    {
-        add_uint16(hs);
-    }
-
-    void add_uint32(uint32_t hl)
-    {
-        uint32_t const nl = htonl(hl);
-        add(&nl, sizeof(nl));
-    }
-
-    void eadd_hton32(uint32_t hl)
-    {
-        add_uint32(hl);
-    }
-
-    void add_uint64(uint64_t hll)
-    {
-        uint64_t const nll = tr_htonll(hll);
-        add(&nll, sizeof(nll));
-    }
-
-    void add_hton64(uint64_t hll)
-    {
-        add_uint64(hll);
+        end_pos_ += n_bytes;
     }
 
 private:
-    evhelpers::evbuffer_unique_ptr buf_{ evbuffer_new() };
-
-    [[nodiscard]] Iterator cbegin() const noexcept
-    {
-        return Iterator{ buf_.get(), 0U };
-    }
-
-    [[nodiscard]] Iterator cend() const noexcept
-    {
-        return Iterator{ buf_.get(), size() };
-    }
+    small::vector<value_type, N, std::allocator<value_type>, std::true_type, size_t, GrowthFactor> buf_ = {};
+    size_t begin_pos_ = {};
+    size_t end_pos_ = {};
 };
 
 } // namespace libtransmission

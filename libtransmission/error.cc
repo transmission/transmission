@@ -6,13 +6,10 @@
 #include <algorithm>
 #include <string_view>
 
-#include <fmt/format.h>
-
-#include "libtransmission/transmission.h"
+#include <fmt/core.h>
 
 #include "libtransmission/error.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
 
 namespace

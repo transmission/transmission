@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include <algorithm>
 #include <array>
-#include <cstddef>
+#include <cstddef> // size_t
 #include <cstdint>
 #include <functional>
 #include <utility>

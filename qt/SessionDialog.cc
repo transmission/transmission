@@ -44,9 +44,9 @@ void SessionDialog::resensitize() const
 ***/
 
 SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , prefs_(prefs)
+    : BaseDialog{ parent }
+    , session_{ session }
+    , prefs_{ prefs }
 {
     ui_.setupUi(this);
 

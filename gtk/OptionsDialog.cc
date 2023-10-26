@@ -334,23 +334,22 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<S
 {
     if (response == TR_GTK_RESPONSE_TYPE(ACCEPT))
     {
-        /* remember this folder the next time we use this dialog */
-        gtr_pref_string_set(TR_KEY_open_dialog_dir, IF_GTKMM4(get_current_folder, get_current_folder_file)()->get_path());
-
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
         bool const do_prompt = get_choice(std::string(ShowOptionsDialogChoice)) == "true";
         bool const do_notify = false;
 
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-        auto files = std::vector<Glib::RefPtr<Gio::File>>();
-        auto files_model = get_files();
-        for (auto i = guint{ 0 }; i < files_model->get_n_items(); ++i)
+        auto const files = IF_GTKMM4(get_files2, get_files)();
+        g_assert(!files.empty());
+
+        /* remember this folder the next time we use this dialog */
+        if (auto const folder = IF_GTKMM4(get_current_folder, get_current_folder_file)(); folder != nullptr)
         {
-            files.push_back(gtr_ptr_dynamic_cast<Gio::File>(files_model->get_object(i)));
+            gtr_pref_string_set(TR_KEY_open_dialog_dir, folder->get_path());
         }
-#else
-        auto const files = get_files();
-#endif
+        else if (auto const parent = files.front()->get_parent(); parent != nullptr)
+        {
+            gtr_pref_string_set(TR_KEY_open_dialog_dir, parent->get_path());
+        }
 
         core->add_files(files, do_start, do_prompt, do_notify);
     }

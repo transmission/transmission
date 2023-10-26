@@ -47,11 +47,11 @@ public:
         }
     }
 
-    constexpr void process(void const* src_data, void* dst_data, size_t data_length)
+    constexpr void process(uint8_t const* const src, size_t n_bytes, uint8_t* const tgt)
     {
-        for (size_t i = 0; i < data_length; ++i)
+        for (size_t i = 0; i != n_bytes; ++i)
         {
-            static_cast<uint8_t*>(dst_data)[i] = static_cast<uint8_t const*>(src_data)[i] ^ arc4_next();
+            tgt[i] = src[i] ^ arc4_next();
         }
     }
 

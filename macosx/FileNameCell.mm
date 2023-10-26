@@ -20,45 +20,51 @@ static CGFloat const kPaddingBelowStatusFile = 2.0;
 static CGFloat const kPaddingBetweenNameAndFolderStatus = 4.0;
 static CGFloat const kPaddingExpansionFrame = 2.0;
 
-@interface FileNameCell ()
+static NSMutableParagraphStyle* sParagraphStyle()
+{
+    NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
+    paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
+    return paragraphStyle;
+}
+static NSMutableParagraphStyle* sStatusParagraphStyle()
+{
+    NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
+    paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
+    return paragraphStyle;
+}
 
-@property(nonatomic, readonly) NSAttributedString* attributedTitle;
-@property(nonatomic, readonly) NSAttributedString* attributedStatus;
-@property(nonatomic, readonly) NSMutableDictionary* fTitleAttributes;
-@property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
-
-@end
+static NSDictionary<NSAttributedStringKey, id>* const kTitleAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:12.0],
+    NSParagraphStyleAttributeName : sParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.controlTextColor
+};
+static NSDictionary<NSAttributedStringKey, id>* const kStatusAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:9.0],
+    NSParagraphStyleAttributeName : sStatusParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.secondaryLabelColor
+};
+static NSDictionary<NSAttributedStringKey, id>* const kTitleEmphasizedAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:12.0],
+    NSParagraphStyleAttributeName : sParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.whiteColor
+};
+static NSDictionary<NSAttributedStringKey, id>* const kStatusEmphasizedAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:9.0],
+    NSParagraphStyleAttributeName : sStatusParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.whiteColor
+};
+static NSDictionary<NSAttributedStringKey, id>* const kTitleDisabledAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:12.0],
+    NSParagraphStyleAttributeName : sParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.disabledControlTextColor
+};
+static NSDictionary<NSAttributedStringKey, id>* const kStatusDisabledAttributes = @{
+    NSFontAttributeName : [NSFont messageFontOfSize:9.0],
+    NSParagraphStyleAttributeName : sStatusParagraphStyle(),
+    NSForegroundColorAttributeName : NSColor.disabledControlTextColor
+};
 
 @implementation FileNameCell
-
-- (instancetype)init
-{
-    if ((self = [super init]))
-    {
-        NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
-        paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
-
-        _fTitleAttributes = [[NSMutableDictionary alloc]
-            initWithObjectsAndKeys:[NSFont messageFontOfSize:12.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
-
-        NSMutableParagraphStyle* statusParagraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
-        statusParagraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
-
-        _fStatusAttributes = [[NSMutableDictionary alloc]
-            initWithObjectsAndKeys:[NSFont messageFontOfSize:9.0], NSFontAttributeName, statusParagraphStyle, NSParagraphStyleAttributeName, nil];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone*)zone
-{
-    FileNameCell* copy = [super copyWithZone:zone];
-
-    copy->_fTitleAttributes = _fTitleAttributes;
-    copy->_fStatusAttributes = _fStatusAttributes;
-
-    return copy;
-}
 
 - (NSImage*)image
 {
@@ -87,40 +93,36 @@ static CGFloat const kPaddingExpansionFrame = 2.0;
             respectFlipped:YES
                      hints:nil];
 
-    NSColor *titleColor, *statusColor;
     FileListNode* node = self.objectValue;
+    AttributesStyle style;
     if (self.backgroundStyle == NSBackgroundStyleEmphasized)
     {
-        titleColor = statusColor = NSColor.whiteColor;
+        style = AttributesStyleEmphasized;
     }
     else if ([node.torrent checkForFiles:node.indexes] == NSControlStateValueOff)
     {
-        titleColor = statusColor = NSColor.disabledControlTextColor;
+        style = AttributesStyleDisabled;
     }
     else
     {
-        titleColor = NSColor.controlTextColor;
-        statusColor = NSColor.secondaryLabelColor;
+        style = AttributesStyleNormal;
     }
 
-    self.fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
-    self.fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
-
     //title
-    NSAttributedString* titleString = self.attributedTitle;
-    NSRect titleRect = [self rectForTitleWithString:titleString inBounds:cellFrame];
+    NSAttributedString* titleString = [self attributedTitleWithStyle:style];
+    NSRect titleRect = [self rectForTitleWithStringSize:[titleString size] inBounds:cellFrame];
     [titleString drawInRect:titleRect];
 
     //status
-    NSAttributedString* statusString = self.attributedStatus;
+    NSAttributedString* statusString = [self attributedStatusWithStyle:style];
     NSRect statusRect = [self rectForStatusWithString:statusString withTitleRect:titleRect inBounds:cellFrame];
     [statusString drawInRect:statusRect];
 }
 
 - (NSRect)expansionFrameWithFrame:(NSRect)cellFrame inView:(NSView*)view
 {
-    NSAttributedString* titleString = self.attributedTitle;
-    NSRect realRect = [self rectForTitleWithString:titleString inBounds:cellFrame];
+    NSAttributedString* titleString = [self attributedTitleWithStyle:AttributesStyleNormal];
+    NSRect realRect = [self rectForTitleWithStringSize:[titleString size] inBounds:cellFrame];
 
     if ([titleString size].width > NSWidth(realRect) &&
         NSMouseInRect([view convertPoint:view.window.mouseLocationOutsideOfEventStream fromView:nil], realRect, view.flipped))
@@ -137,16 +139,15 @@ static CGFloat const kPaddingExpansionFrame = 2.0;
     cellFrame.origin.x += kPaddingExpansionFrame;
     cellFrame.origin.y += kPaddingExpansionFrame;
 
-    self.fTitleAttributes[NSForegroundColorAttributeName] = NSColor.controlTextColor;
-    NSAttributedString* titleString = self.attributedTitle;
+    NSAttributedString* titleString = [self attributedTitleWithStyle:AttributesStyleNormal];
     [titleString drawInRect:cellFrame];
 }
 
 #pragma mark - Private
 
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string inBounds:(NSRect)bounds
+- (NSRect)rectForTitleWithStringSize:(NSSize)stringSize inBounds:(NSRect)bounds
 {
-    NSSize const titleSize = [string size];
+    NSSize const titleSize = stringSize;
 
     //no right padding, so that there's not too much space between this and the priority image
     NSRect result;
@@ -189,13 +190,15 @@ static CGFloat const kPaddingExpansionFrame = 2.0;
     return result;
 }
 
-- (NSAttributedString*)attributedTitle
+- (NSAttributedString*)attributedTitleWithStyle:(AttributesStyle)style
 {
     NSString* title = ((FileListNode*)self.objectValue).name;
-    return [[NSAttributedString alloc] initWithString:title attributes:self.fTitleAttributes];
+    return [[NSAttributedString alloc] initWithString:title attributes:style == AttributesStyleEmphasized ? kTitleEmphasizedAttributes :
+                                                                style == AttributesStyleDisabled ? kTitleDisabledAttributes :
+                                                                                                   kTitleAttributes];
 }
 
-- (NSAttributedString*)attributedStatus
+- (NSAttributedString*)attributedStatusWithStyle:(AttributesStyle)style
 {
     FileListNode* node = (FileListNode*)self.objectValue;
     Torrent* torrent = node.torrent;
@@ -207,7 +210,9 @@ static CGFloat const kPaddingExpansionFrame = 2.0;
                                                   percentString,
                                                   [NSString stringForFileSize:node.size]];
 
-    return [[NSAttributedString alloc] initWithString:status attributes:self.fStatusAttributes];
+    return [[NSAttributedString alloc] initWithString:status attributes:style == AttributesStyleEmphasized ? kStatusEmphasizedAttributes :
+                                                                 style == AttributesStyleDisabled ? kStatusDisabledAttributes :
+                                                                                                    kStatusAttributes];
 }
 
 @end

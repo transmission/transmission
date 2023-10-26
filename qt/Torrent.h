@@ -23,13 +23,8 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/tr-macros.h>
 
-#include "FaviconCache.h"
 #include "IconCache.h"
 #include "Speed.h"
-
-#ifdef ERROR
-#undef ERROR
-#endif
 
 class QPixmap;
 
@@ -110,6 +105,7 @@ class TorrentHash
 {
 private:
     tr_sha1_digest_t data_ = {};
+    QString data_str_;
 
 public:
     TorrentHash() = default;
@@ -124,6 +120,9 @@ public:
         if (auto const hash = tr_sha1_from_string(str != nullptr ? str : ""); hash)
         {
             data_ = *hash;
+
+            auto const tmpstr = tr_sha1_to_string(data_);
+            data_str_ = QString::fromUtf8(std::data(tmpstr), std::size(tmpstr));
         }
     }
 
@@ -132,6 +131,9 @@ public:
         if (auto const hash = tr_sha1_from_string(str.toStdString()); hash)
         {
             data_ = *hash;
+
+            auto const tmpstr = tr_sha1_to_string(data_);
+            data_str_ = QString::fromUtf8(std::data(tmpstr), std::size(tmpstr));
         }
     }
 
@@ -150,9 +152,9 @@ public:
         return data_ < that.data_;
     }
 
-    QString toString() const
+    [[nodiscard]] constexpr auto& toString() const noexcept
     {
-        return QString::fromStdString(tr_sha1_to_string(data_));
+        return data_str_;
     }
 };
 
@@ -572,8 +574,8 @@ public:
         DOWNLOAD_LIMITED,
         DOWNLOAD_SPEED,
         EDIT_DATE,
-        ERROR,
-        ERROR_STRING,
+        TORRENT_ERROR,
+        TORRENT_ERROR_STRING,
         ETA,
         FAILED_EVER,
         FILE_COUNT,

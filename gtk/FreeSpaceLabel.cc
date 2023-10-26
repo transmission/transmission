@@ -8,7 +8,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/utils.h>
+#include <libtransmission/file.h>
 
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
@@ -50,8 +50,9 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
         return false;
     }
 
-    auto const bytes = tr_dirSpace(dir_).free;
-    auto const text = bytes < 0 ? _("Error") : fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(bytes)));
+    auto const capacity = tr_sys_path_get_capacity(dir_);
+    auto const text = capacity ? fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(capacity->free))) :
+                                 _("Error");
     label_.set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), text));
 
     return true;

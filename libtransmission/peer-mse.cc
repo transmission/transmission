@@ -4,15 +4,15 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <memory>
+#include <limits> // std::numeric_limits
+#include <string_view>
 
 #include <math/wide_integer/uintwide_t.h>
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h" // tr_sha1
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/tr-arc4.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t
 
 using namespace std::literals;
 
@@ -103,7 +103,7 @@ void DH::setPeerPublicKey(key_bigend_t const& peer_public_key)
 
 // --- Filter
 
-void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void Filter::decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyA"sv : "keyB"sv;
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);
@@ -112,7 +112,7 @@ void Filter::decryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const&
     dec_key_.discard(1024);
 }
 
-void Filter::encryptInit(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
+void Filter::encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
 {
     auto const key = is_incoming ? "keyB"sv : "keyA"sv;
     auto const buf = tr_sha1::digest(key, dh.secret(), info_hash);

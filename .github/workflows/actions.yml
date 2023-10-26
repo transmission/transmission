@@ -168,7 +168,7 @@ jobs:
             -DENABLE_QT=OFF \
             -DENABLE_TESTS=ON \
             -DENABLE_UTILS=ON \
-            -DENABLE_WEB=OFF \
+            -DREBUILD_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
@@ -239,8 +239,7 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew update
-          brew install cmake gettext libdeflate libevent libnatpmp libpsl miniupnpc ninja node pkg-config
+          brew install cmake gettext libdeflate libevent libpsl miniupnpc ninja node pkg-config
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: brew install gtkmm3
@@ -269,7 +268,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -278,7 +277,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -290,7 +289,7 @@ jobs:
     needs: [ what-to-make ]
     runs-on: ubuntu-22.04
     container:
-      image: radupopescu/musl-builder
+      image: alpine:latest
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
       - name: Show Configuration
@@ -343,9 +342,9 @@ jobs:
             -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_TESTS=OFF \
+            -DENABLE_TESTS=ON \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -437,7 +436,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-dist == 'true' || needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_TESTS=ON `
             -DENABLE_UTILS=ON `
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} `
             -DENABLE_WERROR=ON `
             -DRUN_CLANG_TIDY=OFF
       - name: Make
@@ -513,7 +512,6 @@ jobs:
           sw_vers
       - name: Get Dependencies
         run: |
-          brew update
           brew install cmake gettext ninja node pkg-config
       - name: Get Dependencies (GTK)
         if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
@@ -544,7 +542,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF \
             -DUSE_SYSTEM_EVENT2=OFF \
@@ -561,7 +559,7 @@ jobs:
         if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
-        run: cmake -E chdir obj ctest -j $(nproc) --build-config RelWithDebInfo --output-on-failure
+        run: cmake -E chdir obj ctest -j $(sysctl -n hw.logicalcpu) --build-config RelWithDebInfo --output-on-failure
       - name: Install
         run: cmake --build obj --config RelWithDebInfo --target install/strip
       - uses: actions/upload-artifact@v3
@@ -631,7 +629,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
@@ -646,14 +644,14 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
-  fedora-36-from-tarball:
+  fedora-39-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     runs-on: ubuntu-22.04
     env:
       NODE_PATH: /usr/lib/nodejs:/usr/share/nodejs
     container:
-      image: fedora:36
+      image: fedora:39
     steps:
       - name: Show Configuration
         run: |
@@ -707,8 +705,9 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=${{ (needs.what-to-make.outputs.make-tests == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WERROR=ON \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DEPRECATED=ON \
+            -DENABLE_WERROR=OFF \
             -DRUN_CLANG_TIDY=OFF
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
@@ -780,7 +779,7 @@ jobs:
             -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
             -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
+            -DREBUILD_WEB=${{ (needs.what-to-make.outputs.make-web == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WERROR=ON \
             -DRUN_CLANG_TIDY=OFF
       - name: Make

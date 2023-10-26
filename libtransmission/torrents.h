@@ -9,14 +9,16 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
 #include <ctime>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "torrent-metainfo.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_torrent;
 struct tr_torrent_metainfo;
@@ -43,13 +45,16 @@ public:
 
     [[nodiscard]] tr_torrent const* get(tr_torrent_metainfo const& metainfo) const
     {
-        return get(metainfo.infoHash());
+        return get(metainfo.info_hash());
     }
 
     [[nodiscard]] tr_torrent* get(tr_torrent_metainfo const& metainfo)
     {
-        return get(metainfo.infoHash());
+        return get(metainfo.info_hash());
     }
+
+    // O(n)}
+    [[nodiscard]] tr_torrent* find_from_obfuscated_hash(tr_sha1_digest_t const& obfuscated_hash);
 
     // These convenience functions use get(tr_sha1_digest_t const&)
     // after parsing the magnet link to get the info hash. If you have
@@ -100,6 +105,11 @@ public:
     [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
     {
         return std::empty(by_hash_);
+    }
+
+    [[nodiscard]] constexpr auto const& sorted_by_id() const noexcept
+    {
+        return by_id_;
     }
 
 private:

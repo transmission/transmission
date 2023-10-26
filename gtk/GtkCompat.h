@@ -128,6 +128,12 @@ inline bool operator!=(RefPtr<T> const& lhs, std::nullptr_t /*rhs*/)
 }
 
 template<typename T>
+inline T& operator*(RefPtr<T> const& ptr)
+{
+    return *ptr.get();
+}
+
+template<typename T>
 inline RefPtr<T> make_refptr_for_instance(T* object)
 {
     return RefPtr<T>(object);

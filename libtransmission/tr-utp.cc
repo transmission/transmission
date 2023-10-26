@@ -6,7 +6,6 @@
 #include <chrono>
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #include <libutp/utp.h>
 
@@ -92,10 +91,9 @@ void utp_on_accept(tr_session* const session, UTPSocket* const utp_sock)
 
     utp_getpeername(utp_sock, from, &fromlen);
 
-    if (auto addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
+    if (auto addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&from_storage)); addrport)
     {
-        auto const& [addr, port] = *addrport;
-        session->addIncoming(tr_peer_socket{ addr, port, utp_sock });
+        session->addIncoming({ *addrport, utp_sock });
     }
     else
     {
@@ -166,7 +164,7 @@ void restart_timer(tr_session* session)
         interval = std::chrono::duration_cast<std::chrono::milliseconds>(target);
     }
 
-    session->utp_timer->startSingleShot(interval);
+    session->utp_timer->start_single_shot(interval);
 }
 
 void timer_callback(void* vsession)

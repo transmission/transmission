@@ -6,9 +6,9 @@
 #pragma once
 
 #include <array>
+#include <set>
 
 #include <QObject>
-#include <QSet>
 #include <QString>
 #include <QVariant>
 
@@ -198,13 +198,13 @@ private:
         int type;
     };
 
-    void initDefaults(tr_variant*) const;
+    [[nodiscard]] static tr_variant get_default_app_settings();
 
     void set(int key, char const* value) = delete;
 
     QString const config_dir_;
 
-    QSet<int> temporary_prefs_;
+    std::set<int> temporary_prefs_;
     std::array<QVariant, PREFS_COUNT> mutable values_;
 
     static std::array<PrefItem, PREFS_COUNT> const Items;

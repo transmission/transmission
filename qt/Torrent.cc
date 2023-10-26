@@ -23,8 +23,8 @@
 using ::trqt::variant_helpers::change;
 
 Torrent::Torrent(Prefs const& prefs, int id)
-    : id_(id)
-    , prefs_(prefs)
+    : id_{ id }
+    , prefs_{ prefs }
 {
 }
 
@@ -94,18 +94,7 @@ int Torrent::compareSeedProgress(Torrent const& that) const
 
     double const a_progress = a_ratio / *a_ratio_limit;
     double const b_progress = b_ratio / *b_ratio_limit;
-
-    if (a_progress < b_progress)
-    {
-        return -1;
-    }
-
-    if (a_progress > b_progress)
-    {
-        return 1;
-    }
-
-    return 0;
+    return tr_compare_3way(a_progress, b_progress);
 }
 
 int Torrent::compareRatio(Torrent const& that) const
@@ -128,17 +117,7 @@ int Torrent::compareRatio(Torrent const& that) const
         return -1;
     }
 
-    if (a < b)
-    {
-        return -1;
-    }
-
-    if (a > b)
-    {
-        return 1;
-    }
-
-    return 0;
+    return tr_compare_3way(a, b);
 }
 
 int Torrent::compareETA(Torrent const& that) const
@@ -210,7 +189,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(downloadLimited, download_limited, DOWNLOAD_LIMITED)
             HANDLE_KEY(downloadedEver, downloaded_ever, DOWNLOADED_EVER)
             HANDLE_KEY(editDate, edit_date, EDIT_DATE)
-            HANDLE_KEY(error, error, ERROR)
+            HANDLE_KEY(error, error, TORRENT_ERROR)
             HANDLE_KEY(eta, eta, ETA)
             HANDLE_KEY(fileStats, files, FILES)
             HANDLE_KEY(files, files, FILES)
@@ -269,7 +248,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(comment, comment, COMMENT)
             HANDLE_KEY(creator, creator, CREATOR)
             HANDLE_KEY(downloadDir, download_dir, DOWNLOAD_DIR)
-            HANDLE_KEY(errorString, error_string, ERROR_STRING)
+            HANDLE_KEY(errorString, error_string, TORRENT_ERROR_STRING)
 
 #undef HANDLE_KEY
         default:
@@ -359,5 +338,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return trApp->faviconCache().find(sitename);
+    return trApp->find_favicon(sitename);
 }

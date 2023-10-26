@@ -17,8 +17,6 @@
 
 #include "net.h" // for tr_address
 
-struct tr_address;
-
 namespace libtransmission
 {
 
@@ -51,7 +49,7 @@ public:
         return is_enabled_;
     }
 
-    void setEnabled(bool is_enabled) noexcept
+    constexpr void setEnabled(bool is_enabled) noexcept
     {
         is_enabled_ = is_enabled;
     }

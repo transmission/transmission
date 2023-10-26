@@ -674,7 +674,7 @@
 "Peers" = "Teilnehmer";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port" = "Port";
+"Port: %@" = "Port: %@";
 
 /* Preferences -> Network -> port status */
 "Port check site is down" = "Site zum Überprüfen des Ports ist nicht erreichbar.";

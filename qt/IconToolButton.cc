@@ -17,19 +17,19 @@ IconToolButton::IconToolButton(QWidget* parent)
 
 QSize IconToolButton::sizeHint() const
 {
-    QStyleOptionToolButton option;
+    auto option = QStyleOptionToolButton{};
     initStyleOption(&option);
     option.features = QStyleOptionToolButton::None;
     option.toolButtonStyle = Qt::ToolButtonIconOnly;
     QSize const size = style()->sizeFromContents(QStyle::CT_ToolButton, &option, iconSize(), this);
 
-    return size.expandedTo(iconSize() + QSize(4, 4));
+    return size.expandedTo(iconSize() + QSize{ 4, 4 });
 }
 
 void IconToolButton::paintEvent(QPaintEvent* /*event*/)
 {
-    QStylePainter painter(this);
-    QStyleOptionToolButton option;
+    auto painter = QStylePainter{ this };
+    auto option = QStyleOptionToolButton{};
     initStyleOption(&option);
     option.features = QStyleOptionToolButton::None;
     option.toolButtonStyle = Qt::ToolButtonIconOnly;

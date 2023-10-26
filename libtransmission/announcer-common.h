@@ -12,18 +12,17 @@
 #include <array>
 #include <chrono>
 #include <cstdint> // uint64_t
-#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "announcer.h"
-#include "interned-string.h"
-#include "net.h"
-#include "peer-mgr.h" // tr_pex
+#include "libtransmission/announcer.h"
+#include "libtransmission/interned-string.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-mgr.h" // tr_pex
 
 struct tr_url_parsed_t;
 
@@ -96,7 +95,7 @@ struct tr_announce_request
     tr_sha1_digest_t info_hash;
 
     /* the name to use when deep logging is enabled */
-    char log_name[128];
+    std::string log_name;
 };
 
 struct tr_announce_response
@@ -119,13 +118,13 @@ struct tr_announce_response
     int min_interval = 0;
 
     /* how many peers are seeding this torrent */
-    int seeders = -1;
+    std::optional<int64_t> seeders;
 
     /* how many peers are downloading this torrent */
-    int leechers = -1;
+    std::optional<int64_t> leechers;
 
     /* how many times this torrent has been downloaded */
-    int downloads = -1;
+    std::optional<int64_t> downloads;
 
     /* IPv4 peers that we acquired from the tracker */
     std::vector<tr_pex> pex;
@@ -170,7 +169,7 @@ struct tr_scrape_request
     tr_interned_string scrape_url;
 
     /* the name to use when deep logging is enabled */
-    char log_name[128];
+    std::string log_name;
 
     /* info hashes of the torrents to scrape */
     std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;
@@ -185,18 +184,18 @@ struct tr_scrape_response_row
     tr_sha1_digest_t info_hash;
 
     /* how many peers are seeding this torrent */
-    int seeders = 0;
+    std::optional<int64_t> seeders;
 
     /* how many peers are downloading this torrent */
-    int leechers = 0;
+    std::optional<int64_t> leechers;
 
     /* how many times this torrent has been downloaded */
-    int downloads = 0;
+    std::optional<int64_t> downloads;
 
     /* the number of active downloaders in the swarm.
      * this is a BEP 21 extension that some trackers won't support.
      * http://www.bittorrent.org/beps/bep_0021.html#tracker-scrapes  */
-    int downloaders = 0;
+    std::optional<int64_t> downloaders;
 };
 
 struct tr_scrape_response

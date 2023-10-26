@@ -3,17 +3,23 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
+#include <iterator> // std::inserter
+#include <set>
+#include <string_view>
+#include <vector>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/variant.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-#include <algorithm>
-#include <array>
-#include <set>
-#include <string_view>
-#include <vector>
+struct tr_session;
 
 using namespace std::literals;
 
@@ -26,31 +32,27 @@ TEST_F(RpcTest, list)
 {
     auto i = int64_t{};
     auto sv = std::string_view{};
-    tr_variant top;
 
-    tr_rpc_parse_list_str(&top, "12"sv);
-    EXPECT_TRUE(tr_variantIsInt(&top));
+    auto top = tr_rpc_parse_list_str("12"sv);
+    EXPECT_TRUE(top.holds_alternative<int64_t>());
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
-    tr_variantClear(&top);
 
-    tr_rpc_parse_list_str(&top, "6,7"sv);
-    EXPECT_TRUE(tr_variantIsList(&top));
+    top = tr_rpc_parse_list_str("6,7"sv);
+    EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(2U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(6, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
     EXPECT_EQ(7, i);
-    tr_variantClear(&top);
 
-    tr_rpc_parse_list_str(&top, "asdf"sv);
-    EXPECT_TRUE(tr_variantIsString(&top));
+    top = tr_rpc_parse_list_str("asdf"sv);
+    EXPECT_TRUE(top.holds_alternative<std::string_view>());
     EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
     EXPECT_EQ("asdf"sv, sv);
-    tr_variantClear(&top);
 
-    tr_rpc_parse_list_str(&top, "1,3-5"sv);
-    EXPECT_TRUE(tr_variantIsList(&top));
+    top = tr_rpc_parse_list_str("1,3-5"sv);
+    EXPECT_TRUE(top.holds_alternative<tr_variant::Vector>());
     EXPECT_EQ(4U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(1, i);
@@ -60,7 +62,6 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(4, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 3), &i));
     EXPECT_EQ(5, i);
-    tr_variantClear(&top);
 }
 
 /***
@@ -71,8 +72,7 @@ TEST_F(RpcTest, sessionGet)
 {
     auto const rpc_response_func = [](tr_session* /*session*/, tr_variant* response, void* setme) noexcept
     {
-        *static_cast<tr_variant*>(setme) = *response;
-        tr_variantInitBool(response, false);
+        std::swap(*static_cast<tr_variant*>(setme), *response);
     };
 
     auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
@@ -83,9 +83,8 @@ TEST_F(RpcTest, sessionGet)
     tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
     tr_variant response;
     tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
-    tr_variantClear(&request);
 
-    EXPECT_TRUE(tr_variantIsDict(&response));
+    EXPECT_TRUE(response.holds_alternative<tr_variant::Map>());
     tr_variant* args = nullptr;
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
@@ -181,7 +180,6 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_EQ(decltype(unexpected_keys){}, unexpected_keys);
 
     // cleanup
-    tr_variantClear(&response);
     tr_torrentRemove(tor, false, nullptr, nullptr);
 }
 

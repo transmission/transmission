@@ -4,17 +4,23 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cerrno>
+#include <cstddef> // size_t
 #include <string_view>
+#include <vector>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
+#include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/torrent.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -37,9 +43,9 @@ TEST_F(TorrentMetainfoTest, magnetLink)
 
     auto metainfo = tr_torrent_metainfo{};
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
-    EXPECT_EQ(0U, metainfo.fileCount()); // because it's a magnet link
-    EXPECT_EQ(2U, std::size(metainfo.announceList()));
-    EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
+    EXPECT_EQ(0U, metainfo.file_count()); // because it's a magnet link
+    EXPECT_EQ(2U, std::size(metainfo.announce_list()));
+    EXPECT_EQ(MagnetLink, metainfo.magnet());
 }
 
 #define BEFORE_PATH \
@@ -78,7 +84,7 @@ TEST_F(TorrentMetainfoTest, bucket)
     for (auto const& test : tests)
     {
         auto metainfo = tr_torrent_metainfo{};
-        EXPECT_EQ(test.expected_parse_result, metainfo.parseBenc(test.benc));
+        EXPECT_EQ(test.expected_parse_result, metainfo.parse_benc(test.benc));
     }
 }
 
@@ -91,7 +97,7 @@ TEST_F(TorrentMetainfoTest, parseBencFuzzRegressions)
     for (auto const& test : Tests)
     {
         auto tm = tr_torrent_metainfo{};
-        tm.parseBenc(tr_base64_decode(test));
+        tm.parse_benc(tr_base64_decode(test));
     }
 }
 
@@ -106,7 +112,7 @@ TEST_F(TorrentMetainfoTest, parseBencFuzz)
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
         auto tm = tr_torrent_metainfo{};
-        tm.parseBenc({ std::data(buf), std::size(buf) });
+        tm.parse_benc({ std::data(buf), std::size(buf) });
     }
 }
 
@@ -177,9 +183,9 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
     EXPECT_EQ(nullptr, error) << *error;
     auto const* const metainfo = tr_ctorGetMetainfo(ctor);
     EXPECT_NE(nullptr, metainfo);
-    EXPECT_EQ(336, metainfo->infoDictOffset());
-    EXPECT_EQ(26583, metainfo->infoDictSize());
-    EXPECT_EQ(592, metainfo->piecesOffset());
+    EXPECT_EQ(336, metainfo->info_dict_offset());
+    EXPECT_EQ(26583, metainfo->info_dict_size());
+    EXPECT_EQ(592, metainfo->pieces_offset());
     tr_ctorFree(ctor);
 }
 
@@ -207,9 +213,9 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(src_filename.sv(), src_contents, &error));
+    EXPECT_TRUE(tr_file_read(src_filename.sv(), src_contents, &error));
     auto tgt_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(tgt_filename.sv(), tgt_contents, &error));
+    EXPECT_TRUE(tr_file_read(tgt_filename.sv(), tgt_contents, &error));
     EXPECT_EQ(src_contents, tgt_contents);
 
     // cleanup
@@ -224,15 +230,15 @@ TEST_F(TorrentMetainfoTest, magnetInfoHash)
     // compatibility with magnet torrents created by Transmission <= 3.0
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/gimp-2.10.32-1-arm64.dmg.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
 }
 
 TEST_F(TorrentMetainfoTest, HoffmanStyleWebseeds)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 2 }, tm.webseedCount());
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
+    EXPECT_EQ(size_t{ 2 }, tm.webseed_count());
     EXPECT_EQ(
         "https://cdimage.debian.org/cdimage/release/11.2.0//srv/cdbuilder.debian.org/dst/deb-cd/weekly-builds/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso"sv,
         tm.webseed(0));
@@ -245,8 +251,8 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedList)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-list.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 2 }, tm.webseedCount());
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
+    EXPECT_EQ(size_t{ 2 }, tm.webseed_count());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
     EXPECT_EQ("http://webseed-two.com/"sv, tm.webseed(1));
 }
@@ -255,8 +261,8 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 {
     auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-string.torrent"sv };
     auto tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
-    EXPECT_EQ(size_t{ 1 }, tm.webseedCount());
+    EXPECT_TRUE(tm.parse_torrent_file(src_filename));
+    EXPECT_EQ(size_t{ 1 }, tm.webseed_count());
     EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
 }
 
@@ -264,7 +270,7 @@ TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
 TEST_F(TorrentMetainfoTest, parseBencOOBWrite)
 {
     auto tm = tr_torrent_metainfo{};
-    EXPECT_FALSE(tm.parseBenc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
+    EXPECT_FALSE(tm.parse_benc(tr_base64_decode("ZGg0OmluZm9kNjpwaWVjZXMzOkFpzQ==")));
 }
 
 } // namespace libtransmission::test

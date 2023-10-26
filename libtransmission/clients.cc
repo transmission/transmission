@@ -14,9 +14,7 @@
 #include <utility>
 #include <vector>
 
-#include <fmt/format.h>
-
-#include "libtransmission/transmission.h"
+#include <fmt/core.h>
 
 #include "libtransmission/clients.h"
 #include "libtransmission/utils.h"
@@ -86,7 +84,7 @@ constexpr std::string_view base62str(uint8_t chr)
 int strint(char const* pch, int span, int base = 10)
 {
     auto sv = std::string_view{ pch, static_cast<size_t>(span) };
-    return tr_parseNum<int>(sv, nullptr, base).value_or(0);
+    return tr_num_parse<int>(sv, nullptr, base).value_or(0);
 }
 
 constexpr std::string_view utSuffix(uint8_t ch)

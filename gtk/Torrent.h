@@ -10,6 +10,7 @@
 #include <libtransmission/transmission.h>
 
 #include <giomm/icon.h>
+#include <glibmm/extraclassinit.h>
 #include <glibmm/object.h>
 #include <glibmm/refptr.h>
 #include <glibmm/ustring.h>
@@ -19,11 +20,12 @@
 #include <bitset>
 #include <initializer_list>
 #include <memory>
-#include <vector>
 
 class Percents;
 
-class Torrent : public Glib::Object
+class Torrent
+    : public Glib::ExtraClassInit
+    , public Glib::Object
 {
 public:
     class Columns : public Gtk::TreeModelColumnRecord
@@ -84,6 +86,7 @@ public:
     Glib::ustring get_name() const;
     Percents get_percent_complete() const;
     Percents get_percent_done() const;
+    float get_percent_done_fraction() const;
     tr_priority_t get_priority() const;
     size_t get_queue_position() const;
     float get_ratio() const;
@@ -100,6 +103,7 @@ public:
     Glib::ustring get_long_progress_text() const;
     Glib::ustring get_long_status_text() const;
     bool get_sensitive() const;
+    std::vector<Glib::ustring> get_css_classes() const;
 
     ChangeFlags update();
 

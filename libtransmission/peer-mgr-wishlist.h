@@ -12,9 +12,7 @@
 #include <cstddef> // size_t
 #include <vector>
 
-#include "transmission.h"
-
-#include "torrent.h"
+#include "libtransmission/transmission.h"
 
 /**
  * Figures out what blocks we want to request next.
@@ -22,6 +20,8 @@
 class Wishlist
 {
 public:
+    static auto constexpr EndgameMaxPeers = size_t{ 2U };
+
     struct Mediator
     {
         [[nodiscard]] virtual bool clientCanRequestBlock(tr_block_index_t block) const = 0;

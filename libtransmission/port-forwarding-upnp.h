@@ -16,10 +16,9 @@
 
 #include <string>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "net.h" // tr_port
-
+class tr_port;
 struct tr_upnp;
 
 tr_upnp* tr_upnpInit();

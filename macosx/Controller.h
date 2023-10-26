@@ -17,18 +17,18 @@
 @class PrefsController;
 @class Torrent;
 
-typedef NS_ENUM(unsigned int, addType) { //
-    ADD_MANUAL,
-    ADD_AUTO,
-    ADD_SHOW_OPTIONS,
-    ADD_URL,
-    ADD_CREATED
+typedef NS_ENUM(NSUInteger, AddType) { //
+    AddTypeManual,
+    AddTypeAuto,
+    AddTypeShowOptions,
+    AddTypeURL,
+    AddTypeCreated
 };
 
 @interface Controller
     : NSObject<NSApplicationDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
 
-- (void)openFiles:(NSArray<NSString*>*)filenames addType:(addType)type forcePath:(NSString*)path;
+- (void)openFiles:(NSArray<NSString*>*)filenames addType:(AddType)type forcePath:(NSString*)path;
 
 - (void)askOpenConfirmed:(AddWindowController*)addController add:(BOOL)add;
 - (void)openCreatedFile:(NSNotification*)notification;

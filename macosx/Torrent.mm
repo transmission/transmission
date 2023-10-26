@@ -509,8 +509,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         return;
     }
 
-    volatile int status;
-    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, NULL, &status);
+    int volatile status;
+    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, &status);
 
     while (status == TR_LOC_MOVING) //block while moving (for now)
     {
@@ -612,7 +612,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (uint64_t)size
 {
-    return tr_torrentTotalSize(self.fHandle);
+    return tr_torrentView(self.fHandle).total_size;
 }
 
 - (uint64_t)sizeLeft
@@ -828,10 +828,10 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     }
     if (self.fStat->leftUntilDone <= 0)
     {
-        // We return smallest amount of time remaining for simpliest compliance with sorting.
+        // We return smallest amount of time remaining for simplest compliance with sorting.
         return 0;
     }
-    // We return highest amount of time remaining for simpliest compliance with sorting.
+    // We return highest amount of time remaining for simplest compliance with sorting.
     return LONG_MAX;
 }
 
@@ -1684,10 +1684,10 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     {
         auto const tracker = tr_torrentTracker(self.fHandle, i);
 
-        NSString* host = @(tracker.host);
-        if (!best || [host localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
+        NSString* host_and_port = @(tracker.host_and_port);
+        if (!best || [host_and_port localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
         {
-            best = host;
+            best = host_and_port;
         }
     }
 

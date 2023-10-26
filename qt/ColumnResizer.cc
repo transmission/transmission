@@ -34,7 +34,7 @@ int itemColumnSpan(QGridLayout const* layout, QLayoutItem const* item)
 } // namespace
 
 ColumnResizer::ColumnResizer(QObject* parent)
-    : QObject(parent)
+    : QObject{ parent }
 {
     timer_.setSingleShot(true);
     connect(&timer_, &QTimer::timeout, this, &ColumnResizer::update);
@@ -42,7 +42,7 @@ ColumnResizer::ColumnResizer(QObject* parent)
 
 void ColumnResizer::addLayout(QGridLayout* layout)
 {
-    layouts_ << layout;
+    layouts_.emplace(layout);
     scheduleUpdate();
 }
 

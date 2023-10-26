@@ -6,33 +6,32 @@
 
 @class Torrent;
 
-extern const CGFloat kGroupSeparatorHeight;
+extern CGFloat const kGroupSeparatorHeight;
 
 @interface TorrentTableView : NSOutlineView<NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
+
+- (void)reloadVisibleRows;
 
 - (BOOL)isGroupCollapsed:(NSInteger)value;
 - (void)removeCollapsedGroup:(NSInteger)value;
 - (void)removeAllCollapsedGroups;
 - (void)saveCollapsedGroups;
 
-- (void)removeTrackingAreas;
-@property(nonatomic) NSInteger hoverRow;
-@property(nonatomic) NSInteger controlButtonHoverRow;
-@property(nonatomic) NSInteger revealButtonHoverRow;
-@property(nonatomic) NSInteger actionButtonHoverRow;
-
-- (void)selectValues:(NSArray*)values;
-@property(nonatomic, readonly) NSArray* selectedValues;
-@property(nonatomic, readonly) NSArray<Torrent*>* selectedTorrents;
+@property(nonatomic) NSArray<Torrent*>* selectedTorrents;
 
 - (NSRect)iconRectForRow:(NSInteger)row;
 
 - (void)copy:(id)sender;
 - (void)paste:(id)sender;
 
-- (void)toggleControlForTorrent:(Torrent*)torrent;
+- (void)hoverEventBeganForView:(id)view;
+- (void)hoverEventEndedForView:(id)view;
 
-- (void)displayTorrentActionPopoverForEvent:(NSEvent*)event;
+- (void)toggleGroupRowRatio;
+
+- (IBAction)toggleControlForTorrent:(id)sender;
+
+- (IBAction)displayTorrentActionPopover:(id)sender;
 
 - (IBAction)setQuickLimitMode:(id)sender;
 - (void)setQuickLimit:(id)sender;

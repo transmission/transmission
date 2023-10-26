@@ -9,7 +9,7 @@
 
 #include <string_view>
 
-#include "tr-macros.h"
+#include "libtransmission/tr-macros.h"
 
 [[noreturn]] bool tr_assert_report(std::string_view file, long line, std::string_view message);
 

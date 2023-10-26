@@ -105,16 +105,16 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
 
     for (QSize const& size : base_icon.availableSizes())
     {
-        QSize const emblem_size = size / 2;
-        QRect const emblem_rect = QStyle::alignedRect(
+        auto const emblem_size = size / 2;
+        auto const emblem_rect = QStyle::alignedRect(
             layoutDirection(),
             Qt::AlignBottom | Qt::AlignRight,
             emblem_size,
             QRect(QPoint(0, 0), size));
 
-        QPixmap pixmap = base_icon.pixmap(size);
-        QPixmap const emblem_pixmap = emblem_icon.pixmap(emblem_size);
-        QPainter(&pixmap).drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
+        auto pixmap = base_icon.pixmap(size);
+        auto const emblem_pixmap = emblem_icon.pixmap(emblem_size);
+        QPainter{ &pixmap }.drawPixmap(emblem_rect, emblem_pixmap, emblem_pixmap.rect());
 
         icon.addPixmap(pixmap);
     }
@@ -123,19 +123,19 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
 }
 
 MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool minimized)
-    : session_(session)
-    , prefs_(prefs)
-    , model_(model)
-    , lvp_style_(std::make_shared<ListViewProxyStyle>())
-    , filter_model_(prefs)
-    , torrent_delegate_(new TorrentDelegate(this))
-    , torrent_delegate_min_(new TorrentDelegateMin(this))
-    , network_timer_(this)
-    , refresh_timer_(this)
+    : session_{ session }
+    , prefs_{ prefs }
+    , model_{ model }
+    , lvp_style_{ std::make_shared<ListViewProxyStyle>() }
+    , filter_model_{ prefs }
+    , torrent_delegate_{ new TorrentDelegate{ this } }
+    , torrent_delegate_min_{ new TorrentDelegateMin{ this } }
+    , network_timer_{ this }
+    , refresh_timer_{ this }
 {
     setAcceptDrops(true);
 
-    auto* sep = new QAction(this);
+    auto* sep = new QAction{ this };
     sep->setSeparator(true);
 
     ui_.setupUi(this);
@@ -256,7 +256,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     } };
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
-    auto* action_group = new QActionGroup(this);
+    auto* action_group = new QActionGroup{ this };
 
     for (auto const& [action, mode] : sort_modes)
     {
@@ -267,12 +267,12 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(action_group, &QActionGroup::triggered, this, &MainWindow::onSortModeChanged);
 
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
-    alt_speed_action_ = new QAction(tr("Speed Limits"), this);
+    alt_speed_action_ = new QAction{ tr("Speed Limits"), this };
     alt_speed_action_->setIcon(ui_.altSpeedButton->icon());
     alt_speed_action_->setCheckable(true);
     connect(alt_speed_action_, &QAction::triggered, this, &MainWindow::toggleSpeedMode);
 
-    auto* menu = new QMenu(this);
+    auto* menu = new QMenu{ this };
     menu->addAction(ui_.action_OpenFile);
     menu->addAction(ui_.action_AddURL);
     menu->addSeparator();
@@ -295,7 +295,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_TrayIcon->setChecked(minimized || prefs.getBool(Prefs::SHOW_TRAY_ICON));
 
     initStatusBar();
-    auto* filter_bar = new FilterBar(prefs_, model_, filter_model_);
+    auto* filter_bar = new FilterBar{ prefs_, model_, filter_model_ };
     ui_.verticalLayout->insertWidget(0, filter_bar);
     filter_bar_ = filter_bar;
 
@@ -408,7 +408,7 @@ QMenu* MainWindow::createOptionsMenu()
         int const current_value = prefs_.get<int>(pref);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
-        auto* action_group = new QActionGroup(this);
+        auto* action_group = new QActionGroup{ this };
 
         off_action = menu->addAction(tr("Unlimited"));
         off_action->setCheckable(true);
@@ -438,7 +438,7 @@ QMenu* MainWindow::createOptionsMenu()
         static constexpr std::array<double, 7> StockRatios = { 0.25, 0.50, 0.75, 1, 1.5, 2, 3 };
         auto const current_value = prefs_.get<double>(pref);
 
-        auto* action_group = new QActionGroup(this);
+        auto* action_group = new QActionGroup{ this };
 
         off_action = menu->addAction(tr("Seed Forever"));
         off_action->setCheckable(true);
@@ -462,7 +462,7 @@ QMenu* MainWindow::createOptionsMenu()
         }
     };
 
-    auto* menu = new QMenu(this);
+    auto* menu = new QMenu{ this };
 
     init_speed_sub_menu(
         menu->addMenu(tr("Limit Download Speed")),
@@ -491,19 +491,19 @@ QMenu* MainWindow::createOptionsMenu()
 
 QMenu* MainWindow::createStatsModeMenu()
 {
-    std::array<QPair<QAction*, QString>, 4> const stats_modes = {
-        qMakePair(ui_.action_TotalRatio, total_ratio_stats_mode_name_),
-        qMakePair(ui_.action_TotalTransfer, total_transfer_stats_mode_name_),
-        qMakePair(ui_.action_SessionRatio, session_ratio_stats_mode_name_),
-        qMakePair(ui_.action_SessionTransfer, session_transfer_stats_mode_name_)
-    };
+    auto const stats_modes = std::array<std::pair<QAction*, QString>, 4>{ {
+        { ui_.action_TotalRatio, total_ratio_stats_mode_name_ },
+        { ui_.action_TotalTransfer, total_transfer_stats_mode_name_ },
+        { ui_.action_SessionRatio, session_ratio_stats_mode_name_ },
+        { ui_.action_SessionTransfer, session_transfer_stats_mode_name_ },
+    } };
 
-    auto* action_group = new QActionGroup(this);
-    auto* menu = new QMenu(this);
+    auto* action_group = new QActionGroup{ this };
+    auto* menu = new QMenu{ this };
 
     for (auto const& mode : stats_modes)
     {
-        mode.first->setProperty(StatsModeKey, QString(mode.second));
+        mode.first->setProperty(StatsModeKey, QString{ mode.second });
         action_group->addAction(mode.first);
         menu->addAction(mode.first);
     }
@@ -575,7 +575,7 @@ void MainWindow::openProperties()
 
 void MainWindow::setLocation()
 {
-    auto* d = new RelocateDialog(session_, model_, getSelectedTorrents(), this);
+    auto* d = new RelocateDialog{ session_, model_, getSelectedTorrents(), this };
     d->setAttribute(Qt::WA_DeleteOnClose, true);
     d->show();
 }
@@ -866,7 +866,7 @@ void MainWindow::refreshTorrentViewHeader()
 
     if (visible_count == total_count)
     {
-        ui_.listView->setHeaderText(QString());
+        ui_.listView->setHeaderText(QString{});
     }
     else
     {
@@ -1110,7 +1110,11 @@ void MainWindow::toggleWindows(bool do_show)
         }
 
         raise();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+        this->activateWindow();
+#else
         QApplication::setActiveWindow(this);
+#endif
     }
 }
 
@@ -1261,24 +1265,23 @@ void MainWindow::refreshPref(int key)
 
 void MainWindow::newTorrent()
 {
-    auto* dialog = new MakeDialog(session_, this);
+    auto* dialog = new MakeDialog{ session_, this };
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
 }
 
 void MainWindow::openTorrent()
 {
-    auto* const d = new QFileDialog(
-        this,
-        tr("Open Torrent"),
-        prefs_.getString(Prefs::OPEN_DIALOG_FOLDER),
-        tr("Torrent Files (*.torrent);;All Files (*.*)"));
+    auto* const d = new QFileDialog{ this,
+                                     tr("Open Torrent"),
+                                     prefs_.getString(Prefs::OPEN_DIALOG_FOLDER),
+                                     tr("Torrent Files (*.torrent);;All Files (*.*)") };
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
 
     if (auto* const l = qobject_cast<QGridLayout*>(d->layout()); l != nullptr)
     {
-        auto* b = new QCheckBox(tr("Show &options dialog"));
+        auto* b = new QCheckBox{ tr("Show &options dialog") };
         b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
         b->setObjectName(show_options_checkbox_name_);
         l->addWidget(b, l->rowCount(), 0, 1, -1, Qt::AlignLeft);
@@ -1330,7 +1333,7 @@ void MainWindow::addTorrent(AddData add_me, bool show_options)
 {
     if (show_options)
     {
-        auto* o = new OptionsDialog(session_, prefs_, std::move(add_me), this);
+        auto* o = new OptionsDialog{ session_, prefs_, std::move(add_me), this };
         o->show();
         QApplication::alert(o);
     }
@@ -1429,11 +1432,11 @@ void MainWindow::removeTorrents(bool const delete_files)
 
     if (layout == nullptr)
     {
-        layout = new QGridLayout;
+        layout = new QGridLayout{};
         msg_box.setLayout(layout);
     }
 
-    auto* spacer = new QSpacerItem(450, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    auto* spacer = new QSpacerItem{ 450, 0, QSizePolicy::Minimum, QSizePolicy::Expanding };
     layout->addItem(spacer, layout->rowCount(), 0, 1, layout->columnCount());
 
     if (msg_box.exec() == QMessageBox::Ok)

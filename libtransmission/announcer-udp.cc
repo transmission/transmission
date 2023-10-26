@@ -4,34 +4,42 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // for std::find_if()
-#include <cerrno> // for errno, EAFNOSUPPORT
-#include <climits> // for CHAR_BIT
-#include <cstring> // for memset()
+#include <array>
+#include <chrono> // operator""ms, literals
+#include <climits> // CHAR_BIT
+#include <cstddef> // std::byte
+#include <cstdint> // uint32_t, uint64_t
+#include <cstring> // memcpy()
 #include <ctime>
 #include <future>
 #include <list>
 #include <memory>
+#include <optional>
+#include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #undef gai_strerror
 #define gai_strerror gai_strerrorA
+#else
+#include <netdb.h> // gai_strerror()
+#include <netinet/in.h> // IPPROTO_UDP, in_addr
+#include <sys/socket.h> // sockaddr_storage, AF_INET
 #endif
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
-
-#include "libtransmission/transmission.h"
 
 #include "libtransmission/announcer.h"
 #include "libtransmission/announcer-common.h"
 #include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/interned-string.h"
 #include "libtransmission/log.h"
-#include "libtransmission/peer-io.h"
+#include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" // for tr_pex::fromCompact4()
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-buffer.h"
@@ -49,6 +57,9 @@ using namespace std::literals;
 // size defined by bep15
 using tau_connection_t = uint64_t;
 using tau_transaction_t = uint32_t;
+
+using InBuf = libtransmission::BufferReader<std::byte>;
+using PayloadBuffer = libtransmission::StackBuffer<4096, std::byte>;
 
 constexpr auto TauConnectionTtlSecs = time_t{ 45 };
 
@@ -77,14 +88,11 @@ struct tau_scrape_request
         this->response.row_count = in.info_hash_count;
         for (int i = 0; i < this->response.row_count; ++i)
         {
-            this->response.rows[i].seeders = -1;
-            this->response.rows[i].leechers = -1;
-            this->response.rows[i].downloads = -1;
             this->response.rows[i].info_hash = in.info_hash[i];
         }
 
         // build the payload
-        auto buf = libtransmission::Buffer{};
+        auto buf = PayloadBuffer{};
         buf.add_uint32(TAU_ACTION_SCRAPE);
         buf.add_uint32(transaction_id);
         for (int i = 0; i < in.info_hash_count; ++i)
@@ -115,20 +123,15 @@ struct tau_scrape_request
         requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         response.did_connect = true;
         response.did_timeout = false;
 
         if (action == TAU_ACTION_SCRAPE)
         {
-            for (int i = 0; i < response.row_count; ++i)
+            for (int i = 0; i < response.row_count && std::size(buf) >= sizeof(uint32_t) * 3U; ++i)
             {
-                if (std::size(buf) < sizeof(uint32_t) * 3)
-                {
-                    break;
-                }
-
                 auto& row = response.rows[i];
                 row.seeders = buf.to_uint32();
                 row.downloads = buf.to_uint32();
@@ -166,19 +169,19 @@ private:
 
 struct tau_announce_request
 {
-    tau_announce_request(uint32_t announce_ip, tr_announce_request const& in, tr_announce_response_func on_response)
+    tau_announce_request(
+        std::optional<tr_address> announce_ip,
+        tr_announce_request const& in,
+        tr_announce_response_func on_response)
         : on_response_{ std::move(on_response) }
     {
         // https://www.bittorrent.org/beps/bep_0015.html sets key size at 32 bits
         static_assert(sizeof(tr_announce_request::key) * CHAR_BIT == 32);
 
-        response.seeders = -1;
-        response.leechers = -1;
-        response.downloads = -1;
         response.info_hash = in.info_hash;
 
         // build the payload
-        auto buf = libtransmission::Buffer{};
+        auto buf = PayloadBuffer{};
         buf.add_uint32(TAU_ACTION_ANNOUNCE);
         buf.add_uint32(transaction_id);
         buf.add(in.info_hash);
@@ -187,7 +190,14 @@ struct tau_announce_request
         buf.add_uint64(in.leftUntilComplete);
         buf.add_uint64(in.up);
         buf.add_uint32(get_tau_announce_event(in.event));
-        buf.add_uint32(announce_ip);
+        if (announce_ip && announce_ip->is_ipv4())
+        {
+            buf.add_address(*announce_ip);
+        }
+        else
+        {
+            buf.add_uint32(0U);
+        }
         buf.add_uint32(in.key);
         buf.add_uint32(in.numwant);
         buf.add_port(in.port);
@@ -215,7 +225,7 @@ struct tau_announce_request
         this->requestFinished();
     }
 
-    void onResponse(tau_action_t action, libtransmission::Buffer& buf)
+    void onResponse(tau_action_t action, InBuf& buf)
     {
         auto const buflen = std::size(buf);
 
@@ -228,8 +238,7 @@ struct tau_announce_request
             response.leechers = buf.to_uint32();
             response.seeders = buf.to_uint32();
 
-            auto const [bytes, n_bytes] = buf.pullup();
-            response.pex = tr_pex::from_compact_ipv4(bytes, n_bytes, nullptr, 0);
+            response.pex = tr_pex::from_compact_ipv4(std::data(buf), std::size(buf), nullptr, 0);
             requestFinished();
         }
         else
@@ -311,7 +320,7 @@ struct tau_tracker
         mediator_.sendto(buf, buflen, reinterpret_cast<sockaddr const*>(&ss), sslen);
     }
 
-    void on_connection_response(tau_action_t action, libtransmission::Buffer& buf)
+    void on_connection_response(tau_action_t action, InBuf& buf)
     {
         this->connecting_at = 0;
         this->connection_transaction_id = 0;
@@ -324,9 +333,9 @@ struct tau_tracker
         }
         else if (action == TAU_ACTION_ERROR)
         {
-            std::string const errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
-            logdbg(this->key, errmsg);
+            std::string errmsg = !std::empty(buf) ? buf.to_string() : _("Connection failed");
             this->failAll(true, false, errmsg);
+            logdbg(this->key, std::move(errmsg));
         }
 
         this->upkeep();
@@ -374,13 +383,12 @@ struct tau_tracker
             this->connection_transaction_id = tau_transaction_new();
             logtrace(this->key, fmt::format("Trying to connect. Transaction ID is {}", this->connection_transaction_id));
 
-            auto buf = libtransmission::Buffer{};
+            auto buf = PayloadBuffer{};
             buf.add_uint64(0x41727101980LL);
             buf.add_uint32(TAU_ACTION_CONNECT);
             buf.add_uint32(this->connection_transaction_id);
 
-            auto const [bytes, n_bytes] = buf.pullup();
-            this->sendto(bytes, n_bytes);
+            this->sendto(std::data(buf), std::size(buf));
         }
 
         if (timeout_reqs)
@@ -463,7 +471,7 @@ private:
     {
         if (this->connecting_at != 0 && this->connecting_at + ConnectionRequestTtl < now)
         {
-            auto empty_buf = libtransmission::Buffer{};
+            auto empty_buf = PayloadBuffer{};
             on_connection_response(TAU_ACTION_ERROR, empty_buf);
         }
 
@@ -536,12 +544,11 @@ private:
     {
         logdbg(this->key, fmt::format("sending request w/connection id {}", this->connection_id));
 
-        auto buf = libtransmission::Buffer{};
+        auto buf = PayloadBuffer{};
         buf.add_uint64(this->connection_id);
         buf.add(payload, payload_len);
 
-        auto const [bytes, n_bytes] = buf.pullup();
-        this->sendto(bytes, n_bytes);
+        this->sendto(std::data(buf), std::size(buf));
     }
 
 public:
@@ -588,9 +595,7 @@ public:
         }
 
         // Since size of IP field is only 4 bytes long, we can only announce IPv4 addresses
-        auto const addr = mediator_.announceIP();
-        uint32_t const announce_ip = addr && addr->is_ipv4() ? addr->addr.addr4.s_addr : 0;
-        tracker->announces.emplace_back(announce_ip, request, std::move(on_response));
+        tracker->announces.emplace_back(mediator_.announce_ip(), request, std::move(on_response));
         tracker->upkeep(false);
     }
 
@@ -616,7 +621,7 @@ public:
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
-    bool handleMessage(uint8_t const* msg, size_t msglen) override
+    bool handle_message(uint8_t const* msg, size_t msglen) override
     {
         if (msglen < sizeof(uint32_t) * 2)
         {
@@ -624,7 +629,7 @@ public:
         }
 
         // extract the action_id and see if it makes sense
-        auto buf = libtransmission::Buffer{};
+        auto buf = PayloadBuffer{};
         buf.add(msg, msglen);
         auto const action_id = static_cast<tau_action_t>(buf.to_uint32());
 
@@ -649,11 +654,11 @@ public:
             // is it a response to one of this tracker's announces?
             if (auto& reqs = tracker.announces; !std::empty(reqs))
             {
-                auto it = std::find_if(
-                    std::begin(reqs),
-                    std::end(reqs),
-                    [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                if (it != std::end(reqs))
+                if (auto it = std::find_if(
+                        std::begin(reqs),
+                        std::end(reqs),
+                        [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
+                    it != std::end(reqs))
                 {
                     logtrace(tracker.key, fmt::format("{} is an announce request!", transaction_id));
                     auto req = *it;
@@ -666,11 +671,11 @@ public:
             // is it a response to one of this tracker's scrapes?
             if (auto& reqs = tracker.scrapes; !std::empty(reqs))
             {
-                auto it = std::find_if(
-                    std::begin(reqs),
-                    std::end(reqs),
-                    [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
-                if (it != std::end(reqs))
+                if (auto it = std::find_if(
+                        std::begin(reqs),
+                        std::end(reqs),
+                        [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
+                    it != std::end(reqs))
                 {
                     logtrace(tracker.key, fmt::format("{} is a scrape request!", transaction_id));
                     auto req = *it;
@@ -709,7 +714,7 @@ private:
         }
 
         // we don't have it -- build a new one
-        trackers_.emplace_back(mediator_, key, tr_interned_string(parsed->host), tr_port::fromHost(parsed->port));
+        trackers_.emplace_back(mediator_, key, tr_interned_string(parsed->host), tr_port::from_host(parsed->port));
         auto* const tracker = &trackers_.back();
         logtrace(tracker->key, "New tau_tracker created");
         return tracker;

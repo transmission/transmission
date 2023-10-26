@@ -256,7 +256,7 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
     [self.fTrackerTable reloadData];
     [self.fTrackerTable deselectAll:self];
 
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //incase sort by tracker
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //in case sort by tracker
 }
 
 - (void)addRemoveTracker:(id)sender
@@ -463,7 +463,7 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
 
     [self.fTrackerTable endUpdates];
 
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //incase sort by tracker
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //in case sort by tracker
 }
 
 @end

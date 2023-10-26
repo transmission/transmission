@@ -5,6 +5,7 @@
 
 #include "Torrent.h"
 
+#include "DynamicPropertyStore.h"
 #include "IconCache.h"
 #include "Percents.h"
 #include "Utils.h"
@@ -18,7 +19,7 @@
 #include <fmt/core.h>
 
 #include <array>
-#include <functional>
+#include <cmath>
 #include <utility>
 
 using namespace std::string_view_literals;
@@ -88,6 +89,19 @@ std::string_view get_mime_type(tr_torrent const& torrent)
     return name.find('/') != std::string_view::npos ? DirectoryMimeType : tr_get_mime_type_for_filename(name);
 }
 
+std::string_view get_activity_direction(tr_torrent_activity activity)
+{
+    switch (activity)
+    {
+    case TR_STATUS_DOWNLOAD:
+        return "down"sv;
+    case TR_STATUS_SEED:
+        return "up"sv;
+    default:
+        return "idle"sv;
+    }
+}
+
 } // namespace
 
 Torrent::Columns::Columns()
@@ -99,6 +113,22 @@ Torrent::Columns::Columns()
 class Torrent::Impl
 {
 public:
+    enum class Property : guint
+    {
+        ICON = 1,
+        NAME,
+        PERCENT_DONE,
+        SHORT_STATUS,
+        LONG_PROGRESS,
+        LONG_STATUS,
+        SENSITIVE,
+        CSS_CLASSES,
+
+        N_PROPS
+    };
+
+    using PropertyStore = DynamicPropertyStore<Torrent, Property>;
+
     struct Cache
     {
         Glib::ustring error_message;
@@ -176,6 +206,9 @@ public:
     [[nodiscard]] Glib::ustring get_short_status_text() const;
     [[nodiscard]] Glib::ustring get_long_progress_text() const;
     [[nodiscard]] Glib::ustring get_long_status_text() const;
+    [[nodiscard]] std::vector<Glib::ustring> get_css_classes() const;
+
+    static void class_init(void* cls, void* user_data);
 
 private:
     [[nodiscard]] Glib::ustring get_short_transfer_text() const;
@@ -208,8 +241,9 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
 
     auto seed_ratio = 0.0;
     auto const has_seed_ratio = tr_torrentGetSeedRatio(raw_torrent_, &seed_ratio);
+    auto const view = tr_torrentView(raw_torrent_);
 
-    update_cache_value(cache_.name, tr_torrentName(raw_torrent_), result, ChangeFlag::NAME);
+    update_cache_value(cache_.name, view.name, result, ChangeFlag::NAME);
     update_cache_value(cache_.speed_up, stats->pieceUploadSpeed_KBps, 0.01F, result, ChangeFlag::SPEED_UP);
     update_cache_value(cache_.speed_down, stats->pieceDownloadSpeed_KBps, 0.01F, result, ChangeFlag::SPEED_DOWN);
     update_cache_value(cache_.active_peers_up, stats->peersGettingFromUs, result, ChangeFlag::ACTIVE_PEERS_UP);
@@ -257,7 +291,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
         Percents(stats->seedRatioPercentDone),
         result,
         ChangeFlag::SEED_RATIO_PERCENT_DONE);
-    update_cache_value(cache_.total_size, tr_torrentTotalSize(raw_torrent_), result, ChangeFlag::TOTAL_SIZE);
+    update_cache_value(cache_.total_size, view.total_size, result, ChangeFlag::TOTAL_SIZE);
 
     update_cache_value(cache_.has_seed_ratio, has_seed_ratio, result, ChangeFlag::LONG_PROGRESS);
     update_cache_value(cache_.have_unchecked, stats->haveUnchecked, result, ChangeFlag::LONG_PROGRESS);
@@ -280,7 +314,7 @@ Torrent::ChangeFlags Torrent::Impl::update_cache()
 
     if (result.test(ChangeFlag::NAME))
     {
-        cache_.name_collated = fmt::format("{}\t{}", cache_.name.lowercase(), tr_torrentView(raw_torrent_).hash_string);
+        cache_.name_collated = fmt::format("{}\t{}", cache_.name.lowercase(), view.hash_string);
     }
 
     return result;
@@ -294,7 +328,42 @@ void Torrent::Impl::notify_property_changes(ChangeFlags changes) const
         return;
     }
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+    static auto constexpr properties_flags = std::array<std::pair<Property, ChangeFlags>, PropertyStore::PropertyCount - 1>({ {
+        { Property::ICON, ChangeFlag::MIME_TYPE },
+        { Property::NAME, ChangeFlag::NAME },
+        { Property::PERCENT_DONE, ChangeFlag::PERCENT_DONE },
+        { Property::SHORT_STATUS,
+          ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::FINISHED |
+              ChangeFlag::RATIO | ChangeFlag::RECHECK_PROGRESS | ChangeFlag::SPEED_DOWN | ChangeFlag::SPEED_UP },
+        { Property::LONG_PROGRESS,
+          ChangeFlag::ACTIVITY | ChangeFlag::ETA | ChangeFlag::LONG_PROGRESS | ChangeFlag::PERCENT_COMPLETE |
+              ChangeFlag::PERCENT_DONE | ChangeFlag::RATIO | ChangeFlag::TOTAL_SIZE },
+        { Property::LONG_STATUS,
+          ChangeFlag::ACTIVE_PEERS_DOWN | ChangeFlag::ACTIVE_PEERS_UP | ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE |
+              ChangeFlag::ERROR_MESSAGE | ChangeFlag::HAS_METADATA | ChangeFlag::LONG_STATUS | ChangeFlag::SPEED_DOWN |
+              ChangeFlag::SPEED_UP | ChangeFlag::STALLED },
+        { Property::SENSITIVE, ChangeFlag::ACTIVITY },
+        { Property::CSS_CLASSES, ChangeFlag::ACTIVITY | ChangeFlag::ERROR_CODE },
+    } });
+
+    auto& properties = PropertyStore::get();
+
+    for (auto const& [property, flags] : properties_flags)
+    {
+        if (changes.test(flags))
+        {
+            properties.notify_changed(torrent_, property);
+        }
+    }
+
+#else
+
+    // Reduce redraws by emitting non-detailed signal once for all changes
     gtr_object_notify_emit(torrent_);
+
+#endif
 }
 
 void Torrent::Impl::get_value(int column, Glib::ValueBase& value) const
@@ -454,6 +523,60 @@ Glib::ustring Torrent::Impl::get_long_status_text() const
     return status_str;
 }
 
+std::vector<Glib::ustring> Torrent::Impl::get_css_classes() const
+{
+    auto result = std::vector<Glib::ustring>({
+        fmt::format("tr-transfer-{}", get_activity_direction(cache_.activity)),
+    });
+
+    if (cache_.error_code != 0)
+    {
+        result.emplace_back("tr-error");
+    }
+
+    return result;
+}
+
+void Torrent::Impl::class_init(void* cls, void* /*user_data*/)
+{
+    PropertyStore::get().install(
+        G_OBJECT_CLASS(cls),
+        {
+            { Property::ICON, "icon", "Icon", "Icon based on torrent's likely MIME type", &Torrent::get_icon },
+            { Property::NAME, "name", "Name", "Torrent name / title", &Torrent::get_name },
+            { Property::PERCENT_DONE,
+              "percent-done",
+              "Percent done",
+              "Percent done (0..1) for current activity (leeching or seeding)",
+              &Torrent::get_percent_done_fraction },
+            { Property::SHORT_STATUS,
+              "short-status",
+              "Short status",
+              "Status text displayed in compact view mode",
+              &Torrent::get_short_status_text },
+            { Property::LONG_PROGRESS,
+              "long-progress",
+              "Long progress",
+              "Progress text displayed in full view mode",
+              &Torrent::get_long_progress_text },
+            { Property::LONG_STATUS,
+              "long-status",
+              "Long status",
+              "Status text displayed in full view mode",
+              &Torrent::get_long_status_text },
+            { Property::SENSITIVE,
+              "sensitive",
+              "Sensitive",
+              "Visual sensitivity of the view item, unrelated to activation possibility",
+              &Torrent::get_sensitive },
+            { Property::CSS_CLASSES,
+              "css-classes",
+              "CSS classes",
+              "CSS class names used for styling view items",
+              &Torrent::get_css_classes },
+        });
+}
+
 Glib::ustring Torrent::Impl::get_short_transfer_text() const
 {
     if (cache_.has_metadata && cache_.active_peers_down > 0)
@@ -565,11 +688,13 @@ Glib::ustring Torrent::Impl::get_activity_text() const
 
 Torrent::Torrent()
     : Glib::ObjectBase(typeid(Torrent))
+    , ExtraClassInit(&Impl::class_init)
 {
 }
 
 Torrent::Torrent(tr_torrent* torrent)
     : Glib::ObjectBase(typeid(Torrent))
+    , ExtraClassInit(&Impl::class_init)
     , impl_(std::make_unique<Impl>(*this, torrent))
 {
     g_assert(torrent != nullptr);
@@ -705,6 +830,11 @@ Percents Torrent::get_percent_done() const
     return impl_->get_cache().activity_percent_done;
 }
 
+float Torrent::get_percent_done_fraction() const
+{
+    return get_percent_done().to_fraction();
+}
+
 Glib::ustring Torrent::get_short_status_text() const
 {
     return impl_->get_short_status_text();
@@ -723,6 +853,11 @@ Glib::ustring Torrent::get_long_status_text() const
 bool Torrent::get_sensitive() const
 {
     return impl_->get_cache().activity != TR_STATUS_STOPPED;
+}
+
+std::vector<Glib::ustring> Torrent::get_css_classes() const
+{
+    return impl_->get_css_classes();
 }
 
 Torrent::ChangeFlags Torrent::update()
@@ -764,7 +899,7 @@ void Torrent::get_item_value(Glib::RefPtr<Glib::ObjectBase const> const& item, i
 
 int Torrent::compare_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs)
 {
-    return gtr_compare_generic(lhs->get_id(), rhs->get_id());
+    return tr_compare_3way(lhs->get_id(), rhs->get_id());
 }
 
 bool Torrent::less_by_id(Glib::RefPtr<Torrent const> const& lhs, Glib::RefPtr<Torrent const> const& rhs)

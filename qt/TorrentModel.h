@@ -52,7 +52,7 @@ public:
     }
 
     // QAbstractItemModel
-    int rowCount(QModelIndex const& parent = QModelIndex()) const override;
+    int rowCount(QModelIndex const& parent = QModelIndex{}) const override;
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 public slots:

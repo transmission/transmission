@@ -16,7 +16,7 @@ class FileTreeDelegate : public QItemDelegate
 
 public:
     explicit FileTreeDelegate(QObject* parent = nullptr)
-        : QItemDelegate(parent)
+        : QItemDelegate{ parent }
     {
     }
 

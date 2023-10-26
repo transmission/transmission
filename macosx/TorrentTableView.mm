@@ -12,12 +12,19 @@
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 #import "TorrentCell.h"
+#import "SmallTorrentCell.h"
+#import "GroupCell.h"
 #import "TorrentGroup.h"
-#import "GroupTextCell.h"
+#import "GroupsController.h"
+#import "NSImageAdditions.h"
+#import "TorrentCellActionButton.h"
+#import "TorrentCellControlButton.h"
+#import "TorrentCellRevealButton.h"
 
 CGFloat const kGroupSeparatorHeight = 18.0;
 
 static NSInteger const kMaxGroup = 999999;
+static CGFloat const kErrorImageSize = 20.0;
 
 //eliminate when Lion-only
 typedef NS_ENUM(NSUInteger, ActionMenuTag) {
@@ -38,9 +45,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 @property(nonatomic) IBOutlet Controller* fController;
 
-@property(nonatomic) TorrentCell* fTorrentCell;
-@property(nonatomic) GroupTextCell* fGroupTextCell;
-
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
 @property(nonatomic, readonly) NSMutableIndexSet* fCollapsedGroups;
@@ -48,7 +52,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) IBOutlet NSMenu* fContextRow;
 @property(nonatomic) IBOutlet NSMenu* fContextNoRow;
 
-@property(nonatomic) NSArray* fSelectedValues;
+@property(nonatomic) NSIndexSet* fSelectedRowIndexes;
 
 @property(nonatomic) IBOutlet NSMenu* fActionMenu;
 @property(nonatomic) IBOutlet NSMenu* fUploadMenu;
@@ -64,6 +68,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 @property(nonatomic) BOOL fActionPopoverShown;
 @property(nonatomic) NSView* fPositioningView;
 
+@property(nonatomic) NSDictionary* fHoverEventDict;
+
 @end
 
 @implementation TorrentTableView
@@ -73,9 +79,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     if ((self = [super initWithCoder:decoder]))
     {
         _fDefaults = NSUserDefaults.standardUserDefaults;
-
-        _fTorrentCell = [[TorrentCell alloc] init];
-        _fGroupTextCell = [[GroupTextCell alloc] init];
 
         NSData* groupData;
         if ((groupData = [_fDefaults dataForKey:@"CollapsedGroupIndexes"]))
@@ -93,14 +96,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             _fCollapsedGroups = [[NSMutableIndexSet alloc] init];
         }
 
-        _hoverRow = -1;
-        _controlButtonHoverRow = -1;
-        _revealButtonHoverRow = -1;
-        _actionButtonHoverRow = -1;
-
         _fActionPopoverShown = NO;
 
         self.delegate = self;
+        self.indentationPerLevel = 0;
 
         _piecesBarPercent = [_fDefaults boolForKey:@"PiecesBar"] ? 1.0 : 0.0;
 
@@ -120,13 +119,79 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (void)awakeFromNib
 {
-    //set group columns to show ratio, needs to be in awakeFromNib to size columns correctly
-    [self setGroupStatusColumns];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshTorrentTable) name:@"RefreshTorrentTable"
+                                             object:nil];
+}
 
-    //disable highlight color and set manually in drawRow
-    [self setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleNone];
+- (void)refreshTorrentTable
+{
+    self.needsDisplay = YES;
+}
 
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(setNeedsDisplay) name:@"RefreshTorrentTable" object:nil];
+//make sure we don't lose selection on manual reloads
+- (void)reloadData
+{
+    NSArray<Torrent*>* selectedTorrents = self.selectedTorrents;
+    [super reloadData];
+    self.selectedTorrents = selectedTorrents;
+}
+
+- (void)reloadVisibleRows
+{
+    NSRect visibleRect = self.visibleRect;
+    NSRange range = [self rowsInRect:visibleRect];
+
+    //since we use floating group rows, we need some magic to find visible group rows
+    if ([self.fDefaults boolForKey:@"SortByGroup"])
+    {
+        NSInteger location = range.location;
+        NSInteger length = range.length;
+        NSRange fullRange = NSMakeRange(0, length + location);
+        NSIndexSet* fullIndexSet = [NSIndexSet indexSetWithIndexesInRange:fullRange];
+        NSMutableIndexSet* visibleIndexSet = [[NSMutableIndexSet alloc] init];
+
+        [fullIndexSet enumerateIndexesUsingBlock:^(NSUInteger row, BOOL* stop) {
+            id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
+            if ([rowView isGroupRowStyle])
+            {
+                [visibleIndexSet addIndex:row];
+            }
+            else if (NSIntersectsRect(visibleRect, [self rectOfRow:row]))
+            {
+                [visibleIndexSet addIndex:row];
+            }
+        }];
+
+        [self reloadDataForRowIndexes:visibleIndexSet columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
+    else
+    {
+        [self reloadDataForRowIndexes:[NSIndexSet indexSetWithIndexesInRange:range] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
+}
+
+- (void)reloadDataForRowIndexes:(NSIndexSet*)rowIndexes columnIndexes:(NSIndexSet*)columnIndexes
+{
+    [super reloadDataForRowIndexes:rowIndexes columnIndexes:columnIndexes];
+
+    //redraw fControlButton
+    BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
+    [rowIndexes enumerateIndexesUsingBlock:^(NSUInteger row, BOOL* stop) {
+        id rowView = [self rowViewAtRow:row makeIfNecessary:NO];
+        if (![rowView isGroupRowStyle])
+        {
+            if (minimal)
+            {
+                SmallTorrentCell* smallCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
+                [(TorrentCellControlButton*)smallCell.fControlButton resetImage];
+            }
+            else
+            {
+                TorrentCell* torrentCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
+                [(TorrentCellControlButton*)torrentCell.fControlButton resetImage];
+            }
+        }
+    }];
 }
 
 - (BOOL)isGroupCollapsed:(NSInteger)value
@@ -162,9 +227,11 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
 {
-    //return no and style the groupItem cell manually in willDisplayCell
-    //otherwise we get unwanted padding before each group header
-    return NO;
+    if ([item isKindOfClass:[Torrent class]])
+    {
+        return NO;
+    }
+    return YES;
 }
 
 - (CGFloat)outlineView:(NSOutlineView*)outlineView heightOfRowByItem:(id)item
@@ -172,119 +239,180 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     return [item isKindOfClass:[Torrent class]] ? self.rowHeight : kGroupSeparatorHeight;
 }
 
-- (NSCell*)outlineView:(NSOutlineView*)outlineView dataCellForTableColumn:(NSTableColumn*)tableColumn item:(id)item
-{
-    BOOL const group = ![item isKindOfClass:[Torrent class]];
-    if (!tableColumn)
-    {
-        return !group ? self.fTorrentCell : nil;
-    }
-    else
-    {
-        NSString* ident = tableColumn.identifier;
-        NSArray* imageColumns = @[ @"Color", @"DL Image", @"UL Image" ];
-        if (![imageColumns containsObject:ident])
-        {
-            return group ? self.fGroupTextCell : nil;
-        }
-        else
-        {
-            return group ? [tableColumn dataCellForRow:[self rowForItem:item]] : nil;
-        }
-    }
-}
-
-- (void)outlineView:(NSOutlineView*)outlineView
-    willDisplayCell:(id)cell
-     forTableColumn:(NSTableColumn*)tableColumn
-               item:(id)item
+- (NSView*)outlineView:(NSOutlineView*)outlineView viewForTableColumn:(NSTableColumn*)tableColumn item:(id)item
 {
     if ([item isKindOfClass:[Torrent class]])
     {
-        if (!tableColumn)
+        Torrent* torrent = (Torrent*)item;
+        BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
+        BOOL const error = torrent.anyErrorOrWarning;
+
+        TorrentCell* torrentCell;
+        if (minimal)
         {
-            TorrentCell* torrentCell = cell;
-            torrentCell.representedObject = item;
+            torrentCell = [outlineView makeViewWithIdentifier:@"SmallTorrentCell" owner:self];
 
-            NSInteger const row = [self rowForItem:item];
-            torrentCell.hover = (row == self.hoverRow);
-            torrentCell.hoverControl = (row == self.controlButtonHoverRow);
-            torrentCell.hoverReveal = (row == self.revealButtonHoverRow);
-            torrentCell.hoverAction = (row == self.actionButtonHoverRow);
+            // set torrent icon or error badge
+            torrentCell.fIconView.image = error ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
 
-            // if cell is selected, set backgroundStyle
-            // then can provide alternate font color in TorrentCell - drawInteriorWithFrame
-            NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
-            if ([selectedRowIndexes containsIndex:row])
+            // set torrent status
+            torrentCell.fTorrentStatusField.stringValue = [self.fDefaults boolForKey:@"DisplaySmallStatusRegular"] ?
+                torrent.shortStatusString :
+                torrent.remainingTimeString;
+
+            if (self.fHoverEventDict)
             {
-                torrentCell.backgroundStyle = NSBackgroundStyleEmphasized;
+                NSInteger row = [self rowForItem:item];
+                NSInteger hoverRow = [self.fHoverEventDict[@"row"] integerValue];
+
+                if (row == hoverRow)
+                {
+                    torrentCell.fTorrentStatusField.hidden = YES;
+                    torrentCell.fControlButton.hidden = NO;
+                    torrentCell.fRevealButton.hidden = NO;
+                }
+            }
+            else
+            {
+                torrentCell.fTorrentStatusField.hidden = NO;
+                torrentCell.fControlButton.hidden = YES;
+                torrentCell.fRevealButton.hidden = YES;
             }
         }
+        else
+        {
+            torrentCell = [outlineView makeViewWithIdentifier:@"TorrentCell" owner:self];
+            torrentCell.fTorrentProgressField.stringValue = torrent.progressString;
+
+            // set torrent icon and error badge
+            NSImage* fileImage = torrent.icon;
+            if (error)
+            {
+                NSRect frame = torrentCell.fIconView.frame;
+                NSImage* resultImage = [[NSImage alloc] initWithSize:NSMakeSize(frame.size.height, frame.size.width)];
+                [resultImage lockFocus];
+
+                // draw fileImage
+                [fileImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
+
+                // overlay error badge
+                NSImage* errorImage = [NSImage imageNamed:NSImageNameCaution];
+                NSRect const errorRect = NSMakeRect(frame.origin.x, 0, kErrorImageSize, kErrorImageSize);
+                [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
+                        respectFlipped:YES
+                                 hints:nil];
+
+                [resultImage unlockFocus];
+
+                torrentCell.fIconView.image = resultImage;
+            }
+            else
+            {
+                torrentCell.fIconView.image = fileImage;
+            }
+
+            // set torrent status
+            NSString* status;
+            if (self.fHoverEventDict)
+            {
+                NSInteger row = [self rowForItem:item];
+                NSInteger hoverRow = [self.fHoverEventDict[@"row"] integerValue];
+
+                if (row == hoverRow)
+                {
+                    status = self.fHoverEventDict[@"string"];
+                }
+            }
+            torrentCell.fTorrentStatusField.stringValue = status ?: torrent.statusString;
+        }
+
+        torrentCell.fTorrentTableView = self;
+
+        // set this so that we can draw bar in torrentCell drawRect
+        torrentCell.objectValue = torrent;
+
+        torrentCell.fTorrentTitleField.stringValue = torrent.name;
+
+        torrentCell.fActionButton.action = @selector(displayTorrentActionPopover:);
+
+        NSInteger const groupValue = torrent.groupValue;
+        NSImage* groupImage;
+        if (groupValue != -1)
+        {
+            if (![self.fDefaults boolForKey:@"SortByGroup"])
+            {
+                NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
+                groupImage = [NSImage discIconWithColor:groupColor insetFactor:0];
+            }
+        }
+
+        torrentCell.fGroupIndicatorView.image = groupImage;
+
+        torrentCell.fControlButton.action = @selector(toggleControlForTorrent:);
+        torrentCell.fRevealButton.action = @selector(revealTorrentFile:);
+
+        // redraw buttons
+        [torrentCell.fControlButton display];
+        [torrentCell.fRevealButton display];
+
+        return torrentCell;
     }
     else
     {
-        if ([cell isKindOfClass:[GroupTextCell class]])
+        TorrentGroup* group = (TorrentGroup*)item;
+        GroupCell* groupCell = [outlineView makeViewWithIdentifier:@"GroupCell" owner:self];
+
+        NSInteger groupIndex = group.groupIndex;
+
+        NSColor* groupColor = groupIndex != -1 ? [GroupsController.groups colorForIndex:groupIndex] :
+                                                 [NSColor colorWithWhite:1.0 alpha:0];
+        groupCell.fGroupIndicatorView.image = [NSImage discIconWithColor:groupColor insetFactor:0];
+
+        NSString* groupName = groupIndex != -1 ? [GroupsController.groups nameForIndex:groupIndex] :
+                                                 NSLocalizedString(@"No Group", "Group table row");
+
+        NSInteger row = [self rowForItem:item];
+        if ([self isRowSelected:row])
         {
-            GroupTextCell* groupCell = cell;
+            NSMutableAttributedString* string = [[NSMutableAttributedString alloc] initWithString:groupName];
+            NSDictionary* attributes = @{
+                NSFontAttributeName : [NSFont boldSystemFontOfSize:11.0],
+                NSForegroundColorAttributeName : [NSColor labelColor]
+            };
 
-            // if cell is selected, set selected flag so we can style the title in GroupTextCell drawInteriorWithFrame
-            NSInteger const row = [self rowForItem:item];
-            NSIndexSet* selectedRowIndexes = self.selectedRowIndexes;
-            groupCell.selected = [selectedRowIndexes containsIndex:row];
-        }
-    }
-}
-
-//we override row highlighting because we are custom drawing the group rows
-//see isGroupItem
-- (void)drawRow:(NSInteger)row clipRect:(NSRect)clipRect
-{
-    NSColor* highlightColor = nil;
-
-    id item = [self itemAtRow:row];
-
-    //we only highlight torrent cells
-    if ([item isKindOfClass:[Torrent class]])
-    {
-        //use system highlight color when Transmission is active
-        if (self == [self.window firstResponder] && [self.window isMainWindow] && [self.window isKeyWindow])
-        {
-            highlightColor = [NSColor alternateSelectedControlColor];
+            [string addAttributes:attributes range:NSMakeRange(0, string.length)];
+            groupCell.fGroupTitleField.attributedStringValue = string;
         }
         else
         {
-            highlightColor = [NSColor disabledControlTextColor];
+            groupCell.fGroupTitleField.stringValue = groupName;
         }
 
-        NSIndexSet* selectedRowIndexes = [self selectedRowIndexes];
-        if ([selectedRowIndexes containsIndex:row])
+        groupCell.fGroupDownloadField.stringValue = [NSString stringForSpeed:group.downloadRate];
+        groupCell.fGroupDownloadView.image = [NSImage imageNamed:@"DownArrowGroupTemplate"];
+
+        BOOL displayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
+        groupCell.fGroupDownloadField.hidden = displayGroupRowRatio;
+        groupCell.fGroupDownloadView.hidden = displayGroupRowRatio;
+
+        if (displayGroupRowRatio)
         {
-            [highlightColor setFill];
-            NSRectFill([self rectOfRow:row]);
+            groupCell.fGroupUploadAndRatioView.image = [NSImage imageNamed:@"YingYangGroupTemplate"];
+            groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"Ratio", "Torrent -> status image");
+
+            groupCell.fGroupUploadAndRatioField.stringValue = [NSString stringForRatio:group.ratio];
         }
-    }
-
-    [super drawRow:row clipRect:clipRect];
-}
-
-- (NSRect)frameOfCellAtColumn:(NSInteger)column row:(NSInteger)row
-{
-    if (column == -1)
-    {
-        return [self rectOfRow:row];
-    }
-    else
-    {
-        NSRect rect = [super frameOfCellAtColumn:column row:row];
-
-        //adjust placement for proper vertical alignment
-        if (column == [self columnWithIdentifier:@"Group"])
+        else
         {
-            rect.size.height -= 1.0f;
+            groupCell.fGroupUploadAndRatioView.image = [NSImage imageNamed:@"UpArrowGroupTemplate"];
+            groupCell.fGroupUploadAndRatioView.image.accessibilityDescription = NSLocalizedString(@"UL", "Torrent -> status image");
+
+            groupCell.fGroupUploadAndRatioField.stringValue = [NSString stringForSpeed:group.uploadRate];
         }
 
-        return rect;
+        return groupCell;
     }
+    return nil;
 }
 
 - (NSString*)outlineView:(NSOutlineView*)outlineView typeSelectStringForTableColumn:(NSTableColumn*)tableColumn item:(id)item
@@ -336,160 +464,10 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
 }
 
-- (void)updateTrackingAreas
+- (void)outlineViewSelectionDidChange:(NSNotification*)notification
 {
-    [super updateTrackingAreas];
-    [self removeTrackingAreas];
-
-    NSRange const rows = [self rowsInRect:self.visibleRect];
-    if (rows.length == 0)
-    {
-        return;
-    }
-
-    NSPoint mouseLocation = [self convertPoint:self.window.mouseLocationOutsideOfEventStream fromView:nil];
-    for (NSUInteger row = rows.location; row < NSMaxRange(rows); row++)
-    {
-        if (![[self itemAtRow:row] isKindOfClass:[Torrent class]])
-        {
-            continue;
-        }
-
-        NSDictionary* userInfo = @{ @"Row" : @(row) };
-        TorrentCell* cell = (TorrentCell*)[self preparedCellAtColumn:-1 row:row];
-        [cell addTrackingAreasForView:self inRect:[self rectOfRow:row] withUserInfo:userInfo mouseLocation:mouseLocation];
-    }
-}
-
-- (void)removeTrackingAreas
-{
-    _hoverRow = -1;
-    _controlButtonHoverRow = -1;
-    _revealButtonHoverRow = -1;
-    _actionButtonHoverRow = -1;
-
-    for (NSTrackingArea* area in self.trackingAreas)
-    {
-        if (area.owner == self && area.userInfo[@"Row"])
-        {
-            [self removeTrackingArea:area];
-        }
-    }
-}
-
-- (void)setHoverRow:(NSInteger)row
-{
-    NSAssert([self.fDefaults boolForKey:@"SmallView"], @"cannot set a hover row when not in compact view");
-
-    _hoverRow = row;
-    if (row >= 0)
-    {
-        [self setNeedsDisplayInRect:[self rectOfRow:row]];
-    }
-}
-
-- (void)setControlButtonHoverRow:(NSInteger)row
-{
-    _controlButtonHoverRow = row;
-    if (row >= 0)
-    {
-        [self setNeedsDisplayInRect:[self rectOfRow:row]];
-    }
-}
-
-- (void)setRevealButtonHoverRow:(NSInteger)row
-{
-    _revealButtonHoverRow = row;
-    if (row >= 0)
-    {
-        [self setNeedsDisplayInRect:[self rectOfRow:row]];
-    }
-}
-
-- (void)setActionButtonHoverRow:(NSInteger)row
-{
-    _actionButtonHoverRow = row;
-    if (row >= 0)
-    {
-        [self setNeedsDisplayInRect:[self rectOfRow:row]];
-    }
-}
-
-- (void)mouseEntered:(NSEvent*)event
-{
-    NSDictionary* dict = (NSDictionary*)event.userData;
-
-    NSNumber* row;
-    if ((row = dict[@"Row"]))
-    {
-        NSInteger rowVal = row.integerValue;
-        NSString* type = dict[@"Type"];
-        if ([type isEqualToString:@"Action"])
-        {
-            _actionButtonHoverRow = rowVal;
-        }
-        else if ([type isEqualToString:@"Control"])
-        {
-            _controlButtonHoverRow = rowVal;
-        }
-        else if ([type isEqualToString:@"Reveal"])
-        {
-            _revealButtonHoverRow = rowVal;
-        }
-        else
-        {
-            _hoverRow = rowVal;
-            if (![self.fDefaults boolForKey:@"SmallView"])
-            {
-                return;
-            }
-        }
-
-        [self setNeedsDisplayInRect:[self rectOfRow:rowVal]];
-    }
-}
-
-- (void)mouseExited:(NSEvent*)event
-{
-    NSDictionary* dict = (NSDictionary*)event.userData;
-
-    NSNumber* row;
-    if ((row = dict[@"Row"]))
-    {
-        NSString* type = dict[@"Type"];
-        if ([type isEqualToString:@"Action"])
-        {
-            _actionButtonHoverRow = -1;
-        }
-        else if ([type isEqualToString:@"Control"])
-        {
-            _controlButtonHoverRow = -1;
-        }
-        else if ([type isEqualToString:@"Reveal"])
-        {
-            _revealButtonHoverRow = -1;
-        }
-        else
-        {
-            _hoverRow = -1;
-            if (![self.fDefaults boolForKey:@"SmallView"])
-            {
-                return;
-            }
-        }
-
-        [self setNeedsDisplayInRect:[self rectOfRow:row.integerValue]];
-    }
-}
-
-- (void)outlineViewSelectionIsChanging:(NSNotification*)notification
-{
-#warning eliminate when view-based?
-    //if pushing a button, don't change the selected rows
-    if (self.fSelectedValues)
-    {
-        [self selectValues:self.fSelectedValues];
-    }
+    self.fSelectedRowIndexes = self.selectedRowIndexes;
+    [self reloadVisibleRows];
 }
 
 - (void)outlineViewItemDidExpand:(NSNotification*)notification
@@ -526,42 +504,16 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     NSPoint point = [self convertPoint:event.locationInWindow fromView:nil];
     NSInteger const row = [self rowAtPoint:point];
 
-    //check to toggle group status before anything else
-    if ([self pointInGroupStatusRect:point])
-    {
-        [self.fDefaults setBool:![self.fDefaults boolForKey:@"DisplayGroupRowRatio"] forKey:@"DisplayGroupRowRatio"];
-        [self setGroupStatusColumns];
-
-        return;
-    }
-
-    BOOL const pushed = row != -1 &&
-        (self.actionButtonHoverRow == row || self.revealButtonHoverRow == row || self.controlButtonHoverRow == row);
-
-    //if pushing a button, don't change the selected rows
-    if (pushed)
-    {
-        self.fSelectedValues = self.selectedValues;
-    }
-
     [super mouseDown:event];
 
-    self.fSelectedValues = nil;
-
-    //avoid weird behavior when showing menu by doing this after mouse down
-    if (row != -1 && self.actionButtonHoverRow == row)
+    id item = nil;
+    if (row != -1)
     {
-#warning maybe make appear on mouse down
-        [self displayTorrentActionPopoverForEvent:event];
+        item = [self itemAtRow:row];
     }
-    else if (!pushed && event.clickCount == 2) //double click
-    {
-        id item = nil;
-        if (row != -1)
-        {
-            item = [self itemAtRow:row];
-        }
 
+    if (event.clickCount == 2) //double click
+    {
         if (!item || [item isKindOfClass:[Torrent class]])
         {
             [self.fController showInfo:nil];
@@ -578,52 +530,12 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
             }
         }
     }
-}
-
-- (void)selectValues:(NSArray*)values
-{
-    NSMutableIndexSet* indexSet = [NSMutableIndexSet indexSet];
-
-    for (id item in values)
+    else if ([self pointInGroupStatusRect:point])
     {
-        if ([item isKindOfClass:[Torrent class]])
-        {
-            NSInteger const index = [self rowForItem:item];
-            if (index != -1)
-            {
-                [indexSet addIndex:index];
-            }
-        }
-        else
-        {
-            TorrentGroup* group = (TorrentGroup*)item;
-            NSInteger const groupIndex = group.groupIndex;
-            for (NSInteger i = 0; i < self.numberOfRows; i++)
-            {
-                id tableItem = [self itemAtRow:i];
-                if ([tableItem isKindOfClass:[TorrentGroup class]] && groupIndex == ((TorrentGroup*)tableItem).groupIndex)
-                {
-                    [indexSet addIndex:i];
-                    break;
-                }
-            }
-        }
+        //we check for this here rather than in the GroupCell
+        //as using floating group rows causes all sorts of weirdness...
+        [self toggleGroupRowRatio];
     }
-
-    [self selectRowIndexes:indexSet byExtendingSelection:NO];
-}
-
-- (NSArray*)selectedValues
-{
-    NSIndexSet* selectedIndexes = self.selectedRowIndexes;
-    NSMutableArray* values = [NSMutableArray arrayWithCapacity:selectedIndexes.count];
-
-    for (NSUInteger i = selectedIndexes.firstIndex; i != NSNotFound; i = [selectedIndexes indexGreaterThanIndex:i])
-    {
-        [values addObject:[self itemAtRow:i]];
-    }
-
-    return values;
 }
 
 - (NSArray<Torrent*>*)selectedTorrents
@@ -650,6 +562,16 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
 
     return torrents;
+}
+
+- (void)setSelectedTorrents:(NSArray<Torrent*>*)selectedTorrents
+{
+    NSMutableIndexSet* selectedIndexes = [NSMutableIndexSet new];
+    for (Torrent* i in selectedTorrents)
+    {
+        [selectedIndexes addIndex:[self rowForItem:i]];
+    }
+    [self selectRowIndexes:selectedIndexes byExtendingSelection:NO];
 }
 
 - (NSMenu*)menuForEvent:(NSEvent*)event
@@ -702,7 +624,24 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
 - (NSRect)iconRectForRow:(NSInteger)row
 {
-    return [self.fTorrentCell iconRectForBounds:[self rectOfRow:row]];
+    BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
+    NSRect rect;
+
+    if (minimal)
+    {
+        SmallTorrentCell* smallCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
+        rect = smallCell.fActionButton.frame;
+    }
+    else
+    {
+        TorrentCell* torrentCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
+        rect = torrentCell.fIconView.frame;
+    }
+
+    NSRect rowRect = [self rectOfRow:row];
+    rect.origin.y += rowRect.origin.y;
+    rect.origin.x += self.intercellSpacing.width;
+    return rect;
 }
 
 - (BOOL)acceptsFirstResponder
@@ -793,8 +732,101 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     return YES;
 }
 
-- (void)toggleControlForTorrent:(Torrent*)torrent
+- (void)hoverEventBeganForView:(id)view
 {
+    NSInteger row = [self rowForView:view];
+    Torrent* torrent = [self itemAtRow:row];
+
+    BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
+    if (minimal)
+    {
+        if ([view isKindOfClass:[SmallTorrentCell class]])
+        {
+            self.fHoverEventDict = @{ @"row" : [NSNumber numberWithInteger:row] };
+        }
+        else if ([view isKindOfClass:[TorrentCellActionButton class]])
+        {
+            SmallTorrentCell* smallCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
+            smallCell.fIconView.hidden = YES;
+        }
+    }
+    else
+    {
+        NSString* statusString;
+        if ([view isKindOfClass:[TorrentCellRevealButton class]])
+        {
+            statusString = NSLocalizedString(@"Show the data file in Finder", "Torrent cell -> button info");
+        }
+        else if ([view isKindOfClass:[TorrentCellControlButton class]])
+        {
+            if (torrent.active)
+                statusString = NSLocalizedString(@"Pause the transfer", "Torrent Table -> tooltip");
+            else
+            {
+                if (NSApp.currentEvent.modifierFlags & NSEventModifierFlagOption)
+                {
+                    statusString = NSLocalizedString(@"Resume the transfer right away", "Torrent cell -> button info");
+                }
+                else if (torrent.waitingToStart)
+                {
+                    statusString = NSLocalizedString(@"Stop waiting to start", "Torrent cell -> button info");
+                }
+                else
+                {
+                    statusString = NSLocalizedString(@"Resume the transfer", "Torrent cell -> button info");
+                }
+            }
+        }
+        else if ([view isKindOfClass:[TorrentCellActionButton class]])
+        {
+            statusString = NSLocalizedString(@"Change transfer settings", "Torrent Table -> tooltip");
+        }
+
+        if (statusString)
+        {
+            self.fHoverEventDict = @{ @"string" : statusString, @"row" : [NSNumber numberWithInteger:row] };
+        }
+    }
+
+    [self reloadVisibleRows];
+}
+
+- (void)hoverEventEndedForView:(id)view
+{
+    NSInteger row = [self rowForView:[view superview]];
+
+    BOOL update = YES;
+    BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
+    if (minimal)
+    {
+        if (minimal && ![view isKindOfClass:[SmallTorrentCell class]])
+        {
+            if ([view isKindOfClass:[TorrentCellActionButton class]])
+            {
+                SmallTorrentCell* smallCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
+                smallCell.fIconView.hidden = NO;
+            }
+            update = NO;
+        }
+    }
+
+    if (update)
+    {
+        self.fHoverEventDict = nil;
+        [self reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row] columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
+}
+
+- (void)toggleGroupRowRatio
+{
+    BOOL displayGroupRowRatio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
+    [self.fDefaults setBool:!displayGroupRowRatio forKey:@"DisplayGroupRowRatio"];
+    [self reloadVisibleRows];
+}
+
+- (IBAction)toggleControlForTorrent:(id)sender
+{
+    Torrent* torrent = [self itemAtRow:[self rowForView:[sender superview]]];
     if (torrent.active)
     {
         [self.fController stopTorrents:@[ torrent ]];
@@ -816,22 +848,26 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
 }
 
-- (void)displayTorrentActionPopoverForEvent:(NSEvent*)event
+- (IBAction)revealTorrentFile:(id)sender
 {
-    NSInteger const row = [self rowAtPoint:[self convertPoint:event.locationInWindow fromView:nil]];
-    if (row < 0)
+    Torrent* torrent = [self itemAtRow:[self rowForView:[sender superview]]];
+    NSString* location = torrent.dataLocation;
+    if (location)
     {
-        return;
+        NSURL* file = [NSURL fileURLWithPath:location];
+        [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[ file ]];
     }
+}
 
-    NSRect const rect = [self.fTorrentCell actionRectForBounds:[self rectOfRow:row]];
-
+- (IBAction)displayTorrentActionPopover:(id)sender
+{
     if (self.fActionPopoverShown)
     {
         return;
     }
 
-    Torrent* torrent = [self itemAtRow:row];
+    Torrent* torrent = [self itemAtRow:[self rowForView:[sender superview]]];
+    NSRect rect = [sender bounds];
 
     NSPopover* popover = [[NSPopover alloc] init];
     popover.behavior = NSPopoverBehaviorTransient;
@@ -839,7 +875,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     popover.contentViewController = infoViewController;
     popover.delegate = self;
 
-    [popover showRelativeToRect:rect ofView:self preferredEdge:NSMaxYEdge];
+    [popover showRelativeToRect:rect ofView:sender preferredEdge:NSMaxYEdge];
     [infoViewController setInfoForTorrents:@[ torrent ]];
     [infoViewController updateInfo];
 
@@ -856,7 +892,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
     else
     {
-        [popover showRelativeToRect:rect ofView:self preferredEdge:NSMaxYEdge];
+        [popover showRelativeToRect:rect ofView:sender preferredEdge:NSMaxYEdge];
     }
 }
 
@@ -1106,22 +1142,17 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 - (BOOL)pointInGroupStatusRect:(NSPoint)point
 {
     NSInteger row = [self rowAtPoint:point];
-    if (row < 0 || [[self itemAtRow:row] isKindOfClass:[Torrent class]])
+    if (![[self itemAtRow:row] isKindOfClass:[TorrentGroup class]])
     {
         return NO;
     }
 
-    NSString* ident = (self.tableColumns[[self columnAtPoint:point]]).identifier;
-    return [ident isEqualToString:@"UL"] || [ident isEqualToString:@"UL Image"] || [ident isEqualToString:@"DL"] ||
-        [ident isEqualToString:@"DL Image"];
-}
+    //check if click is within the status/ratio rect
+    GroupCell* groupCell = [self viewAtColumn:0 row:row makeIfNecessary:NO];
+    NSRect titleRect = groupCell.fGroupTitleField.frame;
+    CGFloat maxX = NSMaxX(titleRect);
 
-- (void)setGroupStatusColumns
-{
-    BOOL const ratio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
-
-    [self tableColumnWithIdentifier:@"DL"].hidden = ratio;
-    [self tableColumnWithIdentifier:@"DL Image"].hidden = ratio;
+    return point.x > maxX;
 }
 
 @end

@@ -11,20 +11,19 @@
 #include <cerrno>
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
-#include <cstdio>
+#include <cstdlib> // mkdtemp, mkstemp, realpath
+#include <optional>
 #include <string_view>
 #include <string>
 #include <vector>
 
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
-#include <libgen.h> /* basename(), dirname() */
-#include <sys/file.h> /* flock() */
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
 #ifdef HAVE_XFS_XFS_H
+#include <sys/file.h> /* flock() */
 #include <xfs/xfs.h>
 #endif
 
@@ -49,7 +48,7 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 #include "libtransmission/transmission.h"
 
@@ -57,6 +56,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_UCLIBC_CHECK_VERSION
 #include "libtransmission/tr-strbuf.h"
 
 #ifndef O_LARGEFILE
@@ -439,7 +439,11 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
                 if (copied == -1)
                 {
                     errno_cpy = errno; /* remember me for later */
-                    tr_error_set_from_errno(error, errno);
+                    /* use sendfile with EINVAL (invalid argument) for falling to user-space copy */
+                    if (errno != EINVAL) /* EINVAL is expected on some 32-bit devices (of Synology), don't log error */
+                    {
+                        tr_error_set_from_errno(error, errno);
+                    }
                     if (file_size > 0U)
                     {
                         file_size = info->size; /* restore file_size for next fallback */
@@ -460,7 +464,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     /* Fallback to user-space copy. */
     /* if file_size>0 and errno_cpy==0, we probably never entered any copy attempt, also: */
     /* if we (still) got something to copy and we encountered certain error in previous attempts */
-    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV))
+    if (file_size > 0U && (errno_cpy == 0 || errno_cpy == EXDEV || errno_cpy == EINVAL))
     {
         static auto constexpr Buflen = size_t{ 1024U * 1024U }; /* 1024 KiB buffer */
         auto buf = std::vector<char>{};
@@ -556,7 +560,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), static_cast<int>(std_file)));
         tr_error_set_from_errno(error, EINVAL);
     }
 

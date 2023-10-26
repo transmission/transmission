@@ -5,12 +5,11 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <unordered_set>
 
 #include <QString>
-#include <QMap>
-#include <QSet>
 #include <QTimer>
 
 #include <libtransmission/tr-macros.h>
@@ -46,7 +45,7 @@ public:
     // QWidget
     QSize sizeHint() const override
     {
-        return QSize(440, 460);
+        return QSize{ 440, 460 };
     }
 
 private:
@@ -77,8 +76,8 @@ private slots:
     void onTrackerListEdited(QString);
 
     // Files tab
-    void onFilePriorityChanged(QSet<int> const& file_indices, int);
-    void onFileWantedChanged(QSet<int> const& file_indices, bool);
+    void onFilePriorityChanged(file_indices_t const& file_indices, int);
+    void onFileWantedChanged(file_indices_t const& file_indices, bool);
     void onPathEdited(QString const& old_path, QString const& new_name);
     void onOpenRequested(QString const& path) const;
 
@@ -137,7 +136,7 @@ private:
     std::shared_ptr<TrackerModelFilter> tracker_filter_;
     std::shared_ptr<TrackerDelegate> tracker_delegate_;
 
-    QMap<QString, QTreeWidgetItem*> peers_;
+    std::map<QString, QTreeWidgetItem*> peers_;
 
     QIcon const icon_encrypted_ = QIcon(QStringLiteral(":/icons/encrypted.svg"));
     QIcon const icon_unencrypted_ = {};

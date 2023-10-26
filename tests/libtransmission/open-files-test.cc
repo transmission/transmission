@@ -4,14 +4,22 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
+#include <cassert>
+#include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <string_view>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/open-files.h>
 #include <libtransmission/tr-strbuf.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 using namespace std::literals;
@@ -135,7 +143,7 @@ TEST_F(OpenFilesTest, closeFileClosesTheFile)
     EXPECT_TRUE(session_->openFiles().get(0, 0, false));
 
     // close the file
-    session_->openFiles().closeFile(0, 0);
+    session_->openFiles().close_file(0, 0);
 
     // confirm that its fd is no longer cached
     EXPECT_FALSE(session_->openFiles().get(0, 0, false));
@@ -155,12 +163,12 @@ TEST_F(OpenFilesTest, closeTorrentClosesTheTorrentFiles)
     EXPECT_TRUE(session_->openFiles().get(TorId, 3, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
 
     // confirm that closing a different torrent does not affect these files
-    session_->openFiles().closeTorrent(TorId + 1);
+    session_->openFiles().close_torrent(TorId + 1);
     EXPECT_TRUE(session_->openFiles().get(TorId, 1, false));
     EXPECT_TRUE(session_->openFiles().get(TorId, 3, false));
 
     // confirm that closing this torrent closes and uncaches the files
-    session_->openFiles().closeTorrent(TorId);
+    session_->openFiles().close_torrent(TorId);
     EXPECT_FALSE(session_->openFiles().get(TorId, 1, false));
     EXPECT_FALSE(session_->openFiles().get(TorId, 3, false));
 }

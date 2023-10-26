@@ -25,36 +25,36 @@ public:
     Timer& operator=(Timer const&) = delete;
 
     virtual void stop() = 0;
-    virtual void setCallback(std::function<void()> callback) = 0;
-    virtual void setRepeating(bool repeating = true) = 0;
-    virtual void setInterval(std::chrono::milliseconds) = 0;
+    virtual void set_callback(std::function<void()> callback) = 0;
+    virtual void set_repeating(bool repeating = true) = 0;
+    virtual void set_interval(std::chrono::milliseconds) = 0;
     virtual void start() = 0;
 
     [[nodiscard]] virtual std::chrono::milliseconds interval() const noexcept = 0;
-    [[nodiscard]] virtual bool isRepeating() const noexcept = 0;
+    [[nodiscard]] virtual bool is_repeating() const noexcept = 0;
 
     void start(std::chrono::milliseconds msec)
     {
-        setInterval(msec);
+        set_interval(msec);
         start();
     }
 
-    void startRepeating(std::chrono::milliseconds msec)
+    void start_repeating(std::chrono::milliseconds msec)
     {
-        setRepeating();
+        set_repeating();
         start(msec);
     }
 
-    void startSingleShot(std::chrono::milliseconds msec)
+    void start_single_shot(std::chrono::milliseconds msec)
     {
-        setRepeating(false);
+        set_repeating(false);
         start(msec);
     }
 
     using CStyleCallback = void (*)(void* user_data);
-    void setCallback(CStyleCallback callback, void* user_data)
+    void set_callback(CStyleCallback callback, void* user_data)
     {
-        setCallback([user_data, callback]() { callback(user_data); });
+        set_callback([user_data, callback]() { callback(user_data); });
     }
 };
 
@@ -67,14 +67,14 @@ public:
     [[nodiscard]] std::unique_ptr<Timer> create(std::function<void()> callback)
     {
         auto timer = create();
-        timer->setCallback(std::move(callback));
+        timer->set_callback(std::move(callback));
         return timer;
     }
 
     [[nodiscard]] std::unique_ptr<Timer> create(Timer::CStyleCallback callback, void* user_data)
     {
         auto timer = create();
-        timer->setCallback(callback, user_data);
+        timer->set_callback(callback, user_data);
         return timer;
     }
 };

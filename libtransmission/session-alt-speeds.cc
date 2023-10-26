@@ -3,6 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <chrono>
+#include <cstddef> // size_t
+
 #include <fmt/chrono.h>
 
 #include "libtransmission/transmission.h"
@@ -14,46 +17,49 @@
 
 using namespace std::literals;
 
-void tr_session_alt_speeds::load(tr_variant* src)
+void tr_session_alt_speeds::load(tr_variant const& src)
 {
+    auto const* const src_map = src.get_if<tr_variant::Map>();
+    if (src_map != nullptr)
+    {
 #define V(key, field, type, default_value, comment) \
-    if (auto* const child = tr_variantDictFind(src, key); child != nullptr) \
+    if (auto const iter = src_map->find(key); iter != std::end(*src_map)) \
     { \
-        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(child); val) \
+        if (auto val = libtransmission::VariantConverter::load<decltype(field)>(iter->second); val) \
         { \
             this->field = *val; \
         } \
     }
-    ALT_SPEEDS_FIELDS(V)
+        ALT_SPEEDS_FIELDS(V)
 #undef V
-
-    updateScheduler();
-}
-
-void tr_session_alt_speeds::save(tr_variant* tgt) const
-{
-#define V(key, field, type, default_value, comment) \
-    tr_variantDictRemove(tgt, key); \
-    libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), field);
-    ALT_SPEEDS_FIELDS(V)
-#undef V
-}
-
-void tr_session_alt_speeds::defaultSettings(tr_variant* tgt)
-{
-#define V(key, field, type, default_value, comment) \
-    { \
-        type const val = default_value; \
-        tr_variantDictRemove(tgt, key); \
-        libtransmission::VariantConverter::save<decltype(field)>(tr_variantDictAdd(tgt, key), val); \
     }
+
+    update_scheduler();
+}
+
+tr_variant tr_session_alt_speeds::settings() const
+{
+    auto settings = tr_variant::Map{};
+#define V(key, field, type, default_value, comment) \
+    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(field));
     ALT_SPEEDS_FIELDS(V)
 #undef V
+    return tr_variant{ std::move(settings) };
+}
+
+tr_variant tr_session_alt_speeds::default_settings()
+{
+    auto settings = tr_variant::Map{};
+#define V(key, field, type, default_value, comment) \
+    settings.try_emplace(key, libtransmission::VariantConverter::save<decltype(field)>(static_cast<type>(default_value)));
+    ALT_SPEEDS_FIELDS(V)
+#undef V
+    return tr_variant{ std::move(settings) };
 }
 
 // --- minutes
 
-void tr_session_alt_speeds::updateMinutes()
+void tr_session_alt_speeds::update_minutes()
 {
     minutes_.reset();
 
@@ -71,39 +77,39 @@ void tr_session_alt_speeds::updateMinutes()
     }
 }
 
-void tr_session_alt_speeds::updateScheduler()
+void tr_session_alt_speeds::update_scheduler()
 {
-    updateMinutes();
+    update_minutes();
     scheduler_set_is_active_to_.reset();
-    checkScheduler();
+    check_scheduler();
 }
 
-void tr_session_alt_speeds::checkScheduler()
+void tr_session_alt_speeds::check_scheduler()
 {
-    if (!isSchedulerEnabled())
+    if (!is_scheduler_enabled())
     {
         return;
     }
 
-    if (auto const active = isActiveMinute(mediator_.time());
+    if (auto const active = is_active_minute(mediator_.time());
         !scheduler_set_is_active_to_ || scheduler_set_is_active_to_ != active)
     {
         tr_logAddInfo(active ? _("Time to turn on turtle mode") : _("Time to turn off turtle mode"));
         scheduler_set_is_active_to_ = active;
-        setActive(active, ChangeReason::Scheduler);
+        set_active(active, ChangeReason::Scheduler);
     }
 }
 
-void tr_session_alt_speeds::setActive(bool active, ChangeReason reason)
+void tr_session_alt_speeds::set_active(bool active, ChangeReason reason)
 {
     if (is_active_ != active)
     {
         is_active_ = active;
-        mediator_.isActiveChanged(is_active_, reason);
+        mediator_.is_active_changed(is_active_, reason);
     }
 }
 
-[[nodiscard]] bool tr_session_alt_speeds::isActiveMinute(time_t time) const noexcept
+[[nodiscard]] bool tr_session_alt_speeds::is_active_minute(time_t time) const noexcept
 {
     auto const tm = fmt::localtime(time);
 

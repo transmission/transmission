@@ -3,12 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
-#include <set>
 #include <vector>
+
+#include <small/set.hpp>
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/bitfield.h"
 #include "libtransmission/block-info.h"
 #include "libtransmission/file-piece-map.h"
 #include "libtransmission/torrent-metainfo.h"
@@ -22,14 +23,15 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
     file_pieces_.resize(n_files);
     file_pieces_.shrink_to_fit();
 
-    auto edge_pieces = std::set<tr_piece_index_t>{};
+    auto edge_pieces = small::set<tr_piece_index_t, 1024U>{};
+    edge_pieces.reserve(n_files * 2U);
 
     uint64_t offset = 0;
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
         auto const file_size = file_sizes[i];
         auto const begin_byte = offset;
-        auto const begin_piece = block_info.byteLoc(begin_byte).piece;
+        auto const begin_piece = block_info.byte_loc(begin_byte).piece;
         auto end_byte = tr_byte_index_t{};
         auto end_piece = tr_piece_index_t{};
 
@@ -39,7 +41,7 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
         {
             end_byte = offset + file_size;
             auto const final_byte = end_byte - 1;
-            auto const final_piece = block_info.byteLoc(final_byte).piece;
+            auto const final_piece = block_info.byte_loc(final_byte).piece;
             end_piece = final_piece + 1;
 
             edge_pieces.insert(final_piece);
@@ -60,16 +62,16 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
 
 void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
 {
-    auto const n = tm.fileCount();
+    auto const n = tm.file_count();
     auto file_sizes = std::vector<uint64_t>(n);
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        file_sizes[i] = tm.fileSize(i);
+        file_sizes[i] = tm.file_size(i);
     }
-    reset({ tm.totalSize(), tm.pieceSize() }, std::data(file_sizes), std::size(file_sizes));
+    reset({ tm.total_size(), tm.piece_size() }, std::data(file_sizes), std::size(file_sizes));
 }
 
-tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piece) const
+tr_file_piece_map::file_span_t tr_file_piece_map::file_span(tr_piece_index_t piece) const
 {
     constexpr auto Compare = CompareToSpan<tr_piece_index_t>{};
     auto const begin = std::begin(file_pieces_);
@@ -77,7 +79,7 @@ tr_file_piece_map::file_span_t tr_file_piece_map::fileSpan(tr_piece_index_t piec
     return { tr_piece_index_t(equal_begin - begin), tr_piece_index_t(equal_end - begin) };
 }
 
-tr_file_piece_map::file_offset_t tr_file_piece_map::fileOffset(uint64_t offset) const
+tr_file_piece_map::file_offset_t tr_file_piece_map::file_offset(uint64_t offset) const
 {
     constexpr auto Compare = CompareToSpan<uint64_t>{};
     auto const begin = std::begin(file_bytes_);
@@ -119,7 +121,7 @@ void tr_file_priorities::set(tr_file_index_t const* files, size_t n, tr_priority
     }
 }
 
-tr_priority_t tr_file_priorities::filePriority(tr_file_index_t file) const
+tr_priority_t tr_file_priorities::file_priority(tr_file_index_t file) const
 {
     TR_ASSERT(file < std::size(*fpm_));
 
@@ -131,7 +133,7 @@ tr_priority_t tr_file_priorities::filePriority(tr_file_index_t file) const
     return priorities_[file];
 }
 
-tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
+tr_priority_t tr_file_priorities::piece_priority(tr_piece_index_t piece) const
 {
     // increase priority if a file begins or ends in this piece
     // because that makes life easier for code/users using at incomplete files.
@@ -142,7 +144,7 @@ tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
     }
 
     // check the priorities of the files that touch this piece
-    if (auto const [begin_file, end_file] = fpm_->fileSpan(piece); end_file <= std::size(priorities_))
+    if (auto const [begin_file, end_file] = fpm_->file_span(piece); end_file <= std::size(priorities_))
     {
         auto const begin = std::begin(priorities_) + begin_file;
         auto const end = std::begin(priorities_) + end_file;
@@ -161,7 +163,7 @@ void tr_files_wanted::reset(tr_file_piece_map const* fpm)
 {
     fpm_ = fpm;
     wanted_ = tr_bitfield{ std::size(*fpm) };
-    wanted_.setHasAll(); // by default we want all files
+    wanted_.set_has_all(); // by default we want all files
 }
 
 void tr_files_wanted::set(tr_file_index_t file, bool wanted)
@@ -177,13 +179,13 @@ void tr_files_wanted::set(tr_file_index_t const* files, size_t n, bool wanted)
     }
 }
 
-bool tr_files_wanted::pieceWanted(tr_piece_index_t piece) const
+bool tr_files_wanted::piece_wanted(tr_piece_index_t piece) const
 {
-    if (wanted_.hasAll())
+    if (wanted_.has_all())
     {
         return true;
     }
 
-    auto const [begin, end] = fpm_->fileSpan(piece);
+    auto const [begin, end] = fpm_->file_span(piece);
     return wanted_.count(begin, end) != 0;
 }

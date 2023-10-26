@@ -8,7 +8,7 @@
 
 static NSTimeInterval const kUpdateSeconds = 1.0;
 
-@interface StatsWindowController ()
+@interface StatsWindowController ()<NSWindowRestoration>
 
 @property(nonatomic) IBOutlet NSTextField* fUploadedField;
 @property(nonatomic) IBOutlet NSTextField* fUploadedAllField;
