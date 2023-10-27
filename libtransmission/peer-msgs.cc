@@ -1712,17 +1712,17 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
         }
 
         io->read_uint32(&message_len);
-        current_message_len = message_len;
 
         // The keep-alive message is a message with zero bytes,
         // specified with the length prefix set to zero.
         // There is no message ID and no payload.
-        if (auto const is_keepalive = message_len == uint32_t{}; is_keepalive)
+        if (message_len == 0U)
         {
             logtrace(msgs, "got KeepAlive");
-            current_message_len.reset();
             return READ_NOW;
         }
+
+        current_message_len = message_len;
     }
 
     // read <message ID>
@@ -1744,7 +1744,6 @@ ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     auto const full_payload_len = *current_message_len - sizeof(*current_message_type);
     auto n_left = full_payload_len - std::size(current_payload);
     auto const [buf, n_this_pass] = current_payload.reserve_space(std::min(n_left, io->read_buffer_size()));
-    TR_ASSERT(n_this_pass > 0U);
     io->read_bytes(buf, n_this_pass);
     current_payload.commit_space(n_this_pass);
     n_left -= n_this_pass;
