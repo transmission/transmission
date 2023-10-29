@@ -56,7 +56,7 @@ void getopts_usage_line(tr_option const* const opt, size_t long_width, size_t sh
     auto const arg = getArgName(opt);
 
     fmt::print(
-        FMT_STRING(" {:s}{:<{}s} {:s}{:<{}s} {:<{}s}"),
+        FMT_STRING(" {:s}{:<{}s} {:s}{:<{}s} {:<{}s} "),
         std::empty(short_name) ? " "sv : "-"sv,
         short_name,
         short_width,
@@ -66,7 +66,7 @@ void getopts_usage_line(tr_option const* const opt, size_t long_width, size_t sh
         arg,
         arg_width);
 
-    auto const d_indent = short_width + long_width + arg_width + 6U;
+    auto const d_indent = short_width + long_width + arg_width + 7U;
     auto const d_width = 80U - d_indent;
 
     auto description = std::string_view{ opt->description };
