@@ -110,7 +110,7 @@ public:
         return std::empty(by_hash_);
     }
 
-    [[nodiscard]] auto get_if(std::function<bool(tr_torrent const*)> pred_in) const
+    [[nodiscard]] auto get_matching(std::function<bool(tr_torrent const*)> pred_in) const
     {
         auto const pred = [&pred_in](tr_torrent const* const tor)
         {
@@ -125,7 +125,7 @@ public:
 
     [[nodiscard]] auto get_all() const
     {
-        return get_if([](tr_torrent const*) { return true; });
+        return get_matching([](tr_torrent const*) { return true; });
     }
 
 private:

@@ -127,7 +127,8 @@ auto getTorrents(tr_session* session, tr_variant* args)
         if (sv == "recently-active"sv)
         {
             auto const cutoff = tr_time() - RecentlyActiveSeconds;
-            torrents = session->torrents().get_if([cutoff](tr_torrent const* tor) { return tor->has_changed_since(cutoff); });
+            torrents = session->torrents().get_matching([cutoff](tr_torrent const* tor)
+                                                        { return tor->has_changed_since(cutoff); });
         }
         else
         {
