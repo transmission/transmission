@@ -312,7 +312,7 @@ public:
           } }
     {
 
-        rebuildWebseeds();
+        rebuild_webseeds();
     }
 
     tr_swarm(tr_swarm&&) = delete;
@@ -428,21 +428,6 @@ public:
     [[nodiscard]] constexpr auto is_endgame() const noexcept
     {
         return is_endgame_;
-    }
-
-    void rebuildWebseeds()
-    {
-        auto const n = tor->webseed_count();
-
-        webseeds.clear();
-        webseeds.reserve(n);
-        for (size_t i = 0; i < n; ++i)
-        {
-            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
-        }
-        webseeds.shrink_to_fit();
-
-        stats.active_webseed_count = 0;
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto is_all_seeds() const noexcept
@@ -616,6 +601,21 @@ public:
     time_t lastCancel = 0;
 
 private:
+    void rebuild_webseeds()
+    {
+        auto const n = tor->webseed_count();
+
+        webseeds.clear();
+        webseeds.reserve(n);
+        for (size_t i = 0; i < n; ++i)
+        {
+            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), &tr_swarm::peer_callback_webseed, this));
+        }
+        webseeds.shrink_to_fit();
+
+        stats.active_webseed_count = 0;
+    }
+
     void add_strike(tr_peerMsgs* peer) const
     {
         tr_logAddTraceSwarm(
@@ -736,7 +736,7 @@ private:
     void on_got_metainfo()
     {
         // the webseed list may have changed...
-        rebuildWebseeds();
+        rebuild_webseeds();
 
         // some peer_msgs' progress fields may not be accurate if we
         // didn't have the metadata before now... so refresh them all...
