@@ -591,16 +591,6 @@ public:
 
     void refresh_current_dir();
 
-    [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
-    {
-        if (verify_state_ == VerifyState::Active)
-        {
-            return verify_progress_;
-        }
-
-        return {};
-    }
-
     [[nodiscard]] constexpr auto id() const noexcept
     {
         return unique_id_;
@@ -999,6 +989,7 @@ private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
+    friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
     enum class VerifyState : uint8_t
     {
@@ -1159,6 +1150,16 @@ private:
     }
 
     void set_verify_state(VerifyState state);
+
+    [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
+    {
+        if (verify_state_ == VerifyState::Active)
+        {
+            return verify_progress_;
+        }
+
+        return {};
+    }
 
     void on_metainfo_updated();
 
