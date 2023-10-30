@@ -356,7 +356,7 @@ public:
         }
     }
 
-    [[nodiscard]] uint16_t countActiveWebseeds(uint64_t now) const noexcept
+    [[nodiscard]] uint16_t count_active_webseeds(uint64_t now) const noexcept
     {
         if (!tor->is_running() || tor->is_done())
         {
@@ -372,18 +372,6 @@ public:
     [[nodiscard]] TR_CONSTEXPR20 auto peerCount() const noexcept
     {
         return std::size(peers);
-    }
-
-    void stop()
-    {
-        auto const lock = unique_lock();
-
-        is_running = false;
-        remove_all_peers();
-        for (auto& [sockaddr, peer_info] : connectable_pool)
-        {
-            peer_info.destroy_handshake();
-        }
     }
 
     void remove_peer(tr_peerMsgs* peer)
@@ -642,6 +630,18 @@ public:
     time_t lastCancel = 0;
 
 private:
+    void stop()
+    {
+        auto const lock = unique_lock();
+
+        is_running = false;
+        remove_all_peers();
+        for (auto& [sockaddr, peer_info] : connectable_pool)
+        {
+            peer_info.destroy_handshake();
+        }
+    }
+
     static void maybe_send_cancel_request(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)
     {
         auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
@@ -1557,7 +1557,7 @@ tr_swarm_stats tr_swarmGetStats(tr_swarm const* const swarm)
     auto& stats = swarm->stats;
     stats.active_peer_count[TR_UP] = count_active_peers(TR_UP);
     stats.active_peer_count[TR_DOWN] = count_active_peers(TR_DOWN);
-    stats.active_webseed_count = swarm->countActiveWebseeds(tr_time_msec());
+    stats.active_webseed_count = swarm->count_active_webseeds(tr_time_msec());
     return stats;
 }
 
