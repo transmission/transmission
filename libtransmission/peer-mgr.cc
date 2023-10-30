@@ -472,13 +472,6 @@ public:
         return peer_info;
     }
 
-    void mark_peer_as_seed(tr_peer_info& peer_info)
-    {
-        tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", peer_info.display_name()));
-        peer_info.set_seed();
-        mark_all_seeds_flag_dirty();
-    }
-
     static void peer_callback_webseed(tr_peer* const peer, tr_peer_event const& event, void* const vs)
     {
         TR_ASSERT(peer != nullptr);
@@ -601,6 +594,13 @@ public:
     time_t lastCancel = 0;
 
 private:
+    void mark_peer_as_seed(tr_peer_info& peer_info)
+    {
+        tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", peer_info.display_name()));
+        peer_info.set_seed();
+        mark_all_seeds_flag_dirty();
+    }
+
     void rebuild_webseeds()
     {
         auto const n = tor->webseed_count();
