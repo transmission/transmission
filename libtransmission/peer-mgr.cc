@@ -327,23 +327,15 @@ public:
         TR_ASSERT(std::empty(peers));
     }
 
-    void cancelOldRequests()
+    void cancel_old_requests()
     {
         auto const now = tr_time();
         auto const oldest = now - RequestTtlSecs;
 
         for (auto const& [block, peer] : active_requests.sentBefore(oldest))
         {
-            maybeSendCancelRequest(peer, block, nullptr);
+            maybe_send_cancel_request(peer, block, nullptr);
             active_requests.remove(block, peer);
-        }
-    }
-
-    void cancelAllRequestsForBlock(tr_block_index_t block, tr_peer const* no_notify)
-    {
-        for (auto* peer : active_requests.remove(block))
-        {
-            maybeSendCancelRequest(peer, block, no_notify);
         }
     }
 
@@ -650,13 +642,21 @@ public:
     time_t lastCancel = 0;
 
 private:
-    static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)
+    static void maybe_send_cancel_request(tr_peer* peer, tr_block_index_t block, tr_peer const* muted)
     {
         auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
         if (msgs != nullptr && msgs != muted)
         {
             peer->cancels_sent_to_peer.add(tr_time(), 1);
             msgs->cancel_block_request(block);
+        }
+    }
+
+    void cancel_all_requests_for_block(tr_block_index_t block, tr_peer const* no_notify)
+    {
+        for (auto* peer : active_requests.remove(block))
+        {
+            maybe_send_cancel_request(peer, block, no_notify);
         }
     }
 
@@ -768,7 +768,7 @@ private:
             {
                 auto* const tor = s->tor;
                 auto const loc = tor->piece_loc(event.pieceIndex, event.offset);
-                s->cancelAllRequestsForBlock(loc.block, peer);
+                s->cancel_all_requests_for_block(loc.block, peer);
                 peer->blocks_sent_to_client.add(tr_time(), 1);
                 tr_torrentGotBlock(tor, loc.block);
             }
@@ -1171,7 +1171,7 @@ void tr_peerMgr::refillUpkeep() const
 
     for (auto* const tor : torrents_)
     {
-        tor->swarm->cancelOldRequests();
+        tor->swarm->cancel_old_requests();
         tor->swarm->remove_inactive_peer_info();
     }
 }
