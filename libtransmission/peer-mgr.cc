@@ -418,30 +418,16 @@ public:
         TR_ASSERT(stats.peer_count == 0);
     }
 
-    void updateEndgame()
+    void update_endgame()
     {
         /* we consider ourselves to be in endgame if the number of bytes
            we've got requested is >= the number of bytes left to download */
         is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->left_until_done();
     }
 
-    [[nodiscard]] constexpr auto isEndgame() const noexcept
+    [[nodiscard]] constexpr auto is_endgame() const noexcept
     {
         return is_endgame_;
-    }
-
-    void addStrike(tr_peerMsgs* peer) const
-    {
-        tr_logAddTraceSwarm(
-            this,
-            fmt::format("increasing peer {} strike count to {}", peer->display_name(), peer->strikes + 1));
-
-        if (++peer->strikes >= MaxBadPiecesPerPeer)
-        {
-            peer->peer_info->ban();
-            peer->do_purge = true;
-            tr_logAddTraceSwarm(this, fmt::format("banning peer {}", peer->display_name()));
-        }
     }
 
     void rebuildWebseeds()
@@ -630,6 +616,20 @@ public:
     time_t lastCancel = 0;
 
 private:
+    void add_strike(tr_peerMsgs* peer) const
+    {
+        tr_logAddTraceSwarm(
+            this,
+            fmt::format("increasing peer {} strike count to {}", peer->display_name(), peer->strikes + 1));
+
+        if (++peer->strikes >= MaxBadPiecesPerPeer)
+        {
+            peer->peer_info->ban();
+            peer->do_purge = true;
+            tr_logAddTraceSwarm(this, fmt::format("banning peer {}", peer->display_name()));
+        }
+    }
+
     void stop()
     {
         auto const lock = unique_lock();
@@ -726,7 +726,7 @@ private:
                         peer->display_name(),
                         piece,
                         peer->strikes + 1));
-                addStrike(peer);
+                add_strike(peer);
             }
         }
 
@@ -1109,7 +1109,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] bool isEndgame() const override
         {
-            return swarm_->isEndgame();
+            return swarm_->is_endgame();
         }
 
         [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const override
@@ -1148,7 +1148,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         tr_peer const* const peer_;
     };
 
-    torrent->swarm->updateEndgame();
+    torrent->swarm->update_endgame();
     auto const mediator = MediatorImpl{ torrent, peer };
     return Wishlist{ mediator }.next(numwant);
 }
