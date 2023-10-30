@@ -94,7 +94,7 @@ $image-play-circle-idle: '../img/play-circle-idle.svg';
     --color-fg-primary: #{$dark-mode-white};
     --color-fg-secondary: #{$nice-grey};
     --color-fg-on-popup: #{$nice-grey};
-    --color-fg-disabled: #{color.mix($dark-mode-white, $dark-mode-black, 50%)};
+    --color-fg-disabled: #808088;
     --color-bg-warn: #cf6679;
     --color-fg-warn: #{$dark-mode-black};
     --color-border: #{$dark-mode-white};
