@@ -939,9 +939,9 @@ public:
         : session{ session_in }
         , torrents_{ torrents }
         , handshake_mediator_{ *session, timer_maker, torrents }
-        , bandwidth_timer_{ timer_maker.create([this]() { bandwidthPulse(); }) }
-        , rechoke_timer_{ timer_maker.create([this]() { rechokePulseMarshall(); }) }
-        , refill_upkeep_timer_{ timer_maker.create([this]() { refillUpkeep(); }) }
+        , bandwidth_timer_{ timer_maker.create([this]() { bandwidth_pulse(); }) }
+        , rechoke_timer_{ timer_maker.create([this]() { rechoke_pulse_marshall(); }) }
+        , refill_upkeep_timer_{ timer_maker.create([this]() { refill_upkeep(); }) }
         , blocklist_tag_{ session->blocklist_changed_.observe([this]() { on_blocklist_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthTimerPeriod);
@@ -970,12 +970,6 @@ public:
         rechoke_timer_->set_interval(100ms);
     }
 
-    void bandwidthPulse();
-    void rechokePulse() const;
-    void reconnectPulse();
-    void refillUpkeep() const;
-    void make_new_peer_connections();
-
     [[nodiscard]] tr_swarm* get_existing_swarm(tr_sha1_digest_t const& hash) const
     {
         auto* const tor = torrents_.get(hash);
@@ -989,9 +983,15 @@ public:
     HandshakeMediator handshake_mediator_;
 
 private:
-    void rechokePulseMarshall()
+    void bandwidth_pulse();
+    void make_new_peer_connections();
+    void rechoke_pulse() const;
+    void reconnect_pulse();
+    void refill_upkeep() const;
+
+    void rechoke_pulse_marshall()
     {
-        rechokePulse();
+        rechoke_pulse();
         rechoke_timer_->set_interval(RechokePeriod);
     }
 
@@ -1166,7 +1166,7 @@ size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* tor, tr_peer const*
     return tor->swarm->active_requests.count(peer);
 }
 
-void tr_peerMgr::refillUpkeep() const
+void tr_peerMgr::refill_upkeep() const
 {
     auto const lock = unique_lock();
 
@@ -1989,7 +1989,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 } // namespace rechoke_uploads_helpers
 } // namespace
 
-void tr_peerMgr::rechokePulse() const
+void tr_peerMgr::rechoke_pulse() const
 {
     using namespace update_interest_helpers;
     using namespace rechoke_uploads_helpers;
@@ -2179,7 +2179,7 @@ void enforceSessionPeerLimit(size_t global_peer_limit, tr_torrents& torrents)
 } // namespace disconnect_helpers
 } // namespace
 
-void tr_peerMgr::reconnectPulse()
+void tr_peerMgr::reconnect_pulse()
 {
     using namespace disconnect_helpers;
 
@@ -2238,7 +2238,7 @@ void pumpAllPeers(tr_peerMgr* mgr)
 } // namespace bandwidth_helpers
 } // namespace
 
-void tr_peerMgr::bandwidthPulse()
+void tr_peerMgr::bandwidth_pulse()
 {
     using namespace bandwidth_helpers;
 
@@ -2257,7 +2257,7 @@ void tr_peerMgr::bandwidthPulse()
         tr_torrentMagnetDoIdleWork(tor);
     }
 
-    reconnectPulse();
+    reconnect_pulse();
 }
 
 // ---
