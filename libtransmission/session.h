@@ -46,7 +46,6 @@
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h" // tr_socket_t
-#include "libtransmission/observable.h"
 #include "libtransmission/open-files.h"
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/quark.h"
@@ -488,10 +487,15 @@ public:
 
     // blocklist
 
+    [[nodiscard]] constexpr auto& blocklist() noexcept
+    {
+        return blocklists_;
+    }
+
     void set_blocklist_enabled(bool is_enabled)
     {
         settings_.blocklist_enabled = is_enabled;
-        blocklists_.set_enabled(is_enabled);
+        blocklist().set_enabled(is_enabled);
     }
 
     [[nodiscard]] auto blocklist_enabled() const noexcept
@@ -507,11 +511,6 @@ public:
     void setBlocklistUrl(std::string_view url)
     {
         settings_.blocklist_url = url;
-    }
-
-    [[nodiscard]] constexpr auto& blocklist() noexcept
-    {
-        return blocklists_;
     }
 
     // RPC

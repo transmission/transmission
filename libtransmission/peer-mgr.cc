@@ -923,7 +923,11 @@ public:
     using OutboundCandidates = small::
         max_size_vector<std::pair<tr_torrent_id_t, tr_socket_address>, OutboundCandidateListCapacity>;
 
-    explicit tr_peerMgr(tr_session* session_in, libtransmission::TimerMaker& timer_maker, tr_torrents& torrents, libtransmission::Blocklists& blocklist)
+    explicit tr_peerMgr(
+        tr_session* session_in,
+        libtransmission::TimerMaker& timer_maker,
+        tr_torrents& torrents,
+        libtransmission::Blocklists& blocklist)
         : session{ session_in }
         , torrents_{ torrents }
         , blocklist_{ blocklist }
