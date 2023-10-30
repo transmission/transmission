@@ -9,8 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
 #include <cstddef> // size_t
 #include <ctime>
+#include <functional>
+#include <iterator>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -107,9 +110,22 @@ public:
         return std::empty(by_hash_);
     }
 
-    [[nodiscard]] constexpr auto const& sorted_by_id() const noexcept
+    [[nodiscard]] auto get_if(std::function<bool(tr_torrent const*)> pred_in) const
     {
-        return by_id_;
+        auto const pred = [&pred_in](tr_torrent const* const tor)
+        {
+            return tor != nullptr && pred_in(tor);
+        };
+
+        auto vec = std::vector<tr_torrent*>{};
+        vec.reserve(size());
+        std::copy_if(std::begin(by_id_), std::end(by_id_), std::back_inserter(vec), pred);
+        return vec;
+    }
+
+    [[nodiscard]] auto get_all() const
+    {
+        return get_if([](tr_torrent const*) { return true; });
     }
 
 private:

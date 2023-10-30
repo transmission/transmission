@@ -498,9 +498,9 @@ constexpr struct
 } CompareTorrentByQueuePosition{};
 
 #ifdef TR_ENABLE_ASSERTS
-bool queueIsSequenced(tr_session const* session)
+bool queueIsSequenced(tr_session const* const session)
 {
-    auto torrents = session->getAllTorrents();
+    auto torrents = session->torrents().get_all();
     std::sort(
         std::begin(torrents),
         std::end(torrents),
