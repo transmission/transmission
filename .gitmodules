@@ -54,6 +54,6 @@
 	path = third-party/rapidjson
 	url = https://github.com/transmission/rapidjson.git
 	fetchRecurseSubmodules = false
-[submodule "third-party/cmake-modules"]
-    path = third-party/cmake-modules
-    url = https://github.com/rpavlik/cmake-modules.git
+[submodule "third-party/rapavlik-cmake-modules"]
+	path = third-party/rapavlik-cmake-modules
+	url = https://github.com/transmission/rpavlik-cmake-modules.git
