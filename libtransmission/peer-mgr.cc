@@ -573,8 +573,6 @@ public:
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
-    time_t lastCancel = 0;
-
 private:
     void mark_peer_as_seed(tr_peer_info& peer_info)
     {
