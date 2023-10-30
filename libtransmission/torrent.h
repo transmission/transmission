@@ -544,8 +544,6 @@ public:
 
     /// METAINFO - PIECE CHECKSUMS
 
-    [[nodiscard]] bool check_piece(tr_piece_index_t piece);
-
     [[nodiscard]] bool ensure_piece_is_checked(tr_piece_index_t piece);
 
     void init_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
@@ -1084,6 +1082,8 @@ private:
     {
         return checked_pieces_.test(piece);
     }
+
+    [[nodiscard]] bool check_piece(tr_piece_index_t piece);
 
     [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
     {
