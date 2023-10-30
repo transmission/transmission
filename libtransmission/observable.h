@@ -78,7 +78,7 @@ public:
         TR_ASSERT(std::empty(observers_));
     }
 
-    auto observe(Observer observer)
+    [[nodiscard]] auto observe(Observer observer)
     {
         auto const key = next_key_++;
         observers_.emplace(key, std::move(observer));
