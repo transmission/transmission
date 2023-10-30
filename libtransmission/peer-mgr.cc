@@ -569,7 +569,6 @@ public:
     // therefore references to elements within cannot invalidate
     Pool incoming_pool;
     Pool connectable_pool;
-    Pool graveyard_pool;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
@@ -898,6 +897,10 @@ private:
     static auto constexpr RequestTtlSecs = int{ 90 };
 
     std::array<libtransmission::ObserverTag, 8> const tags_;
+
+    // tr_peerMsgs hold pointers to the items in these containers,
+    // therefore references to elements within cannot invalidate
+    Pool graveyard_pool;
 
     mutable std::optional<bool> pool_is_all_seeds_;
 
