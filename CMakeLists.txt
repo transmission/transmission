@@ -20,7 +20,7 @@ endif()
 
 project(transmission)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 set(CMAKE_MACOSX_RPATH ON)
 
@@ -142,11 +142,11 @@ else()
 endif()
 string(APPEND TR_PEER_ID_PREFIX "-")
 
-set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
+set(TR_VCS_REVISION_FILE "${PROJECT_SOURCE_DIR}/REVISION")
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/third-party/rapavlik-cmake-modules")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/third-party/rapavlik-cmake-modules")
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
+if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
 
@@ -457,7 +457,7 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
-set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
+set(THIRD_PARTY_DIR ${PROJECT_SOURCE_DIR}/third-party)
 
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
@@ -530,7 +530,7 @@ tr_add_external_auto_library(B64 libb64 b64
     CMAKE_ARGS
         -DLIBB64_SHARED:BOOL=OFF)
 
-set(TR_WEB_ASSETS ${CMAKE_SOURCE_DIR}/web/public_html)
+set(TR_WEB_ASSETS ${PROJECT_SOURCE_DIR}/web/public_html)
 if(NOT ${REBUILD_WEB} STREQUAL "OFF")
     find_program(NPM npm)
     if ("${NPM}" STREQUAL "NPM-NOTFOUND")
@@ -830,7 +830,7 @@ if(NOT TR_STABLE_RELEASE AND NOT "${TR_VCS_REVISION}" STREQUAL "")
     string(APPEND CPACK_SOURCE_PACKAGE_FILE_NAME "+r${TR_VCS_REVISION}")
 endif()
 list(APPEND CPACK_SOURCE_IGNORE_FILES
-    "${CMAKE_BINARY_DIR}"
+    "${PROJECT_BINARY_DIR}"
     "[.]git"
     "node_modules")
 
@@ -839,17 +839,17 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES
 if(GIT_FOUND)
     execute_process(
         COMMAND "${GIT_EXECUTABLE}" rev-parse --show-toplevel
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         OUTPUT_VARIABLE TR_GIT_ROOT
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(TR_GIT_ROOT AND IS_DIRECTORY "${TR_GIT_ROOT}/.git")
-        configure_file("${CMAKE_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
+        configure_file("${PROJECT_SOURCE_DIR}/extras/pre-commit" "${TR_GIT_ROOT}/.git/hooks/pre-commit" COPYONLY)
         add_custom_target(check-format
-            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh" --check
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            COMMAND "${PROJECT_SOURCE_DIR}/code_style.sh" --check
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         add_custom_target(format
-            COMMAND "${CMAKE_SOURCE_DIR}/code_style.sh"
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+            COMMAND "${PROJECT_SOURCE_DIR}/code_style.sh"
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}")
         set_property(
             TARGET check-format format
             PROPERTY FOLDER "utility")
