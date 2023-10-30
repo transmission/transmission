@@ -128,10 +128,11 @@ auto getTorrents(tr_session* session, tr_variant* args)
         {
             time_t const cutoff = tr_time() - RecentlyActiveSeconds;
 
-            torrents.reserve(std::size(session->torrents()));
+            auto const& by_id = session->torrents().sorted_by_id();
+            torrents.reserve(std::size(by_id));
             std::copy_if(
-                std::begin(session->torrents()),
-                std::end(session->torrents()),
+                std::begin(by_id),
+                std::end(by_id),
                 std::back_inserter(torrents),
                 [&cutoff](auto const* tor) { return tor->has_changed_since(cutoff); });
         }
@@ -146,8 +147,8 @@ auto getTorrents(tr_session* session, tr_variant* args)
     }
     else // all of them
     {
-        torrents.reserve(std::size(session->torrents()));
-        std::copy(std::begin(session->torrents()), std::end(session->torrents()), std::back_inserter(torrents));
+        auto const& by_id = session->torrents().sorted_by_id();
+        torrents = std::vector<tr_torrent*>{ std::begin(by_id), std::end(by_id) };
     }
 
     return torrents;
@@ -787,7 +788,7 @@ char const* torrentGet(tr_session* session, tr_variant* args_in, tr_variant* arg
             tr_variant* names = tr_variantListAddList(list, std::size(keys));
             for (auto const& key : keys)
             {
-                tr_variantListAddQuark(names, key);
+                tr_variantListAddStrView(names, tr_quark_get_string_view(key));
             }
         }
 

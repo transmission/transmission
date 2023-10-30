@@ -64,8 +64,6 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme_incomplete_
 
 void tr_torrentChangeMyPort(tr_torrent* tor);
 
-[[nodiscard]] tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
-
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
 
 [[nodiscard]] tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file);
@@ -1007,7 +1005,6 @@ private:
     friend tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t file);
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
-    friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
 
     enum class VerifyState : uint8_t

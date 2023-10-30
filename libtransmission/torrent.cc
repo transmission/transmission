@@ -98,13 +98,6 @@ char const* tr_torrentName(tr_torrent const* tor)
     return tor != nullptr ? tor->name().c_str() : "";
 }
 
-uint64_t tr_torrentTotalSize(tr_torrent const* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    return tor->total_size();
-}
-
 tr_torrent_id_t tr_torrentId(tr_torrent const* tor)
 {
     return tor != nullptr ? tor->id() : -1;
@@ -128,19 +121,6 @@ tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
     return magnet_link == nullptr ? nullptr : session->torrents().get(magnet_link);
-}
-
-tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& obfuscated_hash)
-{
-    for (auto* const tor : session->torrents())
-    {
-        if (tor->obfuscated_hash == obfuscated_hash)
-        {
-            return tor;
-        }
-    }
-
-    return nullptr;
 }
 
 bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename)
@@ -419,7 +399,7 @@ void torrentCallScript(tr_torrent const* tor, std::string const& script)
         { "TR_TORRENT_HASH"sv, tor->info_hash_string() },
         { "TR_TORRENT_ID"sv, id_str },
         { "TR_TORRENT_LABELS"sv, labels_str },
-        { "TR_TORRENT_NAME"sv, tr_torrentName(tor) },
+        { "TR_TORRENT_NAME"sv, tor->name() },
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
@@ -1541,7 +1521,7 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     TR_ASSERT(tr_isTorrent(tor));
 
     auto ret = tr_torrent_view{};
-    ret.name = tr_torrentName(tor);
+    ret.name = tor->name().c_str();
     ret.hash_string = tor->info_hash_string().c_str();
     ret.comment = tor->comment().c_str();
     ret.creator = tor->creator().c_str();

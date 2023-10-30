@@ -818,7 +818,7 @@ public:
 
     [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
     {
-        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        TR_ASSERT(tr_address::is_valid(type));
         return global_ip_cache_->has_ip_protocol(type);
     }
 
@@ -826,7 +826,7 @@ public:
 
     [[nodiscard]] std::optional<tr_address> global_address(tr_address_type type) const noexcept
     {
-        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        TR_ASSERT(tr_address::is_valid(type));
         return global_ip_cache_->global_addr(type);
     }
 
@@ -837,7 +837,7 @@ public:
 
     [[nodiscard]] std::optional<tr_address> global_source_address(tr_address_type type) const noexcept
     {
-        TR_ASSERT(type == TR_AF_INET || type == TR_AF_INET6);
+        TR_ASSERT(tr_address::is_valid(type));
         return global_ip_cache_->global_source_addr(type);
     }
 
