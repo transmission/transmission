@@ -145,10 +145,10 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 set(${CMAKE_MATCH_1} ${CMAKE_MATCH_3} CACHE INTERNAL "")
             endif()
         endforeach()
-        add_subdirectory("${PROJECT_SOURCE_DIR}/third-party/${DIRNAME}" "${PROJECT_BINARY_DIR}/third-party/${DIRNAME}.bld")
+        add_subdirectory("${TR_THIRD_PARTY_SOURCE_DIR}/${DIRNAME}" "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld")
     else()
         set(${ID}_UPSTREAM_TARGET ${LIBNAME})
-        set(${ID}_PREFIX "${PROJECT_BINARY_DIR}/third-party/${DIRNAME}.bld/pfx")
+        set(${ID}_PREFIX "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld/pfx")
 
         set(${ID}_INCLUDE_DIR "${${ID}_PREFIX}/include"
             CACHE INTERNAL "")
@@ -169,8 +169,8 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
 
         ExternalProject_Add(
             ${${ID}_UPSTREAM_TARGET}
-            PREFIX "${PROJECT_BINARY_DIR}/third-party/${DIRNAME}.bld"
-            SOURCE_DIR "${PROJECT_SOURCE_DIR}/third-party/${DIRNAME}"
+            PREFIX "${TR_THIRD_PARTY_BINARY_DIR}/${DIRNAME}.bld"
+            SOURCE_DIR "${TR_THIRD_PARTY_SOURCE_DIR}/${DIRNAME}"
             INSTALL_DIR "${${ID}_PREFIX}"
             CMAKE_ARGS
                 -Wno-dev # We don't want to be warned over unused variables
@@ -188,7 +188,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 ${_TAEAL_ARG_CMAKE_ARGS}
             BUILD_BYPRODUCTS "${${ID}_LIBRARY}")
 
-        set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "third-party")
+        set_property(TARGET ${${ID}_UPSTREAM_TARGET} PROPERTY FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
         # Imported target (below) requires include directories to be present at configuration time
         file(MAKE_DIRECTORY ${${ID}_INCLUDE_DIRS})

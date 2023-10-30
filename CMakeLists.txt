@@ -20,7 +20,13 @@ endif()
 
 project(transmission)
 
-list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+set(TR_THIRD_PARTY_DIR_NAME third-party)
+set(TR_THIRD_PARTY_SOURCE_DIR ${PROJECT_SOURCE_DIR}/${TR_THIRD_PARTY_DIR_NAME})
+set(TR_THIRD_PARTY_BINARY_DIR ${PROJECT_BINARY_DIR}/${TR_THIRD_PARTY_DIR_NAME})
+
+list(APPEND CMAKE_MODULE_PATH
+    "${PROJECT_SOURCE_DIR}/cmake"
+    "${TR_THIRD_PARTY_SOURCE_DIR}/rapavlik-cmake-modules")
 
 set(CMAKE_MACOSX_RPATH ON)
 
@@ -144,8 +150,6 @@ string(APPEND TR_PEER_ID_PREFIX "-")
 
 set(TR_VCS_REVISION_FILE "${PROJECT_SOURCE_DIR}/REVISION")
 
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/third-party/rapavlik-cmake-modules")
-
 if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
@@ -204,7 +208,8 @@ if(WIN32)
     endforeach()
 endif()
 
-set(CMAKE_FOLDER "third-party")
+set(CMAKE_FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
+
 find_package(FastFloat)
 find_package(Fmt)
 find_package(RapidJSON)
@@ -457,8 +462,6 @@ if(ENABLE_MAC)
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
 endif()
 
-set(THIRD_PARTY_DIR ${PROJECT_SOURCE_DIR}/third-party)
-
 if(WIN32 AND NOT MINGW)
     set(DEFLATE_LIB_NAME deflatestatic)
 else()
@@ -508,7 +511,7 @@ target_compile_definitions(miniupnpc::libminiupnpc
         SYSTEM_MINIUPNP
         $<$<VERSION_LESS:${MINIUPNPC_VERSION},1.7>:MINIUPNPC_API_VERSION=${MINIUPNPC_API_VERSION}>) # API version macro was only added in 1.7
 
-add_subdirectory(third-party/wildmat)
+add_subdirectory(${TR_THIRD_PARTY_SOURCE_DIR}/wildmat)
 
 tr_add_external_auto_library(DHT dht dht
     TARGET dht::dht)

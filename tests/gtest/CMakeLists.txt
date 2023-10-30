@@ -1,16 +1,18 @@
+set(GTEST_ROOT_DIR ${TR_THIRD_PARTY_SOURCE_DIR}/googletest/googletest)
+
 add_library(gtestall STATIC)
 
 target_sources(gtestall
     PRIVATE
-        ${THIRD_PARTY_DIR}/googletest/googletest/src/gtest-all.cc
-        ${THIRD_PARTY_DIR}/googletest/googletest/src/gtest_main.cc)
+        ${GTEST_ROOT_DIR}/src/gtest-all.cc
+        ${GTEST_ROOT_DIR}/src/gtest_main.cc)
 
 set_property(
     TARGET gtestall
-    PROPERTY FOLDER "third-party")
+    PROPERTY FOLDER "${TR_THIRD_PARTY_DIR_NAME}")
 
 target_include_directories(gtestall SYSTEM
     PRIVATE
-        ${THIRD_PARTY_DIR}/googletest/googletest
+        ${GTEST_ROOT_DIR}
     PUBLIC
-        ${THIRD_PARTY_DIR}/googletest/googletest/include)
+        ${GTEST_ROOT_DIR}/include)
