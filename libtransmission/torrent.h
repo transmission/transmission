@@ -544,11 +544,6 @@ public:
 
     /// METAINFO - PIECE CHECKSUMS
 
-    [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
-    {
-        return checked_pieces_.test(piece);
-    }
-
     [[nodiscard]] bool check_piece(tr_piece_index_t piece);
 
     [[nodiscard]] bool ensure_piece_is_checked(tr_piece_index_t piece);
@@ -1084,6 +1079,11 @@ private:
         uint64_t timestamp_msec_ = {};
         tr_bytes_per_second_t speed_byps_ = {};
     };
+
+    [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
+    {
+        return checked_pieces_.test(piece);
+    }
 
     [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
     {
