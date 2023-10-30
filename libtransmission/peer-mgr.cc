@@ -472,24 +472,6 @@ public:
         return peer_info;
     }
 
-    static void peer_callback_webseed(tr_peer* const peer, tr_peer_event const& event, void* const vs)
-    {
-        TR_ASSERT(peer != nullptr);
-        auto* s = static_cast<tr_swarm*>(vs);
-        auto const lock = s->unique_lock();
-
-        switch (event.type)
-        {
-        case tr_peer_event::Type::ClientGotPieceData:
-            on_client_got_piece_data(s->tor, event.length, tr_time());
-            break;
-
-        default:
-            peer_callback_common(peer, event, s);
-            break;
-        }
-    }
-
     static void peer_callback_bt(tr_peerMsgs* const msgs, tr_peer_event const& event, void* const vs)
     {
         TR_ASSERT(msgs != nullptr);
@@ -599,6 +581,24 @@ private:
         tr_logAddTraceSwarm(this, fmt::format("marking peer {} as a seed", peer_info.display_name()));
         peer_info.set_seed();
         mark_all_seeds_flag_dirty();
+    }
+
+    static void peer_callback_webseed(tr_peer* const peer, tr_peer_event const& event, void* const vs)
+    {
+        TR_ASSERT(peer != nullptr);
+        auto* s = static_cast<tr_swarm*>(vs);
+        auto const lock = s->unique_lock();
+
+        switch (event.type)
+        {
+        case tr_peer_event::Type::ClientGotPieceData:
+            on_client_got_piece_data(s->tor, event.length, tr_time());
+            break;
+
+        default:
+            peer_callback_common(peer, event, s);
+            break;
+        }
     }
 
     void rebuild_webseeds()
