@@ -126,15 +126,9 @@ auto getTorrents(tr_session* session, tr_variant* args)
     {
         if (sv == "recently-active"sv)
         {
-            time_t const cutoff = tr_time() - RecentlyActiveSeconds;
-
-            auto const& by_id = session->torrents().sorted_by_id();
-            torrents.reserve(std::size(by_id));
-            std::copy_if(
-                std::begin(by_id),
-                std::end(by_id),
-                std::back_inserter(torrents),
-                [&cutoff](auto const* tor) { return tor != nullptr && tor->has_changed_since(cutoff); });
+            auto const cutoff = tr_time() - RecentlyActiveSeconds;
+            torrents = session->torrents().get_matching([cutoff](tr_torrent const* tor)
+                                                        { return tor->has_changed_since(cutoff); });
         }
         else
         {
@@ -147,13 +141,7 @@ auto getTorrents(tr_session* session, tr_variant* args)
     }
     else // all of them
     {
-        auto const& by_id = session->torrents().sorted_by_id();
-        torrents.reserve(std::size(by_id));
-        std::copy_if(
-            std::begin(by_id),
-            std::end(by_id),
-            std::back_inserter(torrents),
-            [](auto const* tor) { return tor != nullptr; });
+        torrents = session->torrents().get_all();
     }
 
     return torrents;

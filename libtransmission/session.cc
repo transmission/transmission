@@ -1345,7 +1345,7 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     // Close the torrents in order of most active to least active
     // so that the most important announce=stopped events are
     // fired out first...
-    auto torrents = getAllTorrents();
+    auto torrents = torrents_.get_all();
     std::sort(
         std::begin(torrents),
         std::end(torrents),

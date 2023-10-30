@@ -795,11 +795,6 @@ public:
         return settings_.idle_seeding_limit_minutes;
     }
 
-    [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
-    {
-        return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
-    }
-
     /*module_visible*/
 
     auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
