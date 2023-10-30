@@ -144,6 +144,8 @@ string(APPEND TR_PEER_ID_PREFIX "-")
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/third-party/cmake-modules")
+
 if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
