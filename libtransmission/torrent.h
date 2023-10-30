@@ -544,13 +544,6 @@ public:
 
     /// METAINFO - PIECE CHECKSUMS
 
-    [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
-    {
-        return checked_pieces_.test(piece);
-    }
-
-    [[nodiscard]] bool check_piece(tr_piece_index_t piece);
-
     [[nodiscard]] bool ensure_piece_is_checked(tr_piece_index_t piece);
 
     void init_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
@@ -597,16 +590,6 @@ public:
     void set_download_dir(std::string_view path, bool is_new_torrent = false);
 
     void refresh_current_dir();
-
-    [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
-    {
-        if (verify_state_ == VerifyState::Active)
-        {
-            return verify_progress_;
-        }
-
-        return {};
-    }
 
     [[nodiscard]] constexpr auto id() const noexcept
     {
@@ -1006,6 +989,7 @@ private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
+    friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
     enum class VerifyState : uint8_t
     {
@@ -1085,6 +1069,13 @@ private:
         tr_bytes_per_second_t speed_byps_ = {};
     };
 
+    [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
+    {
+        return checked_pieces_.test(piece);
+    }
+
+    [[nodiscard]] bool check_piece(tr_piece_index_t piece);
+
     [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
     {
         auto const mode = idle_limit_mode();
@@ -1159,6 +1150,16 @@ private:
     }
 
     void set_verify_state(VerifyState state);
+
+    [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
+    {
+        if (verify_state_ == VerifyState::Active)
+        {
+            return verify_progress_;
+        }
+
+        return {};
+    }
 
     void on_metainfo_updated();
 

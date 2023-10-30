@@ -144,6 +144,8 @@ string(APPEND TR_PEER_ID_PREFIX "-")
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/third-party/rapavlik-cmake-modules")
+
 if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
@@ -153,11 +155,9 @@ if(NOT "$ENV{JENKINS_URL}" STREQUAL "" AND NOT "$ENV{GIT_COMMIT}" STREQUAL "")
 elseif(NOT "$ENV{TEAMCITY_PROJECT_NAME}" STREQUAL "" AND NOT "$ENV{BUILD_VCS_NUMBER}" STREQUAL "")
     set(TR_VCS_REVISION "$ENV{BUILD_VCS_NUMBER}")
 elseif(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} rev-list --max-count=1 HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE TR_VCS_REVISION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    include(GetGitRevisionDescription)
+    get_git_head_revision(TR_REFSPEC TR_VCS_REVISION)
+    unset(TR_REFSPEC)
 endif()
 
 if("${TR_VCS_REVISION}" STREQUAL "" AND EXISTS "${TR_VCS_REVISION_FILE}")

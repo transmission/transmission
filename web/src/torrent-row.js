@@ -16,7 +16,7 @@ const TorrentRendererHelper = {
     if (eta < 0 || eta >= 999 * 60 * 60) {
       return '';
     }
-    return `ETA: ${Formatter.timeInterval(eta)}`;
+    return `ETA: ${Formatter.timeInterval(eta, 1)}`;
   },
   formatLabels: (t, label) => {
     const labels = t.getLabels();
@@ -209,7 +209,7 @@ export class TorrentRendererFull {
       if (eta < 0 || eta >= 999 * 60 * 60 /* arbitrary */) {
         c.push('remaining time unknown');
       } else {
-        c.push(Formatter.timeInterval(t.getETA()), ' remaining');
+        c.push(Formatter.timeInterval(t.getETA(), 1), ' remaining');
       }
     }
 

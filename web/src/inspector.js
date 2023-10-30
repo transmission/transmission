@@ -539,7 +539,17 @@ export class Inspector extends EventTarget {
       const get = (t) => t.getDateAdded();
       const first = get(torrents[0]);
       string = torrents.every((t) => get(t) === first)
-        ? new Date(first * 1000).toDateString()
+        ? new Date(first * 1000).toLocaleString(navigator.language, {
+            day: '2-digit',
+            hour: '2-digit',
+            hour12: false,
+            minute: '2-digit',
+            month: 'short',
+            second: '2-digit',
+            timeZoneName: 'short',
+            weekday: 'short',
+            year: 'numeric',
+          })
         : mixed;
     }
     setTextContent(e.info.dateAdded, string);
