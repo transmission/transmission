@@ -46,7 +46,7 @@ For building transmission-daemon you will need basic dependencies:
 ```bash
 $ sudo apt install build-essential cmake git libcurl4-openssl-dev libssl-dev
 ```
-These packages are not mandatory for a working binary. Transmission brings its own libraries if they aren't installed.
+These packages are not mandatory for a working binary. Transmission brings its own libraries if they aren't installed, except for `libsystemd-dev`.
 ```bash
 $ sudo apt install libb64-dev libdeflate-dev libevent-dev libminiupnpc-dev libnatpmp-dev libpsl-dev libsystemd-dev
 ```
