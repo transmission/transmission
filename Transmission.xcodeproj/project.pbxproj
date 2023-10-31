@@ -17,6 +17,7 @@
 		2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB1 /* torrents.cc */; };
 		2B9BA6C508B488FE586A0AB2 /* torrents.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB3 /* torrents.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
+		37D5E15E2AEFE47B00D1ADB3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
@@ -159,7 +160,7 @@
 		A24621410C769D0900088E81 /* session-thread.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* session-thread.h */; };
 		A24621420C769D0900088E81 /* session-thread.cc in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* session-thread.cc */; };
 		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files to Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A254853C0EB66CD4004539DA /* codelength.h in Headers */ = {isa = PBXBuildFile; fileRef = A25485390EB66CBB004539DA /* codelength.h */; };
 		A256588D0A9A695400E8A03B /* MessageWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A256588B0A9A695400E8A03B /* MessageWindowController.mm */; };
 		A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A257C1800CAD3003004E121C /* PeerTableView.mm */; };
@@ -248,7 +249,7 @@
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2EA52311686AC0D00180493 /* quark.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2EA522F1686AC0D00180493 /* quark.cc */; };
 		A2EA52321686AC0D00180493 /* quark.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EA52301686AC0D00180493 /* quark.h */; };
-		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in Copy Files to Wrapper */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.mm */; };
 		A2EE726F14DCCC950093C99A /* port-forwarding-natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EE726E14DCCC950093C99A /* port-forwarding-natpmp.h */; };
 		A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */; };
@@ -256,8 +257,6 @@
 		A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BC915C5A0A100EBF632 /* GenerateThumbnailForURL.mm */; };
 		A2F35BCC15C5A0A100EBF632 /* GeneratePreviewForURL.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.mm */; };
 		A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
-		A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */; };
-		A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BE215C5A7F900EBF632 /* Foundation.framework */; };
 		A2F7CF5513035F7B0016FF10 /* URLSheetWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */; };
 		A2F7CF5F13035FFD0016FF10 /* URLSheetWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2F7CF5E13035FFD0016FF10 /* URLSheetWindowController.mm */; };
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
@@ -591,25 +590,26 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		A24F191B0A3A792300C9C145 /* Copy Files */ = {
+		A24F191B0A3A792300C9C145 /* Copy Files to Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */,
+				A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files to Frameworks */,
 			);
-			name = "Copy Files";
+			name = "Copy Files to Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		A2EB2E7615C8CF1C00FBD5B4 /* CopyFiles */ = {
+		A2EB2E7615C8CF1C00FBD5B4 /* Copy Files to Wrapper */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = Contents/Library/QuickLook;
 			dstSubfolderSpec = 1;
 			files = (
-				A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */,
+				A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in Copy Files to Wrapper */,
 			);
+			name = "Copy Files to Wrapper";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -620,7 +620,6 @@
 		0A89346B736DBCF81F3A4851 /* torrent-metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-metainfo.cc"; sourceTree = "<group>"; };
 		0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-metainfo.h"; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
 		2856E0656A49F2665D69E761 /* benc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = benc.h; sourceTree = "<group>"; };
@@ -1043,8 +1042,6 @@
 		A2EE726E14DCCC950093C99A /* port-forwarding-natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "port-forwarding-natpmp.h"; sourceTree = "<group>"; };
 		A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuickLookPlugin.qlgenerator; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
-		A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = System/Library/Frameworks/ApplicationServices.framework; sourceTree = SDKROOT; };
-		A2F35BBF15C5A0A100EBF632 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		A2F35BC515C5A0A100EBF632 /* QuickLookPlugin-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "QuickLookPlugin-Info.plist"; sourceTree = "<group>"; };
 		A2F35BC715C5A0A100EBF632 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -1052,7 +1049,6 @@
 		A2F35BCB15C5A0A100EBF632 /* GeneratePreviewForURL.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GeneratePreviewForURL.mm; sourceTree = "<group>"; };
 		A2F35BCD15C5A0A100EBF632 /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
 		A2F35BCF15C5A0A100EBF632 /* QuickLookPlugin-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "QuickLookPlugin-Prefix.pch"; sourceTree = "<group>"; };
-		A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		A2F35BE215C5A7F900EBF632 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A2F7CF5413035F7B0016FF10 /* URLSheetWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = URLSheetWindow.xib; sourceTree = "<group>"; };
 		A2F7CF5D13035FFD0016FF10 /* URLSheetWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = URLSheetWindowController.h; sourceTree = "<group>"; };
@@ -1306,9 +1302,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37D5E15E2AEFE47B00D1ADB3 /* Cocoa.framework in Frameworks */,
 				A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */,
-				A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */,
-				A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */,
 				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
 				C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */,
 				C88771B12803EE86005C7523 /* libiconv.tbd in Frameworks */,
@@ -1644,9 +1639,8 @@
 			children = (
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
-				4D3EA0A908AE13C600EA10C2 /* IOKit.framework */,
-				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+				4D3EA0A908AE13C600EA10C2 /* IOKit.framework */,
 				A2E669780F5B8E5A00B4251A /* Security.framework */,
 				A22CFB810FB66EF30009BD3E /* Carbon.framework */,
 				A221DCC7104B3660008A642D /* Quartz.framework */,
@@ -1936,9 +1930,6 @@
 				C88771A92803EE42005C7523 /* libz.tbd */,
 				A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */,
 				A2F35BE215C5A7F900EBF632 /* Foundation.framework */,
-				A2F35BE015C5A7ED00EBF632 /* Cocoa.framework */,
-				A2F35BBD15C5A0A100EBF632 /* ApplicationServices.framework */,
-				A2F35BBF15C5A0A100EBF632 /* CoreServices.framework */,
 				A2F35BC115C5A0A100EBF632 /* CoreFoundation.framework */,
 			);
 			name = Frameworks;
@@ -2495,8 +2486,8 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
-				A24F191B0A3A792300C9C145 /* Copy Files */,
-				A2EB2E7615C8CF1C00FBD5B4 /* CopyFiles */,
+				A24F191B0A3A792300C9C145 /* Copy Files to Frameworks */,
+				A2EB2E7615C8CF1C00FBD5B4 /* Copy Files to Wrapper */,
 			);
 			buildRules = (
 			);
@@ -2638,9 +2629,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C1639A731A55F4D600E42033 /* Build configuration list for PBXNativeTarget "b64" */;
 			buildPhases = (
+				C1639A6D1A55F4D600E42033 /* Headers */,
 				C1639A6B1A55F4D600E42033 /* Sources */,
 				C1639A6C1A55F4D600E42033 /* Frameworks */,
-				C1639A6D1A55F4D600E42033 /* Headers */,
 			);
 			buildRules = (
 			);
