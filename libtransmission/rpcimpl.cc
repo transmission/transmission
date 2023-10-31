@@ -1715,7 +1715,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_blocklist_enabled, &val))
     {
-        session->useBlocklist(val);
+        session->set_blocklist_enabled(val);
     }
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_blocklist_url, &sv))
@@ -1999,7 +1999,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_blocklist_enabled:
-        tr_variantDictAddBool(d, key, s->useBlocklist());
+        tr_variantDictAddBool(d, key, s->blocklist_enabled());
         break;
 
     case TR_KEY_blocklist_url:

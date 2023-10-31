@@ -13,7 +13,6 @@
 #include <iterator> // for std::back_inserter
 #include <limits> // std::numeric_limits
 #include <memory>
-#include <numeric> // for std::accumulate()
 #include <string>
 #include <string_view>
 #include <utility>
@@ -727,7 +726,7 @@ void tr_session::initImpl(init_data& data)
 
     tr_logSetQueueEnabled(data.message_queuing_enabled);
 
-    this->blocklists_ = libtransmission::Blocklist::loadBlocklists(blocklist_dir_, useBlocklist());
+    blocklists_.load(blocklist_dir_, blocklist_enabled());
 
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
@@ -794,7 +793,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 
     bool const utp_changed = new_settings.utp_enabled != old_settings.utp_enabled;
 
-    useBlocklist(new_settings.blocklist_enabled);
+    set_blocklist_enabled(new_settings.blocklist_enabled);
 
     auto local_peer_port = force && settings_.peer_port_random_on_start ? randomPort() : new_settings.peer_port;
     bool port_changed = false;
@@ -1678,93 +1677,43 @@ bool tr_sessionIsPortForwardingEnabled(tr_session const* session)
 
 // ---
 
-void tr_session::useBlocklist(bool enabled)
-{
-    settings_.blocklist_enabled = enabled;
-
-    std::for_each(
-        std::begin(blocklists_),
-        std::end(blocklists_),
-        [enabled](auto& blocklist) { blocklist.setEnabled(enabled); });
-}
-
-bool tr_session::addressIsBlocked(tr_address const& addr) const noexcept
-{
-    return std::any_of(
-        std::begin(blocklists_),
-        std::end(blocklists_),
-        [&addr](auto& blocklist) { return blocklist.contains(addr); });
-}
-
 void tr_sessionReloadBlocklists(tr_session* session)
 {
-    session->blocklists_ = libtransmission::Blocklist::loadBlocklists(session->blocklist_dir_, session->useBlocklist());
-
-    session->blocklist_changed_.emit();
+    session->blocklists_.load(session->blocklist_dir_, session->blocklist_enabled());
 }
 
 size_t tr_blocklistGetRuleCount(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    auto& src = session->blocklists_;
-    return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto& cur) { return sum + std::size(cur); });
+    return session->blocklists_.num_rules();
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->useBlocklist();
+    return session->blocklist_enabled();
 }
 
 void tr_blocklistSetEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(session != nullptr);
 
-    session->useBlocklist(enabled);
+    session->set_blocklist_enabled(enabled);
 }
 
 bool tr_blocklistExists(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return !std::empty(session->blocklists_);
+    return session->blocklists_.num_lists() > 0U;
 }
 
 size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)
 {
     auto const lock = session->unique_lock();
-
-    // These rules will replace the default blocklist.
-    // Build the path of the default blocklist .bin file where we'll save these rules.
-    auto const bin_file = tr_pathbuf{ session->blocklist_dir_, '/', DEFAULT_BLOCKLIST_FILENAME };
-
-    // Try to save it
-    auto added = libtransmission::Blocklist::saveNew(content_filename, bin_file, session->useBlocklist());
-    if (!added)
-    {
-        return 0U;
-    }
-
-    auto const n_rules = std::size(*added);
-
-    // Add (or replace) it in our blocklists_ vector
-    auto& src = session->blocklists_;
-    if (auto iter = std::find_if(
-            std::begin(src),
-            std::end(src),
-            [&bin_file](auto const& candidate) { return bin_file == candidate.binFile(); });
-        iter != std::end(src))
-    {
-        *iter = std::move(*added);
-    }
-    else
-    {
-        src.emplace_back(std::move(*added));
-    }
-
-    return n_rules;
+    return session->blocklists_.update_primary_blocklist(content_filename, session->blocklist_enabled());
 }
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
