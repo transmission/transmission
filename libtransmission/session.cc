@@ -1686,7 +1686,7 @@ size_t tr_blocklistGetRuleCount(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return std::size(session->blocklists_);
+    return session->blocklists_.num_rules();
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)
@@ -1707,7 +1707,7 @@ bool tr_blocklistExists(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return !std::empty(session->blocklists_);
+    return session->blocklists_.num_lists() > 0U;
 }
 
 size_t tr_blocklistSetContent(tr_session* session, char const* content_filename)

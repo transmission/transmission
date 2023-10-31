@@ -16,6 +16,7 @@
 #include <utility> // for std::pair
 #include <vector>
 
+#include "libtransmission/tr-macros.h" // for TR_CONSTEXPR20
 #include "libtransmission/net.h" // for tr_address
 #include "libtransmission/observable.h"
 
@@ -27,15 +28,37 @@ class Blocklists
 public:
     Blocklists() = default;
 
-    [[nodiscard]] bool contains(tr_address const& addr) const noexcept;
-    [[nodiscard]] bool empty() const noexcept;
-    [[nodiscard]] size_t size() const noexcept;
+    [[nodiscard]] bool contains(tr_address const& addr) const noexcept
+    {
+        return std::any_of(
+            std::begin(blocklists_),
+            std::end(blocklists_),
+            [&addr](auto const& blocklist) { return blocklist.enabled() && blocklist.contains(addr); });
+    }
+
+    [[nodiscard]] TR_CONSTEXPR20 auto num_lists() const noexcept
+    {
+        return std::size(blocklists_);
+    }
+
+    [[nodiscard]] TR_CONSTEXPR20 auto num_rules() const noexcept
+    {
+        return std::accumulate(
+            std::begin(blocklists_),
+            std::end(blocklists_),
+            size_t{},
+            [](int sum, auto& cur) { return sum + std::size(cur); });
+    }
 
     void load(std::string_view folder, bool is_enabled);
     void set_enabled(bool is_enabled);
     size_t update_primary_blocklist(std::string_view external_file, bool is_enabled);
 
-    libtransmission::SimpleObservable<> changed_;
+    template<typename Observer>
+    [[nodiscard]] auto observe_changes(Observer observer)
+    {
+        return changed_.observe(std::move(observer));
+    }
 
 private:
     class Blocklist
@@ -87,6 +110,8 @@ private:
     std::vector<Blocklist> blocklists_;
 
     std::string folder_;
+
+    libtransmission::SimpleObservable<> changed_;
 
     [[nodiscard]] static std::vector<Blocklist> load_folder(std::string_view folder, bool is_enabled);
 };

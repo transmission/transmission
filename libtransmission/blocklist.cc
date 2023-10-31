@@ -486,33 +486,6 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
 
 // ---
 
-bool Blocklists::contains(tr_address const& addr) const noexcept
-{
-    for (auto const& blocklist : blocklists_)
-    {
-        if (blocklist.enabled() && blocklist.contains(addr))
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-size_t Blocklists::size() const noexcept
-{
-    return std::accumulate(
-        std::begin(blocklists_),
-        std::end(blocklists_),
-        size_t{},
-        [](int sum, auto& cur) { return sum + std::size(cur); });
-}
-
-bool Blocklists::empty() const noexcept
-{
-    return blocklists_.empty();
-}
-
 void Blocklists::set_enabled(bool is_enabled)
 {
     for (auto& blocklist : blocklists_)

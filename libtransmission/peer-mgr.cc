@@ -930,12 +930,12 @@ public:
         libtransmission::Blocklists& blocklist)
         : session{ session_in }
         , torrents_{ torrents }
-        , blocklist_{ blocklist }
+        , blocklists_{ blocklist }
         , handshake_mediator_{ *session, timer_maker, torrents }
         , bandwidth_timer_{ timer_maker.create([this]() { bandwidth_pulse(); }) }
         , rechoke_timer_{ timer_maker.create([this]() { rechoke_pulse_marshall(); }) }
         , refill_upkeep_timer_{ timer_maker.create([this]() { refill_upkeep(); }) }
-        , blocklist_tag_{ blocklist.changed_.observe([this]() { on_blocklist_changed(); }) }
+        , blocklists_tag_{ blocklist.observe_changes([this]() { on_blocklists_changed(); }) }
     {
         bandwidth_timer_->start_repeating(BandwidthTimerPeriod);
         rechoke_timer_->start_repeating(RechokePeriod);
@@ -971,7 +971,7 @@ public:
 
     tr_session* const session;
     tr_torrents& torrents_;
-    libtransmission::Blocklists const& blocklist_;
+    libtransmission::Blocklists const& blocklists_;
     Handshakes incoming_handshakes;
 
     HandshakeMediator handshake_mediator_;
@@ -989,7 +989,7 @@ private:
         rechoke_timer_->set_interval(RechokePeriod);
     }
 
-    void on_blocklist_changed() const
+    void on_blocklists_changed() const
     {
         /* we cache whether or not a peer is blocklisted...
            since the blocklist has changed, erase that cached value */
@@ -1011,7 +1011,7 @@ private:
     std::unique_ptr<libtransmission::Timer> const rechoke_timer_;
     std::unique_ptr<libtransmission::Timer> const refill_upkeep_timer_;
 
-    libtransmission::ObserverTag const blocklist_tag_;
+    libtransmission::ObserverTag const blocklists_tag_;
 };
 
 // --- tr_peer virtual functions
@@ -1293,7 +1293,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_peer_socket&& socket)
 
     auto const lock = manager->unique_lock();
 
-    if (manager->blocklist_.contains(socket.address()))
+    if (manager->blocklists_.contains(socket.address()))
     {
         tr_logAddTrace(fmt::format("Banned IP address '{}' tried to connect to us", socket.display_name()));
         socket.close();
@@ -1324,7 +1324,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
     for (tr_pex const* const end = pex + n_pex; pex != end; ++pex)
     {
         if (tr_isPex(pex) && /* safeguard against corrupt data */
-            !s->manager->blocklist_.contains(pex->socket_address.address()) && pex->is_valid_for_peers() &&
+            !s->manager->blocklists_.contains(pex->socket_address.address()) && pex->is_valid_for_peers() &&
             from != TR_PEER_FROM_INCOMING && (from != TR_PEER_FROM_PEX || (pex->flags & ADDED_F_CONNECTABLE) != 0))
         {
             // we store this peer since it is supposedly connectable (socket address should be the peer's listening address)
