@@ -11,6 +11,7 @@
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
 #import "Controller.h"
+#import "DefaultAppHelper.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
 #import "NSImageAdditions.h"
@@ -103,6 +104,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic, readonly) NSMutableArray<NSString*>* fRPCWhitelistArray;
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
+@property(nonatomic, readonly) DefaultAppHelper* fDefaultAppHelper;
 
 @end
 
@@ -177,6 +179,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         }
 
         [self setAutoUpdateToBeta:nil];
+
+        _fDefaultAppHelper = [[DefaultAppHelper alloc] init];
     }
 
     return self;
@@ -215,7 +219,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
     [self setPrefView:nil];
 
-    [self updateDefaultsStatus];
+    [self updateDefaultsStates];
 
     //set special-handling of magnet link add window checkbox
     [self updateShowAddMagnetWindowField];
@@ -859,55 +863,27 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (IBAction)setDefaultForMagnets:(id)sender
 {
-    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
-    OSStatus const result = LSSetDefaultHandlerForURLScheme((CFStringRef) @"magnet", (__bridge CFStringRef)bundleID);
-    if (result != noErr)
-    {
-        NSLog(@"Failed setting default magnet link handler");
-    }
-    [self updateDefaultsStatus];
+    PrefsController* __weak weakSelf = self;
+    [self.fDefaultAppHelper setDefaultForMagnetURLs:^{
+        [weakSelf updateDefaultsStates];
+    }];
 }
 
 - (IBAction)setDefaultForTorrentFiles:(id)sender
 {
-    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
-    OSStatus const result = LSSetDefaultRoleHandlerForContentType((CFStringRef) @"org.bittorrent.torrent", kLSRolesViewer, (__bridge CFStringRef)bundleID);
-    if (result != noErr)
-    {
-        NSLog(@"Failed setting default torrent file handler");
-    }
-    [self updateDefaultsStatus];
+    PrefsController* __weak weakSelf = self;
+    [self.fDefaultAppHelper setDefaultForTorrentFiles:^{
+        [weakSelf updateDefaultsStates];
+    }];
 }
 
-- (void)updateDefaultsStatus
+- (void)updateDefaultsStates
 {
-    BOOL isDefaultForMagnetSet = NO;
-    BOOL isDefaultForTorrentSet = NO;
+    BOOL const isDefaultForMagnetURLs = [self.fDefaultAppHelper isDefaultForMagnetURLs];
+    self.fSetDefaultForMagnetButton.enabled = !isDefaultForMagnetURLs;
 
-    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
-
-    NSString* const defaultBundleIdForMagnet = (__bridge NSString*)LSCopyDefaultHandlerForURLScheme((CFStringRef) @"magnet");
-    if (defaultBundleIdForMagnet)
-    {
-        if ([bundleID isEqualToString:defaultBundleIdForMagnet])
-        {
-            isDefaultForMagnetSet = YES;
-        }
-    }
-
-    NSString* const defaultBundleIdForTorrent = (__bridge NSString*)LSCopyDefaultRoleHandlerForContentType(
-        (CFStringRef) @"org.bittorrent.torrent",
-        kLSRolesViewer);
-    if (defaultBundleIdForTorrent)
-    {
-        if ([bundleID isEqualToString:defaultBundleIdForTorrent])
-        {
-            isDefaultForTorrentSet = YES;
-        }
-    }
-
-    self.fSetDefaultForMagnetButton.enabled = !isDefaultForMagnetSet;
-    self.fSetDefaultForTorrentButton.enabled = !isDefaultForTorrentSet;
+    BOOL const isDefaultForTorrentFiles = [self.fDefaultAppHelper isDefaultForTorrentFiles];
+    self.fSetDefaultForTorrentButton.enabled = !isDefaultForTorrentFiles;
 }
 
 - (void)setQueue:(id)sender
