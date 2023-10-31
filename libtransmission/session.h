@@ -1158,7 +1158,7 @@ public:
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
 private:
-    // depends-on: timer_maker_, top_bandwidth_, utp_context, torrents_, web_, blocklist_changed_
+    // depends-on: timer_maker_, blocklists_, top_bandwidth_, utp_context, torrents_, web_
     std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 
     // depends-on: peer_mgr_, advertised_peer_port_, torrents_
