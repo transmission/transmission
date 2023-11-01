@@ -91,7 +91,7 @@ install(
     DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Library/QuickLook)
 
 install(CODE
-    "list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
+    "list(APPEND CMAKE_MODULE_PATH \"${PROJECT_SOURCE_DIR}/cmake\")
     include(TrMacros)
     include(GetPrerequisites)
     tr_fixup_bundle_item(
