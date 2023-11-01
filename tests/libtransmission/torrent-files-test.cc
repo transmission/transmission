@@ -179,6 +179,7 @@ TEST_F(TorrentFilesTest, isSubpathPortable)
         { "hello.txt", true },
         { "hello#.txt", true },
     } };
+#undef PORTABLE_UNIX_NOT_WIN32
 
     for (auto const& [subpath, expected] : Tests)
     {
