@@ -307,18 +307,28 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
 namespace
 {
 
+[[nodiscard]] bool isUnixReservedFile(std::string_view in) noexcept
+{
+    if (std::empty(in))
+    {
+        return false;
+    }
+
+    static auto constexpr ReservedNames = std::array<std::string_view, 2>{
+        "."sv,
+        ".."sv,
+    };
+    return (std::find(std::begin(ReservedNames), std::end(ReservedNames), in) != std::end(ReservedNames));
+}
+
 // https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
 // Do not use the following reserved names for the name of a file:
 // CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8,
 // COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
 // Also avoid these names followed immediately by an extension;
 // for example, NUL.txt is not recommended.
-[[nodiscard]] bool isReservedFile([[maybe_unused]] std::string_view in) noexcept
+[[nodiscard]] bool isWin32ReservedFile(std::string_view in) noexcept
 {
-#ifndef _WIN32
-    // Of course, on Unix-like platforms none of this applies.
-    return false;
-#else
     if (std::empty(in))
     {
         return false;
@@ -355,18 +365,28 @@ namespace
         std::begin(ReservedPrefixes),
         std::end(ReservedPrefixes),
         [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
+}
+
+[[nodiscard]] bool isReservedFile(std::string_view in) noexcept
+{
+#ifdef _WIN32
+    return isWin32ReservedFile(in);
+#else
+    return isUnixReservedFile(in);
 #endif
+}
+
+[[nodiscard]] auto constexpr isUnixReservedChar(unsigned char ch) noexcept
+{
+    return ch == '/';
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
 // Use any character in the current code page for a name, including Unicode
 // characters and characters in the extended character set (128–255),
 // except for the following:
-[[nodiscard]] auto constexpr isReservedChar(char ch) noexcept
+[[nodiscard]] auto constexpr isWin32ReservedChar(unsigned char ch) noexcept
 {
-#if !defined(_WIN32)
-    return ch == '/';
-#else
     switch (ch)
     {
     case '"':
@@ -380,13 +400,23 @@ namespace
     case '|':
         return true;
     default:
-        return false;
+        return ch <= 31;
     }
+}
+
+[[nodiscard]] auto constexpr isReservedChar(unsigned char ch) noexcept
+{
+#ifdef _WIN32
+    return isWin32ReservedChar(ch);
+#else
+    return isUnixReservedChar(ch);
 #endif
 }
 
+// https://en.wikipedia.org/wiki/Filename#Comparison_of_filename_limitations
 void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 {
+#ifdef _WIN32
     // remove leading and trailing spaces
     in = tr_strv_strip(in);
 
@@ -395,7 +425,9 @@ void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
     {
         in.remove_suffix(1);
     }
+#endif
 
+    // replace reserved filenames with an underscore
     if (isReservedFile(in))
     {
         out.append('_');

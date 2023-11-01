@@ -143,30 +143,34 @@ TEST_F(TorrentFilesTest, hasAnyLocalData)
 
 TEST_F(TorrentFilesTest, isSubpathPortable)
 {
+#ifdef _WIN32
+#define PORTABLE_UNIX_NOT_WIN32 false
+#else
+#define PORTABLE_UNIX_NOT_WIN32 true
+#endif
     static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 15>{ {
+        // never portable
+        { ".", false },
+        { "..", false },
+
         // don't end with periods
-        { "foo.", false },
-        { "foo..", false },
+        { "foo.", PORTABLE_UNIX_NOT_WIN32 },
+        { "foo..", PORTABLE_UNIX_NOT_WIN32 },
 
         // don't begin or end with whitespace
-        { " foo ", false },
-        { " foo", false },
-        { "foo ", false },
+        { " foo ", PORTABLE_UNIX_NOT_WIN32 },
+        { " foo", PORTABLE_UNIX_NOT_WIN32 },
+        { "foo ", PORTABLE_UNIX_NOT_WIN32 },
 
-    // reserved names and characters (platform-dependent)
-#ifdef _WIN32
-        { "COM1", false },
-        { "COM1.txt", false },
-        { "Com1", false },
-        { "com1", false },
-        { "hell:o.txt", false },
-#else
-        { "COM1", true },
-        { "COM1.txt", true },
-        { "Com1", true },
-        { "com1", true },
-        { "hell:o.txt", true },
-#endif
+        // reserved names
+        { "COM1", PORTABLE_UNIX_NOT_WIN32 },
+        { "COM1.txt", PORTABLE_UNIX_NOT_WIN32 },
+        { "Com1", PORTABLE_UNIX_NOT_WIN32 },
+        { "com1", PORTABLE_UNIX_NOT_WIN32 },
+
+        // reserved characters
+        { "hell:o.txt", PORTABLE_UNIX_NOT_WIN32 },
+        { "hell\to.txt", PORTABLE_UNIX_NOT_WIN32 },
 
         // everything else
         { ".foo", true },
