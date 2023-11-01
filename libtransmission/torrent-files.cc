@@ -307,13 +307,10 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
 namespace
 {
 
-[[nodiscard]] bool isUnixReservedFile(std::string_view in) noexcept
+// `isUnixReservedFile` and `isWin32ReservedFile` kept as `maybe_unused`
+// for potential support of different filesystems on the same OS
+[[nodiscard, maybe_unused]] bool isUnixReservedFile(std::string_view in) noexcept
 {
-    if (std::empty(in))
-    {
-        return false;
-    }
-
     static auto constexpr ReservedNames = std::array<std::string_view, 2>{
         "."sv,
         ".."sv,
@@ -327,7 +324,7 @@ namespace
 // COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
 // Also avoid these names followed immediately by an extension;
 // for example, NUL.txt is not recommended.
-[[nodiscard]] bool isWin32ReservedFile(std::string_view in) noexcept
+[[nodiscard, maybe_unused]] bool isWin32ReservedFile(std::string_view in) noexcept
 {
     if (std::empty(in))
     {
@@ -376,7 +373,9 @@ namespace
 #endif
 }
 
-[[nodiscard]] auto constexpr isUnixReservedChar(unsigned char ch) noexcept
+// `isUnixReservedChar` and `isWin32ReservedChar` kept as `maybe_unused`
+// for potential support of different filesystems on the same OS
+[[nodiscard, maybe_unused]] auto constexpr isUnixReservedChar(unsigned char ch) noexcept
 {
     return ch == '/';
 }
@@ -385,7 +384,7 @@ namespace
 // Use any character in the current code page for a name, including Unicode
 // characters and characters in the extended character set (128–255),
 // except for the following:
-[[nodiscard]] auto constexpr isWin32ReservedChar(unsigned char ch) noexcept
+[[nodiscard, maybe_unused]] auto constexpr isWin32ReservedChar(unsigned char ch) noexcept
 {
     switch (ch)
     {
