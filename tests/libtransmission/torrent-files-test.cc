@@ -148,7 +148,7 @@ TEST_F(TorrentFilesTest, isSubpathPortable)
 #else
 #define PORTABLE_UNIX_NOT_WIN32 true
 #endif
-    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 15>{ {
+    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 18>{ {
         // never portable
         { ".", false },
         { "..", false },
