@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-$global:DBusVersion = '1.14.4'
+$global:DBusVersion = '1.14.10'
 
 $global:DBusDeps = @(
     'Expat'
