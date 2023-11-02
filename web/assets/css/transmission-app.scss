@@ -459,15 +459,15 @@ $video-image: '../img/film.svg';
   }
 }
 
-.torrent-list {
-  cursor: pointer;
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  text-align: left;
-  width: 100%;
-  user-select: none;
-  -webkit-user-select: none;
+ .torrent-list {
+   cursor: pointer;
+   list-style-type: none;
+   margin: 0;
+   padding: 0;
+   text-align: left;
+   width: 100%;
+   user-select: none;
+   -webkit-user-select: none;
 
   .torrent:nth-child(even) {
     background-color: var(--color-bg-even);
