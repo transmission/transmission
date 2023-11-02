@@ -528,13 +528,12 @@ $video-image: '../img/film.svg';
         font-size: 1em;
         font-weight: normal;
       }
-    }
 
     &.selected {
       color: var(--color-fg-primary);
     }
 
-    &.paused:not(.selected) {
+    &:not(.selected) .paused {
       color: var(--color-fg-disabled);
     }
 
@@ -568,6 +567,7 @@ $video-image: '../img/film.svg';
 
     .torrent-progress-details,
     .torrent-peer-details {
+      color: var(--color-fg-primary);
       font-size: small;
     }
 
@@ -624,7 +624,12 @@ $video-image: '../img/film.svg';
       }
 
       .torrent-name {
+        color: var(--color-fg-primary);
         grid-area: name;
+
+        &.paused {
+          color: var(--color-fg-disabled);
+        }
       }
 
       .torrent-labels {
@@ -738,7 +743,11 @@ $video-image: '../img/film.svg';
       background-color: var(--color-progressbar-seed-paused);
     }
 
-    &.seed:not(.paused) {
+    &.seed {
+      background-color: var(--color-progressbar-seed-1);
+    }
+
+    &.seed.full:not(.paused) {
       background: linear-gradient(
           to right,
           var(--color-progressbar-seed-1) 0,
@@ -1778,3 +1787,4 @@ dialog {
   text-align: center;
   width: 100%;
 }
+
