@@ -455,6 +455,12 @@ public:
             peer_info.found_at(from);
             peer_info.set_pex_flags(flags);
         }
+        else if (is_connectable)
+        {
+            // TODO: decrement count on `connectable_pool.extract` and `connectable_pool.erase`
+            // TODO: increment count on `connectable_pool.insert`
+            ++stats.known_peer_from_count[from];
+        }
 
         mark_all_seeds_flag_dirty();
 
@@ -1334,8 +1340,6 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, tr_peer_from from, tr_pex const* pex, s
             ++n_used;
         }
     }
-    // best estimate: we can't tell for sure if they are the same peers
-    s->stats.known_peer_from_count[from] = std::max(s->stats.known_peer_from_count[from], (uint16_t)n_used);
 
     return n_used;
 }
