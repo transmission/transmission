@@ -336,6 +336,7 @@ public:
             auto& [socket_address, peer_info] = *iter;
             if (peer_info.is_inactive(now))
             {
+                --stats.known_peer_from_count[iter->second.from_first()];
                 iter = connectable_pool.erase(iter);
             }
             else
@@ -457,8 +458,6 @@ public:
         }
         else if (is_connectable)
         {
-            // TODO: decrement count on `connectable_pool.extract` and `connectable_pool.erase`
-            // TODO: increment count on `connectable_pool.insert`
             ++stats.known_peer_from_count[from];
         }
 
@@ -823,7 +822,7 @@ private:
             }
 
             info_this.merge(info_that);
-            connectable_pool.erase(info_that.listen_socket_address());
+            stats.known_peer_from_count[info_that.from_first()] -= connectable_pool.erase(info_that.listen_socket_address());
         }
         else if (!was_connectable)
         {
@@ -839,6 +838,7 @@ private:
         }
         else
         {
+            ++stats.known_peer_from_count[info_this.from_first()];
             TR_ASSERT(nh.key().address() == nh.mapped().listen_address());
         }
         nh.key().port_ = event.port;
@@ -866,6 +866,7 @@ private:
             (*it)->do_purge = true;
 
             // Note that it_that is invalid after this point
+            --stats.known_peer_from_count[info_that.from_first()];
             graveyard_pool.insert(connectable_pool.extract(it_that));
 
             return false;
@@ -876,6 +877,7 @@ private:
 
         if (was_connectable)
         {
+            --stats.known_peer_from_count[info_this.from_first()];
             graveyard_pool.insert(connectable_pool.extract(info_this.listen_socket_address()));
         }
 
