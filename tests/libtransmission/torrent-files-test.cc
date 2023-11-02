@@ -153,14 +153,20 @@ TEST_F(TorrentFilesTest, isSubpathPortable)
         { " foo", false },
         { "foo ", false },
 
-        // reserved names
+    // reserved names and characters (platform-dependent)
+#ifdef _WIN32
         { "COM1", false },
         { "COM1.txt", false },
         { "Com1", false },
         { "com1", false },
-
-        // reserved characters
         { "hell:o.txt", false },
+#else
+        { "COM1", true },
+        { "COM1.txt", true },
+        { "Com1", true },
+        { "com1", true },
+        { "hell:o.txt", true },
+#endif
 
         // everything else
         { ".foo", true },

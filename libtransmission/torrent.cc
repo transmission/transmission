@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -498,9 +498,9 @@ constexpr struct
 } CompareTorrentByQueuePosition{};
 
 #ifdef TR_ENABLE_ASSERTS
-bool queueIsSequenced(tr_session const* session)
+bool queueIsSequenced(tr_session const* const session)
 {
-    auto torrents = session->getAllTorrents();
+    auto torrents = session->torrents().get_all();
     std::sort(
         std::begin(torrents),
         std::end(torrents),

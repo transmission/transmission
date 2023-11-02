@@ -255,6 +255,15 @@ a {
   overflow: auto;
 }
 
+.popup,
+.tabs-container {
+  box-shadow:
+    0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 6px 16px rgba(0, 0, 0, 0.08),
+    0 9px 28px 8px rgba(0, 0, 0, 0.06);
+  position: absolute;
+}
+
 /// TOOLBAR
 
 $toolbar-height-number: 50;
@@ -789,11 +798,6 @@ $video-image: '../img/film.svg';
   $background-color: var(--color-bg-primary);
   background: $background-color;
   bottom: 0;
-  box-shadow:
-    0 3px 6px -4px #0000001f,
-    0 6px 16px #00000014,
-    0 9px 28px 8px #0000000d;
-  position: absolute;
   right: 0;
   top: $popup-top;
   z-index: $z-index-popup;
@@ -1009,10 +1013,6 @@ $video-image: '../img/film.svg';
 }
 
 /// INSPECTOR
-
-#inspector {
-  box-shadow: 0 3px 6px rgba(58, 58, 58, 0.7);
-}
 
 .inspector-info-page {
   font-size: 14px;
@@ -1327,10 +1327,8 @@ $video-image: '../img/film.svg';
   $disabled-color: var(--color-fg-disabled);
   background-color: var(--color-bg-primary);
   border-radius: 5px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
   color: var(--color-fg-on-popup);
   padding: 10px 5px;
-  position: absolute;
   z-index: 9999;
   user-select: none;
   -webkit-user-select: none;
@@ -1372,14 +1370,9 @@ $video-image: '../img/film.svg';
 .overflow-menu {
   background: var(--color-bg-popup);
   border-radius: 5px;
-  box-shadow:
-    0 3px 6px -4px #0000001f,
-    0 6px 16px #00000014,
-    0 9px 28px 8px #0000000d;
   color: var(--color-fg-on-popup);
   overflow: auto;
   padding: 10px;
-  position: absolute;
 
   right: 0;
   margin: 6px;
@@ -1604,10 +1597,6 @@ dialog {
 }
 
 .dialog-container {
-  box-shadow:
-    0 3px 6px -4px #0000001f,
-    0 6px 16px #00000014,
-    0 9px 28px 8px #0000000d;
   color: var(--color-fg-primary);
   display: block;
   padding: 0;

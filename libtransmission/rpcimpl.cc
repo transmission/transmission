@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -126,15 +126,9 @@ auto getTorrents(tr_session* session, tr_variant* args)
     {
         if (sv == "recently-active"sv)
         {
-            time_t const cutoff = tr_time() - RecentlyActiveSeconds;
-
-            auto const& by_id = session->torrents().sorted_by_id();
-            torrents.reserve(std::size(by_id));
-            std::copy_if(
-                std::begin(by_id),
-                std::end(by_id),
-                std::back_inserter(torrents),
-                [&cutoff](auto const* tor) { return tor->has_changed_since(cutoff); });
+            auto const cutoff = tr_time() - RecentlyActiveSeconds;
+            torrents = session->torrents().get_matching([cutoff](tr_torrent const* tor)
+                                                        { return tor->has_changed_since(cutoff); });
         }
         else
         {
@@ -147,8 +141,7 @@ auto getTorrents(tr_session* session, tr_variant* args)
     }
     else // all of them
     {
-        auto const& by_id = session->torrents().sorted_by_id();
-        torrents = std::vector<tr_torrent*>{ std::begin(by_id), std::end(by_id) };
+        torrents = session->torrents().get_all();
     }
 
     return torrents;
@@ -1722,7 +1715,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_blocklist_enabled, &val))
     {
-        session->useBlocklist(val);
+        session->set_blocklist_enabled(val);
     }
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_blocklist_url, &sv))
@@ -2006,7 +1999,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_blocklist_enabled:
-        tr_variantDictAddBool(d, key, s->useBlocklist());
+        tr_variantDictAddBool(d, key, s->blocklist_enabled());
         break;
 
     case TR_KEY_blocklist_url:

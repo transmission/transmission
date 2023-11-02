@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -46,7 +46,6 @@
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/net.h" // tr_socket_t
-#include "libtransmission/observable.h"
 #include "libtransmission/open-files.h"
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/quark.h"
@@ -488,12 +487,21 @@ public:
 
     // blocklist
 
-    [[nodiscard]] constexpr auto useBlocklist() const noexcept
+    [[nodiscard]] constexpr auto& blocklist() noexcept
+    {
+        return blocklists_;
+    }
+
+    void set_blocklist_enabled(bool is_enabled)
+    {
+        settings_.blocklist_enabled = is_enabled;
+        blocklist().set_enabled(is_enabled);
+    }
+
+    [[nodiscard]] auto blocklist_enabled() const noexcept
     {
         return settings_.blocklist_enabled;
     }
-
-    void useBlocklist(bool enabled);
 
     [[nodiscard]] constexpr auto const& blocklistUrl() const noexcept
     {
@@ -795,11 +803,6 @@ public:
         return settings_.idle_seeding_limit_minutes;
     }
 
-    [[nodiscard]] std::vector<tr_torrent*> getAllTorrents() const
-    {
-        return std::vector<tr_torrent*>{ std::begin(torrents()), std::end(torrents()) };
-    }
-
     /*module_visible*/
 
     auto rpcNotify(tr_rpc_callback_type type, tr_torrent* tor = nullptr)
@@ -813,8 +816,6 @@ public:
     }
 
     [[nodiscard]] size_t count_queue_free_slots(tr_direction dir) const noexcept;
-
-    [[nodiscard]] bool addressIsBlocked(tr_address const& addr) const noexcept;
 
     [[nodiscard]] bool has_ip_protocol(tr_address_type type) const noexcept
     {
@@ -1105,10 +1106,7 @@ private:
 
     tr_open_files open_files_;
 
-    std::vector<libtransmission::Blocklist> blocklists_;
-
-public:
-    libtransmission::SimpleObservable<> blocklist_changed_;
+    libtransmission::Blocklists blocklists_;
 
 private:
     /// other fields
@@ -1160,7 +1158,7 @@ public:
     std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
 
 private:
-    // depends-on: timer_maker_, top_bandwidth_, utp_context, torrents_, web_, blocklist_changed_
+    // depends-on: timer_maker_, blocklists_, top_bandwidth_, utp_context, torrents_, web_
     std::unique_ptr<struct tr_peerMgr, void (*)(struct tr_peerMgr*)> peer_mgr_;
 
     // depends-on: peer_mgr_, advertised_peer_port_, torrents_
