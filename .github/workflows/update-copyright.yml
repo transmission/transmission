@@ -30,3 +30,39 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: cmake/Transmission.rc.in
           transform: (?<from>\d{4})?-?(\d{4})(?= Transmission Project)
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in qt/LicenseDialog.ui'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: qt/LicenseDialog.ui
+          transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})(?=. All code is copyrighted by the respective authors.)
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in macosx/nl.lproj/InfoPlist.strings'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: macosx/nl.lproj/InfoPlist.strings
+          transform: (?<=Copyright © )(?<from>\d{4})?-?(\d{4})
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in macosx/Info.plist'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: macosx/Info.plist
+          transform: (?<=Copyright © )(?<from>\d{4})?-?(\d{4})
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in macosx/Info.plist.in'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: macosx/Info.plist.in
+          transform: (?<=Copyright © )(?<from>\d{4})?-?(\d{4})
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in macosx/QuickLookPlugin/QuickLookPlugin-Info.plist'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: macosx/QuickLookPlugin/QuickLookPlugin-Info.plist
+          transform: (?<=Copyright © )(?<from>\d{4})?-?(\d{4})
+      - uses: FantasticFiasco/action-update-license-year@v3
+        with:
+          commitTitle: 'chore: update copyright year in macosx/QuickLookPlugin/Info.plist.in'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: macosx/QuickLookPlugin/Info.plist.in'
+          transform: (?<=Copyright © )(?<from>\d{4})?-?(\d{4})
