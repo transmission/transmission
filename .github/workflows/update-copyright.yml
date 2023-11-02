@@ -9,22 +9,22 @@ jobs:
   update-license-year:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: FantasticFiasco/action-update-license-year@v2
+      - uses: FantasticFiasco/action-update-license-year@v3
         with:
           commitTitle: 'chore: update copyright year in COPYING'
           token: ${{ secrets.GITHUB_TOKEN }}
           path: COPYING
           transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})?
-      - uses: FantasticFiasco/action-update-license-year@v2
+      - uses: FantasticFiasco/action-update-license-year@v3
         with:
           commitTitle: 'chore: update copyright year in gtk/application.cc'
           token: ${{ secrets.GITHUB_TOKEN }}
           path: gtk/Application.cc
           transform: (?<=Copyright )(?<from>\d{4})?-?(\d{4})(?=. All code is copyrighted by the respective authors.)
-      - uses: FantasticFiasco/action-update-license-year@v2
+      - uses: FantasticFiasco/action-update-license-year@v3
         with:
           commitTitle: 'chore: update copyright year in cmake/transmission.rc.in'
           token: ${{ secrets.GITHUB_TOKEN }}
