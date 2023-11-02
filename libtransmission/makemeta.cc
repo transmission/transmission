@@ -153,16 +153,6 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
     checksum_piece_ = 0;
     cancel_ = false;
 
-    if (total_size() == 0U)
-    {
-        if (error != nullptr)
-        {
-            error->set(ENOENT, "zero-length torrents are not allowed"sv);
-        }
-
-        return false;
-    }
-
     auto hashes = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * piece_count());
     auto* walk = std::data(hashes);
     auto sha = tr_sha1{};
@@ -262,22 +252,12 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
 
 std::string tr_metainfo_builder::benc(tr_error* error) const
 {
-    TR_ASSERT_MSG(!std::empty(piece_hashes_), "did you forget to call makeChecksums() first?");
+    TR_ASSERT_MSG(!std::empty(piece_hashes_) || total_size() == 0U, "did you forget to call makeChecksums() first?");
 
     auto const anonymize = this->anonymize();
     auto const& comment = this->comment();
     auto const& source = this->source();
     auto const& webseeds = this->webseeds();
-
-    if (total_size() == 0)
-    {
-        if (error != nullptr)
-        {
-            error->set_from_errno(ENOENT);
-        }
-
-        return {};
-    }
 
     auto top = tr_variant::Map{ 8U };
 
