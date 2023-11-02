@@ -456,11 +456,6 @@ private:
     {
         bool ok = true;
 
-        if (file_length_ == 0)
-        {
-            return ok;
-        }
-
         // FIXME: Check to see if we already added this file. This is a safeguard
         // for hybrid torrents with duplicate info between "file tree" and "files"
         if (std::empty(file_subpath_))
@@ -521,7 +516,7 @@ private:
         // "If length is present then the download represents a single file,
         // otherwise it represents a set of files which go in a directory structure.
         // In the single file case, length maps to the length of the file in bytes.
-        if (tm_.file_count() == 0 && length_ != 0 && !std::empty(tm_.name_))
+        if (tm_.file_count() == 0 && !std::empty(tm_.name_))
         {
             tm_.files_.add(tm_.name_, length_);
         }

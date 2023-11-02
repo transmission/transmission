@@ -154,16 +154,6 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
     checksum_piece_ = 0;
     cancel_ = false;
 
-    if (total_size() == 0U)
-    {
-        if (error != nullptr)
-        {
-            error->set_from_errno(ENOENT);
-        }
-
-        return false;
-    }
-
     auto hashes = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * piece_count());
     auto* walk = std::data(hashes);
     auto sha = tr_sha1::create();
@@ -263,22 +253,12 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
 
 std::string tr_metainfo_builder::benc(tr_error* error) const
 {
-    TR_ASSERT_MSG(!std::empty(piece_hashes_), "did you forget to call makeChecksums() first?");
+    TR_ASSERT_MSG(!std::empty(piece_hashes_) || total_size() == 0U, "did you forget to call makeChecksums() first?");
 
     auto const anonymize = this->anonymize();
     auto const& comment = this->comment();
     auto const& source = this->source();
     auto const& webseeds = this->webseeds();
-
-    if (total_size() == 0)
-    {
-        if (error != nullptr)
-        {
-            error->set_from_errno(ENOENT);
-        }
-
-        return {};
-    }
 
     auto top = tr_variant::Map{ 8U };
 
@@ -374,12 +354,10 @@ std::string tr_metainfo_builder::benc(tr_error* error) const
 
 uint32_t tr_metainfo_builder::default_piece_size(uint64_t total_size) noexcept
 {
-    TR_ASSERT(total_size != 0);
-
     // Ideally, we want approximately 2^10 = 1024 pieces, give or take a few hundred pieces.
     // So we subtract 10 from the log2 of total size.
     // The ideal number of pieces is up for debate.
-    auto exp = std::log2(total_size) - 10;
+    auto exp = (total_size > 0 ? std::log2(total_size) : 0) - 10;
 
     // We want a piece size between 16KiB (2^14 bytes) and 16MiB (2^24 bytes) for maximum compatibility
     exp = std::clamp(exp, 14., 24.);
