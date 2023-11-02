@@ -22,20 +22,20 @@ TEST_F(BlockInfoTest, fieldsAreSet)
     static auto constexpr TotalSize = PieceSize * PieceCount;
 
     auto info = tr_block_info{};
-    info.initSizes(TotalSize, PieceSize);
+    info.init_sizes(TotalSize, PieceSize);
 
-    EXPECT_EQ(ExpectedBlockSize, info.blockSize(info.blockCount() - 1));
-    EXPECT_EQ(PieceCount, info.pieceCount());
-    EXPECT_EQ(PieceSize, info.pieceSize(info.pieceCount() - 1));
-    EXPECT_EQ(PieceSize, info.pieceSize());
-    EXPECT_EQ(TotalSize, info.totalSize());
+    EXPECT_EQ(ExpectedBlockSize, info.block_size(info.block_count() - 1));
+    EXPECT_EQ(PieceCount, info.piece_count());
+    EXPECT_EQ(PieceSize, info.piece_size(info.piece_count() - 1));
+    EXPECT_EQ(PieceSize, info.piece_size());
+    EXPECT_EQ(TotalSize, info.total_size());
 
-    info.initSizes(0, 0);
-    EXPECT_EQ(0U, info.blockSize(info.blockCount() - 1));
-    EXPECT_EQ(0U, info.pieceCount());
-    EXPECT_EQ(0U, info.pieceSize(info.pieceCount() - 1));
-    EXPECT_EQ(0U, info.pieceSize());
-    EXPECT_EQ(0U, info.totalSize());
+    info.init_sizes(0, 0);
+    EXPECT_EQ(0U, info.block_size(info.block_count() - 1));
+    EXPECT_EQ(0U, info.piece_count());
+    EXPECT_EQ(0U, info.piece_size(info.piece_count() - 1));
+    EXPECT_EQ(0U, info.piece_size());
+    EXPECT_EQ(0U, info.total_size());
 }
 
 TEST_F(BlockInfoTest, handlesOddSize)
@@ -47,13 +47,13 @@ TEST_F(BlockInfoTest, handlesOddSize)
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
     auto info = tr_block_info{};
-    info.initSizes(TotalSize, PieceSize);
+    info.init_sizes(TotalSize, PieceSize);
 
-    EXPECT_EQ(1U, info.blockSize(info.blockCount() - 1));
-    EXPECT_EQ(1U, info.pieceSize(info.pieceCount() - 1));
-    EXPECT_EQ(PieceCount, info.pieceCount());
-    EXPECT_EQ(PieceSize, info.pieceSize());
-    EXPECT_EQ(TotalSize, info.totalSize());
+    EXPECT_EQ(1U, info.block_size(info.block_count() - 1));
+    EXPECT_EQ(1U, info.piece_size(info.piece_count() - 1));
+    EXPECT_EQ(PieceCount, info.piece_count());
+    EXPECT_EQ(PieceSize, info.piece_size());
+    EXPECT_EQ(TotalSize, info.total_size());
 }
 
 TEST_F(BlockInfoTest, pieceSize)
@@ -65,10 +65,10 @@ TEST_F(BlockInfoTest, pieceSize)
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
     auto info = tr_block_info{};
-    info.initSizes(TotalSize, PieceSize);
+    info.init_sizes(TotalSize, PieceSize);
 
-    EXPECT_EQ(PieceSize, info.pieceSize(info.pieceCount() - 2));
-    EXPECT_EQ(1U, info.pieceSize(info.pieceCount() - 1));
+    EXPECT_EQ(PieceSize, info.piece_size(info.piece_count() - 2));
+    EXPECT_EQ(1U, info.piece_size(info.piece_count() - 1));
 }
 
 TEST_F(BlockInfoTest, blockSize)
@@ -80,10 +80,10 @@ TEST_F(BlockInfoTest, blockSize)
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
 
     auto info = tr_block_info{};
-    info.initSizes(TotalSize, PieceSize);
+    info.init_sizes(TotalSize, PieceSize);
 
-    EXPECT_EQ(ExpectedBlockSize, info.blockSize(info.blockCount() - 2));
-    EXPECT_EQ(1U, info.blockSize(info.blockCount() - 1));
+    EXPECT_EQ(ExpectedBlockSize, info.block_size(info.block_count() - 2));
+    EXPECT_EQ(1U, info.block_size(info.block_count() - 1));
 }
 
 TEST_F(BlockInfoTest, blockSpanForPiece)
@@ -95,19 +95,19 @@ TEST_F(BlockInfoTest, blockSpanForPiece)
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
     auto info = tr_block_info{};
-    info.initSizes(TotalSize, PieceSize);
+    info.init_sizes(TotalSize, PieceSize);
 
-    EXPECT_EQ(0U, info.blockSpanForPiece(0).begin);
-    EXPECT_EQ(4U, info.blockSpanForPiece(0).end);
-    EXPECT_EQ(12U, info.blockSpanForPiece(3).begin);
-    EXPECT_EQ(16U, info.blockSpanForPiece(3).end);
-    EXPECT_EQ(16U, info.blockSpanForPiece(4).begin);
-    EXPECT_EQ(17U, info.blockSpanForPiece(4).end);
+    EXPECT_EQ(0U, info.block_span_for_piece(0).begin);
+    EXPECT_EQ(4U, info.block_span_for_piece(0).end);
+    EXPECT_EQ(12U, info.block_span_for_piece(3).begin);
+    EXPECT_EQ(16U, info.block_span_for_piece(3).end);
+    EXPECT_EQ(16U, info.block_span_for_piece(4).begin);
+    EXPECT_EQ(17U, info.block_span_for_piece(4).end);
 
     // test that uninitialized block_info returns an invalid span
     info = tr_block_info{};
-    EXPECT_EQ(0U, info.blockSpanForPiece(0).begin);
-    EXPECT_EQ(0U, info.blockSpanForPiece(0).end);
+    EXPECT_EQ(0U, info.block_span_for_piece(0).begin);
+    EXPECT_EQ(0U, info.block_span_for_piece(0).end);
 }
 
 TEST_F(BlockInfoTest, blockLoc)
@@ -119,14 +119,14 @@ TEST_F(BlockInfoTest, blockLoc)
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
     auto info = tr_block_info{};
-    info.initSizes(TotalSize, PieceSize);
+    info.init_sizes(TotalSize, PieceSize);
 
     // begin
-    auto loc = info.blockLoc(0);
+    auto loc = info.block_loc(0);
     EXPECT_EQ(tr_block_info::Location{}, loc);
 
     // third block is halfway through the first piece
-    loc = info.blockLoc(2);
+    loc = info.block_loc(2);
     EXPECT_EQ(ExpectedBlockSize * 2U, loc.byte);
     EXPECT_EQ(2U, loc.block);
     EXPECT_EQ(0U, loc.block_offset);
@@ -134,7 +134,7 @@ TEST_F(BlockInfoTest, blockLoc)
     EXPECT_EQ(ExpectedBlockSize * 2U, loc.piece_offset);
 
     // second piece aligns with fifth block
-    loc = info.blockLoc(4);
+    loc = info.block_loc(4);
     EXPECT_EQ(PieceSize, loc.byte);
     EXPECT_EQ(4U, loc.block);
     EXPECT_EQ(0U, loc.block_offset);
@@ -151,16 +151,16 @@ TEST_F(BlockInfoTest, pieceLoc)
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
     auto info = tr_block_info{};
-    info.initSizes(TotalSize, PieceSize);
+    info.init_sizes(TotalSize, PieceSize);
 
     // begin
-    auto loc = info.pieceLoc(0);
+    auto loc = info.piece_loc(0);
     EXPECT_EQ(tr_block_info::Location{}, loc);
 
     for (uint64_t i = 0; i < PieceCount; ++i)
     {
-        loc = info.pieceLoc(i);
-        EXPECT_EQ(info.blockLoc(i * ExpectedBlocksPerPiece), loc);
+        loc = info.piece_loc(i);
+        EXPECT_EQ(info.block_loc(i * ExpectedBlocksPerPiece), loc);
         EXPECT_EQ(PieceSize * i, loc.byte);
         EXPECT_EQ(ExpectedBlocksPerPiece * i, loc.block);
         EXPECT_EQ(0U, loc.block_offset);
@@ -168,21 +168,21 @@ TEST_F(BlockInfoTest, pieceLoc)
         EXPECT_EQ(0U, loc.piece_offset);
     }
 
-    loc = info.pieceLoc(0, PieceSize - 1);
+    loc = info.piece_loc(0, PieceSize - 1);
     EXPECT_EQ(PieceSize - 1, loc.byte);
     EXPECT_EQ(ExpectedBlocksPerPiece - 1, loc.block);
     EXPECT_EQ(ExpectedBlockSize - 1, loc.block_offset);
     EXPECT_EQ(0U, loc.piece);
     EXPECT_EQ(PieceSize - 1, loc.piece_offset);
 
-    loc = info.pieceLoc(0, PieceSize);
+    loc = info.piece_loc(0, PieceSize);
     EXPECT_EQ(PieceSize, loc.byte);
     EXPECT_EQ(ExpectedBlocksPerPiece, loc.block);
     EXPECT_EQ(0U, loc.block_offset);
     EXPECT_EQ(1U, loc.piece);
     EXPECT_EQ(0U, loc.piece_offset);
 
-    loc = info.pieceLoc(0, PieceSize + 1);
+    loc = info.piece_loc(0, PieceSize + 1);
     EXPECT_EQ(PieceSize + 1, loc.byte);
     EXPECT_EQ(ExpectedBlocksPerPiece, loc.block);
     EXPECT_EQ(1U, loc.block_offset);
@@ -199,12 +199,12 @@ TEST_F(BlockInfoTest, byteLoc)
     static auto constexpr TotalSize = PieceSize * (PieceCount - 1U) + 1U;
 
     auto info = tr_block_info{};
-    info.initSizes(TotalSize, PieceSize);
+    info.init_sizes(TotalSize, PieceSize);
 
-    auto loc = info.byteLoc(0);
+    auto loc = info.byte_loc(0);
     EXPECT_EQ(tr_block_info::Location{}, loc);
 
-    loc = info.byteLoc(1);
+    loc = info.byte_loc(1);
     EXPECT_EQ(1U, loc.byte);
     EXPECT_EQ(0U, loc.block);
     EXPECT_EQ(1U, loc.block_offset);
@@ -212,7 +212,7 @@ TEST_F(BlockInfoTest, byteLoc)
     EXPECT_EQ(1U, loc.piece_offset);
 
     auto n = ExpectedBlockSize - 1;
-    loc = info.byteLoc(n);
+    loc = info.byte_loc(n);
     EXPECT_EQ(n, loc.byte);
     EXPECT_EQ(0U, loc.block);
     EXPECT_EQ(n, loc.block_offset);
@@ -220,7 +220,7 @@ TEST_F(BlockInfoTest, byteLoc)
     EXPECT_EQ(n, loc.piece_offset);
 
     n = ExpectedBlockSize;
-    loc = info.byteLoc(n);
+    loc = info.byte_loc(n);
     EXPECT_EQ(n, loc.byte);
     EXPECT_EQ(1U, loc.block);
     EXPECT_EQ(0U, loc.block_offset);
@@ -228,7 +228,7 @@ TEST_F(BlockInfoTest, byteLoc)
     EXPECT_EQ(n, loc.piece_offset);
 
     n = ExpectedBlockSize + 1;
-    loc = info.byteLoc(n);
+    loc = info.byte_loc(n);
     EXPECT_EQ(n, loc.byte);
     EXPECT_EQ(1U, loc.block);
     EXPECT_EQ(1U, loc.block_offset);
@@ -236,7 +236,7 @@ TEST_F(BlockInfoTest, byteLoc)
     EXPECT_EQ(n, loc.piece_offset);
 
     n = PieceSize - 1;
-    loc = info.byteLoc(n);
+    loc = info.byte_loc(n);
     EXPECT_EQ(n, loc.byte);
     EXPECT_EQ(ExpectedBlocksPerPiece - 1, loc.block);
     EXPECT_EQ(ExpectedBlockSize - 1, loc.block_offset);
@@ -244,7 +244,7 @@ TEST_F(BlockInfoTest, byteLoc)
     EXPECT_EQ(n, loc.piece_offset);
 
     n = PieceSize;
-    loc = info.byteLoc(n);
+    loc = info.byte_loc(n);
     EXPECT_EQ(n, loc.byte);
     EXPECT_EQ(ExpectedBlocksPerPiece, loc.block);
     EXPECT_EQ(0U, loc.block_offset);

@@ -1,22 +1,23 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <chrono>
-#include <set>
+#include <string>
+#include <string_view>
+
+#include <fmt/core.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
-#include "transmission.h"
-
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "tr-strbuf.h"
-#include "utils.h" // for _()
-#include "watchdir-base.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // for _()
+#include "libtransmission/watchdir-base.h"
 
 using namespace std::literals;
 
@@ -110,32 +111,10 @@ void BaseWatchdir::processFile(std::string_view basename)
 void BaseWatchdir::scan()
 {
     tr_error* error = nullptr;
-    auto const dir = tr_sys_dir_open(dirname_.c_str(), &error);
-    if (dir == TR_BAD_SYS_DIR)
+
+    for (auto const& file : tr_sys_dir_get_files(dirname_, tr_basename_is_not_dotfile, &error))
     {
-        tr_logAddWarn(fmt::format(
-            _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", dirname()),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
-        return;
-    }
-
-    for (;;)
-    {
-        char const* const name = tr_sys_dir_read_name(dir, &error);
-        if (name == nullptr)
-        {
-            break;
-        }
-
-        if ("."sv == name || ".."sv == name)
-        {
-            continue;
-        }
-
-        processFile(name);
+        processFile(file);
     }
 
     if (error != nullptr)
@@ -147,8 +126,6 @@ void BaseWatchdir::scan()
             fmt::arg("error_code", error->code)));
         tr_error_free(error);
     }
-
-    tr_sys_dir_close(dir);
 }
 
 } // namespace impl

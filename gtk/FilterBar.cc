@@ -1,11 +1,10 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include "FilterBar.h"
 
-#include "FaviconCache.h" // gtr_get_favicon()
 #include "FilterListModel.hh"
 #include "HigWorkarea.h" // GUI_PAD
 #include "ListModelAdapter.h"
@@ -79,7 +78,7 @@ private:
     bool activity_filter_model_update();
 
     bool tracker_filter_model_update();
-    void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeModel::Path const& path);
+    void favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const* pixbuf, Gtk::TreeModel::Path const& path);
 
     void update_filter_models(Torrent::ChangeFlags changes);
     void update_filter_models_idle(Torrent::ChangeFlags changes);
@@ -172,13 +171,13 @@ void FilterBar::Impl::tracker_model_update_count(Gtk::TreeModel::iterator const&
     }
 }
 
-void FilterBar::Impl::favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const& pixbuf, Gtk::TreeModel::Path const& path)
+void FilterBar::Impl::favicon_ready_cb(Glib::RefPtr<Gdk::Pixbuf> const* pixbuf, Gtk::TreeModel::Path const& path)
 {
-    if (pixbuf != nullptr)
+    if (pixbuf != nullptr && *pixbuf != nullptr)
     {
         if (auto const iter = tracker_model_->get_iter(path); iter)
         {
-            iter->set_value(tracker_filter_cols.pixbuf, pixbuf);
+            iter->set_value(tracker_filter_cols.pixbuf, *pixbuf);
         }
     }
 }
@@ -190,6 +189,7 @@ bool FilterBar::Impl::tracker_filter_model_update()
         int count = 0;
         std::string host;
         std::string sitename;
+        std::string announce_url;
 
         bool operator<(site_info const& that) const
         {
@@ -214,18 +214,19 @@ bool FilterBar::Impl::tracker_filter_model_update()
 
         auto const& raw_torrent = torrent->get_underlying();
 
-        auto torrent_sites_and_hosts = std::map<std::string, std::string>{};
+        auto site_to_host_and_announce = std::map<std::string, std::pair<std::string, std::string>>{};
         for (size_t j = 0, n = tr_torrentTrackerCount(&raw_torrent); j < n; ++j)
         {
             auto const view = tr_torrentTracker(&raw_torrent, j);
-            torrent_sites_and_hosts.try_emplace(std::data(view.sitename), view.host);
+            site_to_host_and_announce.try_emplace(std::data(view.sitename), view.host_and_port, view.announce);
         }
 
-        for (auto const& [sitename, host] : torrent_sites_and_hosts)
+        for (auto const& [sitename, host_and_announce] : site_to_host_and_announce)
         {
             auto& info = site_infos[sitename];
+            info.host = host_and_announce.first;
+            info.announce_url = host_and_announce.second;
             info.sitename = sitename;
-            info.host = host;
             ++info.count;
         }
 
@@ -299,10 +300,9 @@ bool FilterBar::Impl::tracker_filter_model_update()
             add->set_value(tracker_filter_cols.count, site.count);
             add->set_value(tracker_filter_cols.type, static_cast<int>(TrackerType::HOST));
             auto path = tracker_model_->get_path(add);
-            gtr_get_favicon(
-                core_->get_session(),
-                site.host,
-                [this, path](auto const& pixbuf) { favicon_ready_cb(pixbuf, path); });
+            core_->favicon_cache().load(
+                site.announce_url,
+                [this, path = std::move(path)](auto const* pixbuf) { favicon_ready_cb(pixbuf, path); });
             ++i;
         }
         else // update row
@@ -444,7 +444,7 @@ bool FilterBar::Impl::activity_filter_model_update()
         for (auto i = 0U, count = torrents_model->get_n_items(); i < count; ++i)
         {
             auto const torrent = gtr_ptr_dynamic_cast<Torrent>(torrents_model->get_object(i));
-            if (torrent != nullptr && TorrentFilter::match_activity(*torrent.get(), static_cast<ActivityType>(type)))
+            if (torrent != nullptr && TorrentFilter::match_activity(*torrent, static_cast<ActivityType>(type)))
             {
                 ++hits;
             }

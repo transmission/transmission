@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -33,6 +33,19 @@ typedef NS_ENUM(NSInteger, NSTableViewStyle) {
 
 @interface NSTableView ()
 @property NSTableViewStyle style API_AVAILABLE(macos(11.0));
+@end
+
+#endif
+
+// Compatibility declarations to build `@available(macOS 13.0, *)` code with older Xcode 11.3.1 (the last 32-bit OS compatible Xcode)
+#ifndef __MAC_13_0
+
+typedef NS_ENUM(NSInteger, NSColorWellStyle) {
+    NSColorWellStyleMinimal = 1,
+} API_AVAILABLE(macos(13.0));
+
+@interface NSColorWell ()
+@property(assign) NSColorWellStyle colorWellStyle API_AVAILABLE(macos(13.0));
 @end
 
 #endif

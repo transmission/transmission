@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -256,7 +256,7 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
     [self.fTrackerTable reloadData];
     [self.fTrackerTable deselectAll:self];
 
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //incase sort by tracker
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //in case sort by tracker
 }
 
 - (void)addRemoveTracker:(id)sender
@@ -463,7 +463,7 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
 
     [self.fTrackerTable endUpdates];
 
-    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //incase sort by tracker
+    [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //in case sort by tracker
 }
 
 @end

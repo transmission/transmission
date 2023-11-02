@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -27,13 +27,13 @@ static CGFloat const kTabMinHeight = 250;
 
 static NSInteger const kInvalidTag = -99;
 
-typedef NS_ENUM(unsigned int, tabTag) {
-    TAB_GENERAL_TAG = 0,
-    TAB_ACTIVITY_TAG = 1,
-    TAB_TRACKERS_TAG = 2,
-    TAB_PEERS_TAG = 3,
-    TAB_FILE_TAG = 4,
-    TAB_OPTIONS_TAG = 5
+typedef NS_ENUM(NSUInteger, TabTag) {
+    TabTagGeneral = 0,
+    TabTagActivity = 1,
+    TabTagTrackers = 2,
+    TabTagPeers = 3,
+    TabTagFile = 4,
+    TabTagOptions = 5
 };
 
 @interface InfoWindowController ()
@@ -103,21 +103,21 @@ typedef NS_ENUM(unsigned int, tabTag) {
     setImageAndToolTipForSegment(
         [NSImage systemSymbol:@"info.circle" withFallback:@"InfoGeneral"],
         NSLocalizedString(@"General Info", "Inspector -> tab"),
-        TAB_GENERAL_TAG);
+        TabTagGeneral);
     setImageAndToolTipForSegment(
         [NSImage systemSymbol:@"square.grid.3x3.fill.square" withFallback:@"InfoActivity"],
         NSLocalizedString(@"Activity", "Inspector -> tab"),
-        TAB_ACTIVITY_TAG);
+        TabTagActivity);
     setImageAndToolTipForSegment(
         [NSImage systemSymbol:@"antenna.radiowaves.left.and.right" withFallback:@"InfoTracker"],
         NSLocalizedString(@"Trackers", "Inspector -> tab"),
-        TAB_TRACKERS_TAG);
-    setImageAndToolTipForSegment([NSImage systemSymbol:@"person.2" withFallback:@"InfoPeers"], NSLocalizedString(@"Peers", "Inspector -> tab"), TAB_PEERS_TAG);
-    setImageAndToolTipForSegment([NSImage systemSymbol:@"doc.on.doc" withFallback:@"InfoFiles"], NSLocalizedString(@"Files", "Inspector -> tab"), TAB_FILE_TAG);
+        TabTagTrackers);
+    setImageAndToolTipForSegment([NSImage systemSymbol:@"person.2" withFallback:@"InfoPeers"], NSLocalizedString(@"Peers", "Inspector -> tab"), TabTagPeers);
+    setImageAndToolTipForSegment([NSImage systemSymbol:@"doc.on.doc" withFallback:@"InfoFiles"], NSLocalizedString(@"Files", "Inspector -> tab"), TabTagFile);
     setImageAndToolTipForSegment(
         [NSImage systemSymbol:@"gearshape" withFallback:@"InfoOptions"],
         NSLocalizedString(@"Options", "Inspector -> tab"),
-        TAB_OPTIONS_TAG);
+        TabTagOptions);
 
     //set selected tab
     self.fCurrentTabTag = kInvalidTag;
@@ -125,32 +125,32 @@ typedef NS_ENUM(unsigned int, tabTag) {
     NSInteger tag;
     if ([identifier isEqualToString:TabIdentifierInfo])
     {
-        tag = TAB_GENERAL_TAG;
+        tag = TabTagGeneral;
     }
     else if ([identifier isEqualToString:TabIdentifierActivity])
     {
-        tag = TAB_ACTIVITY_TAG;
+        tag = TabTagActivity;
     }
     else if ([identifier isEqualToString:TabIdentifierTracker])
     {
-        tag = TAB_TRACKERS_TAG;
+        tag = TabTagTrackers;
     }
     else if ([identifier isEqualToString:TabIdentifierPeers])
     {
-        tag = TAB_PEERS_TAG;
+        tag = TabTagPeers;
     }
     else if ([identifier isEqualToString:TabIdentifierFiles])
     {
-        tag = TAB_FILE_TAG;
+        tag = TabTagFile;
     }
     else if ([identifier isEqualToString:TabIdentifierOptions])
     {
-        tag = TAB_OPTIONS_TAG;
+        tag = TabTagOptions;
     }
     else //safety
     {
         [NSUserDefaults.standardUserDefaults setObject:TabIdentifierInfo forKey:@"InspectorSelected"];
-        tag = TAB_GENERAL_TAG;
+        tag = TabTagGeneral;
     }
 
     self.fTabs.selectedSegment = tag;
@@ -212,7 +212,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 - (void)windowWillClose:(NSNotification*)notification
 {
-    if (self.fCurrentTabTag == TAB_FILE_TAG && ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible))
+    if (self.fCurrentTabTag == TabTagFile && ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible))
     {
         [[QLPreviewPanel sharedPreviewPanel] reloadData];
     }
@@ -255,7 +255,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     TabIdentifier identifier;
     switch (self.fCurrentTabTag)
     {
-    case TAB_GENERAL_TAG:
+    case TabTagGeneral:
         if (!self.fGeneralViewController)
         {
             self.fGeneralViewController = [[InfoGeneralViewController alloc] init];
@@ -265,7 +265,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         self.fViewController = self.fGeneralViewController;
         identifier = TabIdentifierInfo;
         break;
-    case TAB_ACTIVITY_TAG:
+    case TabTagActivity:
         if (!self.fActivityViewController)
         {
             self.fActivityViewController = [[InfoActivityViewController alloc] init];
@@ -275,7 +275,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         self.fViewController = self.fActivityViewController;
         identifier = TabIdentifierActivity;
         break;
-    case TAB_TRACKERS_TAG:
+    case TabTagTrackers:
         if (!self.fTrackersViewController)
         {
             self.fTrackersViewController = [[InfoTrackersViewController alloc] init];
@@ -285,7 +285,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         self.fViewController = self.fTrackersViewController;
         identifier = TabIdentifierTracker;
         break;
-    case TAB_PEERS_TAG:
+    case TabTagPeers:
         if (!self.fPeersViewController)
         {
             self.fPeersViewController = [[InfoPeersViewController alloc] init];
@@ -295,7 +295,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         self.fViewController = self.fPeersViewController;
         identifier = TabIdentifierPeers;
         break;
-    case TAB_FILE_TAG:
+    case TabTagFile:
         if (!self.fFileViewController)
         {
             self.fFileViewController = [[InfoFileViewController alloc] init];
@@ -305,7 +305,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         self.fViewController = self.fFileViewController;
         identifier = TabIdentifierFiles;
         break;
-    case TAB_OPTIONS_TAG:
+    case TabTagOptions:
         if (!self.fOptionsViewController)
         {
             self.fOptionsViewController = [[InfoOptionsViewController alloc] init];
@@ -415,7 +415,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
         addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[tabs]-0-[view]-0-|" options:0 metrics:nil
                                                                  views:@{ @"tabs" : self.fTabs, @"view" : view }]];
 
-    if ((self.fCurrentTabTag == TAB_FILE_TAG || oldTabTag == TAB_FILE_TAG) &&
+    if ((self.fCurrentTabTag == TabTagFile || oldTabTag == TabTagFile) &&
         ([QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible))
     {
         [[QLPreviewPanel sharedPreviewPanel] reloadData];
@@ -482,7 +482,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 - (BOOL)canQuickLook
 {
-    if (self.fCurrentTabTag != TAB_FILE_TAG || !self.window.visible)
+    if (self.fCurrentTabTag != TabTagFile || !self.window.visible)
     {
         return NO;
     }

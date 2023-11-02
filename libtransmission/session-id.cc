@@ -1,30 +1,27 @@
-// This file Copyright © 2016-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <ctime>
 #include <string_view>
 #include <iterator> // for std::back_inserter
 
 #ifndef _WIN32
+#include <cerrno>
 #include <sys/stat.h>
 #endif
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
-
-#include "session-id.h"
-
-#include "crypto-utils.h" // for tr_rand_obj()
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "platform.h"
-#include "tr-strbuf.h" // for tr_pathbuf
-#include "utils.h" // for _()
+#include "libtransmission/crypto-utils.h" // for tr_rand_obj()
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/platform.h"
+#include "libtransmission/session-id.h"
+#include "libtransmission/tr-strbuf.h" // for tr_pathbuf
+#include "libtransmission/utils.h" // for _()
 
 using namespace std::literals;
 
@@ -119,7 +116,7 @@ tr_session_id::~tr_session_id()
     destroy_lockfile(previous_lock_file_, std::data(previous_value_));
 }
 
-bool tr_session_id::isLocal(std::string_view session_id) noexcept
+bool tr_session_id::is_local(std::string_view session_id) noexcept
 {
     if (std::empty(session_id))
     {

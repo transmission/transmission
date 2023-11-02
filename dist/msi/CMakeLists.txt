@@ -29,6 +29,9 @@ set(MSI_FILENAME_VERSION "${TR_SEMVER}")
 if(NOT TR_STABLE_RELEASE AND NOT "${TR_VCS_REVISION}" STREQUAL "")
     string(APPEND MSI_FILENAME_VERSION "+r${TR_VCS_REVISION}")
 endif()
+if(NOT Qt_VERSION_MAJOR EQUAL 6)
+    string(APPEND MSI_FILENAME_VERSION "-qt${Qt_VERSION_MAJOR}")
+endif()
 
 if(NOT TR_THIRD_PARTY_DIR)
     set(TR_THIRD_PARTY_DIR "$<TARGET_FILE_DIR:OpenSSL::SSL>/..")
@@ -55,7 +58,7 @@ else()
 endif()
 
 file(
-    COPY "${CMAKE_SOURCE_DIR}/qt/icons/transmission.ico"
+    COPY "${PROJECT_SOURCE_DIR}/qt/icons/transmission.ico"
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/public_html")

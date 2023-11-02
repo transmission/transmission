@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,6 +8,8 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
+#include <array>
+#include <cstddef> // size_t
 #include <memory>
 
 #include <openssl/crypto.h>
@@ -20,12 +22,11 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
-
-#include "crypto-utils.h"
-#include "log.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, tr_sha25...
+#include "libtransmission/utils.h"
 
 namespace
 {

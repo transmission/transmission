@@ -1,4 +1,4 @@
-// This file Copyright © 2011-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,16 +12,17 @@
 #include <string>
 #include <string_view>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <fmt/xchar.h> // for wchar_t support
 
 #include <windows.h>
 
-#include "transmission.h"
-#include "error.h"
-#include "subprocess.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/error.h"
+#include "libtransmission/subprocess.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -204,7 +205,7 @@ auto get_app_type(char const* app)
 {
     auto const lower = tr_strlower(app);
 
-    if (tr_strvEndsWith(lower, ".cmd") || tr_strvEndsWith(lower, ".bat"))
+    if (tr_strv_ends_with(lower, ".cmd") || tr_strv_ends_with(lower, ".bat"))
     {
         return tr_app_type::BATCH;
     }

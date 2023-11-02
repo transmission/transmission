@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -37,12 +37,13 @@ public:
 
     /* The Torrent properties that can affect this filter.
        When one of these changes, it's time to refilter. */
-    static Torrent::fields_t constexpr TorrentFields = //
-        (uint64_t(1) << Torrent::ERROR) | //
-        (uint64_t(1) << Torrent::IS_FINISHED) | //
-        (uint64_t(1) << Torrent::PEERS_GETTING_FROM_US) | //
-        (uint64_t(1) << Torrent::PEERS_SENDING_TO_US) | //
-        (uint64_t(1) << Torrent::STATUS);
+    static constexpr auto TorrentFields = Torrent::fields_t{
+        (uint64_t{ 1 } << Torrent::TORRENT_ERROR) | //
+        (uint64_t{ 1 } << Torrent::IS_FINISHED) | //
+        (uint64_t{ 1 } << Torrent::PEERS_GETTING_FROM_US) | //
+        (uint64_t{ 1 } << Torrent::PEERS_SENDING_TO_US) | //
+        (uint64_t{ 1 } << Torrent::STATUS) //
+    };
 
     static bool test(Torrent const& tor, int mode);
 

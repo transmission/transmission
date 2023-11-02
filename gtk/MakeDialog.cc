@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -175,7 +175,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
 
     if (!is_done)
     {
-        auto const [current, total] = builder_.checksumStatus();
+        auto const [current, total] = builder_.checksum_status();
         percent_done = static_cast<double>(current) / total;
         piece_index = current;
     }
@@ -225,7 +225,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
         /* how much data we've scanned through to generate checksums */
         str = fmt::format(
             _("Scanned {file_size}"),
-            fmt::arg("file_size", tr_strlsize(static_cast<uint64_t>(piece_index) * builder_.pieceSize())));
+            fmt::arg("file_size", tr_strlsize(static_cast<uint64_t>(piece_index) * builder_.piece_size())));
     }
 
     progress_bar_->set_fraction(percent_done);
@@ -258,7 +258,8 @@ void MakeProgressDialog::onProgressDialogResponse(int response)
     switch (response)
     {
     case TR_GTK_RESPONSE_TYPE(CANCEL):
-        builder_.cancelChecksums();
+    case TR_GTK_RESPONSE_TYPE(DELETE_EVENT):
+        builder_.cancel_checksums();
         close();
         break;
 
@@ -316,7 +317,7 @@ std::unique_ptr<MakeProgressDialog> MakeProgressDialog::create(
 
 void MakeDialog::Impl::onResponse(int response)
 {
-    if (response == TR_GTK_RESPONSE_TYPE(CLOSE))
+    if (response == TR_GTK_RESPONSE_TYPE(CLOSE) || response == TR_GTK_RESPONSE_TYPE(DELETE_EVENT))
     {
         dialog_.close();
         return;
@@ -335,24 +336,24 @@ void MakeDialog::Impl::onResponse(int response)
     // build the announce list
     auto trackers = tr_announce_list{};
     trackers.parse(announce_text_buffer_->get_text(false).raw());
-    builder_->setAnnounceList(std::move(trackers));
+    builder_->set_announce_list(std::move(trackers));
 
     // comment
     if (comment_check_->get_active())
     {
-        builder_->setComment(comment_entry_->get_text().raw());
+        builder_->set_comment(comment_entry_->get_text().raw());
     }
 
     // source
     if (source_check_->get_active())
     {
-        builder_->setSource(source_entry_->get_text().raw());
+        builder_->set_source(source_entry_->get_text().raw());
     }
 
-    builder_->setPrivate(private_check_->get_active());
+    builder_->set_private(private_check_->get_active());
 
     // build the .torrent
-    progress_dialog_ = MakeProgressDialog::create(target, *builder_, builder_->makeChecksums(), core_);
+    progress_dialog_ = MakeProgressDialog::create(target, *builder_, builder_->make_checksums(), core_);
     progress_dialog_->set_transient_for(dialog_);
     gtr_window_on_close(
         *progress_dialog_,
@@ -384,17 +385,17 @@ void MakeDialog::Impl::updatePiecesLabel()
     else
     {
         gstr += fmt::format(
-            ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", builder_->fileCount()),
-            fmt::arg("total_size", tr_strlsize(builder_->totalSize())),
-            fmt::arg("file_count", builder_->fileCount()));
+            ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", builder_->file_count()),
+            fmt::arg("total_size", tr_strlsize(builder_->total_size())),
+            fmt::arg("file_count", builder_->file_count()));
         gstr += ' ';
         gstr += fmt::format(
             ngettext(
                 "({piece_count} BitTorrent piece @ {piece_size})",
                 "({piece_count} BitTorrent pieces @ {piece_size})",
-                builder_->pieceCount()),
-            fmt::arg("piece_count", builder_->pieceCount()),
-            fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize())));
+                builder_->piece_count()),
+            fmt::arg("piece_count", builder_->piece_count()),
+            fmt::arg("piece_size", tr_formatter_mem_B(builder_->piece_size())));
     }
 
     pieces_lb_->set_text(gstr);
@@ -415,7 +416,7 @@ void MakeDialog::Impl::setFilename(std::string_view filename)
     if (!filename.empty())
     {
         builder_.emplace(filename);
-        configurePieceSizeScale(builder_->pieceSize());
+        configurePieceSizeScale(builder_->piece_size());
     }
 
     updatePiecesLabel();
@@ -561,7 +562,7 @@ void MakeDialog::Impl::onPieceSizeUpdated()
 {
     if (builder_)
     {
-        builder_->setPieceSize(static_cast<uint32_t>(std::pow(2, piece_size_scale_->get_value())));
+        builder_->set_piece_size(static_cast<uint32_t>(std::pow(2, piece_size_scale_->get_value())));
         updatePiecesLabel();
     }
 }

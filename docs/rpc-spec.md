@@ -10,10 +10,10 @@ If `transmission-remote` is called with a `--debug` argument, its RPC traffic to
 
 If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, it too will dump the RPC requests and responses to the terminal for inspection.
 
-Lastly, using devtools in the Transmission web client is always an option.
+Lastly, using the browser's developer tools in the Transmission web client is always an option.
 
 ### 1.3 Libraries of ready-made wrappers
-Some people outside of the Transmission project have written libraries that wrap this RPC API. These aren't supported by the Transmission project, but are listed herer in the hope that they may be useful:
+Some people outside of the Transmission project have written libraries that wrap this RPC API. These aren't supported by the Transmission project, but are listed here in the hope that they may be useful:
 
 | Language | Link
 |:---|:---
@@ -112,13 +112,14 @@ username and password (respectively), separated by a colon.
 
 ## 3 Torrent requests
 ### 3.1 Torrent action requests
-| Method name          | libtransmission function
+| Method name            | libtransmission function
 |:--|:--
-| `torrent-start`      | tr_torrentStart
-| `torrent-start-now`  | tr_torrentStartNow
-| `torrent-stop`       | tr_torrentStop
-| `torrent-verify`     | tr_torrentVerify
-| `torrent-reannounce` | tr_torrentManualUpdate ("ask tracker for more peers")
+| `torrent-start`        | tr_torrentStart
+| `torrent-start-now`    | tr_torrentStartNow
+| `torrent-stop`         | tr_torrentStop
+| `torrent-verify`       | tr_torrentVerify
+| `torrent-verify-force` | tr_torrentVerifyForce
+| `torrent-reannounce`   | tr_torrentManualUpdate ("ask tracker for more peers")
 
 Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
@@ -157,8 +158,9 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
+| `sequentialDownload`  | boolean  | download torrent pieces sequentially
 | `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
-| `trackerList`         | string   | string of announce URLs, one per line, with a blank line between tiers
+| `trackerList`         | string   | string of announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
 | `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
 | `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
 | `uploadLimit`         | number   | maximum upload speed (KBps)
@@ -264,14 +266,15 @@ The 'source' column here corresponds to the data structure there.
 | `secondsDownloading`| number| tr_stat
 | `secondsSeeding`| number| tr_stat
 | `seedIdleLimit`| number| tr_torrent
-| `seedIdleMode`| number| tr_inactvelimit
+| `seedIdleMode`| number| tr_inactivelimit
 | `seedRatioLimit`| double| tr_torrent
 | `seedRatioMode`| number| tr_ratiolimit
+| `sequentialDownload`| boolean| tr_torrent
 | `sizeWhenDone`| number| tr_stat
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
 | `trackers`| array (see below)| n/a
-' `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
+| `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
 | `trackerStats`| array (see below)| n/a
 | `totalSize`| number| tr_torrent_view
 | `torrentFile`| string| tr_info
@@ -292,6 +295,8 @@ The 'source' column here corresponds to the data structure there.
 | `bytesCompleted` | number | tr_file_view
 | `length` | number | tr_file_view
 | `name` | string | tr_file_view
+| `beginPiece` | number | tr_file_view
+| `endPiece` | number | tr_file_view
 
 
 `fileStats`: a file's non-constant properties. An array of `tr_info.filecount` objects, each containing:
@@ -299,7 +304,7 @@ The 'source' column here corresponds to the data structure there.
 | Key | Value Type | transmission.h source
 |:--|:--|:--
 | `bytesCompleted` | number | tr_file_view
-| `wanted` | boolean | tr_file_view
+| `wanted` | number | tr_file_view (**Note:** For backwards compatibility, this is serialized as an array of `0` or `1` that should be treated as booleans)
 | `priority` | number | tr_file_view
 
 `peers`: an array of objects, each containing:
@@ -396,7 +401,7 @@ The 'source' column here corresponds to the data structure there.
 | `tier`                    | number     | tr_tracker_view
 
 
-`wanted`: An array of `tr_torrentFileCount()` booleans true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
+`wanted`: An array of `tr_torrentFileCount()` Booleans true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
 
 
 Example:
@@ -505,7 +510,7 @@ Request arguments:
 
 | Key | Value Type | Description
 |:--|:--|:--
-| `ids` | array | the torrent torrent list, as described in 3.1 (must only be 1 torrent)
+| `ids` | array | the torrent list, as described in 3.1 (must only be 1 torrent)
 | `path` | string | the path to the file or folder that will be renamed
 | `name` | string | the file or folder's new name
 
@@ -527,8 +532,8 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
 | `cache-size-mb` | number | maximum size of the disk cache (MB)
 | `config-dir` | string | location of transmission's configuration directory
-| `default-trackers` | list of default trackers to use on public torrents
-| `dht-enabled` | boolean | true means allow dht in public torrents
+| `default-trackers` | string | announce URLs, one per line, and a blank line between [tiers](https://www.bittorrent.org/beps/bep_0012.html).
+| `dht-enabled` | boolean | true means allow DHT in public torrents
 | `download-dir` | string | default path to download torrents
 | `download-dir-free-space` | number |  **DEPRECATED** Use the `free-space` method instead.
 | `download-queue-enabled` | boolean | if true, limit how many torrents can be downloaded at once
@@ -543,7 +548,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `peer-limit-per-torrent` | number | maximum global number of peers
 | `peer-port-random-on-start` | boolean | true means pick a random peer port on launch
 | `peer-port` | number | port number
-| `pex-enabled` | boolean | true means allow pex in public torrents
+| `pex-enabled` | boolean | true means allow PEX in public torrents
 | `port-forwarding-enabled` | boolean | true means ask upstream router to forward the configured peer port to transmission using UPnP or NAT-PMP
 | `queue-stalled-enabled` | boolean | whether or not to consider idle torrents as stalled
 | `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
@@ -561,6 +566,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `seed-queue-size` | number | max number of torrents to uploaded at once (see seed-queue-enabled)
 | `seedRatioLimit` | double | the default seed ratio for torrents to use
 | `seedRatioLimited` | boolean | true if seedRatioLimit is honored by default
+| `session-id` | string | the current `X-Transmission-Session-Id` value
 | `speed-limit-down-enabled` | boolean | true means enabled
 | `speed-limit-down` | number | max global download speed (KBps)
 | `speed-limit-up-enabled` | boolean | true means enabled
@@ -568,7 +574,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `start-added-torrents` | boolean | true means added torrents will be started right away
 | `trash-original-torrent-files` | boolean | true means the .torrent file of added torrents will be deleted
 | `units` | object | see below
-| `utp-enabled` | boolean | true means allow utp
+| `utp-enabled` | boolean | true means allow UTP
 | `version` | string | long version string `$version ($revision)`
 
 
@@ -603,6 +609,7 @@ except:
 * `rpc-version-semver`
 * `rpc-version`
 * `session-id`
+* `units`
 * `version`
 
 Response arguments: none
@@ -636,11 +643,11 @@ A stats object contains:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| uploadedBytes    | number     | tr_session_stats
-| downloadedBytes  | number     | tr_session_stats
-| filesAdded       | number     | tr_session_stats
-| sessionCount     | number     | tr_session_stats
-| secondsActive    | number     | tr_session_stats
+| `uploadedBytes`    | number     | tr_session_stats
+| `downloadedBytes`  | number     | tr_session_stats
+| `filesAdded`       | number     | tr_session_stats
+| `sessionCount`     | number     | tr_session_stats
+| `secondsActive`    | number     | tr_session_stats
 
 ### 4.3 Blocklist
 Method name: `blocklist-update`
@@ -655,9 +662,18 @@ from the outside world.
 
 Method name: `port-test`
 
-Request arguments: none
+Request arguments: an optional argument `ipProtocol`.
+`ipProtocol` is a string specifying the IP protocol version to be used for the port test.
+Set to `ipv4` to *only* check IPv4, set to `ipv6` to *only* check IPv6,
+or set to `any` to check if the port is open on *any* of the IP protocol versions.
+Omitting `ipProtocol` is the same as setting it to `any`.
 
-Response arguments: a bool, `port-is-open`
+Response arguments:
+
+| Key | Value Type | Description
+| :-- | :-- | :--
+| `port-is-open` | boolean | true if port is open, false if port is closed
+| `ipProtocol` | string | copied from request argument `ipProtocol` if it was specified
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
@@ -976,7 +992,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 |:---|:---
 | `/upload` | :warning: undocumented `/upload` endpoint removed
 | `session-get` | :warning: **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
-| `free-space` | new return arg `total-capacity`
+| `free-space` | new return arg `total_size`
 | `session-get` | new arg `default-trackers`
 | `session-get` | new arg `rpc-version-semver`
 | `session-get` | new arg `script-torrent-added-enabled`
@@ -999,4 +1015,14 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `torrent-set` | :warning: **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
 | `group-set` | new method
 | `group-get` | new method
+| `torrent-get` | :warning: old arg `wanted` was implemented as an array of `0` or `1` in Transmission 3.00 and older, despite being documented as an array of booleans. Transmission 4.0.0 and 4.0.1 "fixed" this by returning an array of booleans; but in practical terms, this change caused an unannounced breaking change for any 3rd party code that expected `0` or `1`. For this reason, 4.0.2 restored the 3.00 behavior and updated this spec to match the code.
 
+Transmission 4.1.0 (`rpc-version-semver` 5.4.0, `rpc-version`: 18)
+| Method | Description
+|:---|:---
+| `torrent-get` | new arg `sequentialDownload`
+| `torrent-set` | new arg `sequentialDownload`
+| `torrent-get` | new arg `files.beginPiece`
+| `torrent-get` | new arg `files.endPiece`
+| `port-test` | new arg `ipProtocol`
+| `torrent-verify-force` | new method

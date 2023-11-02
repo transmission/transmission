@@ -62,7 +62,7 @@
         <translation>Ich &amp;stimme zu</translation>
     </message>
     <message numerus="yes">
-        <location line="+105"/>
+        <location line="+110"/>
         <source>Torrent(s) Completed</source>
         <translation>
             <numerusform>Torrent abgeschlossen</numerusform>
@@ -78,7 +78,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+429"/>
+        <location filename="../DetailsDialog.cc" line="+432"/>
         <source>None</source>
         <translation>Keine</translation>
     </message>
@@ -230,12 +230,12 @@
         </translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+35"/>
         <source>Add tracker announce URLs, one per line:</source>
         <translation>Tracker Announce URL hinzufügen, eine pro Zeile:</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+37"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
@@ -245,7 +245,7 @@
         <translation>Keine neuen URLs gefunden.</translation>
     </message>
     <message>
-        <location line="-834"/>
+        <location line="-843"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -274,12 +274,12 @@
         <translation>Nicht verfügbar</translation>
     </message>
     <message>
-        <location line="+391"/>
+        <location line="+390"/>
         <source>Add URL(s)</source>
         <translation>URL(s) hinzufügen</translation>
     </message>
     <message>
-        <location line="+97"/>
+        <location line="+114"/>
         <source>High</source>
         <translation>Hoch</translation>
     </message>
@@ -633,7 +633,7 @@
     <message>
         <location line="+1"/>
         <source>Rename…</source>
-        <translation>Umbenennen...</translation>
+        <translation>Umbenennen…</translation>
     </message>
 </context>
 <context>
@@ -687,7 +687,7 @@
     <message>
         <location line="+11"/>
         <source>Search…</source>
-        <translation>Suche ...</translation>
+        <translation>Suche…</translation>
     </message>
 </context>
 <context>
@@ -819,7 +819,7 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space…&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Berechne freien Platz ...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;Berechne freien Platz…&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -905,7 +905,7 @@
     <message>
         <location line="+171"/>
         <source>&amp;Open…</source>
-        <translation>&amp;Öffne ...</translation>
+        <translation>&amp;Öffne…</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1236,13 +1236,13 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+733"/>
+        <location line="+752"/>
         <location line="+9"/>
         <source>Limited at %1</source>
         <translation>Begrenzt auf %1</translation>
     </message>
     <message>
-        <location line="-687"/>
+        <location line="-706"/>
         <source>Limit Upload Speed</source>
         <translation>Upload-Geschwindigkeit begrenzen</translation>
     </message>
@@ -1258,7 +1258,7 @@
     </message>
     <message>
         <location line="+6"/>
-        <location line="+720"/>
+        <location line="+739"/>
         <source>Stop at Ratio (%1)</source>
         <translation>Stoppen bei Verhältnis (%1)</translation>
     </message>
@@ -1301,12 +1301,12 @@
         <translation>Torrent öffnen</translation>
     </message>
     <message>
-        <location line="-984"/>
+        <location line="-1003"/>
         <source>Speed Limits</source>
         <translation>Geschwindigkeitsbegrenzungen</translation>
     </message>
     <message>
-        <location line="+518"/>
+        <location line="+537"/>
         <source>Network Error</source>
         <translation>Netzwerkfehler</translation>
     </message>
@@ -2178,12 +2178,12 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-308"/>
+        <location filename="../Application.cc" line="-313"/>
         <source>Invalid option</source>
         <translation>Ungültige Option</translation>
     </message>
     <message>
-        <location line="+307"/>
+        <location line="+312"/>
         <source>Start Now</source>
         <translation>Jetzt starten</translation>
     </message>
@@ -2224,7 +2224,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+501"/>
+        <location filename="../Session.cc" line="+505"/>
         <source>Error Renaming Path</source>
         <translation>Fehler beim Umbenennen des Pfades</translation>
     </message>
@@ -2536,7 +2536,7 @@ Um eine weitere primäre URL hinzuzufügen, muss diese nach einer Leerzeile eing
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+210"/>
+        <location filename="../TrackerDelegate.cc" line="+216"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>

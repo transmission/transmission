@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -15,10 +15,11 @@
 #include <optional>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "block-info.h"
-#include "bitfield.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/tr-macros.h"
 
 /**
  * @brief knows which blocks and pieces we have
@@ -27,7 +28,7 @@ struct tr_completion
 {
     struct torrent_view
     {
-        virtual bool pieceIsWanted(tr_piece_index_t piece) const = 0;
+        virtual bool piece_is_wanted(tr_piece_index_t piece) const = 0;
 
         virtual ~torrent_view() = default;
     };
@@ -35,9 +36,9 @@ struct tr_completion
     explicit tr_completion(torrent_view const* tor, tr_block_info const* block_info)
         : tor_{ tor }
         , block_info_{ block_info }
-        , blocks_{ block_info_->blockCount() }
+        , blocks_{ block_info_->block_count() }
     {
-        blocks_.setHasNone();
+        blocks_.set_has_none();
     }
 
     [[nodiscard]] constexpr tr_bitfield const& blocks() const noexcept
@@ -45,70 +46,70 @@ struct tr_completion
         return blocks_;
     }
 
-    [[nodiscard]] constexpr bool hasAll() const noexcept
+    [[nodiscard]] constexpr bool has_all() const noexcept
     {
-        return hasMetainfo() && blocks_.hasAll();
+        return has_metainfo() && blocks_.has_all();
     }
 
-    [[nodiscard]] TR_CONSTEXPR20 bool hasBlock(tr_block_index_t block) const
+    [[nodiscard]] TR_CONSTEXPR20 bool has_block(tr_block_index_t block) const
     {
         return blocks_.test(block);
     }
 
-    [[nodiscard]] bool hasBlocks(tr_block_span_t span) const
+    [[nodiscard]] bool has_blocks(tr_block_span_t span) const
     {
         return blocks_.count(span.begin, span.end) == span.end - span.begin;
     }
 
-    [[nodiscard]] constexpr bool hasNone() const noexcept
+    [[nodiscard]] constexpr bool has_none() const noexcept
     {
-        return !hasMetainfo() || blocks_.hasNone();
+        return !has_metainfo() || blocks_.has_none();
     }
 
-    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const
+    [[nodiscard]] bool has_piece(tr_piece_index_t piece) const
     {
-        return block_info_->pieceSize() != 0 && countMissingBlocksInPiece(piece) == 0;
+        return block_info_->piece_size() != 0 && count_missing_blocks_in_piece(piece) == 0;
     }
 
-    [[nodiscard]] constexpr uint64_t hasTotal() const noexcept
+    [[nodiscard]] constexpr uint64_t has_total() const noexcept
     {
         return size_now_;
     }
 
-    [[nodiscard]] uint64_t hasValid() const;
+    [[nodiscard]] uint64_t has_valid() const;
 
-    [[nodiscard]] auto leftUntilDone() const
+    [[nodiscard]] auto left_until_done() const
     {
-        return sizeWhenDone() - hasTotal();
+        return size_when_done() - has_total();
     }
 
-    [[nodiscard]] constexpr double percentComplete() const
+    [[nodiscard]] constexpr double percent_complete() const
     {
-        auto const denom = block_info_->totalSize();
+        auto const denom = block_info_->total_size();
         return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
     }
 
-    [[nodiscard]] double percentDone() const
+    [[nodiscard]] double percent_done() const
     {
-        auto const denom = sizeWhenDone();
+        auto const denom = size_when_done();
         return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
     }
 
-    [[nodiscard]] uint64_t sizeWhenDone() const;
+    [[nodiscard]] uint64_t size_when_done() const;
 
     [[nodiscard]] tr_completeness status() const
     {
-        if (!hasMetainfo())
+        if (!has_metainfo())
         {
             return TR_LEECH;
         }
 
-        if (hasAll())
+        if (has_all())
         {
             return TR_SEED;
         }
 
-        if (size_now_ == sizeWhenDone())
+        if (size_now_ == size_when_done())
         {
             return TR_PARTIAL_SEED;
         }
@@ -116,61 +117,63 @@ struct tr_completion
         return TR_LEECH;
     }
 
-    [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const;
+    [[nodiscard]] std::vector<uint8_t> create_piece_bitfield() const;
 
-    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] size_t count_missing_blocks_in_piece(tr_piece_index_t piece) const
     {
-        auto const [begin, end] = block_info_->blockSpanForPiece(piece);
+        auto const [begin, end] = block_info_->block_span_for_piece(piece);
         return (end - begin) - blocks_.count(begin, end);
     }
 
-    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] size_t count_missing_bytes_in_piece(tr_piece_index_t piece) const
     {
-        return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
+        return block_info_->piece_size(piece) - count_has_bytes_in_piece(piece);
     }
 
-    void amountDone(float* tab, size_t n_tabs) const;
+    void amount_done(float* tab, size_t n_tabs) const;
 
-    void addBlock(tr_block_index_t block);
-    void addPiece(tr_piece_index_t piece);
-    void removePiece(tr_piece_index_t piece);
+    void add_block(tr_block_index_t block);
+    void add_piece(tr_piece_index_t piece);
+    void remove_piece(tr_piece_index_t piece);
 
-    void setHasPiece(tr_piece_index_t i, bool has)
+    void set_has_piece(tr_piece_index_t i, bool has)
     {
         if (has)
         {
-            addPiece(i);
+            add_piece(i);
         }
         else
         {
-            removePiece(i);
+            remove_piece(i);
         }
     }
 
-    void setHasAll() noexcept;
+    void set_has_all() noexcept;
 
-    void setBlocks(tr_bitfield blocks);
+    void set_blocks(tr_bitfield blocks);
 
-    void invalidateSizeWhenDone()
+    void invalidate_size_when_done()
     {
         size_when_done_.reset();
     }
 
-    [[nodiscard]] uint64_t countHasBytesInSpan(tr_byte_span_t) const;
+    [[nodiscard]] uint64_t count_has_bytes_in_span(tr_byte_span_t) const;
 
-    [[nodiscard]] constexpr bool hasMetainfo() const noexcept
+    [[nodiscard]] constexpr bool has_metainfo() const noexcept
     {
         return !std::empty(blocks_);
     }
 
 private:
-    [[nodiscard]] uint64_t computeHasValid() const;
-    [[nodiscard]] uint64_t computeSizeWhenDone() const;
+    [[nodiscard]] uint64_t compute_has_valid() const;
+    [[nodiscard]] uint64_t compute_size_when_done() const;
 
-    [[nodiscard]] uint64_t countHasBytesInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] uint64_t count_has_bytes_in_piece(tr_piece_index_t piece) const
     {
-        return countHasBytesInSpan(block_info_->byteSpanForPiece(piece));
+        return count_has_bytes_in_span(block_info_->byte_span_for_piece(piece));
     }
+
+    void remove_block(tr_block_index_t block);
 
     torrent_view const* tor_;
     tr_block_info const* block_info_;

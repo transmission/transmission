@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -68,7 +68,7 @@ void FreeSpaceLabel::onTimer()
     tr_variantInitDict(&args, 1);
     dictAdd(&args, TR_KEY_path, path_);
 
-    auto* q = new RpcQueue(this);
+    auto* q = new RpcQueue{ this };
 
     q->add([this, &args]() { return session_->exec("free-space", &args); });
 
@@ -82,7 +82,7 @@ void FreeSpaceLabel::onTimer()
             }
             else
             {
-                setText(QString());
+                setText(QString{});
             }
 
             // update the tooltip

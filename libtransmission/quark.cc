@@ -1,4 +1,4 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,16 +9,14 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
-
-#include "quark.h"
+#include "libtransmission/quark.h"
 
 using namespace std::literals;
 
 namespace
 {
 
-auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
+auto constexpr MyStatic = std::array<std::string_view, 406>{ ""sv,
                                                              "activeTorrentCount"sv,
                                                              "activity-date"sv,
                                                              "activityDate"sv,
@@ -47,6 +45,7 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "availability"sv,
                                                              "bandwidth-priority"sv,
                                                              "bandwidthPriority"sv,
+                                                             "beginPiece"sv,
                                                              "bind-address-ipv4"sv,
                                                              "bind-address-ipv6"sv,
                                                              "bitfield"sv,
@@ -108,6 +107,7 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "editDate"sv,
                                                              "encoding"sv,
                                                              "encryption"sv,
+                                                             "endPiece"sv,
                                                              "error"sv,
                                                              "errorString"sv,
                                                              "eta"sv,
@@ -154,6 +154,7 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "incomplete-dir-enabled"sv,
                                                              "info"sv,
                                                              "inhibit-desktop-hibernation"sv,
+                                                             "ipProtocol"sv,
                                                              "ipv4"sv,
                                                              "ipv6"sv,
                                                              "isBackup"sv,
@@ -217,7 +218,6 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "paused"sv,
                                                              "pausedTorrentCount"sv,
                                                              "peer-congestion-algorithm"sv,
-                                                             "peer-id-ttl-hours"sv,
                                                              "peer-limit"sv,
                                                              "peer-limit-global"sv,
                                                              "peer-limit-per-torrent"sv,
@@ -248,6 +248,7 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "port-forwarding-enabled"sv,
                                                              "port-is-open"sv,
                                                              "preallocation"sv,
+                                                             "preferred-transport"sv,
                                                              "prefetch-enabled"sv,
                                                              "primary-mime-type"sv,
                                                              "priorities"sv,
@@ -330,6 +331,7 @@ auto constexpr MyStatic = std::array<std::string_view, 402>{ ""sv,
                                                              "seedRatioMode"sv,
                                                              "seederCount"sv,
                                                              "seeding-time-seconds"sv,
+                                                             "sequentialDownload"sv,
                                                              "session-count"sv,
                                                              "session-id"sv,
                                                              "sessionCount"sv,

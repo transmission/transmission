@@ -1,23 +1,26 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <assert.h>
-#include <errno.h>
-#include <pthread.h>
+#include <cassert>
+#include <cerrno>
+#include <csignal>
+#include <string_view>
+
+#include <fcntl.h>
+#include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
+
 #ifdef HAVE_SYS_SIGNALFD_H
 #include <sys/signalfd.h>
 #endif /* signalfd API */
+
 #include <event2/event.h>
-#include <signal.h>
-#include <stdlib.h> /* abort(), daemon(), exit() */
-#include <fcntl.h> /* open() */
-#include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
 
-#include <string_view>
+#include <fmt/core.h>
 
-#include <fmt/format.h>
+#include <libtransmission/error.h>
+#include <libtransmission/utils.h>
 
 #include "daemon.h"
 
@@ -52,10 +55,9 @@ static void handle_signals(evutil_socket_t fd, short /*what*/, void* arg)
     }
 }
 
-bool tr_daemon::setup_signals()
+bool tr_daemon::setup_signals(struct event*& sig_ev)
 {
     sigset_t mask = {};
-    struct event* sigev = nullptr;
     struct event_base* base = ev_base_;
 
     sigemptyset(&mask);
@@ -70,24 +72,15 @@ bool tr_daemon::setup_signals()
     if (sigfd_ < 0)
         return false;
 
-    sigev = event_new(base, sigfd_, EV_READ | EV_PERSIST, handle_signals, this);
-    if (sigev == nullptr)
-    {
-        close(sigfd_);
-        return false;
-    }
+    sig_ev = event_new(base, sigfd_, EV_READ | EV_PERSIST, handle_signals, this);
 
-    if (event_add(sigev, nullptr) < 0)
-    {
-        event_del(sigev);
-        close(sigfd_);
-        return false;
-    }
-
-    return true;
+    return sig_ev != nullptr && event_add(sig_ev, nullptr) >= 0;
 }
 
 #else /* no signalfd API, use evsignal */
+
+namespace
+{
 
 static void reconfigureMarshall(evutil_socket_t /*fd*/, short /*events*/, void* arg)
 {
@@ -99,29 +92,44 @@ static void stopMarshall(evutil_socket_t /*fd*/, short /*events*/, void* arg)
     static_cast<tr_daemon*>(arg)->stop();
 }
 
-static bool setup_signal(struct event_base* base, int sig, void (*callback)(evutil_socket_t, short, void*), void* arg)
+static bool setup_signal(
+    struct event_base* base,
+    struct event*& sig_ev,
+    int sig,
+    void (*callback)(evutil_socket_t, short, void*),
+    void* arg)
 {
-    struct event* sigev = evsignal_new(base, sig, callback, arg);
+    sig_ev = evsignal_new(base, sig, callback, arg);
 
-    if (sigev == nullptr)
-        return false;
-
-    if (evsignal_add(sigev, nullptr) < 0)
-    {
-        event_free(sigev);
-        return false;
-    }
-
-    return true;
+    return sig_ev != nullptr && evsignal_add(sig_ev, nullptr) >= 0;
 }
 
-bool tr_daemon::setup_signals()
+} // anonymous namespace
+
+bool tr_daemon::setup_signals(struct event*& sig_ev)
 {
-    return setup_signal(ev_base_, SIGHUP, reconfigureMarshall, this) && setup_signal(ev_base_, SIGINT, stopMarshall, this) &&
-        setup_signal(ev_base_, SIGTERM, stopMarshall, this);
+    return setup_signal(ev_base_, sig_ev, SIGHUP, reconfigureMarshall, this) &&
+        setup_signal(ev_base_, sig_ev, SIGINT, stopMarshall, this) &&
+        setup_signal(ev_base_, sig_ev, SIGTERM, stopMarshall, this);
 }
 
 #endif /* HAVE_SYS_SIGNALFD_H */
+
+void tr_daemon::cleanup_signals(struct event* sig_ev) const
+{
+    if (sig_ev != nullptr)
+    {
+        event_del(sig_ev);
+        event_free(sig_ev);
+    }
+
+#ifdef HAVE_SYS_SIGNALFD_H
+    if (sigfd_ >= 0)
+    {
+        close(sigfd_);
+    }
+#endif /* HAVE_SYS_SIGNALFD_H */
+}
 
 bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error** error)
 {

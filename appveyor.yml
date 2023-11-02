@@ -11,8 +11,16 @@ environment:
   matrix:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     TR_ARCH: x86
+    QT_VERSION: '5'
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    TR_ARCH: x86
+    QT_VERSION: '6'
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     TR_ARCH: x64
+    QT_VERSION: '5'
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+    TR_ARCH: x64
+    QT_VERSION: '6'
 
 branches:
   only:
@@ -80,6 +88,7 @@ for:
               -Mode Build `
               -BuildArch $env:TR_ARCH `
               -CCachePart App `
+              -UseQtVersion $Env:QT_VERSION `
               -PackDebugSyms:$($Env:APPVEYOR_REPO_BRANCH -eq "main" -or $Env:APPVEYOR_REPO_TAG -eq "true")
       } catch {
           Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue

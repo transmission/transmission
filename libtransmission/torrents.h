@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,14 +9,19 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
+#include <cstddef> // size_t
 #include <ctime>
+#include <functional>
+#include <iterator>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "torrent-metainfo.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_torrent;
 struct tr_torrent_metainfo;
@@ -43,13 +48,16 @@ public:
 
     [[nodiscard]] tr_torrent const* get(tr_torrent_metainfo const& metainfo) const
     {
-        return get(metainfo.infoHash());
+        return get(metainfo.info_hash());
     }
 
     [[nodiscard]] tr_torrent* get(tr_torrent_metainfo const& metainfo)
     {
-        return get(metainfo.infoHash());
+        return get(metainfo.info_hash());
     }
+
+    // O(n)}
+    [[nodiscard]] tr_torrent* find_from_obfuscated_hash(tr_sha1_digest_t const& obfuscated_hash);
 
     // These convenience functions use get(tr_sha1_digest_t const&)
     // after parsing the magnet link to get the info hash. If you have
@@ -100,6 +108,24 @@ public:
     [[nodiscard]] TR_CONSTEXPR20 auto empty() const noexcept
     {
         return std::empty(by_hash_);
+    }
+
+    [[nodiscard]] auto get_matching(std::function<bool(tr_torrent const*)> pred_in) const
+    {
+        auto const pred = [&pred_in](tr_torrent const* const tor)
+        {
+            return tor != nullptr && pred_in(tor);
+        };
+
+        auto vec = std::vector<tr_torrent*>{};
+        vec.reserve(size());
+        std::copy_if(std::begin(by_id_), std::end(by_id_), std::back_inserter(vec), pred);
+        return vec;
+    }
+
+    [[nodiscard]] auto get_all() const
+    {
+        return get_matching([](tr_torrent const*) { return true; });
     }
 
 private:

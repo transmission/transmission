@@ -31,14 +31,16 @@ For a more detailed description, and dependencies, visit [How to Build Transmiss
 
 ### Building a Transmission release from the command line
 
-    $ tar xf transmission-3.00.tar.xz
-    $ cd transmission-3.00
-    $ mkdir build
-    $ cd build
-    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
-    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-    $ make
-    $ sudo make install
+```bash
+$ tar xf transmission-4.0.4.tar.xz
+$ cd transmission-4.0.4
+# Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
+# Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
+$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+$ cd build
+$ cmake --build .
+$ sudo cmake --install .
+```
 
 ### Building Transmission from the nightly builds
 
@@ -48,27 +50,28 @@ If you're new to building programs from source code, this is typically easier th
 
 ### Building Transmission from Git (first time)
 
-    $ git clone https://github.com/transmission/transmission Transmission
-    $ cd Transmission
-    $ git submodule update --init --recursive
-    $ mkdir build
-    $ cd build
-    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
-    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-    $ make
-    $ sudo make install
+```bash
+$ git clone --recurse-submodules https://github.com/transmission/transmission Transmission
+$ cd Transmission
+# Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary with debug information. (preferred)
+# Use -DCMAKE_BUILD_TYPE=Release to build full optimized binary.
+$ cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
+$ cd build
+$ cmake --build .
+$ sudo cmake --install .
+```
 
 ### Building Transmission from Git (updating)
 
-    $ cd Transmission/build
-    $ make clean
-    $ git submodule foreach --recursive git clean -xfd
-    $ git pull --rebase --prune
-    $ git submodule update --recursive
-    $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
-    $ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
-    $ make
-    $ sudo make install
+```bash
+$ cd Transmission/build
+$ cmake --build . -t clean
+$ git submodule foreach --recursive git clean -xfd
+$ git pull --rebase --prune
+$ git submodule update --init --recursive
+$ cmake --build .
+$ sudo cmake --install .
+```
 
 ## Contributing
 

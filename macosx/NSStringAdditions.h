@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -12,8 +12,12 @@
 + (NSString*)stringForFileSize:(uint64_t)size;
 + (NSString*)stringForFilePartialSize:(uint64_t)partialSize fullSize:(uint64_t)fullSize;
 
+// 4 significant digits
 + (NSString*)stringForSpeed:(CGFloat)speed;
+// 4 significant digits
 + (NSString*)stringForSpeedAbbrev:(CGFloat)speed;
+// 3 significant digits
++ (NSString*)stringForSpeedAbbrevCompact:(CGFloat)speed;
 + (NSString*)stringForRatio:(CGFloat)ratio;
 
 + (NSString*)percentString:(CGFloat)progress longDecimals:(BOOL)longDecimals;

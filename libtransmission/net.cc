@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -8,7 +8,6 @@
 #include <climits>
 #include <cstdint>
 #include <cstring>
-#include <ctime>
 #include <iterator> // std::back_inserter
 #include <string_view>
 #include <utility> // std::pair
@@ -25,25 +24,18 @@
 
 #include <fmt/core.h>
 
-#include <libutp/utp.h>
+#include "libtransmission/transmission.h"
 
-#include "transmission.h"
-
-#include "log.h"
-#include "net.h"
-#include "peer-socket.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "tr-macros.h"
-#include "tr-utp.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-utp.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
-
-#ifndef IN_MULTICAST
-#define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
-#endif
 
 std::string tr_net_strerror(int err)
 {
@@ -51,7 +43,7 @@ std::string tr_net_strerror(int err)
 
     auto buf = std::array<char, 512>{};
     (void)FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
-    return std::string{ tr_strvStrip(std::data(buf)) };
+    return std::string{ tr_strv_strip(std::data(buf)) };
 
 #else
 
@@ -60,11 +52,55 @@ std::string tr_net_strerror(int err)
 #endif
 }
 
+std::string_view tr_ip_protocol_to_sv(tr_address_type type)
+{
+    using namespace std::literals;
+
+    switch (type)
+    {
+    case TR_AF_INET:
+        return "IPv4"sv;
+    case TR_AF_INET6:
+        return "IPv6"sv;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return {};
+    }
+}
+
+int tr_ip_protocol_to_af(tr_address_type type)
+{
+    switch (type)
+    {
+    case TR_AF_INET:
+        return AF_INET;
+    case TR_AF_INET6:
+        return AF_INET6;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return {};
+    }
+}
+
+tr_address_type tr_af_to_ip_protocol(int af)
+{
+    switch (af)
+    {
+    case AF_INET:
+        return TR_AF_INET;
+    case AF_INET6:
+        return TR_AF_INET6;
+    default:
+        TR_ASSERT_MSG(false, "invalid address family");
+        return NUM_TR_AF_INET_TYPES;
+    }
+}
+
 // - TCP Sockets
 
 [[nodiscard]] std::optional<tr_tos_t> tr_tos_t::from_string(std::string_view name)
 {
-    auto const needle = tr_strlower(tr_strvStrip(name));
+    auto const needle = tr_strlower(tr_strv_strip(name));
 
     for (auto const& [value, key] : Names)
     {
@@ -74,7 +110,7 @@ std::string tr_net_strerror(int err)
         }
     }
 
-    if (auto value = tr_parseNum<int>(needle); value)
+    if (auto value = tr_num_parse<int>(needle); value)
     {
         return tr_tos_t(*value);
     }
@@ -186,18 +222,19 @@ static tr_socket_t createSocket(int domain, int type)
     return sockfd;
 }
 
-tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr, tr_port port, bool client_is_seed)
+tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_socket_address const& socket_address, bool client_is_seed)
 {
+    auto const& [addr, port] = socket_address;
+
     TR_ASSERT(addr.is_valid());
     TR_ASSERT(!tr_peer_socket::limit_reached(session));
 
-    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !addr.is_valid_for_peers(port))
+    if (tr_peer_socket::limit_reached(session) || !session->allowsTCP() || !socket_address.is_valid_for_peers())
     {
         return {};
     }
 
-    static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-    auto const s = createSocket(Domains[addr.type], SOCK_STREAM);
+    auto const s = createSocket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM);
     if (s == TR_BAD_SOCKET)
     {
         return {};
@@ -214,11 +251,11 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
         }
     }
 
-    auto const [sock, addrlen] = addr.to_sockaddr(port);
+    auto const [sock, addrlen] = socket_address.to_sockaddr();
 
     // set source address
-    auto const [source_addr, is_any] = session->publicAddress(addr.type);
-    auto const [source_sock, sourcelen] = source_addr.to_sockaddr({});
+    auto const source_addr = session->bind_address(addr.type);
+    auto const [source_sock, sourcelen] = tr_socket_address::to_sockaddr(source_addr, {});
 
     if (bind(s, reinterpret_cast<sockaddr const*>(&source_sock), sourcelen) == -1)
     {
@@ -255,10 +292,10 @@ tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const& addr,
     }
     else
     {
-        ret = tr_peer_socket{ session, addr, port, s };
+        ret = tr_peer_socket{ session, socket_address, s };
     }
 
-    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addr.display_name(port)));
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, socket_address.display_name()));
 
     return ret;
 }
@@ -267,9 +304,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 {
     TR_ASSERT(addr.is_valid());
 
-    static auto constexpr Domains = std::array<int, NUM_TR_AF_INET_TYPES>{ AF_INET, AF_INET6 };
-
-    auto const fd = socket(Domains[addr.type], SOCK_STREAM, 0);
+    auto const fd = socket(tr_ip_protocol_to_af(addr.type), SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *err_out = sockerrno;
@@ -300,7 +335,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
 #endif
 
-    auto const [sock, addrlen] = addr.to_sockaddr(port);
+    auto const [sock, addrlen] = tr_socket_address::to_sockaddr(addr, port);
 
     if (bind(fd, reinterpret_cast<sockaddr const*>(&sock), addrlen) == -1)
     {
@@ -360,33 +395,7 @@ tr_socket_t tr_netBindTCP(tr_address const& addr, tr_port port, bool suppress_ms
     return tr_netBindTCPImpl(addr, port, suppress_msgs, &unused);
 }
 
-bool tr_net_hasIPv6(tr_port port)
-{
-    static bool result = false;
-    static bool already_done = false;
-
-    if (!already_done)
-    {
-        int err = 0;
-        auto const fd = tr_netBindTCPImpl(tr_address::any_ipv4(), port, true, &err);
-
-        if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
-        {
-            result = true;
-        }
-
-        if (fd != TR_BAD_SOCKET)
-        {
-            tr_net_close_socket(fd);
-        }
-
-        already_done = true;
-    }
-
-    return result;
-}
-
-std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
+std::optional<std::pair<tr_socket_address, tr_socket_t>> tr_netAccept(tr_session* session, tr_socket_t listening_sockfd)
 {
     TR_ASSERT(session != nullptr);
 
@@ -402,107 +411,19 @@ std::optional<std::tuple<tr_address, tr_port, tr_socket_t>> tr_netAccept(tr_sess
     // get the address and port,
     // make the socket unblocking,
     // and confirm we don't have too many peers
-    auto const addrport = tr_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
+    auto const addrport = tr_socket_address::from_sockaddr(reinterpret_cast<struct sockaddr*>(&sock));
     if (!addrport || evutil_make_socket_nonblocking(sockfd) == -1 || tr_peer_socket::limit_reached(session))
     {
         tr_net_close_socket(sockfd);
         return {};
     }
 
-    return std::make_tuple(addrport->first, addrport->second, sockfd);
+    return std::pair{ *addrport, sockfd };
 }
 
 void tr_net_close_socket(tr_socket_t sockfd)
 {
     evutil_closesocket(sockfd);
-}
-
-namespace
-{
-// code in global_ipv6_herlpers is written by Juliusz Chroboczek
-// and is covered under the same license as dht.cc.
-// Please feel free to copy them into your software if it can help
-// unbreaking the double-stack Internet.
-namespace global_ipv6_helpers
-{
-
-// Get the source address used for a given destination address.
-// Since there is no official interface to get this information,
-// we create a connected UDP socket (connected UDP... hmm...)
-// and check its source address.
-//
-// Since it's a UDP socket, this doesn't actually send any packets
-[[nodiscard]] std::optional<tr_address> get_source_address(tr_address const& dst_addr, tr_port dst_port)
-{
-    auto const save = errno;
-
-    auto const [dst_ss, dst_sslen] = dst_addr.to_sockaddr(dst_port);
-    if (auto const sock = socket(dst_ss.ss_family, SOCK_DGRAM, 0); sock != TR_BAD_SOCKET)
-    {
-        if (connect(sock, reinterpret_cast<sockaddr const*>(&dst_ss), dst_sslen) == 0)
-        {
-            auto src_ss = sockaddr_storage{};
-            auto src_sslen = socklen_t{ sizeof(src_ss) };
-            if (getsockname(sock, reinterpret_cast<sockaddr*>(&src_ss), &src_sslen) == 0)
-            {
-                if (auto const addrport = tr_address::from_sockaddr(reinterpret_cast<sockaddr*>(&src_ss)); addrport)
-                {
-                    evutil_closesocket(sock);
-                    errno = save;
-                    return addrport->first;
-                }
-            }
-        }
-
-        evutil_closesocket(sock);
-    }
-
-    errno = save;
-    return {};
-}
-
-[[nodiscard]] std::optional<tr_address> global_address(int af)
-{
-    // Pick some destination address to pretend to send a packet to
-    static auto constexpr DstIPv4 = "91.121.74.28"sv;
-    static auto constexpr DstIPv6 = "2001:1890:1112:1::20"sv;
-    auto const dst_addr = tr_address::from_string(af == AF_INET ? DstIPv4 : DstIPv6);
-    auto const dst_port = tr_port::fromHost(6969);
-
-    // In order for address selection to work right,
-    // this should be a native IPv6 address, not Teredo or 6to4
-    TR_ASSERT(dst_addr.has_value() && dst_addr->is_global_unicast_address());
-
-    if (dst_addr)
-    {
-        if (auto addr = get_source_address(*dst_addr, dst_port); addr && addr->is_global_unicast_address())
-        {
-            return addr;
-        }
-    }
-
-    return {};
-}
-
-} // namespace global_ipv6_helpers
-} // namespace
-
-/* Return our global IPv6 address, with caching. */
-std::optional<tr_address> tr_globalIPv6()
-{
-    using namespace global_ipv6_helpers;
-
-    // recheck our cached value every half hour
-    static auto constexpr CacheSecs = 1800;
-    static auto cache_val = std::optional<tr_address>{};
-    static auto cache_expires_at = time_t{};
-    if (auto const now = tr_time(); cache_expires_at <= now)
-    {
-        cache_expires_at = now + CacheSecs;
-        cache_val = global_address(AF_INET6);
-    }
-
-    return cache_val;
 }
 
 // ---
@@ -512,14 +433,14 @@ namespace
 namespace is_valid_for_peers_helpers
 {
 
-[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const* addr)
+[[nodiscard]] constexpr auto is_ipv4_mapped_address(tr_address const& addr)
 {
-    return addr->is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr->addr.addr6);
+    return addr.is_ipv6() && IN6_IS_ADDR_V4MAPPED(&addr.addr.addr6);
 }
 
-[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const* addr)
+[[nodiscard]] constexpr auto is_ipv6_link_local_address(tr_address const& addr)
 {
-    return addr->is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr->addr.addr6);
+    return addr.is_ipv6() && IN6_IS_ADDR_LINKLOCAL(&addr.addr.addr6);
 }
 
 /* isMartianAddr was written by Juliusz Chroboczek,
@@ -551,17 +472,9 @@ namespace is_valid_for_peers_helpers
 } // namespace is_valid_for_peers_helpers
 } // namespace
 
-bool tr_address::is_valid_for_peers(tr_port port) const noexcept
-{
-    using namespace is_valid_for_peers_helpers;
-
-    return is_valid() && !std::empty(port) && !is_ipv6_link_local_address(this) && !is_ipv4_mapped_address(this) &&
-        !is_martian_addr(*this);
-}
-
 // --- tr_port
 
-std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compact) noexcept
+std::pair<tr_port, std::byte const*> tr_port::from_compact(std::byte const* compact) noexcept
 {
     static auto constexpr PortLen = size_t{ 2 };
 
@@ -570,7 +483,7 @@ std::pair<tr_port, std::byte const*> tr_port::fromCompact(std::byte const* compa
     std::copy_n(compact, PortLen, reinterpret_cast<std::byte*>(&nport));
     compact += PortLen;
 
-    return std::make_pair(tr_port::fromNetwork(nport), compact);
+    return std::make_pair(tr_port::from_network(nport), compact);
 }
 
 // --- tr_address
@@ -581,13 +494,15 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
 
     auto addr = tr_address{};
 
-    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr) == 1)
+    addr.addr.addr4 = {};
+    if (evutil_inet_pton(AF_INET, address_sz, &addr.addr.addr4) == 1)
     {
         addr.type = TR_AF_INET;
         return addr;
     }
 
-    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr) == 1)
+    addr.addr.addr6 = {};
+    if (evutil_inet_pton(AF_INET6, address_sz, &addr.addr.addr6) == 1)
     {
         addr.type = TR_AF_INET6;
         return addr;
@@ -596,40 +511,21 @@ std::optional<tr_address> tr_address::from_string(std::string_view address_sv)
     return {};
 }
 
-std::string_view tr_address::display_name(char* out, size_t outlen, tr_port port) const
+std::string_view tr_address::display_name(char* out, size_t outlen) const
 {
-    if (std::empty(port))
-    {
-        return is_ipv4() ? evutil_inet_ntop(AF_INET, &addr, out, outlen) : evutil_inet_ntop(AF_INET6, &addr, out, outlen);
-    }
+    TR_ASSERT(is_valid());
+    return evutil_inet_ntop(tr_ip_protocol_to_af(type), &addr, out, outlen);
+}
 
+[[nodiscard]] std::string tr_address::display_name() const
+{
     auto buf = std::array<char, INET6_ADDRSTRLEN>{};
-    auto const addr_sv = display_name(std::data(buf), std::size(buf));
-    auto const [end, size] = fmt::format_to_n(out, outlen - 1, FMT_STRING("[{:s}]:{:d}"), addr_sv, port.host());
-    return { out, size };
-}
-
-template<typename OutputIt>
-OutputIt tr_address::display_name(OutputIt out, tr_port port) const
-{
-    auto addrbuf = std::array<char, TR_ADDRSTRLEN + 16>{};
-    auto const addr_sv = display_name(std::data(addrbuf), std::size(addrbuf), port);
-    return std::copy(std::begin(addr_sv), std::end(addr_sv), out);
-}
-
-template char* tr_address::display_name<char*>(char*, tr_port) const;
-
-[[nodiscard]] std::string tr_address::display_name(tr_port port) const
-{
-    auto buf = std::string{};
-    buf.reserve(INET6_ADDRSTRLEN + 16);
-    this->display_name(std::back_inserter(buf), port);
-    return buf;
+    return std::string{ display_name(std::data(buf), std::size(buf)) };
 }
 
 std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte const* compact) noexcept
 {
-    static auto constexpr Addr4Len = size_t{ 4 };
+    static auto constexpr Addr4Len = tr_address::CompactAddrBytes[TR_AF_INET];
 
     auto address = tr_address{};
     static_assert(sizeof(address.addr.addr4) == Addr4Len);
@@ -637,76 +533,27 @@ std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv4(std::byte 
     std::copy_n(compact, Addr4Len, reinterpret_cast<std::byte*>(&address.addr));
     compact += Addr4Len;
 
-    return std::make_pair(address, compact);
+    return { address, compact };
 }
 
 std::pair<tr_address, std::byte const*> tr_address::from_compact_ipv6(std::byte const* compact) noexcept
 {
-    static auto constexpr Addr6Len = size_t{ 16 };
+    static auto constexpr Addr6Len = tr_address::CompactAddrBytes[TR_AF_INET6];
 
     auto address = tr_address{};
     address.type = TR_AF_INET6;
     std::copy_n(compact, Addr6Len, reinterpret_cast<std::byte*>(&address.addr.addr6.s6_addr));
     compact += Addr6Len;
 
-    return std::make_pair(address, compact);
-}
-
-std::optional<std::pair<tr_address, tr_port>> tr_address::from_sockaddr(struct sockaddr const* from)
-{
-    if (from == nullptr)
-    {
-        return {};
-    }
-
-    if (from->sa_family == AF_INET)
-    {
-        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
-        auto addr = tr_address{};
-        addr.type = TR_AF_INET;
-        addr.addr.addr4 = sin->sin_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin->sin_port));
-    }
-
-    if (from->sa_family == AF_INET6)
-    {
-        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
-        auto addr = tr_address{};
-        addr.type = TR_AF_INET6;
-        addr.addr.addr6 = sin6->sin6_addr;
-        return std::make_pair(addr, tr_port::fromNetwork(sin6->sin6_port));
-    }
-
-    return {};
-}
-
-std::pair<sockaddr_storage, socklen_t> tr_address::to_sockaddr(tr_port port) const noexcept
-{
-    auto ss = sockaddr_storage{};
-
-    if (is_ipv4())
-    {
-        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
-        ss4->sin_addr = addr.addr4;
-        ss4->sin_family = AF_INET;
-        ss4->sin_port = port.network();
-        return { ss, sizeof(sockaddr_in) };
-    }
-
-    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
-    ss6->sin6_addr = addr.addr6;
-    ss6->sin6_family = AF_INET6;
-    ss6->sin6_flowinfo = 0;
-    ss6->sin6_port = port.network();
-    return { ss, sizeof(sockaddr_in6) };
+    return { address, compact };
 }
 
 int tr_address::compare(tr_address const& that) const noexcept // <=>
 {
     // IPv6 addresses are always "greater than" IPv4
-    if (this->type != that.type)
+    if (auto const val = tr_compare_3way(this->type, that.type); val != 0)
     {
-        return this->is_ipv4() ? 1 : -1;
+        return val;
     }
 
     return this->is_ipv4() ? memcmp(&this->addr.addr4, &that.addr.addr4, sizeof(this->addr.addr4)) :
@@ -840,10 +687,75 @@ int tr_address::compare(tr_address const& that) const noexcept // <=>
 
         // TODO: 2000::/3 is commonly used for global unicast but technically
         // other spaces would be allowable too, so we should test those here.
-        // See RFC 4291 in the Section 2.4 lising global unicast as everything
+        // See RFC 4291 in the Section 2.4 listing global unicast as everything
         // that's not link-local, multicast, loopback, or unspecified.
         return (a[0] & 0xE0) == 0x20;
     }
 
     return false;
+}
+
+// --- tr_socket_addrses
+
+std::string tr_socket_address::display_name(tr_address const& address, tr_port port) noexcept
+{
+    return fmt::format("[{:s}]:{:d}", address.display_name(), port.host());
+}
+
+bool tr_socket_address::is_valid_for_peers() const noexcept
+{
+    using namespace is_valid_for_peers_helpers;
+
+    return is_valid() && !std::empty(port_) && !is_ipv6_link_local_address(address_) && !is_ipv4_mapped_address(address_) &&
+        !is_martian_addr(address_);
+}
+
+std::optional<tr_socket_address> tr_socket_address::from_sockaddr(struct sockaddr const* from)
+{
+    if (from == nullptr)
+    {
+        return {};
+    }
+
+    if (from->sa_family == AF_INET)
+    {
+        auto const* const sin = reinterpret_cast<struct sockaddr_in const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET;
+        addr.addr.addr4 = sin->sin_addr;
+        return tr_socket_address{ addr, tr_port::from_network(sin->sin_port) };
+    }
+
+    if (from->sa_family == AF_INET6)
+    {
+        auto const* const sin6 = reinterpret_cast<struct sockaddr_in6 const*>(from);
+        auto addr = tr_address{};
+        addr.type = TR_AF_INET6;
+        addr.addr.addr6 = sin6->sin6_addr;
+        return tr_socket_address{ addr, tr_port::from_network(sin6->sin6_port) };
+    }
+
+    TR_ASSERT_MSG(false, "invalid address family");
+    return {};
+}
+
+std::pair<sockaddr_storage, socklen_t> tr_socket_address::to_sockaddr(tr_address const& addr, tr_port port) noexcept
+{
+    auto ss = sockaddr_storage{};
+
+    if (addr.is_ipv4())
+    {
+        auto* const ss4 = reinterpret_cast<sockaddr_in*>(&ss);
+        ss4->sin_addr = addr.addr.addr4;
+        ss4->sin_family = AF_INET;
+        ss4->sin_port = port.network();
+        return { ss, sizeof(sockaddr_in) };
+    }
+
+    auto* const ss6 = reinterpret_cast<sockaddr_in6*>(&ss);
+    ss6->sin6_addr = addr.addr.addr6;
+    ss6->sin6_family = AF_INET6;
+    ss6->sin6_flowinfo = 0;
+    ss6->sin6_port = port.network();
+    return { ss, sizeof(sockaddr_in6) };
 }

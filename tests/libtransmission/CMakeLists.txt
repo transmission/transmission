@@ -22,6 +22,7 @@ target_sources(libtransmission-test
         file-piece-map-test.cc
         file-test.cc
         getopt-test.cc
+        global-ip-cache-test.cc
         handshake-test.cc
         history-test.cc
         json-test.cc
@@ -51,6 +52,7 @@ target_sources(libtransmission-test
         torrent-magnet-test.cc
         torrent-metainfo-test.cc
         torrents-test.cc
+        tr-peer-info-test.cc
         utils-test.cc
         variant-test.cc
         watchdir-test.cc
@@ -77,9 +79,14 @@ target_link_libraries(libtransmission-test
         libevent::event
         WideInteger::WideInteger)
 
-gtest_discover_tests(libtransmission-test
-    TEST_PREFIX "LT."
-)
+if(NOT CMAKE_CROSSCOMPILING OR CMAKE_CROSSCOMPILING_EMULATOR)
+    gtest_discover_tests(libtransmission-test
+        TEST_PREFIX "LT.")
+else()
+    add_test(
+        NAME libtransmission-test
+        COMMAND libtransmission-test)
+endif()
 
 add_custom_command(
     TARGET libtransmission-test
@@ -99,10 +106,6 @@ target_sources(subprocess-test
 set_property(
     TARGET subprocess-test
     PROPERTY FOLDER "tests")
-
-target_include_directories(subprocess-test
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/libtransmission)
 
 target_link_libraries(subprocess-test
     PRIVATE

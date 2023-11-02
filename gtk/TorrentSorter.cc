@@ -1,14 +1,16 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include "TorrentSorter.h"
 
+#include "Percents.h"
 #include "SorterBase.hh"
 #include "Utils.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/utils.h>
 
 #include <algorithm>
 
@@ -43,7 +45,7 @@ constexpr int compare_eta(time_t lhs, time_t rhs)
         return 1;
     }
 
-    return -gtr_compare_generic(lhs, rhs);
+    return -tr_compare_3way(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
@@ -64,124 +66,107 @@ constexpr int compare_ratio(double lhs, double rhs)
         return -1;
     }
 
-    return gtr_compare_generic(lhs, rhs);
+    return tr_compare_3way(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_name(Torrent const& lhs, Torrent const& rhs)
 {
-    return lhs.get_name_collated().compare(rhs.get_name_collated());
+    return tr_compare_3way(lhs.get_name_collated(), rhs.get_name_collated());
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_queue(Torrent const& lhs, Torrent const& rhs)
 {
-    return gtr_compare_generic(lhs.get_queue_position(), rhs.get_queue_position());
+    return tr_compare_3way(lhs.get_queue_position(), rhs.get_queue_position());
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_ratio(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -compare_ratio(lhs.get_ratio(), rhs.get_ratio()); // default descending
-
-    if (result == 0)
+    if (auto result = -compare_ratio(lhs.get_ratio(), rhs.get_ratio()); result != 0)
     {
-        result = compare_by_queue(lhs, rhs);
+        return result;
     }
 
-    return result;
+    return compare_by_queue(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_activity(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -gtr_compare_generic(
-        lhs.get_speed_up() + lhs.get_speed_down(),
-        rhs.get_speed_up() + rhs.get_speed_down()); // default descending
-
-    if (result == 0)
+    if (auto val = -tr_compare_3way(lhs.get_speed_up() + lhs.get_speed_down(), rhs.get_speed_up() + rhs.get_speed_down());
+        val != 0)
     {
-        result = -gtr_compare_generic(lhs.get_active_peer_count(), rhs.get_active_peer_count()); // default descending
+        return val;
     }
 
-    if (result == 0)
+    if (auto val = -tr_compare_3way(lhs.get_active_peer_count(), rhs.get_active_peer_count()); val != 0)
     {
-        result = compare_by_queue(lhs, rhs);
+        return val;
     }
 
-    return result;
+    return compare_by_queue(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_age(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -gtr_compare_generic(lhs.get_added_date(), rhs.get_added_date()); // default descending
-
-    if (result == 0)
+    if (auto val = -tr_compare_3way(lhs.get_added_date(), rhs.get_added_date()); val != 0)
     {
-        result = compare_by_name(lhs, rhs);
+        return val;
     }
 
-    return result;
+    return compare_by_name(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_size(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -gtr_compare_generic(lhs.get_total_size(), rhs.get_total_size()); // default descending
-
-    if (result == 0)
+    if (auto val = -tr_compare_3way(lhs.get_total_size(), rhs.get_total_size()); val != 0)
     {
-        result = compare_by_name(lhs, rhs);
+        return val;
     }
 
-    return result;
+    return compare_by_name(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_progress(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -gtr_compare_generic(lhs.get_percent_complete(), rhs.get_percent_complete()); // default descending
-
-    if (result == 0)
+    if (auto val = -tr_compare_3way(lhs.get_percent_complete(), rhs.get_percent_complete()); val != 0)
     {
-        result = -gtr_compare_generic(
-            lhs.get_seed_ratio_percent_done(),
-            rhs.get_seed_ratio_percent_done()); // default descending
+        return val;
     }
 
-    if (result == 0)
+    if (auto val = -tr_compare_3way(lhs.get_seed_ratio_percent_done(), rhs.get_seed_ratio_percent_done()); val != 0)
     {
-        result = compare_by_ratio(lhs, rhs);
+        return val;
     }
 
-    return result;
+    return compare_by_ratio(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_eta(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = compare_eta(lhs.get_eta(), rhs.get_eta());
-
-    if (result == 0)
+    if (auto val = compare_eta(lhs.get_eta(), rhs.get_eta()); val != 0)
     {
-        result = compare_by_name(lhs, rhs);
+        return val;
     }
 
-    return result;
+    return compare_by_name(lhs, rhs);
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 int compare_by_state(Torrent const& lhs, Torrent const& rhs)
 {
-    auto result = -gtr_compare_generic(lhs.get_activity(), rhs.get_activity());
-
-    if (result == 0)
+    if (auto val = -tr_compare_3way(lhs.get_activity(), rhs.get_activity()); val != 0)
     {
-        result = compare_by_queue(lhs, rhs);
+        return val;
     }
 
-    return result;
+    return compare_by_queue(lhs, rhs);
 }
 
 } // namespace

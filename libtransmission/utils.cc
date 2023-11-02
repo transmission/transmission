@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,53 +6,53 @@
 #include <algorithm> // for std::sort, std::transform
 #include <array> // std::array
 #include <cctype>
-#include <cerrno>
 #include <cfloat> // DBL_DIG
 #include <chrono>
-#include <clocale> // localeconv()
 #include <cstdint> // SIZE_MAX
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
-#include <ctime> // nanosleep()
+#include <exception>
+#include <iostream>
 #include <iterator> // for std::back_inserter
+#include <locale>
 #include <optional>
 #include <set>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <vector>
 
 #ifdef _WIN32
 #include <windows.h> /* Sleep(), GetEnvironmentVariable() */
+#include <ws2tcpip.h> /* htonl(), ntohl() */
 
 #include <shellapi.h> /* CommandLineToArgv() */
-#include <ws2tcpip.h> /* WSAStartup() */
-#endif
-
-#ifndef _WIN32
-#include <sys/stat.h> // mode_t
+#else
+#include <arpa/inet.h>
 #endif
 
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
-#include <fmt/format.h>
+#include <curl/curl.h>
+
+#include <fmt/core.h>
 
 #include <fast_float/fast_float.h>
 #include <wildmat.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "mime-types.h"
-#include "net.h" // ntohl()
-#include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h"
-#include "variant.h"
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/mime-types.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/variant.h"
 
 using namespace std::literals;
 
@@ -60,7 +60,38 @@ time_t libtransmission::detail::tr_time::current_time = {};
 
 // ---
 
-bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error)
+std::optional<std::locale> tr_locale_set_global(char const* locale_name) noexcept
+{
+    try
+    {
+        return tr_locale_set_global(std::locale{ locale_name });
+    }
+    catch (std::runtime_error const&)
+    {
+        return {};
+    }
+}
+
+std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexcept
+{
+    try
+    {
+        auto old_locale = std::locale::global(locale);
+
+        std::cout.imbue(std::locale{});
+        std::cerr.imbue(std::locale{});
+
+        return old_locale;
+    }
+    catch (std::exception const&)
+    {
+        return {};
+    }
+}
+
+// ---
+
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error)
 {
     auto const szfilename = tr_pathbuf{ filename };
 
@@ -115,13 +146,13 @@ bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_erro
     return true;
 }
 
-bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error)
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error)
 {
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
     if (auto const realname = tr_sys_path_resolve(filename); !std::empty(realname) && realname != filename)
     {
-        return tr_saveFile(realname, contents, error);
+        return tr_file_save(realname, contents, error);
     }
 
     // Write it to a temp file first.
@@ -156,20 +187,9 @@ bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error*
     return true;
 }
 
-tr_disk_space tr_dirSpace(std::string_view directory)
-{
-    if (std::empty(directory))
-    {
-        errno = EINVAL;
-        return { -1, -1 };
-    }
-
-    return tr_device_info_get_disk_space(tr_device_info_create(directory));
-}
-
 // ---
 
-size_t tr_strvToBuf(std::string_view src, char* buf, size_t buflen)
+size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen)
 {
     size_t const len = std::size(src);
 
@@ -206,7 +226,7 @@ char const* tr_strerror(int errnum)
 
 // ---
 
-std::string_view tr_strvStrip(std::string_view str)
+std::string_view tr_strv_strip(std::string_view str)
 {
     auto constexpr Test = [](auto ch)
     {
@@ -255,7 +275,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 {
     if (denominator > 0)
     {
-        return numerator / (double)denominator;
+        return numerator / static_cast<double>(denominator);
     }
 
     if (numerator > 0)
@@ -268,9 +288,24 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator)
 
 // ---
 
+#if !(defined(__APPLE__) && defined(__clang__))
+
+std::string tr_strv_convert_utf8(std::string_view sv)
+{
+    return tr_strv_replace_invalid(sv);
+}
+
+#endif
+
 std::string tr_strv_replace_invalid(std::string_view sv, uint32_t replacement)
 {
+    // stripping characters after first \0
+    if (auto first_null = sv.find('\0'); first_null != std::string::npos)
+    {
+        sv = { std::data(sv), first_null };
+    }
     auto out = std::string{};
+    out.reserve(std::size(sv));
     utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), std::back_inserter(out), replacement);
     return out;
 }
@@ -402,7 +437,7 @@ int tr_main_win32(int argc, char** argv, int (*real_main)(int, char**))
 
 namespace
 {
-namespace tr_parseNumberRange_impl
+namespace tr_num_parse_range_impl
 {
 
 struct number_range
@@ -419,7 +454,7 @@ bool parseNumberSection(std::string_view str, number_range& range)
 {
     auto constexpr Delimiter = "-"sv;
 
-    auto const first = tr_parseNum<int>(str, &str);
+    auto const first = tr_num_parse<int>(str, &str);
     if (!first)
     {
         return false;
@@ -431,13 +466,13 @@ bool parseNumberSection(std::string_view str, number_range& range)
         return true;
     }
 
-    if (!tr_strvStartsWith(str, Delimiter))
+    if (!tr_strv_starts_with(str, Delimiter))
     {
         return false;
     }
 
     str.remove_prefix(std::size(Delimiter));
-    auto const second = tr_parseNum<int>(str);
+    auto const second = tr_num_parse<int>(str);
     if (!second)
     {
         return false;
@@ -447,7 +482,7 @@ bool parseNumberSection(std::string_view str, number_range& range)
     return true;
 }
 
-} // namespace tr_parseNumberRange_impl
+} // namespace tr_num_parse_range_impl
 } // namespace
 
 /**
@@ -456,14 +491,14 @@ bool parseNumberSection(std::string_view str, number_range& range)
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  * If a fragment of the string can't be parsed, nullptr is returned.
  */
-std::vector<int> tr_parseNumberRange(std::string_view str)
+std::vector<int> tr_num_parse_range(std::string_view str)
 {
-    using namespace tr_parseNumberRange_impl;
+    using namespace tr_num_parse_range_impl;
 
     auto values = std::set<int>{};
     auto token = std::string_view{};
     auto range = number_range{};
-    while (tr_strvSep(&str, &token, ',') && parseNumberSection(token, range))
+    while (tr_strv_sep(&str, &token, ',') && parseNumberSection(token, range))
     {
         for (auto i = range.low; i <= range.high; ++i)
         {
@@ -482,27 +517,27 @@ double tr_truncd(double x, int decimal_places)
     auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
     *out = '\0';
 
-    if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
+    if (auto* const pt = strchr(std::data(buf), '.'); pt != nullptr)
     {
         pt[decimal_places != 0 ? decimal_places + 1 : 0] = '\0';
     }
 
-    return tr_parseNum<double>(std::data(buf)).value_or(0.0);
+    return tr_num_parse<double>(std::data(buf)).value_or(0.0);
 }
 
 std::string tr_strpercent(double x)
 {
     if (x < 5.0)
     {
-        return fmt::format("{:.2f}", tr_truncd(x, 2));
+        return fmt::format("{:.2Lf}", tr_truncd(x, 2));
     }
 
     if (x < 100.0)
     {
-        return fmt::format("{:.1f}", tr_truncd(x, 1));
+        return fmt::format("{:.1Lf}", tr_truncd(x, 1));
     }
 
-    return fmt::format("{:.0f}", x);
+    return fmt::format("{:.0Lf}", x);
 }
 
 std::string tr_strratio(double ratio, char const* infinity)
@@ -524,7 +559,7 @@ std::string tr_strratio(double ratio, char const* infinity)
 
 // ---
 
-bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
+bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
 {
     auto const oldpath = tr_pathbuf{ oldpath_in };
     auto const newpath = tr_pathbuf{ newpath_in };
@@ -683,7 +718,7 @@ char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes
         unit = &u[3];
     }
 
-    double const value = double(bytes) / unit->value;
+    double const value = static_cast<double>(bytes) / unit->value;
     auto const* const units = std::data(unit->name);
 
     auto precision = int{};
@@ -700,7 +735,7 @@ char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes
         precision = 1;
     }
 
-    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}f} {:s}", value, precision, units);
+    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}Lf} {:s}", value, precision, units);
     *out = '\0';
     return buf;
 }
@@ -740,25 +775,76 @@ std::string tr_formatter_speed_KBps(double kilo_per_second)
 
     auto speed = kilo_per_second;
 
-    if (speed <= 999.95) // 0.0 KB to 999.9 KB
+    if (speed < 999.95) // 0.0 KB to 999.9 KB (0.0 KiB to 999.9 KiB)
     {
-        return fmt::format("{:d} {:s}", int(speed), std::data(speed_units[TR_FMT_KB].name));
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
     }
 
     double const kilo = speed_units[TR_FMT_KB].value;
     speed /= kilo;
 
-    if (speed <= 99.995) // 0.98 MB to 99.99 MB
+    if (speed < 99.995) // 0.98 MB to 99.99 MB (1.00 MiB to 99.99 MiB)
     {
-        return fmt::format("{:.2f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+    if (speed < 999.95) // 100.0 MB to 999.9 MB (100.0 MiB to 999.9 MiB)
+    {
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
     }
 
-    if (speed <= 999.95) // 100.0 MB to 999.9 MB
+    speed /= kilo;
+
+    if (speed < 99.995) // 0.98 GB to 99.99 GB (1.00 GiB to 99.99 GiB)
     {
-        return fmt::format("{:.1f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+    }
+    // 100.0 GB and above (100.0 GiB and above)
+    return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+}
+
+std::string tr_formatter_speed_compact_KBps(double kilo_per_second)
+{
+    using namespace formatter_impl;
+
+    auto speed = kilo_per_second;
+
+    if (speed < 99.95) // 0.0 KB to 99.9 KB (0.0 KiB to 99.9 KiB)
+    {
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
+    }
+    if (speed < 999.5) // 100 KB to 999 KB (100 KiB to 999 KiB)
+    {
+        return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
     }
 
-    return fmt::format("{:.1f} {:s}", speed / kilo, std::data(speed_units[TR_FMT_GB].name));
+    double const kilo = speed_units[TR_FMT_KB].value;
+    speed /= kilo;
+
+    if (speed < 9.995) // 0.98 MB to 9.99 MB (1.00 MiB to 9.99 MiB)
+    {
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+    if (speed < 99.95) // 10.0 MB to 99.9 MB (10.0 MiB to 99.9 MiB)
+    {
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+    if (speed < 999.5) // 100 MB to 999 MB (100 MiB to 999 MiB)
+    {
+        return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+
+    speed /= kilo;
+
+    if (speed < 9.995) // 0.98 GB to 9.99 GB (1.00 GiB to 9.99 GiB)
+    {
+        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+    }
+    if (speed < 99.95) // 10.0 GB to 99.9 GB (10.0 GiB to 99.9 GiB)
+    {
+        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+    }
+    // 100 GB and above (100 GiB and above)
+    return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
 }
 
 size_t tr_mem_K = 0;
@@ -779,34 +865,30 @@ std::string tr_formatter_mem_B(size_t bytes_per_second)
     return formatter_get_size_str(mem_units, std::data(buf), bytes_per_second, std::size(buf));
 }
 
-void tr_formatter_get_units(void* vdict)
+tr_variant tr_formatter_get_units()
 {
     using namespace formatter_impl;
 
-    auto* dict = static_cast<tr_variant*>(vdict);
-
-    tr_variantDictReserve(dict, 6);
-
-    tr_variantDictAddInt(dict, TR_KEY_memory_bytes, mem_units[TR_FMT_KB].value);
-    tr_variant* l = tr_variantDictAddList(dict, TR_KEY_memory_units, std::size(mem_units));
-    for (auto const& unit : mem_units)
+    auto const make_units_vec = [](formatter_units const& units)
     {
-        tr_variantListAddStr(l, std::data(unit.name));
-    }
+        auto units_vec = tr_variant::Vector{};
+        units_vec.reserve(std::size(units));
+        std::transform(
+            std::begin(units),
+            std::end(units),
+            std::back_inserter(units_vec),
+            [](auto const& unit) { return std::data(unit.name); });
+        return units_vec;
+    };
 
-    tr_variantDictAddInt(dict, TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
-    l = tr_variantDictAddList(dict, TR_KEY_size_units, std::size(size_units));
-    for (auto const& unit : size_units)
-    {
-        tr_variantListAddStr(l, std::data(unit.name));
-    }
-
-    tr_variantDictAddInt(dict, TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
-    l = tr_variantDictAddList(dict, TR_KEY_speed_units, std::size(speed_units));
-    for (auto const& unit : speed_units)
-    {
-        tr_variantListAddStr(l, std::data(unit.name));
-    }
+    auto units_map = tr_variant::Map{ 6U };
+    units_map.try_emplace(TR_KEY_memory_bytes, mem_units[TR_FMT_KB].value);
+    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(mem_units));
+    units_map.try_emplace(TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
+    units_map.try_emplace(TR_KEY_size_units, make_units_vec(size_units));
+    units_map.try_emplace(TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
+    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(speed_units));
+    return tr_variant{ std::move(units_map) };
 }
 
 // --- ENVIRONMENT
@@ -820,21 +902,6 @@ bool tr_env_key_exists(char const* key)
 #else
     return getenv(key) != nullptr;
 #endif
-}
-
-int tr_env_get_int(char const* key, int default_value)
-{
-    TR_ASSERT(key != nullptr);
-
-    if (auto const valstr = tr_env_get_string(key); !std::empty(valstr))
-    {
-        if (auto const valint = tr_parseNum<int>(valstr); valint)
-        {
-            return *valint;
-        }
-    }
-
-    return default_value;
 }
 
 std::string tr_env_get_string(std::string_view key, std::string_view default_value)
@@ -872,19 +939,36 @@ std::string tr_env_get_string(std::string_view key, std::string_view default_val
 
 // ---
 
-void tr_net_init()
+tr_net_init_mgr::tr_net_init_mgr()
 {
-#ifdef _WIN32
-    static bool initialized = false;
-
-    if (!initialized)
+    // try to init curl with default settings (currently ssl support + win32 sockets)
+    // but if that fails, we need to init win32 sockets as a bare minimum
+    if (curl_global_init(CURL_GLOBAL_ALL) != CURLE_OK)
     {
-        WSADATA wsaData;
-        WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-        initialized = true;
+        curl_global_init(CURL_GLOBAL_WIN32);
     }
-#endif
+}
+
+tr_net_init_mgr::~tr_net_init_mgr()
+{
+    curl_global_cleanup();
+}
+
+std::unique_ptr<tr_net_init_mgr> tr_net_init_mgr::create()
+{
+    if (!initialised)
+    {
+        initialised = true;
+        return std::unique_ptr<tr_net_init_mgr>{ new tr_net_init_mgr };
+    }
+    return {};
+}
+
+bool tr_net_init_mgr::initialised = false;
+
+std::unique_ptr<tr_net_init_mgr> tr_lib_init()
+{
+    return tr_net_init_mgr::create();
 }
 
 // --- mime-type
@@ -921,7 +1005,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 #include <sstream>
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder, int base)
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
     auto const tmpstr = std::string(std::data(str), std::min(std::size(str), size_t{ 64 }));
@@ -950,7 +1034,7 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 #include <charconv> // std::from_chars()
 
 template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder, int base)
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
     auto const* const begin_ch = std::data(str);
@@ -973,19 +1057,19 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
 
 #endif // #if defined(__GNUC__) && !__has_include(<charconv>)
 
-template std::optional<long long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<int> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<char> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<long long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<int> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
-template std::optional<unsigned long long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned long> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned int> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned short> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
-template std::optional<unsigned char> tr_parseNum(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned long long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned long> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned int> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
+template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view str, std::string_view* remainder)
+[[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
 {
     auto const* const begin_ch = std::data(str);
     auto const* const end_ch = begin_ch + std::size(str);
@@ -1003,4 +1087,4 @@ template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
     return val;
 }
 
-template std::optional<double> tr_parseNum(std::string_view sv, std::string_view* remainder);
+template std::optional<double> tr_num_parse(std::string_view sv, std::string_view* remainder);

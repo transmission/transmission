@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -14,21 +14,29 @@
 #include <cstdint> // uint32_t
 #include <ctime>
 #include <functional>
+#include <memory>
+#include <optional>
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#ifdef _WIN32
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // socklen_t
+#endif
 
-#include "interned-string.h"
-#include "net.h"
+#include "libtransmission/transmission.h"
 
-class tr_announcer;
+#include "libtransmission/interned-string.h"
+#include "libtransmission/peer-mgr.h"
+
+struct tr_address;
 class tr_announcer_udp;
+struct tr_session;
+struct tr_torrent;
 struct tr_torrent_announcer;
 
 // --- Tracker Publish / Subscribe
-
-struct tr_pex;
 
 /** @brief Notification object to tell listeners about announce or scrape occurrences */
 struct tr_tracker_event
@@ -53,8 +61,8 @@ struct tr_tracker_event
     std::vector<tr_pex> pex;
 
     // for Peers and Counts events
-    int leechers;
-    int seeders;
+    std::optional<int64_t> leechers;
+    std::optional<int64_t> seeders;
 };
 
 using tr_tracker_callback = std::function<void(tr_torrent&, tr_tracker_event const*)>;
@@ -135,7 +143,7 @@ public:
     public:
         virtual ~Mediator() noexcept = default;
         virtual void sendto(void const* buf, size_t buflen, sockaddr const* addr, socklen_t addrlen) = 0;
-        [[nodiscard]] virtual std::optional<tr_address> announceIP() const = 0;
+        [[nodiscard]] virtual std::optional<tr_address> announce_ip() const = 0;
     };
 
     virtual ~tr_announcer_udp() noexcept = default;
@@ -150,5 +158,5 @@ public:
 
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
-    virtual bool handleMessage(uint8_t const* msg, size_t msglen) = 0;
+    virtual bool handle_message(uint8_t const* msg, size_t msglen) = 0;
 };

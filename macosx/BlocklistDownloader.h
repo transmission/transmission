@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -6,10 +6,10 @@
 
 @class BlocklistDownloaderViewController;
 
-typedef NS_ENUM(unsigned int, blocklistDownloadState) { //
-    BLOCKLIST_DL_START,
-    BLOCKLIST_DL_DOWNLOADING,
-    BLOCKLIST_DL_PROCESSING
+typedef NS_ENUM(NSUInteger, BlocklistDownloadState) { //
+    BlocklistDownloadStateStart,
+    BlocklistDownloadStateDownloading,
+    BlocklistDownloadStateProcessing
 };
 
 @interface BlocklistDownloader : NSObject<NSURLSessionDownloadDelegate>

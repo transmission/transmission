@@ -1,20 +1,32 @@
+# minimum macOS target support
 if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS MACOS_SUPPORT_MINIMUM)
     message(FATAL_ERROR "Targeting macOS versions before ${MACOS_SUPPORT_MINIMUM} is not supported for the macOS project, please adjust CMAKE_OSX_DEPLOYMENT_TARGET (${CMAKE_OSX_DEPLOYMENT_TARGET})")
 endif()
 
+find_program(ACTOOL_EXECUTABLE actool REQUIRED)
+find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
+
 set(MAC_BUNDLE_NAME Transmission)
 
 add_compile_options(
-    -fcxx-modules
-    -fmodules
-    -fobjc-arc
-    # #warnings are good practice in development
-    "-Wno-#warnings"
-    # GNU extensions are good practice in Objective-C
-    -Wno-gnu)
+    $<$<COMPILE_LANGUAGE:C,CXX>:-fmodules>
+    $<$<COMPILE_LANGUAGE:C,CXX>:-fcxx-modules>
 
-find_program(ACTOOL_EXECUTABLE actool REQUIRED)
-find_program(CODESIGN_EXECUTABLE codesign REQUIRED)
+    # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES for this directory
+    $<$<COMPILE_LANGUAGE:C,CXX>:-fobjc-arc>
+
+    # equivalent of XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_WEAK YES for this directory
+    $<$<COMPILE_LANGUAGE:C,CXX>:-fobjc-weak>
+
+    # GNU extensions are good practice in Objective-C
+    $<$<COMPILE_LANGUAGE:C,CXX>:-Wno-gnu>
+
+    # Our #warnings are good practice in IDE development, not in command-line compilation
+    $<$<AND:$<NOT:$<BOOL:${XCODE}>>,$<COMPILE_LANGUAGE:C,CXX>>:-Wno-\#warnings>)
+
+add_link_options(
+    # equivalent of XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING YES for this directory
+    $<$<LINK_LANGUAGE:C,CXX>:-dead_strip>)
 
 add_subdirectory(QuickLookPlugin)
 add_subdirectory(VDKQueue)
@@ -50,6 +62,8 @@ target_sources(${TR_NAME}-mac
         Controller.mm
         CreatorWindowController.h
         CreatorWindowController.mm
+        DefaultAppHelper.h
+        DefaultAppHelper.mm
         DragOverlayView.h
         DragOverlayView.mm
         DragOverlayWindow.h
@@ -78,14 +92,14 @@ target_sources(${TR_NAME}-mac
         FilterButton.mm
         GlobalOptionsPopoverViewController.h
         GlobalOptionsPopoverViewController.mm
+        GroupCell.h
+        GroupCell.mm
         GroupPopUpButtonCell.h
         GroupPopUpButtonCell.mm
         GroupsController.h
         GroupsController.mm
         GroupsPrefsController.h
         GroupsPrefsController.mm
-        GroupTextCell.h
-        GroupTextCell.mm
         GroupToolbarItem.h
         GroupToolbarItem.mm
         InfoActivityViewController.h
@@ -136,12 +150,16 @@ target_sources(${TR_NAME}-mac
         PrefsWindow.mm
         PriorityPopUpButtonCell.h
         PriorityPopUpButtonCell.mm
+        ProgressBarView.h
+        ProgressBarView.mm
         ProgressGradients.h
         ProgressGradients.mm
         ShareToolbarItem.h
         ShareToolbarItem.mm
         ShareTorrentFileHelper.h
         ShareTorrentFileHelper.mm
+        SmallTorrentCell.h
+        SmallTorrentCell.mm
         SparkleProxy.mm
         StatsWindowController.h
         StatsWindowController.mm
@@ -155,6 +173,12 @@ target_sources(${TR_NAME}-mac
         Torrent.mm
         TorrentCell.h
         TorrentCell.mm
+        TorrentCellActionButton.h
+        TorrentCellActionButton.mm
+        TorrentCellControlButton.h
+        TorrentCellControlButton.mm
+        TorrentCellRevealButton.h
+        TorrentCellRevealButton.mm
         TorrentGroup.h
         TorrentGroup.mm
         TorrentTableView.h
@@ -411,10 +435,10 @@ endif()
 set_target_properties(
     ${TR_NAME}-mac
     PROPERTIES
-        OUTPUT_NAME ${MAC_BUNDLE_NAME}
+        INSTALL_RPATH "@executable_path;@executable_path/../Frameworks"
         MACOSX_BUNDLE_GUI_IDENTIFIER "org.m0k.transmission"
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
-        INSTALL_RPATH "@executable_path;@executable_path/../Frameworks")
+        OUTPUT_NAME ${MAC_BUNDLE_NAME})
 
 install(
     TARGETS ${TR_NAME}-mac
@@ -426,7 +450,7 @@ install(
 tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 
 install(CODE
-    "list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
+    "list(APPEND CMAKE_MODULE_PATH \"${PROJECT_SOURCE_DIR}/cmake\")
     include(TrMacros)
     include(GetPrerequisites)
     tr_fixup_bundle_item(

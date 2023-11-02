@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -12,7 +12,7 @@
 @property(nonatomic) NSURLSession* fSession;
 @property(nonatomic) NSUInteger fCurrentSize;
 @property(nonatomic) long long fExpectedSize;
-@property(nonatomic) blocklistDownloadState fState;
+@property(nonatomic) BlocklistDownloadState fState;
 
 @end
 
@@ -43,13 +43,13 @@ BlocklistDownloader* fBLDownloader = nil;
     {
         switch (self.fState)
         {
-        case BLOCKLIST_DL_START:
+        case BlocklistDownloadStateStart:
             [_viewController setStatusStarting];
             break;
-        case BLOCKLIST_DL_DOWNLOADING:
+        case BlocklistDownloadStateDownloading:
             [_viewController setStatusProgressForCurrentSize:self.fCurrentSize expectedSize:self.fExpectedSize];
             break;
-        case BLOCKLIST_DL_PROCESSING:
+        case BlocklistDownloadStateProcessing:
             [_viewController setStatusProcessing];
             break;
         }
@@ -74,7 +74,7 @@ BlocklistDownloader* fBLDownloader = nil;
     totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.fState = BLOCKLIST_DL_DOWNLOADING;
+        self.fState = BlocklistDownloadStateDownloading;
 
         self.fCurrentSize = totalBytesWritten;
         self.fExpectedSize = totalBytesExpectedToWrite;
@@ -103,7 +103,7 @@ BlocklistDownloader* fBLDownloader = nil;
                  downloadTask:(NSURLSessionDownloadTask*)downloadTask
     didFinishDownloadingToURL:(NSURL*)location
 {
-    self.fState = BLOCKLIST_DL_PROCESSING;
+    self.fState = BlocklistDownloadStateProcessing;
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.viewController setStatusProcessing];
@@ -163,7 +163,7 @@ BlocklistDownloader* fBLDownloader = nil;
 
 - (void)startDownload
 {
-    self.fState = BLOCKLIST_DL_START;
+    self.fState = BlocklistDownloadStateStart;
 
     self.fSession = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.ephemeralSessionConfiguration delegate:self
                                              delegateQueue:nil];
@@ -175,9 +175,13 @@ BlocklistDownloader* fBLDownloader = nil;
     {
         urlString = @"";
     }
-    else if (![urlString isEqualToString:@""] && [urlString rangeOfString:@"://"].location == NSNotFound)
+    else
     {
-        urlString = [@"https://" stringByAppendingString:urlString];
+        urlString = [urlString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        if (![urlString isEqualToString:@""] && [urlString rangeOfString:@"://"].location == NSNotFound)
+        {
+            urlString = [@"https://" stringByAppendingString:urlString];
+        }
     }
 
     NSURLSessionDownloadTask* task = [self.fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];

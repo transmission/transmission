@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -100,7 +100,7 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
     }
 
     auto const mime_icon = getMimeTypeIcon(mime_type_name, false);
-    for (auto const& size : { QSize(24, 24), QSize(32, 32), QSize(48, 48) })
+    for (auto const& size : { QSize{ 24, 24 }, QSize{ 32, 32 }, QSize{ 48, 48 } })
     {
         // upper left corner
         auto const folder_size = size / 2;
@@ -224,7 +224,7 @@ QIcon IconCache::getThemeIcon(
     QString const& fallbackName,
     std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const
 {
-    auto const rtl_suffix = QApplication::layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString();
+    auto const rtl_suffix = QApplication::layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString{};
 
     auto icon = QIcon::fromTheme(name + rtl_suffix);
 

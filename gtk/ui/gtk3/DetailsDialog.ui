@@ -1192,7 +1192,7 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-7">close_button</action-widget>
+      <action-widget response="close">close_button</action-widget>
     </action-widgets>
   </object>
   <object class="GtkSizeGroup" id="info_page_labels_width_group">

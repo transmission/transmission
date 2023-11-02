@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -42,9 +42,9 @@
 
 #include <fmt/core.h>
 
-#include <array>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <stack>
 #include <stdexcept>
 #include <utility>
@@ -298,7 +298,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
 
 /* pop up the context menu if a user right-clicks.
    if the row they right-click on isn't selected, select it. */
-bool on_tree_view_button_pressed(
+bool on_item_view_button_pressed(
     Gtk::TreeView& view,
     double event_x,
     double event_y,
@@ -327,9 +327,66 @@ bool on_tree_view_button_pressed(
     return false;
 }
 
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+namespace
+{
+
+// NOTE: Estimated position (`get_position_from_allocation` vfunc is private)
+std::optional<guint> get_position_from_allocation(Gtk::ListView& view, double view_x, double view_y)
+{
+    auto* child = view.pick(view_x, view_y);
+    while (child != nullptr && child->get_css_name() != "row")
+    {
+        child = child->get_parent();
+    }
+
+    if (child == nullptr)
+    {
+        return {};
+    }
+
+    double top_x = 0;
+    double top_y = 0;
+    child->translate_coordinates(view, 0, 0, top_x, top_y);
+    return static_cast<guint>((top_y + view.get_vadjustment()->get_value()) / child->get_allocated_height());
+}
+
+} // namespace
+
+bool on_item_view_button_pressed(
+    Gtk::ListView& view,
+    double event_x,
+    double event_y,
+    bool context_menu_requested,
+    std::function<void(double, double)> const& callback)
+{
+    if (context_menu_requested)
+    {
+        if (auto const position = get_position_from_allocation(view, event_x, event_y); position.has_value())
+        {
+            if (auto const selection_model = view.get_model(); !selection_model->is_selected(position.value()))
+            {
+                selection_model->select_item(position.value(), true);
+            }
+        }
+
+        if (callback)
+        {
+            callback(event_x, event_y);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+#endif
+
 /* if the user clicked in an empty area of the list,
  * clear all the selections. */
-bool on_tree_view_button_released(Gtk::TreeView& view, double event_x, double event_y)
+bool on_item_view_button_released(Gtk::TreeView& view, double event_x, double event_y)
 {
     if (Gtk::TreeModel::Path path; !view.get_path_at_pos(static_cast<int>(event_x), static_cast<int>(event_y), path))
     {
@@ -339,8 +396,43 @@ bool on_tree_view_button_released(Gtk::TreeView& view, double event_x, double ev
     return false;
 }
 
-void setup_tree_view_button_event_handling(
-    Gtk::TreeView& view,
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+bool on_item_view_button_released(Gtk::ListView& view, double event_x, double event_y)
+{
+    if (!get_position_from_allocation(view, event_x, event_y).has_value())
+    {
+        view.get_model()->unselect_all();
+    }
+
+    return false;
+}
+
+#endif
+
+namespace
+{
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+std::pair<int, int> convert_widget_to_bin_window_coords(Gtk::TreeView const& view, int view_x, int view_y)
+{
+    int event_x = 0;
+    int event_y = 0;
+    view.convert_widget_to_bin_window_coords(view_x, view_y, event_x, event_y);
+    return { event_x, event_y };
+}
+
+std::pair<int, int> convert_widget_to_bin_window_coords(Gtk::ListView const& /*view*/, int view_x, int view_y)
+{
+    return { view_x, view_y };
+}
+
+#endif
+
+template<typename T>
+void setup_item_view_button_event_handling_impl(
+    T& view,
     std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
     std::function<bool(double, double)> const& release_callback)
 {
@@ -353,9 +445,10 @@ void setup_tree_view_button_event_handling(
         controller->signal_pressed().connect(
             [&view, press_callback, controller](int /*n_press*/, double view_x, double view_y)
             {
-                int event_x = 0;
-                int event_y = 0;
-                view.convert_widget_to_bin_window_coords(static_cast<int>(view_x), static_cast<int>(view_y), event_x, event_y);
+                auto const [event_x, event_y] = convert_widget_to_bin_window_coords(
+                    view,
+                    static_cast<int>(view_x),
+                    static_cast<int>(view_y));
 
                 auto* const sequence = controller->get_current_sequence();
                 auto const event = controller->get_last_event(sequence);
@@ -378,9 +471,10 @@ void setup_tree_view_button_event_handling(
         controller->signal_released().connect(
             [&view, release_callback, controller](int /*n_press*/, double view_x, double view_y)
             {
-                int event_x = 0;
-                int event_y = 0;
-                view.convert_widget_to_bin_window_coords(static_cast<int>(view_x), static_cast<int>(view_y), event_x, event_y);
+                auto const [event_x, event_y] = convert_widget_to_bin_window_coords(
+                    view,
+                    static_cast<int>(view_x),
+                    static_cast<int>(view_y));
 
                 auto* const sequence = controller->get_current_sequence();
                 auto const event = controller->get_last_event(sequence);
@@ -407,6 +501,28 @@ void setup_tree_view_button_event_handling(
     }
 #endif
 }
+
+} // namespace
+
+void setup_item_view_button_event_handling(
+    Gtk::TreeView& view,
+    std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
+    std::function<bool(double, double)> const& release_callback)
+{
+    setup_item_view_button_event_handling_impl(view, press_callback, release_callback);
+}
+
+#if GTKMM_CHECK_VERSION(4, 0, 0)
+
+void setup_item_view_button_event_handling(
+    Gtk::ListView& view,
+    std::function<bool(guint, TrGdkModifierType, double, double, bool)> const& press_callback,
+    std::function<bool(double, double)> const& release_callback)
+{
+    setup_item_view_button_event_handling_impl(view, press_callback, release_callback);
+}
+
+#endif
 
 bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
 {
@@ -655,6 +771,13 @@ void gtr_widget_set_visible(Gtk::Widget& widget, bool is_visible)
 
         for (auto* const top_level_window : Gtk::Window::list_toplevels())
         {
+#if !GTKMM_CHECK_VERSION(4, 0, 0)
+            if (top_level_window->get_window_type() != Gtk::WINDOW_TOPLEVEL)
+            {
+                continue;
+            }
+#endif
+
             if (top_level_window->get_transient_for() != window || top_level_window->get_visible() == is_visible)
             {
                 continue;
@@ -771,7 +894,7 @@ void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 {
     auto const process = [&entry](Glib::ustring const& text)
     {
-        if (auto const sv = tr_strvStrip(text.raw());
+        if (auto const sv = tr_strv_strip(text.raw());
             !sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
         {
             entry.set_text(text);

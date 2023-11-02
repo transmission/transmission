@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -46,7 +46,7 @@ auto inline constexpr Group = fields_t{ 1 << 23 };
 
 auto inline constexpr All = ~fields_t{ 0 };
 
-fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, bool* did_rename_to_hash_only_name);
+fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor);
 
 void save(tr_torrent* tor);
 

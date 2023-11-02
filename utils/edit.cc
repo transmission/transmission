@@ -1,20 +1,20 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cstdio> // stderr
 #include <cstdlib> // EXIT_FAILURE
 #include <string>
 #include <string_view>
 #include <vector>
 
-#include <fmt/format.h>
-
-#include <libtransmission/transmission.h>
+#include <fmt/core.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -189,7 +189,7 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
     tr_variant* announce_list;
     bool changed = false;
 
-    if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && tr_strvContains(sv, oldval))
+    if (tr_variantDictFindStrView(metainfo, TR_KEY_announce, &sv) && tr_strv_contains(sv, oldval))
     {
         auto const newstr = replaceSubstr(sv, oldval, newval);
         fmt::print("\tReplaced in 'announce': '{:s}' --> '{:s}'\n", sv, newstr);
@@ -209,11 +209,11 @@ static bool replaceURL(tr_variant* metainfo, std::string_view oldval, std::strin
 
             while ((node = tr_variantListChild(tier, nodeCount)) != nullptr)
             {
-                if (tr_variantGetStrView(node, &sv) && tr_strvContains(sv, oldval))
+                if (tr_variantGetStrView(node, &sv) && tr_strv_contains(sv, oldval))
                 {
                     auto const newstr = replaceSubstr(sv, oldval, newval);
                     fmt::print("\tReplaced in 'announce-list' tier #{:d}: '{:s}' --> '{:s}'\n", tierCount + 1, sv, newstr);
-                    tr_variantClear(node);
+                    node->clear();
                     tr_variantInitStr(node, newstr);
                     changed = true;
                 }
@@ -322,6 +322,8 @@ static bool setSource(tr_variant* metainfo, char const* source_value)
 
 int tr_main(int argc, char* argv[])
 {
+    tr_locale_set_global("");
+
     int changedCount = 0;
 
     tr_logSetLevel(TR_LOG_ERROR);
@@ -354,20 +356,20 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    auto serde = tr_variant_serde::benc();
     for (auto const& filename : options.files)
     {
-        tr_variant top;
         bool changed = false;
-        tr_error* error = nullptr;
 
         fmt::print("{:s}\n", filename);
 
-        if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
+        auto otop = serde.parse_file(filename);
+        if (!otop)
         {
-            fmt::print("\tError reading file: {:s}\n", error->message);
-            tr_error_free(error);
+            fmt::print("\tError reading file: {:s}\n", serde.error_->message);
             continue;
         }
+        auto& top = *otop;
 
         if (options.deleteme != nullptr)
         {
@@ -392,10 +394,8 @@ int tr_main(int argc, char* argv[])
         if (changed)
         {
             ++changedCount;
-            tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename);
+            serde.to_file(top, filename);
         }
-
-        tr_variantClear(&top);
     }
 
     fmt::print("Changed {:d} files\n", changedCount);

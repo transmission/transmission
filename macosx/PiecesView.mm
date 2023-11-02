@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -129,7 +129,7 @@ typedef struct PieceInfo
     self.image = [[NSImage alloc] initWithSize:self.bounds.size];
 
     [self clearView];
-    [self setNeedsDisplay];
+    self.needsDisplay = YES;
 }
 
 - (void)clearView
@@ -196,7 +196,7 @@ typedef struct PieceInfo
             NSRectFillListWithColors(cFillRects, cFillColors, numCells);
             return YES;
         }];
-        [self setNeedsDisplay];
+        self.needsDisplay = YES;
     }
 
     // save the current state so we can compare it later

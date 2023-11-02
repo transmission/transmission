@@ -21,7 +21,6 @@ target_sources(${TR_NAME}-qt
         DetailsDialog.cc
         DetailsDialog.h
         FaviconCache.cc
-        FaviconCache.h
         FileTreeDelegate.cc
         FileTreeDelegate.h
         FileTreeItem.cc

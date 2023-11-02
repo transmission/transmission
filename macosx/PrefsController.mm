@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -11,6 +11,7 @@
 #import "BlocklistDownloaderViewController.h"
 #import "BlocklistScheduler.h"
 #import "Controller.h"
+#import "DefaultAppHelper.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
 #import "NSImageAdditions.h"
@@ -41,7 +42,7 @@ static char const* const kRPCKeychainName = "Remote";
 
 static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
-@interface PrefsController ()
+@interface PrefsController ()<NSWindowRestoration>
 
 @property(nonatomic, readonly) tr_session* fHandle;
 @property(nonatomic, readonly) NSUserDefaults* fDefaults;
@@ -58,6 +59,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic, copy) NSString* fInitialString;
 
 @property(nonatomic) IBOutlet NSButton* fSystemPreferencesButton;
+@property(nonatomic) IBOutlet NSButton* fSetDefaultForMagnetButton;
+@property(nonatomic) IBOutlet NSButton* fSetDefaultForTorrentButton;
 @property(nonatomic) IBOutlet NSTextField* fCheckForUpdatesLabel;
 @property(nonatomic) IBOutlet NSButton* fCheckForUpdatesButton;
 @property(nonatomic) IBOutlet NSButton* fCheckForUpdatesBetaButton;
@@ -101,6 +104,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 @property(nonatomic, readonly) NSMutableArray<NSString*>* fRPCWhitelistArray;
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
+@property(nonatomic, readonly) DefaultAppHelper* fDefaultAppHelper;
 
 @end
 
@@ -175,6 +179,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         }
 
         [self setAutoUpdateToBeta:nil];
+
+        _fDefaultAppHelper = [[DefaultAppHelper alloc] init];
     }
 
     return self;
@@ -212,6 +218,8 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.window center];
 
     [self setPrefView:nil];
+
+    [self updateDefaultsStates];
 
     //set special-handling of magnet link add window checkbox
     [self updateShowAddMagnetWindowField];
@@ -476,22 +484,22 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     [self.fPortStatusProgress stopAnimation:self];
     switch (self.fPortChecker.status)
     {
-    case PORT_STATUS_OPEN:
+    case PortStatusOpen:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port is open", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusAvailable];
         break;
-    case PORT_STATUS_CLOSED:
+    case PortStatusClosed:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port is closed", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusUnavailable];
         break;
-    case PORT_STATUS_ERROR:
+    case PortStatusError:
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
         break;
-    case PORT_STATUS_CHECKING:
+    case PortStatusChecking:
         break;
     default:
-        NSAssert(NO, @"Port checker returned invalid status: %d", self.fPortChecker.status);
+        NSAssert(NO, @"Port checker returned invalid status: %lu", self.fPortChecker.status);
         break;
     }
     self.fPortChecker = nil;
@@ -818,7 +826,24 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (IBAction)openNotificationSystemPrefs:(NSButton*)sender
 {
-    [NSWorkspace.sharedWorkspace openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"]];
+    NSURL* prefPaneUrl = nil;
+    if (@available(macOS 13, *))
+    {
+        NSString* prefPaneName = @"x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=";
+        prefPaneName = [prefPaneName stringByAppendingString:NSBundle.mainBundle.bundleIdentifier];
+        prefPaneUrl = [NSURL URLWithString:prefPaneName];
+    }
+    else if (@available(macOS 12, *))
+    {
+        NSString* prefPaneName = @"x-apple.systempreferences:com.apple.preference.notifications?id=";
+        prefPaneName = [prefPaneName stringByAppendingString:NSBundle.mainBundle.bundleIdentifier];
+        prefPaneUrl = [NSURL URLWithString:prefPaneName];
+    }
+    else
+    {
+        prefPaneUrl = [NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Notifications.prefPane"];
+    }
+    [NSWorkspace.sharedWorkspace openURL:prefPaneUrl];
 }
 
 - (void)resetWarnings:(id)sender
@@ -836,14 +861,29 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
     //[fDefaults removeObjectForKey: @"WarningLegal"];
 }
 
-- (void)setDefaultForMagnets:(id)sender
+- (IBAction)setDefaultForMagnets:(id)sender
 {
-    NSString* bundleID = NSBundle.mainBundle.bundleIdentifier;
-    OSStatus const result = LSSetDefaultHandlerForURLScheme((CFStringRef) @"magnet", (__bridge CFStringRef)bundleID);
-    if (result != noErr)
-    {
-        NSLog(@"Failed setting default magnet link handler");
-    }
+    PrefsController* __weak weakSelf = self;
+    [self.fDefaultAppHelper setDefaultForMagnetURLs:^{
+        [weakSelf updateDefaultsStates];
+    }];
+}
+
+- (IBAction)setDefaultForTorrentFiles:(id)sender
+{
+    PrefsController* __weak weakSelf = self;
+    [self.fDefaultAppHelper setDefaultForTorrentFiles:^{
+        [weakSelf updateDefaultsStates];
+    }];
+}
+
+- (void)updateDefaultsStates
+{
+    BOOL const isDefaultForMagnetURLs = [self.fDefaultAppHelper isDefaultForMagnetURLs];
+    self.fSetDefaultForMagnetButton.enabled = !isDefaultForMagnetURLs;
+
+    BOOL const isDefaultForTorrentFiles = [self.fDefaultAppHelper isDefaultForTorrentFiles];
+    self.fSetDefaultForTorrentButton.enabled = !isDefaultForTorrentFiles;
 }
 
 - (void)setQueue:(id)sender
@@ -994,11 +1034,15 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
         //always show the add window for magnet links when the download location is the same as the torrent file
         self.fShowMagnetAddWindowCheck.state = NSControlStateValueOn;
         self.fShowMagnetAddWindowCheck.enabled = NO;
+        self.fShowMagnetAddWindowCheck.toolTip = NSLocalizedString(
+            @"This option is not available if Default location is set to Same as torrent file.",
+            "Preferences -> Transfers -> Adding -> Magnet tooltip");
     }
     else
     {
         self.fShowMagnetAddWindowCheck.state = [self.fDefaults boolForKey:@"MagnetOpenAsk"];
         self.fShowMagnetAddWindowCheck.enabled = YES;
+        self.fShowMagnetAddWindowCheck.toolTip = nil;
     }
 }
 

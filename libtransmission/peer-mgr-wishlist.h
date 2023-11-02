@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -12,9 +12,7 @@
 #include <cstddef> // size_t
 #include <vector>
 
-#include "transmission.h"
-
-#include "torrent.h"
+#include "libtransmission/transmission.h"
 
 /**
  * Figures out what blocks we want to request next.
@@ -22,11 +20,14 @@
 class Wishlist
 {
 public:
+    static auto constexpr EndgameMaxPeers = size_t{ 2U };
+
     struct Mediator
     {
         [[nodiscard]] virtual bool clientCanRequestBlock(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual bool clientCanRequestPiece(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual bool isEndgame() const = 0;
+        [[nodiscard]] virtual bool isSequentialDownload() const = 0;
         [[nodiscard]] virtual size_t countActiveRequests(tr_block_index_t block) const = 0;
         [[nodiscard]] virtual size_t countMissingBlocks(tr_piece_index_t piece) const = 0;
         [[nodiscard]] virtual tr_block_span_t blockSpan(tr_piece_index_t) const = 0;
@@ -35,6 +36,14 @@ public:
         virtual ~Mediator() = default;
     };
 
-    // get a list of the next blocks that we should request from a peer
-    static std::vector<tr_block_span_t> next(Mediator const& mediator, size_t n_wanted_blocks);
+    constexpr explicit Wishlist(Mediator const& mediator)
+        : mediator_{ mediator }
+    {
+    }
+
+    // the next blocks that we should request from a peer
+    [[nodiscard]] std::vector<tr_block_span_t> next(size_t n_wanted_blocks);
+
+private:
+    Mediator const& mediator_;
 };

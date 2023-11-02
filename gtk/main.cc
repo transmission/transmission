@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -27,10 +27,8 @@
 
 #include <fmt/core.h>
 
-#include <clocale>
 #include <cstdio>
 #include <string>
-#include <tuple>
 
 namespace
 {
@@ -52,8 +50,11 @@ Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar shor
 
 int main(int argc, char** argv)
 {
+    /* init libtransmission */
+    auto const init_mgr = tr_lib_init();
+
     /* init i18n */
-    std::ignore = std::setlocale(LC_ALL, "");
+    tr_locale_set_global("");
     bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);
     bind_textdomain_codeset(AppTranslationDomainName, "UTF-8");
     textdomain(AppTranslationDomainName);
@@ -74,7 +75,7 @@ int main(int argc, char** argv)
     std::string config_dir;
     bool show_version = false;
     bool start_paused = false;
-    bool is_iconified = false;
+    bool start_iconified = false;
 
     /* parse the command line */
     auto const config_dir_option = create_option_entry("config-dir", 'g', _("Where to look for configuration files"));
@@ -85,7 +86,7 @@ int main(int argc, char** argv)
     Glib::OptionGroup main_group({}, {});
     main_group.add_entry_filename(config_dir_option, config_dir);
     main_group.add_entry(paused_option, start_paused);
-    main_group.add_entry(minimized_option, is_iconified);
+    main_group.add_entry(minimized_option, start_iconified);
     main_group.add_entry(version_option, show_version);
 
     Glib::OptionContext option_context(_("[torrent files or urls]"));
@@ -134,5 +135,5 @@ int main(int argc, char** argv)
     gtr_notify_init();
 
     /* init the application for the specified config dir */
-    return Application(config_dir, start_paused, is_iconified).run(argc, argv);
+    return Application(config_dir, start_paused, start_iconified).run(argc, argv);
 }

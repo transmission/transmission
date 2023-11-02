@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,12 +10,13 @@
 #pragma once
 
 #include <bitset>
+#include <cstddef> // size_t
 #include <ctime> // for time_t
 #include <optional>
 
-#include "transmission.h" // for TR_SCHED_ALL
+#include "libtransmission/transmission.h" // for TR_SCHED_ALL
 
-#include "quark.h"
+#include "libtransmission/quark.h"
 
 struct tr_variant;
 
@@ -43,7 +44,7 @@ public:
         virtual ~Mediator() noexcept = default;
 
         using ChangeReason = tr_session_alt_speeds::ChangeReason;
-        virtual void isActiveChanged(bool is_active, ChangeReason reason) = 0;
+        virtual void is_active_changed(bool is_active, ChangeReason reason) = 0;
 
         [[nodiscard]] virtual time_t time() = 0;
     };
@@ -53,55 +54,55 @@ public:
     {
     }
 
-    void load(tr_variant* src);
-    void save(tr_variant* tgt) const;
-    static void defaultSettings(tr_variant* tgt);
+    void load(tr_variant const& src);
+    [[nodiscard]] tr_variant settings() const;
+    [[nodiscard]] static tr_variant default_settings();
 
-    [[nodiscard]] constexpr bool isActive() const noexcept
+    [[nodiscard]] constexpr bool is_active() const noexcept
     {
         return is_active_;
     }
 
-    void checkScheduler();
+    void check_scheduler();
 
-    void setSchedulerEnabled(bool enabled)
+    void set_scheduler_enabled(bool enabled)
     {
         scheduler_enabled_ = enabled;
-        updateScheduler();
+        update_scheduler();
     }
 
     // return true iff the scheduler will turn alt speeds on/off
-    [[nodiscard]] constexpr auto isSchedulerEnabled() const noexcept
+    [[nodiscard]] constexpr auto is_scheduler_enabled() const noexcept
     {
         return scheduler_enabled_;
     }
 
-    void setStartMinute(size_t minute)
+    void set_start_minute(size_t minute)
     {
         minute_begin_ = minute;
-        updateScheduler();
+        update_scheduler();
     }
 
-    [[nodiscard]] constexpr auto startMinute() const noexcept
+    [[nodiscard]] constexpr auto start_minute() const noexcept
     {
         return minute_begin_;
     }
 
-    void setEndMinute(size_t minute)
+    void set_end_minute(size_t minute)
     {
         minute_end_ = minute;
-        updateScheduler();
+        update_scheduler();
     }
 
-    [[nodiscard]] constexpr auto endMinute() const noexcept
+    [[nodiscard]] constexpr auto end_minute() const noexcept
     {
         return minute_end_;
     }
 
-    void setWeekdays(tr_sched_day days)
+    void set_weekdays(tr_sched_day days)
     {
         use_on_these_weekdays_ = days;
-        updateScheduler();
+        update_scheduler();
     }
 
     [[nodiscard]] constexpr tr_sched_day weekdays() const noexcept
@@ -109,12 +110,12 @@ public:
         return static_cast<tr_sched_day>(use_on_these_weekdays_);
     }
 
-    [[nodiscard]] constexpr auto limitKBps(tr_direction dir) const noexcept
+    [[nodiscard]] constexpr auto limit_kbps(tr_direction dir) const noexcept
     {
         return dir == TR_DOWN ? speed_down_kilobytes_per_second_ : speed_up_kilobytes_per_second_;
     }
 
-    constexpr void setLimitKBps(tr_direction dir, size_t limit) noexcept
+    constexpr void set_limit_kbps(tr_direction dir, size_t limit) noexcept
     {
         if (dir == TR_DOWN)
         {
@@ -126,16 +127,16 @@ public:
         }
     }
 
-    void setActive(bool active, ChangeReason reason);
+    void set_active(bool active, ChangeReason reason);
 
 private:
     Mediator& mediator_;
 
-    void updateScheduler();
-    void updateMinutes();
+    void update_scheduler();
+    void update_minutes();
 
     // whether `time` hits in one of the `minutes_` that is true
-    [[nodiscard]] bool isActiveMinute(time_t time) const noexcept;
+    [[nodiscard]] bool is_active_minute(time_t time) const noexcept;
 
     static auto constexpr MinutesPerHour = int{ 60 };
     static auto constexpr MinutesPerDay = int{ MinutesPerHour * 24 };

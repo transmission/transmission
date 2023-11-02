@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,13 +9,15 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint> // uint64_t
-#include <cstddef> // size_t
+#include <algorithm> // for std::binary_search()
+#include <cstdint> // for uint64_t
+#include <cstddef> // for size_t
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "bitfield.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 
 struct tr_block_info;
 struct tr_torrent_metainfo;
@@ -45,42 +47,61 @@ public:
     {
         reset(tm);
     }
+
     tr_file_piece_map(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
     {
         reset(block_info, file_sizes, n_files);
     }
-    void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
+
     void reset(tr_torrent_metainfo const& tm);
 
-    [[nodiscard]] piece_span_t pieceSpan(tr_file_index_t file) const;
-    [[nodiscard]] file_span_t fileSpan(tr_piece_index_t piece) const;
+    [[nodiscard]] TR_CONSTEXPR20 piece_span_t piece_span(tr_file_index_t file) const noexcept
+    {
+        return file_pieces_[file];
+    }
 
-    [[nodiscard]] file_offset_t fileOffset(uint64_t offset) const;
+    [[nodiscard]] file_span_t file_span(tr_piece_index_t piece) const;
+
+    [[nodiscard]] file_offset_t file_offset(uint64_t offset) const;
 
     [[nodiscard]] TR_CONSTEXPR20 size_t size() const
     {
         return std::size(file_pieces_);
     }
 
+    [[nodiscard]] TR_CONSTEXPR20 bool empty() const noexcept
+    {
+        return std::empty(file_pieces_);
+    }
+
     // TODO(ckerr) minor wart here, two identical span types
-    [[nodiscard]] tr_byte_span_t byteSpan(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 tr_byte_span_t byte_span(tr_file_index_t file) const
     {
         auto const& span = file_bytes_.at(file);
         return tr_byte_span_t{ span.begin, span.end };
     }
 
+    [[nodiscard]] TR_CONSTEXPR20 bool is_edge_piece(tr_piece_index_t piece) const
+    {
+        return std::binary_search(std::begin(edge_pieces_), std::end(edge_pieces_), piece);
+    }
+
 private:
+    void reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files);
+
     using byte_span_t = index_span_t<uint64_t>;
     std::vector<byte_span_t> file_bytes_;
 
     std::vector<piece_span_t> file_pieces_;
+
+    std::vector<tr_piece_index_t> edge_pieces_;
 
     template<typename T>
     struct CompareToSpan
     {
         using span_t = index_span_t<T>;
 
-        int compare(T item, span_t span) const // <=>
+        [[nodiscard]] constexpr int compare(T item, span_t span) const // <=>
         {
             if (item < span.begin)
             {
@@ -95,17 +116,17 @@ private:
             return 0;
         }
 
-        bool operator()(T item, span_t span) const // <
+        [[nodiscard]] constexpr bool operator()(T item, span_t span) const // <
         {
             return compare(item, span) < 0;
         }
 
-        int compare(span_t span, T item) const // <=>
+        [[nodiscard]] constexpr int compare(span_t span, T item) const // <=>
         {
             return -compare(item, span);
         }
 
-        bool operator()(span_t span, T item) const // <
+        [[nodiscard]] constexpr bool operator()(span_t span, T item) const // <
         {
             return compare(span, item) < 0;
         }
@@ -115,7 +136,7 @@ private:
 class tr_file_priorities
 {
 public:
-    explicit tr_file_priorities(tr_file_piece_map const* fpm) noexcept
+    TR_CONSTEXPR20 explicit tr_file_priorities(tr_file_piece_map const* fpm) noexcept
         : fpm_{ fpm }
     {
     }
@@ -124,8 +145,8 @@ public:
     void set(tr_file_index_t file, tr_priority_t priority);
     void set(tr_file_index_t const* files, size_t n, tr_priority_t priority);
 
-    [[nodiscard]] tr_priority_t filePriority(tr_file_index_t file) const;
-    [[nodiscard]] tr_priority_t piecePriority(tr_piece_index_t piece) const;
+    [[nodiscard]] tr_priority_t file_priority(tr_file_index_t file) const;
+    [[nodiscard]] tr_priority_t piece_priority(tr_piece_index_t piece) const;
 
 private:
     tr_file_piece_map const* fpm_;
@@ -145,12 +166,12 @@ public:
     void set(tr_file_index_t file, bool wanted);
     void set(tr_file_index_t const* files, size_t n, bool wanted);
 
-    [[nodiscard]] TR_CONSTEXPR20 bool fileWanted(tr_file_index_t file) const
+    [[nodiscard]] TR_CONSTEXPR20 bool file_wanted(tr_file_index_t file) const
     {
         return wanted_.test(file);
     }
 
-    [[nodiscard]] bool pieceWanted(tr_piece_index_t piece) const;
+    [[nodiscard]] bool piece_wanted(tr_piece_index_t piece) const;
 
 private:
     tr_file_piece_map const* fpm_;

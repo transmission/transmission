@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -32,10 +32,10 @@ using ::trqt::variant_helpers::listAdd;
 ***/
 
 OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent)
-    : BaseDialog(parent)
-    , add_(std::move(addme))
-    , session_(session)
-    , is_local_(session_.isLocal())
+    : BaseDialog{ parent }
+    , add_{ std::move(addme) }
+    , session_{ session }
+    , is_local_{ session_.isLocal() }
 {
     ui_.setupUi(this);
 
@@ -65,11 +65,11 @@ OptionsDialog::OptionsDialog(Session& session, Prefs const& prefs, AddData addme
     ui_.sourceStack->setFixedHeight(ui_.sourceStack->currentWidget()->sizeHint().height());
     ui_.sourceLabel->setBuddy(ui_.sourceStack->currentWidget());
 
-    QFontMetrics const font_metrics(font());
+    auto const font_metrics = QFontMetrics{ font() };
     int const width = font_metrics.size(0, QStringLiteral("This is a pretty long torrent filename indeed.torrent")).width();
     ui_.sourceStack->setMinimumWidth(width);
 
-    QString const download_dir(Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR)));
+    auto const download_dir = Utils::removeTrailingDirSeparator(prefs.getString(Prefs::DOWNLOAD_DIR));
     ui_.freeSpaceLabel->setSession(session_);
     ui_.freeSpaceLabel->setPath(download_dir);
 
@@ -137,11 +137,11 @@ void OptionsDialog::reload()
         break;
 
     case AddData::FILENAME:
-        ok = metainfo.parseTorrentFile(add_.filename.toStdString());
+        ok = metainfo.parse_torrent_file(add_.filename.toStdString());
         break;
 
     case AddData::METAINFO:
-        ok = metainfo.parseBenc(add_.metainfo.toStdString());
+        ok = metainfo.parse_benc(add_.metainfo.toStdString());
         break;
 
     default:
@@ -166,7 +166,7 @@ void OptionsDialog::reload()
 
     if (metainfo_)
     {
-        auto const n_files = metainfo_->fileCount();
+        auto const n_files = metainfo_->file_count();
         priorities_.assign(n_files, TR_PRI_NORMAL);
         wanted_.assign(n_files, true);
 
@@ -176,9 +176,9 @@ void OptionsDialog::reload()
             f.index = i;
             f.priority = priorities_[i];
             f.wanted = wanted_[i];
-            f.size = metainfo_->fileSize(i);
+            f.size = metainfo_->file_size(i);
             f.have = 0;
-            f.filename = QString::fromStdString(metainfo_->fileSubpath(i));
+            f.filename = QString::fromStdString(metainfo_->file_subpath(i));
             files_.push_back(f);
         }
     }
@@ -205,7 +205,7 @@ void OptionsDialog::onSessionUpdated()
     }
 }
 
-void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priority)
+void OptionsDialog::onPriorityChanged(file_indices_t const& file_indices, int priority)
 {
     for (int const i : file_indices)
     {
@@ -213,7 +213,7 @@ void OptionsDialog::onPriorityChanged(QSet<int> const& file_indices, int priorit
     }
 }
 
-void OptionsDialog::onWantedChanged(QSet<int> const& file_indices, bool is_wanted)
+void OptionsDialog::onWantedChanged(file_indices_t const& file_indices, bool is_wanted)
 {
     for (int const i : file_indices)
     {

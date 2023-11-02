@@ -21,7 +21,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Info">
+        <customView clipsToBounds="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2" userLabel="Info">
             <rect key="frame" x="0.0" y="0.0" width="356" height="228"/>
             <subviews>
                 <scrollView horizontalHuggingPriority="249" horizontalCompressionResistancePriority="249" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4">

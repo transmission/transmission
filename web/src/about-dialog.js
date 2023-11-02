@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -10,7 +10,7 @@ export class AboutDialog extends EventTarget {
     super();
 
     this.elements = AboutDialog._create(version_info);
-    this.elements.dismiss.addEventListener('click', () => this._onDismiss());
+    this.elements.dismiss.addEventListener('click', () => this.close());
     document.body.append(this.elements.root);
     this.elements.dismiss.focus();
   }
@@ -19,10 +19,6 @@ export class AboutDialog extends EventTarget {
     this.elements.root.remove();
     this.dispatchEvent(new Event('close'));
     delete this.elements;
-  }
-
-  _onDismiss() {
-    this.close();
   }
 
   static _create(version_info) {
@@ -46,6 +42,12 @@ export class AboutDialog extends EventTarget {
     elements.workarea.append(e);
     e = document.createElement('div');
     e.textContent = 'Copyright © The Transmission Project';
+    elements.workarea.append(e);
+
+    e = document.createElement('a');
+    e.href = 'https://transmissionbt.com/';
+    e.target = '_blank';
+    e.textContent = 'https://transmissionbt.com/';
     elements.workarea.append(e);
 
     elements.confirm.remove();

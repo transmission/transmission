@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
    It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
@@ -71,7 +71,7 @@ export class Remote {
             heading: 'Connection failed',
             message:
               'Could not connect to the server. You may need to reload the page to reconnect.',
-          })
+          }),
         );
       });
   }
@@ -84,8 +84,11 @@ export class Remote {
     this.sendRequest(o, callback, context);
   }
 
-  checkPort(callback, context) {
+  checkPort(ipProtocol, callback, context) {
     const o = {
+      arguments: {
+        ipProtocol,
+      },
       method: 'port-test',
     };
     this.sendRequest(o, callback, context);
@@ -160,7 +163,7 @@ export class Remote {
       },
       () => {
         this._controller.refreshTorrents([torrentId]);
-      }
+      },
     );
   }
 
@@ -189,7 +192,7 @@ export class Remote {
       'torrent-stop',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
 
@@ -202,7 +205,7 @@ export class Remote {
         move: true,
       },
       callback,
-      context
+      context,
     );
   }
 
@@ -224,12 +227,12 @@ export class Remote {
       this._controller.refreshTorrents();
     });
   }
-  verifyTorrents(torrent_ids, callback, context) {
+  verifyTorrents(torrent_ids, force, callback, context) {
     this.sendTorrentActionRequests(
-      'torrent-verify',
+      force ? 'torrent-verify-force' : 'torrent-verify',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   reannounceTorrents(torrent_ids, callback, context) {
@@ -237,7 +240,7 @@ export class Remote {
       'torrent-reannounce',
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   addTorrentByUrl(url, options) {
@@ -279,7 +282,7 @@ export class Remote {
       RPC._QueueMoveTop,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsToBottom(torrent_ids, callback, context) {
@@ -287,7 +290,7 @@ export class Remote {
       RPC._QueueMoveBottom,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsUp(torrent_ids, callback, context) {
@@ -295,7 +298,7 @@ export class Remote {
       RPC._QueueMoveUp,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
   moveTorrentsDown(torrent_ids, callback, context) {
@@ -303,7 +306,7 @@ export class Remote {
       RPC._QueueMoveDown,
       torrent_ids,
       callback,
-      context
+      context,
     );
   }
 }

@@ -1,9 +1,9 @@
-// This file Copyright © 2005-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
+#include <algorithm> // std::min
 #include <array>
 #include <cstdint> // uint8_t, uint64_t
 #include <string_view>
@@ -11,21 +11,21 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error-types.h"
-#include "error.h"
-#include "file.h"
-#include "log.h"
-#include "open-files.h"
-#include "tr-assert.h"
-#include "tr-strbuf.h"
-#include "utils.h" // _()
+#include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/open-files.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h" // _()
 
 namespace
 {
 
-[[nodiscard]] auto constexpr isOpen(tr_sys_file_t fd) noexcept
+[[nodiscard]] auto is_open(tr_sys_file_t fd) noexcept
 {
     return fd != TR_BAD_SYS_FILE;
 }
@@ -115,7 +115,7 @@ bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** error)
 
 std::optional<tr_sys_file_t> tr_open_files::get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable)
 {
-    if (auto* const found = pool_.get(makeKey(tor_id, file_num)); found != nullptr)
+    if (auto* const found = pool_.get(make_key(tor_id, file_num)); found != nullptr)
     {
         if (writable && !found->writable_)
         {
@@ -137,7 +137,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     uint64_t file_size)
 {
     // is there already an entry
-    auto key = makeKey(tor_id, file_num);
+    auto key = make_key(tor_id, file_num);
     if (auto* const found = pool_.get(key); found != nullptr)
     {
         if (!writable || found->writable_)
@@ -178,7 +178,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     int flags = writable ? (TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE) : 0;
     flags |= TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL;
     auto const fd = tr_sys_file_open(filename, flags, 0666, &error);
-    if (!isOpen(fd))
+    if (!is_open(fd))
     {
         tr_logAddError(fmt::format(
             _("Couldn't open '{path}': {error} ({error_code})"),
@@ -247,24 +247,24 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     return fd;
 }
 
-void tr_open_files::closeAll()
+void tr_open_files::close_all()
 {
     pool_.clear();
 }
 
-void tr_open_files::closeTorrent(tr_torrent_id_t tor_id)
+void tr_open_files::close_torrent(tr_torrent_id_t tor_id)
 {
     return pool_.erase_if([&tor_id](Key const& key, Val const& /*unused*/) { return key.first == tor_id; });
 }
 
-void tr_open_files::closeFile(tr_torrent_id_t tor_id, tr_file_index_t file_num)
+void tr_open_files::close_file(tr_torrent_id_t tor_id, tr_file_index_t file_num)
 {
-    pool_.erase(makeKey(tor_id, file_num));
+    pool_.erase(make_key(tor_id, file_num));
 }
 
 tr_open_files::Val::~Val()
 {
-    if (isOpen(fd_))
+    if (is_open(fd_))
     {
         tr_sys_file_close(fd_);
     }

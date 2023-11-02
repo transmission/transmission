@@ -1,12 +1,12 @@
-// This file Copyright © 2013-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <array>
 #include <cctype> // for isalpha()
 #include <cstring>
+#include <ctime>
 #include <iterator> // for std::back_inserter
 #include <optional>
 #include <string>
@@ -15,15 +15,15 @@
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "crypto-utils.h" /* tr_rand_int() */
-#include "error.h"
-#include "file.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/crypto-utils.h" /* tr_rand_int() */
+#include "libtransmission/error.h"
+#include "libtransmission/file.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -113,7 +113,7 @@ static auto constexpr Slashes = "\\/"sv;
 
 static constexpr bool is_slash(char c)
 {
-    return tr_strvContains(Slashes, c);
+    return tr_strv_contains(Slashes, c);
 }
 
 static constexpr bool is_unc_path(std::string_view path)
@@ -212,7 +212,7 @@ static std::string native_path_to_path(std::wstring_view wide_path)
         return {};
     }
 
-    if (tr_strvStartsWith(wide_path, NativeUncPathPrefix))
+    if (tr_strv_starts_with(wide_path, NativeUncPathPrefix))
     {
         wide_path.remove_prefix(std::size(NativeUncPathPrefix));
         auto path = tr_win32_native_to_utf8(wide_path);
@@ -220,7 +220,7 @@ static std::string native_path_to_path(std::wstring_view wide_path)
         return path;
     }
 
-    if (tr_strvStartsWith(wide_path, NativeLocalPathPrefix))
+    if (tr_strv_starts_with(wide_path, NativeLocalPathPrefix))
     {
         wide_path.remove_prefix(std::size(NativeLocalPathPrefix));
         return tr_win32_native_to_utf8(wide_path);
@@ -531,7 +531,7 @@ std::string tr_sys_path_resolve(std::string_view path, tr_error** error)
                 {
                     // `wide_ret_size` includes the terminating '\0'; remove it from `wide_ret`
                     wide_ret.resize(std::size(wide_ret) - 1);
-                    TR_ASSERT(tr_strvStartsWith(wide_ret, NativeLocalPathPrefix));
+                    TR_ASSERT(tr_strv_starts_with(wide_ret, NativeLocalPathPrefix));
                     ret = native_path_to_path(wide_ret);
                 }
             }
@@ -1256,7 +1256,7 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
     return ret;
 }
 
-tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
+tr_sys_dir_t tr_sys_dir_open(std::string_view path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 

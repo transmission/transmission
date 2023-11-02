@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -88,7 +88,7 @@ public:
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, int val);
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, double val);
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QString const& val);
-    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QList<int> const& val);
+    Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, std::vector<int> const& val);
     Tag torrentSet(torrent_ids_t const& torrent_ids, tr_quark const key, QStringList const& val);
 
     void torrentSetLocation(torrent_ids_t const& torrent_ids, QString const& path, bool do_move);

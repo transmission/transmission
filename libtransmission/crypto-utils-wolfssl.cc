@@ -1,4 +1,4 @@
-// This file Copyright 2014-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -15,11 +15,12 @@
 
 #include <fmt/core.h>
 
-#include "transmission.h"
-#include "crypto-utils.h"
-#include "log.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 #if LIBWOLFSSL_VERSION_HEX >= 0x04000000 // 4.0.0
 using TR_WC_RNG = WC_RNG;

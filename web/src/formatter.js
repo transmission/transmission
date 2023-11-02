@@ -1,4 +1,4 @@
-/* @license This file Copyright © 2020-2023 Mnemosyne LLC.
+/* @license This file Copyright © Mnemosyne LLC.
    It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
@@ -129,24 +129,32 @@ export const Formatter = {
     return this.speed(this.toKBps(Bps));
   },
 
-  timeInterval(seconds) {
+  stringSanitizer(str) {
+    return ['E2BIG', 'NaN'].some((badStr) => str.includes(badStr)) ? `…` : str;
+  },
+
+  timeInterval(seconds, granular_depth = 3) {
     const days = Math.floor(seconds / 86_400);
+    let buffer = [];
     if (days) {
-      return this.countString('day', 'days', days);
+      buffer.push(this.countString('day', 'days', days));
     }
 
     const hours = Math.floor((seconds % 86_400) / 3600);
-    if (hours) {
-      return this.countString('hour', 'hours', hours);
+    if (days || hours) {
+      buffer.push(this.countString('hour', 'hours', hours));
     }
 
     const minutes = Math.floor((seconds % 3600) / 60);
-    if (minutes) {
-      return this.countString('minute', 'minutes', minutes);
+    if (days || hours || minutes) {
+      buffer.push(this.countString('minute', 'minutes', minutes));
+      buffer = buffer.slice(0, granular_depth);
+      return buffer.length > 1
+        ? `${buffer.slice(0, -1).join(', ')} and ${buffer.slice(-1)}`
+        : buffer[0];
     }
 
-    seconds = Math.floor(seconds % 60);
-    return this.countString('second', 'seconds', seconds);
+    return this.countString('second', 'seconds', Math.floor(seconds % 60));
   },
 
   timestamp(seconds) {

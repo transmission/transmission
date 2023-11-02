@@ -4,13 +4,18 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <cstdint> // uint64_t
 #include <cstring>
+#include <string_view>
 #include <vector>
 
-#include <libtransmission/transmission.h>
+#include <libtransmission/crypto-utils.h>
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/tr-strbuf.h>
+#include <libtransmission/utils.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 namespace libtransmission::test
@@ -70,7 +75,7 @@ private:
     {
         auto contents1 = std::vector<char>{};
         auto contents2 = std::vector<char>{};
-        return tr_loadFile(filename1, contents1) && tr_loadFile(filename2, contents2) && contents1 == contents2;
+        return tr_file_read(filename1, contents1) && tr_file_read(filename2, contents2) && contents1 == contents2;
     }
 };
 

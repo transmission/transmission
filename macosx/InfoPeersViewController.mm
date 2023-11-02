@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -428,8 +428,7 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
         {
             portString = NSLocalizedString(@"N/A", "Inspector -> Peers tab -> table row tooltip");
         }
-        [components addObject:[NSString stringWithFormat:@"%@: %@",
-                                                         NSLocalizedString(@"Port", "Inspector -> Peers tab -> table row tooltip"),
+        [components addObject:[NSString stringWithFormat:NSLocalizedString(@"Port: %@", "Inspector -> Peers tab -> table row tooltip"),
                                                          portString]];
 
         NSInteger const peerFrom = [peer[@"From"] integerValue];

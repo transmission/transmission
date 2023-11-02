@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,13 +7,12 @@
 #include <cerrno>
 #include <chrono>
 #include <future>
-#include <mutex>
+#include <optional>
 #include <string>
 #include <thread>
 #include <utility>
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 #ifdef SYSTEM_MINIUPNP
 #include <miniupnpc/miniupnpc.h>
@@ -25,13 +24,14 @@
 
 #define LIBTRANSMISSION_PORT_FORWARDING_MODULE
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "log.h"
-#include "port-forwarding-upnp.h"
-#include "port-forwarding.h"
-#include "tr-assert.h"
-#include "utils.h" // for _(), tr_strerror()
+#include "libtransmission/log.h"
+#include "libtransmission/net.h"
+#include "libtransmission/port-forwarding-upnp.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h" // TR_ADDRSTRLEN
+#include "libtransmission/utils.h" // for _(), tr_strerror()
 
 namespace
 {

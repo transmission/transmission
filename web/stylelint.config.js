@@ -1,8 +1,7 @@
 
 module.exports = {
   "extends": [
-    "stylelint-config-sass-guidelines",
-    "stylelint-config-prettier"
+    "stylelint-config-sass-guidelines"
   ],
   "plugins":  [
     "@primer/stylelint-config/plugins/no-undefined-vars",
@@ -22,7 +21,6 @@ module.exports = {
     "no-duplicate-at-import-rules": true,
     "no-duplicate-selectors": null,
     "no-empty-source": true,
-    "no-extra-semicolons": true,
     "no-invalid-double-slash-comments": true,
     "primer/no-undefined-vars": true,
     "primer/no-unused-vars": true,

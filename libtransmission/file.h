@@ -1,22 +1,21 @@
-// This file Copyright 2013-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <cstddef> // size_t
 #include <cstdint> // uint64_t
 #include <ctime> // time_t
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
-
-#include "tr-macros.h"
 
 struct tr_error;
 
@@ -116,6 +115,12 @@ struct tr_sys_path_info
     }
 };
 
+struct tr_sys_path_capacity
+{
+    int64_t free = -1;
+    int64_t total = -1;
+};
+
 /**
  * @name Platform-specific wrapper functions
  *
@@ -157,6 +162,15 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
     std::string_view path,
     int flags = 0,
     tr_error** error = nullptr);
+
+/**
+ * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
+ *
+ * @param[in]  path  Path to directory.
+ * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
+ *                   are not interested in error details.
+ */
+[[nodiscard]] std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `access()`.
@@ -584,7 +598,7 @@ bool tr_sys_dir_create_temp(char* path_template, struct tr_error** error = nullp
  * @return Opened directory descriptor on success, `TR_BAD_SYS_DIR` otherwise
  *         (with `error` set accordingly).
  */
-tr_sys_dir_t tr_sys_dir_open(char const* path, struct tr_error** error = nullptr);
+tr_sys_dir_t tr_sys_dir_open(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `readdir()`.
@@ -611,6 +625,16 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, struct tr_error** error = 
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
 bool tr_sys_dir_close(tr_sys_dir_t handle, struct tr_error** error = nullptr);
+
+[[nodiscard]] constexpr bool tr_basename_is_not_dotfile(std::string_view sv)
+{
+    return std::empty(sv) || sv.front() != '.';
+}
+
+[[nodiscard]] std::vector<std::string> tr_sys_dir_get_files(
+    std::string_view folder,
+    std::function<bool(std::string_view name)> const& test = tr_basename_is_not_dotfile,
+    tr_error** error = nullptr);
 
 /** @} */
 /** @} */

@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,6 +6,7 @@
 #include "TorrentCellRenderer.h"
 
 #include "HigWorkarea.h" // GUI_PAD, GUI_PAD_SMALL
+#include "Percents.h"
 #include "Torrent.h"
 
 #include <libtransmission/transmission.h>
@@ -40,6 +41,8 @@
 
 /* #define TEST_RTL */
 
+using namespace std::string_literals;
+
 /***
 ****
 ***/
@@ -50,18 +53,8 @@ namespace
 auto const DefaultBarHeight = 12;
 auto const CompactBarWidth = 50;
 auto const SmallScale = 0.9;
-auto const CompactIconSize = IF_GTKMM4(Gtk::IconSize::NORMAL, Gtk::ICON_SIZE_MENU);
-auto const FullIconSize = IF_GTKMM4(Gtk::IconSize::LARGE, Gtk::ICON_SIZE_DND);
-
-auto get_height(Gtk::Requisition const& req)
-{
-    return req.IF_GTKMM4(get_height(), height);
-}
-
-auto get_width(Gtk::Requisition const& req)
-{
-    return req.IF_GTKMM4(get_width(), width);
-}
+auto const CompactIconSize = Gtk::ICON_SIZE_MENU;
+auto const FullIconSize = Gtk::ICON_SIZE_DND;
 
 } // namespace
 
@@ -71,9 +64,6 @@ auto get_width(Gtk::Requisition const& req)
 
 class TorrentCellRenderer::Impl
 {
-    using SnapshotPtr = TorrentCellRenderer::SnapshotPtr;
-    using IconSize = IF_GTKMM4(Gtk::IconSize, Gtk::BuiltinIconSize);
-
 public:
     explicit Impl(TorrentCellRenderer& renderer);
     ~Impl();
@@ -84,12 +74,12 @@ public:
     Gtk::Requisition get_size_full(Gtk::Widget& widget) const;
 
     void render_compact(
-        SnapshotPtr const& snapshot,
+        Cairo::RefPtr<Cairo::Context> const& context,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
     void render_full(
-        SnapshotPtr const& snapshot,
+        Cairo::RefPtr<Cairo::Context> const& context,
         Gtk::Widget& widget,
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
@@ -111,13 +101,12 @@ public:
 
 private:
     void render_progress_bar(
-        SnapshotPtr const& snapshot,
+        Cairo::RefPtr<Cairo::Context> const& context,
         Gtk::Widget& widget,
         Gdk::Rectangle const& area,
         Gtk::CellRendererState flags,
-        Gdk::RGBA const& color);
+        std::optional<Gdk::RGBA> const& color);
 
-    static void set_icon(Gtk::CellRendererPixbuf& renderer, Glib::RefPtr<Gio::Icon> const& icon, IconSize icon_size);
     static void adjust_progress_bar_hue(
         Cairo::RefPtr<Cairo::Context> const& context,
         Gdk::RGBA const& color,
@@ -139,19 +128,6 @@ private:
 ****
 ***/
 
-void TorrentCellRenderer::Impl::set_icon(
-    Gtk::CellRendererPixbuf& renderer,
-    Glib::RefPtr<Gio::Icon> const& icon,
-    IconSize icon_size)
-{
-    renderer.property_gicon() = icon;
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-    renderer.property_icon_size() = icon_size;
-#else
-    renderer.property_stock_size() = icon_size;
-#endif
-}
-
 Gtk::Requisition TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget) const
 {
     int xpad = 0;
@@ -169,7 +145,8 @@ Gtk::Requisition TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
-    set_icon(*icon_renderer_, icon, CompactIconSize);
+    icon_renderer_->property_gicon() = icon;
+    icon_renderer_->property_stock_size() = CompactIconSize;
     icon_renderer_->get_preferred_size(widget, min_size, icon_size);
     text_renderer_->property_text() = name;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(NONE);
@@ -183,8 +160,8 @@ Gtk::Requisition TorrentCellRenderer::Impl::get_size_compact(Gtk::Widget& widget
     *** LAYOUT
     **/
 
-    return { xpad * 2 + get_width(icon_size) + GUI_PAD + CompactBarWidth + GUI_PAD + get_width(stat_size),
-             ypad * 2 + std::max(get_height(name_size), property_bar_height_.get_value()) };
+    return { xpad * 2 + icon_size.width + GUI_PAD + CompactBarWidth + GUI_PAD + stat_size.width,
+             ypad * 2 + std::max(name_size.height, property_bar_height_.get_value()) };
 }
 
 Gtk::Requisition TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget) const
@@ -206,7 +183,8 @@ Gtk::Requisition TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget) c
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
-    set_icon(*icon_renderer_, icon, FullIconSize);
+    icon_renderer_->property_gicon() = icon;
+    icon_renderer_->property_stock_size() = FullIconSize;
     icon_renderer_->get_preferred_size(widget, min_size, icon_size);
     text_renderer_->property_text() = name;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(BOLD);
@@ -224,9 +202,9 @@ Gtk::Requisition TorrentCellRenderer::Impl::get_size_full(Gtk::Widget& widget) c
     *** LAYOUT
     **/
 
-    return { xpad * 2 + get_width(icon_size) + GUI_PAD + std::max(get_width(prog_size), get_width(stat_size)),
-             ypad * 2 + get_height(name_size) + get_height(prog_size) + GUI_PAD_SMALL + property_bar_height_.get_value() +
-                 GUI_PAD_SMALL + get_height(stat_size) };
+    return { xpad * 2 + icon_size.width + GUI_PAD + std::max(prog_size.width, stat_size.width),
+             ypad * 2 + name_size.height + prog_size.height + GUI_PAD_SMALL + property_bar_height_.get_value() + GUI_PAD_SMALL +
+                 stat_size.height };
 }
 
 void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& minimum_width, int& natural_width) const
@@ -236,7 +214,7 @@ void TorrentCellRenderer::get_preferred_width_vfunc(Gtk::Widget& widget, int& mi
         auto const size = impl_->property_compact().get_value() ? impl_->get_size_compact(widget) :
                                                                   impl_->get_size_full(widget);
 
-        minimum_width = get_width(size);
+        minimum_width = size.width;
         natural_width = minimum_width;
     }
 }
@@ -248,7 +226,7 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
         auto const size = impl_->property_compact().get_value() ? impl_->get_size_compact(widget) :
                                                                   impl_->get_size_full(widget);
 
-        minimum_height = get_height(size);
+        minimum_height = size.height;
         natural_height = minimum_height;
     }
 }
@@ -256,21 +234,49 @@ void TorrentCellRenderer::get_preferred_height_vfunc(Gtk::Widget& widget, int& m
 namespace
 {
 
-Gdk::RGBA const& get_progress_bar_color(Torrent const& torrent)
+void set_error_color(
+    Gtk::CellRendererText& text_renderer,
+    Torrent const& torrent,
+    Gtk::Widget& widget,
+    Gtk::CellRendererState flags)
 {
-    static auto const steelblue_color = Gdk::RGBA("steelblue");
-    static auto const forestgreen_color = Gdk::RGBA("forestgreen");
-    static auto const silver_color = Gdk::RGBA("silver");
+    static auto const error_color_name = Glib::ustring("tr_error_color"s);
 
+    auto color = Gdk::RGBA();
+    if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{} &&
+        widget.get_style_context()->lookup_color(error_color_name, color))
+    {
+        text_renderer.property_foreground_rgba() = color;
+    }
+    else
+    {
+        text_renderer.property_foreground_set() = false;
+    }
+}
+
+std::optional<Gdk::RGBA> get_progress_bar_color(Torrent const& torrent, Gtk::Widget const& widget)
+{
+    static auto const down_color_name = Glib::ustring("tr_transfer_down_color"s);
+    static auto const up_color_name = Glib::ustring("tr_transfer_up_color"s);
+    static auto const idle_color_name = Glib::ustring("tr_transfer_idle_color"s);
+
+    auto const* color_name = &idle_color_name;
     switch (torrent.get_activity())
     {
     case TR_STATUS_DOWNLOAD:
-        return steelblue_color;
+        color_name = &down_color_name;
+        break;
+
     case TR_STATUS_SEED:
-        return forestgreen_color;
+        color_name = &up_color_name;
+        break;
+
     default:
-        return silver_color;
+        break;
     }
+
+    auto color = Gdk::RGBA();
+    return widget.get_style_context()->lookup_color(*color_name, color) ? std::make_optional(color) : std::nullopt;
 }
 
 Cairo::RefPtr<Cairo::Surface> get_mask_surface(Cairo::RefPtr<Cairo::Surface> const& surface, Gdk::Rectangle const& area)
@@ -289,12 +295,6 @@ Cairo::RefPtr<Cairo::Surface> get_mask_surface(Cairo::RefPtr<Cairo::Surface> con
     return mask_surface;
 }
 
-template<typename... Ts>
-void render_impl(Gtk::CellRenderer& renderer, Ts&&... args)
-{
-    renderer.IF_GTKMM4(snapshot, render)(std::forward<Ts>(args)...);
-}
-
 } // namespace
 
 void TorrentCellRenderer::Impl::adjust_progress_bar_hue(
@@ -302,13 +302,11 @@ void TorrentCellRenderer::Impl::adjust_progress_bar_hue(
     Gdk::RGBA const& color,
     Gdk::Rectangle const& area)
 {
-    using TrCairoContextOperator = IF_GTKMM4(Cairo::Context::Operator, Cairo::Operator);
-
     auto const mask_surface = get_mask_surface(context->get_target(), area);
 
     // Adjust surface color
     context->set_source_rgb(color.get_red(), color.get_green(), color.get_blue());
-    context->set_operator(static_cast<TrCairoContextOperator>(CAIRO_OPERATOR_HSL_COLOR));
+    context->set_operator(static_cast<Cairo::Operator>(CAIRO_OPERATOR_HSL_COLOR));
     context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
     context->fill();
 
@@ -319,13 +317,17 @@ void TorrentCellRenderer::Impl::adjust_progress_bar_hue(
 }
 
 void TorrentCellRenderer::Impl::render_progress_bar(
-    SnapshotPtr const& snapshot,
+    Cairo::RefPtr<Cairo::Context> const& context,
     Gtk::Widget& widget,
     Gdk::Rectangle const& area,
     Gtk::CellRendererState flags,
-    Gdk::RGBA const& color)
+    std::optional<Gdk::RGBA> const& color)
 {
-    auto const context = IF_GTKMM4(snapshot->append_cairo(area), snapshot);
+    if (!color.has_value())
+    {
+        progress_renderer_->render(context, widget, area, area, flags);
+        return;
+    }
 
     auto const temp_area = Gdk::Rectangle(0, 0, area.get_width(), area.get_height());
     auto const temp_surface = Cairo::Surface::create(
@@ -335,23 +337,9 @@ void TorrentCellRenderer::Impl::render_progress_bar(
         area.get_height());
     auto const temp_context = Cairo::Context::create(temp_surface);
 
-    {
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-        auto const temp_snapshot = Gtk::Snapshot::create();
-#endif
+    progress_renderer_->render(temp_context, widget, temp_area, temp_area, flags);
 
-        render_impl(*progress_renderer_, IF_GTKMM4(temp_snapshot, temp_context), widget, temp_area, temp_area, flags);
-
-#if GTKMM_CHECK_VERSION(4, 0, 0)
-        temp_snapshot->reference();
-        auto const render_node = std::unique_ptr<GskRenderNode, void (*)(GskRenderNode*)>(
-            gtk_snapshot_free_to_node(Glib::unwrap(temp_snapshot)),
-            [](GskRenderNode* p) { gsk_render_node_unref(p); });
-        gsk_render_node_draw(render_node.get(), temp_context->cobj());
-#endif
-    }
-
-    adjust_progress_bar_hue(temp_context, color, temp_area);
+    adjust_progress_bar_hue(temp_context, color.value(), temp_area);
 
     context->set_source(temp_context->get_target(), area.get_x(), area.get_y());
     context->rectangle(area.get_x(), area.get_y(), area.get_width(), area.get_height());
@@ -359,7 +347,7 @@ void TorrentCellRenderer::Impl::render_progress_bar(
 }
 
 void TorrentCellRenderer::Impl::render_compact(
-    SnapshotPtr const& snapshot,
+    Cairo::RefPtr<Cairo::Context> const& context,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
@@ -370,21 +358,14 @@ void TorrentCellRenderer::Impl::render_compact(
     int width = 0;
 
     auto const& torrent = *property_torrent_.get_value();
-    auto const percent_done = static_cast<int>(torrent.get_percent_done() * 100);
+    auto const percent_done = torrent.get_percent_done().to_int();
     bool const sensitive = torrent.get_sensitive();
 
-    if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
-    {
-        text_renderer_->property_foreground() = "red";
-    }
-    else
-    {
-        text_renderer_->property_foreground_set() = false;
-    }
+    set_error_color(*text_renderer_, torrent, widget, flags);
 
     auto const icon = torrent.get_icon();
     auto const name = torrent.get_name();
-    auto const& progress_color = get_progress_bar_color(torrent);
+    auto const progress_color = get_progress_bar_color(torrent, widget);
     auto const gstr_stat = torrent.get_short_status_text();
     renderer_.get_padding(xpad, ypad);
 
@@ -395,7 +376,8 @@ void TorrentCellRenderer::Impl::render_compact(
     fill_area.set_height(fill_area.get_height() - ypad * 2);
 
     auto icon_area = fill_area;
-    set_icon(*icon_renderer_, icon, CompactIconSize);
+    icon_renderer_->property_gicon() = icon;
+    icon_renderer_->property_stock_size() = CompactIconSize;
     icon_renderer_->get_preferred_width(widget, min_width, width);
     icon_area.set_width(width);
 
@@ -432,28 +414,29 @@ void TorrentCellRenderer::Impl::render_compact(
     *** RENDER
     **/
 
-    set_icon(*icon_renderer_, icon, CompactIconSize);
+    icon_renderer_->property_gicon() = icon;
+    icon_renderer_->property_stock_size() = CompactIconSize;
     icon_renderer_->property_sensitive() = sensitive;
-    render_impl(*icon_renderer_, snapshot, widget, icon_area, icon_area, flags);
+    icon_renderer_->render(context, widget, icon_area, icon_area, flags);
 
     progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
-    render_progress_bar(snapshot, widget, prog_area, flags, progress_color);
+    render_progress_bar(context, widget, prog_area, flags, progress_color);
 
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
     text_renderer_->property_sensitive() = sensitive;
-    render_impl(*text_renderer_, snapshot, widget, stat_area, stat_area, flags);
+    text_renderer_->render(context, widget, stat_area, stat_area, flags);
 
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
-    render_impl(*text_renderer_, snapshot, widget, name_area, name_area, flags);
+    text_renderer_->render(context, widget, name_area, name_area, flags);
 }
 
 void TorrentCellRenderer::Impl::render_full(
-    SnapshotPtr const& snapshot,
+    Cairo::RefPtr<Cairo::Context> const& context,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gtk::CellRendererState flags)
@@ -464,31 +447,25 @@ void TorrentCellRenderer::Impl::render_full(
     Gtk::Requisition size;
 
     auto const& torrent = *property_torrent_.get_value();
-    auto const percent_done = static_cast<int>(torrent.get_percent_done() * 100);
+    auto const percent_done = torrent.get_percent_done().to_int();
     bool const sensitive = torrent.get_sensitive();
 
-    if (torrent.get_error_code() != 0 && (flags & TR_GTK_CELL_RENDERER_STATE(SELECTED)) == Gtk::CellRendererState{})
-    {
-        text_renderer_->property_foreground() = "red";
-    }
-    else
-    {
-        text_renderer_->property_foreground_set() = false;
-    }
+    set_error_color(*text_renderer_, torrent, widget, flags);
 
     auto const icon = torrent.get_icon();
     auto const name = torrent.get_name();
-    auto const& progress_color = get_progress_bar_color(torrent);
+    auto const progress_color = get_progress_bar_color(torrent, widget);
     auto const gstr_prog = torrent.get_long_progress_text();
     auto const gstr_stat = torrent.get_long_status_text();
     renderer_.get_padding(xpad, ypad);
 
     /* get the idealized cell dimensions */
     Gdk::Rectangle icon_area;
-    set_icon(*icon_renderer_, icon, FullIconSize);
+    icon_renderer_->property_gicon() = icon;
+    icon_renderer_->property_stock_size() = FullIconSize;
     icon_renderer_->get_preferred_size(widget, min_size, size);
-    icon_area.set_width(get_width(size));
-    icon_area.set_height(get_height(size));
+    icon_area.set_width(size.width);
+    icon_area.set_height(size.height);
 
     Gdk::Rectangle name_area;
     text_renderer_->property_text() = name;
@@ -496,19 +473,19 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(NONE);
     text_renderer_->property_scale() = 1.0;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    name_area.set_height(get_height(size));
+    name_area.set_height(size.height);
 
     Gdk::Rectangle prog_area;
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    prog_area.set_height(get_height(size));
+    prog_area.set_height(size.height);
 
     Gdk::Rectangle stat_area;
     text_renderer_->property_text() = gstr_stat;
     text_renderer_->get_preferred_size(widget, min_size, size);
-    stat_area.set_height(get_height(size));
+    stat_area.set_height(size.height);
 
     Gdk::Rectangle prct_area;
 
@@ -560,33 +537,34 @@ void TorrentCellRenderer::Impl::render_full(
     *** RENDER
     **/
 
-    set_icon(*icon_renderer_, icon, FullIconSize);
+    icon_renderer_->property_gicon() = icon;
+    icon_renderer_->property_stock_size() = FullIconSize;
     icon_renderer_->property_sensitive() = sensitive;
-    render_impl(*icon_renderer_, snapshot, widget, icon_area, icon_area, flags);
+    icon_renderer_->render(context, widget, icon_area, icon_area, flags);
 
     text_renderer_->property_text() = name;
     text_renderer_->property_scale() = 1.0;
     text_renderer_->property_ellipsize() = TR_PANGO_ELLIPSIZE_MODE(END);
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(BOLD);
     text_renderer_->property_sensitive() = sensitive;
-    render_impl(*text_renderer_, snapshot, widget, name_area, name_area, flags);
+    text_renderer_->render(context, widget, name_area, name_area, flags);
 
     text_renderer_->property_text() = gstr_prog;
     text_renderer_->property_scale() = SmallScale;
     text_renderer_->property_weight() = TR_PANGO_WEIGHT(NORMAL);
-    render_impl(*text_renderer_, snapshot, widget, prog_area, prog_area, flags);
+    text_renderer_->render(context, widget, prog_area, prog_area, flags);
 
     progress_renderer_->property_value() = percent_done;
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
-    render_progress_bar(snapshot, widget, prct_area, flags, progress_color);
+    render_progress_bar(context, widget, prct_area, flags, progress_color);
 
     text_renderer_->property_text() = gstr_stat;
-    render_impl(*text_renderer_, snapshot, widget, stat_area, stat_area, flags);
+    text_renderer_->render(context, widget, stat_area, stat_area, flags);
 }
 
-void TorrentCellRenderer::IF_GTKMM4(snapshot_vfunc, render_vfunc)(
-    SnapshotPtr const& snapshot,
+void TorrentCellRenderer::render_vfunc(
+    Cairo::RefPtr<Cairo::Context> const& context,
     Gtk::Widget& widget,
     Gdk::Rectangle const& background_area,
     Gdk::Rectangle const& /*cell_area*/,
@@ -601,11 +579,11 @@ void TorrentCellRenderer::IF_GTKMM4(snapshot_vfunc, render_vfunc)(
     {
         if (impl_->property_compact().get_value())
         {
-            impl_->render_compact(snapshot, widget, background_area, flags);
+            impl_->render_compact(context, widget, background_area, flags);
         }
         else
         {
-            impl_->render_full(snapshot, widget, background_area, flags);
+            impl_->render_full(context, widget, background_area, flags);
         }
     }
 

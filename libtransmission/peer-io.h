@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,22 +9,29 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <deque>
 #include <memory>
 #include <utility> // std::pair
 
-#include "transmission.h"
+#include <event2/util.h> // for evutil_socket_t
 
-#include "bandwidth.h"
-#include "net.h" // tr_address
-#include "peer-mse.h"
-#include "peer-socket.h"
-#include "tr-buffer.h"
-#include "utils-ev.h"
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/bandwidth.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/net.h" // tr_address
+#include "libtransmission/peer-mse.h"
+#include "libtransmission/peer-socket.h"
+#include "libtransmission/tr-buffer.h"
+#include "libtransmission/tr-macros.h" // tr_sha1_digest_t, TR_CONSTEXPR20
+#include "libtransmission/utils-ev.h"
 
 struct struct_utp_context;
+struct tr_error;
+struct tr_session;
 
 namespace libtransmission::test
 {
@@ -36,6 +43,14 @@ enum ReadState
     READ_NOW,
     READ_LATER,
     READ_ERR
+};
+
+enum tr_preferred_transport : uint8_t
+{
+    // More preferred transports goes on top
+    TR_PREFER_UTP,
+    TR_PREFER_TCP,
+    TR_NUM_PREFERRED_TRANSPORT
 };
 
 class tr_peerIo final : public std::enable_shared_from_this<tr_peerIo>
@@ -59,8 +74,7 @@ public:
     static std::shared_ptr<tr_peerIo> new_outgoing(
         tr_session* session,
         tr_bandwidth* parent,
-        tr_address const& addr,
-        tr_port port,
+        tr_socket_address const& socket_address,
         tr_sha1_digest_t const& info_hash,
         bool is_seed,
         bool utp);
@@ -75,7 +89,7 @@ public:
         user_data_ = user_data;
     }
 
-    void clear_callbacks()
+    constexpr void clear_callbacks()
     {
         set_callbacks(nullptr, nullptr, nullptr, nullptr);
     }
@@ -106,9 +120,12 @@ public:
         return inbuf_.starts_with(t);
     }
 
-    void read_buffer_drain(size_t byte_count);
+    void read_buffer_discard(size_t n_bytes)
+    {
+        read_bytes(nullptr, n_bytes);
+    }
 
-    void read_bytes(void* bytes, size_t byte_count);
+    void read_bytes(void* bytes, size_t n_bytes);
 
     void read_uint8(uint8_t* setme)
     {
@@ -123,11 +140,24 @@ public:
 
     [[nodiscard]] size_t get_write_buffer_space(uint64_t now) const noexcept;
 
-    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data);
+    void write_bytes(void const* bytes, size_t n_bytes, bool is_piece_data)
+    {
+        outbuf_info_.emplace_back(n_bytes, is_piece_data);
+
+        auto [resbuf, reslen] = outbuf_.reserve_space(n_bytes);
+        filter_.encrypt(reinterpret_cast<std::byte const*>(bytes), n_bytes, resbuf);
+        outbuf_.commit_space(n_bytes);
+    }
 
     // Write all the data from `buf`.
     // This is a destructive add: `buf` is empty after this call.
-    void write(libtransmission::Buffer& buf, bool is_piece_data);
+    template<typename T>
+    void write(libtransmission::BufferReader<T>& buf, bool is_piece_data)
+    {
+        auto const n_bytes = std::size(buf);
+        write_bytes(std::data(buf), n_bytes, is_piece_data);
+        buf.drain(n_bytes);
+    }
 
     size_t flush_outgoing_protocol_msgs();
 
@@ -142,7 +172,7 @@ public:
 
     [[nodiscard]] auto get_piece_speed_bytes_per_second(uint64_t now, tr_direction dir) const noexcept
     {
-        return bandwidth_.getPieceSpeedBytesPerSecond(now, dir);
+        return bandwidth_.get_piece_speed_bytes_per_second(now, dir);
     }
 
     ///
@@ -195,7 +225,7 @@ public:
 
     void set_bandwidth(tr_bandwidth* parent)
     {
-        bandwidth_.setParent(parent);
+        bandwidth_.set_parent(parent);
     }
 
     ///
@@ -239,9 +269,9 @@ public:
         return socket_.address();
     }
 
-    [[nodiscard]] constexpr auto socket_address() const noexcept
+    [[nodiscard]] constexpr auto const& socket_address() const noexcept
     {
-        return socket_.socketAddress();
+        return socket_.socket_address();
     }
 
     [[nodiscard]] auto display_name() const
@@ -258,12 +288,27 @@ public:
 
     void decrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        filter_.decryptInit(is_incoming, dh, info_hash);
+        decrypt_remain_len_.reset();
+        filter_.decrypt_init(is_incoming, dh, info_hash);
+    }
+
+    TR_CONSTEXPR20 void decrypt_disable(size_t decrypt_len = 0U) noexcept
+    {
+        // optionally decrypt decrypt_len more bytes before disabling decryption
+        decrypt_remain_len_ = decrypt_len;
     }
 
     void encrypt_init(bool is_incoming, DH const& dh, tr_sha1_digest_t const& info_hash)
     {
-        filter_.encryptInit(is_incoming, dh, info_hash);
+        filter_.encrypt_init(is_incoming, dh, info_hash);
+    }
+
+    constexpr void encrypt_disable() noexcept
+    {
+        // unlike the read buffer, we don't need to "encrypt xxx
+        // more bytes before disabling encryption" since we control
+        // whether we add data before or after calling encrypt_disable()
+        filter_.encrypt_disable();
     }
 
     ///
@@ -271,7 +316,14 @@ public:
     static void utp_init(struct_utp_context* ctx);
 
 private:
+    // Our target socket receive buffer size.
+    // Gets read from the socket buffer into the PeerBuffer inbuf_.
     static constexpr auto RcvBuf = size_t{ 256 * 1024 };
+
+    // The buffer size for incoming & outgoing peer messages.
+    // Starts off with enough capacity to read a single BT Piece message,
+    // but has a 5x GrowthFactor so that it can quickly to high volume.
+    using PeerBuffer = libtransmission::StackBuffer<tr_block_info::BlockSize + 16U, std::byte, std::ratio<5, 1>>;
 
     friend class libtransmission::test::HandshakeTest;
 
@@ -286,16 +338,6 @@ private:
         {
             got_error_(this, error, user_data_);
         }
-    }
-
-    void decrypt(size_t buflen, void* buf)
-    {
-        filter_.decrypt(buflen, buf);
-    }
-
-    void encrypt(size_t buflen, void* buf)
-    {
-        filter_.encrypt(buflen, buf);
     }
 
     void on_utp_state_change(int new_state);
@@ -325,6 +367,7 @@ private:
         bool is_seed);
 
     Filter filter_;
+    std::optional<size_t> decrypt_remain_len_;
 
     std::deque<std::pair<size_t /*n_bytes*/, bool /*is_piece_data*/>> outbuf_info_;
 
@@ -334,8 +377,8 @@ private:
 
     tr_sha1_digest_t info_hash_;
 
-    libtransmission::Buffer inbuf_;
-    libtransmission::Buffer outbuf_;
+    PeerBuffer inbuf_;
+    PeerBuffer outbuf_;
 
     tr_session* const session_;
 

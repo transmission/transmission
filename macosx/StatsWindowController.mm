@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -8,7 +8,7 @@
 
 static NSTimeInterval const kUpdateSeconds = 1.0;
 
-@interface StatsWindowController ()
+@interface StatsWindowController ()<NSWindowRestoration>
 
 @property(nonatomic) IBOutlet NSTextField* fUploadedField;
 @property(nonatomic) IBOutlet NSTextField* fUploadedAllField;

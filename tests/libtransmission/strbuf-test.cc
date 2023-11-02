@@ -6,11 +6,9 @@
 #include <cstring>
 #include <string_view>
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/tr-strbuf.h>
 
-#include "test-fixtures.h"
+#include "gtest/gtest.h"
 
 using StrbufTest = ::testing::Test;
 using namespace std::literals;

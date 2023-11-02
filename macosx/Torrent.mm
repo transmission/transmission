@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -280,7 +280,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 {
     if ([self alertForRemainingDiskSpace])
     {
-        tr_torrentStartMagnet(self.fHandle);
+        tr_torrentStart(self.fHandle);
         [self update];
 
         //capture, specifically, stop-seeding settings changing to unlimited
@@ -509,8 +509,8 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         return;
     }
 
-    volatile int status;
-    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, NULL, &status);
+    int volatile status;
+    tr_torrentSetLocation(self.fHandle, folder.UTF8String, YES, &status);
 
     while (status == TR_LOC_MOVING) //block while moving (for now)
     {
@@ -612,7 +612,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
 - (uint64_t)size
 {
-    return tr_torrentTotalSize(self.fHandle);
+    return tr_torrentView(self.fHandle).total_size;
 }
 
 - (uint64_t)sizeLeft
@@ -812,6 +812,27 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
 
     NSString* oldPath = [node.path stringByAppendingPathComponent:node.name];
     tr_torrentRenamePath(self.fHandle, oldPath.UTF8String, newName.UTF8String, renameCallback, (__bridge_retained void*)(contextInfo));
+}
+
+- (time_t)eta
+{
+    time_t eta = self.fStat->eta;
+    if (eta >= 0)
+    {
+        return eta;
+    }
+    time_t etaIdle = self.fStat->etaIdle;
+    if (etaIdle >= 0 && etaIdle < kETAIdleDisplaySec)
+    {
+        return etaIdle;
+    }
+    if (self.fStat->leftUntilDone <= 0)
+    {
+        // We return smallest amount of time remaining for simplest compliance with sorting.
+        return 0;
+    }
+    // We return highest amount of time remaining for simplest compliance with sorting.
+    return LONG_MAX;
 }
 
 - (CGFloat)progress
@@ -1663,10 +1684,10 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     {
         auto const tracker = tr_torrentTracker(self.fHandle, i);
 
-        NSString* host = @(tracker.host);
-        if (!best || [host localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
+        NSString* host_and_port = @(tracker.host_and_port);
+        if (!best || [host_and_port localizedCaseInsensitiveCompare:best] == NSOrderedAscending)
         {
-            best = host;
+            best = host_and_port;
         }
     }
 
@@ -2069,13 +2090,13 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     time_t eta = self.fStat->eta;
     // if there's a regular ETA, the torrent isn't idle
     BOOL fromIdle = NO;
-    if (eta == TR_ETA_NOT_AVAIL || eta == TR_ETA_UNKNOWN)
+    if (eta < 0)
     {
         eta = self.fStat->etaIdle;
         fromIdle = YES;
     }
-    // Foundation undocumented behavior: values above INT_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451)
-    if (eta < 0 || eta > INT_MAX || (fromIdle && eta >= kETAIdleDisplaySec))
+    // Foundation undocumented behavior: values above INT32_MAX (68 years) are interpreted as negative values by `stringFromTimeInterval` (#3451)
+    if (eta < 0 || eta > INT32_MAX || (fromIdle && eta >= kETAIdleDisplaySec))
     {
         return NSLocalizedString(@"remaining time unknown", "Torrent -> eta string");
     }

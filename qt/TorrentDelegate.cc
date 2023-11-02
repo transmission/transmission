@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -84,7 +84,7 @@ public:
 private:
     [[nodiscard]] QString elidedText(QFont const& font, QString const& text, int width) const
     {
-        return QFontMetrics(font).elidedText(text, Qt::ElideRight, width);
+        return QFontMetrics{ font }.elidedText(text, Qt::ElideRight, width);
     }
 };
 
@@ -97,29 +97,29 @@ ItemLayout::ItemLayout(
     Qt::LayoutDirection direction,
     QPoint const& top_left,
     int width)
-    : name_text_(std::move(name_text))
-    , status_text_(std::move(status_text))
-    , progress_text_(std::move(progress_text))
-    , name_font(base_font)
-    , status_font(base_font)
-    , progress_font(base_font)
+    : name_text_{ std::move(name_text) }
+    , status_text_{ std::move(status_text) }
+    , progress_text_{ std::move(progress_text) }
+    , name_font{ base_font }
+    , status_font{ base_font }
+    , progress_font{ base_font }
 {
     QStyle const* style = QApplication::style();
     int const icon_size(style->pixelMetric(QStyle::PM_LargeIconSize));
 
     name_font.setWeight(QFont::Bold);
-    QFontMetrics const name_fm(name_font);
-    QSize const name_size(name_fm.size(0, name_text_));
+    auto const name_fm = QFontMetrics{ name_font };
+    auto const name_size = name_fm.size(0, name_text_);
 
     status_font.setPointSize(static_cast<int>(status_font.pointSize() * 0.9));
-    QFontMetrics const status_fm(status_font);
-    QSize const status_size(status_fm.size(0, status_text_));
+    auto const status_fm = QFontMetrics{ status_font };
+    auto const status_size = status_fm.size(0, status_text_);
 
     progress_font.setPointSize(static_cast<int>(progress_font.pointSize() * 0.9));
-    QFontMetrics const progress_fm(progress_font);
-    QSize const progress_size(progress_fm.size(0, progress_text_));
+    auto const progress_fm = QFontMetrics{ progress_font };
+    auto const progress_size = progress_fm.size(0, progress_text_);
 
-    QRect base_rect(top_left, QSize(width, 0));
+    auto base_rect = QRect{ top_left, QSize{ width, 0 } };
     Utils::narrowRect(base_rect, icon_size + GUI_PAD, 0, direction);
 
     name_rect = base_rect.adjusted(0, 0, 0, name_size.height());
@@ -129,8 +129,8 @@ ItemLayout::ItemLayout(
     icon_rect = QStyle::alignedRect(
         direction,
         Qt::AlignLeft | Qt::AlignVCenter,
-        QSize(icon_size, icon_size),
-        QRect(top_left, QSize(width, progress_rect.bottom() - name_rect.top())));
+        QSize{ icon_size, icon_size },
+        QRect{ top_left, QSize{ width, progress_rect.bottom() - name_rect.top() } });
     emblem_rect = QStyle::alignedRect(
         direction,
         Qt::AlignRight | Qt::AlignBottom,
@@ -400,15 +400,8 @@ QString TorrentDelegate::statusString(Torrent const& tor)
 QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
     auto const m = margin(*QApplication::style());
-    auto const layout = ItemLayout(
-        tor.name(),
-        progressString(tor),
-        statusString(tor),
-        QIcon(),
-        option.font,
-        option.direction,
-        QPoint(0, 0),
-        option.rect.width() - m.width() * 2);
+    auto const layout = ItemLayout{ tor.name(),  progressString(tor), statusString(tor), QIcon{},
+                                    option.font, option.direction,    QPoint(0, 0),      option.rect.width() - m.width() * 2 };
     return layout.size() + m * 2;
 }
 
@@ -538,21 +531,14 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
 
     progress_bar_state |= QStyle::State_Small | QStyle::State_Horizontal;
 
-    QIcon::Mode const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
-    QIcon const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon();
+    auto const emblem_im = is_item_selected ? QIcon::Selected : QIcon::Normal;
+    auto const emblem_icon = tor.hasError() ? getWarningEmblem() : QIcon{};
 
     // layout
-    QSize const m(margin(*style));
-    QRect const content_rect(option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()));
-    ItemLayout const layout(
-        tor.name(),
-        progressString(tor),
-        statusString(tor),
-        emblem_icon,
-        option.font,
-        option.direction,
-        content_rect.topLeft(),
-        content_rect.width());
+    auto const m = margin(*style);
+    auto const content_rect = QRect{ option.rect.adjusted(m.width(), m.height(), -m.width(), -m.height()) };
+    auto const layout = ItemLayout{ tor.name(),  progressString(tor), statusString(tor),      emblem_icon,
+                                    option.font, option.direction,    content_rect.topLeft(), content_rect.width() };
 
     // render
     if (tor.hasError() && !is_item_selected)

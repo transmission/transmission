@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -24,9 +24,9 @@ public:
     static std::unique_ptr<tr_session_thread> create();
     virtual ~tr_session_thread() = default;
 
-    [[nodiscard]] virtual struct event_base* eventBase() noexcept = 0;
+    [[nodiscard]] virtual struct event_base* event_base() noexcept = 0;
 
-    [[nodiscard]] virtual bool amInSessionThread() const noexcept = 0;
+    [[nodiscard]] virtual bool am_in_session_thread() const noexcept = 0;
 
     virtual void run(std::function<void(void)>&& func) = 0;
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -23,13 +23,8 @@
 #include <libtransmission/quark.h>
 #include <libtransmission/tr-macros.h>
 
-#include "FaviconCache.h"
 #include "IconCache.h"
 #include "Speed.h"
-
-#ifdef ERROR
-#undef ERROR
-#endif
 
 class QPixmap;
 
@@ -110,6 +105,7 @@ class TorrentHash
 {
 private:
     tr_sha1_digest_t data_ = {};
+    QString data_str_;
 
 public:
     TorrentHash() = default;
@@ -124,6 +120,9 @@ public:
         if (auto const hash = tr_sha1_from_string(str != nullptr ? str : ""); hash)
         {
             data_ = *hash;
+
+            auto const tmpstr = tr_sha1_to_string(data_);
+            data_str_ = QString::fromUtf8(std::data(tmpstr), std::size(tmpstr));
         }
     }
 
@@ -132,6 +131,9 @@ public:
         if (auto const hash = tr_sha1_from_string(str.toStdString()); hash)
         {
             data_ = *hash;
+
+            auto const tmpstr = tr_sha1_to_string(data_);
+            data_str_ = QString::fromUtf8(std::data(tmpstr), std::size(tmpstr));
         }
     }
 
@@ -150,9 +152,9 @@ public:
         return data_ < that.data_;
     }
 
-    QString toString() const
+    [[nodiscard]] constexpr auto& toString() const noexcept
     {
-        return QString::fromStdString(tr_sha1_to_string(data_));
+        return data_str_;
     }
 };
 
@@ -300,10 +302,9 @@ public:
 
     [[nodiscard]] constexpr auto ratio() const noexcept
     {
-        auto const u = uploadedEver();
-        auto const d = downloadedEver();
-        auto const t = totalSize();
-        return double(u) / (d ? d : t);
+        auto const numerator = static_cast<double>(uploadedEver());
+        auto const denominator = sizeWhenDone();
+        return denominator > 0U ? numerator / denominator : double{};
     }
 
     [[nodiscard]] constexpr double percentComplete() const noexcept
@@ -573,8 +574,8 @@ public:
         DOWNLOAD_LIMITED,
         DOWNLOAD_SPEED,
         EDIT_DATE,
-        ERROR,
-        ERROR_STRING,
+        TORRENT_ERROR,
+        TORRENT_ERROR_STRING,
         ETA,
         FAILED_EVER,
         FILE_COUNT,

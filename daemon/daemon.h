@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,14 +6,17 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 
-#include <libtransmission/transmission.h>
+#ifdef HAVE_SYS_SIGNALFD_H
+#include <unistd.h>
+#endif
+
 #include <libtransmission/variant.h>
-#include <libtransmission/error.h>
-#include <libtransmission/utils.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/file.h>
-#include <libtransmission/log.h>
+
+struct tr_error;
+struct tr_session;
 
 class tr_daemon
 {
@@ -28,7 +31,6 @@ public:
             close(sigfd_);
         }
 #endif /* signalfd API */
-        tr_variantClear(&settings_);
     }
 
     bool spawn(bool foreground, int* exit_code, tr_error** error);
@@ -57,6 +59,7 @@ private:
 
     bool parse_args(int argc, char const* const* argv, bool* dump_settings, bool* foreground, int* exit_code);
     bool reopen_log_file(char const* filename);
-    bool setup_signals();
+    bool setup_signals(struct event*& sig_ev);
+    void cleanup_signals(struct event* sig_ev) const;
     void report_status();
 };

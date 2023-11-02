@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -21,7 +21,7 @@ typedef NS_ENUM(NSUInteger, LevelButtonLevel) {
 
 static NSTimeInterval const kUpdateSeconds = 0.75;
 
-@interface MessageWindowController ()
+@interface MessageWindowController ()<NSWindowRestoration>
 
 @property(nonatomic) IBOutlet NSTableView* fMessageTable;
 

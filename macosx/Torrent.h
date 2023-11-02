@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -9,10 +9,7 @@
 
 @class FileListNode;
 
-typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
-    TorrentDeterminationAutomatic = 0,
-    TorrentDeterminationUserSpecified
-};
+typedef NS_ENUM(NSUInteger, TorrentDeterminationType) { TorrentDeterminationAutomatic = 0, TorrentDeterminationUserSpecified };
 
 extern NSString* const kTorrentDidChangeGroupNotification;
 
@@ -121,6 +118,7 @@ extern NSString* const kTorrentDidChangeGroupNotification;
               withName:(NSString*)newName
      completionHandler:(void (^)(BOOL didRename))completionHandler;
 
+@property(nonatomic, readonly) time_t eta;
 @property(nonatomic, readonly) CGFloat progress;
 @property(nonatomic, readonly) CGFloat progressDone;
 @property(nonatomic, readonly) CGFloat progressLeft;

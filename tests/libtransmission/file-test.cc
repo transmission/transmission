@@ -4,27 +4,32 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cassert>
+#include <cstdint> // uint64_t
+#include <cstdio> // stderr
 #include <cstring>
+#include <ctime> // time()
 #include <ostream>
+#include <set>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #ifndef _WIN32
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #else
 #include <windows.h>
 #endif
 
-#include <libtransmission/transmission.h>
+#include <fmt/core.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/tr-strbuf.h>
 
+#include "gtest/gtest.h"
 #include "test-fixtures.h"
 
 #if !defined(__OpenBSD__)
@@ -261,7 +266,7 @@ TEST_F(FileTest, getInfo)
     {
         // Can't get info of non-existent file/directory
         info = tr_sys_path_get_info(path1, 0, &err);
-        ASSERT_FALSE(info.has_value());
+        EXPECT_FALSE(info.has_value());
         EXPECT_NE(nullptr, err);
         tr_error_clear(&err);
 

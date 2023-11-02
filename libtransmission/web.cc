@@ -1,12 +1,15 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#ifdef _WIN32
 #include <array>
+#endif
 #include <atomic>
 #include <condition_variable>
+#include <cstdint> // uint64_t
 #include <list>
 #include <map>
 #include <memory>
@@ -19,21 +22,26 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
+#include <ws2tcpip.h>
+#else
+#include <sys/socket.h> // setsockopt, SOL_SOCKET, SO_RC...
 #endif
 
 #include <curl/curl.h>
 
-#include <fmt/core.h>
-#include <fmt/format.h>
+#include <event2/buffer.h>
 
-#include "crypto-utils.h"
-#include "log.h"
-#include "peer-io.h"
-#include "tr-assert.h"
-#include "utils-ev.h"
-#include "utils.h"
-#include "web.h"
-#include "web-utils.h"
+#include <fmt/core.h>
+
+#ifdef _WIN32
+#include "libtransmission/crypto-utils.h"
+#endif
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils-ev.h"
+#include "libtransmission/utils.h"
+#include "libtransmission/web.h"
+#include "libtransmission/web-utils.h"
 
 using namespace std::literals;
 
@@ -159,14 +167,12 @@ public:
     explicit Impl(Mediator& mediator_in)
         : mediator{ mediator_in }
     {
-        std::call_once(curl_init_flag, curlInit);
-
         if (auto bundle = tr_env_get_string("CURL_CA_BUNDLE"); !std::empty(bundle))
         {
             curl_ca_bundle = std::move(bundle);
         }
 
-        shareEverything();
+        share_setopt();
 
         if (curl_ssl_verify)
         {
@@ -304,19 +310,19 @@ public:
             }
         }
 
-        [[nodiscard]] auto publicAddress() const
+        [[nodiscard]] auto bind_address() const
         {
             switch (options.ip_proto)
             {
             case FetchOptions::IPProtocol::V4:
-                return impl.mediator.publicAddressV4();
+                return impl.mediator.bind_address_V4();
             case FetchOptions::IPProtocol::V6:
-                return impl.mediator.publicAddressV6();
+                return impl.mediator.bind_address_V6();
             default:
-                auto ip = impl.mediator.publicAddressV4();
+                auto ip = impl.mediator.bind_address_V4();
                 if (ip == std::nullopt)
                 {
-                    ip = impl.mediator.publicAddressV6();
+                    ip = impl.mediator.bind_address_V6();
                 }
 
                 return ip;
@@ -350,6 +356,8 @@ public:
             {
                 return;
             }
+
+            impl.paused_easy_handles.erase(easy_);
 
             if (auto const url = tr_urlParse(options.url); url)
             {
@@ -462,7 +470,7 @@ public:
             // again when the transfer is unpaused.
             if (task->impl.mediator.clamp(*tag, bytes_used) < bytes_used)
             {
-                task->impl.paused_easy_handles.emplace(tr_time_msec(), task->easy());
+                task->impl.paused_easy_handles.emplace(task->easy(), tr_time_msec());
                 return CURL_WRITEFUNC_PAUSE;
             }
 
@@ -563,7 +571,7 @@ public:
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, &tr_web::Impl::onDataReceived);
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
 
-        if (auto const addrstr = task.publicAddress(); addrstr)
+        if (auto const addrstr = task.bind_address(); addrstr)
         {
             (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
         }
@@ -601,9 +609,9 @@ public:
 
         for (auto it = std::begin(paused); it != std::end(paused);)
         {
-            if (it->first + BandwidthPauseMsec < now)
+            if (it->second + BandwidthPauseMsec < now)
             {
-                curl_easy_pause(it->second, CURLPAUSE_CONT);
+                curl_easy_pause(it->first, CURLPAUSE_CONT);
                 it = paused.erase(it);
             }
             else
@@ -702,7 +710,7 @@ public:
                 ++repeats;
                 if (repeats > 1U)
                 {
-                    tr_wait(100ms);
+                    std::this_thread::sleep_for(100ms);
                 }
             }
             else
@@ -755,39 +763,26 @@ public:
         return curlsh_.get();
     }
 
-    void shareEverything()
+    void share_setopt()
     {
-        // Tell curl to share whatever it can.
-        // https://curl.se/libcurl/c/CURLSHOPT_SHARE.html
-        //
-        // The user's system probably has a different version of curl than
-        // we're compiling with; so instead of listing fields by name, just
-        // loop until curl says we've exhausted the list.
+        // Do *not* share HSTS cache
+        // https://github.com/transmission/transmission/issues/5199
 
         auto* const sh = shared();
-        for (long type = CURL_LOCK_DATA_COOKIE;; ++type)
-        {
-            if (curl_share_setopt(sh, CURLSHOPT_SHARE, type) != CURLSHE_OK)
-            {
-                tr_logAddDebug(fmt::format("CURLOPT_SHARE ended at {}", type));
-                return;
-            }
-        }
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
+#if LIBCURL_VERSION_NUM >= 0x071700 /* 7.23.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_SSL_SESSION);
+#endif
+#if LIBCURL_VERSION_NUM >= 0x073900 /* 7.57.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_CONNECT);
+#endif
+#if LIBCURL_VERSION_NUM >= 0x073D00 /* 7.61.0 */
+        curl_share_setopt(sh, CURLSHOPT_SHARE, CURL_LOCK_DATA_PSL);
+#endif
     }
 
-    static inline auto curl_init_flag = std::once_flag{};
-
-    std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
-
-    static void curlInit()
-    {
-        // try to enable ssl for https support;
-        // but if that fails, try a plain vanilla init
-        if (curl_global_init(CURL_GLOBAL_SSL) != CURLE_OK)
-        {
-            curl_global_init(0);
-        }
-    }
+    std::map<CURL*, uint64_t /*tr_time_msec()*/> paused_easy_handles;
 };
 
 tr_web::tr_web(Mediator& mediator)

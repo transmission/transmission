@@ -1,9 +1,10 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::find()
+#include <array>
 #include <cctype>
 #include <functional>
 #include <iterator>
@@ -13,14 +14,15 @@
 #include <string_view>
 #include <utility>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "log.h"
-#include "torrent-files.h"
-#include "utils.h"
+#include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -91,7 +93,7 @@ bool isJunkFile(std::string_view filename)
 
 #ifdef __APPLE__
     // check for resource forks. <http://web.archive.org/web/20101010051608/http://support.apple.com/kb/TA20578>
-    if (tr_strvStartsWith(base, "._"sv))
+    if (tr_strv_starts_with(base, "._"sv))
     {
         return true;
     }
@@ -156,15 +158,9 @@ bool tr_torrent_files::hasAnyLocalData(std::string_view const* paths, size_t n_p
 bool tr_torrent_files::move(
     std::string_view old_parent_in,
     std::string_view parent_in,
-    double volatile* setme_progress,
     std::string_view parent_name,
     tr_error** error) const
 {
-    if (setme_progress != nullptr)
-    {
-        *setme_progress = 0.0;
-    }
-
     auto const old_parent = tr_pathbuf{ old_parent_in };
     auto const parent = tr_pathbuf{ parent_in };
     tr_logAddTrace(fmt::format(FMT_STRING("Moving files from '{:s}' to '{:s}'"), old_parent, parent), parent_name);
@@ -181,9 +177,7 @@ bool tr_torrent_files::move(
 
     auto const paths = std::array<std::string_view, 1>{ old_parent.sv() };
 
-    auto const total_size = totalSize();
     auto err = bool{};
-    auto bytes_moved = uint64_t{};
 
     for (tr_file_index_t i = 0, n = fileCount(); i < n; ++i)
     {
@@ -203,16 +197,10 @@ bool tr_torrent_files::move(
         }
 
         tr_logAddTrace(fmt::format(FMT_STRING("Moving file #{:d} to '{:s}'"), i, old_path, path), parent_name);
-        if (!tr_moveFile(old_path, path, error))
+        if (!tr_file_move(old_path, path, error))
         {
             err = true;
             break;
-        }
-
-        if (setme_progress != nullptr && total_size > 0U)
-        {
-            bytes_moved += fileSize(i);
-            *setme_progress = static_cast<double>(bytes_moved) / total_size;
         }
     }
 
@@ -264,7 +252,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     {
         if (auto const found = find(idx, std::data(paths), std::size(paths)); found)
         {
-            tr_moveFile(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
+            tr_file_move(found->filename(), tr_pathbuf{ tmpdir, '/', found->subpath() });
         }
     }
 
@@ -325,8 +313,12 @@ namespace
 // COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
 // Also avoid these names followed immediately by an extension;
 // for example, NUL.txt is not recommended.
-[[nodiscard]] bool isReservedFile(std::string_view in) noexcept
+[[nodiscard]] bool isReservedFile([[maybe_unused]] std::string_view in) noexcept
 {
+#ifndef _WIN32
+    // Of course, on Unix-like platforms none of this applies.
+    return false;
+#else
     if (std::empty(in))
     {
         return false;
@@ -362,7 +354,8 @@ namespace
     return std::any_of(
         std::begin(ReservedPrefixes),
         std::end(ReservedPrefixes),
-        [in_upper_sv](auto const& prefix) { return tr_strvStartsWith(in_upper_sv, prefix); });
+        [in_upper_sv](auto const& prefix) { return tr_strv_starts_with(in_upper_sv, prefix); });
+#endif
 }
 
 // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
@@ -371,6 +364,9 @@ namespace
 // except for the following:
 [[nodiscard]] auto constexpr isReservedChar(char ch) noexcept
 {
+#if !defined(_WIN32)
+    return ch == '/';
+#else
     switch (ch)
     {
     case '"':
@@ -386,15 +382,16 @@ namespace
     default:
         return false;
     }
+#endif
 }
 
 void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 {
     // remove leading and trailing spaces
-    in = tr_strvStrip(in);
+    in = tr_strv_strip(in);
 
     // remove trailing periods
-    while (tr_strvEndsWith(in, '.'))
+    while (tr_strv_ends_with(in, '.'))
     {
         in.remove_suffix(1);
     }
@@ -417,7 +414,7 @@ void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 void tr_torrent_files::makeSubpathPortable(std::string_view path, tr_pathbuf& append_me)
 {
     auto segment = std::string_view{};
-    while (tr_strvSep(&path, &segment, '/'))
+    while (tr_strv_sep(&path, &segment, '/'))
     {
         appendSanitizedComponent(segment, append_me);
         append_me.append('/');

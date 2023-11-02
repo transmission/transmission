@@ -1,19 +1,14 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
-#include <array>
-#include <climits> // SIZE_MAX
-#include <vector>
+#include <algorithm> // std::copy, std::fill_n, std::min, std::max
+#include <vector> // std::vector
 
-#include "tr-popcount.h"
-
-#include "transmission.h"
-
-#include "bitfield.h"
-#include "tr-assert.h"
+#include "libtransmission/bitfield.h"
+#include "libtransmission/tr-assert.h" // TR_ASSERT, TR_ENABLE_ASSERTS
+#include "libtransmission/tr-popcount.h" // tr_popcnt
 
 // ---
 
@@ -76,12 +71,12 @@ void setAllTrue(uint8_t* array, size_t bit_count)
 
 // ---
 
-size_t tr_bitfield::countFlags() const noexcept
+size_t tr_bitfield::count_flags() const noexcept
 {
     return rawCountFlags(std::data(flags_), std::size(flags_));
 }
 
-size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
+size_t tr_bitfield::count_flags(size_t begin, size_t end) const noexcept
 {
     auto ret = size_t{};
     size_t const first_byte = begin >> 3U;
@@ -159,24 +154,24 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
 
 size_t tr_bitfield::count(size_t begin, size_t end) const
 {
-    if (hasAll())
+    if (has_all())
     {
         return end - begin;
     }
 
-    if (hasNone())
+    if (has_none())
     {
         return 0;
     }
 
-    return countFlags(begin, end);
+    return count_flags(begin, end);
 }
 
 // ---
 
-bool tr_bitfield::isValid() const
+bool tr_bitfield::is_valid() const
 {
-    return std::empty(flags_) || true_count_ == countFlags();
+    return std::empty(flags_) || true_count_ == count_flags();
 }
 
 std::vector<uint8_t> tr_bitfield::raw() const
@@ -191,7 +186,7 @@ std::vector<uint8_t> tr_bitfield::raw() const
 
     auto raw = std::vector<uint8_t>(n);
 
-    if (hasAll())
+    if (has_all())
     {
         setAllTrue(std::data(raw), bit_count_);
     }
@@ -199,11 +194,11 @@ std::vector<uint8_t> tr_bitfield::raw() const
     return raw;
 }
 
-void tr_bitfield::ensureBitsAlloced(size_t n)
+void tr_bitfield::ensure_bits_alloced(size_t n)
 {
-    bool const has_all = hasAll();
+    bool const has_all = this->has_all();
 
-    /* Cant use getBytesNeededSafe as n can be > SIZE_MAX - 8. */
+    /* Can't use getBytesNeededSafe as n can be > SIZE_MAX - 8. */
     size_t const bytes_needed = has_all ? getBytesNeeded(std::max(n, true_count_)) : getBytesNeeded(n);
 
     if (std::size(flags_) < bytes_needed)
@@ -216,7 +211,7 @@ void tr_bitfield::ensureBitsAlloced(size_t n)
     }
 }
 
-bool tr_bitfield::ensureNthBitAlloced(size_t nth)
+bool tr_bitfield::ensure_nth_bit_alloced(size_t nth)
 {
     // count is zero-based, so we need to allocate nth+1 bits before setting the nth */
     if (nth == SIZE_MAX)
@@ -224,11 +219,11 @@ bool tr_bitfield::ensureNthBitAlloced(size_t nth)
         return false;
     }
 
-    ensureBitsAlloced(nth + 1);
+    ensure_bits_alloced(nth + 1);
     return true;
 }
 
-void tr_bitfield::setTrueCount(size_t n) noexcept
+void tr_bitfield::set_true_count(size_t n) noexcept
 {
     TR_ASSERT(bit_count_ == 0 || n <= bit_count_);
 
@@ -236,28 +231,28 @@ void tr_bitfield::setTrueCount(size_t n) noexcept
     have_all_hint_ = n == bit_count_;
     have_none_hint_ = n == 0;
 
-    if (hasAll() || hasNone())
+    if (has_all() || has_none())
     {
-        freeArray();
+        free_array();
     }
 
-    TR_ASSERT(isValid());
+    TR_ASSERT(is_valid());
 }
 
-void tr_bitfield::incrementTrueCount(size_t inc) noexcept
+void tr_bitfield::increment_true_count(size_t inc) noexcept
 {
     TR_ASSERT(bit_count_ == 0 || inc <= bit_count_);
     TR_ASSERT(bit_count_ == 0 || true_count_ <= bit_count_ - inc);
 
-    setTrueCount(true_count_ + inc);
+    set_true_count(true_count_ + inc);
 }
 
-void tr_bitfield::decrementTrueCount(size_t dec) noexcept
+void tr_bitfield::decrement_true_count(size_t dec) noexcept
 {
     TR_ASSERT(bit_count_ == 0 || dec <= bit_count_);
     TR_ASSERT(bit_count_ == 0 || true_count_ >= dec);
 
-    setTrueCount(true_count_ - dec);
+    set_true_count(true_count_ - dec);
 }
 
 // ---
@@ -265,30 +260,30 @@ void tr_bitfield::decrementTrueCount(size_t dec) noexcept
 tr_bitfield::tr_bitfield(size_t bit_count)
     : bit_count_{ bit_count }
 {
-    TR_ASSERT(isValid());
+    TR_ASSERT(is_valid());
 }
 
-void tr_bitfield::setHasNone() noexcept
+void tr_bitfield::set_has_none() noexcept
 {
-    freeArray();
+    free_array();
     true_count_ = 0;
     have_all_hint_ = false;
     have_none_hint_ = true;
 
-    TR_ASSERT(isValid());
+    TR_ASSERT(is_valid());
 }
 
-void tr_bitfield::setHasAll() noexcept
+void tr_bitfield::set_has_all() noexcept
 {
-    freeArray();
+    free_array();
     true_count_ = bit_count_;
     have_all_hint_ = true;
     have_none_hint_ = false;
 
-    TR_ASSERT(isValid());
+    TR_ASSERT(is_valid());
 }
 
-void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)
+void tr_bitfield::set_raw(uint8_t const* raw, size_t byte_count)
 {
     flags_.assign(raw, raw + byte_count);
 
@@ -305,15 +300,15 @@ void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)
         }
     }
 
-    rebuildTrueCount();
+    rebuild_true_count();
 }
 
-void tr_bitfield::setFromBools(bool const* flags, size_t n)
+void tr_bitfield::set_from_bools(bool const* flags, size_t n)
 {
     size_t true_count = 0;
 
-    freeArray();
-    ensureBitsAlloced(n);
+    free_array();
+    ensure_bits_alloced(n);
 
     for (size_t i = 0; i < n; ++i)
     {
@@ -324,7 +319,7 @@ void tr_bitfield::setFromBools(bool const* flags, size_t n)
         }
     }
 
-    setTrueCount(true_count);
+    set_true_count(true_count);
 }
 
 void tr_bitfield::set(size_t nth, bool value)
@@ -334,7 +329,7 @@ void tr_bitfield::set(size_t nth, bool value)
         return;
     }
 
-    if (!ensureNthBitAlloced(nth))
+    if (!ensure_nth_bit_alloced(nth))
     {
         return;
     }
@@ -364,7 +359,7 @@ void tr_bitfield::set(size_t nth, bool value)
 }
 
 /* Sets bit range [begin, end) to 1 */
-void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
+void tr_bitfield::set_span(size_t begin, size_t end, bool value)
 {
     // bounds check
     end = std::min(end, bit_count_);
@@ -384,7 +379,7 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
     }
 
     --end;
-    if (!ensureNthBitAlloced(end))
+    if (!ensure_nth_bit_alloced(end))
     {
         return;
     }
@@ -396,7 +391,6 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
     unsigned char last_mask = 0xff << ((~end) & 7U);
     if (value)
     {
-
         if (walk == last_byte)
         {
             flags_[walk] |= first_mask & last_mask;
@@ -413,7 +407,7 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
             }
         }
 
-        incrementTrueCount(new_count - old_count);
+        increment_true_count(new_count - old_count);
     }
     else
     {
@@ -435,18 +429,18 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
             }
         }
 
-        decrementTrueCount(old_count);
+        decrement_true_count(old_count);
     }
 }
 
 tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
 {
-    if (hasAll() || that.hasNone())
+    if (has_all() || that.has_none())
     {
         return *this;
     }
 
-    if (that.hasAll() || hasNone())
+    if (that.has_all() || has_none())
     {
         *this = that;
         return *this;
@@ -459,18 +453,18 @@ tr_bitfield& tr_bitfield::operator|=(tr_bitfield const& that) noexcept
         flags_[i] |= that.flags_[i];
     }
 
-    rebuildTrueCount();
+    rebuild_true_count();
     return *this;
 }
 
 tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
 {
-    if (hasNone() || that.hasAll())
+    if (has_none() || that.has_all())
     {
         return *this;
     }
 
-    if (that.hasNone() || hasAll())
+    if (that.has_none() || has_all())
     {
         *this = that;
         return *this;
@@ -483,6 +477,29 @@ tr_bitfield& tr_bitfield::operator&=(tr_bitfield const& that) noexcept
         flags_[i] &= that.flags_[i];
     }
 
-    rebuildTrueCount();
+    rebuild_true_count();
     return *this;
+}
+
+bool tr_bitfield::intersects(tr_bitfield const& that) const noexcept
+{
+    if (has_none() || that.has_none())
+    {
+        return false;
+    }
+
+    if (has_all() || that.has_all())
+    {
+        return true;
+    }
+
+    for (size_t i = 0, n = std::min(std::size(flags_), std::size(that.flags_)); i < n; ++i)
+    {
+        if ((flags_[i] & that.flags_[i]) != 0U)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

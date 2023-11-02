@@ -1,25 +1,26 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <cerrno> // EINVAL
+#include <cstddef> // size_t
+#include <cstdint> //uint16_t
 #include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "error.h"
-#include "error-types.h"
-#include "magnet-metainfo.h"
-#include "session.h"
-#include "torrent-metainfo.h"
-#include "torrent.h"
-#include "tr-assert.h"
-#include "utils.h"
+#include "libtransmission/error.h"
+#include "libtransmission/quark.h"
+#include "libtransmission/session.h"
+#include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/torrent.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/utils.h"
 
 using namespace std::literals;
 
@@ -59,11 +60,27 @@ struct tr_ctor
 
     std::vector<char> contents;
 
+    tr_torrent::VerifyDoneCallback verify_done_callback_;
+
     explicit tr_ctor(tr_session const* session_in)
         : session{ session_in }
     {
     }
 };
+
+// ---
+
+void tr_ctorSetVerifyDoneCallback(tr_ctor* ctor, tr_torrent::VerifyDoneCallback&& callback)
+{
+    ctor->verify_done_callback_ = std::move(callback);
+}
+
+tr_torrent::VerifyDoneCallback tr_ctorStealVerifyDoneCallback(tr_ctor* ctor)
+{
+    auto tmp = tr_torrent::VerifyDoneCallback{};
+    std::swap(ctor->verify_done_callback_, tmp);
+    return tmp;
+}
 
 // ---
 
@@ -75,14 +92,14 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_err
         return false;
     }
 
-    if (!tr_loadFile(filename, ctor->contents, error))
+    if (!tr_file_read(filename, ctor->contents, error))
     {
         return false;
     }
 
     ctor->torrent_filename = filename;
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
-    return ctor->metainfo.parseBenc(contents_sv, error);
+    return ctor->metainfo.parse_benc(contents_sv, error);
 }
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
@@ -95,7 +112,7 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
     ctor->torrent_filename.clear();
     ctor->contents.assign(metainfo, metainfo + len);
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
-    return ctor->metainfo.parseBenc(contents_sv, error);
+    return ctor->metainfo.parse_benc(contents_sv, error);
 }
 
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error)
@@ -126,7 +143,7 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_erro
         return false;
     }
 
-    return tr_saveFile(filename, ctor->contents, error);
+    return tr_file_save(filename, ctor->contents, error);
 }
 
 // ---
@@ -151,9 +168,9 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tor->setFilePriorities(std::data(ctor->low), std::size(ctor->low), TR_PRI_LOW);
-    tor->setFilePriorities(std::data(ctor->normal), std::size(ctor->normal), TR_PRI_NORMAL);
-    tor->setFilePriorities(std::data(ctor->high), std::size(ctor->high), TR_PRI_HIGH);
+    tor->set_file_priorities(std::data(ctor->low), std::size(ctor->low), TR_PRI_LOW);
+    tor->set_file_priorities(std::data(ctor->normal), std::size(ctor->normal), TR_PRI_NORMAL);
+    tor->set_file_priorities(std::data(ctor->high), std::size(ctor->high), TR_PRI_HIGH);
 }
 
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t file_count, bool wanted)
@@ -164,8 +181,8 @@ void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tor->initFilesWanted(std::data(ctor->unwanted), std::size(ctor->unwanted), false);
-    tor->initFilesWanted(std::data(ctor->wanted), std::size(ctor->wanted), true);
+    tor->init_files_wanted(std::data(ctor->unwanted), std::size(ctor->unwanted), false);
+    tor->init_files_wanted(std::data(ctor->wanted), std::size(ctor->wanted), true);
 }
 
 // ---
@@ -295,7 +312,7 @@ tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor)
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
 {
-    return !std::empty(ctor->metainfo.infoHashString()) ? &ctor->metainfo : nullptr;
+    return !std::empty(ctor->metainfo.info_hash_string()) ? &ctor->metainfo : nullptr;
 }
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor)
@@ -322,9 +339,9 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 
 // ---
 
-void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels)
+void tr_ctorSetLabels(tr_ctor* ctor, tr_torrent::labels_t&& labels)
 {
-    ctor->labels = { labels, labels + n_labels };
+    ctor->labels = std::move(labels);
 }
 
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor)

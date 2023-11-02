@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,7 +8,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/utils.h>
+#include <libtransmission/file.h>
 
 #include <glibmm/i18n.h>
 #include <glibmm/main.h>
@@ -50,8 +50,9 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
         return false;
     }
 
-    auto const bytes = tr_dirSpace(dir_).free;
-    auto const text = bytes < 0 ? _("Error") : fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(bytes)));
+    auto const capacity = tr_sys_path_get_capacity(dir_);
+    auto const text = capacity ? fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(capacity->free))) :
+                                 _("Error");
     label_.set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), text));
 
     return true;

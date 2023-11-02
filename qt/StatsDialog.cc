@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -16,12 +16,12 @@ enum
 };
 
 StatsDialog::StatsDialog(Session& session, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
+    : BaseDialog{ parent }
+    , session_{ session }
 {
     ui_.setupUi(this);
 
-    auto* cr = new ColumnResizer(this);
+    auto* cr = new ColumnResizer{ this };
     cr->addLayout(ui_.currentSessionSectionLayout);
     cr->addLayout(ui_.totalSectionLayout);
     cr->update();

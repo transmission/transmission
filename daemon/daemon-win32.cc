@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,7 +8,11 @@
 
 #include <algorithm> /* std::max() */
 
-#include <fmt/format.h>
+#include <fmt/core.h>
+
+#include <libtransmission/error.h>
+#include <libtransmission/log.h>
+#include <libtransmission/utils.h>
 
 #include "daemon.h"
 
@@ -196,9 +200,13 @@ static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
     update_service_status(SERVICE_STOPPED, NO_ERROR, exit_code, 0, 0);
 }
 
-bool tr_daemon::setup_signals()
+bool tr_daemon::setup_signals([[maybe_unused]] struct event*& sig_ev)
 {
     return true;
+}
+
+void tr_daemon::cleanup_signals([[maybe_unused]] struct event* sig_ev) const
+{
 }
 
 bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error** error)

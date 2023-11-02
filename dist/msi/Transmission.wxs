@@ -17,8 +17,20 @@
     <Package Id="*" Keywords="Installer" Description="Transmission $(var.TrVersion) Installer" Comments="A Fast, Easy, and Free BitTorrent Client" Manufacturer="Transmission Project" InstallerVersion="500" InstallScope="perMachine" Languages="1033" Compressed="yes" SummaryCodepage="1252" />
     <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." AllowSameVersionUpgrades="yes" />
 
-    <Condition Message="This application is only supported on Windows Vista, Windows Server 2008, or higher.">
-      Installed OR (VersionNT &gt;= 600)
+    <?if $(var.QtMajorVer) = 5 ?>
+      <?define MinSystemName = "Windows Vista, Windows Server 2008, or higher" ?>
+      <?define MinSystemCondition = "(VersionNT >= 600)" ?>
+    <?else ?>
+      <!-- https://support.microsoft.com/en-us/help/3202260/versionnt-value-for-windows-10-and-windows-server-2016 -->
+      <Property Id="WINDOWSBUILDNUM" Secure="yes">
+        <RegistrySearch Id="OsMajorVerRegSearch" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Name="CurrentMajorVersionNumber" Type="raw" />
+      </Property>
+      <?define MinSystemName = "Windows 10, Windows Server 2016, or higher" ?>
+      <?define MinSystemCondition = "WINDOWSBUILDNUM" ?>
+    <?endif ?>
+
+    <Condition Message="This application is only supported on $(var.MinSystemName).">
+      <![CDATA[Installed OR $(var.MinSystemCondition)]]>
     </Condition>
 
     <Property Id="TRQTWINSTALLDIR" Secure="yes">
