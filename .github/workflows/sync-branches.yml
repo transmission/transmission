@@ -1,0 +1,20 @@
+name: Mirror main to 4.1 branch
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  mirror-main-to-dev:
+    name: Mirror main branch to dev/4.1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Merge branch 'main' into dev/4.1
+        uses: devmasx/merge-branch@v1.4.0 # https://github.com/marketplace/actions/merge-branch
+        with:
+          type: now
+          from_branch: main
+          target_branch: dev/4.1
+          github_token: ${{secrets.GITHUB_TOKEN}}

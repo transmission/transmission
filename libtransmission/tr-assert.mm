@@ -7,7 +7,7 @@
 
 #include <cstdlib> // for abort()
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "tr-assert.h"
 

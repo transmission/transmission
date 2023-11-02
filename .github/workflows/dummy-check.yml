@@ -1,0 +1,14 @@
+timeout-minutes: 1
+
+name: Dummy
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Great Success !
+        run: exit 0
