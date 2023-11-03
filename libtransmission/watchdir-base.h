@@ -20,8 +20,8 @@
 #include <string_view>
 #include <utility>
 
-#include "timer.h"
-#include "watchdir.h"
+#include "libtransmission/timer.h"
+#include "libtransmission/watchdir.h"
 
 namespace libtransmission::impl
 {

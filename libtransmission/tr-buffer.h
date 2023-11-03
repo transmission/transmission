@@ -14,9 +14,9 @@
 
 #include <small/vector.hpp>
 
-#include "error.h"
-#include "net.h" // tr_socket_t
-#include "utils.h" // for tr_htonll(), tr_ntohll()
+#include "libtransmission/error.h"
+#include "libtransmission/net.h" // tr_socket_t
+#include "libtransmission/utils.h" // for tr_htonll(), tr_ntohll()
 
 namespace libtransmission
 {

@@ -9,6 +9,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm> // std::any_of
+#include <cstddef> // size_t
 #include <numeric>
 #include <optional>
 #include <string>

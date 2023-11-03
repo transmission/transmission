@@ -17,7 +17,6 @@
 
 #include <libtransmission/announce-list.h>
 #include <libtransmission/error.h>
-#include <libtransmission/quark.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>

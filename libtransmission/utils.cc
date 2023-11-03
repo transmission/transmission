@@ -17,9 +17,11 @@
 #include <locale>
 #include <optional>
 #include <set>
+#include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32

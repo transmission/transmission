@@ -3,10 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <array>
 #include <cerrno>
 #include <cstdint>
-#include <type_traits>
+#include <functional>
+#include <type_traits> // std::underlying_type_t
 
 #ifdef _WIN32
 #include <ws2tcpip.h>

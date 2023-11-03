@@ -49,11 +49,13 @@
 #include "libtransmission/open-files.h"
 #include "libtransmission/port-forwarding.h"
 #include "libtransmission/quark.h"
+#include "libtransmission/rpc-server.h"
 #include "libtransmission/session-alt-speeds.h"
 #include "libtransmission/session-id.h"
 #include "libtransmission/session-settings.h"
 #include "libtransmission/session-thread.h"
 #include "libtransmission/stats.h"
+#include "libtransmission/timer.h"
 #include "libtransmission/torrents.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-dht.h"
@@ -67,16 +69,9 @@ tr_peer_id_t tr_peerIdInit();
 
 class tr_peer_socket;
 struct tr_pex;
-class tr_rpc_server;
 struct tr_torrent;
 struct struct_utp_context;
 struct tr_variant;
-
-namespace libtransmission
-{
-class Timer;
-class TimerMaker;
-} // namespace libtransmission
 
 namespace libtransmission::test
 {

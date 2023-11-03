@@ -3,12 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::min
+#include <cerrno>
+
 #include <fmt/core.h>
 
 #include <libutp/utp.h>
 
-#include "libtransmission/transmission.h"
-
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/net.h"
 #include "libtransmission/session.h"

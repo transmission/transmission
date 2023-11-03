@@ -14,7 +14,7 @@
 #include <string_view>
 #include <utility> // make_pair
 
-#include "error.h"
+#include "libtransmission/error.h"
 
 namespace transmission::benc
 {

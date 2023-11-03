@@ -10,6 +10,12 @@
 
 #include <cstddef> // size_t
 
+#ifndef _WIN32
+#include <sys/socket.h>
+#else
+#include <ws2tcpip.h>
+#endif
+
 struct tr_session;
 
 void tr_utpInit(tr_session* session);

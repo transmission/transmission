@@ -21,7 +21,7 @@
 #include <stdbool.h> // bool
 #endif
 
-#include "tr-macros.h"
+#include "libtransmission/tr-macros.h"
 
 using tr_file_index_t = size_t;
 using tr_piece_index_t = uint32_t;

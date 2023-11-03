@@ -6,6 +6,7 @@
 #include <array>
 #include <chrono>
 #include <cstddef> // size_t
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>

@@ -3,6 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <optional>
+#include <utility>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/file.h"

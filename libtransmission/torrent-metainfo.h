@@ -11,11 +11,12 @@
 #include <string_view>
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "block-info.h"
-#include "magnet-metainfo.h"
-#include "torrent-files.h"
+#include "libtransmission/block-info.h"
+#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/torrent-files.h"
+#include "libtransmission/tr-macros.h"
 
 struct tr_error;
 

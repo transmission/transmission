@@ -5,8 +5,10 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstdint>
+#include <cstddef> // std::byte
+#include <cstdint> // uint16_t
 #include <cstring>
+#include <ctime> // time_t
 #include <functional>
 #include <memory>
 #include <optional>
@@ -15,7 +17,6 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <ctime>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
 #endif

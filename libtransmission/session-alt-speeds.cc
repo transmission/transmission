@@ -5,6 +5,7 @@
 
 #include <chrono>
 #include <cstddef> // size_t
+#include <utility>
 
 #include <fmt/chrono.h>
 

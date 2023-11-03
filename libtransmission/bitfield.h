@@ -13,7 +13,7 @@
 #include <cstdint> // uint8_t
 #include <vector> // std::vector
 
-#include "tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.

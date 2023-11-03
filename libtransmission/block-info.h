@@ -7,7 +7,7 @@
 
 #include <cstdint> // uint32_t, uint64_t
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
 struct tr_block_info
 {

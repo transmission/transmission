@@ -11,16 +11,18 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <cstdint>
-#include <functional>
-#include <list>
 #include <memory>
 #include <mutex>
 #include <optional>
 #include <set>
+#include <string>
 #include <thread>
+#include <utility> // std::move
+
+#include "libtransmission/transmission.h"
 
 #include "libtransmission/torrent-metainfo.h"
+#include "libtransmission/tr-macros.h"
 
 class tr_verify_worker
 {

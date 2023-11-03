@@ -10,6 +10,7 @@
 #include <cstddef> // size_t, std::byte
 #include <ctime> // time(), time_t
 #include <fstream>
+#include <functional>
 #include <iterator> // std::back_inserter
 #include <map>
 #include <memory>
@@ -35,6 +36,7 @@
 
 #include <libtransmission/crypto-utils.h> // tr_rand_obj
 #include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/net.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/session-thread.h> // for tr_evthread_init();
