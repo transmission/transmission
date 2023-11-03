@@ -30,8 +30,8 @@
 #else
 #include <sys/quota.h> /* quotactl() */
 #endif
-#ifndef btodb
-#define btodb(num) ((num) >> 10)
+#if !defined(btodb) && defined(QIF_DQBLKSIZE_BITS)
+#define btodb(num) ((num) >> QIF_DQBLKSIZE_BITS)
 #endif
 #ifdef HAVE_GETMNTENT
 #ifdef __sun
