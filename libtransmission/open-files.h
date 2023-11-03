@@ -15,10 +15,10 @@
 #include <string_view>
 #include <utility>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "file.h" // tr_sys_file_t
-#include "lru-cache.h"
+#include "libtransmission/file.h" // tr_sys_file_t
+#include "libtransmission/lru-cache.h"
 
 // A pool of open files that are cached while reading / writing torrents' data
 class tr_open_files
