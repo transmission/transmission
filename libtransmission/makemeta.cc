@@ -250,7 +250,7 @@ bool tr_metainfo_builder::blocking_make_checksums(tr_error* error)
     return true;
 }
 
-std::string tr_metainfo_builder::benc(tr_error* error) const
+std::string tr_metainfo_builder::benc() const
 {
     TR_ASSERT_MSG(!std::empty(piece_hashes_) || total_size() == 0U, "did you forget to call makeChecksums() first?");
 
@@ -353,7 +353,7 @@ std::string tr_metainfo_builder::benc(tr_error* error) const
 
 bool tr_metainfo_builder::save(std::string_view filename, tr_error* error) const
 {
-    return tr_file_save(filename, benc(error), error);
+    return tr_file_save(filename, benc(), error);
 }
 
 uint32_t tr_metainfo_builder::default_piece_size(uint64_t total_size) noexcept
