@@ -320,8 +320,10 @@ static void create_temp_path(
         TR_ASSERT(path_size >= i + 6);
 
         local_error = {};
+
         (*callback)(path.c_str(), callback_param, &local_error);
-        if (local_error == nullptr)
+
+        if (!local_error)
         {
             break;
         }
@@ -888,10 +890,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/,
 
     if (!success)
     {
-        if (error == nullptr)
-        {
-            set_system_error(error, GetLastError());
-        }
+        set_system_error(error, GetLastError());
 
         CloseHandle(ret);
         ret = TR_BAD_SYS_FILE;
