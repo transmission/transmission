@@ -141,7 +141,6 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
     [_fTimer invalidate];
 }
 

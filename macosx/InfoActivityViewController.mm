@@ -69,11 +69,6 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
     [self checkWindowSize];
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (CGFloat)fHorizLayoutHeight
 {
     return NSHeight(self.fTransferView.frame) + 2 * kStackViewInset;

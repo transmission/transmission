@@ -171,8 +171,6 @@ typedef NS_ENUM(NSUInteger, TabTag) {
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
     if ([_fViewController respondsToSelector:@selector(saveViewSize)])
     {
         [_fViewController saveViewSize];
