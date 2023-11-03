@@ -43,13 +43,10 @@
 #include "libtransmission/log.h"
 #include "libtransmission/platform.h"
 #include "libtransmission/session.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;
-
-// FIXME(ckerr) do not merge these three lines.
-// This comment is to make CI think libtransmission has
-// changed so that it will run the libtransmission CI tests
 
 namespace
 {
