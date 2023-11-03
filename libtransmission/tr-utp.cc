@@ -9,16 +9,12 @@
 
 #include <libutp/utp.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h" // tr_rand_int()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
-#include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
-#include "libtransmission/timer.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 
