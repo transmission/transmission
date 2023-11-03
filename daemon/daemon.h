@@ -40,6 +40,7 @@ public:
     void periodic_update();
     void reconfigure();
     void stop();
+    void display_info();
 
 private:
 #ifdef HAVE_SYS_SIGNALFD_H

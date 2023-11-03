@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cerrno>
+#include <cinttypes>
 #include <cstdio> /* printf */
 #include <cstdlib> /* atoi */
 #include <iostream>
@@ -932,11 +933,52 @@ bool tr_daemon::init(int argc, char const* const argv[], bool* foreground, int* 
         fmt::print("{:s}\n", tr_variant_serde::json().to_string(settings_));
         goto EXIT_EARLY;
     }
+    else
+    {
+        display_info();
+    }
 
     return true;
 
 EXIT_EARLY:
     return false;
+}
+
+void tr_daemon::display_info()
+{
+    //fetch the RPC bind address
+    auto rpc_bind_address_sv = std::string_view{};
+    tr_variantDictFindStrView(&settings_, TR_KEY_rpc_bind_address, &rpc_bind_address_sv);
+    auto rpc_bind_address = std::string{ rpc_bind_address_sv };
+
+    //if we are on 0.0.0.0 output a usable IP for the user to connect to
+    if (rpc_bind_address == "0.0.0.0")
+    {
+        rpc_bind_address = std::string{ "127.0.0.1" };
+    }
+
+    //fetch the RPC port
+    int64_t rpc_port_val;
+    tr_variantDictFindInt(&settings_, TR_KEY_rpc_port, &rpc_port_val);
+
+    //fetch the IP whitelist & enabled flag
+    bool ip_whitelist_enabled = false;
+    tr_variantDictFindBool(&settings_, TR_KEY_rpc_whitelist_enabled, &ip_whitelist_enabled);
+
+    auto ip_whitelist_sv = std::string_view{};
+    tr_variantDictFindStrView(&settings_, TR_KEY_rpc_whitelist, &ip_whitelist_sv);
+    auto ip_whitelist = std::string{ ip_whitelist_sv };
+
+    fprintf(stdout, "==============================\n");
+    fprintf(stdout, "Transmission Daemon\n\n");
+    fprintf(stdout, "Web interface available on: http://%s:%" PRId64 "\n", rpc_bind_address.c_str(), rpc_port_val);
+
+    if (ip_whitelist_enabled)
+    {
+        fprintf(stdout, "\nInterface will only allow connections from: %s\n", ip_whitelist.c_str());
+    }
+
+    fprintf(stdout, "==============================\n");
 }
 
 void tr_daemon::handle_error(tr_error* error) const
