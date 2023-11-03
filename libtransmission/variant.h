@@ -89,7 +89,7 @@ public:
             {
                 return item.first == key;
             };
-            return std::find_if(begin(), end(), predicate);
+            return std::find_if(std::begin(vec_), std::end(vec_), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) const noexcept
@@ -98,7 +98,7 @@ public:
             {
                 return item.first == key;
             };
-            return std::find_if(cbegin(), cend(), predicate);
+            return std::find_if(std::cbegin(vec_), std::cend(vec_), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
