@@ -159,12 +159,29 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         set(${ID}_LIBRARIES ${${ID}_LIBRARY})
 
         set(${ID}_EXT_PROJ_CMAKE_ARGS)
+
+        list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
+            "-DCMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}"
+            "-DCMAKE_SYSTEM_VERSION=${CMAKE_SYSTEM_VERSION}"
+            "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+            "-DCMAKE_FIND_ROOT_PATH=${CMAKE_FIND_ROOT_PATH}")
+
         if(APPLE)
             string(REPLACE ";" "$<SEMICOLON>" ${ID}_CMAKE_OSX_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
             list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
                 "-DCMAKE_OSX_ARCHITECTURES:STRING=${${ID}_CMAKE_OSX_ARCHITECTURES}"
                 "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}"
                 "-DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}")
+        endif()
+
+        if(ANDROID)
+            list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
+                "-DANDROID_PLATFORM=${ANDROID_PLATFORM}"
+                "-DANDROID_NDK=${ANDROID_NDK}"
+                "-DANDROID_ABI=${ANDROID_ABI}"
+                "-DANDROID_STL=${ANDROID_STL}"
+                "-DCMAKE_ANDROID_NDK=${CMAKE_ANDROID_NDK}"
+                "-DCMAKE_ANDROID_ARCH_ABI=${CMAKE_ANDROID_ARCH_ABI}")
         endif()
 
         ExternalProject_Add(
