@@ -8,6 +8,8 @@
 #include <string>
 #include <string_view>
 
+#include "libtransmission/tr-macros.h"
+
 /** @brief Structure holding error information. */
 struct tr_error
 {
@@ -25,7 +27,7 @@ public:
         return code_;
     }
 
-    [[nodiscard]] constexpr auto message() const noexcept
+    [[nodiscard]] TR_CONSTEXPR20 auto message() const noexcept
     {
         return std::string_view{ message_ };
     }
