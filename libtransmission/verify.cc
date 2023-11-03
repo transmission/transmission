@@ -5,17 +5,15 @@
 
 #include <algorithm>
 #include <chrono>
-#include <ctime>
+#include <cstddef> // std::byte
+#include <cstdint> // uint64_t, uint32_t
 #include <mutex>
 #include <optional>
 #include <thread>
 #include <vector>
 
-#include <fmt/core.h>
-
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/verify.h"
