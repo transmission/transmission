@@ -7,6 +7,7 @@
 #include <array>
 #include <cerrno> // EINVAL
 #include <climits> /* INT_MAX */
+#include <cstddef> // size_t
 #include <ctime>
 #include <map>
 #include <sstream>
@@ -14,13 +15,6 @@
 #include <string_view>
 #include <utility>
 #include <vector>
-
-#ifndef _WIN32
-#include <sys/wait.h> /* wait() */
-#include <unistd.h> /* fork(), execvp(), _exit() */
-#else
-#include <windows.h> /* CreateProcess(), GetLastError() */
-#endif
 
 #include <fmt/chrono.h>
 #include <fmt/core.h>
@@ -47,9 +41,12 @@
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web-utils.h"
+
+struct tr_ctor;
 
 using namespace std::literals;
 
