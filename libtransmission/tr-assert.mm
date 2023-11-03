@@ -9,7 +9,7 @@
 
 #include <fmt/core.h>
 
-#include "tr-assert.h"
+#include "libtransmission/tr-assert.h"
 
 #if !defined(NDEBUG) || defined(TR_FORCE_ASSERTIONS)
 
