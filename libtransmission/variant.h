@@ -273,8 +273,8 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            auto const* const str = std::get_if<StringHolder>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
+            auto const* const val = std::get_if<StringHolder>(&val_);
+            return val != nullptr ? &val->sv_ : nullptr;
         }
         else
         {
@@ -293,8 +293,8 @@ public:
     {
         if constexpr (Index == StringIndex)
         {
-            auto const* const str = std::get_if<StringIndex>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
+            auto const* const val = std::get_if<StringIndex>(&val_);
+            return val != nullptr ? &val->sv_ : nullptr;
         }
         else
         {
