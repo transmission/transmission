@@ -69,6 +69,7 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/utils.h" // tr_win32_utf8_to_native
 
 namespace
 {
