@@ -10,6 +10,7 @@
 #endif
 
 #include <cstddef> // size_t
+#include <cstdint> // uint64_t, uint16_t
 #include <ctime>
 #include <functional>
 #include <memory>
@@ -32,17 +33,16 @@
 #include "libtransmission/log.h"
 #include "libtransmission/observable.h"
 #include "libtransmission/session.h"
+#include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/verify.h"
 
+struct tr_ctor;
 class tr_swarm;
 struct tr_error;
-struct tr_magnet_info;
-struct tr_metainfo_parsed;
-struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
