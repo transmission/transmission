@@ -659,8 +659,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
     NSPasteboard* pasteBoard = NSPasteboard.generalPasteboard;
     NSString* links = [[selectedTorrents valueForKeyPath:@"magnetLink"] componentsJoinedByString:@"\n"];
-    [pasteBoard declareTypes:@[ NSStringPboardType ] owner:nil];
-    [pasteBoard setString:links forType:NSStringPboardType];
+    [pasteBoard declareTypes:@[ NSPasteboardTypeString ] owner:nil];
+    [pasteBoard setString:links forType:NSPasteboardTypeString];
 }
 
 - (void)paste:(id)sender
@@ -706,7 +706,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     if (action == @selector(paste:))
     {
-        if ([NSPasteboard.generalPasteboard.types containsObject:NSURLPboardType])
+        if ([NSPasteboard.generalPasteboard.types containsObject:NSPasteboardTypeURL])
         {
             return YES;
         }
