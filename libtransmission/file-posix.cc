@@ -896,7 +896,8 @@ bool tr_sys_file_advise(
 
 namespace
 {
-
+namespace preallocate_helpers
+{
 #ifdef HAVE_FALLOCATE64
 bool preallocate_fallocate64(tr_sys_file_t handle, uint64_t size)
 {
@@ -957,11 +958,13 @@ bool full_preallocate_posix(tr_sys_file_t handle, uint64_t size)
     return posix_fallocate(handle, 0, size) == 0;
 }
 #endif
-
+} // namespace preallocate_helpers
 } // unnamed namespace
 
 bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_error* error)
 {
+    using namespace preallocate_helpers;
+
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
     using prealloc_func = bool (*)(tr_sys_file_t, uint64_t);
@@ -1013,7 +1016,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
 
     if (error != nullptr)
     {
-        error->set_from_errno(errno);
+        error->set_from_errno(errno ? errno : ENOSYS);
     }
 
     return false;
