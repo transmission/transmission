@@ -13,7 +13,6 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/quark.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/variant.h"
