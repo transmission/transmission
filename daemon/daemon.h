@@ -33,9 +33,9 @@ public:
 #endif /* signalfd API */
     }
 
-    bool spawn(bool foreground, int* exit_code, tr_error** error);
+    bool spawn(bool foreground, int* exit_code, tr_error& error);
     bool init(int argc, char const* const argv[], bool* foreground, int* ret);
-    void handle_error(tr_error*) const;
+    void handle_error(tr_error const&) const;
     int start(bool foreground);
     void periodic_update();
     void reconfigure();

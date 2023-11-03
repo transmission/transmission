@@ -440,17 +440,16 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = AnnounceHandler{ response, log_name };
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(
             fmt::format(
                 _("Couldn't parse announce response: {error} ({error_code})"),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())),
             log_name);
-        tr_error_clear(&error);
     }
 }
 
@@ -648,16 +647,15 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = ScrapeHandler{ response, log_name };
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(
             fmt::format(
                 _("Couldn't parse scrape response: {error} ({error_code})"),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())),
             log_name);
-        tr_error_clear(&error);
     }
 }

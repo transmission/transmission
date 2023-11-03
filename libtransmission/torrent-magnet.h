@@ -55,8 +55,4 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor);
 
 void tr_torrentMagnetDoIdleWork(tr_torrent* tor);
 
-bool tr_torrentUseMetainfoFromFile(
-    tr_torrent* tor,
-    tr_torrent_metainfo const* metainfo,
-    char const* filename,
-    tr_error** error);
+bool tr_torrentUseMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* metainfo, char const* filename, tr_error* error);

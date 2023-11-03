@@ -239,13 +239,12 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 
     if (auto err_code = reader.GetParseErrorCode(); err_code == rapidjson::kParseErrorDocumentEmpty)
     {
-        tr_error_set(&error_, EINVAL, "No content");
+        error_.set(EINVAL, "No content");
     }
     else
     {
         auto const err_offset = reader.GetErrorOffset();
-        tr_error_set(
-            &error_,
+        error_.set(
             EILSEQ,
             fmt::format(
                 _("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"),

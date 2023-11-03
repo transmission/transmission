@@ -38,7 +38,7 @@ public:
     MakeProgressDialog(
         Session& session,
         tr_metainfo_builder& builder,
-        std::future<tr_error*> future,
+        std::future<tr_error> future,
         QString outfile,
         QWidget* parent = nullptr);
 
@@ -49,7 +49,7 @@ private slots:
 private:
     Session& session_;
     tr_metainfo_builder& builder_;
-    std::future<tr_error*> future_;
+    std::future<tr_error> future_;
     QString const outfile_;
     Ui::MakeProgressDialog ui_ = {};
     QTimer timer_;
@@ -60,7 +60,7 @@ private:
 MakeProgressDialog::MakeProgressDialog(
     Session& session,
     tr_metainfo_builder& builder,
-    std::future<tr_error*> future,
+    std::future<tr_error> future,
     QString outfile,
     QWidget* parent)
     : BaseDialog{ parent }
@@ -128,22 +128,22 @@ void MakeProgressDialog::onProgress()
     }
     else
     {
-        tr_error* error = future_.get();
+        auto error = future_.get();
 
-        if (error == nullptr)
+        if (!error)
         {
             builder_.save(outfile_.toStdString(), &error);
         }
 
-        if (error == nullptr)
+        if (!error)
         {
             str = tr("Created \"%1\"!").arg(base);
             success = true;
         }
         else
         {
-            str = tr("Couldn't create \"%1\": %2 (%3)").arg(base).arg(QString::fromUtf8(error->message)).arg(error->code);
-            tr_error_free(error);
+            auto err_msg = QString::fromUtf8(std::data(error.message()), std::size(error.message()));
+            str = tr("Couldn't create \"%1\": %2 (%3)").arg(base).arg(err_msg).arg(error.code());
         }
     }
 

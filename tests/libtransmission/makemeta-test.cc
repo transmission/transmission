@@ -26,8 +26,6 @@
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
 
-struct tr_error;
-
 using namespace std::literals;
 
 namespace libtransmission::test
@@ -69,8 +67,8 @@ protected:
 
     static auto testBuilder(tr_metainfo_builder& builder)
     {
-        tr_error* error = builder.make_checksums().get();
-        EXPECT_EQ(error, nullptr) << *error;
+        auto error = builder.make_checksums().get();
+        EXPECT_FALSE(error) << error;
 
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parse_benc(builder.benc()));
@@ -233,7 +231,7 @@ TEST_F(MakemetaTest, announceSingleTracker)
     builder.set_announce_list(std::move(trackers));
 
     // generate the torrent and parse it as a variant
-    EXPECT_EQ(nullptr, builder.make_checksums().get());
+    EXPECT_FALSE(builder.make_checksums().get().has_value());
     auto top = tr_variant_serde::benc().parse(builder.benc());
     EXPECT_TRUE(top.has_value());
 
@@ -261,7 +259,7 @@ TEST_F(MakemetaTest, announceMultiTracker)
     builder.set_announce_list(std::move(trackers));
 
     // generate the torrent and parse it as a variant
-    EXPECT_EQ(nullptr, builder.make_checksums().get());
+    EXPECT_FALSE(builder.make_checksums().get().has_value());
     auto top = tr_variant_serde::benc().parse(builder.benc());
     EXPECT_TRUE(top.has_value());
 

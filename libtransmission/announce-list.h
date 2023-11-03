@@ -127,7 +127,7 @@ public:
     bool parse(std::string_view text);
     [[nodiscard]] std::string to_string() const;
 
-    bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
+    bool save(std::string_view torrent_file, tr_error* error = nullptr) const;
 
     [[nodiscard]] static std::optional<std::string> announce_to_scrape(std::string_view announce);
 

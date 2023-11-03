@@ -100,7 +100,7 @@ public:
     }
 
     // Returns the number of bytes written. Check `error` for error.
-    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    size_t to_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
     {
         n_bytes = std::min(n_bytes, size());
 
@@ -115,8 +115,12 @@ public:
             return n_sent;
         }
 
-        auto const err = sockerrno;
-        tr_error_set(error, err, tr_net_strerror(err));
+        if (error != nullptr)
+        {
+            auto const err = sockerrno;
+            error->set(err, tr_net_strerror(err));
+        }
+
         return {};
     }
 
@@ -210,7 +214,7 @@ public:
         }
     }
 
-    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error** error = nullptr)
+    size_t add_socket(tr_socket_t sockfd, size_t n_bytes, tr_error* error = nullptr)
     {
         auto const [buf, buflen] = reserve_space(n_bytes);
         auto const n_read = recv(sockfd, reinterpret_cast<char*>(buf), std::min(n_bytes, buflen), 0);
@@ -224,13 +228,16 @@ public:
 
         // When a stream socket peer has performed an orderly shutdown,
         // the return value will be 0 (the traditional "end-of-file" return).
-        if (n_read == 0)
+        if (error != nullptr)
         {
-            tr_error_set_from_errno(error, ENOTCONN);
-        }
-        else
-        {
-            tr_error_set(error, err, tr_net_strerror(err));
+            if (n_read == 0)
+            {
+                error->set_from_errno(ENOTCONN);
+            }
+            else
+            {
+                error->set(err, tr_net_strerror(err));
+            }
         }
 
         return {};
