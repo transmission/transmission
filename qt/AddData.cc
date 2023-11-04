@@ -124,3 +124,28 @@ QString AddData::readableShortName() const
         return readableName();
     }
 }
+
+void AddData::disposeSourceFile() const
+{
+    auto file = QFile{ filename };
+    if (!disposal_ || !file.exists())
+    {
+        return;
+    }
+
+    switch (*disposal_)
+    {
+    case FilenameDisposal::Delete:
+        file.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
+        file.remove();
+        break;
+
+    case FilenameDisposal::Rename:
+        file.rename(QStringLiteral("%1.added").arg(filename));
+        break;
+
+    default:
+        // no action
+        break;
+    }
+}
