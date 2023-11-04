@@ -2423,8 +2423,7 @@ int renamePath(tr_torrent const* tor, std::string_view oldpath, std::string_view
         {
             tmp = errno;
 
-            auto error = tr_error{};
-            if (!tr_sys_path_rename(src, tgt, &error))
+            if (auto error = tr_error{}; !tr_sys_path_rename(src, tgt, &error))
             {
                 err = error.code();
             }
