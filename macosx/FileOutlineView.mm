@@ -19,6 +19,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     FileNameCell* nameCell = [[FileNameCell alloc] init];
     [self tableColumnWithIdentifier:@"Name"].dataCell = nameCell;
 

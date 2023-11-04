@@ -70,6 +70,7 @@ typedef NS_ENUM(NSUInteger, TabTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fNoneSelectedField.stringValue = NSLocalizedString(@"No Torrents Selected", "Inspector -> selected torrents");
 
     //window location and size

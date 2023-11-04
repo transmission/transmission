@@ -8,6 +8,8 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
+
     self.enabled = self.enabled;
 }
 

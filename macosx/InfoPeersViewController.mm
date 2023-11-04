@@ -49,6 +49,7 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     CGFloat const height = [NSUserDefaults.standardUserDefaults floatForKey:@"InspectorContentHeightPeers"];
     if (height != 0.0)
     {

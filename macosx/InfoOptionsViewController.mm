@@ -74,6 +74,7 @@ static CGFloat const kStackViewSpacing = 8.0;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self checkWindowSize];
 
     [self setGlobalLabels];

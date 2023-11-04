@@ -87,6 +87,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateCheckButtons:) name:@"TorrentFileCheckChange"
                                              object:self.torrent];
 

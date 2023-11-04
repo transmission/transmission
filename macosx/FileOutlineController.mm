@@ -38,6 +38,7 @@ typedef NS_ENUM(NSUInteger, FilePriorityMenuTag) { //
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fFileList = [[NSMutableArray alloc] init];
 
     //set table header tool tips

@@ -24,6 +24,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fLabelField.stringValue = NSLocalizedString(@"Internet address of torrent file:", "URL sheet label");
     self.fOpenButton.title = NSLocalizedString(@"Open", "URL sheet button");
     self.fCancelButton.title = NSLocalizedString(@"Cancel", "URL sheet button");

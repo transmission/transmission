@@ -12,6 +12,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     _searchFieldVerticalConstraint.constant = -.5;
 }
 

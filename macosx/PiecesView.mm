@@ -110,6 +110,7 @@ typedef struct PieceInfo
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.torrent = nil;
 }
 
