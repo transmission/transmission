@@ -958,8 +958,7 @@ int tr_main(int argc, char* argv[])
         return ret;
     }
 
-    auto error = tr_error{};
-    if (!daemon.spawn(foreground, &ret, error))
+    if (auto error = tr_error{}; !daemon.spawn(foreground, &ret, error))
     {
         daemon.handle_error(error);
     }
