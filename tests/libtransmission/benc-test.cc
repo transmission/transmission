@@ -26,14 +26,10 @@ TEST_F(BencTest, MalformedBenc)
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = TestHandler{};
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     EXPECT_FALSE(transmission::benc::parse(Benc, stack, handler, nullptr, &error));
-    EXPECT_NE(nullptr, error);
-    if (error != nullptr)
-    {
-        EXPECT_NE(nullptr, error->message);
-    }
-    tr_error_clear(&error);
+    EXPECT_TRUE(error);
+    EXPECT_NE(""sv, error.message());
 }
 
 TEST_F(BencTest, ContextTokenIsCorrect)
@@ -98,6 +94,7 @@ TEST_F(BencTest, ContextTokenIsCorrect)
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = ContextHandler{};
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     transmission::benc::parse(Benc, stack, handler, nullptr, &error);
+    EXPECT_FALSE(error);
 }

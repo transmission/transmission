@@ -84,11 +84,15 @@ tr_torrent::VerifyDoneCallback tr_ctorStealVerifyDoneCallback(tr_ctor* ctor)
 
 // ---
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error)
 {
     if (std::empty(filename))
     {
-        tr_error_set(error, EINVAL, "no filename specified"sv);
+        if (error != nullptr)
+        {
+            error->set(EINVAL, "no filename specified"sv);
+        }
+
         return false;
     }
 
@@ -102,12 +106,12 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_err
     return ctor->metainfo.parse_benc(contents_sv, error);
 }
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error* error)
 {
     return tr_ctorSetMetainfoFromFile(ctor, std::string_view{ filename != nullptr ? filename : "" }, error);
 }
 
-bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
+bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error* error)
 {
     ctor->torrent_filename.clear();
     ctor->contents.assign(metainfo, metainfo + len);
@@ -115,14 +119,14 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
     return ctor->metainfo.parse_benc(contents_sv, error);
 }
 
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error)
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error* error)
 {
     ctor->torrent_filename.clear();
     ctor->metainfo = {};
     return ctor->metainfo.parseMagnet(magnet_link, error);
 }
 
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error* error)
 {
     return tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ magnet_link != nullptr ? magnet_link : "" }, error);
 }
@@ -132,14 +136,18 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
     return ctor->torrent_filename.c_str();
 }
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error* error)
 {
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(!std::empty(filename));
 
     if (std::empty(ctor->contents))
     {
-        tr_error_set(error, EINVAL, "torrent ctor has no contents to save"sv);
+        if (error != nullptr)
+        {
+            error->set(EINVAL, "torrent ctor has no contents to save"sv);
+        }
+
         return false;
     }
 

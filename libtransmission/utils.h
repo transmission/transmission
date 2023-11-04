@@ -63,14 +63,14 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 
 [[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
-bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error = nullptr);
 
-bool tr_file_move(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
+bool tr_file_move(std::string_view oldpath, std::string_view newpath, tr_error* error = nullptr);
 
-bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error = nullptr);
 
 template<typename ContiguousRange>
-constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error** error = nullptr)
+constexpr auto tr_file_save(std::string_view filename, ContiguousRange const& x, tr_error* error = nullptr)
 {
     return tr_file_save(filename, std::string_view{ std::data(x), std::size(x) }, error);
 }

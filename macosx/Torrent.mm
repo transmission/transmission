@@ -76,7 +76,7 @@ void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char
     }
 }
 
-bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
+bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
     if (filename == NULL)
     {
@@ -88,7 +88,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         NSError* localError;
         if (![Torrent trashFile:@(filename) error:&localError])
         {
-            tr_error_set(error, localError.code, localError.description.UTF8String);
+            error->set(localError.code, localError.description.UTF8String);
             return false;
         }
     }

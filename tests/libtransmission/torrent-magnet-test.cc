@@ -43,10 +43,9 @@ TEST_F(TorrentMagnetTest, getMetadataPiece)
     EXPECT_EQ(tor->info_dict_size(), info_dict_size);
 
     auto torrent_metainfo = tr_torrent_metainfo{};
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     EXPECT_TRUE(torrent_metainfo.parse_benc(benc, &error));
-    EXPECT_EQ(nullptr, error) << error->message;
-    tr_error_clear(&error);
+    EXPECT_FALSE(error) << error.message();
 
     EXPECT_EQ(tor->piece_hash(0), torrent_metainfo.piece_hash(0));
 }

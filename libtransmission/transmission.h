@@ -764,15 +764,15 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme_do_delete);
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool delete_source);
 
 /** @brief Set the constructor's metainfo from a magnet link */
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet, tr_error** error);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet, tr_error* error);
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
 
 /** @brief Set the constructor's metainfo from a raw benc already in memory */
-bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error);
+bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error* error);
 
 /** @brief Set the constructor's metainfo from a local torrent file */
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error* error);
 
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme_count);
@@ -841,7 +841,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 /** @addtogroup tr_torrent Torrents
     @{ */
 
-using tr_fileFunc = bool (*)(char const* filename, void* user_data, struct tr_error** error);
+using tr_fileFunc = bool (*)(char const* filename, void* user_data, tr_error* error);
 
 /** @brief Removes our torrent and .resume files for this torrent */
 void tr_torrentRemove(tr_torrent* torrent, bool delete_flag, tr_fileFunc delete_func, void* user_data);

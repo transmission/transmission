@@ -44,20 +44,15 @@ namespace
 {
     auto const path = tr_pathbuf{ dir, '/', name };
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const info = tr_sys_path_get_info(path, 0, &error);
-    if (error != nullptr)
+    if (error && !TR_ERROR_IS_ENOENT(error.code()))
     {
-        if (!TR_ERROR_IS_ENOENT(error->code))
-        {
-            tr_logAddWarn(fmt::format(
-                _("Skipping '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-        }
-
-        tr_error_free(error);
+        tr_logAddWarn(fmt::format(
+            _("Skipping '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
 
     return info && info->isFile();
@@ -110,21 +105,20 @@ void BaseWatchdir::processFile(std::string_view basename)
 
 void BaseWatchdir::scan()
 {
-    tr_error* error = nullptr;
+    auto error = tr_error{};
 
     for (auto const& file : tr_sys_dir_get_files(dirname_, tr_basename_is_not_dotfile, &error))
     {
         processFile(file);
     }
 
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", dirname()),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_free(error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
 }
 

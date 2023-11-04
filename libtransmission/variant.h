@@ -16,10 +16,9 @@
 #include <variant>
 #include <vector>
 
+#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
-
-struct tr_error;
 
 /**
  * A variant that holds typical benc/json types: bool, int,
@@ -274,8 +273,8 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            auto const* const str = std::get_if<StringHolder>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
+            auto const* const val = std::get_if<StringHolder>(&val_);
+            return val != nullptr ? &val->sv_ : nullptr;
         }
         else
         {
@@ -294,8 +293,8 @@ public:
     {
         if constexpr (Index == StringIndex)
         {
-            auto const* const str = std::get_if<StringIndex>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
+            auto const* const val = std::get_if<StringIndex>(&val_);
+            return val != nullptr ? &val->sv_ : nullptr;
         }
         else
         {
@@ -468,8 +467,6 @@ void tr_variantMergeDicts(tr_variant* tgt, tr_variant const* src);
 class tr_variant_serde
 {
 public:
-    ~tr_variant_serde();
-
     [[nodiscard]] static tr_variant_serde benc() noexcept
     {
         return tr_variant_serde{ Type::Benc };
@@ -523,7 +520,7 @@ public:
     // ---
 
     // Tracks errors when parsing / saving
-    tr_error* error_ = nullptr;
+    tr_error error_ = {};
 
 private:
     friend tr_variant;

@@ -28,13 +28,13 @@ public:
         return std::empty(files_);
     }
 
-    bool parse_benc(std::string_view benc, tr_error** error = nullptr);
+    bool parse_benc(std::string_view benc, tr_error* error = nullptr);
 
     // Helper function wrapper around parseBenc().
     // If you're looping through several files, passing in a non-nullptr
     // `contents` can reduce the number of memory allocations needed to
     // load multiple files.
-    bool parse_torrent_file(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error** error = nullptr);
+    bool parse_torrent_file(std::string_view benc_filename, std::vector<char>* contents = nullptr, tr_error* error = nullptr);
 
     // FILES
 
@@ -196,7 +196,7 @@ public:
 
 private:
     friend struct MetainfoHandler;
-    static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error** error);
+    static bool parse_impl(tr_torrent_metainfo& setme, std::string_view benc, tr_error* error);
     static std::string fix_webseed_url(tr_torrent_metainfo const& tm, std::string_view url);
 
     enum class BasenameFormat

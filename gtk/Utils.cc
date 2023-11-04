@@ -524,14 +524,18 @@ void setup_item_view_button_event_handling(
 
 #endif
 
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
 {
-    bool trashed = false;
-    bool result = true;
-
     g_return_val_if_fail(!filename.empty(), false);
 
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
+
     auto const file = Gio::File::create_for_path(filename);
+    bool trashed = false;
 
     if (gtr_pref_flag_get(TR_KEY_trash_can_enabled))
     {
@@ -541,15 +545,16 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
+            error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             gtr_message(fmt::format(
                 _("Couldn't move '{path}' to trash: {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                fmt::arg("error_code", e.code())));
-            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         }
     }
 
+    bool result = true;
     if (!trashed)
     {
         try
@@ -558,13 +563,12 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
+            error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             gtr_message(fmt::format(
                 _("Couldn't remove '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                fmt::arg("error_code", e.code())));
-            tr_error_clear(error);
-            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
             result = false;
         }
     }

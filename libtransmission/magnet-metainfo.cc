@@ -208,7 +208,7 @@ void tr_magnet_metainfo::add_webseed(std::string_view webseed)
     urls.emplace_back(webseed);
 }
 
-bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
+bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* error)
 {
     magnet_link = tr_strv_strip(magnet_link);
     if (auto const hash = parseHash(magnet_link); hash)
@@ -219,7 +219,11 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     auto const parsed = tr_urlParse(magnet_link);
     if (!parsed || parsed->scheme != "magnet"sv)
     {
-        tr_error_set(error, TR_ERROR_EINVAL, "Error parsing URL"sv);
+        if (error != nullptr)
+        {
+            error->set(TR_ERROR_EINVAL, "Error parsing URL"sv);
+        }
+
         return false;
     }
 

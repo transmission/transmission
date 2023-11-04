@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 
+#include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/tr-assert.h"
 
@@ -18,7 +19,7 @@ static auto constexpr NativeEol = "\r\n"sv;
 static auto constexpr NativeEol = "\n"sv;
 #endif
 
-bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_error** error)
+bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_error* error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
@@ -29,7 +30,7 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_er
 std::vector<std::string> tr_sys_dir_get_files(
     std::string_view folder,
     std::function<bool(std::string_view)> const& test,
-    tr_error** error)
+    tr_error* error)
 {
     if (auto const info = tr_sys_path_get_info(folder); !info || !info->isFolder())
     {

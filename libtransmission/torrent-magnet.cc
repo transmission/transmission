@@ -128,7 +128,7 @@ bool tr_torrentUseMetainfoFromFile(
     tr_torrent* tor,
     tr_torrent_metainfo const* metainfo,
     char const* filename_in,
-    tr_error** error)
+    tr_error* error)
 {
     // add .torrent file
     if (!tr_sys_path_copy(filename_in, tor->torrent_file().c_str(), error))
@@ -202,7 +202,7 @@ tr_variant build_metainfo_except_info_dict(tr_torrent_metainfo const& tm)
     return tr_variant{ std::move(top) };
 }
 
-bool use_new_metainfo(tr_torrent* tor, tr_error** error)
+bool use_new_metainfo(tr_torrent* tor, tr_error* error)
 {
     auto const& m = tor->incomplete_metadata;
     TR_ASSERT(m);
@@ -218,7 +218,12 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
     auto info_dict_v = serde.parse(m->metadata);
     if (!info_dict_v)
     {
-        tr_error_propagate(error, &serde.error_);
+        if (error != nullptr)
+        {
+            *error = std::move(serde.error_);
+            serde.error_ = {};
+        }
+
         return false;
     }
 
@@ -251,7 +256,7 @@ bool use_new_metainfo(tr_torrent* tor, tr_error** error)
 
 void on_have_all_metainfo(tr_torrent* tor)
 {
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto& m = tor->incomplete_metadata;
     TR_ASSERT(m);
     if (use_new_metainfo(tor, &error))
@@ -264,7 +269,7 @@ void on_have_all_metainfo(tr_torrent* tor)
 
         m->pieces_needed = create_all_needed(n);
 
-        char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
+        auto msg = std::string_view{ error && !std::empty(error.message()) ? error.message() : "unknown error" };
         tr_logAddWarnTor(
             tor,
             fmt::format(
@@ -274,7 +279,6 @@ void on_have_all_metainfo(tr_torrent* tor)
                     n),
                 fmt::arg("error", msg),
                 fmt::arg("piece_count", n)));
-        tr_error_clear(&error);
     }
 }
 } // namespace set_metadata_piece_helpers

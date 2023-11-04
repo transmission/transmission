@@ -22,7 +22,7 @@ class tr_magnet_metainfo
     friend struct MetainfoHandler;
 
 public:
-    bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
+    bool parseMagnet(std::string_view magnet_link, tr_error* error = nullptr);
 
     [[nodiscard]] std::string magnet() const;
 

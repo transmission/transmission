@@ -1312,16 +1312,15 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
     auto const filename = tr_pathbuf{ session->configDir(), "/blocklist.tmp"sv };
-    if (tr_error* error = nullptr; !tr_file_save(filename, content, &error))
+    if (auto error = tr_error{}; !tr_file_save(filename, content, &error))
     {
         tr_idle_function_done(
             data,
             fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
         return;
     }
 
@@ -2262,10 +2261,9 @@ char const* freeSpace(tr_session* /*session*/, tr_variant* args_in, tr_variant* 
 
     /* get the free space */
     auto const old_errno = errno;
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const capacity = tr_sys_path_get_capacity(path, &error);
-    char const* const err = error != nullptr ? tr_strerror(error->code) : nullptr;
-    tr_error_clear(&error);
+    char const* const err = error ? tr_strerror(error.code()) : nullptr;
     errno = old_errno;
 
     /* response */

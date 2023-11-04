@@ -114,7 +114,7 @@ public:
         std::string_view old_parent_in,
         std::string_view parent_in,
         std::string_view parent_name = "",
-        tr_error** error = nullptr) const;
+        tr_error* error = nullptr) const;
 
     using FileFunc = std::function<void(char const* filename)>;
     void remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func) const;

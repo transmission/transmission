@@ -324,16 +324,15 @@ void Blocklists::Blocklist::ensureLoaded() const
     }
 
     // get the file's size
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const file_info = tr_sys_path_get_info(bin_file_, 0, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", bin_file_),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
     if (!file_info)
     {
@@ -460,16 +459,15 @@ std::optional<Blocklists::Blocklist> Blocklists::Blocklist::saveNew(
     // make a copy of `external_file` for our own safekeeping
     auto const src_file = std::string{ std::data(bin_file), std::size(bin_file) - std::size(BinFileSuffix) };
     tr_sys_path_remove(src_file.c_str());
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const copied = tr_sys_path_copy(tr_pathbuf{ external_file }, src_file.c_str(), &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", src_file),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
     }
     if (!copied)
     {

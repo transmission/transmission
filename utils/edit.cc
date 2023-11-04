@@ -366,7 +366,7 @@ int tr_main(int argc, char* argv[])
         auto otop = serde.parse_file(filename);
         if (!otop)
         {
-            fmt::print("\tError reading file: {:s}\n", serde.error_->message);
+            fmt::print("\tError reading file: {:s}\n", serde.error_.message());
             continue;
         }
         auto& top = *otop;

@@ -632,7 +632,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         auto const info = handshake->mediator_->torrent(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
-        if ((error.code == ETIMEDOUT || error.code == ECONNREFUSED) && info)
+        if ((error.code() == ETIMEDOUT || error.code() == ECONNREFUSED) && info)
         {
             handshake->mediator_->set_utp_failed(info_hash, io->socket_address());
         }
@@ -657,7 +657,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         return;
     }
 
-    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
+    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message(), error.code()));
     handshake->done(false);
 }
 
