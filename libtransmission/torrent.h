@@ -1216,9 +1216,7 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
     return tor != nullptr && tor->session != nullptr;
 }
 
-/**
- * Tell the `tr_torrent` that it's gotten a block
- */
+// Tell the `tr_torrent` that it's gotten a block
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);

@@ -227,8 +227,8 @@ jobs:
         run: |
           if grep 'warning:' makelog; then exit 1; fi
 
-  macos-11:
-    runs-on: macos-11
+  macos-12:
+    runs-on: macos-12
     needs: [ what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
@@ -500,10 +500,10 @@ jobs:
           name: source-tarball
           path: obj/transmission*.tar.*
 
-  macos-11-from-tarball:
+  macos-12-from-tarball:
     needs: [ make-source-tarball, what-to-make ]
     if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-mac == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
       - name: Show Configuration
         run: |
