@@ -287,7 +287,7 @@ Application::Application(int& argc, char** argv)
     connect(session_.get(), &Session::sourceChanged, this, &Application::onSessionSourceChanged);
     connect(session_.get(), &Session::torrentsRemoved, model_.get(), &TorrentModel::removeTorrents);
     connect(session_.get(), &Session::torrentsUpdated, model_.get(), &TorrentModel::updateTorrents);
-    connect(watch_dir_.get(), &WatchDir::torrentFileAdded, this, qOverload<QString const&>(&Application::addTorrent));
+    connect(watch_dir_.get(), &WatchDir::torrentFileAdded, this, qOverload<QString const&>(&Application::addWatchdirTorrent));
 
     // init from preferences
     for (auto const key : { Prefs::DIR_WATCH })
@@ -345,9 +345,10 @@ Application::Application(int& argc, char** argv)
         dialog->show();
     }
 
+    // torrent files passed in on the command line
     for (QString const& filename : filenames)
     {
-        addTorrent(filename);
+        addTorrent(AddData{ filename });
     }
 
     InteropHelper::registerObject(this);
@@ -574,16 +575,27 @@ void Application::refreshTorrents()
 ****
 ***/
 
-void Application::addTorrent(QString const& addme) const
+void Application::addWatchdirTorrent(QString const& filename) const
 {
-    addTorrent(AddData(addme));
+    auto add_data = AddData{ filename };
+    auto const disposal = prefs_->getBool(Prefs::TRASH_ORIGINAL) ? AddData::FilenameDisposal::Delete :
+                                                                   AddData::FilenameDisposal::Rename;
+    add_data.setFileDisposal(disposal);
+    addTorrent(std::move(add_data));
 }
 
-void Application::addTorrent(AddData const& addme) const
+void Application::addTorrent(AddData addme) const
 {
     if (addme.type == addme.NONE)
     {
         return;
+    }
+
+    // if there's not already a disposal action set,
+    // then honor the `trash original` preference setting
+    if (!addme.fileDisposal() && prefs_->getBool(Prefs::TRASH_ORIGINAL))
+    {
+        addme.setFileDisposal(AddData::FilenameDisposal::Delete);
     }
 
     if (!prefs_->getBool(Prefs::OPTIONS_PROMPT))

@@ -16,6 +16,7 @@
 
 #include <libtransmission/tr-macros.h>
 
+#include "AddData.h"
 #include "FaviconCache.h"
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
@@ -47,8 +48,8 @@ public:
     FaviconCache& faviconCache();
 
 public slots:
-    void addTorrent(AddData const&) const;
-    void addTorrent(QString const&) const;
+    void addTorrent(AddData) const;
+    void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
     void consentGiven(int result) const;

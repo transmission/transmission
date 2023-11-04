@@ -297,7 +297,10 @@ void OptionsDialog::onAccepted()
         }
     }
 
-    session_.addTorrent(add_, &args, ui_.trashCheck->isChecked());
+    auto const disposal = ui_.trashCheck->isChecked() ? AddData::FilenameDisposal::Delete : AddData::FilenameDisposal::NoAction;
+    add_.setFileDisposal(disposal);
+
+    session_.addTorrent(add_, &args);
 
     deleteLater();
 }

@@ -992,7 +992,7 @@ void Session::setBlocklistSize(int64_t i)
     emit blocklistUpdated(i);
 }
 
-void Session::addTorrent(AddData add_me, tr_variant* args_dict, bool trash_original)
+void Session::addTorrent(AddData add_me, tr_variant* args_dict)
 {
     assert(tr_variantDictFind(args_dict, TR_KEY_filename) == nullptr);
     assert(tr_variantDictFind(args_dict, TR_KEY_metainfo) == nullptr);
@@ -1040,39 +1040,20 @@ void Session::addTorrent(AddData add_me, tr_variant* args_dict, bool trash_origi
         });
 
     q->add(
-        [this, add_me, trash_original](RpcResponse const& r)
+        [this, add_me](RpcResponse const& r)
         {
-            bool session_has_torrent = false;
-
             if (tr_variant* dup = nullptr; tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_added, &dup))
             {
-                session_has_torrent = true;
+                add_me.disposeSourceFile();
             }
             else if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_duplicate, &dup))
             {
-                session_has_torrent = true;
+                add_me.disposeSourceFile();
 
-                auto const hash = dictFind<QString>(dup, TR_KEY_hashString);
-                if (hash)
+                if (auto const hash = dictFind<QString>(dup, TR_KEY_hashString); hash)
                 {
                     duplicates_.try_emplace(add_me.readableShortName(), *hash);
                     duplicates_timer_.start(1000);
-                }
-            }
-
-            if (auto const& filename = add_me.filename;
-                session_has_torrent && !filename.isEmpty() && add_me.type == AddData::FILENAME)
-            {
-                auto file = QFile{ filename };
-
-                if (trash_original)
-                {
-                    file.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
-                    file.remove();
-                }
-                else
-                {
-                    file.rename(QStringLiteral("%1.added").arg(filename));
                 }
             }
         });
@@ -1115,8 +1096,7 @@ void Session::addTorrent(AddData add_me)
 {
     tr_variant args;
     tr_variantInitDict(&args, 3);
-
-    addTorrent(std::move(add_me), &args, prefs_.getBool(Prefs::TRASH_ORIGINAL));
+    addTorrent(std::move(add_me), &args);
 }
 
 void Session::addNewlyCreatedTorrent(QString const& filename, QString const& local_path)

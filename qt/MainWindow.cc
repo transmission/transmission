@@ -1316,9 +1316,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     if (auto const* const file_dialog = qobject_cast<QFileDialog const*>(sender()); file_dialog != nullptr)
     {
-        auto const* const b = file_dialog->findChild<QCheckBox const*>(show_options_checkbox_name_);
-
-        if (b != nullptr)
+        if (auto const* const b = file_dialog->findChild<QCheckBox const*>(show_options_checkbox_name_); b != nullptr)
         {
             show_options = b->isChecked();
         }
@@ -1326,7 +1324,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 
     for (QString const& filename : filenames)
     {
-        addTorrent(AddData(filename), show_options);
+        addTorrent(AddData{ filename }, show_options);
     }
 }
 
@@ -1595,7 +1593,7 @@ void MainWindow::dropEvent(QDropEvent* event)
                 key = url.toLocalFile();
             }
 
-            trApp->addTorrent(AddData(key));
+            trApp->addTorrent(AddData{ key });
         }
     }
 }
@@ -1626,7 +1624,7 @@ bool MainWindow::event(QEvent* e)
             if (!clipboard_processed_keys_.contains(key))
             {
                 clipboard_processed_keys_.append(key);
-                trApp->addTorrent(AddData(key));
+                trApp->addTorrent(AddData{ key });
             }
         }
     }
