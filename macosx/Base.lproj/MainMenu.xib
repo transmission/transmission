@@ -76,7 +76,7 @@
                                                                     </constraints>
                                                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="UpArrowTemplate" id="M11-HA-ONH"/>
                                                                 </imageView>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JAO-DI-vbm">
+                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JAO-DI-vbm">
                                                                     <rect key="frame" x="351" y="2" width="64" height="14"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="MR1-WF-Gcs"/>
@@ -87,7 +87,7 @@
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kLh-dT-fWl">
+                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kLh-dT-fWl">
                                                                     <rect key="frame" x="435" y="2" width="64" height="14"/>
                                                                     <constraints>
                                                                         <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="FLW-3y-3Ft"/>
@@ -98,7 +98,7 @@
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
-                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XfM-wG-Zxc">
+                                                                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XfM-wG-Zxc">
                                                                     <rect key="frame" x="28" y="2" width="311" height="14"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" title="Group Title" id="zIM-6D-jsa">
                                                                         <font key="font" metaFont="smallSystemBold"/>
@@ -154,7 +154,7 @@
                                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vYS-eL-CGb">
                                                                     <rect key="frame" x="72" y="44" width="41" height="15"/>
                                                                     <subviews>
-                                                                        <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gIX-h2-fIl">
+                                                                        <textField focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gIX-h2-fIl">
                                                                             <rect key="frame" x="-2" y="0.0" width="29" height="15"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingMiddle" title="Title" id="y9O-gd-sXA">
                                                                                 <font key="font" metaFont="cellTitle"/>
@@ -180,7 +180,7 @@
                                                                         <real value="3.4028234663852886e+38"/>
                                                                     </customSpacing>
                                                                 </stackView>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7sy-Kk-M9Y">
+                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7sy-Kk-M9Y">
                                                                     <rect key="frame" x="70" y="30" width="377" height="13"/>
                                                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Progress" id="oSz-TE-8jj">
                                                                         <font key="font" metaFont="system" size="10"/>
@@ -188,7 +188,7 @@
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J4v-0p-u4L">
+                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J4v-0p-u4L">
                                                                     <rect key="frame" x="70" y="1" width="377" height="13"/>
                                                                     <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Status" id="lmp-Y3-ZQO">
                                                                         <font key="font" metaFont="system" size="10"/>
@@ -202,17 +202,23 @@
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <outlet property="torrentCell" destination="7Ic-8y-f3v" id="BrY-70-Qul"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Rxb-qW-x6p" customClass="TorrentCellActionButton">
                                                                     <rect key="frame" x="25" y="23" width="16" height="16"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" constant="16" id="WLP-JK-i9A"/>
-                                                                        <constraint firstAttribute="height" constant="16" id="bMb-uB-fO6"/>
-                                                                    </constraints>
                                                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ActionHover" imagePosition="only" alignment="center" lineBreakMode="truncatingTail" state="on" imageScaling="proportionallyDown" inset="2" id="9Xz-qo-fuz">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="width" constant="16" id="WLP-JK-i9A"/>
+                                                                        <constraint firstAttribute="height" constant="16" id="bMb-uB-fO6"/>
+                                                                    </constraints>
+                                                                    <connections>
+                                                                        <outlet property="torrentCell" destination="7Ic-8y-f3v" id="sNJ-lh-B90"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <button horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="k5I-MN-hYk" customClass="TorrentCellRevealButton">
                                                                     <rect key="frame" x="483" y="15" width="14" height="14"/>
@@ -220,6 +226,9 @@
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <outlet property="torrentCell" destination="7Ic-8y-f3v" id="npT-CF-ee4"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="Ifq-ub-ay4">
                                                                     <rect key="frame" x="72" y="15" width="373" height="14"/>
@@ -289,19 +298,22 @@
                                                                 </imageView>
                                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="9Cg-Nh-Hcr" customClass="TorrentCellActionButton">
                                                                     <rect key="frame" x="18" y="3" width="16" height="16"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" constant="16" id="B01-Zu-gNh"/>
-                                                                        <constraint firstAttribute="height" constant="16" id="dNQ-J3-27z"/>
-                                                                    </constraints>
                                                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ActionHover" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="ejE-Yu-JNS">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="width" constant="16" id="B01-Zu-gNh"/>
+                                                                        <constraint firstAttribute="height" constant="16" id="dNQ-J3-27z"/>
+                                                                    </constraints>
+                                                                    <connections>
+                                                                        <outlet property="torrentCell" destination="ouH-H8-Otv" id="r2c-b8-jcH"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="250" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dPU-vz-fnz">
                                                                     <rect key="frame" x="54" y="4" width="41" height="15"/>
                                                                     <subviews>
-                                                                        <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nyW-bO-2kN">
+                                                                        <textField focusRingType="none" horizontalHuggingPriority="1000" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nyW-bO-2kN">
                                                                             <rect key="frame" x="-2" y="0.0" width="29" height="15"/>
                                                                             <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" title="Title" id="kbX-Av-eP4">
                                                                                 <font key="font" metaFont="cellTitle"/>
@@ -333,7 +345,7 @@
                                                                         <constraint firstAttribute="height" constant="18" id="UN3-pW-1Yw"/>
                                                                     </constraints>
                                                                 </customView>
-                                                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ExW-pe-aKm">
+                                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="ExW-pe-aKm">
                                                                     <rect key="frame" x="98" y="4" width="398" height="14"/>
                                                                     <textFieldCell key="cell" lineBreakMode="truncatingMiddle" allowsUndo="NO" alignment="right" title="Status String" id="Zmj-A9-NPf">
                                                                         <font key="font" metaFont="smallSystem"/>
@@ -343,25 +355,31 @@
                                                                 </textField>
                                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="bGq-Kc-jWE" customClass="TorrentCellControlButton">
                                                                     <rect key="frame" x="463" y="4" width="14" height="14"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="width" constant="14" id="hQW-cC-Lp7"/>
-                                                                        <constraint firstAttribute="height" constant="14" id="jWF-m2-n6g"/>
-                                                                    </constraints>
                                                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="ResumeOff" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="DmO-My-6OF">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="width" constant="14" id="hQW-cC-Lp7"/>
+                                                                        <constraint firstAttribute="height" constant="14" id="jWF-m2-n6g"/>
+                                                                    </constraints>
+                                                                    <connections>
+                                                                        <outlet property="torrentCell" destination="ouH-H8-Otv" id="1mw-p3-MDP"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <button translatesAutoresizingMaskIntoConstraints="NO" id="Hyt-Uv-vDm" customClass="TorrentCellRevealButton">
                                                                     <rect key="frame" x="480" y="4" width="14" height="14"/>
-                                                                    <constraints>
-                                                                        <constraint firstAttribute="height" constant="14" id="CYn-n4-Daq"/>
-                                                                        <constraint firstAttribute="width" constant="14" id="P9R-Cw-RJF"/>
-                                                                    </constraints>
                                                                     <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="RevealOff" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="dWx-5q-ABk">
                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <constraints>
+                                                                        <constraint firstAttribute="height" constant="14" id="CYn-n4-Daq"/>
+                                                                        <constraint firstAttribute="width" constant="14" id="P9R-Cw-RJF"/>
+                                                                    </constraints>
+                                                                    <connections>
+                                                                        <outlet property="torrentCell" destination="ouH-H8-Otv" id="zlt-Qk-E34"/>
+                                                                    </connections>
                                                                 </button>
                                                             </subviews>
                                                             <constraints>
@@ -428,7 +446,7 @@
                             <customView verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="JCm-xb-Dpw">
                                 <rect key="frame" x="0.0" y="0.0" width="524" height="24"/>
                                 <subviews>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2700">
+                                    <textField focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2700">
                                         <rect key="frame" x="258" y="5" width="8" height="14"/>
                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" usesSingleLineMode="YES" id="3049">
                                             <font key="font" metaFont="smallSystem"/>
