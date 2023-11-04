@@ -12,15 +12,10 @@
 #include <atomic>
 #include <cstddef> // size_t
 #include <string>
-#include <string_view>
 #include <utility> // for std::make_pair()
 
-#include "transmission.h"
-
-#include "error.h"
-#include "net.h"
-#include "tr-assert.h"
-#include "tr-buffer.h"
+#include "libtransmission/net.h"
+#include "libtransmission/tr-buffer.h"
 
 struct UTPSocket;
 struct tr_session;

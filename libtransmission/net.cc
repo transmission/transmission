@@ -12,8 +12,6 @@
 #include <string_view>
 #include <utility> // std::pair
 
-#include <sys/types.h>
-
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
@@ -24,15 +22,13 @@
 
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
-#include "libtransmission/tr-utp.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

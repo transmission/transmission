@@ -17,9 +17,9 @@
 
 #include <small/vector.hpp>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "block-info.h"
+#include "libtransmission/block-info.h"
 
 class tr_torrents;
 struct tr_torrent;

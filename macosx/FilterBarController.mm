@@ -140,11 +140,6 @@ typedef NS_ENUM(NSInteger, FilterTypeTag) {
     self.fSearchField.delegate = self;
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)setFilter:(id)sender
 {
     NSString* oldFilterType = [NSUserDefaults.standardUserDefaults stringForKey:@"Filter"];

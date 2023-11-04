@@ -25,7 +25,10 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/watchdir.h"
 #include "libtransmission/watchdir-base.h"
+
+struct event_base;
 
 namespace libtransmission
 {

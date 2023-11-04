@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
+#include <cstdio> // remove, rename
 #include <cstdlib> // mkdtemp, mkstemp, realpath
 #include <optional>
 #include <string_view>
@@ -50,11 +51,8 @@
 
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
-#include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h" // TR_UCLIBC_CHECK_VERSION
 #include "libtransmission/tr-strbuf.h"

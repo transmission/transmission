@@ -11,13 +11,10 @@
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
-#include <libtransmission/transmission.h>
-
 #include <libtransmission/announcer-common.h>
 #include <libtransmission/net.h>
 
 #include "gtest/gtest.h"
-#include "test-fixtures.h"
 
 using AnnouncerTest = ::testing::Test;
 

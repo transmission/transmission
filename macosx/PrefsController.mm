@@ -188,8 +188,6 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
     [_fPortStatusTimer invalidate];
     if (_fPortChecker)
     {

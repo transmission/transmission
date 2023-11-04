@@ -9,7 +9,6 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <optional>
-#include <numeric>
 #include <string>
 #include <string_view>
 #include <type_traits> // std::is_same_v

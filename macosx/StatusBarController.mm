@@ -73,11 +73,6 @@ typedef NS_ENUM(NSUInteger, StatusTag) {
                                              object:nil];
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)updateWithDownload:(CGFloat)dlRate upload:(CGFloat)ulRate
 {
     //set rates

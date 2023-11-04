@@ -8,11 +8,11 @@
 #include <cassert>
 #include <cerrno>
 #include <cmath> // lrint()
-#include <cctype> // isspace()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <string>
 #include <string_view>
+#include <vector>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 

@@ -5,8 +5,10 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cstdint>
+#include <cstddef> // std::byte
+#include <cstdint> // uint16_t
 #include <cstring>
+#include <ctime> // time_t
 #include <functional>
 #include <memory>
 #include <optional>
@@ -15,7 +17,6 @@
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
-#include <ctime>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
 #endif
@@ -37,7 +38,7 @@
 
 using namespace std::literals;
 
-// Code in this namespace Copyright © 2022 Mnemosyne LLC.
+// Code in this namespace Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only), MIT (SPDX: MIT),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.

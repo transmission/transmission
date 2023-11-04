@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-#include "utils.h"
+#include "libtransmission/utils.h"
 
 // macOS implementation of tr_strv_convert_utf8() that autodetects the encoding.
 // This replaces the generic implementation of the function in utils.cc.

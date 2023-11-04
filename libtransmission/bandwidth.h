@@ -16,9 +16,9 @@
 #include <utility> // for std::move()
 #include <vector>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "tr-assert.h"
+#include "libtransmission/tr-assert.h"
 
 class tr_peerIo;
 

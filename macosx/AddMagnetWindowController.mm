@@ -106,11 +106,6 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
     }
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (void)setDestination:(id)sender
 {
     NSOpenPanel* panel = [NSOpenPanel openPanel];

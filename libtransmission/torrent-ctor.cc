@@ -3,9 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cerrno> // EINVAL
 #include <cstddef> // size_t
-#include <cstdint> //uint16_t
+#include <cstdint> // uint16_t
 #include <optional>
 #include <string>
 #include <string_view>
@@ -15,7 +16,6 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/error.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/torrent.h"

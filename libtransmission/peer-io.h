@@ -22,7 +22,6 @@
 
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h"
-#include "libtransmission/net.h" // tr_address
 #include "libtransmission/peer-mse.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/tr-buffer.h"
@@ -32,6 +31,7 @@
 struct struct_utp_context;
 struct tr_error;
 struct tr_session;
+struct tr_socket_address;
 
 namespace libtransmission::test
 {

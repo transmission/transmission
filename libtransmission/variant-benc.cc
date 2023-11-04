@@ -9,9 +9,10 @@
 #include <cstddef> // size_t, std::byte
 #include <cstdint> // int64_t
 #include <deque>
+#include <optional>
 #include <string>
 #include <string_view>
-#include <optional>
+#include <utility>
 
 #include <fmt/core.h>
 #include <fmt/compile.h>
@@ -23,8 +24,6 @@
 #include "libtransmission/tr-buffer.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
-
-struct tr_error;
 
 using namespace std::literals;
 

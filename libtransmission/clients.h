@@ -11,7 +11,7 @@
 
 #include <cstddef> // size_t
 
-#include "tr-macros.h" // tr_peer_id_t
+#include "libtransmission/tr-macros.h" // tr_peer_id_t
 
 /**
  * @brief parse a peer-id into a human-readable client name and version number

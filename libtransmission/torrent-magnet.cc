@@ -9,7 +9,9 @@
 #include <ctime>
 #include <deque>
 #include <fstream>
+#include <memory>
 #include <string>
+#include <utility> // std::move
 #include <vector>
 
 #include <fmt/core.h>

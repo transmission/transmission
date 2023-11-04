@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <fmt/core.h>
 
@@ -17,7 +18,6 @@
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"

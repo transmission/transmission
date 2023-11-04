@@ -8,7 +8,6 @@
 #include <vector>
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/session.h>
 #include <libtransmission/session-alt-speeds.h>
 
 #include "gtest/gtest.h"

@@ -168,11 +168,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
     };
 }
 
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
 - (NSString*)description
 {
     return [@"Torrent: " stringByAppendingString:self.name];
