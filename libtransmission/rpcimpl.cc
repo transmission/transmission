@@ -809,8 +809,7 @@ char const* torrentGet(
     }
 
     auto keys = std::vector<tr_quark>{};
-    auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields);
-    if (fields_vec != nullptr)
+    if (auto const* const fields_vec = args_in.find_if<tr_variant::Vector>(TR_KEY_fields); fields_vec != nullptr)
     {
         auto const n_fields = std::size(*fields_vec);
         keys.reserve(n_fields);
@@ -848,6 +847,8 @@ char const* torrentGet(
     {
         torrents_vec.emplace_back(make_torrent_info(tor, format, std::data(keys), std::size(keys)));
     }
+
+    args_out.try_emplace(TR_KEY_torrents, std::move(torrents_vec));
 
     return nullptr; // no error message
 }
