@@ -274,6 +274,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error* error) cons
         if (error != nullptr)
         {
             *error = std::move(serde.error_);
+            serde.error_ = {};
         }
 
         return false;
