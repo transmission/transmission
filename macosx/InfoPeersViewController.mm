@@ -228,10 +228,6 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
                 stringByAppendingFormat:@"\n%@", [self connectedTextFrom:tracker:incoming:cache:lpd:pex:dht:ltep]];
         }
 
-        connectedText = [[connectedText stringByAppendingString:@"\n"]
-            stringByAppendingFormat:NSLocalizedString(@"(known: %@)", "Inspector -> Peers tab -> peers"),
-                                    [self connectedTextFrom:knownTracker:knownIncoming:knownCache:knownLpd:knownPex:knownDht:knownLtep]];
-
         self.fConnectedPeersField.stringValue = connectedText;
     }
     else
@@ -246,16 +242,25 @@ static NSString* const kWebSeedAnimationId = @"webSeed";
             notActiveString = NSLocalizedString(@"Transfers Not Active", "Inspector -> Peers tab -> peers");
         }
 
-        notActiveString = [[notActiveString stringByAppendingString:@"\n"]
-            stringByAppendingFormat:NSLocalizedString(@"(known: %@)", "Inspector -> Peers tab -> peers"),
-                                    [self connectedTextFrom:knownTracker:knownIncoming:knownCache:knownLpd:knownPex:knownDht:knownLtep]];
-
         self.fConnectedPeersField.stringValue = notActiveString;
+    }
+    auto totalKnown = knownTracker + knownIncoming + knownCache + knownLpd + knownPex + knownDht + knownLtep;
+    NSString* knownText = [self connectedTextFrom:knownTracker:knownIncoming:knownCache:knownLpd:knownPex:knownDht:knownLtep];
+    if (totalKnown <= 1)
+    {
+        self.fConnectedPeersField.toolTip = [NSLocalizedString(@"Known:", "Inspector -> Peers tab -> peers")
+            stringByAppendingFormat:@" %@", totalKnown > 0 ? knownText : @"0"];
+    }
+    else
+    {
+        self.fConnectedPeersField.toolTip = [[NSString
+            localizedStringWithFormat:NSLocalizedString(@"%lu Known:", "Inspector -> Peers tab -> peers"), totalKnown]
+            stringByAppendingFormat:@" %@", knownText];
     }
 }
 
-- (NSString*)connectedTextFrom:(NSUInteger)
-                       tracker:(NSUInteger)incoming
+- (NSString*)connectedTextFrom:(NSUInteger)tracker //
+                              :(NSUInteger)incoming
                               :(NSUInteger)cache
                               :(NSUInteger)lpd
                               :(NSUInteger)pex
