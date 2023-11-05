@@ -45,13 +45,13 @@ struct Config
     template<typename UnitsEnum>
     struct Units
     {
-        using DisplayNames = std::array<std::string_view, 5>;
-
-        Units(Base base, DisplayNames display_names)
-            : display_names_{ display_names }
-            , base_{ base }
+        template<typename... Names>
+        Units(Base base, Names... names)
         {
             set_base(base);
+
+            auto idx = size_t{ 0U };
+            (set_name(idx++, names), ...);
         }
 
         [[nodiscard]] constexpr auto base() const noexcept
@@ -59,9 +59,9 @@ struct Config
             return base_;
         }
 
-        [[nodiscard]] constexpr auto const& display_name(int units) const noexcept
+        [[nodiscard]] constexpr auto display_name(int units) const noexcept
         {
-            return display_names_[units];
+            return std::string_view{ std::data(display_names_[units]) };
         }
 
         [[nodiscard]] constexpr auto multiplier(UnitsEnum multiplier) const noexcept
@@ -82,7 +82,12 @@ struct Config
             }
         }
 
-        std::array<std::string_view, 5> display_names_;
+        void set_name(size_t idx, std::string_view name)
+        {
+            *fmt::format_to_n(std::data(display_names_[idx]), std::size(display_names_[idx]) - 1, "{:s}", name).out = '\0';
+        }
+
+        std::array<std::array<char, 32>, 5> display_names_ = {};
         std::array<uint64_t, 5> multipliers_;
         Base base_;
     };

@@ -670,9 +670,9 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 namespace libtransmission::Values
 {
 
-auto Config::Memory = Config::Units<MemoryUnits>{ Base::Kibi, { "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv } };
-auto Config::Speed = Config::Units<SpeedUnits>{ Base::Kilo, { "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv } };
-auto Config::Storage = Config::Units<StorageUnits>{ Base::Kilo, { "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv } };
+auto Config::Memory = Config::Units<MemoryUnits>{ Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+auto Config::Speed = Config::Units<SpeedUnits>{ Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+auto Config::Storage = Config::Units<StorageUnits>{ Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
 } // namespace libtransmission::Values
 
@@ -776,7 +776,7 @@ void values_init(
     char const* tb)
 {
     auto const base = kilo == 1000U ? Values::Kilo : Values::Kibi;
-    setme = libtransmission::Values::Config::Units<UnitsEnum>{ base, { b, kb, mb, gb, tb } };
+    setme = libtransmission::Values::Config::Units<UnitsEnum>{ base, b, kb, mb, gb, tb };
 }
 } // namespace formatter_impl
 } // namespace
