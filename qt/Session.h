@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -93,7 +93,7 @@ public:
 
     void torrentSetLocation(torrent_ids_t const& torrent_ids, QString const& path, bool do_move);
     void torrentRenamePath(torrent_ids_t const& torrent_ids, QString const& oldpath, QString const& newname);
-    void addTorrent(AddData add_me, tr_variant* args_dict, bool trash_original);
+    void addTorrent(AddData add_me, tr_variant* args_dict);
     void initTorrents(torrent_ids_t const& ids = {});
     void pauseTorrents(torrent_ids_t const& torrent_ids = {});
     void startTorrents(torrent_ids_t const& torrent_ids = {});

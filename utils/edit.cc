@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -366,7 +366,7 @@ int tr_main(int argc, char* argv[])
         auto otop = serde.parse_file(filename);
         if (!otop)
         {
-            fmt::print("\tError reading file: {:s}\n", serde.error_->message);
+            fmt::print("\tError reading file: {:s}\n", serde.error_.message());
             continue;
         }
         auto& top = *otop;

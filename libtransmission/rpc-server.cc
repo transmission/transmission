@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -278,10 +278,9 @@ void serve_file(struct evhttp_request* req, tr_rpc_server const* server, std::st
 
     auto content = std::vector<char>{};
 
-    if (tr_error* error = nullptr; !tr_file_read(filename, content, &error))
+    if (auto error = tr_error{}; !tr_file_read(filename, content, &error))
     {
-        send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error->message).c_str());
-        tr_error_free(error);
+        send_simple_response(req, HTTP_NOTFOUND, fmt::format("{} ({})", filename, error.message()).c_str());
         return;
     }
 

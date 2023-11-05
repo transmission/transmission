@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -1312,16 +1312,15 @@ void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
     auto const filename = tr_pathbuf{ session->configDir(), "/blocklist.tmp"sv };
-    if (tr_error* error = nullptr; !tr_file_save(filename, content, &error))
+    if (auto error = tr_error{}; !tr_file_save(filename, content, &error))
     {
         tr_idle_function_done(
             data,
             fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-        tr_error_clear(&error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())));
         return;
     }
 
@@ -1715,7 +1714,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_blocklist_enabled, &val))
     {
-        session->useBlocklist(val);
+        session->set_blocklist_enabled(val);
     }
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_blocklist_url, &sv))
@@ -1999,7 +1998,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_blocklist_enabled:
-        tr_variantDictAddBool(d, key, s->useBlocklist());
+        tr_variantDictAddBool(d, key, s->blocklist_enabled());
         break;
 
     case TR_KEY_blocklist_url:
@@ -2262,10 +2261,9 @@ char const* freeSpace(tr_session* /*session*/, tr_variant* args_in, tr_variant* 
 
     /* get the free space */
     auto const old_errno = errno;
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const capacity = tr_sys_path_get_capacity(path, &error);
-    char const* const err = error != nullptr ? tr_strerror(error->code) : nullptr;
-    tr_error_clear(&error);
+    char const* const err = error ? tr_strerror(error.code()) : nullptr;
     errno = old_errno;
 
     /* response */

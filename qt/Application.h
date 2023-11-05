@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -18,6 +18,7 @@
 #include <libtransmission/tr-macros.h>
 #include <libtransmission/favicon-cache.h>
 
+#include "AddData.h"
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
 
@@ -71,8 +72,8 @@ signals:
     void faviconsChanged();
 
 public slots:
-    void addTorrent(AddData const&) const;
-    void addTorrent(QString const&) const;
+    void addTorrent(AddData) const;
+    void addWatchdirTorrent(QString const& filename) const;
 
 private slots:
     void consentGiven(int result) const;

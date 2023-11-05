@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -19,6 +19,7 @@
 
 #include "libtransmission/transmission.h" // tr_block_span_t (ptr only)
 
+#include "libtransmission/blocklist.h"
 #include "libtransmission/handshake.h"
 #include "libtransmission/net.h" /* tr_address */
 #include "libtransmission/tr-assert.h"
@@ -243,7 +244,15 @@ public:
 
     // ---
 
-    [[nodiscard]] bool is_blocklisted(tr_session const* session) const;
+    [[nodiscard]] bool is_blocklisted(libtransmission::Blocklists const& blocklist) const
+    {
+        if (!blocklisted_.has_value())
+        {
+            blocklisted_ = blocklist.contains(listen_address());
+        }
+
+        return *blocklisted_;
+    }
 
     void set_blocklisted_dirty()
     {

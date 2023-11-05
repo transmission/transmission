@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -110,11 +110,6 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
 
     return self;
-}
-
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)awakeFromNib
@@ -659,8 +654,8 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
     }
     NSPasteboard* pasteBoard = NSPasteboard.generalPasteboard;
     NSString* links = [[selectedTorrents valueForKeyPath:@"magnetLink"] componentsJoinedByString:@"\n"];
-    [pasteBoard declareTypes:@[ NSStringPboardType ] owner:nil];
-    [pasteBoard setString:links forType:NSStringPboardType];
+    [pasteBoard declareTypes:@[ NSPasteboardTypeString ] owner:nil];
+    [pasteBoard setString:links forType:NSPasteboardTypeString];
 }
 
 - (void)paste:(id)sender
@@ -706,7 +701,7 @@ static NSTimeInterval const kToggleProgressSeconds = 0.175;
 
     if (action == @selector(paste:))
     {
-        if ([NSPasteboard.generalPasteboard.types containsObject:NSURLPboardType])
+        if ([NSPasteboard.generalPasteboard.types containsObject:NSPasteboardTypeURL])
         {
             return YES;
         }

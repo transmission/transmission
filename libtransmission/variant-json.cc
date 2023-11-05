@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -239,13 +239,12 @@ std::optional<tr_variant> tr_variant_serde::parse_json(std::string_view input)
 
     if (auto err_code = reader.GetParseErrorCode(); err_code == rapidjson::kParseErrorDocumentEmpty)
     {
-        tr_error_set(&error_, EINVAL, "No content");
+        error_.set(EINVAL, "No content");
     }
     else
     {
         auto const err_offset = reader.GetErrorOffset();
-        tr_error_set(
-            &error_,
+        error_.set(
             EILSEQ,
             fmt::format(
                 _("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"),

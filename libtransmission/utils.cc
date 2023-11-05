@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -17,9 +17,11 @@
 #include <locale>
 #include <optional>
 #include <set>
+#include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #ifdef _WIN32
@@ -91,54 +93,56 @@ std::optional<std::locale> tr_locale_set_global(std::locale const& locale) noexc
 
 // ---
 
-bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error** error)
+bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_error* error)
 {
     auto const szfilename = tr_pathbuf{ filename };
 
     /* try to stat the file */
-    tr_error* my_error = nullptr;
-    auto const info = tr_sys_path_get_info(szfilename, 0, &my_error);
-    if (my_error != nullptr)
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
+
+    auto const info = tr_sys_path_get_info(szfilename, 0, error);
+    if (*error)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_propagate(error, &my_error);
+            fmt::arg("error", error->message()),
+            fmt::arg("error_code", error->code())));
         return false;
     }
 
     if (!info || !info->isFile())
     {
         tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", filename)));
-        tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
+        error->set(TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
 
     /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(szfilename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_propagate(error, &my_error);
+            fmt::arg("error", error->message()),
+            fmt::arg("error_code", error->code())));
         return false;
     }
 
     contents.resize(info->size);
-    if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, &my_error))
+    if (!tr_sys_file_read(fd, std::data(contents), info->size, nullptr, error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
+            fmt::arg("error", error->message()),
+            fmt::arg("error_code", error->code())));
         tr_sys_file_close(fd);
-        tr_error_propagate(error, &my_error);
         return false;
     }
 
@@ -146,7 +150,7 @@ bool tr_file_read(std::string_view filename, std::vector<char>& contents, tr_err
     return true;
 }
 
-bool tr_file_save(std::string_view filename, std::string_view contents, tr_error** error)
+bool tr_file_save(std::string_view filename, std::string_view contents, tr_error* error)
 {
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
@@ -559,21 +563,27 @@ std::string tr_strratio(double ratio, char const* infinity)
 
 // ---
 
-bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
+bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_error* error)
 {
     auto const oldpath = tr_pathbuf{ oldpath_in };
     auto const newpath = tr_pathbuf{ newpath_in };
+
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
 
     // make sure the old file exists
     auto const info = tr_sys_path_get_info(oldpath, 0, error);
     if (!info)
     {
-        tr_error_prefix(error, "Unable to get information on old file: ");
+        error->prefix_message("Unable to get information on old file: ");
         return false;
     }
     if (!info->isFile())
     {
-        tr_error_set(error, TR_ERROR_EINVAL, "Old path does not point to a file."sv);
+        error->set(TR_ERROR_EINVAL, "Old path does not point to a file."sv);
         return false;
     }
 
@@ -582,7 +592,7 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
     newdir.popdir();
     if (!tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
-        tr_error_prefix(error, "Unable to create directory for new file: ");
+        error->prefix_message("Unable to create directory for new file: ");
         return false;
     }
 
@@ -595,18 +605,17 @@ bool tr_file_move(std::string_view oldpath_in, std::string_view newpath_in, tr_e
     /* Otherwise, copy the file. */
     if (!tr_sys_path_copy(oldpath, newpath, error))
     {
-        tr_error_prefix(error, "Unable to copy: ");
+        error->prefix_message("Unable to copy: ");
         return false;
     }
 
-    if (tr_error* my_error = nullptr; !tr_sys_path_remove(oldpath, &my_error))
+    if (auto log_error = tr_error{}; !tr_sys_path_remove(oldpath, &log_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't remove '{path}': {error} ({error_code})"),
             fmt::arg("path", oldpath),
-            fmt::arg("error", my_error->message),
-            fmt::arg("error_code", my_error->code)));
-        tr_error_free(my_error);
+            fmt::arg("error", log_error.message()),
+            fmt::arg("error_code", log_error.code())));
     }
 
     return true;

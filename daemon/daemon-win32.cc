@@ -1,4 +1,4 @@
-// This file Copyright © 2015-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -34,10 +34,10 @@ static DWORD current_state = SERVICE_STOPPED;
 static HANDLE service_thread = nullptr;
 static HANDLE service_stop_thread = nullptr;
 
-static void set_system_error(tr_error** error, DWORD code, char const* message)
+static void set_system_error(tr_error& error, DWORD code, char const* message)
 {
     auto const system_message = tr_win32_format_message(code);
-    tr_error_set(error, code, fmt::format(FMT_STRING("{:s} ({:#08x}): {:s})"), message, code, system_message));
+    error.set(code, fmt::format(FMT_STRING("{:s} ({:#08x}): {:s})"), message, code, system_message));
 }
 
 static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
@@ -209,7 +209,7 @@ void tr_daemon::cleanup_signals([[maybe_unused]] struct event* sig_ev) const
 {
 }
 
-bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error** error)
+bool tr_daemon::spawn(bool foreground, int* exit_code, tr_error& error)
 {
     daemon = this;
 

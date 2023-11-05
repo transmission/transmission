@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -297,7 +297,10 @@ void OptionsDialog::onAccepted()
         }
     }
 
-    session_.addTorrent(add_, &args, ui_.trashCheck->isChecked());
+    auto const disposal = ui_.trashCheck->isChecked() ? AddData::FilenameDisposal::Delete : AddData::FilenameDisposal::NoAction;
+    add_.setFileDisposal(disposal);
+
+    session_.addTorrent(add_, &args);
 
     deleteLater();
 }

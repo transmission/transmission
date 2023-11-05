@@ -1,14 +1,17 @@
-// This file Copyright © 2017-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
+
+#include <algorithm> // std::min
+#include <cerrno>
 
 #include <fmt/core.h>
 
 #include <libutp/utp.h>
 
-#include "libtransmission/transmission.h"
-
+#include "libtransmission/error.h"
+#include "libtransmission/log.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/net.h"
 #include "libtransmission/session.h"
@@ -68,7 +71,7 @@ void tr_peer_socket::close()
     handle = {};
 }
 
-size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) const
+size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error* error) const
 {
     if (max == size_t{})
     {
@@ -95,9 +98,9 @@ size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) cons
             return static_cast<size_t>(n_written);
         }
 
-        if (n_written < 0 && error_code != 0)
+        if (error != nullptr && n_written < 0 && error_code != 0)
         {
-            tr_error_set_from_errno(error, error_code);
+            error->set_from_errno(error_code);
         }
     }
 #endif
@@ -105,7 +108,7 @@ size_t tr_peer_socket::try_write(OutBuf& buf, size_t max, tr_error** error) cons
     return {};
 }
 
-size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool buf_is_empty, tr_error** error) const
+size_t tr_peer_socket::try_read(InBuf& buf, size_t max, [[maybe_unused]] bool buf_is_empty, tr_error* error) const
 {
     if (max == size_t{})
     {

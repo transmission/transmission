@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -76,7 +76,7 @@ void renameCallback(tr_torrent* /*torrent*/, char const* oldPathCharString, char
     }
 }
 
-bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
+bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
     if (filename == NULL)
     {
@@ -88,7 +88,7 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         NSError* localError;
         if (![Torrent trashFile:@(filename) error:&localError])
         {
-            tr_error_set(error, localError.code, localError.description.UTF8String);
+            error->set(localError.code, localError.description.UTF8String);
             return false;
         }
     }
@@ -166,11 +166,6 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error** error)
         @"GroupValue" : @(self.groupValue),
         @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding)
     };
-}
-
-- (void)dealloc
-{
-    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (NSString*)description

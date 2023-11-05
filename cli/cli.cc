@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -245,12 +245,14 @@ int tr_main(int argc, char* argv[])
 
         if (!tr_sys_path_exists(sz_download_dir))
         {
-            tr_error* error = nullptr;
-
-            if (!tr_sys_dir_create(sz_download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+            if (auto error = tr_error{}; !tr_sys_dir_create(sz_download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error) && error)
             {
-                fprintf(stderr, "Unable to create download directory \"%s\": %s\n", sz_download_dir.c_str(), error->message);
-                tr_error_free(error);
+                auto const errmsg = fmt::format(
+                    "Couldn't create '{path}': {error} ({error_code})",
+                    fmt::arg("path", sz_download_dir),
+                    fmt::arg("error", error.message()),
+                    fmt::arg("error_code", error.code()));
+                fmt::print(stderr, "{:s}\n", errmsg);
                 return EXIT_FAILURE;
             }
         }

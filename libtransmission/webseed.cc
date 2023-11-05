@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -13,7 +13,6 @@
 #include <string>
 #include <string_view>
 #include <utility>
-#include <vector>
 
 #include <event2/buffer.h>
 
@@ -32,17 +31,19 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"
 #include "libtransmission/webseed.h"
 
+struct evbuffer;
+
 using namespace std::literals;
 
 namespace
 {
-
 class tr_webseed;
 
 void on_idle(tr_webseed* w);

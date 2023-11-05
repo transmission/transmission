@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -44,7 +44,7 @@ typedef NS_ENUM(NSUInteger, TrackerSegmentTag) {
 
 @property(nonatomic, readonly) std::shared_ptr<tr_metainfo_builder> fBuilder;
 @property(nonatomic, readonly) NSURL* fPath;
-@property(nonatomic) std::shared_future<tr_error*> fFuture;
+@property(nonatomic) std::shared_future<tr_error> fFuture;
 @property(nonatomic) NSURL* fLocation; // path to new torrent file
 @property(nonatomic) NSMutableArray<NSString*>* fTrackers;
 
@@ -667,13 +667,13 @@ NSMutableSet* creatorWindowControllerSet = nil;
     [self.fTimer invalidate];
     self.fTimer = nil;
 
-    tr_error* error = self.fFuture.get();
-    if (error == nullptr)
+    auto error = self.fFuture.get();
+    if (!error)
     {
         self.fBuilder->save(self.fLocation.path.UTF8String, &error);
     }
 
-    if (error != nullptr)
+    if (error)
     {
         auto* const alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> failed -> button")];
@@ -681,11 +681,11 @@ NSMutableSet* creatorWindowControllerSet = nil;
                                                        self.fLocation.lastPathComponent];
         alert.alertStyle = NSAlertStyleWarning;
 
-        alert.informativeText = [NSString stringWithFormat:@"%s (%d)", error->message, error->code];
+        alert.informativeText = [NSString
+            stringWithFormat:@"%.*s (%d)", static_cast<int>(std::size(error.message())), std::data(error.message()), error.code()];
         [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse /*returnCode*/) {
             [self.window close];
         }];
-        tr_error_free(error);
     }
     else
     {

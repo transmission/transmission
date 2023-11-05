@@ -8,11 +8,11 @@
 #include <cassert>
 #include <cerrno>
 #include <cmath> // lrint()
-#include <cctype> // isspace()
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <string>
 #include <string_view>
+#include <vector>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -420,8 +420,8 @@ TEST_F(VariantTest, stackSmash)
     auto serde = tr_variant_serde::benc();
     auto var = serde.inplace().parse(in);
     EXPECT_FALSE(var.has_value());
-    EXPECT_NE(nullptr, serde.error_);
-    EXPECT_EQ(E2BIG, serde.error_ != nullptr ? serde.error_->code : 0);
+    EXPECT_TRUE(serde.error_);
+    EXPECT_EQ(E2BIG, serde.error_.code());
 }
 
 TEST_F(VariantTest, boolAndIntRecast)

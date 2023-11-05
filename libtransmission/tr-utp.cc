@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -9,16 +9,12 @@
 
 #include <libutp/utp.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/crypto-utils.h" // tr_rand_int()
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
-#include "libtransmission/peer-mgr.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
-#include "libtransmission/timer.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 

@@ -16,6 +16,7 @@
 #include <libtransmission/crypto-utils.h> // tr_rand_obj()
 #include <libtransmission/net.h>
 #include <libtransmission/session.h>
+#include <libtransmission/timer.h>
 #include <libtransmission/tr-lpd.h>
 #include <libtransmission/utils.h>
 

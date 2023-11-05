@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -12,8 +12,6 @@
 #include <string_view>
 #include <utility> // std::pair
 
-#include <sys/types.h>
-
 #ifdef _WIN32
 #include <ws2tcpip.h>
 #else
@@ -24,15 +22,13 @@
 
 #include <fmt/core.h>
 
-#include "libtransmission/transmission.h"
-
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
-#include "libtransmission/tr-utp.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

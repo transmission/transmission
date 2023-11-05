@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -176,8 +176,6 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)dealloc
 {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
     [_fTimer invalidate];
 }
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -850,14 +850,9 @@ void tr_variantMergeDicts(tr_variant* const tgt, tr_variant const* const src)
 
 // ---
 
-tr_variant_serde::~tr_variant_serde()
-{
-    tr_error_clear(&error_);
-}
-
 std::optional<tr_variant> tr_variant_serde::parse(std::string_view input)
 {
-    tr_error_clear(&error_);
+    error_ = {};
     return type_ == Type::Json ? parse_json(input) : parse_benc(input);
 }
 
@@ -883,13 +878,13 @@ bool tr_variant_serde::to_file(tr_variant const& var, std::string_view filename)
 {
     tr_file_save(filename, to_string(var), &error_);
 
-    if (error_ != nullptr)
+    if (error_)
     {
         tr_logAddError(fmt::format(
             _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("error", error_->message),
-            fmt::arg("error_code", error_->code)));
+            fmt::arg("error", error_.message()),
+            fmt::arg("error_code", error_.code())));
         return false;
     }
 

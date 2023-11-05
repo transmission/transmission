@@ -1,4 +1,4 @@
-// This file Copyright 2021-2022 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -22,7 +22,7 @@ class tr_magnet_metainfo
     friend struct MetainfoHandler;
 
 public:
-    bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
+    bool parseMagnet(std::string_view magnet_link, tr_error* error = nullptr);
 
     [[nodiscard]] std::string magnet() const;
 

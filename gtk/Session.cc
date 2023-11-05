@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
@@ -911,7 +911,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
         tr_torrentRemove(
             &torrent->get_underlying(),
             delete_files,
-            [](char const* filename, void* /*user_data*/, tr_error** error)
+            [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr);
     }

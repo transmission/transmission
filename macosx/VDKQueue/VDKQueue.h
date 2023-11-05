@@ -1,5 +1,5 @@
 //    VDKQueue.h
-//  Copyright © 2017-2022 Transmission authors and contributors.
+//  Copyright © Transmission authors and contributors.
 //
 //  Based on VDKQueue (https://github.com/bdkjones/VDKQueue) which was created and copyrighted by Bryan D K Jones on 28 March 2012.
 //  Based on UKKQueue (https://github.com/uliwitness/UKFileWatcher) which was created and copyrighted by Uli Kusterer on 21 Dec 2003.
