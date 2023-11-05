@@ -54,6 +54,7 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/values.h"
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
@@ -665,6 +666,15 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 }
 
 // ---
+
+namespace libtransmission::Values
+{
+
+auto Config::Memory = Config::Units<MemoryUnits>{ Base::Kibi, { "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv } };
+auto Config::Speed = Config::Units<SpeedUnits>{ Base::Kilo, { "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv } };
+auto Config::Storage = Config::Units<StorageUnits>{ Base::Kilo, { "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv } };
+
+} // namespace libtransmission::Values
 
 namespace
 {
