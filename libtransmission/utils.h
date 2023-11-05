@@ -313,8 +313,6 @@ extern uint64_t tr_size_K; /* unused? */
 
 /** @brief Format a speed from KBps into a user-readable string of at most 4 significant digits. */
 [[nodiscard]] std::string tr_formatter_speed_KBps(double kilo_per_second);
-/** @brief Format a speed from KBps into a user-readable string of at most 3 significant digits. */
-[[nodiscard]] std::string tr_formatter_speed_compact_KBps(double kilo_per_second);
 
 /** @brief Format a memory size from bytes into a user-readable string. */
 [[nodiscard]] std::string tr_formatter_mem_B(size_t bytes);
