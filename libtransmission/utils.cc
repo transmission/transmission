@@ -763,6 +763,21 @@ formatter_units size_units;
 formatter_units speed_units;
 formatter_units mem_units;
 
+namespace Values = libtransmission::Values;
+
+template<typename UnitsEnum>
+void values_init(
+    Values::Config::Units<UnitsEnum>& setme,
+    uint64_t kilo,
+    char const* b,
+    char const* kb,
+    char const* mb,
+    char const* gb,
+    char const* tb)
+{
+    auto const base = kilo == 1000U ? Values::Kilo : Values::Kibi;
+    setme = libtransmission::Values::Config::Units<UnitsEnum>{ base, { b, kb, mb, gb, tb } };
+}
 } // namespace formatter_impl
 } // namespace
 
@@ -772,6 +787,7 @@ void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char 
 {
     using namespace formatter_impl;
     formatter_init(size_units, kilo, kb, mb, gb, tb);
+    values_init(libtransmission::Values::Config::Storage, kilo, "B", kb, mb, gb, tb);
 }
 
 std::string tr_formatter_size_B(uint64_t bytes)
@@ -786,6 +802,7 @@ void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char c
     using namespace formatter_impl;
     tr_speed_K = kilo;
     formatter_init(speed_units, kilo, kb, mb, gb, tb);
+    values_init(libtransmission::Values::Config::Speed, kilo, "B/s", kb, mb, gb, tb);
 }
 
 std::string tr_formatter_speed_KBps(double kilo_per_second)
@@ -874,6 +891,7 @@ void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char con
 
     tr_mem_K = kilo;
     formatter_init(mem_units, kilo, kb, mb, gb, tb);
+    values_init(libtransmission::Values::Config::Memory, kilo, "B", kb, mb, gb, tb);
 }
 
 std::string tr_formatter_mem_B(size_t bytes_per_second)
