@@ -1781,6 +1781,10 @@ void tr_torrent::create_empty_files()
     auto file_count = this->file_count();
     for (tr_file_index_t file_index = 0U; file_index < file_count; ++file_index)
     {
+        if (!file_is_wanted(file_index))
+        {
+            continue;
+        }
         if (auto const file_length = file_size(file_index); file_length != 0)
         {
             continue;
