@@ -29,6 +29,7 @@
 #include <libtransmission/file.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
@@ -371,4 +372,29 @@ TEST_F(UtilsTest, ratioToString)
     {
         ASSERT_EQ(tr_strratio(input, "inf"), expected);
     }
+}
+
+TEST_F(UtilsTest, value)
+{
+    namespace Values = libtransmission::Values;
+
+    auto const val_m = Values::Speed{ 1, Values::MByps };
+    EXPECT_EQ("1 MB/s", val_m.to_string());
+    EXPECT_EQ(1000000U, val_m.base_quantity());
+
+    auto const val_k = val_m.to(Values::KByps);
+    EXPECT_EQ("1000.0 kB/s", val_k.to_string());
+    EXPECT_EQ(1000000U, val_m.base_quantity());
+
+    auto val_b = val_m.to(Values::Byps);
+    EXPECT_EQ("1000000.0 B/s", val_b.to_string());
+    EXPECT_EQ(1000000U, val_m.base_quantity());
+
+    val_b = val_k.to(Values::Byps);
+    EXPECT_EQ("1000000.0 B/s", val_b.to_string());
+    EXPECT_EQ(1000000U, val_m.base_quantity());
+
+    auto val_g = val_m.to(Values::GByps);
+    EXPECT_EQ("0.00 GB/s", val_g.to_string());
+    EXPECT_EQ(1000000U, val_m.base_quantity());
 }
