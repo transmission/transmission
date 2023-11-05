@@ -1763,7 +1763,7 @@ namespace completeness_helpers
 } // namespace completeness_helpers
 } // namespace
 
-void tr_torrent::create_empty_files()
+void tr_torrent::create_empty_files() const
 {
     if (!has_metainfo())
     {

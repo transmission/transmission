@@ -398,7 +398,7 @@ public:
         set_files_wanted(files, n_files, wanted, /*is_bootstrapping*/ false);
     }
 
-    void create_empty_files(); // TODO(ckerr): should be private
+    void create_empty_files() const; // TODO(ckerr): should be private
     void recheck_completeness(); // TODO(ckerr): should be private
 
     /// PRIORITIES
