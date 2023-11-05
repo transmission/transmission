@@ -33,6 +33,7 @@ AboutWindowController* fAboutBoxInstance = nil;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fVersionField.stringValue = @(LONG_VERSION_STRING);
 
     self.fCopyrightField.stringValue = [NSBundle.mainBundle localizedStringForKey:@"NSHumanReadableCopyright" value:nil

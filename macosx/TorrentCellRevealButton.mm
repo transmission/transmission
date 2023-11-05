@@ -4,27 +4,28 @@
 
 #import "TorrentCellRevealButton.h"
 #import "TorrentTableView.h"
+#import "TorrentCell.h"
 
 @interface TorrentCellRevealButton ()
 @property(nonatomic) NSTrackingArea* fTrackingArea;
 @property(nonatomic, copy) NSString* revealImageString;
-@property(nonatomic) TorrentTableView* torrentTableView;
+@property(nonatomic) IBOutlet TorrentCell* torrentCell;
+@property(nonatomic, readonly) TorrentTableView* torrentTableView;
 @end
 
 @implementation TorrentCellRevealButton
 
-- (void)awakeFromNib
+- (TorrentTableView*)torrentTableView
 {
-    self.revealImageString = @"RevealOff";
-    [self updateImage];
+    return self.torrentCell.fTorrentTableView;
 }
 
-- (void)setupTorrentTableView
+- (void)awakeFromNib
 {
-    if (!self.torrentTableView)
-    {
-        self.torrentTableView = (TorrentTableView*)[[[self superview] superview] superview];
-    }
+    [super awakeFromNib];
+
+    self.revealImageString = @"RevealOff";
+    [self updateImage];
 }
 
 - (void)mouseEntered:(NSEvent*)event
@@ -57,8 +58,6 @@
 
 - (void)updateImage
 {
-    [self setupTorrentTableView];
-
     NSImage* revealImage = [NSImage imageNamed:self.revealImageString];
     self.image = revealImage;
     self.needsDisplay = YES;

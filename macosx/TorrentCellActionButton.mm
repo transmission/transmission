@@ -5,19 +5,27 @@
 #import "TorrentCellActionButton.h"
 #import "TorrentTableView.h"
 #import "Torrent.h"
+#import "TorrentCell.h"
 
 @interface TorrentCellActionButton ()
 @property(nonatomic) NSTrackingArea* fTrackingArea;
 @property(nonatomic) NSImage* fImage;
 @property(nonatomic) NSImage* fAlternativeImage;
-@property(nonatomic) TorrentTableView* torrentTableView;
+@property(nonatomic) IBOutlet TorrentCell* torrentCell;
+@property(nonatomic, readonly) TorrentTableView* torrentTableView;
 @property(nonatomic) NSUserDefaults* fDefaults;
 @end
 
 @implementation TorrentCellActionButton
 
+- (TorrentTableView*)torrentTableView
+{
+    return self.torrentCell.fTorrentTableView;
+}
+
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fDefaults = NSUserDefaults.standardUserDefaults;
     self.fImage = self.image;
 
@@ -29,21 +37,12 @@
     [self.cell setHighlightsBy:NSNoCellMask];
 }
 
-- (void)setupTorrentTableView
-{
-    if (!self.torrentTableView)
-    {
-        self.torrentTableView = (TorrentTableView*)[[[self superview] superview] superview];
-    }
-}
-
 - (void)mouseEntered:(NSEvent*)event
 {
     [super mouseEntered:event];
 
     self.image = self.fImage;
 
-    [self setupTorrentTableView];
     [self.torrentTableView hoverEventBeganForView:self];
 }
 
@@ -53,7 +52,6 @@
 
     self.image = self.fAlternativeImage;
 
-    [self setupTorrentTableView];
     [self.torrentTableView hoverEventEndedForView:self];
 }
 
@@ -67,7 +65,6 @@
     BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
     if (!minimal)
     {
-        [self setupTorrentTableView];
         [self.torrentTableView hoverEventEndedForView:self];
     }
 }

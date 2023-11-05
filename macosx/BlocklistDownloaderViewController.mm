@@ -32,6 +32,7 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fButton.title = NSLocalizedString(@"Cancel", "Blocklist -> cancel button");
 
     CGFloat const oldWidth = NSWidth(self.fButton.frame);

@@ -50,6 +50,7 @@ typedef NS_ENUM(NSInteger, FilterTypeTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     //localizations
     self.fNoFilterButton.title = NSLocalizedString(@"All", "Filter Bar -> filter button");
     self.fActiveFilterButton.title = NSLocalizedString(@"Active", "Filter Bar -> filter button");
