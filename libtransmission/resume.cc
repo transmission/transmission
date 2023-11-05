@@ -1,8 +1,10 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm> // std::min
+#include <array>
 #include <cstring>
 #include <ctime>
 #include <string_view>
@@ -12,14 +14,17 @@
 
 #include "libtransmission/transmission.h"
 
+#include "libtransmission/bitfield.h"
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
-#include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
+#include "libtransmission/quark.h"
 #include "libtransmission/resume.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
+#include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
@@ -636,7 +641,7 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
     auto otop = serde.parse_file(filename);
     if (!otop)
     {
-        tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, serde.error_->message));
+        tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, serde.error_.message()));
         return {};
     }
     auto& top = *otop;
@@ -914,7 +919,7 @@ void save(tr_torrent* tor)
     auto serde = tr_variant_serde::benc();
     if (!serde.to_file(top, tor->resume_file()))
     {
-        tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_->message));
+        tor->error().set_local_error(fmt::format("Unable to save resume file: {:s}", serde.error_.message()));
     }
 }
 

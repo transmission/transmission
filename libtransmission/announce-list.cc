@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #include <fmt/core.h>
 
@@ -17,7 +18,6 @@
 #include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/web-utils.h"
@@ -264,14 +264,19 @@ void tr_announce_list::add_to_map(tr_variant::Map& setme) const
     }
 }
 
-bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
+bool tr_announce_list::save(std::string_view torrent_file, tr_error* error) const
 {
     // load the torrent file
     auto serde = tr_variant_serde::benc();
     auto ometainfo = serde.parse_file(torrent_file);
     if (!ometainfo)
     {
-        tr_error_propagate(error, &serde.error_);
+        if (error != nullptr)
+        {
+            *error = std::move(serde.error_);
+            serde.error_ = {};
+        }
+
         return false;
     }
     auto& metainfo = *ometainfo;

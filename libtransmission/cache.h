@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -17,9 +17,9 @@
 
 #include <small/vector.hpp>
 
-#include "transmission.h"
+#include "libtransmission/transmission.h"
 
-#include "block-info.h"
+#include "libtransmission/block-info.h"
 
 class tr_torrents;
 struct tr_torrent;

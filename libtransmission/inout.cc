@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -19,7 +19,6 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/inout.h"
-#include "libtransmission/log.h"
 #include "libtransmission/session.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrent-files.h"
@@ -33,7 +32,7 @@ using namespace std::literals;
 namespace
 {
 
-bool readEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t* buf, uint64_t buflen, tr_error** error)
+bool readEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t* buf, uint64_t buflen, tr_error* error)
 {
     while (buflen > 0)
     {
@@ -52,7 +51,7 @@ bool readEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t* buf, uint64_
     return true;
 }
 
-bool writeEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t const* buf, uint64_t buflen, tr_error** error)
+bool writeEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t const* buf, uint64_t buflen, tr_error* error)
 {
     while (buflen > 0)
     {
@@ -107,7 +106,7 @@ void readOrWriteBytes(
     uint64_t file_offset,
     uint8_t* buf,
     size_t buflen,
-    tr_error** error)
+    tr_error* error)
 {
     TR_ASSERT(file_index < tor->file_count());
 
@@ -121,6 +120,12 @@ void readOrWriteBytes(
         return;
     }
 
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
+
     // --- Find the fd
 
     auto fd = session->openFiles().get(tor->id(), file_index, do_write);
@@ -128,12 +133,13 @@ void readOrWriteBytes(
     if (!fd && !getFilename(filename, tor, file_index, io_mode))
     {
         auto const err = ENOENT;
-        auto const msg = fmt::format(
-            _("Couldn't get '{path}': {error} ({error_code})"),
-            fmt::arg("path", tor->file_subpath(file_index)),
-            fmt::arg("error", tr_strerror(err)),
-            fmt::arg("error_code", err));
-        tr_error_set(error, err, msg);
+        error->set(
+            err,
+            fmt::format(
+                _("Couldn't get '{path}': {error} ({error_code})"),
+                fmt::arg("path", tor->file_subpath(file_index)),
+                fmt::arg("error", tr_strerror(err)),
+                fmt::arg("error_code", err)));
         return;
     }
 
@@ -152,45 +158,44 @@ void readOrWriteBytes(
 
     if (!fd) // couldn't create/open it either
     {
-        auto const err = errno;
-        auto msg = fmt::format(
-            _("Couldn't get '{path}': {error} ({error_code})"),
-            fmt::arg("path", filename),
-            fmt::arg("error", tr_strerror(err)),
-            fmt::arg("error_code", err));
-        tr_error_set(error, err, msg);
-        tr_logAddErrorTor(tor, std::move(msg));
+        auto const errnum = errno;
+        error->set(
+            errnum,
+            fmt::format(
+                _("Couldn't get '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", tr_strerror(errnum)),
+                fmt::arg("error_code", errnum)));
+        tr_logAddErrorTor(tor, std::string{ error->message() });
         return;
     }
 
     switch (io_mode)
     {
     case IoMode::Read:
-        if (tr_error* my_error = nullptr; !readEntireBuf(*fd, file_offset, buf, buflen, &my_error) && my_error != nullptr)
+        if (!readEntireBuf(*fd, file_offset, buf, buflen, error) && *error)
         {
             tr_logAddErrorTor(
                 tor,
                 fmt::format(
                     _("Couldn't read '{path}': {error} ({error_code})"),
                     fmt::arg("path", tor->file_subpath(file_index)),
-                    fmt::arg("error", my_error->message),
-                    fmt::arg("error_code", my_error->code)));
-            tr_error_propagate(error, &my_error);
+                    fmt::arg("error", error->message()),
+                    fmt::arg("error_code", error->code())));
             return;
         }
         break;
 
     case IoMode::Write:
-        if (tr_error* my_error = nullptr; !writeEntireBuf(*fd, file_offset, buf, buflen, &my_error) && my_error != nullptr)
+        if (!writeEntireBuf(*fd, file_offset, buf, buflen, error) && *error)
         {
             tr_logAddErrorTor(
                 tor,
                 fmt::format(
                     _("Couldn't save '{path}': {error} ({error_code})"),
                     fmt::arg("path", tor->file_subpath(file_index)),
-                    fmt::arg("error", my_error->message),
-                    fmt::arg("error_code", my_error->code)));
-            tr_error_propagate(error, &my_error);
+                    fmt::arg("error", error->message()),
+                    fmt::arg("error_code", error->code())));
             return;
         }
         break;
@@ -215,20 +220,17 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
     {
         uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->file_size(file_index) - file_offset });
 
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         readOrWriteBytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass, &error);
-
-        if (error != nullptr) // if IO failed, set torrent's error if not already set
+        if (error) // if IO failed, set torrent's error if not already set
         {
             if (io_mode == IoMode::Write && tor->error().error_type() != TR_STAT_LOCAL_ERROR)
             {
-                tor->error().set_local_error(error->message);
+                tor->error().set_local_error(error.message());
                 tr_torrentStop(tor);
             }
 
-            auto const error_code = error->code;
-            tr_error_clear(&error);
-            return error_code;
+            return error.code();
         }
 
         if (buf != nullptr)

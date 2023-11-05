@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype> /* isprint() */
+#include <cstdint> // uint8_t
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -17,6 +18,7 @@
 #include <fmt/core.h>
 
 #include "libtransmission/clients.h"
+#include "libtransmission/tr-macros.h" // tr_peer_id_t
 #include "libtransmission/utils.h"
 
 using namespace std::literals;

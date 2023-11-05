@@ -1,4 +1,4 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -67,7 +67,7 @@ public:
         BaseObjectType* cast_item,
         Glib::RefPtr<Gtk::Builder> const& builder,
         tr_metainfo_builder& metainfo_builder,
-        std::future<tr_error*> future,
+        std::future<tr_error> future,
         std::string_view target,
         Glib::RefPtr<Session> const& core);
     ~MakeProgressDialog() override;
@@ -77,7 +77,7 @@ public:
     static std::unique_ptr<MakeProgressDialog> create(
         std::string_view target,
         tr_metainfo_builder& metainfo_builder,
-        std::future<tr_error*> future,
+        std::future<tr_error> future,
         Glib::RefPtr<Session> const& core);
 
     [[nodiscard]] bool success() const
@@ -93,7 +93,7 @@ private:
 
 private:
     tr_metainfo_builder& builder_;
-    std::future<tr_error*> future_;
+    std::future<tr_error> future_;
     std::string const target_;
     Glib::RefPtr<Session> const core_;
     bool success_ = false;
@@ -190,14 +190,14 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     }
     else
     {
-        tr_error* error = future_.get();
+        auto error = future_.get();
 
-        if (error == nullptr)
+        if (!error)
         {
             builder_.save(target_, &error);
         }
 
-        if (error == nullptr)
+        if (!error)
         {
             str = fmt::format(_("Created '{path}'"), fmt::arg("path", base));
             success = true;
@@ -207,9 +207,8 @@ bool MakeProgressDialog::onProgressDialogRefresh()
             str = fmt::format(
                 _("Couldn't create '{path}': {error} ({error_code})"),
                 fmt::arg("path", base),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code));
-            tr_error_free(error);
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code()));
         }
     }
 
@@ -280,7 +279,7 @@ MakeProgressDialog::MakeProgressDialog(
     BaseObjectType* cast_item,
     Glib::RefPtr<Gtk::Builder> const& builder,
     tr_metainfo_builder& metainfo_builder,
-    std::future<tr_error*> future,
+    std::future<tr_error> future,
     std::string_view target,
     Glib::RefPtr<Session> const& core)
     : Gtk::Dialog(cast_item)
@@ -302,7 +301,7 @@ MakeProgressDialog::MakeProgressDialog(
 std::unique_ptr<MakeProgressDialog> MakeProgressDialog::create(
     std::string_view target,
     tr_metainfo_builder& metainfo_builder,
-    std::future<tr_error*> future,
+    std::future<tr_error> future,
     Glib::RefPtr<Session> const& core)
 {
     auto const builder = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("MakeProgressDialog.ui"));

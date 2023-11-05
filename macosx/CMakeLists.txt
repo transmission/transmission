@@ -62,6 +62,8 @@ target_sources(${TR_NAME}-mac
         Controller.mm
         CreatorWindowController.h
         CreatorWindowController.mm
+        DefaultAppHelper.h
+        DefaultAppHelper.mm
         DragOverlayView.h
         DragOverlayView.mm
         DragOverlayWindow.h
@@ -448,7 +450,7 @@ install(
 tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 
 install(CODE
-    "list(APPEND CMAKE_MODULE_PATH \"${CMAKE_SOURCE_DIR}/cmake\")
+    "list(APPEND CMAKE_MODULE_PATH \"${PROJECT_SOURCE_DIR}/cmake\")
     include(TrMacros)
     include(GetPrerequisites)
     tr_fixup_bundle_item(

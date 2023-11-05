@@ -1,21 +1,19 @@
-// This file Copyright © 2007-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <chrono>
-#include <ctime>
+#include <cstddef> // std::byte
+#include <cstdint> // uint64_t, uint32_t
 #include <mutex>
 #include <optional>
 #include <thread>
 #include <vector>
 
-#include <fmt/core.h>
-
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/completion.h"
 #include "libtransmission/crypto-utils.h"
 #include "libtransmission/file.h"
 #include "libtransmission/verify.h"

@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -31,8 +31,8 @@ extern NSString* const kTorrentDidChangeGroupNotification;
 
 @property(nonatomic, readonly) NSString* currentDirectory;
 
-- (void)getAvailability:(int8_t*)tab size:(NSInteger)size;
-- (void)getAmountFinished:(float*)tab size:(NSInteger)size;
+- (void)getAvailability:(int8_t*)tab size:(int)size;
+- (void)getAmountFinished:(float*)tab size:(int)size;
 @property(nonatomic) NSIndexSet* previousFinishedPieces;
 
 - (void)update;

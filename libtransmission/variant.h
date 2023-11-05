@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,7 +9,6 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <optional>
-#include <numeric>
 #include <string>
 #include <string_view>
 #include <type_traits> // std::is_same_v
@@ -17,10 +16,9 @@
 #include <variant>
 #include <vector>
 
+#include "libtransmission/error.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
-
-struct tr_error;
 
 /**
  * A variant that holds typical benc/json types: bool, int,
@@ -89,7 +87,7 @@ public:
             {
                 return item.first == key;
             };
-            return std::find_if(begin(), end(), predicate);
+            return std::find_if(std::begin(vec_), std::end(vec_), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto find(tr_quark const key) const noexcept
@@ -98,7 +96,7 @@ public:
             {
                 return item.first == key;
             };
-            return std::find_if(cbegin(), cend(), predicate);
+            return std::find_if(std::cbegin(vec_), std::cend(vec_), predicate);
         }
 
         [[nodiscard]] TR_CONSTEXPR20 auto size() const noexcept
@@ -275,8 +273,8 @@ public:
     {
         if constexpr (std::is_same_v<Val, std::string_view>)
         {
-            auto const* const str = std::get_if<StringHolder>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
+            auto const* const val = std::get_if<StringHolder>(&val_);
+            return val != nullptr ? &val->sv_ : nullptr;
         }
         else
         {
@@ -295,8 +293,8 @@ public:
     {
         if constexpr (Index == StringIndex)
         {
-            auto const* const str = std::get_if<StringIndex>(&val_);
-            return str != nullptr ? &str->sv_ : nullptr;
+            auto const* const val = std::get_if<StringIndex>(&val_);
+            return val != nullptr ? &val->sv_ : nullptr;
         }
         else
         {
@@ -469,8 +467,6 @@ void tr_variantMergeDicts(tr_variant* tgt, tr_variant const* src);
 class tr_variant_serde
 {
 public:
-    ~tr_variant_serde();
-
     [[nodiscard]] static tr_variant_serde benc() noexcept
     {
         return tr_variant_serde{ Type::Benc };
@@ -524,7 +520,7 @@ public:
     // ---
 
     // Tracks errors when parsing / saving
-    tr_error* error_ = nullptr;
+    tr_error error_ = {};
 
 private:
     friend tr_variant;

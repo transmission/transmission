@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -7,7 +7,6 @@
 #include <cctype>
 #include <cstddef> // std::byte, size_t
 #include <cstdint> // int64_t, uint8_t, uint...
-#include <cstdio> /* fprintf() */
 #include <iomanip>
 #include <iostream>
 #include <iterator>
@@ -34,7 +33,6 @@
 #include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h" /* pex */
 #include "libtransmission/session.h"
-#include "libtransmission/torrent.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h" // tr_strbuf, tr_urlbuf
@@ -442,17 +440,16 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = AnnounceHandler{ response, log_name };
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(
             fmt::format(
                 _("Couldn't parse announce response: {error} ({error_code})"),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())),
             log_name);
-        tr_error_clear(&error);
     }
 }
 
@@ -650,16 +647,15 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = ScrapeHandler{ response, log_name };
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
-    if (error != nullptr)
+    if (error)
     {
         tr_logAddWarn(
             fmt::format(
                 _("Couldn't parse scrape response: {error} ({error_code})"),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code())),
             log_name);
-        tr_error_clear(&error);
     }
 }

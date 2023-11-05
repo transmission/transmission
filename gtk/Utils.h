@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -185,7 +185,7 @@ void setup_item_view_button_event_handling(
 #endif
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error = nullptr);
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 

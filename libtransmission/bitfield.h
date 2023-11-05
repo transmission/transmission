@@ -1,4 +1,4 @@
-// This file Copyright © 2008-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -13,7 +13,7 @@
 #include <cstdint> // uint8_t
 #include <vector> // std::vector
 
-#include "tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
 
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.

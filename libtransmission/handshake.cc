@@ -1,4 +1,4 @@
-// This file Copyright © 2017-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -632,7 +632,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         auto const info = handshake->mediator_->torrent(info_hash);
 
         /* Don't mark a peer as non-µTP unless it's really a connect failure. */
-        if ((error.code == ETIMEDOUT || error.code == ECONNREFUSED) && info)
+        if ((error.code() == ETIMEDOUT || error.code() == ECONNREFUSED) && info)
         {
             handshake->mediator_->set_utp_failed(info_hash, io->socket_address());
         }
@@ -657,7 +657,7 @@ void tr_handshake::on_error(tr_peerIo* io, tr_error const& error, void* vhandsha
         return;
     }
 
-    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message, error.code));
+    tr_logAddTraceHand(handshake, fmt::format("handshake socket err: {:s} ({:d})", error.message(), error.code()));
     handshake->done(false);
 }
 

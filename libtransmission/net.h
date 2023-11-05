@@ -1,4 +1,4 @@
-// This file Copyright © 2006-2023 Transmission authors and contributors.
+// This file Copyright © Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 
@@ -11,6 +11,7 @@
 #include <algorithm> // for std::copy_n
 #include <array>
 #include <cstddef> // size_t
+#include <cstdint> // uint16_t, uint32_t, uint8_t
 #include <functional>
 #include <optional>
 #include <string>
@@ -269,7 +270,7 @@ struct tr_address
 
     [[nodiscard]] auto is_any() const noexcept
     {
-        return is_valid() ? *this == any(type) : false;
+        return is_valid() && *this == any(type);
     }
 };
 

@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -122,5 +122,30 @@ QString AddData::readableShortName() const
 
     default:
         return readableName();
+    }
+}
+
+void AddData::disposeSourceFile() const
+{
+    auto file = QFile{ filename };
+    if (!disposal_ || !file.exists())
+    {
+        return;
+    }
+
+    switch (*disposal_)
+    {
+    case FilenameDisposal::Delete:
+        file.setPermissions(QFile::ReadOwner | QFile::WriteOwner);
+        file.remove();
+        break;
+
+    case FilenameDisposal::Rename:
+        file.rename(QStringLiteral("%1.added").arg(filename));
+        break;
+
+    default:
+        // no action
+        break;
     }
 }

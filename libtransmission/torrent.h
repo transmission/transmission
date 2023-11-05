@@ -1,4 +1,4 @@
-// This file Copyright © 2009-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -10,6 +10,7 @@
 #endif
 
 #include <cstddef> // size_t
+#include <cstdint> // uint64_t, uint16_t
 #include <ctime>
 #include <functional>
 #include <memory>
@@ -32,17 +33,16 @@
 #include "libtransmission/log.h"
 #include "libtransmission/observable.h"
 #include "libtransmission/session.h"
+#include "libtransmission/torrent-files.h"
 #include "libtransmission/torrent-magnet.h"
 #include "libtransmission/torrent-metainfo.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/verify.h"
 
+struct tr_ctor;
 class tr_swarm;
 struct tr_error;
-struct tr_magnet_info;
-struct tr_metainfo_parsed;
-struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
@@ -54,7 +54,7 @@ void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor);
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error);
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error* error);
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
@@ -544,13 +544,6 @@ public:
 
     /// METAINFO - PIECE CHECKSUMS
 
-    [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
-    {
-        return checked_pieces_.test(piece);
-    }
-
-    [[nodiscard]] bool check_piece(tr_piece_index_t piece);
-
     [[nodiscard]] bool ensure_piece_is_checked(tr_piece_index_t piece);
 
     void init_checked_pieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
@@ -597,16 +590,6 @@ public:
     void set_download_dir(std::string_view path, bool is_new_torrent = false);
 
     void refresh_current_dir();
-
-    [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
-    {
-        if (verify_state_ == VerifyState::Active)
-        {
-            return verify_progress_;
-        }
-
-        return {};
-    }
 
     [[nodiscard]] constexpr auto id() const noexcept
     {
@@ -1006,6 +989,7 @@ private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
+    friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
     enum class VerifyState : uint8_t
     {
@@ -1085,6 +1069,13 @@ private:
         tr_bytes_per_second_t speed_byps_ = {};
     };
 
+    [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
+    {
+        return checked_pieces_.test(piece);
+    }
+
+    [[nodiscard]] bool check_piece(tr_piece_index_t piece);
+
     [[nodiscard]] constexpr std::optional<uint16_t> effective_idle_limit_minutes() const noexcept
     {
         auto const mode = idle_limit_mode();
@@ -1160,6 +1151,16 @@ private:
 
     void set_verify_state(VerifyState state);
 
+    [[nodiscard]] constexpr std::optional<float> verify_progress() const noexcept
+    {
+        if (verify_state_ == VerifyState::Active)
+        {
+            return verify_progress_;
+        }
+
+        return {};
+    }
+
     void on_metainfo_updated();
 
     tr_stat stats_ = {};
@@ -1215,15 +1216,13 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
     return tor != nullptr && tor->session != nullptr;
 }
 
-/**
- * Tell the `tr_torrent` that it's gotten a block
- */
+// Tell the `tr_torrent` that it's gotten a block
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error = nullptr);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error = nullptr);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error* error = nullptr);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_torrent::labels_t&& labels);
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);

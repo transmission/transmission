@@ -1,4 +1,4 @@
-// This file Copyright © 2012-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -132,19 +132,6 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
 
     return 0;
 }
-
-std::string tr_getcwd()
-{
-    tr_error* error = nullptr;
-    auto cur = tr_sys_dir_get_current(&error);
-    if (error != nullptr)
-    {
-        fprintf(stderr, "getcwd error: \"%s\"", error->message);
-        tr_error_free(error);
-    }
-    return cur;
-}
-
 } // namespace
 
 int tr_main(int argc, char* argv[])
@@ -178,16 +165,32 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(options.outfile))
     {
-        tr_error* error = nullptr;
+        auto error = tr_error{};
         auto const base = tr_sys_path_basename(options.infile, &error);
-
-        if (std::empty(base))
+        if (error)
         {
-            fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
+            auto const errmsg = fmt::format(
+                "Couldn't use '{path}': {error} ({error_code})",
+                fmt::arg("path", options.infile),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code()));
+            fmt::print(stderr, "{:s}\n", errmsg);
             return EXIT_FAILURE;
         }
 
-        options.outfile = fmt::format("{:s}/{:s}.torrent"sv, tr_getcwd(), base);
+        auto const cur = tr_sys_dir_get_current(&error);
+        if (error)
+        {
+            auto const errmsg = fmt::format(
+                "Couldn't create '{path}': {error} ({error_code})",
+                fmt::arg("path", base),
+                fmt::arg("error", error.message()),
+                fmt::arg("error_code", error.code()));
+            fmt::print(stderr, "{:s}\n", errmsg);
+            return EXIT_FAILURE;
+        }
+
+        options.outfile = fmt::format("{:s}/{:s}.torrent"sv, cur, base);
     }
 
     if (std::empty(options.trackers))
@@ -274,17 +277,20 @@ int tr_main(int argc, char* argv[])
 
     fmt::print(" ");
 
-    if (tr_error* error = future.get(); error != nullptr)
+    if (auto error = future.get(); error)
     {
-        fmt::print("ERROR: {:s} {:d}\n", error->message, error->code);
-        tr_error_free(error);
+        fmt::print("ERROR: {:s} {:d}\n", error.message(), error.code());
         return EXIT_FAILURE;
     }
 
-    if (tr_error* error = nullptr; !builder.save(options.outfile, &error))
+    if (auto error = tr_error{}; !builder.save(options.outfile, &error))
     {
-        fmt::print("ERROR: could not save \"{:s}\": {:s} {:d}\n", options.outfile, error->message, error->code);
-        tr_error_free(error);
+        auto const errmsg = fmt::format(
+            "Couldn't save '{path}': {error} ({error_code})",
+            fmt::arg("path", options.outfile),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code()));
+        fmt::print(stderr, "{:s}\n", errmsg);
         return EXIT_FAILURE;
     }
 

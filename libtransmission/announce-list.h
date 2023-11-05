@@ -1,4 +1,4 @@
-// This file Copyright © 2021-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -13,7 +13,6 @@
 
 #include "libtransmission/transmission.h"
 
-#include "libtransmission/quark.h"
 #include "libtransmission/interned-string.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/variant.h"
@@ -128,7 +127,7 @@ public:
     bool parse(std::string_view text);
     [[nodiscard]] std::string to_string() const;
 
-    bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
+    bool save(std::string_view torrent_file, tr_error* error = nullptr) const;
 
     [[nodiscard]] static std::optional<std::string> announce_to_scrape(std::string_view announce);
 

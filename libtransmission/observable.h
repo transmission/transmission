@@ -1,4 +1,4 @@
-// This file Copyright © 2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,13 +9,13 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <algorithm> // for std::move
 #include <cstddef> // for size_t
 #include <functional>
+#include <utility> // for std::move
 
 #include <small/map.hpp>
 
-#include "tr-assert.h"
+#include "libtransmission/tr-assert.h"
 
 namespace libtransmission
 {
@@ -30,13 +30,12 @@ public:
 
     ObserverTag() = default;
 
-    ObserverTag(ObserverTag&& that)
+    ObserverTag(ObserverTag&& that) noexcept
     {
-        on_destroy_ = std::move(that.on_destroy_);
-        that.on_destroy_ = nullptr;
+        *this = std::forward<ObserverTag>(that);
     }
 
-    ObserverTag& operator=(ObserverTag&& that)
+    ObserverTag& operator=(ObserverTag&& that) noexcept
     {
         on_destroy_ = std::move(that.on_destroy_);
         that.on_destroy_ = nullptr;
@@ -46,7 +45,7 @@ public:
     ObserverTag(ObserverTag const&) = delete;
     ObserverTag& operator=(ObserverTag const&) = delete;
 
-    ObserverTag(Callback on_destroy)
+    explicit ObserverTag(Callback on_destroy)
         : on_destroy_{ std::move(on_destroy) }
     {
     }
@@ -54,7 +53,9 @@ public:
     ~ObserverTag()
     {
         if (on_destroy_)
+        {
             on_destroy_();
+        }
     }
 
 private:
@@ -78,7 +79,7 @@ public:
         TR_ASSERT(std::empty(observers_));
     }
 
-    auto observe(Observer observer)
+    [[nodiscard]] auto observe(Observer observer)
     {
         auto const key = next_key_++;
         observers_.emplace(key, std::move(observer));
@@ -92,7 +93,7 @@ public:
     {
         for (auto& [tag, observer] : observers_)
         {
-            observer((args)...);
+            observer(args...);
         }
     }
 

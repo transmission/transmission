@@ -1,4 +1,4 @@
-// This file Copyright © 2010-2023 Juliusz Chroboczek.
+// This file Copyright © Juliusz Chroboczek.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -9,6 +9,12 @@
 #endif
 
 #include <cstddef> // size_t
+
+#ifndef _WIN32
+#include <sys/socket.h>
+#else
+#include <ws2tcpip.h>
+#endif
 
 struct tr_session;
 

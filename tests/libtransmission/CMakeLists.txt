@@ -107,10 +107,6 @@ set_property(
     TARGET subprocess-test
     PROPERTY FOLDER "tests")
 
-target_include_directories(subprocess-test
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/libtransmission)
-
 target_link_libraries(subprocess-test
     PRIVATE
         ${TR_NAME})

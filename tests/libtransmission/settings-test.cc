@@ -12,6 +12,7 @@
 
 #include <libtransmission/log.h>
 #include <libtransmission/net.h>
+#include <libtransmission/peer-io.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/session-settings.h>
 #include <libtransmission/variant.h>

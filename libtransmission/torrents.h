@@ -1,4 +1,4 @@
-// This file Copyright © 2022-2023 Mnemosyne LLC.
+// This file Copyright © Mnemosyne LLC.
 // It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
@@ -9,8 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
 #include <cstddef> // size_t
 #include <ctime>
+#include <functional>
+#include <iterator>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -21,7 +24,6 @@
 #include "libtransmission/tr-macros.h"
 
 struct tr_torrent;
-struct tr_torrent_metainfo;
 
 // A helper class to manage tracking sets of tr_torrent objects.
 class tr_torrents
@@ -107,9 +109,22 @@ public:
         return std::empty(by_hash_);
     }
 
-    [[nodiscard]] constexpr auto const& sorted_by_id() const noexcept
+    [[nodiscard]] auto get_matching(std::function<bool(tr_torrent const*)> pred_in) const
     {
-        return by_id_;
+        auto const pred = [&pred_in](tr_torrent const* const tor)
+        {
+            return tor != nullptr && pred_in(tor);
+        };
+
+        auto vec = std::vector<tr_torrent*>{};
+        vec.reserve(size());
+        std::copy_if(std::begin(by_id_), std::end(by_id_), std::back_inserter(vec), pred);
+        return vec;
+    }
+
+    [[nodiscard]] auto get_all() const
+    {
+        return get_matching([](tr_torrent const*) { return true; });
     }
 
 private:
