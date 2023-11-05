@@ -628,6 +628,10 @@ void torrentStartImpl(tr_torrent* const tor)
 
     TR_ASSERT(tr_isTorrent(tor));
 
+    // We are after `torrentStart` and before announcing to trackers/peers,
+    // so now is the best time to create wanted empty files.
+    tor->create_empty_files();
+
     tor->recheck_completeness();
     tor->set_is_queued(false);
 
@@ -910,6 +914,7 @@ void on_metainfo_completed(tr_torrent* tor)
 
     if (tor->session->shouldFullyVerifyAddedTorrents() || !isNewTorrentASeed(tor))
     {
+        // Potentially, we are in `tr_torrentNew`, and we don't want any file created before `torrentStartImpl`, so we Verify but we don't Create files.
         tr_torrentVerify(tor);
     }
     else
@@ -1757,6 +1762,52 @@ namespace completeness_helpers
 }
 } // namespace completeness_helpers
 } // namespace
+
+void tr_torrent::create_empty_files()
+{
+    if (!has_metainfo())
+    {
+        return;
+    }
+
+    auto paths = std::array<std::string_view, 4>{};
+    auto const n_paths = location_helpers::buildSearchPathArray(this, std::data(paths));
+    if (n_paths == 0)
+    {
+        return;
+    }
+    auto const base = paths[0];
+
+    auto file_count = this->file_count();
+    for (tr_file_index_t file_index = 0U; file_index < file_count; ++file_index)
+    {
+        if (auto const file_length = file_size(file_index); file_length != 0)
+        {
+            continue;
+        }
+        if (auto const found = find_file(file_index); found)
+        {
+            continue;
+        }
+        // torrent contains a wanted zero-bytes file and that file isn't on disk yet.
+        // We attempt to create that file.
+        auto filename = tr_pathbuf{};
+        auto const& subpath = file_subpath(file_index);
+        filename.assign(base, '/', subpath);
+
+        // create subfolders, if any
+        auto dir = tr_pathbuf{ filename.sv() };
+        dir.popdir();
+        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
+
+        // create the file
+        int flags = TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_SEQUENTIAL;
+        if (auto const fd = tr_sys_file_open(filename, flags, 0666); fd != TR_BAD_SYS_FILE)
+        {
+            tr_sys_file_close(fd);
+        }
+    }
+}
 
 void tr_torrent::recheck_completeness()
 {
