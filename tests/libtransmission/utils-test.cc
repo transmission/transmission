@@ -398,3 +398,14 @@ TEST_F(UtilsTest, value)
     EXPECT_EQ("0.00 GB/s", val_g.to_string());
     EXPECT_EQ(1000000U, val_m.base_quantity());
 }
+
+TEST_F(UtilsTest, valueHonorsFormatterInit)
+{
+    namespace Values = libtransmission::Values;
+
+    tr_formatter_speed_init(1024, "KayBeePerEss", "EmmBeePerEss", "GeeBeePerEss", "TeeBeePerEss");
+
+    auto const val_m = Values::Speed{ 1, Values::MByps };
+    EXPECT_EQ("1 EmmBeePerEss", val_m.to_string());
+    EXPECT_EQ(1048576U, val_m.base_quantity());
+}
