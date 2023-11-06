@@ -206,13 +206,13 @@ public:
             ++idx;
             val /= units_.base();
 
-            if (val < 99.995) // 0.98 MB to 99.99 MB
+            if (val < 99.995) // 0.98 to 99.99
             {
                 *fmt::format_to_n(buf, buflen - 1, "{:.2Lf} {:s}", val, units_.display_name(idx)).out = '\0';
                 return buf;
             }
 
-            if (val < 999.95 || std::empty(units_.display_name(idx + 1))) // 100.0 MB to 999.9 MB
+            if (val < 999.95 || std::empty(units_.display_name(idx + 1))) // 100.0 to 999.9
             {
                 *fmt::format_to_n(buf, buflen - 1, "{:.1Lf} {:s}", val, units_.display_name(idx)).out = '\0';
                 return buf;
@@ -227,22 +227,7 @@ public:
     }
 
 private:
-    uint64_t base_quantity_;
-
-    [[nodiscard]] static constexpr int display_precision(double value) noexcept
-    {
-        if (0.99 < value && value < 1.001)
-        {
-            return 0;
-        }
-
-        if (value < 100)
-        {
-            return 2;
-        }
-
-        return 1;
-    }
+    uint64_t base_quantity_ = {};
 
     [[nodiscard]] constexpr int compare(Value const& that) const noexcept // <=>
     {

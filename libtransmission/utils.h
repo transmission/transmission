@@ -301,53 +301,24 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 // ---
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
-
-void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
-
-void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
-
-void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(uint64_t base, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 
 extern size_t tr_speed_K;
 extern size_t tr_mem_K;
 
-/** @brief Format a speed from KBps into a user-readable string of at most 4 significant digits. */
+[[nodiscard]] double tr_toMemMB(uint64_t B);
+[[nodiscard]] double tr_toSpeedKBps(size_t Bps);
+[[nodiscard]] size_t tr_toMemBytes(size_t MB);
+[[nodiscard]] size_t tr_toSpeedBytes(size_t KBps);
+
+[[nodiscard]] std::string tr_formatter_mem_B(size_t bytes);
+[[nodiscard]] std::string tr_formatter_mem_MB(double MB);
+[[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
 [[nodiscard]] std::string tr_formatter_speed_KBps(double kilo_per_second);
 
-/** @brief Format a memory size from bytes into a user-readable string. */
-[[nodiscard]] std::string tr_formatter_mem_B(size_t bytes);
-
-/** @brief Format a memory size from MB into a user-readable string. */
-[[nodiscard]] static inline std::string tr_formatter_mem_MB(double MB)
-{
-    namespace Values = libtransmission::Values;
-    return libtransmission::Values::Memory{ MB, libtransmission::Values::MBytes }.to_string();
-}
-
-/** @brief Format a file size from bytes into a user-readable string. */
-[[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
-
-struct tr_variant tr_formatter_get_units();
-
-[[nodiscard]] static constexpr size_t tr_toSpeedBytes(size_t KBps)
-{
-    return libtransmission::Values::Speed{ KBps, libtransmission::Values::KByps }.base_quantity();
-}
-
-[[nodiscard]] static constexpr auto tr_toSpeedKBps(size_t Bps)
-{
-    return libtransmission::Values::Speed{ Bps, libtransmission::Values::Byps }.count(libtransmission::Values::KByps);
-}
-
-[[nodiscard]] static constexpr auto tr_toMemBytes(size_t MB)
-{
-    return libtransmission::Values::Memory{ MB, libtransmission::Values::MBytes }.base_quantity();
-}
-
-[[nodiscard]] static inline auto tr_toMemMB(uint64_t B)
-{
-    return libtransmission::Values::Memory{ B, libtransmission::Values::MBytes }.count(libtransmission::Values::MBytes);
-}
+[[nodiscard]] struct tr_variant tr_formatter_get_units();
 
 // ---
 
