@@ -378,25 +378,21 @@ TEST_F(UtilsTest, value)
 {
     namespace Values = libtransmission::Values;
 
-    auto const val_m = Values::Speed{ 1, Values::MByps };
-    EXPECT_EQ("1 MB/s", val_m.to_string());
-    EXPECT_EQ(1000000U, val_m.base_quantity());
+    auto val = Values::Speed{ 1, Values::MByps };
+    EXPECT_EQ("1.00 MB/s", val.to_string());
+    EXPECT_NEAR(1000000U, val.base_quantity(), 0.0001);
+    EXPECT_NEAR(1000U, val.count(Values::KByps), 0.0001);
+    EXPECT_NEAR(1U, val.count(Values::MByps), 0.0001);
+    EXPECT_NEAR(0.001, val.count(Values::GByps), 0.0001);
 
-    auto const val_k = val_m.to(Values::KByps);
-    EXPECT_EQ("1000.0 kB/s", val_k.to_string());
-    EXPECT_EQ(1000000U, val_m.base_quantity());
+    val = Values::Speed{ 1, Values::Byps };
+    EXPECT_EQ("1 B/s", val.to_string());
 
-    auto val_b = val_m.to(Values::Byps);
-    EXPECT_EQ("1000000.0 B/s", val_b.to_string());
-    EXPECT_EQ(1000000U, val_m.base_quantity());
+    val = Values::Speed{ 10, Values::KByps };
+    EXPECT_EQ("10.00 kB/s", val.to_string());
 
-    val_b = val_k.to(Values::Byps);
-    EXPECT_EQ("1000000.0 B/s", val_b.to_string());
-    EXPECT_EQ(1000000U, val_m.base_quantity());
-
-    auto val_g = val_m.to(Values::GByps);
-    EXPECT_EQ("0.00 GB/s", val_g.to_string());
-    EXPECT_EQ(1000000U, val_m.base_quantity());
+    val = Values::Speed{ 999, Values::KByps };
+    EXPECT_EQ("999.0 kB/s", val.to_string());
 }
 
 TEST_F(UtilsTest, valueHonorsFormatterInit)
@@ -406,6 +402,6 @@ TEST_F(UtilsTest, valueHonorsFormatterInit)
     tr_formatter_speed_init(1024, "KayBeePerEss", "EmmBeePerEss", "GeeBeePerEss", "TeeBeePerEss");
 
     auto const val_m = Values::Speed{ 1, Values::MByps };
-    EXPECT_EQ("1 EmmBeePerEss", val_m.to_string());
+    EXPECT_EQ("1.00 EmmBeePerEss", val_m.to_string());
     EXPECT_EQ(1048576U, val_m.base_quantity());
 }
