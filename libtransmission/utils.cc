@@ -59,6 +59,8 @@
 
 using namespace std::literals;
 
+namespace Values = libtransmission::Values;
+
 time_t libtransmission::detail::tr_time::current_time = {};
 
 // ---
