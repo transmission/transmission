@@ -380,12 +380,13 @@ TEST_F(UtilsTest, value)
 
     auto val = Speed{ 1, Speed::Units::MByps };
     EXPECT_EQ("1.00 MB/s", val.to_string());
-    EXPECT_NEAR(1000000U, val.base_quantity(), 0.0001);
+    EXPECT_EQ(1000000UL, val.base_quantity());
     EXPECT_NEAR(1000U, val.count(Speed::Units::KByps), 0.0001);
     EXPECT_NEAR(1U, val.count(Speed::Units::MByps), 0.0001);
     EXPECT_NEAR(0.001, val.count(Speed::Units::GByps), 0.0001);
 
     val = Speed{ 1, Speed::Units::Byps };
+    EXPECT_EQ(1U, val.base_quantity());
     EXPECT_EQ("1 B/s", val.to_string());
 
     val = Speed{ 10, Speed::Units::KByps };
