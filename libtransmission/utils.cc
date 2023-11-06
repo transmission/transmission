@@ -60,8 +60,6 @@
 using namespace std::literals;
 using namespace libtransmission::Values;
 
-namespace Values = libtransmission::Values;
-
 time_t libtransmission::detail::tr_time::current_time = {};
 
 // ---
@@ -682,6 +680,8 @@ Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, 
 
 tr_variant tr_formatter_get_units()
 {
+    using namespace libtransmission::Values;
+
     auto const make_units_vec = [](auto const& units)
     {
         auto units_vec = tr_variant::Vector{};
