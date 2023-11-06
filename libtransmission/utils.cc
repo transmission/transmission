@@ -766,7 +766,7 @@ void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char con
     tr_mem_K = base;
 }
 
-std::string tr_formatter_mem_B(size_t bytes)
+std::string tr_formatter_mem_B(uint64_t bytes)
 {
     using Memory = libtransmission::Values::Memory;
 

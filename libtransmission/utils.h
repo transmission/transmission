@@ -313,7 +313,7 @@ extern size_t tr_mem_K;
 [[nodiscard]] uint64_t tr_toMemBytes(size_t mbytes);
 [[nodiscard]] uint64_t tr_toSpeedBytes(size_t kbyps);
 
-[[nodiscard]] std::string tr_formatter_mem_B(size_t bytes);
+[[nodiscard]] std::string tr_formatter_mem_B(uint64_t bytes);
 [[nodiscard]] std::string tr_formatter_mem_MB(double mbytes);
 [[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
 [[nodiscard]] std::string tr_formatter_speed_KBps(double kbyps);
