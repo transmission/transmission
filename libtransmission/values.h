@@ -105,14 +105,12 @@ public:
 
     constexpr Value(uint64_t value, UnitsEnum multiple)
         : base_quantity_{ value * units_.multiplier(multiple) }
-        , multiple_{ multiple }
     {
     }
 
     template<typename Number>
     Value(Number value, UnitsEnum multiple)
         : base_quantity_{ static_cast<uint64_t>(value * units_.multiplier(multiple)) }
-        , multiple_{ multiple }
     {
     }
 
@@ -162,14 +160,6 @@ public:
         return ret /= mult;
     }
 
-    [[nodiscard]] constexpr auto to(UnitsEnum tgt) const noexcept
-    {
-        auto ret = Value{};
-        ret.base_quantity_ = base_quantity_;
-        ret.multiple_ = tgt;
-        return ret;
-    }
-
     [[nodiscard]] constexpr auto operator<(Value const& that) const noexcept
     {
         return compare(that) < 0;
@@ -202,17 +192,32 @@ public:
 
     [[nodiscard]] std::string_view to_string(char* buf, size_t buflen) const noexcept
     {
-        auto const value = count(multiple_);
-        auto const precision = display_precision(value);
-        auto const [out, len] = fmt::format_to_n(
-            buf,
-            buflen - 1,
-            "{:.{}Lf} {:s}",
-            value,
-            precision,
-            units_.display_name(multiple_));
-        *out = '\0';
-        return buf;
+        auto idx = size_t{ 0 };
+
+        if (base_quantity_ < 1000) // 0 to 999
+        {
+            *fmt::format_to_n(buf, buflen - 1, "{:d} {:s}", base_quantity_, units_.display_name(idx)).out = '\0';
+            return buf;
+        }
+
+        auto val = 1.0 * base_quantity_;
+        for (;;)
+        {
+            ++idx;
+            val /= units_.base();
+
+            if (val < 99.995) // 0.98 MB to 99.99 MB
+            {
+                *fmt::format_to_n(buf, buflen - 1, "{:.2Lf} {:s}", val, units_.display_name(idx)).out = '\0';
+                return buf;
+            }
+
+            if (val < 999.95 || std::empty(units_.display_name(idx + 1))) // 100.0 MB to 999.9 MB
+            {
+                *fmt::format_to_n(buf, buflen - 1, "{:.1Lf} {:s}", val, units_.display_name(idx)).out = '\0';
+                return buf;
+            }
+        }
     }
 
     [[nodiscard]] std::string to_string() const
@@ -223,7 +228,6 @@ public:
 
 private:
     uint64_t base_quantity_;
-    UnitsEnum multiple_;
 
     [[nodiscard]] static constexpr int display_precision(double value) noexcept
     {
