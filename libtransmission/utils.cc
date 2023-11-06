@@ -682,48 +682,6 @@ namespace
 {
 namespace formatter_impl
 {
-
-struct formatter_unit
-{
-    std::array<char, 16> name;
-    uint64_t value;
-};
-
-using formatter_units = std::array<formatter_unit, 4>;
-
-enum
-{
-    TR_FMT_KB,
-    TR_FMT_MB,
-    TR_FMT_GB,
-    TR_FMT_TB
-};
-
-void formatter_init(formatter_units& units, uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    uint64_t value = kilo;
-    tr_strlcpy(std::data(units[TR_FMT_KB].name), kb, std::size(units[TR_FMT_KB].name));
-    units[TR_FMT_KB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_MB].name), mb, std::size(units[TR_FMT_MB].name));
-    units[TR_FMT_MB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_GB].name), gb, std::size(units[TR_FMT_GB].name));
-    units[TR_FMT_GB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_TB].name), tb, std::size(units[TR_FMT_TB].name));
-    units[TR_FMT_TB].value = value;
-}
-
-formatter_units size_units;
-formatter_units speed_units;
-formatter_units mem_units;
-
-namespace Values = libtransmission::Values;
-
 template<typename UnitsEnum>
 void values_init(
     Values::Config::Units<UnitsEnum>& setme,
@@ -745,8 +703,7 @@ size_t tr_speed_K = 0;
 void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     using namespace formatter_impl;
-    formatter_init(size_units, kilo, kb, mb, gb, tb);
-    values_init(libtransmission::Values::Config::Storage, kilo, "B", kb, mb, gb, tb);
+    values_init(Values::Config::Storage, kilo, "B", kb, mb, gb, tb);
 }
 
 std::string tr_formatter_size_B(uint64_t bytes)
@@ -757,9 +714,8 @@ std::string tr_formatter_size_B(uint64_t bytes)
 void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     using namespace formatter_impl;
+    values_init(Values::Config::Speed, kilo, "B/s", kb, mb, gb, tb);
     tr_speed_K = kilo;
-    formatter_init(speed_units, kilo, kb, mb, gb, tb);
-    values_init(libtransmission::Values::Config::Speed, kilo, "B/s", kb, mb, gb, tb);
 }
 
 std::string tr_formatter_speed_KBps(double kilo_per_second)
@@ -772,10 +728,8 @@ size_t tr_mem_K = 0;
 void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     using namespace formatter_impl;
-
+    values_init(Values::Config::Memory, kilo, "B", kb, mb, gb, tb);
     tr_mem_K = kilo;
-    formatter_init(mem_units, kilo, kb, mb, gb, tb);
-    values_init(libtransmission::Values::Config::Memory, kilo, "B", kb, mb, gb, tb);
 }
 
 std::string tr_formatter_mem_B(size_t bytes)
@@ -785,27 +739,28 @@ std::string tr_formatter_mem_B(size_t bytes)
 
 tr_variant tr_formatter_get_units()
 {
-    using namespace formatter_impl;
-
-    auto const make_units_vec = [](formatter_units const& units)
+    auto const make_units_vec = [](auto const& units)
     {
         auto units_vec = tr_variant::Vector{};
-        units_vec.reserve(std::size(units));
-        std::transform(
-            std::begin(units),
-            std::end(units),
-            std::back_inserter(units_vec),
-            [](auto const& unit) { return std::data(unit.name); });
+        for (size_t i = 0;; ++i)
+        {
+            auto const display_name = units.display_name(i);
+            if (std::empty(display_name))
+            {
+                break;
+            }
+            units_vec.emplace_back(display_name);
+        }
         return units_vec;
     };
 
     auto units_map = tr_variant::Map{ 6U };
-    units_map.try_emplace(TR_KEY_memory_bytes, mem_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(mem_units));
-    units_map.try_emplace(TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_size_units, make_units_vec(size_units));
-    units_map.try_emplace(TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(speed_units));
+    units_map.try_emplace(TR_KEY_memory_bytes, Values::Config::Memory.base());
+    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Values::Config::Memory));
+    units_map.try_emplace(TR_KEY_size_bytes, Values::Config::Storage.base());
+    units_map.try_emplace(TR_KEY_size_units, make_units_vec(Values::Config::Storage));
+    units_map.try_emplace(TR_KEY_speed_bytes, Values::Config::Speed.base());
+    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(Values::Config::Speed));
     return tr_variant{ std::move(units_map) };
 }
 

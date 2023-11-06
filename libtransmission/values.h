@@ -59,9 +59,9 @@ struct Config
             return base_;
         }
 
-        [[nodiscard]] constexpr auto display_name(int units) const noexcept
+        [[nodiscard]] constexpr auto display_name(size_t units) const noexcept
         {
-            return std::string_view{ std::data(display_names_[units]) };
+            return std::string_view{ units < std::size(display_names_) ? std::data(display_names_[units]) : "" };
         }
 
         [[nodiscard]] constexpr auto multiplier(UnitsEnum multiplier) const noexcept
