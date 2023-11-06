@@ -301,7 +301,7 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 // ---
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
-void tr_formatter_size_init(uint64_t base, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 
