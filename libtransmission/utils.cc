@@ -59,8 +59,6 @@
 
 using namespace std::literals;
 
-namespace Values = libtransmission::Values;
-
 time_t libtransmission::detail::tr_time::current_time = {};
 
 // ---
@@ -667,80 +665,22 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 #endif
 }
 
-// ---
+// --- VALUES / FORMATTER
 
 namespace libtransmission::Values
 {
 
+// default values; can be overridden by client apps
 Config::Units<MemoryUnits> Config::Memory{ Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
-
 Config::Units<SpeedUnits> Config::Speed{ Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
-
 Config::Units<StorageUnits> Config::Storage{ Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
 } // namespace libtransmission::Values
 
-namespace
-{
-namespace formatter_impl
-{
-template<typename UnitsEnum>
-void values_init(
-    Values::Config::Units<UnitsEnum>& setme,
-    size_t const base_in,
-    char const* const b,
-    char const* const kb,
-    char const* const mb,
-    char const* const gb,
-    char const* const tb)
-{
-    auto const base = base_in == 1000U ? Values::Kilo : Values::Kibi;
-    setme = libtransmission::Values::Config::Units<UnitsEnum>{ base, b, kb, mb, gb, tb };
-}
-} // namespace formatter_impl
-} // namespace
-
-size_t tr_speed_K = 0;
-
-void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    using namespace formatter_impl;
-    values_init(Values::Config::Storage, base, "B", kb, mb, gb, tb);
-}
-
-std::string tr_formatter_size_B(uint64_t bytes)
-{
-    return Values::Storage{ bytes, Values::Bytes }.to_string();
-}
-
-void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    using namespace formatter_impl;
-    values_init(Values::Config::Speed, base, "B/s", kb, mb, gb, tb);
-    tr_speed_K = base;
-}
-
-std::string tr_formatter_speed_KBps(double kbyps)
-{
-    return Values::Speed{ kbyps, Values::KByps }.to_string();
-}
-
-size_t tr_mem_K = 0;
-
-void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    using namespace formatter_impl;
-    values_init(Values::Config::Memory, base, "B", kb, mb, gb, tb);
-    tr_mem_K = base;
-}
-
-std::string tr_formatter_mem_B(size_t bytes)
-{
-    return Values::Memory{ bytes, Values::Bytes }.to_string();
-}
-
 tr_variant tr_formatter_get_units()
 {
+    using namespace libtransmission::Values;
+
     auto const make_units_vec = [](auto const& units)
     {
         auto units_vec = tr_variant::Vector{};
@@ -757,38 +697,101 @@ tr_variant tr_formatter_get_units()
     };
 
     auto units_map = tr_variant::Map{ 6U };
-    units_map.try_emplace(TR_KEY_memory_bytes, Values::Config::Memory.base());
-    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Values::Config::Memory));
-    units_map.try_emplace(TR_KEY_size_bytes, Values::Config::Storage.base());
-    units_map.try_emplace(TR_KEY_size_units, make_units_vec(Values::Config::Storage));
-    units_map.try_emplace(TR_KEY_speed_bytes, Values::Config::Speed.base());
-    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(Values::Config::Speed));
+    units_map.try_emplace(TR_KEY_memory_bytes, Memory::units().base());
+    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Memory::units()));
+    units_map.try_emplace(TR_KEY_size_bytes, Storage::units().base());
+    units_map.try_emplace(TR_KEY_size_units, make_units_vec(Storage::units()));
+    units_map.try_emplace(TR_KEY_speed_bytes, Speed::units().base());
+    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(Speed::units()));
     return tr_variant{ std::move(units_map) };
 }
 
-std::string tr_formatter_mem_MB(double mbytes)
+// --- formatters: storage
+
+void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
-    return Values::Memory{ mbytes, Values::MBytes }.to_string();
+    namespace Values = libtransmission::Values;
+
+    Values::Config::Storage = { base == 1000U ? Values::Kilo : Values::Kibi, "B", kb, mb, gb, tb };
 }
 
+std::string tr_formatter_size_B(uint64_t bytes)
+{
+    using Storage = libtransmission::Values::Storage;
+
+    return Storage{ bytes, Storage::Units::Bytes }.to_string();
+}
+
+// --- formatters: speed
+
+size_t tr_speed_K = 0;
+
+void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
+{
+    namespace Values = libtransmission::Values;
+
+    Values::Config::Speed = { base == 1000U ? Values::Kilo : Values::Kibi, "B/s", kb, mb, gb, tb };
+    tr_speed_K = base;
+}
+
+std::string tr_formatter_speed_KBps(double kbyps)
+{
+    using Speed = libtransmission::Values::Speed;
+
+    return Speed{ kbyps, Speed::Units::KByps }.to_string();
+}
 uint64_t tr_toSpeedBytes(size_t kbyps)
 {
-    return Values::Speed{ kbyps, Values::KByps }.base_quantity();
+    using Speed = libtransmission::Values::Speed;
+
+    return Speed{ kbyps, Speed::Units::KByps }.base_quantity();
 }
 
 double tr_toSpeedKBps(size_t byps)
 {
-    return Values::Speed{ byps, Values::Byps }.count(Values::KByps);
+    using Speed = libtransmission::Values::Speed;
+
+    return Speed{ byps, Speed::Units::Byps }.count(Speed::Units::KByps);
+}
+
+// --- formatters: memory
+
+size_t tr_mem_K = 0;
+
+void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
+{
+    namespace Values = libtransmission::Values;
+
+    Values::Config::Memory = { base == 1000U ? Values::Kilo : Values::Kibi, "B", kb, mb, gb, tb };
+    tr_mem_K = base;
+}
+
+std::string tr_formatter_mem_B(size_t bytes)
+{
+    using Memory = libtransmission::Values::Memory;
+
+    return Memory{ bytes, Memory::Units::Bytes }.to_string();
+}
+
+std::string tr_formatter_mem_MB(double mbytes)
+{
+    using Memory = libtransmission::Values::Memory;
+
+    return Memory{ mbytes, Memory::Units::MBytes }.to_string();
 }
 
 uint64_t tr_toMemBytes(size_t mbytes)
 {
-    return Values::Memory{ mbytes, Values::MBytes }.base_quantity();
+    using Memory = libtransmission::Values::Memory;
+
+    return Memory{ mbytes, Memory::Units::MBytes }.base_quantity();
 }
 
 double tr_toMemMB(uint64_t bytes)
 {
-    return Values::Memory{ bytes, Values::MBytes }.count(Values::MBytes);
+    using Memory = libtransmission::Values::Memory;
+
+    return Memory{ bytes, Memory::Units::Bytes }.count(Memory::Units::MBytes);
 }
 
 // --- ENVIRONMENT

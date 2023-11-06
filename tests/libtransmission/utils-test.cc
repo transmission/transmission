@@ -376,32 +376,32 @@ TEST_F(UtilsTest, ratioToString)
 
 TEST_F(UtilsTest, value)
 {
-    namespace Values = libtransmission::Values;
+    using Speed = libtransmission::Values::Speed;
 
-    auto val = Values::Speed{ 1, Values::MByps };
+    auto val = Speed{ 1, Speed::Units::MByps };
     EXPECT_EQ("1.00 MB/s", val.to_string());
     EXPECT_NEAR(1000000U, val.base_quantity(), 0.0001);
-    EXPECT_NEAR(1000U, val.count(Values::KByps), 0.0001);
-    EXPECT_NEAR(1U, val.count(Values::MByps), 0.0001);
-    EXPECT_NEAR(0.001, val.count(Values::GByps), 0.0001);
+    EXPECT_NEAR(1000U, val.count(Speed::Units::KByps), 0.0001);
+    EXPECT_NEAR(1U, val.count(Speed::Units::MByps), 0.0001);
+    EXPECT_NEAR(0.001, val.count(Speed::Units::GByps), 0.0001);
 
-    val = Values::Speed{ 1, Values::Byps };
+    val = Speed{ 1, Speed::Units::Byps };
     EXPECT_EQ("1 B/s", val.to_string());
 
-    val = Values::Speed{ 10, Values::KByps };
+    val = Speed{ 10, Speed::Units::KByps };
     EXPECT_EQ("10.00 kB/s", val.to_string());
 
-    val = Values::Speed{ 999, Values::KByps };
+    val = Speed{ 999, Speed::Units::KByps };
     EXPECT_EQ("999.0 kB/s", val.to_string());
 }
 
 TEST_F(UtilsTest, valueHonorsFormatterInit)
 {
-    namespace Values = libtransmission::Values;
+    using Speed = libtransmission::Values::Speed;
 
     tr_formatter_speed_init(1024, "KayBeePerEss", "EmmBeePerEss", "GeeBeePerEss", "TeeBeePerEss");
 
-    auto const val_m = Values::Speed{ 1, Values::MByps };
-    EXPECT_EQ("1.00 EmmBeePerEss", val_m.to_string());
-    EXPECT_EQ(1048576U, val_m.base_quantity());
+    auto const val = Speed{ 1, Speed::Units::MByps };
+    EXPECT_EQ("1.00 EmmBeePerEss", val.to_string());
+    EXPECT_EQ(1048576U, val.base_quantity());
 }

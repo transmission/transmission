@@ -20,7 +20,7 @@ enum Base
     Kibi = 1024U
 };
 
-enum MemoryUnits
+enum class MemoryUnits
 {
     Bytes,
     KBytes,
@@ -31,7 +31,7 @@ enum MemoryUnits
 
 using StorageUnits = MemoryUnits;
 
-enum SpeedUnits
+enum class SpeedUnits
 {
     Byps,
     KByps,
@@ -66,7 +66,7 @@ struct Config
 
         [[nodiscard]] constexpr auto multiplier(UnitsEnum multiplier) const noexcept
         {
-            return multipliers_[multiplier];
+            return multipliers_[static_cast<int>(multiplier)];
         }
 
     private:
@@ -101,15 +101,17 @@ template<typename UnitsEnum, Config::Units<UnitsEnum> const& units_>
 class Value
 {
 public:
+    using Units = UnitsEnum;
+
     constexpr Value() = default;
 
-    constexpr Value(uint64_t value, UnitsEnum multiple)
+    constexpr Value(uint64_t value, Units multiple)
         : base_quantity_{ value * units_.multiplier(multiple) }
     {
     }
 
     template<typename Number>
-    Value(Number value, UnitsEnum multiple)
+    Value(Number value, Units multiple)
         : base_quantity_{ static_cast<uint64_t>(value * units_.multiplier(multiple)) }
     {
     }
@@ -125,7 +127,7 @@ public:
         return base_quantity_;
     }
 
-    [[nodiscard]] constexpr auto count(UnitsEnum tgt) const noexcept
+    [[nodiscard]] constexpr auto count(Units tgt) const noexcept
     {
         return base_quantity_ / (1.0 * units_.multiplier(tgt));
     }
@@ -224,6 +226,11 @@ public:
     {
         auto buf = std::array<char, 64>{};
         return std::string{ to_string(std::data(buf), std::size(buf)) };
+    }
+
+    [[nodiscard]] static constexpr auto const& units() noexcept
+    {
+        return units_;
     }
 
 private:
