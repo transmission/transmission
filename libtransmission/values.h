@@ -190,7 +190,7 @@ public:
         return compare(that) >= 0;
     }
 
-    [[nodiscard]] std::string_view to_string(char* buf, size_t buflen) const noexcept
+    std::string_view to_string(char* buf, size_t buflen) const noexcept
     {
         auto idx = size_t{ 0 };
 
