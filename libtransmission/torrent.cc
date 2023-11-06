@@ -1634,14 +1634,9 @@ tr_torrent_metainfo const& tr_torrent::VerifyMediator::metainfo() const
     return tor_->metainfo_;
 }
 
-std::optional<std::string> tr_torrent::VerifyMediator::find_file(tr_file_index_t const file_index) const
+bool tr_torrent::VerifyMediator::check_piece(tr_piece_index_t const piece) const
 {
-    if (auto const found = tor_->find_file(file_index); found)
-    {
-        return std::string{ found->filename().sv() };
-    }
-
-    return {};
+    return tr_ioTestPiece(tor_, piece);
 }
 
 void tr_torrent::VerifyMediator::on_verify_queued()

@@ -134,7 +134,7 @@ public:
         ~VerifyMediator() override = default;
 
         [[nodiscard]] tr_torrent_metainfo const& metainfo() const override;
-        [[nodiscard]] std::optional<std::string> find_file(tr_file_index_t file_index) const override;
+        [[nodiscard]] bool check_piece(tr_piece_index_t piece) const override;
 
         void on_verify_queued() override;
         void on_verify_started() override;
