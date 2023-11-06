@@ -718,49 +718,6 @@ void formatter_init(formatter_units& units, uint64_t kilo, char const* kb, char 
     units[TR_FMT_TB].value = value;
 }
 
-char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes, size_t buflen)
-{
-    formatter_unit const* unit = nullptr;
-
-    if (bytes < u[1].value)
-    {
-        unit = std::data(u);
-    }
-    else if (bytes < u[2].value)
-    {
-        unit = &u[1];
-    }
-    else if (bytes < u[3].value)
-    {
-        unit = &u[2];
-    }
-    else
-    {
-        unit = &u[3];
-    }
-
-    double const value = static_cast<double>(bytes) / unit->value;
-    auto const* const units = std::data(unit->name);
-
-    auto precision = int{};
-    if (unit->value == 1)
-    {
-        precision = 0;
-    }
-    else if (value < 100)
-    {
-        precision = 2;
-    }
-    else
-    {
-        precision = 1;
-    }
-
-    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}Lf} {:s}", value, precision, units);
-    *out = '\0';
-    return buf;
-}
-
 formatter_units size_units;
 formatter_units speed_units;
 formatter_units mem_units;
@@ -794,9 +751,7 @@ void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char 
 
 std::string tr_formatter_size_B(uint64_t bytes)
 {
-    using namespace formatter_impl;
-    auto buf = std::array<char, 64>{};
-    return formatter_get_size_str(size_units, std::data(buf), bytes, std::size(buf));
+    return Values::Storage{ bytes, Values::Bytes }.to_string();
 }
 
 void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
@@ -823,12 +778,9 @@ void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char con
     values_init(libtransmission::Values::Config::Memory, kilo, "B", kb, mb, gb, tb);
 }
 
-std::string tr_formatter_mem_B(size_t bytes_per_second)
+std::string tr_formatter_mem_B(size_t bytes)
 {
-    using namespace formatter_impl;
-
-    auto buf = std::array<char, 64>{};
-    return formatter_get_size_str(mem_units, std::data(buf), bytes_per_second, std::size(buf));
+    return Values::Memory{ bytes, Values::Bytes }.to_string();
 }
 
 tr_variant tr_formatter_get_units()
