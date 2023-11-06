@@ -672,13 +672,11 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 namespace libtransmission::Values
 {
 
-Config::Units<libtransmission::Values::MemoryUnits> Config::Memory = Config::Units<MemoryUnits>{ Base::Kibi, "B"sv,   "KiB"sv,
-                                                                                                 "MiB"sv,    "GiB"sv, "TiB"sv };
-Config::Units<libtransmission::Values::SpeedUnits> Config::Speed = Config::Units<SpeedUnits>{ Base::Kilo, "B/s"sv,  "kB/s"sv,
-                                                                                              "MB/s"sv,   "GB/s"sv, "TB/s"sv };
-Config::Units<libtransmission::Values::StorageUnits> Config::Storage = Config::Units<StorageUnits>{
-    Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv
-};
+Config::Units<MemoryUnits> Config::Memory{ Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+
+Config::Units<SpeedUnits> Config::Speed{ Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+
+Config::Units<StorageUnits> Config::Storage{ Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
 } // namespace libtransmission::Values
 
