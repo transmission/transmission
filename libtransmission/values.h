@@ -70,11 +70,11 @@ struct Config
         }
 
     private:
-        void set_base(Base base)
+        constexpr void set_base(Base base)
         {
             base_ = base;
 
-            auto val = 1ULL;
+            auto val = uint64_t{ 1U };
             for (auto& multiplier : multipliers_)
             {
                 multiplier = val;
