@@ -768,29 +768,29 @@ tr_variant tr_formatter_get_units()
     return tr_variant{ std::move(units_map) };
 }
 
-std::string tr_formatter_mem_MB(double MB)
+std::string tr_formatter_mem_MB(double mbytes)
 {
-    return Values::Memory{ MB, Values::MBytes }.to_string();
+    return Values::Memory{ mbytes, Values::MBytes }.to_string();
 }
 
-uint64_t tr_toSpeedBytes(size_t KBps)
+uint64_t tr_toSpeedBytes(size_t kbyps)
 {
-    return Values::Speed{ KBps, Values::KByps }.base_quantity();
+    return Values::Speed{ kbyps, Values::KByps }.base_quantity();
 }
 
-double tr_toSpeedKBps(size_t Bps)
+double tr_toSpeedKBps(size_t byps)
 {
-    return Values::Speed{ Bps, Values::Byps }.count(Values::KByps);
+    return Values::Speed{ byps, Values::Byps }.count(Values::KByps);
 }
 
-uint64_t tr_toMemBytes(size_t MB)
+uint64_t tr_toMemBytes(size_t mbytes)
 {
-    return Values::Memory{ MB, Values::MBytes }.base_quantity();
+    return Values::Memory{ mbytes, Values::MBytes }.base_quantity();
 }
 
-double tr_toMemMB(uint64_t B)
+double tr_toMemMB(uint64_t bytes)
 {
-    return Values::Memory{ B, Values::MBytes }.count(Values::MBytes);
+    return Values::Memory{ bytes, Values::MBytes }.count(Values::MBytes);
 }
 
 // --- ENVIRONMENT
