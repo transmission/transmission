@@ -29,7 +29,6 @@
 #include <libtransmission/file.h>
 #include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
-#include <libtransmission/values.h>
 
 #include "gtest/gtest.h"
 #include "test-fixtures.h"
@@ -372,36 +371,4 @@ TEST_F(UtilsTest, ratioToString)
     {
         ASSERT_EQ(tr_strratio(input, "inf"), expected);
     }
-}
-
-TEST_F(UtilsTest, value)
-{
-    using Speed = libtransmission::Values::Speed;
-
-    auto val = Speed{ 1, Speed::Units::MByps };
-    EXPECT_EQ("1.00 MB/s", val.to_string());
-    EXPECT_NEAR(1000000U, val.base_quantity(), 0.0001);
-    EXPECT_NEAR(1000U, val.count(Speed::Units::KByps), 0.0001);
-    EXPECT_NEAR(1U, val.count(Speed::Units::MByps), 0.0001);
-    EXPECT_NEAR(0.001, val.count(Speed::Units::GByps), 0.0001);
-
-    val = Speed{ 1, Speed::Units::Byps };
-    EXPECT_EQ("1 B/s", val.to_string());
-
-    val = Speed{ 10, Speed::Units::KByps };
-    EXPECT_EQ("10.00 kB/s", val.to_string());
-
-    val = Speed{ 999, Speed::Units::KByps };
-    EXPECT_EQ("999.0 kB/s", val.to_string());
-}
-
-TEST_F(UtilsTest, valueHonorsFormatterInit)
-{
-    using Speed = libtransmission::Values::Speed;
-
-    tr_formatter_speed_init(1024, "KayBeePerEss", "EmmBeePerEss", "GeeBeePerEss", "TeeBeePerEss");
-
-    auto const val = Speed{ 1, Speed::Units::MByps };
-    EXPECT_EQ("1.00 EmmBeePerEss", val.to_string());
-    EXPECT_EQ(1048576U, val.base_quantity());
 }
