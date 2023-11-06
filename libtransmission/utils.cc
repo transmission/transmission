@@ -59,6 +59,8 @@
 
 using namespace std::literals;
 
+namespace Values = libtransmission::Values;
+
 time_t libtransmission::detail::tr_time::current_time = {};
 
 // ---
@@ -807,35 +809,7 @@ void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char c
 
 std::string tr_formatter_speed_KBps(double kilo_per_second)
 {
-    using namespace formatter_impl;
-
-    auto speed = kilo_per_second;
-
-    if (speed < 999.95) // 0.0 KB to 999.9 KB (0.0 KiB to 999.9 KiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
-    }
-
-    double const kilo = speed_units[TR_FMT_KB].value;
-    speed /= kilo;
-
-    if (speed < 99.995) // 0.98 MB to 99.99 MB (1.00 MiB to 99.99 MiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-    if (speed < 999.95) // 100.0 MB to 999.9 MB (100.0 MiB to 999.9 MiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-
-    speed /= kilo;
-
-    if (speed < 99.995) // 0.98 GB to 99.99 GB (1.00 GiB to 99.99 GiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-    }
-    // 100.0 GB and above (100.0 GiB and above)
-    return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
+    return Values::Speed{ kilo_per_second, Values::KByps }.to_string();
 }
 
 size_t tr_mem_K = 0;
