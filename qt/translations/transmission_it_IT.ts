@@ -2620,7 +2620,7 @@ una riga vuota.</translation>
         <location line="+56"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Richeista del conto dei peer tra %1</translation>
+        <translation>Richiesta del conto dei peer tra %1</translation>
     </message>
     <message>
         <location line="+5"/>
