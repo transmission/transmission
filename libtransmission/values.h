@@ -14,15 +14,6 @@
 
 namespace libtransmission::Values
 {
-<<<<<<< HEAD
-=======
-enum Base
-{
-    Kilo = 1000U,
-    Kibi = 1024U
-};
-
->>>>>>> c69a053d8 (refactor: add Units alias in the Value class)
 enum class MemoryUnits
 {
     Bytes,

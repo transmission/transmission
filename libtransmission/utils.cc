@@ -755,7 +755,8 @@ void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char con
 {
     namespace Values = libtransmission::Values;
 
-    Values::Config::Memory = { base == 1000U ? Values::Kilo : Values::Kibi, "B", kb, mb, gb, tb };
+    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
+    Values::Config::Memory = { kval, "B", kb, mb, gb, tb };
     tr_mem_K = base;
 }
 
