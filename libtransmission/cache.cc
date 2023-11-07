@@ -146,7 +146,7 @@ int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniq
         // already has a cache layer for the very purpose of this cache
         // https://github.com/transmission/transmission/pull/5668
         auto* const tor = torrents_.get(tor_id);
-        return tr_ioWrite(tor, tor->block_loc(block), std::size(*writeme), std::data(*writeme));
+        return tor != nullptr ? tr_ioWrite(tor, tor->block_loc(block), std::size(*writeme), std::data(*writeme)) : EINVAL;
     }
 
     auto const key = Key{ tor_id, block };
