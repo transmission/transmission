@@ -14,12 +14,6 @@
 
 namespace libtransmission::Values
 {
-enum Base
-{
-    Kilo = 1000U,
-    Kibi = 1024U
-};
-
 enum class MemoryUnits
 {
     Bytes,
@@ -42,6 +36,12 @@ enum class SpeedUnits
 
 struct Config
 {
+    enum class Base
+    {
+        Kilo = 1000U,
+        Kibi = 1024U
+    };
+
     template<typename UnitsEnum>
     struct Units
     {
@@ -56,7 +56,7 @@ struct Config
 
         [[nodiscard]] constexpr auto base() const noexcept
         {
-            return base_;
+            return static_cast<size_t>(base_);
         }
 
         [[nodiscard]] constexpr auto display_name(size_t units) const noexcept
@@ -78,7 +78,7 @@ struct Config
             for (auto& multiplier : multipliers_)
             {
                 multiplier = val;
-                val *= base;
+                val *= static_cast<size_t>(base);
             }
         }
 

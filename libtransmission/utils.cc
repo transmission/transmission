@@ -671,9 +671,9 @@ namespace libtransmission::Values
 {
 
 // default values; can be overridden by client apps
-Config::Units<MemoryUnits> Config::Memory{ Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
-Config::Units<SpeedUnits> Config::Speed{ Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
-Config::Units<StorageUnits> Config::Storage{ Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
+Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
 
 } // namespace libtransmission::Values
 
@@ -712,7 +712,8 @@ void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char co
 {
     namespace Values = libtransmission::Values;
 
-    Values::Config::Storage = { base == 1000U ? Values::Kilo : Values::Kibi, "B", kb, mb, gb, tb };
+    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
+    Values::Config::Storage = { kval, "B", kb, mb, gb, tb };
 }
 
 std::string tr_formatter_size_B(uint64_t bytes)
@@ -730,7 +731,8 @@ void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char c
 {
     namespace Values = libtransmission::Values;
 
-    Values::Config::Speed = { base == 1000U ? Values::Kilo : Values::Kibi, "B/s", kb, mb, gb, tb };
+    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
+    Values::Config::Speed = { kval, "B/s", kb, mb, gb, tb };
     tr_speed_K = base;
 }
 
@@ -762,7 +764,8 @@ void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char con
 {
     namespace Values = libtransmission::Values;
 
-    Values::Config::Memory = { base == 1000U ? Values::Kilo : Values::Kibi, "B", kb, mb, gb, tb };
+    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
+    Values::Config::Memory = { kval, "B", kb, mb, gb, tb };
     tr_mem_K = base;
 }
 
