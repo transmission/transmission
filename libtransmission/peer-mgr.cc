@@ -52,6 +52,7 @@
 #include "libtransmission/utils.h"
 #include "libtransmission/webseed.h"
 
+using Speed = libtransmission::Values::Speed;
 using namespace std::literals;
 
 static auto constexpr CancelHistorySec = int{ 60 };
@@ -356,7 +357,7 @@ public:
         return std::count_if(
             std::begin(webseeds),
             std::end(webseeds),
-            [&now](auto const& webseed) { return webseed->isTransferringPieces(now, TR_DOWN, nullptr); });
+            [&now](auto const& webseed) { return webseed->get_piece_speed(now, TR_DOWN).base_quantity() != 0U; });
     }
 
     [[nodiscard]] TR_CONSTEXPR20 auto peerCount() const noexcept
@@ -1635,8 +1636,8 @@ namespace peer_stat_helpers
     stats.progress = peer->percentDone();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
-    stats.rateToPeer_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_CLIENT_TO_PEER));
-    stats.rateToClient_KBps = tr_toSpeedKBps(peer->get_piece_speed_bytes_per_second(now_msec, TR_PEER_TO_CLIENT));
+    stats.rateToPeer_KBps = peer->get_piece_speed(now_msec, TR_CLIENT_TO_PEER).count(Speed::Units::KByps);
+    stats.rateToClient_KBps = peer->get_piece_speed(now_msec, TR_PEER_TO_CLIENT).count(Speed::Units::KByps);
     stats.peerIsChoked = peer->peer_is_choked();
     stats.peerIsInterested = peer->peer_is_interested();
     stats.clientIsChoked = peer->client_is_choked();
@@ -1812,7 +1813,13 @@ namespace rechoke_uploads_helpers
 {
 struct ChokeData
 {
-    ChokeData(tr_peerMsgs* msgs_in, int rate_in, uint8_t salt_in, bool is_interested_in, bool was_choked_in, bool is_choked_in)
+    ChokeData(
+        tr_peerMsgs* msgs_in,
+        Speed rate_in,
+        uint8_t salt_in,
+        bool is_interested_in,
+        bool was_choked_in,
+        bool is_choked_in)
         : msgs{ msgs_in }
         , rate{ rate_in }
         , salt{ salt_in }
@@ -1823,7 +1830,7 @@ struct ChokeData
     }
 
     tr_peerMsgs* msgs;
-    int rate;
+    Speed rate;
     uint8_t salt;
     bool is_interested;
     bool was_choked;
@@ -1852,23 +1859,22 @@ struct ChokeData
 };
 
 /* get a rate for deciding which peers to choke and unchoke. */
-[[nodiscard]] auto getRateBps(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
+[[nodiscard]] auto get_rate(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
 {
     if (tor->is_done())
     {
-        return peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
+        return peer->get_piece_speed(now, TR_CLIENT_TO_PEER);
     }
 
-    /* downloading a private torrent... take upload speed into account
-     * because there may only be a small window of opportunity to share */
+    // downloading a private torrent... take upload speed into account
+    // because there may only be a small window of opportunity to share
     if (tor->is_private())
     {
-        return peer->get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT) +
-            peer->get_piece_speed_bytes_per_second(now, TR_CLIENT_TO_PEER);
+        return peer->get_piece_speed(now, TR_PEER_TO_CLIENT) + peer->get_piece_speed(now, TR_CLIENT_TO_PEER);
     }
 
-    /* downloading a public torrent */
-    return peer->get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
+    // downloading a public torrent
+    return peer->get_piece_speed(now, TR_PEER_TO_CLIENT);
 }
 
 // an optimistically unchoked peer is immune from rechoking
@@ -1916,7 +1922,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         {
             choked.emplace_back(
                 peer,
-                getRateBps(s->tor, peer, now),
+                get_rate(s->tor, peer, now),
                 salter(),
                 peer->peer_is_interested(),
                 peer->peer_is_choked(),
