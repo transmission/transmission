@@ -1177,7 +1177,7 @@ void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kiloby
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    session->alt_speeds_.set_limit_kbps(dir, limit);
+    session->alt_speeds_.set_speed_limit(dir, Speed{ limit, Speed::Units::KByps });
     update_bandwidth(session, dir);
 }
 
@@ -1186,7 +1186,7 @@ tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, 
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return session->alt_speeds_.limit_kbps(dir);
+    return session->alt_speeds_.speed_limit(dir).count(Speed::Units::KByps);
 }
 
 void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled)
