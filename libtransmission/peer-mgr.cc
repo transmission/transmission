@@ -336,6 +336,7 @@ public:
             auto& [socket_address, peer_info] = *iter;
             if (peer_info.is_inactive(now))
             {
+                --stats.known_peer_from_count[peer_info.from_first()];
                 iter = connectable_pool.erase(iter);
             }
             else
@@ -454,6 +455,10 @@ public:
         {
             peer_info.found_at(from);
             peer_info.set_pex_flags(flags);
+        }
+        else if (is_connectable)
+        {
+            ++stats.known_peer_from_count[from];
         }
 
         mark_all_seeds_flag_dirty();
@@ -817,7 +822,8 @@ private:
             }
 
             info_this.merge(info_that);
-            connectable_pool.erase(info_that.listen_socket_address());
+            auto from = info_that.from_first();
+            stats.known_peer_from_count[from] -= connectable_pool.erase(info_that.listen_socket_address());
         }
         else if (!was_connectable)
         {
@@ -833,6 +839,7 @@ private:
         }
         else
         {
+            ++stats.known_peer_from_count[nh.mapped().from_first()];
             TR_ASSERT(nh.key().address() == nh.mapped().listen_address());
         }
         nh.key().port_ = event.port;
@@ -859,6 +866,7 @@ private:
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
 
+            --stats.known_peer_from_count[info_that.from_first()];
             // Note that it_that is invalid after this point
             graveyard_pool.insert(connectable_pool.extract(it_that));
 
@@ -870,6 +878,7 @@ private:
 
         if (was_connectable)
         {
+            --stats.known_peer_from_count[info_this.from_first()];
             graveyard_pool.insert(connectable_pool.extract(info_this.listen_socket_address()));
         }
 

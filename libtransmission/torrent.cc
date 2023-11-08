@@ -1357,6 +1357,7 @@ tr_stat tr_torrent::stats() const
     for (int i = 0; i < TR_PEER_FROM__MAX; i++)
     {
         stats.peersFrom[i] = swarm_stats.peer_from_count[i];
+        stats.knownPeersFrom[i] = swarm_stats.known_peer_from_count[i];
     }
 
     auto const piece_upload_speed_byps = this->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_UP);

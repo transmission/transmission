@@ -1352,6 +1352,41 @@ bool trashDataFile(char const* filename, void* /*user_data*/, tr_error* error)
     return self.fStat->peersFrom[TR_PEER_FROM_LTEP];
 }
 
+- (NSUInteger)totalKnownPeersTracker
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_TRACKER];
+}
+
+- (NSUInteger)totalKnownPeersIncoming
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_INCOMING];
+}
+
+- (NSUInteger)totalKnownPeersCache
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_RESUME];
+}
+
+- (NSUInteger)totalKnownPeersPex
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_PEX];
+}
+
+- (NSUInteger)totalKnownPeersDHT
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_DHT];
+}
+
+- (NSUInteger)totalKnownPeersLocal
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_LPD];
+}
+
+- (NSUInteger)totalKnownPeersLTEP
+{
+    return self.fStat->knownPeersFrom[TR_PEER_FROM_LTEP];
+}
+
 - (NSUInteger)peersSendingToUs
 {
     return self.fStat->peersSendingToUs;
