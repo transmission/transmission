@@ -617,7 +617,10 @@ export class Inspector extends EventTarget {
         setTextContent(td, peer.address);
         td.setAttribute('title', peer.address);
       },
-      (peer, td) => setTextContent(td, peer.clientName),
+      (peer, td) => {
+        setTextContent(td, peer.clientName);
+        td.setAttribute('title', peer.clientName);
+      },
     ];
 
     const rows = [];
