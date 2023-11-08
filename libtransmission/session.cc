@@ -1163,7 +1163,7 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 
 // --- Session alt speed limits
 
-void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction const dir, size_t limit_kbyps)
+void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
