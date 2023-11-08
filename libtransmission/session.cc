@@ -152,20 +152,20 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
         tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
 } // namespace bandwidth_group_helpers
+} // namespace
 
-void update_bandwidth(tr_session* session, tr_direction dir)
+void tr_session::update_bandwidth(tr_direction const dir)
 {
-    if (auto const limit = session->active_speed_limit(dir); limit)
+    if (auto const limit = active_speed_limit(dir); limit)
     {
-        session->top_bandwidth_.set_limited(dir, limit->base_quantity() > 0U);
-        session->top_bandwidth_.set_desired_speed(dir, *limit);
+        top_bandwidth_.set_limited(dir, limit->base_quantity() > 0U);
+        top_bandwidth_.set_desired_speed(dir, *limit);
     }
     else
     {
-        session->top_bandwidth_.set_limited(dir, false);
+        top_bandwidth_.set_limited(dir, false);
     }
 }
-} // namespace
 
 tr_port tr_session::randomPort() const
 {
@@ -870,8 +870,8 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 
     // We need to update bandwidth if speed settings changed.
     // It's a harmless call, so just call it instead of checking for settings changes
-    update_bandwidth(this, TR_UP);
-    update_bandwidth(this, TR_DOWN);
+    update_bandwidth(TR_UP);
+    update_bandwidth(TR_DOWN);
 }
 
 void tr_sessionSet(tr_session* session, tr_variant const& settings)
@@ -1085,10 +1085,9 @@ std::optional<Speed> tr_session::active_speed_limit(tr_direction dir) const noex
         return alt_speeds_.speed_limit(dir);
     }
 
-    if (this->is_speed_limited(dir))
+    if (is_speed_limited(dir))
     {
-        auto const kbyps = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
-        return Speed{ kbyps, Speed::Units::KByps };
+        return speed_limit(dir);
     }
 
     return {};
@@ -1103,8 +1102,8 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 {
     auto const in_session_thread = [session = &session_, is_active, reason]()
     {
-        update_bandwidth(session, TR_UP);
-        update_bandwidth(session, TR_DOWN);
+        session->update_bandwidth(TR_UP);
+        session->update_bandwidth(TR_DOWN);
 
         if (session->alt_speed_active_changed_func_ != nullptr)
         {
@@ -1121,7 +1120,7 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 
 // --- Session primary speed limits
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction const dir, tr_kilobytes_per_second_t const limit)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -1135,7 +1134,7 @@ void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilo
         session->settings_.speed_limit_up = limit;
     }
 
-    update_bandwidth(session, dir);
+    session->update_bandwidth(dir);
 }
 
 tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
@@ -1146,7 +1145,7 @@ tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session
     return session->speed_limit(dir).count(Speed::Units::KByps);
 }
 
-void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
+void tr_sessionLimitSpeed(tr_session* session, tr_direction const dir, bool limited)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -1160,10 +1159,10 @@ void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
         session->settings_.speed_limit_up_enabled = limited;
     }
 
-    update_bandwidth(session, dir);
+    session->update_bandwidth(dir);
 }
 
-bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
+bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -1173,13 +1172,13 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
 
 // --- Session alt speed limits
 
-void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
+void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction const dir, tr_kilobytes_per_second_t limit)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
     session->alt_speeds_.set_speed_limit(dir, Speed{ limit, Speed::Units::KByps });
-    update_bandwidth(session, dir);
+    session->update_bandwidth(dir);
 }
 
 tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)

@@ -839,10 +839,17 @@ public:
         return global_ip_cache_->global_source_addr(type);
     }
 
-    [[nodiscard]] constexpr auto speed_limit(tr_direction dir) const noexcept
+    [[nodiscard]] constexpr auto speed_limit(tr_direction const dir) const noexcept
     {
         auto const kbyps = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
         return Speed{ kbyps, Speed::Units::KByps };
+    }
+
+    void set_speed_limit(tr_direction dir, Speed limit) noexcept
+    {
+        auto& tgt = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        tgt = limit.count(Speed::Units::KByps);
+        update_bandwidth(dir);
     }
 
     [[nodiscard]] constexpr auto is_speed_limited(tr_direction dir) const noexcept
@@ -936,6 +943,8 @@ private:
         return settings_.script_torrent_done_seeding_filename;
     }
 
+    void update_bandwidth(tr_direction dir);
+
     [[nodiscard]] tr_port randomPort() const;
 
     void onAdvertisedPeerPortChanged();
@@ -1018,7 +1027,6 @@ private:
     friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
-    friend void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeed(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled);
