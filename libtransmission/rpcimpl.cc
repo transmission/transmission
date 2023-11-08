@@ -41,6 +41,7 @@
 #include "libtransmission/web-utils.h"
 #include "libtransmission/web.h"
 
+using Speed = libtransmission::Values::Speed;
 using namespace std::literals;
 
 namespace
@@ -1604,9 +1605,9 @@ char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, s
             auto limits = group->get_limits();
             tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
             tr_variantDictAddStr(dict, TR_KEY_name, name);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit_KBps);
+            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
             tr_variantDictAddBool(dict, TR_KEY_speed_limit_down_enabled, limits.down_limited);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit_KBps);
+            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
             tr_variantDictAddBool(dict, TR_KEY_speed_limit_up_enabled, limits.up_limited);
         }
     }
@@ -1632,12 +1633,12 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &limit))
     {
-        limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+        limits.down_limit = Speed{ limit, Speed::Units::KByps };
     }
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &limit))
     {
-        limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+        limits.up_limit = Speed{ limit, Speed::Units::KByps };
     }
 
     group.set_limits(limits);

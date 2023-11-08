@@ -73,8 +73,8 @@ size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
     // the .5 is to leave room for protocol messages
     static auto constexpr Floor = static_cast<size_t>(tr_block_info::BlockSize * 3.5);
 
-    auto const current_speed_bytes_per_second = io->get_piece_speed_bytes_per_second(now, TR_UP);
-    return std::max(Floor, current_speed_bytes_per_second * PeriodSecs);
+    auto const current_speed = io->get_piece_speed(now, TR_UP);
+    return std::max(Floor, current_speed.base_quantity() * PeriodSecs);
 }
 } // namespace
 

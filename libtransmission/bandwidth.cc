@@ -18,8 +18,11 @@
 #include "libtransmission/peer-io.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h" // tr_time_msec()
+#include "libtransmission/values.h"
 
-tr_bytes_per_second_t tr_bandwidth::get_speed_bytes_per_second(RateControl& r, unsigned int interval_msec, uint64_t now)
+using Speed = libtransmission::Values::Speed;
+
+Speed tr_bandwidth::get_speed(RateControl& r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
     {
@@ -46,7 +49,7 @@ tr_bytes_per_second_t tr_bandwidth::get_speed_bytes_per_second(RateControl& r, u
             }
         }
 
-        r.cache_val_ = static_cast<tr_bytes_per_second_t>(bytes * 1000U / interval_msec);
+        r.cache_val_ = Speed{ bytes * 1000U / interval_msec, Speed::Units::Byps };
         r.cache_time_ = now;
     }
 
@@ -146,8 +149,8 @@ void tr_bandwidth::allocate_bandwidth(
     {
         if (auto& bandwidth = band_[dir]; bandwidth.is_limited_)
         {
-            auto const next_pulse_speed = bandwidth.desired_speed_bps_;
-            bandwidth.bytes_left_ = next_pulse_speed * period_msec / 1000U;
+            auto const next_pulse_speed = bandwidth.desired_speed_;
+            bandwidth.bytes_left_ = next_pulse_speed.base_quantity() * period_msec / 1000U;
         }
     }
 
@@ -321,9 +324,9 @@ void tr_bandwidth::notify_bandwidth_consumed(tr_direction dir, size_t byte_count
 
 tr_bandwidth_limits tr_bandwidth::get_limits() const
 {
-    tr_bandwidth_limits limits;
-    limits.up_limit_KBps = tr_toSpeedKBps(this->get_desired_speed_bytes_per_second(TR_UP));
-    limits.down_limit_KBps = tr_toSpeedKBps(this->get_desired_speed_bytes_per_second(TR_DOWN));
+    auto limits = tr_bandwidth_limits{};
+    limits.up_limit = this->get_desired_speed(TR_UP);
+    limits.down_limit = this->get_desired_speed(TR_DOWN);
     limits.up_limited = this->is_limited(TR_UP);
     limits.down_limited = this->is_limited(TR_DOWN);
     return limits;
@@ -331,8 +334,8 @@ tr_bandwidth_limits tr_bandwidth::get_limits() const
 
 void tr_bandwidth::set_limits(tr_bandwidth_limits const& limits)
 {
-    this->set_desired_speed_bytes_per_second(TR_UP, tr_toSpeedBytes(limits.up_limit_KBps));
-    this->set_desired_speed_bytes_per_second(TR_DOWN, tr_toSpeedBytes(limits.down_limit_KBps));
+    this->set_desired_speed(TR_UP, limits.up_limit);
+    this->set_desired_speed(TR_DOWN, limits.down_limit);
     this->set_limited(TR_UP, limits.up_limited);
     this->set_limited(TR_DOWN, limits.down_limited);
 }
