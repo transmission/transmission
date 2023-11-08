@@ -981,11 +981,7 @@ private:
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);
     friend size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
     friend size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
-<<<<<<< HEAD
     friend size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
-=======
-    friend tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
->>>>>>> 86053d7e6 (refactor: tr_session::speedLimitKBps() is now tr_session::speed_limit() and returns a Values::Speed)
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings);
