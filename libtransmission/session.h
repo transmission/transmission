@@ -847,9 +847,9 @@ public:
         return dir == TR_DOWN ? settings_.speed_limit_down_enabled : settings_.speed_limit_up_enabled;
     }
 
-    [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
+    [[nodiscard]] auto piece_speed(tr_direction dir) const noexcept
     {
-        return top_bandwidth_.get_piece_speed(0, dir).base_quantity();
+        return top_bandwidth_.get_piece_speed(0, dir);
     }
 
     [[nodiscard]] std::optional<tr_bytes_per_second_t> activeSpeedLimitBps(tr_direction dir) const noexcept;
