@@ -845,7 +845,7 @@ public:
         return Speed{ kbyps, Speed::Units::KByps };
     }
 
-    [[nodiscard]] constexpr auto isSpeedLimited(tr_direction dir) const noexcept
+    [[nodiscard]] constexpr auto is_speed_limited(tr_direction dir) const noexcept
     {
         return dir == TR_DOWN ? settings_.speed_limit_down_enabled : settings_.speed_limit_up_enabled;
     }

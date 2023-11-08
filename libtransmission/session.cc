@@ -1085,7 +1085,7 @@ std::optional<Speed> tr_session::active_speed_limit(tr_direction dir) const noex
         return alt_speeds_.speed_limit(dir);
     }
 
-    if (this->isSpeedLimited(dir))
+    if (this->is_speed_limited(dir))
     {
         auto const kbyps = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
         return Speed{ kbyps, Speed::Units::KByps };
@@ -1168,7 +1168,7 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return session->isSpeedLimited(dir);
+    return session->is_speed_limited(dir);
 }
 
 // --- Session alt speed limits
