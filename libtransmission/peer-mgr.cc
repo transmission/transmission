@@ -1813,43 +1813,37 @@ namespace rechoke_uploads_helpers
 {
 struct ChokeData
 {
-    ChokeData(
-        tr_peerMsgs* msgs_in,
-        Speed rate_in,
-        uint8_t salt_in,
-        bool is_interested_in,
-        bool was_choked_in,
-        bool is_choked_in)
-        : msgs{ msgs_in }
-        , rate{ rate_in }
-        , salt{ salt_in }
-        , is_interested{ is_interested_in }
-        , was_choked{ was_choked_in }
-        , is_choked{ is_choked_in }
+    ChokeData(tr_peerMsgs* msgs, Speed rate, uint8_t salt, bool is_interested, bool was_choked, bool is_choked)
+        : msgs_{ msgs }
+        , rate_{ rate }
+        , salt_{ salt }
+        , is_interested_{ is_interested }
+        , was_choked_{ was_choked }
+        , is_choked_{ is_choked }
     {
     }
 
-    tr_peerMsgs* msgs;
-    Speed rate;
-    uint8_t salt;
-    bool is_interested;
-    bool was_choked;
-    bool is_choked;
+    tr_peerMsgs* msgs_;
+    Speed rate_;
+    uint8_t salt_;
+    bool is_interested_;
+    bool was_choked_;
+    bool is_choked_;
 
     [[nodiscard]] constexpr auto compare(ChokeData const& that) const noexcept // <=>
     {
         // prefer higher overall speeds
-        if (auto const val = tr_compare_3way(this->rate, that.rate); val != 0)
+        if (auto const val = tr_compare_3way(rate_, that.rate_); val != 0)
         {
             return -val;
         }
 
-        if (this->was_choked != that.was_choked) // prefer unchoked
+        if (was_choked_ != that.was_choked_) // prefer unchoked
         {
-            return this->was_choked ? 1 : -1;
+            return was_choked_ ? 1 : -1;
         }
 
-        return tr_compare_3way(this->salt, that.salt);
+        return tr_compare_3way(salt_, that.salt_);
     }
 
     [[nodiscard]] constexpr auto operator<(ChokeData const& that) const noexcept
@@ -1957,11 +1951,11 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
             break;
         }
 
-        item.is_choked = is_maxed_out ? item.was_choked : false;
+        item.is_choked_ = is_maxed_out ? item.was_choked_ : false;
 
         ++checked_choke_count;
 
-        if (item.is_interested)
+        if (item.is_interested_)
         {
             ++unchoked_interested;
         }
@@ -1974,7 +1968,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
 
         for (auto i = checked_choke_count, n = std::size(choked); i < n; ++i)
         {
-            if (choked[i].is_interested)
+            if (choked[i].is_interested_)
             {
                 rand_pool.push_back(&choked[i]);
             }
@@ -1983,15 +1977,15 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
         if (auto const n = std::size(rand_pool); n != 0)
         {
             auto* c = rand_pool[tr_rand_int(n)];
-            c->is_choked = false;
-            s->optimistic = c->msgs;
+            c->is_choked_ = false;
+            s->optimistic = c->msgs_;
             s->optimistic_unchoke_time_scaler = OptimisticUnchokeMultiplier;
         }
     }
 
     for (auto& item : choked)
     {
-        item.msgs->set_choke(item.is_choked);
+        item.msgs_->set_choke(item.is_choked_);
     }
 }
 } // namespace rechoke_uploads_helpers
