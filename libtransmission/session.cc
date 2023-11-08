@@ -155,10 +155,10 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 
 void update_bandwidth(tr_session* session, tr_direction dir)
 {
-    if (auto const limit_byps = session->activeSpeedLimitBps(dir); limit_byps)
+    if (auto const limit = session->active_speed_limit(dir); limit)
     {
-        session->top_bandwidth_.set_limited(dir, *limit_byps > 0U);
-        session->top_bandwidth_.set_desired_speed(dir, Speed{ *limit_byps, Speed::Units::Byps });
+        session->top_bandwidth_.set_limited(dir, limit->base_quantity() > 0U);
+        session->top_bandwidth_.set_desired_speed(dir, *limit);
     }
     else
     {
@@ -1078,16 +1078,17 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 
 // --- Speed limits
 
-std::optional<tr_bytes_per_second_t> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
+std::optional<Speed> tr_session::active_speed_limit(tr_direction dir) const noexcept
 {
     if (tr_sessionUsesAltSpeed(this))
     {
-        return tr_toSpeedBytes(tr_sessionGetAltSpeed_KBps(this, dir));
+        return alt_speeds_.speed_limit(dir);
     }
 
     if (this->isSpeedLimited(dir))
     {
-        return tr_toSpeedBytes(tr_sessionGetSpeedLimit_KBps(this, dir));
+        auto const kbyps = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        return Speed{ kbyps, Speed::Units::KByps };
     }
 
     return {};

@@ -1120,7 +1120,7 @@ private:
 
         if (uses_session_limits())
         {
-            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
+            if (auto const limit = session->active_speed_limit(direction); limit && limit->base_quantity() == 0U)
             {
                 return false;
             }

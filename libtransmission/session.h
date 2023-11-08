@@ -83,6 +83,8 @@ class SessionTest;
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
+    using Speed = libtransmission::Values::Speed;
+
 private:
     class BoundSocket
     {
@@ -852,7 +854,7 @@ public:
         return top_bandwidth_.get_piece_speed(0, dir);
     }
 
-    [[nodiscard]] std::optional<tr_bytes_per_second_t> activeSpeedLimitBps(tr_direction dir) const noexcept;
+    [[nodiscard]] std::optional<Speed> active_speed_limit(tr_direction dir) const noexcept;
 
     [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
     {
