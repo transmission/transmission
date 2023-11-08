@@ -737,15 +737,6 @@ std::string tr_formatter_speed_KBps(double kbyps)
 {
     return Speed{ kbyps, Speed::Units::KByps }.to_string();
 }
-uint64_t tr_toSpeedBytes(size_t kbyps)
-{
-    return Speed{ kbyps, Speed::Units::KByps }.base_quantity();
-}
-
-double tr_toSpeedKBps(size_t byps)
-{
-    return Speed{ byps, Speed::Units::Byps }.count(Speed::Units::KByps);
-}
 
 // --- formatters: memory
 

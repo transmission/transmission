@@ -480,8 +480,8 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_peerIsInterested, peer.peerIsInterested);
         peer_map.try_emplace(TR_KEY_port, peer.port);
         peer_map.try_emplace(TR_KEY_progress, peer.progress);
-        peer_map.try_emplace(TR_KEY_rateToClient, tr_toSpeedBytes(peer.rateToClient_KBps));
-        peer_map.try_emplace(TR_KEY_rateToPeer, tr_toSpeedBytes(peer.rateToPeer_KBps));
+        peer_map.try_emplace(TR_KEY_rateToClient, Speed{ peer.rateToClient_KBps, Speed::Units::KByps }.base_quantity());
+        peer_map.try_emplace(TR_KEY_rateToPeer, Speed{ peer.rateToPeer_KBps, Speed::Units::KByps }.base_quantity());
         peers_vec.emplace_back(std::move(peer_map));
     }
     tr_torrentPeersFree(peers, n_peers);
@@ -675,8 +675,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_primary_mime_type: return tor.primary_mime_type();
     case TR_KEY_priorities: return make_file_priorities_vec(tor);
     case TR_KEY_queuePosition: return st.queuePosition;
-    case TR_KEY_rateDownload: return tr_toSpeedBytes(st.pieceDownloadSpeed_KBps);
-    case TR_KEY_rateUpload: return tr_toSpeedBytes(st.pieceUploadSpeed_KBps);
+    case TR_KEY_rateDownload: return Speed{ st.pieceDownloadSpeed_KBps, Speed::Units::KByps }.base_quantity();
+    case TR_KEY_rateUpload: return Speed{ st.pieceUploadSpeed_KBps, Speed::Units::KByps }.base_quantity();
     case TR_KEY_recheckProgress: return st.recheckProgress;
     case TR_KEY_secondsDownloading: return st.secondsDownloading;
     case TR_KEY_secondsSeeding: return st.secondsSeeding;
