@@ -1023,9 +1023,9 @@ void tr_torrent::init(tr_ctor const* const ctor)
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
         use_speed_limit(TR_UP, false);
-        set_speed_limit(TR_UP, Speed{ session->speedLimitKBps(TR_UP), Speed::Units::KByps });
+        set_speed_limit(TR_UP, session->speed_limit(TR_UP));
         use_speed_limit(TR_DOWN, false);
-        set_speed_limit(TR_DOWN, Speed{ session->speedLimitKBps(TR_DOWN), Speed::Units::KByps });
+        set_speed_limit(TR_DOWN, session->speed_limit(TR_DOWN));
         tr_torrentUseSessionLimits(this, true);
     }
 

@@ -1143,7 +1143,7 @@ tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return dir == TR_DOWN ? session->settings_.speed_limit_down : session->settings_.speed_limit_up;
+    return session->speed_limit(dir).count(Speed::Units::KByps);
 }
 
 void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)

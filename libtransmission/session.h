@@ -839,9 +839,10 @@ public:
         return global_ip_cache_->global_source_addr(type);
     }
 
-    [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
+    [[nodiscard]] constexpr auto speed_limit(tr_direction dir) const noexcept
     {
-        return dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        auto const kbyps = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        return Speed{ kbyps, Speed::Units::KByps };
     }
 
     [[nodiscard]] constexpr auto isSpeedLimited(tr_direction dir) const noexcept
@@ -972,7 +973,6 @@ private:
     friend size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
     friend size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
     friend tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
-    friend tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings);
