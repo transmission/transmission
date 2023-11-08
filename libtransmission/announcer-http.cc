@@ -97,7 +97,6 @@ struct http_announce_data
     std::optional<tr_announce_response> previous_response;
 
     tr_announce_response_func on_response;
-    bool http_success = false;
 
     uint8_t requests_sent_count = {};
     uint8_t requests_answered_count = {};
@@ -144,16 +143,13 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
 
     ++data->requests_answered_count;
 
-    // If another request already succeeded (or we don't have a registered callback),
-    // skip processing this response:
-    if (!data->http_success && data->on_response)
+    TR_ASSERT(data->on_response);
+    if (data->on_response)
     {
         tr_announce_response response;
         response.info_hash = data->info_hash;
 
-        data->http_success = handleAnnounceResponse(web_response, &response);
-
-        if (data->http_success)
+        if (handleAnnounceResponse(web_response, &response))
         {
             data->on_response(response);
         }
@@ -178,10 +174,6 @@ void onAnnounceDone(tr_web::FetchResponse const& web_response)
             TR_ASSERT(!data->previous_response);
             data->previous_response = std::move(response);
         }
-    }
-    else
-    {
-        tr_logAddTrace("Ignoring redundant announce response", data->log_name);
     }
 
     // Free data if no more responses are expected:
