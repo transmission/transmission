@@ -309,7 +309,6 @@ extern size_t tr_speed_K;
 extern size_t tr_mem_K;
 
 [[nodiscard]] double tr_toMemMB(uint64_t bytes);
-[[nodiscard]] double tr_toSpeedKBps(size_t byps);
 [[nodiscard]] uint64_t tr_toMemBytes(size_t mbytes);
 [[nodiscard]] uint64_t tr_toSpeedBytes(size_t kbyps);
 
