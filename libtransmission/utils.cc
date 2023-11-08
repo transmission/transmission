@@ -765,11 +765,6 @@ uint64_t tr_toMemBytes(size_t mbytes)
     return Memory{ mbytes, Memory::Units::MBytes }.base_quantity();
 }
 
-double tr_toMemMB(uint64_t bytes)
-{
-    return Memory{ bytes, Memory::Units::Bytes }.count(Memory::Units::MBytes);
-}
-
 // --- ENVIRONMENT
 
 bool tr_env_key_exists(char const* key)
