@@ -752,11 +752,6 @@ std::string tr_formatter_mem_MB(double mbytes)
     return Memory{ mbytes, Memory::Units::MBytes }.to_string();
 }
 
-uint64_t tr_toMemBytes(size_t mbytes)
-{
-    return Memory{ mbytes, Memory::Units::MBytes }.base_quantity();
-}
-
 // --- ENVIRONMENT
 
 bool tr_env_key_exists(char const* key)
