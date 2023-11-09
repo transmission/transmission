@@ -73,24 +73,6 @@ static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                                 "\n"
                                 "Usage: transmission-daemon [options]";
 
-static auto constexpr MemK = size_t{ 1024 };
-static char constexpr MemKStr[] = "KiB";
-static char constexpr MemMStr[] = "MiB";
-static char constexpr MemGStr[] = "GiB";
-static char constexpr MemTStr[] = "TiB";
-
-static auto constexpr DiskK = size_t{ 1000 };
-static char constexpr DiskKStr[] = "kB";
-static char constexpr DiskMStr[] = "MB";
-static char constexpr DiskGStr[] = "GB";
-static char constexpr DiskTStr[] = "TB";
-
-static auto constexpr SpeedK = size_t{ 1000 };
-static char constexpr SpeedKStr[] = "kB/s";
-static char constexpr SpeedMStr[] = "MB/s";
-static char constexpr SpeedGStr[] = "GB/s";
-static char constexpr SpeedTStr[] = "TB/s";
-
 /***
 ****  Config File
 ***/
@@ -723,9 +705,6 @@ int tr_daemon::start([[maybe_unused]] bool foreground)
     }
 
     /* start the session */
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
     session = tr_sessionInit(cdir, true, settings_);
     tr_sessionSetRPCCallback(session, on_rpc_callback, this);
     tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", cdir)));

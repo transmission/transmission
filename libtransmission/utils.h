@@ -19,6 +19,7 @@
 
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/variant.h"
+#include "libtransmission/values.h"
 
 struct tr_error;
 
@@ -300,55 +301,24 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 // ---
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
-
-void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
-
-void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
-
-void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 
 extern size_t tr_speed_K;
 extern size_t tr_mem_K;
-extern uint64_t tr_size_K; /* unused? */
 
-/** @brief Format a speed from KBps into a user-readable string of at most 4 significant digits. */
-[[nodiscard]] std::string tr_formatter_speed_KBps(double kilo_per_second);
-/** @brief Format a speed from KBps into a user-readable string of at most 3 significant digits. */
-[[nodiscard]] std::string tr_formatter_speed_compact_KBps(double kilo_per_second);
+[[nodiscard]] double tr_toMemMB(uint64_t bytes);
+[[nodiscard]] double tr_toSpeedKBps(size_t byps);
+[[nodiscard]] uint64_t tr_toMemBytes(size_t mbytes);
+[[nodiscard]] uint64_t tr_toSpeedBytes(size_t kbyps);
 
-/** @brief Format a memory size from bytes into a user-readable string. */
-[[nodiscard]] std::string tr_formatter_mem_B(size_t bytes);
-
-/** @brief Format a memory size from MB into a user-readable string. */
-[[nodiscard]] static inline std::string tr_formatter_mem_MB(double MBps)
-{
-    return tr_formatter_mem_B((size_t)(MBps * tr_mem_K * tr_mem_K));
-}
-
-/** @brief Format a file size from bytes into a user-readable string. */
+[[nodiscard]] std::string tr_formatter_mem_B(uint64_t bytes);
+[[nodiscard]] std::string tr_formatter_mem_MB(double mbytes);
 [[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
+[[nodiscard]] std::string tr_formatter_speed_KBps(double kbyps);
 
-struct tr_variant tr_formatter_get_units();
-
-[[nodiscard]] static inline size_t tr_toSpeedBytes(size_t KBps)
-{
-    return KBps * tr_speed_K;
-}
-
-[[nodiscard]] static inline auto tr_toSpeedKBps(size_t Bps)
-{
-    return Bps / double(tr_speed_K);
-}
-
-[[nodiscard]] static inline auto tr_toMemBytes(size_t MB)
-{
-    return uint64_t(tr_mem_K) * tr_mem_K * MB;
-}
-
-[[nodiscard]] static inline auto tr_toMemMB(uint64_t B)
-{
-    return size_t(B / (tr_mem_K * tr_mem_K));
-}
+[[nodiscard]] struct tr_variant tr_formatter_get_units();
 
 // ---
 
