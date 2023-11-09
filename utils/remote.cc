@@ -1169,7 +1169,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    fmt::print("{:s}\n", tr_formatter_speed_KBps(i));
+                    fmt::print("{:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
                 }
                 else
                 {
@@ -1183,7 +1183,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    fmt::print("{:s}\n", tr_formatter_speed_KBps(i));
+                    fmt::print("{:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
                 }
                 else
                 {
@@ -1830,11 +1830,11 @@ static void printSession(tr_variant* top)
 
                 if (altEnabled)
                 {
-                    effective_up_limit = tr_formatter_speed_KBps(altUp);
+                    effective_up_limit = Speed{ altUp, Speed::Units::KByps }.to_string();
                 }
                 else if (upEnabled)
                 {
-                    effective_up_limit = tr_formatter_speed_KBps(upLimit);
+                    effective_up_limit = Speed{ upLimit, Speed::Units::KByps }.to_string();
                 }
                 else
                 {
@@ -1845,19 +1845,19 @@ static void printSession(tr_variant* top)
                     FMT_STRING("  Upload speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
                     effective_up_limit,
                     upEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(upLimit),
+                    Speed{ upLimit, Speed::Units::KByps }.to_string(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(altUp));
+                    Speed{ altUp, Speed::Units::KByps }.to_string());
 
                 std::string effective_down_limit;
 
                 if (altEnabled)
                 {
-                    effective_down_limit = tr_formatter_speed_KBps(altDown);
+                    effective_down_limit = Speed{ altDown, Speed::Units::KByps }.to_string();
                 }
                 else if (downEnabled)
                 {
-                    effective_down_limit = tr_formatter_speed_KBps(downLimit);
+                    effective_down_limit = Speed{ downLimit, Speed::Units::KByps }.to_string();
                 }
                 else
                 {
@@ -1868,9 +1868,9 @@ static void printSession(tr_variant* top)
                     FMT_STRING("  Download speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
                     effective_down_limit,
                     downEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(downLimit),
+                    Speed{ downLimit, Speed::Units::KByps }.to_string(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(altDown));
+                    Speed{ altDown, Speed::Units::KByps }.to_string());
 
                 if (altTimeEnabled)
                 {
@@ -1999,8 +1999,8 @@ static void printGroups(tr_variant* top)
                 fmt::print("{:s}: ", name);
                 fmt::print(
                     FMT_STRING("Upload speed limit: {:s}, Download speed limit: {:s}, {:s} session bandwidth limits\n"),
-                    upEnabled ? tr_formatter_speed_KBps(upLimit).c_str() : "unlimited",
-                    downEnabled ? tr_formatter_speed_KBps(downLimit).c_str() : "unlimited",
+                    upEnabled ? Speed{ upLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
+                    downEnabled ? Speed{ downLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
                     honors ? "honors" : "does not honor");
             }
         }

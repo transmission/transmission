@@ -1232,12 +1232,12 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
 
     if (peer->rateToPeer_KBps > 0.01)
     {
-        up_speed = tr_formatter_speed_KBps(peer->rateToPeer_KBps);
+        up_speed = Speed{ peer->rateToPeer_KBps, Speed::Units::KByps }.to_string();
     }
 
     if (peer->rateToClient_KBps > 0)
     {
-        down_speed = tr_formatter_speed_KBps(peer->rateToClient_KBps);
+        down_speed = Speed{ peer->rateToClient_KBps, Speed::Units::KByps }.to_string();
     }
 
     if (peer->activeReqsToPeer > 0)
@@ -1426,7 +1426,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             auto const iter = store->get_iter(hash.at(key).get_path());
 
             auto const KBps = double(webseed.download_bytes_per_second) / speed_K;
-            auto const buf = webseed.is_downloading ? tr_formatter_speed_KBps(KBps) : std::string();
+            auto const buf = webseed.is_downloading ? Speed{ KBps, Speed::Units::KByps }.to_string() : std::string{};
 
             (*iter)[webseed_cols.download_rate_double] = KBps;
             (*iter)[webseed_cols.download_rate_string] = buf;

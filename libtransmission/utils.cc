@@ -707,8 +707,6 @@ tr_variant tr_formatter_get_units()
     return tr_variant{ std::move(units_map) };
 }
 
-// --- formatters: storage
-
 void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     namespace Values = libtransmission::Values;
@@ -717,8 +715,6 @@ void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char co
     Values::Config::Storage = { kval, "B", kb, mb, gb, tb };
 }
 
-// --- formatters: speed
-
 void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     namespace Values = libtransmission::Values;
@@ -726,13 +722,6 @@ void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char c
     auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
     Values::Config::Speed = { kval, "B/s", kb, mb, gb, tb };
 }
-
-std::string tr_formatter_speed_KBps(double kbyps)
-{
-    return Speed{ kbyps, Speed::Units::KByps }.to_string();
-}
-
-// --- formatters: memory
 
 void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
