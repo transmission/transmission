@@ -130,7 +130,7 @@ int Cache::set_limit(size_t new_limit)
     return cache_trim();
 }
 
-Cache::Cache(tr_torrents& torrents, size_t max_bytes)
+Cache::Cache(tr_torrents const& torrents, size_t max_bytes)
     : torrents_{ torrents }
     , max_blocks_(get_max_blocks(max_bytes))
 {
@@ -184,7 +184,7 @@ Cache::CIter Cache::get_block(tr_torrent const* torrent, tr_block_info::Location
     return std::end(blocks_);
 }
 
-int Cache::read_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme)
+int Cache::read_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len, uint8_t* setme)
 {
     auto lock = std::unique_lock{ mutex_ };
     if (auto const iter = get_block(torrent, loc); iter != std::end(blocks_))
@@ -197,7 +197,7 @@ int Cache::read_block(tr_torrent* torrent, tr_block_info::Location const& loc, u
     return tr_ioRead(torrent, loc, len, setme);
 }
 
-int Cache::prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len)
+int Cache::prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len)
 {
     auto lock = std::unique_lock{ mutex_ };
     if (auto const iter = get_block(torrent, loc); iter != std::end(blocks_))

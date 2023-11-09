@@ -30,15 +30,15 @@ class Cache
 public:
     using BlockData = small::max_size_vector<uint8_t, tr_block_info::BlockSize>;
 
-    Cache(tr_torrents& torrents, size_t max_bytes);
+    Cache(tr_torrents const& torrents, size_t max_bytes);
 
     int set_limit(size_t new_limit);
 
     // @return any error code from cacheTrim()
     int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<BlockData> writeme);
 
-    int read_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme);
-    int prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len);
+    int read_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len, uint8_t* setme);
+    int prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len);
     int flush_torrent(tr_torrent const* torrent);
     int flush_file(tr_torrent const* torrent, tr_file_index_t file);
 
@@ -76,7 +76,7 @@ private:
 
     [[nodiscard]] CIter get_block(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept;
 
-    tr_torrents& torrents_;
+    tr_torrents const& torrents_;
 
     Blocks blocks_ = {};
     size_t max_blocks_ = 0;
