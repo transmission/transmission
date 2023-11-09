@@ -81,7 +81,7 @@ QString Formatter::sizeToString(uint64_t bytes) const
         return tr("None");
     }
 
-    return QString::fromStdString(tr_formatter_size_B(bytes));
+    return QString::fromStdString(Storage{ bytes, Storage::Units::Bytes }.to_string());
 }
 
 QString Formatter::sizeToString(int64_t bytes) const

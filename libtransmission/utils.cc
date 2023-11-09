@@ -717,11 +717,6 @@ void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char co
     Values::Config::Storage = { kval, "B", kb, mb, gb, tb };
 }
 
-std::string tr_formatter_size_B(uint64_t bytes)
-{
-    return Storage{ bytes, Storage::Units::Bytes }.to_string();
-}
-
 // --- formatters: speed
 
 void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)

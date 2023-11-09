@@ -27,9 +27,12 @@
 #include <libtransmission/torrent-files.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/version.h>
 
 using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -231,7 +234,7 @@ int tr_main(int argc, char* argv[])
     fmt::print(
         tr_ngettext("{file_count:L} file, {total_size}\n", "{file_count:L} files, {total_size}\n", builder.file_count()),
         fmt::arg("file_count", builder.file_count()),
-        fmt::arg("total_size", tr_formatter_size_B(builder.total_size())));
+        fmt::arg("total_size", Storage{ builder.total_size(), Storage::Units::Bytes }.to_string()));
 
     fmt::print(
         tr_ngettext(
@@ -239,7 +242,7 @@ int tr_main(int argc, char* argv[])
             "{piece_count:L} pieces, {piece_size} each\n",
             builder.piece_count()),
         fmt::arg("piece_count", builder.piece_count()),
-        fmt::arg("piece_size", tr_formatter_size_B(builder.piece_size())));
+        fmt::arg("piece_size", Memory{ builder.piece_size(), Memory::Units::Bytes }.to_string()));
 
     if (!std::empty(options.comment))
     {

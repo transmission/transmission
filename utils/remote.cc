@@ -193,7 +193,7 @@ static std::string strlsize(int64_t bytes)
         return "None"s;
     }
 
-    return tr_formatter_size_B(bytes);
+    return Storage{ bytes, Storage::Units::Bytes }.to_string();
 }
 
 enum
