@@ -321,9 +321,9 @@ public:
         return fpm_.piece_span(file);
     }
 
-    [[nodiscard]] auto file_offset(tr_block_info::Location loc) const
+    [[nodiscard]] auto file_offset(tr_block_info::Location loc, bool include_empty_files) const
     {
-        return fpm_.file_offset(loc.byte);
+        return fpm_.file_offset(loc.byte, include_empty_files);
     }
 
     [[nodiscard]] auto byte_span(tr_file_index_t file) const

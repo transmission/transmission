@@ -18,6 +18,7 @@
 
 #include "libtransmission/bitfield.h"
 #include "libtransmission/tr-macros.h" // TR_CONSTEXPR20
+#include "libtransmission/utils.h"
 
 struct tr_block_info;
 struct tr_torrent_metainfo;
@@ -62,7 +63,7 @@ public:
 
     [[nodiscard]] file_span_t file_span(tr_piece_index_t piece) const;
 
-    [[nodiscard]] file_offset_t file_offset(uint64_t offset) const;
+    [[nodiscard]] file_offset_t file_offset(uint64_t offset, bool include_empty_files) const;
 
     [[nodiscard]] TR_CONSTEXPR20 size_t size() const
     {
@@ -103,6 +104,11 @@ private:
 
         [[nodiscard]] constexpr int compare(T item, span_t span) const // <=>
         {
+            if (include_empty_span && span.begin == span.end)
+            {
+                return tr_compare_3way(item, span.begin);
+            }
+
             if (item < span.begin)
             {
                 return -1;
@@ -130,6 +136,8 @@ private:
         {
             return compare(span, item) < 0;
         }
+
+        bool const include_empty_span;
     };
 };
 
