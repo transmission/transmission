@@ -678,35 +678,6 @@ Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, 
 
 } // namespace libtransmission::Values
 
-tr_variant tr_formatter_get_units()
-{
-    using namespace libtransmission::Values;
-
-    auto const make_units_vec = [](auto const& units)
-    {
-        auto units_vec = tr_variant::Vector{};
-        for (size_t i = 0;; ++i)
-        {
-            auto const display_name = units.display_name(i);
-            if (std::empty(display_name))
-            {
-                break;
-            }
-            units_vec.emplace_back(display_name);
-        }
-        return units_vec;
-    };
-
-    auto units_map = tr_variant::Map{ 6U };
-    units_map.try_emplace(TR_KEY_memory_bytes, Memory::units().base());
-    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Memory::units()));
-    units_map.try_emplace(TR_KEY_size_bytes, Storage::units().base());
-    units_map.try_emplace(TR_KEY_size_units, make_units_vec(Storage::units()));
-    units_map.try_emplace(TR_KEY_speed_bytes, Speed::units().base());
-    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(Speed::units()));
-    return tr_variant{ std::move(units_map) };
-}
-
 void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     namespace Values = libtransmission::Values;

@@ -305,8 +305,6 @@ void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char co
 void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 
-[[nodiscard]] struct tr_variant tr_formatter_get_units();
-
 // ---
 
 /** @brief Check if environment variable exists. */
