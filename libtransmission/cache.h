@@ -21,6 +21,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/block-info.h"
+#include "libtransmission/values.h"
 
 class tr_torrents;
 struct tr_torrent;
@@ -29,10 +30,11 @@ class Cache
 {
 public:
     using BlockData = small::max_size_vector<uint8_t, tr_block_info::BlockSize>;
+    using Memory = libtransmission::Values::Memory;
 
-    Cache(tr_torrents const& torrents, size_t max_bytes);
+    Cache(tr_torrents const& torrents, Memory max_bytes);
 
-    int set_limit(size_t new_limit);
+    int set_limit(Memory max_size);
 
     // @return any error code from cacheTrim()
     int write_block(tr_torrent_id_t tor, tr_block_index_t block, std::unique_ptr<BlockData> writeme);
@@ -72,7 +74,10 @@ private:
     // @return any error code from writeContiguous()
     [[nodiscard]] int cache_trim();
 
-    [[nodiscard]] static size_t get_max_blocks(size_t max_bytes) noexcept;
+    [[nodiscard]] static constexpr size_t get_max_blocks(Memory const max_size) noexcept
+    {
+        return max_size.base_quantity() / tr_block_info::BlockSize;
+    }
 
     [[nodiscard]] CIter get_block(tr_torrent const* torrent, tr_block_info::Location const& loc) noexcept;
 
