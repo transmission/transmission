@@ -27,6 +27,7 @@
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
@@ -34,10 +35,13 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
 using namespace std::literals;
+
+using Speed = libtransmission::Values::Speed;
 
 #define SPEED_K_STR "kB/s"
 #define MEM_M_STR "MiB"
@@ -993,12 +997,12 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_rateDownload, &i))
             {
-                fmt::print("  Download Speed: {:s}\n", tr_formatter_speed_KBps(i / (double)tr_speed_K));
+                fmt::print("  Download Speed: {:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_rateUpload, &i))
             {
-                fmt::print("  Upload Speed: {:s}\n", tr_formatter_speed_KBps(i / (double)tr_speed_K));
+                fmt::print("  Upload Speed: {:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_haveUnchecked, &i) && tr_variantDictFindInt(t, TR_KEY_haveValid, &j))
@@ -1333,8 +1337,8 @@ static void printPeersImpl(tr_variant* peers)
                 address,
                 flagstr,
                 progress * 100.0,
-                rateToClient / static_cast<double>(tr_speed_K),
-                rateToPeer / static_cast<double>(tr_speed_K),
+                Speed{ rateToClient, Speed::Units::KByps }.count(Speed::Units::KByps),
+                Speed{ rateToPeer, Speed::Units::KByps }.count(Speed::Units::KByps),
                 client);
         }
     }
@@ -1513,8 +1517,8 @@ static void printTorrentList(tr_variant* top)
                     done_str,
                     strlsize(sizeWhenDone - leftUntilDone),
                     eta_str,
-                    up / static_cast<double>(tr_speed_K),
-                    down / static_cast<double>(tr_speed_K),
+                    Speed{ up, Speed::Units::Byps }.count(Speed::Units::KByps),
+                    Speed{ down, Speed::Units::Byps }.count(Speed::Units::KByps),
                     strlratio2(ratio),
                     getStatusString(d),
                     name);
@@ -1528,8 +1532,8 @@ static void printTorrentList(tr_variant* top)
         fmt::print(
             FMT_STRING("Sum:           {:>9s}             {:6.1f}  {:6.1f}\n"),
             strlsize(total_size).c_str(),
-            total_up / static_cast<double>(tr_speed_K),
-            total_down / static_cast<double>(tr_speed_K));
+            Speed{ total_up, Speed::Units::Byps }.count(Speed::Units::KByps),
+            Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
     }
 }
 
