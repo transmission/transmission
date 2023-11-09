@@ -26,8 +26,8 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
     auto edge_pieces = small::set<tr_piece_index_t, 1024U>{};
     edge_pieces.reserve(n_files * 2U);
 
-    uint64_t offset = 0;
-    for (tr_file_index_t i = 0; i < n_files; ++i)
+    uint64_t offset = 0U;
+    for (tr_file_index_t i = 0U; i < n_files; ++i)
     {
         auto const file_size = file_sizes[i];
         auto const begin_byte = offset;
@@ -37,12 +37,12 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
 
         edge_pieces.insert(begin_piece);
 
-        if (file_size != 0)
+        if (file_size != 0U)
         {
             end_byte = begin_byte + file_size;
-            auto const final_byte = end_byte - 1;
+            auto const final_byte = end_byte - 1U;
             auto const final_piece = block_info.byte_loc(final_byte).piece;
-            end_piece = final_piece + 1;
+            end_piece = final_piece + 1U;
 
             edge_pieces.insert(final_piece);
         }
@@ -50,7 +50,7 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
         {
             end_byte = begin_byte;
             // TODO(ckerr): should end_piece == begin_piece, same as _bytes are?
-            end_piece = begin_piece + 1;
+            end_piece = begin_piece + 1U;
         }
         file_bytes_[i] = byte_span_t{ begin_byte, end_byte };
         file_pieces_[i] = piece_span_t{ begin_piece, end_piece };
@@ -64,7 +64,7 @@ void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
 {
     auto const n = tm.file_count();
     auto file_sizes = std::vector<uint64_t>(n);
-    for (tr_file_index_t i = 0; i < n; ++i)
+    for (tr_file_index_t i = 0U; i < n; ++i)
     {
         file_sizes[i] = tm.file_size(i);
     }
@@ -115,7 +115,7 @@ void tr_file_priorities::set(tr_file_index_t file, tr_priority_t new_priority)
 
 void tr_file_priorities::set(tr_file_index_t const* files, size_t n, tr_priority_t new_priority)
 {
-    for (size_t i = 0; i < n; ++i)
+    for (size_t i = 0U; i < n; ++i)
     {
         set(files[i], new_priority);
     }
@@ -173,7 +173,7 @@ void tr_files_wanted::set(tr_file_index_t file, bool wanted)
 
 void tr_files_wanted::set(tr_file_index_t const* files, size_t n, bool wanted)
 {
-    for (size_t i = 0; i < n; ++i)
+    for (size_t i = 0U; i < n; ++i)
     {
         set(files[i], wanted);
     }
@@ -187,5 +187,5 @@ bool tr_files_wanted::piece_wanted(tr_piece_index_t piece) const
     }
 
     auto const [begin, end] = fpm_->file_span(piece);
-    return wanted_.count(begin, end) != 0;
+    return wanted_.count(begin, end) != 0U;
 }
