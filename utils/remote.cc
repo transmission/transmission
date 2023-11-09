@@ -41,7 +41,7 @@
 
 using namespace std::literals;
 
-using Speed = libtransmission::Values::Speed;
+using namespace libtransmission::Values;
 
 #define SPEED_K_STR "kB/s"
 #define MEM_M_STR "MiB"
@@ -65,7 +65,7 @@ static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
 
 static auto constexpr Arguments = TR_KEY_arguments;
 
-struct Config
+struct RemoteConfig
 {
     std::string auth;
     std::string filter;
@@ -179,11 +179,6 @@ static std::string strlratio2(double ratio)
 static std::string strlratio(int64_t numerator, int64_t denominator)
 {
     return strlratio2(tr_getRatio(numerator, denominator));
-}
-
-static std::string strlmem(int64_t bytes)
-{
-    return bytes == 0 ? "None"s : tr_formatter_mem_B(bytes);
 }
 
 static std::string strlsize(int64_t bytes)
@@ -598,7 +593,7 @@ static void addIdArg(tr_variant* args, std::string_view id_str, std::string_view
     }
 }
 
-static void addIdArg(tr_variant* args, Config const& config, std::string_view fallback = "")
+static void addIdArg(tr_variant* args, RemoteConfig const& config, std::string_view fallback = "")
 {
     return addIdArg(args, config.torrent_ids, fallback);
 }
@@ -798,7 +793,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 /* look for a session id in the header in case the server gives back a 409 */
 static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
-    auto& config = *static_cast<Config*>(vconfig);
+    auto& config = *static_cast<RemoteConfig*>(vconfig);
     auto const* const line = static_cast<char const*>(ptr);
     size_t const line_len = size * nmemb;
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
@@ -1160,7 +1155,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_pieceSize, &i))
             {
-                fmt::print("  Piece Size: {:s}\n", strlmem(i));
+                fmt::print("  Piece Size: {:s}\n", Memory{ i, Memory::Units::Bytes }.to_string());
             }
 
             fmt::print("\n");
@@ -2012,7 +2007,7 @@ static void printGroups(tr_variant* top)
     }
 }
 
-static void filterIds(tr_variant* top, Config& config)
+static void filterIds(tr_variant* top, RemoteConfig& config)
 {
     tr_variant* args;
     tr_variant* list;
@@ -2133,7 +2128,7 @@ static void filterIds(tr_variant* top, Config& config)
         }
     }
 }
-static int processResponse(char const* rpcurl, std::string_view response, Config& config)
+static int processResponse(char const* rpcurl, std::string_view response, RemoteConfig& config)
 {
     auto status = int{ EXIT_SUCCESS };
 
@@ -2254,7 +2249,7 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
     return status;
 }
 
-static CURL* tr_curl_easy_init(struct evbuffer* writebuf, Config& config)
+static CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
     (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format(FMT_STRING("{:s}/{:s}"), MyName, LONG_VERSION_STRING).c_str());
@@ -2320,7 +2315,7 @@ static void tr_curl_easy_cleanup(CURL* curl)
     }
 }
 
-static int flush(char const* rpcurl, tr_variant* benc, Config& config)
+static int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
 {
     auto const json = tr_variant_serde::json().compact().to_string(*benc);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
@@ -2411,7 +2406,7 @@ static tr_variant* ensure_tset(tr_variant& tset)
     return tr_variantDictAddDict(&tset, Arguments, 1);
 }
 
-static int processArgs(char const* rpcurl, int argc, char const* const* argv, Config& config)
+static int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteConfig& config)
 {
     int status = EXIT_SUCCESS;
     char const* optarg;
@@ -3242,7 +3237,13 @@ static bool parsePortString(char const* s, int* port)
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* port, std::string* rpcurl, Config& config)
+static void getHostAndPortAndRpcUrl(
+    int* argc,
+    char** argv,
+    std::string* host,
+    int* port,
+    std::string* rpcurl,
+    RemoteConfig& config)
 {
     if (*argv[1] == '-')
     {
@@ -3304,7 +3305,7 @@ int tr_main(int argc, char* argv[])
 
     tr_locale_set_global("");
 
-    auto config = Config{};
+    auto config = RemoteConfig{};
     auto port = DefaultPort;
     auto host = std::string{};
     auto rpcurl = std::string{};

@@ -747,11 +747,6 @@ void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char con
     Values::Config::Memory = { kval, "B", kb, mb, gb, tb };
 }
 
-std::string tr_formatter_mem_B(uint64_t bytes)
-{
-    return Memory{ bytes, Memory::Units::Bytes }.to_string();
-}
-
 std::string tr_formatter_mem_MB(double mbytes)
 {
     return Memory{ mbytes, Memory::Units::MBytes }.to_string();

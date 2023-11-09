@@ -14,7 +14,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>
 
 #include <gdkmm/pixbuf.h>
@@ -70,6 +70,8 @@
 #endif
 
 using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 class DetailsDialog::Impl
 {
@@ -886,7 +888,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
                         "({piece_count} BitTorrent pieces @ {piece_size})",
                         piece_count),
                     fmt::arg("piece_count", piece_count),
-                    fmt::arg("piece_size", tr_formatter_mem_B(piece_size)));
+                    fmt::arg("piece_size", Memory{ piece_size, Memory::Units::Bytes }.to_string()));
             }
         }
 
