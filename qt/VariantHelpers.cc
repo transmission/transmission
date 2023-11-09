@@ -33,8 +33,8 @@ bool change(double& setme, double const& value)
 
 bool change(Speed& setme, tr_variant const* value)
 {
-    auto const bytes_per_second = getValue<int>(value);
-    return bytes_per_second && change(setme, Speed::fromBps(*bytes_per_second));
+    auto const byps = getValue<int>(value);
+    return byps && change(setme, Speed{ *byps, Speed::Units::Byps });
 }
 
 bool change(TorrentHash& setme, tr_variant const* value)

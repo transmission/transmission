@@ -1039,8 +1039,8 @@ void DetailsDialog::refreshUI()
 
         setIfIdle(ui_.bandwidthPriorityCombo, i);
 
-        setIfIdle(ui_.singleDownSpin, static_cast<int>(baseline.downloadLimit().getKBps()));
-        setIfIdle(ui_.singleUpSpin, static_cast<int>(baseline.uploadLimit().getKBps()));
+        setIfIdle(ui_.singleDownSpin, static_cast<int>(baseline.downloadLimit().count(Speed::Units::KByps)));
+        setIfIdle(ui_.singleUpSpin, static_cast<int>(baseline.uploadLimit().count(Speed::Units::KByps)));
         setIfIdle(ui_.peerLimitSpin, baseline.peerLimit());
     }
 
@@ -1201,8 +1201,8 @@ void DetailsDialog::refreshUI()
                 code_tip.resize(code_tip.size() - 1); // eat the trailing linefeed
             }
 
-            item->setText(COL_UP, peer.rate_to_peer.isZero() ? QString{} : fmt.speedToString(peer.rate_to_peer));
-            item->setText(COL_DOWN, peer.rate_to_client.isZero() ? QString{} : fmt.speedToString(peer.rate_to_client));
+            item->setText(COL_UP, peer.rate_to_peer.is_zero() ? QString{} : peer.rate_to_peer.to_qstring());
+            item->setText(COL_DOWN, peer.rate_to_client.is_zero() ? QString{} : peer.rate_to_client.to_qstring());
             item->setText(
                 COL_PERCENT,
                 peer.progress > 0 ? QStringLiteral("%1%").arg(static_cast<int>(peer.progress * 100.0)) : QString{});
