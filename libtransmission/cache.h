@@ -12,6 +12,7 @@
 #include <cstddef> // for size_t
 #include <cstdint> // for intX_t, uintX_t
 #include <memory> // for std::unique_ptr
+#include <mutex>
 #include <utility> // for std::pair
 #include <vector>
 
@@ -84,6 +85,8 @@ private:
     mutable size_t disk_write_bytes_ = 0;
     mutable size_t cache_writes_ = 0;
     mutable size_t cache_write_bytes_ = 0;
+
+    mutable std::mutex mutex_;
 
     static constexpr struct
     {
