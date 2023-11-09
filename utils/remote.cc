@@ -1785,7 +1785,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindInt(args, TR_KEY_cache_size_mb, &i))
         {
-            fmt::print("  Maximum memory cache size: {:s}\n", tr_formatter_mem_MB(i));
+            fmt::print("  Maximum memory cache size: {:s}\n", Memory{ i, Memory::Units::MBytes }.to_string());
         }
 
         fmt::print("\n");

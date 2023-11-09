@@ -305,7 +305,6 @@ void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char co
 void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 
-[[nodiscard]] std::string tr_formatter_mem_MB(double mbytes);
 [[nodiscard]] std::string tr_formatter_size_B(uint64_t bytes);
 [[nodiscard]] std::string tr_formatter_speed_KBps(double kbyps);
 
