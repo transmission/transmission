@@ -739,15 +739,12 @@ std::string tr_formatter_speed_KBps(double kbyps)
 
 // --- formatters: memory
 
-size_t tr_mem_K = 0;
-
 void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     namespace Values = libtransmission::Values;
 
     auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
     Values::Config::Memory = { kval, "B", kb, mb, gb, tb };
-    tr_mem_K = base;
 }
 
 std::string tr_formatter_mem_B(uint64_t bytes)
