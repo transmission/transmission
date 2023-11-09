@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <cstdint> // for uint64_t
 #include <string>
 #include <string_view>
@@ -116,12 +117,6 @@ public:
     {
     }
 
-    constexpr auto& operator+=(Value const& that) noexcept
-    {
-        base_quantity_ += that.base_quantity_;
-        return *this;
-    }
-
     [[nodiscard]] constexpr auto base_quantity() const noexcept
     {
         return base_quantity_;
@@ -130,6 +125,12 @@ public:
     [[nodiscard]] constexpr auto count(Units tgt) const noexcept
     {
         return base_quantity_ / (1.0 * units_.multiplier(tgt));
+    }
+
+    constexpr auto& operator+=(Value const& that) noexcept
+    {
+        base_quantity_ += that.base_quantity_;
+        return *this;
     }
 
     [[nodiscard]] constexpr auto operator+(Value const& that) noexcept
@@ -195,18 +196,14 @@ public:
     std::string_view to_string(char* buf, size_t buflen) const noexcept
     {
         auto idx = size_t{ 0 };
-
-        if (base_quantity_ < 1000) // 0 to 999
-        {
-            *fmt::format_to_n(buf, buflen - 1, "{:d} {:s}", base_quantity_, units_.display_name(idx)).out = '\0';
-            return buf;
-        }
-
         auto val = 1.0 * base_quantity_;
         for (;;)
         {
-            ++idx;
-            val /= units_.base();
+            if (std::fabs(val - std::floor(val)) < 0.001 && (val < 999.5 || std::empty(units_.display_name(idx + 1))))
+            {
+                *fmt::format_to_n(buf, buflen - 1, "{:.0Lf} {:s}", val, units_.display_name(idx)).out = '\0';
+                return buf;
+            }
 
             if (val < 99.995) // 0.98 to 99.99
             {
@@ -219,6 +216,9 @@ public:
                 *fmt::format_to_n(buf, buflen - 1, "{:.1Lf} {:s}", val, units_.display_name(idx)).out = '\0';
                 return buf;
             }
+
+            val /= units_.base();
+            ++idx;
         }
     }
 
