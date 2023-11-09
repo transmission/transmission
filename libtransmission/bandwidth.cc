@@ -20,7 +20,7 @@
 #include "libtransmission/utils.h" // tr_time_msec()
 #include "libtransmission/values.h"
 
-using Speed = libtransmission::Values::Speed;
+using namespace libtransmission::Values;
 
 Speed tr_bandwidth::get_speed(RateControl& r, unsigned int interval_msec, uint64_t now)
 {

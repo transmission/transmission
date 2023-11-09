@@ -10,12 +10,12 @@
 
 #include "gtest/gtest.h"
 
+using namespace libtransmission::Values;
+
 using ValuesTest = ::testing::Test;
 
 TEST_F(ValuesTest, value)
 {
-    using Speed = libtransmission::Values::Speed;
-
     auto val = Speed{ 1, Speed::Units::MByps };
     EXPECT_EQ("1.00 MB/s", val.to_string());
     EXPECT_EQ(1000000UL, val.base_quantity());
@@ -36,8 +36,6 @@ TEST_F(ValuesTest, value)
 
 TEST_F(ValuesTest, valueHonorsFormatterInit)
 {
-    using Speed = libtransmission::Values::Speed;
-
     tr_formatter_speed_init(1024, "KayBeePerEss", "EmmBeePerEss", "GeeBeePerEss", "TeeBeePerEss");
 
     auto const val = Speed{ 1, Speed::Units::MByps };
