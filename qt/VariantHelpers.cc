@@ -195,12 +195,12 @@ void variantInit(tr_variant* init_me, bool value)
 
 void variantInit(tr_variant* init_me, int64_t value)
 {
-    tr_variantInitInt(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, int value)
 {
-    tr_variantInitInt(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, double value)

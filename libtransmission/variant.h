@@ -388,8 +388,6 @@ bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
 bool tr_variantGetInt(tr_variant const* var, int64_t* setme);
 
-void tr_variantInitInt(tr_variant* initme, int64_t value);
-
 // --- Lists
 
 void tr_variantInitList(tr_variant* initme, size_t n_reserve);

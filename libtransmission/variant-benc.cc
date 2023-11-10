@@ -158,7 +158,7 @@ struct MyHandler : public transmission::benc::Handler
             return false;
         }
 
-        tr_variantInitInt(variant, value);
+        *variant = value;
         return true;
     }
 

@@ -346,11 +346,6 @@ bool tr_variantDictFindRaw(tr_variant* const var, tr_quark key, std::byte const*
 
 // ---
 
-void tr_variantInitInt(tr_variant* initme, int64_t value)
-{
-    *initme = value;
-}
-
 void tr_variantInitList(tr_variant* initme, size_t n_reserve)
 {
     auto vec = tr_variant::Vector{};
@@ -473,7 +468,7 @@ tr_variant* tr_variantDictAddInt(tr_variant* const var, tr_quark key, int64_t va
 {
     tr_variantDictRemove(var, key);
     auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitInt(child, val);
+    *child = val;
     return child;
 }
 

@@ -42,7 +42,7 @@ TEST_F(VariantTest, getType)
     auto sv = std::string_view{};
     auto v = tr_variant{};
 
-    tr_variantInitInt(&v, 30);
+    v = 30;
     EXPECT_TRUE(tr_variantGetInt(&v, &i));
     EXPECT_EQ(30, i);
     EXPECT_TRUE(tr_variantGetReal(&v, &d));

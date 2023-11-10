@@ -82,7 +82,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Int64(int64_t const val)
     {
-        tr_variantInitInt(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
