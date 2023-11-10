@@ -66,7 +66,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Bool(bool const val)
     {
-        tr_variantInitBool(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 

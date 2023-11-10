@@ -384,8 +384,6 @@ bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
 
-void tr_variantInitBool(tr_variant* initme, bool value);
-
 // --- Ints
 
 bool tr_variantGetInt(tr_variant const* var, int64_t* setme);

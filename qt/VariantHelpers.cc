@@ -190,7 +190,7 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
 void variantInit(tr_variant* init_me, bool value)
 {
-    tr_variantInitBool(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, int64_t value)
@@ -215,7 +215,7 @@ void variantInit(tr_variant* init_me, QByteArray const& value)
 
 void variantInit(tr_variant* init_me, QString const& value)
 {
-    variantInit(init_me, value.toUtf8());
+    *init_me = value.toStdString();
 }
 
 void variantInit(tr_variant* init_me, std::string_view value)
