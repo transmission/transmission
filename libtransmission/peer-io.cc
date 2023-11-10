@@ -67,11 +67,11 @@ size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
     // this is all kind of arbitrary, but what seems to work well is
     // being large enough to hold the next 20 seconds' worth of input,
     // or a few blocks, whichever is bigger. OK to tweak this as needed.
-    static auto constexpr PeriodSecs = 15U;
+    static auto constexpr PeriodSecs = uint64_t{ 15U };
 
     // the 3 is an arbitrary number of blocks;
     // the .5 is to leave room for protocol messages
-    static auto constexpr Floor = static_cast<size_t>(tr_block_info::BlockSize * 3.5);
+    static auto constexpr Floor = static_cast<uint64_t>(tr_block_info::BlockSize * 3.5);
 
     auto const current_speed = io->get_piece_speed(now, TR_UP);
     return std::max(Floor, current_speed.base_quantity() * PeriodSecs);
