@@ -559,7 +559,7 @@ private:
         // Get the rate limit we should use.
         // TODO: this needs to consider all the other peers as well...
         uint64_t const now = tr_time_msec();
-        auto rate_bytes_per_second = get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
+        auto rate_bytes_per_second = uint64_t{ get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT) };
         if (torrent->uses_speed_limit(TR_PEER_TO_CLIENT))
         {
             rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speed_limit(TR_PEER_TO_CLIENT).base_quantity());
@@ -571,7 +571,7 @@ private:
             if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
                 irate_bytes_per_second)
             {
-                rate_bytes_per_second = std::min(rate_bytes_per_second, *irate_bytes_per_second);
+                rate_bytes_per_second = std::min(rate_bytes_per_second, uint64_t{ *irate_bytes_per_second });
             }
         }
 
