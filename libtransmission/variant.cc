@@ -361,11 +361,6 @@ void tr_variantInitInt(tr_variant* initme, int64_t value)
     *initme = value;
 }
 
-void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len)
-{
-    *initme = std::string_view{ static_cast<char const*>(value), value_len };
-}
-
 void tr_variantInitList(tr_variant* initme, size_t n_reserve)
 {
     auto vec = tr_variant::Vector{};

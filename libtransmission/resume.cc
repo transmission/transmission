@@ -428,7 +428,7 @@ void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
     else
     {
         auto const raw = b.raw();
-        tr_variantInitRaw(benc, raw.data(), std::size(raw));
+        *benc = std::string_view{ static_cast<char const*>(raw.data()), std::size(raw) };
     }
 }
 
