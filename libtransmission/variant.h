@@ -380,8 +380,6 @@ bool tr_variantGetRaw(tr_variant const* variant, uint8_t const** setme_raw, size
 
 bool tr_variantGetReal(tr_variant const* variant, double* value_setme);
 
-void tr_variantInitReal(tr_variant* initme, double value);
-
 // --- Booleans
 
 bool tr_variantGetBool(tr_variant const* variant, bool* setme);
