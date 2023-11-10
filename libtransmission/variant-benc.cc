@@ -164,22 +164,13 @@ struct MyHandler : public transmission::benc::Handler
 
     bool String(std::string_view sv, Context const& /*context*/) final
     {
-        auto* const variant = get_node();
-        if (variant == nullptr)
+        if (auto* const variant = get_node(); variant != nullptr)
         {
-            return false;
+            *variant = inplace_ ? tr_variant::unmanaged_string(sv) : tr_variant{ sv };
+            return true;
         }
 
-        if (inplace_)
-        {
-            tr_variantInitStrView(variant, sv);
-        }
-        else
-        {
-            tr_variantInitStr(variant, sv);
-        }
-
-        return true;
+        return false;
     }
 
     bool StartDict(Context const& /*context*/) final

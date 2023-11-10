@@ -58,7 +58,7 @@ TEST_F(VariantTest, getType)
     EXPECT_NE(std::data(strkey), std::data(sv));
 
     strkey = "anything"sv;
-    tr_variantInitStrView(&v, strkey);
+    v = tr_variant::unmanaged_string(strkey);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
     EXPECT_EQ(std::data(strkey), std::data(sv)); // literally the same memory

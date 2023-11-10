@@ -361,11 +361,6 @@ void tr_variantInitInt(tr_variant* initme, int64_t value)
     *initme = value;
 }
 
-void tr_variantInitStrView(tr_variant* initme, std::string_view val)
-{
-    *initme = tr_variant::unmanaged_string(val);
-}
-
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len)
 {
     tr_variantInitStr(initme, std::string_view{ static_cast<char const*>(value), value_len });
@@ -530,7 +525,7 @@ tr_variant* tr_variantDictAddStrView(tr_variant* const var, tr_quark key, std::s
 {
     tr_variantDictRemove(var, key);
     auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitStrView(child, val);
+    *child = tr_variant::unmanaged_string(val);
     return child;
 }
 
@@ -758,9 +753,7 @@ void tr_variant_serde::walk(tr_variant const& top, WalkFuncs const& walk_funcs, 
                 if (node.current()->holds_alternative<tr_variant::Map>())
                 {
                     auto const keystr = tr_quark_get_string_view(key);
-                    auto tmp = tr_variant{};
-                    tr_variantInitStrView(&tmp, keystr);
-                    walk_funcs.string_func(tmp, keystr, user_data);
+                    walk_funcs.string_func(tr_variant::unmanaged_string(keystr), keystr, user_data);
                 }
             }
             else // finished with this node

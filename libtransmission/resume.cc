@@ -419,11 +419,11 @@ void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
 {
     if (b.has_none() || std::empty(b))
     {
-        tr_variantInitStr(benc, "none"sv);
+        *benc = tr_variant::unmanaged_string("none"sv);
     }
     else if (b.has_all())
     {
-        tr_variantInitStrView(benc, "all"sv);
+        *benc = tr_variant::unmanaged_string("all"sv);
     }
     else
     {
