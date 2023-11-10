@@ -95,20 +95,21 @@ private:
     {
         Key key_ = {};
         Val val_ = {};
-        bool can_erase_ = true;
+        size_t in_use_ = 0;
         uint64_t sequence_ = InvalidSeq;
     };
 
     std::pair<Val&, libtransmission::ObserverTag> lock_and_get_entry(Entry& entry)
     {
         auto const lock = std::lock_guard{ mutex_ };
-        entry.can_erase_ = false;
+        ++entry.in_use_;
         return std::make_pair(
             std::ref(entry.val_),
             libtransmission::ObserverTag{ [this, &entry]()
                                           {
                                               auto lock2 = std::unique_lock{ mutex_ };
-                                              entry.can_erase_ = true;
+                                              --entry.in_use_;
+                                              TR_ASSERT(entry.in_use_ >= 0U);
                                               lock2.unlock();
                                               cv_.notify_one();
                                           } });
@@ -164,12 +165,12 @@ private:
                 return std::any_of(
                     std::begin(entries_),
                     std::end(entries_),
-                    [](Entry const& entry) { return entry.can_erase_; });
+                    [](Entry const& entry) { return entry.in_use_ == 0U; });
             });
         auto const iter = std::min_element(
             std::begin(entries_),
             std::end(entries_),
-            [](auto const& a, auto const& b) { return !b.can_erase_ || a.sequence_ < b.sequence_; });
+            [](auto const& a, auto const& b) { return b.in_use_ > 0U || a.sequence_ < b.sequence_; });
         this->erase(*iter);
         return *iter;
     }
