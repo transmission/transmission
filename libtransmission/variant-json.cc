@@ -60,13 +60,13 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Null()
     {
-        tr_variantInitStrView(get_leaf(), "");
+        *get_leaf() = tr_variant::unmanaged_string("");
         return true;
     }
 
     bool Bool(bool const val)
     {
-        tr_variantInitBool(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
@@ -82,7 +82,7 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Int64(int64_t const val)
     {
-        tr_variantInitInt(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
@@ -93,20 +93,13 @@ struct json_to_variant_handler : public rapidjson::BaseReaderHandler<>
 
     bool Double(double const val)
     {
-        tr_variantInitReal(get_leaf(), val);
+        *get_leaf() = val;
         return true;
     }
 
     bool String(Ch const* const str, rapidjson::SizeType const len, bool const copy)
     {
-        if (copy)
-        {
-            tr_variantInitStr(get_leaf(), { str, len });
-        }
-        else
-        {
-            tr_variantInitStrView(get_leaf(), { str, len });
-        }
+        *get_leaf() = copy ? tr_variant{ std::string{ str, len } } : tr_variant::unmanaged_string({ str, len });
         return true;
     }
 
