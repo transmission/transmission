@@ -377,7 +377,7 @@ uint32_t tr_metainfo_builder::default_piece_size(uint64_t total_size) noexcept
     // Ideally, we want approximately 2^10 = 1024 pieces, give or take a few hundred pieces.
     // So we subtract 10 from the log2 of total size.
     // The ideal number of pieces is up for debate.
-    auto exp = (total_size > 0 ? std::log2(total_size) : 0) - 10;
+    auto exp = (total_size > 0U ? std::log2(total_size) : 0) - 10;
 
     // We want a piece size between 16KiB (2^14 bytes) and 16MiB (2^24 bytes) for maximum compatibility
     exp = std::clamp(exp, 14., 24.);
