@@ -1097,10 +1097,6 @@ private:
     /// fields that aren't trivial,
     /// but are self-contained / don't hold references to others
 
-    // used during shutdown:
-    // how many &event=stopped announces are still being sent to trackers
-    std::atomic<size_t> n_pending_stops_ = {};
-
     mutable std::recursive_mutex session_mutex_;
 
     tr_stats session_stats_{ config_dir_, time(nullptr) };
@@ -1183,7 +1179,7 @@ public:
     std::unique_ptr<tr_announcer_udp> announcer_udp_ = tr_announcer_udp::create(announcer_udp_mediator_);
 
     // depends-on: settings_, torrents_, web_, announcer_udp_
-    std::unique_ptr<tr_announcer> announcer_ = tr_announcer::create(this, *announcer_udp_, n_pending_stops_);
+    std::unique_ptr<tr_announcer> announcer_ = tr_announcer::create(this, *announcer_udp_);
 
     // depends-on: public_peer_port_, udp_core_, dht_mediator_
     std::unique_ptr<tr_dht> dht_;

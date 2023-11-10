@@ -70,10 +70,7 @@ using tr_tracker_callback = std::function<void(tr_torrent&, tr_tracker_event con
 class tr_announcer
 {
 public:
-    [[nodiscard]] static std::unique_ptr<tr_announcer> create(
-        tr_session* session,
-        tr_announcer_udp&,
-        std::atomic<size_t>& n_pending_stops);
+    [[nodiscard]] static std::unique_ptr<tr_announcer> create(tr_session* session, tr_announcer_udp&);
     virtual ~tr_announcer() = default;
 
     virtual tr_torrent_announcer* addTorrent(tr_torrent*, tr_tracker_callback callback) = 0;
@@ -82,6 +79,8 @@ public:
     virtual void resetTorrent(tr_torrent* tor) = 0;
     virtual void removeTorrent(tr_torrent* tor) = 0;
     virtual void startShutdown() = 0;
+
+    virtual void upkeep() = 0;
 };
 
 std::unique_ptr<tr_announcer> tr_announcerCreate(tr_session* session);
@@ -159,4 +158,6 @@ public:
     // @brief process an incoming udp message if it's a tracker response.
     // @return true if msg was a tracker response; false otherwise
     virtual bool handle_message(uint8_t const* msg, size_t msglen) = 0;
+
+    [[nodiscard]] virtual bool is_idle() = 0;
 };
