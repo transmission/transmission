@@ -94,7 +94,7 @@ private:
     {
         Key key_ = {};
         Val val_ = {};
-        size_t in_use_ = 0;
+        size_t in_use_ = 0U;
         uint64_t sequence_ = InvalidSeq;
     };
 
