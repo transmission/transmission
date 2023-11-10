@@ -210,7 +210,7 @@ void variantInit(tr_variant* init_me, double value)
 
 void variantInit(tr_variant* init_me, QByteArray const& value)
 {
-    *init_me = std::string_view{ value.constData(), value.size() };
+    *init_me = std::string_view{ value.constData(), static_cast<size_t>(value.size()) };
 }
 
 void variantInit(tr_variant* init_me, QString const& value)
