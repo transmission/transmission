@@ -383,14 +383,14 @@ public:
 
     bool isTransferringPieces(uint64_t now, tr_direction dir, tr_bytes_per_second_t* setme_bytes_per_second) const override
     {
-        auto const bytes_per_second = io->get_piece_speed_bytes_per_second(now, dir);
+        auto const byps = io->get_piece_speed(now, dir).base_quantity();
 
         if (setme_bytes_per_second != nullptr)
         {
-            *setme_bytes_per_second = bytes_per_second;
+            *setme_bytes_per_second = byps;
         }
 
-        return bytes_per_second > 0;
+        return byps != 0U;
     }
 
     [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
@@ -559,10 +559,10 @@ private:
         // Get the rate limit we should use.
         // TODO: this needs to consider all the other peers as well...
         uint64_t const now = tr_time_msec();
-        auto rate_bytes_per_second = get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT);
+        auto rate_bytes_per_second = uint64_t{ get_piece_speed_bytes_per_second(now, TR_PEER_TO_CLIENT) };
         if (torrent->uses_speed_limit(TR_PEER_TO_CLIENT))
         {
-            rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speed_limit_bps(TR_PEER_TO_CLIENT));
+            rate_bytes_per_second = std::min(rate_bytes_per_second, torrent->speed_limit(TR_PEER_TO_CLIENT).base_quantity());
         }
 
         // honor the session limits, if enabled
@@ -571,7 +571,7 @@ private:
             if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
                 irate_bytes_per_second)
             {
-                rate_bytes_per_second = std::min(rate_bytes_per_second, *irate_bytes_per_second);
+                rate_bytes_per_second = std::min(rate_bytes_per_second, uint64_t{ *irate_bytes_per_second });
             }
         }
 

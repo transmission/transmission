@@ -30,6 +30,7 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace tr_resume
 {
@@ -237,7 +238,7 @@ auto loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direction dir)
 {
     tr_variantDictReserve(d, 3);
-    tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speed_limit_bps(dir));
+    tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speed_limit(dir).base_quantity());
     tr_variantDictAddBool(d, TR_KEY_use_global_speed_limit, tor->uses_session_limits());
     tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tor->uses_speed_limit(dir));
 }
@@ -266,11 +267,11 @@ void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* tor)
 {
     if (auto val = int64_t{}; tr_variantDictFindInt(d, TR_KEY_speed_Bps, &val))
     {
-        tor->set_speed_limit_bps(dir, val);
+        tor->set_speed_limit(dir, Speed{ val, Speed::Units::Byps });
     }
     else if (tr_variantDictFindInt(d, TR_KEY_speed, &val))
     {
-        tor->set_speed_limit_bps(dir, val * 1024);
+        tor->set_speed_limit(dir, Speed{ val, Speed::Units::KByps });
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(d, TR_KEY_use_speed_limit, &val))

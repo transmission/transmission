@@ -49,6 +49,7 @@
 struct tr_ctor;
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 // ---
 
@@ -211,9 +212,9 @@ bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
 
 // --- PER-TORRENT UL / DL SPEEDS
 
-void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobytes_per_second_t kilo_per_second)
+void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobytes_per_second_t kbyps)
 {
-    tor->set_speed_limit_bps(dir, tr_toSpeedBytes(kilo_per_second));
+    tor->set_speed_limit(dir, Speed{ kbyps, Speed::Units::KByps });
 }
 
 tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
@@ -221,7 +222,7 @@ tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
 
-    return tr_toSpeedKBps(tor->speed_limit_bps(dir));
+    return tor->speed_limit(dir).count(Speed::Units::KByps);
 }
 
 void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool enabled)
@@ -1021,9 +1022,9 @@ void tr_torrent::init(tr_ctor const* const ctor)
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
         use_speed_limit(TR_UP, false);
-        set_speed_limit_bps(TR_UP, tr_toSpeedBytes(session->speedLimitKBps(TR_UP)));
+        set_speed_limit(TR_UP, Speed{ session->speedLimitKBps(TR_UP), Speed::Units::KByps });
         use_speed_limit(TR_DOWN, false);
-        set_speed_limit_bps(TR_DOWN, tr_toSpeedBytes(session->speedLimitKBps(TR_DOWN)));
+        set_speed_limit(TR_DOWN, Speed{ session->speedLimitKBps(TR_DOWN), Speed::Units::KByps });
         tr_torrentUseSessionLimits(this, true);
     }
 
@@ -1360,10 +1361,10 @@ tr_stat tr_torrent::stats() const
         stats.knownPeersFrom[i] = swarm_stats.known_peer_from_count[i];
     }
 
-    auto const piece_upload_speed_byps = this->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_UP);
-    stats.pieceUploadSpeed_KBps = tr_toSpeedKBps(piece_upload_speed_byps);
-    auto const piece_download_speed_byps = this->bandwidth_.get_piece_speed_bytes_per_second(now_msec, TR_DOWN);
-    stats.pieceDownloadSpeed_KBps = tr_toSpeedKBps(piece_download_speed_byps);
+    auto const piece_upload_speed = this->bandwidth_.get_piece_speed(now_msec, TR_UP);
+    stats.pieceUploadSpeed_KBps = piece_upload_speed.count(Speed::Units::KByps);
+    auto const piece_download_speed = this->bandwidth_.get_piece_speed(now_msec, TR_DOWN);
+    stats.pieceDownloadSpeed_KBps = piece_download_speed.count(Speed::Units::KByps);
 
     stats.percentComplete = this->completion.percent_complete();
     stats.metadataPercentComplete = tr_torrentGetMetadataPercent(this);
@@ -1400,7 +1401,7 @@ tr_stat tr_torrent::stats() const
     stats.etaIdle = TR_ETA_NOT_AVAIL;
     if (activity == TR_STATUS_DOWNLOAD)
     {
-        if (auto const eta_speed_byps = eta_speed_.update(now_msec, piece_download_speed_byps); eta_speed_byps == 0U)
+        if (auto const eta_speed_byps = eta_speed_.update(now_msec, piece_download_speed).base_quantity(); eta_speed_byps == 0U)
         {
             stats.eta = TR_ETA_UNKNOWN;
         }
@@ -1411,7 +1412,7 @@ tr_stat tr_torrent::stats() const
     }
     else if (activity == TR_STATUS_SEED)
     {
-        auto const eta_speed_byps = eta_speed_.update(now_msec, piece_upload_speed_byps);
+        auto const eta_speed_byps = eta_speed_.update(now_msec, piece_upload_speed).base_quantity();
 
         if (seed_ratio_applies)
         {

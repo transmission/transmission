@@ -19,6 +19,7 @@
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/values.h"
 
 class tr_peerIo;
 
@@ -29,8 +30,8 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    tr_kilobytes_per_second_t up_limit_KBps = 0U;
-    tr_kilobytes_per_second_t down_limit_KBps = 0U;
+    libtransmission::Values::Speed up_limit = {};
+    libtransmission::Values::Speed down_limit = {};
     bool up_limited = false;
     bool down_limited = false;
 };
@@ -77,6 +78,8 @@ struct tr_bandwidth_limits
 struct tr_bandwidth
 {
 private:
+    using Speed = libtransmission::Values::Speed;
+
     static constexpr size_t HistoryMSec = 2000U;
     static constexpr size_t GranularityMSec = 250U;
     static constexpr size_t HistorySize = HistoryMSec / GranularityMSec;
@@ -136,19 +139,19 @@ public:
     [[nodiscard]] size_t clamp(tr_direction dir, size_t byte_count) const noexcept;
 
     /** @brief Get the raw total of bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] auto get_raw_speed_bytes_per_second(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] auto get_raw_speed(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return get_speed_bytes_per_second(this->band_[dir].raw_, HistoryMSec, now);
+        return get_speed(this->band_[dir].raw_, HistoryMSec, now);
     }
 
     /** @brief Get the number of piece data bytes read or sent by this bandwidth subtree. */
-    [[nodiscard]] auto get_piece_speed_bytes_per_second(uint64_t const now, tr_direction const dir) const
+    [[nodiscard]] auto get_piece_speed(uint64_t const now, tr_direction const dir) const
     {
         TR_ASSERT(tr_isDirection(dir));
 
-        return get_speed_bytes_per_second(this->band_[dir].piece_, HistoryMSec, now);
+        return get_speed(this->band_[dir].piece_, HistoryMSec, now);
     }
 
     /**
@@ -156,9 +159,9 @@ public:
      * @see `tr_bandwidth::allocate`
      * @see `tr_bandwidth::getDesiredSpeed`
      */
-    constexpr bool set_desired_speed_bytes_per_second(tr_direction dir, tr_bytes_per_second_t desired_speed)
+    constexpr bool set_desired_speed(tr_direction dir, Speed desired_speed)
     {
-        auto& value = this->band_[dir].desired_speed_bps_;
+        auto& value = this->band_[dir].desired_speed_;
         bool const did_change = desired_speed != value;
         value = desired_speed;
         return did_change;
@@ -168,9 +171,9 @@ public:
      * @brief Get the desired speed for the bandwidth subtree.
      * @see `tr_bandwidth::setDesiredSpeed`
      */
-    [[nodiscard]] constexpr auto get_desired_speed_bytes_per_second(tr_direction dir) const
+    [[nodiscard]] constexpr auto get_desired_speed(tr_direction dir) const
     {
-        return this->band_[dir].desired_speed_bps_;
+        return this->band_[dir].desired_speed_;
     }
 
     [[nodiscard]] bool is_maxed_out(tr_direction dir, uint64_t now_msec) const noexcept
@@ -180,8 +183,8 @@ public:
             return false;
         }
 
-        auto const got = get_piece_speed_bytes_per_second(now_msec, dir);
-        auto const want = get_desired_speed_bytes_per_second(dir);
+        auto const got = get_piece_speed(now_msec, dir);
+        auto const want = get_desired_speed(dir);
         return got >= want;
     }
 
@@ -235,7 +238,7 @@ private:
         std::array<uint64_t, HistorySize> date_;
         std::array<size_t, HistorySize> size_;
         uint64_t cache_time_;
-        tr_bytes_per_second_t cache_val_;
+        Speed cache_val_;
         int newest_;
     };
 
@@ -244,12 +247,12 @@ private:
         RateControl raw_;
         RateControl piece_;
         size_t bytes_left_;
-        tr_bytes_per_second_t desired_speed_bps_;
+        Speed desired_speed_;
         bool is_limited_ = false;
         bool honor_parent_limits_ = true;
     };
 
-    static tr_bytes_per_second_t get_speed_bytes_per_second(RateControl& r, unsigned int interval_msec, uint64_t now);
+    static Speed get_speed(RateControl& r, unsigned int interval_msec, uint64_t now);
 
     [[nodiscard]] constexpr auto* parent() noexcept
     {

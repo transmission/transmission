@@ -58,6 +58,7 @@
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 time_t libtransmission::detail::tr_time::current_time = {};
 
@@ -679,8 +680,6 @@ Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, 
 
 tr_variant tr_formatter_get_units()
 {
-    using namespace libtransmission::Values;
-
     auto const make_units_vec = [](auto const& units)
     {
         auto units_vec = tr_variant::Vector{};
@@ -718,8 +717,6 @@ void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char co
 
 std::string tr_formatter_size_B(uint64_t bytes)
 {
-    using Storage = libtransmission::Values::Storage;
-
     return Storage{ bytes, Storage::Units::Bytes }.to_string();
 }
 
@@ -738,21 +735,15 @@ void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char c
 
 std::string tr_formatter_speed_KBps(double kbyps)
 {
-    using Speed = libtransmission::Values::Speed;
-
     return Speed{ kbyps, Speed::Units::KByps }.to_string();
 }
 uint64_t tr_toSpeedBytes(size_t kbyps)
 {
-    using Speed = libtransmission::Values::Speed;
-
     return Speed{ kbyps, Speed::Units::KByps }.base_quantity();
 }
 
 double tr_toSpeedKBps(size_t byps)
 {
-    using Speed = libtransmission::Values::Speed;
-
     return Speed{ byps, Speed::Units::Byps }.count(Speed::Units::KByps);
 }
 
@@ -771,29 +762,21 @@ void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char con
 
 std::string tr_formatter_mem_B(uint64_t bytes)
 {
-    using Memory = libtransmission::Values::Memory;
-
     return Memory{ bytes, Memory::Units::Bytes }.to_string();
 }
 
 std::string tr_formatter_mem_MB(double mbytes)
 {
-    using Memory = libtransmission::Values::Memory;
-
     return Memory{ mbytes, Memory::Units::MBytes }.to_string();
 }
 
 uint64_t tr_toMemBytes(size_t mbytes)
 {
-    using Memory = libtransmission::Values::Memory;
-
     return Memory{ mbytes, Memory::Units::MBytes }.base_quantity();
 }
 
 double tr_toMemMB(uint64_t bytes)
 {
-    using Memory = libtransmission::Values::Memory;
-
     return Memory{ bytes, Memory::Units::Bytes }.count(Memory::Units::MBytes);
 }
 

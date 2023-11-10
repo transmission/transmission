@@ -41,6 +41,7 @@
 struct evbuffer;
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -203,18 +204,18 @@ public:
         tr_direction dir,
         tr_bytes_per_second_t* setme_bytes_per_second) const override
     {
-        tr_bytes_per_second_t bytes_per_second = 0;
-        bool is_active = false;
+        auto piece_speed = Speed{};
+        auto is_active = bool{ false };
 
         if (dir == TR_DOWN)
         {
             is_active = !std::empty(tasks);
-            bytes_per_second = bandwidth_.get_piece_speed_bytes_per_second(now, dir);
+            piece_speed = bandwidth_.get_piece_speed(now, dir);
         }
 
         if (setme_bytes_per_second != nullptr)
         {
-            *setme_bytes_per_second = bytes_per_second;
+            *setme_bytes_per_second = piece_speed.base_quantity();
         }
 
         return is_active;
