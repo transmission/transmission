@@ -363,12 +363,7 @@ void tr_variantInitInt(tr_variant* initme, int64_t value)
 
 void tr_variantInitRaw(tr_variant* initme, void const* value, size_t value_len)
 {
-    tr_variantInitStr(initme, std::string_view{ static_cast<char const*>(value), value_len });
-}
-
-void tr_variantInitStr(tr_variant* initme, std::string_view value)
-{
-    *initme = value;
+    *initme = std::string_view{ static_cast<char const*>(value), value_len };
 }
 
 void tr_variantInitList(tr_variant* initme, size_t n_reserve)
@@ -517,7 +512,7 @@ tr_variant* tr_variantDictAddStr(tr_variant* const var, tr_quark key, std::strin
 {
     tr_variantDictRemove(var, key);
     auto* const child = tr_variantDictAdd(var, key);
-    tr_variantInitStr(child, val);
+    *child = val;
     return child;
 }
 

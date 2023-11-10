@@ -220,7 +220,7 @@ void variantInit(tr_variant* init_me, QString const& value)
 
 void variantInit(tr_variant* init_me, std::string_view value)
 {
-    tr_variantInitStr(init_me, value);
+    *init_me = value;
 }
 
 } // namespace trqt::variant_helpers

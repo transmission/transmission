@@ -51,7 +51,7 @@ TEST_F(VariantTest, getType)
     EXPECT_FALSE(tr_variantGetStrView(&v, &sv));
 
     auto strkey = "foo"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_FALSE(tr_variantGetBool(&v, &b));
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
@@ -65,14 +65,14 @@ TEST_F(VariantTest, getType)
     EXPECT_EQ(std::size(strkey), std::size(sv));
 
     strkey = "true"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_TRUE(tr_variantGetBool(&v, &b));
     EXPECT_TRUE(b);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
     EXPECT_EQ(strkey, sv);
 
     strkey = "false"sv;
-    tr_variantInitStr(&v, strkey);
+    v = tr_variant{ strkey };
     EXPECT_TRUE(tr_variantGetBool(&v, &b));
     EXPECT_FALSE(b);
     EXPECT_TRUE(tr_variantGetStrView(&v, &sv));
