@@ -29,7 +29,6 @@
 #include "libtransmission/utils.h"
 #include "libtransmission/variant.h"
 
-using Speed = libtransmission::Values::Speed;
 using namespace std::literals;
 using namespace libtransmission::Values;
 
