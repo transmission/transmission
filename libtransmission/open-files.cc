@@ -23,6 +23,8 @@
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h" // _()
 
+using namespace std::literals;
+
 namespace
 {
 
@@ -33,7 +35,7 @@ namespace
 
 bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
-    if (length == 0)
+    if (length == 0U)
     {
         return true;
     }
@@ -49,12 +51,12 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
     if (!TR_ERROR_IS_ENOSPC(local_error.code()))
     {
-        char const zero = '\0';
+        static char constexpr Zero = '\0';
 
         local_error = {};
 
         /* fallback: the old-style seek-and-write */
-        if (tr_sys_file_write_at(fd, &zero, 1, length - 1, nullptr, &local_error) &&
+        if (tr_sys_file_write_at(fd, &Zero, 1, length - 1, nullptr, &local_error) &&
             tr_sys_file_truncate(fd, length, &local_error))
         {
             return true;
@@ -73,7 +75,7 @@ bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error* error)
 
 bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error* error)
 {
-    if (length == 0)
+    if (length == 0U)
     {
         return true;
     }
@@ -205,20 +207,20 @@ std::optional<std::pair<tr_sys_file_t, libtransmission::ObserverTag>> tr_open_fi
     if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
     {
         bool success = false;
-        char const* type = nullptr;
+        auto type = std::string_view{};
 
         if (allocation == TR_PREALLOCATE_FULL)
         {
             success = preallocate_file_full(fd, file_size, &error);
-            type = "full";
+            type = "full"sv;
         }
         else if (allocation == TR_PREALLOCATE_SPARSE)
         {
             success = preallocate_file_sparse(fd, file_size, &error);
-            type = "sparse";
+            type = "sparse"sv;
         }
 
-        TR_ASSERT(type != nullptr);
+        TR_ASSERT(!std::empty(type));
 
         if (!success)
         {

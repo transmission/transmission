@@ -42,7 +42,7 @@ public:
     {
         auto const lock = std::lock_guard{ mutex_ };
 
-        auto& entry = getFreeSlot();
+        auto& entry = get_free_slot();
         entry.key_ = std::move(key);
         entry.sequence_ = next_sequence_++;
 
@@ -82,14 +82,13 @@ public:
 
     using PreEraseCallback = std::function<void(Key const&, Val&)>;
 
-    void setPreErase(PreEraseCallback&& func)
+    void set_pre_erase(PreEraseCallback&& func)
     {
         pre_erase_cb_ = std::move(func);
     }
 
 private:
-    PreEraseCallback pre_erase_cb_ = [](Key const&, Val&) {
-    };
+    PreEraseCallback pre_erase_cb_;
 
     struct Entry
     {
@@ -118,7 +117,7 @@ private:
     void erase(Entry& entry)
     {
         auto const lock = std::lock_guard{ mutex_ };
-        if (entry.sequence_ != InvalidSeq)
+        if (pre_erase_cb_ && entry.sequence_ != InvalidSeq)
         {
             pre_erase_cb_(entry.key_, entry.val_);
         }
@@ -156,7 +155,7 @@ private:
         return nullptr;
     }
 
-    Entry& getFreeSlot()
+    Entry& get_free_slot()
     {
         auto lock = std::unique_lock{ mutex_ };
         cv_.wait(
@@ -165,19 +164,19 @@ private:
                 return std::any_of(
                     std::begin(entries_),
                     std::end(entries_),
-                    [](Entry const& entry) { return entry.in_use_ == 0U; });
+                    [](auto const& entry) { return entry.in_use_ == 0U; });
             });
         auto const iter = std::min_element(
             std::begin(entries_),
             std::end(entries_),
             [](auto const& a, auto const& b) { return b.in_use_ > 0U || a.sequence_ < b.sequence_; });
-        this->erase(*iter);
+        erase(*iter);
         return *iter;
     }
 
     std::array<Entry, N> entries_;
-    uint64_t next_sequence_ = 1;
-    static uint64_t constexpr InvalidSeq = 0;
+    uint64_t next_sequence_ = 1U;
+    static uint64_t constexpr InvalidSeq = 0U;
 
     mutable std::recursive_mutex mutex_;
     std::condition_variable_any cv_;

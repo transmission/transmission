@@ -70,6 +70,6 @@ private:
         bool writable_ = false;
     };
 
-    static constexpr size_t MaxOpenFiles = 32;
+    static constexpr size_t MaxOpenFiles = 32U;
     tr_lru_cache<Key, Val, MaxOpenFiles> pool_;
 };

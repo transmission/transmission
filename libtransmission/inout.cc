@@ -34,7 +34,7 @@ namespace
 
 bool readEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t* buf, uint64_t buflen, tr_error* error)
 {
-    while (buflen > 0)
+    while (buflen > 0U)
     {
         auto n_read = uint64_t{};
 
@@ -53,7 +53,7 @@ bool readEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t* buf, uint64_
 
 bool writeEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t const* buf, uint64_t buflen, tr_error* error)
 {
-    while (buflen > 0)
+    while (buflen > 0U)
     {
         auto n_written = uint64_t{};
 
@@ -112,10 +112,10 @@ void readOrWriteBytes(
 
     bool const do_write = io_mode == IoMode::Write;
     auto const file_size = tor->file_size(file_index);
-    TR_ASSERT(file_size == 0 || file_offset < file_size);
+    TR_ASSERT(file_size == 0U || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
 
-    if (file_size == 0)
+    if (file_size == 0U)
     {
         return;
     }
@@ -217,7 +217,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
 
     auto [file_index, file_offset] = tor->file_offset(loc, false);
 
-    while (buflen != 0)
+    while (buflen != 0U)
     {
         uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->file_size(file_index) - file_offset });
 
@@ -241,7 +241,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
         buflen -= bytes_this_pass;
 
         ++file_index;
-        file_offset = 0;
+        file_offset = 0U;
     }
 
     return 0;
@@ -276,7 +276,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
         {
             begin += (begin_byte - block_loc.byte);
         }
-        if (block + 1 == end_block) // `block` may end after `piece` does
+        if (block + 1U == end_block) // `block` may end after `piece` does
         {
             end -= (block_loc.byte + block_len - end_byte);
         }
