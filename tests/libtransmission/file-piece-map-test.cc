@@ -171,14 +171,14 @@ TEST_F(FilePieceMapTest, priorities)
     {
         for (tr_file_index_t i = 0U; i < n_files; ++i)
         {
-            auto const expected = int{ expected_file_priorities[i] };
-            auto const actual = int{ file_priorities.file_priority(i) };
+            auto const expected = expected_file_priorities[i];
+            auto const actual = file_priorities.file_priority(i);
             EXPECT_EQ(expected, actual) << "idx[" << i << "] expected [" << expected << "] actual [" << actual << ']';
         }
         for (tr_piece_index_t i = 0U; i < block_info_.piece_count(); ++i)
         {
-            auto const expected = int{ expected_piece_priorities[i] };
-            auto const actual = int{ file_priorities.piece_priority(i) };
+            auto const expected = expected_piece_priorities[i];
+            auto const actual = file_priorities.piece_priority(i);
             EXPECT_EQ(expected, actual) << "idx[" << i << "] expected [" << expected << "] actual [" << actual << ']';
         }
     };
@@ -333,14 +333,14 @@ TEST_F(FilePieceMapTest, wanted)
     {
         for (tr_file_index_t i = 0U; i < n_files; ++i)
         {
-            auto const expected = int{ expected_files_wanted.test(i) };
-            auto const actual = int{ files_wanted.file_wanted(i) };
+            auto const expected = expected_files_wanted.test(i);
+            auto const actual = files_wanted.file_wanted(i);
             EXPECT_EQ(expected, actual) << "idx[" << i << "] expected [" << expected << "] actual [" << actual << ']';
         }
         for (tr_piece_index_t i = 0U; i < block_info_.piece_count(); ++i)
         {
-            auto const expected = int{ expected_pieces_wanted.test(i) };
-            auto const actual = int{ files_wanted.piece_wanted(i) };
+            auto const expected = expected_pieces_wanted.test(i);
+            auto const actual = files_wanted.piece_wanted(i);
             EXPECT_EQ(expected, actual) << "idx[" << i << "] expected [" << expected << "] actual [" << actual << ']';
         }
     };
