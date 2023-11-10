@@ -1685,6 +1685,8 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
 
     tor_->set_verify_state(VerifyState::None);
 
+    tor_->session->closeTorrentFiles(tor_);
+
     if (!aborted && !tor_->is_deleting_)
     {
         tor_->session->runInSessionThread(
