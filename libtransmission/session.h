@@ -839,7 +839,7 @@ public:
         return global_ip_cache_->global_source_addr(type);
     }
 
-    [[nodiscard]] constexpr auto speed_limit(tr_direction const dir) const noexcept
+    [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
         auto const kbyps = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
         return Speed{ kbyps, Speed::Units::KByps };

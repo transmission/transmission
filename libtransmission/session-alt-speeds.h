@@ -113,7 +113,7 @@ public:
         return static_cast<tr_sched_day>(use_on_these_weekdays_);
     }
 
-    [[nodiscard]] constexpr auto speed_limit(tr_direction const dir) const noexcept
+    [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
         auto const kbyps = dir == TR_DOWN ? speed_down_kbyps_ : speed_up_kbyps_;
         return Speed{ kbyps, Speed::Units::KByps };
