@@ -50,6 +50,7 @@ static NSTimeInterval const kUpdateSeconds = 0.75;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     NSWindow* window = self.window;
     window.frameAutosaveName = @"MessageWindowFrame";
     [window setFrameUsingName:@"MessageWindowFrame"];

@@ -336,6 +336,7 @@ public:
             auto& [socket_address, peer_info] = *iter;
             if (peer_info.is_inactive(now))
             {
+                --stats.known_peer_from_count[peer_info.from_first()];
                 iter = connectable_pool.erase(iter);
             }
             else
@@ -454,6 +455,10 @@ public:
         {
             peer_info.found_at(from);
             peer_info.set_pex_flags(flags);
+        }
+        else if (is_connectable)
+        {
+            ++stats.known_peer_from_count[from];
         }
 
         mark_all_seeds_flag_dirty();
@@ -817,7 +822,8 @@ private:
             }
 
             info_this.merge(info_that);
-            connectable_pool.erase(info_that.listen_socket_address());
+            auto from = info_that.from_first();
+            stats.known_peer_from_count[from] -= connectable_pool.erase(info_that.listen_socket_address());
         }
         else if (!was_connectable)
         {
@@ -833,6 +839,7 @@ private:
         }
         else
         {
+            ++stats.known_peer_from_count[nh.mapped().from_first()];
             TR_ASSERT(nh.key().address() == nh.mapped().listen_address());
         }
         nh.key().port_ = event.port;
@@ -859,6 +866,7 @@ private:
             TR_ASSERT(it != std::end(peers));
             (*it)->do_purge = true;
 
+            --stats.known_peer_from_count[info_that.from_first()];
             // Note that it_that is invalid after this point
             graveyard_pool.insert(connectable_pool.extract(it_that));
 
@@ -870,6 +878,7 @@ private:
 
         if (was_connectable)
         {
+            --stats.known_peer_from_count[info_this.from_first()];
             graveyard_pool.insert(connectable_pool.extract(info_this.listen_socket_address()));
         }
 
@@ -1198,15 +1207,12 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
 /* FIXME: this is kind of a mess. */
 [[nodiscard]] bool on_handshake_done(tr_peerMgr* const manager, tr_handshake::Result const& result)
 {
+    auto const lock = manager->unique_lock();
+
     TR_ASSERT(result.io != nullptr);
-
-    bool const ok = result.is_connected;
-
-    auto* const s = manager->get_existing_swarm(result.io->torrent_hash());
-
     auto const& socket_address = result.io->socket_address();
-
-    auto* const info_ptr = s != nullptr ? s->get_existing_peer_info(socket_address) : nullptr;
+    auto* const swarm = manager->get_existing_swarm(result.io->torrent_hash());
+    auto* info_ptr = swarm != nullptr ? swarm->get_existing_peer_info(socket_address) : nullptr;
 
     if (result.io->is_incoming())
     {
@@ -1217,9 +1223,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
         info_ptr->destroy_handshake();
     }
 
-    auto const lock = manager->unique_lock();
-
-    if (!ok || s == nullptr || !s->is_running)
+    if (!result.is_connected || swarm == nullptr || !swarm->is_running)
     {
         if (info_ptr != nullptr && !info_ptr->is_connected())
         {
@@ -1228,7 +1232,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
             if (!result.read_anything_from_peer)
             {
                 tr_logAddTraceSwarm(
-                    s,
+                    swarm,
                     fmt::format(
                         "marking peer {} as unreachable... num_fails is {}",
                         info_ptr->display_name(),
@@ -1236,54 +1240,59 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
                 info_ptr->set_connectable(false);
             }
         }
+
+        return false;
     }
-    else /* looking good */
+
+    if (info_ptr == nullptr && result.io->is_incoming())
     {
-        // If this is an outgoing connection, then we are sure we already have the peer info object
-        auto& info = result.io->is_incoming() ? s->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false) :
-                                                *info_ptr;
-
-        if (!result.io->is_incoming())
-        {
-            info.set_connectable();
-        }
-
-        // If we're connected via µTP, then we know the peer supports µTP...
-        if (result.io->is_utp())
-        {
-            info.set_utp_supported();
-        }
-
-        if (info.is_banned())
-        {
-            tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", info.display_name()));
-        }
-        else if (s->peerCount() >= s->tor->peer_limit())
-        {
-            // too many peers already
-        }
-        else if (info.is_connected())
-        {
-            // we're already connected to this peer; do nothing
-        }
-        else
-        {
-            auto client = tr_interned_string{};
-            if (result.peer_id)
-            {
-                auto buf = std::array<char, 128>{};
-                tr_clientForId(std::data(buf), sizeof(buf), *result.peer_id);
-                client = tr_interned_string{ tr_quark_new(std::data(buf)) };
-            }
-
-            result.io->set_bandwidth(&s->tor->bandwidth_);
-            create_bit_torrent_peer(s->tor, result.io, &info, client);
-
-            return true;
-        }
+        info_ptr = &swarm->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false);
     }
 
-    return false;
+    if (info_ptr == nullptr)
+    {
+        return false;
+    }
+
+    if (!result.io->is_incoming())
+    {
+        info_ptr->set_connectable();
+    }
+
+    // If we're connected via µTP, then we know the peer supports µTP...
+    if (result.io->is_utp())
+    {
+        info_ptr->set_utp_supported();
+    }
+
+    if (info_ptr->is_banned())
+    {
+        tr_logAddTraceSwarm(swarm, fmt::format("banned peer {} tried to reconnect", info_ptr->display_name()));
+        return false;
+    }
+
+    if (swarm->peerCount() >= swarm->tor->peer_limit()) // too many peers already
+    {
+        return false;
+    }
+
+    if (info_ptr->is_connected()) // we're already connected to this peer; do nothing
+    {
+        return false;
+    }
+
+    auto client = tr_interned_string{};
+    if (result.peer_id)
+    {
+        auto buf = std::array<char, 128>{};
+        tr_clientForId(std::data(buf), sizeof(buf), *result.peer_id);
+        client = tr_interned_string{ tr_quark_new(std::data(buf)) };
+    }
+
+    result.io->set_bandwidth(&swarm->tor->bandwidth_);
+    create_bit_torrent_peer(swarm->tor, result.io, info_ptr, client);
+
+    return true;
 }
 } // namespace handshake_helpers
 } // namespace

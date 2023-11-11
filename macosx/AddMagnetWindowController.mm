@@ -52,6 +52,7 @@ typedef NS_ENUM(NSUInteger, PopupPriority) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateGroupMenu:) name:@"UpdateGroups" object:nil];
 
     NSString* name = self.torrent.name;

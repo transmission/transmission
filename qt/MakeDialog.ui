@@ -82,10 +82,10 @@
      <item row="4" column="1">
       <widget class="QSlider" name="pieceSizeSlider">
        <property name="minimum">
-        <number>10</number>
+        <number>14</number>
        </property>
        <property name="maximum">
-        <number>26</number>
+        <number>28</number>
        </property>
        <property name="pageStep">
         <number>1</number>

@@ -29,8 +29,6 @@
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
-#include "units.h"
-
 using namespace std::literals;
 
 namespace
@@ -139,9 +137,6 @@ int tr_main(int argc, char* argv[])
     tr_locale_set_global("");
 
     tr_logSetLevel(TR_LOG_ERROR);
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     auto options = app_options{};
     if (parseCommandLine(options, argc, (char const* const*)argv) != 0)

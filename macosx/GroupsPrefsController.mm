@@ -39,6 +39,7 @@ typedef NS_ENUM(NSInteger, SegmentTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self.fTableView registerForDraggedTypes:@[ kGroupTableViewDataType ]];
 
     [self.fSelectedColorView addObserver:self forKeyPath:@"color" options:0 context:NULL];

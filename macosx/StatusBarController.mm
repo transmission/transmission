@@ -54,6 +54,7 @@ typedef NS_ENUM(NSUInteger, StatusTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     //localize menu items
     [self.fStatusButton.menu itemWithTag:StatusTagTotalRatio].title = NSLocalizedString(@"Total Ratio", "Status Bar -> status menu");
     [self.fStatusButton.menu itemWithTag:StatusTagSessionRatio].title = NSLocalizedString(@"Session Ratio", "Status Bar -> status menu");

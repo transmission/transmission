@@ -305,38 +305,6 @@ private:
     Sandbox sandbox_;
 };
 
-inline void ensureFormattersInited()
-{
-    static constexpr int MEM_K = 1024;
-    static char constexpr const* const MEM_K_STR = "KiB";
-    static char constexpr const* const MEM_M_STR = "MiB";
-    static char constexpr const* const MEM_G_STR = "GiB";
-    static char constexpr const* const MEM_T_STR = "TiB";
-
-    static constexpr int DISK_K = 1000;
-    static char constexpr const* const DISK_K_STR = "kB";
-    static char constexpr const* const DISK_M_STR = "MB";
-    static char constexpr const* const DISK_G_STR = "GB";
-    static char constexpr const* const DISK_T_STR = "TB";
-
-    static constexpr int SPEED_K = 1000;
-    static char constexpr const* const SPEED_K_STR = "kB/s";
-    static char constexpr const* const SPEED_M_STR = "MB/s";
-    static char constexpr const* const SPEED_G_STR = "GB/s";
-    static char constexpr const* const SPEED_T_STR = "TB/s";
-
-    static std::once_flag flag;
-
-    std::call_once(
-        flag,
-        []()
-        {
-            tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-            tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-            tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
-        });
-}
-
 class SessionTest : public SandboxedTest
 {
 private:
@@ -344,8 +312,6 @@ private:
 
     tr_session* sessionInit(tr_variant& settings)
     {
-        ensureFormattersInited();
-
         auto* const settings_map = settings.get_if<tr_variant::Map>();
         EXPECT_NE(settings_map, nullptr);
 

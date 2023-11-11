@@ -158,6 +158,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.window.restorationClass = [self class];
 
     NSString* name = self.fPath.lastPathComponent;

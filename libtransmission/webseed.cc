@@ -41,6 +41,7 @@
 struct evbuffer;
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -203,18 +204,18 @@ public:
         tr_direction dir,
         tr_bytes_per_second_t* setme_bytes_per_second) const override
     {
-        tr_bytes_per_second_t bytes_per_second = 0;
-        bool is_active = false;
+        auto piece_speed = Speed{};
+        auto is_active = bool{ false };
 
         if (dir == TR_DOWN)
         {
             is_active = !std::empty(tasks);
-            bytes_per_second = bandwidth_.get_piece_speed_bytes_per_second(now, dir);
+            piece_speed = bandwidth_.get_piece_speed(now, dir);
         }
 
         if (setme_bytes_per_second != nullptr)
         {
-            *setme_bytes_per_second = bytes_per_second;
+            *setme_bytes_per_second = piece_speed.base_quantity();
         }
 
         return is_active;
@@ -518,7 +519,7 @@ void task_request_next_chunk(tr_webseed_task* task)
 
     auto const loc = tor->byte_loc(task->loc.byte + evbuffer_get_length(task->content()));
 
-    auto const [file_index, file_offset] = tor->file_offset(loc);
+    auto const [file_index, file_offset] = tor->file_offset(loc, false);
     auto const left_in_file = tor->file_size(file_index) - file_offset;
     auto const left_in_task = task->end_byte - loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);

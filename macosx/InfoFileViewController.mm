@@ -36,6 +36,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     CGFloat const height = [NSUserDefaults.standardUserDefaults floatForKey:@"InspectorContentHeightFiles"];
     if (height != 0.0)
     {

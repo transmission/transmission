@@ -35,6 +35,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fUploadLimitField.integerValue = [self.fDefaults integerForKey:@"UploadLimit"];
     self.fDownloadLimitField.integerValue = [self.fDefaults integerForKey:@"DownloadLimit"];
 

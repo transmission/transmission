@@ -61,24 +61,6 @@ static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
 
 static auto constexpr Arguments = TR_KEY_arguments;
 
-static auto constexpr MemK = size_t{ 1024 };
-static char constexpr MemKStr[] = "KiB";
-static char constexpr MemMStr[] = MEM_M_STR;
-static char constexpr MemGStr[] = "GiB";
-static char constexpr MemTStr[] = "TiB";
-
-static auto constexpr DiskK = size_t{ 1000 };
-static char constexpr DiskKStr[] = "kB";
-static char constexpr DiskMStr[] = "MB";
-static char constexpr DiskGStr[] = "GB";
-static char constexpr DiskTStr[] = "TB";
-
-static auto constexpr SpeedK = size_t{ 1000 };
-static auto constexpr SpeedKStr = SPEED_K_STR;
-static char constexpr SpeedMStr[] = "MB/s";
-static char constexpr SpeedGStr[] = "GB/s";
-static char constexpr SpeedTStr[] = "TB/s";
-
 struct Config
 {
     std::string auth;
@@ -3328,10 +3310,6 @@ int tr_main(int argc, char* argv[])
         showUsage();
         return EXIT_FAILURE;
     }
-
-    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
-    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
-    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     getHostAndPortAndRpcUrl(&argc, argv, &host, &port, &rpcurl, config);
 

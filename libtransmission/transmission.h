@@ -969,7 +969,7 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
 // --- Torrent speed limits
 
 tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir);
-void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobytes_per_second_t kilo_per_second);
+void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobytes_per_second_t kbyps);
 
 bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir);
 void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool enabled);
@@ -1574,9 +1574,13 @@ struct tr_stat
     /** Number of peers that we're connected to */
     uint16_t peersConnected;
 
-    /** How many peers we found out about from the tracker, or from pex,
+    /** How many connected peers we found out about from the tracker, or from pex,
         or from incoming connections, or from our resume file. */
     uint16_t peersFrom[TR_PEER_FROM__MAX];
+
+    /** How many known peers we found out about from the tracker, or from pex,
+        or from incoming connections, or from our resume file. */
+    uint16_t knownPeersFrom[TR_PEER_FROM__MAX];
 
     /** Number of peers that are sending data to us. */
     uint16_t peersSendingToUs;

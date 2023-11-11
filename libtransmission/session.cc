@@ -60,6 +60,7 @@
 struct tr_ctor;
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -110,12 +111,12 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
         if (auto const* val = group_map->find_if<int64_t>(TR_KEY_uploadLimit); val != nullptr)
         {
-            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
+            limits.up_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         if (auto const* val = group_map->find_if<int64_t>(TR_KEY_downloadLimit); val != nullptr)
         {
-            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
+            limits.down_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         group.set_limits(limits);
@@ -136,11 +137,11 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
     {
         auto const limits = group->get_limits();
         auto group_map = tr_variant::Map{ 6U };
-        group_map.try_emplace(TR_KEY_downloadLimit, limits.down_limit_KBps);
+        group_map.try_emplace(TR_KEY_downloadLimit, limits.down_limit.count(Speed::Units::KByps));
         group_map.try_emplace(TR_KEY_downloadLimited, limits.down_limited);
         group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
         group_map.try_emplace(TR_KEY_name, name.sv());
-        group_map.try_emplace(TR_KEY_uploadLimit, limits.up_limit_KBps);
+        group_map.try_emplace(TR_KEY_uploadLimit, limits.up_limit.count(Speed::Units::KByps));
         group_map.try_emplace(TR_KEY_uploadLimited, limits.up_limited);
         groups_map.try_emplace(name.quark(), std::move(group_map));
     }
@@ -153,10 +154,10 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 
 void update_bandwidth(tr_session* session, tr_direction dir)
 {
-    if (auto const limit_bytes_per_second = session->activeSpeedLimitBps(dir); limit_bytes_per_second)
+    if (auto const limit_byps = session->activeSpeedLimitBps(dir); limit_byps)
     {
-        session->top_bandwidth_.set_limited(dir, *limit_bytes_per_second > 0U);
-        session->top_bandwidth_.set_desired_speed_bytes_per_second(dir, *limit_bytes_per_second);
+        session->top_bandwidth_.set_limited(dir, *limit_byps > 0U);
+        session->top_bandwidth_.set_desired_speed(dir, Speed{ *limit_byps, Speed::Units::Byps });
     }
     else
     {
@@ -1319,8 +1320,12 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    auto const bps = session != nullptr ? session->top_bandwidth_.get_raw_speed_bytes_per_second(0, dir) : 0;
-    return tr_toSpeedKBps(bps);
+    if (session != nullptr)
+    {
+        return session->top_bandwidth_.get_raw_speed(0, dir).count(Speed::Units::KByps);
+    }
+
+    return {};
 }
 
 void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)

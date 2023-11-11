@@ -190,37 +190,37 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
 void variantInit(tr_variant* init_me, bool value)
 {
-    tr_variantInitBool(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, int64_t value)
 {
-    tr_variantInitInt(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, int value)
 {
-    tr_variantInitInt(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, double value)
 {
-    tr_variantInitReal(init_me, value);
+    *init_me = value;
 }
 
 void variantInit(tr_variant* init_me, QByteArray const& value)
 {
-    tr_variantInitRaw(init_me, value.constData(), value.size());
+    *init_me = std::string_view{ value.constData(), static_cast<size_t>(value.size()) };
 }
 
 void variantInit(tr_variant* init_me, QString const& value)
 {
-    variantInit(init_me, value.toUtf8());
+    *init_me = value.toStdString();
 }
 
 void variantInit(tr_variant* init_me, std::string_view value)
 {
-    tr_variantInitStr(init_me, value);
+    *init_me = value;
 }
 
 } // namespace trqt::variant_helpers
