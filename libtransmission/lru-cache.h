@@ -80,16 +80,7 @@ public:
         }
     }
 
-    using PreEraseCallback = std::function<void(Key const&, Val&)>;
-
-    void set_pre_erase(PreEraseCallback&& func)
-    {
-        pre_erase_cb_ = std::move(func);
-    }
-
 private:
-    PreEraseCallback pre_erase_cb_;
-
     struct Entry
     {
         Key key_ = {};
@@ -117,10 +108,6 @@ private:
     void erase(Entry& entry)
     {
         auto const lock = std::lock_guard{ mutex_ };
-        if (pre_erase_cb_ && entry.sequence_ != InvalidSeq)
-        {
-            pre_erase_cb_(entry.key_, entry.val_);
-        }
 
         entry.key_ = {};
         entry.val_ = {};
