@@ -6,7 +6,7 @@
 #pragma once
 
 #include <array>
-#include <cmath>
+#include <cmath> // for std::fabs(), std::floor()
 #include <cstdint> // for uint64_t
 #include <string>
 #include <string_view>
