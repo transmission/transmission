@@ -212,12 +212,12 @@ bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
 
 // --- PER-TORRENT UL / DL SPEEDS
 
-void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobytes_per_second_t kbyps)
+void tr_torrentSetSpeedLimit_KBps(tr_torrent* const tor, tr_direction const dir, size_t const limit_kbyps)
 {
-    tor->set_speed_limit(dir, Speed{ kbyps, Speed::Units::KByps });
+    tor->set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
 }
 
-tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir)
+size_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* const tor, tr_direction const dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
@@ -225,7 +225,7 @@ tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr
     return tor->speed_limit(dir).count(Speed::Units::KByps);
 }
 
-void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool enabled)
+void tr_torrentUseSpeedLimit(tr_torrent* const tor, tr_direction const dir, bool const enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_isDirection(dir));
@@ -233,14 +233,14 @@ void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool enabled)
     tor->use_speed_limit(dir, enabled);
 }
 
-bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir)
+bool tr_torrentUsesSpeedLimit(tr_torrent const* const tor, tr_direction const dir)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     return tor->uses_speed_limit(dir);
 }
 
-void tr_torrentUseSessionLimits(tr_torrent* tor, bool enabled)
+void tr_torrentUseSessionLimits(tr_torrent* const tor, bool const enabled)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -1022,9 +1022,9 @@ void tr_torrent::init(tr_ctor const* const ctor)
     if ((loaded & tr_resume::Speedlimit) == 0)
     {
         use_speed_limit(TR_UP, false);
-        set_speed_limit(TR_UP, Speed{ session->speedLimitKBps(TR_UP), Speed::Units::KByps });
+        set_speed_limit(TR_UP, session->speed_limit(TR_UP));
         use_speed_limit(TR_DOWN, false);
-        set_speed_limit(TR_DOWN, Speed{ session->speedLimitKBps(TR_DOWN), Speed::Units::KByps });
+        set_speed_limit(TR_DOWN, session->speed_limit(TR_DOWN));
         tr_torrentUseSessionLimits(this, true);
     }
 

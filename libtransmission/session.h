@@ -83,6 +83,8 @@ class SessionTest;
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
+    using Speed = libtransmission::Values::Speed;
+
 private:
     class BoundSocket
     {
@@ -837,22 +839,30 @@ public:
         return global_ip_cache_->global_source_addr(type);
     }
 
-    [[nodiscard]] constexpr auto speedLimitKBps(tr_direction dir) const noexcept
+    [[nodiscard]] auto speed_limit(tr_direction const dir) const noexcept
     {
-        return dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        auto const kbyps = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        return Speed{ kbyps, Speed::Units::KByps };
     }
 
-    [[nodiscard]] constexpr auto isSpeedLimited(tr_direction dir) const noexcept
+    void set_speed_limit(tr_direction dir, Speed limit) noexcept
+    {
+        auto& tgt = dir == TR_DOWN ? settings_.speed_limit_down : settings_.speed_limit_up;
+        tgt = limit.count(Speed::Units::KByps);
+        update_bandwidth(dir);
+    }
+
+    [[nodiscard]] constexpr auto is_speed_limited(tr_direction dir) const noexcept
     {
         return dir == TR_DOWN ? settings_.speed_limit_down_enabled : settings_.speed_limit_up_enabled;
     }
 
-    [[nodiscard]] auto pieceSpeedBps(tr_direction dir) const noexcept
+    [[nodiscard]] auto piece_speed(tr_direction dir) const noexcept
     {
-        return top_bandwidth_.get_piece_speed(0, dir).base_quantity();
+        return top_bandwidth_.get_piece_speed(0, dir);
     }
 
-    [[nodiscard]] std::optional<tr_bytes_per_second_t> activeSpeedLimitBps(tr_direction dir) const noexcept;
+    [[nodiscard]] std::optional<Speed> active_speed_limit(tr_direction dir) const noexcept;
 
     [[nodiscard]] constexpr auto isIncompleteFileNamingEnabled() const noexcept
     {
@@ -933,6 +943,8 @@ private:
         return settings_.script_torrent_done_seeding_filename;
     }
 
+    void update_bandwidth(tr_direction dir);
+
     [[nodiscard]] tr_port randomPort() const;
 
     void onAdvertisedPeerPortChanged();
@@ -969,8 +981,7 @@ private:
     friend size_t tr_sessionGetAltSpeedBegin(tr_session const* session);
     friend size_t tr_sessionGetAltSpeedEnd(tr_session const* session);
     friend size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
-    friend tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
-    friend tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
+    friend size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
     friend tr_port_forwarding_state tr_sessionGetPortForwarding(tr_session const* session);
     friend tr_sched_day tr_sessionGetAltSpeedDay(tr_session const* session);
     friend tr_session* tr_sessionInit(char const* config_dir, bool message_queueing_enabled, tr_variant const& client_settings);
@@ -986,7 +997,7 @@ private:
     friend void tr_sessionSetAltSpeedDay(tr_session* session, tr_sched_day days);
     friend void tr_sessionSetAltSpeedEnd(tr_session* session, size_t minutes_since_midnight);
     friend void tr_sessionSetAltSpeedFunc(tr_session* session, tr_altSpeedFunc func, void* user_data);
-    friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_bytes_per_second_t limit);
+    friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
     friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
@@ -1016,7 +1027,6 @@ private:
     friend void tr_sessionSetRPCUsername(tr_session* session, char const* username);
     friend void tr_sessionSetRatioLimit(tr_session* session, double desired_ratio);
     friend void tr_sessionSetRatioLimited(tr_session* session, bool is_limited);
-    friend void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit);
     friend void tr_sessionSetUTPEnabled(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeed(tr_session* session, bool enabled);
     friend void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled);

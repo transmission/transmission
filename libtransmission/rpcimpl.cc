@@ -1868,7 +1868,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(i));
+        session->set_speed_limit(TR_DOWN, Speed{ i, Speed::Units::KByps });
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &val))
@@ -1878,7 +1878,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_UP, static_cast<tr_kilobytes_per_second_t>(i));
+        session->set_speed_limit(TR_UP, Speed{ i, Speed::Units::KByps });
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &val))
@@ -1927,10 +1927,10 @@ char const* sessionStats(tr_session* session, tr_variant* /*args_in*/, tr_varian
         [](auto const* tor) { return tor->is_running(); });
 
     tr_variantDictAddInt(args_out, TR_KEY_activeTorrentCount, running);
-    tr_variantDictAddReal(args_out, TR_KEY_downloadSpeed, session->pieceSpeedBps(TR_DOWN));
+    tr_variantDictAddInt(args_out, TR_KEY_downloadSpeed, session->piece_speed(TR_DOWN).base_quantity());
     tr_variantDictAddInt(args_out, TR_KEY_pausedTorrentCount, total - running);
     tr_variantDictAddInt(args_out, TR_KEY_torrentCount, total);
-    tr_variantDictAddReal(args_out, TR_KEY_uploadSpeed, session->pieceSpeedBps(TR_UP));
+    tr_variantDictAddInt(args_out, TR_KEY_uploadSpeed, session->piece_speed(TR_UP).base_quantity());
 
     auto stats = session->stats().cumulative();
     tr_variant* d = tr_variantDictAddDict(args_out, TR_KEY_cumulative_stats, 5);
@@ -2142,19 +2142,19 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_speed_limit_up:
-        tr_variantDictAddInt(d, key, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
+        tr_variantDictAddInt(d, key, s->speed_limit(TR_UP).count(Speed::Units::KByps));
         break;
 
     case TR_KEY_speed_limit_up_enabled:
-        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_UP));
+        tr_variantDictAddBool(d, key, s->is_speed_limited(TR_UP));
         break;
 
     case TR_KEY_speed_limit_down:
-        tr_variantDictAddInt(d, key, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
+        tr_variantDictAddInt(d, key, s->speed_limit(TR_DOWN).count(Speed::Units::KByps));
         break;
 
     case TR_KEY_speed_limit_down_enabled:
-        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_DOWN));
+        tr_variantDictAddBool(d, key, s->is_speed_limited(TR_DOWN));
         break;
 
     case TR_KEY_script_torrent_added_filename:

@@ -568,10 +568,9 @@ private:
         // honor the session limits, if enabled
         if (torrent->uses_session_limits())
         {
-            if (auto const irate_bytes_per_second = torrent->session->activeSpeedLimitBps(TR_PEER_TO_CLIENT);
-                irate_bytes_per_second)
+            if (auto const limit = torrent->session->active_speed_limit(TR_PEER_TO_CLIENT); limit)
             {
-                rate_bytes_per_second = std::min(rate_bytes_per_second, uint64_t{ *irate_bytes_per_second });
+                rate_bytes_per_second = std::min(rate_bytes_per_second, limit->base_quantity());
             }
         }
 
