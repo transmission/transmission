@@ -8,6 +8,7 @@
 #include <cstdint> // uint8_t
 #include <iterator> // std::distance(), std::next(), std::prev()
 #include <memory>
+#include <mutex>
 #include <numeric> // std::accumulate()
 #include <utility> // std::make_pair()
 #include <vector>
@@ -121,14 +122,15 @@ size_t Cache::get_max_blocks(size_t max_bytes) noexcept
 
 int Cache::set_limit(size_t new_limit)
 {
-    max_blocks_ = get_max_blocks(new_limit);
+    auto const lock = std::lock_guard{ mutex_ };
 
+    max_blocks_ = get_max_blocks(new_limit);
     tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(new_limit), max_blocks_));
 
     return cache_trim();
 }
 
-Cache::Cache(tr_torrents& torrents, size_t max_bytes)
+Cache::Cache(tr_torrents const& torrents, size_t max_bytes)
     : torrents_{ torrents }
     , max_blocks_(get_max_blocks(max_bytes))
 {
@@ -148,6 +150,8 @@ int Cache::write_block(tr_torrent_id_t tor_id, tr_block_index_t block, std::uniq
         auto* const tor = torrents_.get(tor_id);
         return tr_ioWrite(tor, tor->block_loc(block), std::size(*writeme), std::data(*writeme));
     }
+
+    auto const lock = std::lock_guard{ mutex_ };
 
     auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey);
@@ -180,23 +184,27 @@ Cache::CIter Cache::get_block(tr_torrent const* torrent, tr_block_info::Location
     return std::end(blocks_);
 }
 
-int Cache::read_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len, uint8_t* setme)
+int Cache::read_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len, uint8_t* setme)
 {
+    auto lock = std::unique_lock{ mutex_ };
     if (auto const iter = get_block(torrent, loc); iter != std::end(blocks_))
     {
         std::copy_n(std::begin(*iter->buf), len, setme);
         return {};
     }
+    lock.unlock();
 
     return tr_ioRead(torrent, loc, len, setme);
 }
 
-int Cache::prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, uint32_t len)
+int Cache::prefetch_block(tr_torrent* torrent, tr_block_info::Location const& loc, size_t len)
 {
+    auto lock = std::unique_lock{ mutex_ };
     if (auto const iter = get_block(torrent, loc); iter != std::end(blocks_))
     {
         return {}; // already have it
     }
+    lock.unlock();
 
     return tr_ioPrefetch(torrent, loc, len);
 }
@@ -226,6 +234,7 @@ int Cache::flush_file(tr_torrent const* torrent, tr_file_index_t file)
     auto const tor_id = torrent->id();
     auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, file);
 
+    auto const lock = std::lock_guard{ mutex_ };
     return flush_span(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), CompareCacheBlockByKey),
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), CompareCacheBlockByKey));
@@ -235,6 +244,7 @@ int Cache::flush_torrent(tr_torrent const* torrent)
 {
     auto const tor_id = torrent->id();
 
+    auto const lock = std::lock_guard{ mutex_ };
     return flush_span(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), CompareCacheBlockByKey),
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), CompareCacheBlockByKey));
