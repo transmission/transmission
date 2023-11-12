@@ -32,7 +32,6 @@ using tr_byte_index_t = uint64_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
 using tr_torrent_id_t = int;
-using tr_bytes_per_second_t = size_t;
 using tr_mode_t = uint16_t;
 
 struct tr_block_span_t
@@ -1331,7 +1330,7 @@ struct tr_webseed_view
 {
     char const* url; // the url to download from
     bool is_downloading; // can be true even if speed is 0, e.g. slow download
-    tr_bytes_per_second_t download_bytes_per_second; // current download speed
+    uint64_t download_bytes_per_second; // current download speed
 };
 
 struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);

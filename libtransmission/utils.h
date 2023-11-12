@@ -308,10 +308,7 @@ void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char con
 extern size_t tr_speed_K;
 extern size_t tr_mem_K;
 
-[[nodiscard]] double tr_toMemMB(uint64_t bytes);
-[[nodiscard]] double tr_toSpeedKBps(size_t byps);
 [[nodiscard]] uint64_t tr_toMemBytes(size_t mbytes);
-[[nodiscard]] uint64_t tr_toSpeedBytes(size_t kbyps);
 
 [[nodiscard]] std::string tr_formatter_mem_B(uint64_t bytes);
 [[nodiscard]] std::string tr_formatter_mem_MB(double mbytes);

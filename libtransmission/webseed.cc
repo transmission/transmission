@@ -199,26 +199,9 @@ public:
         return tr_torrentFindFromId(session, torrent_id);
     }
 
-    [[nodiscard]] bool isTransferringPieces( //
-        uint64_t now,
-        tr_direction dir,
-        tr_bytes_per_second_t* setme_bytes_per_second) const override
+    [[nodiscard]] Speed get_piece_speed(uint64_t now, tr_direction dir) const override
     {
-        auto piece_speed = Speed{};
-        auto is_active = bool{ false };
-
-        if (dir == TR_DOWN)
-        {
-            is_active = !std::empty(tasks);
-            piece_speed = bandwidth_.get_piece_speed(now, dir);
-        }
-
-        if (setme_bytes_per_second != nullptr)
-        {
-            *setme_bytes_per_second = piece_speed.base_quantity();
-        }
-
-        return is_active;
+        return dir == TR_DOWN ? bandwidth_.get_piece_speed(now, dir) : Speed{};
     }
 
     [[nodiscard]] TR_CONSTEXPR20 size_t activeReqCount(tr_direction dir) const noexcept override
@@ -547,13 +530,13 @@ tr_peer* tr_webseedNew(tr_torrent* torrent, std::string_view url, tr_peer_callba
 
 tr_webseed_view tr_webseedView(tr_peer const* peer)
 {
-    auto const* w = dynamic_cast<tr_webseed const*>(peer);
-    if (w == nullptr)
+    auto const* const webseed = dynamic_cast<tr_webseed const*>(peer);
+    if (webseed == nullptr)
     {
         return {};
     }
 
-    auto bytes_per_second = tr_bytes_per_second_t{ 0 };
-    auto const is_downloading = peer->isTransferringPieces(tr_time_msec(), TR_DOWN, &bytes_per_second);
-    return { w->base_url.c_str(), is_downloading, bytes_per_second };
+    auto const is_downloading = !std::empty(webseed->tasks);
+    auto const speed = peer->get_piece_speed(tr_time_msec(), TR_DOWN);
+    return { webseed->base_url.c_str(), is_downloading, speed.base_quantity() };
 }
