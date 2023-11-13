@@ -51,7 +51,6 @@
 #include <utility>
 
 using namespace std::literals;
-
 using namespace libtransmission::Values;
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)

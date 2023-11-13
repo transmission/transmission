@@ -59,8 +59,6 @@
 
 struct tr_ctor;
 
-using Memory = libtransmission::Values::Memory;
-using Speed = libtransmission::Values::Speed;
 using namespace std::literals;
 using namespace libtransmission::Values;
 

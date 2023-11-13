@@ -26,7 +26,6 @@
 #include <libtransmission/web.h> // tr_sessionFetch()
 
 using namespace std::chrono_literals;
-
 using namespace libtransmission::Values;
 
 #define SPEED_K_STR "kB/s"

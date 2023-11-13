@@ -49,8 +49,7 @@
 #endif
 
 using namespace std::literals;
-
-using Speed = libtransmission::Values::Speed;
+using namespace libtransmission::Values;
 
 namespace
 {
