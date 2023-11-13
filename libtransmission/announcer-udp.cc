@@ -690,7 +690,7 @@ public:
         return false;
     }
 
-    [[nodiscard]] bool is_idle() override
+    [[nodiscard]] bool is_idle() const noexcept override
     {
         return std::all_of(std::begin(trackers_), std::end(trackers_), [](auto const& tracker) { return tracker.is_idle(); });
     }

@@ -158,5 +158,5 @@ public:
     // @return true if msg was a tracker response; false otherwise
     virtual bool handle_message(uint8_t const* msg, size_t msglen) = 0;
 
-    [[nodiscard]] virtual bool is_idle() = 0;
+    [[nodiscard]] virtual bool is_idle() const noexcept = 0;
 };
