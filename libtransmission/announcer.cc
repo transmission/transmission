@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono> // operator""ms
-#include <cstdio>
+#include <cstddef> // size_t
 #include <ctime>
 #include <deque>
 #include <iterator>

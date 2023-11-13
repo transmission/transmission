@@ -9,7 +9,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <atomic>
 #include <cstddef> // size_t
 #include <cstdint> // uint32_t
 #include <ctime>
