@@ -737,15 +737,6 @@ std::string tr_formatter_speed_KBps(double kbyps)
 {
     return Speed{ kbyps, Speed::Units::KByps }.to_string();
 }
-uint64_t tr_toSpeedBytes(size_t kbyps)
-{
-    return Speed{ kbyps, Speed::Units::KByps }.base_quantity();
-}
-
-double tr_toSpeedKBps(size_t byps)
-{
-    return Speed{ byps, Speed::Units::Byps }.count(Speed::Units::KByps);
-}
 
 // --- formatters: memory
 
@@ -773,11 +764,6 @@ std::string tr_formatter_mem_MB(double mbytes)
 uint64_t tr_toMemBytes(size_t mbytes)
 {
     return Memory{ mbytes, Memory::Units::MBytes }.base_quantity();
-}
-
-double tr_toMemMB(uint64_t bytes)
-{
-    return Memory{ bytes, Memory::Units::Bytes }.count(Memory::Units::MBytes);
 }
 
 // --- ENVIRONMENT

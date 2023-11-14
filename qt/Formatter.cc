@@ -5,11 +5,14 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
+#include <libtransmission/values.h> // tr_formatter
 
 #include "Formatter.h"
 #include "Speed.h"
 
 #include <algorithm>
+
+using namespace std::literals;
 
 Formatter& Formatter::get()
 {
@@ -25,13 +28,12 @@ Formatter::Formatter()
           { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM
       } }
 {
+    namespace Values = libtransmission::Values;
+
     auto const& speed = UnitStrings[SPEED];
-    tr_formatter_speed_init(
-        SpeedBase,
-        speed[KB].toUtf8().constData(),
-        speed[MB].toUtf8().constData(),
-        speed[GB].toUtf8().constData(),
-        speed[TB].toUtf8().constData());
+    Values::Config::Speed = { Values::Config::Base::Kilo, "B"sv,
+                              speed[KB].toStdString(),    speed[MB].toStdString(),
+                              speed[GB].toStdString(),    speed[TB].toStdString() };
 
     auto const& size = UnitStrings[SIZE];
     tr_formatter_size_init(
@@ -116,18 +118,4 @@ QString Formatter::timeToString(int seconds) const
     auto const days = hours / 24;
 
     return tr("%Ln day(s)", nullptr, days);
-}
-
-/***
-****
-***/
-
-double Speed::getKBps() const
-{
-    return getBps() / static_cast<double>(Formatter::SpeedBase);
-}
-
-Speed Speed::fromKBps(double KBps)
-{
-    return Speed{ static_cast<int>(KBps * Formatter::SpeedBase) };
 }

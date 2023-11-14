@@ -40,7 +40,6 @@ public:
         NUM_TYPES
     };
 
-    static constexpr int SpeedBase = 1000;
     static constexpr int SizeBase = 1000;
     static constexpr int MemBase = 1024;
 
@@ -51,25 +50,6 @@ public:
     [[nodiscard]] QString sizeToString(uint64_t bytes) const;
     [[nodiscard]] QString timeToString(int seconds) const;
     [[nodiscard]] QString unitStr(Type t, Size s) const;
-
-    [[nodiscard]] auto speedToString(Speed const& speed) const
-    {
-        return QString::fromStdString(tr_formatter_speed_KBps(speed.getKBps()));
-    }
-
-    [[nodiscard]] auto uploadSpeedToString(Speed const& upload_speed) const
-    {
-        static auto constexpr UploadSymbol = QChar{ 0x25B4 };
-
-        return tr("%1 %2").arg(speedToString(upload_speed)).arg(UploadSymbol);
-    }
-
-    [[nodiscard]] auto downloadSpeedToString(Speed const& download_speed) const
-    {
-        static auto constexpr DownloadSymbol = QChar{ 0x25BE };
-
-        return tr("%1 %2").arg(speedToString(download_speed)).arg(DownloadSymbol);
-    }
 
     [[nodiscard]] auto percentToString(double x) const
     {
