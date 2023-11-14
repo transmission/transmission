@@ -140,6 +140,13 @@ string(APPEND TR_PEER_ID_PREFIX "-")
 
 set(TR_VCS_REVISION_FILE "${CMAKE_SOURCE_DIR}/REVISION")
 
+## Compiler standard version
+
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 if(EXISTS ${CMAKE_SOURCE_DIR}/.git)
     find_package(Git)
 endif()
@@ -593,13 +600,6 @@ if(WIN32)
 endif()
 
 unset(CMAKE_FOLDER)
-
-## Compiler standard version
-
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 ### Compiler Warnings
 
