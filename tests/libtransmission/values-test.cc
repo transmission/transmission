@@ -16,7 +16,7 @@ using ValuesTest = ::testing::Test;
 
 TEST_F(ValuesTest, baseQuantity)
 {
-    auto val = Speed{ 1, Speed::Units::MByps };
+    auto const val = Speed{ 1, Speed::Units::MByps };
     EXPECT_EQ(1000000UL, val.base_quantity());
 }
 

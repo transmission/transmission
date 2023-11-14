@@ -678,35 +678,6 @@ Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, 
 
 } // namespace libtransmission::Values
 
-tr_variant tr_formatter_get_units()
-{
-    auto const make_units_vec = [](auto const& units)
-    {
-        auto units_vec = tr_variant::Vector{};
-        for (size_t i = 0;; ++i)
-        {
-            auto const display_name = units.display_name(i);
-            if (std::empty(display_name))
-            {
-                break;
-            }
-            units_vec.emplace_back(display_name);
-        }
-        return units_vec;
-    };
-
-    auto units_map = tr_variant::Map{ 6U };
-    units_map.try_emplace(TR_KEY_memory_bytes, Memory::units().base());
-    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Memory::units()));
-    units_map.try_emplace(TR_KEY_size_bytes, Storage::units().base());
-    units_map.try_emplace(TR_KEY_size_units, make_units_vec(Storage::units()));
-    units_map.try_emplace(TR_KEY_speed_bytes, Speed::units().base());
-    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(Speed::units()));
-    return tr_variant{ std::move(units_map) };
-}
-
-// --- formatters: storage
-
 void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     namespace Values = libtransmission::Values;
@@ -715,32 +686,13 @@ void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char co
     Values::Config::Storage = { kval, "B", kb, mb, gb, tb };
 }
 
-std::string tr_formatter_size_B(uint64_t bytes)
-{
-    return Storage{ bytes, Storage::Units::Bytes }.to_string();
-}
-
-// --- formatters: speed
-
-size_t tr_speed_K = 0;
-
 void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
     namespace Values = libtransmission::Values;
 
     auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
     Values::Config::Speed = { kval, "B/s", kb, mb, gb, tb };
-    tr_speed_K = base;
 }
-
-std::string tr_formatter_speed_KBps(double kbyps)
-{
-    return Speed{ kbyps, Speed::Units::KByps }.to_string();
-}
-
-// --- formatters: memory
-
-size_t tr_mem_K = 0;
 
 void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
@@ -748,22 +700,6 @@ void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char con
 
     auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
     Values::Config::Memory = { kval, "B", kb, mb, gb, tb };
-    tr_mem_K = base;
-}
-
-std::string tr_formatter_mem_B(uint64_t bytes)
-{
-    return Memory{ bytes, Memory::Units::Bytes }.to_string();
-}
-
-std::string tr_formatter_mem_MB(double mbytes)
-{
-    return Memory{ mbytes, Memory::Units::MBytes }.to_string();
-}
-
-uint64_t tr_toMemBytes(size_t mbytes)
-{
-    return Memory{ mbytes, Memory::Units::MBytes }.base_quantity();
 }
 
 // --- ENVIRONMENT

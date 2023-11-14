@@ -4,8 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_formatter
-#include <libtransmission/values.h> // tr_formatter
+
+#include <libtransmission/values.h>
 
 #include "Formatter.h"
 #include "Speed.h"
@@ -13,6 +13,8 @@
 #include <algorithm>
 
 using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 Formatter& Formatter::get()
 {
@@ -69,7 +71,7 @@ QString Formatter::memToString(int64_t bytes) const
         return tr("None");
     }
 
-    return QString::fromStdString(tr_formatter_mem_B(bytes));
+    return QString::fromStdString(Memory{ bytes, Memory::Units::Bytes }.to_string());
 }
 
 QString Formatter::sizeToString(uint64_t bytes) const
@@ -79,7 +81,7 @@ QString Formatter::sizeToString(uint64_t bytes) const
         return tr("None");
     }
 
-    return QString::fromStdString(tr_formatter_size_B(bytes));
+    return QString::fromStdString(Storage{ bytes, Storage::Units::Bytes }.to_string());
 }
 
 QString Formatter::sizeToString(int64_t bytes) const

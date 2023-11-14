@@ -83,6 +83,7 @@ class SessionTest;
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
+    using Memory = libtransmission::Values::Memory;
     using Speed = libtransmission::Values::Speed;
 
 private:
@@ -1000,7 +1001,7 @@ private:
     friend void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
     friend void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled);
     friend void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int max_bad_requests);
-    friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
+    friend void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
     friend void tr_sessionSetDHTEnabled(tr_session* session, bool enabled);
     friend void tr_sessionSetDeleteSource(tr_session* session, bool delete_source);
     friend void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
@@ -1156,7 +1157,7 @@ private:
 
 public:
     // depends-on: settings_, open_files_, torrents_
-    std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, 1024 * 1024 * 2);
+    std::unique_ptr<Cache> cache = std::make_unique<Cache>(torrents_, Memory{ 2U, Memory::Units::MBytes });
 
 private:
     // depends-on: timer_maker_, blocklists_, top_bandwidth_, utp_context, torrents_, web_

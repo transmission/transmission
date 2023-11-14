@@ -19,12 +19,14 @@
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h> // _()
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
 #include <libtransmission/web.h> // tr_sessionFetch()
 
 using namespace std::chrono_literals;
+using namespace libtransmission::Values;
 
 #define SPEED_K_STR "kB/s"
 
@@ -134,9 +136,9 @@ static std::string getStatusStr(tr_stat const* st)
             tr_truncd(100 * st->percentDone, 1),
             st->peersSendingToUs,
             st->peersConnected,
-            tr_formatter_speed_KBps(st->pieceDownloadSpeed_KBps),
+            Speed{ st->pieceDownloadSpeed_KBps, Speed::Units::KByps }.to_string(),
             st->peersGettingFromUs,
-            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps),
+            Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
             tr_strlratio(st->ratio));
     }
 
@@ -146,7 +148,7 @@ static std::string getStatusStr(tr_stat const* st)
             FMT_STRING("Seeding, uploading to {:d} of {:d} peer(s), {:s} [{:s}]"),
             st->peersGettingFromUs,
             st->peersConnected,
-            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps),
+            Speed{ st->pieceUploadSpeed_KBps, Speed::Units::KByps }.to_string(),
             tr_strlratio(st->ratio));
     }
 
