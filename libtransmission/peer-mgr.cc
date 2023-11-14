@@ -1245,7 +1245,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
         return false;
     }
 
-    if (info_ptr == nullptr && result.io->is_incoming())
+    if (result.io->is_incoming())
     {
         info_ptr = &swarm->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false);
     }
