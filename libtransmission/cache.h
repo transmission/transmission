@@ -32,7 +32,7 @@ public:
     using BlockData = small::max_size_vector<uint8_t, tr_block_info::BlockSize>;
     using Memory = libtransmission::Values::Memory;
 
-    Cache(tr_torrents const& torrents, Memory max_bytes);
+    Cache(tr_torrents const& torrents, Memory max_size);
 
     int set_limit(Memory max_size);
 

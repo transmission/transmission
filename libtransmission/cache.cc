@@ -115,19 +115,19 @@ int Cache::write_contiguous(CIter const begin, CIter const end) const
     return {};
 }
 
-int Cache::set_limit(Memory const new_limit)
+int Cache::set_limit(Memory const max_size)
 {
     auto const lock = std::lock_guard{ mutex_ };
 
-    max_blocks_ = get_max_blocks(new_limit);
-    tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", new_limit.to_string(), max_blocks_));
+    max_blocks_ = get_max_blocks(max_size);
+    tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", max_size.to_string(), max_blocks_));
 
     return cache_trim();
 }
 
-Cache::Cache(tr_torrents const& torrents, Memory const new_limit)
+Cache::Cache(tr_torrents const& torrents, Memory const max_size)
     : torrents_{ torrents }
-    , max_blocks_{ get_max_blocks(new_limit) }
+    , max_blocks_{ get_max_blocks(max_size) }
 {
 }
 
