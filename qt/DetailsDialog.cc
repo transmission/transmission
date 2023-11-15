@@ -531,14 +531,14 @@ void DetailsDialog::refreshUI()
         double const d = size_when_done == 0 ?
             100.0 :
             100.0 * static_cast<double>(size_when_done - left_until_done) / static_cast<double>(size_when_done);
-        auto const pct = Formatter::percentToString(d);
-        auto const size_when_done_str = Formatter::sizeToString(size_when_done);
+        auto const pct = Formatter::percent_to_string(d);
+        auto const size_when_done_str = Formatter::storage_to_string(size_when_done);
 
         if (have_unverified == 0 && left_until_done == 0)
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data
-            string = tr("%1 (100%)").arg(Formatter::sizeToString(have_verified));
+            string = tr("%1 (100%)").arg(Formatter::storage_to_string(have_verified));
         }
         else if (have_unverified == 0)
         {
@@ -546,7 +546,7 @@ void DetailsDialog::refreshUI()
             //: %1 is amount of downloaded and verified data,
             //: %2 is overall size of torrent data,
             //: %3 is percentage (%1/%2*100)
-            string = tr("%1 of %2 (%3%)").arg(Formatter::sizeToString(have_verified)).arg(size_when_done_str).arg(pct);
+            string = tr("%1 of %2 (%3%)").arg(Formatter::storage_to_string(have_verified)).arg(size_when_done_str).arg(pct);
         }
         else
         {
@@ -556,10 +556,10 @@ void DetailsDialog::refreshUI()
             //: %3 is percentage (%1/%2*100),
             //: %4 is amount of downloaded but not yet verified data
             string = tr("%1 of %2 (%3%), %4 Unverified")
-                         .arg(Formatter::sizeToString(have_verified + have_unverified))
+                         .arg(Formatter::storage_to_string(have_verified + have_unverified))
                          .arg(size_when_done_str)
                          .arg(pct)
-                         .arg(Formatter::sizeToString(have_unverified));
+                         .arg(Formatter::storage_to_string(have_unverified));
         }
     }
 
@@ -573,7 +573,7 @@ void DetailsDialog::refreshUI()
     else
     {
         auto const percent = 100.0 * static_cast<double>(available) / static_cast<double>(size_when_done);
-        string = QStringLiteral("%1%").arg(Formatter::percentToString(percent));
+        string = QStringLiteral("%1%").arg(Formatter::percent_to_string(percent));
     }
 
     ui_.availabilityValueLabel->setText(string);
@@ -594,8 +594,8 @@ void DetailsDialog::refreshUI()
             f += t->failedEver();
         }
 
-        QString const dstr = Formatter::sizeToString(d);
-        QString const fstr = Formatter::sizeToString(f);
+        auto const dstr = Formatter::storage_to_string(d);
+        auto const fstr = Formatter::storage_to_string(f);
 
         if (f != 0)
         {
@@ -626,8 +626,8 @@ void DetailsDialog::refreshUI()
         }
 
         string = tr("%1 (Ratio: %2)")
-                     .arg(Formatter::sizeToString(uploaded))
-                     .arg(Formatter::ratioToString(tr_getRatio(uploaded, denominator)));
+                     .arg(Formatter::storage_to_string(uploaded))
+                     .arg(Formatter::ratio_to_string(tr_getRatio(uploaded, denominator)));
     }
 
     ui_.uploadedValueLabel->setText(string);
@@ -666,7 +666,7 @@ void DetailsDialog::refreshUI()
         else
         {
             auto const seconds = static_cast<int>(std::difftime(now, baseline));
-            string = Formatter::timeToString(seconds);
+            string = Formatter::time_to_string(seconds);
         }
     }
 
@@ -700,7 +700,7 @@ void DetailsDialog::refreshUI()
             }
             else
             {
-                string = Formatter::timeToString(baseline);
+                string = Formatter::time_to_string(baseline);
             }
         }
     }
@@ -738,7 +738,7 @@ void DetailsDialog::refreshUI()
         }
         else
         {
-            string = tr("%1 ago").arg(Formatter::timeToString(seconds));
+            string = tr("%1 ago").arg(Formatter::time_to_string(seconds));
         }
     }
 
@@ -802,12 +802,12 @@ void DetailsDialog::refreshUI()
         else if (piece_size > 0)
         {
             string = tr("%1 (%Ln pieces @ %2)", "", pieces)
-                         .arg(Formatter::sizeToString(size))
-                         .arg(Formatter::memToString(piece_size));
+                         .arg(Formatter::storage_to_string(size))
+                         .arg(Formatter::memory_to_string(piece_size));
         }
         else
         {
-            string = tr("%1 (%Ln pieces)", "", pieces).arg(Formatter::sizeToString(size));
+            string = tr("%1 (%Ln pieces)", "", pieces).arg(Formatter::storage_to_string(size));
         }
     }
 

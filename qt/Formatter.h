@@ -22,20 +22,22 @@ class Formatter
 public:
     Formatter() = delete;
 
-    [[nodiscard]] static QString memToString(int64_t bytes);
-    [[nodiscard]] static QString sizeToString(int64_t bytes);
-    [[nodiscard]] static QString sizeToString(uint64_t bytes);
-    [[nodiscard]] static QString timeToString(int seconds);
+    [[nodiscard]] static QString memory_to_string(int64_t bytes);
 
-    [[nodiscard]] static auto percentToString(double x)
+    [[nodiscard]] static auto percent_to_string(double x)
     {
         return QString::fromStdString(tr_strpercent(x));
     }
 
-    [[nodiscard]] static auto ratioToString(double ratio)
+    [[nodiscard]] static auto ratio_to_string(double ratio)
     {
         static auto constexpr InfinitySymbol = "\xE2\x88\x9E";
 
         return QString::fromStdString(tr_strratio(ratio, InfinitySymbol));
     }
+
+    [[nodiscard]] static QString storage_to_string(int64_t bytes);
+    [[nodiscard]] static QString storage_to_string(uint64_t bytes);
+
+    [[nodiscard]] static QString time_to_string(int seconds);
 };

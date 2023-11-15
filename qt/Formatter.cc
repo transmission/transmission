@@ -8,14 +8,13 @@
 #include <libtransmission/values.h>
 
 #include "Formatter.h"
-#include "Speed.h"
 
 #include <algorithm>
 
 using namespace std::literals;
 using namespace libtransmission::Values;
 
-QString Formatter::memToString(int64_t const bytes)
+QString Formatter::memory_to_string(int64_t const bytes)
 {
     if (bytes < 0)
     {
@@ -30,7 +29,7 @@ QString Formatter::memToString(int64_t const bytes)
     return QString::fromStdString(Memory{ bytes, Memory::Units::Bytes }.to_string());
 }
 
-QString Formatter::sizeToString(uint64_t const bytes)
+QString Formatter::storage_to_string(uint64_t const bytes)
 {
     if (bytes == 0)
     {
@@ -40,17 +39,17 @@ QString Formatter::sizeToString(uint64_t const bytes)
     return QString::fromStdString(Storage{ bytes, Storage::Units::Bytes }.to_string());
 }
 
-QString Formatter::sizeToString(int64_t const bytes)
+QString Formatter::storage_to_string(int64_t const bytes)
 {
     if (bytes < 0)
     {
         return tr("Unknown");
     }
 
-    return Formatter::sizeToString(static_cast<uint64_t>(bytes));
+    return storage_to_string(static_cast<uint64_t>(bytes));
 }
 
-QString Formatter::timeToString(int seconds)
+QString Formatter::time_to_string(int seconds)
 {
     seconds = std::max(seconds, 0);
 

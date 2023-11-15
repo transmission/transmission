@@ -24,7 +24,6 @@
 
 namespace
 {
-
 auto constexpr Spacing = int{ 6 };
 
 auto constexpr Margin = QSize{ 10, 10 };
@@ -158,17 +157,15 @@ void TrackerDelegate::setShowMore(bool b)
 
 namespace
 {
-
-QString timeToStringRounded(int seconds)
+QString timeToRoundedString(int seconds)
 {
     if (seconds > 60)
     {
         seconds -= seconds % 60;
     }
 
-    return Formatter::timeToString(seconds);
+    return Formatter::time_to_string(seconds);
 }
-
 } // namespace
 
 QString TrackerDelegate::getText(TrackerInfo const& inf) const
@@ -184,11 +181,11 @@ QString TrackerDelegate::getText(TrackerInfo const& inf) const
     auto const now = time(nullptr);
     auto const time_until = [&now](auto t)
     {
-        return timeToStringRounded(static_cast<int>(t - now));
+        return timeToRoundedString(static_cast<int>(t - now));
     };
     auto const time_since = [&now](auto t)
     {
-        return timeToStringRounded(static_cast<int>(now - t));
+        return timeToRoundedString(static_cast<int>(now - t));
     };
 
     // hostname

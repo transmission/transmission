@@ -446,7 +446,7 @@ QMenu* MainWindow::createOptionsMenu()
         action_group->addAction(off_action);
         connect(off_action, &QAction::triggered, this, qOverload<bool>(&MainWindow::onSetPrefs));
 
-        on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::ratioToString(current_value)));
+        on_action = menu->addAction(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(current_value)));
         on_action->setCheckable(true);
         on_action->setProperty(PrefVariantsKey, QVariantList{ pref, current_value, enabled_pref, true });
         action_group->addAction(on_action);
@@ -456,7 +456,7 @@ QMenu* MainWindow::createOptionsMenu()
 
         for (double const i : StockRatios)
         {
-            QAction* action = menu->addAction(Formatter::ratioToString(i));
+            QAction* action = menu->addAction(Formatter::ratio_to_string(i));
             action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
             connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
         }
@@ -836,26 +836,26 @@ void MainWindow::refreshStatusBar(TransferStats const& stats)
 
     if (mode == session_ratio_stats_mode_name_)
     {
-        str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getStats().ratio));
+        str = tr("Ratio: %1").arg(Formatter::ratio_to_string(session_.getStats().ratio));
     }
     else if (mode == session_transfer_stats_mode_name_)
     {
         auto const& st = session_.getStats();
         str = tr("Down: %1, Up: %2")
-                  .arg(Formatter::sizeToString(st.downloadedBytes))
-                  .arg(Formatter::sizeToString(st.uploadedBytes));
+                  .arg(Formatter::storage_to_string(st.downloadedBytes))
+                  .arg(Formatter::storage_to_string(st.uploadedBytes));
     }
     else if (mode == total_transfer_stats_mode_name_)
     {
         auto const& st = session_.getCumulativeStats();
         str = tr("Down: %1, Up: %2")
-                  .arg(Formatter::sizeToString(st.downloadedBytes))
-                  .arg(Formatter::sizeToString(st.uploadedBytes));
+                  .arg(Formatter::storage_to_string(st.downloadedBytes))
+                  .arg(Formatter::storage_to_string(st.uploadedBytes));
     }
     else // default is "total-ratio"
     {
         assert(mode == total_ratio_stats_mode_name_);
-        str = tr("Ratio: %1").arg(Formatter::ratioToString(session_.getCumulativeStats().ratio));
+        str = tr("Ratio: %1").arg(Formatter::ratio_to_string(session_.getCumulativeStats().ratio));
     }
 
     ui_.statsLabel->setText(str);
@@ -1191,7 +1191,7 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::RATIO:
-        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratioToString(prefs_.get<double>(key))));
+        ratio_on_action_->setText(tr("Stop at Ratio (%1)").arg(Formatter::ratio_to_string(prefs_.get<double>(key))));
         break;
 
     case Prefs::FILTERBAR:
@@ -1498,7 +1498,7 @@ void MainWindow::updateNetworkIcon()
     }
     else if (seconds_since_last_read < 120)
     {
-        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::timeToString(seconds_since_last_read));
+        tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::time_to_string(seconds_since_last_read));
     }
     else
     {
