@@ -20,51 +20,22 @@ class Formatter
     Q_DECLARE_TR_FUNCTIONS(Formatter)
 
 public:
-    enum Size
-    {
-        B,
-        KB,
-        MB,
-        GB,
-        TB,
+    Formatter() = delete;
 
-        NUM_SIZES
-    };
+    [[nodiscard]] static QString memToString(int64_t bytes);
+    [[nodiscard]] static QString sizeToString(int64_t bytes);
+    [[nodiscard]] static QString sizeToString(uint64_t bytes);
+    [[nodiscard]] static QString timeToString(int seconds);
 
-    enum Type
-    {
-        SPEED,
-        SIZE,
-        MEM,
-
-        NUM_TYPES
-    };
-
-    static constexpr int SizeBase = 1000;
-    static constexpr int MemBase = 1024;
-
-    [[nodiscard]] static Formatter& get();
-
-    [[nodiscard]] QString memToString(int64_t bytes) const;
-    [[nodiscard]] QString sizeToString(int64_t bytes) const;
-    [[nodiscard]] QString sizeToString(uint64_t bytes) const;
-    [[nodiscard]] QString timeToString(int seconds) const;
-
-    [[nodiscard]] auto percentToString(double x) const
+    [[nodiscard]] static auto percentToString(double x)
     {
         return QString::fromStdString(tr_strpercent(x));
     }
 
-    [[nodiscard]] auto ratioToString(double ratio) const
+    [[nodiscard]] static auto ratioToString(double ratio)
     {
         static auto constexpr InfinitySymbol = "\xE2\x88\x9E";
 
         return QString::fromStdString(tr_strratio(ratio, InfinitySymbol));
     }
-
-protected:
-    Formatter();
-
-private:
-    std::array<std::array<QString, Formatter::NUM_SIZES>, Formatter::NUM_TYPES> const UnitStrings;
 };

@@ -220,7 +220,7 @@ double FileTreeItem::progress() const
 
 QString FileTreeItem::sizeString() const
 {
-    return Formatter::get().sizeToString(size());
+    return Formatter::sizeToString(size());
 }
 
 uint64_t FileTreeItem::size() const
