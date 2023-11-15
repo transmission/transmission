@@ -49,3 +49,15 @@ TEST_F(ValuesTest, toString)
     val = Speed{ 999.22222, Speed::Units::KByps };
     EXPECT_EQ("999.2 kB/s", val.to_string());
 }
+
+TEST_F(ValuesTest, isZero)
+{
+    auto val = Speed{};
+    EXPECT_TRUE(val.is_zero());
+
+    val = Speed{ 0, Speed::Units::Byps };
+    EXPECT_TRUE(val.is_zero());
+
+    val = Speed{ 1, Speed::Units::Byps };
+    EXPECT_FALSE(val.is_zero());
+}

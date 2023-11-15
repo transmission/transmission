@@ -29,11 +29,6 @@ public:
     {
     }
 
-    [[nodiscard]] auto constexpr is_zero() const noexcept
-    {
-        return base_quantity() == 0U;
-    }
-
     [[nodiscard]] auto to_qstring() const noexcept
     {
         return QString::fromStdString(to_string());

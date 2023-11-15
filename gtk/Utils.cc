@@ -115,7 +115,7 @@ Glib::ustring tr_strlratio(double ratio)
 
 Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage)
 {
-    return storage.base_quantity() == 0U ? Q_("None") : storage.to_string();
+    return storage.is_zero() ? Q_("None") : storage.to_string();
 }
 
 Glib::ustring tr_strlsize(guint64 n_bytes)

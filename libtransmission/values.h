@@ -127,6 +127,11 @@ public:
         return base_quantity_;
     }
 
+    [[nodiscard]] constexpr auto is_zero() const noexcept
+    {
+        return base_quantity_ == 0U;
+    }
+
     [[nodiscard]] constexpr auto count(Units tgt) const noexcept
     {
         return base_quantity_ / (1.0 * units_.multiplier(tgt));

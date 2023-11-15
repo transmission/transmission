@@ -455,7 +455,7 @@ Glib::ustring Torrent::Impl::get_long_progress_text() const
 {
     Glib::ustring gstr;
 
-    bool const isDone = cache_.left_until_done.base_quantity() == 0;
+    bool const isDone = cache_.left_until_done.is_zero();
     auto const haveTotal = cache_.have_unchecked + cache_.have_valid;
     bool const isSeed = cache_.have_valid >= cache_.total_size;
 
