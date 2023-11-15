@@ -487,10 +487,13 @@ void DetailsDialog::Impl::torrent_set_real(tr_quark key, double value)
 
 void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*builder*/)
 {
+    auto const speed_units_kbyps_str = Speed::units().display_name(Speed::Units::KByps);
+
     honor_limits_check_tag_ = honor_limits_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_honorsSessionLimits, honor_limits_check_->get_active()); });
 
-    down_limited_check_->set_label(fmt::format(down_limited_check_->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
+    down_limited_check_->set_label(
+        fmt::format(fmt::runtime(down_limited_check_->get_label().raw()), fmt::arg("speed_units", speed_units_kbyps_str)));
     down_limited_check_tag_ = down_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_downloadLimited, down_limited_check_->get_active()); });
 
@@ -498,7 +501,8 @@ void DetailsDialog::Impl::options_page_init(Glib::RefPtr<Gtk::Builder> const& /*
     down_limit_spin_tag_ = down_limit_spin_->signal_value_changed().connect(
         [this]() { torrent_set_int(TR_KEY_downloadLimit, down_limit_spin_->get_value_as_int()); });
 
-    up_limited_check_->set_label(fmt::format(up_limited_check_->get_label().raw(), fmt::arg("speed_units", speed_K_str)));
+    up_limited_check_->set_label(
+        fmt::format(fmt::runtime(up_limited_check_->get_label().raw()), fmt::arg("speed_units", speed_units_kbyps_str)));
     up_limited_check_tag_ = up_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_uploadLimited, up_limited_check_->get_active()); });
 
@@ -1108,14 +1112,14 @@ public:
         add(key);
         add(was_updated);
         add(url);
-        add(download_rate_double);
+        add(download_rate);
         add(download_rate_string);
     }
 
     Gtk::TreeModelColumn<std::string> key;
     Gtk::TreeModelColumn<bool> was_updated;
     Gtk::TreeModelColumn<Glib::ustring> url;
-    Gtk::TreeModelColumn<double> download_rate_double;
+    Gtk::TreeModelColumn<Speed> download_rate;
     Gtk::TreeModelColumn<Glib::ustring> download_rate_string;
 };
 
@@ -1130,7 +1134,7 @@ public:
         add(was_updated);
         add(address);
         add(address_collated);
-        add(download_rate_double);
+        add(download_rate);
         add(download_rate_string);
         add(upload_rate_double);
         add(upload_rate_string);
@@ -1157,7 +1161,7 @@ public:
     Gtk::TreeModelColumn<bool> was_updated;
     Gtk::TreeModelColumn<Glib::ustring> address;
     Gtk::TreeModelColumn<Glib::ustring> address_collated;
-    Gtk::TreeModelColumn<double> download_rate_double;
+    Gtk::TreeModelColumn<Speed> download_rate;
     Gtk::TreeModelColumn<Glib::ustring> download_rate_string;
     Gtk::TreeModelColumn<double> upload_rate_double;
     Gtk::TreeModelColumn<Glib::ustring> upload_rate_string;
@@ -1275,7 +1279,7 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
     (*iter)[peer_cols.upload_request_count_string] = up_count;
     (*iter)[peer_cols.download_request_count_number] = peer->activeReqsToPeer;
     (*iter)[peer_cols.download_request_count_string] = down_count;
-    (*iter)[peer_cols.download_rate_double] = peer->rateToClient_KBps;
+    (*iter)[peer_cols.download_rate] = Speed{ peer->rateToClient_KBps, Speed::Units::KByps };
     (*iter)[peer_cols.download_rate_string] = down_speed;
     (*iter)[peer_cols.upload_rate_double] = peer->rateToPeer_KBps;
     (*iter)[peer_cols.upload_rate_string] = up_speed;
@@ -1425,11 +1429,11 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             auto const key = make_key(tor, webseed.url);
             auto const iter = store->get_iter(hash.at(key).get_path());
 
-            auto const KBps = double(webseed.download_bytes_per_second) / speed_K;
-            auto const buf = webseed.is_downloading ? Speed{ KBps, Speed::Units::KByps }.to_string() : std::string{};
+            auto const speed = Speed{ webseed.download_bytes_per_second, Speed::Units::Byps };
+            auto const speed_str = webseed.is_downloading ? speed.to_string() : std::string{};
 
-            (*iter)[webseed_cols.download_rate_double] = KBps;
-            (*iter)[webseed_cols.download_rate_string] = buf;
+            (*iter)[webseed_cols.download_rate] = speed;
+            (*iter)[webseed_cols.download_rate_string] = speed_str;
             (*iter)[webseed_cols.was_updated] = true;
         }
     }
@@ -1683,7 +1687,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
             r->property_xalign() = 1.0F;
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Down"), *r);
             c->add_attribute(r->property_text(), *col);
-            sort_col = &peer_cols.download_rate_double;
+            sort_col = &peer_cols.download_rate;
         }
         else if (*col == peer_cols.upload_rate_string)
         {
@@ -1761,7 +1765,7 @@ void DetailsDialog::Impl::peer_page_init(Glib::RefPtr<Gtk::Builder> const& build
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
         auto* c = Gtk::make_managed<Gtk::TreeViewColumn>(_("Down"), *r);
         c->add_attribute(r->property_text(), webseed_cols.download_rate_string);
-        c->set_sort_column(webseed_cols.download_rate_double);
+        c->set_sort_column(webseed_cols.download_rate);
         v->append_column(*c);
     }
 

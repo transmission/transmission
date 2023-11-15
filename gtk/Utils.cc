@@ -62,28 +62,6 @@ using namespace std::literals;
 using namespace libtransmission::Values;
 
 /***
-****  UNITS
-***/
-
-int const mem_K = 1024;
-char const* const mem_K_str = N_("KiB");
-char const* const mem_M_str = N_("MiB");
-char const* const mem_G_str = N_("GiB");
-char const* const mem_T_str = N_("TiB");
-
-int const disk_K = 1000;
-char const* const disk_K_str = N_("kB");
-char const* const disk_M_str = N_("MB");
-char const* const disk_G_str = N_("GB");
-char const* const disk_T_str = N_("TB");
-
-int const speed_K = 1000;
-char const* const speed_K_str = N_("kB/s");
-char const* const speed_M_str = N_("MB/s");
-char const* const speed_G_str = N_("GB/s");
-char const* const speed_T_str = N_("TB/s");
-
-/***
 ****
 ***/
 

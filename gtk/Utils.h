@@ -43,28 +43,6 @@
 ****
 ***/
 
-extern int const mem_K;
-extern char const* const mem_K_str;
-extern char const* const mem_M_str;
-extern char const* const mem_G_str;
-extern char const* const mem_T_str;
-
-extern int const disk_K;
-extern char const* const disk_K_str;
-extern char const* const disk_M_str;
-extern char const* const disk_G_str;
-extern char const* const disk_T_str;
-
-extern int const speed_K;
-extern char const* const speed_K_str;
-extern char const* const speed_M_str;
-extern char const* const speed_G_str;
-extern char const* const speed_T_str;
-
-/***
-****
-***/
-
 void gtr_message(std::string const& message);
 void gtr_warning(std::string const& message);
 void gtr_error(std::string const& message);
