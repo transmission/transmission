@@ -977,8 +977,8 @@ void tr_torrent::init(tr_ctor const* const ctor)
 
     session->addTorrent(this);
 
-    TR_ASSERT(tor->bytes_downloaded_.during_this_session() == 0U);
-    TR_ASSERT(tor->bytes_uploaded_.during_this_session() == 0);
+    TR_ASSERT(bytes_downloaded_.during_this_session() == 0U);
+    TR_ASSERT(bytes_uploaded_.during_this_session() == 0);
 
     mark_changed();
 

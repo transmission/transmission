@@ -78,9 +78,6 @@ struct tr_torrent final : public tr_completion::torrent_view
 {
     using Speed = libtransmission::Values::Speed;
 
-public:
-    using labels_t = std::vector<tr_interned_string>;
-
     class CumulativeCount
     {
     public:
@@ -120,6 +117,9 @@ public:
         uint64_t prev_ = {};
         uint64_t cur_ = {};
     };
+
+public:
+    using labels_t = std::vector<tr_interned_string>;
 
     using VerifyDoneCallback = std::function<void(tr_torrent*)>;
 
