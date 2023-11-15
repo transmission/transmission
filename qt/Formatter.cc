@@ -54,11 +54,6 @@ Formatter::Formatter()
         mem[TB].toUtf8().constData());
 }
 
-QString Formatter::unitStr(Type t, Size s) const
-{
-    return UnitStrings[t][s];
-}
-
 QString Formatter::memToString(int64_t bytes) const
 {
     if (bytes < 0)

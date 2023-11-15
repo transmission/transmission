@@ -65,6 +65,11 @@ struct Config
             return std::string_view{ units < std::size(display_names_) ? std::data(display_names_[units]) : "" };
         }
 
+        [[nodiscard]] constexpr auto display_name(UnitsEnum multiplier) const noexcept
+        {
+            return display_name(static_cast<size_t>(multiplier));
+        }
+
         [[nodiscard]] constexpr auto multiplier(UnitsEnum multiplier) const noexcept
         {
             return multipliers_[static_cast<int>(multiplier)];

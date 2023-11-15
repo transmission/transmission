@@ -49,7 +49,6 @@ public:
     [[nodiscard]] QString sizeToString(int64_t bytes) const;
     [[nodiscard]] QString sizeToString(uint64_t bytes) const;
     [[nodiscard]] QString timeToString(int seconds) const;
-    [[nodiscard]] QString unitStr(Type t, Size s) const;
 
     [[nodiscard]] auto percentToString(double x) const
     {

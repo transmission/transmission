@@ -1449,10 +1449,9 @@ void DetailsDialog::onRemoveTrackerClicked()
 
 void DetailsDialog::initOptionsTab()
 {
-    auto const speed_unit_str = Formatter::get().unitStr(Formatter::SPEED, Formatter::KB);
-
-    ui_.singleDownSpin->setSuffix(QStringLiteral(" %1").arg(speed_unit_str));
-    ui_.singleUpSpin->setSuffix(QStringLiteral(" %1").arg(speed_unit_str));
+    auto const speed_unit_suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
+    ui_.singleDownSpin->setSuffix(speed_unit_suffix);
+    ui_.singleUpSpin->setSuffix(speed_unit_suffix);
 
     ui_.singleDownSpin->setProperty(PrefKey, TR_KEY_downloadLimit);
     ui_.singleUpSpin->setProperty(PrefKey, TR_KEY_uploadLimit);
