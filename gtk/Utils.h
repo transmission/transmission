@@ -9,6 +9,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/values.h>
 
 #include <glibmm/objectbase.h>
 #include <glibmm/refptr.h>
@@ -63,6 +64,7 @@ Glib::ustring gtr_get_unicode_string(GtrUnicode uni);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size_in_bytes);
+Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage);
 
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);

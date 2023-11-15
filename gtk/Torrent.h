@@ -8,6 +8,7 @@
 #include "Flags.h"
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/values.h>
 
 #include <giomm/icon.h>
 #include <glibmm/extraclassinit.h>
@@ -71,6 +72,9 @@ public:
     using ChangeFlags = Flags<ChangeFlag>;
 
 public:
+    using Speed = libtransmission::Values::Speed;
+    using Storage = libtransmission::Values::Storage;
+
     int get_active_peer_count() const;
     int get_active_peers_down() const;
     int get_active_peers_up() const;
@@ -92,10 +96,10 @@ public:
     float get_ratio() const;
     Percents get_recheck_progress() const;
     Percents get_seed_ratio_percent_done() const;
-    float get_speed_down() const;
-    float get_speed_up() const;
+    Speed get_speed_down() const;
+    Speed get_speed_up() const;
     tr_torrent& get_underlying() const;
-    uint64_t get_total_size() const;
+    Storage get_total_size() const;
     unsigned int get_trackers() const;
 
     Glib::RefPtr<Gio::Icon> get_icon() const;

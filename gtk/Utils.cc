@@ -113,9 +113,14 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
+Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage)
+{
+    return storage.base_quantity() == 0U ? Q_("None") : storage.to_string();
+}
+
 Glib::ustring tr_strlsize(guint64 n_bytes)
 {
-    return n_bytes == 0 ? Q_("None") : Storage{ n_bytes, Storage::Units::Bytes }.to_string();
+    return tr_strlsize(Storage{ n_bytes, Storage::Units::Bytes });
 }
 
 namespace
