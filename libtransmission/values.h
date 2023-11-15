@@ -138,7 +138,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator+(Value const& that) noexcept
+    [[nodiscard]] constexpr auto operator+(Value const& that) const noexcept
     {
         auto ret = *this;
         return ret += that;
@@ -150,7 +150,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator*(uint64_t mult) noexcept
+    [[nodiscard]] constexpr auto operator*(uint64_t mult) const noexcept
     {
         auto ret = *this;
         return ret *= mult;
@@ -162,7 +162,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator/(uint64_t mult) noexcept
+    [[nodiscard]] constexpr auto operator/(uint64_t mult) const noexcept
     {
         auto ret = *this;
         return ret /= mult;
