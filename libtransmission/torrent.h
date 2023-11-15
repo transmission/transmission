@@ -559,6 +559,16 @@ public:
         return this->is_queued_;
     }
 
+    void set_is_queued(bool queued = true) noexcept
+    {
+        if (is_queued_ != queued)
+        {
+            is_queued_ = queued;
+            mark_changed();
+            set_dirty();
+        }
+    }
+
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
         return this->is_done() ? TR_UP : TR_DOWN;
@@ -676,6 +686,11 @@ public:
     [[nodiscard]] constexpr auto is_stopping() const noexcept
     {
         return is_stopping_;
+    }
+
+    constexpr void stop_soon() noexcept
+    {
+        is_stopping_ = true;
     }
 
     [[nodiscard]] constexpr auto is_dirty() const noexcept
@@ -900,6 +915,11 @@ public:
 
     void init(tr_ctor const* ctor);
 
+    [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
+    {
+        return obfuscated_hash_ == test;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -936,8 +956,6 @@ public:
     // Where the files are now.
     // Will equal either download_dir or incomplete_dir
     tr_interned_string current_dir_;
-
-    tr_sha1_digest_t obfuscated_hash = {};
 
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
@@ -976,11 +994,7 @@ public:
 
     bool finished_seeding_by_idle_ = false;
 
-    bool is_deleting_ = false;
-    bool is_dirty_ = false;
-    bool is_queued_ = false;
     bool is_running_ = false;
-    bool is_stopping_ = false;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
@@ -991,7 +1005,12 @@ private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
+    friend void tr_torrentCheckSeedLimit(tr_torrent* tor);
+    friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
     friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
+    friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
+    friend void tr_torrentStop(tr_torrent* tor);
+    friend void tr_torrentVerify(tr_torrent* tor, bool force);
 
     enum class VerifyState : uint8_t
     {
@@ -1165,6 +1184,8 @@ private:
 
     void on_metainfo_updated();
 
+    void stop_now();
+
     tr_stat stats_ = {};
 
     Error error_;
@@ -1174,6 +1195,8 @@ private:
     labels_t labels_;
 
     tr_interned_string bandwidth_group_;
+
+    tr_sha1_digest_t obfuscated_hash_ = {};
 
     mutable SimpleSmoothedSpeed eta_speed_;
 
@@ -1205,6 +1228,11 @@ private:
     VerifyState verify_state_ = VerifyState::None;
 
     uint16_t idle_limit_minutes_ = 0;
+
+    bool is_deleting_ = false;
+    bool is_dirty_ = false;
+    bool is_queued_ = false;
+    bool is_stopping_ = false;
 
     bool needs_completeness_check_ = true;
 

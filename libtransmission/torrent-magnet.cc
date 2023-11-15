@@ -389,7 +389,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return tor->metainfo_.magnet();
+    return tor->magnet();
 }
 
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)
