@@ -16,6 +16,7 @@
 #include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 
 #import "VDKQueue.h"
@@ -125,6 +126,41 @@ static NSString* const kGithubURL = @"https://github.com/transmission/transmissi
 static NSString* const kDonateURL = @"https://transmissionbt.com/donate/";
 
 static NSTimeInterval const kDonateNagTime = 60 * 60 * 24 * 7;
+
+static void initUnits()
+{
+    using Config = libtransmission::Values::Config;
+
+    // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
+    // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
+    int const ArbitraryPluralNumber = 17;
+
+    NSByteCountFormatter* unitFormatter = [[NSByteCountFormatter alloc] init];
+    unitFormatter.includesCount = NO;
+    unitFormatter.allowsNonnumericFormatting = NO;
+    unitFormatter.allowedUnits = NSByteCountFormatterUseBytes;
+    NSString* b_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseKB;
+    NSString* k_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseMB;
+    NSString* m_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseGB;
+    NSString* g_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    unitFormatter.allowedUnits = NSByteCountFormatterUseTB;
+    NSString* t_str = [unitFormatter stringFromByteCount:ArbitraryPluralNumber];
+    Config::Memory = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+    Config::Storage = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                        m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+
+    b_str = NSLocalizedString(@"B/s", "Transfer speed (bytes per second)").UTF8String;
+    k_str = NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)").UTF8String;
+    m_str = NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)").UTF8String;
+    g_str = NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)").UTF8String;
+    t_str = NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)").UTF8String;
+    Config::Speed = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
+                      m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
+}
 
 static void altSpeedToggledCallback([[maybe_unused]] tr_session* handle, bool active, bool byUser, void* controller)
 {
@@ -514,34 +550,7 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
             tr_variantDictAddStr(&settings, TR_KEY_rpc_host_whitelist, [_fDefaults stringForKey:@"RPCHostWhitelist"].UTF8String);
         }
 
-        NSByteCountFormatter* unitFormatter = [[NSByteCountFormatter alloc] init];
-        unitFormatter.includesCount = NO;
-        unitFormatter.allowsNonnumericFormatting = NO;
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseKB;
-        // use a random value to avoid possible pluralization issues with 1 or 0 (an example is if we use 1 for bytes,
-        // we'd get "byte" when we'd want "bytes" for the generic libtransmission value at least)
-        NSString* kbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseMB;
-        NSString* mbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseGB;
-        NSString* gbString = [unitFormatter stringFromByteCount:17];
-
-        unitFormatter.allowedUnits = NSByteCountFormatterUseTB;
-        NSString* tbString = [unitFormatter stringFromByteCount:17];
-
-        tr_formatter_size_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
-
-        tr_formatter_speed_init(
-            1000,
-            NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)").UTF8String,
-            NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)").UTF8String,
-            NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)").UTF8String,
-            NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)").UTF8String); //why not?
-
-        tr_formatter_mem_init(1000, kbString.UTF8String, mbString.UTF8String, gbString.UTF8String, tbString.UTF8String);
+        initUnits();
 
         auto const default_config_dir = tr_getDefaultConfigDir("Transmission");
         _fLib = tr_sessionInit(default_config_dir.c_str(), YES, settings);
