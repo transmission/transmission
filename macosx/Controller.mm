@@ -153,11 +153,11 @@ static void initUnits()
     Config::Storage = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
                         m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 
-    b_str = NSLocalizedString(@"B/s", "Transfer speed (bytes per second)").UTF8String;
-    k_str = NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)").UTF8String;
-    m_str = NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)").UTF8String;
-    g_str = NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)").UTF8String;
-    t_str = NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)").UTF8String;
+    b_str = NSLocalizedString(@"B/s", "Transfer speed (bytes per second)");
+    k_str = NSLocalizedString(@"KB/s", "Transfer speed (kilobytes per second)");
+    m_str = NSLocalizedString(@"MB/s", "Transfer speed (megabytes per second)");
+    g_str = NSLocalizedString(@"GB/s", "Transfer speed (gigabytes per second)");
+    t_str = NSLocalizedString(@"TB/s", "Transfer speed (terabytes per second)");
     Config::Speed = { Config::Base::Kilo, b_str.UTF8String, k_str.UTF8String,
                       m_str.UTF8String,   g_str.UTF8String, t_str.UTF8String };
 }
