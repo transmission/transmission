@@ -14,7 +14,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
 #include <libtransmission/makemeta.h>
-#include <libtransmission/utils.h> /* tr_formatter_mem_B() */
+#include <libtransmission/values.h>
 
 #include <giomm/file.h>
 #include <glibmm/convert.h>
@@ -51,6 +51,7 @@
 #include <utility>
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 #if GTKMM_CHECK_VERSION(4, 0, 0)
 using FileListValue = Glib::Value<GSList*>;
@@ -394,7 +395,7 @@ void MakeDialog::Impl::updatePiecesLabel()
                 "({piece_count} BitTorrent pieces @ {piece_size})",
                 builder_->piece_count()),
             fmt::arg("piece_count", builder_->piece_count()),
-            fmt::arg("piece_size", tr_formatter_mem_B(builder_->piece_size())));
+            fmt::arg("piece_size", Memory{ builder_->piece_size(), Memory::Units::Bytes }.to_string()));
     }
 
     pieces_lb_->set_text(gstr);

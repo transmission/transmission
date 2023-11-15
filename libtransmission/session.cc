@@ -60,6 +60,7 @@
 struct tr_ctor;
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -110,12 +111,12 @@ void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 
         if (auto const* val = group_map->find_if<int64_t>(TR_KEY_uploadLimit); val != nullptr)
         {
-            limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
+            limits.up_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         if (auto const* val = group_map->find_if<int64_t>(TR_KEY_downloadLimit); val != nullptr)
         {
-            limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(*val);
+            limits.down_limit = Speed{ *val, Speed::Units::KByps };
         }
 
         group.set_limits(limits);
@@ -136,11 +137,11 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
     {
         auto const limits = group->get_limits();
         auto group_map = tr_variant::Map{ 6U };
-        group_map.try_emplace(TR_KEY_downloadLimit, limits.down_limit_KBps);
+        group_map.try_emplace(TR_KEY_downloadLimit, limits.down_limit.count(Speed::Units::KByps));
         group_map.try_emplace(TR_KEY_downloadLimited, limits.down_limited);
         group_map.try_emplace(TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
         group_map.try_emplace(TR_KEY_name, name.sv());
-        group_map.try_emplace(TR_KEY_uploadLimit, limits.up_limit_KBps);
+        group_map.try_emplace(TR_KEY_uploadLimit, limits.up_limit.count(Speed::Units::KByps));
         group_map.try_emplace(TR_KEY_uploadLimited, limits.up_limited);
         groups_map.try_emplace(name.quark(), std::move(group_map));
     }
@@ -150,20 +151,20 @@ void bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
         tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename });
 }
 } // namespace bandwidth_group_helpers
+} // namespace
 
-void update_bandwidth(tr_session* session, tr_direction dir)
+void tr_session::update_bandwidth(tr_direction const dir)
 {
-    if (auto const limit_bytes_per_second = session->activeSpeedLimitBps(dir); limit_bytes_per_second)
+    if (auto const limit = active_speed_limit(dir); limit)
     {
-        session->top_bandwidth_.set_limited(dir, *limit_bytes_per_second > 0U);
-        session->top_bandwidth_.set_desired_speed_bytes_per_second(dir, *limit_bytes_per_second);
+        top_bandwidth_.set_limited(dir, limit->base_quantity() > 0U);
+        top_bandwidth_.set_desired_speed(dir, *limit);
     }
     else
     {
-        session->top_bandwidth_.set_limited(dir, false);
+        top_bandwidth_.set_limited(dir, false);
     }
 }
-} // namespace
 
 tr_port tr_session::randomPort() const
 {
@@ -772,7 +773,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     }
 #endif
 
-    if (auto const& val = new_settings.cache_size_mb; force || val != old_settings.cache_size_mb)
+    if (auto const& val = new_settings.cache_size_mbytes; force || val != old_settings.cache_size_mbytes)
     {
         tr_sessionSetCacheLimit_MB(this, val);
     }
@@ -868,8 +869,8 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
 
     // We need to update bandwidth if speed settings changed.
     // It's a harmless call, so just call it instead of checking for settings changes
-    update_bandwidth(this, TR_UP);
-    update_bandwidth(this, TR_DOWN);
+    update_bandwidth(TR_UP);
+    update_bandwidth(TR_DOWN);
 }
 
 void tr_sessionSet(tr_session* session, tr_variant const& settings)
@@ -1076,16 +1077,16 @@ uint16_t tr_sessionGetIdleLimit(tr_session const* session)
 
 // --- Speed limits
 
-std::optional<tr_bytes_per_second_t> tr_session::activeSpeedLimitBps(tr_direction dir) const noexcept
+std::optional<Speed> tr_session::active_speed_limit(tr_direction dir) const noexcept
 {
     if (tr_sessionUsesAltSpeed(this))
     {
-        return tr_toSpeedBytes(tr_sessionGetAltSpeed_KBps(this, dir));
+        return alt_speeds_.speed_limit(dir);
     }
 
-    if (this->isSpeedLimited(dir))
+    if (is_speed_limited(dir))
     {
-        return tr_toSpeedBytes(tr_sessionGetSpeedLimit_KBps(this, dir));
+        return speed_limit(dir);
     }
 
     return {};
@@ -1100,8 +1101,8 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 {
     auto const in_session_thread = [session = &session_, is_active, reason]()
     {
-        update_bandwidth(session, TR_UP);
-        update_bandwidth(session, TR_DOWN);
+        session->update_bandwidth(TR_UP);
+        session->update_bandwidth(TR_DOWN);
 
         if (session->alt_speed_active_changed_func_ != nullptr)
         {
@@ -1118,32 +1119,23 @@ void tr_session::AltSpeedMediator::is_active_changed(bool is_active, tr_session_
 
 // --- Session primary speed limits
 
-void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
+void tr_sessionSetSpeedLimit_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    if (dir == TR_DOWN)
-    {
-        session->settings_.speed_limit_down = limit;
-    }
-    else
-    {
-        session->settings_.speed_limit_up = limit;
-    }
-
-    update_bandwidth(session, dir);
+    session->set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
 }
 
-tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
+size_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return dir == TR_DOWN ? session->settings_.speed_limit_down : session->settings_.speed_limit_up;
+    return session->speed_limit(dir).count(Speed::Units::KByps);
 }
 
-void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
+void tr_sessionLimitSpeed(tr_session* session, tr_direction const dir, bool limited)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -1157,34 +1149,34 @@ void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited)
         session->settings_.speed_limit_up_enabled = limited;
     }
 
-    update_bandwidth(session, dir);
+    session->update_bandwidth(dir);
 }
 
-bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir)
+bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return session->isSpeedLimited(dir);
+    return session->is_speed_limited(dir);
 }
 
 // --- Session alt speed limits
 
-void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit)
+void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    session->alt_speeds_.set_limit_kbps(dir, limit);
-    update_bandwidth(session, dir);
+    session->alt_speeds_.set_speed_limit(dir, Speed{ limit_kbyps, Speed::Units::KByps });
+    session->update_bandwidth(dir);
 }
 
-tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
+size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
 
-    return session->alt_speeds_.limit_kbps(dir);
+    return session->alt_speeds_.speed_limit(dir).count(Speed::Units::KByps);
 }
 
 void tr_sessionUseAltSpeedTime(tr_session* session, bool enabled)
@@ -1319,8 +1311,12 @@ void tr_sessionSetDeleteSource(tr_session* session, bool delete_source)
 
 double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 {
-    auto const bps = session != nullptr ? session->top_bandwidth_.get_raw_speed_bytes_per_second(0, dir) : 0;
-    return tr_toSpeedKBps(bps);
+    if (session != nullptr)
+    {
+        return session->top_bandwidth_.get_raw_speed(0, dir).count(Speed::Units::KByps);
+    }
+
+    return {};
 }
 
 void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
@@ -1382,13 +1378,14 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
 
 void tr_session::closeImplPart2(std::promise<void>* closed_promise, std::chrono::time_point<std::chrono::steady_clock> deadline)
 {
-    // try to keep the UDP announcer alive long enough to send out
+    // try to keep web_ and the UDP announcer alive long enough to send out
     // all the &event=stopped tracker announces.
     // also wait for all ip cache updates to finish so that web_ can
     // safely destruct.
-    if ((n_pending_stops_ != 0U || !global_ip_cache_->try_shutdown()) && std::chrono::steady_clock::now() < deadline)
+    if ((!web_->is_idle() || !announcer_udp_->is_idle() || !global_ip_cache_->try_shutdown()) &&
+        std::chrono::steady_clock::now() < deadline)
     {
-        announcer_udp_->upkeep();
+        announcer_->upkeep();
         return;
     }
 
@@ -1594,19 +1591,19 @@ bool tr_sessionIsLPDEnabled(tr_session const* session)
 
 // ---
 
-void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb)
+void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes)
 {
     TR_ASSERT(session != nullptr);
 
-    session->settings_.cache_size_mb = mb;
-    session->cache->set_limit(tr_toMemBytes(mb));
+    session->settings_.cache_size_mbytes = mbytes;
+    session->cache->set_limit(Memory{ mbytes, Memory::Units::MBytes });
 }
 
 size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->settings_.cache_size_mb;
+    return session->settings_.cache_size_mbytes;
 }
 
 // ---

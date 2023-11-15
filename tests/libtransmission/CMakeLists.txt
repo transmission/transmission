@@ -54,6 +54,7 @@ target_sources(libtransmission-test
         torrents-test.cc
         tr-peer-info-test.cc
         utils-test.cc
+        values-test.cc
         variant-test.cc
         watchdir-test.cc
         web-utils-test.cc)

@@ -14,7 +14,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/web-utils.h>
 
 #include <gdkmm/pixbuf.h>
@@ -70,6 +70,8 @@
 #endif
 
 using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 class DetailsDialog::Impl
 {
@@ -886,7 +888,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
                         "({piece_count} BitTorrent pieces @ {piece_size})",
                         piece_count),
                     fmt::arg("piece_count", piece_count),
-                    fmt::arg("piece_size", tr_formatter_mem_B(piece_size)));
+                    fmt::arg("piece_size", Memory{ piece_size, Memory::Units::Bytes }.to_string()));
             }
         }
 
@@ -1230,12 +1232,12 @@ void refreshPeerRow(Gtk::TreeModel::iterator const& iter, tr_peer_stat const* pe
 
     if (peer->rateToPeer_KBps > 0.01)
     {
-        up_speed = tr_formatter_speed_KBps(peer->rateToPeer_KBps);
+        up_speed = Speed{ peer->rateToPeer_KBps, Speed::Units::KByps }.to_string();
     }
 
     if (peer->rateToClient_KBps > 0)
     {
-        down_speed = tr_formatter_speed_KBps(peer->rateToClient_KBps);
+        down_speed = Speed{ peer->rateToClient_KBps, Speed::Units::KByps }.to_string();
     }
 
     if (peer->activeReqsToPeer > 0)
@@ -1424,7 +1426,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             auto const iter = store->get_iter(hash.at(key).get_path());
 
             auto const KBps = double(webseed.download_bytes_per_second) / speed_K;
-            auto const buf = webseed.is_downloading ? tr_formatter_speed_KBps(KBps) : std::string();
+            auto const buf = webseed.is_downloading ? Speed{ KBps, Speed::Units::KByps }.to_string() : std::string{};
 
             (*iter)[webseed_cols.download_rate_double] = KBps;
             (*iter)[webseed_cols.download_rate_string] = buf;

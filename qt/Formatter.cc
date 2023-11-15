@@ -4,12 +4,17 @@
 // License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_formatter
+
+#include <libtransmission/values.h>
 
 #include "Formatter.h"
 #include "Speed.h"
 
 #include <algorithm>
+
+using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 Formatter& Formatter::get()
 {
@@ -25,13 +30,12 @@ Formatter::Formatter()
           { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM
       } }
 {
+    namespace Values = libtransmission::Values;
+
     auto const& speed = UnitStrings[SPEED];
-    tr_formatter_speed_init(
-        SpeedBase,
-        speed[KB].toUtf8().constData(),
-        speed[MB].toUtf8().constData(),
-        speed[GB].toUtf8().constData(),
-        speed[TB].toUtf8().constData());
+    Values::Config::Speed = { Values::Config::Base::Kilo, "B"sv,
+                              speed[KB].toStdString(),    speed[MB].toStdString(),
+                              speed[GB].toStdString(),    speed[TB].toStdString() };
 
     auto const& size = UnitStrings[SIZE];
     tr_formatter_size_init(
@@ -67,7 +71,7 @@ QString Formatter::memToString(int64_t bytes) const
         return tr("None");
     }
 
-    return QString::fromStdString(tr_formatter_mem_B(bytes));
+    return QString::fromStdString(Memory{ bytes, Memory::Units::Bytes }.to_string());
 }
 
 QString Formatter::sizeToString(uint64_t bytes) const
@@ -77,7 +81,7 @@ QString Formatter::sizeToString(uint64_t bytes) const
         return tr("None");
     }
 
-    return QString::fromStdString(tr_formatter_size_B(bytes));
+    return QString::fromStdString(Storage{ bytes, Storage::Units::Bytes }.to_string());
 }
 
 QString Formatter::sizeToString(int64_t bytes) const
@@ -116,18 +120,4 @@ QString Formatter::timeToString(int seconds) const
     auto const days = hours / 24;
 
     return tr("%Ln day(s)", nullptr, days);
-}
-
-/***
-****
-***/
-
-double Speed::getKBps() const
-{
-    return getBps() / static_cast<double>(Formatter::SpeedBase);
-}
-
-Speed Speed::fromKBps(double KBps)
-{
-    return Speed{ static_cast<int>(KBps * Formatter::SpeedBase) };
 }

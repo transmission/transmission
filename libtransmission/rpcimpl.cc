@@ -42,6 +42,7 @@
 #include "libtransmission/web.h"
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -479,8 +480,8 @@ namespace make_torrent_field_helpers
         peer_map.try_emplace(TR_KEY_peerIsInterested, peer.peerIsInterested);
         peer_map.try_emplace(TR_KEY_port, peer.port);
         peer_map.try_emplace(TR_KEY_progress, peer.progress);
-        peer_map.try_emplace(TR_KEY_rateToClient, tr_toSpeedBytes(peer.rateToClient_KBps));
-        peer_map.try_emplace(TR_KEY_rateToPeer, tr_toSpeedBytes(peer.rateToPeer_KBps));
+        peer_map.try_emplace(TR_KEY_rateToClient, Speed{ peer.rateToClient_KBps, Speed::Units::KByps }.base_quantity());
+        peer_map.try_emplace(TR_KEY_rateToPeer, Speed{ peer.rateToPeer_KBps, Speed::Units::KByps }.base_quantity());
         peers_vec.emplace_back(std::move(peer_map));
     }
     tr_torrentPeersFree(peers, n_peers);
@@ -674,8 +675,8 @@ namespace make_torrent_field_helpers
     case TR_KEY_primary_mime_type: return tor.primary_mime_type();
     case TR_KEY_priorities: return make_file_priorities_vec(tor);
     case TR_KEY_queuePosition: return st.queuePosition;
-    case TR_KEY_rateDownload: return tr_toSpeedBytes(st.pieceDownloadSpeed_KBps);
-    case TR_KEY_rateUpload: return tr_toSpeedBytes(st.pieceUploadSpeed_KBps);
+    case TR_KEY_rateDownload: return Speed{ st.pieceDownloadSpeed_KBps, Speed::Units::KByps }.base_quantity();
+    case TR_KEY_rateUpload: return Speed{ st.pieceUploadSpeed_KBps, Speed::Units::KByps }.base_quantity();
     case TR_KEY_recheckProgress: return st.recheckProgress;
     case TR_KEY_secondsDownloading: return st.secondsDownloading;
     case TR_KEY_secondsSeeding: return st.secondsSeeding;
@@ -1604,9 +1605,9 @@ char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, s
             auto limits = group->get_limits();
             tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->are_parent_limits_honored(TR_UP));
             tr_variantDictAddStr(dict, TR_KEY_name, name);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit_KBps);
+            tr_variantDictAddInt(dict, TR_KEY_speed_limit_down, limits.down_limit.count(Speed::Units::KByps));
             tr_variantDictAddBool(dict, TR_KEY_speed_limit_down_enabled, limits.down_limited);
-            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit_KBps);
+            tr_variantDictAddInt(dict, TR_KEY_speed_limit_up, limits.up_limit.count(Speed::Units::KByps));
             tr_variantDictAddBool(dict, TR_KEY_speed_limit_up_enabled, limits.up_limited);
         }
     }
@@ -1632,12 +1633,12 @@ char const* groupSet(tr_session* session, tr_variant* args_in, tr_variant* /*arg
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &limit))
     {
-        limits.down_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+        limits.down_limit = Speed{ limit, Speed::Units::KByps };
     }
 
     if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &limit))
     {
-        limits.up_limit_KBps = static_cast<tr_kilobytes_per_second_t>(limit);
+        limits.up_limit = Speed{ limit, Speed::Units::KByps };
     }
 
     group.set_limits(limits);
@@ -1867,7 +1868,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_DOWN, static_cast<tr_kilobytes_per_second_t>(i));
+        session->set_speed_limit(TR_DOWN, Speed{ i, Speed::Units::KByps });
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &val))
@@ -1877,7 +1878,7 @@ char const* sessionSet(tr_session* session, tr_variant* args_in, tr_variant* /*a
 
     if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &i))
     {
-        tr_sessionSetSpeedLimit_KBps(session, TR_UP, static_cast<tr_kilobytes_per_second_t>(i));
+        session->set_speed_limit(TR_UP, Speed{ i, Speed::Units::KByps });
     }
 
     if (auto val = bool{}; tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &val))
@@ -1926,10 +1927,10 @@ char const* sessionStats(tr_session* session, tr_variant* /*args_in*/, tr_varian
         [](auto const* tor) { return tor->is_running(); });
 
     tr_variantDictAddInt(args_out, TR_KEY_activeTorrentCount, running);
-    tr_variantDictAddReal(args_out, TR_KEY_downloadSpeed, session->pieceSpeedBps(TR_DOWN));
+    tr_variantDictAddInt(args_out, TR_KEY_downloadSpeed, session->piece_speed(TR_DOWN).base_quantity());
     tr_variantDictAddInt(args_out, TR_KEY_pausedTorrentCount, total - running);
     tr_variantDictAddInt(args_out, TR_KEY_torrentCount, total);
-    tr_variantDictAddReal(args_out, TR_KEY_uploadSpeed, session->pieceSpeedBps(TR_UP));
+    tr_variantDictAddInt(args_out, TR_KEY_uploadSpeed, session->piece_speed(TR_UP).base_quantity());
 
     auto stats = session->stats().cumulative();
     tr_variant* d = tr_variantDictAddDict(args_out, TR_KEY_cumulative_stats, 5);
@@ -1963,6 +1964,35 @@ constexpr std::string_view getEncryptionModeString(tr_encryption_mode mode)
     default:
         return "preferred"sv;
     }
+}
+
+[[nodiscard]] auto values_get_units()
+{
+    using namespace libtransmission::Values;
+
+    auto const make_units_vec = [](auto const& units)
+    {
+        auto units_vec = tr_variant::Vector{};
+        for (size_t i = 0;; ++i)
+        {
+            auto const display_name = units.display_name(i);
+            if (std::empty(display_name))
+            {
+                break;
+            }
+            units_vec.emplace_back(display_name);
+        }
+        return units_vec;
+    };
+
+    auto units_map = tr_variant::Map{ 6U };
+    units_map.try_emplace(TR_KEY_memory_bytes, Memory::units().base());
+    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Memory::units()));
+    units_map.try_emplace(TR_KEY_size_bytes, Storage::units().base());
+    units_map.try_emplace(TR_KEY_size_units, make_units_vec(Storage::units()));
+    units_map.try_emplace(TR_KEY_speed_bytes, Speed::units().base());
+    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(Speed::units()));
+    return tr_variant{ std::move(units_map) };
 }
 
 void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
@@ -2141,19 +2171,19 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_speed_limit_up:
-        tr_variantDictAddInt(d, key, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
+        tr_variantDictAddInt(d, key, s->speed_limit(TR_UP).count(Speed::Units::KByps));
         break;
 
     case TR_KEY_speed_limit_up_enabled:
-        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_UP));
+        tr_variantDictAddBool(d, key, s->is_speed_limited(TR_UP));
         break;
 
     case TR_KEY_speed_limit_down:
-        tr_variantDictAddInt(d, key, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
+        tr_variantDictAddInt(d, key, s->speed_limit(TR_DOWN).count(Speed::Units::KByps));
         break;
 
     case TR_KEY_speed_limit_down_enabled:
-        tr_variantDictAddBool(d, key, s->isSpeedLimited(TR_DOWN));
+        tr_variantDictAddBool(d, key, s->is_speed_limited(TR_DOWN));
         break;
 
     case TR_KEY_script_torrent_added_filename:
@@ -2197,7 +2227,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_units:
-        *tr_variantDictAdd(d, key) = tr_formatter_get_units();
+        *tr_variantDictAdd(d, key) = values_get_units();
         break;
 
     case TR_KEY_version:

@@ -323,6 +323,7 @@ if(INSTALL_LIB)
             tr-strbuf.h
             transmission.h
             utils.h
+            values.h
             variant.h
             watchdir.h
             web-utils.h

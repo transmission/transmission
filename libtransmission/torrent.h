@@ -76,6 +76,8 @@ void tr_torrentSave(tr_torrent* tor);
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
 {
+    using Speed = libtransmission::Values::Speed;
+
 public:
     using labels_t = std::vector<tr_interned_string>;
     using VerifyDoneCallback = std::function<void(tr_torrent*)>;
@@ -146,9 +148,9 @@ public:
         return bandwidth_;
     }
 
-    constexpr void set_speed_limit_bps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
+    constexpr void set_speed_limit(tr_direction dir, Speed limit)
     {
-        if (bandwidth().set_desired_speed_bytes_per_second(dir, bytes_per_second))
+        if (bandwidth().set_desired_speed(dir, limit))
         {
             set_dirty();
         }
@@ -162,9 +164,9 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto speed_limit_bps(tr_direction dir) const
+    [[nodiscard]] constexpr auto speed_limit(tr_direction dir) const
     {
-        return bandwidth().get_desired_speed_bytes_per_second(dir);
+        return bandwidth().get_desired_speed(dir);
     }
 
     [[nodiscard]] constexpr auto uses_session_limits() const noexcept
@@ -321,9 +323,9 @@ public:
         return fpm_.piece_span(file);
     }
 
-    [[nodiscard]] auto file_offset(tr_block_info::Location loc) const
+    [[nodiscard]] auto file_offset(tr_block_info::Location loc, bool include_empty_files) const
     {
-        return fpm_.file_offset(loc.byte);
+        return fpm_.file_offset(loc.byte, include_empty_files);
     }
 
     [[nodiscard]] auto byte_span(tr_file_index_t file) const
@@ -1041,13 +1043,13 @@ private:
     class SimpleSmoothedSpeed
     {
     public:
-        constexpr auto update(uint64_t time_msec, tr_bytes_per_second_t speed_byps)
+        constexpr auto update(uint64_t time_msec, Speed speed)
         {
             // If the old speed is too old, just replace it
             if (timestamp_msec_ + MaxAgeMSec <= time_msec)
             {
                 timestamp_msec_ = time_msec;
-                speed_byps_ = speed_byps;
+                speed_ = speed;
             }
 
             // To prevent the smoothing from being overwhelmed by frequent calls
@@ -1055,10 +1057,10 @@ private:
             else if (timestamp_msec_ + MinUpdateMSec <= time_msec)
             {
                 timestamp_msec_ = time_msec;
-                speed_byps_ = (speed_byps_ * 4U + speed_byps) / 5U;
+                speed_ = (speed_ * 4U + speed) / 5U;
             }
 
-            return speed_byps_;
+            return speed_;
         }
 
     private:
@@ -1066,7 +1068,7 @@ private:
         static auto constexpr MinUpdateMSec = 800U;
 
         uint64_t timestamp_msec_ = {};
-        tr_bytes_per_second_t speed_byps_ = {};
+        Speed speed_ = {};
     };
 
     [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
@@ -1111,14 +1113,14 @@ private:
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
-        if (uses_speed_limit(direction) && speed_limit_bps(direction) <= 0)
+        if (uses_speed_limit(direction) && speed_limit(direction).base_quantity() == 0U)
         {
             return false;
         }
 
         if (uses_session_limits())
         {
-            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
+            if (auto const limit = session->active_speed_limit(direction); limit && limit->base_quantity() == 0U)
             {
                 return false;
             }

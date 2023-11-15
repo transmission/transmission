@@ -13,6 +13,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
+#include <libtransmission/values.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 #include <libtransmission/web-utils.h>
 
@@ -57,6 +58,8 @@
 #endif
 
 using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 /***
 ****  UNITS
@@ -132,9 +135,9 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlsize(guint64 size_in_bytes)
+Glib::ustring tr_strlsize(guint64 n_bytes)
 {
-    return size_in_bytes == 0 ? Q_("None") : tr_formatter_size_B(size_in_bytes);
+    return n_bytes == 0 ? Q_("None") : Storage{ n_bytes, Storage::Units::Bytes }.to_string();
 }
 
 namespace

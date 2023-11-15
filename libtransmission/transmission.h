@@ -32,8 +32,6 @@ using tr_byte_index_t = uint64_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
 using tr_torrent_id_t = int;
-using tr_bytes_per_second_t = size_t;
-using tr_kilobytes_per_second_t = size_t;
 using tr_mode_t = uint16_t;
 
 struct tr_block_span_t
@@ -450,7 +448,7 @@ bool tr_sessionIsLPDEnabled(tr_session const* session);
 void tr_sessionSetLPDEnabled(tr_session* session, bool is_enabled);
 
 size_t tr_sessionGetCacheLimit_MB(tr_session const* session);
-void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb);
+void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes);
 
 tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
@@ -489,16 +487,16 @@ enum tr_direction
 
 // --- Session primary speed limits
 
-tr_kilobytes_per_second_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
-void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit);
+size_t tr_sessionGetSpeedLimit_KBps(tr_session const* session, tr_direction dir);
+void tr_sessionSetSpeedLimit_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
 
 bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction dir);
 void tr_sessionLimitSpeed(tr_session* session, tr_direction dir, bool limited);
 
 // --- Session alt speed limits
 
-tr_kilobytes_per_second_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
-void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, tr_kilobytes_per_second_t limit);
+size_t tr_sessionGetAltSpeed_KBps(tr_session const* session, tr_direction dir);
+void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction dir, size_t limit_kbyps);
 
 bool tr_sessionUsesAltSpeed(tr_session const* session);
 void tr_sessionUseAltSpeed(tr_session* session, bool enabled);
@@ -968,8 +966,8 @@ size_t tr_torrentFindFileToBuf(tr_torrent const* tor, tr_file_index_t file_num, 
 
 // --- Torrent speed limits
 
-tr_kilobytes_per_second_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir);
-void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, tr_kilobytes_per_second_t kilo_per_second);
+size_t tr_torrentGetSpeedLimit_KBps(tr_torrent const* tor, tr_direction dir);
+void tr_torrentSetSpeedLimit_KBps(tr_torrent* tor, tr_direction dir, size_t limit_kbyps);
 
 bool tr_torrentUsesSpeedLimit(tr_torrent const* tor, tr_direction dir);
 void tr_torrentUseSpeedLimit(tr_torrent* tor, tr_direction dir, bool enabled);
@@ -1333,7 +1331,7 @@ struct tr_webseed_view
 {
     char const* url; // the url to download from
     bool is_downloading; // can be true even if speed is 0, e.g. slow download
-    tr_bytes_per_second_t download_bytes_per_second; // current download speed
+    uint64_t download_bytes_per_second; // current download speed
 };
 
 struct tr_webseed_view tr_torrentWebseed(tr_torrent const* torrent, size_t nth);
@@ -1575,9 +1573,13 @@ struct tr_stat
     /** Number of peers that we're connected to */
     uint16_t peersConnected;
 
-    /** How many peers we found out about from the tracker, or from pex,
+    /** How many connected peers we found out about from the tracker, or from pex,
         or from incoming connections, or from our resume file. */
     uint16_t peersFrom[TR_PEER_FROM__MAX];
+
+    /** How many known peers we found out about from the tracker, or from pex,
+        or from incoming connections, or from our resume file. */
+    uint16_t knownPeersFrom[TR_PEER_FROM__MAX];
 
     /** Number of peers that are sending data to us. */
     uint16_t peersSendingToUs;

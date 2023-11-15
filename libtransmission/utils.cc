@@ -54,9 +54,11 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/values.h"
 #include "libtransmission/variant.h"
 
 using namespace std::literals;
+using namespace libtransmission::Values;
 
 time_t libtransmission::detail::tr_time::current_time = {};
 
@@ -664,240 +666,40 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 #endif
 }
 
-// ---
+// --- VALUES / FORMATTER
 
-namespace
-{
-namespace formatter_impl
+namespace libtransmission::Values
 {
 
-struct formatter_unit
+// default values; can be overridden by client apps
+Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
+
+} // namespace libtransmission::Values
+
+void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
-    std::array<char, 16> name;
-    uint64_t value;
-};
+    namespace Values = libtransmission::Values;
 
-using formatter_units = std::array<formatter_unit, 4>;
-
-enum
-{
-    TR_FMT_KB,
-    TR_FMT_MB,
-    TR_FMT_GB,
-    TR_FMT_TB
-};
-
-void formatter_init(formatter_units& units, uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    uint64_t value = kilo;
-    tr_strlcpy(std::data(units[TR_FMT_KB].name), kb, std::size(units[TR_FMT_KB].name));
-    units[TR_FMT_KB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_MB].name), mb, std::size(units[TR_FMT_MB].name));
-    units[TR_FMT_MB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_GB].name), gb, std::size(units[TR_FMT_GB].name));
-    units[TR_FMT_GB].value = value;
-
-    value *= kilo;
-    tr_strlcpy(std::data(units[TR_FMT_TB].name), tb, std::size(units[TR_FMT_TB].name));
-    units[TR_FMT_TB].value = value;
+    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
+    Values::Config::Storage = { kval, "B", kb, mb, gb, tb };
 }
 
-char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_t bytes, size_t buflen)
+void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
-    formatter_unit const* unit = nullptr;
+    namespace Values = libtransmission::Values;
 
-    if (bytes < u[1].value)
-    {
-        unit = std::data(u);
-    }
-    else if (bytes < u[2].value)
-    {
-        unit = &u[1];
-    }
-    else if (bytes < u[3].value)
-    {
-        unit = &u[2];
-    }
-    else
-    {
-        unit = &u[3];
-    }
-
-    double const value = static_cast<double>(bytes) / unit->value;
-    auto const* const units = std::data(unit->name);
-
-    auto precision = int{};
-    if (unit->value == 1)
-    {
-        precision = 0;
-    }
-    else if (value < 100)
-    {
-        precision = 2;
-    }
-    else
-    {
-        precision = 1;
-    }
-
-    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}Lf} {:s}", value, precision, units);
-    *out = '\0';
-    return buf;
+    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
+    Values::Config::Speed = { kval, "B/s", kb, mb, gb, tb };
 }
 
-formatter_units size_units;
-formatter_units speed_units;
-formatter_units mem_units;
-
-} // namespace formatter_impl
-} // namespace
-
-size_t tr_speed_K = 0;
-
-void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
+void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
 {
-    using namespace formatter_impl;
-    formatter_init(size_units, kilo, kb, mb, gb, tb);
-}
+    namespace Values = libtransmission::Values;
 
-std::string tr_formatter_size_B(uint64_t bytes)
-{
-    using namespace formatter_impl;
-    auto buf = std::array<char, 64>{};
-    return formatter_get_size_str(size_units, std::data(buf), bytes, std::size(buf));
-}
-
-void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    using namespace formatter_impl;
-    tr_speed_K = kilo;
-    formatter_init(speed_units, kilo, kb, mb, gb, tb);
-}
-
-std::string tr_formatter_speed_KBps(double kilo_per_second)
-{
-    using namespace formatter_impl;
-
-    auto speed = kilo_per_second;
-
-    if (speed < 999.95) // 0.0 KB to 999.9 KB (0.0 KiB to 999.9 KiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
-    }
-
-    double const kilo = speed_units[TR_FMT_KB].value;
-    speed /= kilo;
-
-    if (speed < 99.995) // 0.98 MB to 99.99 MB (1.00 MiB to 99.99 MiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-    if (speed < 999.95) // 100.0 MB to 999.9 MB (100.0 MiB to 999.9 MiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-
-    speed /= kilo;
-
-    if (speed < 99.995) // 0.98 GB to 99.99 GB (1.00 GiB to 99.99 GiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-    }
-    // 100.0 GB and above (100.0 GiB and above)
-    return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-}
-
-std::string tr_formatter_speed_compact_KBps(double kilo_per_second)
-{
-    using namespace formatter_impl;
-
-    auto speed = kilo_per_second;
-
-    if (speed < 99.95) // 0.0 KB to 99.9 KB (0.0 KiB to 99.9 KiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
-    }
-    if (speed < 999.5) // 100 KB to 999 KB (100 KiB to 999 KiB)
-    {
-        return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_KB].name));
-    }
-
-    double const kilo = speed_units[TR_FMT_KB].value;
-    speed /= kilo;
-
-    if (speed < 9.995) // 0.98 MB to 9.99 MB (1.00 MiB to 9.99 MiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-    if (speed < 99.95) // 10.0 MB to 99.9 MB (10.0 MiB to 99.9 MiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-    if (speed < 999.5) // 100 MB to 999 MB (100 MiB to 999 MiB)
-    {
-        return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
-    }
-
-    speed /= kilo;
-
-    if (speed < 9.995) // 0.98 GB to 9.99 GB (1.00 GiB to 9.99 GiB)
-    {
-        return fmt::format("{:.2Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-    }
-    if (speed < 99.95) // 10.0 GB to 99.9 GB (10.0 GiB to 99.9 GiB)
-    {
-        return fmt::format("{:.1Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-    }
-    // 100 GB and above (100 GiB and above)
-    return fmt::format("{:.0Lf} {:s}", speed, std::data(speed_units[TR_FMT_GB].name));
-}
-
-size_t tr_mem_K = 0;
-
-void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    using namespace formatter_impl;
-
-    tr_mem_K = kilo;
-    formatter_init(mem_units, kilo, kb, mb, gb, tb);
-}
-
-std::string tr_formatter_mem_B(size_t bytes_per_second)
-{
-    using namespace formatter_impl;
-
-    auto buf = std::array<char, 64>{};
-    return formatter_get_size_str(mem_units, std::data(buf), bytes_per_second, std::size(buf));
-}
-
-tr_variant tr_formatter_get_units()
-{
-    using namespace formatter_impl;
-
-    auto const make_units_vec = [](formatter_units const& units)
-    {
-        auto units_vec = tr_variant::Vector{};
-        units_vec.reserve(std::size(units));
-        std::transform(
-            std::begin(units),
-            std::end(units),
-            std::back_inserter(units_vec),
-            [](auto const& unit) { return std::data(unit.name); });
-        return units_vec;
-    };
-
-    auto units_map = tr_variant::Map{ 6U };
-    units_map.try_emplace(TR_KEY_memory_bytes, mem_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(mem_units));
-    units_map.try_emplace(TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_size_units, make_units_vec(size_units));
-    units_map.try_emplace(TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
-    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(speed_units));
-    return tr_variant{ std::move(units_map) };
+    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
+    Values::Config::Memory = { kval, "B", kb, mb, gb, tb };
 }
 
 // --- ENVIRONMENT

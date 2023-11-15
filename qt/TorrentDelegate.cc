@@ -278,12 +278,11 @@ QString TorrentDelegate::shortTransferString(Torrent const& tor)
 
     if (have_down)
     {
-        str = Formatter::get().downloadSpeedToString(tor.downloadSpeed()) + QStringLiteral("   ") +
-            Formatter::get().uploadSpeedToString(tor.uploadSpeed());
+        str = tor.downloadSpeed().to_download_qstring() + QStringLiteral("   ") + tor.uploadSpeed().to_upload_qstring();
     }
     else if (have_up)
     {
-        str = Formatter::get().uploadSpeedToString(tor.uploadSpeed());
+        str = tor.uploadSpeed().to_upload_qstring();
     }
 
     return str.trimmed();

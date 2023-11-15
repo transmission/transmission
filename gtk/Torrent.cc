@@ -12,6 +12,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 
 #include <glibmm/i18n.h>
 #include <glibmm/value.h>
@@ -23,6 +24,8 @@
 #include <utility>
 
 using namespace std::string_view_literals;
+
+using namespace libtransmission::Values;
 
 namespace
 {
@@ -583,13 +586,15 @@ Glib::ustring Torrent::Impl::get_short_transfer_text() const
     {
         return fmt::format(
             _("{download_speed} ▼  {upload_speed} ▲"),
-            fmt::arg("upload_speed", tr_formatter_speed_KBps(cache_.speed_up)),
-            fmt::arg("download_speed", tr_formatter_speed_KBps(cache_.speed_down)));
+            fmt::arg("upload_speed", Speed{ cache_.speed_up, Speed::Units::KByps }.to_string()),
+            fmt::arg("download_speed", Speed{ cache_.speed_down, Speed::Units::KByps }.to_string()));
     }
 
     if (cache_.has_metadata && cache_.active_peers_up > 0)
     {
-        return fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(cache_.speed_up)));
+        return fmt::format(
+            _("{upload_speed} ▲"),
+            fmt::arg("upload_speed", Speed{ cache_.speed_up, Speed::Units::KByps }.to_string()));
     }
 
     if (cache_.stalled)
