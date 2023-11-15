@@ -64,6 +64,18 @@ time_t libtransmission::detail::tr_time::current_time = {};
 
 // ---
 
+namespace libtransmission::Values
+{
+
+// default values; can be overridden by client apps
+Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
+
+} // namespace libtransmission::Values
+
+// ---
+
 std::optional<std::locale> tr_locale_set_global(char const* locale_name) noexcept
 {
     try
@@ -664,42 +676,6 @@ uint64_t tr_ntohll(uint64_t netlonglong)
     return ((uint64_t)ntohl(u.lx[0]) << 32) | (uint64_t)ntohl(u.lx[1]);
 
 #endif
-}
-
-// --- VALUES / FORMATTER
-
-namespace libtransmission::Values
-{
-
-// default values; can be overridden by client apps
-Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
-Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
-Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
-
-} // namespace libtransmission::Values
-
-void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    namespace Values = libtransmission::Values;
-
-    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
-    Values::Config::Storage = { kval, "B", kb, mb, gb, tb };
-}
-
-void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    namespace Values = libtransmission::Values;
-
-    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
-    Values::Config::Speed = { kval, "B/s", kb, mb, gb, tb };
-}
-
-void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    namespace Values = libtransmission::Values;
-
-    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
-    Values::Config::Memory = { kval, "B", kb, mb, gb, tb };
 }
 
 // --- ENVIRONMENT

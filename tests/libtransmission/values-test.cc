@@ -49,12 +49,3 @@ TEST_F(ValuesTest, toString)
     val = Speed{ 999.22222, Speed::Units::KByps };
     EXPECT_EQ("999.2 kB/s", val.to_string());
 }
-
-TEST_F(ValuesTest, valueHonorsFormatterInit)
-{
-    tr_formatter_speed_init(1024, "KayBeePerEss", "EmmBeePerEss", "GeeBeePerEss", "TeeBeePerEss");
-
-    auto const val = Speed{ 1, Speed::Units::MByps };
-    EXPECT_EQ("1 EmmBeePerEss", val.to_string());
-    EXPECT_EQ(1048576U, val.base_quantity());
-}
