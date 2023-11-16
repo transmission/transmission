@@ -15,6 +15,7 @@
 #include <mutex>
 #include <optional>
 #include <set>
+#include <string>
 #include <thread>
 #include <utility> // std::move
 
@@ -32,7 +33,7 @@ public:
         virtual ~Mediator() = default;
 
         [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
-        [[nodiscard]] virtual bool check_piece(tr_piece_index_t piece) const = 0;
+        [[nodiscard]] virtual std::optional<std::string> find_file(tr_file_index_t file_index) const = 0;
 
         virtual void on_verify_queued() = 0;
         virtual void on_verify_started() = 0;
@@ -71,7 +72,7 @@ private:
         tr_priority_t priority_;
     };
 
-    static void verify_torrent(Mediator& verify_mediator, bool abort_flag);
+    static void verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag);
 
     void verify_thread_func();
 

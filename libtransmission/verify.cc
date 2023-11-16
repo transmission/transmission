@@ -5,10 +5,17 @@
 
 #include <algorithm>
 #include <chrono>
+#include <cstddef> // std::byte
+#include <cstdint> // uint64_t, uint32_t
 #include <mutex>
+#include <optional>
 #include <thread>
-#include <utility>
+#include <vector>
 
+#include "libtransmission/transmission.h"
+
+#include "libtransmission/crypto-utils.h"
+#include "libtransmission/file.h"
 #include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;
@@ -23,22 +30,94 @@ auto constexpr SleepPerSecondDuringVerify = 100ms;
 }
 } // namespace
 
-void tr_verify_worker::verify_torrent(Mediator& verify_mediator, bool const abort_flag)
+void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag)
 {
     verify_mediator.on_verify_started();
 
+    tr_sys_file_t fd = TR_BAD_SYS_FILE;
+    uint64_t file_pos = 0U;
+    uint32_t piece_pos = 0U;
+    tr_file_index_t file_index = 0U;
+    tr_file_index_t prev_file_index = ~file_index;
+    tr_piece_index_t piece = 0U;
+    auto buffer = std::vector<std::byte>(1024U * 256U);
+    auto sha = tr_sha1::create();
     auto last_slept_at = current_time_secs();
-    for (tr_piece_index_t piece = 0U, n = verify_mediator.metainfo().piece_count(); !abort_flag && piece < n; ++piece)
-    {
-        verify_mediator.on_piece_checked(piece, verify_mediator.check_piece(piece));
 
-        /* sleeping even just a few msec per second goes a long
-         * way towards reducing IO load... */
-        if (auto const now = current_time_secs(); last_slept_at != now)
+    auto const& metainfo = verify_mediator.metainfo();
+    while (!abort_flag && piece < metainfo.piece_count())
+    {
+        auto const file_length = metainfo.file_size(file_index);
+
+        /* if we're starting a new file... */
+        if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
-            last_slept_at = now;
-            std::this_thread::sleep_for(SleepPerSecondDuringVerify);
+            auto const found = verify_mediator.find_file(file_index);
+            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+            prev_file_index = file_index;
         }
+
+        /* figure out how much we can read this pass */
+        uint64_t left_in_piece = metainfo.piece_size(piece) - piece_pos;
+        uint64_t left_in_file = file_length - file_pos;
+        uint64_t bytes_this_pass = std::min(left_in_file, left_in_piece);
+        bytes_this_pass = std::min(bytes_this_pass, uint64_t(std::size(buffer)));
+
+        /* read a bit */
+        if (fd != TR_BAD_SYS_FILE)
+        {
+            auto num_read = uint64_t{};
+            if (tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0)
+            {
+                bytes_this_pass = num_read;
+                sha->add(std::data(buffer), bytes_this_pass);
+                tr_sys_file_advise(fd, file_pos, bytes_this_pass, TR_SYS_FILE_ADVICE_DONT_NEED);
+            }
+        }
+
+        /* move our offsets */
+        left_in_piece -= bytes_this_pass;
+        left_in_file -= bytes_this_pass;
+        piece_pos += bytes_this_pass;
+        file_pos += bytes_this_pass;
+
+        /* if we're finishing a piece... */
+        if (left_in_piece == 0)
+        {
+            auto const has_piece = sha->finish() == metainfo.piece_hash(piece);
+            verify_mediator.on_piece_checked(piece, has_piece);
+
+            /* sleeping even just a few msec per second goes a long
+             * way towards reducing IO load... */
+            if (auto const now = current_time_secs(); last_slept_at != now)
+            {
+                last_slept_at = now;
+                std::this_thread::sleep_for(SleepPerSecondDuringVerify);
+            }
+
+            sha->clear();
+            ++piece;
+            piece_pos = 0;
+        }
+
+        /* if we're finishing a file... */
+        if (left_in_file == 0)
+        {
+            if (fd != TR_BAD_SYS_FILE)
+            {
+                tr_sys_file_close(fd);
+                fd = TR_BAD_SYS_FILE;
+            }
+
+            ++file_index;
+            file_pos = 0;
+        }
+    }
+
+    /* cleanup */
+    if (fd != TR_BAD_SYS_FILE)
+    {
+        tr_sys_file_close(fd);
     }
 
     verify_mediator.on_verify_done(abort_flag);
