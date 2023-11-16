@@ -34,6 +34,7 @@ public:
 
         [[nodiscard]] virtual tr_torrent_metainfo const& metainfo() const = 0;
         [[nodiscard]] virtual std::optional<std::string> find_file(tr_file_index_t file_index) const = 0;
+        [[nodiscard]] virtual bool file_piece_is_wanted(tr_file_index_t file_index) const = 0;
         [[nodiscard]] virtual std::string download_dir() const = 0;
 
         virtual void on_verify_queued() = 0;
