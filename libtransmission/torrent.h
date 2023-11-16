@@ -1172,14 +1172,14 @@ private:
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
-        if (uses_speed_limit(direction) && speed_limit(direction).base_quantity() == 0U)
+        if (uses_speed_limit(direction) && speed_limit(direction).is_zero())
         {
             return false;
         }
 
         if (uses_session_limits())
         {
-            if (auto const limit = session->active_speed_limit(direction); limit && limit->base_quantity() == 0U)
+            if (auto const limit = session->active_speed_limit(direction); limit && limit->is_zero())
             {
                 return false;
             }

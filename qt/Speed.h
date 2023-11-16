@@ -29,11 +29,6 @@ public:
     {
     }
 
-    [[nodiscard]] auto constexpr is_zero() const noexcept
-    {
-        return base_quantity() == 0U;
-    }
-
     [[nodiscard]] auto to_qstring() const noexcept
     {
         return QString::fromStdString(to_string());
@@ -54,5 +49,11 @@ public:
     [[nodiscard]] constexpr auto operator+(Speed const& other) const noexcept
     {
         return Speed{ base_quantity() + other.base_quantity(), Speed::Units::Byps };
+    }
+
+    [[nodiscard]] static auto display_name(Speed::Units const units)
+    {
+        auto const speed_unit_sv = Speed::units().display_name(units);
+        return QString::fromUtf8(std::data(speed_unit_sv), std::size(speed_unit_sv));
     }
 };
