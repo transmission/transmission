@@ -13,6 +13,8 @@
 #include <thread>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h"
@@ -21,6 +23,7 @@
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
+#include "libtransmission/utils.h"
 #include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;
