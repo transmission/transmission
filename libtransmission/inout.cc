@@ -77,7 +77,7 @@ enum class IoMode
     Write
 };
 
-bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_index, bool do_write)
+bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_index, IoMode io_mode)
 {
     if (auto found = tor->find_file(file_index); found)
     {
@@ -85,7 +85,7 @@ bool getFilename(tr_pathbuf& setme, tr_torrent const* tor, tr_file_index_t file_
         return true;
     }
 
-    if (!do_write)
+    if (io_mode != IoMode::Write)
     {
         return false;
     }
@@ -112,8 +112,8 @@ void readOrWriteBytes(
 {
     TR_ASSERT(file_index < tor->file_count());
 
+    bool const do_write = io_mode == IoMode::Write;
     auto const file_size = tor->file_size(file_index);
-    bool const do_write = io_mode == IoMode::Write || file_size == 0U;
     TR_ASSERT(file_size == 0U || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
 
@@ -127,7 +127,7 @@ void readOrWriteBytes(
 
     auto fd_top = session->openFiles().get(tor->id(), file_index, do_write);
     auto filename = tr_pathbuf{};
-    if (!fd_top && !getFilename(filename, tor, file_index, do_write))
+    if (!fd_top && !getFilename(filename, tor, file_index, io_mode))
     {
         auto const err = ENOENT;
         error->set(
