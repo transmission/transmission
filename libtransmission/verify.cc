@@ -9,13 +9,18 @@
 #include <cstdint> // uint64_t, uint32_t
 #include <mutex>
 #include <optional>
+#include <string_view>
 #include <thread>
 #include <vector>
 
 #include "libtransmission/transmission.h"
 
 #include "libtransmission/crypto-utils.h"
+#include "libtransmission/error.h"
 #include "libtransmission/file.h"
+#include "libtransmission/log.h"
+#include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-strbuf.h"
 #include "libtransmission/verify.h"
 
 using namespace std::chrono_literals;
@@ -27,6 +32,37 @@ auto constexpr SleepPerSecondDuringVerify = 100ms;
 [[nodiscard]] auto current_time_secs()
 {
     return std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::steady_clock::now());
+}
+
+tr_sys_file_t create_empty_file(tr_pathbuf const& filepath, std::string_view tor_name)
+{
+    auto error = tr_error{};
+
+    auto dir = filepath;
+    dir.popdir();
+    if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't create '{path}': {error} ({error_code})"),
+            fmt::arg("path", dir),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
+        return TR_BAD_SYS_FILE;
+    }
+
+    tr_sys_file_t fd = tr_sys_file_open(filepath, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL | TR_SYS_FILE_CREATE, 0666, &error);
+    if (error)
+    {
+        TR_ASSERT(fd == TR_BAD_SYS_FILE);
+        tr_logAddWarn(fmt::format(
+            _("Couldn't create empty file '{file}' when verifying '{tor}': {error} ({error_code})"),
+            fmt::arg("file", filepath),
+            fmt::arg("tor", tor_name),
+            fmt::arg("error", error.message()),
+            fmt::arg("error_code", error.code())));
+    }
+
+    return fd;
 }
 } // namespace
 
@@ -52,8 +88,16 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, bool const abor
         /* if we're starting a new file... */
         if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
-            auto const found = verify_mediator.find_file(file_index);
-            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+            if (auto const found = verify_mediator.find_file(file_index); found)
+            {
+                fd = tr_sys_file_open(found->c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+            }
+            else if (file_length == 0U)
+            {
+                fd = create_empty_file(
+                    tr_pathbuf{ verify_mediator.download_dir(), '/', metainfo.file_subpath(file_index) },
+                    metainfo.name());
+            }
             prev_file_index = file_index;
         }
 
