@@ -481,7 +481,7 @@ public:
                 auto const now = tr_time();
                 auto* const tor = s->tor;
 
-                tor->uploadedCur += event.length;
+                tor->bytes_uploaded_ += event.length;
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
                 tor->set_date_active(now);
                 tor->set_dirty();
@@ -795,7 +795,7 @@ private:
 
     static void on_client_got_piece_data(tr_torrent* const tor, uint32_t const sent_length, time_t const now)
     {
-        tor->downloadedCur += sent_length;
+        tor->bytes_downloaded_ += sent_length;
         tor->set_date_active(now);
         tor->set_dirty();
         tor->session->add_downloaded(sent_length);

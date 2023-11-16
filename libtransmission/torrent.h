@@ -78,8 +78,49 @@ struct tr_torrent final : public tr_completion::torrent_view
 {
     using Speed = libtransmission::Values::Speed;
 
+    class CumulativeCount
+    {
+    public:
+        [[nodiscard]] constexpr auto start_new_session() noexcept
+        {
+            prev_ += cur_;
+            cur_ = {};
+        }
+
+        [[nodiscard]] constexpr auto during_this_session() const noexcept
+        {
+            return cur_;
+        }
+
+        [[nodiscard]] constexpr auto ever() const noexcept
+        {
+            return cur_ + prev_;
+        }
+
+        constexpr auto& operator+=(uint64_t count) noexcept
+        {
+            cur_ += count;
+            return *this;
+        }
+
+        constexpr void reduce(uint64_t count) // subtract w/underflow guard
+        {
+            cur_ = cur_ >= count ? cur_ - count : 0U;
+        }
+
+        constexpr void set_prev(uint64_t count) noexcept
+        {
+            prev_ = count;
+        }
+
+    private:
+        uint64_t prev_ = {};
+        uint64_t cur_ = {};
+    };
+
 public:
     using labels_t = std::vector<tr_interned_string>;
+
     using VerifyDoneCallback = std::function<void(tr_torrent*)>;
 
     class VerifyMediator : public tr_verify_worker::Mediator
@@ -104,6 +145,8 @@ public:
         tr_torrent* const tor_;
         std::optional<time_t> time_started_;
     };
+
+    // ---
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
@@ -957,6 +1000,10 @@ public:
     // Will equal either download_dir or incomplete_dir
     tr_interned_string current_dir_;
 
+    CumulativeCount bytes_corrupt_;
+    CumulativeCount bytes_downloaded_;
+    CumulativeCount bytes_uploaded_;
+
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
      * other peers */
@@ -978,13 +1025,6 @@ public:
 
     time_t seconds_downloading_before_current_start_ = 0;
     time_t seconds_seeding_before_current_start_ = 0;
-
-    uint64_t downloadedCur = 0;
-    uint64_t downloadedPrev = 0;
-    uint64_t uploadedCur = 0;
-    uint64_t uploadedPrev = 0;
-    uint64_t corruptCur = 0;
-    uint64_t corruptPrev = 0;
 
     size_t queuePosition = 0;
 
