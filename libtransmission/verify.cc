@@ -30,7 +30,7 @@ auto constexpr SleepPerSecondDuringVerify = 100ms;
 }
 } // namespace
 
-void tr_verify_worker::verify_torrent(Mediator& verify_mediator, std::atomic<bool> const& abort_flag)
+void tr_verify_worker::verify_torrent(Mediator& verify_mediator, bool const abort_flag)
 {
     verify_mediator.on_verify_started();
 
