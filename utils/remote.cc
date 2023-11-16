@@ -27,6 +27,7 @@
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/file.h>
 #include <libtransmission/log.h>
@@ -34,10 +35,13 @@
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/values.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 
 using namespace std::literals;
+
+using namespace libtransmission::Values;
 
 #define SPEED_K_STR "kB/s"
 #define MEM_M_STR "MiB"
@@ -61,7 +65,7 @@ static char constexpr Usage[] = "transmission-remote " LONG_VERSION_STRING
 
 static auto constexpr Arguments = TR_KEY_arguments;
 
-struct Config
+struct RemoteConfig
 {
     std::string auth;
     std::string filter;
@@ -177,11 +181,6 @@ static std::string strlratio(int64_t numerator, int64_t denominator)
     return strlratio2(tr_getRatio(numerator, denominator));
 }
 
-static std::string strlmem(int64_t bytes)
-{
-    return bytes == 0 ? "None"s : tr_formatter_mem_B(bytes);
-}
-
 static std::string strlsize(int64_t bytes)
 {
     if (bytes < 0)
@@ -194,7 +193,7 @@ static std::string strlsize(int64_t bytes)
         return "None"s;
     }
 
-    return tr_formatter_size_B(bytes);
+    return Storage{ bytes, Storage::Units::Bytes }.to_string();
 }
 
 enum
@@ -594,7 +593,7 @@ static void addIdArg(tr_variant* args, std::string_view id_str, std::string_view
     }
 }
 
-static void addIdArg(tr_variant* args, Config const& config, std::string_view fallback = "")
+static void addIdArg(tr_variant* args, RemoteConfig const& config, std::string_view fallback = "")
 {
     return addIdArg(args, config.torrent_ids, fallback);
 }
@@ -794,7 +793,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 /* look for a session id in the header in case the server gives back a 409 */
 static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* vconfig)
 {
-    auto& config = *static_cast<Config*>(vconfig);
+    auto& config = *static_cast<RemoteConfig*>(vconfig);
     auto const* const line = static_cast<char const*>(ptr);
     size_t const line_len = size * nmemb;
     char const* key = TR_RPC_SESSION_ID_HEADER ": ";
@@ -993,12 +992,12 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_rateDownload, &i))
             {
-                fmt::print("  Download Speed: {:s}\n", tr_formatter_speed_KBps(i / (double)tr_speed_K));
+                fmt::print("  Download Speed: {:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_rateUpload, &i))
             {
-                fmt::print("  Upload Speed: {:s}\n", tr_formatter_speed_KBps(i / (double)tr_speed_K));
+                fmt::print("  Upload Speed: {:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_haveUnchecked, &i) && tr_variantDictFindInt(t, TR_KEY_haveValid, &j))
@@ -1156,7 +1155,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_pieceSize, &i))
             {
-                fmt::print("  Piece Size: {:s}\n", strlmem(i));
+                fmt::print("  Piece Size: {:s}\n", Memory{ i, Memory::Units::Bytes }.to_string());
             }
 
             fmt::print("\n");
@@ -1170,7 +1169,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    fmt::print("{:s}\n", tr_formatter_speed_KBps(i));
+                    fmt::print("{:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
                 }
                 else
                 {
@@ -1184,7 +1183,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    fmt::print("{:s}\n", tr_formatter_speed_KBps(i));
+                    fmt::print("{:s}\n", Speed{ i, Speed::Units::KByps }.to_string());
                 }
                 else
                 {
@@ -1333,8 +1332,8 @@ static void printPeersImpl(tr_variant* peers)
                 address,
                 flagstr,
                 progress * 100.0,
-                rateToClient / static_cast<double>(tr_speed_K),
-                rateToPeer / static_cast<double>(tr_speed_K),
+                Speed{ rateToClient, Speed::Units::KByps }.count(Speed::Units::KByps),
+                Speed{ rateToPeer, Speed::Units::KByps }.count(Speed::Units::KByps),
                 client);
         }
     }
@@ -1513,8 +1512,8 @@ static void printTorrentList(tr_variant* top)
                     done_str,
                     strlsize(sizeWhenDone - leftUntilDone),
                     eta_str,
-                    up / static_cast<double>(tr_speed_K),
-                    down / static_cast<double>(tr_speed_K),
+                    Speed{ up, Speed::Units::Byps }.count(Speed::Units::KByps),
+                    Speed{ down, Speed::Units::Byps }.count(Speed::Units::KByps),
                     strlratio2(ratio),
                     getStatusString(d),
                     name);
@@ -1528,8 +1527,8 @@ static void printTorrentList(tr_variant* top)
         fmt::print(
             FMT_STRING("Sum:           {:>9s}             {:6.1f}  {:6.1f}\n"),
             strlsize(total_size).c_str(),
-            total_up / static_cast<double>(tr_speed_K),
-            total_down / static_cast<double>(tr_speed_K));
+            Speed{ total_up, Speed::Units::Byps }.count(Speed::Units::KByps),
+            Speed{ total_down, Speed::Units::Byps }.count(Speed::Units::KByps));
     }
 }
 
@@ -1786,7 +1785,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindInt(args, TR_KEY_cache_size_mb, &i))
         {
-            fmt::print("  Maximum memory cache size: {:s}\n", tr_formatter_mem_MB(i));
+            fmt::print("  Maximum memory cache size: {:s}\n", Memory{ i, Memory::Units::MBytes }.to_string());
         }
 
         fmt::print("\n");
@@ -1831,11 +1830,11 @@ static void printSession(tr_variant* top)
 
                 if (altEnabled)
                 {
-                    effective_up_limit = tr_formatter_speed_KBps(altUp);
+                    effective_up_limit = Speed{ altUp, Speed::Units::KByps }.to_string();
                 }
                 else if (upEnabled)
                 {
-                    effective_up_limit = tr_formatter_speed_KBps(upLimit);
+                    effective_up_limit = Speed{ upLimit, Speed::Units::KByps }.to_string();
                 }
                 else
                 {
@@ -1846,19 +1845,19 @@ static void printSession(tr_variant* top)
                     FMT_STRING("  Upload speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
                     effective_up_limit,
                     upEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(upLimit),
+                    Speed{ upLimit, Speed::Units::KByps }.to_string(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(altUp));
+                    Speed{ altUp, Speed::Units::KByps }.to_string());
 
                 std::string effective_down_limit;
 
                 if (altEnabled)
                 {
-                    effective_down_limit = tr_formatter_speed_KBps(altDown);
+                    effective_down_limit = Speed{ altDown, Speed::Units::KByps }.to_string();
                 }
                 else if (downEnabled)
                 {
-                    effective_down_limit = tr_formatter_speed_KBps(downLimit);
+                    effective_down_limit = Speed{ downLimit, Speed::Units::KByps }.to_string();
                 }
                 else
                 {
@@ -1869,9 +1868,9 @@ static void printSession(tr_variant* top)
                     FMT_STRING("  Download speed limit: {:s} ({:s} limit: {:s}; {:s} turtle limit: {:s})\n"),
                     effective_down_limit,
                     downEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(downLimit),
+                    Speed{ downLimit, Speed::Units::KByps }.to_string(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(altDown));
+                    Speed{ altDown, Speed::Units::KByps }.to_string());
 
                 if (altTimeEnabled)
                 {
@@ -2000,15 +1999,15 @@ static void printGroups(tr_variant* top)
                 fmt::print("{:s}: ", name);
                 fmt::print(
                     FMT_STRING("Upload speed limit: {:s}, Download speed limit: {:s}, {:s} session bandwidth limits\n"),
-                    upEnabled ? tr_formatter_speed_KBps(upLimit).c_str() : "unlimited",
-                    downEnabled ? tr_formatter_speed_KBps(downLimit).c_str() : "unlimited",
+                    upEnabled ? Speed{ upLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
+                    downEnabled ? Speed{ downLimit, Speed::Units::KByps }.to_string() : "unlimited"s,
                     honors ? "honors" : "does not honor");
             }
         }
     }
 }
 
-static void filterIds(tr_variant* top, Config& config)
+static void filterIds(tr_variant* top, RemoteConfig& config)
 {
     tr_variant* args;
     tr_variant* list;
@@ -2129,7 +2128,7 @@ static void filterIds(tr_variant* top, Config& config)
         }
     }
 }
-static int processResponse(char const* rpcurl, std::string_view response, Config& config)
+static int processResponse(char const* rpcurl, std::string_view response, RemoteConfig& config)
 {
     auto status = int{ EXIT_SUCCESS };
 
@@ -2250,7 +2249,7 @@ static int processResponse(char const* rpcurl, std::string_view response, Config
     return status;
 }
 
-static CURL* tr_curl_easy_init(struct evbuffer* writebuf, Config& config)
+static CURL* tr_curl_easy_init(struct evbuffer* writebuf, RemoteConfig& config)
 {
     CURL* curl = curl_easy_init();
     (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format(FMT_STRING("{:s}/{:s}"), MyName, LONG_VERSION_STRING).c_str());
@@ -2316,7 +2315,7 @@ static void tr_curl_easy_cleanup(CURL* curl)
     }
 }
 
-static int flush(char const* rpcurl, tr_variant* benc, Config& config)
+static int flush(char const* rpcurl, tr_variant* benc, RemoteConfig& config)
 {
     auto const json = tr_variant_serde::json().compact().to_string(*benc);
     auto const scheme = config.use_ssl ? "https"sv : "http"sv;
@@ -2407,7 +2406,7 @@ static tr_variant* ensure_tset(tr_variant& tset)
     return tr_variantDictAddDict(&tset, Arguments, 1);
 }
 
-static int processArgs(char const* rpcurl, int argc, char const* const* argv, Config& config)
+static int processArgs(char const* rpcurl, int argc, char const* const* argv, RemoteConfig& config)
 {
     int status = EXIT_SUCCESS;
     char const* optarg;
@@ -3238,7 +3237,13 @@ static bool parsePortString(char const* s, int* port)
 }
 
 /* [host:port] or [host] or [port] or [http(s?)://host:port/transmission/] */
-static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, int* port, std::string* rpcurl, Config& config)
+static void getHostAndPortAndRpcUrl(
+    int* argc,
+    char** argv,
+    std::string* host,
+    int* port,
+    std::string* rpcurl,
+    RemoteConfig& config)
 {
     if (*argv[1] == '-')
     {
@@ -3300,7 +3305,7 @@ int tr_main(int argc, char* argv[])
 
     tr_locale_set_global("");
 
-    auto config = Config{};
+    auto config = RemoteConfig{};
     auto port = DefaultPort;
     auto host = std::string{};
     auto rpcurl = std::string{};

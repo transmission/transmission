@@ -236,7 +236,7 @@ char const* torrentStop(tr_session* session, tr_variant* args_in, tr_variant* /*
     {
         if (tor->activity() != TR_STATUS_STOPPED)
         {
-            tor->is_stopping_ = true;
+            tor->stop_soon();
             session->rpcNotify(TR_RPC_TORRENT_STOPPED, tor);
         }
     }
@@ -1966,6 +1966,35 @@ constexpr std::string_view getEncryptionModeString(tr_encryption_mode mode)
     }
 }
 
+[[nodiscard]] auto values_get_units()
+{
+    using namespace libtransmission::Values;
+
+    auto const make_units_vec = [](auto const& units)
+    {
+        auto units_vec = tr_variant::Vector{};
+        for (size_t i = 0;; ++i)
+        {
+            auto const display_name = units.display_name(i);
+            if (std::empty(display_name))
+            {
+                break;
+            }
+            units_vec.emplace_back(display_name);
+        }
+        return units_vec;
+    };
+
+    auto units_map = tr_variant::Map{ 6U };
+    units_map.try_emplace(TR_KEY_memory_bytes, Memory::units().base());
+    units_map.try_emplace(TR_KEY_memory_units, make_units_vec(Memory::units()));
+    units_map.try_emplace(TR_KEY_size_bytes, Storage::units().base());
+    units_map.try_emplace(TR_KEY_size_units, make_units_vec(Storage::units()));
+    units_map.try_emplace(TR_KEY_speed_bytes, Speed::units().base());
+    units_map.try_emplace(TR_KEY_speed_units, make_units_vec(Speed::units()));
+    return tr_variant{ std::move(units_map) };
+}
+
 void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
 {
     switch (key)
@@ -2198,7 +2227,7 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_units:
-        *tr_variantDictAdd(d, key) = tr_formatter_get_units();
+        *tr_variantDictAdd(d, key) = values_get_units();
         break;
 
     case TR_KEY_version:

@@ -481,7 +481,7 @@ public:
                 auto const now = tr_time();
                 auto* const tor = s->tor;
 
-                tor->uploadedCur += event.length;
+                tor->bytes_uploaded_ += event.length;
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
                 tor->set_date_active(now);
                 tor->set_dirty();
@@ -795,7 +795,7 @@ private:
 
     static void on_client_got_piece_data(tr_torrent* const tor, uint32_t const sent_length, time_t const now)
     {
-        tor->downloadedCur += sent_length;
+        tor->bytes_downloaded_ += sent_length;
         tor->set_date_active(now);
         tor->set_dirty();
         tor->session->add_downloaded(sent_length);
@@ -1213,22 +1213,22 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     TR_ASSERT(result.io != nullptr);
     auto const& socket_address = result.io->socket_address();
     auto* const swarm = manager->get_existing_swarm(result.io->torrent_hash());
-    auto* info_ptr = swarm != nullptr ? swarm->get_existing_peer_info(socket_address) : nullptr;
+    auto* info = swarm != nullptr ? swarm->get_existing_peer_info(socket_address) : nullptr;
 
     if (result.io->is_incoming())
     {
         manager->incoming_handshakes.erase(socket_address);
     }
-    else if (info_ptr != nullptr)
+    else if (info != nullptr)
     {
-        info_ptr->destroy_handshake();
+        info->destroy_handshake();
     }
 
     if (!result.is_connected || swarm == nullptr || !swarm->is_running)
     {
-        if (info_ptr != nullptr && !info_ptr->is_connected())
+        if (info != nullptr && !info->is_connected())
         {
-            info_ptr->on_connection_failed();
+            info->on_connection_failed();
 
             if (!result.read_anything_from_peer)
             {
@@ -1236,39 +1236,39 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
                     swarm,
                     fmt::format(
                         "marking peer {} as unreachable... num_fails is {}",
-                        info_ptr->display_name(),
-                        info_ptr->connection_failure_count()));
-                info_ptr->set_connectable(false);
+                        info->display_name(),
+                        info->connection_failure_count()));
+                info->set_connectable(false);
             }
         }
 
         return false;
     }
 
-    if (info_ptr == nullptr && result.io->is_incoming())
+    if (result.io->is_incoming())
     {
-        info_ptr = &swarm->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false);
+        info = &swarm->ensure_info_exists(socket_address, 0U, TR_PEER_FROM_INCOMING, false);
     }
 
-    if (info_ptr == nullptr)
+    if (info == nullptr)
     {
         return false;
     }
 
     if (!result.io->is_incoming())
     {
-        info_ptr->set_connectable();
+        info->set_connectable();
     }
 
     // If we're connected via µTP, then we know the peer supports µTP...
     if (result.io->is_utp())
     {
-        info_ptr->set_utp_supported();
+        info->set_utp_supported();
     }
 
-    if (info_ptr->is_banned())
+    if (info->is_banned())
     {
-        tr_logAddTraceSwarm(swarm, fmt::format("banned peer {} tried to reconnect", info_ptr->display_name()));
+        tr_logAddTraceSwarm(swarm, fmt::format("banned peer {} tried to reconnect", info->display_name()));
         return false;
     }
 
@@ -1277,7 +1277,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
         return false;
     }
 
-    if (info_ptr->is_connected()) // we're already connected to this peer; do nothing
+    if (info->is_connected()) // we're already connected to this peer; do nothing
     {
         return false;
     }
@@ -1291,7 +1291,7 @@ void create_bit_torrent_peer(tr_torrent* tor, std::shared_ptr<tr_peerIo> io, tr_
     }
 
     result.io->set_bandwidth(&swarm->tor->bandwidth_);
-    create_bit_torrent_peer(swarm->tor, result.io, info_ptr, client);
+    create_bit_torrent_peer(swarm->tor, result.io, info, client);
 
     return true;
 }

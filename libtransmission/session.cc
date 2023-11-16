@@ -773,7 +773,7 @@ void tr_session::setSettings(tr_session_settings&& settings_in, bool force)
     }
 #endif
 
-    if (auto const& val = new_settings.cache_size_mb; force || val != old_settings.cache_size_mb)
+    if (auto const& val = new_settings.cache_size_mbytes; force || val != old_settings.cache_size_mbytes)
     {
         tr_sessionSetCacheLimit_MB(this, val);
     }
@@ -1162,7 +1162,7 @@ bool tr_sessionIsSpeedLimited(tr_session const* session, tr_direction const dir)
 
 // --- Session alt speed limits
 
-void tr_sessionSetAltSpeed_KBps(tr_session* session, tr_direction const dir, size_t limit_kbyps)
+void tr_sessionSetAltSpeed_KBps(tr_session* const session, tr_direction const dir, size_t const limit_kbyps)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_isDirection(dir));
@@ -1346,8 +1346,8 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
         std::end(torrents),
         [](auto const* a, auto const* b)
         {
-            auto const a_cur = a->downloadedCur + a->uploadedCur;
-            auto const b_cur = b->downloadedCur + b->uploadedCur;
+            auto const a_cur = a->bytes_downloaded_.ever();
+            auto const b_cur = b->bytes_downloaded_.ever();
             return a_cur > b_cur; // larger xfers go first
         });
     for (auto* tor : torrents)
@@ -1591,19 +1591,19 @@ bool tr_sessionIsLPDEnabled(tr_session const* session)
 
 // ---
 
-void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mb)
+void tr_sessionSetCacheLimit_MB(tr_session* session, size_t mbytes)
 {
     TR_ASSERT(session != nullptr);
 
-    session->settings_.cache_size_mb = mb;
-    session->cache->set_limit(tr_toMemBytes(mb));
+    session->settings_.cache_size_mbytes = mbytes;
+    session->cache->set_limit(Memory{ mbytes, Memory::Units::MBytes });
 }
 
 size_t tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
-    return session->settings_.cache_size_mb;
+    return session->settings_.cache_size_mbytes;
 }
 
 // ---

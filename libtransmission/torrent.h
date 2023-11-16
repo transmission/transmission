@@ -78,8 +78,49 @@ struct tr_torrent final : public tr_completion::torrent_view
 {
     using Speed = libtransmission::Values::Speed;
 
+    class CumulativeCount
+    {
+    public:
+        [[nodiscard]] constexpr auto start_new_session() noexcept
+        {
+            prev_ += cur_;
+            cur_ = {};
+        }
+
+        [[nodiscard]] constexpr auto during_this_session() const noexcept
+        {
+            return cur_;
+        }
+
+        [[nodiscard]] constexpr auto ever() const noexcept
+        {
+            return cur_ + prev_;
+        }
+
+        constexpr auto& operator+=(uint64_t count) noexcept
+        {
+            cur_ += count;
+            return *this;
+        }
+
+        constexpr void reduce(uint64_t count) // subtract w/underflow guard
+        {
+            cur_ = cur_ >= count ? cur_ - count : 0U;
+        }
+
+        constexpr void set_prev(uint64_t count) noexcept
+        {
+            prev_ = count;
+        }
+
+    private:
+        uint64_t prev_ = {};
+        uint64_t cur_ = {};
+    };
+
 public:
     using labels_t = std::vector<tr_interned_string>;
+
     using VerifyDoneCallback = std::function<void(tr_torrent*)>;
 
     class VerifyMediator : public tr_verify_worker::Mediator
@@ -104,6 +145,8 @@ public:
         tr_torrent* const tor_;
         std::optional<time_t> time_started_;
     };
+
+    // ---
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
@@ -559,6 +602,16 @@ public:
         return this->is_queued_;
     }
 
+    void set_is_queued(bool queued = true) noexcept
+    {
+        if (is_queued_ != queued)
+        {
+            is_queued_ = queued;
+            mark_changed();
+            set_dirty();
+        }
+    }
+
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
         return this->is_done() ? TR_UP : TR_DOWN;
@@ -676,6 +729,11 @@ public:
     [[nodiscard]] constexpr auto is_stopping() const noexcept
     {
         return is_stopping_;
+    }
+
+    constexpr void stop_soon() noexcept
+    {
+        is_stopping_ = true;
     }
 
     [[nodiscard]] constexpr auto is_dirty() const noexcept
@@ -900,6 +958,11 @@ public:
 
     void init(tr_ctor const* ctor);
 
+    [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
+    {
+        return obfuscated_hash_ == test;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -937,7 +1000,9 @@ public:
     // Will equal either download_dir or incomplete_dir
     tr_interned_string current_dir_;
 
-    tr_sha1_digest_t obfuscated_hash = {};
+    CumulativeCount bytes_corrupt_;
+    CumulativeCount bytes_downloaded_;
+    CumulativeCount bytes_uploaded_;
 
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
@@ -961,13 +1026,6 @@ public:
     time_t seconds_downloading_before_current_start_ = 0;
     time_t seconds_seeding_before_current_start_ = 0;
 
-    uint64_t downloadedCur = 0;
-    uint64_t downloadedPrev = 0;
-    uint64_t uploadedCur = 0;
-    uint64_t uploadedPrev = 0;
-    uint64_t corruptCur = 0;
-    uint64_t corruptPrev = 0;
-
     size_t queuePosition = 0;
 
     tr_completeness completeness = TR_LEECH;
@@ -976,11 +1034,7 @@ public:
 
     bool finished_seeding_by_idle_ = false;
 
-    bool is_deleting_ = false;
-    bool is_dirty_ = false;
-    bool is_queued_ = false;
     bool is_running_ = false;
-    bool is_stopping_ = false;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
@@ -991,7 +1045,12 @@ private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
+    friend void tr_torrentCheckSeedLimit(tr_torrent* tor);
+    friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
     friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
+    friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
+    friend void tr_torrentStop(tr_torrent* tor);
+    friend void tr_torrentVerify(tr_torrent* tor, bool force);
 
     enum class VerifyState : uint8_t
     {
@@ -1113,14 +1172,14 @@ private:
 
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
-        if (uses_speed_limit(direction) && speed_limit(direction).base_quantity() == 0U)
+        if (uses_speed_limit(direction) && speed_limit(direction).is_zero())
         {
             return false;
         }
 
         if (uses_session_limits())
         {
-            if (auto const limit = session->active_speed_limit(direction); limit && limit->base_quantity() == 0U)
+            if (auto const limit = session->active_speed_limit(direction); limit && limit->is_zero())
             {
                 return false;
             }
@@ -1165,6 +1224,8 @@ private:
 
     void on_metainfo_updated();
 
+    void stop_now();
+
     tr_stat stats_ = {};
 
     Error error_;
@@ -1174,6 +1235,8 @@ private:
     labels_t labels_;
 
     tr_interned_string bandwidth_group_;
+
+    tr_sha1_digest_t obfuscated_hash_ = {};
 
     mutable SimpleSmoothedSpeed eta_speed_;
 
@@ -1205,6 +1268,11 @@ private:
     VerifyState verify_state_ = VerifyState::None;
 
     uint16_t idle_limit_minutes_ = 0;
+
+    bool is_deleting_ = false;
+    bool is_dirty_ = false;
+    bool is_queued_ = false;
+    bool is_stopping_ = false;
 
     bool needs_completeness_check_ = true;
 
