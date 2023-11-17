@@ -798,6 +798,22 @@ public:
         return idle_limit_minutes_;
     }
 
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
+    {
+        auto const activity = this->activity();
+
+        if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
+        {
+            if (auto const latest = std::max(startDate, activityDate); latest != 0)
+            {
+                TR_ASSERT(now >= latest);
+                return now - latest;
+            }
+        }
+
+        return {};
+    }
+
     [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
     {
         auto const idle_limit_minutes = effective_idle_limit_minutes();
@@ -1144,22 +1160,6 @@ private:
         if (mode == TR_IDLELIMIT_GLOBAL && session->isIdleLimited())
         {
             return session->idleLimitMinutes();
-        }
-
-        return {};
-    }
-
-    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
-    {
-        auto const activity = this->activity();
-
-        if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
-        {
-            if (auto const latest = std::max(startDate, activityDate); latest != 0)
-            {
-                TR_ASSERT(now >= latest);
-                return now - latest;
-            }
         }
 
         return {};

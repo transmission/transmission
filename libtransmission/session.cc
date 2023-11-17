@@ -639,16 +639,20 @@ size_t tr_session::count_queue_free_slots(tr_direction dir) const noexcept
     auto const now = tr_time();
     for (auto const* const tor : torrents())
     {
-        /* is it the right activity? */
+        // is it the right activity?
         if (activity != tor->activity())
         {
             continue;
         }
 
-        /* is it stalled? */
-        if (stalled_enabled && difftime(now, std::max(tor->startDate, tor->activityDate)) >= stalled_if_idle_for_n_seconds)
+        // is it stalled?
+        if (stalled_enabled)
         {
-            continue;
+            auto const idle_seconds = tor->idle_seconds(now);
+            if (idle_seconds && *idle_seconds >= stalled_if_idle_for_n_seconds)
+            {
+                continue;
+            }
         }
 
         ++active_count;
