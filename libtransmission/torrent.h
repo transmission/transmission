@@ -597,9 +597,14 @@ public:
 
     [[nodiscard]] tr_stat stats() const;
 
-    [[nodiscard]] constexpr auto is_queued() const noexcept
+    [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
-        return this->is_queued_;
+        return is_done() ? TR_UP : TR_DOWN;
+    }
+
+    [[nodiscard]] constexpr auto is_queued(tr_direction const dir) const noexcept
+    {
+        return is_queued_ && dir == queue_direction();
     }
 
     void set_is_queued(bool queued = true) noexcept
@@ -610,11 +615,6 @@ public:
             mark_changed();
             set_dirty();
         }
-    }
-
-    [[nodiscard]] constexpr auto queue_direction() const noexcept
-    {
-        return this->is_done() ? TR_UP : TR_DOWN;
     }
 
     [[nodiscard]] constexpr auto allows_pex() const noexcept
@@ -667,8 +667,6 @@ public:
 
     [[nodiscard]] constexpr auto activity() const noexcept
     {
-        bool const is_seed = this->is_done();
-
         if (verify_state_ == VerifyState::Active)
         {
             return TR_STATUS_CHECK;
@@ -679,22 +677,19 @@ public:
             return TR_STATUS_CHECK_WAIT;
         }
 
-        if (this->is_running())
+        if (is_running())
         {
-            return is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+            return is_done() ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
         }
 
-        if (this->is_queued())
+        if (is_queued(TR_UP) && session->queueEnabled(TR_UP))
         {
-            if (is_seed && this->session->queueEnabled(TR_UP))
-            {
-                return TR_STATUS_SEED_WAIT;
-            }
+            return TR_STATUS_SEED_WAIT;
+        }
 
-            if (!is_seed && this->session->queueEnabled(TR_DOWN))
-            {
-                return TR_STATUS_DOWNLOAD_WAIT;
-            }
+        if (is_queued(TR_DOWN) && session->queueEnabled(TR_DOWN))
+        {
+            return TR_STATUS_DOWNLOAD_WAIT;
         }
 
         return TR_STATUS_STOPPED;

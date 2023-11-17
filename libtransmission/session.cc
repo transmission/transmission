@@ -603,16 +603,7 @@ std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_dire
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    // build an array of the candidates
-    auto candidates = std::vector<tr_torrent*>{};
-    candidates.reserve(std::size(torrents));
-    for (auto* const tor : torrents)
-    {
-        if (tor->is_queued() && (dir == tor->queue_direction()))
-        {
-            candidates.push_back(tor);
-        }
-    }
+    auto candidates = torrents.get_matching([dir](auto const* const tor) { return tor->is_queued(dir); });
 
     // find the best n candidates
     num_wanted = std::min(num_wanted, std::size(candidates));
