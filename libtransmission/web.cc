@@ -227,6 +227,11 @@ public:
         queued_tasks_cv_.notify_one();
     }
 
+    [[nodiscard]] bool is_idle() const noexcept
+    {
+        return std::empty(queued_tasks_) && std::empty(running_tasks_);
+    }
+
     class Task
     {
     public:
@@ -621,11 +626,6 @@ public:
         }
     }
 
-    [[nodiscard]] bool is_idle() const noexcept
-    {
-        return std::empty(queued_tasks_) && std::empty(running_tasks_);
-    }
-
     void remove_task(Task const& task)
     {
         auto const lock = std::unique_lock{ tasks_mutex_ };
@@ -808,4 +808,9 @@ void tr_web::fetch(FetchOptions&& options)
 void tr_web::startShutdown(std::chrono::milliseconds deadline)
 {
     impl_->startShutdown(deadline);
+}
+
+bool tr_web::is_idle() const noexcept
+{
+    return impl_->is_idle();
 }

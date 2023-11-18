@@ -35,22 +35,16 @@ public:
     void remove(tr_torrent const* tor, time_t current_time);
 
     // O(1)
-    [[nodiscard]] TR_CONSTEXPR20 tr_torrent* get(tr_torrent_id_t id)
+    [[nodiscard]] TR_CONSTEXPR20 tr_torrent* get(tr_torrent_id_t id) const
     {
         auto const uid = static_cast<size_t>(id);
         return uid >= std::size(by_id_) ? nullptr : by_id_.at(uid);
     }
 
     // O(log n)
-    [[nodiscard]] tr_torrent const* get(tr_sha1_digest_t const& hash) const;
-    [[nodiscard]] tr_torrent* get(tr_sha1_digest_t const& hash);
+    [[nodiscard]] tr_torrent* get(tr_sha1_digest_t const& hash) const;
 
-    [[nodiscard]] tr_torrent const* get(tr_torrent_metainfo const& metainfo) const
-    {
-        return get(metainfo.info_hash());
-    }
-
-    [[nodiscard]] tr_torrent* get(tr_torrent_metainfo const& metainfo)
+    [[nodiscard]] tr_torrent* get(tr_torrent_metainfo const& metainfo) const
     {
         return get(metainfo.info_hash());
     }
@@ -61,7 +55,7 @@ public:
     // These convenience functions use get(tr_sha1_digest_t const&)
     // after parsing the magnet link to get the info hash. If you have
     // the info hash already, use get() instead to avoid excess parsing.
-    [[nodiscard]] tr_torrent* get(std::string_view magnet_link);
+    [[nodiscard]] tr_torrent* get(std::string_view magnet_link) const;
 
     template<typename T>
     [[nodiscard]] bool contains(T const& key) const

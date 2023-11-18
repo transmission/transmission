@@ -66,6 +66,7 @@ static CGFloat const kStackViewVerticalSpacing = 8.0;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self checkWindowSize];
 }
 

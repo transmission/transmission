@@ -13,6 +13,7 @@
 #include <libtransmission/error.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
+#include <libtransmission/values.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 #include <libtransmission/web-utils.h>
 
@@ -58,27 +59,7 @@
 
 using namespace std::literals;
 
-/***
-****  UNITS
-***/
-
-int const mem_K = 1024;
-char const* const mem_K_str = N_("KiB");
-char const* const mem_M_str = N_("MiB");
-char const* const mem_G_str = N_("GiB");
-char const* const mem_T_str = N_("TiB");
-
-int const disk_K = 1000;
-char const* const disk_K_str = N_("kB");
-char const* const disk_M_str = N_("MB");
-char const* const disk_G_str = N_("GB");
-char const* const disk_T_str = N_("TB");
-
-int const speed_K = 1000;
-char const* const speed_K_str = N_("kB/s");
-char const* const speed_M_str = N_("MB/s");
-char const* const speed_G_str = N_("GB/s");
-char const* const speed_T_str = N_("TB/s");
+using namespace libtransmission::Values;
 
 /***
 ****
@@ -132,9 +113,14 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlsize(guint64 size_in_bytes)
+Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage)
 {
-    return size_in_bytes == 0 ? Q_("None") : tr_formatter_size_B(size_in_bytes);
+    return storage.is_zero() ? Q_("None") : storage.to_string();
+}
+
+Glib::ustring tr_strlsize(guint64 n_bytes)
+{
+    return tr_strlsize(Storage{ n_bytes, Storage::Units::Bytes });
 }
 
 namespace
@@ -524,14 +510,18 @@ void setup_item_view_button_event_handling(
 
 #endif
 
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error)
 {
-    bool trashed = false;
-    bool result = true;
-
     g_return_val_if_fail(!filename.empty(), false);
 
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
+
     auto const file = Gio::File::create_for_path(filename);
+    bool trashed = false;
 
     if (gtr_pref_flag_get(TR_KEY_trash_can_enabled))
     {
@@ -541,15 +531,16 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
+            error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             gtr_message(fmt::format(
                 _("Couldn't move '{path}' to trash: {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                fmt::arg("error_code", e.code())));
-            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
         }
     }
 
+    bool result = true;
     if (!trashed)
     {
         try
@@ -558,13 +549,12 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         }
         catch (Glib::Error const& e)
         {
+            error->set(e.code(), TR_GLIB_EXCEPTION_WHAT(e));
             gtr_message(fmt::format(
                 _("Couldn't remove '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("error", TR_GLIB_EXCEPTION_WHAT(e)),
-                fmt::arg("error_code", e.code())));
-            tr_error_clear(error);
-            tr_error_set(error, e.code(), TR_GLIB_EXCEPTION_WHAT(e));
+                fmt::arg("error", error->message()),
+                fmt::arg("error_code", error->code())));
             result = false;
         }
     }

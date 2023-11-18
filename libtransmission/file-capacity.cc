@@ -509,9 +509,15 @@ tr_sys_path_capacity tr_device_info_get_disk_space(struct tr_device_info const& 
 
 } // namespace
 
-std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error** error)
+std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view path, tr_error* error)
 {
-    auto const info = tr_sys_path_get_info(path, 0, error);
+    auto local_error = tr_error{};
+    if (error == nullptr)
+    {
+        error = &local_error;
+    }
+
+    auto const info = tr_sys_path_get_info(path, 0, &local_error);
     if (!info)
     {
         return {};
@@ -519,16 +525,15 @@ std::optional<tr_sys_path_capacity> tr_sys_path_get_capacity(std::string_view pa
 
     if (!info->isFolder())
     {
-        tr_error_set_from_errno(error, ENOTDIR);
+        error->set_from_errno(ENOTDIR);
         return {};
     }
 
     auto const device = tr_device_info_create(path);
     auto capacity = tr_device_info_get_disk_space(device);
-
     if (capacity.free < 0 || capacity.total < 0)
     {
-        tr_error_set_from_errno(error, EINVAL);
+        error->set_from_errno(EINVAL);
         return {};
     }
 

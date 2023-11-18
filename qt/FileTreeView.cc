@@ -22,6 +22,8 @@
 #include "Formatter.h"
 #include "Utils.h"
 
+using namespace libtransmission::Values;
+
 namespace
 {
 
@@ -89,12 +91,11 @@ void FileTreeView::resizeEvent(QResizeEvent* event)
         switch (column)
         {
         case FileTreeModel::COL_SIZE:
-            for (int s = Formatter::get().B; s <= Formatter::get().TB; ++s)
-            {
-                item_texts
-                    << (QStringLiteral("999.9 ") + Formatter::get().unitStr(Formatter::MEM, static_cast<Formatter::Size>(s)));
-            }
-
+            item_texts << QString::fromStdString(Memory{ 999.9, Memory::Units::Bytes }.to_string())
+                       << QString::fromStdString(Memory{ 999.9, Memory::Units::KBytes }.to_string())
+                       << QString::fromStdString(Memory{ 999.9, Memory::Units::MBytes }.to_string())
+                       << QString::fromStdString(Memory{ 999.9, Memory::Units::GBytes }.to_string())
+                       << QString::fromStdString(Memory{ 999.9, Memory::Units::TBytes }.to_string());
             break;
 
         case FileTreeModel::COL_PROGRESS:

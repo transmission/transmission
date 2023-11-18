@@ -178,9 +178,9 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
     auto const filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
 
     auto* ctor = tr_ctorNew(session_);
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
     auto const* const metainfo = tr_ctorGetMetainfo(ctor);
     EXPECT_NE(nullptr, metainfo);
     EXPECT_EQ(336, metainfo->info_dict_offset());
@@ -196,20 +196,17 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
 
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
-    EXPECT_NE(nullptr, error);
-    if (error != nullptr)
-    {
-        EXPECT_EQ(EINVAL, error->code);
-        tr_error_clear(&error);
-    }
+    EXPECT_TRUE(error);
+    EXPECT_EQ(EINVAL, error.code());
+    error = {};
 
     // now try saving _with_ metainfo
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
     EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
-    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_FALSE(error) << error;
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
@@ -220,8 +217,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
 
     // cleanup
     EXPECT_TRUE(tr_sys_path_remove(tgt_filename, &error));
-    EXPECT_EQ(nullptr, error) << *error;
-    tr_error_clear(&error);
+    EXPECT_FALSE(error) << error;
     tr_ctorFree(ctor);
 }
 

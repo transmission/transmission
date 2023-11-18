@@ -19,7 +19,7 @@
 #endif
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_formatter_speed_KBps()
+#include <libtransmission/values.h>
 
 #include <gdkmm/cursor.h>
 #include <gdkmm/rectangle.h>
@@ -61,6 +61,7 @@
 
 using namespace std::string_literals;
 using namespace std::string_view_literals;
+using namespace libtransmission::Values;
 
 using VariantInt = Glib::Variant<int>;
 using VariantDouble = Glib::Variant<double>;
@@ -379,8 +380,8 @@ void MainWindow::Impl::syncAltSpeedButton()
     alt_speed_button_->set_tooltip_text(fmt::format(
         b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :
             _("Click to enable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)"),
-        fmt::arg("download_speed", tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_down))),
-        fmt::arg("upload_speed", tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_up)))));
+        fmt::arg("download_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_down), Speed::Units::KByps }.to_string()),
+        fmt::arg("upload_speed", Speed{ gtr_pref_int_get(TR_KEY_alt_speed_up), Speed::Units::KByps }.to_string())));
 }
 
 void MainWindow::Impl::alt_speed_toggled_cb()
@@ -451,7 +452,7 @@ Glib::RefPtr<Gio::MenuModel> MainWindow::Impl::createSpeedMenu(
 
     for (auto const KBps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
     {
-        auto item = Gio::MenuItem::create(tr_formatter_speed_KBps(KBps), full_stock_action_name);
+        auto item = Gio::MenuItem::create(Speed{ KBps, Speed::Units::KByps }.to_string(), full_stock_action_name);
         item->set_action_and_target(full_stock_action_name, VariantInt::create(KBps));
         section->append_item(item);
     }
@@ -566,12 +567,12 @@ void MainWindow::Impl::onOptionsClicked()
 
     update_menu(
         speed_menu_info_[TR_DOWN],
-        tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_speed_limit_down)),
+        Speed{ gtr_pref_int_get(TR_KEY_speed_limit_down), Speed::Units::KByps }.to_string(),
         TR_KEY_speed_limit_down_enabled);
 
     update_menu(
         speed_menu_info_[TR_UP],
-        tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_speed_limit_up)),
+        Speed{ gtr_pref_int_get(TR_KEY_speed_limit_up), Speed::Units::KByps }.to_string(),
         TR_KEY_speed_limit_up_enabled);
 
     update_menu(
@@ -791,9 +792,9 @@ void MainWindow::Impl::updateSpeeds()
     if (session != nullptr)
     {
         auto dn_count = int{};
-        auto dn_speed = double{};
+        auto dn_speed = Speed{};
         auto up_count = int{};
-        auto up_speed = double{};
+        auto up_speed = Speed{};
 
         auto const model = core_->get_model();
         for (auto i = 0U, count = model->get_n_items(); i < count; ++i)
@@ -805,10 +806,10 @@ void MainWindow::Impl::updateSpeeds()
             up_speed += torrent->get_speed_up();
         }
 
-        dl_lb_->set_text(fmt::format(_("{download_speed} ▼"), fmt::arg("download_speed", tr_formatter_speed_KBps(dn_speed))));
+        dl_lb_->set_text(fmt::format(fmt::runtime(_("{download_speed} ▼")), fmt::arg("download_speed", dn_speed.to_string())));
         dl_lb_->set_visible(dn_count > 0);
 
-        ul_lb_->set_text(fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(up_speed))));
+        ul_lb_->set_text(fmt::format(fmt::runtime(_("{upload_speed} ▲")), fmt::arg("upload_speed", up_speed.to_string())));
         ul_lb_->set_visible(dn_count > 0 || up_count > 0);
     }
 }

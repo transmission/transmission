@@ -53,6 +53,7 @@ tr_session* fLib = NULL;
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self updateStats];
 
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:kUpdateSeconds target:self selector:@selector(updateStats)

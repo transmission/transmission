@@ -46,6 +46,7 @@ typedef NS_ENUM(NSInteger, TrackerSegmentTag) {
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Add a tracker", "Inspector view -> tracker buttons")
                                         forSegment:TrackerSegmentTagAdd];
     [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Remove selected trackers", "Inspector view -> tracker buttons")

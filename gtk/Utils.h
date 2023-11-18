@@ -9,6 +9,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/values.h>
 
 #include <glibmm/objectbase.h>
 #include <glibmm/refptr.h>
@@ -43,28 +44,6 @@
 ****
 ***/
 
-extern int const mem_K;
-extern char const* const mem_K_str;
-extern char const* const mem_M_str;
-extern char const* const mem_G_str;
-extern char const* const mem_T_str;
-
-extern int const disk_K;
-extern char const* const disk_K_str;
-extern char const* const disk_M_str;
-extern char const* const disk_G_str;
-extern char const* const disk_T_str;
-
-extern int const speed_K;
-extern char const* const speed_K_str;
-extern char const* const speed_M_str;
-extern char const* const speed_G_str;
-extern char const* const speed_T_str;
-
-/***
-****
-***/
-
 void gtr_message(std::string const& message);
 void gtr_warning(std::string const& message);
 void gtr_error(std::string const& message);
@@ -85,6 +64,7 @@ Glib::ustring gtr_get_unicode_string(GtrUnicode uni);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size_in_bytes);
+Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage);
 
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);
@@ -185,7 +165,7 @@ void setup_item_view_button_event_handling(
 #endif
 
 /* move a file to the trashcan if GIO is available; otherwise, delete it */
-bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error);
+bool gtr_file_trash_or_remove(std::string const& filename, tr_error* error = nullptr);
 
 void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry);
 

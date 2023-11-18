@@ -26,7 +26,7 @@
 
 #include "libtransmission/bandwidth.h"
 #include "libtransmission/block-info.h" // tr_block_info
-#include "libtransmission/error.h" // tr_error_clear, tr_error_s...
+#include "libtransmission/error.h"
 #include "libtransmission/log.h"
 #include "libtransmission/net.h"
 #include "libtransmission/peer-io.h"
@@ -67,14 +67,14 @@ size_t get_desired_output_buffer_size(tr_peerIo const* io, uint64_t now)
     // this is all kind of arbitrary, but what seems to work well is
     // being large enough to hold the next 20 seconds' worth of input,
     // or a few blocks, whichever is bigger. OK to tweak this as needed.
-    static auto constexpr PeriodSecs = 15U;
+    static auto constexpr PeriodSecs = uint64_t{ 15U };
 
     // the 3 is an arbitrary number of blocks;
     // the .5 is to leave room for protocol messages
-    static auto constexpr Floor = static_cast<size_t>(tr_block_info::BlockSize * 3.5);
+    static auto constexpr Floor = static_cast<uint64_t>(tr_block_info::BlockSize * 3.5);
 
-    auto const current_speed_bytes_per_second = io->get_piece_speed_bytes_per_second(now, TR_UP);
-    return std::max(Floor, current_speed_bytes_per_second * PeriodSecs);
+    auto const current_speed = io->get_piece_speed(now, TR_UP);
+    return std::max(Floor, current_speed.base_quantity() * PeriodSecs);
 }
 } // namespace
 
@@ -325,22 +325,20 @@ size_t tr_peerIo::try_write(size_t max)
         return {};
     }
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const n_written = socket_.try_write(buf, max, &error);
     // enable further writes if there's more data to write
-    set_enabled(Dir, !std::empty(buf) && (error == nullptr || canRetryFromError(error->code)));
+    set_enabled(Dir, !std::empty(buf) && (!error || canRetryFromError(error.code())));
 
-    if (error != nullptr)
+    if (error)
     {
-        if (!canRetryFromError(error->code))
+        if (!canRetryFromError(error.code()))
         {
             tr_logAddTraceIo(
                 this,
-                fmt::format("try_write err: wrote:{}, errno:{} ({})", n_written, error->code, error->message));
-            call_error_callback(*error);
+                fmt::format("try_write err: wrote:{}, errno:{} ({})", n_written, error.code(), error.message()));
+            call_error_callback(error);
         }
-
-        tr_error_clear(&error);
     }
     else if (n_written > 0U)
     {
@@ -450,19 +448,17 @@ size_t tr_peerIo::try_read(size_t max)
     }
 
     auto& buf = inbuf_;
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     auto const n_read = socket_.try_read(buf, max, std::empty(buf), &error);
-    set_enabled(Dir, error == nullptr || canRetryFromError(error->code));
+    set_enabled(Dir, !error || canRetryFromError(error.code()));
 
-    if (error != nullptr)
+    if (error)
     {
-        if (!canRetryFromError(error->code))
+        if (!canRetryFromError(error.code()))
         {
-            tr_logAddTraceIo(this, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error->code, error->message));
-            call_error_callback(*error);
+            tr_logAddTraceIo(this, fmt::format("try_read err: n_read:{} errno:{} ({})", n_read, error.code(), error.message()));
+            call_error_callback(error);
         }
-
-        tr_error_clear(&error);
     }
     else if (!std::empty(buf))
     {
@@ -672,10 +668,9 @@ void tr_peerIo::on_utp_state_change(int state)
     }
     else if (state == UTP_STATE_EOF)
     {
-        tr_error* error = nullptr;
-        tr_error_set_from_errno(&error, ENOTCONN);
-        call_error_callback(*error);
-        tr_error_clear(&error);
+        auto error = tr_error{};
+        error.set_from_errno(ENOTCONN);
+        call_error_callback(error);
     }
     else if (state == UTP_STATE_DESTROYING)
     {
@@ -696,23 +691,24 @@ void tr_peerIo::on_utp_error(int errcode)
         return;
     }
 
-    tr_error* error = nullptr;
+    auto error = tr_error{};
     switch (errcode)
     {
     case UTP_ECONNREFUSED:
-        tr_error_set_from_errno(&error, ECONNREFUSED);
+        error.set_from_errno(ECONNREFUSED);
         break;
     case UTP_ECONNRESET:
-        tr_error_set_from_errno(&error, ECONNRESET);
+        error.set_from_errno(ECONNRESET);
         break;
     case UTP_ETIMEDOUT:
-        tr_error_set_from_errno(&error, ETIMEDOUT);
+        error.set_from_errno(ETIMEDOUT);
         break;
     default:
-        tr_error_set(&error, errcode, utp_error_code_names[errcode]);
+        error.set(errcode, utp_error_code_names[errcode]);
+        break;
     }
-    call_error_callback(*error);
-    tr_error_clear(&error);
+
+    call_error_callback(error);
 }
 
 #endif /* #ifdef WITH_UTP */

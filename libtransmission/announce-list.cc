@@ -264,14 +264,19 @@ void tr_announce_list::add_to_map(tr_variant::Map& setme) const
     }
 }
 
-bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
+bool tr_announce_list::save(std::string_view torrent_file, tr_error* error) const
 {
     // load the torrent file
     auto serde = tr_variant_serde::benc();
     auto ometainfo = serde.parse_file(torrent_file);
     if (!ometainfo)
     {
-        tr_error_propagate(error, &serde.error_);
+        if (error != nullptr)
+        {
+            *error = std::move(serde.error_);
+            serde.error_ = {};
+        }
+
         return false;
     }
     auto& metainfo = *ometainfo;

@@ -911,7 +911,7 @@ void Session::remove_torrent(tr_torrent_id_t id, bool delete_files)
         tr_torrentRemove(
             &torrent->get_underlying(),
             delete_files,
-            [](char const* filename, void* /*user_data*/, tr_error** error)
+            [](char const* filename, void* /*user_data*/, tr_error* error)
             { return gtr_file_trash_or_remove(filename, error); },
             nullptr);
     }
@@ -1190,7 +1190,7 @@ bool core_read_rpc_response_idle(tr_variant& response)
 void core_read_rpc_response(tr_session* /*session*/, tr_variant* response, gpointer /*user_data*/)
 {
     auto owned_response = std::make_shared<tr_variant>();
-    tr_variantInitBool(owned_response.get(), false);
+    *owned_response.get() = false;
     std::swap(*owned_response, *response);
 
     Glib::signal_idle().connect([owned_response]() mutable { return core_read_rpc_response_idle(*owned_response); });

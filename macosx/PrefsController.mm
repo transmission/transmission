@@ -197,6 +197,7 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     self.fHasLoaded = YES;
 
     self.window.restorationClass = [self class];

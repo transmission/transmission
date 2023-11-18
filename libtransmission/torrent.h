@@ -54,7 +54,7 @@ void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor);
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error);
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error* error);
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
@@ -76,8 +76,51 @@ void tr_torrentSave(tr_torrent* tor);
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
 {
+    using Speed = libtransmission::Values::Speed;
+
+    class CumulativeCount
+    {
+    public:
+        [[nodiscard]] constexpr auto start_new_session() noexcept
+        {
+            prev_ += cur_;
+            cur_ = {};
+        }
+
+        [[nodiscard]] constexpr auto during_this_session() const noexcept
+        {
+            return cur_;
+        }
+
+        [[nodiscard]] constexpr auto ever() const noexcept
+        {
+            return cur_ + prev_;
+        }
+
+        constexpr auto& operator+=(uint64_t count) noexcept
+        {
+            cur_ += count;
+            return *this;
+        }
+
+        constexpr void reduce(uint64_t count) // subtract w/underflow guard
+        {
+            cur_ = cur_ >= count ? cur_ - count : 0U;
+        }
+
+        constexpr void set_prev(uint64_t count) noexcept
+        {
+            prev_ = count;
+        }
+
+    private:
+        uint64_t prev_ = {};
+        uint64_t cur_ = {};
+    };
+
 public:
     using labels_t = std::vector<tr_interned_string>;
+
     using VerifyDoneCallback = std::function<void(tr_torrent*)>;
 
     class VerifyMediator : public tr_verify_worker::Mediator
@@ -102,6 +145,8 @@ public:
         tr_torrent* const tor_;
         std::optional<time_t> time_started_;
     };
+
+    // ---
 
     explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ std::move(tm) }
@@ -146,9 +191,9 @@ public:
         return bandwidth_;
     }
 
-    constexpr void set_speed_limit_bps(tr_direction dir, tr_bytes_per_second_t bytes_per_second)
+    constexpr void set_speed_limit(tr_direction dir, Speed limit)
     {
-        if (bandwidth().set_desired_speed_bytes_per_second(dir, bytes_per_second))
+        if (bandwidth().set_desired_speed(dir, limit))
         {
             set_dirty();
         }
@@ -162,9 +207,9 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto speed_limit_bps(tr_direction dir) const
+    [[nodiscard]] constexpr auto speed_limit(tr_direction dir) const
     {
-        return bandwidth().get_desired_speed_bytes_per_second(dir);
+        return bandwidth().get_desired_speed(dir);
     }
 
     [[nodiscard]] constexpr auto uses_session_limits() const noexcept
@@ -321,9 +366,9 @@ public:
         return fpm_.piece_span(file);
     }
 
-    [[nodiscard]] auto file_offset(tr_block_info::Location loc) const
+    [[nodiscard]] auto file_offset(tr_block_info::Location loc, bool include_empty_files) const
     {
-        return fpm_.file_offset(loc.byte);
+        return fpm_.file_offset(loc.byte, include_empty_files);
     }
 
     [[nodiscard]] auto byte_span(tr_file_index_t file) const
@@ -552,14 +597,24 @@ public:
 
     [[nodiscard]] tr_stat stats() const;
 
-    [[nodiscard]] constexpr auto is_queued() const noexcept
-    {
-        return this->is_queued_;
-    }
-
     [[nodiscard]] constexpr auto queue_direction() const noexcept
     {
-        return this->is_done() ? TR_UP : TR_DOWN;
+        return is_done() ? TR_UP : TR_DOWN;
+    }
+
+    [[nodiscard]] constexpr auto is_queued(tr_direction const dir) const noexcept
+    {
+        return is_queued_ && dir == queue_direction();
+    }
+
+    void set_is_queued(bool queued = true) noexcept
+    {
+        if (is_queued_ != queued)
+        {
+            is_queued_ = queued;
+            mark_changed();
+            set_dirty();
+        }
     }
 
     [[nodiscard]] constexpr auto allows_pex() const noexcept
@@ -612,8 +667,6 @@ public:
 
     [[nodiscard]] constexpr auto activity() const noexcept
     {
-        bool const is_seed = this->is_done();
-
         if (verify_state_ == VerifyState::Active)
         {
             return TR_STATUS_CHECK;
@@ -624,22 +677,19 @@ public:
             return TR_STATUS_CHECK_WAIT;
         }
 
-        if (this->is_running())
+        if (is_running())
         {
-            return is_seed ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
+            return is_done() ? TR_STATUS_SEED : TR_STATUS_DOWNLOAD;
         }
 
-        if (this->is_queued())
+        if (is_queued(TR_UP) && session->queueEnabled(TR_UP))
         {
-            if (is_seed && this->session->queueEnabled(TR_UP))
-            {
-                return TR_STATUS_SEED_WAIT;
-            }
+            return TR_STATUS_SEED_WAIT;
+        }
 
-            if (!is_seed && this->session->queueEnabled(TR_DOWN))
-            {
-                return TR_STATUS_DOWNLOAD_WAIT;
-            }
+        if (is_queued(TR_DOWN) && session->queueEnabled(TR_DOWN))
+        {
+            return TR_STATUS_DOWNLOAD_WAIT;
         }
 
         return TR_STATUS_STOPPED;
@@ -674,6 +724,11 @@ public:
     [[nodiscard]] constexpr auto is_stopping() const noexcept
     {
         return is_stopping_;
+    }
+
+    constexpr void stop_soon() noexcept
+    {
+        is_stopping_ = true;
     }
 
     [[nodiscard]] constexpr auto is_dirty() const noexcept
@@ -741,6 +796,22 @@ public:
     [[nodiscard]] constexpr auto idle_limit_minutes() const noexcept
     {
         return idle_limit_minutes_;
+    }
+
+    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
+    {
+        auto const activity = this->activity();
+
+        if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
+        {
+            if (auto const latest = std::max(startDate, activityDate); latest != 0)
+            {
+                TR_ASSERT(now >= latest);
+                return now - latest;
+            }
+        }
+
+        return {};
     }
 
     [[nodiscard]] constexpr std::optional<size_t> idle_seconds_left(time_t now) const noexcept
@@ -898,6 +969,11 @@ public:
 
     void init(tr_ctor const* ctor);
 
+    [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
+    {
+        return obfuscated_hash_ == test;
+    }
+
     tr_torrent_metainfo metainfo_;
 
     tr_bandwidth bandwidth_;
@@ -935,7 +1011,9 @@ public:
     // Will equal either download_dir or incomplete_dir
     tr_interned_string current_dir_;
 
-    tr_sha1_digest_t obfuscated_hash = {};
+    CumulativeCount bytes_corrupt_;
+    CumulativeCount bytes_downloaded_;
+    CumulativeCount bytes_uploaded_;
 
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
@@ -959,13 +1037,6 @@ public:
     time_t seconds_downloading_before_current_start_ = 0;
     time_t seconds_seeding_before_current_start_ = 0;
 
-    uint64_t downloadedCur = 0;
-    uint64_t downloadedPrev = 0;
-    uint64_t uploadedCur = 0;
-    uint64_t uploadedPrev = 0;
-    uint64_t corruptCur = 0;
-    uint64_t corruptPrev = 0;
-
     size_t queuePosition = 0;
 
     tr_completeness completeness = TR_LEECH;
@@ -974,11 +1045,7 @@ public:
 
     bool finished_seeding_by_idle_ = false;
 
-    bool is_deleting_ = false;
-    bool is_dirty_ = false;
-    bool is_queued_ = false;
     bool is_running_ = false;
-    bool is_stopping_ = false;
 
     // start the torrent after all the startup scaffolding is done,
     // e.g. fetching metadata from peers and/or verifying the torrent
@@ -989,7 +1056,12 @@ private:
     friend tr_stat const* tr_torrentStat(tr_torrent* tor);
     friend tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
     friend uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor);
+    friend void tr_torrentCheckSeedLimit(tr_torrent* tor);
+    friend void tr_torrentFreeInSessionThread(tr_torrent* tor);
     friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
+    friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
+    friend void tr_torrentStop(tr_torrent* tor);
+    friend void tr_torrentVerify(tr_torrent* tor, bool force);
 
     enum class VerifyState : uint8_t
     {
@@ -1041,13 +1113,13 @@ private:
     class SimpleSmoothedSpeed
     {
     public:
-        constexpr auto update(uint64_t time_msec, tr_bytes_per_second_t speed_byps)
+        constexpr auto update(uint64_t time_msec, Speed speed)
         {
             // If the old speed is too old, just replace it
             if (timestamp_msec_ + MaxAgeMSec <= time_msec)
             {
                 timestamp_msec_ = time_msec;
-                speed_byps_ = speed_byps;
+                speed_ = speed;
             }
 
             // To prevent the smoothing from being overwhelmed by frequent calls
@@ -1055,10 +1127,10 @@ private:
             else if (timestamp_msec_ + MinUpdateMSec <= time_msec)
             {
                 timestamp_msec_ = time_msec;
-                speed_byps_ = (speed_byps_ * 4U + speed_byps) / 5U;
+                speed_ = (speed_ * 4U + speed) / 5U;
             }
 
-            return speed_byps_;
+            return speed_;
         }
 
     private:
@@ -1066,7 +1138,7 @@ private:
         static auto constexpr MinUpdateMSec = 800U;
 
         uint64_t timestamp_msec_ = {};
-        tr_bytes_per_second_t speed_byps_ = {};
+        Speed speed_ = {};
     };
 
     [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
@@ -1093,32 +1165,16 @@ private:
         return {};
     }
 
-    [[nodiscard]] constexpr std::optional<size_t> idle_seconds(time_t now) const noexcept
-    {
-        auto const activity = this->activity();
-
-        if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
-        {
-            if (auto const latest = std::max(startDate, activityDate); latest != 0)
-            {
-                TR_ASSERT(now >= latest);
-                return now - latest;
-            }
-        }
-
-        return {};
-    }
-
     [[nodiscard]] constexpr bool is_piece_transfer_allowed(tr_direction direction) const noexcept
     {
-        if (uses_speed_limit(direction) && speed_limit_bps(direction) <= 0)
+        if (uses_speed_limit(direction) && speed_limit(direction).is_zero())
         {
             return false;
         }
 
         if (uses_session_limits())
         {
-            if (auto const limit = session->activeSpeedLimitBps(direction); limit && *limit == 0U)
+            if (auto const limit = session->active_speed_limit(direction); limit && limit->is_zero())
             {
                 return false;
             }
@@ -1163,6 +1219,8 @@ private:
 
     void on_metainfo_updated();
 
+    void stop_now();
+
     tr_stat stats_ = {};
 
     Error error_;
@@ -1172,6 +1230,8 @@ private:
     labels_t labels_;
 
     tr_interned_string bandwidth_group_;
+
+    tr_sha1_digest_t obfuscated_hash_ = {};
 
     mutable SimpleSmoothedSpeed eta_speed_;
 
@@ -1204,6 +1264,11 @@ private:
 
     uint16_t idle_limit_minutes_ = 0;
 
+    bool is_deleting_ = false;
+    bool is_dirty_ = false;
+    bool is_queued_ = false;
+    bool is_stopping_ = false;
+
     bool needs_completeness_check_ = true;
 
     bool sequential_download_ = false;
@@ -1216,15 +1281,13 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
     return tor != nullptr && tor->session != nullptr;
 }
 
-/**
- * Tell the `tr_torrent` that it's gotten a block
- */
+// Tell the `tr_torrent` that it's gotten a block
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
 
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error = nullptr);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error* error = nullptr);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error* error = nullptr);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_torrent::labels_t&& labels);
 void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority);
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor);

@@ -159,7 +159,7 @@ bool tr_torrent_files::move(
     std::string_view old_parent_in,
     std::string_view parent_in,
     std::string_view parent_name,
-    tr_error** error) const
+    tr_error* error) const
 {
     auto const old_parent = tr_pathbuf{ old_parent_in };
     auto const parent = tr_pathbuf{ parent_in };
