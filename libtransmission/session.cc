@@ -701,7 +701,7 @@ void tr_session::on_save_timer()
 {
     for (auto* const tor : torrents())
     {
-        tr_torrentSave(tor);
+        tor->save_resume_file();
     }
 
     stats().save();

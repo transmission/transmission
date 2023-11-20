@@ -11,8 +11,9 @@
 
 #include <cstdint> // uint64_t
 
-struct tr_ctor;
-struct tr_torrent;
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/torrent.h>
 
 namespace tr_resume
 {
@@ -46,8 +47,8 @@ auto inline constexpr Group = fields_t{ 1 << 23 };
 
 auto inline constexpr All = ~fields_t{ 0 };
 
-fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor);
+fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields_to_load, tr_ctor const* ctor);
 
-void save(tr_torrent* tor);
+void save(tr_torrent* tor, tr_torrent::ResumeHelper const& helper);
 
 } // namespace tr_resume
