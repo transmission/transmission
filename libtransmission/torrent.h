@@ -952,7 +952,7 @@ public:
     /* Used when the torrent has been created with a magnet link
      * and we're in the process of downloading the metainfo from
      * other peers */
-    std::unique_ptr<tr_incomplete_metadata> incomplete_metadata;
+    struct tr_incomplete_metadata* incomplete_metadata = nullptr;
 
     tr_session* session = nullptr;
 

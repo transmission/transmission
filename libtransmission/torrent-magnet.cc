@@ -78,17 +78,18 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    auto m = std::make_unique<tr_incomplete_metadata>();
+    auto* const m = new tr_incomplete_metadata{};
     m->piece_count = n;
     m->metadata.resize(size);
     m->pieces_needed = create_all_needed(n);
 
     if (std::empty(m->metadata) || std::empty(m->pieces_needed))
     {
+        delete m;
         return false;
     }
 
-    tor->incomplete_metadata = std::move(m);
+    tor->incomplete_metadata = m;
     return true;
 }
 
@@ -146,7 +147,11 @@ bool tr_torrentUseMetainfoFromFile(
     // tor should keep this metainfo
     tor->set_metainfo(*metainfo);
 
-    tor->incomplete_metadata.reset();
+    if (tor->incomplete_metadata != nullptr)
+    {
+        delete tor->incomplete_metadata;
+        tor->incomplete_metadata = nullptr;
+    }
 
     return true;
 }
@@ -157,10 +162,10 @@ namespace
 {
 namespace set_metadata_piece_helpers
 {
-[[nodiscard]] constexpr size_t get_piece_length(tr_incomplete_metadata const& m, int piece)
+[[nodiscard]] constexpr size_t get_piece_length(struct tr_incomplete_metadata const* m, int piece)
 {
-    return piece + 1 == m.piece_count ? // last piece
-        std::size(m.metadata) - (piece * MetadataPieceSize) :
+    return piece + 1 == m->piece_count ? // last piece
+        std::size(m->metadata) - (piece * MetadataPieceSize) :
         MetadataPieceSize;
 }
 
@@ -261,14 +266,15 @@ bool use_new_metainfo(tr_torrent* tor, tr_error* error)
 void on_have_all_metainfo(tr_torrent* tor)
 {
     auto error = tr_error{};
-    auto& m = tor->incomplete_metadata;
-    TR_ASSERT(m);
     if (use_new_metainfo(tor, &error))
     {
-        m.reset();
+        delete tor->incomplete_metadata;
+        tor->incomplete_metadata = nullptr;
     }
     else /* drat. */
     {
+        auto& m = tor->incomplete_metadata;
+        TR_ASSERT(m);
         auto const n = m->piece_count;
 
         m->pieces_needed = create_all_needed(n);
@@ -294,7 +300,7 @@ void tr_torrentMagnetDoIdleWork(tr_torrent* const tor)
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (auto const& m = tor->incomplete_metadata; m && std::empty(m->pieces_needed))
+    if (auto* const m = tor->incomplete_metadata; m != nullptr && std::empty(m->pieces_needed))
     {
         tr_logAddDebugTor(tor, fmt::format("we now have all the metainfo!"));
         on_have_all_metainfo(tor);
@@ -311,8 +317,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
     tr_logAddDebugTor(tor, fmt::format("got metadata piece {} of {} bytes", piece, len));
 
     // are we set up to download metadata?
-    auto& m = tor->incomplete_metadata;
-    if (!m)
+    tr_incomplete_metadata* const m = tor->incomplete_metadata;
+    if (m == nullptr)
     {
         return;
     }
@@ -324,7 +330,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, si
     }
 
     // sanity test: is `len` the right size?
-    if (get_piece_length(*m, piece) != len)
+    if (get_piece_length(m, piece) != len)
     {
         return;
     }
@@ -353,8 +359,8 @@ std::optional<int> tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto& m = tor->incomplete_metadata;
-    if (!m)
+    struct tr_incomplete_metadata* m = tor->incomplete_metadata;
+    if (m == nullptr)
     {
         return {};
     }
@@ -380,15 +386,8 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
         return 1.0;
     }
 
-    if (auto const& m = tor->incomplete_metadata; m)
-    {
-        if (auto const n = m->piece_count; n != 0)
-        {
-            return (n - std::size(m->pieces_needed)) / static_cast<double>(n);
-        }
-    }
-
-    return 0.0;
+    auto const* const m = tor->incomplete_metadata;
+    return m == nullptr || m->piece_count == 0 ? 0.0 : (m->piece_count - std::size(m->pieces_needed)) / (double)m->piece_count;
 }
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
