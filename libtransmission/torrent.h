@@ -76,7 +76,8 @@ void tr_torrentSave(tr_torrent* tor);
 namespace libtransmission::test
 {
 
-class RenameTest;
+class RenameTest_multifileTorrent_Test;
+class RenameTest_singleFilenameTorrent_Test;
 
 } // namespace libtransmission::test
 
@@ -88,11 +89,6 @@ struct tr_torrent final : public tr_completion::torrent_view
     class ResumeHelper
     {
     public:
-        ResumeHelper(tr_torrent& tor)
-            : tor_{ tor }
-        {
-        }
-
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
 
@@ -100,6 +96,15 @@ struct tr_torrent final : public tr_completion::torrent_view
         [[nodiscard]] time_t seconds_seeding(time_t now) const noexcept;
 
     private:
+        friend class libtransmission::test::RenameTest_multifileTorrent_Test;
+        friend class libtransmission::test::RenameTest_singleFilenameTorrent_Test;
+        friend struct tr_torrent;
+
+        ResumeHelper(tr_torrent& tor)
+            : tor_{ tor }
+        {
+        }
+
         tr_torrent& tor_;
     };
 
