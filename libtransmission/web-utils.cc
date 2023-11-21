@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <cstdint>
 #include <cstdlib> // for strtoul()
 #include <limits>
 #include <optional>
@@ -407,7 +408,7 @@ std::string tr_urlTrackerLogName(std::string_view url)
 {
     if (auto const parsed = tr_urlParse(url); parsed)
     {
-        return fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed->scheme, parsed->host, parsed->port);
+        return fmt::format("{:s}://{:s}:{:d}", parsed->scheme, parsed->host, parsed->port);
     }
 
     // we have an invalid URL, we log the full string

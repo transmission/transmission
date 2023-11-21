@@ -33,9 +33,9 @@ char const* const PriorityKey = "priority";
 
 FileTreeView::FileTreeView(QWidget* parent, bool is_editable)
     : QTreeView{ parent }
-    , model_{ new FileTreeModel(this, is_editable) }
-    , proxy_{ new QSortFilterProxyModel(this) }
-    , delegate_{ new FileTreeDelegate(this) }
+    , model_{ new FileTreeModel{ this, is_editable } }
+    , proxy_{ new QSortFilterProxyModel{ this } }
+    , delegate_{ new FileTreeDelegate{ this } }
 {
     proxy_->setSourceModel(model_);
     proxy_->setSortRole(FileTreeModel::SortRole);
@@ -59,11 +59,11 @@ void FileTreeView::onClicked(QModelIndex const& proxy_index)
 
     if (model_index.column() == FileTreeModel::COL_WANTED)
     {
-        model_->twiddleWanted(QModelIndexList() << model_index);
+        model_->twiddleWanted(QModelIndexList{} << model_index);
     }
     else if (model_index.column() == FileTreeModel::COL_PRIORITY)
     {
-        model_->twiddlePriority(QModelIndexList() << model_index);
+        model_->twiddlePriority(QModelIndexList{} << model_index);
     }
 }
 

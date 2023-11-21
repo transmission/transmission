@@ -4,7 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cerrno>
+#include <cerrno> // EINVAL
+#include <cstddef>
 #include <cstdint> // uint8_t
 #include <iterator> // std::distance(), std::next(), std::prev()
 #include <memory>
@@ -14,7 +15,6 @@
 #include <vector>
 
 #include <fmt/core.h>
-#include <small/vector.hpp>
 
 #include "libtransmission/transmission.h"
 
@@ -24,7 +24,6 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
 #include "libtransmission/tr-assert.h"
-#include "libtransmission/utils.h" // tr_formatter
 
 Cache::Key Cache::make_key(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {

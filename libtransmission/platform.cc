@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <list>
 #include <string>
 #include <string_view>
@@ -119,7 +120,7 @@ std::string getXdgEntryFromUserDirs(std::string_view key)
     }
 
     // search for key="val" and extract val
-    auto const search = fmt::format(FMT_STRING("{:s}=\""), key);
+    auto const search = fmt::format("{:s}=\"", key);
     auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
     if (begin == std::end(content))
     {

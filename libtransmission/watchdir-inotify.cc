@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <cerrno>
+#include <cstddef>
 #include <cstdint> // uint32_t
 #include <memory>
 #include <string>
@@ -181,7 +182,7 @@ private:
 
             // NB: `name` may have extra trailing zeroes from inotify;
             // pass the c_str() so that processFile gets the right strlen
-            processFile(name.c_str());
+            processFile(name);
         }
     }
 

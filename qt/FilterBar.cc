@@ -219,11 +219,11 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
 ***/
 
 FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent)
-    : QWidget(parent)
-    , prefs_(prefs)
-    , torrents_(torrents)
-    , filter_(filter)
-    , is_bootstrapping_(true)
+    : QWidget{ parent }
+    , prefs_{ prefs }
+    , torrents_{ torrents }
+    , filter_{ filter }
+    , is_bootstrapping_{ true }
 {
     auto* h = new QHBoxLayout{ this };
     h->setContentsMargins(3, 3, 3, 3);

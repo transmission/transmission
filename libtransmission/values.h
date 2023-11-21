@@ -47,7 +47,7 @@ struct Config
     struct Units
     {
         template<typename... Names>
-        Units(Base base, Names... names)
+        Units(Base base, Names... names) noexcept
         {
             set_base(base);
 
@@ -76,7 +76,7 @@ struct Config
         }
 
     private:
-        constexpr void set_base(Base base)
+        constexpr void set_base(Base base) noexcept
         {
             base_ = base;
 

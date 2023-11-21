@@ -13,22 +13,17 @@
 
 #include <libtransmission/torrent-metainfo.h>
 
-#include "Prefs.h"
 #include "TorrentModel.h"
 #include "WatchDir.h"
 
-/***
-****
-***/
+// ---
 
 WatchDir::WatchDir(TorrentModel const& model)
     : model_{ model }
 {
 }
 
-/***
-****
-***/
+// ---
 
 WatchDir::AddResult WatchDir::metainfoTest(QString const& filename) const
 {
@@ -102,7 +97,7 @@ void WatchDir::watcherActivated(QString const& path)
         case AddResult::Error:
             {
                 // give the torrent a few seconds to finish downloading
-                auto* t = new QTimer(this);
+                auto* t = new QTimer{ this };
                 t->setObjectName(dir.absoluteFilePath(name));
                 t->setSingleShot(true);
                 connect(t, &QTimer::timeout, this, &WatchDir::onTimeout);

@@ -15,6 +15,7 @@
 #include <memory> // std::unique_ptr
 #include <optional>
 #include <queue>
+#include <ratio>
 #include <string>
 #include <string_view>
 #include <tuple>

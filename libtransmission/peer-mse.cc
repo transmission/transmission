@@ -4,6 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
+#include <cstddef> // std::byte
+#include <cstdint>
 #include <limits> // std::numeric_limits
 #include <string_view>
 

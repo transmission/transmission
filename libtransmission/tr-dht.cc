@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cstddef>
 #include <cstdint> // uint16_t
 #include <cstring> // memcpy()
 #include <ctime>
@@ -17,6 +18,7 @@
 #include <string_view>
 #include <tuple> // std::tie()
 #include <utility>
+#include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -555,7 +557,7 @@ private:
         hints.ai_flags = 0;
 
         auto port_str = std::array<char, 16>{};
-        *fmt::format_to(std::data(port_str), FMT_STRING("{:d}"), port_in.host()) = '\0';
+        *fmt::format_to(std::data(port_str), "{:d}", port_in.host()) = '\0';
 
         addrinfo* info = nullptr;
         if (int const rc = getaddrinfo(name, std::data(port_str), &hints, &info); rc != 0)

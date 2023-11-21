@@ -5,11 +5,16 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
 #include <set>
 
 #include <libtransmission/transmission.h> // priorities
+
+#include <QAbstractItemModel>
+#include <QMutableListIterator>
 
 #include "FileTreeItem.h"
 #include "FileTreeModel.h"
@@ -40,7 +45,7 @@ class ForwardPathIterator : public PathIteratorBase
 {
 public:
     explicit ForwardPathIterator(QString const& path)
-        : PathIteratorBase(path, path.size() - 1)
+        : PathIteratorBase{ path, path.size() - 1 }
     {
     }
 
@@ -371,8 +376,8 @@ void FileTreeModel::addFile(
             if (child == nullptr)
             {
                 added = true;
-                QModelIndex const parent_index(indexOf(item, 0));
-                int const n(item->childCount());
+                auto const parent_index = indexOf(item, 0);
+                auto const n = item->childCount();
 
                 beginInsertRows(parent_index, n, n);
 

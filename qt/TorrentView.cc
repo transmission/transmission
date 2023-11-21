@@ -61,8 +61,8 @@ private:
 };
 
 TorrentView::TorrentView(QWidget* parent)
-    : QListView(parent)
-    , header_widget_(new HeaderWidget(this))
+    : QListView{ parent }
+    , header_widget_{ new HeaderWidget{ this } }
 {
 }
 

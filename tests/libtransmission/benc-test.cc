@@ -81,13 +81,13 @@ TEST_F(BencTest, ContextTokenIsCorrect)
 
         bool Int64(int64_t value, Context const& context) override
         {
-            EXPECT_EQ(fmt::format(FMT_STRING("i{:d}e"), value), context.raw());
+            EXPECT_EQ(fmt::format("i{:d}e", value), context.raw());
             return true;
         }
 
         bool String(std::string_view value, Context const& context) override
         {
-            EXPECT_EQ(fmt::format(FMT_STRING("{:d}:{:s}"), std::size(value), value), context.raw());
+            EXPECT_EQ(fmt::format("{:d}:{:s}", std::size(value), value), context.raw());
             return true;
         }
     };

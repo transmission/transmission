@@ -36,6 +36,7 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/values.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web-utils.h"
@@ -2240,6 +2241,9 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_session_id:
         tr_variantDictAddStr(d, key, s->sessionId());
+        break;
+
+    default:
         break;
     }
 }

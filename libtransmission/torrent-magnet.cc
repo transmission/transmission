@@ -5,12 +5,16 @@
 
 #include <algorithm>
 #include <climits> /* INT_MAX */
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <deque>
 #include <fstream>
+#include <ios>
 #include <memory>
+#include <optional>
 #include <string>
+#include <string_view>
 #include <utility> // std::move
 #include <vector>
 

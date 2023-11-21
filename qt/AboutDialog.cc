@@ -17,7 +17,7 @@
 #include "Utils.h"
 
 AboutDialog::AboutDialog(Session& session, QWidget* parent)
-    : BaseDialog(parent)
+    : BaseDialog{ parent }
 {
     ui_.setupUi(this);
 

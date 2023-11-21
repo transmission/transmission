@@ -8,8 +8,12 @@
 #include <array>
 #endif
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
-#include <cstdint> // uint64_t
+#include <cstddef>
+#include <cstdint> // for uint64_t
+#include <ctime>
+#include <functional> // for std::less()
 #include <list>
 #include <map>
 #include <memory>
