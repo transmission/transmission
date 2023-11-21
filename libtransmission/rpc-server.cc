@@ -119,7 +119,7 @@ class tr_rpc_address
 {
 public:
     tr_rpc_address()
-        : inet_addr_(tr_address::any(TR_AF_INET))
+        : inet_addr_{ tr_address::any(TR_AF_INET) }
     {
     }
 
@@ -527,7 +527,7 @@ void handle_request(struct evhttp_request* req, void* arg)
 
         if (std::empty(location) || location == "web"sv)
         {
-            auto const new_location = fmt::format(FMT_STRING("{:s}web/"), server->url());
+            auto const new_location = fmt::format("{:s}web/", server->url());
             evhttp_add_header(req->output_headers, "Location", new_location.c_str());
             send_simple_response(req, HTTP_MOVEPERM, nullptr);
         }
@@ -555,16 +555,16 @@ void handle_request(struct evhttp_request* req, void* arg)
         {
             auto const session_id = std::string{ server->session->sessionId() };
             auto const tmp = fmt::format(
-                FMT_STRING("<p>Your request had an invalid session-id header.</p>"
-                           "<p>To fix this, follow these steps:"
-                           "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
-                           "<li> Add the updated header to your outgoing requests"
-                           "<li> When you get this 409 error message, resend your request with the updated header"
-                           "</ol></p>"
-                           "<p>This requirement has been added to help prevent "
-                           "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
-                           "attacks.</p>"
-                           "<p><code>{:s}: {:s}</code></p>"),
+                "<p>Your request had an invalid session-id header.</p>"
+                "<p>To fix this, follow these steps:"
+                "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
+                "<li> Add the updated header to your outgoing requests"
+                "<li> When you get this 409 error message, resend your request with the updated header"
+                "</ol></p>"
+                "<p>This requirement has been added to help prevent "
+                "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
+                "attacks.</p>"
+                "<p><code>{:s}: {:s}</code></p>",
                 TR_RPC_SESSION_ID_HEADER,
                 session_id);
             evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, session_id.c_str());
@@ -842,7 +842,7 @@ void tr_rpc_server::set_anti_brute_force_enabled(bool enabled) noexcept
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant const& settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
     , web_client_dir_{ tr_getWebClientDir(session_in) }
-    , bind_address_(std::make_unique<class tr_rpc_address>())
+    , bind_address_{ std::make_unique<class tr_rpc_address>() }
     , session{ session_in }
 {
     load(settings);

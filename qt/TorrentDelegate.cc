@@ -399,7 +399,7 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, Torrent cons
 {
     auto const m = margin(*QApplication::style());
     auto const layout = ItemLayout{ tor.name(),  progressString(tor), statusString(tor), QIcon{},
-                                    option.font, option.direction,    QPoint(0, 0),      option.rect.width() - m.width() * 2 };
+                                    option.font, option.direction,    QPoint{ 0, 0 },    option.rect.width() - m.width() * 2 };
     return layout.size() + m * 2;
 }
 
@@ -541,7 +541,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     // render
     if (tor.hasError() && !is_item_selected)
     {
-        painter->setPen(QColor("red"));
+        painter->setPen(QColor{ "red" });
     }
     else
     {

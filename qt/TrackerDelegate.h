@@ -21,7 +21,7 @@ class TrackerDelegate : public QItemDelegate
 
 public:
     explicit TrackerDelegate(QObject* parent = nullptr)
-        : QItemDelegate(parent)
+        : QItemDelegate{ parent }
     {
     }
 

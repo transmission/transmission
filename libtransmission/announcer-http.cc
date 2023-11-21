@@ -54,7 +54,7 @@ void verboseLog(std::string_view description, tr_direction direction, std::strin
     }
 
     auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
-    out << description << std::endl << "[raw]"sv << direction_sv;
+    out << description << '\n' << "[raw]"sv << direction_sv;
     for (unsigned char const ch : message)
     {
         if (isprint(ch) != 0)
@@ -67,7 +67,7 @@ void verboseLog(std::string_view description, tr_direction direction, std::strin
                 << std::setfill(' ');
         }
     }
-    out << std::endl << "[b64]"sv << direction_sv << tr_base64_encode(message) << std::endl;
+    out << '\n' << "[b64]"sv << direction_sv << tr_base64_encode(message) << '\n';
 }
 
 auto constexpr MaxBencDepth = 8;
@@ -499,7 +499,7 @@ void onScrapeDone(tr_web::FetchResponse const& web_response)
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response.errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s})"), status, response_str);
+        response.errmsg = fmt::format("Tracker HTTP response {:d} ({:s})", status, response_str);
     }
     else if (!std::empty(body))
     {

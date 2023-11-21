@@ -44,7 +44,7 @@ void set_system_error(tr_error* error, int code, std::string_view what)
 {
     if (error != nullptr)
     {
-        error->set(code, fmt::format(FMT_STRING("{:s} failed: {:s} ({:d})"), what, tr_strerror(code), code));
+        error->set(code, fmt::format("{:s} failed: {:s} ({:d})", what, tr_strerror(code), code));
     }
 }
 

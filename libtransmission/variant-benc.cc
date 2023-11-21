@@ -71,7 +71,7 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
     }
 
     // parse the string and make sure the next char is `Suffix`
-    auto const value = tr_num_parse<int64_t>(walk, &walk);
+    auto value = tr_num_parse<int64_t>(walk, &walk);
     if (!value || !tr_strv_starts_with(walk, Suffix))
     {
         return {};
@@ -79,7 +79,7 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
 
     walk.remove_prefix(std::size(Suffix));
     *benc = walk;
-    return *value;
+    return value;
 }
 
 /**

@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <condition_variable>
+#include <chrono>
 #include <csignal>
 #include <cstddef> // size_t
 #include <cstdint>
@@ -13,6 +14,7 @@
 #include <iterator> // for std::back_inserter
 #include <limits> // std::numeric_limits
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>

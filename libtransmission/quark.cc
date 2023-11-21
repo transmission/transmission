@@ -5,6 +5,9 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
+#include <iterator> // for std::distance()
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>

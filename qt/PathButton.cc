@@ -112,7 +112,7 @@ void PathButton::onClicked() const
         dialog->setNameFilter(name_filter_);
     }
 
-    if (auto const path_info = QFileInfo(path_); !path_.isEmpty() && path_info.exists())
+    if (auto const path_info = QFileInfo{ path_ }; !path_.isEmpty() && path_info.exists())
     {
         if (path_info.isDir())
         {
@@ -150,7 +150,7 @@ void PathButton::updateAppearance()
 
     if (!path_.isEmpty() && path_info.exists())
     {
-        icon = icon_provider.icon(QFileInfo(path_));
+        icon = icon_provider.icon(QFileInfo{ path_ });
     }
 
     if (icon.isNull())

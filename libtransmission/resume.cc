@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::min
 #include <array>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <string_view>
@@ -114,7 +115,7 @@ auto loadLabels(tr_variant* dict, tr_torrent* tor)
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            labels.emplace_back(tr_interned_string{ sv });
+            labels.emplace_back(sv);
         }
     }
 

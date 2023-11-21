@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::min
 #include <cerrno>
+#include <cstddef> // std::byte
 
 #include <fmt/core.h>
 
@@ -12,9 +13,10 @@
 
 #include "libtransmission/error.h"
 #include "libtransmission/log.h"
-#include "libtransmission/peer-socket.h"
 #include "libtransmission/net.h"
+#include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
 
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->display_name())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->display_name())

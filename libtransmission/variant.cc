@@ -4,9 +4,15 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::sort
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
+#include <variant>
 
 #ifdef _WIN32
 #include <share.h>

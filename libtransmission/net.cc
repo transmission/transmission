@@ -6,9 +6,12 @@
 #include <array>
 #include <cerrno>
 #include <climits>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iterator> // std::back_inserter
+#include <optional>
+#include <string>
 #include <string_view>
 #include <utility> // std::pair
 
@@ -356,7 +359,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const& addr, tr_port port, bool 
 
     if (!suppress_msgs)
     {
-        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr.display_name()));
+        tr_logAddDebug(fmt::format("Bound socket {:d} to port {:d} on {:s}", fd, port.host(), addr.display_name()));
     }
 
 #ifdef TCP_FASTOPEN

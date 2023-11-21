@@ -211,7 +211,7 @@ bool isValidUtf8(QByteArray const& byteArray)
 ***/
 
 Prefs::Prefs(QString config_dir)
-    : config_dir_(std::move(config_dir))
+    : config_dir_{ std::move(config_dir) }
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 

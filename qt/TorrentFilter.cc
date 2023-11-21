@@ -16,7 +16,7 @@
 #include "Utils.h"
 
 TorrentFilter::TorrentFilter(Prefs const& prefs)
-    : prefs_(prefs)
+    : prefs_{ prefs }
 {
     connect(&prefs_, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
     connect(&refilter_timer_, &QTimer::timeout, this, &TorrentFilter::refilter);

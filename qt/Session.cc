@@ -24,6 +24,7 @@
 
 #include <libtransmission/transmission.h>
 
+#include <libtransmission/quark.h>
 #include <libtransmission/session-id.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>

@@ -170,7 +170,7 @@ class PeerItem : public QTreeWidgetItem
 
 public:
     explicit PeerItem(Peer p)
-        : peer_(std::move(p))
+        : peer_{ std::move(p) }
     {
     }
 
@@ -499,7 +499,7 @@ void DetailsDialog::refreshUI()
     }
 
     ui_.stateValueLabel->setText(string);
-    QString const state_string = string;
+    auto const state_string = string;
 
     // myHaveLabel
     uint64_t size_when_done = 0;
@@ -882,7 +882,7 @@ void DetailsDialog::refreshUI()
     {
         bool mixed_creator = false;
         bool mixed_date = false;
-        QString const creator = torrents[0]->creator();
+        auto const creator = torrents[0]->creator();
         auto const date = torrents[0]->dateCreated();
 
         for (Torrent const* const t : torrents)
@@ -1103,11 +1103,11 @@ void DetailsDialog::refreshUI()
 
     for (Torrent const* const t : torrents)
     {
-        QString const id_str(QString::number(t->id()));
+        auto const id_str = QString::number(t->id());
 
         for (Peer const& peer : t->peers())
         {
-            QString const key = id_str + QLatin1Char(':') + peer.address;
+            auto const key = id_str + QLatin1Char(':') + peer.address;
 
             PeerItem* item = nullptr;
             if (auto iter = peers_.find(key); iter != std::end(peers_))
@@ -1617,7 +1617,7 @@ void DetailsDialog::onOpenRequested(QString const& path) const
             continue;
         }
 
-        QString const local_file_path = tor->getPath() + QLatin1Char('/') + path;
+        auto const local_file_path = tor->getPath() + QLatin1Char('/') + path;
 
         if (!QFile::exists(local_file_path))
         {

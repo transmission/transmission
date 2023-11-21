@@ -26,6 +26,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
+#include <libtransmission/quark.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>

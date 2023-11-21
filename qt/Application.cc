@@ -650,9 +650,9 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
         args.append(title); // summary
         args.append(body); // body
         args.append(actions);
-        args.append(QVariantMap({
-            std::make_pair(QStringLiteral("category"), QVariant(QStringLiteral("transfer.complete"))),
-        })); // hints
+        args.append(QVariantMap{ {
+            std::make_pair(QStringLiteral("category"), QVariant{ QStringLiteral("transfer.complete") }),
+        } }); // hints
         args.append(static_cast<int32_t>(-1)); // use the default timeout period
         m.setArguments(args);
         QDBusReply<quint32> const reply_msg = bus.call(m);

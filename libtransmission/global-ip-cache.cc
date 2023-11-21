@@ -4,7 +4,11 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::all_of
+#include <array>
 #include <cstddef>
+#include <memory>
+#include <mutex>
+#include <optional>
 #include <string_view>
 #include <utility> // std::move
 
@@ -21,6 +25,7 @@
 #include "libtransmission/global-ip-cache.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/web.h"
 
 namespace
 {
