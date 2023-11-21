@@ -1215,7 +1215,7 @@ char const* torrentRenamePath(
 void onPortTested(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
-    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
     if (status != 200)
     {
@@ -1234,7 +1234,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     }
 }
 
-char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
+char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* idle_data)
 {
     auto const port = session->advertisedPeerPort();
     auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
