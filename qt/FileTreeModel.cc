@@ -25,7 +25,7 @@ namespace
 class PathIteratorBase
 {
 protected:
-    PathIteratorBase(QString const& path, int slash_index)
+    PathIteratorBase(QString const& path, int const slash_index)
         : path_{ path }
         , slash_index_{ slash_index }
     {
@@ -45,7 +45,7 @@ class ForwardPathIterator : public PathIteratorBase
 {
 public:
     explicit ForwardPathIterator(QString const& path)
-        : PathIteratorBase{ path, path.size() - 1 }
+        : PathIteratorBase(path, path.size() - 1)
     {
     }
 
