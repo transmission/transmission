@@ -182,7 +182,7 @@ private:
 
             // NB: `name` may have extra trailing zeroes from inotify;
             // pass the c_str() so that processFile gets the right strlen
-            processFile(name);
+            processFile(name.c_str());
         }
     }
 
