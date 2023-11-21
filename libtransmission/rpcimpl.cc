@@ -1251,7 +1251,7 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
         }
-        else if (arg != "any"sv)
+        else
         {
             return "invalid ip protocol string";
         }
