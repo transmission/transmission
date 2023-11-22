@@ -674,7 +674,7 @@ Response arguments:
 | Key | Value Type | Description
 | :-- | :-- | :--
 | `port-is-open` | boolean | true if port is open, false if port is closed
-| `ipProtocol` | string | copied from request argument `ipProtocol` if it was specified
+| `ipProtocol` | string | `ipv4` if the test was carried out on IPv4, `ipv6` if the test was carried out on IPv6, unset if an error occured
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.
