@@ -41,7 +41,6 @@
 #include "libtransmission/crypto-utils.h"
 #endif
 #include "libtransmission/log.h"
-#include "libtransmission/net.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/utils-ev.h"
 #include "libtransmission/utils.h"
@@ -749,7 +748,7 @@ public:
                     task->response.did_connect = task->response.status > 0 || req_bytes_sent > 0;
                     task->response.did_timeout = task->response.status == 0 &&
                         std::chrono::duration<double>(total_time) >= task->timeoutSecs();
-                    task->response.primary_ip = tr_address::from_string(primary_ip);
+                    task->response.primary_ip = primary_ip;
                     curl_multi_remove_handle(multi.get(), e);
                     remove_task(*task);
                 }

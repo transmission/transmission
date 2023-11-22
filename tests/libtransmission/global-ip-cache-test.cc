@@ -232,11 +232,8 @@ TEST_F(GlobalIPCacheTest, onResponseIPQuery)
     {
         void fetch(tr_web::FetchOptions&& options) override
         {
-            auto response = tr_web::FetchResponse{ http_code,
-                                                   std::string{ AddrStr[k_] },
-                                                   true,
-                                                   false,
-                                                   options.done_func_user_data };
+            auto response = tr_web::FetchResponse{ http_code, std::string{ AddrStr[k_] }, std::string{}, true,
+                                                   false,     options.done_func_user_data };
             options.done_func(response);
         }
 

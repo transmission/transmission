@@ -28,6 +28,7 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
+#include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
@@ -1228,7 +1229,8 @@ void onPortTested(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    if (!primary_ip || !primary_ip->is_valid())
+    auto const addr = tr_address::from_string(primary_ip);
+    if (!addr || !addr->is_valid())
     {
         tr_idle_function_done(data, "Unknown error, please file a bug report to us");
         return;
@@ -1238,7 +1240,7 @@ void onPortTested(tr_web::FetchResponse const& web_response)
     tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
     if (tr_variantDictFind(data->args_out, TR_KEY_ipProtocol) == nullptr) // `ipProtocol` was not specified in the request
     {
-        tr_variantDictAddStrView(data->args_out, TR_KEY_ipProtocol, primary_ip->is_ipv4() ? "ipv4"sv : "ipv6"sv);
+        tr_variantDictAddStrView(data->args_out, TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
     }
     tr_idle_function_done(data, SuccessResult);
 }

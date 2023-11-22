@@ -15,8 +15,6 @@
 #include <string_view>
 #include <utility>
 
-#include "libtransmission/net.h"
-
 struct evbuffer;
 
 class tr_web
@@ -28,7 +26,7 @@ public:
     {
         long status = 0; // http server response, e.g. 200
         std::string body;
-        std::optional<tr_address> primary_ip;
+        std::string primary_ip;
         bool did_connect = false;
         bool did_timeout = false;
         void* user_data = nullptr;
