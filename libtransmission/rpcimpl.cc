@@ -1253,7 +1253,7 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
     if (std::string_view arg; tr_variantDictFindStrView(args_in, TR_KEY_ipProtocol, &arg))
     {
-        tr_variantDictAddStrView(args_out, TR_KEY_ipProtocol, arg);
+        tr_variantDictAddStr(args_out, TR_KEY_ipProtocol, arg);
         if (arg == "ipv4"sv)
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
