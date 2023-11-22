@@ -161,8 +161,9 @@ bool set_local_error_if_files_disappeared(tr_torrent* tor, std::optional<bool> h
     if (files_disappeared)
     {
         tr_logAddTraceTor(tor, "[LAZY] uh oh, the files disappeared");
-        tor->error().set_local_error(_(
-            "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."));
+        tor->error().set_local_error(
+            _("No data found! Ensure your drives are connected or use \"Set Location\". "
+              "To re-download, use \"Verify Local Data\" and start the torrent afterwards."));
     }
 
     return files_disappeared;
@@ -1608,10 +1609,15 @@ void tr_torrentVerify(tr_torrent* tor)
                 tor->stop_now();
             }
 
-            if (!setLocalErrorIfFilesDisappeared(tor))
+            if (if_files_disappeared(tor))
             {
-                tor->session->verify_add(tor);
+                tor->error().set_local_error(
+                    _("Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\". "
+                      "To re-download, start the torrent."));
+                tor->start_when_stable = false;
             }
+
+            tor->session->verify_add(tor);
         });
 }
 
