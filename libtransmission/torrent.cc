@@ -148,10 +148,15 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
 
 namespace
 {
-bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
+bool if_files_disappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
 {
     auto const has = has_local_data ? *has_local_data : tor->has_any_local_data();
-    bool const files_disappeared = tor->has_total() > 0 && !has;
+    return tor->has_total() > 0 && !has;
+}
+
+bool set_local_error_if_files_disappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
+{
+    auto const files_disappeared = if_files_disappeared(tor, has_local_data);
 
     if (files_disappeared)
     {
@@ -735,7 +740,7 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
     }
 
     /* don't allow the torrent to be started if the files disappeared */
-    if (setLocalErrorIfFilesDisappeared(tor, opts.has_local_data))
+    if (set_local_error_if_files_disappeared(tor, opts.has_local_data))
     {
         return;
     }
@@ -1072,7 +1077,7 @@ void tr_torrent::init(tr_ctor const* const ctor)
     }
     else
     {
-        setLocalErrorIfFilesDisappeared(this, has_local_data);
+        set_local_error_if_files_disappeared(this, has_local_data);
     }
 }
 
@@ -2271,7 +2276,7 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
             recheck_completeness();
         }
     }
-    else if (error_.error_type() == TR_STAT_LOCAL_ERROR && !setLocalErrorIfFilesDisappeared(this))
+    else if (error_.error_type() == TR_STAT_LOCAL_ERROR && !set_local_error_if_files_disappeared(this))
     {
         error_.clear();
     }
