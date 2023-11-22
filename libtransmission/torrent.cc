@@ -1578,10 +1578,10 @@ void tr_torrentStartMagnet(tr_torrent* tor)
 
 // ---
 
-void tr_torrentVerify(tr_torrent* tor, bool force)
+void tr_torrentVerify(tr_torrent* tor)
 {
     tor->session->runInSessionThread(
-        [tor, force]()
+        [tor]()
         {
             TR_ASSERT(tor->session->am_in_session_thread());
             auto const lock = tor->unique_lock();
@@ -1603,7 +1603,7 @@ void tr_torrentVerify(tr_torrent* tor, bool force)
                 tor->stop_now();
             }
 
-            if (force || !setLocalErrorIfFilesDisappeared(tor))
+            if (!setLocalErrorIfFilesDisappeared(tor))
             {
                 tor->session->verify_add(tor);
             }

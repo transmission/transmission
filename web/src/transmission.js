@@ -4,7 +4,6 @@
 
 import { AboutDialog } from './about-dialog.js';
 import { ContextMenu } from './context-menu.js';
-import { ForceVerifyDialog } from './force-verify-dialog';
 import { Formatter } from './formatter.js';
 import { Inspector } from './inspector.js';
 import { MoveDialog } from './move-dialog.js';
@@ -175,10 +174,7 @@ export class Transmission extends EventTarget {
           this._removeSelectedTorrents(true);
           break;
         case 'verify-selected-torrents':
-          this._verifyTorrents(this.getSelectedTorrents(), false);
-          break;
-        case 'verify-selected-torrents-force':
-          this._verifyTorrents(this.getSelectedTorrents(), true);
+          this._verifyTorrents(this.getSelectedTorrents());
           break;
         default:
           console.warn(`unhandled action: ${event_.action}`);
@@ -857,24 +853,12 @@ TODO: fix this when notifications get fixed
       this,
     );
   }
-  _verifyTorrents(torrents, force) {
-    if (force) {
-      this.setCurrentPopup(
-        new ForceVerifyDialog({
-          callback: this.refreshTorrents,
-          controller: this,
-          remote: this.remote,
-          torrents,
-        }),
-      );
-    } else {
-      this.remote.verifyTorrents(
-        Transmission._getTorrentIds(torrents),
-        force,
-        this.refreshTorrents,
-        this,
-      );
-    }
+  _verifyTorrents(torrents) {
+    this.remote.verifyTorrents(
+      Transmission._getTorrentIds(torrents),
+      this.refreshTorrents,
+      this,
+    );
   }
 
   _reannounceTorrents(torrents) {

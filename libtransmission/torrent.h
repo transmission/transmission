@@ -1058,7 +1058,7 @@ private:
     friend void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block);
     friend void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func, void* user_data);
     friend void tr_torrentStop(tr_torrent* tor);
-    friend void tr_torrentVerify(tr_torrent* tor, bool force);
+    friend void tr_torrentVerify(tr_torrent* tor);
 
     enum class VerifyState : uint8_t
     {
