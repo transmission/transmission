@@ -1032,7 +1032,6 @@ public:
     time_t activityDate = 0;
     time_t addedDate = 0;
     time_t doneDate = 0;
-    time_t editDate = 0;
 
     size_t queuePosition = 0;
 
@@ -1283,6 +1282,7 @@ private:
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
     time_t date_changed_ = 0;
+    time_t date_edited_ = 0;
     time_t date_started_ = 0;
 
     time_t seconds_downloading_before_current_start_ = 0;

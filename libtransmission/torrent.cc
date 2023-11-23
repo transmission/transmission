@@ -749,7 +749,7 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
 
     tor->is_running_ = true;
     tor->set_dirty();
-    tor->session->runInSessionThread([tor](){ tor->start_in_session_thread(); });
+    tor->session->runInSessionThread([tor]() { tor->start_in_session_thread(); });
 }
 } // namespace
 
@@ -1365,7 +1365,7 @@ tr_stat tr_torrent::stats() const
     stats.activityDate = this->activityDate;
     stats.addedDate = this->addedDate;
     stats.doneDate = this->doneDate;
-    stats.editDate = this->editDate;
+    stats.editDate = this->date_edited_;
     stats.startDate = this->date_started_;
     stats.secondsSeeding = this->seconds_seeding(now_sec);
     stats.secondsDownloading = this->seconds_downloading(now_sec);
@@ -2556,7 +2556,7 @@ bool tr_torrentHasMetadata(tr_torrent const* tor)
 
 void tr_torrent::mark_edited()
 {
-    this->editDate = tr_time();
+    this->date_edited_ = tr_time();
 }
 
 void tr_torrent::mark_changed()
