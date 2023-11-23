@@ -148,7 +148,7 @@ bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo const* m
 
 namespace
 {
-bool if_files_disappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
+bool did_files_disappear(tr_torrent* tor, std::optional<bool> has_local_data = {})
 {
     auto const has = has_local_data ? *has_local_data : tor->has_any_local_data();
     return tor->has_total() > 0 && !has;
@@ -156,7 +156,7 @@ bool if_files_disappeared(tr_torrent* tor, std::optional<bool> has_local_data = 
 
 bool set_local_error_if_files_disappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
 {
-    auto const files_disappeared = if_files_disappeared(tor, has_local_data);
+    auto const files_disappeared = did_files_disappear(tor, has_local_data);
 
     if (files_disappeared)
     {
@@ -1609,7 +1609,7 @@ void tr_torrentVerify(tr_torrent* tor)
                 tor->stop_now();
             }
 
-            if (if_files_disappeared(tor))
+            if (did_files_disappear(tor))
             {
                 tor->error().set_local_error(
                     _("Paused torrent as no data was found! Ensure your drives are connected or use \"Set Location\". "
