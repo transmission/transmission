@@ -432,7 +432,7 @@ void on_idle(tr_webseed* webseed)
 
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, vtask] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, vtask] = web_response;
     bool const success = status == 206;
 
     auto* const task = static_cast<tr_webseed_task*>(vtask);
