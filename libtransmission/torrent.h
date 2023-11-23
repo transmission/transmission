@@ -94,6 +94,7 @@ struct tr_torrent final : public tr_completion::torrent_view
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
 
+        [[nodiscard]] time_t date_active() const noexcept;
         [[nodiscard]] time_t date_added() const noexcept;
         [[nodiscard]] time_t date_done() const noexcept;
         [[nodiscard]] time_t seconds_downloading(time_t now) const noexcept;
@@ -701,7 +702,7 @@ public:
 
     constexpr void set_date_active(time_t when) noexcept
     {
-        this->activityDate = when;
+        this->date_active_ = when;
 
         bump_date_changed(when);
     }
@@ -845,7 +846,7 @@ public:
 
         if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
         {
-            if (auto const latest = std::max(date_started_, activityDate); latest != 0)
+            if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
                 TR_ASSERT(now >= latest);
                 return now - latest;
@@ -1032,8 +1033,6 @@ public:
     tr_swarm* swarm = nullptr;
 
     time_t lpdAnnounceAt = 0;
-
-    time_t activityDate = 0;
 
     size_t queuePosition = 0;
 
@@ -1286,6 +1285,7 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
+    time_t date_active_ = 0;
     time_t date_added_ = 0;
     time_t date_changed_ = 0;
     time_t date_done_ = 0;

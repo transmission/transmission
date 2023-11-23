@@ -1350,7 +1350,7 @@ tr_stat tr_torrent::stats() const
 
     auto const verify_progress = this->verify_progress();
     stats.recheckProgress = verify_progress.value_or(0.0);
-    stats.activityDate = this->activityDate;
+    stats.activityDate = this->date_active_;
     stats.addedDate = this->date_added_;
     stats.doneDate = this->date_done_;
     stats.editDate = this->date_edited_;
@@ -2600,24 +2600,16 @@ void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* m
 
 // ---
 
+time_t tr_torrent::ResumeHelper::date_active() const noexcept
+{
+    return tor_.date_active_;
+}
+
+// ---
+
 time_t tr_torrent::ResumeHelper::date_added() const noexcept
 {
     return tor_.date_added_;
-}
-
-time_t tr_torrent::ResumeHelper::date_done() const noexcept
-{
-    return tor_.date_done_;
-}
-
-time_t tr_torrent::ResumeHelper::seconds_downloading(time_t now) const noexcept
-{
-    return tor_.seconds_downloading(now);
-}
-
-time_t tr_torrent::ResumeHelper::seconds_seeding(time_t now) const noexcept
-{
-    return tor_.seconds_seeding(now);
 }
 
 void tr_torrent::ResumeHelper::load_date_added(time_t when) noexcept
@@ -2625,14 +2617,35 @@ void tr_torrent::ResumeHelper::load_date_added(time_t when) noexcept
     tor_.date_added_ = when;
 }
 
+// ---
+
+time_t tr_torrent::ResumeHelper::date_done() const noexcept
+{
+    return tor_.date_done_;
+}
+
 void tr_torrent::ResumeHelper::load_date_done(time_t when) noexcept
 {
     tor_.date_done_ = when;
 }
 
+// ---
+
+time_t tr_torrent::ResumeHelper::seconds_downloading(time_t now) const noexcept
+{
+    return tor_.seconds_downloading(now);
+}
+
 void tr_torrent::ResumeHelper::load_seconds_downloading_before_current_start(time_t when) noexcept
 {
     tor_.seconds_downloading_before_current_start_ = when;
+}
+
+// ---
+
+time_t tr_torrent::ResumeHelper::seconds_seeding(time_t now) const noexcept
+{
+    return tor_.seconds_seeding(now);
 }
 
 void tr_torrent::ResumeHelper::load_seconds_seeding_before_current_start(time_t when) noexcept

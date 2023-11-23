@@ -884,7 +884,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     tr_variantInitDict(&top, 50); /* arbitrary "big enough" number */
     tr_variantDictAddInt(&top, TR_KEY_seeding_time_seconds, helper.seconds_seeding(now));
     tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, helper.seconds_downloading(now));
-    tr_variantDictAddInt(&top, TR_KEY_activity_date, tor->activityDate);
+    tr_variantDictAddInt(&top, TR_KEY_activity_date, helper.date_active());
     tr_variantDictAddInt(&top, TR_KEY_added_date, helper.date_added());
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->bytes_corrupt_.ever());
     tr_variantDictAddInt(&top, TR_KEY_done_date, helper.date_done());
