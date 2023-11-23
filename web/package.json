@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "node esbuild.mjs",
+    "dev": "DEV=true node esbuild.mjs",
     "lint": "run-p --silent lint:eslint lint:stylelint lint:prettier",
     "lint:fix": "run-s lint:eslint:fix lint:stylelint:fix lint:prettier:fix",
     "lint:eslint": "eslint src/*.js",
@@ -15,9 +16,9 @@
     "lint:stylelint:fix": "stylelint --fix assets/css/*scss"
   },
   "devDependencies": {
-    "@primer/stylelint-config": "^12.8.0",
     "esbuild": "^0.19.7",
     "esbuild-sass-plugin": "^2.16.0",
+    "@primer/stylelint-config": "^12.8.0",
     "eslint": "^8.45.0",
     "eslint-plugin-sonarjs": "^0.19.0",
     "eslint-plugin-unicorn": "^47.0.0",
