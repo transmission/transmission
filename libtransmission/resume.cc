@@ -711,7 +711,7 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& help
 
     if ((fields_to_load & tr_resume::AddedDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_added_date, &i))
     {
-        tor->addedDate = i;
+        helper.load_date_added(static_cast<time_t>(i));
         fields_loaded |= tr_resume::AddedDate;
     }
 
@@ -885,7 +885,7 @@ void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
     tr_variantDictAddInt(&top, TR_KEY_seeding_time_seconds, helper.seconds_seeding(now));
     tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, helper.seconds_downloading(now));
     tr_variantDictAddInt(&top, TR_KEY_activity_date, tor->activityDate);
-    tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
+    tr_variantDictAddInt(&top, TR_KEY_added_date, helper.date_added());
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->bytes_corrupt_.ever());
     tr_variantDictAddInt(&top, TR_KEY_done_date, helper.date_done());
     tr_variantDictAddStrView(&top, TR_KEY_destination, tor->download_dir().sv());

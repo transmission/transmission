@@ -89,10 +89,12 @@ struct tr_torrent final : public tr_completion::torrent_view
     class ResumeHelper
     {
     public:
+        void load_date_added(time_t when) noexcept;
         void load_date_done(time_t when) noexcept;
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
 
+        [[nodiscard]] time_t date_added() const noexcept;
         [[nodiscard]] time_t date_done() const noexcept;
         [[nodiscard]] time_t seconds_downloading(time_t now) const noexcept;
         [[nodiscard]] time_t seconds_seeding(time_t now) const noexcept;
@@ -1032,7 +1034,6 @@ public:
     time_t lpdAnnounceAt = 0;
 
     time_t activityDate = 0;
-    time_t addedDate = 0;
 
     size_t queuePosition = 0;
 
@@ -1257,6 +1258,8 @@ private:
 
     void stop_now();
 
+    [[nodiscard]] bool is_new_torrent_a_seed();
+
     tr_stat stats_ = {};
 
     Error error_;
@@ -1283,6 +1286,7 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
+    time_t date_added_ = 0;
     time_t date_changed_ = 0;
     time_t date_done_ = 0;
     time_t date_edited_ = 0;
