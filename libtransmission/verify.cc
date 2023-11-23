@@ -99,7 +99,7 @@ void tr_verify_worker::verify_torrent(Mediator& verify_mediator, bool const abor
             {
                 fd = tr_sys_file_open(found->c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
             }
-            else if (file_length == 0U && verify_mediator.file_piece_is_wanted(file_index))
+            else if (file_length == 0U)
             {
                 fd = create_empty_file(
                     tr_pathbuf{ verify_mediator.download_dir(), '/', metainfo.file_subpath(file_index) },
