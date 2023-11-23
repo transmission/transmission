@@ -902,33 +902,6 @@ bool isNewTorrentASeed(tr_torrent* tor)
     return tor->ensure_piece_is_checked(0);
 }
 
-void on_metainfo_completed(tr_torrent* tor)
-{
-    // we can look for files now that we know what files are in the torrent
-    tor->refresh_current_dir();
-
-    callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
-
-    if (tor->session->shouldFullyVerifyAddedTorrents() || !isNewTorrentASeed(tor))
-    {
-        tr_torrentVerify(tor);
-    }
-    else
-    {
-        tor->completion.set_has_all();
-        tor->doneDate = tor->addedDate;
-        tor->recheck_completeness();
-
-        if (tor->start_when_stable)
-        {
-            torrentStart(tor, {});
-        }
-        else if (tor->is_running())
-        {
-            tr_torrentStop(tor);
-        }
-    }
-}
 } // namespace torrent_init_helpers
 } // namespace
 
@@ -941,6 +914,36 @@ void tr_torrent::on_metainfo_updated()
     file_priorities_.reset(&fpm_);
     files_wanted_.reset(&fpm_);
     checked_pieces_ = tr_bitfield{ size_t(piece_count()) };
+}
+
+void tr_torrent::on_metainfo_completed()
+{
+    using namespace torrent_init_helpers;
+
+    // we can look for files now that we know what files are in the torrent
+    refresh_current_dir();
+
+    callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_ADDED);
+
+    if (session->shouldFullyVerifyAddedTorrents() || !isNewTorrentASeed(this))
+    {
+        tr_torrentVerify(this);
+    }
+    else
+    {
+        completion.set_has_all();
+        date_done_ = addedDate;
+        recheck_completeness();
+
+        if (start_when_stable)
+        {
+            torrentStart(this, {});
+        }
+        else if (is_running())
+        {
+            tr_torrentStop(this);
+        }
+    }
 }
 
 void tr_torrent::init(tr_ctor const* const ctor)
@@ -1069,7 +1072,7 @@ void tr_torrent::init(tr_ctor const* const ctor)
 
     if (auto const has_metainfo = this->has_metainfo(); is_new_torrent && has_metainfo)
     {
-        on_metainfo_completed(this);
+        on_metainfo_completed();
     }
     else if (start_when_stable)
     {
@@ -1097,7 +1100,7 @@ void tr_torrent::set_metainfo(tr_torrent_metainfo tm)
     this->set_dirty();
     this->mark_edited();
 
-    on_metainfo_completed(this);
+    on_metainfo_completed();
     this->on_announce_list_changed();
 }
 
@@ -1364,7 +1367,7 @@ tr_stat tr_torrent::stats() const
     stats.recheckProgress = verify_progress.value_or(0.0);
     stats.activityDate = this->activityDate;
     stats.addedDate = this->addedDate;
-    stats.doneDate = this->doneDate;
+    stats.doneDate = this->date_done_;
     stats.editDate = this->date_edited_;
     stats.startDate = this->date_started_;
     stats.secondsSeeding = this->seconds_seeding(now_sec);
@@ -1795,7 +1798,7 @@ void tr_torrent::recheck_completeness()
             {
                 tr_announcerTorrentCompleted(this);
                 this->mark_changed();
-                this->doneDate = tr_time();
+                date_done_ = tr_time();
             }
 
             if (this->current_dir() == this->incomplete_dir())
@@ -2279,7 +2282,7 @@ void tr_torrent::set_download_dir(std::string_view path, bool is_new_torrent)
         else
         {
             completion.set_has_all();
-            doneDate = addedDate;
+            date_done_ = addedDate;
             recheck_completeness();
         }
     }
@@ -2612,6 +2615,11 @@ void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* m
 
 // ---
 
+time_t tr_torrent::ResumeHelper::date_done() const noexcept
+{
+    return tor_.date_done_;
+}
+
 time_t tr_torrent::ResumeHelper::seconds_downloading(time_t now) const noexcept
 {
     return tor_.seconds_downloading(now);
@@ -2621,6 +2629,12 @@ time_t tr_torrent::ResumeHelper::seconds_seeding(time_t now) const noexcept
 {
     return tor_.seconds_seeding(now);
 }
+
+void tr_torrent::ResumeHelper::load_date_done(time_t when) noexcept
+{
+    tor_.date_done_ = when;
+}
+
 void tr_torrent::ResumeHelper::load_seconds_downloading_before_current_start(time_t when) noexcept
 {
     tor_.seconds_downloading_before_current_start_ = when;

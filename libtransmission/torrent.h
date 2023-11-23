@@ -89,9 +89,11 @@ struct tr_torrent final : public tr_completion::torrent_view
     class ResumeHelper
     {
     public:
+        void load_date_done(time_t when) noexcept;
         void load_seconds_downloading_before_current_start(time_t when) noexcept;
         void load_seconds_seeding_before_current_start(time_t when) noexcept;
 
+        [[nodiscard]] time_t date_done() const noexcept;
         [[nodiscard]] time_t seconds_downloading(time_t now) const noexcept;
         [[nodiscard]] time_t seconds_seeding(time_t now) const noexcept;
 
@@ -1031,7 +1033,6 @@ public:
 
     time_t activityDate = 0;
     time_t addedDate = 0;
-    time_t doneDate = 0;
 
     size_t queuePosition = 0;
 
@@ -1143,11 +1144,11 @@ private:
 
         if (is_running())
         {
-            if (doneDate > date_started_)
+            if (date_done_ > date_started_)
             {
-                n_secs += doneDate - date_started_;
+                n_secs += date_done_ - date_started_;
             }
-            else if (doneDate == 0)
+            else if (date_done_ == 0)
             {
                 n_secs += now - date_started_;
             }
@@ -1162,11 +1163,11 @@ private:
 
         if (is_running())
         {
-            if (doneDate > date_started_)
+            if (date_done_ > date_started_)
             {
-                n_secs += now - doneDate;
+                n_secs += now - date_done_;
             }
-            else if (doneDate != 0)
+            else if (date_done_ != 0)
             {
                 n_secs += now - date_started_;
             }
@@ -1252,6 +1253,7 @@ private:
     }
 
     void on_metainfo_updated();
+    void on_metainfo_completed();
 
     void stop_now();
 
@@ -1282,6 +1284,7 @@ private:
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
     time_t date_changed_ = 0;
+    time_t date_done_ = 0;
     time_t date_edited_ = 0;
     time_t date_started_ = 0;
 
