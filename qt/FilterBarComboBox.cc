@@ -3,7 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+
 #include <QApplication>
+#include <QComboBox>
+#include <QPen>
+#include <QRect>
 #include <QStyle>
 #include <QStylePainter>
 
@@ -16,7 +21,7 @@ namespace
 
 int getHSpacing(QWidget const* w)
 {
-    return qMax(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, nullptr, w));
+    return std::max(3, w->style()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing, nullptr, w));
 }
 
 } // namespace

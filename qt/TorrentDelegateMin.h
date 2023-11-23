@@ -16,7 +16,7 @@ class TorrentDelegateMin : public TorrentDelegate
 
 public:
     explicit TorrentDelegateMin(QObject* parent = nullptr)
-        : TorrentDelegate(parent)
+        : TorrentDelegate{ parent }
     {
     }
 

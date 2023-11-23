@@ -110,7 +110,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
             layoutDirection(),
             Qt::AlignBottom | Qt::AlignRight,
             emblem_size,
-            QRect(QPoint(0, 0), size));
+            QRect{ QPoint{ 0, 0 }, size });
 
         auto pixmap = base_icon.pixmap(size);
         auto const emblem_pixmap = emblem_icon.pixmap(emblem_size);
@@ -151,7 +151,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     QIcon const icon_open = icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
     ui_.action_OpenFile->setIcon(icon_open);
     ui_.action_AddURL->setIcon(
-        addEmblem(icon_open, QStringList() << QStringLiteral("emblem-web") << QStringLiteral("applications-internet")));
+        addEmblem(icon_open, QStringList{} << QStringLiteral("emblem-web") << QStringLiteral("applications-internet")));
     ui_.action_New->setIcon(icons.getThemeIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
     ui_.action_Properties->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
     ui_.action_OpenFolder->setIcon(icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
@@ -590,13 +590,13 @@ void openSelect(QString const& path)
     auto const explorer = QStringLiteral("explorer");
     QString param;
 
-    if (!QFileInfo(path).isDir())
+    if (!QFileInfo{ path }.isDir())
     {
         param = QStringLiteral("/select,");
     }
 
     param += QDir::toNativeSeparators(path);
-    QProcess::startDetached(explorer, QStringList(param));
+    QProcess::startDetached(explorer, QStringList{ param });
 }
 #elif defined(Q_OS_MAC)
 void openSelect(QString const& path)
@@ -703,7 +703,7 @@ void MainWindow::openStats()
 
 void MainWindow::openDonate() const
 {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://transmissionbt.com/donate/")));
+    QDesktopServices::openUrl(QUrl{ QStringLiteral("https://transmissionbt.com/donate/") });
 }
 
 void MainWindow::openAbout()
@@ -714,7 +714,7 @@ void MainWindow::openAbout()
 void MainWindow::openHelp() const
 {
     QDesktopServices::openUrl(
-        QUrl(QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).arg(MINOR_VERSION / 10)));
+        QUrl{ QStringLiteral("https://transmissionbt.com/help/gtk/%1.%2x").arg(MAJOR_VERSION).arg(MINOR_VERSION / 10) });
 }
 
 /****
@@ -788,7 +788,7 @@ void MainWindow::refreshTitle()
 {
     QString title(QStringLiteral("Transmission"));
 
-    if (auto const url = QUrl(session_.getRemoteUrl()); !url.isEmpty())
+    if (auto const url = QUrl{ session_.getRemoteUrl() }; !url.isEmpty())
     {
         //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session)
         //: notice that leading space (before the dash) is included here
@@ -1589,7 +1589,7 @@ void MainWindow::dropEvent(QDropEvent* event)
 
         if (!key.isEmpty())
         {
-            if (auto const url = QUrl(key); url.isLocalFile())
+            if (auto const url = QUrl{ key }; url.isLocalFile())
             {
                 key = url.toLocalFile();
             }

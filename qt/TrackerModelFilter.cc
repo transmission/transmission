@@ -7,7 +7,7 @@
 #include "TrackerModelFilter.h"
 
 TrackerModelFilter::TrackerModelFilter(QObject* parent)
-    : QSortFilterProxyModel(parent)
+    : QSortFilterProxyModel{ parent }
 {
 }
 

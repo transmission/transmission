@@ -77,7 +77,7 @@ bool RpcClient::isLocal() const
         return true;
     }
 
-    if (QHostAddress(url_.host()).isLoopback())
+    if (QHostAddress{ url_.host() }.isLoopback())
     {
         return true;
     }

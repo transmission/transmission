@@ -4,6 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::copy, std::fill_n, std::min, std::max
+#include <cstddef>
+#include <cstdint>
 #include <vector> // std::vector
 
 #include "libtransmission/bitfield.h"

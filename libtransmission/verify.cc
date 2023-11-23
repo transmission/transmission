@@ -4,13 +4,16 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstddef> // std::byte
 #include <cstdint> // uint64_t, uint32_t
+#include <memory>
 #include <mutex>
 #include <optional>
 #include <string_view>
 #include <thread>
+#include <utility> // for std::move()
 #include <vector>
 
 #include <fmt/core.h>
@@ -22,6 +25,7 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/verify.h"

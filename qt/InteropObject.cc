@@ -8,7 +8,7 @@
 #include "InteropObject.h"
 
 InteropObject::InteropObject(QObject* parent)
-    : QObject(parent)
+    : QObject{ parent }
 {
 }
 

@@ -2,8 +2,9 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#include <cstdint>
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
 
 #include <fmt/core.h>
 
@@ -15,6 +16,7 @@
 #include "libtransmission/peer-io.h"
 #include "libtransmission/peer-socket.h"
 #include "libtransmission/session.h"
+#include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-utp.h"
 #include "libtransmission/utils.h"
 
@@ -129,6 +131,9 @@ uint64 utp_callback(utp_callback_arguments* args)
 
     case UTP_SENDTO:
         utp_send_to(session, args->buf, args->len, args->address, args->address_len);
+        break;
+
+    default:
         break;
     }
 

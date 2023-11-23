@@ -26,7 +26,7 @@ public:
     };
 
     explicit FilterMode(int mode = SHOW_ALL)
-        : mode_(mode)
+        : mode_{ mode }
     {
     }
 

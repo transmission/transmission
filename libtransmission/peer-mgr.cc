@@ -11,7 +11,9 @@
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <ctime> // time_t
+#include <functional>
 #include <iterator> // std::back_inserter
+#include <memory>
 #include <optional>
 #include <tuple> // std::tie
 #include <unordered_map>
@@ -50,6 +52,7 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/values.h"
 #include "libtransmission/webseed.h"
 
 using namespace std::literals;
