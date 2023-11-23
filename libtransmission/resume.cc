@@ -626,7 +626,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
 // ---
 
-tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
+tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& helper, tr_resume::fields_t fields_to_load)
 {
     TR_ASSERT(tr_isTorrent(tor));
     auto const was_dirty = tor->is_dirty();
@@ -729,13 +729,13 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
 
     if ((fields_to_load & tr_resume::TimeSeeding) != 0 && tr_variantDictFindInt(&top, TR_KEY_seeding_time_seconds, &i))
     {
-        tor->seconds_seeding_before_current_start_ = i;
+        helper.load_seconds_seeding_before_current_start(i);
         fields_loaded |= tr_resume::TimeSeeding;
     }
 
     if ((fields_to_load & tr_resume::TimeDownloading) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloading_time_seconds, &i))
     {
-        tor->seconds_downloading_before_current_start_ = i;
+        helper.load_seconds_downloading_before_current_start(i);
         fields_loaded |= tr_resume::TimeDownloading;
     }
 
@@ -857,7 +857,7 @@ auto useFallbackFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor cons
 }
 } // namespace
 
-fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor)
+fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields_to_load, tr_ctor const* ctor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -865,14 +865,14 @@ fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor)
 
     ret |= useMandatoryFields(tor, fields_to_load, ctor);
     fields_to_load &= ~ret;
-    ret |= loadFromFile(tor, fields_to_load);
+    ret |= loadFromFile(tor, helper, fields_to_load);
     fields_to_load &= ~ret;
     ret |= useFallbackFields(tor, fields_to_load, ctor);
 
     return ret;
 }
 
-void save(tr_torrent* const tor)
+void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
 {
     if (!tr_isTorrent(tor))
     {
@@ -882,8 +882,8 @@ void save(tr_torrent* const tor)
     auto top = tr_variant{};
     auto const now = tr_time();
     tr_variantInitDict(&top, 50); /* arbitrary "big enough" number */
-    tr_variantDictAddInt(&top, TR_KEY_seeding_time_seconds, tor->seconds_seeding(now));
-    tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, tor->seconds_downloading(now));
+    tr_variantDictAddInt(&top, TR_KEY_seeding_time_seconds, helper.seconds_seeding(now));
+    tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, helper.seconds_downloading(now));
     tr_variantDictAddInt(&top, TR_KEY_activity_date, tor->activityDate);
     tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->bytes_corrupt_.ever());

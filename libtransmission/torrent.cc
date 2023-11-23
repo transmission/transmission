@@ -799,7 +799,7 @@ void tr_torrent::stop_now()
 
     if (!is_deleting_)
     {
-        tr_torrentSave(this);
+        save_resume_file();
     }
 
     set_is_queued(false);
@@ -992,7 +992,8 @@ void tr_torrent::init(tr_ctor const* const ctor)
         // the same ones that would be saved back again, so don't let them
         // affect the 'is dirty' flag.
         auto const was_dirty = is_dirty();
-        loaded = tr_resume::load(this, tr_resume::All, ctor);
+        auto resume_helper = ResumeHelper{ *this };
+        loaded = tr_resume::load(this, resume_helper, tr_resume::All, ctor);
         set_dirty(was_dirty);
         tr_torrent_metainfo::migrate_file(session->torrentDir(), name(), info_hash_string(), ".torrent"sv);
     }
@@ -1719,15 +1720,16 @@ void tr_torrent::VerifyMediator::on_verify_done(bool const aborted)
 
 // ---
 
-void tr_torrentSave(tr_torrent* tor)
+void tr_torrent::save_resume_file()
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    if (tor->is_dirty())
+    if (!is_dirty())
     {
-        tor->set_dirty(false);
-        tr_resume::save(tor);
+        return;
     }
+
+    set_dirty(false);
+    auto helper = ResumeHelper{ *this };
+    tr_resume::save(this, helper);
 }
 
 // --- Completeness
@@ -1809,7 +1811,7 @@ void tr_torrent::recheck_completeness()
 
         if (this->is_done())
         {
-            tr_torrentSave(this);
+            save_resume_file();
             callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
         }
     }
@@ -2605,4 +2607,25 @@ void tr_torrent::init_checked_pieces(tr_bitfield const& checked, time_t const* m
             checked_pieces_.unset_span(begin, end);
         }
     }
+}
+
+// ---
+
+time_t tr_torrent::ResumeHelper::seconds_downloading(time_t now) const noexcept
+{
+    return tor_.seconds_downloading(now);
+}
+
+time_t tr_torrent::ResumeHelper::seconds_seeding(time_t now) const noexcept
+{
+    return tor_.seconds_seeding(now);
+}
+void tr_torrent::ResumeHelper::load_seconds_downloading_before_current_start(time_t when) noexcept
+{
+    tor_.seconds_downloading_before_current_start_ = when;
+}
+
+void tr_torrent::ResumeHelper::load_seconds_seeding_before_current_start(time_t when) noexcept
+{
+    tor_.seconds_seeding_before_current_start_ = when;
 }

@@ -73,10 +73,40 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
+namespace libtransmission::test
+{
+
+class RenameTest_multifileTorrent_Test;
+class RenameTest_singleFilenameTorrent_Test;
+
+} // namespace libtransmission::test
+
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
 {
     using Speed = libtransmission::Values::Speed;
+
+    class ResumeHelper
+    {
+    public:
+        void load_seconds_downloading_before_current_start(time_t when) noexcept;
+        void load_seconds_seeding_before_current_start(time_t when) noexcept;
+
+        [[nodiscard]] time_t seconds_downloading(time_t now) const noexcept;
+        [[nodiscard]] time_t seconds_seeding(time_t now) const noexcept;
+
+    private:
+        friend class libtransmission::test::RenameTest_multifileTorrent_Test;
+        friend class libtransmission::test::RenameTest_singleFilenameTorrent_Test;
+        friend struct tr_torrent;
+
+        ResumeHelper(tr_torrent& tor)
+            : tor_{ tor }
+        {
+        }
+
+        tr_torrent& tor_;
+    };
 
     class CumulativeCount
     {
@@ -178,6 +208,8 @@ public:
     {
         return session->unique_lock();
     }
+
+    void save_resume_file();
 
     /// SPEED LIMIT
 
@@ -883,44 +915,6 @@ public:
 
     // ---
 
-    [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
-    {
-        auto n_secs = seconds_downloading_before_current_start_;
-
-        if (is_running())
-        {
-            if (doneDate > startDate)
-            {
-                n_secs += doneDate - startDate;
-            }
-            else if (doneDate == 0)
-            {
-                n_secs += now - startDate;
-            }
-        }
-
-        return n_secs;
-    }
-
-    [[nodiscard]] constexpr auto seconds_seeding(time_t now) const noexcept
-    {
-        auto n_secs = seconds_seeding_before_current_start_;
-
-        if (is_running())
-        {
-            if (doneDate > startDate)
-            {
-                n_secs += now - doneDate;
-            }
-            else if (doneDate != 0)
-            {
-                n_secs += now - startDate;
-            }
-        }
-
-        return n_secs;
-    }
-
     constexpr void set_needs_completeness_check() noexcept
     {
         needs_completeness_check_ = true;
@@ -1034,9 +1028,6 @@ public:
     time_t editDate = 0;
     time_t startDate = 0;
 
-    time_t seconds_downloading_before_current_start_ = 0;
-    time_t seconds_seeding_before_current_start_ = 0;
-
     size_t queuePosition = 0;
 
     tr_completeness completeness = TR_LEECH;
@@ -1140,6 +1131,44 @@ private:
         uint64_t timestamp_msec_ = {};
         Speed speed_ = {};
     };
+
+    [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
+    {
+        auto n_secs = seconds_downloading_before_current_start_;
+
+        if (is_running())
+        {
+            if (doneDate > startDate)
+            {
+                n_secs += doneDate - startDate;
+            }
+            else if (doneDate == 0)
+            {
+                n_secs += now - startDate;
+            }
+        }
+
+        return n_secs;
+    }
+
+    [[nodiscard]] constexpr auto seconds_seeding(time_t now) const noexcept
+    {
+        auto n_secs = seconds_seeding_before_current_start_;
+
+        if (is_running())
+        {
+            if (doneDate > startDate)
+            {
+                n_secs += now - doneDate;
+            }
+            else if (doneDate != 0)
+            {
+                n_secs += now - startDate;
+            }
+        }
+
+        return n_secs;
+    }
 
     [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
     {
@@ -1248,6 +1277,9 @@ private:
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
     time_t changed_date_ = 0;
+
+    time_t seconds_downloading_before_current_start_ = 0;
+    time_t seconds_seeding_before_current_start_ = 0;
 
     float verify_progress_ = -1.0F;
     float seed_ratio_ = 0.0F;
