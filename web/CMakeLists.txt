@@ -53,17 +53,19 @@ set(WEB_IMAGES
 
 add_custom_command(
     OUTPUT
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
     WORKING_DIRECTORY
         "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy
+        "${CMAKE_CURRENT_SOURCE_DIR}/esbuild.mjs"
         "${CMAKE_CURRENT_SOURCE_DIR}/package-lock.json"
         "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
         "${CMAKE_CURRENT_SOURCE_DIR}/prettier.config.js"
         "${CMAKE_CURRENT_SOURCE_DIR}/stylelint.config.js"
-        "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js"
         "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/assets" "assets"
@@ -81,6 +83,8 @@ add_custom_command(
 add_custom_target("${TR_NAME}-web"
     ALL
     DEPENDS
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
