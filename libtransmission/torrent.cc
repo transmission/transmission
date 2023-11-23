@@ -1644,11 +1644,6 @@ std::optional<std::string> tr_torrent::VerifyMediator::find_file(tr_file_index_t
     return {};
 }
 
-std::string tr_torrent::VerifyMediator::download_dir() const
-{
-    return tor_->download_dir().c_str();
-}
-
 void tr_torrent::VerifyMediator::on_verify_queued()
 {
     tr_logAddTraceTor(tor_, "Queued for verification");

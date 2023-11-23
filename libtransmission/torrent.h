@@ -135,7 +135,6 @@ public:
 
         [[nodiscard]] tr_torrent_metainfo const& metainfo() const override;
         [[nodiscard]] std::optional<std::string> find_file(tr_file_index_t file_index) const override;
-        [[nodiscard]] std::string download_dir() const override;
 
         void on_verify_queued() override;
         void on_verify_started() override;
