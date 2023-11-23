@@ -7,8 +7,6 @@
     "dev": "WEBPACK_MODE=development webpack serve --config webpack.config.js",
     "build": "webpack --config webpack.config.js",
     "esbuild": "node esbuild.mjs",
-    "css": "sass --no-source-map assets/css/",
-    "css:map": "sass assets/css/",
     "lint": "run-p --silent lint:eslint lint:stylelint lint:prettier",
     "lint:fix": "run-s lint:eslint:fix lint:stylelint:fix lint:prettier:fix",
     "lint:eslint": "eslint src/*.js",
