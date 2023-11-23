@@ -11,9 +11,9 @@
 
 #include <cstdint> // uint64_t
 
-#include <libtransmission/transmission.h>
+#include "libtransmission/transmission.h"
 
-#include <libtransmission/torrent.h>
+#include "libtransmission/torrent.h"
 
 namespace tr_resume
 {
