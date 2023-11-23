@@ -1770,29 +1770,15 @@ void tr_torrent::create_empty_files() const
         return;
     }
 
-    auto paths = std::array<std::string_view, 4>{};
-    auto const n_paths = location_helpers::buildSearchPathArray(this, std::data(paths));
-    if (n_paths == 0)
-    {
-        return;
-    }
-    auto const base = paths[0];
-
-    auto file_count = this->file_count();
+    auto const base = download_dir();
+    auto const file_count = this->file_count();
     for (tr_file_index_t file_index = 0U; file_index < file_count; ++file_index)
     {
-        if (!file_is_wanted(file_index))
+        if (file_size(file_index) != 0U || !file_is_wanted(file_index) || find_file(file_index))
         {
             continue;
         }
-        if (auto const file_length = file_size(file_index); file_length != 0)
-        {
-            continue;
-        }
-        if (auto const found = find_file(file_index); found)
-        {
-            continue;
-        }
+
         // torrent contains a wanted zero-bytes file and that file isn't on disk yet.
         // We attempt to create that file.
         auto filename = tr_pathbuf{};
@@ -1805,8 +1791,8 @@ void tr_torrent::create_empty_files() const
         tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
 
         // create the file
-        int flags = TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_SEQUENTIAL;
-        if (auto const fd = tr_sys_file_open(filename, flags, 0666); fd != TR_BAD_SYS_FILE)
+        if (auto const fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_SEQUENTIAL, 0666);
+            fd != TR_BAD_SYS_FILE)
         {
             tr_sys_file_close(fd);
         }
