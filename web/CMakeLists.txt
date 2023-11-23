@@ -54,10 +54,11 @@ set(WEB_IMAGES
 add_custom_command(
     OUTPUT
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.LEGAL.txt"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LEGAL.txt"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
-        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
     WORKING_DIRECTORY
         "${CMAKE_CURRENT_BINARY_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E copy
@@ -84,10 +85,11 @@ add_custom_target("${TR_NAME}-web"
     ALL
     DEPENDS
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.LEGAL.txt"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.css.map"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js"
+        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LEGAL.txt"
         "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.map"
-        "${CMAKE_CURRENT_BINARY_DIR}/public_html/transmission-app.js.LICENSE.txt"
     SOURCES
         ${WEB_SOURCES})
 
