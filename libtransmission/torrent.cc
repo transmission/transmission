@@ -622,30 +622,6 @@ void torrentResetTransferStats(tr_torrent* tor)
     tor->set_dirty();
 }
 
-void torrentStartImpl(tr_torrent* const tor)
-{
-    auto const lock = tor->unique_lock();
-
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->recheck_completeness();
-    tor->set_is_queued(false);
-
-    time_t const now = tr_time();
-
-    tor->is_running_ = true;
-    tor->completeness = tor->completion.status();
-    tor->startDate = now;
-    tor->mark_changed();
-    tor->error().clear();
-    tor->finished_seeding_by_idle_ = false;
-
-    torrentResetTransferStats(tor);
-    tor->session->announcer_->startTorrent(tor);
-    tor->lpdAnnounceAt = now;
-    tor->started_.emit(tor);
-}
-
 bool removeTorrentFile(char const* filename, void* /*user_data*/, tr_error* error)
 {
     return tr_sys_path_remove(filename, error);
@@ -773,9 +749,34 @@ void torrentStart(tr_torrent* tor, torrent_start_opts opts)
 
     tor->is_running_ = true;
     tor->set_dirty();
-    tor->session->runInSessionThread(torrentStartImpl, tor);
+    tor->session->runInSessionThread([tor](){ tor->start_in_session_thread(); });
 }
 } // namespace
+
+void tr_torrent::start_in_session_thread()
+{
+    using namespace start_stop_helpers;
+
+    TR_ASSERT(session->am_in_session_thread());
+    auto const lock = unique_lock();
+
+    recheck_completeness();
+    set_is_queued(false);
+
+    time_t const now = tr_time();
+
+    is_running_ = true;
+    completeness = completion.status();
+    date_started_ = now;
+    mark_changed();
+    error().clear();
+    finished_seeding_by_idle_ = false;
+
+    torrentResetTransferStats(this);
+    session->announcer_->startTorrent(this);
+    lpdAnnounceAt = now;
+    started_.emit(this);
+}
 
 void tr_torrent::stop_now()
 {
@@ -1365,7 +1366,7 @@ tr_stat tr_torrent::stats() const
     stats.addedDate = this->addedDate;
     stats.doneDate = this->doneDate;
     stats.editDate = this->editDate;
-    stats.startDate = this->startDate;
+    stats.startDate = this->date_started_;
     stats.secondsSeeding = this->seconds_seeding(now_sec);
     stats.secondsDownloading = this->seconds_downloading(now_sec);
 

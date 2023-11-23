@@ -211,6 +211,11 @@ public:
 
     void save_resume_file();
 
+    [[nodiscard]] constexpr auto started_recently(time_t const now, time_t recent_secs = 120) const noexcept
+    {
+        return now - date_started_ <= recent_secs;
+    }
+
     /// SPEED LIMIT
 
     [[nodiscard]] constexpr auto& bandwidth() noexcept
@@ -778,7 +783,7 @@ public:
 
     [[nodiscard]] constexpr auto has_changed_since(time_t when) const noexcept
     {
-        return changed_date_ > when;
+        return date_changed_ > when;
     }
 
     void set_bandwidth_group(std::string_view group_name) noexcept;
@@ -836,7 +841,7 @@ public:
 
         if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
         {
-            if (auto const latest = std::max(startDate, activityDate); latest != 0)
+            if (auto const latest = std::max(date_started_, activityDate); latest != 0)
             {
                 TR_ASSERT(now >= latest);
                 return now - latest;
@@ -963,6 +968,8 @@ public:
 
     void init(tr_ctor const* ctor);
 
+    void start_in_session_thread();
+
     [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
     {
         return obfuscated_hash_ == test;
@@ -1026,7 +1033,6 @@ public:
     time_t addedDate = 0;
     time_t doneDate = 0;
     time_t editDate = 0;
-    time_t startDate = 0;
 
     size_t queuePosition = 0;
 
@@ -1138,13 +1144,13 @@ private:
 
         if (is_running())
         {
-            if (doneDate > startDate)
+            if (doneDate > date_started_)
             {
-                n_secs += doneDate - startDate;
+                n_secs += doneDate - date_started_;
             }
             else if (doneDate == 0)
             {
-                n_secs += now - startDate;
+                n_secs += now - date_started_;
             }
         }
 
@@ -1157,13 +1163,13 @@ private:
 
         if (is_running())
         {
-            if (doneDate > startDate)
+            if (doneDate > date_started_)
             {
                 n_secs += now - doneDate;
             }
             else if (doneDate != 0)
             {
-                n_secs += now - startDate;
+                n_secs += now - date_started_;
             }
         }
 
@@ -1228,9 +1234,9 @@ private:
 
     constexpr void bump_date_changed(time_t when)
     {
-        if (changed_date_ < when)
+        if (date_changed_ < when)
         {
-            changed_date_ = when;
+            date_changed_ = when;
         }
     }
 
@@ -1276,7 +1282,8 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
-    time_t changed_date_ = 0;
+    time_t date_changed_ = 0;
+    time_t date_started_ = 0;
 
     time_t seconds_downloading_before_current_start_ = 0;
     time_t seconds_seeding_before_current_start_ = 0;
