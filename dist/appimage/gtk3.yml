@@ -1,0 +1,44 @@
+version: 1
+
+AppDir:
+  path: ./AppDir
+
+  app_info:
+    id: com.transmission.Transmission
+    name: transmission-gtk3
+    icon: transmission
+    version: !ENV ${APP_VERSION}
+    exec: usr/bin/transmission-gtk
+
+  apt:
+    arch: amd64
+    sources:
+      - sourceline: 'deb [arch=amd64] http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse'
+        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C'
+    include:
+      - libcurl4
+      - libdeflate0
+      - libevent-2.1-7
+      - libfmt8
+      - libglibmm-2.4-1v5
+      - libgtkmm-3.0-1v5
+      - libminiupnpc17
+      - libnatpmp1
+      - libpsl5
+      - librsvg2-common
+      - libssl3
+    exclude:
+      - adwaita-icon-theme
+      - hicolor-icon-theme
+      - libapparmor1
+      - libcups2
+
+  files:
+    exclude:
+      - usr/bin/dbus-*
+      - usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/printbackends
+      - usr/share/doc
+      - usr/share/man
+
+AppImage:
+  arch: x86_64

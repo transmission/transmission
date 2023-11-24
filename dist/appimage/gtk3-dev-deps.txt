@@ -1,0 +1,11 @@
+gettext
+libcurl4-openssl-dev
+libdeflate-dev
+libevent-dev
+libfmt-dev
+libglibmm-2.4-dev
+libgtkmm-3.0-dev
+libminiupnpc-dev
+libnatpmp-dev
+libpsl-dev
+libssl-dev

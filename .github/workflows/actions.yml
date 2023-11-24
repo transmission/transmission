@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'main'
+      - wip/appimage
   pull_request:
     branches:
       - 'main'
@@ -793,3 +794,62 @@ jobs:
         with:
           name: binaries-${{ github.job }}
           path: pfx/**/*
+
+  appimage-gtk3:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Get Dependencies
+        run: |
+          set -ex
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            g++ \
+            ninja-build \
+            pkg-config \
+            python3-pip \
+            $(cat src/dist/appimage/gtk3-dev-deps.txt)
+          # sudo apt-get install -y --no-install-recommends \
+          #   python3-pip \
+          #   bash \
+          #   dash \
+          #   squashfs-tools \
+          #   zsync \
+          #   fakeroot
+          sudo pip install appimage-builder # git+https://github.com/AppImageCrafters/appimage-builder.git
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DENABLE_CLI=OFF \
+            -DENABLE_DAEMON=OFF \
+            -DENABLE_GTK=ON \
+            -DENABLE_MAC=OFF \
+            -DENABLE_QT=OFF \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_UTILS=OFF \
+            -DREBUILD_WEB=OFF \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Install
+        run: DESTDIR=$PWD/AppDir cmake --build obj --config RelWithDebInfo --target install/strip
+      - name: Package
+        run: |
+          VER="$(fgrep -w SHORT_VERSION_STRING obj/libtransmission/version.h | cut -d\" -f2)"
+          REV="$(fgrep -w VCS_REVISION obj/libtransmission/version.h | cut -d\" -f2)"
+          APP_VERSION="${VER}+r${REV}" appimage-builder --recipe src/dist/appimage/gtk3.yml --skip-tests
+      - uses: actions/upload-artifact@v3
+        with:
+          name: appimage-gtk3
+          path: transmission-*.AppImage
