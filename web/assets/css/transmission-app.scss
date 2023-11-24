@@ -65,6 +65,15 @@
   --image-play-circle-active: url('../img/play-circle-active.svg');
   --image-play-circle-idle: url('../img/play-circle-idle.svg');
 
+  --app-image-url: url('../img/box.svg');
+  --audio-image-url: url('../img/music.svg');
+  --folder-image-url: url('../img/folder.svg');
+  --font-image-url: url('../img/type.svg');
+  --image-image-url: url('../img/image.svg');
+  --package-image-url: url('../img/package.svg');
+  --text-image-url: url('../img/file-text.svg');
+  --video-image-url: url('../img/film.svg');
+
   --progress: 100%;
   --color-fg-error: var(--red-500);
   --color-fg-port-closed: var(--red-500);
@@ -402,30 +411,21 @@ a {
   background-color: var(--white);
 }
 
-$app-image: '../img/box.svg';
-$audio-image: '../img/music.svg';
-$folder-image: '../img/folder.svg';
-$font-image: '../img/type.svg';
-$image-image: '../img/image.svg';
-$package-image: '../img/package.svg';
-$text-image: '../img/file-text.svg';
-$video-image: '../img/film.svg';
-
-@mixin mime-icon($mime-icon) {
+@mixin mime-icon($mime-icon-url) {
   background-color: var(--color-fg-primary);
-  -webkit-mask-image: url($mime-icon);
+  -webkit-mask-image: $mime-icon-url;
   -webkit-mask-repeat: no-repeat;
-  mask-image: url($mime-icon);
+  mask-image: $mime-icon-url;
   mask-repeat: no-repeat;
 
   &[data-icon-multifile='true'] {
-    -webkit-mask-image: url($mime-icon), url($folder-image);
+    -webkit-mask-image: $mime-icon-url, var(--folder-image-url);
     -webkit-mask-position:
       top left,
       bottom right;
     -webkit-mask-repeat: no-repeat, no-repeat;
     -webkit-mask-size: 16px, 16px;
-    mask-image: url($mime-icon), url($folder-image);
+    mask-image: $mime-icon-url, var(--folder-image-url);
     mask-position:
       top left,
       bottom right;
@@ -463,31 +463,31 @@ $video-image: '../img/film.svg';
         top left;
 
       &[data-icon-mime-type='audio'] {
-        @include mime-icon($audio-image);
+        @include mime-icon(var(--audio-image-url));
       }
 
       &[data-icon-mime-type='application'] {
-        @include mime-icon($app-image);
+        @include mime-icon(var(--app-image-url));
       }
 
       &[data-icon-mime-type='font'] {
-        @include mime-icon($font-image);
+        @include mime-icon(var(--font-image-url));
       }
 
       &[data-icon-mime-type='image'] {
-        @include mime-icon($image-image);
+        @include mime-icon(var(--image-image-url));
       }
 
       &[data-icon-mime-type='model'] {
-        @include mime-icon($package-image);
+        @include mime-icon(var(--package-image-url));
       }
 
       &[data-icon-mime-type='text'] {
-        @include mime-icon($text-image);
+        @include mime-icon(var(--text-image-url));
       }
 
       &[data-icon-mime-type='video'] {
-        @include mime-icon($video-image);
+        @include mime-icon(var(--video-image-url));
       }
     }
 
@@ -558,7 +558,7 @@ $video-image: '../img/film.svg';
         width: var(--icon-size);
 
         &[data-icon-multifile='true'] {
-          @include mime-icon($folder-image);
+          @include mime-icon(var(--folder-image-url));
         }
       }
 
