@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
+#include <cstddef>
 #include <optional>
 #include <string_view>
 #include <utility> // std::move

@@ -73,10 +73,45 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
+namespace libtransmission::test
+{
+
+class RenameTest_multifileTorrent_Test;
+class RenameTest_singleFilenameTorrent_Test;
+
+} // namespace libtransmission::test
+
 /** @brief Torrent object */
 struct tr_torrent final : public tr_completion::torrent_view
 {
     using Speed = libtransmission::Values::Speed;
+
+    class ResumeHelper
+    {
+    public:
+        void load_date_added(time_t when) noexcept;
+        void load_date_done(time_t when) noexcept;
+        void load_seconds_downloading_before_current_start(time_t when) noexcept;
+        void load_seconds_seeding_before_current_start(time_t when) noexcept;
+
+        [[nodiscard]] time_t date_active() const noexcept;
+        [[nodiscard]] time_t date_added() const noexcept;
+        [[nodiscard]] time_t date_done() const noexcept;
+        [[nodiscard]] time_t seconds_downloading(time_t now) const noexcept;
+        [[nodiscard]] time_t seconds_seeding(time_t now) const noexcept;
+
+    private:
+        friend class libtransmission::test::RenameTest_multifileTorrent_Test;
+        friend class libtransmission::test::RenameTest_singleFilenameTorrent_Test;
+        friend struct tr_torrent;
+
+        ResumeHelper(tr_torrent& tor)
+            : tor_{ tor }
+        {
+        }
+
+        tr_torrent& tor_;
+    };
 
     class CumulativeCount
     {
@@ -177,6 +212,13 @@ public:
     [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
+    }
+
+    void save_resume_file();
+
+    [[nodiscard]] constexpr auto started_recently(time_t const now, time_t recent_secs = 120) const noexcept
+    {
+        return now - date_started_ <= recent_secs;
     }
 
     /// SPEED LIMIT
@@ -660,7 +702,7 @@ public:
 
     constexpr void set_date_active(time_t when) noexcept
     {
-        this->activityDate = when;
+        this->date_active_ = when;
 
         bump_date_changed(when);
     }
@@ -746,7 +788,7 @@ public:
 
     [[nodiscard]] constexpr auto has_changed_since(time_t when) const noexcept
     {
-        return changed_date_ > when;
+        return date_changed_ > when;
     }
 
     void set_bandwidth_group(std::string_view group_name) noexcept;
@@ -804,7 +846,7 @@ public:
 
         if (activity == TR_STATUS_DOWNLOAD || activity == TR_STATUS_SEED)
         {
-            if (auto const latest = std::max(startDate, activityDate); latest != 0)
+            if (auto const latest = std::max(date_started_, date_active_); latest != 0)
             {
                 TR_ASSERT(now >= latest);
                 return now - latest;
@@ -883,44 +925,6 @@ public:
 
     // ---
 
-    [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
-    {
-        auto n_secs = seconds_downloading_before_current_start_;
-
-        if (is_running())
-        {
-            if (doneDate > startDate)
-            {
-                n_secs += doneDate - startDate;
-            }
-            else if (doneDate == 0)
-            {
-                n_secs += now - startDate;
-            }
-        }
-
-        return n_secs;
-    }
-
-    [[nodiscard]] constexpr auto seconds_seeding(time_t now) const noexcept
-    {
-        auto n_secs = seconds_seeding_before_current_start_;
-
-        if (is_running())
-        {
-            if (doneDate > startDate)
-            {
-                n_secs += now - doneDate;
-            }
-            else if (doneDate != 0)
-            {
-                n_secs += now - startDate;
-            }
-        }
-
-        return n_secs;
-    }
-
     constexpr void set_needs_completeness_check() noexcept
     {
         needs_completeness_check_ = true;
@@ -968,6 +972,8 @@ public:
     }
 
     void init(tr_ctor const* ctor);
+
+    void start_in_session_thread();
 
     [[nodiscard]] TR_CONSTEXPR20 auto obfuscated_hash_equals(tr_sha1_digest_t const& test) const noexcept
     {
@@ -1027,15 +1033,6 @@ public:
     tr_swarm* swarm = nullptr;
 
     time_t lpdAnnounceAt = 0;
-
-    time_t activityDate = 0;
-    time_t addedDate = 0;
-    time_t doneDate = 0;
-    time_t editDate = 0;
-    time_t startDate = 0;
-
-    time_t seconds_downloading_before_current_start_ = 0;
-    time_t seconds_seeding_before_current_start_ = 0;
 
     size_t queuePosition = 0;
 
@@ -1141,6 +1138,44 @@ private:
         Speed speed_ = {};
     };
 
+    [[nodiscard]] constexpr auto seconds_downloading(time_t now) const noexcept
+    {
+        auto n_secs = seconds_downloading_before_current_start_;
+
+        if (is_running())
+        {
+            if (date_done_ > date_started_)
+            {
+                n_secs += date_done_ - date_started_;
+            }
+            else if (date_done_ == 0)
+            {
+                n_secs += now - date_started_;
+            }
+        }
+
+        return n_secs;
+    }
+
+    [[nodiscard]] constexpr auto seconds_seeding(time_t now) const noexcept
+    {
+        auto n_secs = seconds_seeding_before_current_start_;
+
+        if (is_running())
+        {
+            if (date_done_ > date_started_)
+            {
+                n_secs += now - date_done_;
+            }
+            else if (date_done_ != 0)
+            {
+                n_secs += now - date_started_;
+            }
+        }
+
+        return n_secs;
+    }
+
     [[nodiscard]] TR_CONSTEXPR20 bool is_piece_checked(tr_piece_index_t piece) const
     {
         return checked_pieces_.test(piece);
@@ -1199,9 +1234,9 @@ private:
 
     constexpr void bump_date_changed(time_t when)
     {
-        if (changed_date_ < when)
+        if (date_changed_ < when)
         {
-            changed_date_ = when;
+            date_changed_ = when;
         }
     }
 
@@ -1218,8 +1253,11 @@ private:
     }
 
     void on_metainfo_updated();
+    void on_metainfo_completed();
 
     void stop_now();
+
+    [[nodiscard]] bool is_new_torrent_a_seed();
 
     tr_stat stats_ = {};
 
@@ -1247,7 +1285,15 @@ private:
      */
     tr_peer_id_t peer_id_ = tr_peerIdInit();
 
-    time_t changed_date_ = 0;
+    time_t date_active_ = 0;
+    time_t date_added_ = 0;
+    time_t date_changed_ = 0;
+    time_t date_done_ = 0;
+    time_t date_edited_ = 0;
+    time_t date_started_ = 0;
+
+    time_t seconds_downloading_before_current_start_ = 0;
+    time_t seconds_seeding_before_current_start_ = 0;
 
     float verify_progress_ = -1.0F;
     float seed_ratio_ = 0.0F;

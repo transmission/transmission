@@ -664,16 +664,17 @@ Method name: `port-test`
 
 Request arguments: an optional argument `ipProtocol`.
 `ipProtocol` is a string specifying the IP protocol version to be used for the port test.
-Set to `ipv4` to *only* check IPv4, set to `ipv6` to *only* check IPv6,
-or set to `any` to check if the port is open on *any* of the IP protocol versions.
-Omitting `ipProtocol` is the same as setting it to `any`.
+Set to `ipv4` to check IPv4, or set to `ipv6` to check IPv6.
+For backwards compatibility, it is allowed to omit this argument to get the behaviour before Transmission `4.1.0`,
+which is to check whichever IP protocol the OS happened to use to connect to our port test service,
+frankly not very useful.
 
 Response arguments:
 
 | Key | Value Type | Description
 | :-- | :-- | :--
 | `port-is-open` | boolean | true if port is open, false if port is closed
-| `ipProtocol` | string | copied from request argument `ipProtocol` if it was specified
+| `ipProtocol` | string | `ipv4` if the test was carried out on IPv4, `ipv6` if the test was carried out on IPv6, unset if an error occured
 
 ### 4.5 Session shutdown
 This method tells the transmission session to shut down.

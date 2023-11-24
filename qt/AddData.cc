@@ -5,6 +5,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 
 #include <libtransmission/transmission.h>
 
@@ -56,7 +57,7 @@ int AddData::set(QString const& key)
         this->url = key;
         type = URL;
     }
-    else if (QFile(key).exists())
+    else if (QFile{ key }.exists())
     {
         this->filename = QDir::fromNativeSeparators(key);
         type = FILENAME;
@@ -115,7 +116,7 @@ QString AddData::readableShortName() const
     switch (type)
     {
     case FILENAME:
-        return QFileInfo(filename).baseName();
+        return QFileInfo{ filename }.baseName();
 
     case URL:
         return url.path().split(QLatin1Char('/')).last();

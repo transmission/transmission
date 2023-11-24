@@ -419,7 +419,7 @@ private:
     [[nodiscard]] static MaybeSockaddr lookup(tr_interned_string host, tr_port port, tr_interned_string logname)
     {
         auto szport = std::array<char, 16>{};
-        *fmt::format_to(std::data(szport), FMT_STRING("{:d}"), port.host()) = '\0';
+        *fmt::format_to(std::data(szport), "{:d}", port.host()) = '\0';
 
         auto hints = addrinfo{};
         hints.ai_family = AF_INET; // https://github.com/transmission/transmission/issues/4719

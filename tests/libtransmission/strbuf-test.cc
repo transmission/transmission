@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstring>
+#include <iterator>
 #include <string_view>
 
 #include <libtransmission/tr-strbuf.h>

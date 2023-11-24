@@ -267,7 +267,7 @@ struct string_output_stream
     using Ch = char;
 
     explicit string_output_stream(std::string& str)
-        : str_ref_(str)
+        : str_ref_{ str }
     {
     }
 

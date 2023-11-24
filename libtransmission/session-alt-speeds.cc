@@ -3,8 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <chrono>
 #include <cstddef> // size_t
+#include <ctime>
 #include <utility>
 
 #include <fmt/chrono.h>

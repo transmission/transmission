@@ -25,7 +25,7 @@ extern wchar_t qAxModuleFilename[MAX_PATH]; // NOLINT
 extern QString qAxInit(); // NOLINT
 
 ComInteropHelper::ComInteropHelper()
-    : client_(new QAxObject(QStringLiteral("Transmission.QtClient")))
+    : client_{ new QAxObject{ QStringLiteral("Transmission.QtClient") } }
 {
 }
 
@@ -52,5 +52,5 @@ void ComInteropHelper::initialize()
 void ComInteropHelper::registerObject(QObject* parent)
 {
     QAxFactory::startServer();
-    QAxFactory::registerActiveObject(new InteropObject(parent));
+    QAxFactory::registerActiveObject(new InteropObject{ parent });
 }

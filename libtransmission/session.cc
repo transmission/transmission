@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <condition_variable>
+#include <chrono>
 #include <csignal>
 #include <cstddef> // size_t
 #include <cstdint>
@@ -13,6 +14,7 @@
 #include <iterator> // for std::back_inserter
 #include <limits> // std::numeric_limits
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -699,7 +701,7 @@ void tr_session::on_save_timer()
 {
     for (auto* const tor : torrents())
     {
-        tr_torrentSave(tor);
+        tor->save_resume_file();
     }
 
     stats().save();

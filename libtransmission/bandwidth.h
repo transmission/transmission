@@ -88,7 +88,7 @@ public:
     explicit tr_bandwidth(tr_bandwidth* new_parent);
 
     tr_bandwidth()
-        : tr_bandwidth(nullptr)
+        : tr_bandwidth{ nullptr }
     {
     }
 

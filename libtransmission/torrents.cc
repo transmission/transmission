@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <ctime>
 #include <set>
 #include <string_view>
 #include <vector>
@@ -14,6 +15,7 @@
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
 #include "libtransmission/tr-assert.h"
+#include "libtransmission/tr-macros.h"
 
 namespace
 {

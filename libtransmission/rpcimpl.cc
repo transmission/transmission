@@ -28,6 +28,7 @@
 #include "libtransmission/error.h"
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
+#include "libtransmission/net.h"
 #include "libtransmission/peer-mgr.h"
 #include "libtransmission/quark.h"
 #include "libtransmission/rpcimpl.h"
@@ -36,6 +37,7 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/values.h"
 #include "libtransmission/variant.h"
 #include "libtransmission/version.h"
 #include "libtransmission/web-utils.h"
@@ -1213,8 +1215,8 @@ char const* torrentRenamePath(
 
 void onPortTested(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
-    auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
+    auto* data = static_cast<tr_rpc_idle_data*>(user_data);
 
     if (status != 200)
     {
@@ -1224,16 +1226,26 @@ void onPortTested(tr_web::FetchResponse const& web_response)
                 _("Couldn't test port: {error} ({error_code})"),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
+        return;
     }
-    else /* success */
+
+    auto const addr = tr_address::from_string(primary_ip);
+    if (!addr || !addr->is_valid())
     {
-        bool const is_open = tr_strv_starts_with(body, '1');
-        tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
-        tr_idle_function_done(data, SuccessResult);
+        tr_idle_function_done(data, "Unknown error, please file a bug report to us");
+        return;
     }
+
+    bool const is_open = tr_strv_starts_with(body, '1');
+    tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, is_open);
+    if (tr_variantDictFind(data->args_out, TR_KEY_ipProtocol) == nullptr) // `ipProtocol` was not specified in the request
+    {
+        tr_variantDictAddStrView(data->args_out, TR_KEY_ipProtocol, addr->is_ipv4() ? "ipv4"sv : "ipv6"sv);
+    }
+    tr_idle_function_done(data, SuccessResult);
 }
 
-char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* idle_data)
+char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* idle_data)
 {
     auto const port = session->advertisedPeerPort();
     auto const url = fmt::format("https://portcheck.transmissionbt.com/{:d}", port.host());
@@ -1241,7 +1253,7 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_
     auto options = tr_web::FetchOptions{ url, onPortTested, idle_data };
     if (std::string_view arg; tr_variantDictFindStrView(args_in, TR_KEY_ipProtocol, &arg))
     {
-        tr_variantDictAddStrView(args_out, TR_KEY_ipProtocol, arg);
+        tr_variantDictAddStr(args_out, TR_KEY_ipProtocol, arg);
         if (arg == "ipv4"sv)
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
@@ -1250,7 +1262,7 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_
         {
             options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
         }
-        else if (arg != "any"sv)
+        else
         {
             return "invalid ip protocol string";
         }
@@ -1263,7 +1275,7 @@ char const* portTest(tr_session* session, tr_variant* args_in, tr_variant* args_
 
 void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
     auto* const session = data->session;
 
@@ -1387,7 +1399,7 @@ struct add_torrent_idle_data
 
 void onMetadataFetched(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
     tr_logAddTrace(fmt::format(
@@ -2240,6 +2252,9 @@ void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_session_id:
         tr_variantDictAddStr(d, key, s->sessionId());
+        break;
+
+    default:
         break;
     }
 }

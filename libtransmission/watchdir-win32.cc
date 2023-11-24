@@ -114,12 +114,12 @@ public:
 
         if (notify_pipe_[0] != TR_BAD_SOCKET)
         {
-            evutil_closesocket(notify_pipe_[0]);
+            tr_net_close_socket(notify_pipe_[0]);
         }
 
         if (notify_pipe_[1] != TR_BAD_SOCKET)
         {
-            evutil_closesocket(notify_pipe_[1]);
+            tr_net_close_socket(notify_pipe_[1]);
         }
 
         if (fd_ != INVALID_HANDLE_VALUE)

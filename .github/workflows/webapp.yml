@@ -62,6 +62,7 @@ jobs:
       - name: Get dependencies
         run: |
           set -e # abort if any command fails
+          sudo apt-get update
           sudo apt-get install -y npm
       - name: Check for style diffs
         id: check-for-diffs

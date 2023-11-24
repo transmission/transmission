@@ -165,7 +165,7 @@ class tr_files_wanted
 {
 public:
     explicit tr_files_wanted(tr_file_piece_map const* fpm)
-        : wanted_(std::size(*fpm))
+        : wanted_{ std::size(*fpm) }
     {
         reset(fpm);
     }

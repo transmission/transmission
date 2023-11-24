@@ -8,8 +8,12 @@
 #include <array>
 #endif
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
-#include <cstdint> // uint64_t
+#include <cstddef>
+#include <cstdint> // for uint64_t
+#include <ctime>
+#include <functional> // for std::less()
 #include <list>
 #include <map>
 #include <memory>
@@ -736,12 +740,15 @@ public:
 
                     auto req_bytes_sent = long{};
                     auto total_time = double{};
+                    char* primary_ip = nullptr;
                     curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                     curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
                     curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->response.status);
+                    curl_easy_getinfo(e, CURLINFO_PRIMARY_IP, &primary_ip);
                     task->response.did_connect = task->response.status > 0 || req_bytes_sent > 0;
                     task->response.did_timeout = task->response.status == 0 &&
                         std::chrono::duration<double>(total_time) >= task->timeoutSecs();
+                    task->response.primary_ip = primary_ip;
                     curl_multi_remove_handle(multi.get(), e);
                     remove_task(*task);
                 }

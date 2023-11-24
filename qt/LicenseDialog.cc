@@ -3,6 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <QWidget>
+
+#include "BaseDialog.h"
 #include "LicenseDialog.h"
 
 LicenseDialog::LicenseDialog(QWidget* parent)

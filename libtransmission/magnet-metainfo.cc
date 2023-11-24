@@ -9,14 +9,16 @@
 #include <cstring>
 #include <iterator> // back_inserter
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include <fmt/core.h>
 
 #include "libtransmission/crypto-utils.h"
-#include "libtransmission/error.h"
 #include "libtransmission/error-types.h"
+#include "libtransmission/error.h"
 #include "libtransmission/magnet-metainfo.h"
+#include "libtransmission/tr-macros.h" // for tr_sha1_digest_t
 #include "libtransmission/tr-strbuf.h" // for tr_urlbuf
 #include "libtransmission/utils.h"
 #include "libtransmission/web-utils.h"
@@ -213,7 +215,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error* err
     magnet_link = tr_strv_strip(magnet_link);
     if (auto const hash = parseHash(magnet_link); hash)
     {
-        return parseMagnet(fmt::format(FMT_STRING("magnet:?xt=urn:btih:{:s}"), tr_sha1_to_string(*hash)));
+        return parseMagnet(fmt::format("magnet:?xt=urn:btih:{:s}", tr_sha1_to_string(*hash)));
     }
 
     auto const parsed = tr_urlParse(magnet_link);

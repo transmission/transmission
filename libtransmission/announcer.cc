@@ -7,12 +7,14 @@
 #include <array>
 #include <chrono> // operator""ms
 #include <cstddef> // size_t
+#include <cstdint>
 #include <ctime>
 #include <deque>
 #include <iterator>
 #include <map>
 #include <memory>
 #include <numeric>
+#include <optional>
 #include <set>
 #include <string>
 #include <string_view>
@@ -783,7 +785,7 @@ void tr_logAddTrace_tier_announce_queue(tr_tier const* tier)
     buf.reserve(std::size(events) * 20);
     for (size_t i = 0, n = std::size(events); i < n; ++i)
     {
-        fmt::format_to(std::back_inserter(buf), FMT_STRING("[{:d}:{:s}]"), i, tr_announce_event_get_string(events[i]));
+        fmt::format_to(std::back_inserter(buf), "[{:d}:{:s}]", i, tr_announce_event_get_string(events[i]));
     }
 
     tr_logAddTraceTier(tier, std::move(buf));
