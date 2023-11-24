@@ -92,6 +92,7 @@ private slots:
 private:
     void maybeUpdateBlocklist() const;
     void loadTranslations();
+    void initUnits();
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;
     void notifyTorrentAdded(Torrent const*) const;

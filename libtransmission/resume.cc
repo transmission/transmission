@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::min
 #include <array>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <string_view>
@@ -114,7 +115,7 @@ auto loadLabels(tr_variant* dict, tr_torrent* tor)
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            labels.emplace_back(tr_interned_string{ sv });
+            labels.emplace_back(sv);
         }
     }
 
@@ -625,7 +626,7 @@ auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
 // ---
 
-tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_load)
+tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_torrent::ResumeHelper& helper, tr_resume::fields_t fields_to_load)
 {
     TR_ASSERT(tr_isTorrent(tor));
     auto const was_dirty = tor->is_dirty();
@@ -654,7 +655,7 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
 
     if ((fields_to_load & tr_resume::Corrupt) != 0 && tr_variantDictFindInt(&top, TR_KEY_corrupt, &i))
     {
-        tor->corruptPrev = i;
+        tor->bytes_corrupt_.set_prev(i);
         fields_loaded |= tr_resume::Corrupt;
     }
 
@@ -686,13 +687,13 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
 
     if ((fields_to_load & tr_resume::Downloaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloaded, &i))
     {
-        tor->downloadedPrev = i;
+        tor->bytes_downloaded_.set_prev(i);
         fields_loaded |= tr_resume::Downloaded;
     }
 
     if ((fields_to_load & tr_resume::Uploaded) != 0 && tr_variantDictFindInt(&top, TR_KEY_uploaded, &i))
     {
-        tor->uploadedPrev = i;
+        tor->bytes_uploaded_.set_prev(i);
         fields_loaded |= tr_resume::Uploaded;
     }
 
@@ -710,13 +711,13 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
 
     if ((fields_to_load & tr_resume::AddedDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_added_date, &i))
     {
-        tor->addedDate = i;
+        helper.load_date_added(static_cast<time_t>(i));
         fields_loaded |= tr_resume::AddedDate;
     }
 
     if ((fields_to_load & tr_resume::DoneDate) != 0 && tr_variantDictFindInt(&top, TR_KEY_done_date, &i))
     {
-        tor->doneDate = i;
+        helper.load_date_done(static_cast<time_t>(i));
         fields_loaded |= tr_resume::DoneDate;
     }
 
@@ -728,13 +729,13 @@ tr_resume::fields_t loadFromFile(tr_torrent* tor, tr_resume::fields_t fields_to_
 
     if ((fields_to_load & tr_resume::TimeSeeding) != 0 && tr_variantDictFindInt(&top, TR_KEY_seeding_time_seconds, &i))
     {
-        tor->seconds_seeding_before_current_start_ = i;
+        helper.load_seconds_seeding_before_current_start(i);
         fields_loaded |= tr_resume::TimeSeeding;
     }
 
     if ((fields_to_load & tr_resume::TimeDownloading) != 0 && tr_variantDictFindInt(&top, TR_KEY_downloading_time_seconds, &i))
     {
-        tor->seconds_downloading_before_current_start_ = i;
+        helper.load_seconds_downloading_before_current_start(i);
         fields_loaded |= tr_resume::TimeDownloading;
     }
 
@@ -856,7 +857,7 @@ auto useFallbackFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor cons
 }
 } // namespace
 
-fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor)
+fields_t load(tr_torrent* tor, tr_torrent::ResumeHelper& helper, fields_t fields_to_load, tr_ctor const* ctor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
@@ -864,14 +865,14 @@ fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor)
 
     ret |= useMandatoryFields(tor, fields_to_load, ctor);
     fields_to_load &= ~ret;
-    ret |= loadFromFile(tor, fields_to_load);
+    ret |= loadFromFile(tor, helper, fields_to_load);
     fields_to_load &= ~ret;
     ret |= useFallbackFields(tor, fields_to_load, ctor);
 
     return ret;
 }
 
-void save(tr_torrent* tor)
+void save(tr_torrent* const tor, tr_torrent::ResumeHelper const& helper)
 {
     if (!tr_isTorrent(tor))
     {
@@ -881,12 +882,12 @@ void save(tr_torrent* tor)
     auto top = tr_variant{};
     auto const now = tr_time();
     tr_variantInitDict(&top, 50); /* arbitrary "big enough" number */
-    tr_variantDictAddInt(&top, TR_KEY_seeding_time_seconds, tor->seconds_seeding(now));
-    tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, tor->seconds_downloading(now));
-    tr_variantDictAddInt(&top, TR_KEY_activity_date, tor->activityDate);
-    tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
-    tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->corruptPrev + tor->corruptCur);
-    tr_variantDictAddInt(&top, TR_KEY_done_date, tor->doneDate);
+    tr_variantDictAddInt(&top, TR_KEY_seeding_time_seconds, helper.seconds_seeding(now));
+    tr_variantDictAddInt(&top, TR_KEY_downloading_time_seconds, helper.seconds_downloading(now));
+    tr_variantDictAddInt(&top, TR_KEY_activity_date, helper.date_active());
+    tr_variantDictAddInt(&top, TR_KEY_added_date, helper.date_added());
+    tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->bytes_corrupt_.ever());
+    tr_variantDictAddInt(&top, TR_KEY_done_date, helper.date_done());
     tr_variantDictAddStrView(&top, TR_KEY_destination, tor->download_dir().sv());
 
     if (!std::empty(tor->incomplete_dir()))
@@ -894,8 +895,8 @@ void save(tr_torrent* tor)
         tr_variantDictAddStrView(&top, TR_KEY_incomplete_dir, tor->incomplete_dir().sv());
     }
 
-    tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
-    tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
+    tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->bytes_downloaded_.ever());
+    tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->bytes_uploaded_.ever());
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->peer_limit());
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tor->get_priority());
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->start_when_stable);

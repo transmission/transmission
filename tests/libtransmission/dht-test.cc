@@ -582,7 +582,7 @@ TEST_F(DhtTest, usesBootstrapFile)
     static auto constexpr BootstrapNodePort = tr_port::from_host(8080);
     if (auto ofs = std::ofstream{ tr_pathbuf{ sandboxDir(), "/dht.bootstrap" } }; ofs)
     {
-        ofs << BootstrapNodeName << ' ' << BootstrapNodePort.host() << std::endl;
+        ofs << BootstrapNodeName << ' ' << BootstrapNodePort.host() << '\n';
         ofs.close();
     }
 

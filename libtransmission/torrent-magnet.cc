@@ -5,12 +5,16 @@
 
 #include <algorithm>
 #include <climits> /* INT_MAX */
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
 #include <deque>
 #include <fstream>
+#include <ios>
 #include <memory>
+#include <optional>
 #include <string>
+#include <string_view>
 #include <utility> // std::move
 #include <vector>
 
@@ -389,7 +393,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
 std::string tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return tor->metainfo_.magnet();
+    return tor->magnet();
 }
 
 size_t tr_torrentGetMagnetLinkToBuf(tr_torrent const* tor, char* buf, size_t buflen)

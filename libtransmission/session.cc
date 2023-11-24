@@ -5,6 +5,7 @@
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <condition_variable>
+#include <chrono>
 #include <csignal>
 #include <cstddef> // size_t
 #include <cstdint>
@@ -13,6 +14,7 @@
 #include <iterator> // for std::back_inserter
 #include <limits> // std::numeric_limits
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -603,16 +605,7 @@ std::vector<tr_torrent*> get_next_queued_torrents(tr_torrents& torrents, tr_dire
 {
     TR_ASSERT(tr_isDirection(dir));
 
-    // build an array of the candidates
-    auto candidates = std::vector<tr_torrent*>{};
-    candidates.reserve(std::size(torrents));
-    for (auto* const tor : torrents)
-    {
-        if (tor->is_queued() && (dir == tor->queue_direction()))
-        {
-            candidates.push_back(tor);
-        }
-    }
+    auto candidates = torrents.get_matching([dir](auto const* const tor) { return tor->is_queued(dir); });
 
     // find the best n candidates
     num_wanted = std::min(num_wanted, std::size(candidates));
@@ -648,16 +641,20 @@ size_t tr_session::count_queue_free_slots(tr_direction dir) const noexcept
     auto const now = tr_time();
     for (auto const* const tor : torrents())
     {
-        /* is it the right activity? */
+        // is it the right activity?
         if (activity != tor->activity())
         {
             continue;
         }
 
-        /* is it stalled? */
-        if (stalled_enabled && difftime(now, std::max(tor->startDate, tor->activityDate)) >= stalled_if_idle_for_n_seconds)
+        // is it stalled?
+        if (stalled_enabled)
         {
-            continue;
+            auto const idle_seconds = tor->idle_seconds(now);
+            if (idle_seconds && *idle_seconds >= stalled_if_idle_for_n_seconds)
+            {
+                continue;
+            }
         }
 
         ++active_count;
@@ -704,7 +701,7 @@ void tr_session::on_save_timer()
 {
     for (auto* const tor : torrents())
     {
-        tr_torrentSave(tor);
+        tor->save_resume_file();
     }
 
     stats().save();
@@ -1346,8 +1343,8 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
         std::end(torrents),
         [](auto const* a, auto const* b)
         {
-            auto const a_cur = a->downloadedCur + a->uploadedCur;
-            auto const b_cur = b->downloadedCur + b->uploadedCur;
+            auto const a_cur = a->bytes_downloaded_.ever();
+            auto const b_cur = b->bytes_downloaded_.ever();
             return a_cur > b_cur; // larger xfers go first
         });
     for (auto* tor : torrents)

@@ -288,7 +288,7 @@ private:
     {
     public:
         explicit GlobalIPCacheMediator(tr_session& session) noexcept
-            : session_(session)
+            : session_{ session }
         {
         }
 

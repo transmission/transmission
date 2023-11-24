@@ -26,6 +26,7 @@ public:
     {
         long status = 0; // http server response, e.g. 200
         std::string body;
+        std::string primary_ip;
         bool did_connect = false;
         bool did_timeout = false;
         void* user_data = nullptr;

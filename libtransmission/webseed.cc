@@ -223,7 +223,7 @@ public:
     {
         if (auto const parsed = tr_urlParse(base_url); parsed)
         {
-            return fmt::format(FMT_STRING("{:s}:{:d}"), parsed->host, parsed->port);
+            return fmt::format("{:s}:{:d}", parsed->host, parsed->port);
         }
 
         return base_url;
@@ -432,7 +432,7 @@ void on_idle(tr_webseed* webseed)
 
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, vtask] = web_response;
+    auto const& [status, body, primary_ip, did_connect, did_timeout, vtask] = web_response;
     bool const success = status == 206;
 
     auto* const task = static_cast<tr_webseed_task*>(vtask);
@@ -513,7 +513,7 @@ void task_request_next_chunk(tr_webseed_task* task)
     auto url = tr_urlbuf{};
     makeUrl(webseed, tor->file_subpath(file_index), std::back_inserter(url));
     auto options = tr_web::FetchOptions{ url.sv(), onPartialDataFetched, task };
-    options.range = fmt::format(FMT_STRING("{:d}-{:d}"), file_offset, file_offset + this_chunk - 1);
+    options.range = fmt::format("{:d}-{:d}", file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor->id();
     options.buffer = task->content();
     tor->session->fetch(std::move(options));

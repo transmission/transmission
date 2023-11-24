@@ -47,7 +47,7 @@ struct Config
     struct Units
     {
         template<typename... Names>
-        Units(Base base, Names... names)
+        Units(Base base, Names... names) noexcept
         {
             set_base(base);
 
@@ -65,13 +65,18 @@ struct Config
             return std::string_view{ units < std::size(display_names_) ? std::data(display_names_[units]) : "" };
         }
 
+        [[nodiscard]] constexpr auto display_name(UnitsEnum multiplier) const noexcept
+        {
+            return display_name(static_cast<size_t>(multiplier));
+        }
+
         [[nodiscard]] constexpr auto multiplier(UnitsEnum multiplier) const noexcept
         {
             return multipliers_[static_cast<int>(multiplier)];
         }
 
     private:
-        constexpr void set_base(Base base)
+        constexpr void set_base(Base base) noexcept
         {
             base_ = base;
 
@@ -122,6 +127,11 @@ public:
         return base_quantity_;
     }
 
+    [[nodiscard]] constexpr auto is_zero() const noexcept
+    {
+        return base_quantity_ == 0U;
+    }
+
     [[nodiscard]] constexpr auto count(Units tgt) const noexcept
     {
         return base_quantity_ / (1.0 * units_.multiplier(tgt));
@@ -133,7 +143,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator+(Value const& that) noexcept
+    [[nodiscard]] constexpr auto operator+(Value const& that) const noexcept
     {
         auto ret = *this;
         return ret += that;
@@ -145,7 +155,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator*(uint64_t mult) noexcept
+    [[nodiscard]] constexpr auto operator*(uint64_t mult) const noexcept
     {
         auto ret = *this;
         return ret *= mult;
@@ -157,7 +167,7 @@ public:
         return *this;
     }
 
-    [[nodiscard]] constexpr auto operator/(uint64_t mult) noexcept
+    [[nodiscard]] constexpr auto operator/(uint64_t mult) const noexcept
     {
         auto ret = *this;
         return ret /= mult;

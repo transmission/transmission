@@ -116,63 +116,6 @@ TEST_F(TorrentMetainfoTest, parseBencFuzz)
     }
 }
 
-#if 0
-TEST_F(TorrentMetainfoTest, sanitize)
-{
-    struct LocalTest
-    {
-        std::string_view input;
-        std::string_view expected_output;
-    };
-
-    auto const tests = std::array<LocalTest, 29>{
-        // skipped
-        LocalTest{ ""sv, ""sv },
-        { "."sv, ""sv },
-        { ".."sv, ""sv },
-        { "....."sv, ""sv },
-        { "  "sv, ""sv },
-        { " . "sv, ""sv },
-        { ". . ."sv, ""sv },
-        // replaced with '_'
-        { "/"sv, "_"sv },
-        { "////"sv, "____"sv },
-        { "\\\\"sv, "__"sv },
-        { "/../"sv, "_.._"sv },
-        { "foo<bar:baz/boo"sv, "foo_bar_baz_boo"sv },
-        { "t\0e\x01s\tt\ri\nn\fg"sv, "t_e_s_t_i_n_g"sv },
-        // appended with '_'
-        { "con"sv, "con_"sv },
-        { "cOm4"sv, "cOm4_"sv },
-        { "LPt9.txt"sv, "LPt9_.txt"sv },
-        { "NUL.tar.gz"sv, "NUL_.tar.gz"sv },
-        // trimmed
-        { " foo"sv, "foo"sv },
-        { "foo "sv, "foo"sv },
-        { " foo "sv, "foo"sv },
-        { "foo."sv, "foo"sv },
-        { "foo..."sv, "foo"sv },
-        { " foo... "sv, "foo"sv },
-        // unmodified
-        { "foo"sv, "foo"sv },
-        { ".foo"sv, ".foo"sv },
-        { "..foo"sv, "..foo"sv },
-        { "foo.bar.baz"sv, "foo.bar.baz"sv },
-        { "null"sv, "null"sv },
-        { "compass"sv, "compass"sv },
-    };
-
-    auto out = std::string{};
-    for (auto const& test : tests)
-    {
-        out.clear();
-        auto const success = tr_metainfoAppendSanitizedPathComponent(out, test.input);
-        EXPECT_EQ(!std::empty(out), success);
-        EXPECT_EQ(test.expected_output, out);
-    }
-}
-#endif
-
 TEST_F(TorrentMetainfoTest, AndroidTorrent)
 {
     auto const filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };

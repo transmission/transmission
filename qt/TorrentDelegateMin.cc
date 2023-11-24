@@ -240,7 +240,7 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     // render
     if (tor.hasError() && !is_item_selected)
     {
-        painter->setPen(QColor("red"));
+        painter->setPen(QColor{ "red" });
     }
     else
     {

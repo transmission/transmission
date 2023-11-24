@@ -170,7 +170,7 @@ class PeerItem : public QTreeWidgetItem
 
 public:
     explicit PeerItem(Peer p)
-        : peer_(std::move(p))
+        : peer_{ std::move(p) }
     {
     }
 
@@ -430,7 +430,6 @@ void DetailsDialog::refreshUI()
     auto const mixed = tr("Mixed");
     auto const unknown = tr("Unknown");
     auto const now = time(nullptr);
-    auto const& fmt = Formatter::get();
 
     // build a list of torrents
     auto torrents = QList<Torrent const*>{};
@@ -500,7 +499,7 @@ void DetailsDialog::refreshUI()
     }
 
     ui_.stateValueLabel->setText(string);
-    QString const state_string = string;
+    auto const state_string = string;
 
     // myHaveLabel
     uint64_t size_when_done = 0;
@@ -532,14 +531,14 @@ void DetailsDialog::refreshUI()
         double const d = size_when_done == 0 ?
             100.0 :
             100.0 * static_cast<double>(size_when_done - left_until_done) / static_cast<double>(size_when_done);
-        auto const pct = fmt.percentToString(d);
-        auto const size_when_done_str = fmt.sizeToString(size_when_done);
+        auto const pct = Formatter::percent_to_string(d);
+        auto const size_when_done_str = Formatter::storage_to_string(size_when_done);
 
         if (have_unverified == 0 && left_until_done == 0)
         {
             //: Text following the "Have:" label in torrent properties dialog;
             //: %1 is amount of downloaded and verified data
-            string = tr("%1 (100%)").arg(fmt.sizeToString(have_verified));
+            string = tr("%1 (100%)").arg(Formatter::storage_to_string(have_verified));
         }
         else if (have_unverified == 0)
         {
@@ -547,7 +546,7 @@ void DetailsDialog::refreshUI()
             //: %1 is amount of downloaded and verified data,
             //: %2 is overall size of torrent data,
             //: %3 is percentage (%1/%2*100)
-            string = tr("%1 of %2 (%3%)").arg(fmt.sizeToString(have_verified)).arg(size_when_done_str).arg(pct);
+            string = tr("%1 of %2 (%3%)").arg(Formatter::storage_to_string(have_verified)).arg(size_when_done_str).arg(pct);
         }
         else
         {
@@ -557,10 +556,10 @@ void DetailsDialog::refreshUI()
             //: %3 is percentage (%1/%2*100),
             //: %4 is amount of downloaded but not yet verified data
             string = tr("%1 of %2 (%3%), %4 Unverified")
-                         .arg(fmt.sizeToString(have_verified + have_unverified))
+                         .arg(Formatter::storage_to_string(have_verified + have_unverified))
                          .arg(size_when_done_str)
                          .arg(pct)
-                         .arg(fmt.sizeToString(have_unverified));
+                         .arg(Formatter::storage_to_string(have_unverified));
         }
     }
 
@@ -574,7 +573,7 @@ void DetailsDialog::refreshUI()
     else
     {
         auto const percent = 100.0 * static_cast<double>(available) / static_cast<double>(size_when_done);
-        string = QStringLiteral("%1%").arg(fmt.percentToString(percent));
+        string = QStringLiteral("%1%").arg(Formatter::percent_to_string(percent));
     }
 
     ui_.availabilityValueLabel->setText(string);
@@ -595,8 +594,8 @@ void DetailsDialog::refreshUI()
             f += t->failedEver();
         }
 
-        QString const dstr = fmt.sizeToString(d);
-        QString const fstr = fmt.sizeToString(f);
+        auto const dstr = Formatter::storage_to_string(d);
+        auto const fstr = Formatter::storage_to_string(f);
 
         if (f != 0)
         {
@@ -627,8 +626,8 @@ void DetailsDialog::refreshUI()
         }
 
         string = tr("%1 (Ratio: %2)")
-                     .arg(fmt.sizeToString(uploaded))
-                     .arg(fmt.ratioToString(tr_getRatio(uploaded, denominator)));
+                     .arg(Formatter::storage_to_string(uploaded))
+                     .arg(Formatter::ratio_to_string(tr_getRatio(uploaded, denominator)));
     }
 
     ui_.uploadedValueLabel->setText(string);
@@ -667,7 +666,7 @@ void DetailsDialog::refreshUI()
         else
         {
             auto const seconds = static_cast<int>(std::difftime(now, baseline));
-            string = fmt.timeToString(seconds);
+            string = Formatter::time_to_string(seconds);
         }
     }
 
@@ -701,7 +700,7 @@ void DetailsDialog::refreshUI()
             }
             else
             {
-                string = fmt.timeToString(baseline);
+                string = Formatter::time_to_string(baseline);
             }
         }
     }
@@ -739,7 +738,7 @@ void DetailsDialog::refreshUI()
         }
         else
         {
-            string = tr("%1 ago").arg(fmt.timeToString(seconds));
+            string = tr("%1 ago").arg(Formatter::time_to_string(seconds));
         }
     }
 
@@ -802,11 +801,13 @@ void DetailsDialog::refreshUI()
         }
         else if (piece_size > 0)
         {
-            string = tr("%1 (%Ln pieces @ %2)", "", pieces).arg(fmt.sizeToString(size)).arg(fmt.memToString(piece_size));
+            string = tr("%1 (%Ln pieces @ %2)", "", pieces)
+                         .arg(Formatter::storage_to_string(size))
+                         .arg(Formatter::memory_to_string(piece_size));
         }
         else
         {
-            string = tr("%1 (%Ln pieces)", "", pieces).arg(fmt.sizeToString(size));
+            string = tr("%1 (%Ln pieces)", "", pieces).arg(Formatter::storage_to_string(size));
         }
     }
 
@@ -881,7 +882,7 @@ void DetailsDialog::refreshUI()
     {
         bool mixed_creator = false;
         bool mixed_date = false;
-        QString const creator = torrents[0]->creator();
+        auto const creator = torrents[0]->creator();
         auto const date = torrents[0]->dateCreated();
 
         for (Torrent const* const t : torrents)
@@ -1102,11 +1103,11 @@ void DetailsDialog::refreshUI()
 
     for (Torrent const* const t : torrents)
     {
-        QString const id_str(QString::number(t->id()));
+        auto const id_str = QString::number(t->id());
 
         for (Peer const& peer : t->peers())
         {
-            QString const key = id_str + QLatin1Char(':') + peer.address;
+            auto const key = id_str + QLatin1Char(':') + peer.address;
 
             PeerItem* item = nullptr;
             if (auto iter = peers_.find(key); iter != std::end(peers_))
@@ -1449,10 +1450,9 @@ void DetailsDialog::onRemoveTrackerClicked()
 
 void DetailsDialog::initOptionsTab()
 {
-    auto const speed_unit_str = Formatter::get().unitStr(Formatter::SPEED, Formatter::KB);
-
-    ui_.singleDownSpin->setSuffix(QStringLiteral(" %1").arg(speed_unit_str));
-    ui_.singleUpSpin->setSuffix(QStringLiteral(" %1").arg(speed_unit_str));
+    auto const speed_unit_suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
+    ui_.singleDownSpin->setSuffix(speed_unit_suffix);
+    ui_.singleUpSpin->setSuffix(speed_unit_suffix);
 
     ui_.singleDownSpin->setProperty(PrefKey, TR_KEY_downloadLimit);
     ui_.singleUpSpin->setProperty(PrefKey, TR_KEY_uploadLimit);
@@ -1545,12 +1545,14 @@ void DetailsDialog::initTrackerTab()
 
 void DetailsDialog::initPeersTab()
 {
+    auto const speed_width_str = Speed{ 1024U, Speed::Units::MByps }.to_qstring();
+
     ui_.peersView->setHeaderLabels({ QString{}, tr("Up"), tr("Down"), tr("%"), tr("Status"), tr("Address"), tr("Client") });
     ui_.peersView->sortByColumn(COL_ADDRESS, Qt::AscendingOrder);
 
     ui_.peersView->setColumnWidth(COL_LOCK, 20);
-    ui_.peersView->setColumnWidth(COL_UP, measureViewItem(ui_.peersView, COL_UP, QStringLiteral("1024 MiB/s")));
-    ui_.peersView->setColumnWidth(COL_DOWN, measureViewItem(ui_.peersView, COL_DOWN, QStringLiteral("1024 MiB/s")));
+    ui_.peersView->setColumnWidth(COL_UP, measureViewItem(ui_.peersView, COL_UP, speed_width_str));
+    ui_.peersView->setColumnWidth(COL_DOWN, measureViewItem(ui_.peersView, COL_DOWN, speed_width_str));
     ui_.peersView->setColumnWidth(COL_PERCENT, measureViewItem(ui_.peersView, COL_PERCENT, QStringLiteral("100%")));
     ui_.peersView->setColumnWidth(COL_STATUS, measureViewItem(ui_.peersView, COL_STATUS, QStringLiteral("ODUK?EXI")));
     ui_.peersView->setColumnWidth(COL_ADDRESS, measureViewItem(ui_.peersView, COL_ADDRESS, QStringLiteral("888.888.888.888")));
@@ -1615,7 +1617,7 @@ void DetailsDialog::onOpenRequested(QString const& path) const
             continue;
         }
 
-        QString const local_file_path = tor->getPath() + QLatin1Char('/') + path;
+        auto const local_file_path = tor->getPath() + QLatin1Char('/') + path;
 
         if (!QFile::exists(local_file_path))
         {

@@ -36,9 +36,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-/***
-****
-***/
+// ---
 
 namespace
 {
@@ -171,7 +169,7 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     }
     else if (pref_widget.is<QTimeEdit>())
     {
-        pref_widget.as<QTimeEdit>()->setTime(QTime(0, 0).addSecs(prefs_.getInt(pref_key) * 60));
+        pref_widget.as<QTimeEdit>()->setTime(QTime{ 0, 0 }.addSecs(prefs_.getInt(pref_key) * 60));
     }
     else if (pref_widget.is<QLineEdit>())
     {
@@ -307,7 +305,7 @@ void PrefsDialog::timeEditingFinished()
 
     if (pref_widget.is<QTimeEdit>())
     {
-        setPref(pref_widget.getPrefKey(), QTime(0, 0).secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
+        setPref(pref_widget.getPrefKey(), QTime{ 0, 0 }.secsTo(pref_widget.as<QTimeEdit>()->time()) / 60);
     }
 }
 
@@ -370,18 +368,18 @@ void PrefsDialog::altSpeedDaysEdited(int i)
 
 void PrefsDialog::initSpeedTab()
 {
-    QString const speed_unit_str = Formatter::get().unitStr(Formatter::get().SPEED, Formatter::get().KB);
-    auto const suffix = QStringLiteral(" %1").arg(speed_unit_str);
-    QLocale const locale;
+    auto const suffix = QStringLiteral(" %1").arg(Speed::display_name(Speed::Units::KByps));
+
+    auto const locale = QLocale{};
 
     ui_.uploadSpeedLimitSpin->setSuffix(suffix);
     ui_.downloadSpeedLimitSpin->setSuffix(suffix);
     ui_.altUploadSpeedLimitSpin->setSuffix(suffix);
     ui_.altDownloadSpeedLimitSpin->setSuffix(suffix);
 
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant(TR_SCHED_ALL));
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant(TR_SCHED_WEEKDAY));
-    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant(TR_SCHED_WEEKEND));
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Every Day"), QVariant{ TR_SCHED_ALL });
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekdays"), QVariant{ TR_SCHED_WEEKDAY });
+    ui_.altSpeedLimitDaysCombo->addItem(tr("Weekends"), QVariant{ TR_SCHED_WEEKEND });
     ui_.altSpeedLimitDaysCombo->insertSeparator(ui_.altSpeedLimitDaysCombo->count());
 
     for (int i = locale.firstDayOfWeek(); i <= Qt::Sunday; ++i)
@@ -663,11 +661,11 @@ void PrefsDialog::updateSeedingWidgetsLocality()
 ***/
 
 PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
-    : BaseDialog(parent)
-    , session_(session)
-    , prefs_(prefs)
-    , is_server_(session.isServer())
-    , is_local_(session_.isLocal())
+    : BaseDialog{ parent }
+    , session_{ session }
+    , prefs_{ prefs }
+    , is_server_{ session.isServer() }
+    , is_local_{ session_.isLocal() }
 {
     ui_.setupUi(this);
 

@@ -11,7 +11,9 @@
 #include <cstddef> // std::byte
 #include <cstdint>
 #include <ctime> // time_t
+#include <functional>
 #include <iterator> // std::back_inserter
+#include <memory>
 #include <optional>
 #include <tuple> // std::tie
 #include <unordered_map>
@@ -50,6 +52,7 @@
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-macros.h"
 #include "libtransmission/utils.h"
+#include "libtransmission/values.h"
 #include "libtransmission/webseed.h"
 
 using namespace std::literals;
@@ -481,7 +484,7 @@ public:
                 auto const now = tr_time();
                 auto* const tor = s->tor;
 
-                tor->uploadedCur += event.length;
+                tor->bytes_uploaded_ += event.length;
                 tr_announcerAddBytes(tor, TR_ANN_UP, event.length);
                 tor->set_date_active(now);
                 tor->set_dirty();
@@ -795,7 +798,7 @@ private:
 
     static void on_client_got_piece_data(tr_torrent* const tor, uint32_t const sent_length, time_t const now)
     {
-        tor->downloadedCur += sent_length;
+        tor->bytes_downloaded_ += sent_length;
         tor->set_date_active(now);
         tor->set_dirty();
         tor->session->add_downloaded(sent_length);
@@ -2325,14 +2328,9 @@ struct peer_candidate
     tr_peer_info const* peer_info;
 };
 
-[[nodiscard]] bool torrentWasRecentlyStarted(tr_torrent const* tor)
+[[nodiscard]] constexpr uint64_t addValToKey(uint64_t value, unsigned int width, uint64_t addme)
 {
-    return difftime(tr_time(), tor->startDate) < 120;
-}
-
-[[nodiscard]] constexpr uint64_t addValToKey(uint64_t value, int width, uint64_t addme)
-{
-    value = value << (uint64_t)width;
+    value <<= width;
     value |= addme;
     return value;
 }
@@ -2345,11 +2343,11 @@ struct peer_candidate
 
     /* prefer peers we've connected to, or never tried, over peers we failed to connect to. */
     i = peer_info.connection_failure_count() != 0U ? 1U : 0U;
-    score = addValToKey(score, 1, i);
+    score = addValToKey(score, 1U, i);
 
     /* prefer the one we attempted least recently (to cycle through all peers) */
     i = peer_info.connection_attempt_time();
-    score = addValToKey(score, 32, i);
+    score = addValToKey(score, 32U, i);
 
     /* prefer peers belonging to a torrent of a higher priority */
     switch (tor->get_priority())
@@ -2371,30 +2369,30 @@ struct peer_candidate
         break;
     }
 
-    score = addValToKey(score, 4, i);
+    score = addValToKey(score, 4U, i);
 
-    /* prefer recently-started torrents */
-    i = torrentWasRecentlyStarted(tor) ? 0 : 1;
-    score = addValToKey(score, 1, i);
+    // prefer recently-started torrents
+    i = tor->started_recently(tr_time()) ? 0 : 1;
+    score = addValToKey(score, 1U, i);
 
     /* prefer torrents we're downloading with */
     i = tor->is_done() ? 1 : 0;
-    score = addValToKey(score, 1, i);
+    score = addValToKey(score, 1U, i);
 
     /* prefer peers that are known to be connectible */
     i = peer_info.is_connectable().value_or(false) ? 0 : 1;
-    score = addValToKey(score, 1, i);
+    score = addValToKey(score, 1U, i);
 
     /* prefer peers that we might be able to upload to */
     i = peer_info.is_seed() ? 0 : 1;
-    score = addValToKey(score, 1, i);
+    score = addValToKey(score, 1U, i);
 
     /* Prefer peers that we got from more trusted sources.
      * lower `fromBest` values indicate more trusted sources */
-    score = addValToKey(score, 4, peer_info.from_best());
+    score = addValToKey(score, 4U, peer_info.from_best());
 
     /* salt */
-    score = addValToKey(score, 8, salt);
+    score = addValToKey(score, 8U, salt);
 
     return score;
 }

@@ -222,10 +222,10 @@ size_t tr_strv_to_buf(std::string_view src, char* buf, size_t buflen);
 
 // ---
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr, int base = 10);
 
-template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* setme_remainder = nullptr);
 
 /**
@@ -297,13 +297,6 @@ constexpr void tr_timeUpdate(time_t now) noexcept
 
 /** @brief Portability wrapper for `ntohll()` that uses the system implementation if available */
 [[nodiscard]] uint64_t tr_ntohll(uint64_t netlonglong);
-
-// ---
-
-/* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
-void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
-void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
-void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb);
 
 // ---
 

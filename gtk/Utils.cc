@@ -62,28 +62,6 @@ using namespace std::literals;
 using namespace libtransmission::Values;
 
 /***
-****  UNITS
-***/
-
-int const mem_K = 1024;
-char const* const mem_K_str = N_("KiB");
-char const* const mem_M_str = N_("MiB");
-char const* const mem_G_str = N_("GiB");
-char const* const mem_T_str = N_("TiB");
-
-int const disk_K = 1000;
-char const* const disk_K_str = N_("kB");
-char const* const disk_M_str = N_("MB");
-char const* const disk_G_str = N_("GB");
-char const* const disk_T_str = N_("TB");
-
-int const speed_K = 1000;
-char const* const speed_K_str = N_("kB/s");
-char const* const speed_M_str = N_("MB/s");
-char const* const speed_G_str = N_("GB/s");
-char const* const speed_T_str = N_("TB/s");
-
-/***
 ****
 ***/
 
@@ -135,9 +113,14 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
+Glib::ustring tr_strlsize(libtransmission::Values::Storage const& storage)
+{
+    return storage.is_zero() ? Q_("None") : storage.to_string();
+}
+
 Glib::ustring tr_strlsize(guint64 n_bytes)
 {
-    return n_bytes == 0 ? Q_("None") : Storage{ n_bytes, Storage::Units::Bytes }.to_string();
+    return tr_strlsize(Storage{ n_bytes, Storage::Units::Bytes });
 }
 
 namespace

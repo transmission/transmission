@@ -13,6 +13,8 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
+#include <vector>
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -232,7 +234,7 @@ public:
 
         if (mcast_socket_ != TR_BAD_SOCKET)
         {
-            evutil_closesocket(mcast_socket_);
+            tr_net_close_socket(mcast_socket_);
         }
 
         tr_logAddTrace("Done uninitialising Local Peer Discovery");
@@ -247,7 +249,7 @@ private:
         }
 
         auto const err = sockerrno;
-        evutil_closesocket(mcast_socket_);
+        tr_net_close_socket(mcast_socket_);
         mcast_socket_ = TR_BAD_SOCKET;
         tr_logAddWarn(fmt::format(
             _("Couldn't initialize LPD: {error} ({error_code})"),

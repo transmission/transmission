@@ -88,7 +88,7 @@ public:
     explicit tr_bandwidth(tr_bandwidth* new_parent, bool is_group = false);
 
     explicit tr_bandwidth(bool is_group = false)
-        : tr_bandwidth(nullptr, is_group)
+        : tr_bandwidth{ nullptr, is_group }
     {
     }
 

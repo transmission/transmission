@@ -8,7 +8,7 @@
 #include "RpcQueue.h"
 
 RpcQueue::RpcQueue(QObject* parent)
-    : QObject(parent)
+    : QObject{ parent }
 {
     connect(&future_watcher_, &QFutureWatcher<RpcResponse>::finished, this, &RpcQueue::stepFinished);
 }

@@ -792,9 +792,9 @@ void MainWindow::Impl::updateSpeeds()
     if (session != nullptr)
     {
         auto dn_count = int{};
-        auto dn_speed = double{};
+        auto dn_speed = Speed{};
         auto up_count = int{};
-        auto up_speed = double{};
+        auto up_speed = Speed{};
 
         auto const model = core_->get_model();
         for (auto i = 0U, count = model->get_n_items(); i < count; ++i)
@@ -806,13 +806,10 @@ void MainWindow::Impl::updateSpeeds()
             up_speed += torrent->get_speed_up();
         }
 
-        dl_lb_->set_text(fmt::format(
-            _("{download_speed} ▼"),
-            fmt::arg("download_speed", Speed{ dn_speed, Speed::Units::KByps }.to_string())));
+        dl_lb_->set_text(fmt::format(fmt::runtime(_("{download_speed} ▼")), fmt::arg("download_speed", dn_speed.to_string())));
         dl_lb_->set_visible(dn_count > 0);
 
-        ul_lb_->set_text(
-            fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", Speed{ up_speed, Speed::Units::KByps }.to_string())));
+        ul_lb_->set_text(fmt::format(fmt::runtime(_("{upload_speed} ▲")), fmt::arg("upload_speed", up_speed.to_string())));
         ul_lb_->set_visible(dn_count > 0 || up_count > 0);
     }
 }

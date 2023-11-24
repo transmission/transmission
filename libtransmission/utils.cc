@@ -11,17 +11,19 @@
 #include <cstdint> // SIZE_MAX
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
+#include <ctime>
 #include <exception>
 #include <iostream>
 #include <iterator> // for std::back_inserter
 #include <locale>
+#include <memory>
 #include <optional>
 #include <set>
 #include <stdexcept> // std::runtime_error
 #include <string>
 #include <string_view>
 #include <system_error>
-#include <utility>
+#include <type_traits>
 #include <vector>
 
 #ifdef _WIN32
@@ -50,17 +52,27 @@
 #include "libtransmission/file.h"
 #include "libtransmission/log.h"
 #include "libtransmission/mime-types.h"
-#include "libtransmission/quark.h"
 #include "libtransmission/tr-assert.h"
 #include "libtransmission/tr-strbuf.h"
 #include "libtransmission/utils.h"
 #include "libtransmission/values.h"
-#include "libtransmission/variant.h"
 
 using namespace std::literals;
 using namespace libtransmission::Values;
 
 time_t libtransmission::detail::tr_time::current_time = {};
+
+// ---
+
+namespace libtransmission::Values
+{
+
+// default values; can be overridden by client apps
+Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
+Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
+Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
+
+} // namespace libtransmission::Values
 
 // ---
 
@@ -270,7 +282,7 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
     TR_ASSERT(dst != nullptr);
     TR_ASSERT(src != nullptr);
 
-    auto const res = fmt::format_to_n(dst, siz - 1, FMT_STRING("{:s}"), src);
+    auto const res = fmt::format_to_n(dst, siz - 1, "{:s}", src);
     *res.out = '\0';
     return res.size;
 }
@@ -351,7 +363,7 @@ std::string tr_win32_format_message(uint32_t code)
 
     if (wide_size == 0)
     {
-        return fmt::format(FMT_STRING("Unknown error ({:#08x})"), code);
+        return fmt::format("Unknown error ({:#08x})", code);
     }
 
     auto text = std::string{};
@@ -666,42 +678,6 @@ uint64_t tr_ntohll(uint64_t netlonglong)
 #endif
 }
 
-// --- VALUES / FORMATTER
-
-namespace libtransmission::Values
-{
-
-// default values; can be overridden by client apps
-Config::Units<MemoryUnits> Config::Memory{ Config::Base::Kibi, "B"sv, "KiB"sv, "MiB"sv, "GiB"sv, "TiB"sv };
-Config::Units<SpeedUnits> Config::Speed{ Config::Base::Kilo, "B/s"sv, "kB/s"sv, "MB/s"sv, "GB/s"sv, "TB/s"sv };
-Config::Units<StorageUnits> Config::Storage{ Config::Base::Kilo, "B"sv, "kB"sv, "MB"sv, "GB"sv, "TB"sv };
-
-} // namespace libtransmission::Values
-
-void tr_formatter_size_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    namespace Values = libtransmission::Values;
-
-    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
-    Values::Config::Storage = { kval, "B", kb, mb, gb, tb };
-}
-
-void tr_formatter_speed_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    namespace Values = libtransmission::Values;
-
-    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
-    Values::Config::Speed = { kval, "B/s", kb, mb, gb, tb };
-}
-
-void tr_formatter_mem_init(size_t base, char const* kb, char const* mb, char const* gb, char const* tb)
-{
-    namespace Values = libtransmission::Values;
-
-    auto const kval = base == 1000U ? Values::Config::Base::Kilo : Values::Config::Base::Kibi;
-    Values::Config::Memory = { kval, "B", kb, mb, gb, tb };
-}
-
 // --- ENVIRONMENT
 
 bool tr_env_key_exists(char const* key)
@@ -815,7 +791,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 #include <iomanip> // std::setbase
 #include <sstream>
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+template<typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
@@ -844,7 +820,7 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 
 #include <charconv> // std::from_chars()
 
-template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+template<typename T, std::enable_if_t<std::is_integral_v<T>, bool>>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder, int base)
 {
     auto val = T{};
@@ -879,7 +855,7 @@ template std::optional<unsigned int> tr_num_parse(std::string_view str, std::str
 template std::optional<unsigned short> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 template std::optional<unsigned char> tr_num_parse(std::string_view str, std::string_view* remainder, int base);
 
-template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
+template<typename T, std::enable_if_t<std::is_floating_point_v<T>, bool>>
 [[nodiscard]] std::optional<T> tr_num_parse(std::string_view str, std::string_view* remainder)
 {
     auto const* const begin_ch = std::data(str);
